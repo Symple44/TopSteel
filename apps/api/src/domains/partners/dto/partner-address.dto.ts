@@ -1,6 +1,16 @@
-import { IsString, IsOptional, IsUUID, IsEnum, IsBoolean, IsNumber, IsDateString, Min, Max } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { AddressType, AddressStatus } from '../entities/partner-address.entity'
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator'
+import { AddressStatus, AddressType } from '../entities/partner-address.entity'
 
 export class CreatePartnerAddressDto {
   @ApiProperty()

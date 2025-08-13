@@ -105,7 +105,7 @@ const testData = [
     type: 'projet',
     id: 'projet-1',
     title: 'Construction Hangar Industriel Lyon',
-    description: 'Projet de construction d\'un hangar industriel de 2000m²',
+    description: "Projet de construction d'un hangar industriel de 2000m²",
     metadata: {
       client: 'SARL Construction Moderne',
       status: 'En cours',
@@ -116,7 +116,7 @@ const testData = [
     type: 'projet',
     id: 'projet-2',
     title: 'Rénovation Charpente Métallique',
-    description: 'Rénovation complète de la charpente métallique d\'un bâtiment',
+    description: "Rénovation complète de la charpente métallique d'un bâtiment",
     metadata: {
       client: 'Métallerie Dupont',
       status: 'Planifié',
@@ -133,9 +133,9 @@ async function seedElasticSearch() {
 
     // Vérifier si l'index existe
     const indexExists = await client.indices.exists({ index: 'topsteel_global' })
-    
+
     if (!indexExists) {
-      console.log('❌ L\'index topsteel_global n\'existe pas')
+      console.log("❌ L'index topsteel_global n'existe pas")
       return
     }
 
@@ -159,7 +159,7 @@ async function seedElasticSearch() {
     const bulkResponse = await client.bulk({ body: operations })
 
     if (bulkResponse.errors) {
-      console.error('❌ Erreurs lors de l\'indexation:')
+      console.error("❌ Erreurs lors de l'indexation:")
       const erroredDocuments: any[] = []
       bulkResponse.items.forEach((action: any, i: number) => {
         const operation = Object.keys(action)[0]

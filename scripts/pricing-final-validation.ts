@@ -1,8 +1,8 @@
 #!/usr/bin/env ts-node
 
-import * as fs from 'fs'
-import * as path from 'path'
-import { execSync } from 'child_process'
+import { execSync } from 'node:child_process'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import * as colors from 'colors'
 
 /**
@@ -24,9 +24,6 @@ class PricingFinalValidation {
   private pricingDir = path.join(this.apiDir, 'src', 'features', 'pricing')
 
   async run(): Promise<void> {
-    console.log(colors.cyan.bold('\n🚀 VALIDATION FINALE DU SYSTÈME PRICING\n'))
-    console.log(colors.gray('=' .repeat(60)))
-
     // 1. Vérification de la structure
     await this.validateFileStructure()
 
@@ -62,8 +59,6 @@ class PricingFinalValidation {
   }
 
   private async validateFileStructure(): Promise<void> {
-    console.log(colors.blue('\n📁 Vérification de la structure des fichiers...'))
-
     const requiredFiles = [
       'pricing-unified.module.ts',
       'services/pricing-engine.service.ts',
@@ -80,11 +75,11 @@ class PricingFinalValidation {
       'entities/webhook-event.entity.ts',
       'entities/webhook-delivery.entity.ts',
       'entities/sales-history.entity.ts',
-      'graphql/pricing.resolver.ts'
+      'graphql/pricing.resolver.ts',
     ]
 
     const missingFiles: string[] = []
-    
+
     for (const file of requiredFiles) {
       const filePath = path.join(this.pricingDir, file)
       if (!fs.existsSync(filePath)) {
@@ -96,21 +91,19 @@ class PricingFinalValidation {
       this.results.push({
         name: 'Structure des fichiers',
         status: 'success',
-        message: 'Tous les fichiers requis sont présents'
+        message: 'Tous les fichiers requis sont présents',
       })
     } else {
       this.results.push({
         name: 'Structure des fichiers',
         status: 'error',
         message: `${missingFiles.length} fichiers manquants`,
-        details: missingFiles
+        details: missingFiles,
       })
     }
   }
 
   private async validateDependencies(): Promise<void> {
-    console.log(colors.blue('\n📦 Vérification des dépendances...'))
-
     const requiredDeps = [
       '@nestjs-modules/ioredis',
       '@nestjs/graphql',
@@ -121,98 +114,91 @@ class PricingFinalValidation {
       'ioredis',
       'graphql',
       'apollo-server-express',
-      'axios'
+      'axios',
     ]
 
     const packageJsonPath = path.join(this.apiDir, 'package.json')
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
     const installedDeps = {
       ...packageJson.dependencies,
-      ...packageJson.devDependencies
+      ...packageJson.devDependencies,
     }
 
-    const missingDeps = requiredDeps.filter(dep => !installedDeps[dep])
+    const missingDeps = requiredDeps.filter((dep) => !installedDeps[dep])
 
     if (missingDeps.length === 0) {
       this.results.push({
         name: 'Dépendances NPM',
         status: 'success',
-        message: 'Toutes les dépendances sont installées'
+        message: 'Toutes les dépendances sont installées',
       })
     } else {
       this.results.push({
         name: 'Dépendances NPM',
         status: 'error',
         message: `${missingDeps.length} dépendances manquantes`,
-        details: missingDeps
+        details: missingDeps,
       })
     }
   }
 
   private async validateTypeScript(): Promise<void> {
-    console.log(colors.blue('\n🔧 Vérification TypeScript...'))
-
     try {
       process.chdir(this.apiDir)
       execSync('npx tsc --noEmit', { stdio: 'pipe' })
-      
+
       this.results.push({
         name: 'Compilation TypeScript',
         status: 'success',
-        message: 'Aucune erreur TypeScript'
+        message: 'Aucune erreur TypeScript',
       })
     } catch (error: any) {
       const output = error.stdout?.toString() || error.message
       const errorCount = (output.match(/error TS/g) || []).length
-      
+
       this.results.push({
         name: 'Compilation TypeScript',
         status: 'error',
         message: `${errorCount} erreurs TypeScript détectées`,
-        details: output.split('\n').slice(0, 10)
+        details: output.split('\n').slice(0, 10),
       })
     }
   }
 
   private async validateImports(): Promise<void> {
-    console.log(colors.blue('\n🔗 Vérification des imports circulaires...'))
-
     try {
       const madgePath = path.join(this.rootDir, 'node_modules', '.bin', 'madge')
-      const result = execSync(
-        `${madgePath} --circular --extensions ts ${this.pricingDir}`,
-        { stdio: 'pipe' }
-      ).toString()
+      const result = execSync(`${madgePath} --circular --extensions ts ${this.pricingDir}`, {
+        stdio: 'pipe',
+      }).toString()
 
       if (result.includes('No circular dependencies found')) {
         this.results.push({
           name: 'Dépendances circulaires',
           status: 'success',
-          message: 'Aucune dépendance circulaire détectée'
+          message: 'Aucune dépendance circulaire détectée',
         })
       } else {
         this.results.push({
           name: 'Dépendances circulaires',
           status: 'warning',
           message: 'Dépendances circulaires détectées',
-          details: result.split('\n').filter(line => line.trim())
+          details: result.split('\n').filter((line) => line.trim()),
         })
       }
-    } catch (error) {
+    } catch (_error) {
       this.results.push({
         name: 'Dépendances circulaires',
         status: 'warning',
-        message: 'Impossible de vérifier les dépendances circulaires'
+        message: 'Impossible de vérifier les dépendances circulaires',
       })
     }
   }
 
   private async validateConfiguration(): Promise<void> {
-    console.log(colors.blue('\n⚙️ Vérification de la configuration...'))
-
     const envFile = path.join(this.rootDir, '.env')
-    const envExample = path.join(this.rootDir, '.env.example')
-    
+    const _envExample = path.join(this.rootDir, '.env.example')
+
     const requiredEnvVars = [
       'REDIS_HOST',
       'REDIS_PORT',
@@ -220,51 +206,46 @@ class PricingFinalValidation {
       'DB_PORT',
       'DB_USER',
       'DB_PASSWORD',
-      'DB_NAME'
+      'DB_NAME',
     ]
 
     if (fs.existsSync(envFile)) {
       const envContent = fs.readFileSync(envFile, 'utf-8')
-      const missingVars = requiredEnvVars.filter(
-        varName => !envContent.includes(`${varName}=`)
-      )
+      const missingVars = requiredEnvVars.filter((varName) => !envContent.includes(`${varName}=`))
 
       if (missingVars.length === 0) {
         this.results.push({
-          name: 'Variables d\'environnement',
+          name: "Variables d'environnement",
           status: 'success',
-          message: 'Toutes les variables requises sont configurées'
+          message: 'Toutes les variables requises sont configurées',
         })
       } else {
         this.results.push({
-          name: 'Variables d\'environnement',
+          name: "Variables d'environnement",
           status: 'warning',
           message: `${missingVars.length} variables manquantes`,
-          details: missingVars
+          details: missingVars,
         })
       }
     } else {
       this.results.push({
-        name: 'Variables d\'environnement',
+        name: "Variables d'environnement",
         status: 'error',
-        message: 'Fichier .env manquant'
+        message: 'Fichier .env manquant',
       })
     }
   }
 
   private async validateEntities(): Promise<void> {
-    console.log(colors.blue('\n🗃️ Vérification des entités...'))
-
     const entitiesDir = path.join(this.pricingDir, 'entities')
-    const entities = fs.readdirSync(entitiesDir)
-      .filter(file => file.endsWith('.entity.ts'))
+    const entities = fs.readdirSync(entitiesDir).filter((file) => file.endsWith('.entity.ts'))
 
     let validEntities = 0
     const issues: string[] = []
 
     for (const entity of entities) {
       const content = fs.readFileSync(path.join(entitiesDir, entity), 'utf-8')
-      
+
       // Vérifier les décorateurs TypeORM
       if (!content.includes('@Entity')) {
         issues.push(`${entity}: Décorateur @Entity manquant`)
@@ -275,7 +256,7 @@ class PricingFinalValidation {
       if (!content.includes('@Column')) {
         issues.push(`${entity}: Aucune colonne définie`)
       }
-      
+
       if (issues.length === 0) {
         validEntities++
       }
@@ -285,49 +266,46 @@ class PricingFinalValidation {
       this.results.push({
         name: 'Entités TypeORM',
         status: 'success',
-        message: `${validEntities} entités valides`
+        message: `${validEntities} entités valides`,
       })
     } else {
       this.results.push({
         name: 'Entités TypeORM',
         status: 'warning',
         message: `Problèmes détectés dans les entités`,
-        details: issues
+        details: issues,
       })
     }
   }
 
   private async validateServices(): Promise<void> {
-    console.log(colors.blue('\n🔧 Vérification des services...'))
-
     const servicesDir = path.join(this.pricingDir, 'services')
-    const services = fs.readdirSync(servicesDir)
-      .filter(file => file.endsWith('.service.ts'))
+    const services = fs.readdirSync(servicesDir).filter((file) => file.endsWith('.service.ts'))
 
     let validServices = 0
     const issues: string[] = []
 
     for (const service of services) {
       const content = fs.readFileSync(path.join(servicesDir, service), 'utf-8')
-      
+
       // Vérifier les décorateurs NestJS
       if (!content.includes('@Injectable')) {
         issues.push(`${service}: Décorateur @Injectable manquant`)
       }
-      
+
       // Vérifier les méthodes principales
       if (service.includes('engine')) {
         if (!content.includes('calculatePrice')) {
           issues.push(`${service}: Méthode calculatePrice manquante`)
         }
       }
-      
+
       if (service.includes('cache')) {
         if (!content.includes('get') || !content.includes('set')) {
           issues.push(`${service}: Méthodes get/set manquantes`)
         }
       }
-      
+
       if (issues.length === 0) {
         validServices++
       }
@@ -337,51 +315,51 @@ class PricingFinalValidation {
       this.results.push({
         name: 'Services NestJS',
         status: 'success',
-        message: `${validServices} services valides`
+        message: `${validServices} services valides`,
       })
     } else {
       this.results.push({
         name: 'Services NestJS',
         status: 'warning',
         message: `Problèmes détectés dans les services`,
-        details: issues
+        details: issues,
       })
     }
   }
 
   private async validateControllers(): Promise<void> {
-    console.log(colors.blue('\n🎮 Vérification des contrôleurs...'))
-
     const controllersDir = path.join(this.pricingDir, 'controllers')
-    const controllers = fs.readdirSync(controllersDir)
-      .filter(file => file.endsWith('.controller.ts'))
+    const controllers = fs
+      .readdirSync(controllersDir)
+      .filter((file) => file.endsWith('.controller.ts'))
 
     let validControllers = 0
     const issues: string[] = []
 
     for (const controller of controllers) {
       const content = fs.readFileSync(path.join(controllersDir, controller), 'utf-8')
-      
+
       // Vérifier les décorateurs NestJS
       if (!content.includes('@Controller')) {
         issues.push(`${controller}: Décorateur @Controller manquant`)
       }
-      
+
       // Vérifier au moins une route
-      const hasRoute = content.includes('@Get') || 
-                      content.includes('@Post') || 
-                      content.includes('@Put') || 
-                      content.includes('@Delete')
-      
+      const hasRoute =
+        content.includes('@Get') ||
+        content.includes('@Post') ||
+        content.includes('@Put') ||
+        content.includes('@Delete')
+
       if (!hasRoute) {
         issues.push(`${controller}: Aucune route définie`)
       }
-      
+
       // Vérifier la documentation Swagger
       if (!content.includes('@ApiTags')) {
         issues.push(`${controller}: Documentation Swagger manquante`)
       }
-      
+
       if (issues.length === 0) {
         validControllers++
       }
@@ -391,101 +369,97 @@ class PricingFinalValidation {
       this.results.push({
         name: 'Contrôleurs REST',
         status: 'success',
-        message: `${validControllers} contrôleurs valides`
+        message: `${validControllers} contrôleurs valides`,
       })
     } else {
       this.results.push({
         name: 'Contrôleurs REST',
         status: 'warning',
         message: `Problèmes détectés dans les contrôleurs`,
-        details: issues
+        details: issues,
       })
     }
   }
 
   private async validateTests(): Promise<void> {
-    console.log(colors.blue('\n🧪 Vérification des tests...'))
-
     const testFiles = this.findFiles(this.pricingDir, '.spec.ts')
-    
+
     if (testFiles.length > 0) {
       let totalTests = 0
-      
+
       for (const testFile of testFiles) {
         const content = fs.readFileSync(testFile, 'utf-8')
-        const describeCount = (content.match(/describe\(/g) || []).length
+        const _describeCount = (content.match(/describe\(/g) || []).length
         const itCount = (content.match(/it\(/g) || []).length
         totalTests += itCount
       }
-      
+
       this.results.push({
         name: 'Tests unitaires',
         status: 'success',
-        message: `${testFiles.length} fichiers de test, ${totalTests} tests trouvés`
+        message: `${testFiles.length} fichiers de test, ${totalTests} tests trouvés`,
       })
     } else {
       this.results.push({
         name: 'Tests unitaires',
         status: 'warning',
-        message: 'Aucun fichier de test trouvé'
+        message: 'Aucun fichier de test trouvé',
       })
     }
   }
 
   private async validateDocumentation(): Promise<void> {
-    console.log(colors.blue('\n📚 Vérification de la documentation...'))
-
     const readmePath = path.join(this.pricingDir, 'README.md')
     const reportPath = path.join(this.rootDir, 'PRICING_INTEGRATION_REPORT.md')
-    
+
     const docs: string[] = []
-    
+
     if (fs.existsSync(readmePath)) {
       docs.push('README.md du module')
     }
-    
+
     if (fs.existsSync(reportPath)) {
-      docs.push('Rapport d\'intégration')
+      docs.push("Rapport d'intégration")
     }
-    
+
     // Vérifier les commentaires JSDoc
     const serviceFiles = this.findFiles(this.pricingDir, '.service.ts')
     let jsdocCount = 0
-    
+
     for (const file of serviceFiles) {
       const content = fs.readFileSync(file, 'utf-8')
       jsdocCount += (content.match(/\/\*\*/g) || []).length
     }
-    
+
     if (jsdocCount > 0) {
       docs.push(`${jsdocCount} méthodes documentées avec JSDoc`)
     }
-    
+
     if (docs.length > 0) {
       this.results.push({
         name: 'Documentation',
         status: 'success',
         message: 'Documentation présente',
-        details: docs
+        details: docs,
       })
     } else {
       this.results.push({
         name: 'Documentation',
         status: 'warning',
-        message: 'Documentation limitée'
+        message: 'Documentation limitée',
       })
     }
   }
 
   private findFiles(dir: string, extension: string): string[] {
     const files: string[] = []
-    
+
     function walk(directory: string) {
       const items = fs.readdirSync(directory)
       for (const item of items) {
         const fullPath = path.join(directory, item)
         const stat = fs.statSync(fullPath)
-        
+
         if (stat.isDirectory() && !item.includes('node_modules')) {
           walk(fullPath)
         } else if (stat.isFile() && item.endsWith(extension)) {
@@ -493,57 +467,40 @@ class PricingFinalValidation {
         }
       }
     }
-    
+
     walk(dir)
     return files
   }
 
   private displayReport(): void {
-    console.log(colors.cyan.bold('\n\n📊 RAPPORT DE VALIDATION\n'))
-    console.log(colors.gray('=' .repeat(60)))
-
-    const successCount = this.results.filter(r => r.status === 'success').length
-    const warningCount = this.results.filter(r => r.status === 'warning').length
-    const errorCount = this.results.filter(r => r.status === 'error').length
+    const successCount = this.results.filter((r) => r.status === 'success').length
+    const warningCount = this.results.filter((r) => r.status === 'warning').length
+    const errorCount = this.results.filter((r) => r.status === 'error').length
 
     for (const result of this.results) {
-      const icon = result.status === 'success' ? '✅' : 
-                   result.status === 'warning' ? '⚠️' : '❌'
-      
-      const color = result.status === 'success' ? colors.green :
-                    result.status === 'warning' ? colors.yellow : colors.red
-      
-      console.log(`\n${icon} ${color.bold(result.name)}`)
-      console.log(`   ${color(result.message)}`)
-      
+      const _icon = result.status === 'success' ? '✅' : result.status === 'warning' ? '⚠️' : '❌'
+
+      const _color =
+        result.status === 'success'
+          ? colors.green
+          : result.status === 'warning'
+            ? colors.yellow
+            : colors.red
+
       if (result.details && result.details.length > 0) {
-        for (const detail of result.details.slice(0, 5)) {
-          console.log(colors.gray(`   • ${detail}`))
+        for (const _detail of result.details.slice(0, 5)) {
         }
         if (result.details.length > 5) {
-          console.log(colors.gray(`   ... et ${result.details.length - 5} autres`))
         }
       }
     }
 
-    console.log(colors.cyan.bold('\n\n📈 RÉSUMÉ\n'))
-    console.log(colors.gray('=' .repeat(60)))
-    console.log(colors.green(`✅ Succès: ${successCount}`))
-    console.log(colors.yellow(`⚠️  Avertissements: ${warningCount}`))
-    console.log(colors.red(`❌ Erreurs: ${errorCount}`))
-
     const score = (successCount * 100) / this.results.length
-    const scoreColor = score >= 80 ? colors.green :
-                       score >= 60 ? colors.yellow : colors.red
-    
-    console.log(colors.cyan.bold(`\n🎯 Score global: ${scoreColor(score.toFixed(1) + '%')}\n`))
+    const _scoreColor = score >= 80 ? colors.green : score >= 60 ? colors.yellow : colors.red
 
     if (errorCount === 0) {
-      console.log(colors.green.bold('✨ Le système de pricing est prêt pour la production !'))
     } else if (errorCount <= 2) {
-      console.log(colors.yellow.bold('⚡ Quelques corrections mineures sont nécessaires.'))
     } else {
-      console.log(colors.red.bold('🔧 Des corrections importantes sont requises.'))
     }
 
     // Sauvegarder le rapport
@@ -554,14 +511,12 @@ class PricingFinalValidation {
         success: successCount,
         warnings: warningCount,
         errors: errorCount,
-        score: score
-      }
+        score: score,
+      },
     }
 
     const reportPath = path.join(this.rootDir, 'pricing-validation-report.json')
     fs.writeFileSync(reportPath, JSON.stringify(reportContent, null, 2))
-    
-    console.log(colors.gray(`\n📄 Rapport détaillé sauvegardé: ${reportPath}\n`))
   }
 }
 

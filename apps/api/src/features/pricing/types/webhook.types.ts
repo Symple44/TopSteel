@@ -11,7 +11,7 @@ export enum WebhookEventType {
   RULE_APPLIED = 'rule.applied',
   THRESHOLD_EXCEEDED = 'threshold.exceeded',
   ML_SUGGESTION = 'ml.suggestion',
-  COMPETITIVE_ALERT = 'competitive.alert'
+  COMPETITIVE_ALERT = 'competitive.alert',
 }
 
 export interface WebhookSubscription {

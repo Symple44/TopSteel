@@ -1,21 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import {
+  Badge,
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
   Textarea,
-  Badge,
 } from '@erp/ui'
-import { useEffectuerInventaire, type Article } from '@/hooks/use-articles'
-import { sanitizeInput } from '@/lib/security-utils'
-import { formatCurrency, cn } from '@/lib/utils'
 import { AlertCircle, Package2, TrendingUp } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { type Article, useEffectuerInventaire } from '@/hooks/use-articles'
+import { sanitizeInput } from '@/lib/security-utils'
+import { cn, formatCurrency } from '@/lib/utils'
 
 interface InventoryDialogProps {
   open: boolean
@@ -67,7 +67,7 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!article || !validateForm()) {
       return
     }
@@ -79,15 +79,13 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
         commentaire: sanitizeInput(formData.commentaire) || undefined,
       })
       onOpenChange(false)
-    } catch (error) {
-      console.error('Erreur lors de l\'inventaire:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
 
@@ -98,7 +96,7 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
   const stockActuel = article.stockPhysique || 0
   const stockReel = parseFloat(formData.stockPhysiqueReel) || 0
   const ecart = stockReel - stockActuel
-  const ecartPourcentage = stockActuel > 0 ? ((ecart / stockActuel) * 100) : 0
+  const ecartPourcentage = stockActuel > 0 ? (ecart / stockActuel) * 100 : 0
 
   const valeurActuelle = stockActuel * (article.prixAchatStandard || article.prixVenteHT || 0)
   const valeurReelle = stockReel * (article.prixAchatStandard || article.prixVenteHT || 0)
@@ -138,23 +136,27 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
               <div className="text-sm text-muted-foreground">Stock actuel</div>
               <div className="text-xs text-muted-foreground">{article.uniteStock}</div>
             </div>
-            
+
             <div className="text-center p-4 border rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{stockReel}</div>
               <div className="text-sm text-muted-foreground">Stock réel</div>
               <div className="text-xs text-muted-foreground">{article.uniteStock}</div>
             </div>
-            
+
             <div className="text-center p-4 border rounded-lg">
-              <div className={cn(
-                "text-2xl font-bold",
-                ecart > 0 ? "text-green-600" : ecart < 0 ? "text-red-600" : "text-gray-600"
-              )}>
-                {ecart > 0 ? '+' : ''}{ecart}
+              <div
+                className={cn(
+                  'text-2xl font-bold',
+                  ecart > 0 ? 'text-green-600' : ecart < 0 ? 'text-red-600' : 'text-gray-600'
+                )}
+              >
+                {ecart > 0 ? '+' : ''}
+                {ecart}
               </div>
               <div className="text-sm text-muted-foreground">Écart</div>
               <div className="text-xs text-muted-foreground">
-                {ecartPourcentage > 0 ? '+' : ''}{ecartPourcentage.toFixed(1)}%
+                {ecartPourcentage > 0 ? '+' : ''}
+                {ecartPourcentage.toFixed(1)}%
               </div>
             </div>
           </div>
@@ -177,10 +179,17 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
                 </div>
                 <div>
                   <div className="font-medium">Écart de valeur</div>
-                  <div className={cn(
-                    ecartValeur > 0 ? "text-green-600" : ecartValeur < 0 ? "text-red-600" : "text-gray-600"
-                  )}>
-                    {ecartValeur > 0 ? '+' : ''}{formatCurrency(ecartValeur)}
+                  <div
+                    className={cn(
+                      ecartValeur > 0
+                        ? 'text-green-600'
+                        : ecartValeur < 0
+                          ? 'text-red-600'
+                          : 'text-gray-600'
+                    )}
+                  >
+                    {ecartValeur > 0 ? '+' : ''}
+                    {formatCurrency(ecartValeur)}
                   </div>
                 </div>
               </div>
@@ -195,7 +204,8 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
                 <span className="font-medium">Attention: Stock sous le minimum</span>
               </div>
               <div className="text-sm text-orange-700 mt-1">
-                Le stock réel ({stockReel} {article.uniteStock}) est inférieur au stock minimum ({article.stockMini} {article.uniteStock})
+                Le stock réel ({stockReel} {article.uniteStock}) est inférieur au stock minimum (
+                {article.stockMini} {article.uniteStock})
               </div>
             </div>
           )}
@@ -255,7 +265,7 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Enregistrement...' : 'Confirmer l\'inventaire'}
+                {isSubmitting ? 'Enregistrement...' : "Confirmer l'inventaire"}
               </Button>
             </div>
           </form>

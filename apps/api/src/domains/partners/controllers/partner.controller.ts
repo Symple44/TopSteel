@@ -16,26 +16,26 @@ import { CurrentUser } from '../../../core/common/decorators/current-user.decora
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
 import type { BusinessContext } from '../../core/interfaces/business-service.interface'
 import type { User } from '../../users/entities/user.entity'
+import type {
+  CreateContactDto,
+  CreatePartnerAddressDto,
+  CreatePartnerGroupDto,
+  CreatePartnerSiteDto,
+  UpdateContactDto,
+  UpdatePartnerAddressDto,
+  UpdatePartnerGroupDto,
+  UpdatePartnerSiteDto,
+} from '../dto'
 import type { CreatePartnerDto } from '../dto/create-partner.dto'
 import type { PartnerFiltersDto } from '../dto/partner-filters.dto'
 import type { UpdatePartnerDto } from '../dto/update-partner.dto'
-import type {
-  CreateContactDto,
-  UpdateContactDto,
-  CreatePartnerSiteDto,
-  UpdatePartnerSiteDto,
-  CreatePartnerAddressDto,
-  UpdatePartnerAddressDto,
-  CreatePartnerGroupDto,
-  UpdatePartnerGroupDto,
-} from '../dto'
-import type { Partner } from '../entities/partner.entity'
-import type { PartnerGroup } from '../entities/partner-group.entity'
 import type { Contact } from '../entities/contact.entity'
-import type { PartnerSite } from '../entities/partner-site.entity'
+import type { Partner } from '../entities/partner.entity'
 import type { PartnerAddress } from '../entities/partner-address.entity'
-import { PartnerService, PartnerStatistics } from '../services/partner.service'
-import { PartnerParametersInitService } from '../services/partner-parameters-init.service'
+import type { PartnerGroup } from '../entities/partner-group.entity'
+import type { PartnerSite } from '../entities/partner-site.entity'
+import type { PartnerService, PartnerStatistics } from '../services/partner.service'
+import type { PartnerParametersInitService } from '../services/partner-parameters-init.service'
 
 /**
  * Contrôleur REST pour la gestion des partenaires (clients/fournisseurs)
@@ -122,9 +122,9 @@ export class PartnerController {
         site_types: ['SIEGE_SOCIAL', 'USINE', 'DEPOT', 'CHANTIER'],
         payment_terms: ['COMPTANT', '30_JOURS', '60_JOURS'],
         payment_modes: ['VIREMENT', 'CHEQUE', 'CB'],
-        civilites: ['M.', 'Mme', 'Mlle']
-      }
-    }
+        civilites: ['M.', 'Mme', 'Mlle'],
+      },
+    },
   })
   async getPartnerParameters(): Promise<Record<string, string[]>> {
     return await this.partnerParametersService.getAllPartnerParameters()
@@ -330,7 +330,7 @@ export class PartnerController {
   @Patch('groups/:groupId')
   @ApiOperation({
     summary: 'Mettre à jour un groupe',
-    description: 'Modifier les paramètres d\'un groupe tarifaire',
+    description: "Modifier les paramètres d'un groupe tarifaire",
   })
   async updatePartnerGroup(
     @Param('groupId') groupId: string,
@@ -359,8 +359,8 @@ export class PartnerController {
    */
   @Get(':partnerId/contacts')
   @ApiOperation({
-    summary: 'Lister les contacts d\'un partenaire',
-    description: 'Récupérer tous les interlocuteurs d\'un partenaire',
+    summary: "Lister les contacts d'un partenaire",
+    description: "Récupérer tous les interlocuteurs d'un partenaire",
   })
   async getPartnerContacts(
     @Param('partnerId') partnerId: string,
@@ -386,7 +386,7 @@ export class PartnerController {
   @Patch('contacts/:contactId')
   @ApiOperation({
     summary: 'Mettre à jour un contact',
-    description: 'Modifier les informations d\'un interlocuteur',
+    description: "Modifier les informations d'un interlocuteur",
   })
   async updateContact(
     @Param('contactId') contactId: string,
@@ -414,8 +414,8 @@ export class PartnerController {
    */
   @Get(':partnerId/sites')
   @ApiOperation({
-    summary: 'Lister les sites d\'un partenaire',
-    description: 'Récupérer tous les sites (dépôts, usines, chantiers) d\'un partenaire',
+    summary: "Lister les sites d'un partenaire",
+    description: "Récupérer tous les sites (dépôts, usines, chantiers) d'un partenaire",
   })
   async getPartnerSites(
     @Param('partnerId') partnerId: string,
@@ -441,7 +441,7 @@ export class PartnerController {
   @Patch('sites/:siteId')
   @ApiOperation({
     summary: 'Mettre à jour un site',
-    description: 'Modifier les informations d\'un site',
+    description: "Modifier les informations d'un site",
   })
   async updatePartnerSite(
     @Param('siteId') siteId: string,
@@ -469,8 +469,8 @@ export class PartnerController {
    */
   @Get(':partnerId/addresses')
   @ApiOperation({
-    summary: 'Lister les adresses d\'un partenaire',
-    description: 'Récupérer toutes les adresses d\'un partenaire',
+    summary: "Lister les adresses d'un partenaire",
+    description: "Récupérer toutes les adresses d'un partenaire",
   })
   async getPartnerAddresses(
     @Param('partnerId') partnerId: string,
@@ -490,20 +490,28 @@ export class PartnerController {
     @Body() createDto: CreatePartnerAddressDto,
     @CurrentUser() user: User
   ): Promise<PartnerAddress> {
-    return await this.partnerService.createPartnerAddress(partnerId, createDto, this.getContext(user))
+    return await this.partnerService.createPartnerAddress(
+      partnerId,
+      createDto,
+      this.getContext(user)
+    )
   }
 
   @Patch('addresses/:addressId')
   @ApiOperation({
     summary: 'Mettre à jour une adresse',
-    description: 'Modifier les informations d\'une adresse',
+    description: "Modifier les informations d'une adresse",
   })
   async updatePartnerAddress(
     @Param('addressId') addressId: string,
     @Body() updateDto: UpdatePartnerAddressDto,
     @CurrentUser() user: User
   ): Promise<PartnerAddress> {
-    return await this.partnerService.updatePartnerAddress(addressId, updateDto, this.getContext(user))
+    return await this.partnerService.updatePartnerAddress(
+      addressId,
+      updateDto,
+      this.getContext(user)
+    )
   }
 
   @Delete('addresses/:addressId')
@@ -524,7 +532,7 @@ export class PartnerController {
    */
   @Get(':partnerId/complete')
   @ApiOperation({
-    summary: 'Récupérer toutes les données d\'un partenaire',
+    summary: "Récupérer toutes les données d'un partenaire",
     description: 'Obtenir le partenaire avec ses contacts, sites, adresses et groupe',
   })
   async getPartnerComplete(
@@ -547,7 +555,7 @@ export class PartnerController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Dupliquer un partenaire',
-    description: 'Créer une copie complète d\'un partenaire avec ses données associées',
+    description: "Créer une copie complète d'un partenaire avec ses données associées",
   })
   async duplicatePartner(
     @Param('partnerId') partnerId: string,

@@ -13,7 +13,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
 import { BTPIndex, type BTPIndexType } from '../entities/btp-index.entity'
-import { BTPIndexService, IndexedPricingResult } from '../services/btp-index.service'
+import type { BTPIndexService, IndexedPricingResult } from '../services/btp-index.service'
 
 // DTOs
 export class CreateBTPIndexDto {

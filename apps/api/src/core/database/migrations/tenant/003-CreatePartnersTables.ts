@@ -1080,7 +1080,10 @@ export class CreatePartnersTables1740000001000 implements MigrationInterface {
           { name: 'idx_partner_addresses_societe', columnNames: ['societe_id'] },
           { name: 'idx_partner_addresses_partner', columnNames: ['partner_id'] },
           { name: 'idx_partner_addresses_type', columnNames: ['type'] },
-          { name: 'idx_partner_addresses_default', columnNames: ['partner_id', 'type', 'is_default'] },
+          {
+            name: 'idx_partner_addresses_default',
+            columnNames: ['partner_id', 'type', 'is_default'],
+          },
         ],
       }),
       true

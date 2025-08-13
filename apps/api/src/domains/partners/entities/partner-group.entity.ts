@@ -85,7 +85,10 @@ export class PartnerGroup extends BusinessEntity {
   }
 
   // Relations
-  @OneToMany(() => Partner, partner => partner.group)
+  @OneToMany(
+    () => Partner,
+    (partner) => partner.group
+  )
   partners!: Partner[]
 
   /**
@@ -112,7 +115,7 @@ export class PartnerGroup extends BusinessEntity {
       if (this.maxDiscount < 0 || this.maxDiscount > 100) {
         errors.push('La remise maximale doit être entre 0 et 100%')
       }
-      
+
       if (this.defaultDiscount && this.maxDiscount < this.defaultDiscount) {
         errors.push('La remise maximale ne peut pas être inférieure à la remise par défaut')
       }
@@ -181,14 +184,14 @@ export class PartnerGroup extends BusinessEntity {
     if (this.rules?.minOrderAmount && amount < this.rules.minOrderAmount) {
       return {
         valid: false,
-        message: `Montant minimum requis: ${this.rules.minOrderAmount}€`
+        message: `Montant minimum requis: ${this.rules.minOrderAmount}€`,
       }
     }
 
     if (this.rules?.maxOrderAmount && amount > this.rules.maxOrderAmount) {
       return {
         valid: false,
-        message: `Montant maximum autorisé: ${this.rules.maxOrderAmount}€`
+        message: `Montant maximum autorisé: ${this.rules.maxOrderAmount}€`,
       }
     }
 
@@ -215,11 +218,13 @@ export class PartnerGroup extends BusinessEntity {
   /**
    * Mettre à jour les statistiques du groupe
    */
-  updateStatistics(stats: Partial<{
-    memberCount: number
-    totalRevenue: number
-    averageOrderValue: number
-  }>): void {
+  updateStatistics(
+    stats: Partial<{
+      memberCount: number
+      totalRevenue: number
+      averageOrderValue: number
+    }>
+  ): void {
     if (!this.metadata) {
       this.metadata = {}
     }
@@ -229,7 +234,7 @@ export class PartnerGroup extends BusinessEntity {
 
     Object.assign(this.metadata.statistics, {
       ...stats,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     })
 
     this.markAsModified()

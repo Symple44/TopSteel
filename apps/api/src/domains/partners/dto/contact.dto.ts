@@ -1,7 +1,17 @@
-import { IsString, IsEmail, IsOptional, IsUUID, IsEnum, IsBoolean, IsObject, IsDateString, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { ContactRole, ContactStatus, ContactPreference } from '../entities/contact.entity'
+import { Type } from 'class-transformer'
+import {
+  IsBoolean,
+  IsDateString,
+  IsEmail,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator'
+import { ContactPreference, ContactRole, ContactStatus } from '../entities/contact.entity'
 
 export class ContactDisponibiliteDto {
   @ApiPropertyOptional()

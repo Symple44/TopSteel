@@ -89,53 +89,53 @@ export interface Partner {
   denominationCommerciale?: string
   category: string
   status: PartnerStatus
-  
+
   // Identification
   siret?: string
   numeroTVA?: string
   codeAPE?: string
-  
+
   // Contact principal
   contactPrincipal?: string
   telephone?: string
   mobile?: string
   email?: string
   siteWeb?: string
-  
+
   // Adresse principale
   adresse?: string
   adresseComplement?: string
   codePostal?: string
   ville?: string
   pays?: string
-  
+
   // Commercial
   conditionsPaiement?: string
   modePaiement?: string
   plafondCredit?: number
   tauxRemise?: number
   representantCommercial?: string
-  
+
   // Fournisseur
   delaiLivraison?: number
   montantMiniCommande?: number
   fournisseurPrefere?: boolean
-  
+
   // Comptabilité
   compteComptableClient?: string
   compteComptableFournisseur?: string
-  
+
   // Relations
   groupId?: string
   group?: PartnerGroup
   contacts?: Contact[]
   sites?: PartnerSite[]
   addresses?: PartnerAddress[]
-  
+
   // Metadata
   notes?: Record<string, any>
   donneesTechniques?: Record<string, any>
-  
+
   // Timestamps
   createdAt: Date
   updatedAt: Date
@@ -150,14 +150,14 @@ export interface PartnerGroup {
   description?: string
   type: GroupType
   status: GroupStatus
-  
+
   // Paramètres commerciaux
   defaultDiscount?: number
   maxDiscount?: number
   creditLimit?: number
   paymentTerms?: string
   priority?: number
-  
+
   // Règles métier
   rules?: {
     requiresApproval?: boolean
@@ -168,7 +168,7 @@ export interface PartnerGroup {
     blockedProducts?: string[]
     exclusiveProducts?: string[]
   }
-  
+
   // Metadata
   metadata?: {
     color?: string
@@ -176,10 +176,10 @@ export interface PartnerGroup {
     tags?: string[]
     customFields?: Record<string, any>
   }
-  
+
   // Relations
   partners?: Partner[]
-  
+
   // Timestamps
   createdAt: Date
   updatedAt: Date
@@ -191,7 +191,7 @@ export interface Contact {
   id: string
   partnerId: string
   partner?: Partner
-  
+
   // Identification
   civilite?: string
   nom: string
@@ -200,28 +200,28 @@ export interface Contact {
   service?: string
   role: ContactRole
   status: ContactStatus
-  
+
   // Contact
   telephoneDirect?: string
   telephoneMobile?: string
   email?: string
   fax?: string
-  
+
   // Préférences
   isPrincipal?: boolean
   prefereEmail?: boolean
   prefereSMS?: boolean
   accepteMarketing?: boolean
-  
+
   // Disponibilité
   horairesDisponibilite?: Record<string, any>
   joursAbsence?: string[]
   dateNaissance?: Date
-  
+
   // Site associé
   partnerSiteId?: string
   partnerSite?: PartnerSite
-  
+
   // Notes
   notes?: string
   preferences?: Record<string, any>
@@ -231,7 +231,7 @@ export interface Contact {
     description: string
     userId?: string
   }>
-  
+
   // Timestamps
   createdAt: Date
   updatedAt: Date
@@ -243,19 +243,19 @@ export interface PartnerSite {
   id: string
   partnerId: string
   partner?: Partner
-  
+
   // Identification
   code: string
   nom: string
   description?: string
   type: SiteType
   status: SiteStatus
-  
+
   // Configuration
   isPrincipal?: boolean
   accepteLivraisons?: boolean
   accepteEnlevements?: boolean
-  
+
   // Localisation
   adresse?: string
   adresseComplement?: string
@@ -265,12 +265,12 @@ export interface PartnerSite {
   region?: string
   latitude?: number
   longitude?: number
-  
+
   // Contact
   responsable?: string
   telephone?: string
   email?: string
-  
+
   // Capacités logistiques
   surfaceM2?: number
   capaciteStockageTonnes?: number
@@ -278,33 +278,33 @@ export interface PartnerSite {
   poidsMaxTonnes?: number
   accessibilite?: AccessibiliteType
   typeVehiculeMax?: string
-  
+
   // Équipements
   hasQuaiChargement?: boolean
   hasChariot?: boolean
   hasPontRoulant?: boolean
   hasGrue?: boolean
-  
+
   // Horaires et instructions
   horaires?: Record<string, any>
   instructionsLivraison?: string
   consignesSecurite?: string
   documentsRequis?: Record<string, any>
-  
+
   // Préférences
   preferences?: Record<string, any>
-  
+
   // Dates
   dateOuverture?: Date
   dateFermeture?: Date
-  
+
   // Relations
   contacts?: Contact[]
   addresses?: PartnerAddress[]
-  
+
   // Metadata
   metadata?: Record<string, any>
-  
+
   // Timestamps
   createdAt: Date
   updatedAt: Date
@@ -318,13 +318,13 @@ export interface PartnerAddress {
   partner?: Partner
   partnerSiteId?: string
   partnerSite?: PartnerSite
-  
+
   // Identification
   libelle: string
   type: AddressType
   status: AddressStatus
   isDefault?: boolean
-  
+
   // Adresse
   ligne1: string
   ligne2?: string
@@ -334,24 +334,24 @@ export interface PartnerAddress {
   region?: string
   pays?: string
   codePays?: string
-  
+
   // Géolocalisation
   latitude?: number
   longitude?: number
-  
+
   // Contact
   contactNom?: string
   contactTelephone?: string
   contactEmail?: string
-  
+
   // Instructions
   instructionsAcces?: string
   notes?: string
-  
+
   // Validité
   dateDebut?: Date
   dateFin?: Date
-  
+
   // Timestamps
   createdAt: Date
   updatedAt: Date

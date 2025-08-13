@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { Contact, ContactStatus } from '../entities/contact.entity'
 import type { IContactRepository } from '../services/partner.service'
 
@@ -23,19 +23,19 @@ export class ContactRepository implements IContactRepository {
   async findByPartner(partnerId: string): Promise<Contact[]> {
     return await this.repository.find({
       where: { partnerId, status: ContactStatus.ACTIF },
-      order: { isPrincipal: 'DESC', nom: 'ASC' }
+      order: { isPrincipal: 'DESC', nom: 'ASC' },
     })
   }
 
   async findPrincipalContact(partnerId: string): Promise<Contact | null> {
     return await this.repository.findOne({
-      where: { partnerId, isPrincipal: true, status: ContactStatus.ACTIF }
+      where: { partnerId, isPrincipal: true, status: ContactStatus.ACTIF },
     })
   }
 
   async findByEmail(email: string, societeId: string): Promise<Contact[]> {
     return await this.repository.find({
-      where: { email, societeId }
+      where: { email, societeId },
     })
   }
 

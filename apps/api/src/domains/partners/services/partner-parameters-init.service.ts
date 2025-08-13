@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { ParameterSystem } from '../../../features/parameters/entities/parameter-system.entity'
 
 @Injectable()
@@ -24,7 +24,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Types de partenaires disponibles',
         arrayValues: ['CLIENT', 'FOURNISSEUR', 'MIXTE'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'PARTNER_STATUS',
@@ -34,7 +34,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Statuts possibles pour les partenaires',
         arrayValues: ['ACTIF', 'INACTIF', 'PROSPECT', 'SUSPENDU', 'ARCHIVE'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'PARTNER_CATEGORIES',
@@ -43,8 +43,17 @@ export class PartnerParametersInitService {
         type: 'ARRAY',
         scope: 'SYSTEM',
         description: 'Catégories métier des partenaires',
-        arrayValues: ['METALLURGIE', 'BTP', 'INDUSTRIE', 'NEGOCE', 'DISTRIBUTION', 'PARTICULIER', 'COLLECTIVITE', 'AUTRE'],
-        isActive: true
+        arrayValues: [
+          'METALLURGIE',
+          'BTP',
+          'INDUSTRIE',
+          'NEGOCE',
+          'DISTRIBUTION',
+          'PARTICULIER',
+          'COLLECTIVITE',
+          'AUTRE',
+        ],
+        isActive: true,
       },
       {
         group: 'GROUP_TYPES',
@@ -54,7 +63,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Types de groupes de partenaires',
         arrayValues: ['TARIF', 'COMMERCIAL', 'LOGISTIQUE', 'COMPTABLE'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'GROUP_STATUS',
@@ -64,7 +73,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Statuts possibles pour les groupes',
         arrayValues: ['ACTIVE', 'INACTIVE', 'ARCHIVED'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'CONTACT_ROLES',
@@ -73,8 +82,17 @@ export class PartnerParametersInitService {
         type: 'ARRAY',
         scope: 'SYSTEM',
         description: 'Rôles possibles pour les contacts',
-        arrayValues: ['COMMERCIAL', 'TECHNIQUE', 'COMPTABILITE', 'DIRECTION', 'ACHAT', 'LOGISTIQUE', 'QUALITE', 'AUTRE'],
-        isActive: true
+        arrayValues: [
+          'COMMERCIAL',
+          'TECHNIQUE',
+          'COMPTABILITE',
+          'DIRECTION',
+          'ACHAT',
+          'LOGISTIQUE',
+          'QUALITE',
+          'AUTRE',
+        ],
+        isActive: true,
       },
       {
         group: 'CONTACT_STATUS',
@@ -84,7 +102,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Statuts possibles pour les contacts',
         arrayValues: ['ACTIF', 'INACTIF', 'PARTI'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'SITE_TYPES',
@@ -94,7 +112,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Types de sites partenaires',
         arrayValues: ['SIEGE_SOCIAL', 'USINE', 'DEPOT', 'CHANTIER', 'MAGASIN', 'BUREAU', 'AUTRE'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'SITE_STATUS',
@@ -104,7 +122,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Statuts possibles pour les sites',
         arrayValues: ['ACTIF', 'INACTIF', 'FERME', 'EN_TRAVAUX'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'ACCESSIBILITE',
@@ -112,29 +130,29 @@ export class PartnerParametersInitService {
         value: 'Niveaux accessibilité',
         type: 'ARRAY',
         scope: 'SYSTEM',
-        description: 'Niveaux d\'accessibilité des sites',
+        description: "Niveaux d'accessibilité des sites",
         arrayValues: ['FACILE', 'MOYEN', 'DIFFICILE', 'TRES_DIFFICILE'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'ADDRESS_TYPES',
         key: 'address_types',
-        value: 'Types d\'adresses',
+        value: "Types d'adresses",
         type: 'ARRAY',
         scope: 'SYSTEM',
-        description: 'Types d\'adresses possibles',
+        description: "Types d'adresses possibles",
         arrayValues: ['FACTURATION', 'LIVRAISON', 'SIEGE', 'AUTRE'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'ADDRESS_STATUS',
         key: 'address_status',
-        value: 'Statuts d\'adresses',
+        value: "Statuts d'adresses",
         type: 'ARRAY',
         scope: 'SYSTEM',
         description: 'Statuts possibles pour les adresses',
         arrayValues: ['ACTIVE', 'INACTIVE', 'ARCHIVED'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'PAYMENT_TERMS',
@@ -143,8 +161,17 @@ export class PartnerParametersInitService {
         type: 'ARRAY',
         scope: 'SYSTEM',
         description: 'Conditions de paiement disponibles',
-        arrayValues: ['COMPTANT', '30_JOURS', '30_JOURS_FIN_DE_MOIS', '45_JOURS', '45_JOURS_FIN_DE_MOIS', '60_JOURS', '60_JOURS_FIN_DE_MOIS', '90_JOURS'],
-        isActive: true
+        arrayValues: [
+          'COMPTANT',
+          '30_JOURS',
+          '30_JOURS_FIN_DE_MOIS',
+          '45_JOURS',
+          '45_JOURS_FIN_DE_MOIS',
+          '60_JOURS',
+          '60_JOURS_FIN_DE_MOIS',
+          '90_JOURS',
+        ],
+        isActive: true,
       },
       {
         group: 'PAYMENT_MODES',
@@ -154,7 +181,7 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Modes de paiement acceptés',
         arrayValues: ['VIREMENT', 'CHEQUE', 'ESPECES', 'CB', 'PRELEVEMENT', 'TRAITE', 'LCR'],
-        isActive: true
+        isActive: true,
       },
       {
         group: 'CIVILITES',
@@ -164,28 +191,28 @@ export class PartnerParametersInitService {
         scope: 'SYSTEM',
         description: 'Civilités disponibles',
         arrayValues: ['M.', 'Mme', 'Mlle', 'Dr', 'Pr', 'Me'],
-        isActive: true
-      }
+        isActive: true,
+      },
     ]
 
     for (const param of parameters) {
       try {
         // Vérifier si le paramètre existe déjà
         const existing = await this.parameterSystemRepository.findOne({
-          where: { group: param.group, key: param.key }
+          where: { group: param.group, key: param.key },
         })
 
-        if (!existing) {
+        if (existing) {
+          this.logger.log(`Parameter already exists: ${param.group}.${param.key}`)
+        } else {
           // Créer le paramètre s'il n'existe pas
           const newParam = this.parameterSystemRepository.create({
             ...param,
-            arrayValues: param.arrayValues // TypeORM convertira automatiquement en JSONB
+            arrayValues: param.arrayValues, // TypeORM convertira automatiquement en JSONB
           } as any)
-          
+
           await this.parameterSystemRepository.save(newParam)
           this.logger.log(`Created parameter: ${param.group}.${param.key}`)
-        } else {
-          this.logger.log(`Parameter already exists: ${param.group}.${param.key}`)
         }
       } catch (error) {
         this.logger.error(`Error creating parameter ${param.group}.${param.key}:`, error)
@@ -200,7 +227,7 @@ export class PartnerParametersInitService {
    */
   async getParameterValues(group: string, key: string): Promise<string[]> {
     const param = await this.parameterSystemRepository.findOne({
-      where: { group, key }
+      where: { group, key },
     })
 
     if (!param || !param.arrayValues) {
@@ -230,14 +257,14 @@ export class PartnerParametersInitService {
         { group: 'ADDRESS_STATUS' },
         { group: 'PAYMENT_TERMS' },
         { group: 'PAYMENT_MODES' },
-        { group: 'CIVILITES' }
-      ]
+        { group: 'CIVILITES' },
+      ],
     })
 
     const result: Record<string, string[]> = {}
-    
+
     for (const param of params) {
-      result[param.key] = param.arrayValues as string[] || []
+      result[param.key] = (param.arrayValues as string[]) || []
     }
 
     return result

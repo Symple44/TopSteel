@@ -39,10 +39,10 @@ interface PricingQuery {
   promotionCode?: string
 }
 
-import { MarketplaceProductsService } from '../services/marketplace-products.service'
-import { HttpService } from '@nestjs/axios'
-import { firstValueFrom } from 'rxjs'
 import { PriceRuleChannel } from '@erp/entities'
+import type { HttpService } from '@nestjs/axios'
+import { firstValueFrom } from 'rxjs'
+import type { MarketplaceProductsService } from '../services/marketplace-products.service'
 
 @ApiTags('admin-products')
 @Controller('admin/products')
@@ -119,24 +119,26 @@ export class ProductsController {
     // Appeler l'API de pricing centralisée
     try {
       const priceResponse = await firstValueFrom(
-        this.httpService.post(`${process.env.API_URL || 'http://localhost:3002'}/pricing/calculate`, {
-          articleId: productId,
-          customerId: query.customerId,
-          customerGroup: query.customerGroup,
-          quantity: parseInt(query.quantity) || 1,
-          promotionCode: query.promotionCode,
-          channel: PriceRuleChannel.MARKETPLACE
-        })
+        this.httpService.post(
+          `${process.env.API_URL || 'http://localhost:3002'}/pricing/calculate`,
+          {
+            articleId: productId,
+            customerId: query.customerId,
+            customerGroup: query.customerGroup,
+            quantity: parseInt(query.quantity) || 1,
+            promotionCode: query.promotionCode,
+            channel: PriceRuleChannel.MARKETPLACE,
+          }
+        )
       )
       return priceResponse.data
-    } catch (error) {
-      console.error('Erreur calcul prix:', error)
+    } catch (_error) {
       return {
         basePrice: product.basePrice,
         finalPrice: product.basePrice,
         appliedRules: [],
         totalDiscount: 0,
-        totalDiscountPercentage: 0
+        totalDiscountPercentage: 0,
       }
     }
   }
@@ -150,13 +152,12 @@ export class ProductsController {
         this.httpService.get(`${process.env.API_URL || 'http://localhost:3002'}/pricing/rules`, {
           params: {
             articleId: productId,
-            channel: PriceRuleChannel.MARKETPLACE
-          }
+            channel: PriceRuleChannel.MARKETPLACE,
+          },
         })
       )
       return rulesResponse.data
-    } catch (error) {
-      console.error('Erreur récupération règles:', error)
+    } catch (_error) {
       return { rules: [], total: 0 }
     }
   }

@@ -1,4 +1,4 @@
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { DatatableHierarchicalPreferences } from '../../api/entities/datatable-hierarchical-preferences.entity'
 import { DatatableHierarchyOrder } from '../../api/entities/datatable-hierarchy-order.entity'

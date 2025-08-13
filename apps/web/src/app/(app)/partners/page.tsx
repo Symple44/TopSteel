@@ -8,7 +8,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  type ColumnConfig,
   DataTable,
   Select,
   SelectContent,

@@ -39,9 +39,13 @@ export class Contact extends BusinessEntity {
   @Index()
   partnerId!: string
 
-  @ManyToOne(() => Partner, partner => partner.contacts, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(
+    () => Partner,
+    (partner) => partner.contacts,
+    {
+      onDelete: 'CASCADE',
+    }
+  )
   @JoinColumn({ name: 'partnerId' })
   partner!: Partner
 
@@ -183,11 +187,11 @@ export class Contact extends BusinessEntity {
 
     // Validation téléphone
     if (this.telephoneDirect && !this.isValidPhone(this.telephoneDirect)) {
-      errors.push('Le numéro de téléphone direct n\'est pas valide')
+      errors.push("Le numéro de téléphone direct n'est pas valide")
     }
 
     if (this.mobile && !this.isValidPhone(this.mobile)) {
-      errors.push('Le numéro de mobile n\'est pas valide')
+      errors.push("Le numéro de mobile n'est pas valide")
     }
 
     return errors
@@ -293,7 +297,7 @@ export class Contact extends BusinessEntity {
       type,
       objet,
       notes,
-      auteur
+      auteur,
     })
 
     // Limiter l'historique aux 100 dernières interactions

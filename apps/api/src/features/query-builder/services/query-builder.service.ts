@@ -9,7 +9,7 @@ import {
   QueryBuilderColumn,
   QueryBuilderJoin,
 } from '../entities'
-import { QueryBuilderPermissionService } from './query-builder-permission.service'
+import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 @Injectable()
 export class QueryBuilderService {

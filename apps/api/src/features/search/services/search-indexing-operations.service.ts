@@ -1,14 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
-import { ISearchIndexingService } from '../interfaces/search.interfaces'
-import { ElasticsearchSearchService } from './elasticsearch-search.service'
-import { SearchResultFormatterService } from './search-result-formatter.service'
-import {
-  SEARCHABLE_ENTITIES,
-  SearchableEntity
-} from '../config/searchable-entities.config'
-import { SearchDocument, IndexingDocument, IndexingBatchResult } from '../types/search-types'
+import type { DataSource } from 'typeorm'
+import { SEARCHABLE_ENTITIES, type SearchableEntity } from '../config/searchable-entities.config'
+import type { ISearchIndexingService } from '../interfaces/search.interfaces'
+import type { IndexingBatchResult, IndexingDocument, SearchDocument } from '../types/search-types'
+import type { ElasticsearchSearchService } from './elasticsearch-search.service'
+import type { SearchResultFormatterService } from './search-result-formatter.service'
 
 @Injectable()
 export class SearchIndexingOperationsService implements ISearchIndexingService {
@@ -51,7 +48,7 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
     }
 
     this.logger.log('🔄 Starting full reindex...')
-    
+
     let totalIndexed = 0
     const errors: string[] = []
 
@@ -69,33 +66,36 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
         errors.push(errorMsg)
       }
     }
-    
+
     this.logger.log(`🎯 Full reindex completed: ${totalIndexed} documents indexed`)
     if (errors.length > 0) {
       this.logger.error(`❌ Errors during reindex: ${errors.join(', ')}`)
     }
-    
+
     return totalIndexed
   }
 
   async reindexEntity(entity: SearchableEntity, tenantId?: string): Promise<number> {
     // Determine which datasource to use
-    const ds = entity.database === 'tenant' && this.tenantDataSource
-      ? this.tenantDataSource
-      : this.dataSource
+    const ds =
+      entity.database === 'tenant' && this.tenantDataSource
+        ? this.tenantDataSource
+        : this.dataSource
 
     // Check if table exists before reindexing
     const tableExists = await this.checkTableExists(ds, entity.tableName)
     if (!tableExists) {
-      this.logger.warn(`Table ${entity.tableName} does not exist, skipping reindex for ${entity.type}`)
+      this.logger.warn(
+        `Table ${entity.tableName} does not exist, skipping reindex for ${entity.type}`
+      )
       return 0
     }
 
     // Build query to get all records
     const fields = [
-      ...entity.searchableFields.primary.map(f => f.name),
-      ...entity.searchableFields.secondary.map(f => f.name),
-      ...entity.searchableFields.metadata.map(f => f.name)
+      ...entity.searchableFields.primary.map((f) => f.name),
+      ...entity.searchableFields.secondary.map((f) => f.name),
+      ...entity.searchableFields.metadata.map((f) => f.name),
     ].filter((v, i, a) => a.indexOf(v) === i) // Unique
 
     // Add societe_id if it's a tenant entity
@@ -114,7 +114,7 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
     `
 
     const records = await ds.query(query)
-    
+
     // Index each record
     for (const record of records) {
       // Determine tenantId based on database
@@ -137,9 +137,9 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
         icon: entity.icon,
         type: entity.type,
         tenantId: documentTenantId,
-        ...record
+        ...record,
       }
-      
+
       await this.indexDocument(entity.type, record.id, document)
     }
 
@@ -174,35 +174,41 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
           id: doc.id,
           type: doc.type,
           title: this.formatter.getRecordTitle(
-            SEARCHABLE_ENTITIES.find(e => e.type === doc.type)!,
+            SEARCHABLE_ENTITIES.find((e) => e.type === doc.type)!,
             doc.data
           ),
           description: this.formatter.getRecordDescription(
-            SEARCHABLE_ENTITIES.find(e => e.type === doc.type)!,
+            SEARCHABLE_ENTITIES.find((e) => e.type === doc.type)!,
             doc.data
           ),
           metadata: this.formatter.extractMetadata(
-            SEARCHABLE_ENTITIES.find(e => e.type === doc.type)!,
+            SEARCHABLE_ENTITIES.find((e) => e.type === doc.type)!,
             doc.data
-          )
+          ),
         }
-        
+
         await this.indexDocument(doc.type, doc.id, searchDoc)
         return { success: true, id: doc.id, type: doc.type }
       } catch (error) {
         return { success: false, id: doc.id, type: doc.type, error: String(error) }
       }
     })
-    
+
     const results = await Promise.allSettled(promises)
-    const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length
+    const successful = results.filter((r) => r.status === 'fulfilled' && r.value.success).length
     const failed = results.length - successful
     const errors = results
-      .filter(r => r.status === 'fulfilled' && !r.value.success)
-      .map(r => r.status === 'fulfilled' ? { id: r.value.id, type: r.value.type, error: r.value.error } : { id: '', type: '', error: 'Unknown error' })
+      .filter((r) => r.status === 'fulfilled' && !r.value.success)
+      .map((r) =>
+        r.status === 'fulfilled'
+          ? { id: r.value.id, type: r.value.type, error: r.value.error }
+          : { id: '', type: '', error: 'Unknown error' }
+      )
 
-    this.logger.debug(`Batch indexed ${documents.length} documents: ${successful} successful, ${failed} failed`)
-    
+    this.logger.debug(
+      `Batch indexed ${documents.length} documents: ${successful} successful, ${failed} failed`
+    )
+
     return { successful, failed, errors }
   }
 
@@ -210,10 +216,8 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
    * Delete multiple documents in batch
    */
   async deleteBatch(documents: Array<{ type: string; id: string }>) {
-    const promises = documents.map(doc => 
-      this.deleteDocument(doc.type, doc.id)
-    )
-    
+    const promises = documents.map((doc) => this.deleteDocument(doc.type, doc.id))
+
     await Promise.allSettled(promises)
     this.logger.debug(`Batch deleted ${documents.length} documents`)
   }

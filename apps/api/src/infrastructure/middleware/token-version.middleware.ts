@@ -1,5 +1,5 @@
 import { Injectable, Logger, type NestMiddleware, UnauthorizedException } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import type { JwtService } from '@nestjs/jwt'
 import type { NextFunction, Request, Response } from 'express'
 
 interface JwtPayload {

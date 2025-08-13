@@ -29,10 +29,13 @@ export function usePermissions() {
       const cached = permissionsCache.get(user.id)
       // Get primary role for API call (using first role or legacy single role)
       const userRoles = (user as any).roles || (user.role ? [user.role] : [])
-      const primaryRole = userRoles.length > 0 ? 
-        (typeof userRoles[0] === 'object' ? userRoles[0].name || userRoles[0].role : userRoles[0]) :
-        ''
-      
+      const primaryRole =
+        userRoles.length > 0
+          ? typeof userRoles[0] === 'object'
+            ? userRoles[0].name || userRoles[0].role
+            : userRoles[0]
+          : ''
+
       if (cached) {
         setUserPermissions({
           roleId: primaryRole,
@@ -177,7 +180,7 @@ export function usePermissions() {
     if (!user) return false
     // Get user roles array (new system) or single role (legacy)
     const userRoles = (user as any).roles || (user.role ? [user.role] : [])
-    
+
     return userRoles.some((role: any) => {
       const roleValue = typeof role === 'object' ? role.name || role.role : role
       return roleValue === roleId

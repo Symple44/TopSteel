@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { PartnerGroup, GroupStatus } from '../entities/partner-group.entity'
+import type { Repository } from 'typeorm'
+import { GroupStatus, PartnerGroup } from '../entities/partner-group.entity'
 import type { IPartnerGroupRepository } from '../services/partner.service'
 
 @Injectable()
@@ -23,13 +23,13 @@ export class PartnerGroupRepository implements IPartnerGroupRepository {
   async findBySociete(societeId: string): Promise<PartnerGroup[]> {
     return await this.repository.find({
       where: { societeId, status: GroupStatus.ACTIVE },
-      order: { priority: 'ASC', name: 'ASC' }
+      order: { priority: 'ASC', name: 'ASC' },
     })
   }
 
   async findByCode(code: string, societeId: string): Promise<PartnerGroup | null> {
-    return await this.repository.findOne({ 
-      where: { code, societeId } 
+    return await this.repository.findOne({
+      where: { code, societeId },
     })
   }
 

@@ -219,13 +219,13 @@ export function usePermissions() {
 
     // Get user roles array (new system) or single role (legacy)
     const userRoles = (user as any).roles || (user.role ? [user.role] : [])
-    
+
     // L'admin et super admin ont toutes les permissions
     const hasAdminRole = userRoles.some((role: any) => {
       const roleValue = typeof role === 'object' ? role.name || role.role : role
       return roleValue === 'ADMIN' || roleValue === 'SUPER_ADMIN'
     })
-    
+
     if (hasAdminRole) {
       return true
     }
@@ -268,7 +268,7 @@ export function usePermissions() {
     if (!user) return false
     // Get user roles array (new system) or single role (legacy)
     const userRoles = (user as any).roles || (user.role ? [user.role] : [])
-    
+
     return userRoles.some((userRole: any) => {
       const roleValue = typeof userRole === 'object' ? userRole.name || userRole.role : userRole
       return roleValue === role || roleValue === role.toLowerCase()
@@ -290,13 +290,13 @@ export function usePermissions() {
 
     // Get user roles array (new system) or single role (legacy)
     const userRoles = (user as any).roles || (user.role ? [user.role] : [])
-    
+
     // L'admin a toutes les permissions
     const hasAdminRole = userRoles.some((role: any) => {
       const roleValue = typeof role === 'object' ? role.name || role.role : role
       return roleValue === 'admin' || roleValue === 'ADMIN'
     })
-    
+
     if (hasAdminRole) {
       return Object.values(ROLE_PERMISSIONS).flat()
     }

@@ -19,7 +19,7 @@ export function AutoBreadcrumbWrapper(props: AutoBreadcrumbWrapperProps) {
     if (uuidRegex.test(segment)) {
       return 'Détail'
     }
-    
+
     // Utiliser la traduction ou fallback sur le segment formaté
     return t(segment) || segment.charAt(0).toUpperCase() + segment.slice(1)
   }

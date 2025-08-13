@@ -17,7 +17,7 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
         'FORMULA'
       )
     `)
-    
+
     await queryRunner.query(`
       CREATE TYPE "price_rule_channel_enum" AS ENUM (
         'ALL',
@@ -27,7 +27,7 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
         'B2B'
       )
     `)
-    
+
     // Créer la table price_rules
     await queryRunner.query(`
       CREATE TABLE "price_rules" (
@@ -59,38 +59,38 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
         CONSTRAINT "PK_price_rules" PRIMARY KEY ("id")
       )
     `)
-    
+
     // Créer les index
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rules_societe_id_is_active" 
       ON "price_rules" ("societe_id", "is_active")
     `)
-    
+
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rules_channel" 
       ON "price_rules" ("channel")
     `)
-    
+
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rules_article_id" 
       ON "price_rules" ("article_id")
     `)
-    
+
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rules_article_family" 
       ON "price_rules" ("article_family")
     `)
-    
+
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rules_priority" 
       ON "price_rules" ("priority" DESC)
     `)
-    
+
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rules_valid_dates" 
       ON "price_rules" ("valid_from", "valid_until")
     `)
-    
+
     // Créer la table de suivi d'usage par client (optionnelle)
     await queryRunner.query(`
       CREATE TABLE "price_rule_usage" (
@@ -106,17 +106,17 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
         CONSTRAINT "UQ_price_rule_usage_rule_customer" UNIQUE ("rule_id", "customer_id")
       )
     `)
-    
+
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rule_usage_rule_id" 
       ON "price_rule_usage" ("rule_id")
     `)
-    
+
     await queryRunner.query(`
       CREATE INDEX "IDX_price_rule_usage_customer_id" 
       ON "price_rule_usage" ("customer_id")
     `)
-    
+
     // Ajouter les contraintes de clés étrangères
     await queryRunner.query(`
       ALTER TABLE "price_rules" 
@@ -125,7 +125,7 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
       REFERENCES "societes"("id") 
       ON DELETE CASCADE
     `)
-    
+
     await queryRunner.query(`
       ALTER TABLE "price_rules" 
       ADD CONSTRAINT "FK_price_rules_article" 
@@ -133,7 +133,7 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
       REFERENCES "articles"("id") 
       ON DELETE CASCADE
     `)
-    
+
     await queryRunner.query(`
       ALTER TABLE "price_rule_usage" 
       ADD CONSTRAINT "FK_price_rule_usage_rule" 
@@ -141,14 +141,14 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
       REFERENCES "price_rules"("id") 
       ON DELETE CASCADE
     `)
-    
+
     // Ajouter les colonnes surface et volume calculées aux articles si elles n'existent pas
     await queryRunner.query(`
       ALTER TABLE "articles" 
       ADD COLUMN IF NOT EXISTS "surface" decimal(10,4),
       ADD COLUMN IF NOT EXISTS "volume" decimal(10,4)
     `)
-    
+
     // Créer une fonction pour calculer automatiquement surface et volume
     await queryRunner.query(`
       CREATE OR REPLACE FUNCTION calculate_article_dimensions()
@@ -168,7 +168,7 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
       END;
       $$ LANGUAGE plpgsql;
     `)
-    
+
     // Créer le trigger pour calculer automatiquement les dimensions
     await queryRunner.query(`
       CREATE TRIGGER article_dimensions_trigger
@@ -177,7 +177,7 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
       FOR EACH ROW
       EXECUTE FUNCTION calculate_article_dimensions();
     `)
-    
+
     // Mettre à jour les articles existants
     await queryRunner.query(`
       UPDATE articles 
@@ -200,23 +200,29 @@ export class CreatePriceRulesTables1704000005 implements MigrationInterface {
     // Supprimer le trigger et la fonction
     await queryRunner.query(`DROP TRIGGER IF EXISTS article_dimensions_trigger ON articles`)
     await queryRunner.query(`DROP FUNCTION IF EXISTS calculate_article_dimensions()`)
-    
+
     // Supprimer les colonnes ajoutées aux articles
     await queryRunner.query(`
       ALTER TABLE "articles" 
       DROP COLUMN IF EXISTS "surface",
       DROP COLUMN IF EXISTS "volume"
     `)
-    
+
     // Supprimer les contraintes
-    await queryRunner.query(`ALTER TABLE "price_rule_usage" DROP CONSTRAINT IF EXISTS "FK_price_rule_usage_rule"`)
-    await queryRunner.query(`ALTER TABLE "price_rules" DROP CONSTRAINT IF EXISTS "FK_price_rules_article"`)
-    await queryRunner.query(`ALTER TABLE "price_rules" DROP CONSTRAINT IF EXISTS "FK_price_rules_societe"`)
-    
+    await queryRunner.query(
+      `ALTER TABLE "price_rule_usage" DROP CONSTRAINT IF EXISTS "FK_price_rule_usage_rule"`
+    )
+    await queryRunner.query(
+      `ALTER TABLE "price_rules" DROP CONSTRAINT IF EXISTS "FK_price_rules_article"`
+    )
+    await queryRunner.query(
+      `ALTER TABLE "price_rules" DROP CONSTRAINT IF EXISTS "FK_price_rules_societe"`
+    )
+
     // Supprimer les tables
     await queryRunner.query(`DROP TABLE IF EXISTS "price_rule_usage"`)
     await queryRunner.query(`DROP TABLE IF EXISTS "price_rules"`)
-    
+
     // Supprimer les enums
     await queryRunner.query(`DROP TYPE IF EXISTS "price_rule_channel_enum"`)
     await queryRunner.query(`DROP TYPE IF EXISTS "adjustment_type_enum"`)

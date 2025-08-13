@@ -24,7 +24,9 @@ async function createMissingMenuTables() {
 
     // Vérifier si menu_item_roles existe
     const rolesTableExists = await queryRunner.hasTable('menu_item_roles')
-    if (!rolesTableExists) {
+    if (rolesTableExists) {
+      console.log('ℹ️ Table menu_item_roles existe déjà')
+    } else {
       console.log('📋 Création de la table menu_item_roles...')
       await queryRunner.query(`
         CREATE TABLE "menu_item_roles" (
@@ -37,13 +39,13 @@ async function createMissingMenuTables() {
         )
       `)
       console.log('✅ Table menu_item_roles créée')
-    } else {
-      console.log('ℹ️ Table menu_item_roles existe déjà')
     }
 
     // Vérifier si menu_item_permissions existe
     const permissionsTableExists = await queryRunner.hasTable('menu_item_permissions')
-    if (!permissionsTableExists) {
+    if (permissionsTableExists) {
+      console.log('ℹ️ Table menu_item_permissions existe déjà')
+    } else {
       console.log('📋 Création de la table menu_item_permissions...')
       await queryRunner.query(`
         CREATE TABLE "menu_item_permissions" (
@@ -56,8 +58,6 @@ async function createMissingMenuTables() {
         )
       `)
       console.log('✅ Table menu_item_permissions créée')
-    } else {
-      console.log('ℹ️ Table menu_item_permissions existe déjà')
     }
 
     await queryRunner.release()

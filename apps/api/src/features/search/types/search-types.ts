@@ -20,7 +20,7 @@ export interface SearchDocument {
   lastModified?: Date
   accessRoles?: string[]
   accessPermissions?: string[]
-  
+
   // Entity-specific fields
   email?: string
   siret?: string
@@ -208,7 +208,7 @@ export interface QueryBuilderRecord extends DatabaseRecord {
 }
 
 // Union type for all possible database records
-export type AnyDatabaseRecord = 
+export type AnyDatabaseRecord =
   | PartnerRecord
   | ArticleRecord
   | MaterialRecord

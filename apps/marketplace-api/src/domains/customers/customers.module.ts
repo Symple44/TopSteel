@@ -6,10 +6,7 @@ import { MarketplaceCustomer } from './entities/marketplace-customer.entity'
 import { MarketplaceCustomersService } from './services/marketplace-customers.service'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([MarketplaceCustomer], 'marketplace'),
-    TenantModule
-  ],
+  imports: [TypeOrmModule.forFeature([MarketplaceCustomer], 'marketplace'), TenantModule],
   providers: [MarketplaceCustomersService],
   controllers: [CustomersController],
   exports: [MarketplaceCustomersService],

@@ -1,6 +1,6 @@
 'use client'
 
-import { 
+import {
   AlertCircle,
   Calculator,
   Check,
@@ -11,22 +11,24 @@ import {
   Play,
   RefreshCw,
   Settings,
-  TrendingDown,
-  TrendingUp,
-  Users,
-  Zap
+  Zap,
 } from 'lucide-react'
-import type React from 'react'
-import { useState, useCallback, useMemo } from 'react'
-import { Button } from '../../../primitives/button'
-import { Input } from '../../../primitives/input'
-import { Label } from '../../../forms/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
+import { useCallback, useMemo, useState } from 'react'
+import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Alert, AlertDescription, AlertTitle } from '../../../feedback/alert'
+import { Label } from '../../../forms/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
 import { Separator } from '../../../layout/separator'
-import { cn } from '../../../../lib/utils'
+import { Button } from '../../../primitives/button'
+import { Input } from '../../../primitives/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select'
 import type { PriceRule } from '../PriceRuleCard/PriceRuleCard'
 import { PriceRuleChannel } from '../PriceRuleCard/PriceRuleCard'
 
@@ -40,7 +42,7 @@ export interface SimulationContext {
   quantity: number
   channel: PriceRuleChannel
   societeId?: string
-  
+
   // Données article pour simulation
   article?: {
     id: string
@@ -108,26 +110,26 @@ const SAMPLE_ARTICLES = [
     reference: 'IPE140-S275JR',
     designation: 'IPE 140 - Acier S275JR',
     famille: 'ACIER',
-    prixVenteHT: 19.90,
-    poids: 12.9
+    prixVenteHT: 19.9,
+    poids: 12.9,
   },
   {
     id: '2',
     reference: 'TUB-40x40x3',
     designation: 'Tube carré 40x40x3',
     famille: 'TUBES',
-    prixVenteHT: 8.50,
-    poids: 3.41
+    prixVenteHT: 8.5,
+    poids: 3.41,
   },
   {
     id: '3',
     reference: 'TOLE-2MM-1000',
     designation: 'Tôle 2mm 1000x2000',
     famille: 'TOLES',
-    prixVenteHT: 45.00,
+    prixVenteHT: 45.0,
     poids: 31.4,
-    surface: 2
-  }
+    surface: 2,
+  },
 ]
 
 const CUSTOMER_GROUPS = [
@@ -135,7 +137,7 @@ const CUSTOMER_GROUPS = [
   { value: 'VIP', label: 'Client VIP' },
   { value: 'GROSSISTE', label: 'Grossiste' },
   { value: 'PROFESSIONNEL', label: 'Professionnel' },
-  { value: 'PARTICULIER', label: 'Particulier' }
+  { value: 'PARTICULIER', label: 'Particulier' },
 ]
 
 export function PriceSimulator({
@@ -143,58 +145,61 @@ export function PriceSimulator({
   availableArticles = SAMPLE_ARTICLES,
   availableRules = [],
   className,
-  defaultContext
+  defaultContext,
 }: PriceSimulatorProps) {
   const [context, setContext] = useState<SimulationContext>({
     quantity: 1,
     channel: PriceRuleChannel.ERP,
-    ...defaultContext
+    ...defaultContext,
   })
-  
+
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showDetails, setShowDetails] = useState(true)
   const [showAdvanced, setShowAdvanced] = useState(false)
-  
+
   const selectedArticle = useMemo(() => {
-    return availableArticles.find(a => a.id === context.articleId)
+    return availableArticles.find((a) => a.id === context.articleId)
   }, [context.articleId, availableArticles])
-  
-  const updateContext = useCallback((field: keyof SimulationContext, value: string | number | undefined | PriceRuleChannel) => {
-    setContext(prev => {
-      const updated = { ...prev, [field]: value }
-      
-      // Si on change l'article, mettre à jour les données
-      if (field === 'articleId') {
-        const article = availableArticles.find(a => a.id === value)
-        if (article) {
-          updated.article = {
-            ...article,
-            uniteVente: article.poids ? 'KG' : 'U',
-            coefficientVente: 1
+
+  const updateContext = useCallback(
+    (field: keyof SimulationContext, value: string | number | undefined | PriceRuleChannel) => {
+      setContext((prev) => {
+        const updated = { ...prev, [field]: value }
+
+        // Si on change l'article, mettre à jour les données
+        if (field === 'articleId') {
+          const article = availableArticles.find((a) => a.id === value)
+          if (article) {
+            updated.article = {
+              ...article,
+              uniteVente: article.poids ? 'KG' : 'U',
+              coefficientVente: 1,
+            }
+            updated.articleReference = article.reference
+            updated.articleFamily = article.famille
           }
-          updated.articleReference = article.reference
-          updated.articleFamily = article.famille
         }
-      }
-      
-      return updated
-    })
-    
-    // Réinitialiser le résultat si on change le contexte
-    setResult(null)
-  }, [availableArticles])
-  
+
+        return updated
+      })
+
+      // Réinitialiser le résultat si on change le contexte
+      setResult(null)
+    },
+    [availableArticles]
+  )
+
   const handleSimulate = useCallback(async () => {
     if (!context.articleId) {
       setError('Veuillez sélectionner un article')
       return
     }
-    
+
     setLoading(true)
     setError(null)
-    
+
     try {
       const simulationResult = await onSimulate(context)
       setResult(simulationResult)
@@ -204,24 +209,24 @@ export function PriceSimulator({
       setLoading(false)
     }
   }, [context, onSimulate])
-  
+
   const handleReset = useCallback(() => {
     setContext({
       quantity: 1,
       channel: PriceRuleChannel.ERP,
-      ...defaultContext
+      ...defaultContext,
     })
     setResult(null)
     setError(null)
   }, [defaultContext])
-  
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'EUR',
     }).format(price)
   }
-  
+
   const formatPercentage = (value: number) => {
     const sign = value > 0 ? '+' : ''
     return `${sign}${value.toFixed(1)}%`
@@ -240,7 +245,7 @@ export function PriceSimulator({
             Testez l'application des règles de prix sur vos articles
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -253,10 +258,12 @@ export function PriceSimulator({
                   <SelectValue placeholder="Sélectionnez un article" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableArticles.map(article => (
+                  {availableArticles.map((article) => (
                     <SelectItem key={article.id} value={article.id}>
                       <div className="flex items-center justify-between w-full">
-                        <span>{article.reference} - {article.designation}</span>
+                        <span>
+                          {article.reference} - {article.designation}
+                        </span>
                         <Badge variant="outline" className="ml-2">
                           {formatPrice(article.prixVenteHT)}
                         </Badge>
@@ -266,7 +273,7 @@ export function PriceSimulator({
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="quantity">Quantité</Label>
               <Input
@@ -278,7 +285,7 @@ export function PriceSimulator({
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="channel">Canal de vente</Label>
@@ -297,7 +304,7 @@ export function PriceSimulator({
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="customerGroup">Groupe client</Label>
               <Select
@@ -308,7 +315,7 @@ export function PriceSimulator({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CUSTOMER_GROUPS.map(group => (
+                  {CUSTOMER_GROUPS.map((group) => (
                     <SelectItem key={group.value} value={group.value}>
                       {group.label}
                     </SelectItem>
@@ -317,7 +324,7 @@ export function PriceSimulator({
               </Select>
             </div>
           </div>
-          
+
           {/* Options avancées */}
           <div>
             <Button
@@ -326,10 +333,14 @@ export function PriceSimulator({
               onClick={() => setShowAdvanced(!showAdvanced)}
               className="mb-3"
             >
-              {showAdvanced ? <ChevronDown className="w-4 h-4 mr-2" /> : <ChevronRight className="w-4 h-4 mr-2" />}
+              {showAdvanced ? (
+                <ChevronDown className="w-4 h-4 mr-2" />
+              ) : (
+                <ChevronRight className="w-4 h-4 mr-2" />
+              )}
               Options avancées
             </Button>
-            
+
             {showAdvanced && (
               <div className="grid grid-cols-2 gap-4 pl-6">
                 <div>
@@ -341,7 +352,7 @@ export function PriceSimulator({
                     placeholder="UUID du client"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="customerEmail">Email client</Label>
                   <Input
@@ -355,7 +366,7 @@ export function PriceSimulator({
               </div>
             )}
           </div>
-          
+
           {/* Article sélectionné */}
           {selectedArticle && (
             <Alert>
@@ -385,7 +396,7 @@ export function PriceSimulator({
               </AlertDescription>
             </Alert>
           )}
-          
+
           {/* Erreur */}
           {error && (
             <Alert variant="destructive">
@@ -394,14 +405,14 @@ export function PriceSimulator({
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
+
           {/* Actions */}
           <div className="flex justify-between">
             <Button variant="outline" onClick={handleReset}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Réinitialiser
             </Button>
-            
+
             <Button onClick={handleSimulate} disabled={loading || !context.articleId}>
               {loading ? (
                 <>
@@ -418,7 +429,7 @@ export function PriceSimulator({
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Résultats */}
       {result && (
         <Card>
@@ -428,36 +439,30 @@ export function PriceSimulator({
                 <Zap className="w-5 h-5" />
                 Résultat de la simulation
               </CardTitle>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowDetails(!showDetails)}
-              >
+
+              <Button variant="ghost" size="sm" onClick={() => setShowDetails(!showDetails)}>
                 {showDetails ? 'Masquer les détails' : 'Afficher les détails'}
               </Button>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <div className="grid grid-cols-3 gap-6 mb-6">
               <div>
                 <span className="text-sm text-muted-foreground">Prix de base</span>
                 <p className="text-2xl font-bold">{formatPrice(result.basePrice)}</p>
               </div>
-              
+
               <div>
                 <span className="text-sm text-muted-foreground">Prix final</span>
-                <p className="text-2xl font-bold text-primary">
-                  {formatPrice(result.finalPrice)}
-                </p>
+                <p className="text-2xl font-bold text-primary">{formatPrice(result.finalPrice)}</p>
                 {result.unitPrice && (
                   <p className="text-sm text-muted-foreground">
                     soit {formatPrice(result.unitPrice.value)}/{result.unitPrice.unit}
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <span className="text-sm text-muted-foreground">
                   {result.totalDiscount < 0 ? 'Remise totale' : 'Majoration totale'}
@@ -468,9 +473,7 @@ export function PriceSimulator({
                       {formatPrice(Math.abs(result.totalDiscount))}
                     </span>
                   ) : (
-                    <span className="text-orange-600">
-                      +{formatPrice(result.totalDiscount)}
-                    </span>
+                    <span className="text-orange-600">+{formatPrice(result.totalDiscount)}</span>
                   )}
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -478,22 +481,24 @@ export function PriceSimulator({
                 </p>
               </div>
             </div>
-            
+
             {context.quantity > 1 && (
               <div className="bg-muted/50 rounded-lg p-4 mb-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Prix total pour {context.quantity} unités</span>
+                  <span className="text-sm font-medium">
+                    Prix total pour {context.quantity} unités
+                  </span>
                   <span className="text-xl font-bold">
                     {formatPrice(result.finalPrice * context.quantity)}
                   </span>
                 </div>
               </div>
             )}
-            
+
             {showDetails && (
               <>
                 <Separator className="my-6" />
-                
+
                 {/* Règles appliquées */}
                 {result.appliedRules.length > 0 && (
                   <div className="space-y-3">
@@ -501,10 +506,10 @@ export function PriceSimulator({
                       <Check className="w-4 h-4 text-green-600" />
                       Règles appliquées ({result.appliedRules.length})
                     </h4>
-                    
+
                     <div className="space-y-2">
                       {result.appliedRules.map((rule, index) => (
-                        <div 
+                        <div
                           key={rule.ruleId}
                           className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/10 rounded-lg"
                         >
@@ -514,12 +519,10 @@ export function PriceSimulator({
                             </Badge>
                             <div>
                               <p className="font-medium">{rule.ruleName}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Type: {rule.ruleType}
-                              </p>
+                              <p className="text-sm text-muted-foreground">Type: {rule.ruleType}</p>
                             </div>
                           </div>
-                          
+
                           <div className="text-right">
                             <p className="font-medium">
                               {rule.discountAmount < 0 ? (
@@ -541,7 +544,7 @@ export function PriceSimulator({
                     </div>
                   </div>
                 )}
-                
+
                 {/* Règles non appliquées */}
                 {result.skippedRules && result.skippedRules.length > 0 && (
                   <div className="space-y-3 mt-6">
@@ -549,25 +552,23 @@ export function PriceSimulator({
                       <Info className="w-4 h-4" />
                       Règles non appliquées ({result.skippedRules.length})
                     </h4>
-                    
+
                     <div className="space-y-2">
-                      {result.skippedRules.map(rule => (
-                        <div 
+                      {result.skippedRules.map((rule) => (
+                        <div
                           key={rule.ruleId}
                           className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/10 rounded-lg"
                         >
                           <div>
                             <p className="font-medium text-muted-foreground">{rule.ruleName}</p>
-                            <p className="text-sm text-muted-foreground">
-                              Raison: {rule.reason}
-                            </p>
+                            <p className="text-sm text-muted-foreground">Raison: {rule.reason}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
-                
+
                 {/* Avertissements */}
                 {result.warnings && result.warnings.length > 0 && (
                   <Alert className="mt-6">
@@ -587,7 +588,7 @@ export function PriceSimulator({
           </CardContent>
         </Card>
       )}
-      
+
       {/* Règles disponibles */}
       {availableRules.length > 0 && (
         <Card>
@@ -600,11 +601,11 @@ export function PriceSimulator({
               {availableRules.length} règles peuvent potentiellement s'appliquer
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent>
             <div className="space-y-2">
-              {availableRules.map(rule => (
-                <div 
+              {availableRules.map((rule) => (
+                <div
                   key={rule.id}
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
@@ -617,16 +618,12 @@ export function PriceSimulator({
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     {rule.priority > 0 && (
-                      <Badge variant="secondary">
-                        Priorité: {rule.priority}
-                      </Badge>
+                      <Badge variant="secondary">Priorité: {rule.priority}</Badge>
                     )}
-                    {!rule.combinable && (
-                      <Badge variant="destructive">Non combinable</Badge>
-                    )}
+                    {!rule.combinable && <Badge variant="destructive">Non combinable</Badge>}
                   </div>
                 </div>
               ))}

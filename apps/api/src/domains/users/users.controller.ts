@@ -14,7 +14,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
 import { Roles } from '../../core/common/decorators/roles.decorator'
-import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+import type { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { JwtAuthGuard } from '../auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/security/guards/roles.guard'
 import {
@@ -30,7 +30,7 @@ import type { UpdateUserDto } from './dto/update-user.dto'
 import type { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
 import type { UserQueryDto } from './dto/user-query.dto'
 import { UserRole } from './entities/user.entity'
-import { UsersService } from './users.service'
+import type { UsersService } from './users.service'
 
 @Controller('users')
 @ApiTags('👤 Users')

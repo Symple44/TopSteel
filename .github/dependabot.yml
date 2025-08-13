@@ -1,7 +1,7 @@
 # .github/dependabot.yml
 version: 2
 updates:
-  # Configuration pour les dépendances npm
+  # Configuration pour les dépendances npm (racine du monorepo)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -10,16 +10,34 @@ updates:
       time: "04:00"
     open-pull-requests-limit: 10
     groups:
+      # Grouper les mises à jour de sécurité (priorité haute)
+      security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      # Grouper les dépendances de production
       production-dependencies:
         dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      # Grouper les dépendances de développement
       development-dependencies:
         dependency-type: "development"
         patterns:
           - "@types/*"
           - "eslint*"
-          - "prettier*"
-          - "jest*"
-          - "*test*"
+          - "@biomejs/*"
+          - "vitest*"
+          - "turbo"
+      # Grouper les packages Radix UI
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
+      # Grouper les packages TanStack
+      tanstack:
+        patterns:
+          - "@tanstack/*"
     reviewers:
       - "Symple44"
     labels:
@@ -34,6 +52,12 @@ updates:
       - dependency-name: "next"
         update-types: ["version-update:semver-major"]
       - dependency-name: "@nestjs/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typeorm"
         update-types: ["version-update:semver-major"]
 
   # Configuration pour les GitHub Actions

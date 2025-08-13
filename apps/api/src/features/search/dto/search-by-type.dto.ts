@@ -1,16 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
 import {
-  IsString,
-  IsOptional,
-  MinLength,
-  MaxLength,
   IsIn,
   IsInt,
-  Min,
-  Max,
   IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
 } from 'class-validator'
-import { Type, Transform } from 'class-transformer'
-import { ApiProperty } from '@nestjs/swagger'
 
 // Valid entity types based on searchable-entities.config.ts
 const VALID_ENTITY_TYPES = [
@@ -59,7 +59,7 @@ export class SearchByTypeQueryDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       // Sanitize the input by trimming and removing dangerous characters
-      return value.trim().replace(/[<>\"'%;()&+]/g, '')
+      return value.trim().replace(/[<>"'%;()&+]/g, '')
     }
     return value
   })
@@ -77,7 +77,7 @@ export class SearchByTypeQueryDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       const parsed = parseInt(value, 10)
-      return isNaN(parsed) ? 20 : parsed
+      return Number.isNaN(parsed) ? 20 : parsed
     }
     return value
   })
@@ -99,13 +99,13 @@ export class SearchByTypeQueryDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       const parsed = parseInt(value, 10)
-      return isNaN(parsed) ? 0 : parsed
+      return Number.isNaN(parsed) ? 0 : parsed
     }
     return value
   })
   @Type(() => Number)
-  @IsInt({ message: 'L\'offset doit être un nombre entier' })
-  @Min(0, { message: 'L\'offset doit être au minimum 0' })
-  @Max(10000, { message: 'L\'offset ne peut pas dépasser 10000' })
+  @IsInt({ message: "L'offset doit être un nombre entier" })
+  @Min(0, { message: "L'offset doit être au minimum 0" })
+  @Max(10000, { message: "L'offset ne peut pas dépasser 10000" })
   offset?: number = 0
 }

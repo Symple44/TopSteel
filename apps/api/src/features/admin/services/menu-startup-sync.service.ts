@@ -1,6 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { MenuSyncService } from './menu-sync.service'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
+import type { MenuSyncService } from './menu-sync.service'
 
 @Injectable()
 export class MenuStartupSyncService implements OnModuleInit {
@@ -14,7 +14,7 @@ export class MenuStartupSyncService implements OnModuleInit {
   async onModuleInit() {
     // Synchronisation automatique au démarrage si activée
     const autoSyncEnabled = this.configService.get<boolean>('MENU_AUTO_SYNC_ON_STARTUP', true)
-    
+
     if (!autoSyncEnabled) {
       this.logger.log('Synchronisation automatique du menu désactivée')
       return
@@ -22,9 +22,9 @@ export class MenuStartupSyncService implements OnModuleInit {
 
     try {
       this.logger.log('Vérification du besoin de synchronisation du menu au démarrage...')
-      
+
       const needsSync = await this.menuSyncService.needsSync()
-      
+
       if (needsSync) {
         this.logger.log('Synchronisation du menu nécessaire - démarrage en cours...')
         await this.menuSyncService.syncMenuFromSidebar()

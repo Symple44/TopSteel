@@ -37,7 +37,7 @@ export class SocieteUsersService {
         'sites.id',
         'sites.nom',
         'sites.code',
-        'sites.isPrincipal'
+        'sites.isPrincipal',
       ])
       .where('su.userId = :userId', { userId })
       .andWhere('su.deletedAt IS NULL')

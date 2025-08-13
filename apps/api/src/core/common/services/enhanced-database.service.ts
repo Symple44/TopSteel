@@ -1,8 +1,8 @@
 // apps/api/src/common/services/enhanced-database.service.ts
 import { Injectable, Logger } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
-import { CircuitBreakerService } from '../../../infrastructure/monitoring/circuit-breaker.service'
-import { MetricsService } from '../../../infrastructure/monitoring/metrics.service'
+import type { CircuitBreakerService } from '../../../infrastructure/monitoring/circuit-breaker.service'
+import type { MetricsService } from '../../../infrastructure/monitoring/metrics.service'
 
 interface DatabaseResult<T = unknown> {
   success: boolean

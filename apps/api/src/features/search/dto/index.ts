@@ -1,13 +1,13 @@
 export { GlobalSearchDto } from './global-search.dto'
-export { SuggestionsDto } from './suggestions.dto'
-export { SearchByTypeParamsDto, SearchByTypeQueryDto } from './search-by-type.dto'
 export { MenuSearchDto } from './menu-search.dto'
+export { SearchByTypeParamsDto, SearchByTypeQueryDto } from './search-by-type.dto'
 export {
-  SearchResultDto,
-  SearchResponseDto,
   GlobalSearchResponseDto,
-  SuggestionsResponseDto,
-  SearchStatsResponseDto,
-  SearchEngineStatusResponseDto,
   ReindexResponseDto,
+  SearchEngineStatusResponseDto,
+  SearchResponseDto,
+  SearchResultDto,
+  SearchStatsResponseDto,
+  SuggestionsResponseDto,
 } from './search-response.dto'
+export { SuggestionsDto } from './suggestions.dto'

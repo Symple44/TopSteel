@@ -2,9 +2,9 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
-import { MenuItem, MenuItemType } from '../entities/menu-item.entity'
+import { MenuItem } from '../entities/menu-item.entity'
 import { MenuItemRole } from '../entities/menu-item-role.entity'
-import { MenuConfigurationService } from './menu-configuration.service'
+import type { MenuConfigurationService } from './menu-configuration.service'
 
 interface SidebarNavItem {
   title: string
@@ -41,7 +41,7 @@ export class MenuSyncService {
       const sidebarNavigation = this.getSidebarNavigationStructure()
 
       // Chercher ou créer la configuration système
-      let systemConfig = await this.findOrCreateSystemConfig()
+      const systemConfig = await this.findOrCreateSystemConfig()
 
       // Supprimer les anciens items pour une synchro complète
       await this.itemRepository.delete({ configId: systemConfig.id })
@@ -261,9 +261,7 @@ export class MenuSyncService {
 
       // Créer les rôles si spécifiés
       if (sidebarItem.roles && sidebarItem.roles.length > 0) {
-        const roles = sidebarItem.roles.map((roleId) =>
-          MenuItemRole.create(savedItem.id, roleId)
-        )
+        const roles = sidebarItem.roles.map((roleId) => MenuItemRole.create(savedItem.id, roleId))
         await this.roleRepository.save(roles)
         this.logger.debug(`Rôles ajoutés pour ${savedItem.title}: ${sidebarItem.roles.join(', ')}`)
       }

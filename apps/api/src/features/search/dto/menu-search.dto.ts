@@ -1,12 +1,6 @@
-import {
-  IsString,
-  MinLength,
-  MaxLength,
-  IsNotEmpty,
-  IsOptional,
-} from 'class-validator'
-import { Transform } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator'
 
 export class MenuSearchDto {
   @ApiProperty({
@@ -22,7 +16,7 @@ export class MenuSearchDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       // Sanitize the input by trimming and removing dangerous characters
-      return value.trim().replace(/[<>\"'%;()&+]/g, '')
+      return value.trim().replace(/[<>"'%;()&+]/g, '')
     }
     return value
   })

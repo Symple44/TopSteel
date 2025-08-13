@@ -1,9 +1,8 @@
 #!/usr/bin/env ts-node
 
-import { DataSource } from 'typeorm'
+import * as path from 'node:path'
 import * as dotenv from 'dotenv'
-import * as path from 'path'
-import { CreateSearchIndexes20250811 } from '../core/database/migrations/topsteel/20250811-CreateSearchIndexes'
+import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
 dotenv.config({ path: path.join(__dirname, '../../../../.env') })
@@ -22,7 +21,7 @@ const databases = [
   {
     name: 'shared',
     database: process.env.DB_SHARED_NAME || 'erp_topsteel_shared',
-  }
+  },
 ]
 
 async function runSearchIndexesMigration() {
@@ -68,12 +67,12 @@ async function runSearchIndexesMigration() {
         'shared_materials',
         'price_rules',
         'notifications',
-        'query_builders'
+        'query_builders',
       ]
 
       console.log('\n🔍 Vérification des tables...')
       const existingTables: string[] = []
-      
+
       for (const table of tables) {
         const result = await queryRunner.query(`
           SELECT EXISTS (
@@ -82,7 +81,7 @@ async function runSearchIndexesMigration() {
             AND table_name = '${table}'
           )
         `)
-        
+
         if (result[0].exists) {
           existingTables.push(table)
           console.log(`  ✓ Table '${table}' trouvée`)
@@ -100,7 +99,7 @@ async function runSearchIndexesMigration() {
 
       // Exécuter la migration pour les tables existantes
       console.log('\n📦 Création des index de recherche...')
-      
+
       // Activer les extensions PostgreSQL
       try {
         await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS pg_trgm;`)
@@ -120,9 +119,9 @@ async function runSearchIndexesMigration() {
       for (const table of existingTables) {
         try {
           console.log(`\n  📑 Création des index pour '${table}'...`)
-          
+
           // Index spécifiques par table
-          switch(table) {
+          switch (table) {
             case 'partners':
               await createPartnersIndexes(queryRunner)
               break
@@ -152,7 +151,7 @@ async function runSearchIndexesMigration() {
               break
             // Ajouter d'autres cas si nécessaire
           }
-          
+
           console.log(`    ✅ Index créés pour '${table}'`)
         } catch (error) {
           console.log(`    ⚠️ Erreur lors de la création des index pour '${table}':`, error.message)
@@ -162,9 +161,8 @@ async function runSearchIndexesMigration() {
       // Libérer les ressources
       await queryRunner.release()
       await dataSource.destroy()
-      
-      console.log(`\n✅ Migration terminée pour la base ${db.name}\n`)
 
+      console.log(`\n✅ Migration terminée pour la base ${db.name}\n`)
     } catch (error) {
       console.error(`❌ Erreur pour la base ${db.name}:`, error)
       if (dataSource.isInitialized) {
@@ -188,7 +186,7 @@ async function createPartnersIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_partners_code ON partners(code);
     CREATE INDEX IF NOT EXISTS idx_partners_email ON partners(email);
@@ -205,7 +203,7 @@ async function createArticlesIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_articles_reference ON articles(reference);
   `)
@@ -221,7 +219,7 @@ async function createMaterialsIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_materials_reference ON materials(reference);
   `)
@@ -237,7 +235,7 @@ async function createProjetsIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_projets_code ON projets(code);
   `)
@@ -253,7 +251,7 @@ async function createDevisIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_devis_numero ON devis(numero);
   `)
@@ -269,7 +267,7 @@ async function createFacturesIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_factures_numero ON factures(numero);
   `)
@@ -284,7 +282,7 @@ async function createMenuItemsIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_menu_items_visible ON menu_items("isVisible");
     CREATE INDEX IF NOT EXISTS idx_menu_items_type ON menu_items(type);
@@ -302,7 +300,7 @@ async function createUsersIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
   `)
@@ -318,7 +316,7 @@ async function createSocietesIndexes(queryRunner: any) {
       )
     );
   `)
-  
+
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_societes_code ON societes(code);
   `)

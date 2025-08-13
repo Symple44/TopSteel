@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing'
+import { AdjustmentType, PriceRule, PriceRuleChannel } from '@erp/entities'
+import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { Repository, DataSource } from 'typeorm'
-import { PricingEngineService, PricingContext } from './pricing-engine.service'
-import { PriceRule, AdjustmentType, PriceRuleChannel } from '@erp/entities'
+import { DataSource, Repository } from 'typeorm'
 import { Article } from '../../../domains/inventory/entities/article.entity'
+import { type PricingContext, PricingEngineService } from './pricing-engine.service'
 
 describe('PricingEngineService', () => {
   let service: PricingEngineService
   let priceRuleRepository: Repository<PriceRule>
   let articleRepository: Repository<Article>
-  let dataSource: DataSource
+  let _dataSource: DataSource
 
   // Mock data
   const mockArticle = {
@@ -23,7 +23,7 @@ describe('PricingEngineService', () => {
     largeur: 500,
     hauteur: 100,
     uniteVente: 'U',
-    coefficientVente: 1
+    coefficientVente: 1,
   }
 
   const mockPriceRule = {
@@ -39,12 +39,12 @@ describe('PricingEngineService', () => {
       {
         type: 'customer_group' as const,
         operator: 'equals' as const,
-        value: 'VIP'
-      }
+        value: 'VIP',
+      },
     ],
     canBeApplied: jest.fn().mockReturnValue(true),
     incrementUsage: jest.fn(),
-    validate: jest.fn().mockReturnValue([])
+    validate: jest.fn().mockReturnValue([]),
   }
 
   const mockContext: PricingContext = {
@@ -53,7 +53,7 @@ describe('PricingEngineService', () => {
     customerId: 'customer-123',
     customerGroup: 'VIP',
     quantity: 1,
-    channel: PriceRuleChannel.ERP
+    channel: PriceRuleChannel.ERP,
   }
 
   beforeEach(async () => {
@@ -62,31 +62,31 @@ describe('PricingEngineService', () => {
         PricingEngineService,
         {
           provide: getRepositoryToken(PriceRule),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(Article),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: DataSource,
           useValue: {
             // Mock DataSource methods if needed
-          }
-        }
+          },
+        },
       ],
     }).compile()
 
     service = module.get<PricingEngineService>(PricingEngineService)
     priceRuleRepository = module.get<Repository<PriceRule>>(getRepositoryToken(PriceRule))
     articleRepository = module.get<Repository<Article>>(getRepositoryToken(Article))
-    dataSource = module.get<DataSource>(DataSource)
+    _dataSource = module.get<DataSource>(DataSource)
 
     // Setup default mocks
     jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
-      getOne: jest.fn().mockResolvedValue(mockArticle)
+      getOne: jest.fn().mockResolvedValue(mockArticle),
     } as any)
 
     jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -94,7 +94,7 @@ describe('PricingEngineService', () => {
       andWhere: jest.fn().mockReturnThis(),
       orderBy: jest.fn().mockReturnThis(),
       addOrderBy: jest.fn().mockReturnThis(),
-      getMany: jest.fn().mockResolvedValue([mockPriceRule])
+      getMany: jest.fn().mockResolvedValue([mockPriceRule]),
     } as any)
 
     jest.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as any)
@@ -116,7 +116,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([])
+        getMany: jest.fn().mockResolvedValue([]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -127,7 +127,7 @@ describe('PricingEngineService', () => {
         currency: 'EUR',
         appliedRules: [],
         totalDiscount: 0,
-        totalDiscountPercentage: 0
+        totalDiscountPercentage: 0,
       })
     })
 
@@ -140,7 +140,7 @@ describe('PricingEngineService', () => {
       expect(result.appliedRules[0]).toMatchObject({
         ruleId: 'rule-123',
         ruleName: 'Remise VIP',
-        ruleType: AdjustmentType.PERCENTAGE
+        ruleType: AdjustmentType.PERCENTAGE,
       })
       expect(result.totalDiscount).toBe(10)
       expect(result.totalDiscountPercentage).toBe(10)
@@ -149,13 +149,13 @@ describe('PricingEngineService', () => {
     it('should apply coefficient de vente', async () => {
       const articleWithCoeff = {
         ...mockArticle,
-        coefficientVente: 1.2
+        coefficientVente: 1.2,
       }
 
       jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(articleWithCoeff)
+        getOne: jest.fn().mockResolvedValue(articleWithCoeff),
       } as any)
 
       // No rules to focus on coefficient
@@ -164,7 +164,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([])
+        getMany: jest.fn().mockResolvedValue([]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -177,7 +177,7 @@ describe('PricingEngineService', () => {
       const fixedAmountRule = {
         ...mockPriceRule,
         adjustmentType: AdjustmentType.FIXED_AMOUNT,
-        adjustmentValue: -15 // -15€
+        adjustmentValue: -15, // -15€
       }
 
       jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -185,7 +185,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([fixedAmountRule])
+        getMany: jest.fn().mockResolvedValue([fixedAmountRule]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -198,7 +198,7 @@ describe('PricingEngineService', () => {
       const fixedPriceRule = {
         ...mockPriceRule,
         adjustmentType: AdjustmentType.FIXED_PRICE,
-        adjustmentValue: 75 // 75€ fixe
+        adjustmentValue: 75, // 75€ fixe
       }
 
       jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -206,7 +206,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([fixedPriceRule])
+        getMany: jest.fn().mockResolvedValue([fixedPriceRule]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -220,14 +220,14 @@ describe('PricingEngineService', () => {
         ...mockPriceRule,
         id: 'rule-low',
         priority: 50,
-        adjustmentValue: -20
+        adjustmentValue: -20,
       }
 
       const highPriorityRule = {
         ...mockPriceRule,
         id: 'rule-high',
         priority: 100,
-        adjustmentValue: -10
+        adjustmentValue: -10,
       }
 
       jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -235,7 +235,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([lowPriorityRule, highPriorityRule])
+        getMany: jest.fn().mockResolvedValue([lowPriorityRule, highPriorityRule]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -248,13 +248,13 @@ describe('PricingEngineService', () => {
     it('should stop at non-combinable rule', async () => {
       const nonCombinableRule = {
         ...mockPriceRule,
-        combinable: false
+        combinable: false,
       }
 
       const secondRule = {
         ...mockPriceRule,
         id: 'rule-2',
-        priority: 90
+        priority: 90,
       }
 
       jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -262,7 +262,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([nonCombinableRule, secondRule])
+        getMany: jest.fn().mockResolvedValue([nonCombinableRule, secondRule]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -275,7 +275,7 @@ describe('PricingEngineService', () => {
       jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(null)
+        getOne: jest.fn().mockResolvedValue(null),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -286,10 +286,10 @@ describe('PricingEngineService', () => {
     })
 
     it('should provide detailed breakdown when requested', async () => {
-      const result = await service.calculatePrice(mockContext, { 
+      const result = await service.calculatePrice(mockContext, {
         detailed: true,
         includeMargins: true,
-        includeSkippedRules: true 
+        includeSkippedRules: true,
       })
 
       expect(result.breakdown).toBeDefined()
@@ -303,13 +303,13 @@ describe('PricingEngineService', () => {
     it('should calculate prices for multiple articles', async () => {
       const articles = [
         { articleId: 'article-1', quantity: 1 },
-        { articleId: 'article-2', quantity: 2 }
+        { articleId: 'article-2', quantity: 2 },
       ]
 
       const context = {
         societeId: 'societe-123',
         customerId: 'customer-123',
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       const result = await service.calculateBulkPrices(articles, context)
@@ -325,11 +325,9 @@ describe('PricingEngineService', () => {
     it('should preview a specific rule', async () => {
       jest.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as any)
 
-      const result = await service.previewRule(
-        'rule-123',
-        'article-123',
-        { societeId: 'societe-123' }
-      )
+      const result = await service.previewRule('rule-123', 'article-123', {
+        societeId: 'societe-123',
+      })
 
       expect(result.appliedRules).toHaveLength(1)
       expect(result.appliedRules[0].ruleId).toBe('rule-123')
@@ -338,11 +336,9 @@ describe('PricingEngineService', () => {
     it('should handle missing rule', async () => {
       jest.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(null)
 
-      const result = await service.previewRule(
-        'missing-rule',
-        'article-123',
-        { societeId: 'societe-123' }
-      )
+      const result = await service.previewRule('missing-rule', 'article-123', {
+        societeId: 'societe-123',
+      })
 
       expect(result.warnings).toContain('Règle introuvable')
     })
@@ -354,8 +350,9 @@ describe('PricingEngineService', () => {
         throw new Error('Database connection failed')
       })
 
-      await expect(service.calculatePrice(mockContext))
-        .rejects.toThrow('Database connection failed')
+      await expect(service.calculatePrice(mockContext)).rejects.toThrow(
+        'Database connection failed'
+      )
     })
 
     it('should handle rule evaluation errors', async () => {
@@ -363,7 +360,7 @@ describe('PricingEngineService', () => {
         ...mockPriceRule,
         canBeApplied: jest.fn().mockImplementation(() => {
           throw new Error('Rule evaluation failed')
-        })
+        }),
       }
 
       jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -371,7 +368,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([problematicRule])
+        getMany: jest.fn().mockResolvedValue([problematicRule]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -384,15 +381,16 @@ describe('PricingEngineService', () => {
 
   describe('Edge cases', () => {
     it('should handle zero base price', async () => {
-      const zeroPrice Article = {
+      const _zeroPrice
+      Article = {
         ...mockArticle,
-        prixVenteHT: 0
+        prixVenteHT: 0,
       }
 
       jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(zeroPriceArticle)
+        getOne: jest.fn().mockResolvedValue(zeroPriceArticle),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -405,7 +403,7 @@ describe('PricingEngineService', () => {
       const largeDiscountRule = {
         ...mockPriceRule,
         adjustmentType: AdjustmentType.FIXED_AMOUNT,
-        adjustmentValue: -150 // Plus que le prix de base
+        adjustmentValue: -150, // Plus que le prix de base
       }
 
       jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -413,7 +411,7 @@ describe('PricingEngineService', () => {
         andWhere: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([largeDiscountRule])
+        getMany: jest.fn().mockResolvedValue([largeDiscountRule]),
       } as any)
 
       const result = await service.calculatePrice(mockContext)
@@ -424,7 +422,7 @@ describe('PricingEngineService', () => {
     it('should handle very large quantities', async () => {
       const largeQuantityContext = {
         ...mockContext,
-        quantity: 999999
+        quantity: 999999,
       }
 
       const result = await service.calculatePrice(largeQuantityContext)

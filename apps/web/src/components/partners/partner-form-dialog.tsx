@@ -1,51 +1,40 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+import type { CreatePartnerDto, Partner, UpdatePartnerDto } from '@erp/types'
+import { PartnerType } from '@erp/types'
 import {
+  Button,
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@erp/ui'
-import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
-} from '@erp/ui'
-import { Input } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Textarea } from '@erp/ui'
-import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Separator,
+  Switch,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@erp/ui'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { Switch } from '@erp/ui'
-import { Separator } from '@erp/ui'
-import {
-  Building2,
-  User,
-  CreditCard,
-  FileText,
-  MapPin,
-  Phone,
-  Mail,
-  Globe,
-} from 'lucide-react'
-import type { Partner, CreatePartnerDto, UpdatePartnerDto } from '@erp/types'
-import { PartnerType, type PartnerStatus } from '@erp/types'
-import { useCreatePartner, useUpdatePartner, usePartnerGroups } from '@/hooks/use-partners'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Building2, CreditCard, FileText, MapPin, Phone } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { useCreatePartner, usePartnerGroups, useUpdatePartner } from '@/hooks/use-partners'
 
 const partnerSchema = z.object({
   code: z.string().optional(),
@@ -54,26 +43,26 @@ const partnerSchema = z.object({
   denominationCommerciale: z.string().optional(),
   category: z.string().min(1, 'La catégorie est requise'),
   status: z.nativeEnum(PartnerStatus).optional(),
-  
+
   // Identification
   siret: z.string().optional(),
   numeroTVA: z.string().optional(),
   codeAPE: z.string().optional(),
-  
+
   // Contact
   contactPrincipal: z.string().optional(),
   telephone: z.string().optional(),
   mobile: z.string().optional(),
   email: z.string().email().optional().or(z.literal('')),
   siteWeb: z.string().url().optional().or(z.literal('')),
-  
+
   // Adresse
   adresse: z.string().optional(),
   adresseComplement: z.string().optional(),
   codePostal: z.string().optional(),
   ville: z.string().optional(),
   pays: z.string().optional(),
-  
+
   // Commercial
   conditionsPaiement: z.string().optional(),
   modePaiement: z.string().optional(),
@@ -81,12 +70,12 @@ const partnerSchema = z.object({
   tauxRemise: z.coerce.number().min(0).max(100).optional(),
   representantCommercial: z.string().optional(),
   groupId: z.string().optional(),
-  
+
   // Fournisseur
   delaiLivraison: z.coerce.number().optional(),
   montantMiniCommande: z.coerce.number().optional(),
   fournisseurPrefere: z.boolean().optional(),
-  
+
   // Comptabilité
   compteComptableClient: z.string().optional(),
   compteComptableFournisseur: z.string().optional(),
@@ -103,7 +92,7 @@ interface PartnerFormDialogProps {
 // Catégories métallurgie
 const PARTNER_CATEGORIES = [
   'ACIER_NEGOCE',
-  'ACIER_PRODUCTION', 
+  'ACIER_PRODUCTION',
   'ALUMINIUM',
   'INOX',
   'METALLURGIE_GENERALE',
@@ -148,9 +137,9 @@ export function PartnerFormDialog({ open, onOpenChange, partner }: PartnerFormDi
   const createPartner = useCreatePartner()
   const updatePartner = useUpdatePartner()
   const { data: groups = [] } = usePartnerGroups()
-  
+
   const isEditing = !!partner
-  
+
   const form = useForm<PartnerFormData>({
     resolver: zodResolver(partnerSchema),
     defaultValues: {
@@ -184,22 +173,19 @@ export function PartnerFormDialog({ open, onOpenChange, partner }: PartnerFormDi
       }
       onOpenChange(false)
       form.reset()
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   const partnerType = form.watch('type')
   const showClientFields = partnerType === PartnerType.CLIENT || partnerType === PartnerType.MIXTE
-  const showSupplierFields = partnerType === PartnerType.FOURNISSEUR || partnerType === PartnerType.MIXTE
+  const showSupplierFields =
+    partnerType === PartnerType.FOURNISSEUR || partnerType === PartnerType.MIXTE
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? 'Modifier le partenaire' : 'Nouveau partenaire'}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? 'Modifier le partenaire' : 'Nouveau partenaire'}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -679,7 +665,7 @@ export function PartnerFormDialog({ open, onOpenChange, partner }: PartnerFormDi
                   <>
                     <Separator />
                     <h3 className="text-lg font-semibold">Paramètres fournisseur</h3>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -716,18 +702,13 @@ export function PartnerFormDialog({ open, onOpenChange, partner }: PartnerFormDi
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">
-                              Fournisseur préféré
-                            </FormLabel>
+                            <FormLabel className="text-base">Fournisseur préféré</FormLabel>
                             <FormDescription>
                               Ce fournisseur sera proposé en priorité
                             </FormDescription>
                           </div>
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -781,13 +762,12 @@ export function PartnerFormDialog({ open, onOpenChange, partner }: PartnerFormDi
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
-              <Button 
-                type="submit" 
-                disabled={createPartner.isPending || updatePartner.isPending}
-              >
-                {createPartner.isPending || updatePartner.isPending 
-                  ? 'Enregistrement...' 
-                  : isEditing ? 'Modifier' : 'Créer'}
+              <Button type="submit" disabled={createPartner.isPending || updatePartner.isPending}>
+                {createPartner.isPending || updatePartner.isPending
+                  ? 'Enregistrement...'
+                  : isEditing
+                    ? 'Modifier'
+                    : 'Créer'}
               </Button>
             </DialogFooter>
           </form>

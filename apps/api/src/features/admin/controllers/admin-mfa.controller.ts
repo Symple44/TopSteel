@@ -20,8 +20,8 @@ import {
 } from '@nestjs/swagger'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
-import { MFAService } from '../../../domains/auth/services/mfa.service'
+import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
+import type { MFAService } from '../../../domains/auth/services/mfa.service'
 
 @Controller('admin/mfa')
 @ApiTags('🔧 Admin - Multi-Factor Authentication')

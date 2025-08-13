@@ -27,9 +27,13 @@ export class PartnerAddress extends BusinessEntity {
   @Index()
   partnerId!: string
 
-  @ManyToOne(() => Partner, partner => partner.addresses, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(
+    () => Partner,
+    (partner) => partner.addresses,
+    {
+      onDelete: 'CASCADE',
+    }
+  )
   @JoinColumn({ name: 'partnerId' })
   partner!: Partner
 
@@ -37,10 +41,14 @@ export class PartnerAddress extends BusinessEntity {
   @Index()
   partnerSiteId?: string
 
-  @ManyToOne(() => PartnerSite, site => site.addresses, {
-    nullable: true,
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(
+    () => PartnerSite,
+    (site) => site.addresses,
+    {
+      nullable: true,
+      onDelete: 'CASCADE',
+    }
+  )
   @JoinColumn({ name: 'partnerSiteId' })
   site?: PartnerSite
 
@@ -141,11 +149,11 @@ export class PartnerAddress extends BusinessEntity {
     const errors: string[] = []
 
     if (!this.libelle?.trim()) {
-      errors.push('Le libellé de l\'adresse est requis')
+      errors.push("Le libellé de l'adresse est requis")
     }
 
     if (!this.ligne1?.trim()) {
-      errors.push('La première ligne d\'adresse est requise')
+      errors.push("La première ligne d'adresse est requise")
     }
 
     if (!this.codePostal?.trim()) {
@@ -215,7 +223,7 @@ export class PartnerAddress extends BusinessEntity {
    */
   getAdresseLigne(): string {
     const parts: string[] = []
-    
+
     parts.push(this.ligne1)
     if (this.ligne2) parts.push(this.ligne2)
     if (this.ligne3) parts.push(this.ligne3)
@@ -231,7 +239,7 @@ export class PartnerAddress extends BusinessEntity {
    */
   getAdresseMultiLignes(): string {
     const lines: string[] = []
-    
+
     lines.push(this.ligne1)
     if (this.ligne2) lines.push(this.ligne2)
     if (this.ligne3) lines.push(this.ligne3)
@@ -306,13 +314,16 @@ export class PartnerAddress extends BusinessEntity {
     const R = 6371 // Rayon de la Terre en km
     const dLat = this.toRad(this.latitude - lat)
     const dLon = this.toRad(this.longitude - lon)
-    
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRad(lat)) * Math.cos(this.toRad(this.latitude)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2)
-    
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(lat)) *
+        Math.cos(this.toRad(this.latitude)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2)
+
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    
+
     return R * c // Distance en km
   }
 
@@ -334,7 +345,7 @@ export class PartnerAddress extends BusinessEntity {
     this.metadata.validation = {
       valideePar: validatedBy,
       dateValidation: new Date().toISOString(),
-      source
+      source,
     }
 
     this.markAsModified()
@@ -349,6 +360,6 @@ export class PartnerAddress extends BusinessEntity {
   }
 
   private toRad(value: number): number {
-    return value * Math.PI / 180
+    return (value * Math.PI) / 180
   }
 }

@@ -1,18 +1,18 @@
+import { Client, type ClientOptions } from '@elastic/elasticsearch'
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { Client, ClientOptions } from '@elastic/elasticsearch'
-import {
+import type { ConfigService } from '@nestjs/config'
+import { getElasticsearchMapping } from '../config/searchable-entities.config'
+import type {
+  IElasticsearchSearchService,
   SearchOptions,
   SearchResponse,
-  IElasticsearchSearchService
 } from '../interfaces/search.interfaces'
-import { SearchResultFormatterService } from './search-result-formatter.service'
-import { getElasticsearchMapping } from '../config/searchable-entities.config'
-import { 
-  ElasticsearchQuery, 
-  ElasticsearchSearchResponse, 
-  SearchDocument 
+import type {
+  ElasticsearchQuery,
+  ElasticsearchSearchResponse,
+  SearchDocument,
 } from '../types/search-types'
+import type { SearchResultFormatterService } from './search-result-formatter.service'
 
 @Injectable()
 export class ElasticsearchSearchService implements IElasticsearchSearchService {
@@ -21,7 +21,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
   private client: Client | null = null
 
   constructor(
-    private readonly configService: ConfigService,
+    readonly _configService: ConfigService,
     private readonly formatter: SearchResultFormatterService
   ) {
     this.initializeClient()
@@ -29,7 +29,8 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
 
   private initializeClient() {
     const config: ClientOptions = {
-      node: process.env.ELASTICSEARCH_NODE || process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
+      node:
+        process.env.ELASTICSEARCH_NODE || process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
       maxRetries: 3,
       requestTimeout: 30000,
     }
@@ -59,24 +60,26 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
 
   async search(options: SearchOptions): Promise<SearchResponse> {
     const startTime = Date.now()
-    
+
     try {
       const searchBody = this.buildQuery(options)
       if (!this.client) throw new Error('ElasticSearch client not initialized')
-      
+
       if (process.env.NODE_ENV === 'development') {
         this.logger.debug('ElasticSearch query:', JSON.stringify(searchBody, null, 2))
       }
-      
-      const response = await this.client.search({
+
+      const response = (await this.client.search({
         index: this.indexName,
-        ...searchBody
-      }) as ElasticsearchSearchResponse
-      
+        ...searchBody,
+      })) as ElasticsearchSearchResponse
+
       if (process.env.NODE_ENV === 'development') {
-        this.logger.debug(`ElasticSearch response: ${response.hits.total.value || response.hits.total} results found`)
+        this.logger.debug(
+          `ElasticSearch response: ${response.hits.total.value || response.hits.total} results found`
+        )
       }
-      
+
       const rawResults = this.formatter.formatResults(response.hits.hits, 'elasticsearch')
       const results = this.formatter.sanitizeResults(rawResults)
       const suggestions = this.formatter.extractSuggestions(response)
@@ -84,11 +87,12 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
 
       return {
         results,
-        total: typeof response.hits.total === 'object' ? response.hits.total.value : response.hits.total,
+        total:
+          typeof response.hits.total === 'object' ? response.hits.total.value : response.hits.total,
         took: Date.now() - startTime,
         searchEngine: 'elasticsearch',
         suggestions,
-        facets
+        facets,
       }
     } catch (error) {
       this.logger.error('ElasticSearch search error:', error)
@@ -113,12 +117,12 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
           'reference^2',
           'denomination^2',
           'email',
-          'tags'
+          'tags',
         ],
         type: 'best_fields',
         fuzziness: 'AUTO',
-        prefix_length: 2
-      }
+        prefix_length: 2,
+      },
     })
 
     // Tenant filter for multi-tenant security
@@ -127,10 +131,10 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
         bool: {
           should: [
             { term: { tenantId: options.tenantId } },
-            { bool: { must_not: { exists: { field: 'tenantId' } } } }
+            { bool: { must_not: { exists: { field: 'tenantId' } } } },
           ],
-          minimum_should_match: 1
-        }
+          minimum_should_match: 1,
+        },
       })
     }
 
@@ -145,9 +149,9 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
         bool: {
           should: [
             { terms: { accessRoles: options.roles } },
-            { bool: { must_not: { exists: { field: 'accessRoles' } } } }
-          ]
-        }
+            { bool: { must_not: { exists: { field: 'accessRoles' } } } },
+          ],
+        },
       })
     }
 
@@ -157,9 +161,9 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
         bool: {
           should: [
             { terms: { accessPermissions: options.permissions } },
-            { bool: { must_not: { exists: { field: 'accessPermissions' } } } }
-          ]
-        }
+            { bool: { must_not: { exists: { field: 'accessPermissions' } } } },
+          ],
+        },
       })
     }
 
@@ -167,8 +171,8 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
       query: {
         bool: {
           must,
-          filter
-        }
+          filter,
+        },
       },
       size: options.limit || 10,
       from: options.offset || 0,
@@ -176,25 +180,25 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
         fields: {
           title: { number_of_fragments: 1 },
           description: { number_of_fragments: 2 },
-          denomination: { number_of_fragments: 1 }
+          denomination: { number_of_fragments: 1 },
         },
         pre_tags: ['<mark>'],
-        post_tags: ['</mark>']
+        post_tags: ['</mark>'],
       },
       aggs: {
         types: {
           terms: {
             field: 'type',
-            size: 10
-          }
-        }
-      }
+            size: 10,
+          },
+        },
+      },
     }
   }
 
   async indexDocument(type: string, id: string, document: SearchDocument): Promise<void> {
     if (!this.client) throw new Error('ElasticSearch client not initialized')
-    
+
     await this.client.index({
       index: this.indexName,
       id: `${type}_${id}`,
@@ -202,18 +206,18 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
         type,
         id,
         ...document,
-        indexedAt: new Date().toISOString()
-      }
+        indexedAt: new Date().toISOString(),
+      },
     })
   }
 
   async deleteDocument(type: string, id: string): Promise<void> {
     if (!this.client) throw new Error('ElasticSearch client not initialized')
-    
+
     try {
       await this.client.delete({
         index: this.indexName,
-        id: `${type}_${id}`
+        id: `${type}_${id}`,
       })
     } catch (error) {
       // Don't throw error if document doesn't exist
@@ -231,7 +235,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
         }
         return
       }
-      
+
       // Check if index already exists
       const exists = await this.client.indices.exists({ index: this.indexName })
       if (!exists) {
@@ -242,12 +246,12 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
               analyzer: {
                 french_analyzer: {
                   type: 'standard' as const,
-                  stopwords: '_french_'
-                }
-              }
-            }
+                  stopwords: '_french_',
+                },
+              },
+            },
           },
-          mappings: getElasticsearchMapping()
+          mappings: getElasticsearchMapping(),
         })
         this.logger.log('✅ ElasticSearch index created successfully')
       }

@@ -1,12 +1,12 @@
-import { Resolver, Query, Mutation, Args, Float, Int } from '@nestjs/graphql'
-import { UseGuards } from '@nestjs/common'
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
-import { PricingEngineService } from '../services/pricing-engine.service'
-import { PricingAnalyticsService } from '../services/pricing-analytics.service'
-import { PricingMLService } from '../services/pricing-ml.service'
-import { GraphQLJSONObject } from 'graphql-type-json'
 import { PriceRuleChannel } from '@erp/entities'
+import { UseGuards } from '@nestjs/common'
+import { Args, Float, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { GraphQLJSONObject } from 'graphql-type-json'
+import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
+import type { PricingAnalyticsService } from '../services/pricing-analytics.service'
+import type { PricingEngineService } from '../services/pricing-engine.service'
+import type { PricingMLService } from '../services/pricing-ml.service'
 
 // GraphQL Types
 @Resolver('Pricing')
@@ -20,9 +20,9 @@ export class PricingResolver {
   /**
    * Simulation de prix simple
    */
-  @Query(() => GraphQLJSONObject, { 
+  @Query(() => GraphQLJSONObject, {
     name: 'simulatePrice',
-    description: 'Simule le calcul de prix pour un article avec contexte flexible'
+    description: 'Simule le calcul de prix pour un article avec contexte flexible',
   })
   @UseGuards(JwtAuthGuard)
   async simulatePrice(
@@ -38,13 +38,13 @@ export class PricingResolver {
       customerId: context?.customerId || user?.id,
       customerGroup: context?.customerGroup,
       channel: context?.channel || 'ERP',
-      ...context
+      ...context,
     }
-    
+
     return await this.pricingEngine.calculatePrice(pricingContext, {
       detailed: true,
       includeMargins: true,
-      includeSkippedRules: true
+      includeSkippedRules: true,
     })
   }
 
@@ -53,7 +53,7 @@ export class PricingResolver {
    */
   @Query(() => [GraphQLJSONObject], {
     name: 'simulateScenarios',
-    description: 'Compare plusieurs scénarios de prix en parallèle'
+    description: 'Compare plusieurs scénarios de prix en parallèle',
   })
   @UseGuards(JwtAuthGuard)
   async simulateScenarios(
@@ -62,23 +62,23 @@ export class PricingResolver {
     @CurrentUser() user?: any
   ) {
     const results = []
-    
+
     for (const scenario of scenarios) {
       const context = {
         ...baseContext,
         ...scenario,
-        societeId: user?.societeId
+        societeId: user?.societeId,
       }
-      
+
       const result = await this.pricingEngine.calculatePrice(context)
       results.push({
         scenario: scenario.name || 'Scenario',
         ...result,
         priceChange: result.finalPrice - result.basePrice,
-        priceChangePercent: ((result.finalPrice - result.basePrice) / result.basePrice) * 100
+        priceChangePercent: ((result.finalPrice - result.basePrice) / result.basePrice) * 100,
       })
     }
-    
+
     return results
   }
 
@@ -87,7 +87,7 @@ export class PricingResolver {
    */
   @Query(() => [GraphQLJSONObject], {
     name: 'priceMatrix',
-    description: 'Génère une matrice de prix selon différentes quantités'
+    description: 'Génère une matrice de prix selon différentes quantités',
   })
   @UseGuards(JwtAuthGuard)
   async priceMatrix(
@@ -98,7 +98,7 @@ export class PricingResolver {
   ) {
     const matrix = []
     const groups = customerGroups || ['STANDARD']
-    
+
     for (const quantity of quantities) {
       for (const group of groups) {
         const context = {
@@ -106,11 +106,11 @@ export class PricingResolver {
           quantity,
           customerGroup: group !== 'STANDARD' ? group : undefined,
           societeId: user?.societeId,
-          channel: PriceRuleChannel.ERP
+          channel: PriceRuleChannel.ERP,
         }
-        
+
         const result = await this.pricingEngine.calculatePrice(context)
-        
+
         matrix.push({
           quantity,
           customerGroup: group,
@@ -118,11 +118,11 @@ export class PricingResolver {
           totalPrice: result.finalPrice * quantity,
           discount: result.totalDiscount,
           discountPercent: result.totalDiscountPercentage,
-          appliedRules: result.appliedRules.map(r => r.ruleName)
+          appliedRules: result.appliedRules.map((r) => r.ruleName),
         })
       }
     }
-    
+
     return matrix
   }
 
@@ -131,35 +131,35 @@ export class PricingResolver {
    */
   @Query(() => GraphQLJSONObject, {
     name: 'suggestOptimalPrice',
-    description: 'Suggère un prix optimal basé sur le machine learning'
+    description: 'Suggère un prix optimal basé sur le machine learning',
   })
   @UseGuards(JwtAuthGuard)
   async suggestOptimalPrice(
     @Args('articleId') articleId: string,
-    @Args('includeCompetitors', { nullable: true }) includeCompetitors?: boolean,
+    @Args('includeCompetitors', { nullable: true }) _includeCompetitors?: boolean,
     @CurrentUser() user?: any
   ) {
     // Récupérer l'historique des ventes
     const salesHistory = [] // À implémenter: récupérer depuis la DB
-    
+
     const context = {
       articleId,
       historicalSales: salesHistory,
       inventory: 100, // À récupérer depuis l'article
       cost: 50, // À récupérer depuis l'article
-      category: 'GENERAL'
+      category: 'GENERAL',
     }
-    
+
     const suggestion = await this.mlService.suggestOptimalPrice(context)
-    
+
     // Comparer avec le prix actuel calculé
     const currentPricing = await this.pricingEngine.calculatePrice({
       articleId,
       societeId: user?.societeId,
       quantity: 1,
-      channel: PriceRuleChannel.ERP
+      channel: PriceRuleChannel.ERP,
     })
-    
+
     return {
       ...suggestion,
       currentCalculatedPrice: currentPricing.finalPrice,
@@ -167,8 +167,8 @@ export class PricingResolver {
       implementation: {
         createRule: suggestion.suggestedPrice !== currentPricing.finalPrice,
         ruleType: suggestion.suggestedPrice > currentPricing.finalPrice ? 'MARKUP' : 'DISCOUNT',
-        adjustmentValue: Math.abs(suggestion.suggestedPrice - currentPricing.finalPrice)
-      }
+        adjustmentValue: Math.abs(suggestion.suggestedPrice - currentPricing.finalPrice),
+      },
     }
   }
 
@@ -177,13 +177,13 @@ export class PricingResolver {
    */
   @Query(() => GraphQLJSONObject, {
     name: 'pricingAnalytics',
-    description: 'Tableau de bord analytics des règles de prix'
+    description: 'Tableau de bord analytics des règles de prix',
   })
   @UseGuards(JwtAuthGuard)
   async pricingAnalytics(
     @Args('from', { type: () => String }) from: string,
     @Args('to', { type: () => String }) to: string,
-    @Args('groupBy', { nullable: true }) groupBy?: string,
+    @Args('groupBy', { nullable: true }) _groupBy?: string,
     @CurrentUser() user?: any
   ) {
     const dashboard = await this.analytics.getDashboard(
@@ -191,23 +191,21 @@ export class PricingResolver {
       new Date(from),
       new Date(to)
     )
-    
+
     // Ajouter des insights supplémentaires
     const insights = {
       mostProfitableRules: dashboard.topRules
         .sort((a, b) => b.totalRevenue - a.totalRevenue)
         .slice(0, 3),
-      underperformingRules: dashboard.topRules
-        .filter(r => r.conversionRate < 20)
-        .slice(0, 3),
+      underperformingRules: dashboard.topRules.filter((r) => r.conversionRate < 20).slice(0, 3),
       peakHours: this.aggregatePeakHours(dashboard.topRules),
-      customerSegmentation: this.aggregateCustomerGroups(dashboard.topRules)
+      customerSegmentation: this.aggregateCustomerGroups(dashboard.topRules),
     }
-    
+
     return {
       ...dashboard,
       insights,
-      exportUrl: `/api/pricing/analytics/export?from=${from}&to=${to}`
+      exportUrl: `/api/pricing/analytics/export?from=${from}&to=${to}`,
     }
   }
 
@@ -216,7 +214,7 @@ export class PricingResolver {
    */
   @Mutation(() => GraphQLJSONObject, {
     name: 'testPriceRule',
-    description: 'Teste l\'impact d\'une règle avant de la créer'
+    description: "Teste l'impact d'une règle avant de la créer",
   })
   @UseGuards(JwtAuthGuard)
   async testPriceRule(
@@ -225,39 +223,36 @@ export class PricingResolver {
     @CurrentUser() user?: any
   ) {
     const results = []
-    
+
     for (const articleId of testArticles) {
       // Prix sans la règle
       const withoutRule = await this.pricingEngine.calculatePrice({
         articleId,
         societeId: user?.societeId,
         quantity: 1,
-        channel: rule.channel || 'ERP'
+        channel: rule.channel || 'ERP',
       })
-      
+
       // Simuler avec la règle
-      const withRule = await this.pricingEngine.previewRule(
-        'test-rule',
-        articleId,
-        {
-          societeId: user?.societeId,
-          quantity: 1,
-          channel: rule.channel || 'ERP'
-        }
-      )
-      
+      const withRule = await this.pricingEngine.previewRule('test-rule', articleId, {
+        societeId: user?.societeId,
+        quantity: 1,
+        channel: rule.channel || 'ERP',
+      })
+
       results.push({
         articleId,
         priceWithoutRule: withoutRule.finalPrice,
         priceWithRule: withRule.finalPrice,
         impact: withRule.finalPrice - withoutRule.finalPrice,
-        impactPercent: ((withRule.finalPrice - withoutRule.finalPrice) / withoutRule.finalPrice) * 100
+        impactPercent:
+          ((withRule.finalPrice - withoutRule.finalPrice) / withoutRule.finalPrice) * 100,
       })
     }
-    
+
     const avgImpact = results.reduce((sum, r) => sum + r.impact, 0) / results.length
     const avgImpactPercent = results.reduce((sum, r) => sum + r.impactPercent, 0) / results.length
-    
+
     return {
       rule,
       testResults: results,
@@ -266,8 +261,8 @@ export class PricingResolver {
         averageImpact: avgImpact,
         averageImpactPercent: avgImpactPercent,
         totalRevenuImpact: results.reduce((sum, r) => sum + r.impact, 0),
-        recommendation: Math.abs(avgImpactPercent) < 50 ? 'SAFE' : 'REVIEW'
-      }
+        recommendation: Math.abs(avgImpactPercent) < 50 ? 'SAFE' : 'REVIEW',
+      },
     }
   }
 
@@ -276,7 +271,7 @@ export class PricingResolver {
    */
   @Query(() => GraphQLJSONObject, {
     name: 'competitivePricing',
-    description: 'Compare les prix avec la concurrence'
+    description: 'Compare les prix avec la concurrence',
   })
   @UseGuards(JwtAuthGuard)
   async competitivePricing(
@@ -285,26 +280,28 @@ export class PricingResolver {
     @CurrentUser() user?: any
   ) {
     const analysis = []
-    
+
     for (const articleId of articleIds) {
       const ourPrice = await this.pricingEngine.calculatePrice({
         articleId,
         societeId: user?.societeId,
         quantity: 1,
-        channel: PriceRuleChannel.MARKETPLACE
+        channel: PriceRuleChannel.MARKETPLACE,
       })
-      
+
       const competitors = competitorPrices[articleId] || []
-      const avgCompetitorPrice = competitors.length > 0
-        ? competitors.reduce((a: number, b: number) => a + b, 0) / competitors.length
-        : ourPrice.finalPrice
-      
-      const position = ourPrice.finalPrice < avgCompetitorPrice
-        ? 'BELOW_MARKET'
-        : ourPrice.finalPrice > avgCompetitorPrice * 1.1
-        ? 'ABOVE_MARKET'
-        : 'COMPETITIVE'
-      
+      const avgCompetitorPrice =
+        competitors.length > 0
+          ? competitors.reduce((a: number, b: number) => a + b, 0) / competitors.length
+          : ourPrice.finalPrice
+
+      const position =
+        ourPrice.finalPrice < avgCompetitorPrice
+          ? 'BELOW_MARKET'
+          : ourPrice.finalPrice > avgCompetitorPrice * 1.1
+            ? 'ABOVE_MARKET'
+            : 'COMPETITIVE'
+
       analysis.push({
         articleId,
         ourPrice: ourPrice.finalPrice,
@@ -314,33 +311,37 @@ export class PricingResolver {
         position,
         gap: ourPrice.finalPrice - avgCompetitorPrice,
         gapPercent: ((ourPrice.finalPrice - avgCompetitorPrice) / avgCompetitorPrice) * 100,
-        recommendation: this.generateCompetitiveRecommendation(position, ourPrice.finalPrice, avgCompetitorPrice)
+        recommendation: this.generateCompetitiveRecommendation(
+          position,
+          ourPrice.finalPrice,
+          avgCompetitorPrice
+        ),
       })
     }
-    
+
     return {
       analysis,
       summary: {
         totalArticles: analysis.length,
-        belowMarket: analysis.filter(a => a.position === 'BELOW_MARKET').length,
-        competitive: analysis.filter(a => a.position === 'COMPETITIVE').length,
-        aboveMarket: analysis.filter(a => a.position === 'ABOVE_MARKET').length,
-        averageGap: analysis.reduce((sum, a) => sum + a.gapPercent, 0) / analysis.length
-      }
+        belowMarket: analysis.filter((a) => a.position === 'BELOW_MARKET').length,
+        competitive: analysis.filter((a) => a.position === 'COMPETITIVE').length,
+        aboveMarket: analysis.filter((a) => a.position === 'ABOVE_MARKET').length,
+        averageGap: analysis.reduce((sum, a) => sum + a.gapPercent, 0) / analysis.length,
+      },
     }
   }
 
   // Méthodes utilitaires privées
   private aggregatePeakHours(rules: any[]): any[] {
     const hourMap = new Map<number, number>()
-    
+
     for (const rule of rules) {
       for (const peak of rule.peakUsageHours || []) {
         const current = hourMap.get(peak.hour) || 0
         hourMap.set(peak.hour, current + peak.count)
       }
     }
-    
+
     return Array.from(hourMap.entries())
       .map(([hour, count]) => ({ hour, count }))
       .sort((a, b) => b.count - a.count)
@@ -349,14 +350,14 @@ export class PricingResolver {
 
   private aggregateCustomerGroups(rules: any[]): any[] {
     const groupMap = new Map<string, number>()
-    
+
     for (const rule of rules) {
       for (const group of rule.topCustomerGroups || []) {
         const current = groupMap.get(group.group) || 0
         groupMap.set(group.group, current + group.count)
       }
     }
-    
+
     return Array.from(groupMap.entries())
       .map(([group, count]) => ({ group, count }))
       .sort((a, b) => b.count - a.count)
@@ -369,9 +370,9 @@ export class PricingResolver {
   ): string {
     switch (position) {
       case 'BELOW_MARKET':
-        return `Opportunité d'augmenter le prix de ${((marketAvg - ourPrice) / ourPrice * 100).toFixed(1)}% tout en restant compétitif`
+        return `Opportunité d'augmenter le prix de ${(((marketAvg - ourPrice) / ourPrice) * 100).toFixed(1)}% tout en restant compétitif`
       case 'ABOVE_MARKET':
-        return `Considérer une réduction de ${((ourPrice - marketAvg) / ourPrice * 100).toFixed(1)}% pour améliorer la compétitivité`
+        return `Considérer une réduction de ${(((ourPrice - marketAvg) / ourPrice) * 100).toFixed(1)}% pour améliorer la compétitivité`
       default:
         return 'Prix aligné avec le marché'
     }

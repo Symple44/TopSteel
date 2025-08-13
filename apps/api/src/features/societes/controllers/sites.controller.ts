@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { Site } from '../entities/site.entity'
-import { SitesService } from '../services/sites.service'
+import type { SitesService } from '../services/sites.service'
 
 @ApiTags('Sites')
 @Controller('sites')

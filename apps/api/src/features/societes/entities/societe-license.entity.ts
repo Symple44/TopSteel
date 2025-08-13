@@ -34,7 +34,11 @@ export class SocieteLicense {
   @Column({ type: 'uuid' })
   societeId: string
 
-  @OneToOne(() => Societe, (societe) => societe.license, { onDelete: 'CASCADE' })
+  @OneToOne(
+    () => Societe,
+    (societe) => societe.license,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'societeId' })
   societe: Societe
 
@@ -185,7 +189,7 @@ export class SocieteLicense {
     if (!this.expiresAt) return false
     const daysLeft = this.getDaysUntilExpiration()
     if (!daysLeft) return false
-    
+
     // Notifier 30, 15, 7, 3, 1 jours avant expiration
     const notificationDays = [30, 15, 7, 3, 1]
     return notificationDays.includes(daysLeft)

@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Post, Request } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { DatabaseHealthSimpleService } from '../services/database-health-simple.service'
-import { MigrationManagerService } from '../services/migration-manager.service'
-import {
-  type ConnectionsResponse,
+import type { DatabaseHealthSimpleService } from '../services/database-health-simple.service'
+import type { MigrationManagerService } from '../services/migration-manager.service'
+import type {
+  ConnectionsResponse,
   TenantConnectionSimpleService,
 } from '../services/tenant-connection-simple.service'
 

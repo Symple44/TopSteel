@@ -1,20 +1,19 @@
+import * as crypto from 'node:crypto'
+import type { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { HttpService } from '@nestjs/axios'
-import { EventEmitter2 } from '@nestjs/event-emitter'
-import { OnEvent } from '@nestjs/event-emitter'
+import { type EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import * as crypto from 'crypto'
+import { InjectRepository } from '@nestjs/typeorm'
 import { firstValueFrom } from 'rxjs'
-import { WebhookSubscription as WebhookSubscriptionEntity } from '../entities/webhook-subscription.entity'
-import { WebhookEvent as WebhookEventEntity } from '../entities/webhook-event.entity'
+import type { Repository } from 'typeorm'
 import { WebhookDelivery as WebhookDeliveryEntity } from '../entities/webhook-delivery.entity'
+import { WebhookEvent as WebhookEventEntity } from '../entities/webhook-event.entity'
+import { WebhookSubscription as WebhookSubscriptionEntity } from '../entities/webhook-subscription.entity'
 import {
+  type WebhookDelivery,
+  type WebhookEvent,
   WebhookEventType,
-  WebhookSubscription,
-  WebhookEvent,
-  WebhookDelivery
+  type WebhookSubscription,
 } from '../types/webhook.types'
 
 @Injectable()
@@ -22,23 +21,23 @@ export class PricingWebhooksService {
   async listSubscriptions(societeId: string): Promise<WebhookSubscription[]> {
     return await this.subscriptionRepo.find({
       where: { societeId },
-      order: { id: 'DESC' }
+      order: { id: 'DESC' },
     })
   }
 
   async updateSubscription(
-    id: string, 
-    updates: any, 
+    id: string,
+    updates: any,
     societeId: string
   ): Promise<WebhookSubscription> {
     const subscription = await this.subscriptionRepo.findOne({
-      where: { id, societeId }
+      where: { id, societeId },
     })
-    
+
     if (!subscription) {
       throw new Error('Subscription not found')
     }
-    
+
     Object.assign(subscription, updates)
     return await this.subscriptionRepo.save(subscription)
   }
@@ -49,27 +48,27 @@ export class PricingWebhooksService {
 
   async testWebhook(url: string, event: any): Promise<any> {
     const startTime = Date.now()
-    
+
     try {
       const response = await firstValueFrom(
         this.httpService.post(url, event, {
           headers: { 'X-Webhook-Test': 'true' },
-          timeout: 3000
+          timeout: 3000,
         })
       )
-      
+
       return {
         success: true,
         statusCode: response.status,
         responseTime: Date.now() - startTime,
-        error: null
+        error: null,
       }
     } catch (error: any) {
       return {
         success: false,
         statusCode: error.response?.status || 0,
         responseTime: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       }
     }
   }
@@ -78,27 +77,28 @@ export class PricingWebhooksService {
     societeId: string,
     options: { limit: number; offset: number; type?: WebhookEventType }
   ): Promise<{ events: WebhookEvent[]; total: number }> {
-    const query = this.eventRepo.createQueryBuilder('event')
+    const query = this.eventRepo
+      .createQueryBuilder('event')
       .where('event.societeId = :societeId', { societeId })
-    
+
     if (options.type) {
       query.andWhere('event.type = :type', { type: options.type })
     }
-    
+
     const [events, total] = await query
       .orderBy('event.timestamp', 'DESC')
       .limit(options.limit)
       .offset(options.offset)
       .getManyAndCount()
-    
+
     return { events, total }
   }
 
-  async getDeliveryStatus(eventId: string, societeId: string): Promise<WebhookDelivery[]> {
+  async getDeliveryStatus(eventId: string, _societeId: string): Promise<WebhookDelivery[]> {
     return await this.deliveryRepo.find({
       where: { eventId },
       relations: ['subscription'],
-      order: { id: 'DESC' }
+      order: { id: 'DESC' },
     })
   }
   private readonly logger = new Logger(PricingWebhooksService.name)
@@ -112,7 +112,7 @@ export class PricingWebhooksService {
     @InjectRepository(WebhookDeliveryEntity, 'tenant')
     private readonly deliveryRepo: Repository<WebhookDeliveryEntity>,
     private readonly httpService: HttpService,
-    private readonly eventEmitter: EventEmitter2
+    readonly _eventEmitter: EventEmitter2
   ) {}
 
   /**
@@ -127,10 +127,10 @@ export class PricingWebhooksService {
   }): Promise<WebhookSubscription> {
     // Générer un secret pour la signature HMAC
     const secret = crypto.randomBytes(32).toString('hex')
-    
+
     // Valider l'URL
     await this.validateWebhookUrl(data.url)
-    
+
     const subscription = await this.subscriptionRepo.save({
       ...data,
       secret,
@@ -138,18 +138,18 @@ export class PricingWebhooksService {
       retryPolicy: {
         maxRetries: 3,
         retryDelay: 1000,
-        backoffMultiplier: 2
+        backoffMultiplier: 2,
       },
       metadata: {
         description: data.description,
         createdBy: 'system',
         totalCalls: 0,
-        successRate: 100
-      }
+        successRate: 100,
+      },
     })
-    
+
     this.logger.log(`Webhook subscription créée: ${subscription.id}`)
-    
+
     return subscription
   }
 
@@ -159,21 +159,23 @@ export class PricingWebhooksService {
   async emit(event: Omit<WebhookEvent, 'id' | 'timestamp'>): Promise<void> {
     const savedEvent = await this.eventRepo.save({
       ...event,
-      timestamp: new Date()
+      timestamp: new Date(),
     })
-    
+
     // Trouver les souscriptions correspondantes
     const subscriptions = await this.findMatchingSubscriptions(savedEvent)
-    
-    this.logger.debug(`${subscriptions.length} souscriptions trouvées pour l'événement ${event.type}`)
-    
+
+    this.logger.debug(
+      `${subscriptions.length} souscriptions trouvées pour l'événement ${event.type}`
+    )
+
     // Créer les deliveries
     for (const subscription of subscriptions) {
       if (this.shouldTrigger(subscription, savedEvent)) {
         await this.createDelivery(subscription, savedEvent)
       }
     }
-    
+
     // Traiter la queue
     await this.processDeliveryQueue()
   }
@@ -182,14 +184,14 @@ export class PricingWebhooksService {
    * Trouve les souscriptions correspondant à un événement
    */
   private async findMatchingSubscriptions(event: WebhookEvent): Promise<WebhookSubscription[]> {
-    return await this.subscriptionRepo.find({
-      where: {
-        societeId: event.societeId,
-        isActive: true
-      }
-    }).then(subs => 
-      subs.filter(sub => sub.events.includes(event.type))
-    )
+    return await this.subscriptionRepo
+      .find({
+        where: {
+          societeId: event.societeId,
+          isActive: true,
+        },
+      })
+      .then((subs) => subs.filter((sub) => sub.events.includes(event.type)))
   }
 
   /**
@@ -198,35 +200,35 @@ export class PricingWebhooksService {
   private shouldTrigger(subscription: WebhookSubscription, event: WebhookEvent): boolean {
     const filters = subscription.filters
     if (!filters) return true
-    
+
     // Filtre sur le changement de prix minimum
     if (filters.minPriceChange && event.metadata?.changePercent) {
       if (Math.abs(event.metadata.changePercent) < filters.minPriceChange) {
         return false
       }
     }
-    
+
     // Filtre sur les articles
     if (filters.articleIds && event.metadata?.articleId) {
       if (!filters.articleIds.includes(event.metadata.articleId)) {
         return false
       }
     }
-    
+
     // Filtre sur les règles
     if (filters.ruleIds && event.metadata?.ruleId) {
       if (!filters.ruleIds.includes(event.metadata.ruleId)) {
         return false
       }
     }
-    
+
     // Filtre sur les canaux
     if (filters.channels && event.metadata?.channel) {
       if (!filters.channels.includes(event.metadata.channel)) {
         return false
       }
     }
-    
+
     return true
   }
 
@@ -242,9 +244,9 @@ export class PricingWebhooksService {
       eventId: event.id,
       url: subscription.url,
       status: 'pending',
-      attempts: 0
+      attempts: 0,
     })
-    
+
     this.deliveryQueue.set(delivery.id, delivery)
   }
 
@@ -252,9 +254,8 @@ export class PricingWebhooksService {
    * Traite la queue de delivery
    */
   private async processDeliveryQueue(): Promise<void> {
-    const pending = Array.from(this.deliveryQueue.values())
-      .filter(d => d.status === 'pending')
-    
+    const pending = Array.from(this.deliveryQueue.values()).filter((d) => d.status === 'pending')
+
     for (const delivery of pending) {
       await this.deliverWebhook(delivery)
     }
@@ -265,26 +266,26 @@ export class PricingWebhooksService {
    */
   private async deliverWebhook(delivery: WebhookDelivery): Promise<void> {
     const subscription = await this.subscriptionRepo.findOne({
-      where: { id: delivery.subscriptionId }
+      where: { id: delivery.subscriptionId },
     })
-    
+
     if (!subscription) {
       this.logger.error(`Subscription ${delivery.subscriptionId} non trouvée`)
       return
     }
-    
+
     const event = await this.eventRepo.findOne({
-      where: { id: delivery.eventId }
+      where: { id: delivery.eventId },
     })
-    
+
     if (!event) {
       this.logger.error(`Event ${delivery.eventId} non trouvé`)
       return
     }
-    
+
     delivery.attempts++
     delivery.lastAttempt = new Date()
-    
+
     try {
       // Préparer le payload
       const payload = {
@@ -292,12 +293,12 @@ export class PricingWebhooksService {
         type: event.type,
         timestamp: event.timestamp,
         data: event.data,
-        metadata: event.metadata
+        metadata: event.metadata,
       }
-      
+
       // Générer la signature HMAC
       const signature = this.generateSignature(payload, subscription.secret)
-      
+
       // Envoyer la requête
       const response = await firstValueFrom(
         this.httpService.post(subscription.url, payload, {
@@ -305,51 +306,54 @@ export class PricingWebhooksService {
             'Content-Type': 'application/json',
             'X-Webhook-Signature': signature,
             'X-Webhook-Event': event.type,
-            'X-Webhook-Delivery': delivery.id
+            'X-Webhook-Delivery': delivery.id,
           },
-          timeout: 5000
+          timeout: 5000,
         })
       )
-      
+
       delivery.status = 'success'
       delivery.response = {
         statusCode: response.status,
-        body: response.data
+        body: response.data,
       }
-      
+
       // Mettre à jour les stats
       await this.updateSubscriptionStats(subscription.id, true)
-      
+
       this.logger.log(`Webhook délivré avec succès: ${delivery.id}`)
     } catch (error: any) {
       delivery.response = {
         statusCode: error.response?.status || 0,
-        error: error.message
+        error: error.message,
       }
-      
+
       // Vérifier si on doit réessayer
       if (delivery.attempts < subscription.retryPolicy.maxRetries) {
         delivery.status = 'pending'
-        
+
         // Planifier le retry avec backoff exponentiel
-        const delay = subscription.retryPolicy.retryDelay * 
-          Math.pow(subscription.retryPolicy.backoffMultiplier, delivery.attempts - 1)
-        
+        const delay =
+          subscription.retryPolicy.retryDelay *
+          subscription.retryPolicy.backoffMultiplier ** (delivery.attempts - 1)
+
         setTimeout(() => {
           this.deliverWebhook(delivery)
         }, delay)
-        
-        this.logger.warn(`Webhook échoué, retry ${delivery.attempts}/${subscription.retryPolicy.maxRetries} dans ${delay}ms`)
+
+        this.logger.warn(
+          `Webhook échoué, retry ${delivery.attempts}/${subscription.retryPolicy.maxRetries} dans ${delay}ms`
+        )
       } else {
         delivery.status = 'failed'
         await this.updateSubscriptionStats(subscription.id, false)
         this.logger.error(`Webhook définitivement échoué après ${delivery.attempts} tentatives`)
       }
     }
-    
+
     // Sauvegarder l'état de la delivery
     await this.deliveryRepo.save(delivery)
-    
+
     // Retirer de la queue si terminé
     if (delivery.status !== 'pending') {
       this.deliveryQueue.delete(delivery.id)
@@ -374,10 +378,10 @@ export class PricingWebhooksService {
       const response = await firstValueFrom(
         this.httpService.post(url, testPayload, {
           headers: { 'X-Webhook-Test': 'true' },
-          timeout: 3000
+          timeout: 3000,
         })
       )
-      
+
       if (response.status >= 400) {
         throw new Error(`URL returned ${response.status}`)
       }
@@ -389,28 +393,27 @@ export class PricingWebhooksService {
   /**
    * Met à jour les statistiques d'une souscription
    */
-  private async updateSubscriptionStats(
-    subscriptionId: string,
-    success: boolean
-  ): Promise<void> {
+  private async updateSubscriptionStats(subscriptionId: string, success: boolean): Promise<void> {
     const subscription = await this.subscriptionRepo.findOne({
-      where: { id: subscriptionId }
+      where: { id: subscriptionId },
     })
-    
+
     if (!subscription) return
-    
+
     const metadata = subscription.metadata || {}
     metadata.lastTriggered = new Date()
     metadata.totalCalls = (metadata.totalCalls || 0) + 1
-    
+
     if (success) {
-      const successCount = Math.floor((metadata.successRate || 100) * metadata.totalCalls / 100)
+      const successCount = Math.floor(((metadata.successRate || 100) * metadata.totalCalls) / 100)
       metadata.successRate = ((successCount + 1) / metadata.totalCalls) * 100
     } else {
-      const successCount = Math.floor((metadata.successRate || 100) * (metadata.totalCalls - 1) / 100)
+      const successCount = Math.floor(
+        ((metadata.successRate || 100) * (metadata.totalCalls - 1)) / 100
+      )
       metadata.successRate = (successCount / metadata.totalCalls) * 100
     }
-    
+
     subscription.metadata = metadata
     await this.subscriptionRepo.save(subscription)
   }
@@ -422,7 +425,7 @@ export class PricingWebhooksService {
   async handlePriceCalculated(event: any): Promise<void> {
     if (event.previousPrice && event.newPrice) {
       const changePercent = ((event.newPrice - event.previousPrice) / event.previousPrice) * 100
-      
+
       if (Math.abs(changePercent) > 10) {
         await this.emit({
           type: WebhookEventType.PRICE_CHANGED,
@@ -432,8 +435,8 @@ export class PricingWebhooksService {
             articleId: event.articleId,
             previousValue: event.previousPrice,
             newValue: event.newPrice,
-            changePercent
-          }
+            changePercent,
+          },
         })
       }
     }
@@ -448,8 +451,8 @@ export class PricingWebhooksService {
       metadata: {
         ruleId: event.ruleId,
         articleId: event.articleId,
-        channel: event.channel
-      }
+        channel: event.channel,
+      },
     })
   }
 
@@ -460,13 +463,13 @@ export class PricingWebhooksService {
   async cleanupOldDeliveries(): Promise<void> {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-    
+
     const deleted = await this.deliveryRepo
       .createQueryBuilder()
       .delete()
       .where('lastAttempt < :date', { date: thirtyDaysAgo })
       .execute()
-    
+
     this.logger.log(`Nettoyage: ${deleted.affected} anciennes deliveries supprimées`)
   }
 
@@ -476,13 +479,15 @@ export class PricingWebhooksService {
   @Cron(CronExpression.EVERY_HOUR)
   async monitorFailingWebhooks(): Promise<void> {
     const subscriptions = await this.subscriptionRepo.find({
-      where: { isActive: true }
+      where: { isActive: true },
     })
-    
+
     for (const subscription of subscriptions) {
       if (subscription.metadata?.successRate && subscription.metadata.successRate < 50) {
-        this.logger.warn(`Webhook ${subscription.id} a un taux de succès faible: ${subscription.metadata.successRate}%`)
-        
+        this.logger.warn(
+          `Webhook ${subscription.id} a un taux de succès faible: ${subscription.metadata.successRate}%`
+        )
+
         // Désactiver automatiquement si trop de failures
         if (subscription.metadata.successRate < 10 && subscription.metadata.totalCalls > 100) {
           subscription.isActive = false

@@ -8,7 +8,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  type ColumnConfig,
   DataTable,
   Select,
   SelectContent,
@@ -21,7 +20,6 @@ import { useState } from 'react'
 import { PartnerDetailDialog } from '@/components/partners/partner-detail-dialog'
 import { PartnerFormDialog } from '@/components/partners/partner-form-dialog'
 import { useDeletePartner, usePartnerStatistics, usePartners } from '@/hooks/use-partners'
-import { formatCurrency } from '@/lib/utils'
 
 export default function SuppliersPage() {
   const [filters, setFilters] = useState<PartnerFilters>({ type: ['FOURNISSEUR'] })

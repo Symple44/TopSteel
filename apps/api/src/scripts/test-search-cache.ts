@@ -2,23 +2,23 @@
 
 /**
  * Test script for Search Cache Implementation
- * 
+ *
  * This script validates the search cache functionality including:
  * - Cache service initialization
  * - Cache operations (set, get, delete)
  * - Cache invalidation
  * - Statistics collection
  * - Performance metrics
- * 
+ *
  * Usage: npm run test:search-cache
  */
 
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from '../app/app.module'
+import type { SearchOptions } from '../features/search/interfaces/search.interfaces'
+import { CachedGlobalSearchService } from '../features/search/services/cached-global-search.service'
 import { SearchCacheService } from '../features/search/services/search-cache.service'
 import { SearchCacheInvalidationService } from '../features/search/services/search-cache-invalidation.service'
-import { CachedGlobalSearchService } from '../features/search/services/cached-global-search.service'
-import { SearchOptions } from '../features/search/interfaces/search.interfaces'
 
 interface TestResult {
   testName: string
@@ -32,7 +32,6 @@ class SearchCacheValidator {
   private results: TestResult[] = []
   private cacheService: SearchCacheService
   private invalidationService: SearchCacheInvalidationService
-  private cachedSearchService: CachedGlobalSearchService
 
   async run() {
     console.log('🚀 Starting Search Cache Validation...\n')
@@ -40,7 +39,7 @@ class SearchCacheValidator {
     try {
       // Initialize NestJS application
       const app = await NestFactory.createApplicationContext(AppModule, {
-        logger: ['error'] // Reduce noise during testing
+        logger: ['error'], // Reduce noise during testing
       })
 
       // Get service instances
@@ -85,15 +84,15 @@ class SearchCacheValidator {
         details: {
           healthy: isHealthy,
           enabled: config.enabled,
-          defaultTTL: config.defaultTTL
-        }
+          defaultTTL: config.defaultTTL,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -106,12 +105,18 @@ class SearchCacheValidator {
       const config = this.cacheService.getCacheConfig()
 
       const expectedEntityTypes = [
-        'product', 'customer', 'supplier', 'order', 
-        'invoice', 'user', 'site', 'menu'
+        'product',
+        'customer',
+        'supplier',
+        'order',
+        'invoice',
+        'user',
+        'site',
+        'menu',
       ]
 
       const hasAllEntityTTLs = expectedEntityTypes.every(
-        type => config.entityTTLs[type] !== undefined
+        (type) => config.entityTTLs[type] !== undefined
       )
 
       this.addResult({
@@ -121,15 +126,15 @@ class SearchCacheValidator {
         details: {
           entityTTLsConfigured: expectedEntityTypes.length,
           defaultTTL: config.defaultTTL,
-          keyPrefix: config.keyPrefix
-        }
+          keyPrefix: config.keyPrefix,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -144,16 +149,16 @@ class SearchCacheValidator {
         query: 'test search query',
         entityTypes: ['product'],
         limit: 10,
-        offset: 0
+        offset: 0,
       }
 
       const mockResults = {
         results: [
           { id: '1', title: 'Test Product 1', type: 'product' },
-          { id: '2', title: 'Test Product 2', type: 'product' }
+          { id: '2', title: 'Test Product 2', type: 'product' },
         ],
         total: 2,
-        metadata: { searchTime: 50 }
+        metadata: { searchTime: 50 },
       }
 
       // Test cache set
@@ -162,9 +167,8 @@ class SearchCacheValidator {
       // Test cache get
       const cachedResults = await this.cacheService.getCachedSearchResults(tenantId, testOptions)
 
-      const cacheWorking = cachedResults !== null && 
-                          cachedResults.results.length === 2 &&
-                          cachedResults.total === 2
+      const cacheWorking =
+        cachedResults !== null && cachedResults.results.length === 2 && cachedResults.total === 2
 
       this.addResult({
         testName,
@@ -173,15 +177,15 @@ class SearchCacheValidator {
         details: {
           cacheSet: true,
           cacheGet: cachedResults !== null,
-          resultCount: cachedResults?.results.length || 0
-        }
+          resultCount: cachedResults?.results.length || 0,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -192,18 +196,18 @@ class SearchCacheValidator {
 
     try {
       const tenantId = 'test-tenant-001'
-      
+
       // Test consistent key generation
       const options1: SearchOptions = {
         query: 'test query',
         entityTypes: ['product', 'customer'],
-        limit: 20
+        limit: 20,
       }
 
       const options2: SearchOptions = {
         query: 'test query',
         entityTypes: ['customer', 'product'], // Different order
-        limit: 20
+        limit: 20,
       }
 
       const key1 = this.cacheService.generateCacheKey(tenantId, options1)
@@ -223,15 +227,15 @@ class SearchCacheValidator {
         details: {
           consistentKeys: keysMatch,
           tenantSeparation: tenantSeparation,
-          sampleKey: key1
-        }
+          sampleKey: key1,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -243,22 +247,22 @@ class SearchCacheValidator {
     try {
       const tenant1 = 'tenant-001'
       const tenant2 = 'tenant-002'
-      
+
       const searchOptions: SearchOptions = {
         query: 'same query',
-        entityTypes: ['product']
+        entityTypes: ['product'],
       }
 
       const results1 = {
         results: [{ id: '1', title: 'Tenant 1 Product', type: 'product' }],
         total: 1,
-        metadata: {}
+        metadata: {},
       }
 
       const results2 = {
         results: [{ id: '2', title: 'Tenant 2 Product', type: 'product' }],
         total: 1,
-        metadata: {}
+        metadata: {},
       }
 
       // Cache same query for different tenants
@@ -269,9 +273,11 @@ class SearchCacheValidator {
       const cached1 = await this.cacheService.getCachedSearchResults(tenant1, searchOptions)
       const cached2 = await this.cacheService.getCachedSearchResults(tenant2, searchOptions)
 
-      const tenantIsolation = cached1 && cached2 &&
-                             cached1.results[0].title === 'Tenant 1 Product' &&
-                             cached2.results[0].title === 'Tenant 2 Product'
+      const tenantIsolation =
+        cached1 &&
+        cached2 &&
+        cached1.results[0].title === 'Tenant 1 Product' &&
+        cached2.results[0].title === 'Tenant 2 Product'
 
       this.addResult({
         testName,
@@ -280,15 +286,15 @@ class SearchCacheValidator {
         details: {
           tenant1Results: cached1?.results.length || 0,
           tenant2Results: cached2?.results.length || 0,
-          tenantIsolation: tenantIsolation
-        }
+          tenantIsolation: tenantIsolation,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -299,23 +305,26 @@ class SearchCacheValidator {
 
     try {
       const tenantId = 'test-tenant-invalidation'
-      
+
       // Cache some data
       const searchOptions: SearchOptions = {
         query: 'product to be invalidated',
-        entityTypes: ['product']
+        entityTypes: ['product'],
       }
 
       const results = {
         results: [{ id: 'product-123', title: 'Test Product', type: 'product' }],
         total: 1,
-        metadata: {}
+        metadata: {},
       }
 
       await this.cacheService.cacheSearchResults(tenantId, searchOptions, results)
 
       // Verify cache exists
-      const beforeInvalidation = await this.cacheService.getCachedSearchResults(tenantId, searchOptions)
+      const beforeInvalidation = await this.cacheService.getCachedSearchResults(
+        tenantId,
+        searchOptions
+      )
 
       // Invalidate cache
       await this.invalidationService.invalidateEntity(tenantId, 'product', 'product-123')
@@ -330,15 +339,15 @@ class SearchCacheValidator {
         details: {
           cacheExistedBefore: beforeInvalidation !== null,
           invalidationCount: stats.totalInvalidations,
-          invalidationsByEntity: stats.invalidationsByEntity
-        }
+          invalidationsByEntity: stats.invalidationsByEntity,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -351,10 +360,11 @@ class SearchCacheValidator {
       const stats = await this.cacheService.getCacheStatistics()
       const invalidationStats = this.invalidationService.getInvalidationStats()
 
-      const hasRequiredStats = stats.hits !== undefined &&
-                              stats.misses !== undefined &&
-                              stats.hitRate !== undefined &&
-                              stats.lastUpdated instanceof Date
+      const hasRequiredStats =
+        stats.hits !== undefined &&
+        stats.misses !== undefined &&
+        stats.hitRate !== undefined &&
+        stats.lastUpdated instanceof Date
 
       this.addResult({
         testName,
@@ -364,15 +374,15 @@ class SearchCacheValidator {
           hits: stats.hits,
           misses: stats.misses,
           hitRate: stats.hitRate,
-          totalInvalidations: invalidationStats.totalInvalidations
-        }
+          totalInvalidations: invalidationStats.totalInvalidations,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -384,17 +394,17 @@ class SearchCacheValidator {
     try {
       // Perform multiple cache operations to generate metrics
       const tenantId = 'perf-test-tenant'
-      
+
       for (let i = 0; i < 5; i++) {
         const options: SearchOptions = {
           query: `performance test ${i}`,
-          entityTypes: ['product']
+          entityTypes: ['product'],
         }
 
         const mockResults = {
           results: [{ id: `perf-${i}`, title: `Performance Test ${i}`, type: 'product' }],
           total: 1,
-          metadata: {}
+          metadata: {},
         }
 
         await this.cacheService.cacheSearchResults(tenantId, options, mockResults)
@@ -412,15 +422,15 @@ class SearchCacheValidator {
           operationsPerformed: 10, // 5 sets + 5 gets
           totalHits: stats.hits,
           totalMisses: stats.misses,
-          hitRate: stats.hitRate
-        }
+          hitRate: stats.hitRate,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -440,15 +450,15 @@ class SearchCacheValidator {
         details: {
           healthy: isHealthy,
           enabled: config.enabled,
-          redisRequired: config.enabled
-        }
+          redisRequired: config.enabled,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -461,27 +471,27 @@ class SearchCacheValidator {
       // Test with invalid tenant ID
       const invalidOptions: SearchOptions = {
         query: 'test with null tenant',
-        entityTypes: ['product']
+        entityTypes: ['product'],
       }
 
       // This should not throw an error, but return null gracefully
       const result = await this.cacheService.getCachedSearchResults('', invalidOptions)
-      
+
       this.addResult({
         testName,
         success: result === null, // Should handle gracefully
         duration: Date.now() - startTime,
         details: {
           handledGracefully: result === null,
-          noExceptionThrown: true
-        }
+          noExceptionThrown: true,
+        },
       })
     } catch (error) {
       this.addResult({
         testName,
         success: false,
         duration: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       })
     }
   }
@@ -492,27 +502,27 @@ class SearchCacheValidator {
 
   private printResults() {
     console.log('\n📊 Search Cache Validation Results')
-    console.log('=' .repeat(50))
+    console.log('='.repeat(50))
 
     let passed = 0
     let failed = 0
 
-    this.results.forEach(result => {
+    this.results.forEach((result) => {
       const status = result.success ? '✅' : '❌'
       const duration = `${result.duration}ms`
-      
+
       console.log(`${status} ${result.testName} (${duration})`)
-      
+
       if (result.details) {
         Object.entries(result.details).forEach(([key, value]) => {
           console.log(`   ${key}: ${value}`)
         })
       }
-      
+
       if (result.error) {
         console.log(`   Error: ${result.error}`)
       }
-      
+
       console.log('')
 
       if (result.success) {
@@ -542,7 +552,7 @@ class SearchCacheValidator {
 // Run the validation if this script is executed directly
 if (require.main === module) {
   const validator = new SearchCacheValidator()
-  validator.run().catch(error => {
+  validator.run().catch((error) => {
     console.error('❌ Validation failed:', error)
     process.exit(1)
   })

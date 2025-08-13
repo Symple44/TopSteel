@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
-import { MFAService } from '../../services/mfa.service'
+import type { MFAService } from '../../services/mfa.service'
 
 interface SetupTOTPDto {
   phoneNumber?: string

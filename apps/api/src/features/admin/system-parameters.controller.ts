@@ -21,7 +21,7 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import { SystemParametersService } from './system-parameters.service'
+import type { SystemParametersService } from './system-parameters.service'
 
 @Controller('admin/system-parameters')
 @ApiTags('🔧 System Parameters')

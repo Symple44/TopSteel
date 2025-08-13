@@ -1,34 +1,39 @@
 'use client'
 
 import {
-  Plus,
-  Trash2,
-  Copy,
-  ChevronDown,
-  ChevronUp,
-  Settings,
-  Info,
   AlertCircle,
   Calendar,
-  Hash,
-  Package,
-  Users,
-  Mail,
+  ChevronDown,
+  ChevronUp,
   Code,
-  DollarSign
+  Copy,
+  DollarSign,
+  Hash,
+  Info,
+  Mail,
+  Package,
+  Plus,
+  Settings,
+  Trash2,
+  Users,
 } from 'lucide-react'
 import type React from 'react'
-import { useState, useCallback, useMemo } from 'react'
-import { Button } from '../../../primitives/button'
-import { Input } from '../../../primitives/input'
-import { Label } from '../../../forms/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
+import { useCallback, useMemo, useState } from 'react'
+import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Alert, AlertDescription, AlertTitle } from '../../../feedback/alert'
+import { Label } from '../../../forms/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
+import { Button } from '../../../primitives/button'
+import { Input } from '../../../primitives/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select'
 import { SimpleTooltip } from '../../../primitives/tooltip'
-import { Switch } from '../../../primitives/switch'
-import { cn } from '../../../../lib/utils'
 import type { PricingCondition } from '../PriceRuleCard/PriceRuleCard'
 
 export interface ConditionBuilderProps {
@@ -55,80 +60,80 @@ interface ConditionGroup {
 }
 
 const CONDITION_TYPES = [
-  { 
-    value: 'quantity', 
+  {
+    value: 'quantity',
     label: 'Quantité',
     icon: <Hash className="w-4 h-4" />,
     description: 'Basé sur la quantité commandée',
     operators: ['equals', 'greater_than', 'less_than', 'between'],
-    valueType: 'number'
+    valueType: 'number',
   },
-  { 
-    value: 'customer_group', 
+  {
+    value: 'customer_group',
     label: 'Groupe client',
     icon: <Users className="w-4 h-4" />,
     description: 'Basé sur le groupe du client',
     operators: ['equals', 'in', 'not_in'],
     valueType: 'select',
-    options: ['VIP', 'GROSSISTE', 'PROFESSIONNEL', 'PARTICULIER']
+    options: ['VIP', 'GROSSISTE', 'PROFESSIONNEL', 'PARTICULIER'],
   },
-  { 
-    value: 'customer_email', 
+  {
+    value: 'customer_email',
     label: 'Email client',
     icon: <Mail className="w-4 h-4" />,
-    description: 'Basé sur l\'email du client',
+    description: "Basé sur l'email du client",
     operators: ['equals', 'contains', 'starts_with', 'ends_with'],
-    valueType: 'email'
+    valueType: 'email',
   },
-  { 
-    value: 'customer_code', 
+  {
+    value: 'customer_code',
     label: 'Code client',
     icon: <Code className="w-4 h-4" />,
     description: 'Basé sur le code client',
     operators: ['equals', 'starts_with', 'contains'],
-    valueType: 'text'
+    valueType: 'text',
   },
-  { 
-    value: 'date_range', 
+  {
+    value: 'date_range',
     label: 'Période',
     icon: <Calendar className="w-4 h-4" />,
     description: 'Valide pendant une période',
     operators: ['between', 'after', 'before'],
-    valueType: 'date_range'
+    valueType: 'date_range',
   },
-  { 
-    value: 'article_reference', 
+  {
+    value: 'article_reference',
     label: 'Référence article',
     icon: <Package className="w-4 h-4" />,
-    description: 'Basé sur la référence de l\'article',
+    description: "Basé sur la référence de l'article",
     operators: ['equals', 'starts_with', 'contains', 'in'],
-    valueType: 'text'
+    valueType: 'text',
   },
-  { 
-    value: 'article_family', 
+  {
+    value: 'article_family',
     label: 'Famille article',
     icon: <Package className="w-4 h-4" />,
-    description: 'Basé sur la famille de l\'article',
+    description: "Basé sur la famille de l'article",
     operators: ['equals', 'in', 'not_in'],
     valueType: 'select',
-    options: ['ACIER', 'INOX', 'ALUMINIUM', 'TUBES', 'TOLES', 'PROFILES']
+    options: ['ACIER', 'INOX', 'ALUMINIUM', 'TUBES', 'TOLES', 'PROFILES'],
   },
-  { 
-    value: 'order_total', 
+  {
+    value: 'order_total',
     label: 'Montant total',
     icon: <DollarSign className="w-4 h-4" />,
     description: 'Basé sur le montant total de la commande',
     operators: ['greater_than', 'less_than', 'between'],
-    valueType: 'number'
+    valueType: 'number',
   },
-  { 
-    value: 'custom', 
+  {
+    value: 'custom',
     label: 'Personnalisé',
     icon: <Settings className="w-4 h-4" />,
     description: 'Condition personnalisée',
     operators: ['equals', 'not_equals', 'greater_than', 'less_than', 'contains'],
-    valueType: 'mixed'
-  }
+    valueType: 'mixed',
+  },
 ]
 
 const CONDITION_OPERATORS = [
@@ -143,7 +148,7 @@ const CONDITION_OPERATORS = [
   { value: 'starts_with', label: 'Commence par', symbol: '^' },
   { value: 'ends_with', label: 'Se termine par', symbol: '$' },
   { value: 'after', label: 'Après', symbol: '>' },
-  { value: 'before', label: 'Avant', symbol: '<' }
+  { value: 'before', label: 'Avant', symbol: '<' },
 ]
 
 const DEFAULT_TEMPLATES: ConditionTemplate[] = [
@@ -155,9 +160,9 @@ const DEFAULT_TEMPLATES: ConditionTemplate[] = [
       {
         type: 'quantity',
         operator: 'greater_than',
-        value: 100
-      }
-    ]
+        value: 100,
+      },
+    ],
   },
   {
     name: 'Client VIP',
@@ -167,9 +172,9 @@ const DEFAULT_TEMPLATES: ConditionTemplate[] = [
       {
         type: 'customer_group',
         operator: 'equals',
-        value: 'VIP'
-      }
-    ]
+        value: 'VIP',
+      },
+    ],
   },
   {
     name: 'Promotion temporaire',
@@ -179,10 +184,13 @@ const DEFAULT_TEMPLATES: ConditionTemplate[] = [
       {
         type: 'date_range',
         operator: 'between',
-        value: { from: new Date().toISOString(), to: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }
-      }
-    ]
-  }
+        value: {
+          from: new Date().toISOString(),
+          to: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+      },
+    ],
+  },
 ]
 
 export function ConditionBuilder({
@@ -192,7 +200,7 @@ export function ConditionBuilder({
   maxConditions = 10,
   showPreview = true,
   allowGroups = false,
-  templates = DEFAULT_TEMPLATES
+  templates = DEFAULT_TEMPLATES,
 }: ConditionBuilderProps) {
   const [expandedConditions, setExpandedConditions] = useState<Set<number>>(new Set())
   const [testContext, setTestContext] = useState<Record<string, any>>({
@@ -200,76 +208,91 @@ export function ConditionBuilder({
     customer_group: 'PARTICULIER',
     customer_email: 'test@example.com',
     article_reference: 'REF001',
-    article_family: 'ACIER'
+    article_family: 'ACIER',
   })
-  
+
   // Ajouter des IDs uniques aux conditions pour le suivi
-  const conditionsWithIds = useMemo(() => 
-    conditions.map((c, i) => ({ ...c, id: `condition-${i}` })),
+  const conditionsWithIds = useMemo(
+    () => conditions.map((c, i) => ({ ...c, id: `condition-${i}` })),
     [conditions]
   )
 
-  const addCondition = useCallback((template?: PricingCondition) => {
-    if (conditions.length >= maxConditions) {
-      return
-    }
-    
-    const newCondition: PricingCondition = template || {
-      type: 'quantity',
-      operator: 'equals',
-      value: ''
-    }
-    
-    onChange([...conditions, newCondition])
-    setExpandedConditions(prev => new Set(prev).add(conditions.length))
-  }, [conditions, onChange, maxConditions])
+  const addCondition = useCallback(
+    (template?: PricingCondition) => {
+      if (conditions.length >= maxConditions) {
+        return
+      }
 
-  const removeCondition = useCallback((index: number) => {
-    const newConditions = [...conditions]
-    newConditions.splice(index, 1)
-    onChange(newConditions)
-    
-    // Mettre à jour les indices expandés
-    setExpandedConditions(prev => {
-      const newSet = new Set<number>()
-      prev.forEach(i => {
-        if (i < index) newSet.add(i)
-        else if (i > index) newSet.add(i - 1)
+      const newCondition: PricingCondition = template || {
+        type: 'quantity',
+        operator: 'equals',
+        value: '',
+      }
+
+      onChange([...conditions, newCondition])
+      setExpandedConditions((prev) => new Set(prev).add(conditions.length))
+    },
+    [conditions, onChange, maxConditions]
+  )
+
+  const removeCondition = useCallback(
+    (index: number) => {
+      const newConditions = [...conditions]
+      newConditions.splice(index, 1)
+      onChange(newConditions)
+
+      // Mettre à jour les indices expandés
+      setExpandedConditions((prev) => {
+        const newSet = new Set<number>()
+        prev.forEach((i) => {
+          if (i < index) newSet.add(i)
+          else if (i > index) newSet.add(i - 1)
+        })
+        return newSet
       })
-      return newSet
-    })
-  }, [conditions, onChange])
+    },
+    [conditions, onChange]
+  )
 
-  const updateCondition = useCallback((index: number, updates: Partial<PricingCondition>) => {
-    const newConditions = [...conditions]
-    newConditions[index] = { ...newConditions[index], ...updates }
-    
-    // Réinitialiser la valeur si on change d'opérateur vers 'between'
-    if (updates.operator === 'between' && typeof newConditions[index].value !== 'object') {
-      newConditions[index].value = { from: '', to: '' }
-    } else if (updates.operator !== 'between' && typeof newConditions[index].value === 'object') {
-      newConditions[index].value = ''
-    }
-    
-    onChange(newConditions)
-  }, [conditions, onChange])
+  const updateCondition = useCallback(
+    (index: number, updates: Partial<PricingCondition>) => {
+      const newConditions = [...conditions]
+      newConditions[index] = { ...newConditions[index], ...updates }
 
-  const duplicateCondition = useCallback((index: number) => {
-    if (conditions.length >= maxConditions) {
-      return
-    }
-    
-    const newConditions = [...conditions]
-    newConditions.splice(index + 1, 0, { ...conditions[index] })
-    onChange(newConditions)
-  }, [conditions, onChange, maxConditions])
+      // Réinitialiser la valeur si on change d'opérateur vers 'between'
+      if (updates.operator === 'between' && typeof newConditions[index].value !== 'object') {
+        newConditions[index].value = { from: '', to: '' }
+      } else if (updates.operator !== 'between' && typeof newConditions[index].value === 'object') {
+        newConditions[index].value = ''
+      }
 
-  const applyTemplate = useCallback((template: ConditionTemplate) => {
-    onChange([...conditions, ...template.conditions])
-  }, [conditions, onChange])
+      onChange(newConditions)
+    },
+    [conditions, onChange]
+  )
+
+  const duplicateCondition = useCallback(
+    (index: number) => {
+      if (conditions.length >= maxConditions) {
+        return
+      }
+
+      const newConditions = [...conditions]
+      newConditions.splice(index + 1, 0, { ...conditions[index] })
+      onChange(newConditions)
+    },
+    [conditions, onChange, maxConditions]
+  )
+
+  const applyTemplate = useCallback(
+    (template: ConditionTemplate) => {
+      onChange([...conditions, ...template.conditions])
+    },
+    [conditions, onChange]
+  )
 
   const toggleExpanded = useCallback((index: number) => {
-    setExpandedConditions(prev => {
+    setExpandedConditions((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(index)) {
         newSet.delete(index)
@@ -280,61 +303,78 @@ export function ConditionBuilder({
     })
   }, [])
 
-  const evaluateCondition = useCallback((condition: PricingCondition, context: Record<string, any>): boolean => {
-    const contextValue = context[condition.type] || context[condition.field || '']
-    
-    switch (condition.operator) {
-      case 'equals':
-        return contextValue === condition.value
-      case 'not_equals':
-        return contextValue !== condition.value
-      case 'greater_than':
-        return Number(contextValue) > Number(condition.value)
-      case 'less_than':
-        return Number(contextValue) < Number(condition.value)
-      case 'between':
-        if (typeof condition.value === 'object' && 'from' in condition.value && 'to' in condition.value) {
-          const val = Number(contextValue)
-          return val >= Number(condition.value.from) && val <= Number(condition.value.to)
-        }
-        return false
-      case 'contains':
-        return String(contextValue).includes(String(condition.value))
-      case 'starts_with':
-        return String(contextValue).startsWith(String(condition.value))
-      case 'ends_with':
-        return String(contextValue).endsWith(String(condition.value))
-      case 'in':
-        return Array.isArray(condition.value) ? 
-          condition.value.includes(contextValue) : 
-          String(condition.value).split(',').map(s => s.trim()).includes(contextValue)
-      case 'not_in':
-        return Array.isArray(condition.value) ? 
-          !condition.value.includes(contextValue) : 
-          !String(condition.value).split(',').map(s => s.trim()).includes(contextValue)
-      default:
-        return false
-    }
-  }, [])
+  const evaluateCondition = useCallback(
+    (condition: PricingCondition, context: Record<string, any>): boolean => {
+      const contextValue = context[condition.type] || context[condition.field || '']
+
+      switch (condition.operator) {
+        case 'equals':
+          return contextValue === condition.value
+        case 'not_equals':
+          return contextValue !== condition.value
+        case 'greater_than':
+          return Number(contextValue) > Number(condition.value)
+        case 'less_than':
+          return Number(contextValue) < Number(condition.value)
+        case 'between':
+          if (
+            typeof condition.value === 'object' &&
+            'from' in condition.value &&
+            'to' in condition.value
+          ) {
+            const val = Number(contextValue)
+            return val >= Number(condition.value.from) && val <= Number(condition.value.to)
+          }
+          return false
+        case 'contains':
+          return String(contextValue).includes(String(condition.value))
+        case 'starts_with':
+          return String(contextValue).startsWith(String(condition.value))
+        case 'ends_with':
+          return String(contextValue).endsWith(String(condition.value))
+        case 'in':
+          return Array.isArray(condition.value)
+            ? condition.value.includes(contextValue)
+            : String(condition.value)
+                .split(',')
+                .map((s) => s.trim())
+                .includes(contextValue)
+        case 'not_in':
+          return Array.isArray(condition.value)
+            ? !condition.value.includes(contextValue)
+            : !String(condition.value)
+                .split(',')
+                .map((s) => s.trim())
+                .includes(contextValue)
+        default:
+          return false
+      }
+    },
+    []
+  )
 
   const allConditionsMet = useMemo(() => {
-    return conditions.every(condition => evaluateCondition(condition, testContext))
+    return conditions.every((condition) => evaluateCondition(condition, testContext))
   }, [conditions, testContext, evaluateCondition])
 
   const renderConditionValue = (condition: PricingCondition, index: number) => {
-    const conditionType = CONDITION_TYPES.find(t => t.value === condition.type)
-    
+    const conditionType = CONDITION_TYPES.find((t) => t.value === condition.type)
+
     if (condition.operator === 'between') {
-      const value = typeof condition.value === 'object' && 'from' in condition.value ? 
-        condition.value : { from: '', to: '' }
-      
+      const value =
+        typeof condition.value === 'object' && 'from' in condition.value
+          ? condition.value
+          : { from: '', to: '' }
+
       return (
         <div className="flex items-center gap-2">
           <Input
             value={value.from}
-            onChange={(e) => updateCondition(index, { 
-              value: { ...value, from: e.target.value }
-            })}
+            onChange={(e) =>
+              updateCondition(index, {
+                value: { ...value, from: e.target.value },
+              })
+            }
             placeholder="De"
             type={conditionType?.valueType === 'number' ? 'number' : 'text'}
             className="w-24"
@@ -342,9 +382,11 @@ export function ConditionBuilder({
           <span className="text-muted-foreground">à</span>
           <Input
             value={value.to}
-            onChange={(e) => updateCondition(index, { 
-              value: { ...value, to: e.target.value }
-            })}
+            onChange={(e) =>
+              updateCondition(index, {
+                value: { ...value, to: e.target.value },
+              })
+            }
             placeholder="À"
             type={conditionType?.valueType === 'number' ? 'number' : 'text'}
             className="w-24"
@@ -352,25 +394,28 @@ export function ConditionBuilder({
         </div>
       )
     }
-    
+
     if (conditionType?.valueType === 'select' && conditionType.options) {
       if (condition.operator === 'in' || condition.operator === 'not_in') {
         // Multi-select pour les opérateurs 'in' et 'not_in'
-        const selectedValues = Array.isArray(condition.value) ? 
-          condition.value : 
-          String(condition.value || '').split(',').map(s => s.trim()).filter(Boolean)
-        
+        const selectedValues = Array.isArray(condition.value)
+          ? condition.value
+          : String(condition.value || '')
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+
         return (
           <div className="flex flex-wrap gap-2">
-            {conditionType.options.map(option => (
+            {conditionType.options.map((option) => (
               <label key={option} className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={selectedValues.includes(option)}
                   onChange={(e) => {
-                    const newValues = e.target.checked ?
-                      [...selectedValues, option] :
-                      selectedValues.filter(v => v !== option)
+                    const newValues = e.target.checked
+                      ? [...selectedValues, option]
+                      : selectedValues.filter((v) => v !== option)
                     updateCondition(index, { value: newValues })
                   }}
                   className="w-4 h-4 rounded border-gray-300"
@@ -390,7 +435,7 @@ export function ConditionBuilder({
               <SelectValue placeholder="Sélectionner..." />
             </SelectTrigger>
             <SelectContent>
-              {conditionType.options.map(option => (
+              {conditionType.options.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
                 </SelectItem>
@@ -400,29 +445,35 @@ export function ConditionBuilder({
         )
       }
     }
-    
+
     if (conditionType?.valueType === 'date_range' || condition.type === 'date_range') {
       if (['between', 'after', 'before'].includes(condition.operator)) {
-        const value = typeof condition.value === 'object' && 'from' in condition.value ? 
-          condition.value : { from: '', to: '' }
-        
+        const value =
+          typeof condition.value === 'object' && 'from' in condition.value
+            ? condition.value
+            : { from: '', to: '' }
+
         return (
           <div className="flex items-center gap-2">
             <Input
               type="date"
               value={value.from ? new Date(value.from).toISOString().split('T')[0] : ''}
-              onChange={(e) => updateCondition(index, { 
-                value: { ...value, from: e.target.value }
-              })}
+              onChange={(e) =>
+                updateCondition(index, {
+                  value: { ...value, from: e.target.value },
+                })
+              }
               className="w-36"
             />
             <span className="text-muted-foreground">à</span>
             <Input
               type="date"
               value={value.to ? new Date(value.to).toISOString().split('T')[0] : ''}
-              onChange={(e) => updateCondition(index, { 
-                value: { ...value, to: e.target.value }
-              })}
+              onChange={(e) =>
+                updateCondition(index, {
+                  value: { ...value, to: e.target.value },
+                })
+              }
               className="w-36"
             />
           </div>
@@ -431,21 +482,30 @@ export function ConditionBuilder({
         return (
           <Input
             type="date"
-            value={condition.value ? new Date(String(condition.value)).toISOString().split('T')[0] : ''}
+            value={
+              condition.value ? new Date(String(condition.value)).toISOString().split('T')[0] : ''
+            }
             onChange={(e) => updateCondition(index, { value: e.target.value })}
             className="w-36"
           />
         )
       }
     }
-    
+
     return (
       <Input
         value={String(condition.value || '')}
         onChange={(e) => updateCondition(index, { value: e.target.value })}
-        placeholder={condition.operator === 'in' ? 'Valeurs séparées par des virgules' : 'Valeur...'}
-        type={conditionType?.valueType === 'number' ? 'number' : 
-              conditionType?.valueType === 'email' ? 'email' : 'text'}
+        placeholder={
+          condition.operator === 'in' ? 'Valeurs séparées par des virgules' : 'Valeur...'
+        }
+        type={
+          conditionType?.valueType === 'number'
+            ? 'number'
+            : conditionType?.valueType === 'email'
+              ? 'email'
+              : 'text'
+        }
         className="w-48"
       />
     )
@@ -458,13 +518,11 @@ export function ConditionBuilder({
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">Modèles de conditions</CardTitle>
-            <CardDescription>
-              Utilisez un modèle pour démarrer rapidement
-            </CardDescription>
+            <CardDescription>Utilisez un modèle pour démarrer rapidement</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-3">
-              {templates.map(template => (
+              {templates.map((template) => (
                 <Card
                   key={template.name}
                   className="cursor-pointer hover:shadow-md transition-shadow"
@@ -475,9 +533,7 @@ export function ConditionBuilder({
                       {template.icon}
                       {template.name}
                     </CardTitle>
-                    <CardDescription className="text-xs">
-                      {template.description}
-                    </CardDescription>
+                    <CardDescription className="text-xs">{template.description}</CardDescription>
                   </CardHeader>
                 </Card>
               ))}
@@ -489,16 +545,19 @@ export function ConditionBuilder({
       {/* Liste des conditions */}
       <div className="space-y-3">
         {conditionsWithIds.map((condition, index) => {
-          const conditionType = CONDITION_TYPES.find(t => t.value === condition.type)
-          const operator = CONDITION_OPERATORS.find(o => o.value === condition.operator)
+          const conditionType = CONDITION_TYPES.find((t) => t.value === condition.type)
+          const operator = CONDITION_OPERATORS.find((o) => o.value === condition.operator)
           const isExpanded = expandedConditions.has(index)
           const isValid = evaluateCondition(condition, testContext)
-          
+
           return (
-            <Card key={condition.id} className={cn(
-              'transition-all',
-              showPreview && (isValid ? 'ring-2 ring-green-500' : 'ring-1 ring-red-200')
-            )}>
+            <Card
+              key={condition.id}
+              className={cn(
+                'transition-all',
+                showPreview && (isValid ? 'ring-2 ring-green-500' : 'ring-1 ring-red-200')
+              )}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
@@ -506,28 +565,26 @@ export function ConditionBuilder({
                       {conditionType?.icon}
                       <span className="font-medium">{conditionType?.label}</span>
                     </div>
-                    
+
                     {!isExpanded && (
                       <>
-                        <Badge variant="outline">
-                          {operator?.symbol || operator?.label}
-                        </Badge>
-                        
+                        <Badge variant="outline">{operator?.symbol || operator?.label}</Badge>
+
                         <span className="text-sm text-muted-foreground">
-                          {typeof condition.value === 'object' ? 
-                            JSON.stringify(condition.value) : 
-                            String(condition.value || 'Non défini')}
+                          {typeof condition.value === 'object'
+                            ? JSON.stringify(condition.value)
+                            : String(condition.value || 'Non défini')}
                         </span>
                       </>
                     )}
-                    
+
                     {showPreview && (
                       <Badge variant={isValid ? 'default' : 'destructive'} className="ml-auto">
                         {isValid ? 'Valide' : 'Non valide'}
                       </Badge>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <SimpleTooltip content="Dupliquer">
                       <Button
@@ -539,30 +596,26 @@ export function ConditionBuilder({
                         <Copy className="w-4 h-4" />
                       </Button>
                     </SimpleTooltip>
-                    
+
                     <SimpleTooltip content={isExpanded ? 'Réduire' : 'Développer'}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleExpanded(index)}
-                      >
-                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      <Button variant="ghost" size="sm" onClick={() => toggleExpanded(index)}>
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
                       </Button>
                     </SimpleTooltip>
-                    
+
                     <SimpleTooltip content="Supprimer">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeCondition(index)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => removeCondition(index)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </SimpleTooltip>
                   </div>
                 </div>
               </CardHeader>
-              
+
               {isExpanded && (
                 <CardContent>
                   <div className="space-y-4">
@@ -571,17 +624,19 @@ export function ConditionBuilder({
                         <Label>Type de condition</Label>
                         <Select
                           value={condition.type}
-                          onValueChange={(value) => updateCondition(index, { 
-                            type: value as PricingCondition['type'],
-                            operator: 'equals',
-                            value: ''
-                          })}
+                          onValueChange={(value) =>
+                            updateCondition(index, {
+                              type: value as PricingCondition['type'],
+                              operator: 'equals',
+                              value: '',
+                            })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {CONDITION_TYPES.map(type => (
+                            {CONDITION_TYPES.map((type) => (
                               <SelectItem key={type.value} value={type.value}>
                                 <div className="flex items-center gap-2">
                                   {type.icon}
@@ -597,40 +652,43 @@ export function ConditionBuilder({
                           </p>
                         )}
                       </div>
-                      
+
                       <div>
                         <Label>Opérateur</Label>
                         <Select
                           value={condition.operator}
-                          onValueChange={(value) => updateCondition(index, { 
-                            operator: value as PricingCondition['operator']
-                          })}
+                          onValueChange={(value) =>
+                            updateCondition(index, {
+                              operator: value as PricingCondition['operator'],
+                            })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {CONDITION_OPERATORS
-                              .filter(op => !conditionType?.operators || conditionType.operators.includes(op.value))
-                              .map(op => (
-                                <SelectItem key={op.value} value={op.value}>
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-mono">{op.symbol}</span>
-                                    {op.label}
-                                  </div>
-                                </SelectItem>
-                              ))
-                            }
+                            {CONDITION_OPERATORS.filter(
+                              (op) =>
+                                !conditionType?.operators ||
+                                conditionType.operators.includes(op.value)
+                            ).map((op) => (
+                              <SelectItem key={op.value} value={op.value}>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono">{op.symbol}</span>
+                                  {op.label}
+                                </div>
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div>
                         <Label>Valeur</Label>
                         {renderConditionValue(condition, index)}
                       </div>
                     </div>
-                    
+
                     {condition.type === 'custom' && (
                       <div>
                         <Label>Champ personnalisé</Label>
@@ -651,11 +709,7 @@ export function ConditionBuilder({
 
       {/* Bouton d'ajout */}
       {conditions.length < maxConditions && (
-        <Button
-          onClick={() => addCondition()}
-          variant="outline"
-          className="w-full"
-        >
+        <Button onClick={() => addCondition()} variant="outline" className="w-full">
           <Plus className="w-4 h-4 mr-2" />
           Ajouter une condition ({conditions.length}/{maxConditions})
         </Button>
@@ -669,23 +723,23 @@ export function ConditionBuilder({
               <Settings className="w-4 h-4" />
               Test des conditions
             </CardTitle>
-            <CardDescription>
-              Modifiez le contexte pour tester vos conditions
-            </CardDescription>
+            <CardDescription>Modifiez le contexte pour tester vos conditions</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 mb-4">
               {Object.entries(testContext).map(([key, value]) => {
-                const type = CONDITION_TYPES.find(t => t.value === key)
+                const type = CONDITION_TYPES.find((t) => t.value === key)
                 return (
                   <div key={key}>
                     <Label className="text-xs">{type?.label || key}</Label>
                     <Input
                       value={value}
-                      onChange={(e) => setTestContext(prev => ({
-                        ...prev,
-                        [key]: e.target.value
-                      }))}
+                      onChange={(e) =>
+                        setTestContext((prev) => ({
+                          ...prev,
+                          [key]: e.target.value,
+                        }))
+                      }
                       placeholder={`Valeur de ${key}`}
                       className="h-8"
                     />
@@ -693,17 +747,18 @@ export function ConditionBuilder({
                 )
               })}
             </div>
-            
+
             <Alert variant={allConditionsMet ? 'default' : 'destructive'}>
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>
-                {allConditionsMet ? 'Toutes les conditions sont remplies' : 'Conditions non remplies'}
+                {allConditionsMet
+                  ? 'Toutes les conditions sont remplies'
+                  : 'Conditions non remplies'}
               </AlertTitle>
               <AlertDescription>
-                {allConditionsMet ? 
-                  'La règle sera appliquée avec ce contexte.' :
-                  'La règle ne sera pas appliquée avec ce contexte.'
-                }
+                {allConditionsMet
+                  ? 'La règle sera appliquée avec ce contexte.'
+                  : 'La règle ne sera pas appliquée avec ce contexte.'}
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -716,8 +771,8 @@ export function ConditionBuilder({
           <Info className="h-4 w-4" />
           <AlertTitle>Aucune condition</AlertTitle>
           <AlertDescription>
-            Sans condition, la règle s'appliquera à tous les articles du canal sélectionné.
-            Ajoutez des conditions pour cibler des cas spécifiques.
+            Sans condition, la règle s'appliquera à tous les articles du canal sélectionné. Ajoutez
+            des conditions pour cibler des cas spécifiques.
           </AlertDescription>
         </Alert>
       )}

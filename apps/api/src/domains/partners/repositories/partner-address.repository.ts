@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { PartnerAddress, AddressType, AddressStatus } from '../entities/partner-address.entity'
+import type { Repository } from 'typeorm'
+import { AddressStatus, type AddressType, PartnerAddress } from '../entities/partner-address.entity'
 import type { IPartnerAddressRepository } from '../services/partner.service'
 
 @Injectable()
@@ -23,14 +23,14 @@ export class PartnerAddressRepository implements IPartnerAddressRepository {
   async findByPartner(partnerId: string): Promise<PartnerAddress[]> {
     return await this.repository.find({
       where: { partnerId, status: AddressStatus.ACTIVE },
-      order: { isDefault: 'DESC', type: 'ASC', libelle: 'ASC' }
+      order: { isDefault: 'DESC', type: 'ASC', libelle: 'ASC' },
     })
   }
 
   async findByType(partnerId: string, type: AddressType): Promise<PartnerAddress[]> {
     return await this.repository.find({
       where: { partnerId, type, status: AddressStatus.ACTIVE },
-      order: { isDefault: 'DESC', libelle: 'ASC' }
+      order: { isDefault: 'DESC', libelle: 'ASC' },
     })
   }
 

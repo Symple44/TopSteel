@@ -1,6 +1,17 @@
-import { IsString, IsOptional, IsUUID, IsEnum, IsBoolean, IsNumber, IsObject, IsDateString, Min, Max } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { SiteType, SiteStatus, AccessibiliteType } from '../entities/partner-site.entity'
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator'
+import { AccessibiliteType, SiteStatus, SiteType } from '../entities/partner-site.entity'
 
 export class CreatePartnerSiteDto {
   @ApiProperty()

@@ -7,41 +7,40 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  AdvancedDataTable as DataTable,
   type ColumnConfig,
+  AdvancedDataTable as DataTable,
 } from '@erp/ui'
-import { 
-  AlertCircle, 
-  Download, 
-  Package2, 
-  Plus, 
-  TrendingUp, 
-  Upload,
-  Eye,
-  Edit,
-  Trash2,
+import {
+  AlertCircle,
   Copy,
+  Edit,
+  Eye,
+  Package2,
+  Plus,
+  Trash2,
+  TrendingUp,
+  Upload,
   Warehouse,
 } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  useArticles,
-  useArticleStatistics,
-  useDeleteArticle,
+import { useCallback, useMemo, useState } from 'react'
+import { ArticleFormDialog } from '@/components/articles/article-form-dialog'
+import { DuplicateArticleDialog } from '@/components/articles/duplicate-article-dialog'
+import { InventoryDialog } from '@/components/articles/inventory-dialog'
+import {
   type Article,
   type ArticleFilters,
+  ArticleStatus,
   ArticleType,
-  ArticleStatus 
+  useArticleStatistics,
+  useArticles,
+  useDeleteArticle,
 } from '@/hooks/use-articles'
-import { formatCurrency, cn } from '@/lib/utils'
-import { ArticleFormDialog } from '@/components/articles/article-form-dialog'
-import { InventoryDialog } from '@/components/articles/inventory-dialog'
-import { DuplicateArticleDialog } from '@/components/articles/duplicate-article-dialog'
+import { cn, formatCurrency } from '@/lib/utils'
 
 export default function ArticlesPage() {
   const router = useRouter()
-  const [filters, setFilters] = useState<ArticleFilters>({})
+  const [filters, _setFilters] = useState<ArticleFilters>({})
   const [showArticleForm, setShowArticleForm] = useState(false)
   const [showInventoryDialog, setShowInventoryDialog] = useState(false)
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false)
@@ -67,9 +66,12 @@ export default function ArticlesPage() {
     setShowArticleForm(true)
   }, [])
 
-  const handleView = useCallback((article: Article) => {
-    router.push(`/inventory/articles/${article.id}`)
-  }, [router])
+  const handleView = useCallback(
+    (article: Article) => {
+      router.push(`/inventory/articles/${article.id}`)
+    },
+    [router]
+  )
 
   const handleDuplicate = useCallback((article: Article) => {
     setSelectedArticle(article)
@@ -89,7 +91,7 @@ export default function ArticlesPage() {
     [ArticleType.CONSOMMABLE]: 'Consommable',
     [ArticleType.SERVICE]: 'Service',
   }
-  
+
   const typeColors = {
     [ArticleType.MATIERE_PREMIERE]: 'bg-blue-100 text-blue-800',
     [ArticleType.PRODUIT_FINI]: 'bg-green-100 text-green-800',
@@ -105,7 +107,7 @@ export default function ArticlesPage() {
     [ArticleStatus.OBSOLETE]: 'Obsolète',
     [ArticleStatus.EN_COURS_CREATION]: 'En cours de création',
   }
-  
+
   const statusColors = {
     [ArticleStatus.ACTIF]: 'bg-green-100 text-green-800',
     [ArticleStatus.INACTIF]: 'bg-gray-100 text-gray-800',
@@ -119,26 +121,24 @@ export default function ArticlesPage() {
         id: 'reference',
         key: 'reference',
         title: 'Référence',
-        description: 'Code référence unique de l\'article',
+        description: "Code référence unique de l'article",
         type: 'text',
         sortable: true,
         searchable: true,
         width: 150,
         locked: true,
-        render: (value, article) => (
-          <div className="font-medium">{article.reference}</div>
-        ),
+        render: (_value, article) => <div className="font-medium">{article.reference}</div>,
       },
       {
         id: 'designation',
         key: 'designation',
         title: 'Désignation',
-        description: 'Nom et description de l\'article',
+        description: "Nom et description de l'article",
         type: 'text',
         sortable: true,
         searchable: true,
         width: 300,
-        render: (value, article) => (
+        render: (_value, article) => (
           <div className="max-w-[300px]">
             <div className="font-medium truncate">{article.designation}</div>
             {article.description && (
@@ -153,16 +153,16 @@ export default function ArticlesPage() {
         id: 'type',
         key: 'type',
         title: 'Type',
-        description: 'Type d\'article',
+        description: "Type d'article",
         type: 'select',
         sortable: true,
         searchable: true,
         width: 150,
-        options: Object.entries(ArticleType).map(([key, value]) => ({
+        options: Object.entries(ArticleType).map(([_key, value]) => ({
           value: value,
           label: typeLabels[value],
         })),
-        render: (value, article) => (
+        render: (_value, article) => (
           <Badge className={cn('text-xs', typeColors[article.type])}>
             {typeLabels[article.type]}
           </Badge>
@@ -172,7 +172,7 @@ export default function ArticlesPage() {
         id: 'famille',
         key: 'famille',
         title: 'Famille',
-        description: 'Famille d\'articles',
+        description: "Famille d'articles",
         type: 'text',
         sortable: true,
         searchable: true,
@@ -183,16 +183,16 @@ export default function ArticlesPage() {
         id: 'status',
         key: 'status',
         title: 'Statut',
-        description: 'Statut de l\'article',
+        description: "Statut de l'article",
         type: 'select',
         sortable: true,
         searchable: true,
         width: 130,
-        options: Object.entries(ArticleStatus).map(([key, value]) => ({
+        options: Object.entries(ArticleStatus).map(([_key, value]) => ({
           value: value,
           label: statusLabels[value],
         })),
-        render: (value, article) => (
+        render: (_value, article) => (
           <Badge className={cn('text-xs', statusColors[article.status])}>
             {statusLabels[article.status]}
           </Badge>
@@ -209,14 +209,14 @@ export default function ArticlesPage() {
         format: {
           decimals: 2,
         },
-        render: (value, article) => {
+        render: (_value, article) => {
           if (!article.gereEnStock) {
             return <span className="text-muted-foreground">Non géré</span>
           }
 
           const stock = Number(article.stockPhysique || 0)
           const stockMini = Number(article.stockMini || 0)
-          
+
           let className = ''
           if (stock === 0) {
             className = 'text-red-600 font-medium'
@@ -246,7 +246,7 @@ export default function ArticlesPage() {
           currency: 'EUR',
           decimals: 2,
         },
-        render: (value, article) => {
+        render: (_value, article) => {
           const prix = Number(article.prixVenteHT || 0)
           return prix ? formatCurrency(prix) : '-'
         },
@@ -259,22 +259,12 @@ export default function ArticlesPage() {
         type: 'custom',
         width: 200,
         locked: true,
-        render: (value, article) => (
+        render: (_value, article) => (
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleView(article)}
-              title="Voir"
-            >
+            <Button variant="ghost" size="sm" onClick={() => handleView(article)} title="Voir">
               <Eye className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleEdit(article)}
-              title="Modifier"
-            >
+            <Button variant="ghost" size="sm" onClick={() => handleEdit(article)} title="Modifier">
               <Edit className="h-4 w-4" />
             </Button>
             {article.gereEnStock && (
@@ -308,17 +298,25 @@ export default function ArticlesPage() {
         ),
       },
     ],
-    [handleDelete, handleEdit, handleView, handleDuplicate, handleInventory]
+    [
+      handleDelete,
+      handleEdit,
+      handleView,
+      handleDuplicate,
+      handleInventory,
+      statusColors[article.status],
+      statusLabels[article.status],
+      typeColors[article.type],
+      typeLabels[article.type],
+    ]
   )
 
   // Actions globales pour le DataTable
-  const handleExport = useCallback((format: 'csv' | 'excel' | 'pdf') => {
-    console.log('Export en', format)
+  const handleExport = useCallback((_format: 'csv' | 'excel' | 'pdf') => {
     // TODO: Implémenter l'export
   }, [])
 
   const handleImport = useCallback(() => {
-    console.log('Import')
     // TODO: Implémenter l'import
   }, [])
 
@@ -389,9 +387,7 @@ export default function ArticlesPage() {
               <div className="text-2xl font-bold">
                 {formatCurrency(statistics.valeurTotaleStock)}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Valorisation totale
-              </p>
+              <p className="text-xs text-muted-foreground">Valorisation totale</p>
             </CardContent>
           </Card>
 
@@ -401,9 +397,7 @@ export default function ArticlesPage() {
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">
-                {statistics.articlesEnRupture}
-              </div>
+              <div className="text-2xl font-bold text-red-600">{statistics.articlesEnRupture}</div>
               <p className="text-xs text-muted-foreground">
                 {statistics.articlesSousStockMini} sous stock mini
               </p>
@@ -419,9 +413,7 @@ export default function ArticlesPage() {
               <div className="text-2xl font-bold text-orange-600">
                 {statistics.articlesObsoletes}
               </div>
-              <p className="text-xs text-muted-foreground">
-                À réviser
-              </p>
+              <p className="text-xs text-muted-foreground">À réviser</p>
             </CardContent>
           </Card>
         </div>
@@ -436,7 +428,6 @@ export default function ArticlesPage() {
             keyField="id"
             tableId="articles-table"
             userId="current-user" // TODO: Récupérer l'ID utilisateur réel
-            
             // Fonctionnalités
             sortable={true}
             searchable={true}
@@ -445,7 +436,6 @@ export default function ArticlesPage() {
             reorderable={true}
             selectable={true}
             editable={false} // On gère l'édition via les dialogs
-            
             // Pagination
             pagination={{
               page: 1,
@@ -454,18 +444,15 @@ export default function ArticlesPage() {
               showSizeChanger: true,
               pageSizeOptions: [10, 25, 50, 100],
             }}
-            
             // Export
             exportable={true}
             onExport={handleExport}
-            
             // Vues
             views={[
               { id: 'table', name: 'Table', icon: 'table' },
               { id: 'cards', name: 'Cartes', icon: 'cards' },
               { id: 'kanban', name: 'Kanban', icon: 'kanban', groupBy: 'status' },
             ]}
-            
             // Colonnes calculées
             calculatedColumns={[
               {
@@ -475,17 +462,14 @@ export default function ArticlesPage() {
                 format: { currency: 'EUR', decimals: 2 },
               },
             ]}
-            
             // Indicateurs colorés
             colorRules={[
               { column: 'stockPhysique', operator: 'equals', value: 0, color: '#ef4444' },
               { column: 'status', operator: 'equals', value: 'OBSOLETE', color: '#f59e0b' },
             ]}
-            
             // État
             loading={isLoading}
             error={error}
-            
             // Messages
             emptyMessage="Aucun article trouvé"
             loadingMessage="Chargement des articles..."

@@ -1,13 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication } from '@nestjs/common'
+import { PriceRuleChannel, PriceRuleStatus, PriceRuleType } from '@erp/entities'
+import type { INestApplication } from '@nestjs/common'
+import { Test, type TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
 import { PricingUnifiedModule } from '../pricing-unified.module'
-import { PricingEngineService } from '../services/pricing-engine.service'
-import { PricingCacheService } from '../services/pricing-cache.service'
 import { PricingAnalyticsService } from '../services/pricing-analytics.service'
+import { PricingCacheService } from '../services/pricing-cache.service'
+import { PricingEngineService } from '../services/pricing-engine.service'
 import { PricingMLService } from '../services/pricing-ml.service'
 import { PricingWebhooksService } from '../services/pricing-webhooks.service'
-import { PriceRuleChannel, PriceRuleType, PriceRuleStatus } from '@erp/entities'
 
 describe('Pricing System Integration Tests', () => {
   let app: INestApplication
@@ -43,11 +43,11 @@ describe('Pricing System Integration Tests', () => {
         societeId: 'test-societe-1',
         quantity: 10,
         basePrice: 100,
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       const result = await pricingEngine.calculatePrice(context)
-      
+
       expect(result).toBeDefined()
       expect(result.basePrice).toBe(100)
       expect(result.finalPrice).toBe(100)
@@ -63,7 +63,7 @@ describe('Pricing System Integration Tests', () => {
         priority: 1,
         status: PriceRuleStatus.ACTIVE,
         conditions: [],
-        channels: [PriceRuleChannel.ERP]
+        channels: [PriceRuleChannel.ERP],
       }
 
       // Mock the rule repository to return our test rule
@@ -74,11 +74,11 @@ describe('Pricing System Integration Tests', () => {
         societeId: 'test-societe-1',
         quantity: 10,
         basePrice: 100,
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       const result = await pricingEngine.calculatePrice(context)
-      
+
       expect(result.finalPrice).toBe(90) // 100 - 10%
       expect(result.totalDiscount).toBe(10)
       expect(result.totalDiscountPercentage).toBe(10)
@@ -92,19 +92,19 @@ describe('Pricing System Integration Tests', () => {
           societeId: 'test-societe-1',
           quantity: 10,
           basePrice: 100,
-          channel: PriceRuleChannel.ERP
+          channel: PriceRuleChannel.ERP,
         },
         {
           articleId: 'test-article-2',
           societeId: 'test-societe-1',
           quantity: 5,
           basePrice: 200,
-          channel: PriceRuleChannel.ERP
-        }
+          channel: PriceRuleChannel.ERP,
+        },
       ]
 
       const results = await pricingEngine.calculateBulkPrices(contexts)
-      
+
       expect(results).toHaveLength(2)
       expect(results[0].basePrice).toBe(100)
       expect(results[1].basePrice).toBe(200)
@@ -117,7 +117,7 @@ describe('Pricing System Integration Tests', () => {
         articleId: 'test-article-1',
         societeId: 'test-societe-1',
         quantity: 10,
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       const pricingData = {
@@ -125,12 +125,12 @@ describe('Pricing System Integration Tests', () => {
         finalPrice: 90,
         totalDiscount: 10,
         totalDiscountPercentage: 10,
-        appliedRules: []
+        appliedRules: [],
       }
 
       await cacheService.set(context, pricingData)
       const cached = await cacheService.get(context)
-      
+
       expect(cached).toEqual(pricingData)
     })
 
@@ -139,7 +139,7 @@ describe('Pricing System Integration Tests', () => {
         articleId: 'test-article-1',
         societeId: 'test-societe-1',
         quantity: 10,
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       const pricingData = {
@@ -147,13 +147,13 @@ describe('Pricing System Integration Tests', () => {
         finalPrice: 90,
         totalDiscount: 10,
         totalDiscountPercentage: 10,
-        appliedRules: []
+        appliedRules: [],
       }
 
       await cacheService.set(context, pricingData)
       await cacheService.invalidateByPattern('test-article-1')
       const cached = await cacheService.get(context)
-      
+
       expect(cached).toBeNull()
     })
 
@@ -163,13 +163,13 @@ describe('Pricing System Integration Tests', () => {
           articleId: 'test-article-1',
           societeId: 'test-societe-1',
           quantity: 10,
-          channel: PriceRuleChannel.ERP
-        }
+          channel: PriceRuleChannel.ERP,
+        },
       ]
 
       await cacheService.warmUp(contexts)
       const stats = await cacheService.getStats()
-      
+
       expect(stats.totalKeys).toBeGreaterThan(0)
     })
   })
@@ -184,7 +184,7 @@ describe('Pricing System Integration Tests', () => {
         basePrice: 100,
         finalPrice: 90,
         discount: 10,
-        applied: true
+        applied: true,
       }
 
       await analyticsService.logRuleUsage(usageData)
@@ -198,7 +198,7 @@ describe('Pricing System Integration Tests', () => {
         new Date('2024-01-01'),
         new Date('2024-12-31')
       )
-      
+
       expect(dashboard).toBeDefined()
       expect(dashboard.period).toBeDefined()
       expect(dashboard.totalCalculations).toBeGreaterThanOrEqual(0)
@@ -208,7 +208,7 @@ describe('Pricing System Integration Tests', () => {
     it('should track performance metrics', async () => {
       await analyticsService.trackPerformance('test-operation', 100)
       const metrics = await analyticsService.getPerformanceMetrics('test-societe-1')
-      
+
       expect(metrics).toBeDefined()
       expect(metrics.averageCalculationTime).toBeGreaterThanOrEqual(0)
     })
@@ -221,15 +221,15 @@ describe('Pricing System Integration Tests', () => {
         historicalSales: [
           { date: new Date('2024-01-01'), price: 100, quantity: 10, revenue: 1000 },
           { date: new Date('2024-01-02'), price: 95, quantity: 15, revenue: 1425 },
-          { date: new Date('2024-01-03'), price: 90, quantity: 20, revenue: 1800 }
+          { date: new Date('2024-01-03'), price: 90, quantity: 20, revenue: 1800 },
         ],
         inventory: 100,
         cost: 50,
-        category: 'GENERAL'
+        category: 'GENERAL',
       }
 
       const suggestion = await mlService.suggestOptimalPrice(context)
-      
+
       expect(suggestion).toBeDefined()
       expect(suggestion.suggestedPrice).toBeGreaterThan(0)
       expect(suggestion.confidence).toBeGreaterThanOrEqual(0)
@@ -239,7 +239,7 @@ describe('Pricing System Integration Tests', () => {
 
     it('should predict demand', async () => {
       const prediction = await mlService.predictDemand('test-article-1', 95)
-      
+
       expect(prediction).toBeDefined()
       expect(prediction.expectedQuantity).toBeGreaterThanOrEqual(0)
       expect(prediction.confidence).toBeGreaterThanOrEqual(0)
@@ -252,7 +252,7 @@ describe('Pricing System Integration Tests', () => {
         100,
         [95, 98, 102, 105]
       )
-      
+
       expect(analysis).toBeDefined()
       expect(analysis.position).toBeDefined()
       expect(analysis.recommendation).toBeDefined()
@@ -266,14 +266,14 @@ describe('Pricing System Integration Tests', () => {
         societeId: 'test-societe-1',
         url: 'https://example.com/webhook',
         events: ['price.changed', 'rule.applied'],
-        description: 'Test webhook'
+        description: 'Test webhook',
       }
 
       // Mock URL validation
       jest.spyOn(webhooksService as any, 'validateWebhookUrl').mockResolvedValue(undefined)
 
       const subscription = await webhooksService.createSubscription(subscriptionData)
-      
+
       expect(subscription).toBeDefined()
       expect(subscription.societeId).toBe('test-societe-1')
       expect(subscription.url).toBe('https://example.com/webhook')
@@ -288,8 +288,8 @@ describe('Pricing System Integration Tests', () => {
         data: {
           articleId: 'article-1',
           oldPrice: 100,
-          newPrice: 90
-        }
+          newPrice: 90,
+        },
       }
 
       await webhooksService.emit(event)
@@ -310,10 +310,10 @@ describe('Pricing System Integration Tests', () => {
         .send({
           articleId: 'test-article-1',
           quantity: 10,
-          channel: 'ERP'
+          channel: 'ERP',
         })
         .expect(201)
-      
+
       expect(response.body).toHaveProperty('finalPrice')
       expect(response.body).toHaveProperty('appliedRules')
     })
@@ -324,11 +324,11 @@ describe('Pricing System Integration Tests', () => {
         .send({
           calculations: [
             { articleId: 'test-1', quantity: 10 },
-            { articleId: 'test-2', quantity: 5 }
-          ]
+            { articleId: 'test-2', quantity: 5 },
+          ],
         })
         .expect(201)
-      
+
       expect(response.body).toBeInstanceOf(Array)
       expect(response.body).toHaveLength(2)
     })
@@ -338,7 +338,7 @@ describe('Pricing System Integration Tests', () => {
         .get('/pricing/analytics/dashboard')
         .query({ from: '2024-01-01', to: '2024-12-31' })
         .expect(200)
-      
+
       expect(response.body).toHaveProperty('totalCalculations')
       expect(response.body).toHaveProperty('topRules')
     })
@@ -365,11 +365,11 @@ describe('Pricing System Integration Tests', () => {
           query,
           variables: {
             articleId: 'test-article-1',
-            quantity: 10
-          }
+            quantity: 10,
+          },
         })
         .expect(200)
-      
+
       expect(response.body.data.calculatePrice).toBeDefined()
       expect(response.body.data.calculatePrice.finalPrice).toBeGreaterThan(0)
     })
@@ -391,11 +391,11 @@ describe('Pricing System Integration Tests', () => {
         .send({
           query,
           variables: {
-            articleId: 'test-article-1'
-          }
+            articleId: 'test-article-1',
+          },
         })
         .expect(200)
-      
+
       expect(response.body.data.suggestOptimalPrice).toBeDefined()
     })
   })
@@ -406,7 +406,7 @@ describe('Pricing System Integration Tests', () => {
         articleId: 'invalid-article',
         societeId: 'test-societe-1',
         quantity: 10,
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       const result = await pricingEngine.calculatePrice(context)
@@ -424,7 +424,7 @@ describe('Pricing System Integration Tests', () => {
         articleId: 'test-article-1',
         societeId: 'test-societe-1',
         quantity: 10,
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       // Should continue without cache
@@ -443,7 +443,7 @@ describe('Pricing System Integration Tests', () => {
             societeId: 'test-societe-1',
             quantity: Math.random() * 100,
             basePrice: Math.random() * 1000,
-            channel: PriceRuleChannel.ERP
+            channel: PriceRuleChannel.ERP,
           })
         )
       }
@@ -454,8 +454,8 @@ describe('Pricing System Integration Tests', () => {
 
       expect(results).toHaveLength(1000)
       expect(duration).toBeLessThan(5000) // Should complete in less than 5 seconds
-      
-      results.forEach(result => {
+
+      results.forEach((result) => {
         expect(result.finalPrice).toBeGreaterThanOrEqual(0)
       })
     })
@@ -466,7 +466,7 @@ describe('Pricing System Integration Tests', () => {
         societeId: 'test-societe-1',
         quantity: 10,
         basePrice: 100,
-        channel: PriceRuleChannel.ERP
+        channel: PriceRuleChannel.ERP,
       }
 
       // First call to populate cache

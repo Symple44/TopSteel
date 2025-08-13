@@ -1,37 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import type { Partner } from '@erp/types'
+import { type PartnerStatus, PartnerType } from '@erp/types'
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
+  ScrollArea,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Separator } from '@erp/ui'
-import { ScrollArea } from '@erp/ui'
-import {
-  Building2,
-  Phone,
-  Mail,
-  MapPin,
-  Globe,
-  Users,
-  Edit,
-  ExternalLink,
-} from 'lucide-react'
-import type { Partner } from '@erp/types'
-import { PartnerType, type PartnerStatus } from '@erp/types'
+import { Building2, Edit, ExternalLink, Globe, Mail, MapPin, Phone, Users } from 'lucide-react'
+import { useState } from 'react'
 import { usePartnerComplete } from '@/hooks/use-partners'
+import { formatCurrency, formatDate } from '@/lib/utils'
+import { AddressesManager } from './addresses-manager'
 import { ContactsManager } from './contacts-manager'
 import { SitesManager } from './sites-manager'
-import { AddressesManager } from './addresses-manager'
-import { formatCurrency, formatDate } from '@/lib/utils'
-import { cn } from '@erp/ui'
 
 interface PartnerDetailDialogProps {
   open: boolean
@@ -100,9 +96,7 @@ export function PartnerDetailDialog({
           </div>
           <div className="text-sm text-muted-foreground">
             Code: {partner.code} | Catégorie: {partner.category?.replace(/_/g, ' ')}
-            {completeData?.group && (
-              <> | Groupe: {completeData.group.name}</>
-            )}
+            {completeData?.group && <> | Groupe: {completeData.group.name}</>}
           </div>
         </DialogHeader>
 
@@ -112,9 +106,7 @@ export function PartnerDetailDialog({
             <TabsTrigger value="contacts">
               Contacts ({completeData?.contacts?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="sites">
-              Sites ({completeData?.sites?.length || 0})
-            </TabsTrigger>
+            <TabsTrigger value="sites">Sites ({completeData?.sites?.length || 0})</TabsTrigger>
             <TabsTrigger value="addresses">
               Adresses ({completeData?.addresses?.length || 0})
             </TabsTrigger>
@@ -273,14 +265,17 @@ export function PartnerDetailDialog({
                     {partner.representantCommercial && (
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Commercial:</span>
-                        <span className="text-sm font-medium">{partner.representantCommercial}</span>
+                        <span className="text-sm font-medium">
+                          {partner.representantCommercial}
+                        </span>
                       </div>
                     )}
                   </CardContent>
                 </Card>
 
                 {/* Informations fournisseur */}
-                {(partner.type === PartnerType.FOURNISSEUR || partner.type === PartnerType.MIXTE) && (
+                {(partner.type === PartnerType.FOURNISSEUR ||
+                  partner.type === PartnerType.MIXTE) && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base">Informations fournisseur</CardTitle>
@@ -289,17 +284,20 @@ export function PartnerDetailDialog({
                       {partner.delaiLivraison !== undefined && partner.delaiLivraison !== null && (
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">Délai livraison:</span>
-                          <span className="text-sm font-medium">{partner.delaiLivraison} jours</span>
-                        </div>
-                      )}
-                      {partner.montantMiniCommande !== undefined && partner.montantMiniCommande !== null && (
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">Commande min:</span>
                           <span className="text-sm font-medium">
-                            {formatCurrency(partner.montantMiniCommande)}
+                            {partner.delaiLivraison} jours
                           </span>
                         </div>
                       )}
+                      {partner.montantMiniCommande !== undefined &&
+                        partner.montantMiniCommande !== null && (
+                          <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">Commande min:</span>
+                            <span className="text-sm font-medium">
+                              {formatCurrency(partner.montantMiniCommande)}
+                            </span>
+                          </div>
+                        )}
                       {partner.fournisseurPrefere && (
                         <Badge variant="default" className="w-full justify-center">
                           Fournisseur préféré
@@ -319,7 +317,9 @@ export function PartnerDetailDialog({
                       {partner.compteComptableClient && (
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">Compte client:</span>
-                          <span className="text-sm font-medium">{partner.compteComptableClient}</span>
+                          <span className="text-sm font-medium">
+                            {partner.compteComptableClient}
+                          </span>
                         </div>
                       )}
                       {partner.compteComptableFournisseur && (
@@ -396,10 +396,7 @@ export function PartnerDetailDialog({
 
             <TabsContent value="sites">
               {completeData && (
-                <SitesManager
-                  partnerId={partner.id}
-                  sites={completeData.sites || []}
-                />
+                <SitesManager partnerId={partner.id} sites={completeData.sites || []} />
               )}
             </TabsContent>
 

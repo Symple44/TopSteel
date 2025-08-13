@@ -1,13 +1,6 @@
+import type { CreatePartnerDto, PartnerFilters, UpdatePartnerDto } from '@erp/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type {
-  CreatePartnerDto,
-  Partner,
-  PartnerFilters,
-  PartnerGroup,
-  PartnerStatistics,
-  UpdatePartnerDto,
-} from '@erp/types'
 import { apiClient } from '@/lib/api-client'
 
 // Query keys

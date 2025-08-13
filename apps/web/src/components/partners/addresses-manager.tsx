@@ -1,54 +1,56 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Edit2, Trash2, MapPin, Home, Building, Package, CheckCircle } from 'lucide-react'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Badge } from '@erp/ui'
+import type {
+  CreatePartnerAddressDto,
+  PartnerAddress,
+  PartnerSite,
+  UpdatePartnerAddressDto,
+} from '@erp/types'
+import { AddressStatus, AddressType } from '@erp/types'
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  Textarea,
 } from '@erp/ui'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@erp/ui'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from '@erp/ui'
-import { Input } from '@erp/ui'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@erp/ui'
-import { Switch } from '@erp/ui'
-import { Textarea } from '@erp/ui'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Building, CheckCircle, Edit2, Home, MapPin, Package, Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import type { PartnerAddress, PartnerSite, CreatePartnerAddressDto, UpdatePartnerAddressDto } from '@erp/types'
-import { AddressType, AddressStatus } from '@erp/types'
 import {
-  usePartnerAddresses,
   useCreatePartnerAddress,
-  useUpdatePartnerAddress,
   useDeletePartnerAddress,
+  usePartnerAddresses,
+  useUpdatePartnerAddress,
 } from '@/hooks/use-partner-details'
 import { formatDate } from '@/lib/utils'
 
@@ -57,9 +59,9 @@ const addressSchema = z.object({
   type: z.nativeEnum(AddressType),
   status: z.nativeEnum(AddressStatus).optional(),
   isDefault: z.boolean().optional(),
-  
+
   // Adresse
-  ligne1: z.string().min(1, 'L\'adresse est requise'),
+  ligne1: z.string().min(1, "L'adresse est requise"),
   ligne2: z.string().optional(),
   ligne3: z.string().optional(),
   codePostal: z.string().min(1, 'Le code postal est requis'),
@@ -67,16 +69,16 @@ const addressSchema = z.object({
   region: z.string().optional(),
   pays: z.string().optional(),
   codePays: z.string().optional(),
-  
+
   // Géolocalisation
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
-  
+
   // Contact
   contactNom: z.string().optional(),
   contactTelephone: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal('')),
-  
+
   // Instructions et validité
   instructionsAcces: z.string().optional(),
   notes: z.string().optional(),
@@ -93,10 +95,14 @@ interface AddressesManagerProps {
   sites?: PartnerSite[]
 }
 
-export function AddressesManager({ partnerId, addresses: initialAddresses, sites = [] }: AddressesManagerProps) {
+export function AddressesManager({
+  partnerId,
+  addresses: initialAddresses,
+  sites = [],
+}: AddressesManagerProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState<PartnerAddress | null>(null)
-  
+
   const { data: addresses = initialAddresses } = usePartnerAddresses(partnerId)
   const createAddress = useCreatePartnerAddress()
   const updateAddress = useUpdatePartnerAddress()
@@ -131,7 +137,9 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
       ...address,
       latitude: address.latitude || undefined,
       longitude: address.longitude || undefined,
-      dateDebut: address.dateDebut ? new Date(address.dateDebut).toISOString().split('T')[0] : undefined,
+      dateDebut: address.dateDebut
+        ? new Date(address.dateDebut).toISOString().split('T')[0]
+        : undefined,
       dateFin: address.dateFin ? new Date(address.dateFin).toISOString().split('T')[0] : undefined,
     } as AddressFormData)
     setIsFormOpen(true)
@@ -146,15 +154,16 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
   const onSubmit = async (data: AddressFormData) => {
     try {
       if (editingAddress) {
-        await updateAddress.mutateAsync({ id: editingAddress.id, data: data as UpdatePartnerAddressDto })
+        await updateAddress.mutateAsync({
+          id: editingAddress.id,
+          data: data as UpdatePartnerAddressDto,
+        })
       } else {
         await createAddress.mutateAsync({ partnerId, data: data as CreatePartnerAddressDto })
       }
       setIsFormOpen(false)
       form.reset()
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   const getTypeIcon = (type: AddressType) => {
@@ -219,9 +228,7 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
                   <TableRow key={address.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {address.isDefault && (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        )}
+                        {address.isDefault && <CheckCircle className="h-4 w-4 text-green-500" />}
                         <div>
                           <div className="font-medium flex items-center gap-2">
                             {getTypeIcon(address.type)}
@@ -277,12 +284,8 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
                     <TableCell>
                       {address.dateDebut || address.dateFin ? (
                         <div className="text-sm">
-                          {address.dateDebut && (
-                            <div>Du: {formatDate(address.dateDebut)}</div>
-                          )}
-                          {address.dateFin && (
-                            <div>Au: {formatDate(address.dateFin)}</div>
-                          )}
+                          {address.dateDebut && <div>Du: {formatDate(address.dateDebut)}</div>}
+                          {address.dateFin && <div>Au: {formatDate(address.dateFin)}</div>}
                         </div>
                       ) : (
                         <span className="text-sm text-muted-foreground">Permanente</span>
@@ -295,18 +298,10 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(address)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(address)}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(address)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(address)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -322,9 +317,7 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {editingAddress ? 'Modifier l\'adresse' : 'Nouvelle adresse'}
-            </DialogTitle>
+            <DialogTitle>{editingAddress ? "Modifier l'adresse" : 'Nouvelle adresse'}</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -445,7 +438,7 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Adresse</h3>
-                
+
                 <FormField
                   control={form.control}
                   name="ligne1"
@@ -565,7 +558,7 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Géolocalisation (optionnel)</h3>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -599,7 +592,7 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Contact sur place (optionnel)</h3>
-                
+
                 <FormField
                   control={form.control}
                   name="contactNom"
@@ -647,7 +640,7 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Informations complémentaires</h3>
-                
+
                 <FormField
                   control={form.control}
                   name="instructionsAcces"
@@ -673,11 +666,7 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
                     <FormItem>
                       <FormLabel>Notes</FormLabel>
                       <FormControl>
-                        <Textarea
-                          {...field}
-                          placeholder="Informations complémentaires"
-                          rows={3}
-                        />
+                        <Textarea {...field} placeholder="Informations complémentaires" rows={3} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -725,15 +714,12 @@ export function AddressesManager({ partnerId, addresses: initialAddresses, sites
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                   Annuler
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={createAddress.isPending || updateAddress.isPending}
-                >
+                <Button type="submit" disabled={createAddress.isPending || updateAddress.isPending}>
                   {createAddress.isPending || updateAddress.isPending
                     ? 'Enregistrement...'
                     : editingAddress
-                    ? 'Modifier'
-                    : 'Créer'}
+                      ? 'Modifier'
+                      : 'Créer'}
                 </Button>
               </DialogFooter>
             </form>

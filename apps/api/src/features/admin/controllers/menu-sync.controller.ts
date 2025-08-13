@@ -1,12 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
-import { MenuSyncService } from '../services/menu-sync.service'
+import { Controller, Get, HttpStatus, Logger, Post } from '@nestjs/common'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { MenuSyncService } from '../services/menu-sync.service'
 
 @ApiTags('Admin - Menu Sync')
 @Controller('admin/menu-sync')
@@ -18,7 +12,8 @@ export class MenuSyncController {
   @Post('sync')
   @ApiOperation({
     summary: 'Synchroniser le menu depuis le sidebar',
-    description: 'Force la synchronisation de la structure de menu du sidebar vers la base de données',
+    description:
+      'Force la synchronisation de la structure de menu du sidebar vers la base de données',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -41,9 +36,9 @@ export class MenuSyncController {
     try {
       this.logger.log('Démarrage de la synchronisation manuelle du menu')
       const configuration = await this.menuSyncService.syncMenuFromSidebar()
-      
-      const itemsCount = await this.menuSyncService['itemRepository'].count({
-        where: { configId: configuration.id }
+
+      const itemsCount = await this.menuSyncService.itemRepository.count({
+        where: { configId: configuration.id },
       })
 
       return {
@@ -81,16 +76,16 @@ export class MenuSyncController {
   async getSyncStatus() {
     try {
       const needsSync = await this.menuSyncService.needsSync()
-      
+
       // Récupérer la configuration système pour obtenir la date de dernière sync
-      const systemConfig = await this.menuSyncService['configRepository'].findOne({
+      const systemConfig = await this.menuSyncService.configRepository.findOne({
         where: { name: 'Configuration Système Auto-Sync', isSystem: true },
         relations: ['items'],
       })
 
       const currentItemsCount = systemConfig?.items?.length || 0
-      const sidebarNavigation = this.menuSyncService['getSidebarNavigationStructure']()
-      const expectedItemsCount = this.menuSyncService['countTotalItems'](sidebarNavigation)
+      const sidebarNavigation = this.menuSyncService.getSidebarNavigationStructure()
+      const expectedItemsCount = this.menuSyncService.countTotalItems(sidebarNavigation)
 
       return {
         needsSync,
@@ -117,7 +112,8 @@ export class MenuSyncController {
   @Post('auto-sync')
   @ApiOperation({
     summary: 'Synchronisation automatique',
-    description: 'Lance la synchronisation automatique (vérifie si nécessaire avant de synchroniser)',
+    description:
+      'Lance la synchronisation automatique (vérifie si nécessaire avant de synchroniser)',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -135,7 +131,7 @@ export class MenuSyncController {
   async autoSync() {
     try {
       const needsSync = await this.menuSyncService.needsSync()
-      
+
       if (!needsSync) {
         return {
           success: true,
@@ -147,9 +143,9 @@ export class MenuSyncController {
       }
 
       const syncResult = await this.menuSyncService.autoSync()
-      
+
       if (syncResult) {
-        const systemConfig = await this.menuSyncService['configRepository'].findOne({
+        const systemConfig = await this.menuSyncService.configRepository.findOne({
           where: { name: 'Configuration Système Auto-Sync', isSystem: true },
         })
 

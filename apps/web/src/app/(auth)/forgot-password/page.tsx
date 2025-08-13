@@ -4,8 +4,8 @@ import { Button, Card, Input, Label } from '@erp/ui'
 import { ArrowLeft, CheckCircle, Mail, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import type { FC } from 'react'
+import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 
@@ -88,7 +88,11 @@ const ForgotPasswordPage: FC = () => {
             </div>
 
             <div className="space-y-3">
-              <Button onClick={() => setIsEmailSent(false)} variant={'outline' as const} className="w-full">
+              <Button
+                onClick={() => setIsEmailSent(false)}
+                variant={'outline' as const}
+                className="w-full"
+              >
                 {t('resendEmail')}
               </Button>
 

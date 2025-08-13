@@ -1,55 +1,47 @@
 'use client'
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '../../../layout/card'
+  Calculator,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  Clock,
+  Copy,
+  DollarSign,
+  Download,
+  Hash,
+  Info,
+  Minus,
+  Package,
+  Percent,
+  TrendingDown,
+  TrendingUp,
+  User,
+  XCircle,
+} from 'lucide-react'
+import type React from 'react'
+import { useMemo, useState } from 'react'
+import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
-import { Progress } from '../../../primitives/progress'
-import { Separator } from '../../../primitives/separator'
-import { Alert, AlertDescription } from '../../../feedback/alert'
-import { SimpleTooltip } from '../../../primitives/tooltip'
-import { Button } from '../../../primitives/button'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from '../../../primitives/collapsible'
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '../../../data-display/table'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
+import { Button } from '../../../primitives/button'
 import {
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  ChevronRight,
-  Info,
-  AlertCircle,
-  Package,
-  User,
-  Hash,
-  DollarSign,
-  Percent,
-  Calculator,
-  Clock,
-  CheckCircle,
-  XCircle,
-  ChevronDown,
-  ChevronUp,
-  Download,
-  Copy
-} from 'lucide-react'
-import type React from 'react'
-import { useState, useMemo } from 'react'
-import { cn } from '../../../../lib/utils'
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../../../primitives/collapsible'
+import { Progress } from '../../../primitives/progress'
+import { Separator } from '../../../primitives/separator'
+import { SimpleTooltip } from '../../../primitives/tooltip'
 
 export interface PriceBreakdownProps {
   breakdown: {
@@ -124,7 +116,7 @@ export interface PriceBreakdownProps {
 const formatCurrency = (value: number, currency = 'EUR') => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency
+    currency,
   }).format(value)
 }
 
@@ -153,36 +145,36 @@ export function PriceBreakdown({
   showDetails = true,
   collapsible = true,
   onExport,
-  onCopy
+  onCopy,
 }: PriceBreakdownProps) {
   const [expandedSections, setExpandedSections] = useState({
     steps: true,
     context: !collapsible,
     skipped: false,
     margins: true,
-    metadata: false
+    metadata: false,
   })
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     if (!collapsible && section === 'context') return
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section],
     }))
   }
 
   const totalDiscount = basePrice - finalPrice
   const totalDiscountPercentage = basePrice > 0 ? (totalDiscount / basePrice) * 100 : 0
 
-  const priceEvolution = useMemo(() => {
+  const _priceEvolution = useMemo(() => {
     if (!breakdown.steps.length) return []
-    
+
     const evolution = [{ step: 0, price: basePrice, label: 'Prix de base' }]
-    breakdown.steps.forEach(step => {
+    breakdown.steps.forEach((step) => {
       evolution.push({
         step: step.stepNumber,
         price: step.priceAfter,
-        label: step.ruleName
+        label: step.ruleName,
       })
     })
     return evolution
@@ -206,22 +198,19 @@ export function PriceBreakdown({
       {/* Étapes de calcul */}
       {breakdown.steps.map((step, index) => {
         const isLastStep = index === breakdown.steps.length - 1
-        const adjustmentPercent = step.priceBefore > 0 
-          ? ((step.priceAfter - step.priceBefore) / step.priceBefore) * 100 
-          : 0
+        const adjustmentPercent =
+          step.priceBefore > 0 ? ((step.priceAfter - step.priceBefore) / step.priceBefore) * 100 : 0
 
         return (
           <div key={step.ruleId} className="relative">
             {/* Ligne de connexion */}
-            {!isLastStep && (
-              <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-gray-200" />
-            )}
-            
+            {!isLastStep && <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-gray-200" />}
+
             <div className="flex items-start gap-4">
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white border-2 border-gray-200 text-sm font-medium z-10">
                 {step.stepNumber}
               </div>
-              
+
               <div className="flex-1 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -232,17 +221,19 @@ export function PriceBreakdown({
                   </div>
                   {getAdjustmentIcon(step.adjustment)}
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground">{step.description}</p>
-                
+
                 <div className="flex items-center gap-4 text-sm">
                   <span className="font-mono">{formatCurrency(step.priceBefore, currency)}</span>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
-                  <span className={cn('font-mono font-medium', getAdjustmentColor(step.adjustment))}>
+                  <span
+                    className={cn('font-mono font-medium', getAdjustmentColor(step.adjustment))}
+                  >
                     {formatCurrency(step.priceAfter, currency)}
                   </span>
-                  <Badge 
-                    variant={step.adjustment < 0 ? 'default' : 'destructive'} 
+                  <Badge
+                    variant={step.adjustment < 0 ? 'default' : 'destructive'}
                     className="text-xs"
                   >
                     {formatPercentage(adjustmentPercent)}
@@ -309,7 +300,7 @@ export function PriceBreakdown({
         </Collapsible>
       )
     }
-    
+
     return (
       <div>
         <div className="flex items-center gap-2 p-4">
@@ -328,9 +319,7 @@ export function PriceBreakdown({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Décomposition du prix</CardTitle>
-            <CardDescription>
-              Détail du calcul étape par étape
-            </CardDescription>
+            <CardDescription>Détail du calcul étape par étape</CardDescription>
           </div>
           <div className="flex items-center gap-2">
             {onCopy && (
@@ -473,7 +462,7 @@ export function PriceBreakdown({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {breakdown.skippedRules.map(rule => (
+                      {breakdown.skippedRules.map((rule) => (
                         <TableRow key={rule.ruleId}>
                           <TableCell>{rule.ruleName}</TableCell>
                           <TableCell>{rule.priority}</TableCell>
@@ -501,12 +490,16 @@ export function PriceBreakdown({
                     {breakdown.margins.costPrice && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Prix d'achat</span>
-                        <span className="font-mono">{formatCurrency(breakdown.margins.costPrice, currency)}</span>
+                        <span className="font-mono">
+                          {formatCurrency(breakdown.margins.costPrice, currency)}
+                        </span>
                       </div>
                     )}
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Prix de vente</span>
-                      <span className="font-mono">{formatCurrency(breakdown.margins.sellingPrice, currency)}</span>
+                      <span className="font-mono">
+                        {formatCurrency(breakdown.margins.sellingPrice, currency)}
+                      </span>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between">
@@ -520,8 +513,8 @@ export function PriceBreakdown({
                         </Badge>
                       </div>
                     </div>
-                    <Progress 
-                      value={Math.max(0, Math.min(100, breakdown.margins.marginPercentage))} 
+                    <Progress
+                      value={Math.max(0, Math.min(100, breakdown.margins.marginPercentage))}
                       className="h-2"
                     />
                   </div>

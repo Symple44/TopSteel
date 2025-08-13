@@ -43,6 +43,8 @@ import { DatabaseCoreModule } from '../features/database-core/database-core.modu
 import { MenuModule } from '../features/menu/menu.module'
 // Module de paramètres
 import { ParametersModule } from '../features/parameters/parameters.module'
+// Module de pricing unifié (remplace les deux modules précédents)
+import { PricingUnifiedModule } from '../features/pricing/pricing-unified.module'
 import { QueryBuilderModule } from '../features/query-builder/query-builder.module'
 import { SearchModule } from '../features/search/search.module'
 import { SharedModule } from '../features/shared/shared.module'
@@ -60,8 +62,6 @@ import {
 // Middleware
 import { ConsolidatedSecurityMiddleware } from '../infrastructure/security/enhanced-security.middleware'
 import { EnhancedThrottlerGuard } from '../infrastructure/security/guards/enhanced-throttler.guard'
-// Module de pricing unifié (remplace les deux modules précédents)
-import { PricingUnifiedModule } from '../features/pricing/pricing-unified.module'
 // Controllers
 import { AppController } from './app.controller'
 import { AppService } from './app.service'

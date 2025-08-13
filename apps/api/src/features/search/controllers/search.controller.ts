@@ -1,28 +1,32 @@
 import {
+  BadRequestException,
   Controller,
   Get,
+  Logger,
+  Param,
   Post,
   Query,
-  Param,
-  UseGuards,
   Request,
-  Logger,
-  BadRequestException,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import { GlobalSearchService, SearchOptions, SearchResponse } from '../services/global-search.service'
 import { Roles } from '../../../domains/auth/decorators/roles.decorator'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import {
+import type {
   GlobalSearchDto,
-  SuggestionsDto,
+  MenuSearchDto,
   SearchByTypeParamsDto,
   SearchByTypeQueryDto,
-  MenuSearchDto,
+  SuggestionsDto,
 } from '../dto'
-import { AuthenticatedRequest, SearchStatistics } from '../types/search-types'
+import type {
+  GlobalSearchService,
+  SearchOptions,
+  SearchResponse,
+} from '../services/global-search.service'
+import type { AuthenticatedRequest, SearchStatistics } from '../types/search-types'
 
 @Controller('search')
 @UseGuards(JwtAuthGuard)
@@ -61,7 +65,7 @@ export class SearchController {
         tenantId,
         userId: user?.id,
         roles,
-        permissions
+        permissions,
       }
 
       // Log de la recherche
@@ -73,11 +77,11 @@ export class SearchController {
       return {
         success: true,
         data: results,
-        message: `${results.total} résultat(s) trouvé(s) en ${results.took}ms`
+        message: `${results.total} résultat(s) trouvé(s) en ${results.took}ms`,
       }
     } catch (error) {
       this.logger.error('Search error:', error)
-      
+
       if (error instanceof BadRequestException) {
         throw error
       }
@@ -88,9 +92,9 @@ export class SearchController {
           results: [],
           total: 0,
           took: 0,
-          searchEngine: 'postgresql'
+          searchEngine: 'postgresql',
         },
-        message: 'Une erreur est survenue lors de la recherche'
+        message: 'Une erreur est survenue lors de la recherche',
       }
     }
   }
@@ -119,14 +123,14 @@ export class SearchController {
         tenantId,
         userId: user?.id,
         roles: user?.roles || [],
-        permissions: user?.permissions || []
+        permissions: user?.permissions || [],
       }
 
       const results = await this.searchService.search(searchOptions)
 
       // Extraire les titres comme suggestions
       const suggestions = results.results
-        .map(r => r.title)
+        .map((r) => r.title)
         .filter((v, i, a) => a.indexOf(v) === i) // Unique
         .slice(0, 5)
 
@@ -137,13 +141,13 @@ export class SearchController {
 
       return {
         success: true,
-        data: suggestions.slice(0, 10) // Maximum 10 suggestions
+        data: suggestions.slice(0, 10), // Maximum 10 suggestions
       }
     } catch (error) {
       this.logger.error('Suggestions error:', error)
       return {
         success: true,
-        data: []
+        data: [],
       }
     }
   }
@@ -159,16 +163,16 @@ export class SearchController {
   }> {
     try {
       const stats = await this.searchService.getSearchStatistics()
-      
+
       return {
         success: true,
-        data: stats
+        data: stats,
       }
     } catch (error) {
       this.logger.error('Stats error:', error)
       return {
         success: false,
-        data: null
+        data: null,
       }
     }
   }
@@ -187,10 +191,10 @@ export class SearchController {
     }
   }> {
     const status = this.searchService.getSearchEngineStatus()
-    
+
     return {
       success: true,
-      data: status
+      data: status,
     }
   }
 
@@ -207,21 +211,21 @@ export class SearchController {
   }> {
     try {
       this.logger.log('Starting full reindex...')
-      
+
       // Lancer la réindexation en arrière-plan
-      this.searchService.reindexAll().catch(error => {
+      this.searchService.reindexAll().catch((error) => {
         this.logger.error('Reindex failed:', error)
       })
 
       return {
         success: true,
-        message: 'Réindexation démarrée en arrière-plan. Consultez les logs pour le suivi.'
+        message: 'Réindexation démarrée en arrière-plan. Consultez les logs pour le suivi.',
       }
     } catch (error) {
       this.logger.error('Reindex error:', error)
       return {
         success: false,
-        message: 'Erreur lors du démarrage de la réindexation'
+        message: 'Erreur lors du démarrage de la réindexation',
       }
     }
   }
@@ -250,18 +254,18 @@ export class SearchController {
         tenantId: user?.societeId || user?.tenantId,
         userId: user?.id,
         roles: user?.roles || [],
-        permissions: user?.permissions || []
+        permissions: user?.permissions || [],
       }
 
       const results = await this.searchService.search(searchOptions)
 
       return {
         success: true,
-        data: results
+        data: results,
       }
     } catch (error) {
       this.logger.error('Type search error:', error)
-      
+
       if (error instanceof BadRequestException) {
         throw error
       }
@@ -272,8 +276,8 @@ export class SearchController {
           results: [],
           total: 0,
           took: 0,
-          searchEngine: 'postgresql'
-        }
+          searchEngine: 'postgresql',
+        },
       }
     }
   }
@@ -300,14 +304,14 @@ export class SearchController {
         offset: 0,
         userId: user?.id,
         roles: user?.roles || [],
-        permissions: user?.permissions || []
+        permissions: user?.permissions || [],
       }
 
       const results = await this.searchService.search(searchOptions)
 
       return {
         success: true,
-        data: results
+        data: results,
       }
     } catch (error) {
       this.logger.error('Menu search error:', error)
@@ -317,8 +321,8 @@ export class SearchController {
           results: [],
           total: 0,
           took: 0,
-          searchEngine: 'postgresql'
-        }
+          searchEngine: 'postgresql',
+        },
       }
     }
   }

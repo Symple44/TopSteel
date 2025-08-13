@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { SearchStatistics } from '../types/search-types'
+import type { SearchStatistics } from '../types/search-types'
 
 export class SearchResultDto {
   @ApiProperty({
@@ -157,7 +157,7 @@ export class SearchStatsResponseDto {
       totalSearches: 1250,
       averageResponseTime: 45,
       popularQueries: ['client', 'article', 'commande'],
-      searchEngineStatus: 'healthy'
+      searchEngineStatus: 'healthy',
     },
   })
   data: SearchStatistics

@@ -1,5 +1,5 @@
+import { AdjustmentType, PriceRule, PriceRuleChannel } from '@erp/entities'
 import { DataSource } from 'typeorm'
-import { PriceRule, AdjustmentType, PriceRuleChannel } from '@erp/entities'
 
 /**
  * Script pour créer des règles de prix par défaut
@@ -23,24 +23,24 @@ async function setupDefaultPricingRules() {
     console.log('✅ Connexion à la base de données établie\n')
 
     const priceRuleRepo = dataSource.getRepository(PriceRule)
-    
+
     // Récupérer la société TopSteel
     const societeResult = await dataSource.query(`
       SELECT id FROM societes WHERE denomination = 'TOPSTEEL' LIMIT 1
     `)
-    
+
     if (!societeResult || societeResult.length === 0) {
       throw new Error('Société TOPSTEEL non trouvée')
     }
-    
+
     const societeId = societeResult[0].id
     console.log(`📦 Société TOPSTEEL trouvée: ${societeId}\n`)
 
     // Vérifier les règles existantes
     const existingRules = await priceRuleRepo.find({
-      where: { societeId }
+      where: { societeId },
     })
-    
+
     console.log(`📋 ${existingRules.length} règles existantes trouvées\n`)
 
     const rulesToCreate = []
@@ -60,8 +60,8 @@ async function setupDefaultPricingRules() {
       metadata: {
         createdBy: 'system',
         notes: 'Règle par défaut pour le marketplace',
-        tags: ['marketplace', 'default']
-      }
+        tags: ['marketplace', 'default'],
+      },
     })
     rulesToCreate.push(marketplaceDefaultRule)
 
@@ -78,16 +78,16 @@ async function setupDefaultPricingRules() {
         {
           type: 'article_reference',
           operator: 'starts_with',
-          value: 'IPE'
-        }
+          value: 'IPE',
+        },
       ],
       priority: 10,
       combinable: false, // Ne pas combiner avec d'autres règles
       isActive: true,
       metadata: {
         createdBy: 'system',
-        notes: 'Prix au poids pour profilés IPE'
-      }
+        notes: 'Prix au poids pour profilés IPE',
+      },
     })
     rulesToCreate.push(ipeWeightRule)
 
@@ -104,16 +104,16 @@ async function setupDefaultPricingRules() {
         {
           type: 'article_family',
           operator: 'equals',
-          value: 'TOLES'
-        }
+          value: 'TOLES',
+        },
       ],
       priority: 10,
       combinable: false,
       isActive: true,
       metadata: {
         createdBy: 'system',
-        notes: 'Prix à la surface pour les tôles'
-      }
+        notes: 'Prix à la surface pour les tôles',
+      },
     })
     rulesToCreate.push(sheetSurfaceRule)
 
@@ -130,16 +130,16 @@ async function setupDefaultPricingRules() {
         {
           type: 'article_reference',
           operator: 'starts_with',
-          value: 'TUB'
-        }
+          value: 'TUB',
+        },
       ],
       priority: 10,
       combinable: false,
       isActive: true,
       metadata: {
         createdBy: 'system',
-        notes: 'Prix au mètre pour les tubes'
-      }
+        notes: 'Prix au mètre pour les tubes',
+      },
     })
     rulesToCreate.push(tubeLengthRule)
 
@@ -155,16 +155,16 @@ async function setupDefaultPricingRules() {
         {
           type: 'quantity',
           operator: 'greater_than',
-          value: 100
-        }
+          value: 100,
+        },
       ],
       priority: 5,
       combinable: true, // Peut se combiner avec d'autres règles
       isActive: true,
       metadata: {
         createdBy: 'system',
-        notes: 'Remise automatique pour grandes quantités'
-      }
+        notes: 'Remise automatique pour grandes quantités',
+      },
     })
     rulesToCreate.push(quantityDiscountRule)
 
@@ -180,8 +180,8 @@ async function setupDefaultPricingRules() {
         {
           type: 'article_reference',
           operator: 'equals',
-          value: 'HEA200-S275JR'
-        }
+          value: 'HEA200-S275JR',
+        },
       ],
       priority: 20, // Haute priorité
       combinable: false,
@@ -191,8 +191,8 @@ async function setupDefaultPricingRules() {
       metadata: {
         createdBy: 'system',
         notes: 'Promotion spéciale HEA200',
-        tags: ['promo', 'featured']
-      }
+        tags: ['promo', 'featured'],
+      },
     })
     rulesToCreate.push(fixedPriceRule)
 
@@ -209,8 +209,8 @@ async function setupDefaultPricingRules() {
         {
           type: 'article_reference',
           operator: 'starts_with',
-          value: 'RHS'
-        }
+          value: 'RHS',
+        },
       ],
       priority: 15,
       combinable: false,
@@ -218,19 +218,19 @@ async function setupDefaultPricingRules() {
       metadata: {
         createdBy: 'system',
         notes: 'Formule complexe pour RHS incluant poids et longueur',
-        tags: ['formula', 'complex']
-      }
+        tags: ['formula', 'complex'],
+      },
     })
     rulesToCreate.push(formulaRule)
 
     // Sauvegarder toutes les règles
     console.log('💾 Création des règles de prix...\n')
-    
+
     for (const rule of rulesToCreate) {
       try {
         // Vérifier si une règle similaire existe déjà
-        const existing = existingRules.find(r => r.ruleName === rule.ruleName)
-        
+        const existing = existingRules.find((r) => r.ruleName === rule.ruleName)
+
         if (existing) {
           console.log(`⏭️  Règle "${rule.ruleName}" existe déjà, mise à jour...`)
           Object.assign(existing, rule)
@@ -241,7 +241,10 @@ async function setupDefaultPricingRules() {
           console.log(`✅ Règle "${rule.ruleName}" créée`)
         }
       } catch (error) {
-        console.error(`❌ Erreur lors de la création de la règle "${rule.ruleName}":`, error.message)
+        console.error(
+          `❌ Erreur lors de la création de la règle "${rule.ruleName}":`,
+          error.message
+        )
       }
     }
 
@@ -249,19 +252,20 @@ async function setupDefaultPricingRules() {
     console.log('\n📊 Résumé des règles de prix:')
     const allRules = await priceRuleRepo.find({
       where: { societeId, isActive: true },
-      order: { priority: 'DESC', ruleName: 'ASC' }
+      order: { priority: 'DESC', ruleName: 'ASC' },
     })
 
     console.log(`\nTotal: ${allRules.length} règles actives\n`)
-    
-    allRules.forEach(rule => {
+
+    allRules.forEach((rule) => {
       const unit = rule.adjustmentUnit ? ` ${rule.adjustmentUnit}` : ''
-      const value = rule.adjustmentType === AdjustmentType.PERCENTAGE 
-        ? `${rule.adjustmentValue}%`
-        : rule.adjustmentType === AdjustmentType.FORMULA
-        ? 'Formule'
-        : `${rule.adjustmentValue}€${unit}`
-      
+      const value =
+        rule.adjustmentType === AdjustmentType.PERCENTAGE
+          ? `${rule.adjustmentValue}%`
+          : rule.adjustmentType === AdjustmentType.FORMULA
+            ? 'Formule'
+            : `${rule.adjustmentValue}€${unit}`
+
       console.log(`  [${rule.priority}] ${rule.ruleName}`)
       console.log(`      Type: ${rule.adjustmentType} | Valeur: ${value}`)
       console.log(`      Canal: ${rule.channel} | Combinable: ${rule.combinable ? 'Oui' : 'Non'}`)
@@ -275,25 +279,24 @@ async function setupDefaultPricingRules() {
 
     // Test rapide d'une règle
     console.log('🧪 Test rapide de calcul de prix...\n')
-    
+
     const testArticle = await dataSource.query(`
       SELECT id, reference, designation, prix_vente_ht, poids, longueur
       FROM articles
       WHERE reference = 'IPE140-S275JR'
       LIMIT 1
     `)
-    
+
     if (testArticle && testArticle.length > 0) {
       const article = testArticle[0]
       console.log(`Article test: ${article.reference}`)
       console.log(`  Prix de base: ${article.prix_vente_ht}€`)
       console.log(`  Poids: ${article.poids} kg`)
-      
+
       // La règle IPE au poids devrait s'appliquer
       const expectedPrice = article.poids * 1.85
       console.log(`  Prix attendu (poids * 1.85€/kg): ${expectedPrice.toFixed(2)}€`)
     }
-
   } catch (error) {
     console.error('\n❌ Erreur:', error)
     throw error

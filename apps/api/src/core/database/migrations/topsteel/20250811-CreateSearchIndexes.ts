@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreateSearchIndexes20250811 implements MigrationInterface {
   name = 'CreateSearchIndexes20250811'
@@ -457,9 +457,20 @@ export class CreateSearchIndexes20250811 implements MigrationInterface {
 
     // Supprimer tous les index créés
     const tables = [
-      'partners', 'articles', 'materials', 'projets', 'devis', 'factures',
-      'commandes', 'menu_items', 'users', 'societes', 'shared_materials',
-      'price_rules', 'notifications', 'query_builders'
+      'partners',
+      'articles',
+      'materials',
+      'projets',
+      'devis',
+      'factures',
+      'commandes',
+      'menu_items',
+      'users',
+      'societes',
+      'shared_materials',
+      'price_rules',
+      'notifications',
+      'query_builders',
     ]
 
     for (const table of tables) {

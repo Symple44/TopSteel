@@ -1,11 +1,11 @@
-import { 
-  SearchMetadata, 
-  SearchDocument, 
-  ElasticsearchSearchResponse, 
+import type { SearchableEntity } from '../config/searchable-entities.config'
+import type {
   AnyDatabaseRecord,
-  ElasticsearchQuery 
+  ElasticsearchQuery,
+  ElasticsearchSearchResponse,
+  SearchDocument,
+  SearchMetadata,
 } from '../types/search-types'
-import { SearchableEntity } from '../config/searchable-entities.config'
 
 export interface SearchResult {
   type: string
@@ -55,10 +55,15 @@ export interface ISearchStrategy {
 }
 
 export interface ISearchResultFormatter {
-  formatResults(rawResults: AnyDatabaseRecord[] | ElasticsearchSearchResponse['hits']['hits'], engine: 'elasticsearch' | 'postgresql'): SearchResult[]
+  formatResults(
+    rawResults: AnyDatabaseRecord[] | ElasticsearchSearchResponse['hits']['hits'],
+    engine: 'elasticsearch' | 'postgresql'
+  ): SearchResult[]
   sanitizeResults(results: SearchResult[]): SearchResult[]
   extractSuggestions(response: ElasticsearchSearchResponse): string[]
-  extractFacets(response: ElasticsearchSearchResponse): Record<string, { value: string; count: number }[]>
+  extractFacets(
+    response: ElasticsearchSearchResponse
+  ): Record<string, { value: string; count: number }[]>
 }
 
 export interface IElasticsearchSearchService extends ISearchStrategy {

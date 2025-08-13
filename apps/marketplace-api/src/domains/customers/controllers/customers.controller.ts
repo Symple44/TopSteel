@@ -16,11 +16,11 @@ import type { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
 import type { CustomerAddress } from '../entities/marketplace-customer.entity'
-import {
-  type CreateCustomerDto,
-  type CustomerLoginDto,
+import type {
+  CreateCustomerDto,
+  CustomerLoginDto,
   MarketplaceCustomersService,
-  type UpdateCustomerDto,
+  UpdateCustomerDto,
 } from '../services/marketplace-customers.service'
 
 @ApiTags('customers')

@@ -1,20 +1,13 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  HttpCode,
-  HttpStatus
-} from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { PriceRuleChannel } from '@erp/entities'
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
+import { Roles } from '../../../domains/auth/decorators/roles.decorator'
+import { EnhancedTenantGuard } from '../../../domains/auth/security/guards/enhanced-tenant.guard'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import { EnhancedTenantGuard } from '../../../domains/auth/security/guards/enhanced-tenant.guard'
-import { Roles } from '../../../domains/auth/decorators/roles.decorator'
-import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import type { User } from '../../../domains/users/entities/user.entity'
-import { PricingEngineService } from '../services/pricing-engine.service'
-import { PriceRuleChannel } from '@erp/entities'
+import type { PricingEngineService } from '../services/pricing-engine.service'
 
 export interface QuoteLineItem {
   articleId?: string
@@ -86,19 +79,18 @@ export interface QuoteResponse {
 @UseGuards(JwtAuthGuard, RolesGuard, EnhancedTenantGuard)
 @ApiBearerAuth()
 export class PricingQuoteController {
-  constructor(
-    private readonly pricingEngine: PricingEngineService
-  ) {}
+  constructor(private readonly pricingEngine: PricingEngineService) {}
 
   @Post('quote')
   @HttpCode(HttpStatus.OK)
   @Roles('ADMIN', 'MANAGER', 'COMMERCIAL', 'USER')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Générer un devis avec calcul de prix détaillé',
-    description: 'Calcule les prix pour plusieurs articles en tenant compte des règles de prix et retourne un devis détaillé'
+    description:
+      'Calcule les prix pour plusieurs articles en tenant compte des règles de prix et retourne un devis détaillé',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Devis généré avec succès',
     schema: {
       type: 'object',
@@ -116,14 +108,14 @@ export class PricingQuoteController {
               articleId: { type: 'string' },
               quantity: { type: 'number' },
               unitPrice: { type: 'number' },
-              lineTotal: { type: 'number' }
-            }
-          }
+              lineTotal: { type: 'number' },
+            },
+          },
         },
         subtotal: { type: 'number' },
-        totalDiscount: { type: 'number' }
-      }
-    } 
+        totalDiscount: { type: 'number' },
+      },
+    },
   })
   async generateQuote(
     @Body() request: QuoteRequest,
@@ -131,33 +123,36 @@ export class PricingQuoteController {
   ): Promise<QuoteResponse> {
     const startTime = Date.now()
     const quoteId = `QUOTE-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`
-    
+
     // Calculer les prix pour chaque ligne
     const lines: QuoteLineResult[] = []
     let totalAppliedRules = 0
-    
+
     for (const item of request.items) {
-      const priceResult = await this.pricingEngine.calculatePrice({
-        societeId: request.societeId,
-        articleId: item.articleId,
-        articleReference: item.articleReference,
-        customerId: request.customerId,
-        customerGroup: request.customerGroup,
-        customerEmail: request.customerEmail,
-        channel: request.channel || PriceRuleChannel.ERP,
-        quantity: item.quantity,
-        promotionCode: request.promotionCode
-      }, {
-        detailed: request.includeBreakdown,
-        includeMargins: request.includeMargins,
-        includeSkippedRules: false
-      })
-      
+      const priceResult = await this.pricingEngine.calculatePrice(
+        {
+          societeId: request.societeId,
+          articleId: item.articleId,
+          articleReference: item.articleReference,
+          customerId: request.customerId,
+          customerGroup: request.customerGroup,
+          customerEmail: request.customerEmail,
+          channel: request.channel || PriceRuleChannel.ERP,
+          quantity: item.quantity,
+          promotionCode: request.promotionCode,
+        },
+        {
+          detailed: request.includeBreakdown,
+          includeMargins: request.includeMargins,
+          includeSkippedRules: false,
+        }
+      )
+
       const lineTotal = priceResult.finalPrice * item.quantity
       const baseTotal = priceResult.basePrice * item.quantity
-      
+
       totalAppliedRules += priceResult.appliedRules.length
-      
+
       lines.push({
         articleId: item.articleId,
         articleReference: item.articleReference || priceResult.breakdown?.context.article.reference,
@@ -169,34 +164,34 @@ export class PricingQuoteController {
         lineTotal,
         discount: baseTotal - lineTotal,
         discountPercentage: priceResult.totalDiscountPercentage,
-        appliedRules: priceResult.appliedRules.map(rule => ({
+        appliedRules: priceResult.appliedRules.map((rule) => ({
           ruleId: rule.ruleId,
           ruleName: rule.ruleName,
-          discount: rule.discountAmount
+          discount: rule.discountAmount,
         })),
         breakdown: request.includeBreakdown ? priceResult.breakdown : undefined,
-        warnings: priceResult.warnings
+        warnings: priceResult.warnings,
       })
     }
-    
+
     // Calculer les totaux
-    const subtotal = lines.reduce((sum, line) => sum + (line.basePrice * line.quantity), 0)
+    const subtotal = lines.reduce((sum, line) => sum + line.basePrice * line.quantity, 0)
     const totalBeforeTax = lines.reduce((sum, line) => sum + line.lineTotal, 0)
     const totalDiscount = subtotal - totalBeforeTax
     const totalDiscountPercentage = subtotal > 0 ? (totalDiscount / subtotal) * 100 : 0
-    
+
     // Calculer la TVA si demandée (20% par défaut pour la France)
-    const taxRate = request.metadata?.taxRate || 0.20
+    const taxRate = request.metadata?.taxRate || 0.2
     const taxAmount = request.metadata?.includeTax ? totalBeforeTax * taxRate : undefined
     const totalIncludingTax = taxAmount ? totalBeforeTax + taxAmount : undefined
-    
+
     const processingTime = Date.now() - startTime
-    
+
     // Créer la date d'expiration (30 jours par défaut)
     const expirationDays = request.metadata?.expirationDays || 30
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + expirationDays)
-    
+
     return {
       quoteId,
       createdAt: new Date().toISOString(),
@@ -214,28 +209,30 @@ export class PricingQuoteController {
       metadata: {
         ...request.metadata,
         generatedBy: user.id,
-        generatedByEmail: user.email
+        generatedByEmail: user.email,
       },
       breakdown: {
         rulesApplied: totalAppliedRules,
         totalItems: lines.length,
-        averageDiscount: lines.length > 0 ? 
-          lines.reduce((sum, line) => sum + line.discountPercentage, 0) / lines.length : 0,
-        processingTime
-      }
+        averageDiscount:
+          lines.length > 0
+            ? lines.reduce((sum, line) => sum + line.discountPercentage, 0) / lines.length
+            : 0,
+        processingTime,
+      },
     }
   }
 
   @Post('simulate')
   @HttpCode(HttpStatus.OK)
   @Roles('ADMIN', 'MANAGER', 'COMMERCIAL')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Simuler plusieurs scénarios de prix',
-    description: 'Permet de tester différents scénarios de prix en variant les paramètres'
+    description: 'Permet de tester différents scénarios de prix en variant les paramètres',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Simulations effectuées avec succès'
+  @ApiResponse({
+    status: 200,
+    description: 'Simulations effectuées avec succès',
   })
   async simulateScenarios(
     @Body() request: {
@@ -250,7 +247,7 @@ export class PricingQuoteController {
       }>
       includeBreakdown?: boolean
     },
-    @CurrentUser() user: User
+    @CurrentUser() _user: User
   ): Promise<{
     articleId: string
     scenarios: Array<{
@@ -272,19 +269,22 @@ export class PricingQuoteController {
     }
   }> {
     const results = []
-    
+
     for (const scenario of request.scenarios) {
-      const priceResult = await this.pricingEngine.calculatePrice({
-        societeId: request.societeId,
-        articleId: request.articleId,
-        quantity: scenario.quantity,
-        customerGroup: scenario.customerGroup,
-        channel: scenario.channel || PriceRuleChannel.ERP,
-        promotionCode: scenario.promotionCode
-      }, {
-        detailed: request.includeBreakdown
-      })
-      
+      const priceResult = await this.pricingEngine.calculatePrice(
+        {
+          societeId: request.societeId,
+          articleId: request.articleId,
+          quantity: scenario.quantity,
+          customerGroup: scenario.customerGroup,
+          channel: scenario.channel || PriceRuleChannel.ERP,
+          promotionCode: scenario.promotionCode,
+        },
+        {
+          detailed: request.includeBreakdown,
+        }
+      )
+
       results.push({
         name: scenario.name,
         quantity: scenario.quantity,
@@ -293,18 +293,19 @@ export class PricingQuoteController {
         discount: priceResult.totalDiscount,
         discountPercentage: priceResult.totalDiscountPercentage,
         appliedRules: priceResult.appliedRules.length,
-        breakdown: request.includeBreakdown ? priceResult.breakdown : undefined
+        breakdown: request.includeBreakdown ? priceResult.breakdown : undefined,
       })
     }
-    
+
     // Analyser les résultats
-    const prices = results.map(r => r.finalPrice)
+    const prices = results.map((r) => r.finalPrice)
     const bestPrice = Math.min(...prices)
     const worstPrice = Math.max(...prices)
-    const bestScenario = results.find(r => r.finalPrice === bestPrice)?.name || ''
-    const worstScenario = results.find(r => r.finalPrice === worstPrice)?.name || ''
-    const averageDiscount = results.reduce((sum, r) => sum + r.discountPercentage, 0) / results.length
-    
+    const bestScenario = results.find((r) => r.finalPrice === bestPrice)?.name || ''
+    const worstScenario = results.find((r) => r.finalPrice === worstPrice)?.name || ''
+    const averageDiscount =
+      results.reduce((sum, r) => sum + r.discountPercentage, 0) / results.length
+
     return {
       articleId: request.articleId,
       scenarios: results,
@@ -313,8 +314,8 @@ export class PricingQuoteController {
         bestScenario,
         worstPrice,
         worstScenario,
-        averageDiscount
-      }
+        averageDiscount,
+      },
     }
   }
 }

@@ -24,10 +24,10 @@ import type {
   MaterialCompatibilityAnalysis,
   MaterialStockAlert,
 } from '../repositories/material.repository'
-import {
+import type {
   MaterialService,
-  type MaterialStatistics,
-  type MaterialStockValorisation,
+  MaterialStatistics,
+  MaterialStockValorisation,
 } from '../services/material.service'
 
 /**

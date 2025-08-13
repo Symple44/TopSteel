@@ -65,6 +65,20 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
+  // Optimisations de production pour réduire la taille des bundles
+  swcMinify: true,
+  productionBrowserSourceMaps: false,
+  
+  // Optimisation des modules
+  modularizeImports: {
+    '@radix-ui': {
+      transform: '@radix-ui/{{member}}',
+    },
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+    },
+  },
+
   // Add dev origins
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
 

@@ -2,12 +2,12 @@ import { Client } from '@elastic/elasticsearch'
 
 async function testElastic() {
   console.log('🔍 Test direct ElasticSearch...')
-  
+
   const client = new Client({
     node: 'http://127.0.0.1:9200',
     auth: {
       username: 'elastic',
-      password: 'ogAceYjRKTIMmACWwhRA'
+      password: 'ogAceYjRKTIMmACWwhRA',
     },
     maxRetries: 3,
     requestTimeout: 5000,
@@ -15,7 +15,7 @@ async function testElastic() {
 
   try {
     // 1. Vérifier la connexion
-    const ping = await client.ping()
+    const _ping = await client.ping()
     console.log('✅ ElasticSearch connecté')
 
     // 2. Vérifier l'index
@@ -31,11 +31,13 @@ async function testElastic() {
     const sample = await client.search({
       index: 'topsteel_global',
       size: 3,
-      query: { match_all: {} }
+      query: { match_all: {} },
     })
-    
-    console.log(`Total hits: ${typeof sample.hits.total === 'object' ? sample.hits.total.value : sample.hits.total}`)
-    
+
+    console.log(
+      `Total hits: ${typeof sample.hits.total === 'object' ? sample.hits.total.value : sample.hits.total}`
+    )
+
     if (sample.hits.hits.length > 0) {
       sample.hits.hits.forEach((hit: any, i) => {
         console.log(`\nDocument ${i + 1}:`)
@@ -60,20 +62,21 @@ async function testElastic() {
       query: {
         query_string: {
           query: '*IPE*',
-          fields: ['title', 'designation', 'reference', 'description']
-        }
-      }
+          fields: ['title', 'designation', 'reference', 'description'],
+        },
+      },
     })
-    
-    const ipeTotal = typeof ipeSearch.hits.total === 'object' 
-      ? ipeSearch.hits.total.value 
-      : ipeSearch.hits.total
+
+    const ipeTotal =
+      typeof ipeSearch.hits.total === 'object' ? ipeSearch.hits.total.value : ipeSearch.hits.total
     console.log(`  Résultats trouvés: ${ipeTotal}`)
-    
+
     if (ipeSearch.hits.hits.length > 0) {
       console.log('  Premiers résultats:')
       ipeSearch.hits.hits.forEach((hit: any) => {
-        console.log(`    - ${hit._source.title || hit._source.designation} (type: ${hit._source.type})`)
+        console.log(
+          `    - ${hit._source.title || hit._source.designation} (type: ${hit._source.type})`
+        )
       })
     }
 
@@ -87,16 +90,17 @@ async function testElastic() {
           query: 'IPE 300',
           fields: ['title^3', 'designation^3', 'reference^2', 'description'],
           type: 'best_fields',
-          fuzziness: 'AUTO'
-        }
-      }
+          fuzziness: 'AUTO',
+        },
+      },
     })
-    
-    const multiTotal = typeof multiSearch.hits.total === 'object' 
-      ? multiSearch.hits.total.value 
-      : multiSearch.hits.total
+
+    const multiTotal =
+      typeof multiSearch.hits.total === 'object'
+        ? multiSearch.hits.total.value
+        : multiSearch.hits.total
     console.log(`  Résultats trouvés: ${multiTotal}`)
-    
+
     if (multiSearch.hits.hits.length > 0) {
       console.log('  Premiers résultats:')
       multiSearch.hits.hits.forEach((hit: any) => {
@@ -116,27 +120,28 @@ async function testElastic() {
             {
               query_string: {
                 query: '*IPE*',
-                fields: ['title', 'designation', 'reference']
-              }
-            }
+                fields: ['title', 'designation', 'reference'],
+              },
+            },
           ],
           filter: [
             {
               bool: {
                 should: [
                   { term: { tenantId } },
-                  { bool: { must_not: { exists: { field: 'tenantId' } } } }
-                ]
-              }
-            }
-          ]
-        }
-      }
+                  { bool: { must_not: { exists: { field: 'tenantId' } } } },
+                ],
+              },
+            },
+          ],
+        },
+      },
     })
-    
-    const tenantTotal = typeof tenantSearch.hits.total === 'object' 
-      ? tenantSearch.hits.total.value 
-      : tenantSearch.hits.total
+
+    const tenantTotal =
+      typeof tenantSearch.hits.total === 'object'
+        ? tenantSearch.hits.total.value
+        : tenantSearch.hits.total
     console.log(`  Résultats trouvés: ${tenantTotal}`)
 
     // 8. Vérifier les tenantId uniques
@@ -148,12 +153,12 @@ async function testElastic() {
         tenants: {
           terms: {
             field: 'tenantId',
-            size: 10
-          }
-        }
-      }
+            size: 10,
+          },
+        },
+      },
     })
-    
+
     const buckets = (agg.aggregations?.tenants as any)?.buckets || []
     if (buckets.length > 0) {
       buckets.forEach((bucket: any) => {
@@ -162,7 +167,6 @@ async function testElastic() {
     } else {
       console.log('  Aucun tenantId trouvé')
     }
-
   } catch (error: any) {
     console.error('❌ Erreur:', error.message)
     if (error.meta?.body) {

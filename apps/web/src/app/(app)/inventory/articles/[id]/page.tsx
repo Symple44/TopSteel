@@ -1,7 +1,5 @@
 'use client'
 
-import { useParams, useRouter } from 'next/navigation'
-import { useState, useMemo } from 'react'
 import {
   Badge,
   Button,
@@ -9,30 +7,31 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Separator,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
 import {
-  ArrowLeft,
-  Edit,
-  Copy,
-  Package2,
-  TrendingUp,
   AlertCircle,
-  Calendar,
-  DollarSign,
-  Warehouse,
+  ArrowLeft,
   Barcode,
+  Calendar,
+  Copy,
+  DollarSign,
+  Edit,
+  Package2,
   Tags,
+  TrendingUp,
+  Warehouse,
 } from 'lucide-react'
-import { useArticle, ArticleType, ArticleStatus } from '@/hooks/use-articles'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { useParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { ArticleFormDialog } from '@/components/articles/article-form-dialog'
-import { InventoryDialog } from '@/components/articles/inventory-dialog'
 import { DuplicateArticleDialog } from '@/components/articles/duplicate-article-dialog'
+import { InventoryDialog } from '@/components/articles/inventory-dialog'
+import { ArticleStatus, ArticleType, useArticle } from '@/hooks/use-articles'
+import { formatCurrency, formatDate } from '@/lib/utils'
 
 const articleTypeLabels = {
   [ArticleType.MATIERE_PREMIERE]: 'Matière première',
@@ -80,11 +79,7 @@ export default function ArticleDetailPage() {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" onClick={() => router.back()} className="h-8 w-8 p-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="h-8 w-48 bg-gray-200 animate-pulse rounded" />
@@ -105,11 +100,7 @@ export default function ArticleDetailPage() {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" onClick={() => router.back()} className="h-8 w-8 p-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </div>
@@ -120,31 +111,26 @@ export default function ArticleDetailPage() {
             <p className="text-gray-600 text-center mb-4">
               L'article demandé n'existe pas ou vous n'avez pas les permissions pour le voir.
             </p>
-            <Button onClick={() => router.push('/inventory/articles')}>
-              Retour à la liste
-            </Button>
+            <Button onClick={() => router.push('/inventory/articles')}>Retour à la liste</Button>
           </CardContent>
         </Card>
       </div>
     )
   }
 
-  const stockStatus = Number(article.stockPhysique || 0) <= 0 
-    ? 'rupture' 
-    : article.stockMini && Number(article.stockPhysique || 0) <= Number(article.stockMini || 0)
-    ? 'sous-mini' 
-    : 'normal'
+  const stockStatus =
+    Number(article.stockPhysique || 0) <= 0
+      ? 'rupture'
+      : article.stockMini && Number(article.stockPhysique || 0) <= Number(article.stockMini || 0)
+        ? 'sous-mini'
+        : 'normal'
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" onClick={() => router.back()} className="h-8 w-8 p-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -159,26 +145,15 @@ export default function ArticleDetailPage() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowInventoryDialog(true)}
-            className="h-8"
-          >
+          <Button variant="outline" onClick={() => setShowInventoryDialog(true)} className="h-8">
             <Warehouse className="h-4 w-4 mr-2" />
             Inventaire
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowDuplicateDialog(true)}
-            className="h-8"
-          >
+          <Button variant="outline" onClick={() => setShowDuplicateDialog(true)} className="h-8">
             <Copy className="h-4 w-4 mr-2" />
             Dupliquer
           </Button>
-          <Button
-            onClick={() => setShowEditDialog(true)}
-            className="h-8"
-          >
+          <Button onClick={() => setShowEditDialog(true)} className="h-8">
             <Edit className="h-4 w-4 mr-2" />
             Modifier
           </Button>
@@ -197,13 +172,21 @@ export default function ArticleDetailPage() {
               {Number(article.stockPhysique || 0).toFixed(2)}
             </div>
             <div className="flex items-center space-x-2 text-xs">
-              <div className={`w-2 h-2 rounded-full ${
-                stockStatus === 'rupture' ? 'bg-red-500' :
-                stockStatus === 'sous-mini' ? 'bg-orange-500' : 'bg-green-500'
-              }`} />
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  stockStatus === 'rupture'
+                    ? 'bg-red-500'
+                    : stockStatus === 'sous-mini'
+                      ? 'bg-orange-500'
+                      : 'bg-green-500'
+                }`}
+              />
               <span className="text-gray-600">
-                {stockStatus === 'rupture' ? 'En rupture' :
-                 stockStatus === 'sous-mini' ? 'Sous stock mini' : 'Normal'}
+                {stockStatus === 'rupture'
+                  ? 'En rupture'
+                  : stockStatus === 'sous-mini'
+                    ? 'Sous stock mini'
+                    : 'Normal'}
               </span>
             </div>
           </CardContent>
@@ -215,9 +198,7 @@ export default function ArticleDetailPage() {
             <DollarSign className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(article.prixVenteHT ?? 0)}
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(article.prixVenteHT ?? 0)}</div>
             <p className="text-xs text-gray-600">HT</p>
           </CardContent>
         </Card>
@@ -241,9 +222,7 @@ export default function ArticleDetailPage() {
             <Tags className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-medium">
-              {articleTypeLabels[article.type]}
-            </div>
+            <div className="text-lg font-medium">{articleTypeLabels[article.type]}</div>
             <p className="text-xs text-gray-600">{article.famille ?? 'Non classé'}</p>
           </CardContent>
         </Card>
@@ -334,7 +313,9 @@ export default function ArticleDetailPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Stock physique</label>
-                  <p className="text-sm font-bold">{Number(article.stockPhysique || 0).toFixed(2)}</p>
+                  <p className="text-sm font-bold">
+                    {Number(article.stockPhysique || 0).toFixed(2)}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Stock minimum</label>
@@ -352,25 +333,39 @@ export default function ArticleDetailPage() {
                 <CardTitle>État du stock</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`p-4 rounded-lg border-2 ${
-                  stockStatus === 'rupture' ? 'bg-red-50 border-red-200' :
-                  stockStatus === 'sous-mini' ? 'bg-orange-50 border-orange-200' : 
-                  'bg-green-50 border-green-200'
-                }`}>
+                <div
+                  className={`p-4 rounded-lg border-2 ${
+                    stockStatus === 'rupture'
+                      ? 'bg-red-50 border-red-200'
+                      : stockStatus === 'sous-mini'
+                        ? 'bg-orange-50 border-orange-200'
+                        : 'bg-green-50 border-green-200'
+                  }`}
+                >
                   <div className="flex items-center space-x-2">
-                    <div className={`w-3 h-3 rounded-full ${
-                      stockStatus === 'rupture' ? 'bg-red-500' :
-                      stockStatus === 'sous-mini' ? 'bg-orange-500' : 'bg-green-500'
-                    }`} />
+                    <div
+                      className={`w-3 h-3 rounded-full ${
+                        stockStatus === 'rupture'
+                          ? 'bg-red-500'
+                          : stockStatus === 'sous-mini'
+                            ? 'bg-orange-500'
+                            : 'bg-green-500'
+                      }`}
+                    />
                     <span className="font-medium">
-                      {stockStatus === 'rupture' ? 'Stock en rupture' :
-                       stockStatus === 'sous-mini' ? 'Stock sous le minimum' : 'Stock normal'}
+                      {stockStatus === 'rupture'
+                        ? 'Stock en rupture'
+                        : stockStatus === 'sous-mini'
+                          ? 'Stock sous le minimum'
+                          : 'Stock normal'}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    {stockStatus === 'rupture' ? 'Aucun stock disponible' :
-                     stockStatus === 'sous-mini' ? 'Réapprovisionnement recommandé' :
-                     'Niveau de stock optimal'}
+                    {stockStatus === 'rupture'
+                      ? 'Aucun stock disponible'
+                      : stockStatus === 'sous-mini'
+                        ? 'Réapprovisionnement recommandé'
+                        : 'Niveau de stock optimal'}
                   </p>
                 </div>
               </CardContent>
@@ -390,7 +385,9 @@ export default function ArticleDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600">Prix d'achat standard</label>
-                  <p className="text-lg font-bold">{formatCurrency(article.prixAchatStandard ?? 0)}</p>
+                  <p className="text-lg font-bold">
+                    {formatCurrency(article.prixAchatStandard ?? 0)}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Prix de vente HT</label>

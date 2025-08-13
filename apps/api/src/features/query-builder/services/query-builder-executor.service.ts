@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
-import { QueryBuilderPermissionService } from './query-builder-permission.service'
+import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 export interface QueryExecutionParams {
   page?: number

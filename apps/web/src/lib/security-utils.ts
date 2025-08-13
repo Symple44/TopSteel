@@ -101,10 +101,10 @@ export function sanitizeInput(input: string): string {
   if (!input || typeof input !== 'string') {
     return ''
   }
-  
+
   return input
     .replace(/[<>"'&]/g, '') // Caractères XSS
-    .replace(/[;()=]/g, '') // Caractères d'injection SQL  
+    .replace(/[;()=]/g, '') // Caractères d'injection SQL
     .trim()
     .slice(0, 1000) // Limiter la longueur
 }

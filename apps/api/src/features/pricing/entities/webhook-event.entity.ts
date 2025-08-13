@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Index } from 'typeorm'
-import { WebhookEventType } from '../types/webhook.types'
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
+import type { WebhookEventType } from '../types/webhook.types'
 
 @Entity('webhook_events')
 @Index(['societeId', 'type', 'timestamp'])

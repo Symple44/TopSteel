@@ -41,11 +41,11 @@ interface SearchQueryDto {
   limit?: string
 }
 
-import {
+import type {
   MarketplaceProductsService,
-  type ProductFilters,
+  ProductFilters,
 } from '../../products/services/marketplace-products.service'
-import { StorefrontService } from '../services/storefront.service'
+import type { StorefrontService } from '../services/storefront.service'
 
 // DTO for product query parameters
 class ProductQueryDto {

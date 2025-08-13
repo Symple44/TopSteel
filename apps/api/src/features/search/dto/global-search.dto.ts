@@ -1,18 +1,15 @@
-import {
-  IsString,
-  IsOptional,
-  MinLength,
-  MaxLength,
-  IsArray,
-  IsIn,
-  IsInt,
-  Min,
-  Max,
-  IsNotEmpty,
-  ArrayMaxSize,
-} from 'class-validator'
-import { Type, Transform } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator'
 
 // Valid entity types based on searchable-entities.config.ts
 const VALID_ENTITY_TYPES = [
@@ -47,7 +44,7 @@ export class GlobalSearchDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       // Sanitize the input by trimming and removing dangerous characters
-      return value.trim().replace(/[<>\"'%;()&+]/g, '')
+      return value.trim().replace(/[<>"'%;()&+]/g, '')
     }
     return value
   })
@@ -65,9 +62,11 @@ export class GlobalSearchDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       // Split comma-separated string and validate each type
-      const types = value.split(',').map(type => type.trim().toLowerCase())
+      const types = value.split(',').map((type) => type.trim().toLowerCase())
       // Filter only valid types to prevent injection
-      return types.filter(type => VALID_ENTITY_TYPES.includes(type as typeof VALID_ENTITY_TYPES[number])).join(',')
+      return types
+        .filter((type) => VALID_ENTITY_TYPES.includes(type as (typeof VALID_ENTITY_TYPES)[number]))
+        .join(',')
     }
     return value
   })
@@ -85,7 +84,7 @@ export class GlobalSearchDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       const parsed = parseInt(value, 10)
-      return isNaN(parsed) ? 20 : parsed
+      return Number.isNaN(parsed) ? 20 : parsed
     }
     return value
   })
@@ -107,19 +106,22 @@ export class GlobalSearchDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       const parsed = parseInt(value, 10)
-      return isNaN(parsed) ? 0 : parsed
+      return Number.isNaN(parsed) ? 0 : parsed
     }
     return value
   })
   @Type(() => Number)
-  @IsInt({ message: 'L\'offset doit être un nombre entier' })
-  @Min(0, { message: 'L\'offset doit être au minimum 0' })
-  @Max(10000, { message: 'L\'offset ne peut pas dépasser 10000' })
+  @IsInt({ message: "L'offset doit être un nombre entier" })
+  @Min(0, { message: "L'offset doit être au minimum 0" })
+  @Max(10000, { message: "L'offset ne peut pas dépasser 10000" })
   offset?: number = 0
 
   // Helper method to get validated types as array
   getTypesArray(): string[] {
     if (!this.types) return []
-    return this.types.split(',').map(type => type.trim()).filter(Boolean)
+    return this.types
+      .split(',')
+      .map((type) => type.trim())
+      .filter(Boolean)
   }
 }

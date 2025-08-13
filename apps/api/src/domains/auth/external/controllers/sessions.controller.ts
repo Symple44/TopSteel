@@ -12,7 +12,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common'
-import { AuthService } from '../../auth.service'
+import type { AuthService } from '../../auth.service'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'

@@ -1,19 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { SearchResult, ISearchResultFormatter } from '../interfaces/search.interfaces'
-import { sanitizeSearchResults } from '../utils/sanitize-highlights'
-import { SearchableEntity, calculateRelevanceScore } from '../config/searchable-entities.config'
-import { 
-  AnyDatabaseRecord, 
-  ElasticsearchSearchResponse, 
+import { Injectable } from '@nestjs/common'
+import {
+  calculateRelevanceScore,
+  type SearchableEntity,
+} from '../config/searchable-entities.config'
+import type { ISearchResultFormatter, SearchResult } from '../interfaces/search.interfaces'
+import type {
+  AnyDatabaseRecord,
   ElasticsearchHit,
-  SearchMetadata 
+  ElasticsearchSearchResponse,
+  SearchMetadata,
 } from '../types/search-types'
+import { sanitizeSearchResults } from '../utils/sanitize-highlights'
 
 @Injectable()
 export class SearchResultFormatterService implements ISearchResultFormatter {
-  private readonly logger = new Logger(SearchResultFormatterService.name)
-
-  formatResults(rawResults: AnyDatabaseRecord[] | ElasticsearchHit[], engine: 'elasticsearch' | 'postgresql'): SearchResult[] {
+  formatResults(
+    rawResults: AnyDatabaseRecord[] | ElasticsearchHit[],
+    engine: 'elasticsearch' | 'postgresql'
+  ): SearchResult[] {
     if (engine === 'elasticsearch') {
       return this.formatElasticsearchResults(rawResults as ElasticsearchHit[])
     } else {
@@ -31,7 +35,7 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
       icon: hit._source.icon,
       metadata: hit._source.metadata,
       score: hit._score,
-      highlight: hit.highlight
+      highlight: hit.highlight,
     }))
   }
 
@@ -43,8 +47,11 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
       description: record.description ? String(record.description) : undefined,
       url: record.url ? String(record.url) : undefined,
       icon: record.icon ? String(record.icon) : undefined,
-      metadata: (record.metadata && typeof record.metadata === 'object' && !(record.metadata instanceof Date)) ? record.metadata as SearchMetadata : undefined,
-      score: typeof record.score === 'number' ? record.score : undefined
+      metadata:
+        record.metadata && typeof record.metadata === 'object' && !(record.metadata instanceof Date)
+          ? (record.metadata as SearchMetadata)
+          : undefined,
+      score: typeof record.score === 'number' ? record.score : undefined,
     }))
   }
 
@@ -56,33 +63,39 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
     if (!response.suggest?.search_suggest) {
       return []
     }
-    
-    return response.suggest.search_suggest[0]?.options?.map(
-      (option: { text: string }) => option.text
-    ) || []
+
+    return (
+      response.suggest.search_suggest[0]?.options?.map((option: { text: string }) => option.text) ||
+      []
+    )
   }
 
-  extractFacets(response: ElasticsearchSearchResponse): Record<string, { value: string; count: number }[]> {
+  extractFacets(
+    response: ElasticsearchSearchResponse
+  ): Record<string, { value: string; count: number }[]> {
     const facets: Record<string, { value: string; count: number }[]> = {}
-    
+
     if (response.aggregations) {
       for (const [key, agg] of Object.entries(response.aggregations)) {
-        facets[key] = agg.buckets?.map((bucket) => ({
-          value: String(bucket.key),
-          count: bucket.doc_count
-        })) || []
+        facets[key] =
+          agg.buckets?.map((bucket) => ({
+            value: String(bucket.key),
+            count: bucket.doc_count,
+          })) || []
       }
     }
-    
+
     return facets
   }
 
   /**
    * Calculate facets from search results (used for PostgreSQL)
    */
-  calculateFacetsFromResults(results: SearchResult[]): Record<string, { value: string; count: number }[]> {
+  calculateFacetsFromResults(
+    results: SearchResult[]
+  ): Record<string, { value: string; count: number }[]> {
     const typeCounts = new Map<string, number>()
-    
+
     for (const result of results) {
       typeCounts.set(result.type, (typeCounts.get(result.type) || 0) + 1)
     }
@@ -90,7 +103,7 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
     return {
       types: Array.from(typeCounts.entries())
         .map(([value, count]) => ({ value, count }))
-        .sort((a, b) => b.count - a.count)
+        .sort((a, b) => b.count - a.count),
     }
   }
 
@@ -103,7 +116,9 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
         return String(record.title || 'Menu sans titre')
       case 'client':
       case 'fournisseur':
-        return String(record.denomination || record.denomination_commerciale || record.code || record.id)
+        return String(
+          record.denomination || record.denomination_commerciale || record.code || record.id
+        )
       case 'article':
         return String(record.designation || record.reference || record.id)
       case 'material':
@@ -116,7 +131,9 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
       case 'commande':
         return String(`${entity.displayName} ${record.numero || record.id}`)
       case 'user':
-        return String(`${record.prenom || ''} ${record.nom || ''}`.trim() || record.email || record.id)
+        return String(
+          `${record.prenom || ''} ${record.nom || ''}`.trim() || record.email || record.id
+        )
       case 'societe':
         return String(record.nom || record.code || record.id)
       case 'price_rule':
@@ -136,12 +153,13 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
   getRecordDescription(entity: SearchableEntity, record: AnyDatabaseRecord): string | undefined {
     switch (entity.type) {
       case 'client':
-      case 'fournisseur':
+      case 'fournisseur': {
         const parts = []
         if (record.code) parts.push(record.code)
         if (record.email) parts.push(record.email)
         if (record.ville) parts.push(record.ville)
         return parts.join(' - ')
+      }
       case 'article':
         return `${record.reference || ''} - ${record.description || ''}`.trim()
       case 'material':
@@ -167,24 +185,28 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
    */
   extractMetadata(entity: SearchableEntity, record: AnyDatabaseRecord): SearchMetadata {
     const metadata: SearchMetadata = {}
-    
-    entity.searchableFields.metadata.forEach(field => {
+
+    entity.searchableFields.metadata.forEach((field) => {
       if (record[field.name] !== undefined && record[field.name] !== null) {
         metadata[field.name] = record[field.name]
       }
     })
-    
+
     return metadata
   }
 
   /**
    * Format a search result from entity data
    */
-  formatEntityResult(entity: SearchableEntity, record: AnyDatabaseRecord, query: string): SearchResult {
+  formatEntityResult(
+    entity: SearchableEntity,
+    record: AnyDatabaseRecord,
+    query: string
+  ): SearchResult {
     const title = this.getRecordTitle(entity, record)
     const description = this.getRecordDescription(entity, record)
     const score = calculateRelevanceScore(entity, record, query)
-    
+
     let url = entity.urlPattern
     if (url.includes('{id}')) {
       url = url.replace('{id}', record.id)
@@ -192,7 +214,7 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
     if (url.includes('{programId}')) {
       url = url.replace('{programId}', String(record.programId || ''))
     }
-    
+
     return {
       type: entity.type,
       id: record.id,
@@ -201,7 +223,7 @@ export class SearchResultFormatterService implements ISearchResultFormatter {
       url,
       icon: entity.icon,
       score,
-      metadata: this.extractMetadata(entity, record)
+      metadata: this.extractMetadata(entity, record),
     }
   }
 }

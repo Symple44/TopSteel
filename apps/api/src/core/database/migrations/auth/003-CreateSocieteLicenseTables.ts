@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table, TableIndex } from 'typeorm'
 
 export class CreateSocieteLicenseTables1736365620000 implements MigrationInterface {
   name = 'CreateSocieteLicenseTables1736365620000'
@@ -201,7 +201,7 @@ export class CreateSocieteLicenseTables1736365620000 implements MigrationInterfa
       new TableIndex({
         name: 'IDX_user_session_metadata_societe',
         columnNames: ['metadata'],
-        where: "metadata IS NOT NULL",
+        where: 'metadata IS NOT NULL',
       })
     )
 
@@ -338,7 +338,9 @@ export class CreateSocieteLicenseTables1736365620000 implements MigrationInterfa
     await queryRunner.query('DROP VIEW IF EXISTS v_license_monitoring')
 
     // Supprimer le trigger et la fonction
-    await queryRunner.query('DROP TRIGGER IF EXISTS trigger_check_license_expiration ON societe_licenses')
+    await queryRunner.query(
+      'DROP TRIGGER IF EXISTS trigger_check_license_expiration ON societe_licenses'
+    )
     await queryRunner.query('DROP FUNCTION IF EXISTS check_license_expiration()')
 
     // Supprimer la table d'audit

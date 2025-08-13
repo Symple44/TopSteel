@@ -8,29 +8,36 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
     const enums = [
       {
         name: 'article_type',
-        values: ['MATIERE_PREMIERE', 'PRODUIT_FINI', 'PRODUIT_SEMI_FINI', 'FOURNITURE', 'CONSOMMABLE', 'SERVICE']
+        values: [
+          'MATIERE_PREMIERE',
+          'PRODUIT_FINI',
+          'PRODUIT_SEMI_FINI',
+          'FOURNITURE',
+          'CONSOMMABLE',
+          'SERVICE',
+        ],
       },
       {
-        name: 'article_status', 
-        values: ['ACTIF', 'INACTIF', 'OBSOLETE', 'EN_COURS_CREATION']
+        name: 'article_status',
+        values: ['ACTIF', 'INACTIF', 'OBSOLETE', 'EN_COURS_CREATION'],
       },
       {
         name: 'unite_stock',
-        values: ['PCS', 'KG', 'G', 'M', 'CM', 'MM', 'M2', 'M3', 'L', 'ML', 'T', 'H']
+        values: ['PCS', 'KG', 'G', 'M', 'CM', 'MM', 'M2', 'M3', 'L', 'ML', 'T', 'H'],
       },
       {
         name: 'methode_valorisation_stock',
-        values: ['FIFO', 'LIFO', 'CMUP', 'PRIX_STANDARD']
-      }
+        values: ['FIFO', 'LIFO', 'CMUP', 'PRIX_STANDARD'],
+      },
     ]
 
     for (const enumDef of enums) {
       const enumExists = await queryRunner.query(
         `SELECT EXISTS(SELECT 1 FROM pg_type WHERE typname = '${enumDef.name}')`
       )
-      
+
       if (!enumExists[0].exists) {
-        const enumValues = enumDef.values.map(v => `'${v}'`).join(', ')
+        const enumValues = enumDef.values.map((v) => `'${v}'`).join(', ')
         await queryRunner.query(`CREATE TYPE "${enumDef.name}" AS ENUM (${enumValues})`)
       }
     }

@@ -11,8 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
-import { PageBuilderService } from '../services/page-builder.service'
+import type { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
+import type { PageBuilderService } from '../services/page-builder.service'
 
 @Controller('page-builder')
 @UseGuards(TenantGuard)

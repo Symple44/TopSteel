@@ -14,9 +14,9 @@ import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.gua
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { ExecuteQueryDto } from '../dto/execute-query.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
-import { QueryBuilderService } from '../services/query-builder.service'
-import { QueryBuilderExecutorService } from '../services/query-builder-executor.service'
-import { SchemaIntrospectionService } from '../services/schema-introspection.service'
+import type { QueryBuilderService } from '../services/query-builder.service'
+import type { QueryBuilderExecutorService } from '../services/query-builder-executor.service'
+import type { SchemaIntrospectionService } from '../services/schema-introspection.service'
 
 @Controller('query-builder')
 @UseGuards(JwtAuthGuard)

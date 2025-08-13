@@ -1,5 +1,5 @@
-import * as dotenv from 'dotenv'
 import axios from 'axios'
+import * as dotenv from 'dotenv'
 
 dotenv.config({ path: '.env' })
 
@@ -149,7 +149,7 @@ async function testGlobalSearch() {
     }
 
     // 5. Test de l'historique
-    console.log('\n\n📜 Test de l\'historique de recherche')
+    console.log("\n\n📜 Test de l'historique de recherche")
     try {
       const historyResponse = await axios.get(`${API_URL}/search/history`, authConfig)
 

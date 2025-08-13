@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import { MenuRawService } from '../services/menu-raw.service'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { MenuRawService } from '../services/menu-raw.service'
 
 @Controller('admin/menu-raw')
 @UseGuards(JwtAuthGuard)

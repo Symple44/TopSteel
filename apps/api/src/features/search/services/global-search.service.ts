@@ -1,23 +1,21 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import {
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
+import type {
+  ISearchStrategy,
   SearchOptions,
   SearchResponse,
-  ISearchStrategy
 } from '../interfaces/search.interfaces'
-import { ElasticsearchSearchService } from './elasticsearch-search.service'
-import { PostgreSQLSearchService } from './postgresql-search.service'
-import { SearchIndexingOperationsService } from './search-indexing-operations.service'
-import { SearchDocument, SearchStatistics } from '../types/search-types'
-import { SEARCHABLE_ENTITIES } from '../config/searchable-entities.config'
+import type { SearchDocument, SearchStatistics } from '../types/search-types'
+import type { ElasticsearchSearchService } from './elasticsearch-search.service'
+import type { PostgreSQLSearchService } from './postgresql-search.service'
+import type { SearchIndexingOperationsService } from './search-indexing-operations.service'
 
 // Re-export interfaces for backwards compatibility
 export type {
-  SearchResult,
   SearchOptions,
-  SearchResponse
+  SearchResponse,
+  SearchResult,
 } from '../interfaces/search.interfaces'
-
 
 // Main search service with adaptive strategy
 @Injectable()
@@ -34,7 +32,7 @@ export class GlobalSearchService implements OnModuleInit {
 
   async onModuleInit() {
     await this.initializeSearchStrategy()
-    
+
     // Create ElasticSearch index if available
     if (this.searchStrategy === this.elasticsearchService) {
       await this.elasticsearchService.createIndex()
@@ -43,10 +41,10 @@ export class GlobalSearchService implements OnModuleInit {
 
   private async initializeSearchStrategy() {
     const useElasticsearch = this.configService.get<boolean>('ELASTICSEARCH_ENABLED', true)
-    
+
     if (useElasticsearch) {
       const isElasticsearchAvailable = await this.elasticsearchService.isAvailable()
-      
+
       if (isElasticsearchAvailable) {
         this.logger.log('✅ Using ElasticSearch for global search')
         this.searchStrategy = this.elasticsearchService
@@ -66,12 +64,14 @@ export class GlobalSearchService implements OnModuleInit {
       const searchOptions: SearchOptions = {
         ...options,
         limit: options.limit || 10,
-        offset: options.offset || 0
+        offset: options.offset || 0,
       }
 
       // Log search in development only
       if (process.env.NODE_ENV === 'development') {
-        this.logger.debug(`Searching for: "${options.query}" with engine: ${this.getSearchEngineStatus().engine}`)
+        this.logger.debug(
+          `Searching for: "${options.query}" with engine: ${this.getSearchEngineStatus().engine}`
+        )
       }
 
       return await this.searchStrategy.search(searchOptions)
@@ -97,14 +97,14 @@ export class GlobalSearchService implements OnModuleInit {
     return this.indexingService.reindexAll(tenantId)
   }
 
-
   getSearchEngineStatus(): { engine: string; available: boolean; info?: string } {
     return {
       engine: this.searchStrategy === this.elasticsearchService ? 'elasticsearch' : 'postgresql',
       available: true,
-      info: this.searchStrategy === this.elasticsearchService 
-        ? '🚀 High-performance search with ElasticSearch'
-        : '📊 Database search with PostgreSQL'
+      info:
+        this.searchStrategy === this.elasticsearchService
+          ? '🚀 High-performance search with ElasticSearch'
+          : '📊 Database search with PostgreSQL',
     }
   }
 
@@ -113,12 +113,12 @@ export class GlobalSearchService implements OnModuleInit {
       totalSearches: 0, // This would come from analytics/logging
       averageResponseTime: 0, // This would come from performance monitoring
       popularQueries: [], // This would come from search analytics
-      searchEngineStatus: this.searchStrategy === this.elasticsearchService ? 'healthy' : 'degraded',
+      searchEngineStatus:
+        this.searchStrategy === this.elasticsearchService ? 'healthy' : 'degraded',
       indexCounts: {}, // This would come from index status
-      lastIndexUpdate: new Date()
+      lastIndexUpdate: new Date(),
     }
 
     return stats
   }
-
 }

@@ -1,6 +1,6 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsObject, Min, Max } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { GroupType, GroupStatus } from '../entities/partner-group.entity'
+import { IsEnum, IsNumber, IsObject, IsOptional, IsString, Max, Min } from 'class-validator'
+import { GroupStatus, GroupType } from '../entities/partner-group.entity'
 
 export class CreatePartnerGroupDto {
   @ApiProperty()

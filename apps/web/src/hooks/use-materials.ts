@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Material, MaterialFilters, MaterialStatistics } from '@erp/types'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 
 const MATERIALS_KEY = 'materials'
@@ -10,7 +10,7 @@ export function useMaterials(filters?: MaterialFilters) {
     queryKey: [MATERIALS_KEY, filters],
     queryFn: async () => {
       const params = new URLSearchParams()
-      
+
       if (filters?.type) params.append('type', filters.type)
       if (filters?.category) params.append('category', filters.category)
       if (filters?.dimensions) params.append('dimensions', filters.dimensions)
@@ -18,8 +18,9 @@ export function useMaterials(filters?: MaterialFilters) {
       if (filters?.search) params.append('search', filters.search)
       if (filters?.minStock !== undefined) params.append('minStock', filters.minStock.toString())
       if (filters?.maxStock !== undefined) params.append('maxStock', filters.maxStock.toString())
-      if (filters?.stockAlert !== undefined) params.append('stockAlert', filters.stockAlert.toString())
-      
+      if (filters?.stockAlert !== undefined)
+        params.append('stockAlert', filters.stockAlert.toString())
+
       const response = await apiClient.get(`/business/materials?${params}`)
       return response.data as Material[]
     },
@@ -49,7 +50,7 @@ export function useMaterialStatistics() {
 
 export function useCreateMaterial() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (data: Partial<Material>) => {
       const response = await apiClient.post('/business/materials', data)
@@ -64,7 +65,7 @@ export function useCreateMaterial() {
 
 export function useUpdateMaterial() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Material> }) => {
       const response = await apiClient.patch(`/business/materials/${id}`, data)
@@ -80,7 +81,7 @@ export function useUpdateMaterial() {
 
 export function useDeleteMaterial() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (id: string) => {
       await apiClient.delete(`/business/materials/${id}`)

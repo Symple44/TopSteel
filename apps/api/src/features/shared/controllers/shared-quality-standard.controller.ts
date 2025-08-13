@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedQualityStandard } from '../entities/shared-quality-standard.entity'
-import { SharedQualityStandardService } from '../services/shared-quality-standard.service'
+import type { SharedQualityStandardService } from '../services/shared-quality-standard.service'
 
 @ApiTags('Shared Quality Standards')
 @Controller('shared/quality-standards')

@@ -1,57 +1,66 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Edit2, Trash2, MapPin, Truck, Warehouse, HardHat, Building2, Package } from 'lucide-react'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Badge } from '@erp/ui'
+import type { CreatePartnerSiteDto, PartnerSite, UpdatePartnerSiteDto } from '@erp/types'
+import { AccessibiliteType, SiteStatus, SiteType } from '@erp/types'
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Textarea,
 } from '@erp/ui'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@erp/ui'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from '@erp/ui'
-import { Input } from '@erp/ui'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@erp/ui'
-import { Switch } from '@erp/ui'
-import { Textarea } from '@erp/ui'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import type { PartnerSite, CreatePartnerSiteDto, UpdatePartnerSiteDto } from '@erp/types'
-import { SiteType, SiteStatus, AccessibiliteType } from '@erp/types'
 import {
-  usePartnerSites,
+  Building2,
+  Edit2,
+  HardHat,
+  MapPin,
+  Package,
+  Plus,
+  Trash2,
+  Truck,
+  Warehouse,
+} from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import {
   useCreatePartnerSite,
-  useUpdatePartnerSite,
   useDeletePartnerSite,
+  usePartnerSites,
+  useUpdatePartnerSite,
 } from '@/hooks/use-partner-details'
-import { formatCurrency } from '@/lib/utils'
 
 const siteSchema = z.object({
   code: z.string().min(1, 'Le code est requis'),
@@ -62,7 +71,7 @@ const siteSchema = z.object({
   isPrincipal: z.boolean().optional(),
   accepteLivraisons: z.boolean().optional(),
   accepteEnlevements: z.boolean().optional(),
-  
+
   // Localisation
   adresse: z.string().optional(),
   adresseComplement: z.string().optional(),
@@ -72,12 +81,12 @@ const siteSchema = z.object({
   region: z.string().optional(),
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
-  
+
   // Contact
   responsable: z.string().optional(),
   telephone: z.string().optional(),
   email: z.string().email().optional().or(z.literal('')),
-  
+
   // Capacités
   surfaceM2: z.coerce.number().min(0).optional(),
   capaciteStockageTonnes: z.coerce.number().min(0).optional(),
@@ -89,7 +98,7 @@ const siteSchema = z.object({
   hasChariot: z.boolean().optional(),
   hasPontRoulant: z.boolean().optional(),
   hasGrue: z.boolean().optional(),
-  
+
   // Instructions
   instructionsLivraison: z.string().optional(),
   consignesSecurite: z.string().optional(),
@@ -106,7 +115,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingSite, setEditingSite] = useState<PartnerSite | null>(null)
   const [activeTab, setActiveTab] = useState('general')
-  
+
   const { data: sites = initialSites } = usePartnerSites(partnerId)
   const createSite = useCreatePartnerSite()
   const updateSite = useUpdatePartnerSite()
@@ -176,9 +185,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
       }
       setIsFormOpen(false)
       form.reset()
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   const getSiteIcon = (type: SiteType) => {
@@ -216,9 +223,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
         </CardHeader>
         <CardContent>
           {sites.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              Aucun site enregistré
-            </p>
+            <p className="text-sm text-muted-foreground text-center py-8">Aucun site enregistré</p>
           ) : (
             <Table>
               <TableHeader>
@@ -257,15 +262,11 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
-                        {site.type.replace(/_/g, ' ')}
-                      </Badge>
+                      <Badge variant="outline">{site.type.replace(/_/g, ' ')}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        {site.ville && (
-                          <div className="text-sm">{site.ville}</div>
-                        )}
+                        {site.ville && <div className="text-sm">{site.ville}</div>}
                         {site.codePostal && (
                           <div className="text-xs text-muted-foreground">{site.codePostal}</div>
                         )}
@@ -276,12 +277,8 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1 text-sm">
-                        {site.surfaceM2 && (
-                          <div>{site.surfaceM2} m²</div>
-                        )}
-                        {site.capaciteStockageTonnes && (
-                          <div>{site.capaciteStockageTonnes} T</div>
-                        )}
+                        {site.surfaceM2 && <div>{site.surfaceM2} m²</div>}
+                        {site.capaciteStockageTonnes && <div>{site.capaciteStockageTonnes} T</div>}
                         {site.accessibilite && (
                           <Badge variant="outline" className="text-xs">
                             {site.accessibilite}
@@ -320,24 +317,14 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatusBadgeVariant(site.status)}>
-                        {site.status}
-                      </Badge>
+                      <Badge variant={getStatusBadgeVariant(site.status)}>{site.status}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(site)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(site)}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(site)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(site)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -353,9 +340,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {editingSite ? 'Modifier le site' : 'Nouveau site'}
-            </DialogTitle>
+            <DialogTitle>{editingSite ? 'Modifier le site' : 'Nouveau site'}</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -518,9 +503,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                           <div className="space-y-0.5">
                             <FormLabel>Site principal</FormLabel>
-                            <FormDescription>
-                              Ce site sera utilisé par défaut
-                            </FormDescription>
+                            <FormDescription>Ce site sera utilisé par défaut</FormDescription>
                           </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -874,7 +857,8 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                           />
                         </FormControl>
                         <FormDescription>
-                          Indiquez les équipements de protection individuelle requis et les procédures de sécurité
+                          Indiquez les équipements de protection individuelle requis et les
+                          procédures de sécurité
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -887,15 +871,12 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                   Annuler
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={createSite.isPending || updateSite.isPending}
-                >
+                <Button type="submit" disabled={createSite.isPending || updateSite.isPending}>
                   {createSite.isPending || updateSite.isPending
                     ? 'Enregistrement...'
                     : editingSite
-                    ? 'Modifier'
-                    : 'Créer'}
+                      ? 'Modifier'
+                      : 'Créer'}
                 </Button>
               </DialogFooter>
             </form>

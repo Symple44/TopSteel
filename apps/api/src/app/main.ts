@@ -74,14 +74,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   })
-  
+
   // Désactiver complètement les redirections automatiques d'Express
   const expressApp = app.getHttpAdapter().getInstance()
   expressApp.set('strict routing', false)
   expressApp.set('x-powered-by', false)
-  
+
   // Middleware pour gérer les trailing slashes sans redirection
-  expressApp.use((req: any, res: any, next: any) => {
+  expressApp.use((req: any, _res: any, next: any) => {
     // Supprimer le trailing slash si présent (sauf pour la racine)
     if (req.path !== '/' && req.path.endsWith('/')) {
       req.url = req.url.slice(0, -1)

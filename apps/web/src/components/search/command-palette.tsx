@@ -1,36 +1,31 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Dialog, DialogContent, DialogTitle } from '@erp/ui'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@erp/ui'
-import {
-  Search,
-  Users,
-  Package,
-  Truck,
-  Layers,
-  Folder,
-  FileText,
-  Receipt,
-  ShoppingCart,
-  User,
+  ArrowRight,
+  Bell,
   Building,
   Calculator,
-  Bell,
-  Database,
-  Menu,
   Clock,
-  ArrowRight,
-  Sparkles,
-  Zap,
+  Database,
+  FileText,
+  Folder,
   Hash,
+  Layers,
+  Menu,
+  Package,
+  Receipt,
+  Search,
+  ShoppingCart,
+  Sparkles,
+  Truck,
+  User,
+  Users,
+  Zap,
 } from 'lucide-react'
-import { useGlobalSearch, SearchResult } from '@/hooks/use-global-search'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { type SearchResult, useGlobalSearch } from '@/hooks/use-global-search'
 import { useTranslation } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
@@ -100,7 +95,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter()
   const { t } = useTranslation('common')
   const [selectedTab, setSelectedTab] = useState<string | null>(null)
-  
+
   const {
     query,
     results,
@@ -146,7 +141,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         onOpenChange(false)
       }
     }
-    
+
     if (open) {
       window.addEventListener('keydown', handleEscape)
       return () => window.removeEventListener('keydown', handleEscape)
@@ -162,17 +157,20 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   }, [open, clearSearch])
 
   // Navigation vers un résultat
-  const navigateToResult = useCallback((result: SearchResult) => {
-    if (result.url) {
-      onOpenChange(false)
-      
-      if (result.url.startsWith('http')) {
-        window.open(result.url, '_blank')
-      } else {
-        router.push(result.url)
+  const navigateToResult = useCallback(
+    (result: SearchResult) => {
+      if (result.url) {
+        onOpenChange(false)
+
+        if (result.url.startsWith('http')) {
+          window.open(result.url, '_blank')
+        } else {
+          router.push(result.url)
+        }
       }
-    }
-  }, [router, onOpenChange])
+    },
+    [router, onOpenChange]
+  )
 
   // Obtenir l'icône pour un type
   const getIcon = (type: string) => {
@@ -183,7 +181,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   // Obtenir les résultats filtrés
   const getFilteredResults = () => {
     if (!selectedTab) return results
-    return results.filter(r => r.type === selectedTab)
+    return results.filter((r) => r.type === selectedTab)
   }
 
   const filteredResults = getFilteredResults()
@@ -225,17 +223,17 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 onClick={() => setSelectedTab(null)}
                 className={cn(
                   'px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
-                  !selectedTab
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  selectedTab
+                    ? 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    : 'bg-primary text-primary-foreground'
                 )}
               >
                 Tout ({total})
               </button>
-              {types.map(type => {
+              {types.map((type) => {
                 const count = getResultCountByType(type)
                 const Icon = getIcon(type)
-                
+
                 return (
                   <button
                     key={type}
@@ -259,11 +257,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         {/* Corps avec résultats */}
         <div className="max-h-[420px] overflow-y-auto bg-background">
           {/* Message d'erreur */}
-          {error && (
-            <div className="p-4 text-sm text-destructive">
-              {error}
-            </div>
-          )}
+          {error && <div className="p-4 text-sm text-destructive">{error}</div>}
 
           {/* Pas de résultats */}
           {!loading && query && filteredResults.length === 0 && (
@@ -271,12 +265,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-muted/50 flex items-center justify-center">
                 <Search className="h-7 w-7 text-muted-foreground" />
               </div>
-              <p className="text-base font-medium text-foreground mb-1">
-                Aucun résultat trouvé
-              </p>
-              <p className="text-sm text-muted-foreground">
-                pour "{query}"
-              </p>
+              <p className="text-base font-medium text-foreground mb-1">Aucun résultat trouvé</p>
+              <p className="text-sm text-muted-foreground">pour "{query}"</p>
             </div>
           )}
 
@@ -295,7 +285,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   <Clock className="mr-3 h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="flex-1 text-left font-medium">{item.query}</span>
                   <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                    {typeof item.resultCount === 'object' ? item.resultCount.value : item.resultCount}
+                    {typeof item.resultCount === 'object'
+                      ? item.resultCount.value
+                      : item.resultCount}
                   </span>
                 </button>
               ))}
@@ -305,14 +297,27 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           {/* Résultats de recherche */}
           {filteredResults.length > 0 && (
             <div className="p-3">
-              {!selectedTab ? (
-                // Vue groupée par type
-                <>
-                  {types.map(type => {
+              {selectedTab
+                ? // Vue filtrée par type
+                  filteredResults.map((result, index) => {
+                    const typeColor = TYPE_COLORS[result.type] || 'text-gray-600 bg-gray-50'
+
+                    return (
+                      <SearchResultItem
+                        key={`${result.type}-${result.id}`}
+                        result={result}
+                        isSelected={selectedIndex === index}
+                        onClick={() => navigateToResult(result)}
+                        typeColor={typeColor}
+                      />
+                    )
+                  })
+                : // Vue groupée par type
+                  types.map((type) => {
                     const typeResults = groupedResults[type].slice(0, 5)
                     const Icon = getIcon(type)
                     const typeColor = TYPE_COLORS[type] || 'text-gray-600 bg-gray-50'
-                    
+
                     return (
                       <div key={type} className="mb-4 last:mb-0">
                         <div className="flex items-center justify-between px-2 py-2">
@@ -329,8 +334,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                             </button>
                           )}
                         </div>
-                        
-                        {typeResults.map((result, index) => (
+
+                        {typeResults.map((result, _index) => (
                           <SearchResultItem
                             key={`${result.type}-${result.id}`}
                             result={result}
@@ -342,25 +347,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                       </div>
                     )
                   })}
-                </>
-              ) : (
-                // Vue filtrée par type
-                <>
-                  {filteredResults.map((result, index) => {
-                    const typeColor = TYPE_COLORS[result.type] || 'text-gray-600 bg-gray-50'
-                    
-                    return (
-                      <SearchResultItem
-                        key={`${result.type}-${result.id}`}
-                        result={result}
-                        isSelected={selectedIndex === index}
-                        onClick={() => navigateToResult(result)}
-                        typeColor={typeColor}
-                      />
-                    )
-                  })}
-                </>
-              )}
             </div>
           )}
 
@@ -421,62 +407,54 @@ interface SearchResultItemProps {
 
 function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResultItemProps) {
   const Icon = TYPE_ICONS[result.type] || Hash
-  
+
   // Fonction pour rendre le texte avec highlighting
   const renderHighlighted = (text: string, highlights?: string[]) => {
     if (!highlights || highlights.length === 0) return text
-    
+
     // Pour simplifier, on prend juste le premier highlight
     const highlighted = highlights[0]
     return <span dangerouslySetInnerHTML={{ __html: highlighted }} />
   }
-  
+
   return (
     <button
       onClick={onClick}
       className={cn(
         'flex items-center w-full px-3 py-3 text-sm rounded-lg transition-all duration-200',
-        isSelected 
-          ? 'bg-accent shadow-sm scale-[1.02]' 
-          : 'hover:bg-accent/50'
+        isSelected ? 'bg-accent shadow-sm scale-[1.02]' : 'hover:bg-accent/50'
       )}
     >
       <div className={cn('mr-3 p-2 rounded-lg', typeColor)}>
         <Icon className="h-4 w-4" />
       </div>
-      
+
       <div className="flex-1 text-left">
         <div className="font-semibold text-foreground">
-          {result.highlight?.title 
+          {result.highlight?.title
             ? renderHighlighted(result.title, result.highlight.title)
-            : result.title
-          }
+            : result.title}
         </div>
         {result.description && (
           <div className="text-xs text-muted-foreground line-clamp-1">
             {result.highlight?.description
               ? renderHighlighted(result.description, result.highlight.description)
-              : result.description
-            }
+              : result.description}
           </div>
         )}
       </div>
-      
+
       {result.metadata && (
         <div className="ml-2 flex items-center gap-2 text-xs text-muted-foreground">
           {result.metadata.statut && (
-            <span className="px-1.5 py-0.5 bg-muted rounded">
-              {result.metadata.statut}
-            </span>
+            <span className="px-1.5 py-0.5 bg-muted rounded">{result.metadata.statut}</span>
           )}
           {result.metadata.montant && (
-            <span className="font-medium">
-              {result.metadata.montant}€
-            </span>
+            <span className="font-medium">{result.metadata.montant}€</span>
           )}
         </div>
       )}
-      
+
       <ArrowRight className="ml-2 h-3 w-3 text-muted-foreground" />
     </button>
   )

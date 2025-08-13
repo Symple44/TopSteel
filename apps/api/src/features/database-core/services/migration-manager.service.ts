@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
-import { TenantConnectionService } from './tenant-connection.service'
+import type { TenantConnectionService } from './tenant-connection.service'
 
 export interface MigrationStatus {
   database: string

@@ -1,5 +1,6 @@
+import { PriceRule } from '@erp/entities'
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { DataSource, type DataSourceOptions } from 'typeorm'
 import { Group } from '../../../domains/auth/core/entities/group.entity'
@@ -15,13 +16,18 @@ import { UserSession } from '../../../domains/auth/core/entities/user-session.en
 import { UserSocieteRole } from '../../../domains/auth/core/entities/user-societe-role.entity'
 import { Article } from '../../../domains/inventory/entities/article.entity'
 import { Material } from '../../../domains/materials/entities/material.entity'
-import { Partner } from '../../../domains/partners/entities/partner.entity'
-import { PartnerGroup } from '../../../domains/partners/entities/partner-group.entity'
 import { Contact } from '../../../domains/partners/entities/contact.entity'
-import { PartnerSite } from '../../../domains/partners/entities/partner-site.entity'
+import { Partner } from '../../../domains/partners/entities/partner.entity'
 import { PartnerAddress } from '../../../domains/partners/entities/partner-address.entity'
+import { PartnerGroup } from '../../../domains/partners/entities/partner-group.entity'
+import { PartnerSite } from '../../../domains/partners/entities/partner-site.entity'
 import { User } from '../../../domains/users/entities/user.entity'
 import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
+// Entités de menu (dans AUTH)
+import { MenuConfiguration } from '../../../features/admin/entities/menu-configuration.entity'
+import { MenuItem } from '../../../features/admin/entities/menu-item.entity'
+import { MenuItemPermission } from '../../../features/admin/entities/menu-item-permission.entity'
+import { MenuItemRole } from '../../../features/admin/entities/menu-item-role.entity'
 // Entités métier (bases sociétés) - Supprimées pour optimiser
 // Entités marketplace
 import { MarketplaceModule as MarketplaceModuleEntity } from '../../../features/marketplace/entities/marketplace-module.entity'
@@ -33,25 +39,25 @@ import { ParameterApplication } from '../../../features/parameters/entities/para
 import { ParameterClient } from '../../../features/parameters/entities/parameter-client.entity'
 // Entités de paramètres (dans AUTH)
 import { ParameterSystem } from '../../../features/parameters/entities/parameter-system.entity'
-// Entités de menu (dans AUTH)
-import { MenuConfiguration } from '../../../features/admin/entities/menu-configuration.entity'
-import { MenuItem } from '../../../features/admin/entities/menu-item.entity'
-import { MenuItemPermission } from '../../../features/admin/entities/menu-item-permission.entity'
-import { MenuItemRole } from '../../../features/admin/entities/menu-item-role.entity'
+import {
+  PricingLog,
+  SalesHistory,
+  WebhookDelivery,
+  WebhookEvent,
+  WebhookSubscription,
+} from '../../../features/pricing/entities'
 // Entités partagées (base shared)
 import { SharedEntities } from '../../../features/shared/entities'
 import { SharedDataRegistry } from '../../../features/shared/entities/shared-data-registry.entity'
 import { Site } from '../../../features/societes/entities/site.entity'
 // Entités d'authentification (base auth)
 import { Societe } from '../../../features/societes/entities/societe.entity'
-import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
 import { SocieteLicense } from '../../../features/societes/entities/societe-license.entity'
+import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
 import { BTPIndex } from '../../../modules/pricing/entities/btp-index.entity'
 import { CustomerSectorAssignment } from '../../../modules/pricing/entities/customer-sector-assignment.entity'
 // Entités pricing
 import { SectorCoefficient } from '../../../modules/pricing/entities/sector-coefficient.entity'
-import { PriceRule } from '@erp/entities'
-import { PricingLog, WebhookSubscription, WebhookEvent, WebhookDelivery, SalesHistory } from '../../../features/pricing/entities'
 
 @Injectable()
 export class MultiTenantDatabaseConfig {

@@ -1782,7 +1782,6 @@ export const fr = {
     editRule: 'Modifier la règle',
     deleteRule: 'Supprimer la règle',
     duplicateRule: 'Dupliquer la règle',
-    simulator: 'Simulateur',
     simulatePrice: 'Simuler le prix',
     export: 'Exporter les règles',
     import: 'Importer des règles',
@@ -1792,7 +1791,7 @@ export const fr = {
       averageDiscount: 'Remise moyenne',
       totalUsage: 'Utilisations totales',
       performance: 'Performance',
-      activationRate: 'Taux d\'activation'
+      activationRate: "Taux d'activation",
     },
     form: {
       basicInfo: 'Informations de base',
@@ -1800,11 +1799,11 @@ export const fr = {
       description: 'Description',
       channel: 'Canal de vente',
       target: 'Ciblage',
-      articleFamily: 'Famille d\'articles',
+      articleFamily: "Famille d'articles",
       specificArticle: 'Article spécifique',
       customerGroups: 'Groupes clients',
       adjustment: 'Ajustement de prix',
-      adjustmentType: 'Type d\'ajustement',
+      adjustmentType: "Type d'ajustement",
       adjustmentValue: 'Valeur',
       adjustmentUnit: 'Unité',
       formula: 'Formule',
@@ -1813,12 +1812,12 @@ export const fr = {
       validity: 'Validité et limites',
       validFrom: 'Date de début',
       validUntil: 'Date de fin',
-      usageLimit: 'Limite d\'utilisation totale',
+      usageLimit: "Limite d'utilisation totale",
       usageLimitPerCustomer: 'Limite par client',
       advanced: 'Options avancées',
       priority: 'Priorité',
-      combinable: 'Combinable avec d\'autres règles',
-      isActive: 'Règle active'
+      combinable: "Combinable avec d'autres règles",
+      isActive: 'Règle active',
     },
     types: {
       percentage: 'Pourcentage',
@@ -1828,20 +1827,20 @@ export const fr = {
       pricePerLength: 'Prix à la longueur',
       pricePerSurface: 'Prix à la surface',
       pricePerVolume: 'Prix au volume',
-      formula: 'Formule personnalisée'
+      formula: 'Formule personnalisée',
     },
     channels: {
       all: 'Tous les canaux',
       erp: 'ERP',
       marketplace: 'Marketplace',
       b2b: 'B2B',
-      api: 'API'
+      api: 'API',
     },
     templates: {
       quantityDiscount: 'Remise quantité',
       weightPricing: 'Prix au poids',
       marketplaceMargin: 'Marge marketplace',
-      vipDiscount: 'Tarif groupe VIP'
+      vipDiscount: 'Tarif groupe VIP',
     },
     simulator: {
       title: 'Simulateur de prix',
@@ -1858,7 +1857,7 @@ export const fr = {
       totalDiscount: 'Remise totale',
       appliedRules: 'Règles appliquées',
       skippedRules: 'Règles non appliquées',
-      totalForQuantity: 'Prix total pour {quantity} unités'
+      totalForQuantity: 'Prix total pour {quantity} unités',
     },
     messages: {
       ruleCreated: 'Règle créée avec succès',
@@ -1868,7 +1867,7 @@ export const fr = {
       rulesExported: 'Règles exportées avec succès',
       rulesImported: '{count} règle(s) importée(s)',
       simulationError: 'Erreur lors de la simulation',
-      loadError: 'Erreur lors du chargement des règles'
-    }
+      loadError: 'Erreur lors du chargement des règles',
+    },
   },
 }

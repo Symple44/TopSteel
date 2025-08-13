@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { User } from '../../users/entities/user.entity'
 import {
   canManageUser,

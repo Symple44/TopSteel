@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import type { BusinessContext } from '../../core/interfaces/business-service.interface'
 import { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
 
@@ -99,13 +99,19 @@ export class ArticleService {
           queryBuilder.andWhere('article.gereEnStock = true AND article.stockPhysique = 0')
           break
         case 'sous_mini':
-          queryBuilder.andWhere('article.gereEnStock = true AND article.stockPhysique > 0 AND article.stockPhysique <= article.stockMini')
+          queryBuilder.andWhere(
+            'article.gereEnStock = true AND article.stockPhysique > 0 AND article.stockPhysique <= article.stockMini'
+          )
           break
         case 'normal':
-          queryBuilder.andWhere('article.gereEnStock = true AND (article.stockMini IS NULL OR article.stockPhysique > article.stockMini)')
+          queryBuilder.andWhere(
+            'article.gereEnStock = true AND (article.stockMini IS NULL OR article.stockPhysique > article.stockMini)'
+          )
           break
         case 'surstock':
-          queryBuilder.andWhere('article.gereEnStock = true AND article.stockMaxi IS NOT NULL AND article.stockPhysique > article.stockMaxi')
+          queryBuilder.andWhere(
+            'article.gereEnStock = true AND article.stockMaxi IS NOT NULL AND article.stockPhysique > article.stockMaxi'
+          )
           break
       }
     }
@@ -128,7 +134,7 @@ export class ArticleService {
   /**
    * Obtenir les statistiques des articles
    */
-  async getStatistiques(context: BusinessContext): Promise<ArticleStatistics> {
+  async getStatistiques(_context: BusinessContext): Promise<ArticleStatistics> {
     // Version simplifiée pour test initial
     return {
       totalArticles: 0,
@@ -158,7 +164,10 @@ export class ArticleService {
   /**
    * Calculer la valorisation du stock
    */
-  async calculerValorisationStock(famille?: string, context?: BusinessContext): Promise<StockValorisation> {
+  async calculerValorisationStock(
+    _famille?: string,
+    _context?: BusinessContext
+  ): Promise<StockValorisation> {
     // Version simplifiée pour test initial
     return {
       nombreArticles: 0,
@@ -174,7 +183,8 @@ export class ArticleService {
    * Obtenir les articles en rupture
    */
   async getArticlesEnRupture(context: BusinessContext): Promise<Article[]> {
-    return await this.articleRepository.createQueryBuilder('article')
+    return await this.articleRepository
+      .createQueryBuilder('article')
       .where('article.societeId = :societeId', { societeId: context.tenantId })
       .andWhere('article.gereEnStock = true')
       .andWhere('article.stockPhysique = 0')
@@ -186,7 +196,8 @@ export class ArticleService {
    * Obtenir les articles sous stock minimum
    */
   async getArticlesSousStockMini(context: BusinessContext): Promise<Article[]> {
-    return await this.articleRepository.createQueryBuilder('article')
+    return await this.articleRepository
+      .createQueryBuilder('article')
       .where('article.societeId = :societeId', { societeId: context.tenantId })
       .andWhere('article.gereEnStock = true')
       .andWhere('article.stockPhysique > 0')
@@ -200,11 +211,14 @@ export class ArticleService {
    * Obtenir les articles à réapprovisionner
    */
   async getArticlesAReapprovisionner(context: BusinessContext): Promise<Article[]> {
-    return await this.articleRepository.createQueryBuilder('article')
+    return await this.articleRepository
+      .createQueryBuilder('article')
       .where('article.societeId = :societeId', { societeId: context.tenantId })
       .andWhere('article.gereEnStock = true')
       .andWhere('article.status = :status', { status: ArticleStatus.ACTIF })
-      .andWhere('(article.stockPhysique = 0 OR (article.stockMini IS NOT NULL AND article.stockPhysique <= article.stockMini))')
+      .andWhere(
+        '(article.stockPhysique = 0 OR (article.stockMini IS NOT NULL AND article.stockPhysique <= article.stockMini))'
+      )
       .getMany()
   }
 
@@ -215,8 +229,8 @@ export class ArticleService {
     return await this.articleRepository.findOne({
       where: {
         id,
-        societeId: context.tenantId
-      }
+        societeId: context.tenantId,
+      },
     })
   }
 
@@ -230,7 +244,7 @@ export class ArticleService {
       createdById: context.userId,
       updatedById: context.userId,
       dateCreationFiche: new Date(),
-      dateDerniereModification: new Date()
+      dateDerniereModification: new Date(),
     })
 
     return await this.articleRepository.save(article)
@@ -249,7 +263,7 @@ export class ArticleService {
     Object.assign(article, {
       ...data,
       updatedById: context.userId,
-      dateDerniereModification: new Date()
+      dateDerniereModification: new Date(),
     })
 
     return await this.articleRepository.save(article)
@@ -263,7 +277,7 @@ export class ArticleService {
     if (!article) {
       throw new Error(`Article avec l'ID ${id} introuvable`)
     }
-    
+
     await this.articleRepository.remove(article)
   }
 
@@ -273,7 +287,7 @@ export class ArticleService {
   async effectuerInventaire(
     id: string,
     stockPhysiqueReel: number,
-    commentaire?: string,
+    _commentaire?: string,
     context?: BusinessContext
   ): Promise<Article> {
     if (!context) {
@@ -344,8 +358,8 @@ export class ArticleService {
     context: BusinessContext
   ): Promise<{ articles: Article[]; quantitesTotales: number }> {
     const articles = await this.getArticlesAReapprovisionner(context)
-    const articlesFiltered = articles.filter(a => a.fournisseurPrincipalId === fournisseurId)
-    
+    const articlesFiltered = articles.filter((a) => a.fournisseurPrincipalId === fournisseurId)
+
     return {
       articles: articlesFiltered,
       quantitesTotales: articlesFiltered.length,

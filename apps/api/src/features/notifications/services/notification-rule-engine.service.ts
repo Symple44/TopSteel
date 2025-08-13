@@ -14,7 +14,7 @@ import {
   type RecipientType,
   TriggerType,
 } from '../entities'
-import { NotificationRuleService } from './notification-rule.service'
+import type { NotificationRuleService } from './notification-rule.service'
 
 @Injectable()
 export class NotificationRuleEngineService {

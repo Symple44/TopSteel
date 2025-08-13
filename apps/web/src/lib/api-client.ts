@@ -221,7 +221,7 @@ export class APIClient {
     try {
       // Chercher d'abord dans localStorage (remember me)
       let authData = localStorage.getItem('topsteel_auth_tokens')
-      
+
       // Si pas dans localStorage, chercher dans sessionStorage
       if (!authData) {
         authData = sessionStorage.getItem('topsteel_auth_tokens')

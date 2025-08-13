@@ -114,7 +114,7 @@ export function useArticles(filters: ArticleFilters = {}) {
     queryKey: ['articles', filters],
     queryFn: async (): Promise<Article[]> => {
       const params = new URLSearchParams()
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
           params.append(key, String(value))
@@ -215,9 +215,8 @@ export function useCreateArticle() {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       toast.success('Article créé avec succès')
     },
-    onError: (error: any) => {
-      console.error('Erreur lors de la création de l\'article:', error)
-      toast.error('Erreur lors de la création de l\'article')
+    onError: (_error: any) => {
+      toast.error("Erreur lors de la création de l'article")
     },
   })
 }
@@ -236,9 +235,8 @@ export function useUpdateArticle() {
       queryClient.setQueryData(['articles', updatedArticle.id], updatedArticle)
       toast.success('Article modifié avec succès')
     },
-    onError: (error: any) => {
-      console.error('Erreur lors de la modification de l\'article:', error)
-      toast.error('Erreur lors de la modification de l\'article')
+    onError: (_error: any) => {
+      toast.error("Erreur lors de la modification de l'article")
     },
   })
 }
@@ -255,9 +253,8 @@ export function useDeleteArticle() {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       toast.success('Article supprimé avec succès')
     },
-    onError: (error: any) => {
-      console.error('Erreur lors de la suppression de l\'article:', error)
-      toast.error('Erreur lors de la suppression de l\'article')
+    onError: (_error: any) => {
+      toast.error("Erreur lors de la suppression de l'article")
     },
   })
 }
@@ -267,14 +264,14 @@ export function useEffectuerInventaire() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ 
-      id, 
-      stockPhysiqueReel, 
-      commentaire 
-    }: { 
+    mutationFn: async ({
+      id,
+      stockPhysiqueReel,
+      commentaire,
+    }: {
       id: string
       stockPhysiqueReel: number
-      commentaire?: string 
+      commentaire?: string
     }): Promise<Article> => {
       const response = await apiClient.post(`/api/business/articles/${id}/inventaire`, {
         stockPhysiqueReel,
@@ -287,9 +284,8 @@ export function useEffectuerInventaire() {
       queryClient.setQueryData(['articles', article.id], article)
       toast.success('Inventaire effectué avec succès')
     },
-    onError: (error: any) => {
-      console.error('Erreur lors de l\'inventaire:', error)
-      toast.error('Erreur lors de l\'inventaire')
+    onError: (_error: any) => {
+      toast.error("Erreur lors de l'inventaire")
     },
   })
 }
@@ -299,14 +295,14 @@ export function useDupliquerArticle() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ 
-      id, 
-      nouvelleReference, 
-      modifications 
-    }: { 
+    mutationFn: async ({
+      id,
+      nouvelleReference,
+      modifications,
+    }: {
       id: string
       nouvelleReference: string
-      modifications?: Partial<Article> 
+      modifications?: Partial<Article>
     }): Promise<Article> => {
       const response = await apiClient.post(`/api/business/articles/${id}/dupliquer`, {
         nouvelleReference,
@@ -318,8 +314,7 @@ export function useDupliquerArticle() {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       toast.success('Article dupliqué avec succès')
     },
-    onError: (error: any) => {
-      console.error('Erreur lors de la duplication:', error)
+    onError: (_error: any) => {
       toast.error('Erreur lors de la duplication')
     },
   })
@@ -328,15 +323,20 @@ export function useDupliquerArticle() {
 // Hook pour créer une commande de réapprovisionnement
 export function useCreerCommandeReapprovisionnement() {
   return useMutation({
-    mutationFn: async (fournisseurId: string): Promise<{ articles: Article[]; quantitesTotales: number }> => {
-      const response = await apiClient.post(`/api/business/articles/reapprovisionner/${fournisseurId}`)
+    mutationFn: async (
+      fournisseurId: string
+    ): Promise<{ articles: Article[]; quantitesTotales: number }> => {
+      const response = await apiClient.post(
+        `/api/business/articles/reapprovisionner/${fournisseurId}`
+      )
       return response.data
     },
     onSuccess: (result) => {
-      toast.success(`Commande créée: ${result.articles.length} articles (${result.quantitesTotales} unités)`)
+      toast.success(
+        `Commande créée: ${result.articles.length} articles (${result.quantitesTotales} unités)`
+      )
     },
-    onError: (error: any) => {
-      console.error('Erreur lors de la création de la commande:', error)
+    onError: (_error: any) => {
       toast.error('Erreur lors de la création de la commande')
     },
   })

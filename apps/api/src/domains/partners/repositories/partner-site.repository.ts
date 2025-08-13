@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { PartnerSite, SiteStatus } from '../entities/partner-site.entity'
 import type { IPartnerSiteRepository } from '../services/partner.service'
 
@@ -23,30 +23,30 @@ export class PartnerSiteRepository implements IPartnerSiteRepository {
   async findByPartner(partnerId: string): Promise<PartnerSite[]> {
     return await this.repository.find({
       where: { partnerId, status: SiteStatus.ACTIF },
-      order: { isPrincipal: 'DESC', nom: 'ASC' }
+      order: { isPrincipal: 'DESC', nom: 'ASC' },
     })
   }
 
   async findPrincipalSite(partnerId: string): Promise<PartnerSite | null> {
     return await this.repository.findOne({
-      where: { partnerId, isPrincipal: true, status: SiteStatus.ACTIF }
+      where: { partnerId, isPrincipal: true, status: SiteStatus.ACTIF },
     })
   }
 
   async findByCode(code: string, partnerId: string): Promise<PartnerSite | null> {
     return await this.repository.findOne({
-      where: { code, partnerId }
+      where: { code, partnerId },
     })
   }
 
   async findDeliverySites(partnerId: string): Promise<PartnerSite[]> {
     return await this.repository.find({
-      where: { 
-        partnerId, 
+      where: {
+        partnerId,
         accepteLivraisons: true,
-        status: SiteStatus.ACTIF 
+        status: SiteStatus.ACTIF,
       },
-      order: { nom: 'ASC' }
+      order: { nom: 'ASC' },
     })
   }
 

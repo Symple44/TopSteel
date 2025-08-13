@@ -3,10 +3,10 @@ import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 // Module multi-tenant est nécessaire pour MultiTenantDatabaseConfig
 import { DatabaseMultiTenantModule } from '../../core/database/database-multi-tenant.module'
+import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
 // Entités utilisées par TenantInitializationService
 import { User } from '../../domains/users/entities/user.entity'
 import { UserSettings } from '../../domains/users/entities/user-settings.entity'
-import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
 import { NotificationSettings } from '../notifications/entities/notification-settings.entity'
 import { SitesController } from './controllers/sites.controller'
 import { SocieteUsersController } from './controllers/societe-users.controller'
@@ -16,8 +16,9 @@ import { TenantProvisioningController } from './controllers/tenant-provisioning.
 import { Site } from './entities/site.entity'
 // Entités
 import { Societe } from './entities/societe.entity'
-import { SocieteUser } from './entities/societe-user.entity'
 import { SocieteLicense } from './entities/societe-license.entity'
+import { SocieteUser } from './entities/societe-user.entity'
+import { LicenseManagementService } from './services/license-management.service'
 import { SitesService } from './services/sites.service'
 import {
   SocieteAuthRepositoryService,
@@ -28,7 +29,6 @@ import { SocieteUsersService } from './services/societe-users.service'
 import { SocietesService } from './services/societes.service'
 import { TenantInitializationService } from './services/tenant-initialization.service'
 import { TenantProvisioningService } from './services/tenant-provisioning.service'
-import { LicenseManagementService } from './services/license-management.service'
 
 @Module({
   imports: [
@@ -37,7 +37,16 @@ import { LicenseManagementService } from './services/license-management.service'
 
     // Repositories pour la base AUTH
     TypeOrmModule.forFeature(
-      [Societe, Site, SocieteUser, SocieteLicense, User, UserSettings, UserSession, NotificationSettings],
+      [
+        Societe,
+        Site,
+        SocieteUser,
+        SocieteLicense,
+        User,
+        UserSettings,
+        UserSession,
+        NotificationSettings,
+      ],
       'auth'
     ),
   ],

@@ -1,5 +1,5 @@
-import { PriceRule } from '@erp/entities'
-import { FindManyOptions, FindOneOptions } from 'typeorm'
+import type { PriceRule } from '@erp/entities'
+import type { FindManyOptions, FindOneOptions } from 'typeorm'
 
 /**
  * Interface pour le repository des règles de prix

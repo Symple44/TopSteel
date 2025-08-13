@@ -41,7 +41,7 @@ export class ERPApiClient {
     this.projects = new ProjectApiClient(config)
     this.userSettings = new UserSettingsApiClient(config)
     this.systemParameters = new SystemParametersApiClient(config)
-    
+
     // Initialize APIs with HttpClient
     const httpClient = new HttpClient(config)
     this.partners = new PartnerApi(httpClient.axiosInstance)

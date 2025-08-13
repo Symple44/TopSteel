@@ -1,34 +1,20 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common'
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger'
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { GlobalUserRole } from '../../../domains/auth/core/constants/roles.constants'
+import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import { Roles } from '../../../domains/auth/decorators/roles.decorator'
-import { GlobalUserRole } from '../../../domains/auth/core/constants/roles.constants'
 import {
-  CreateLicenseDto,
-  UpdateLicenseDto,
-  SuspendLicenseDto,
+  type CheckFeatureDto,
+  type CheckRestrictionDto,
+  type CreateLicenseDto,
   LicenseResponseDto,
   LicenseUsageStatsDto,
-  CheckFeatureDto,
-  CheckRestrictionDto,
+  type SuspendLicenseDto,
+  type UpdateLicenseDto,
 } from '../dto/license.dto'
-import { LicenseManagementService } from '../services/license-management.service'
-import { SocieteLicense } from '../entities/societe-license.entity'
+import type { SocieteLicense } from '../entities/societe-license.entity'
+import type { LicenseManagementService } from '../services/license-management.service'
 
 @ApiTags('License Management')
 @ApiBearerAuth()
@@ -72,11 +58,9 @@ export class LicenseManagementController {
 
   @Get('societe/:societeId/usage')
   @Roles(GlobalUserRole.SUPER_ADMIN, GlobalUserRole.ADMIN)
-  @ApiOperation({ summary: 'Obtenir les statistiques d\'utilisation d\'une licence' })
+  @ApiOperation({ summary: "Obtenir les statistiques d'utilisation d'une licence" })
   @ApiResponse({ status: 200, type: LicenseUsageStatsDto })
-  async getLicenseUsageStats(
-    @Param('societeId') societeId: string
-  ): Promise<LicenseUsageStatsDto> {
+  async getLicenseUsageStats(@Param('societeId') societeId: string): Promise<LicenseUsageStatsDto> {
     return await this.licenseService.getLicenseUsageStats(societeId)
   }
 
@@ -85,10 +69,7 @@ export class LicenseManagementController {
   @ApiOperation({ summary: 'Vérifier si une fonctionnalité est disponible' })
   @ApiResponse({ status: 200, type: Boolean })
   async checkFeature(@Body() checkDto: CheckFeatureDto): Promise<{ enabled: boolean }> {
-    const enabled = await this.licenseService.isFeatureEnabled(
-      checkDto.societeId,
-      checkDto.feature
-    )
+    const enabled = await this.licenseService.isFeatureEnabled(checkDto.societeId, checkDto.feature)
     return { enabled }
   }
 

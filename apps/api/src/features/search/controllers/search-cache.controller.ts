@@ -1,28 +1,27 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Delete, 
-  Param, 
-  Body, 
-  HttpCode, 
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
   HttpStatus,
+  Param,
+  Post,
+  Query,
   UseGuards,
-  Query
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger'
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import { Roles } from '../../../domains/auth/decorators/roles.decorator'
-import { SearchCacheService, CacheStatistics } from '../services/search-cache.service'
-import { SearchCacheInvalidationService } from '../services/search-cache-invalidation.service'
-import { CachedGlobalSearchService } from '../services/cached-global-search.service'
+import type { CachedGlobalSearchService } from '../services/cached-global-search.service'
+import type { CacheStatistics, SearchCacheService } from '../services/search-cache.service'
+import type { SearchCacheInvalidationService } from '../services/search-cache-invalidation.service'
 
 @ApiTags('Search Cache Management')
 @Controller('api/search/cache')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SearchCacheController {
-
   constructor(
     private readonly cacheService: SearchCacheService,
     private readonly invalidationService: SearchCacheInvalidationService,
@@ -46,7 +45,7 @@ export class SearchCacheController {
       this.cacheService.getCacheStatistics(),
       this.invalidationService.getInvalidationStats(),
       this.cacheService.isHealthy(),
-      this.cacheService.getCacheConfig()
+      this.cacheService.getCacheConfig(),
     ])
 
     return {
@@ -57,8 +56,8 @@ export class SearchCacheController {
         enabled: config.enabled,
         defaultTTL: config.defaultTTL,
         entityTTLs: config.entityTTLs,
-        popularSearchesLimit: config.popularSearchesLimit
-      }
+        popularSearchesLimit: config.popularSearchesLimit,
+      },
     }
   }
 
@@ -81,7 +80,7 @@ export class SearchCacheController {
       healthy,
       redis: healthy, // Simplified - in reality you might check Redis specifically
       enabled: config.enabled,
-      lastCheck: new Date()
+      lastCheck: new Date(),
     }
   }
 
@@ -151,10 +150,10 @@ export class SearchCacheController {
     @Body() body: { queries: string[] }
   ): Promise<{ message: string; queriesWarmed: number }> {
     await this.cachedSearchService.warmCacheForTenant(tenantId, body.queries)
-    
+
     return {
       message: 'Cache warming completed',
-      queriesWarmed: body.queries.length
+      queriesWarmed: body.queries.length,
     }
   }
 
@@ -163,7 +162,12 @@ export class SearchCacheController {
    */
   @Get('popular-queries')
   @ApiOperation({ summary: 'Get popular search queries' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Limit number of results' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Limit number of results',
+  })
   @ApiResponse({ status: 200, description: 'Popular queries retrieved' })
   @Roles('admin', 'analyst')
   async getPopularQueries(
@@ -171,7 +175,7 @@ export class SearchCacheController {
   ): Promise<{ query: string; count: number; lastAccess: Date }[]> {
     const stats = await this.cacheService.getCacheStatistics()
     const limitValue = limit || 20
-    
+
     return stats.popularQueries.slice(0, limitValue)
   }
 
@@ -201,7 +205,7 @@ export class SearchCacheController {
   }> {
     const [cacheStats, invalidationStats] = await Promise.all([
       this.cacheService.getCacheStatistics(),
-      this.invalidationService.getInvalidationStats()
+      this.invalidationService.getInvalidationStats(),
     ])
 
     return {
@@ -209,17 +213,17 @@ export class SearchCacheController {
         hitRate: cacheStats.hitRate,
         totalHits: cacheStats.hits,
         totalMisses: cacheStats.misses,
-        totalRequests: cacheStats.hits + cacheStats.misses
+        totalRequests: cacheStats.hits + cacheStats.misses,
       },
       storage: {
         totalKeys: cacheStats.totalKeys,
-        memoryUsage: cacheStats.memoryUsage
+        memoryUsage: cacheStats.memoryUsage,
       },
       invalidation: {
         totalInvalidations: invalidationStats.totalInvalidations,
         invalidationsByEntity: invalidationStats.invalidationsByEntity,
-        lastInvalidation: invalidationStats.lastInvalidation
-      }
+        lastInvalidation: invalidationStats.lastInvalidation,
+      },
     }
   }
 
@@ -232,9 +236,9 @@ export class SearchCacheController {
   @Roles('admin')
   async resetStatistics(): Promise<{ message: string }> {
     this.invalidationService.resetStats()
-    
+
     return {
-      message: 'Cache statistics reset successfully'
+      message: 'Cache statistics reset successfully',
     }
   }
 
@@ -260,12 +264,12 @@ export class SearchCacheController {
 
       return {
         message: 'Cache maintenance completed successfully',
-        actions
+        actions,
       }
     } catch (error) {
       return {
         message: 'Cache maintenance completed with some errors',
-        actions: [...actions, `Error: ${error.message}`]
+        actions: [...actions, `Error: ${error.message}`],
       }
     }
   }
@@ -292,35 +296,34 @@ export class SearchCacheController {
     // Perform basic cache operations test
     const testKey = `test:${Date.now()}`
     const testValue = JSON.stringify({ test: true, timestamp: new Date() })
-    
-    let testResults = {
+
+    const testResults = {
       setOperation: false,
       getOperation: false,
-      deleteOperation: false
+      deleteOperation: false,
     }
 
     try {
       // Test set operation
-      await this.cacheService['redisService'].set(testKey, testValue, 60)
+      await this.cacheService.redisService.set(testKey, testValue, 60)
       testResults.setOperation = true
 
       // Test get operation
-      const retrieved = await this.cacheService['redisService'].get(testKey)
+      const retrieved = await this.cacheService.redisService.get(testKey)
       testResults.getOperation = retrieved === testValue
 
       // Test delete operation
-      await this.cacheService['redisService'].del(testKey)
-      const afterDelete = await this.cacheService['redisService'].get(testKey)
+      await this.cacheService.redisService.del(testKey)
+      const afterDelete = await this.cacheService.redisService.get(testKey)
       testResults.deleteOperation = afterDelete === null
-
-    } catch (error) {
+    } catch (_error) {
       // Test failed, but we don't throw to return partial results
     }
 
     return {
       cacheEnabled: config.enabled,
       redisConnected: health,
-      testResults
+      testResults,
     }
   }
 }

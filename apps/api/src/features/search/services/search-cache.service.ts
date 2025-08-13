@@ -1,13 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { RedisService } from '../../../core/common/services/redis.service'
-import {
-  SearchOptions,
-  SearchResponse,
-  SearchResult
-} from '../interfaces/search.interfaces'
-import { SearchDocument } from '../types/search-types'
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
+import type { RedisService } from '../../../core/common/services/redis.service'
+import type { SearchOptions, SearchResponse } from '../interfaces/search.interfaces'
 
 export interface CacheConfig {
   enabled: boolean
@@ -124,10 +119,14 @@ export class SearchCacheService implements OnModuleInit {
       tenant: tenantId,
       query: options.query?.toLowerCase().trim(),
       entityTypes: options.entityTypes?.sort(),
-      filters: options.filters ? Object.keys(options.filters).sort().reduce((acc, key) => {
-        acc[key] = options.filters![key]
-        return acc
-      }, {} as any) : undefined,
+      filters: options.filters
+        ? Object.keys(options.filters)
+            .sort()
+            .reduce((acc, key) => {
+              acc[key] = options.filters?.[key]
+              return acc
+            }, {} as any)
+        : undefined,
       limit: options.limit,
       offset: options.offset,
       sortBy: options.sortBy,
@@ -136,15 +135,15 @@ export class SearchCacheService implements OnModuleInit {
 
     // Remove undefined values
     const cleanedData = JSON.parse(JSON.stringify(keyData))
-    
+
     // Create hash for consistent key generation
     const dataString = JSON.stringify(cleanedData)
     const hash = createHash('md5').update(dataString).digest('hex')
-    
+
     const baseKey = `${this.config.keyPrefix}${tenantId}:${hash}`
-    
+
     // Ensure key doesn't exceed Redis limits
-    return baseKey.length > this.config.maxKeyLength 
+    return baseKey.length > this.config.maxKeyLength
       ? `${this.config.keyPrefix}${tenantId}:${hash.substring(0, 32)}`
       : baseKey
   }
@@ -158,10 +157,8 @@ export class SearchCacheService implements OnModuleInit {
     }
 
     // If multiple entity types, use the shortest TTL for safety
-    const ttls = entityTypes.map(type => 
-      this.config.entityTTLs[type] || this.config.defaultTTL
-    )
-    
+    const ttls = entityTypes.map((type) => this.config.entityTTLs[type] || this.config.defaultTTL)
+
     return Math.min(...ttls)
   }
 
@@ -192,19 +189,21 @@ export class SearchCacheService implements OnModuleInit {
           createdAt: new Date(),
           accessCount: 0,
           lastAccessAt: new Date(),
-        } as CacheMetadata
+        } as CacheMetadata,
       }
 
-      let serializedData = JSON.stringify(cacheData)
+      const serializedData = JSON.stringify(cacheData)
 
       // Compress large payloads
       if (serializedData.length > this.config.compressionThreshold) {
         // Could add compression here if needed
-        this.logger.debug(`Large cache payload (${serializedData.length} bytes) for key: ${cacheKey}`)
+        this.logger.debug(
+          `Large cache payload (${serializedData.length} bytes) for key: ${cacheKey}`
+        )
       }
 
       await this.redisService.set(cacheKey, serializedData, ttl)
-      
+
       // Store metadata separately for statistics
       const metadataKey = `${cacheKey}:meta`
       await this.redisService.set(metadataKey, JSON.stringify(cacheData.metadata), ttl)
@@ -212,7 +211,9 @@ export class SearchCacheService implements OnModuleInit {
       this.statistics.sets++
       this.updatePopularSearches(options.query || '', tenantId)
 
-      this.logger.debug(`Cached search results for tenant ${tenantId}, key: ${cacheKey}, TTL: ${ttl}s`)
+      this.logger.debug(
+        `Cached search results for tenant ${tenantId}, key: ${cacheKey}, TTL: ${ttl}s`
+      )
     } catch (error) {
       this.logger.error(`Failed to cache search results: ${error.message}`, error.stack)
     }
@@ -239,7 +240,7 @@ export class SearchCacheService implements OnModuleInit {
       }
 
       const parsed = JSON.parse(cachedData)
-      
+
       // Update access metadata
       await this.updateAccessMetadata(cacheKey, parsed.metadata)
 
@@ -248,7 +249,7 @@ export class SearchCacheService implements OnModuleInit {
       this.updatePopularSearches(options.query || '', tenantId)
 
       this.logger.debug(`Cache hit for tenant ${tenantId}, key: ${cacheKey}`)
-      
+
       return parsed.results
     } catch (error) {
       this.logger.error(`Failed to retrieve cached search results: ${error.message}`, error.stack)
@@ -268,11 +269,11 @@ export class SearchCacheService implements OnModuleInit {
     try {
       // In a real implementation, we'd need to track which cache keys contain which entity types
       // For now, we'll use a pattern-based approach
-      const pattern = `${this.config.keyPrefix}${tenantId}:*`
-      
+      const _pattern = `${this.config.keyPrefix}${tenantId}:*`
+
       // Note: This is a simplified approach. In production, you'd want to maintain
       // a registry of cache keys by entity type for more efficient invalidation
-      
+
       this.logger.debug(`Invalidating cache for tenant ${tenantId}, entity type: ${entityType}`)
       this.statistics.deletes++
     } catch (error) {
@@ -291,8 +292,8 @@ export class SearchCacheService implements OnModuleInit {
     try {
       // Delete all cache keys for this tenant
       // This is a simplified implementation
-      const pattern = `${this.config.keyPrefix}${tenantId}:*`
-      
+      const _pattern = `${this.config.keyPrefix}${tenantId}:*`
+
       this.logger.debug(`Invalidating all cache for tenant ${tenantId}`)
       this.statistics.deletes++
     } catch (error) {
@@ -330,11 +331,11 @@ export class SearchCacheService implements OnModuleInit {
         .map(([query, data]) => ({
           query,
           count: data.count,
-          lastAccess: data.lastAccess
+          lastAccess: data.lastAccess,
         }))
 
       this.statistics.lastUpdated = new Date()
-      
+
       return { ...this.statistics }
     } catch (error) {
       this.logger.error(`Failed to get cache statistics: ${error.message}`, error.stack)
@@ -391,14 +392,14 @@ export class SearchCacheService implements OnModuleInit {
 
     const key = `${tenantId}:${query.toLowerCase()}`
     const existing = this.popularSearches.get(key)
-    
+
     if (existing) {
       existing.count++
       existing.lastAccess = new Date()
     } else {
       this.popularSearches.set(key, {
         count: 1,
-        lastAccess: new Date()
+        lastAccess: new Date(),
       })
     }
 
@@ -407,7 +408,7 @@ export class SearchCacheService implements OnModuleInit {
       const entries = Array.from(this.popularSearches.entries())
         .sort((a, b) => b[1].count - a[1].count)
         .slice(0, this.config.popularSearchesLimit)
-      
+
       this.popularSearches.clear()
       entries.forEach(([key, data]) => {
         this.popularSearches.set(key, data)
@@ -419,7 +420,7 @@ export class SearchCacheService implements OnModuleInit {
     try {
       metadata.accessCount++
       metadata.lastAccessAt = new Date()
-      
+
       const metadataKey = `${cacheKey}:meta`
       await this.redisService.set(metadataKey, JSON.stringify(metadata), metadata.ttl)
     } catch (error) {

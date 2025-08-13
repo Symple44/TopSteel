@@ -1,29 +1,17 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
 import {
-  Plus,
-  Calculator,
-  Settings,
-  Download,
-  Upload,
-  Filter,
-  Search,
-  RefreshCw,
-  Activity,
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-} from 'lucide-react'
-import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Badge,
   Button,
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  type ColumnConfig,
   DataTable,
-  PageHeader,
   // PriceRuleCard,  // Commented out - component doesn't exist
   // PriceRuleForm,  // Commented out - component doesn't exist
   // PriceSimulator, // Commented out - component doesn't exist
@@ -31,25 +19,26 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Badge,
+  PageHeader,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-  type ColumnConfig,
 } from '@erp/ui'
+import { Activity, Calculator, Download, Plus, TrendingDown, Upload } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+
 // import { useApiClient } from '@/lib/api-client-enhanced' // Commented out - doesn't exist
 // Temporary replacement
 const useApiClient = () => ({
   get: async (_url: string) => ({ data: { rules: [], total: 0 } }),
   post: async (_url: string, _data?: unknown) => ({ data: {} }),
   put: async (_url: string, _data?: unknown) => ({ data: {} }),
-  delete: async (_url: string) => ({ data: {} })
+  delete: async (_url: string) => ({ data: {} }),
 })
+
 import { toast } from 'sonner'
+
 // Comment out the problematic imports for now to fix build
 // import type { PriceRule, PriceRuleChannel, AdjustmentType } from '@erp/entities'
 // import type { PriceCalculationRequest as SimulationContext, PriceCalculationResult as SimulationResult } from '@/lib/api-client'
@@ -129,7 +118,7 @@ export default function PricingManagementPage() {
   const [stats, setStats] = useState<PricingStats | null>(null)
   const [searchTerm, _setSearchTerm] = useState('')
   const [filterChannel, _setFilterChannel] = useState<PriceRuleChannel | 'ALL'>('ALL')
-  const [filterActive, setFilterActive] = useState<boolean | null>(null)
+  const [filterActive, _setFilterActive] = useState<boolean | null>(null)
 
   const apiClient = useApiClient()
 
@@ -287,7 +276,7 @@ export default function PricingManagementPage() {
 
       setStats(stats)
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
+      const _errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
       setError('Impossible de charger les règles de prix')
       toast.error('Erreur lors du chargement des règles')
     } finally {
@@ -300,7 +289,7 @@ export default function PricingManagementPage() {
   }, [loadRules])
 
   // Créer/Modifier une règle
-  const handleSaveRule = async (ruleData: Partial<PriceRule>) => {
+  const _handleSaveRule = async (ruleData: Partial<PriceRule>) => {
     try {
       if (selectedRule) {
         // Modification
@@ -369,7 +358,7 @@ export default function PricingManagementPage() {
   }
 
   // Simuler un calcul de prix
-  const handleSimulate = async (context: SimulationContext): Promise<SimulationResult> => {
+  const _handleSimulate = async (context: SimulationContext): Promise<SimulationResult> => {
     try {
       const response = await apiClient.post('/pricing/calculate', context)
       return response.data
@@ -431,7 +420,7 @@ export default function PricingManagementPage() {
   // Export des règles
   const handleExport = () => {
     const dataStr = JSON.stringify(rules, null, 2)
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr)
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`
 
     const exportFileDefaultName = `price-rules-${new Date().toISOString().split('T')[0]}.json`
 
@@ -671,7 +660,11 @@ export default function PricingManagementPage() {
           {/* PriceRuleForm component commented out */}
           <div className="p-4">
             <p>Rule form would be here</p>
-            <button type="button" onClick={() => setShowForm(false)} className="mt-4 px-4 py-2 bg-gray-200 rounded">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-200 rounded"
+            >
               Close
             </button>
           </div>
@@ -688,7 +681,11 @@ export default function PricingManagementPage() {
           {/* PriceSimulator component commented out */}
           <div className="p-4">
             <p>Price simulator would be here</p>
-            <button type="button" onClick={() => setShowSimulator(false)} className="mt-4 px-4 py-2 bg-gray-200 rounded">
+            <button
+              type="button"
+              onClick={() => setShowSimulator(false)}
+              className="mt-4 px-4 py-2 bg-gray-200 rounded"
+            >
               Close
             </button>
           </div>

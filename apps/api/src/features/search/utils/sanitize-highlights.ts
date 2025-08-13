@@ -1,28 +1,30 @@
 import sanitizeHtml from 'sanitize-html'
-import { SearchMetadata } from '../types/search-types'
+import type { SearchMetadata } from '../types/search-types'
 
 /**
  * Sanitise les highlights de recherche pour éviter les attaques XSS
  * Conserve uniquement les balises <mark> pour le highlighting
  */
-export function sanitizeSearchHighlights(highlight: Record<string, string[]> | undefined): Record<string, string[]> | undefined {
+export function sanitizeSearchHighlights(
+  highlight: Record<string, string[]> | undefined
+): Record<string, string[]> | undefined {
   if (!highlight) {
     return undefined
   }
 
   const sanitized: Record<string, string[]> = {}
-  
+
   for (const [field, values] of Object.entries(highlight)) {
-    sanitized[field] = values.map(value => 
+    sanitized[field] = values.map((value) =>
       sanitizeHtml(value, {
         allowedTags: ['mark'], // Autoriser uniquement les balises mark pour le highlighting
         allowedAttributes: {}, // Pas d'attributs autorisés
         allowedSchemes: [], // Pas de schémas d'URL autorisés
-        disallowedTagsMode: 'discard' // Supprimer les balises non autorisées
+        disallowedTagsMode: 'discard', // Supprimer les balises non autorisées
       })
     )
   }
-  
+
   return sanitized
 }
 
@@ -33,12 +35,12 @@ export function sanitizeText(text: string | undefined): string | undefined {
   if (!text) {
     return text
   }
-  
+
   return sanitizeHtml(text, {
     allowedTags: [], // Aucune balise autorisée
     allowedAttributes: {},
     allowedSchemes: [],
-    disallowedTagsMode: 'discard'
+    disallowedTagsMode: 'discard',
   })
 }
 
@@ -66,5 +68,5 @@ export function sanitizeSearchResult<T extends SearchResultToSanitize>(result: T
  * Sanitise un tableau de résultats de recherche
  */
 export function sanitizeSearchResults<T extends SearchResultToSanitize>(results: T[]): T[] {
-  return results.map(result => sanitizeSearchResult(result))
+  return results.map((result) => sanitizeSearchResult(result))
 }

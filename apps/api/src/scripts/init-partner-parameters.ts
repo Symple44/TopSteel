@@ -3,8 +3,13 @@
  * Insère les types, catégories et groupes de clients dans la table parameters_client
  */
 
-import { DataSource } from 'typeorm'
-import { ParameterClient, ClientParameterScope, ClientParameterType, ClientParameterAccess } from '../features/parameters/entities/parameter-client.entity'
+import type { DataSource } from 'typeorm'
+import {
+  ClientParameterAccess,
+  ClientParameterScope,
+  ClientParameterType,
+  ParameterClient,
+} from '../features/parameters/entities/parameter-client.entity'
 
 // Configuration des paramètres à insérer
 const PARTNER_PARAMETERS = [
@@ -19,13 +24,13 @@ const PARTNER_PARAMETERS = [
       { code: 'CUIVRE', label: 'Cuivre et alliages', icon: '🔌' },
       { code: 'SPECIAL', label: 'Métaux spéciaux', icon: '💎' },
       { code: 'RECYCLAGE', label: 'Recyclage métaux', icon: '♻️' },
-      { code: 'NEGOCE', label: 'Négoce général', icon: '📦' }
+      { code: 'NEGOCE', label: 'Négoce général', icon: '📦' },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.ADMIN_ONLY,
     description: 'Types de business spécifiques à la métallurgie',
-    displayOrder: 1
+    displayOrder: 1,
   },
 
   // Groupes tarifaires
@@ -33,52 +38,52 @@ const PARTNER_PARAMETERS = [
     group: 'partner_groups',
     key: 'tariff_groups',
     value: JSON.stringify([
-      { 
-        code: 'VIP', 
-        label: 'Client VIP', 
-        discount: 15, 
+      {
+        code: 'VIP',
+        label: 'Client VIP',
+        discount: 15,
         creditLimit: 100000,
         paymentTerms: '60J',
-        color: '#FFD700'
+        color: '#FFD700',
       },
-      { 
-        code: 'GROSSISTE', 
-        label: 'Grossiste', 
-        discount: 10, 
+      {
+        code: 'GROSSISTE',
+        label: 'Grossiste',
+        discount: 10,
         creditLimit: 50000,
         paymentTerms: '45J',
-        color: '#4CAF50'
+        color: '#4CAF50',
       },
-      { 
-        code: 'REVENDEUR', 
-        label: 'Revendeur', 
-        discount: 5, 
+      {
+        code: 'REVENDEUR',
+        label: 'Revendeur',
+        discount: 5,
         creditLimit: 25000,
         paymentTerms: '30J',
-        color: '#2196F3'
+        color: '#2196F3',
       },
-      { 
-        code: 'PROFESSIONNEL', 
-        label: 'Professionnel', 
-        discount: 3, 
+      {
+        code: 'PROFESSIONNEL',
+        label: 'Professionnel',
+        discount: 3,
         creditLimit: 15000,
         paymentTerms: '30J',
-        color: '#9C27B0'
+        color: '#9C27B0',
       },
-      { 
-        code: 'PARTICULIER', 
-        label: 'Particulier', 
-        discount: 0, 
+      {
+        code: 'PARTICULIER',
+        label: 'Particulier',
+        discount: 0,
         creditLimit: 5000,
         paymentTerms: 'COMPTANT',
-        color: '#607D8B'
-      }
+        color: '#607D8B',
+      },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.ADMIN_ONLY,
     description: 'Groupes tarifaires pour les partners',
-    displayOrder: 2
+    displayOrder: 2,
   },
 
   // Secteurs d'activité
@@ -99,13 +104,13 @@ const PARTNER_PARAMETERS = [
       { code: 'ELECTRONIQUE', label: 'Électronique', icon: '💻' },
       { code: 'MEDICAL', label: 'Médical - Pharmaceutique', icon: '🏥' },
       { code: 'DEFENSE', label: 'Défense', icon: '🛡️' },
-      { code: 'AUTRE', label: 'Autre secteur', icon: '📋' }
+      { code: 'AUTRE', label: 'Autre secteur', icon: '📋' },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.ADMIN_ONLY,
-    description: 'Secteurs d\'activité des partners',
-    displayOrder: 3
+    description: "Secteurs d'activité des partners",
+    displayOrder: 3,
   },
 
   // Rôles des contacts
@@ -124,13 +129,13 @@ const PARTNER_PARAMETERS = [
       { code: 'HSE', label: 'HSE - Sécurité', icon: '🦺' },
       { code: 'JURIDIQUE', label: 'Juridique', icon: '⚖️' },
       { code: 'RH', label: 'Ressources Humaines', icon: '👥' },
-      { code: 'AUTRE', label: 'Autre', icon: '📋' }
+      { code: 'AUTRE', label: 'Autre', icon: '📋' },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.USER_EDITABLE,
     description: 'Rôles possibles pour les contacts',
-    displayOrder: 4
+    displayOrder: 4,
   },
 
   // Types de sites
@@ -147,13 +152,13 @@ const PARTNER_PARAMETERS = [
       { code: 'PLATEFORME', label: 'Plateforme logistique', icon: '🚛' },
       { code: 'POINT_LIVRAISON', label: 'Point de livraison', icon: '📍' },
       { code: 'ATELIER', label: 'Atelier', icon: '🔧' },
-      { code: 'LABORATOIRE', label: 'Laboratoire', icon: '🔬' }
+      { code: 'LABORATOIRE', label: 'Laboratoire', icon: '🔬' },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.USER_EDITABLE,
     description: 'Types de sites pour les partners',
-    displayOrder: 5
+    displayOrder: 5,
   },
 
   // Conditions de paiement
@@ -170,13 +175,13 @@ const PARTNER_PARAMETERS = [
       { code: '60JFDM', label: '60 jours fin de mois', days: 60, endOfMonth: true },
       { code: '90J', label: '90 jours', days: 90 },
       { code: 'ANTICIPE', label: 'Paiement anticipé', days: -1 },
-      { code: 'SPECIAL', label: 'Conditions spéciales', days: null }
+      { code: 'SPECIAL', label: 'Conditions spéciales', days: null },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.ADMIN_ONLY,
     description: 'Conditions de paiement disponibles',
-    displayOrder: 6
+    displayOrder: 6,
   },
 
   // Modes de paiement
@@ -191,13 +196,13 @@ const PARTNER_PARAMETERS = [
       { code: 'TRAITE', label: 'Traite', icon: '📜' },
       { code: 'LCR', label: 'LCR', icon: '📄' },
       { code: 'PRELEVEMENT', label: 'Prélèvement SEPA', icon: '🔄' },
-      { code: 'AFFACTURAGE', label: 'Affacturage', icon: '📊' }
+      { code: 'AFFACTURAGE', label: 'Affacturage', icon: '📊' },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.USER_EDITABLE,
     description: 'Modes de paiement acceptés',
-    displayOrder: 7
+    displayOrder: 7,
   },
 
   // Incoterms pour l'international
@@ -207,21 +212,37 @@ const PARTNER_PARAMETERS = [
     value: JSON.stringify([
       { code: 'EXW', label: 'EXW - Ex Works', description: 'Départ usine' },
       { code: 'FCA', label: 'FCA - Free Carrier', description: 'Franco transporteur' },
-      { code: 'CPT', label: 'CPT - Carriage Paid To', description: 'Port payé jusqu\'à' },
-      { code: 'CIP', label: 'CIP - Carriage and Insurance Paid To', description: 'Port payé, assurance comprise' },
-      { code: 'DAP', label: 'DAP - Delivered at Place', description: 'Rendu au lieu de destination' },
-      { code: 'DPU', label: 'DPU - Delivered at Place Unloaded', description: 'Rendu au lieu de destination déchargé' },
+      { code: 'CPT', label: 'CPT - Carriage Paid To', description: "Port payé jusqu'à" },
+      {
+        code: 'CIP',
+        label: 'CIP - Carriage and Insurance Paid To',
+        description: 'Port payé, assurance comprise',
+      },
+      {
+        code: 'DAP',
+        label: 'DAP - Delivered at Place',
+        description: 'Rendu au lieu de destination',
+      },
+      {
+        code: 'DPU',
+        label: 'DPU - Delivered at Place Unloaded',
+        description: 'Rendu au lieu de destination déchargé',
+      },
       { code: 'DDP', label: 'DDP - Delivered Duty Paid', description: 'Rendu droits acquittés' },
       { code: 'FAS', label: 'FAS - Free Alongside Ship', description: 'Franco le long du navire' },
       { code: 'FOB', label: 'FOB - Free on Board', description: 'Franco à bord' },
       { code: 'CFR', label: 'CFR - Cost and Freight', description: 'Coût et fret' },
-      { code: 'CIF', label: 'CIF - Cost, Insurance and Freight', description: 'Coût, assurance et fret' }
+      {
+        code: 'CIF',
+        label: 'CIF - Cost, Insurance and Freight',
+        description: 'Coût, assurance et fret',
+      },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.USER_EDITABLE,
     description: 'Incoterms 2020 pour le commerce international',
-    displayOrder: 8
+    displayOrder: 8,
   },
 
   // Types de véhicules pour la logistique
@@ -237,13 +258,13 @@ const PARTNER_PARAMETERS = [
       { code: 'GRUE', label: 'Camion-grue', maxTonnage: 32 },
       { code: 'PLATEAU', label: 'Plateau', maxTonnage: 44 },
       { code: 'BENNE', label: 'Benne', maxTonnage: 32 },
-      { code: 'CITERNE', label: 'Citerne', maxTonnage: 30 }
+      { code: 'CITERNE', label: 'Citerne', maxTonnage: 30 },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.USER_EDITABLE,
     description: 'Types de véhicules pour la livraison',
-    displayOrder: 9
+    displayOrder: 9,
   },
 
   // Zones de transport
@@ -257,21 +278,21 @@ const PARTNER_PARAMETERS = [
       { code: 'INTERNATIONAL_UE', label: 'International UE', tarifMultiplier: 2 },
       { code: 'INTERNATIONAL_HORS_UE', label: 'International Hors UE', tarifMultiplier: 3 },
       { code: 'EXPRESS', label: 'Express', tarifMultiplier: 2.5 },
-      { code: 'URGENT', label: 'Urgent', tarifMultiplier: 3.5 }
+      { code: 'URGENT', label: 'Urgent', tarifMultiplier: 3.5 },
     ]),
     type: ClientParameterType.JSON,
     scope: ClientParameterScope.CONFIGURATION,
     access: ClientParameterAccess.ADMIN_ONLY,
     description: 'Zones de transport et multiplicateurs tarifaires',
-    displayOrder: 10
-  }
+    displayOrder: 10,
+  },
 ]
 
 async function initPartnerParameters(dataSource: DataSource): Promise<void> {
   const repository = dataSource.getRepository(ParameterClient)
-  
+
   console.log('🚀 Initialisation des paramètres partners...')
-  
+
   for (const param of PARTNER_PARAMETERS) {
     try {
       // Vérifier si le paramètre existe déjà
@@ -279,15 +300,15 @@ async function initPartnerParameters(dataSource: DataSource): Promise<void> {
         where: {
           group: param.group,
           key: param.key,
-          tenantId: 'default' // À adapter selon votre système de tenant
-        }
+          tenantId: 'default', // À adapter selon votre système de tenant
+        },
       })
-      
+
       if (existing) {
         console.log(`⚠️  Paramètre existant: ${param.group}.${param.key}`)
         continue
       }
-      
+
       // Créer le nouveau paramètre
       const entity = repository.create({
         ...param,
@@ -296,25 +317,24 @@ async function initPartnerParameters(dataSource: DataSource): Promise<void> {
         metadata: {
           createdBy: 'system',
           createdAt: new Date().toISOString(),
-          source: 'init-script'
-        }
+          source: 'init-script',
+        },
       })
-      
+
       await repository.save(entity)
       console.log(`✅ Paramètre créé: ${param.group}.${param.key}`)
-      
     } catch (error) {
       console.error(`❌ Erreur création paramètre ${param.group}.${param.key}:`, error)
     }
   }
-  
+
   console.log('✨ Initialisation des paramètres partners terminée!')
 }
 
 // Si exécuté directement
 if (require.main === module) {
   const { AppDataSource } = require('../core/database/data-source')
-  
+
   AppDataSource.initialize()
     .then(async () => {
       await initPartnerParameters(AppDataSource)

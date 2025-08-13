@@ -1,5 +1,5 @@
-import { HttpClient } from '../core/http-client'
 import type { PriceRuleChannel } from '@erp/entities'
+import type { HttpClient } from '../core/http-client'
 
 export interface PriceCalculationRequest {
   articleId?: string
@@ -82,10 +82,7 @@ export class PricingApi {
    * Calcule les prix pour plusieurs articles en une seule requête
    */
   async calculateBulkPrices(request: BulkPriceRequest): Promise<BulkPriceResult> {
-    const response = await this.httpClient.post<BulkPriceResult>(
-      '/pricing/calculate-bulk',
-      request
-    )
+    const response = await this.httpClient.post<BulkPriceResult>('/pricing/calculate-bulk', request)
     return response.data
   }
 
@@ -101,14 +98,11 @@ export class PricingApi {
       channel?: PriceRuleChannel
     }
   ): Promise<PriceCalculationResult> {
-    const response = await this.httpClient.post<PriceCalculationResult>(
-      '/pricing/preview-rule',
-      {
-        ruleId,
-        articleId,
-        ...options
-      }
-    )
+    const response = await this.httpClient.post<PriceCalculationResult>('/pricing/preview-rule', {
+      ruleId,
+      articleId,
+      ...options,
+    })
     return response.data
   }
 
@@ -124,10 +118,9 @@ export class PricingApi {
     limit?: number
     offset?: number
   }): Promise<{ rules: any[]; total: number }> {
-    const response = await this.httpClient.get<{ rules: any[]; total: number }>(
-      '/pricing/rules',
-      { params: filters }
-    )
+    const response = await this.httpClient.get<{ rules: any[]; total: number }>('/pricing/rules', {
+      params: filters,
+    })
     return response.data
   }
 

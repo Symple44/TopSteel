@@ -6,7 +6,7 @@ import { DataSource } from 'typeorm'
 
 async function analyzeMenuStructure() {
   console.log('🔍 Analyse de la structure des menus...\n')
-  
+
   const authDataSource = new DataSource({
     type: 'postgres',
     host: 'localhost',
@@ -16,15 +16,15 @@ async function analyzeMenuStructure() {
     database: 'erp_topsteel_auth',
     synchronize: false,
   })
-  
+
   try {
     await authDataSource.initialize()
     console.log('✅ Connecté à la base auth\n')
-    
+
     // 1. Récupérer tous les menus actifs
     console.log('📋 STRUCTURE DES MENUS PRINCIPAUX:')
-    console.log('=' .repeat(50))
-    
+    console.log('='.repeat(50))
+
     const menus = await authDataSource.query(`
       SELECT 
         id,
@@ -41,16 +41,17 @@ async function analyzeMenuStructure() {
       WHERE "parentId" IS NULL
       ORDER BY "order"
     `)
-    
+
     for (const menu of menus) {
       console.log(`\n📁 ${menu.title}`)
       console.log(`   ID: ${menu.programId}`)
       console.log(`   Route: ${menu.route || 'N/A'}`)
       console.log(`   Type: ${menu.type}`)
       console.log(`   Icon: ${menu.icon || 'N/A'}`)
-      
+
       // Récupérer les sous-menus
-      const subMenus = await authDataSource.query(`
+      const subMenus = await authDataSource.query(
+        `
         SELECT 
           title,
           "programId",
@@ -59,8 +60,10 @@ async function analyzeMenuStructure() {
         FROM menu_items
         WHERE "parentId" = $1
         ORDER BY "order"
-      `, [menu.id])
-      
+      `,
+        [menu.id]
+      )
+
       if (subMenus.length > 0) {
         console.log('   Sous-menus:')
         for (const sub of subMenus) {
@@ -69,11 +72,11 @@ async function analyzeMenuStructure() {
         }
       }
     }
-    
+
     // 2. Analyser les routes spécifiques pour les entités business
     console.log('\n\n📊 ROUTES BUSINESS DISPONIBLES:')
-    console.log('=' .repeat(50))
-    
+    console.log('='.repeat(50))
+
     const businessRoutes = await authDataSource.query(`
       SELECT DISTINCT
         "programId",
@@ -96,7 +99,7 @@ async function analyzeMenuStructure() {
         )
       ORDER BY route
     `)
-    
+
     if (businessRoutes.length > 0) {
       for (const route of businessRoutes) {
         console.log(`\n${route.title}:`)
@@ -106,11 +109,11 @@ async function analyzeMenuStructure() {
     } else {
       console.log('\n⚠️ Aucune route business trouvée dans les menus')
     }
-    
+
     // 3. Analyser toutes les routes disponibles
     console.log('\n\n📍 TOUTES LES ROUTES DISPONIBLES:')
-    console.log('=' .repeat(50))
-    
+    console.log('='.repeat(50))
+
     const allRoutes = await authDataSource.query(`
       SELECT 
         title,
@@ -122,28 +125,28 @@ async function analyzeMenuStructure() {
         AND route != ''
       ORDER BY route
     `)
-    
+
     const routesByCategory = new Map<string, any[]>()
-    
+
     for (const item of allRoutes) {
       const category = item.route.split('/')[1] || 'root'
       if (!routesByCategory.has(category)) {
         routesByCategory.set(category, [])
       }
-      routesByCategory.get(category)!.push(item)
+      routesByCategory.get(category)?.push(item)
     }
-    
+
     for (const [category, items] of routesByCategory) {
       console.log(`\n/${category}/*:`)
       for (const item of items) {
         console.log(`  - ${item.route} => ${item.title} (${item.programId})`)
       }
     }
-    
+
     // 4. Suggestion de mapping pour les entités de recherche
     console.log('\n\n💡 SUGGESTIONS DE MAPPING POUR LA RECHERCHE:')
-    console.log('=' .repeat(50))
-    
+    console.log('='.repeat(50))
+
     const suggestions = [
       { entity: 'article', suggested: 'À créer dans /inventory ou /stock' },
       { entity: 'client', suggested: '/partners (avec filtre type=CLIENT)' },
@@ -154,20 +157,19 @@ async function analyzeMenuStructure() {
       { entity: 'facture', suggested: 'À créer dans /invoices ou /billing' },
       { entity: 'commande', suggested: 'À créer dans /orders ou /sales' },
     ]
-    
+
     for (const suggestion of suggestions) {
       console.log(`\n${suggestion.entity}:`)
       console.log(`  Suggestion: ${suggestion.suggested}`)
     }
-    
+
     await authDataSource.destroy()
     console.log('\n\n✅ Analyse terminée')
-    
   } catch (error) {
     console.error('❌ Erreur:', error)
     await authDataSource.destroy()
   }
-  
+
   process.exit(0)
 }
 

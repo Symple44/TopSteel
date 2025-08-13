@@ -1,6 +1,6 @@
 // apps/api/src/modules/auth/guards/jwt.guard.ts
 import { type ExecutionContext, Injectable } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
+import type { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 
 @Injectable()

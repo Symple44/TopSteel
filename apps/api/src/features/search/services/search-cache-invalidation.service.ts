@@ -1,6 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
-import { SearchCacheService } from './search-cache.service'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
+import { type EventEmitter2, OnEvent } from '@nestjs/event-emitter'
+import type { SearchCacheService } from './search-cache.service'
 
 // Events that trigger cache invalidation
 export interface CacheInvalidationEvent {
@@ -27,12 +27,12 @@ export interface BulkCacheInvalidationEvent {
 @Injectable()
 export class SearchCacheInvalidationService implements OnModuleInit {
   private readonly logger = new Logger(SearchCacheInvalidationService.name)
-  
+
   // Track invalidation statistics
   private stats = {
     totalInvalidations: 0,
     invalidationsByEntity: new Map<string, number>(),
-    lastInvalidation: null as Date | null
+    lastInvalidation: null as Date | null,
   }
 
   constructor(
@@ -51,18 +51,17 @@ export class SearchCacheInvalidationService implements OnModuleInit {
     try {
       await this.cacheService.invalidateEntityCache(tenantId, entityType)
       this.updateStats(entityType)
-      
+
       this.logger.debug(`Cache invalidated for ${entityType}:${entityId} in tenant ${tenantId}`)
-      
+
       // Emit event for potential listeners
       this.eventEmitter.emit('cache.invalidated', {
         tenantId,
         entityType,
         entityId,
         operation: 'delete' as const, // Use 'delete' instead of 'manual'
-        timestamp: new Date()
+        timestamp: new Date(),
       } as CacheInvalidationEvent)
-      
     } catch (error) {
       this.logger.error(`Failed to invalidate cache for ${entityType}:${entityId}`, error.stack)
     }
@@ -75,14 +74,13 @@ export class SearchCacheInvalidationService implements OnModuleInit {
     try {
       await this.cacheService.invalidateTenantCache(tenantId)
       this.updateStats('tenant')
-      
+
       this.logger.debug(`All cache invalidated for tenant ${tenantId}`)
-      
+
       this.eventEmitter.emit('cache.tenant.invalidated', {
         tenantId,
-        timestamp: new Date()
+        timestamp: new Date(),
       })
-      
     } catch (error) {
       this.logger.error(`Failed to invalidate tenant cache for ${tenantId}`, error.stack)
     }
@@ -180,7 +178,9 @@ export class SearchCacheInvalidationService implements OnModuleInit {
   async handleBulkChange(event: BulkCacheInvalidationEvent): Promise<void> {
     // For bulk operations, invalidate the entire entity type cache
     await this.invalidateEntity(event.tenantId, event.entityType, 'bulk')
-    this.logger.debug(`Bulk cache invalidation for ${event.entityType} in tenant ${event.tenantId} (${event.count} items)`)
+    this.logger.debug(
+      `Bulk cache invalidation for ${event.entityType} in tenant ${event.tenantId} (${event.count} items)`
+    )
   }
 
   /**
@@ -214,13 +214,14 @@ export class SearchCacheInvalidationService implements OnModuleInit {
       // This could implement logic to clean up expired cache entries
       // or perform cache warming for popular searches
       this.logger.debug('Performing scheduled cache cleanup')
-      
+
       // Get current cache statistics
       const stats = await this.cacheService.getCacheStatistics()
-      
+
       // Log cache health
-      this.logger.debug(`Cache stats - Hits: ${stats.hits}, Misses: ${stats.misses}, Hit Rate: ${stats.hitRate.toFixed(2)}%`)
-      
+      this.logger.debug(
+        `Cache stats - Hits: ${stats.hits}, Misses: ${stats.misses}, Hit Rate: ${stats.hitRate.toFixed(2)}%`
+      )
     } catch (error) {
       this.logger.error('Failed to perform scheduled cache cleanup', error.stack)
     }
@@ -232,7 +233,7 @@ export class SearchCacheInvalidationService implements OnModuleInit {
   getInvalidationStats() {
     return {
       ...this.stats,
-      invalidationsByEntity: Object.fromEntries(this.stats.invalidationsByEntity)
+      invalidationsByEntity: Object.fromEntries(this.stats.invalidationsByEntity),
     }
   }
 
@@ -250,7 +251,7 @@ export class SearchCacheInvalidationService implements OnModuleInit {
   private updateStats(entityType: string): void {
     this.stats.totalInvalidations++
     this.stats.lastInvalidation = new Date()
-    
+
     const currentCount = this.stats.invalidationsByEntity.get(entityType) || 0
     this.stats.invalidationsByEntity.set(entityType, currentCount + 1)
   }
@@ -274,7 +275,7 @@ export function emitCacheInvalidationEvent(
     entityId,
     operation,
     timestamp: new Date(),
-    metadata
+    metadata,
   }
 
   eventEmitter.emit(`${entityType}.${operation}`, event)
@@ -285,26 +286,24 @@ export function emitCacheInvalidationEvent(
  * Usage: @InvalidateCache('product', 'update')
  */
 export function InvalidateCache(entityType: string, operation: 'create' | 'update' | 'delete') {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+  return (_target: any, _propertyName: string, descriptor: PropertyDescriptor) => {
     const method = descriptor.value
 
     descriptor.value = async function (...args: any[]) {
       const result = await method.apply(this, args)
-      
+
       // Try to extract tenant and entity information from result or arguments
       // This is a simplified implementation - you might need to customize based on your data structure
       try {
-        const tenantId = this.extractTenantId?.(args, result) || args[0]?.tenantId || result?.tenantId
+        const tenantId =
+          this.extractTenantId?.(args, result) || args[0]?.tenantId || result?.tenantId
         const entityId = this.extractEntityId?.(args, result) || args[0]?.id || result?.id
-        
+
         if (tenantId && entityId && this.eventEmitter) {
           emitCacheInvalidationEvent(this.eventEmitter, tenantId, entityType, entityId, operation)
         }
-      } catch (error) {
-        // Silently fail cache invalidation to not affect business logic
-        console.warn(`Failed to emit cache invalidation event: ${error.message}`)
-      }
-      
+      } catch (_error) {}
+
       return result
     }
 

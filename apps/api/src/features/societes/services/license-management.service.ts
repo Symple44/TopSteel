@@ -1,18 +1,12 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { InjectRepository } from '@nestjs/typeorm'
-import { LessThan, Repository } from 'typeorm'
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { SocieteLicense, LicenseStatus, LicenseType } from '../entities/societe-license.entity'
-import { Societe } from '../entities/societe.entity'
-import { User } from '../../../domains/users/entities/user.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { LessThan, type Repository } from 'typeorm'
 import { UserSession } from '../../../domains/auth/core/entities/user-session.entity'
+import { User } from '../../../domains/users/entities/user.entity'
+import { Societe } from '../entities/societe.entity'
+import { LicenseStatus, LicenseType, SocieteLicense } from '../entities/societe-license.entity'
 
 export interface LicenseCheckResult {
   isValid: boolean
@@ -49,7 +43,7 @@ export class LicenseManagementService {
     private userRepository: Repository<User>,
     @InjectRepository(UserSession, 'auth')
     private sessionRepository: Repository<UserSession>,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
   /**
@@ -68,18 +62,18 @@ export class LicenseManagementService {
     // Si aucune licence n'existe, appliquer le comportement par défaut
     if (!license) {
       const defaultBehavior = this.getDefaultLicenseBehavior()
-      
+
       if (defaultBehavior.allowWithoutLicense) {
         // Mode permissif : autoriser avec limites par défaut
         this.logger.warn(
           `Aucune licence trouvée pour la société ${societeId}. Application des limites par défaut.`
         )
-        
+
         // Créer automatiquement une licence d'essai si configuré
         if (defaultBehavior.autoCreateTrial) {
           await this.createDefaultTrialLicense(societeId)
         }
-        
+
         return {
           isValid: true,
           reason: 'Fonctionnement en mode par défaut (sans licence)',
@@ -107,7 +101,7 @@ export class LicenseManagementService {
     // Vérifier les sessions concurrentes si nécessaire
     if (!allowConcurrent || !license.allowConcurrentSessions) {
       const activeSessions = await this.getActiveSessionCount(societeId, userId)
-      
+
       if (activeSessions > 0) {
         return {
           isValid: false,
@@ -120,7 +114,7 @@ export class LicenseManagementService {
     // Vérifier la limite de sessions concurrentes globale
     if (license.maxConcurrentSessions) {
       const totalActiveSessions = await this.getTotalActiveSessionCount(societeId)
-      
+
       if (totalActiveSessions >= license.maxConcurrentSessions) {
         return {
           isValid: false,
@@ -135,7 +129,7 @@ export class LicenseManagementService {
     if (activeUsers >= license.maxUsers) {
       // Vérifier si l'utilisateur fait déjà partie des utilisateurs actifs
       const isExistingUser = await this.isUserActive(societeId, userId)
-      
+
       if (!isExistingUser) {
         return {
           isValid: false,
@@ -163,7 +157,7 @@ export class LicenseManagementService {
    */
   async createLicense(societeId: string, data: Partial<SocieteLicense>): Promise<SocieteLicense> {
     const societe = await this.societeRepository.findOne({ where: { id: societeId } })
-    
+
     if (!societe) {
       throw new NotFoundException('Société non trouvée')
     }
@@ -197,7 +191,7 @@ export class LicenseManagementService {
     updates: Partial<SocieteLicense>
   ): Promise<SocieteLicense> {
     const license = await this.licenseRepository.findOne({ where: { id: licenseId } })
-    
+
     if (!license) {
       throw new NotFoundException('Licence non trouvée')
     }
@@ -226,14 +220,14 @@ export class LicenseManagementService {
    */
   async suspendLicense(licenseId: string, reason?: string): Promise<void> {
     const license = await this.licenseRepository.findOne({ where: { id: licenseId } })
-    
+
     if (!license) {
       throw new NotFoundException('Licence non trouvée')
     }
 
     license.status = LicenseStatus.SUSPENDED
     license.violationCount++
-    
+
     if (reason) {
       license.violationHistory = license.violationHistory || []
       license.violationHistory.push({
@@ -300,10 +294,10 @@ export class LicenseManagementService {
     for (const license of expiredLicenses) {
       license.status = LicenseStatus.EXPIRED
       await this.licenseRepository.save(license)
-      
+
       // Déconnecter tous les utilisateurs
       await this.disconnectAllUsers(license.societeId)
-      
+
       this.logger.warn(`Licence expirée pour la société ${license.societeId}`)
     }
 
@@ -322,7 +316,7 @@ export class LicenseManagementService {
       .where('license.status = :status', { status: LicenseStatus.ACTIVE })
       .andWhere('license.expiresAt IS NOT NULL')
       .andWhere('license.expiresAt > NOW()')
-      .andWhere('license.expiresAt < NOW() + INTERVAL \'30 days\'')
+      .andWhere("license.expiresAt < NOW() + INTERVAL '30 days'")
       .getMany()
 
     for (const license of licensesToNotify) {
@@ -331,7 +325,7 @@ export class LicenseManagementService {
         this.logger.log(
           `Notification de renouvellement pour société ${license.societeId} - ${license.getDaysUntilExpiration()} jours restants`
         )
-        
+
         license.lastNotificationAt = new Date()
         await this.licenseRepository.save(license)
       }
@@ -520,11 +514,11 @@ export class LicenseManagementService {
         },
         validFrom: new Date(),
         expiresAt,
-        notes: 'Licence d\'essai créée automatiquement',
+        notes: "Licence d'essai créée automatiquement",
       })
 
       await this.licenseRepository.save(trialLicense)
-      
+
       this.logger.log(
         `Licence d'essai créée automatiquement pour la société ${societeId} (expire le ${expiresAt.toISOString()})`
       )

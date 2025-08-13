@@ -1,20 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { OnEvent } from '@nestjs/event-emitter'
-import { SearchIndexingOperationsService } from './search-indexing-operations.service'
 import { getEntityByType } from '../config/searchable-entities.config'
-import { 
-  PartnerRecord, 
-  ArticleRecord, 
-  MaterialRecord, 
-  ProjetRecord, 
-  DevisRecord, 
-  FactureRecord, 
-  MenuRecord, 
-  UserRecord,
+import type {
+  ArticleRecord,
+  DevisRecord,
+  FactureRecord,
   IndexingDocument,
-  SearchDocument
+  MaterialRecord,
+  MenuRecord,
+  PartnerRecord,
+  ProjetRecord,
+  UserRecord,
 } from '../types/search-types'
 import { convertToSearchDocument } from '../utils/search-document-converter'
+import type { SearchIndexingOperationsService } from './search-indexing-operations.service'
 
 /**
  * Service d'indexation automatique pour la recherche
@@ -27,7 +26,7 @@ export class SearchIndexingService {
   constructor(private readonly indexingOperations: SearchIndexingOperationsService) {}
 
   // ========== PARTNERS (Clients/Fournisseurs) ==========
-  
+
   @OnEvent('partner.created')
   async onPartnerCreated(payload: { id: string; data: PartnerRecord }) {
     try {

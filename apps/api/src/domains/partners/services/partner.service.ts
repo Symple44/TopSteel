@@ -5,21 +5,21 @@ import {
   BusinessOperation,
   type ValidationResult,
 } from '../../core/interfaces/business-service.interface'
-import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
-import { PartnerGroup } from '../entities/partner-group.entity'
-import { Contact } from '../entities/contact.entity'
-import { PartnerSite } from '../entities/partner-site.entity'
-import { PartnerAddress } from '../entities/partner-address.entity'
 import type {
   CreateContactDto,
-  UpdateContactDto,
-  CreatePartnerSiteDto,
-  UpdatePartnerSiteDto,
   CreatePartnerAddressDto,
-  UpdatePartnerAddressDto,
   CreatePartnerGroupDto,
+  CreatePartnerSiteDto,
+  UpdateContactDto,
+  UpdatePartnerAddressDto,
   UpdatePartnerGroupDto,
+  UpdatePartnerSiteDto,
 } from '../dto'
+import type { Contact } from '../entities/contact.entity'
+import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
+import type { PartnerAddress } from '../entities/partner-address.entity'
+import type { PartnerGroup } from '../entities/partner-group.entity'
+import type { PartnerSite } from '../entities/partner-site.entity'
 import type { IPartnerRepository } from '../repositories/partner.repository'
 
 /**
@@ -132,7 +132,7 @@ export class PartnerService extends BusinessService<Partner> {
     partner.plafondCredit = data.plafondCredit
     partner.tauxRemise = data.tauxRemise
     partner.representantCommercial = data.representantCommercial
-    
+
     // Groupe tarifaire
     if (data.groupId) {
       partner.groupId = data.groupId
@@ -184,8 +184,11 @@ export class PartnerService extends BusinessService<Partner> {
   /**
    * Gestion des groupes de partenaires
    */
-  async createPartnerGroup(data: CreatePartnerGroupDto, context?: BusinessContext): Promise<PartnerGroup> {
-    this.logger.log('Création d\'un groupe de partenaires', data)
+  async createPartnerGroup(
+    data: CreatePartnerGroupDto,
+    context?: BusinessContext
+  ): Promise<PartnerGroup> {
+    this.logger.log("Création d'un groupe de partenaires", data)
     const group = await this.groupRepository.create({
       ...data,
       societeId: context?.societeId,
@@ -196,7 +199,7 @@ export class PartnerService extends BusinessService<Partner> {
   async updatePartnerGroup(
     groupId: string,
     data: UpdatePartnerGroupDto,
-    context?: BusinessContext
+    _context?: BusinessContext
   ): Promise<PartnerGroup> {
     const group = await this.groupRepository.findById(groupId)
     if (!group) {
@@ -219,12 +222,12 @@ export class PartnerService extends BusinessService<Partner> {
     if (!partner) {
       throw new NotFoundException(`Partenaire ${partnerId} introuvable`)
     }
-    
+
     const group = await this.groupRepository.findById(groupId)
     if (!group) {
       throw new NotFoundException(`Groupe ${groupId} introuvable`)
     }
-    
+
     partner.groupId = groupId
     partner.group = group
     return await this.repository.save(partner)
@@ -242,7 +245,7 @@ export class PartnerService extends BusinessService<Partner> {
     if (!partner) {
       throw new NotFoundException(`Partenaire ${partnerId} introuvable`)
     }
-    
+
     const contactData = {
       ...data,
       partnerId,
@@ -250,7 +253,7 @@ export class PartnerService extends BusinessService<Partner> {
       // Convertir les dates string en Date
       dateNaissance: data.dateNaissance ? new Date(data.dateNaissance) : undefined,
     }
-    
+
     const contact = await this.contactRepository.create(contactData)
     return contact
   }
@@ -258,7 +261,7 @@ export class PartnerService extends BusinessService<Partner> {
   async updateContact(
     contactId: string,
     data: UpdateContactDto,
-    context?: BusinessContext
+    _context?: BusinessContext
   ): Promise<Contact> {
     const contact = await this.contactRepository.findById(contactId)
     if (!contact) {
@@ -268,17 +271,11 @@ export class PartnerService extends BusinessService<Partner> {
     return await this.contactRepository.save(contact)
   }
 
-  async getPartnerContacts(
-    partnerId: string,
-    context?: BusinessContext
-  ): Promise<Contact[]> {
+  async getPartnerContacts(partnerId: string, _context?: BusinessContext): Promise<Contact[]> {
     return await this.contactRepository.findByPartner(partnerId)
   }
 
-  async deleteContact(
-    contactId: string,
-    context?: BusinessContext
-  ): Promise<void> {
+  async deleteContact(contactId: string, _context?: BusinessContext): Promise<void> {
     const contact = await this.contactRepository.findById(contactId)
     if (!contact) {
       throw new NotFoundException(`Contact ${contactId} introuvable`)
@@ -298,7 +295,7 @@ export class PartnerService extends BusinessService<Partner> {
     if (!partner) {
       throw new NotFoundException(`Partenaire ${partnerId} introuvable`)
     }
-    
+
     const siteData = {
       ...data,
       partnerId,
@@ -307,7 +304,7 @@ export class PartnerService extends BusinessService<Partner> {
       dateOuverture: data.dateOuverture ? new Date(data.dateOuverture) : undefined,
       dateFermeture: data.dateFermeture ? new Date(data.dateFermeture) : undefined,
     }
-    
+
     const site = await this.siteRepository.create(siteData)
     return site
   }
@@ -315,7 +312,7 @@ export class PartnerService extends BusinessService<Partner> {
   async updatePartnerSite(
     siteId: string,
     data: UpdatePartnerSiteDto,
-    context?: BusinessContext
+    _context?: BusinessContext
   ): Promise<PartnerSite> {
     const site = await this.siteRepository.findById(siteId)
     if (!site) {
@@ -325,17 +322,11 @@ export class PartnerService extends BusinessService<Partner> {
     return await this.siteRepository.save(site)
   }
 
-  async getPartnerSites(
-    partnerId: string,
-    context?: BusinessContext
-  ): Promise<PartnerSite[]> {
+  async getPartnerSites(partnerId: string, _context?: BusinessContext): Promise<PartnerSite[]> {
     return await this.siteRepository.findByPartner(partnerId)
   }
 
-  async deletePartnerSite(
-    siteId: string,
-    context?: BusinessContext
-  ): Promise<void> {
+  async deletePartnerSite(siteId: string, _context?: BusinessContext): Promise<void> {
     const site = await this.siteRepository.findById(siteId)
     if (!site) {
       throw new NotFoundException(`Site ${siteId} introuvable`)
@@ -355,7 +346,7 @@ export class PartnerService extends BusinessService<Partner> {
     if (!partner) {
       throw new NotFoundException(`Partenaire ${partnerId} introuvable`)
     }
-    
+
     const addressData = {
       ...data,
       partnerId,
@@ -364,7 +355,7 @@ export class PartnerService extends BusinessService<Partner> {
       dateDebut: data.dateDebut ? new Date(data.dateDebut) : undefined,
       dateFin: data.dateFin ? new Date(data.dateFin) : undefined,
     }
-    
+
     const address = await this.addressRepository.create(addressData)
     return address
   }
@@ -372,7 +363,7 @@ export class PartnerService extends BusinessService<Partner> {
   async updatePartnerAddress(
     addressId: string,
     data: UpdatePartnerAddressDto,
-    context?: BusinessContext
+    _context?: BusinessContext
   ): Promise<PartnerAddress> {
     const address = await this.addressRepository.findById(addressId)
     if (!address) {
@@ -384,15 +375,12 @@ export class PartnerService extends BusinessService<Partner> {
 
   async getPartnerAddresses(
     partnerId: string,
-    context?: BusinessContext
+    _context?: BusinessContext
   ): Promise<PartnerAddress[]> {
     return await this.addressRepository.findByPartner(partnerId)
   }
 
-  async deletePartnerAddress(
-    addressId: string,
-    context?: BusinessContext
-  ): Promise<void> {
+  async deletePartnerAddress(addressId: string, _context?: BusinessContext): Promise<void> {
     const address = await this.addressRepository.findById(addressId)
     if (!address) {
       throw new NotFoundException(`Adresse ${addressId} introuvable`)
@@ -647,17 +635,17 @@ export class PartnerService extends BusinessService<Partner> {
   private async calculerRepartitionGroupe(partners: Partner[]): Promise<Record<string, number>> {
     const repartition = {}
     const groups = await this.groupRepository.findBySociete(partners[0]?.societeId || '')
-    
+
     groups.forEach((group) => {
       repartition[group.name] = partners.filter((p) => p.groupId === group.id).length
     })
-    
+
     // Ajouter les partenaires sans groupe
     const sansGroupe = partners.filter((p) => !p.groupId).length
     if (sansGroupe > 0) {
       repartition['Sans groupe'] = sansGroupe
     }
-    
+
     return repartition
   }
 

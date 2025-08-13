@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
 import type { UserMenuPreference } from '../entities/user-menu-preference.entity'
-import { UserMenuPreferenceService } from '../services/user-menu-preference.service'
+import type { UserMenuPreferenceService } from '../services/user-menu-preference.service'
 
 @ApiTags('User Menu Preferences')
 @Controller('user/menu-preferences')

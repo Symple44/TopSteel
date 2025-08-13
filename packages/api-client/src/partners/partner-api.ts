@@ -112,7 +112,9 @@ export class PartnerApi {
   }
 
   async duplicatePartner(id: string, newCode: string): Promise<Partner> {
-    const response = await this.http.post<Partner>(`/business/partners/${id}/duplicate`, { newCode })
+    const response = await this.http.post<Partner>(`/business/partners/${id}/duplicate`, {
+      newCode,
+    })
     return response.data
   }
 
@@ -146,10 +148,7 @@ export class PartnerApi {
   }
 
   async createContact(partnerId: string, data: CreateContactDto): Promise<Contact> {
-    const response = await this.http.post<Contact>(
-      `/business/partners/${partnerId}/contacts`,
-      data
-    )
+    const response = await this.http.post<Contact>(`/business/partners/${partnerId}/contacts`, data)
     return response.data
   }
 
@@ -180,10 +179,7 @@ export class PartnerApi {
   }
 
   async updatePartnerSite(siteId: string, data: UpdatePartnerSiteDto): Promise<PartnerSite> {
-    const response = await this.http.patch<PartnerSite>(
-      `/business/partners/sites/${siteId}`,
-      data
-    )
+    const response = await this.http.patch<PartnerSite>(`/business/partners/sites/${siteId}`, data)
     return response.data
   }
 
@@ -234,10 +230,9 @@ export class PartnerApi {
   }
 
   async suspendPartner(partnerId: string, raison: string): Promise<Partner> {
-    const response = await this.http.post<Partner>(
-      `/business/partners/${partnerId}/suspendre`,
-      { raison }
-    )
+    const response = await this.http.post<Partner>(`/business/partners/${partnerId}/suspendre`, {
+      raison,
+    })
     return response.data
   }
 
@@ -266,7 +261,10 @@ export class PartnerApi {
   }
 
   // Export/Import
-  async exportPartners(format: 'CSV' | 'EXCEL' | 'PDF', filters?: Record<string, any>): Promise<{
+  async exportPartners(
+    format: 'CSV' | 'EXCEL' | 'PDF',
+    filters?: Record<string, any>
+  ): Promise<{
     url: string
     filename: string
   }> {

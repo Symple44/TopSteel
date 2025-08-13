@@ -26,13 +26,13 @@ import {
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { RequireSocieteContext } from '../../../domains/auth/security/guards/enhanced-tenant.guard'
-import { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
-import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import type { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
+import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import { CreateUserDto } from '../../../domains/users/dto/create-user.dto'
 import { UpdateUserDto } from '../../../domains/users/dto/update-user.dto'
 import type { UserQueryDto } from '../../../domains/users/dto/user-query.dto'
-import { UsersService } from '../../../domains/users/users.service'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { UsersService } from '../../../domains/users/users.service'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
 @Controller('admin/users')
 @ApiTags('🔧 Admin - Users')

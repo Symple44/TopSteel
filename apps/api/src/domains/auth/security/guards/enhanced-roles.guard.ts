@@ -6,7 +6,7 @@ import {
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
+import type { Reflector } from '@nestjs/core'
 import {
   GlobalUserRole,
   isGlobalRoleHigherOrEqual,
@@ -14,7 +14,7 @@ import {
   SocieteRoleType,
   SYSTEM_ADMIN_ROLES,
 } from '../../core/constants/roles.constants'
-import { UnifiedRolesService } from '../../services/unified-roles.service'
+import type { UnifiedRolesService } from '../../services/unified-roles.service'
 
 export interface RoleRequirement {
   // Rôles globaux requis
@@ -61,7 +61,7 @@ export class EnhancedRolesGuard implements CanActivate {
     try {
       // Get user roles array (new system) or single role (legacy)
       const userRoles = user.roles || (user.role ? [user.role] : [])
-      
+
       // Vérification SUPER_ADMIN bypass
       if (
         roleRequirement.allowSuperAdminBypass !== false &&
@@ -77,7 +77,8 @@ export class EnhancedRolesGuard implements CanActivate {
       if (roleRequirement.globalRoles && roleRequirement.globalRoles.length > 0) {
         const hasGlobalRole = roleRequirement.globalRoles.some((requiredRole) =>
           userRoles.some((userRole: any) => {
-            const roleValue = typeof userRole === 'object' ? userRole.name || userRole.role : userRole
+            const roleValue =
+              typeof userRole === 'object' ? userRole.name || userRole.role : userRole
             return isGlobalRoleHigherOrEqual(roleValue, requiredRole)
           })
         )

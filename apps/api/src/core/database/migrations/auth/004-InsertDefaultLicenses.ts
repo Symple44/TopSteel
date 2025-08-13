@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class InsertDefaultLicenses1736367000000 implements MigrationInterface {
   name = 'InsertDefaultLicenses1736367000000'
@@ -18,7 +18,8 @@ export class InsertDefaultLicenses1736367000000 implements MigrationInterface {
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + 30) // 30 jours d'essai
 
-      await queryRunner.query(`
+      await queryRunner.query(
+        `
         INSERT INTO societe_licenses (
           id,
           "societeId",
@@ -56,19 +57,17 @@ export class InsertDefaultLicenses1736367000000 implements MigrationInterface {
           NOW(),
           NOW()
         )
-      `, [
-        societe.id,
-        expiresAt.toISOString(),
-        `Licence d'essai créée automatiquement pour ${societe.nom} (migration)`
-      ])
-
-      console.log(`✅ Licence d'essai créée pour: ${societe.nom} (${societe.code})`)
+      `,
+        [
+          societe.id,
+          expiresAt.toISOString(),
+          `Licence d'essai créée automatiquement pour ${societe.nom} (migration)`,
+        ]
+      )
     }
 
     if (societesWithoutLicense.length === 0) {
-      console.log('ℹ️ Aucune société sans licence trouvée')
     } else {
-      console.log(`✅ ${societesWithoutLicense.length} licence(s) d'essai créée(s)`)
     }
 
     // Créer une procédure stockée pour auto-créer des licences d'essai pour les nouvelles sociétés
@@ -152,8 +151,6 @@ export class InsertDefaultLicenses1736367000000 implements MigrationInterface {
       FOR EACH ROW
       EXECUTE FUNCTION create_trial_license_for_new_societe();
     `)
-
-    console.log('✅ Trigger de création automatique de licence installé')
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

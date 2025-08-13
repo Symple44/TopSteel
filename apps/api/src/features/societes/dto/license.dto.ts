@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
 import {
   IsBoolean,
   IsDate,
@@ -12,15 +13,14 @@ import {
   Max,
   Min,
 } from 'class-validator'
-import { Type } from 'class-transformer'
-import { LicenseType, LicenseStatus } from '../entities/societe-license.entity'
+import { LicenseStatus, LicenseType } from '../entities/societe-license.entity'
 
 export class CreateLicenseDto {
   @ApiProperty({ enum: LicenseType, default: LicenseType.BASIC })
   @IsEnum(LicenseType)
   type: LicenseType
 
-  @ApiProperty({ description: 'Nombre maximum d\'utilisateurs', minimum: 1, maximum: 10000 })
+  @ApiProperty({ description: "Nombre maximum d'utilisateurs", minimum: 1, maximum: 10000 })
   @IsInt()
   @Min(1)
   @Max(10000)
@@ -79,7 +79,7 @@ export class CreateLicenseDto {
   @IsOptional()
   validFrom?: Date
 
-  @ApiPropertyOptional({ description: 'Date d\'expiration' })
+  @ApiPropertyOptional({ description: "Date d'expiration" })
   @IsDate()
   @Type(() => Date)
   @IsOptional()
@@ -119,7 +119,7 @@ export class UpdateLicenseDto {
   @IsOptional()
   status?: LicenseStatus
 
-  @ApiPropertyOptional({ description: 'Nombre maximum d\'utilisateurs', minimum: 1, maximum: 10000 })
+  @ApiPropertyOptional({ description: "Nombre maximum d'utilisateurs", minimum: 1, maximum: 10000 })
   @IsInt()
   @Min(1)
   @Max(10000)
@@ -179,7 +179,7 @@ export class UpdateLicenseDto {
   @IsOptional()
   validFrom?: Date
 
-  @ApiPropertyOptional({ description: 'Date d\'expiration' })
+  @ApiPropertyOptional({ description: "Date d'expiration" })
   @IsDate()
   @Type(() => Date)
   @IsOptional()

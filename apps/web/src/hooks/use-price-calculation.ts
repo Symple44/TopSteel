@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { useApiClient } from '@/lib/api-client-enhanced'
 import type { SimulationContext, SimulationResult } from '@erp/ui'
+import { useCallback, useState } from 'react'
+import { useApiClient } from '@/lib/api-client-enhanced'
 
 export interface PriceCalculationDetailedResult extends SimulationResult {
   breakdown?: {
@@ -149,7 +149,7 @@ export function usePriceCalculation(
         setLoading(false)
       }
     },
-    [apiClient, cache]
+    [apiClient, cache, getCacheKey, resultsCache.get, resultsCache.set]
   )
 
   const calculateDetailed = useCallback(
@@ -192,7 +192,15 @@ export function usePriceCalculation(
         setLoading(false)
       }
     },
-    [apiClient, cache, includeMargins, includeSkippedRules]
+    [
+      apiClient,
+      cache,
+      includeMargins,
+      includeSkippedRules,
+      getCacheKey,
+      resultsCache.get,
+      resultsCache.set,
+    ]
   )
 
   const calculateBulk = useCallback(
@@ -222,7 +230,7 @@ export function usePriceCalculation(
         setLoading(false)
       }
     },
-    [apiClient, cache]
+    [apiClient, cache, getCacheKey, resultsCache.set]
   )
 
   const simulateScenarios = useCallback(
@@ -234,7 +242,7 @@ export function usePriceCalculation(
       setError(null)
 
       try {
-        const contexts = scenarios.map((scenario) => ({ ...baseContext, ...scenario }))
+        const _contexts = scenarios.map((scenario) => ({ ...baseContext, ...scenario }))
         const response = await apiClient.post('/pricing/simulate-scenarios', {
           baseContext,
           scenarios,

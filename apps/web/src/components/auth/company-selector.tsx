@@ -482,7 +482,10 @@ export default function CompanySelector({
     // Ne plus vider le cache systématiquement, utiliser le cache persistant
     loadRolesFromParameters('fr', false).catch((_error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Retirer loadCompanies des dépendances pour éviter la boucle
+  }, [
+    // Charger les sociétés une seule fois au montage
+    loadCompanies,
+  ]) // Retirer loadCompanies des dépendances pour éviter la boucle
 
   const handleSelectCompany = async () => {
     if (!selectedCompanyId) {

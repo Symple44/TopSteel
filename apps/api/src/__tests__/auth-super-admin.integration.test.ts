@@ -70,11 +70,9 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
   beforeAll(async () => {
     // Vérifier que les credentials de test sont configurés
     if (!SUPER_ADMIN_USER.password) {
-      console.warn('⚠️  TEST_ADMIN_PASSWORD not set in environment variables')
-      console.warn('   Please set TEST_ADMIN_PASSWORD in your .env.test file')
       return
     }
-    
+
     // Vérifier que le serveur API est accessible
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {

@@ -1,11 +1,11 @@
 // packages/utils/src/index.ts - Version corrigée
+
+// Export des services de conversion
+export { UnitConversionService, UnitType } from './conversion/unit-conversion.service'
 export { cn } from './lib/cn'
 export { formatCurrency, formatDate, formatNumber } from './lib/formatters'
 export { debounce, throttle } from './lib/functions'
 export { validateCNPJ, validateEmail, validatePhone } from './lib/validators'
-
-// Export des services de conversion
-export { UnitConversionService, UnitType } from './conversion/unit-conversion.service'
 
 // Export des types utilitaires
 export type { DeepPartial, DeepRequired } from './types'

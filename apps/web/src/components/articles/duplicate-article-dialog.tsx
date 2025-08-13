@@ -1,26 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
-  Textarea,
-  Badge,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Textarea,
 } from '@erp/ui'
-import { useDupliquerArticle, type Article, ArticleStatus } from '@/hooks/use-articles'
+import { Copy, Package2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { type Article, ArticleStatus, useDupliquerArticle } from '@/hooks/use-articles'
 import { sanitizeInput } from '@/lib/security-utils'
 import { cn } from '@/lib/utils'
-import { Copy, Package2 } from 'lucide-react'
 
 interface DuplicateArticleDialogProps {
   open: boolean
@@ -56,7 +55,11 @@ const defaultFormData: FormData = {
   prixVenteHT: '',
 }
 
-export function DuplicateArticleDialog({ open, onOpenChange, article }: DuplicateArticleDialogProps) {
+export function DuplicateArticleDialog({
+  open,
+  onOpenChange,
+  article,
+}: DuplicateArticleDialogProps) {
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -68,7 +71,7 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
     if (article && open) {
       // Générer une nouvelle référence suggérée
       const refSuggestion = `${article.reference}_COPY`
-      
+
       setFormData({
         nouvelleReference: refSuggestion,
         designation: `${article.designation} (Copie)`,
@@ -101,12 +104,12 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
 
     if (formData.gereEnStock) {
       const stockPhysique = parseFloat(formData.stockPhysique)
-      if (isNaN(stockPhysique) || stockPhysique < 0) {
+      if (Number.isNaN(stockPhysique) || stockPhysique < 0) {
         newErrors.stockPhysique = 'Le stock physique doit être positif ou nul'
       }
 
       const stockMini = parseFloat(formData.stockMini)
-      if (isNaN(stockMini) || stockMini < 0) {
+      if (Number.isNaN(stockMini) || stockMini < 0) {
         newErrors.stockMini = 'Le stock minimum doit être positif ou nul'
       }
     }
@@ -117,7 +120,7 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!article || !validateForm()) {
       return
     }
@@ -142,15 +145,13 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
         modifications,
       })
       onOpenChange(false)
-    } catch (error) {
-      console.error('Erreur lors de la duplication:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
 
@@ -200,7 +201,7 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
             {/* Informations de base */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Nouvel article</h3>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="nouvelleReference">Nouvelle référence *</Label>
@@ -291,7 +292,7 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
             {/* Configuration du stock */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Configuration du stock</h3>
-              
+
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -346,7 +347,7 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
             {/* Prix */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Tarification</h3>
-              
+
               <div>
                 <Label htmlFor="prixVenteHT">Prix de vente HT</Label>
                 <Input
@@ -389,7 +390,7 @@ export function DuplicateArticleDialog({ open, onOpenChange, article }: Duplicat
                 Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Duplication...' : 'Dupliquer l\'article'}
+                {isSubmitting ? 'Duplication...' : "Dupliquer l'article"}
               </Button>
             </div>
           </form>

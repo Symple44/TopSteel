@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table, TableIndex } from 'typeorm'
 
 export class CreatePricingAnalyticsTables1740000000006 implements MigrationInterface {
   name = 'CreatePricingAnalyticsTables1740000000006'
@@ -14,114 +14,114 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'uuid_generate_v4()'
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'societe_id',
             type: 'uuid',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'rule_id',
             type: 'uuid',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'article_id',
             type: 'uuid',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'customer_id',
             type: 'uuid',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'customer_group',
             type: 'varchar',
             length: '50',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'channel',
             type: 'varchar',
             length: '20',
-            default: "'ERP'"
+            default: "'ERP'",
           },
           {
             name: 'base_price',
             type: 'decimal',
             precision: 12,
             scale: 4,
-            default: 0
+            default: 0,
           },
           {
             name: 'final_price',
             type: 'decimal',
             precision: 12,
             scale: 4,
-            default: 0
+            default: 0,
           },
           {
             name: 'discount',
             type: 'decimal',
             precision: 12,
             scale: 4,
-            default: 0
+            default: 0,
           },
           {
             name: 'discount_percentage',
             type: 'decimal',
             precision: 5,
             scale: 2,
-            default: 0
+            default: 0,
           },
           {
             name: 'quantity',
             type: 'decimal',
             precision: 10,
             scale: 3,
-            default: 1
+            default: 1,
           },
           {
             name: 'calculation_time',
             type: 'integer',
             default: 0,
-            comment: 'Temps de calcul en millisecondes'
+            comment: 'Temps de calcul en millisecondes',
           },
           {
             name: 'applied',
             type: 'boolean',
-            default: false
+            default: false,
           },
           {
             name: 'reason',
             type: 'varchar',
             length: '255',
             isNullable: true,
-            comment: 'Raison si règle non appliquée'
+            comment: 'Raison si règle non appliquée',
           },
           {
             name: 'cache_hit',
             type: 'boolean',
-            default: false
+            default: false,
           },
           {
             name: 'error',
             type: 'text',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'metadata',
             type: 'jsonb',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'created_at',
             type: 'timestamptz',
-            default: 'now()'
-          }
-        ]
+            default: 'now()',
+          },
+        ],
       }),
       true
     )
@@ -136,43 +136,43 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'uuid_generate_v4()'
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'societe_id',
             type: 'uuid',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'url',
             type: 'varchar',
             length: '500',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'secret',
             type: 'varchar',
             length: '128',
             isNullable: false,
-            comment: 'Secret pour signature HMAC'
+            comment: 'Secret pour signature HMAC',
           },
           {
             name: 'events',
             type: 'jsonb',
             isNullable: false,
             default: "'[]'",
-            comment: 'Liste des événements écoutés'
+            comment: 'Liste des événements écoutés',
           },
           {
             name: 'is_active',
             type: 'boolean',
-            default: true
+            default: true,
           },
           {
             name: 'filters',
             type: 'jsonb',
             isNullable: true,
-            comment: 'Filtres pour déclencher le webhook'
+            comment: 'Filtres pour déclencher le webhook',
           },
           {
             name: 'retry_policy',
@@ -181,7 +181,7 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
               "maxRetries": 3,
               "retryDelay": 1000,
               "backoffMultiplier": 2
-            }'`
+            }'`,
           },
           {
             name: 'metadata',
@@ -190,19 +190,19 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
             default: `'{
               "totalCalls": 0,
               "successRate": 100
-            }'`
+            }'`,
           },
           {
             name: 'created_at',
             type: 'timestamptz',
-            default: 'now()'
+            default: 'now()',
           },
           {
             name: 'updated_at',
             type: 'timestamptz',
-            default: 'now()'
-          }
-        ]
+            default: 'now()',
+          },
+        ],
       }),
       true
     )
@@ -217,35 +217,35 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'uuid_generate_v4()'
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'type',
             type: 'varchar',
             length: '50',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'societe_id',
             type: 'uuid',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'data',
             type: 'jsonb',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'metadata',
             type: 'jsonb',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'timestamp',
             type: 'timestamptz',
-            default: 'now()'
-          }
-        ]
+            default: 'now()',
+          },
+        ],
       }),
       true
     )
@@ -260,52 +260,52 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'uuid_generate_v4()'
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'subscription_id',
             type: 'uuid',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'event_id',
             type: 'uuid',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'url',
             type: 'varchar',
             length: '500',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'status',
             type: 'varchar',
             length: '20',
-            default: "'pending'"
+            default: "'pending'",
           },
           {
             name: 'attempts',
             type: 'integer',
-            default: 0
+            default: 0,
           },
           {
             name: 'last_attempt',
             type: 'timestamptz',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'response',
             type: 'jsonb',
             isNullable: true,
-            comment: 'Réponse HTTP (status, body, error)'
+            comment: 'Réponse HTTP (status, body, error)',
           },
           {
             name: 'created_at',
             type: 'timestamptz',
-            default: 'now()'
-          }
-        ]
+            default: 'now()',
+          },
+        ],
       }),
       true
     )
@@ -320,148 +320,184 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'uuid_generate_v4()'
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'societe_id',
             type: 'uuid',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'article_id',
             type: 'uuid',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'customer_id',
             type: 'uuid',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'date',
             type: 'date',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'price',
             type: 'decimal',
             precision: 12,
             scale: 4,
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'quantity',
             type: 'decimal',
             precision: 10,
             scale: 3,
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'revenue',
             type: 'decimal',
             precision: 15,
             scale: 4,
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'cost',
             type: 'decimal',
             precision: 12,
             scale: 4,
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'channel',
             type: 'varchar',
             length: '20',
-            default: "'ERP'"
+            default: "'ERP'",
           },
           {
             name: 'metadata',
             type: 'jsonb',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'created_at',
             type: 'timestamptz',
-            default: 'now()'
-          }
-        ]
+            default: 'now()',
+          },
+        ],
       }),
       true
     )
 
     // =============== INDEXES POUR PERFORMANCE ===============
-    
+
     // Pricing Logs indexes
-    await queryRunner.createIndex('pricing_logs', new TableIndex({
-      name: 'idx_pricing_logs_societe_date',
-      columnNames: ['societe_id', 'created_at']
-    }))
+    await queryRunner.createIndex(
+      'pricing_logs',
+      new TableIndex({
+        name: 'idx_pricing_logs_societe_date',
+        columnNames: ['societe_id', 'created_at'],
+      })
+    )
 
-    await queryRunner.createIndex('pricing_logs', new TableIndex({
-      name: 'idx_pricing_logs_rule_id',
-      columnNames: ['rule_id'],
-      where: 'rule_id IS NOT NULL'
-    }))
+    await queryRunner.createIndex(
+      'pricing_logs',
+      new TableIndex({
+        name: 'idx_pricing_logs_rule_id',
+        columnNames: ['rule_id'],
+        where: 'rule_id IS NOT NULL',
+      })
+    )
 
-    await queryRunner.createIndex('pricing_logs', new TableIndex({
-      name: 'idx_pricing_logs_article_customer',
-      columnNames: ['article_id', 'customer_id']
-    }))
+    await queryRunner.createIndex(
+      'pricing_logs',
+      new TableIndex({
+        name: 'idx_pricing_logs_article_customer',
+        columnNames: ['article_id', 'customer_id'],
+      })
+    )
 
-    await queryRunner.createIndex('pricing_logs', new TableIndex({
-      name: 'idx_pricing_logs_channel_applied',
-      columnNames: ['channel', 'applied']
-    }))
+    await queryRunner.createIndex(
+      'pricing_logs',
+      new TableIndex({
+        name: 'idx_pricing_logs_channel_applied',
+        columnNames: ['channel', 'applied'],
+      })
+    )
 
     // Webhook Subscriptions indexes
-    await queryRunner.createIndex('webhook_subscriptions', new TableIndex({
-      name: 'idx_webhook_subs_societe_active',
-      columnNames: ['societe_id', 'is_active']
-    }))
+    await queryRunner.createIndex(
+      'webhook_subscriptions',
+      new TableIndex({
+        name: 'idx_webhook_subs_societe_active',
+        columnNames: ['societe_id', 'is_active'],
+      })
+    )
 
     // Webhook Events indexes
-    await queryRunner.createIndex('webhook_events', new TableIndex({
-      name: 'idx_webhook_events_societe_type_time',
-      columnNames: ['societe_id', 'type', 'timestamp']
-    }))
+    await queryRunner.createIndex(
+      'webhook_events',
+      new TableIndex({
+        name: 'idx_webhook_events_societe_type_time',
+        columnNames: ['societe_id', 'type', 'timestamp'],
+      })
+    )
 
     // Webhook Deliveries indexes
-    await queryRunner.createIndex('webhook_deliveries', new TableIndex({
-      name: 'idx_webhook_deliveries_subscription',
-      columnNames: ['subscription_id']
-    }))
+    await queryRunner.createIndex(
+      'webhook_deliveries',
+      new TableIndex({
+        name: 'idx_webhook_deliveries_subscription',
+        columnNames: ['subscription_id'],
+      })
+    )
 
-    await queryRunner.createIndex('webhook_deliveries', new TableIndex({
-      name: 'idx_webhook_deliveries_event',
-      columnNames: ['event_id']
-    }))
+    await queryRunner.createIndex(
+      'webhook_deliveries',
+      new TableIndex({
+        name: 'idx_webhook_deliveries_event',
+        columnNames: ['event_id'],
+      })
+    )
 
-    await queryRunner.createIndex('webhook_deliveries', new TableIndex({
-      name: 'idx_webhook_deliveries_status',
-      columnNames: ['status']
-    }))
+    await queryRunner.createIndex(
+      'webhook_deliveries',
+      new TableIndex({
+        name: 'idx_webhook_deliveries_status',
+        columnNames: ['status'],
+      })
+    )
 
     // Sales History indexes
-    await queryRunner.createIndex('sales_history', new TableIndex({
-      name: 'idx_sales_history_article_date',
-      columnNames: ['article_id', 'date']
-    }))
+    await queryRunner.createIndex(
+      'sales_history',
+      new TableIndex({
+        name: 'idx_sales_history_article_date',
+        columnNames: ['article_id', 'date'],
+      })
+    )
 
-    await queryRunner.createIndex('sales_history', new TableIndex({
-      name: 'idx_sales_history_societe_date',
-      columnNames: ['societe_id', 'date']
-    }))
+    await queryRunner.createIndex(
+      'sales_history',
+      new TableIndex({
+        name: 'idx_sales_history_societe_date',
+        columnNames: ['societe_id', 'date'],
+      })
+    )
 
-    await queryRunner.createIndex('sales_history', new TableIndex({
-      name: 'idx_sales_history_customer_date',
-      columnNames: ['customer_id', 'date'],
-      where: 'customer_id IS NOT NULL'
-    }))
+    await queryRunner.createIndex(
+      'sales_history',
+      new TableIndex({
+        name: 'idx_sales_history_customer_date',
+        columnNames: ['customer_id', 'date'],
+        where: 'customer_id IS NOT NULL',
+      })
+    )
 
     // =============== FOREIGN KEYS ===============
-    
+
     // Webhook deliveries -> subscriptions
     await queryRunner.query(`
       ALTER TABLE webhook_deliveries 
@@ -515,8 +551,6 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
 
       CREATE UNIQUE INDEX ON rule_performance (rule_id, societe_id);
     `)
-
-    console.log('✅ Tables de pricing analytics créées avec succès')
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -526,11 +560,9 @@ export class CreatePricingAnalyticsTables1740000000006 implements MigrationInter
 
     // Supprimer les tables dans l'ordre inverse
     await queryRunner.dropTable('webhook_deliveries', true)
-    await queryRunner.dropTable('webhook_events', true) 
+    await queryRunner.dropTable('webhook_events', true)
     await queryRunner.dropTable('webhook_subscriptions', true)
     await queryRunner.dropTable('sales_history', true)
     await queryRunner.dropTable('pricing_logs', true)
-
-    console.log('❌ Tables de pricing analytics supprimées')
   }
 }

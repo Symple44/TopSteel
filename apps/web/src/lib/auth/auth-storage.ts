@@ -38,14 +38,17 @@ export class AuthStorage {
     try {
       // Sauvegarder la session
       storage.setItem(this.config.tokenStorageKey, JSON.stringify(sessionData))
-      
+
       // Sauvegarder aussi dans localStorage pour l'apiClient (compatibilité)
-      localStorage.setItem('topsteel-tokens', JSON.stringify({
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-        expiresIn: tokens.expiresIn,
-        expiresAt: tokens.expiresAt
-      }))
+      localStorage.setItem(
+        'topsteel-tokens',
+        JSON.stringify({
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          expiresIn: tokens.expiresIn,
+          expiresAt: tokens.expiresAt,
+        })
+      )
 
       // Sauvegarder également le token d'accès dans les cookies pour les routes API Next.js
       if (tokens.accessToken) {

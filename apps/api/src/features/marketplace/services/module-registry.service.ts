@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { MarketplaceModule as MarketplaceModuleEntity } from '../entities/marketplace-module.entity'
 // Import des modules réels - Supprimés pour optimiser le debug
-import { MarketplaceService } from './marketplace.service'
+import type { MarketplaceService } from './marketplace.service'
 
 export interface ModuleInfo {
   moduleKey: string

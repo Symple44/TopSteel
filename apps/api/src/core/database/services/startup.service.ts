@@ -1,9 +1,9 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { DatabaseHealthService } from './health.service'
-import { MigrationService } from './migration.service'
-import { MigrationLoaderService } from './migration-loader.service'
-import { SeederService } from './seeder.service'
+import type { ConfigService } from '@nestjs/config'
+import type { DatabaseHealthService } from './health.service'
+import type { MigrationService } from './migration.service'
+import type { MigrationLoaderService } from './migration-loader.service'
+import type { SeederService } from './seeder.service'
 
 @Injectable()
 export class DatabaseStartupService implements OnModuleInit {

@@ -1,20 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 import {
+  generateSearchQuery,
+  getAccessibleEntities,
+  type SearchableEntity,
+} from '../config/searchable-entities.config'
+import type {
+  IPostgreSQLSearchService,
   SearchOptions,
   SearchResponse,
   SearchResult,
-  IPostgreSQLSearchService
 } from '../interfaces/search.interfaces'
-import { SearchResultFormatterService } from './search-result-formatter.service'
-import {
-  SEARCHABLE_ENTITIES,
-  SearchableEntity,
-  getAccessibleEntities,
-  generateSearchQuery
-} from '../config/searchable-entities.config'
-import { AnyDatabaseRecord, SearchDocument } from '../types/search-types'
+import type { AnyDatabaseRecord, SearchDocument } from '../types/search-types'
+import type { SearchResultFormatterService } from './search-result-formatter.service'
 
 @Injectable()
 export class PostgreSQLSearchService implements IPostgreSQLSearchService {
@@ -32,10 +31,10 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
 
   async search(options: SearchOptions): Promise<SearchResponse> {
     const startTime = Date.now()
-    
+
     try {
       const results: SearchResult[] = []
-      
+
       // Get accessible entities based on permissions
       const accessibleEntities = getAccessibleEntities(
         options.permissions || [],
@@ -44,7 +43,7 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
 
       // Filter by types if specified
       const entitiesToSearch = options.types
-        ? accessibleEntities.filter(e => options.types!.includes(e.type))
+        ? accessibleEntities.filter((e) => options.types?.includes(e.type))
         : accessibleEntities
 
       // Search in each entity
@@ -65,7 +64,7 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
         options.offset || 0,
         (options.offset || 0) + (options.limit || 10)
       )
-      
+
       // Sanitize results
       const sanitizedResults = this.formatter.sanitizeResults(limitedResults)
 
@@ -77,7 +76,7 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
         total: results.length,
         took: Date.now() - startTime,
         searchEngine: 'postgresql',
-        facets
+        facets,
       }
     } catch (error) {
       this.logger.error('PostgreSQL search error:', error)
@@ -87,14 +86,17 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
 
   async searchEntity(entity: SearchableEntity, options: SearchOptions): Promise<SearchResult[]> {
     // Determine which datasource to use
-    const ds = entity.database === 'tenant' && this.tenantDataSource
-      ? this.tenantDataSource
-      : this.dataSource
+    const ds =
+      entity.database === 'tenant' && this.tenantDataSource
+        ? this.tenantDataSource
+        : this.dataSource
 
     // Check if table exists before searching
     const tableExists = await this.checkTableExists(entity.tableName)
     if (!tableExists) {
-      this.logger.warn(`Table ${entity.tableName} does not exist, skipping search for ${entity.type}`)
+      this.logger.warn(
+        `Table ${entity.tableName} does not exist, skipping search for ${entity.type}`
+      )
       return []
     }
 
@@ -110,16 +112,12 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
     }
 
     // Generate SQL query
-    const { query, params } = generateSearchQuery(
-      entity,
-      options.query,
-      options.tenantId
-    )
+    const { query, params } = generateSearchQuery(entity, options.query, options.tenantId)
 
     try {
       const records = await ds.query(query, params)
-      
-      return records.map((record: AnyDatabaseRecord) => 
+
+      return records.map((record: AnyDatabaseRecord) =>
         this.formatter.formatEntityResult(entity, record, options.query)
       )
     } catch (error) {
@@ -146,7 +144,7 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
   }
 
   // PostgreSQL doesn't support direct document indexing, so these are no-ops
-  async indexDocument(type: string, id: string, document: SearchDocument): Promise<void> {
+  async indexDocument(type: string, id: string, _document: SearchDocument): Promise<void> {
     // PostgreSQL search doesn't require indexing - data is searched directly
     if (process.env.NODE_ENV === 'development') {
       this.logger.debug(`PostgreSQL doesn't require indexing for ${type}/${id}`)

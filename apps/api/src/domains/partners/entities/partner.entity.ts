@@ -1,9 +1,9 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
-import { PartnerGroup } from './partner-group.entity'
 import { Contact } from './contact.entity'
-import { PartnerSite } from './partner-site.entity'
 import { PartnerAddress } from './partner-address.entity'
+import { PartnerGroup } from './partner-group.entity'
+import { PartnerSite } from './partner-site.entity'
 
 export enum PartnerType {
   CLIENT = 'CLIENT',
@@ -39,9 +39,13 @@ export class Partner extends BusinessEntity {
   @Index()
   groupId?: string
 
-  @ManyToOne(() => PartnerGroup, group => group.partners, {
-    nullable: true
-  })
+  @ManyToOne(
+    () => PartnerGroup,
+    (group) => group.partners,
+    {
+      nullable: true,
+    }
+  )
   @JoinColumn({ name: 'groupId' })
   group?: PartnerGroup
 
@@ -167,13 +171,22 @@ export class Partner extends BusinessEntity {
   }
 
   // Relations
-  @OneToMany(() => Contact, contact => contact.partner)
+  @OneToMany(
+    () => Contact,
+    (contact) => contact.partner
+  )
   contacts!: Contact[]
 
-  @OneToMany(() => PartnerSite, site => site.partner)
+  @OneToMany(
+    () => PartnerSite,
+    (site) => site.partner
+  )
   sites!: PartnerSite[]
 
-  @OneToMany(() => PartnerAddress, address => address.partner)
+  @OneToMany(
+    () => PartnerAddress,
+    (address) => address.partner
+  )
   addresses!: PartnerAddress[]
 
   // Relations futures

@@ -190,15 +190,15 @@ export function RouteGuard({
     }
 
     if (requiredPermissions.length > 0 && user) {
-      // Get user roles array (new system) or single role (legacy)  
+      // Get user roles array (new system) or single role (legacy)
       const userRoles = (user as any).roles || (user.role ? [user.role] : [])
-      
+
       const hasPermission = requiredPermissions.some((permission) => {
         // Check if user has the permission directly
         if (user.permissions?.includes(permission)) {
           return true
         }
-        
+
         // Check if any user role matches the permission
         return userRoles.some((role: any) => {
           const roleValue = typeof role === 'object' ? role.name || role.role : role
@@ -237,15 +237,15 @@ export function RouteGuard({
 
   // Vérifier les permissions si spécifiées
   if (requiredPermissions.length > 0 && user) {
-    // Get user roles array (new system) or single role (legacy)  
+    // Get user roles array (new system) or single role (legacy)
     const userRoles = (user as any).roles || (user.role ? [user.role] : [])
-    
+
     const hasPermission = requiredPermissions.some((permission) => {
       // Check if user has the permission directly
       if (user.permissions?.includes(permission)) {
         return true
       }
-      
+
       // Check if any user role matches the permission
       return userRoles.some((role: any) => {
         const roleValue = typeof role === 'object' ? role.name || role.role : role

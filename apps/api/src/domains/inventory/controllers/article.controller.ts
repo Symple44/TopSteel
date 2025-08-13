@@ -13,13 +13,18 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
+import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
 import type { BusinessContext } from '../../core/interfaces/business-service.interface'
 import type { User } from '../../users/entities/user.entity'
-import { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
-import { ArticleService, type ArticleSearchCriteria, type StockValorisation, type ArticleStatistics } from '../services/article.service'
-import { CreateArticleDto, UpdateArticleDto } from '../dto'
+import type { CreateArticleDto, UpdateArticleDto } from '../dto'
+import type { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
+import type {
+  ArticleSearchCriteria,
+  ArticleService,
+  ArticleStatistics,
+  StockValorisation,
+} from '../services/article.service'
 
 @ApiTags('Articles')
 @Controller('api/business/articles')
@@ -31,7 +36,7 @@ export class ArticleController {
   @ApiOperation({ summary: 'Obtenir la liste des articles avec filtres' })
   @ApiResponse({ status: 200, description: 'Liste des articles récupérée avec succès' })
   async findAll(
-    @CurrentUser() user: User,
+    @CurrentUser() _user: User,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('search') search?: string,
@@ -41,7 +46,7 @@ export class ArticleController {
     @Query('marque') marque?: string,
     @Query('stockCondition') stockCondition?: 'rupture' | 'sous_mini' | 'normal' | 'surstock',
     @Query('sortBy') sortBy?: string,
-    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC'
   ) {
     const criteria: ArticleSearchCriteria = {
       tenantId: 'a4a21147-ef1b-489c-8769-067bc45da723',

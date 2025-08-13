@@ -1,6 +1,6 @@
-import { DataSource } from 'typeorm'
+import * as path from 'node:path'
 import * as dotenv from 'dotenv'
-import * as path from 'path'
+import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
 dotenv.config({ path: path.join(__dirname, '../../../../.env') })
@@ -20,11 +20,9 @@ export const AppDataSource = new DataSource({
     path.join(__dirname, '../../**/*.entity.{ts,js}'),
     path.join(__dirname, '../../../domains/**/*.entity.{ts,js}'),
     path.join(__dirname, '../../../features/**/*.entity.{ts,js}'),
-    path.join(__dirname, '../../../modules/**/*.entity.{ts,js}')
+    path.join(__dirname, '../../../modules/**/*.entity.{ts,js}'),
   ],
-  migrations: [
-    path.join(__dirname, '../migrations/topsteel/*.{ts,js}')
-  ],
+  migrations: [path.join(__dirname, '../migrations/topsteel/*.{ts,js}')],
   subscribers: [],
 })
 
@@ -43,11 +41,9 @@ export const AuthDataSource = new DataSource({
     path.join(__dirname, '../../**/*.entity.{ts,js}'),
     path.join(__dirname, '../../../domains/auth/**/*.entity.{ts,js}'),
     path.join(__dirname, '../../../features/societes/**/*.entity.{ts,js}'),
-    path.join(__dirname, '../../../features/pricing/entities/*.entity.{ts,js}')
+    path.join(__dirname, '../../../features/pricing/entities/*.entity.{ts,js}'),
   ],
-  migrations: [
-    path.join(__dirname, '../migrations/auth/*.{ts,js}')
-  ],
+  migrations: [path.join(__dirname, '../migrations/auth/*.{ts,js}')],
   subscribers: [],
 })
 

@@ -7,9 +7,9 @@ import {
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
+import type { Reflector } from '@nestjs/core'
 import { GlobalUserRole, SocieteRoleType } from '../../core/constants/roles.constants'
-import { UnifiedRolesService } from '../../services/unified-roles.service'
+import type { UnifiedRolesService } from '../../services/unified-roles.service'
 
 export interface ResourceOwnershipRequirement {
   // Nom du paramètre contenant l'ID de la ressource

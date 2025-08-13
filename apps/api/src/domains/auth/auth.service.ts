@@ -5,30 +5,30 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { JwtService } from '@nestjs/jwt'
+import type { ConfigService } from '@nestjs/config'
+import type { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import type { Request } from 'express'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
-import { SocieteUsersService } from '../../features/societes/services/societe-users.service'
-import { SocietesService } from '../../features/societes/services/societes.service'
-import { LicenseManagementService } from '../../features/societes/services/license-management.service'
+import type { LicenseManagementService } from '../../features/societes/services/license-management.service'
+import type { SocieteUsersService } from '../../features/societes/services/societe-users.service'
+import type { SocietesService } from '../../features/societes/services/societes.service'
 import type { User } from '../users/entities/user.entity'
-import { UsersService } from '../users/users.service'
+import type { UsersService } from '../users/users.service'
 import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
 import { UserSession } from './core/entities/user-session.entity'
 import type { LoginDto } from './external/dto/login.dto'
 import type { RegisterDto } from './external/dto/register.dto'
 import type { JwtPayload, MultiTenantJwtPayload } from './interfaces/jwt-payload.interface'
-import { AuthPerformanceService } from './services/auth-performance.service'
-import { GeolocationService } from './services/geolocation.service'
-import { MFAService } from './services/mfa.service'
-import { SessionRedisService } from './services/session-redis.service'
-import { UnifiedRolesService } from './services/unified-roles.service'
-import { UserSocieteRolesService } from './services/user-societe-roles.service'
+import type { AuthPerformanceService } from './services/auth-performance.service'
+import type { GeolocationService } from './services/geolocation.service'
+import type { MFAService } from './services/mfa.service'
+import type { SessionRedisService } from './services/session-redis.service'
+import type { UnifiedRolesService } from './services/unified-roles.service'
+import type { UserSocieteRolesService } from './services/user-societe-roles.service'
 
 @Injectable()
 export class AuthService {
@@ -51,10 +51,10 @@ export class AuthService {
 
   async validateUser(emailOrAcronym: string, password: string): Promise<Omit<User, 'password'>> {
     const user = await this.usersService.findByEmailOrAcronym(emailOrAcronym)
-    
+
     // Message d'erreur générique pour éviter de révéler si l'utilisateur existe
     const genericError = 'Invalid credentials'
-    
+
     if (!user) {
       // Effectuer quand même une comparaison pour éviter les timing attacks
       await bcrypt.compare(password, '$2b$10$dummyhash')
@@ -214,7 +214,7 @@ export class AuthService {
 
     if (!licenseCheck.isValid) {
       throw new UnauthorizedException(
-        licenseCheck.reason || 'Licence invalide ou limite d\'utilisateurs atteinte'
+        licenseCheck.reason || "Licence invalide ou limite d'utilisateurs atteinte"
       )
     }
 
@@ -463,7 +463,7 @@ export class AuthService {
 
     // Récupérer les sociétés disponibles pour l'utilisateur
     const societes = await this.getUserSocietes(user.id)
-    
+
     return {
       user,
       sessionId,

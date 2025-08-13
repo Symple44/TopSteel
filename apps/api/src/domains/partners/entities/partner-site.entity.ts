@@ -1,7 +1,7 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
-import { Partner } from './partner.entity'
 import { Contact } from './contact.entity'
+import { Partner } from './partner.entity'
 import { PartnerAddress } from './partner-address.entity'
 
 export enum SiteType {
@@ -39,9 +39,13 @@ export class PartnerSite extends BusinessEntity {
   @Index()
   partnerId!: string
 
-  @ManyToOne(() => Partner, partner => partner.sites, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(
+    () => Partner,
+    (partner) => partner.sites,
+    {
+      onDelete: 'CASCADE',
+    }
+  )
   @JoinColumn({ name: 'partnerId' })
   partner!: Partner
 
@@ -201,7 +205,8 @@ export class PartnerSite extends BusinessEntity {
     photos?: string[] // URLs des photos du site
     plans?: string[] // URLs des plans d'accès
     certifications?: string[] // Certifications du site
-    zones?: Array<{ // Zones de stockage
+    zones?: Array<{
+      // Zones de stockage
       nom: string
       type: string
       capacite?: number
@@ -223,10 +228,16 @@ export class PartnerSite extends BusinessEntity {
   }
 
   // Relations
-  @OneToMany(() => Contact, contact => contact.site)
+  @OneToMany(
+    () => Contact,
+    (contact) => contact.site
+  )
   contacts!: Contact[]
 
-  @OneToMany(() => PartnerAddress, address => address.site)
+  @OneToMany(
+    () => PartnerAddress,
+    (address) => address.site
+  )
   addresses!: PartnerAddress[]
 
   /**
@@ -339,7 +350,7 @@ export class PartnerSite extends BusinessEntity {
     if (horaires.pause) {
       const pauseDebutMinutes = this.timeToMinutes(horaires.pause.debut)
       const pauseFinMinutes = this.timeToMinutes(horaires.pause.fin)
-      
+
       if (heureMinutes >= pauseDebutMinutes && heureMinutes < pauseFinMinutes) {
         return false
       }
@@ -370,9 +381,7 @@ export class PartnerSite extends BusinessEntity {
   calculerTauxOccupation(): number {
     if (!this.metadata?.zones || !this.capaciteStockageTonnes) return 0
 
-    const totalOccupe = this.metadata.zones.reduce((sum, zone) => 
-      sum + (zone.occupee || 0), 0
-    )
+    const totalOccupe = this.metadata.zones.reduce((sum, zone) => sum + (zone.occupee || 0), 0)
 
     return (totalOccupe / this.capaciteStockageTonnes) * 100
   }
@@ -412,7 +421,7 @@ export class PartnerSite extends BusinessEntity {
       reference,
       tonnage,
       transporteur,
-      statut
+      statut,
     })
 
     // Limiter l'historique aux 100 dernières livraisons
@@ -442,15 +451,16 @@ export class PartnerSite extends BusinessEntity {
     const currentYear = now.getFullYear()
 
     if (this.metadata.historiqueLivraisons) {
-      const livraisonsMois = this.metadata.historiqueLivraisons.filter(l => {
+      const livraisonsMois = this.metadata.historiqueLivraisons.filter((l) => {
         const date = new Date(l.date)
         return date.getMonth() === currentMonth && date.getFullYear() === currentYear
       })
 
       this.metadata.statistiques.nombreLivraisonsMois = livraisonsMois.length
-      this.metadata.statistiques.tonnageMoyenMois = livraisonsMois.length > 0
-        ? livraisonsMois.reduce((sum, l) => sum + l.tonnage, 0) / livraisonsMois.length
-        : 0
+      this.metadata.statistiques.tonnageMoyenMois =
+        livraisonsMois.length > 0
+          ? livraisonsMois.reduce((sum, l) => sum + l.tonnage, 0) / livraisonsMois.length
+          : 0
     }
 
     this.metadata.statistiques.tauxOccupation = this.calculerTauxOccupation()

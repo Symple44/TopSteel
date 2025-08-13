@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { UserMenuItemPreference } from '../entities/user-menu-item-preference.entity'
 import { UserMenuPreferences } from '../entities/user-menu-preferences.entity'
-import { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
+import type { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
 
 export interface UpdateUserPreferencesDto {
   useCustomLayout?: boolean

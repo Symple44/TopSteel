@@ -1,9 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm'
-import { 
-  WebhookEventType, 
-  WebhookRetryPolicy, 
-  WebhookFilters, 
-  WebhookMetadata 
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
+import type {
+  WebhookEventType,
+  WebhookFilters,
+  WebhookMetadata,
+  WebhookRetryPolicy,
 } from '../types/webhook.types'
 
 @Entity('webhook_subscriptions')
@@ -30,14 +37,14 @@ export class WebhookSubscription {
   @Column('jsonb', { nullable: true })
   filters?: WebhookFilters
 
-  @Column('jsonb', { 
-    default: () => `'{"maxRetries": 3, "retryDelay": 1000, "backoffMultiplier": 2}'` 
+  @Column('jsonb', {
+    default: () => `'{"maxRetries": 3, "retryDelay": 1000, "backoffMultiplier": 2}'`,
   })
   retryPolicy!: WebhookRetryPolicy
 
-  @Column('jsonb', { 
+  @Column('jsonb', {
     nullable: true,
-    default: () => `'{"totalCalls": 0, "successRate": 100}'`
+    default: () => `'{"totalCalls": 0, "successRate": 100}'`,
   })
   metadata?: WebhookMetadata
 

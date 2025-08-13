@@ -23,10 +23,10 @@ import {
 import { SocieteRoleType } from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
-import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
-import { UsersService } from '../../../domains/users/users.service'
-import { SocietesService } from '../../../features/societes/services/societes.service'
+import type { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
+import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import type { UsersService } from '../../../domains/users/users.service'
+import type { SocietesService } from '../../../features/societes/services/societes.service'
 
 interface SocieteQueryDto {
   page?: number

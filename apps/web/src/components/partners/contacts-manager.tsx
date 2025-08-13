@@ -1,53 +1,50 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Edit2, Trash2, Phone, Mail, User, Building } from 'lucide-react'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Badge } from '@erp/ui'
+import type { Contact, CreateContactDto, PartnerSite, UpdateContactDto } from '@erp/types'
+import { ContactRole, ContactStatus } from '@erp/types'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@erp/ui'
-import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@erp/ui'
-import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@erp/ui'
-import { Input } from '@erp/ui'
-import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Textarea,
 } from '@erp/ui'
-import { Switch } from '@erp/ui'
-import { Textarea } from '@erp/ui'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Building, Edit2, Mail, Phone, Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import type { Contact, PartnerSite, CreateContactDto, UpdateContactDto } from '@erp/types'
-import { ContactRole, ContactStatus } from '@erp/types'
 import {
-  usePartnerContacts,
   useCreateContact,
-  useUpdateContact,
   useDeleteContact,
+  usePartnerContacts,
+  useUpdateContact,
 } from '@/hooks/use-partner-details'
 
 const contactSchema = z.object({
@@ -78,10 +75,14 @@ interface ContactsManagerProps {
   sites?: PartnerSite[]
 }
 
-export function ContactsManager({ partnerId, contacts: initialContacts, sites = [] }: ContactsManagerProps) {
+export function ContactsManager({
+  partnerId,
+  contacts: initialContacts,
+  sites = [],
+}: ContactsManagerProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
-  
+
   const { data: contacts = initialContacts } = usePartnerContacts(partnerId)
   const createContact = useCreateContact()
   const updateContact = useUpdateContact()
@@ -133,9 +134,7 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
       }
       setIsFormOpen(false)
       form.reset()
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   const getRoleBadgeVariant = (role: ContactRole) => {
@@ -211,9 +210,7 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
                     </TableCell>
                     <TableCell>{contact.fonction || '-'}</TableCell>
                     <TableCell>
-                      <Badge variant={getRoleBadgeVariant(contact.role)}>
-                        {contact.role}
-                      </Badge>
+                      <Badge variant={getRoleBadgeVariant(contact.role)}>{contact.role}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
@@ -260,18 +257,10 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(contact)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(contact)}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(contact)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(contact)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -287,9 +276,7 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
-              {editingContact ? 'Modifier le contact' : 'Nouveau contact'}
-            </DialogTitle>
+            <DialogTitle>{editingContact ? 'Modifier le contact' : 'Nouveau contact'}</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -528,10 +515,7 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
                         <FormLabel>Contact principal</FormLabel>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -547,10 +531,7 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
                           <FormLabel className="text-sm">Préfère email</FormLabel>
                         </div>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -565,10 +546,7 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
                           <FormLabel className="text-sm">Préfère SMS</FormLabel>
                         </div>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -583,10 +561,7 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
                           <FormLabel className="text-sm">Marketing</FormLabel>
                         </div>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -616,15 +591,12 @@ export function ContactsManager({ partnerId, contacts: initialContacts, sites = 
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                   Annuler
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={createContact.isPending || updateContact.isPending}
-                >
+                <Button type="submit" disabled={createContact.isPending || updateContact.isPending}>
                   {createContact.isPending || updateContact.isPending
                     ? 'Enregistrement...'
                     : editingContact
-                    ? 'Modifier'
-                    : 'Créer'}
+                      ? 'Modifier'
+                      : 'Créer'}
                 </Button>
               </DialogFooter>
             </form>

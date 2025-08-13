@@ -1,24 +1,29 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
-  Textarea,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
   Switch,
-  Badge,
+  Textarea,
 } from '@erp/ui'
-import { useCreateArticle, useUpdateArticle, type Article, ArticleType, ArticleStatus } from '@/hooks/use-articles'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  type Article,
+  ArticleStatus,
+  ArticleType,
+  useCreateArticle,
+  useUpdateArticle,
+} from '@/hooks/use-articles'
 import { sanitizeInput } from '@/lib/security-utils'
 import { cn } from '@/lib/utils'
 
@@ -145,7 +150,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
       setFormData(defaultFormData)
     }
     setErrors({})
-  }, [article, mode, open])
+  }, [article, mode])
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -159,27 +164,27 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
     }
 
     if (!formData.uniteStock.trim()) {
-      newErrors.uniteStock = 'L\'unité de stock est obligatoire'
+      newErrors.uniteStock = "L'unité de stock est obligatoire"
     }
 
     const coeffAchat = parseFloat(formData.coefficientAchat)
-    if (isNaN(coeffAchat) || coeffAchat <= 0) {
-      newErrors.coefficientAchat = 'Le coefficient d\'achat doit être supérieur à 0'
+    if (Number.isNaN(coeffAchat) || coeffAchat <= 0) {
+      newErrors.coefficientAchat = "Le coefficient d'achat doit être supérieur à 0"
     }
 
     const coeffVente = parseFloat(formData.coefficientVente)
-    if (isNaN(coeffVente) || coeffVente <= 0) {
+    if (Number.isNaN(coeffVente) || coeffVente <= 0) {
       newErrors.coefficientVente = 'Le coefficient de vente doit être supérieur à 0'
     }
 
     if (formData.gereEnStock) {
       const stockPhysique = parseFloat(formData.stockPhysique)
-      if (isNaN(stockPhysique) || stockPhysique < 0) {
+      if (Number.isNaN(stockPhysique) || stockPhysique < 0) {
         newErrors.stockPhysique = 'Le stock physique doit être positif ou nul'
       }
 
       const stockMini = parseFloat(formData.stockMini)
-      if (isNaN(stockMini) || stockMini < 0) {
+      if (Number.isNaN(stockMini) || stockMini < 0) {
         newErrors.stockMini = 'Le stock minimum doit être positif ou nul'
       }
     }
@@ -190,7 +195,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
@@ -213,15 +218,25 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
       gereEnStock: formData.gereEnStock,
       stockPhysique: formData.gereEnStock ? parseFloat(formData.stockPhysique) || 0 : undefined,
       stockMini: formData.gereEnStock ? parseFloat(formData.stockMini) || 0 : undefined,
-      stockMaxi: formData.gereEnStock && formData.stockMaxi ? parseFloat(formData.stockMaxi) : undefined,
-      stockSecurite: formData.gereEnStock && formData.stockSecurite ? parseFloat(formData.stockSecurite) : undefined,
+      stockMaxi:
+        formData.gereEnStock && formData.stockMaxi ? parseFloat(formData.stockMaxi) : undefined,
+      stockSecurite:
+        formData.gereEnStock && formData.stockSecurite
+          ? parseFloat(formData.stockSecurite)
+          : undefined,
       methodeValorisation: formData.methodeValorisation,
-      prixAchatStandard: formData.prixAchatStandard ? parseFloat(formData.prixAchatStandard) : undefined,
+      prixAchatStandard: formData.prixAchatStandard
+        ? parseFloat(formData.prixAchatStandard)
+        : undefined,
       prixVenteHT: formData.prixVenteHT ? parseFloat(formData.prixVenteHT) : undefined,
       tauxTVA: formData.tauxTVA ? parseFloat(formData.tauxTVA) : undefined,
       tauxMarge: formData.tauxMarge ? parseFloat(formData.tauxMarge) : undefined,
-      delaiApprovisionnement: formData.delaiApprovisionnement ? parseInt(formData.delaiApprovisionnement) : undefined,
-      quantiteMiniCommande: formData.quantiteMiniCommande ? parseFloat(formData.quantiteMiniCommande) : undefined,
+      delaiApprovisionnement: formData.delaiApprovisionnement
+        ? parseInt(formData.delaiApprovisionnement)
+        : undefined,
+      quantiteMiniCommande: formData.quantiteMiniCommande
+        ? parseFloat(formData.quantiteMiniCommande)
+        : undefined,
       poids: formData.poids ? parseFloat(formData.poids) : undefined,
       longueur: formData.longueur ? parseFloat(formData.longueur) : undefined,
       largeur: formData.largeur ? parseFloat(formData.largeur) : undefined,
@@ -236,40 +251,46 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
         await updateArticle.mutateAsync({ id: article.id, data: sanitizedData })
       }
       onOpenChange(false)
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
 
-  const typeLabels = useMemo(() => ({
-    [ArticleType.MATIERE_PREMIERE]: 'Matière première',
-    [ArticleType.PRODUIT_FINI]: 'Produit fini',
-    [ArticleType.PRODUIT_SEMI_FINI]: 'Produit semi-fini',
-    [ArticleType.FOURNITURE]: 'Fourniture',
-    [ArticleType.CONSOMMABLE]: 'Consommable',
-    [ArticleType.SERVICE]: 'Service',
-  }), [])
+  const typeLabels = useMemo(
+    () => ({
+      [ArticleType.MATIERE_PREMIERE]: 'Matière première',
+      [ArticleType.PRODUIT_FINI]: 'Produit fini',
+      [ArticleType.PRODUIT_SEMI_FINI]: 'Produit semi-fini',
+      [ArticleType.FOURNITURE]: 'Fourniture',
+      [ArticleType.CONSOMMABLE]: 'Consommable',
+      [ArticleType.SERVICE]: 'Service',
+    }),
+    []
+  )
 
-  const statusLabels = useMemo(() => ({
-    [ArticleStatus.ACTIF]: 'Actif',
-    [ArticleStatus.INACTIF]: 'Inactif',
-    [ArticleStatus.OBSOLETE]: 'Obsolète',
-    [ArticleStatus.EN_COURS_CREATION]: 'En cours de création',
-  }), [])
+  const statusLabels = useMemo(
+    () => ({
+      [ArticleStatus.ACTIF]: 'Actif',
+      [ArticleStatus.INACTIF]: 'Inactif',
+      [ArticleStatus.OBSOLETE]: 'Obsolète',
+      [ArticleStatus.EN_COURS_CREATION]: 'En cours de création',
+    }),
+    []
+  )
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'create' ? 'Créer un nouvel article' : `Modifier l'article ${article?.reference}`}
+            {mode === 'create'
+              ? 'Créer un nouvel article'
+              : `Modifier l'article ${article?.reference}`}
           </DialogTitle>
         </DialogHeader>
 
@@ -277,7 +298,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
           {/* Informations générales */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Informations générales</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="reference">Référence *</Label>
@@ -389,7 +410,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
           {/* Unités et coefficients */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Unités et coefficients</h3>
-            
+
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="uniteStock">Unité de stock *</Label>
@@ -471,7 +492,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
                 <Label htmlFor="gereEnStock">Géré en stock</Label>
               </div>
             </div>
-            
+
             {formData.gereEnStock && (
               <div className="grid grid-cols-4 gap-4">
                 <div>
@@ -554,7 +575,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
           {/* Prix */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Prix et tarification</h3>
-            
+
             <div className="grid grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="prixAchatStandard">Prix d'achat standard</Label>
@@ -610,7 +631,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
           {/* Approvisionnement */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Approvisionnement</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="delaiApprovisionnement">Délai d'approvisionnement (jours)</Label>
@@ -640,7 +661,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
           {/* Caractéristiques physiques */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Caractéristiques physiques</h3>
-            
+
             <div className="grid grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="poids">Poids (kg)</Label>
@@ -717,8 +738,8 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
                   ? 'Création...'
                   : 'Modification...'
                 : mode === 'create'
-                ? 'Créer l\'article'
-                : 'Modifier l\'article'}
+                  ? "Créer l'article"
+                  : "Modifier l'article"}
             </Button>
           </div>
         </form>

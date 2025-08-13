@@ -1,19 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import type {
-  Contact,
   CreateContactDto,
   CreatePartnerAddressDto,
   CreatePartnerGroupDto,
   CreatePartnerSiteDto,
-  PartnerAddress,
-  PartnerGroup,
-  PartnerSite,
   UpdateContactDto,
   UpdatePartnerAddressDto,
   UpdatePartnerGroupDto,
   UpdatePartnerSiteDto,
 } from '@erp/types'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 // Query keys
@@ -57,7 +53,7 @@ export function useCreateContact() {
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreateContactDto }) =>
       apiClient.partners.createContact(partnerId, data),
-    onSuccess: (contact, { partnerId }) => {
+    onSuccess: (_contact, { partnerId }) => {
       queryClient.invalidateQueries({ queryKey: CONTACT_KEYS.byPartner(partnerId) })
       queryClient.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
       toast.success('Contact créé avec succès')
@@ -116,7 +112,7 @@ export function useCreatePartnerSite() {
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreatePartnerSiteDto }) =>
       apiClient.partners.createPartnerSite(partnerId, data),
-    onSuccess: (site, { partnerId }) => {
+    onSuccess: (_site, { partnerId }) => {
       queryClient.invalidateQueries({ queryKey: SITE_KEYS.byPartner(partnerId) })
       queryClient.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
       toast.success('Site créé avec succès')
@@ -175,7 +171,7 @@ export function useCreatePartnerAddress() {
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreatePartnerAddressDto }) =>
       apiClient.partners.createPartnerAddress(partnerId, data),
-    onSuccess: (address, { partnerId }) => {
+    onSuccess: (_address, { partnerId }) => {
       queryClient.invalidateQueries({ queryKey: ADDRESS_KEYS.byPartner(partnerId) })
       queryClient.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
       toast.success('Adresse créée avec succès')
