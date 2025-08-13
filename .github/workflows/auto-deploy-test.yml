@@ -46,7 +46,7 @@ jobs:
       marketplace: ${{ steps.changes.outputs.marketplace }}
       packages: ${{ steps.changes.outputs.packages }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 2
       
@@ -76,7 +76,7 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.api == 'true' || needs.changes.outputs.web == 'true' || needs.changes.outputs.packages == 'true' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v3
@@ -112,7 +112,7 @@ jobs:
       url: https://test.topsteel.local
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: 🔧 Setup SSH
         run: |
