@@ -38,6 +38,14 @@ export class AuthStorage {
     try {
       // Sauvegarder la session
       storage.setItem(this.config.tokenStorageKey, JSON.stringify(sessionData))
+      
+      // Sauvegarder aussi dans localStorage pour l'apiClient (compatibilité)
+      localStorage.setItem('topsteel-tokens', JSON.stringify({
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        expiresIn: tokens.expiresIn,
+        expiresAt: tokens.expiresAt
+      }))
 
       // Sauvegarder également le token d'accès dans les cookies pour les routes API Next.js
       if (tokens.accessToken) {
@@ -99,6 +107,7 @@ export class AuthStorage {
       localStorage.removeItem(this.config.tokenStorageKey)
       sessionStorage.removeItem(this.config.tokenStorageKey)
       localStorage.removeItem(this.config.rememberMeStorageKey)
+      localStorage.removeItem('topsteel-tokens') // Nettoyer aussi la clé de compatibilité
 
       // Effacer également le cookie
       // biome-ignore lint: Cookie cleanup required for secure logout
@@ -138,33 +147,35 @@ export class AuthStorage {
   private isValidSession(session: unknown): session is StoredSession {
     if (!session || typeof session !== 'object') return false
 
+    const sessionObj = session as Record<string, unknown>
+
     // Valider l'utilisateur
     if (
-      session.user &&
-      (typeof session.user.id !== 'string' ||
-        typeof session.user.email !== 'string' ||
-        typeof session.user.firstName !== 'string' ||
-        typeof session.user.lastName !== 'string')
+      sessionObj.user &&
+      (typeof (sessionObj.user as Record<string, unknown>).id !== 'string' ||
+        typeof (sessionObj.user as Record<string, unknown>).email !== 'string' ||
+        typeof (sessionObj.user as Record<string, unknown>).prenom !== 'string' ||
+        typeof (sessionObj.user as Record<string, unknown>).nom !== 'string')
     ) {
       return false
     }
 
     // Valider les tokens
     if (
-      session.tokens &&
-      (typeof session.tokens.accessToken !== 'string' ||
-        typeof session.tokens.refreshToken !== 'string' ||
-        typeof session.tokens.expiresAt !== 'number')
+      sessionObj.tokens &&
+      (typeof (sessionObj.tokens as Record<string, unknown>).accessToken !== 'string' ||
+        typeof (sessionObj.tokens as Record<string, unknown>).refreshToken !== 'string' ||
+        typeof (sessionObj.tokens as Record<string, unknown>).expiresAt !== 'number')
     ) {
       return false
     }
 
     // Valider la société
     if (
-      session.company &&
-      (typeof session.company.id !== 'string' ||
-        typeof session.company.name !== 'string' ||
-        typeof session.company.code !== 'string')
+      sessionObj.company &&
+      (typeof (sessionObj.company as Record<string, unknown>).id !== 'string' ||
+        typeof (sessionObj.company as Record<string, unknown>).nom !== 'string' ||
+        typeof (sessionObj.company as Record<string, unknown>).code !== 'string')
     ) {
       return false
     }

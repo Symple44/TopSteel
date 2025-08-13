@@ -33,6 +33,11 @@ import { ParameterApplication } from '../../../features/parameters/entities/para
 import { ParameterClient } from '../../../features/parameters/entities/parameter-client.entity'
 // Entités de paramètres (dans AUTH)
 import { ParameterSystem } from '../../../features/parameters/entities/parameter-system.entity'
+// Entités de menu (dans AUTH)
+import { MenuConfiguration } from '../../../features/admin/entities/menu-configuration.entity'
+import { MenuItem } from '../../../features/admin/entities/menu-item.entity'
+import { MenuItemPermission } from '../../../features/admin/entities/menu-item-permission.entity'
+import { MenuItemRole } from '../../../features/admin/entities/menu-item-role.entity'
 // Entités partagées (base shared)
 import { SharedEntities } from '../../../features/shared/entities'
 import { SharedDataRegistry } from '../../../features/shared/entities/shared-data-registry.entity'
@@ -92,6 +97,11 @@ export class MultiTenantDatabaseConfig {
         ParameterSystem,
         ParameterApplication,
         ParameterClient,
+        // Entités de menu
+        MenuConfiguration,
+        MenuItem,
+        MenuItemPermission,
+        MenuItemRole,
       ],
       synchronize: false, // Toujours false en production
       logging: this.configService.get('DB_LOGGING', false),

@@ -932,8 +932,16 @@ export const fr = {
     projects: 'Projets',
     production: 'Production',
     inventory: 'Inventaire',
+    articles: 'Articles',
+    materials: 'Matériaux',
+    stock: 'Stock',
     stocks: 'Stocks',
     sales: 'Ventes',
+    quotes: 'Devis',
+    orders: 'Commandes',
+    finance: 'Finance',
+    invoices: 'Factures',
+    partners: 'Partenaires',
   },
 
   queryBuilder: {

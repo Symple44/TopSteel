@@ -219,12 +219,18 @@ export class APIClient {
     if (typeof window === 'undefined') return null
 
     try {
-      const authData = localStorage.getItem('topsteel-tokens')
+      // Chercher d'abord dans localStorage (remember me)
+      let authData = localStorage.getItem('topsteel_auth_tokens')
+      
+      // Si pas dans localStorage, chercher dans sessionStorage
+      if (!authData) {
+        authData = sessionStorage.getItem('topsteel_auth_tokens')
+      }
 
       if (!authData) return null
 
-      const tokenData = JSON.parse(authData)
-      const { accessToken } = tokenData
+      const sessionData = JSON.parse(authData)
+      const accessToken = sessionData.tokens?.accessToken
 
       return accessToken || null
     } catch {

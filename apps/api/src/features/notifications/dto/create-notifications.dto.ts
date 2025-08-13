@@ -5,7 +5,7 @@ import { NotificationType } from '../entities/notifications.entity'
 
 export class CreateNotificationsDto {
   @ApiProperty({
-    example: 'Nom de la notification',
+    example: 'Titre de la notification',
     minLength: 2,
     maxLength: 255,
   })
@@ -13,13 +13,12 @@ export class CreateNotificationsDto {
   @MinLength(2)
   @MaxLength(255)
   @Transform(({ value }) => value?.trim())
-  nom!: string
+  title!: string
 
-  @ApiPropertyOptional({ example: 'Description détaillée' })
-  @IsOptional()
+  @ApiProperty({ example: 'Message détaillé' })
   @IsString()
   @MaxLength(2000)
-  description?: string
+  message!: string
 
   @ApiPropertyOptional({
     enum: NotificationType,
@@ -29,10 +28,10 @@ export class CreateNotificationsDto {
   @IsEnum(NotificationType)
   type?: NotificationType = NotificationType.INFO
 
-  @ApiPropertyOptional({ example: true })
+  @ApiPropertyOptional({ example: false })
   @IsOptional()
   @IsBoolean()
-  actif?: boolean = true
+  isArchived?: boolean = false
 
   @ApiPropertyOptional()
   @IsOptional()

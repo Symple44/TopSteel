@@ -175,7 +175,10 @@
       "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"SELECT * FROM parameters_client LIMIT 5\")",
       "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"\\dt param*\")",
       "Bash(PGPASSWORD=postgres psql:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(PORT=3002 timeout 30s pnpm dev)",
+      "Bash(PORT=3002 pnpm dev)",
+      "Bash(NODE_ENV=development REDIS_ENABLED=true PORT=3005 pnpm dev)"
     ],
     "deny": []
   }

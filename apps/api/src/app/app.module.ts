@@ -37,12 +37,14 @@ import { BusinessModule } from '../domains/business.module'
 import { UsersModule } from '../domains/users/users.module'
 // Module d'administration
 import { AdminModule } from '../features/admin/admin.module'
+import { MenuSyncModule } from '../features/admin/menu-sync.module'
 // Module Database Core
 import { DatabaseCoreModule } from '../features/database-core/database-core.module'
 import { MenuModule } from '../features/menu/menu.module'
 // Module de paramètres
 import { ParametersModule } from '../features/parameters/parameters.module'
 import { QueryBuilderModule } from '../features/query-builder/query-builder.module'
+import { SearchModule } from '../features/search/search.module'
 import { SharedModule } from '../features/shared/shared.module'
 // Modules multi-tenant
 import { SocietesModule } from '../features/societes/societes.module'
@@ -98,6 +100,7 @@ import { AppService } from './app.service'
 
     // Administration
     AdminModule,
+    MenuSyncModule,
     ParametersModule,
 
     // Marketplace - supprimé pour simplifier
@@ -118,6 +121,7 @@ import { AppService } from './app.service'
     // Modules métier à réactiver progressivement (supprimés pour optimiser)
     // NotificationsModule,
     QueryBuilderModule, // Activé pour le test multi-tenant
+    SearchModule, // Module de recherche globale
   ],
   controllers: [AppController, TestController, HealthController],
   providers: [

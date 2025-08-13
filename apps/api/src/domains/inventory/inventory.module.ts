@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { ArticleController } from './controllers/article.controller'
 import { Article } from './entities/article.entity'
 import { ArticleRepositoryImpl } from './repositories/article-repository.impl'
 import { ArticleService } from './services/article.service'
@@ -9,9 +10,7 @@ import { ArticleService } from './services/article.service'
  */
 @Module({
   imports: [TypeOrmModule.forFeature([Article], 'tenant')],
-  controllers: [
-    // Le contrôleur sera ajouté quand il sera créé
-  ],
+  controllers: [ArticleController],
   providers: [
     ArticleService,
     {

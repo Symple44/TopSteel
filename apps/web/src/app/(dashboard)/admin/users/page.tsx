@@ -65,9 +65,11 @@ export default function UsersManagementPage() {
                         ? `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim()
                         : t('users.user')}
                     </DialogTitle>
-                    <DialogDescription className="text-gray-600 flex items-center mt-1">
-                      <Mail className="h-4 w-4 mr-2" />
-                      {selectedUser.email}
+                    <DialogDescription asChild>
+                      <div className="text-gray-600 flex items-center mt-1">
+                        <Mail className="h-4 w-4 mr-2" />
+                        {selectedUser.email}
+                      </div>
                     </DialogDescription>
                   </div>
                   <Badge

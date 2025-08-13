@@ -138,22 +138,43 @@ function validateJWTStructure(token: string): {
  */
 function hasAdminAccess(payload: JWTPayload): boolean {
   // Vérifier le rôle principal
-  if (ADMIN_ROLES.includes(payload.role as unknown)) {
+  if (ADMIN_ROLES.includes(payload.role as (typeof ADMIN_ROLES)[number])) {
     return true
   }
 
   // Vérifier dans les rôles multiples (si disponible)
   if (payload.roles && Array.isArray(payload.roles)) {
-    return payload.roles.some((role) => ADMIN_ROLES.includes(role as unknown))
+    return payload.roles.some((role) => ADMIN_ROLES.includes(role as (typeof ADMIN_ROLES)[number]))
   }
 
   return false
 }
 
 /**
+ * Valide l'accès au tenant
+ */
+function validateTenantAccess(payload: JWTPayload, requestedTenantId?: string): boolean {
+  // Si un tenant spécifique est demandé, vérifier que l'utilisateur y a accès
+  if (requestedTenantId && payload.societeId !== requestedTenantId) {
+    return false
+  }
+  return true
+}
+
+/**
  * Ajoute les headers utilisateur de manière centralisée
  */
-function addUserHeaders(response: NextResponse, payload: JWTPayload): NextResponse {
+function addUserHeaders(
+  response: NextResponse,
+  payload: JWTPayload,
+  request: NextRequest
+): NextResponse {
+  // Vérifier l'accès au tenant si spécifié dans la requête
+  const requestedTenantId = request.headers.get('x-tenant-id')
+  if (requestedTenantId && !validateTenantAccess(payload, requestedTenantId)) {
+    return createApiErrorResponse('Accès non autorisé à ce tenant', 403)
+  }
+
   response.headers.set('x-user-id', payload.sub)
   response.headers.set('x-user-email', payload.email)
   response.headers.set('x-user-role', payload.role)
@@ -207,12 +228,72 @@ function createLoginRedirect(request: NextRequest) {
   return NextResponse.redirect(loginUrl)
 }
 
+// Mapping des anciennes URLs vers les nouvelles
+const redirectMap: Record<string, string> = {
+  // Anciennes routes protected vers (app)
+  '/protected/partners': '/partners',
+  '/protected/partners/clients': '/partners/clients',
+  '/protected/partners/suppliers': '/partners/suppliers',
+  '/protected/inventory': '/inventory',
+  '/protected/inventory/materials': '/inventory/materials',
+  '/protected/inventory/articles': '/inventory/articles',
+  '/protected/inventory/stock': '/inventory/stock',
+  '/protected/sales': '/sales',
+  '/protected/sales/quotes': '/sales/quotes',
+  '/protected/sales/orders': '/sales/orders',
+  '/protected/finance': '/finance',
+  '/protected/finance/invoices': '/finance/invoices',
+  '/protected/projects': '/projects',
+}
+
+/**
+ * Ajoute les headers de sécurité
+ */
+function addSecurityHeaders(response: NextResponse): NextResponse {
+  // Headers de sécurité essentiels
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('X-XSS-Protection', '1; mode=block')
+
+  // Content Security Policy strict
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // TODO: Remove unsafe-* in production
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "frame-ancestors 'none'",
+  ].join('; ')
+
+  response.headers.set('Content-Security-Policy', csp)
+
+  return response
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // === ÉTAPE 0: Gestion des redirections ===
+  // Vérifier si l'URL nécessite une redirection
+  if (redirectMap[pathname]) {
+    const url = request.nextUrl.clone()
+    url.pathname = redirectMap[pathname]
+    return NextResponse.redirect(url, { status: 301 }) // 301 = Permanent redirect
+  }
+
+  // Redirection générique pour toutes les routes /protected/*
+  if (pathname.startsWith('/protected/')) {
+    const newPath = pathname.replace('/protected/', '/')
+    const url = request.nextUrl.clone()
+    url.pathname = newPath
+    return NextResponse.redirect(url, { status: 301 })
+  }
+
   // === ÉTAPE 1: Gestion des routes publiques ===
   if (isPublicRoute(pathname)) {
-    return NextResponse.next()
+    return addSecurityHeaders(NextResponse.next())
   }
 
   // === ÉTAPE 2: Récupération et validation du token ===
@@ -245,11 +326,12 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/api')) {
     // Routes API publiques
     if (isPublicApiRoute(pathname)) {
-      return NextResponse.next()
+      return addSecurityHeaders(NextResponse.next())
     }
 
     // Routes API protégées - ajouter headers utilisateur
-    return addUserHeaders(NextResponse.next(), payload!)
+    const response = addUserHeaders(NextResponse.next(), payload!, request)
+    return addSecurityHeaders(response)
   }
 
   // === ÉTAPE 4: Contrôle d'accès pour les pages admin ===
@@ -260,7 +342,8 @@ export function middleware(request: NextRequest) {
   }
 
   // === ÉTAPE 5: Pages protégées - ajouter headers utilisateur ===
-  return addUserHeaders(NextResponse.next(), payload!)
+  const response = addUserHeaders(NextResponse.next(), payload!, request)
+  return addSecurityHeaders(response)
 }
 
 // Configuration du middleware - Routes à traiter

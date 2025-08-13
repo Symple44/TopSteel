@@ -175,7 +175,12 @@ export class MenuConfigurationService {
 
   async activateConfiguration(id: string): Promise<void> {
     // Désactiver toutes les autres configurations
-    await this._configRepository.update({}, { isActive: false })
+    await this._configRepository
+      .createQueryBuilder()
+      .update(MenuConfiguration)
+      .set({ isActive: false })
+      .where('isActive = :isActive', { isActive: true })
+      .execute()
 
     // Activer la configuration sélectionnée
     await this._configRepository.update(id, { isActive: true })

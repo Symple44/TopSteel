@@ -346,7 +346,7 @@ export class LicenseManagementService {
       .innerJoin('user_societe_roles', 'usr', 'usr.userId = user.id')
       .where('usr.societeId = :societeId', { societeId })
       .andWhere('usr.isActive = :usrActive', { usrActive: true })
-      .andWhere('user.isActive = :userActive', { userActive: true })
+      .andWhere('user.actif = :userActive', { userActive: true })
       .getCount()
 
     return result
@@ -359,7 +359,7 @@ export class LicenseManagementService {
       .where('usr.societeId = :societeId', { societeId })
       .andWhere('usr.userId = :userId', { userId })
       .andWhere('usr.isActive = :usrActive', { usrActive: true })
-      .andWhere('user.isActive = :userActive', { userActive: true })
+      .andWhere('user.actif = :userActive', { userActive: true })
       .getCount()
 
     return result > 0

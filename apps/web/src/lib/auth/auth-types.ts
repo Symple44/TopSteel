@@ -28,6 +28,8 @@ export interface AuthTokens {
   accessToken: string
   refreshToken: string
   expiresAt: number
+  expiresIn?: number
+  tokenType?: string
 }
 
 export interface MFAState {

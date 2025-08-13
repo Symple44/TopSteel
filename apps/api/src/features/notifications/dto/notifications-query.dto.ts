@@ -5,11 +5,11 @@ import { BaseQueryDto } from '../../../core/common/dto/base.dto'
 import { NotificationType } from '../entities/notifications.entity'
 
 export class NotificationsQueryDto extends BaseQueryDto {
-  @ApiPropertyOptional({ example: true })
+  @ApiPropertyOptional({ example: false })
   @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()
-  actif?: boolean
+  isArchived?: boolean
 
   @ApiPropertyOptional({ enum: NotificationType })
   @IsOptional()

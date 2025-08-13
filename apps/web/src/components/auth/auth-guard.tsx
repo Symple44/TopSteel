@@ -89,9 +89,21 @@ export function AuthGuardOLD({
 
     if (!isLoading && isAuthenticated && user && requiredRoles.length > 0) {
       // Vérifier les rôles si spécifiés
-      const hasRequiredRole = requiredRoles.some(role => 
-        user.role === role || user.permissions?.includes(role)
-      )
+      // Get user roles array (new system) or single role (legacy)  
+      const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+      
+      const hasRequiredRole = requiredRoles.some(requiredRole => {
+        // Check if user has the permission directly
+        if (user.permissions?.includes(requiredRole)) {
+          return true
+        }
+        
+        // Check if any user role matches the required role
+        return userRoles.some((role: any) => {
+          const roleValue = typeof role === 'object' ? role.name || role.role : role
+          return roleValue === requiredRole
+        })
+      })
       
       if (!hasRequiredRole) {
         // Rediriger vers une page d'erreur ou dashboard si pas les bonnes permissions
@@ -137,9 +149,21 @@ export function AuthGuardOLD({
 
   // Vérifier les rôles si spécifiés
   if (requiredRoles.length > 0) {
-    const hasRequiredRole = requiredRoles.some(role => 
-      user.role === role || user.permissions?.includes(role)
-    )
+    // Get user roles array (new system) or single role (legacy)  
+    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    
+    const hasRequiredRole = requiredRoles.some(requiredRole => {
+      // Check if user has the permission directly
+      if (user.permissions?.includes(requiredRole)) {
+        return true
+      }
+      
+      // Check if any user role matches the required role
+      return userRoles.some((role: any) => {
+        const roleValue = typeof role === 'object' ? role.name || role.role : role
+        return roleValue === requiredRole
+      })
+    })
     
     if (!hasRequiredRole) {
       return (

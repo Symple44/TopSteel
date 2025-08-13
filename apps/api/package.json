@@ -67,6 +67,7 @@
     "db:test:topsteel:keep": "ts-node src/scripts/migration/test-with-topsteel-prefix.ts --keep-databases",
     "script:diagnose-admin": "ts-node -r tsconfig-paths/register src/scripts/diagnose-admin-user.ts",
     "script:create-admin-user": "ts-node -r tsconfig-paths/register src/scripts/create-admin-user.ts",
+    "migration:search-indexes": "ts-node -r tsconfig-paths/register src/scripts/run-search-indexes-migration.ts",
     "script:test-admin-login": "ts-node -r tsconfig-paths/register src/scripts/test-admin-login.ts",
     "marketplace:generate-data": "ts-node -r tsconfig-paths/register src/scripts/generate-marketplace-test-data.ts",
     "marketplace:test-modules": "ts-node -r tsconfig-paths/register src/scripts/test-marketplace-modules.ts",
@@ -76,11 +77,13 @@
     "inject:metallurgy-clean": "ts-node -r tsconfig-paths/register src/scripts/metallurgy-injection-orchestrator.ts",
     "cleanup:produits": "ts-node -r tsconfig-paths/register src/scripts/cleanup-legacy-produits.ts",
     "cleanup:migrations": "ts-node -r tsconfig-paths/register src/scripts/cleanup-migration-history.ts",
+    "test:search-cache": "ts-node -r tsconfig-paths/register src/scripts/test-search-cache.ts",
     "migrate:settings-to-auth": "ts-node -r tsconfig-paths/register src/scripts/migrate-system-settings-to-auth.ts",
     "cleanup:system-settings": "ts-node -r tsconfig-paths/register src/scripts/cleanup-system-settings.ts"
   },
   "dependencies": {
     "@azure/identity": "^4.11.1",
+    "@elastic/elasticsearch": "^9.1.0",
     "@erp/entities": "workspace:*",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@nestjs-modules/ioredis": "^2.0.2",

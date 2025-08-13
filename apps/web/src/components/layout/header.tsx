@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import SyncIndicator from '@/components/auth/sync-indicator'
 import { NotificationCenter } from '@/components/notifications/notification-center'
+import { CommandPalette } from '@/components/search/command-palette'
 import { useAuth } from '@/hooks/use-auth'
 import { useTranslation } from '@/lib/i18n'
 import { getApproximateTabCount } from '@/lib/tab-detection'
@@ -21,7 +22,7 @@ export function Header({
   _isSidebarCollapsed = false,
   onShowCompanySelector,
 }: HeaderProps) {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [showCommandPalette, setShowCommandPalette] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [tabCount, setTabCount] = useState(1)
   const { user, logout, company } = useAuth()
@@ -59,6 +60,19 @@ export function Header({
     return () => clearInterval(interval)
   }, [])
 
+  // Raccourci clavier pour ouvrir la recherche (Ctrl+K ou Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setShowCommandPalette(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   const handleLogout = async () => {
     try {
       await logout()
@@ -82,16 +96,18 @@ export function Header({
 
         {/* Section centre - Recherche */}
         <div className="flex-1 max-w-md mx-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={t('search')}
-              value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-muted border border-input rounded-lg text-foreground placeholder-muted-foreground focus:bg-background focus:ring-2 focus:ring-ring focus:outline-none transition-all"
-            />
-          </div>
+          <button
+            onClick={() => setShowCommandPalette(true)}
+            className="w-full flex items-center px-4 py-2 bg-muted border border-input rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all group"
+          >
+            <Search className="mr-3 h-4 w-4" />
+            <span className="flex-1 text-left text-sm">
+              {t('search')}...
+            </span>
+            <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium opacity-100">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </button>
         </div>
 
         {/* Section droite - Actions utilisateur */}
@@ -204,6 +220,12 @@ export function Header({
           </div>
         </div>
       </div>
+
+      {/* Command Palette (Modal de recherche) */}
+      <CommandPalette 
+        open={showCommandPalette} 
+        onOpenChange={setShowCommandPalette} 
+      />
     </header>
   )
 }

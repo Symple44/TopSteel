@@ -25,7 +25,9 @@
     "baseUrl": "./",
     "paths": {
       "@erp/entities": ["../../packages/erp-entities/src"],
-      "@erp/entities/*": ["../../packages/erp-entities/src/*"]
+      "@erp/entities/*": ["../../packages/erp-entities/src/*"],
+      "@erp/domains": ["../../packages/domains/src"],
+      "@erp/domains/*": ["../../packages/domains/src/*"]
     },
     "typeRoots": ["node_modules/@types", "../../node_modules/@types"],
     "types": ["node"]

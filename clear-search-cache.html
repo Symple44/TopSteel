@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Search Cache</title>
+</head>
+<body>
+    <h1>Clear Search Cache</h1>
+    <button onclick="clearCache()">Clear Search History</button>
+    <div id="result"></div>
+
+    <script>
+        function clearCache() {
+            try {
+                // Vérifier ce qui est stocké
+                const stored = localStorage.getItem('topsteel_search_history');
+                console.log('Current stored data:', stored);
+                
+                // Nettoyer le localStorage
+                localStorage.removeItem('topsteel_search_history');
+                
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: green;">✅ Cache cleared successfully!</p>' +
+                    '<p>Previous data: ' + (stored || 'none') + '</p>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+            }
+        }
+
+        // Afficher le contenu actuel au chargement
+        window.onload = function() {
+            const stored = localStorage.getItem('topsteel_search_history');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    document.getElementById('result').innerHTML = 
+                        '<h3>Current search history:</h3>' +
+                        '<pre>' + JSON.stringify(parsed, null, 2) + '</pre>';
+                } catch (e) {
+                    document.getElementById('result').innerHTML = 
+                        '<h3>Current search history (invalid JSON):</h3>' +
+                        '<pre>' + stored + '</pre>';
+                }
+            } else {
+                document.getElementById('result').innerHTML = '<p>No search history found.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -14,6 +14,12 @@ export function AutoBreadcrumbWrapper(props: AutoBreadcrumbWrapperProps) {
   const { t } = useTranslation('breadcrumb')
 
   const translateSegment = (segment: string) => {
+    // Si c'est un UUID, ne pas afficher dans le breadcrumb
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (uuidRegex.test(segment)) {
+      return 'Détail'
+    }
+    
     // Utiliser la traduction ou fallback sur le segment formaté
     return t(segment) || segment.charAt(0).toUpperCase() + segment.slice(1)
   }

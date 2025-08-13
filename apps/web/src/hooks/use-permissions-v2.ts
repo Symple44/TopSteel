@@ -27,10 +27,16 @@ export function usePermissions() {
     try {
       // Utiliser le cache si disponible
       const cached = permissionsCache.get(user.id)
+      // Get primary role for API call (using first role or legacy single role)
+      const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+      const primaryRole = userRoles.length > 0 ? 
+        (typeof userRoles[0] === 'object' ? userRoles[0].name || userRoles[0].role : userRoles[0]) :
+        ''
+      
       if (cached) {
         setUserPermissions({
-          roleId: user.role || '',
-          roleName: user.role || '',
+          roleId: primaryRole,
+          roleName: primaryRole,
           permissions: cached,
         })
         setLoading(false)
@@ -38,7 +44,7 @@ export function usePermissions() {
       }
 
       // Charger depuis l'API backend
-      const response = await callClientApi(`admin/roles/${user.role}/permissions`, {
+      const response = await callClientApi(`admin/roles/${primaryRole}/permissions`, {
         headers: {
           Authorization: `Bearer ${tokens.accessToken}`,
         },
@@ -66,8 +72,8 @@ export function usePermissions() {
         permissionsCache.set(user.id, permissions)
 
         setUserPermissions({
-          roleId: user.role || '',
-          roleName: user.role || '',
+          roleId: primaryRole,
+          roleName: primaryRole,
           permissions,
         })
       }
@@ -169,7 +175,13 @@ export function usePermissions() {
    */
   const hasRole = (roleId: string): boolean => {
     if (!user) return false
-    return user.role === roleId
+    // Get user roles array (new system) or single role (legacy)
+    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    
+    return userRoles.some((role: any) => {
+      const roleValue = typeof role === 'object' ? role.name || role.role : role
+      return roleValue === roleId
+    })
   }
 
   /**

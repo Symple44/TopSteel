@@ -217,8 +217,16 @@ export function usePermissions() {
   const hasPermission = (permission: Permission): boolean => {
     if (!user) return false
 
+    // Get user roles array (new system) or single role (legacy)
+    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    
     // L'admin et super admin ont toutes les permissions
-    if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+    const hasAdminRole = userRoles.some((role: any) => {
+      const roleValue = typeof role === 'object' ? role.name || role.role : role
+      return roleValue === 'ADMIN' || roleValue === 'SUPER_ADMIN'
+    })
+    
+    if (hasAdminRole) {
       return true
     }
 
@@ -227,10 +235,13 @@ export function usePermissions() {
       return true
     }
 
-    // Vérifier dans les permissions du rôle
-    const rolePermissions = ROLE_PERMISSIONS[user.role as Role]
-    if (rolePermissions?.includes(permission)) {
-      return true
+    // Vérifier dans les permissions des rôles
+    for (const role of userRoles) {
+      const roleValue = typeof role === 'object' ? role.name || role.role : role
+      const rolePermissions = ROLE_PERMISSIONS[roleValue as Role]
+      if (rolePermissions?.includes(permission)) {
+        return true
+      }
     }
 
     return false
@@ -255,7 +266,13 @@ export function usePermissions() {
    */
   const hasRole = (role: Role): boolean => {
     if (!user) return false
-    return user.role === role || user.role === role.toLowerCase()
+    // Get user roles array (new system) or single role (legacy)
+    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    
+    return userRoles.some((userRole: any) => {
+      const roleValue = typeof userRole === 'object' ? userRole.name || userRole.role : userRole
+      return roleValue === role || roleValue === role.toLowerCase()
+    })
   }
 
   /**
@@ -271,12 +288,25 @@ export function usePermissions() {
   const getUserPermissions = (): Permission[] => {
     if (!user) return []
 
+    // Get user roles array (new system) or single role (legacy)
+    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    
     // L'admin a toutes les permissions
-    if (user.role === 'admin' || user.role === 'ADMIN') {
+    const hasAdminRole = userRoles.some((role: any) => {
+      const roleValue = typeof role === 'object' ? role.name || role.role : role
+      return roleValue === 'admin' || roleValue === 'ADMIN'
+    })
+    
+    if (hasAdminRole) {
       return Object.values(ROLE_PERMISSIONS).flat()
     }
 
-    const rolePermissions = ROLE_PERMISSIONS[user.role as Role] || []
+    const rolePermissions: Permission[] = []
+    for (const role of userRoles) {
+      const roleValue = typeof role === 'object' ? role.name || role.role : role
+      const permissions = ROLE_PERMISSIONS[roleValue as Role] || []
+      rolePermissions.push(...permissions)
+    }
     const userPermissions = (user.permissions || []) as Permission[]
 
     // Combiner les permissions du rôle et les permissions explicites

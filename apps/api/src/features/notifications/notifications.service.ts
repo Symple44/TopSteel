@@ -26,13 +26,13 @@ export class NotificationsService {
     const queryBuilder = this._repository.createQueryBuilder('entity')
 
     if (search) {
-      queryBuilder.andWhere('(entity.nom ILIKE :search OR entity.description ILIKE :search)', {
+      queryBuilder.andWhere('(entity.title ILIKE :search OR entity.message ILIKE :search)', {
         search: `%${search}%`,
       })
     }
 
-    if (query.actif !== undefined) {
-      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif })
+    if (query.isArchived !== undefined) {
+      queryBuilder.andWhere('entity.isArchived = :isArchived', { isArchived: query.isArchived })
     }
 
     if (query.type) {

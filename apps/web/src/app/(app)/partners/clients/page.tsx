@@ -1,26 +1,30 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Download, Upload, Users, Building2, Briefcase } from 'lucide-react'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { DataTable, type ColumnConfig } from '@erp/ui'
-import { Badge } from '@erp/ui'
+import type { Partner, PartnerFilters, PartnerStatus } from '@erp/types'
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  type ColumnConfig,
+  DataTable,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
-import type { Partner, PartnerFilters, PartnerType, PartnerStatus } from '@erp/types'
-import { usePartners, usePartnerStatistics, useDeletePartner } from '@/hooks/use-partners'
-import { PartnerFormDialog } from '@/components/partners/partner-form-dialog'
+import { Briefcase, Download, Plus, Upload } from 'lucide-react'
+import { useState } from 'react'
 import { PartnerDetailDialog } from '@/components/partners/partner-detail-dialog'
+import { PartnerFormDialog } from '@/components/partners/partner-form-dialog'
+import { useDeletePartner, usePartnerStatistics, usePartners } from '@/hooks/use-partners'
 import { formatCurrency } from '@/lib/utils'
 
-export default function PartnersPage() {
-  const [filters, setFilters] = useState<PartnerFilters>({})
+export default function ClientsPage() {
+  const [filters, setFilters] = useState<PartnerFilters>({ type: ['CLIENT'] })
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -59,16 +63,6 @@ export default function PartnersPage() {
       width: 120,
     },
     {
-      key: 'type',
-      label: 'Type',
-      width: 120,
-      render: (value: PartnerType) => (
-        <Badge variant={value === 'CLIENT' ? 'default' : value === 'FOURNISSEUR' ? 'secondary' : 'outline'}>
-          {value}
-        </Badge>
-      ),
-    },
-    {
       key: 'denomination',
       label: 'Dénomination',
       sortable: true,
@@ -99,20 +93,21 @@ export default function PartnersPage() {
       key: 'plafondCredit',
       label: 'Plafond crédit',
       width: 150,
-      render: (value: number) => value ? formatCurrency(value) : '-',
+      render: (value: number) => (value ? formatCurrency(value) : '-'),
     },
     {
       key: 'status',
       label: 'Statut',
       width: 120,
       render: (value: PartnerStatus) => {
-        const variants: Record<PartnerStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-          ACTIF: 'default',
-          INACTIF: 'secondary',
-          PROSPECT: 'outline',
-          SUSPENDU: 'destructive',
-          ARCHIVE: 'secondary',
-        }
+        const variants: Record<PartnerStatus, 'default' | 'secondary' | 'destructive' | 'outline'> =
+          {
+            ACTIF: 'default',
+            INACTIF: 'secondary',
+            PROSPECT: 'outline',
+            SUSPENDU: 'destructive',
+            ARCHIVE: 'secondary',
+          }
         return <Badge variant={variants[value]}>{value}</Badge>
       },
     },
@@ -145,10 +140,8 @@ export default function PartnersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Partenaires</h1>
-          <p className="text-muted-foreground">
-            Gérez vos clients, fournisseurs et prospects
-          </p>
+          <h1 className="text-3xl font-bold">Clients</h1>
+          <p className="text-muted-foreground">Gérez vos clients et prospects</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
@@ -161,62 +154,44 @@ export default function PartnersPage() {
           </Button>
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            Nouveau partenaire
+            Nouveau client
           </Button>
         </div>
       </div>
 
       {/* Statistics */}
       {statistics && (
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Partenaires</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{statistics.totalPartenaires}</div>
-              <p className="text-xs text-muted-foreground">
-                {statistics.partenairesActifs} actifs
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Clients</CardTitle>
+              <CardTitle className="text-sm font-medium">Clients actifs</CardTitle>
               <Briefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{statistics.totalClients}</div>
-              <p className="text-xs text-muted-foreground">
-                {statistics.totalProspects} prospects
-              </p>
+              <p className="text-xs text-muted-foreground">Clients enregistrés</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Fournisseurs</CardTitle>
-              <Building2 className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Prospects</CardTitle>
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{statistics.totalFournisseurs}</div>
-              <p className="text-xs text-muted-foreground">
-                {statistics.partenairesSuspendus} suspendus
-              </p>
+              <div className="text-2xl font-bold">{statistics.totalProspects}</div>
+              <p className="text-xs text-muted-foreground">En cours de conversion</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Groupes</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Groupes tarifaires</CardTitle>
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {Object.keys(statistics.repartitionParGroupe || {}).length}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Groupes tarifaires
-              </p>
+              <p className="text-xs text-muted-foreground">Groupes actifs</p>
             </CardContent>
           </Card>
         </div>
@@ -229,26 +204,6 @@ export default function PartnersPage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Select
-              value={filters.type?.[0] || 'all'}
-              onValueChange={(value) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  type: value === 'all' ? undefined : [value as PartnerType],
-                }))
-              }
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les types</SelectItem>
-                <SelectItem value="CLIENT">Clients</SelectItem>
-                <SelectItem value="FOURNISSEUR">Fournisseurs</SelectItem>
-                <SelectItem value="MIXTE">Mixtes</SelectItem>
-              </SelectContent>
-            </Select>
-
             <Select
               value={filters.status?.[0] || 'all'}
               onValueChange={(value) =>
@@ -296,9 +251,10 @@ export default function PartnersPage() {
           open={isFormOpen}
           onOpenChange={setIsFormOpen}
           partner={editingPartner}
+          defaultType="CLIENT"
         />
       )}
-      
+
       {isDetailOpen && selectedPartner && (
         <PartnerDetailDialog
           open={isDetailOpen}

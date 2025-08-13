@@ -59,10 +59,16 @@ export class EnhancedRolesGuard implements CanActivate {
     }
 
     try {
+      // Get user roles array (new system) or single role (legacy)
+      const userRoles = user.roles || (user.role ? [user.role] : [])
+      
       // Vérification SUPER_ADMIN bypass
       if (
         roleRequirement.allowSuperAdminBypass !== false &&
-        user.role === GlobalUserRole.SUPER_ADMIN
+        userRoles.some((role: any) => {
+          const roleValue = typeof role === 'object' ? role.name || role.role : role
+          return roleValue === GlobalUserRole.SUPER_ADMIN
+        })
       ) {
         return true
       }
@@ -70,7 +76,10 @@ export class EnhancedRolesGuard implements CanActivate {
       // Vérifier les rôles globaux
       if (roleRequirement.globalRoles && roleRequirement.globalRoles.length > 0) {
         const hasGlobalRole = roleRequirement.globalRoles.some((requiredRole) =>
-          isGlobalRoleHigherOrEqual(user.role, requiredRole)
+          userRoles.some((userRole: any) => {
+            const roleValue = typeof userRole === 'object' ? userRole.name || userRole.role : userRole
+            return isGlobalRoleHigherOrEqual(roleValue, requiredRole)
+          })
         )
 
         if (!hasGlobalRole) {

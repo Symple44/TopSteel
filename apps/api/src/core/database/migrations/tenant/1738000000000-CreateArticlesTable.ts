@@ -4,39 +4,36 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
   name = 'CreateArticlesTable1738000000000'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Créer les enums nécessaires
-    await queryRunner.query(`
-      CREATE TYPE IF NOT EXISTS "article_type" AS ENUM (
-        'MATIERE_PREMIERE',
-        'PRODUIT_FINI',
-        'PRODUIT_SEMI_FINI',
-        'FOURNITURE',
-        'CONSOMMABLE',
-        'SERVICE'
-      )
-    `)
+    // Créer les enums nécessaires - vérifier d'abord s'ils existent
+    const enums = [
+      {
+        name: 'article_type',
+        values: ['MATIERE_PREMIERE', 'PRODUIT_FINI', 'PRODUIT_SEMI_FINI', 'FOURNITURE', 'CONSOMMABLE', 'SERVICE']
+      },
+      {
+        name: 'article_status', 
+        values: ['ACTIF', 'INACTIF', 'OBSOLETE', 'EN_COURS_CREATION']
+      },
+      {
+        name: 'unite_stock',
+        values: ['PCS', 'KG', 'G', 'M', 'CM', 'MM', 'M2', 'M3', 'L', 'ML', 'T', 'H']
+      },
+      {
+        name: 'methode_valorisation_stock',
+        values: ['FIFO', 'LIFO', 'CMUP', 'PRIX_STANDARD']
+      }
+    ]
 
-    await queryRunner.query(`
-      CREATE TYPE IF NOT EXISTS "article_status" AS ENUM (
-        'ACTIF',
-        'INACTIF',
-        'OBSOLETE',
-        'EN_COURS_CREATION'
+    for (const enumDef of enums) {
+      const enumExists = await queryRunner.query(
+        `SELECT EXISTS(SELECT 1 FROM pg_type WHERE typname = '${enumDef.name}')`
       )
-    `)
-
-    await queryRunner.query(`
-      CREATE TYPE IF NOT EXISTS "unite_stock" AS ENUM (
-        'PCS', 'KG', 'G', 'M', 'CM', 'MM',
-        'M2', 'M3', 'L', 'ML', 'T', 'H'
-      )
-    `)
-
-    await queryRunner.query(`
-      CREATE TYPE IF NOT EXISTS "methode_valorisation_stock" AS ENUM (
-        'FIFO', 'LIFO', 'CMUP', 'PRIX_STANDARD'
-      )
-    `)
+      
+      if (!enumExists[0].exists) {
+        const enumValues = enumDef.values.map(v => `'${v}'`).join(', ')
+        await queryRunner.query(`CREATE TYPE "${enumDef.name}" AS ENUM (${enumValues})`)
+      }
+    }
 
     // Créer la table articles
     await queryRunner.createTable(

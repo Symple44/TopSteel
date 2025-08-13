@@ -35,8 +35,8 @@ export class HealthController {
         () => this.checkMultiTenantDatabase('auth'),
         () => this.checkMultiTenantDatabase('shared'),
         // Seuils mémoire plus réalistes pour une application moderne
-        () => this.memory.checkHeap('memory_heap', 512 * 1024 * 1024), // 512MB au lieu de 150MB
-        () => this.memory.checkRSS('memory_rss', 512 * 1024 * 1024), // 512MB au lieu de 150MB
+        () => this.memory.checkHeap('memory_heap', 1024 * 1024 * 1024), // 1GB pour éviter les faux positifs
+        () => this.memory.checkRSS('memory_rss', 1536 * 1024 * 1024), // 1.5GB pour éviter les faux positifs
       ]
 
       // Désactiver le check disque en développement car souvent problématique
