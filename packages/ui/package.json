@@ -131,7 +131,7 @@
     "react-dom": "^19.1.1",
     "rimraf": "^6.0.1",
     "rollup-plugin-visualizer": "^6.0.3",
-    "storybook": "^9.1.1",
+    "storybook": "^9.1.2",
     "typescript": "^5.9.2",
     "vite": "7.1.1",
     "vite-bundle-analyzer": "^1.2.0",
