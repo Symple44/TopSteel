@@ -47,7 +47,7 @@ export class SearchCacheService implements OnModuleInit {
   private popularSearches: Map<string, { count: number; lastAccess: Date }> = new Map()
 
   constructor(
-    private readonly redisService: RedisService,
+    public readonly redisService: RedisService,
     private readonly configService: ConfigService
   ) {
     this.initializeConfig()

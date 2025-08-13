@@ -179,7 +179,8 @@
       "Bash(PORT=3002 timeout 30s pnpm dev)",
       "Bash(PORT=3002 pnpm dev)",
       "Bash(NODE_ENV=development REDIS_ENABLED=true PORT=3005 pnpm dev)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

@@ -22,11 +22,11 @@ export class MenuSyncService {
 
   constructor(
     @InjectRepository(MenuConfiguration, 'auth')
-    private readonly configRepository: Repository<MenuConfiguration>,
+    public readonly configRepository: Repository<MenuConfiguration>,
     @InjectRepository(MenuItem, 'auth')
-    private readonly itemRepository: Repository<MenuItem>,
+    public readonly itemRepository: Repository<MenuItem>,
     @InjectRepository(MenuItemRole, 'auth')
-    private readonly roleRepository: Repository<MenuItemRole>,
+    public readonly roleRepository: Repository<MenuItemRole>,
     private readonly menuConfigService: MenuConfigurationService
   ) {}
 
@@ -63,7 +63,7 @@ export class MenuSyncService {
   /**
    * Structure de navigation actuelle du sidebar
    */
-  private getSidebarNavigationStructure(): SidebarNavItem[] {
+  getSidebarNavigationStructure(): SidebarNavItem[] {
     return [
       {
         title: 'Tableau de bord',
@@ -320,7 +320,7 @@ export class MenuSyncService {
   /**
    * Compte le nombre total d'items dans la structure
    */
-  private countTotalItems(items: SidebarNavItem[]): number {
+  countTotalItems(items: SidebarNavItem[]): number {
     let count = items.length
     for (const item of items) {
       if (item.children) {
