@@ -16,6 +16,7 @@ import {
   USER_MANAGEMENT_ROLES,
 } from '../core/constants/roles.constants'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
+import { PermissionCalculatorService } from './permission-calculator.service'
 
 export interface UserSocieteInfo {
   userId: string
@@ -59,7 +60,8 @@ export class UnifiedRolesService {
     private readonly userSocieteRoleRepository: Repository<UserSocieteRole>,
     @InjectRepository(User, 'auth')
     private readonly userRepository: Repository<User>,
-    private readonly cacheService: OptimizedCacheService
+    private readonly cacheService: OptimizedCacheService,
+    private readonly permissionCalculator: PermissionCalculatorService
   ) {}
 
   // ===== GESTION DES RÔLES UTILISATEUR-SOCIÉTÉ =====
@@ -92,7 +94,10 @@ export class UnifiedRolesService {
       .andWhere('usr.deletedAt IS NULL') // Explicitly filter out soft deleted records
       .getMany()
 
-    const result = userSocieteRoles.map((usr) => this.mapToUserSocieteInfo(user, usr))
+    // Calculate effective permissions for each societe role
+    const result = await Promise.all(
+      userSocieteRoles.map((usr) => this.mapToUserSocieteInfoWithPermissions(user, usr))
+    )
 
     // Cache with group invalidation
     await this.cacheService.setWithGroup(cacheKey, result, `user:${userId}`, this.ROLE_CACHE_TTL)
@@ -132,11 +137,11 @@ export class UnifiedRolesService {
     let result: UserSocieteInfo | null = null
 
     if (userSocieteRole) {
-      result = this.mapToUserSocieteInfo(user, userSocieteRole)
+      result = await this.mapToUserSocieteInfoWithPermissions(user, userSocieteRole)
     } else {
       // Pour SUPER_ADMIN, créer un rôle virtuel
       if (user.role === GlobalUserRole.SUPER_ADMIN) {
-        result = this.createVirtualSuperAdminRole(user, societeId)
+        result = await this.createVirtualSuperAdminRoleWithPermissions(user, societeId)
       }
     }
 
@@ -229,7 +234,13 @@ export class UnifiedRolesService {
       userSocieteRole.expiresAt = options.expiresAt
     }
 
-    return await this.userSocieteRoleRepository.save(userSocieteRole)
+    const saved = await this.userSocieteRoleRepository.save(userSocieteRole)
+
+    // Invalidate permission cache
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+    await this.invalidateUserRoleCache(userId)
+
+    return saved
   }
 
   /**
@@ -246,6 +257,11 @@ export class UnifiedRolesService {
 
     userSocieteRole.deactivate()
     await this.userSocieteRoleRepository.save(userSocieteRole)
+
+    // Invalidate permission cache
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+    await this.invalidateUserRoleCache(userId)
+
     return true
   }
 
@@ -417,12 +433,21 @@ export class UnifiedRolesService {
   // ===== MÉTHODES PRIVÉES =====
 
   /**
-   * Convertit une entité UserSocieteRole en UserSocieteInfo
+   * Convertit une entité UserSocieteRole en UserSocieteInfo avec permissions calculées
    */
-  private mapToUserSocieteInfo(user: User, userSocieteRole: UserSocieteRole): UserSocieteInfo {
+  private async mapToUserSocieteInfoWithPermissions(
+    user: User,
+    userSocieteRole: UserSocieteRole
+  ): Promise<UserSocieteInfo> {
     const globalRole = user.role as GlobalUserRole
     const societeRole = userSocieteRole.roleType as SocieteRoleType
     const effectiveRole = getEffectiveSocieteRole(globalRole, societeRole)
+
+    // Calculate effective permissions
+    const permissionSet = await this.permissionCalculator.calculateUserPermissions(
+      user.id,
+      userSocieteRole.societeId
+    )
 
     return {
       userId: user.id,
@@ -432,7 +457,7 @@ export class UnifiedRolesService {
       effectiveRole,
       isDefaultSociete: userSocieteRole.isDefaultSociete,
       isActive: userSocieteRole.isEffectivelyActive(),
-      permissions: [], // TODO: Calculer les permissions effectives
+      permissions: permissionSet.effectivePermissions,
       additionalPermissions: userSocieteRole.additionalPermissions,
       restrictedPermissions: userSocieteRole.restrictedPermissions,
       allowedSiteIds: userSocieteRole.allowedSiteIds,
@@ -454,9 +479,18 @@ export class UnifiedRolesService {
   }
 
   /**
-   * Crée un rôle virtuel pour SUPER_ADMIN
+   * Crée un rôle virtuel pour SUPER_ADMIN avec permissions
    */
-  private createVirtualSuperAdminRole(user: User, societeId: string): UserSocieteInfo {
+  private async createVirtualSuperAdminRoleWithPermissions(
+    user: User,
+    societeId: string
+  ): Promise<UserSocieteInfo> {
+    // Calculate permissions for SUPER_ADMIN
+    const permissionSet = await this.permissionCalculator.calculateUserPermissions(
+      user.id,
+      societeId
+    )
+
     return {
       userId: user.id,
       societeId,
@@ -465,9 +499,157 @@ export class UnifiedRolesService {
       effectiveRole: SocieteRoleType.OWNER,
       isDefaultSociete: false,
       isActive: true,
-      permissions: [], // SUPER_ADMIN a toutes les permissions
+      permissions: permissionSet.effectivePermissions,
       additionalPermissions: [],
       restrictedPermissions: [],
     }
+  }
+
+  /**
+   * Vérifie si un utilisateur a une permission spécifique dans une société
+   */
+  async hasPermission(
+    userId: string,
+    societeId: string,
+    resource: string,
+    action: string,
+    requiredLevel: 'READ' | 'WRITE' | 'DELETE' | 'ADMIN' = 'READ'
+  ): Promise<boolean> {
+    return await this.permissionCalculator.hasPermission(
+      userId,
+      societeId,
+      resource,
+      action,
+      requiredLevel
+    )
+  }
+
+  /**
+   * Récupère toutes les permissions effectives d'un utilisateur dans une société
+   */
+  async getUserEffectivePermissions(
+    userId: string,
+    societeId: string,
+    siteId?: string
+  ) {
+    return await this.permissionCalculator.calculateUserPermissions(userId, societeId, siteId)
+  }
+
+  /**
+   * Récupère un résumé des permissions d'un utilisateur
+   */
+  async getUserPermissionsSummary(userId: string, societeId: string) {
+    return await this.permissionCalculator.getPermissionsSummary(userId, societeId)
+  }
+
+  /**
+   * Mise à jour en masse des permissions pour un rôle
+   */
+  async bulkUpdateRolePermissions(
+    societeId: string,
+    roleType: SocieteRoleType,
+    permissions: {
+      add?: string[]
+      remove?: string[]
+      restrict?: string[]
+    }
+  ): Promise<number> {
+    const userRoles = await this.userSocieteRoleRepository.find({
+      where: {
+        societeId,
+        roleType,
+        isActive: true
+      }
+    })
+
+    let updatedCount = 0
+
+    for (const userRole of userRoles) {
+      let changed = false
+
+      // Add permissions
+      if (permissions.add?.length) {
+        for (const perm of permissions.add) {
+          if (!userRole.additionalPermissions.includes(perm)) {
+            userRole.addAdditionalPermission(perm)
+            changed = true
+          }
+        }
+      }
+
+      // Remove permissions
+      if (permissions.remove?.length) {
+        for (const perm of permissions.remove) {
+          userRole.removeAdditionalPermission(perm)
+          changed = true
+        }
+      }
+
+      // Restrict permissions
+      if (permissions.restrict?.length) {
+        for (const perm of permissions.restrict) {
+          if (!userRole.restrictedPermissions.includes(perm)) {
+            userRole.addRestrictedPermission(perm)
+            changed = true
+          }
+        }
+      }
+
+      if (changed) {
+        await this.userSocieteRoleRepository.save(userRole)
+        await this.permissionCalculator.invalidateUserPermissions(userRole.userId, societeId)
+        updatedCount++
+      }
+    }
+
+    return updatedCount
+  }
+
+  /**
+   * Copie les permissions d'un utilisateur à un autre
+   */
+  async copyUserPermissions(
+    fromUserId: string,
+    toUserId: string,
+    societeId: string,
+    grantedById: string
+  ): Promise<UserSocieteRole> {
+    const fromRole = await this.userSocieteRoleRepository.findOne({
+      where: { userId: fromUserId, societeId, isActive: true }
+    })
+
+    if (!fromRole) {
+      throw new Error(`Source user role not found for user ${fromUserId} in societe ${societeId}`)
+    }
+
+    // Create or update target user role
+    let toRole = await this.userSocieteRoleRepository.findOne({
+      where: { userId: toUserId, societeId }
+    })
+
+    if (toRole) {
+      toRole.roleType = fromRole.roleType
+      toRole.additionalPermissions = [...fromRole.additionalPermissions]
+      toRole.restrictedPermissions = [...fromRole.restrictedPermissions]
+      toRole.allowedSiteIds = fromRole.allowedSiteIds ? [...fromRole.allowedSiteIds] : undefined
+      toRole.grantedById = grantedById
+      toRole.grantedAt = new Date()
+      toRole.isActive = true
+    } else {
+      toRole = UserSocieteRole.create(toUserId, societeId, fromRole.roleType, grantedById)
+      toRole.additionalPermissions = [...fromRole.additionalPermissions]
+      toRole.restrictedPermissions = [...fromRole.restrictedPermissions]
+      toRole.allowedSiteIds = fromRole.allowedSiteIds ? [...fromRole.allowedSiteIds] : undefined
+    }
+
+    const saved = await this.userSocieteRoleRepository.save(toRole)
+
+    // Invalidate caches
+    await Promise.all([
+      this.permissionCalculator.invalidateUserPermissions(toUserId, societeId),
+      this.invalidateUserRoleCache(toUserId)
+    ])
+
+    return saved
   }
 }

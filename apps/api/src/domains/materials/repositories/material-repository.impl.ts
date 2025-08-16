@@ -202,24 +202,260 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return await query.getMany()
   }
 
-  async hasStockMovements(_materialId: string): Promise<boolean> {
-    // TODO: Implémenter selon votre logique de mouvements de stock
-    return false
+  async hasStockMovements(materialId: string): Promise<boolean> {
+    // Vérifier s'il existe des mouvements de stock pour ce matériau
+    const count = await this.repository.manager
+      .createQueryBuilder('material_movements', 'movement')
+      .where('movement.materialId = :materialId', { materialId })
+      .andWhere('movement.status != :status', { status: 'ANNULE' })
+      .getCount()
+
+    return count > 0
   }
 
-  async findWithFilters(_filters: MaterialAdvancedFilters): Promise<{
+  async findWithFilters(filters: MaterialAdvancedFilters): Promise<{
     items: Material[]
     total: number
     page: number
     limit: number
   }> {
-    // TODO: Implémenter la recherche avancée avec filtres
-    const items = await this.repository.find()
+    const query = this.repository.createQueryBuilder('material')
+
+    // Filtres de base
+    if (filters.types?.length) {
+      query.andWhere('material.type IN (:...types)', { types: filters.types })
+    }
+
+    if (filters.formes?.length) {
+      query.andWhere('material.forme IN (:...formes)', { formes: filters.formes })
+    }
+
+    if (filters.status?.length) {
+      query.andWhere('material.status IN (:...status)', { status: filters.status })
+    }
+
+    if (filters.nuances?.length) {
+      query.andWhere('material.nuance IN (:...nuances)', { nuances: filters.nuances })
+    }
+
+    // Filtres de stock
+    if (filters.stock) {
+      if (filters.stock.min !== undefined) {
+        query.andWhere('material.stockPhysique >= :stockMin', { stockMin: filters.stock.min })
+      }
+      if (filters.stock.max !== undefined) {
+        query.andWhere('material.stockPhysique <= :stockMax', { stockMax: filters.stock.max })
+      }
+      if (filters.stock.disponible !== undefined) {
+        query.andWhere('(material.stockPhysique - COALESCE(material.stockReserve, 0)) >= :disponible', {
+          disponible: filters.stock.disponible
+        })
+      }
+      if (filters.stock.enRupture === true) {
+        query.andWhere('material.stockPhysique <= 0')
+      }
+      if (filters.stock.sousStockMinimum === true) {
+        query.andWhere('material.stockPhysique < material.stockMini')
+        query.andWhere('material.stockPhysique > 0')
+      }
+    }
+
+    // Filtres de prix
+    if (filters.prix) {
+      if (filters.prix.min !== undefined) {
+        query.andWhere('material.prixUnitaire >= :prixMin', { prixMin: filters.prix.min })
+      }
+      if (filters.prix.max !== undefined) {
+        query.andWhere('material.prixUnitaire <= :prixMax', { prixMax: filters.prix.max })
+      }
+    }
+
+    // Filtres de dimensions
+    if (filters.dimensions) {
+      if (filters.dimensions.longueurMin !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'longueur' AS FLOAT) >= :longueurMin", {
+          longueurMin: filters.dimensions.longueurMin
+        })
+      }
+      if (filters.dimensions.longueurMax !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'longueur' AS FLOAT) <= :longueurMax", {
+          longueurMax: filters.dimensions.longueurMax
+        })
+      }
+      if (filters.dimensions.largeurMin !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'largeur' AS FLOAT) >= :largeurMin", {
+          largeurMin: filters.dimensions.largeurMin
+        })
+      }
+      if (filters.dimensions.largeurMax !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'largeur' AS FLOAT) <= :largeurMax", {
+          largeurMax: filters.dimensions.largeurMax
+        })
+      }
+      if (filters.dimensions.epaisseurMin !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'epaisseur' AS FLOAT) >= :epaisseurMin", {
+          epaisseurMin: filters.dimensions.epaisseurMin
+        })
+      }
+      if (filters.dimensions.epaisseurMax !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'epaisseur' AS FLOAT) <= :epaisseurMax", {
+          epaisseurMax: filters.dimensions.epaisseurMax
+        })
+      }
+      if (filters.dimensions.diametreMin !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'diametre' AS FLOAT) >= :diametreMin", {
+          diametreMin: filters.dimensions.diametreMin
+        })
+      }
+      if (filters.dimensions.diametreMax !== undefined) {
+        query.andWhere("CAST(material.dimensions->>'diametre' AS FLOAT) <= :diametreMax", {
+          diametreMax: filters.dimensions.diametreMax
+        })
+      }
+    }
+
+    // Filtres de poids
+    if (filters.poids) {
+      if (filters.poids.min !== undefined) {
+        query.andWhere('material.poidsUnitaire >= :poidsMin', { poidsMin: filters.poids.min })
+      }
+      if (filters.poids.max !== undefined) {
+        query.andWhere('material.poidsUnitaire <= :poidsMax', { poidsMax: filters.poids.max })
+      }
+    }
+
+    // Filtres mécaniques
+    if (filters.proprietesMecaniques) {
+      if (filters.proprietesMecaniques.resistanceMin !== undefined) {
+        query.andWhere("CAST(material.proprietesMecaniques->>'resistanceTraction' AS FLOAT) >= :resistanceMin", {
+          resistanceMin: filters.proprietesMecaniques.resistanceMin
+        })
+      }
+      if (filters.proprietesMecaniques.resistanceMax !== undefined) {
+        query.andWhere("CAST(material.proprietesMecaniques->>'resistanceTraction' AS FLOAT) <= :resistanceMax", {
+          resistanceMax: filters.proprietesMecaniques.resistanceMax
+        })
+      }
+      if (filters.proprietesMecaniques.dureteMin !== undefined) {
+        query.andWhere("CAST(material.proprietesMecaniques->>'durete' AS FLOAT) >= :dureteMin", {
+          dureteMin: filters.proprietesMecaniques.dureteMin
+        })
+      }
+      if (filters.proprietesMecaniques.dureteMax !== undefined) {
+        query.andWhere("CAST(material.proprietesMecaniques->>'durete' AS FLOAT) <= :dureteMax", {
+          dureteMax: filters.proprietesMecaniques.dureteMax
+        })
+      }
+      if (filters.proprietesMecaniques.limiteElastiqueMin !== undefined) {
+        query.andWhere("CAST(material.proprietesMecaniques->>'limiteElastique' AS FLOAT) >= :limiteElastiqueMin", {
+          limiteElastiqueMin: filters.proprietesMecaniques.limiteElastiqueMin
+        })
+      }
+    }
+
+    // Filtres physiques
+    if (filters.proprietesPhysiques) {
+      if (filters.proprietesPhysiques.densiteMin !== undefined) {
+        query.andWhere('material.densite >= :densiteMin', { 
+          densiteMin: filters.proprietesPhysiques.densiteMin 
+        })
+      }
+      if (filters.proprietesPhysiques.densiteMax !== undefined) {
+        query.andWhere('material.densite <= :densiteMax', { 
+          densiteMax: filters.proprietesPhysiques.densiteMax 
+        })
+      }
+      if (filters.proprietesPhysiques.temperatureFusionMin !== undefined) {
+        query.andWhere("CAST(material.proprietesPhysiques->>'temperatureFusion' AS FLOAT) >= :tempFusionMin", {
+          tempFusionMin: filters.proprietesPhysiques.temperatureFusionMin
+        })
+      }
+      if (filters.proprietesPhysiques.temperatureFusionMax !== undefined) {
+        query.andWhere("CAST(material.proprietesPhysiques->>'temperatureFusion' AS FLOAT) <= :tempFusionMax", {
+          tempFusionMax: filters.proprietesPhysiques.temperatureFusionMax
+        })
+      }
+    }
+
+    // Filtres chimiques
+    if (filters.proprietesChimiques) {
+      if (filters.proprietesChimiques.resistanceCorrosion !== undefined) {
+        query.andWhere("material.proprietesChimiques->>'resistanceCorrosion' = :resistanceCorrosion", {
+          resistanceCorrosion: filters.proprietesChimiques.resistanceCorrosion
+        })
+      }
+      if (filters.proprietesChimiques.traitementSurface?.length) {
+        query.andWhere("material.proprietesChimiques->>'traitementSurface' IN (:...traitements)", {
+          traitements: filters.proprietesChimiques.traitementSurface
+        })
+      }
+    }
+
+    // Filtres par fournisseurs
+    if (filters.fournisseurs?.length) {
+      query.andWhere("material.informationsApprovisionnement->>'fournisseurPrincipalId' IN (:...fournisseurs)", {
+        fournisseurs: filters.fournisseurs
+      })
+    }
+
+    // Filtre par certifications
+    if (filters.certifications?.length) {
+      query.andWhere("material.conformiteNormes->>'certifications' ?| ARRAY[:...certs]", {
+        certs: filters.certifications
+      })
+    }
+
+    // Filtre par stockage spécial
+    if (filters.stockageSpecial === true) {
+      query.andWhere(
+        "material.methodeStockage IN (:...methodes)",
+        { 
+          methodes: [
+            StorageMethod.CONTROLE_HUMIDITE,
+            StorageMethod.CONTROLE_TEMPERATURE,
+            StorageMethod.SUSPENDU
+          ]
+        }
+      )
+    }
+
+    // Filtres booléens
+    if (filters.dangereux !== undefined) {
+      query.andWhere('material.dangereux = :dangereux', { dangereux: filters.dangereux })
+    }
+
+    if (filters.obsolete !== undefined) {
+      query.andWhere('material.obsolete = :obsolete', { obsolete: filters.obsolete })
+    }
+
+    // Recherche textuelle
+    if (filters.recherche) {
+      query.andWhere(
+        '(material.nom ILIKE :search OR material.reference ILIKE :search OR material.description ILIKE :search OR material.nuance ILIKE :search)',
+        { search: `%${filters.recherche}%` }
+      )
+    }
+
+    // Tri
+    const sortField = filters.tri?.champ || 'reference'
+    const sortOrder = filters.tri?.ordre || 'ASC'
+    query.orderBy(`material.${sortField}`, sortOrder)
+
+    // Pagination
+    const page = filters.pagination?.page || 1
+    const limit = filters.pagination?.limite || 20
+    const skip = (page - 1) * limit
+
+    query.skip(skip).take(limit)
+
+    // Exécution
+    const [items, total] = await query.getManyAndCount()
+
     return {
       items,
-      total: items.length,
-      page: 1,
-      limit: 10,
+      total,
+      page,
+      limit
     }
   }
 
@@ -239,110 +475,119 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   }
 
   async getMaterialStats(): Promise<MaterialStatistics> {
-    const totalMateriaux = await this.repository.count()
+    // Requête optimisée pour récupérer toutes les statistiques en une seule fois
+    const [
+      totalMateriaux,
+      typeStats,
+      formeStats,
+      statusStats,
+      stockageStats,
+      valeurTotaleStock,
+      materialsEnRupture,
+      materialsSousStockMini,
+      materialsObsoletes,
+      materialsDangereux,
+      materialsStockageSpecial
+    ] = await Promise.all([
+      // Total des matériaux
+      this.repository.count(),
+      
+      // Répartition par type
+      this.repository
+        .createQueryBuilder('material')
+        .select('material.type', 'type')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('material.type')
+        .getRawMany(),
+      
+      // Répartition par forme
+      this.repository
+        .createQueryBuilder('material')
+        .select('material.forme', 'forme')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('material.forme')
+        .getRawMany(),
+      
+      // Répartition par status
+      this.repository
+        .createQueryBuilder('material')
+        .select('material.status', 'status')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('material.status')
+        .getRawMany(),
+      
+      // Répartition par méthode de stockage
+      this.repository
+        .createQueryBuilder('material')
+        .select('material.methodeStockage', 'methodeStockage')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('material.methodeStockage')
+        .getRawMany(),
+      
+      // Valeur totale du stock
+      this.calculateTotalStockValue(),
+      
+      // Matériaux en rupture
+      this.countMaterialsEnRupture(),
+      
+      // Matériaux sous stock minimum
+      this.countMaterialsSousStockMinimum(),
+      
+      // Matériaux obsolètes
+      this.repository.count({ where: { obsolete: true } }),
+      
+      // Matériaux dangereux
+      this.repository.count({ where: { dangereux: true } }),
+      
+      // Matériaux nécessitant un stockage spécial
+      this.countMaterialsStockageSpecial()
+    ])
 
-    // Implémentation basique - peut être améliorée avec des requêtes optimisées
+    // Construire les objets de répartition
+    const repartitionParType: Record<MaterialType, number> = {} as any
+    Object.values(MaterialType).forEach(type => {
+      repartitionParType[type] = 0
+    })
+    typeStats.forEach((stat) => {
+      repartitionParType[stat.type] = parseInt(stat.count)
+    })
+
+    const repartitionParForme: Record<MaterialShape, number> = {} as any
+    Object.values(MaterialShape).forEach(forme => {
+      repartitionParForme[forme] = 0
+    })
+    formeStats.forEach((stat) => {
+      repartitionParForme[stat.forme] = parseInt(stat.count)
+    })
+
+    const repartitionParStatus: Record<MaterialStatus, number> = {} as any
+    Object.values(MaterialStatus).forEach(status => {
+      repartitionParStatus[status] = 0
+    })
+    statusStats.forEach((stat) => {
+      repartitionParStatus[stat.status] = parseInt(stat.count)
+    })
+
+    const repartitionParStockage: Record<StorageMethod, number> = {} as any
+    Object.values(StorageMethod).forEach(method => {
+      repartitionParStockage[method] = 0
+    })
+    stockageStats.forEach((stat) => {
+      repartitionParStockage[stat.methodeStockage] = parseInt(stat.count)
+    })
+
     return {
       totalMateriaux,
-      repartitionParType: {
-        [MaterialType.ACIER]: await this.repository.count({ where: { type: MaterialType.ACIER } }),
-        [MaterialType.INOX]: await this.repository.count({ where: { type: MaterialType.INOX } }),
-        [MaterialType.ALUMINIUM]: await this.repository.count({
-          where: { type: MaterialType.ALUMINIUM },
-        }),
-        [MaterialType.CUIVRE]: await this.repository.count({
-          where: { type: MaterialType.CUIVRE },
-        }),
-        [MaterialType.FONTE]: await this.repository.count({ where: { type: MaterialType.FONTE } }),
-        [MaterialType.BRONZE]: await this.repository.count({
-          where: { type: MaterialType.BRONZE },
-        }),
-        [MaterialType.LAITON]: await this.repository.count({
-          where: { type: MaterialType.LAITON },
-        }),
-        [MaterialType.PLASTIQUE]: await this.repository.count({
-          where: { type: MaterialType.PLASTIQUE },
-        }),
-        [MaterialType.COMPOSITE]: await this.repository.count({
-          where: { type: MaterialType.COMPOSITE },
-        }),
-        [MaterialType.AUTRE]: await this.repository.count({ where: { type: MaterialType.AUTRE } }),
-      },
-      repartitionParForme: {
-        [MaterialShape.PLAQUE]: await this.repository.count({
-          where: { forme: MaterialShape.PLAQUE },
-        }),
-        [MaterialShape.TUBE]: await this.repository.count({ where: { forme: MaterialShape.TUBE } }),
-        [MaterialShape.BARRE]: await this.repository.count({
-          where: { forme: MaterialShape.BARRE },
-        }),
-        [MaterialShape.PROFILE]: await this.repository.count({
-          where: { forme: MaterialShape.PROFILE },
-        }),
-        [MaterialShape.TOLE]: await this.repository.count({ where: { forme: MaterialShape.TOLE } }),
-        [MaterialShape.FIL]: await this.repository.count({ where: { forme: MaterialShape.FIL } }),
-        [MaterialShape.ROND]: await this.repository.count({ where: { forme: MaterialShape.ROND } }),
-        [MaterialShape.CARRE]: await this.repository.count({
-          where: { forme: MaterialShape.CARRE },
-        }),
-        [MaterialShape.RECTANGLE]: await this.repository.count({
-          where: { forme: MaterialShape.RECTANGLE },
-        }),
-        [MaterialShape.CORNIERE]: await this.repository.count({
-          where: { forme: MaterialShape.CORNIERE },
-        }),
-        [MaterialShape.U]: await this.repository.count({ where: { forme: MaterialShape.U } }),
-        [MaterialShape.T]: await this.repository.count({ where: { forme: MaterialShape.T } }),
-        [MaterialShape.AUTRE]: await this.repository.count({
-          where: { forme: MaterialShape.AUTRE },
-        }),
-      },
-      repartitionParStatus: {
-        [MaterialStatus.ACTIF]: await this.repository.count({
-          where: { status: MaterialStatus.ACTIF },
-        }),
-        [MaterialStatus.INACTIF]: await this.repository.count({
-          where: { status: MaterialStatus.INACTIF },
-        }),
-        [MaterialStatus.OBSOLETE]: await this.repository.count({
-          where: { status: MaterialStatus.OBSOLETE },
-        }),
-        [MaterialStatus.EN_EVALUATION]: await this.repository.count({
-          where: { status: MaterialStatus.EN_EVALUATION },
-        }),
-      },
-      repartitionParStockage: {
-        [StorageMethod.STANDARD]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.STANDARD },
-        }),
-        [StorageMethod.VERTICAL]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.VERTICAL },
-        }),
-        [StorageMethod.HORIZONTAL]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.HORIZONTAL },
-        }),
-        [StorageMethod.SUSPENDU]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.SUSPENDU },
-        }),
-        [StorageMethod.EMPILE]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.EMPILE },
-        }),
-        [StorageMethod.SEPARATEUR]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.SEPARATEUR },
-        }),
-        [StorageMethod.CONTROLE_HUMIDITE]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.CONTROLE_HUMIDITE },
-        }),
-        [StorageMethod.CONTROLE_TEMPERATURE]: await this.repository.count({
-          where: { methodeStockage: StorageMethod.CONTROLE_TEMPERATURE },
-        }),
-      },
-      valeurTotaleStock: 0, // TODO: Calculer la valeur totale
-      materialsEnRupture: 0, // TODO: Calculer
-      materialsSousStockMini: 0, // TODO: Calculer
-      materialsObsoletes: await this.repository.count({ where: { obsolete: true } }),
-      materialsDangereux: await this.repository.count({ where: { dangereux: true } }),
-      materialsStockageSpecial: 0, // TODO: Calculer
+      repartitionParType,
+      repartitionParForme,
+      repartitionParStatus,
+      repartitionParStockage,
+      valeurTotaleStock,
+      materialsEnRupture,
+      materialsSousStockMini,
+      materialsObsoletes,
+      materialsDangereux,
+      materialsStockageSpecial
     }
   }
 
@@ -493,34 +738,123 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   async getStockValuationByType(): Promise<
     Record<MaterialType, { quantite: number; valeur: number }>
   > {
-    // TODO: Implémenter avec une requête optimisée
-    return {} as Record<MaterialType, { quantite: number; valeur: number }>
+    const result = await this.repository
+      .createQueryBuilder('material')
+      .select('material.type', 'type')
+      .addSelect('SUM(material.stockPhysique)', 'quantite')
+      .addSelect('SUM(material.stockPhysique * material.prixUnitaire)', 'valeur')
+      .where('material.status = :status', { status: MaterialStatus.ACTIF })
+      .andWhere('material.obsolete = :obsolete', { obsolete: false })
+      .groupBy('material.type')
+      .getRawMany()
+
+    const valuation: Record<MaterialType, { quantite: number; valeur: number }> = {} as any
+
+    // Initialiser avec 0 pour tous les types
+    Object.values(MaterialType).forEach(type => {
+      valuation[type] = { quantite: 0, valeur: 0 }
+    })
+
+    // Remplir avec les données réelles
+    result.forEach((row) => {
+      valuation[row.type] = {
+        quantite: parseFloat(row.quantite || '0'),
+        valeur: parseFloat(row.valeur || '0')
+      }
+    })
+
+    return valuation
   }
 
   async getStockValuationByShape(): Promise<
     Record<MaterialShape, { quantite: number; valeur: number }>
   > {
-    // TODO: Implémenter avec une requête optimisée
-    return {} as Record<MaterialShape, { quantite: number; valeur: number }>
+    const result = await this.repository
+      .createQueryBuilder('material')
+      .select('material.forme', 'forme')
+      .addSelect('SUM(material.stockPhysique)', 'quantite')
+      .addSelect('SUM(material.stockPhysique * material.prixUnitaire)', 'valeur')
+      .where('material.status = :status', { status: MaterialStatus.ACTIF })
+      .andWhere('material.obsolete = :obsolete', { obsolete: false })
+      .groupBy('material.forme')
+      .getRawMany()
+
+    const valuation: Record<MaterialShape, { quantite: number; valeur: number }> = {} as any
+
+    // Initialiser avec 0 pour toutes les formes
+    Object.values(MaterialShape).forEach(shape => {
+      valuation[shape] = { quantite: 0, valeur: 0 }
+    })
+
+    // Remplir avec les données réelles
+    result.forEach((row) => {
+      valuation[row.forme] = {
+        quantite: parseFloat(row.quantite || '0'),
+        valeur: parseFloat(row.valeur || '0')
+      }
+    })
+
+    return valuation
   }
 
   async getRecentStockMovements(
-    _materialId: string,
-    _limit: number
+    materialId: string,
+    limit: number = 10
   ): Promise<Record<string, unknown>[]> {
-    // TODO: Implémenter selon votre système de mouvements
-    return []
+    // Note: Cette méthode devra être mise à jour quand l'entité MaterialMovement sera créée
+    const movements = await this.repository.manager
+      .createQueryBuilder('material_movements', 'movement')
+      .where('movement.materialId = :materialId', { materialId })
+      .andWhere('movement.status != :status', { status: 'ANNULE' })
+      .orderBy('movement.dateCreation', 'DESC')
+      .limit(limit)
+      .getRawMany()
+
+    return movements.map(movement => ({
+      id: movement.movement_id,
+      type: movement.movement_type,
+      quantite: movement.movement_quantite,
+      date: movement.movement_dateCreation,
+      reference: movement.movement_reference,
+      motif: movement.movement_motif,
+      stockAvant: movement.movement_stockAvant,
+      stockApres: movement.movement_stockApres
+    }))
   }
 
   async getMostUsedMaterials(
     limit: number,
-    _periode?: { debut: Date; fin: Date }
+    periode?: { debut: Date; fin: Date }
   ): Promise<Array<Material & { quantiteUtilisee: number }>> {
-    // TODO: Implémenter avec les données d'utilisation
-    const materials = await this.repository.find({ take: limit })
-    return materials.map((material) => {
-      const result = Object.assign(material, { quantiteUtilisee: 0 })
-      return result as Material & { quantiteUtilisee: number }
+    let subQuery = '(SELECT "materialId", SUM(quantite) as total_usage FROM material_movements WHERE type IN (\'SORTIE\', \'TRANSFERT\') AND status = \'COMPLETE\''
+    
+    if (periode) {
+      subQuery += ' AND "dateCreation" BETWEEN :debut AND :fin'
+    }
+    
+    subQuery += ' GROUP BY "materialId")'
+    
+    const query = this.repository
+      .createQueryBuilder('material')
+      .leftJoin(
+        subQuery,
+        'usage',
+        'usage."materialId" = material.id'
+      )
+      .addSelect('COALESCE(usage.total_usage, 0)', 'quantiteUtilisee')
+      .where('material.status = :status', { status: MaterialStatus.ACTIF })
+      .orderBy('quantiteUtilisee', 'DESC')
+      .limit(limit)
+
+    if (periode) {
+      query.setParameters({ debut: periode.debut, fin: periode.fin })
+    }
+
+    const results = await query.getRawAndEntities()
+    
+    return results.entities.map((material, index) => {
+      const quantiteUtilisee = parseFloat(results.raw[index]?.quantiteUtilisee || '0')
+      return Object.assign(material, { quantiteUtilisee }) as Material & { quantiteUtilisee: number }
     })
   }
 
@@ -528,17 +862,57 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     const date = new Date()
     date.setDate(date.getDate() - nbJoursSansUtilisation)
 
-    // TODO: Implémenter avec les données de mouvement
-    return await this.repository.find()
+    // Trouver les matériaux sans mouvement depuis X jours
+    const query = this.repository
+      .createQueryBuilder('material')
+      .leftJoin(
+        '(SELECT DISTINCT "materialId" FROM material_movements WHERE "dateCreation" > :date AND status = \'COMPLETE\')',
+        'recent_movements',
+        'recent_movements."materialId" = material.id'
+      )
+      .where('material.status = :status', { status: MaterialStatus.ACTIF })
+      .andWhere('material.stockPhysique > 0')
+      .andWhere('recent_movements."materialId" IS NULL')
+      .setParameter('date', date)
+
+    return await query.getMany()
   }
 
   async findByStorageLocation(emplacement: string): Promise<Material[]> {
     return await this.repository.find({ where: { emplacement } })
   }
 
-  async findCompatibleMaterials(_materialId: string): Promise<Material[]> {
-    // TODO: Implémenter la logique de compatibilité
-    return await this.repository.find()
+  async findCompatibleMaterials(materialId: string): Promise<Material[]> {
+    // Trouver le matériau de référence
+    const material = await this.repository.findOne({ where: { id: materialId } })
+    if (!material) return []
+
+    // Trouver les matériaux compatibles basés sur plusieurs critères
+    const query = this.repository
+      .createQueryBuilder('material')
+      .where('material.id != :materialId', { materialId })
+      .andWhere('material.status = :status', { status: MaterialStatus.ACTIF })
+      .andWhere('material.obsolete = :obsolete', { obsolete: false })
+
+    // Compatibilité par type et forme
+    query.andWhere('(material.type = :type OR material.forme = :forme)', {
+      type: material.type,
+      forme: material.forme
+    })
+
+    // Exclure les matériaux avec des incompatibilités connues
+    if (material.dangereux) {
+      query.andWhere('material.dangereux = :dangereux', { dangereux: true })
+    }
+
+    // Méthode de stockage compatible
+    if (material.methodeStockage !== StorageMethod.STANDARD) {
+      query.andWhere('material.methodeStockage = :methodeStockage', {
+        methodeStockage: material.methodeStockage
+      })
+    }
+
+    return await query.getMany()
   }
 
   async findAlternativeMaterials(obsoleteMaterialId: string): Promise<Material[]> {
@@ -562,8 +936,14 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   }
 
   async findByPreferredSuppliers(): Promise<Material[]> {
-    // TODO: Implémenter avec la logique de fournisseurs préférés
-    return await this.repository.find()
+    // Trouver les matériaux des fournisseurs marqués comme préférés
+    return await this.repository
+      .createQueryBuilder('material')
+      .where("material.informationsApprovisionnement->>'fournisseurPrefere' = 'true'")
+      .andWhere('material.status = :status', { status: MaterialStatus.ACTIF })
+      .andWhere('material.obsolete = :obsolete', { obsolete: false })
+      .orderBy('material.reference', 'ASC')
+      .getMany()
   }
 
   async findRequiringRestock(): Promise<Array<Material & { quantiteACommander: number }>> {
@@ -584,8 +964,8 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   }
 
   async getUsageStatsByPeriod(
-    _debut: Date,
-    _fin: Date
+    debut: Date,
+    fin: Date
   ): Promise<
     Array<{
       materialId: string
@@ -597,8 +977,47 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       valeurStock: number
     }>
   > {
-    // TODO: Implémenter avec les données de mouvement
-    return []
+    const materials = await this.repository
+      .createQueryBuilder('material')
+      .where('material.status = :status', { status: MaterialStatus.ACTIF })
+      .getMany()
+
+    const stats = await Promise.all(
+      materials.map(async (material) => {
+        // Calculer les entrées
+        const entrees = await this.repository.manager
+          .createQueryBuilder('material_movements', 'movement')
+          .select('SUM(movement.quantite)', 'total')
+          .where('movement.materialId = :materialId', { materialId: material.id })
+          .andWhere('movement.type IN (:...types)', { types: ['ENTREE', 'RETOUR', 'CORRECTION_POSITIVE'] })
+          .andWhere('movement.dateCreation BETWEEN :debut AND :fin', { debut, fin })
+          .andWhere('movement.status = :status', { status: 'COMPLETE' })
+          .getRawOne()
+
+        // Calculer les sorties
+        const sorties = await this.repository.manager
+          .createQueryBuilder('material_movements', 'movement')
+          .select('SUM(movement.quantite)', 'total')
+          .where('movement.materialId = :materialId', { materialId: material.id })
+          .andWhere('movement.type IN (:...types)', { types: ['SORTIE', 'TRANSFERT', 'CORRECTION_NEGATIVE'] })
+          .andWhere('movement.dateCreation BETWEEN :debut AND :fin', { debut, fin })
+          .andWhere('movement.status = :status', { status: 'COMPLETE' })
+          .getRawOne()
+
+        return {
+          materialId: material.id,
+          reference: material.reference,
+          nom: material.nom,
+          quantiteEntree: parseFloat(entrees?.total || '0'),
+          quantiteSortie: parseFloat(sorties?.total || '0'),
+          quantiteStock: material.stockPhysique || 0,
+          valeurStock: (material.stockPhysique || 0) * (material.prixUnitaire || 0)
+        }
+      })
+    )
+
+    // Filtrer pour ne garder que les matériaux avec des mouvements
+    return stats.filter(s => s.quantiteEntree > 0 || s.quantiteSortie > 0)
   }
 
   // Méthodes de l'interface IBusinessRepository
@@ -609,5 +1028,47 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   async findBySpecification(_spec: any): Promise<Material[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
+  }
+
+  /**
+   * Méthodes privées helper
+   */
+  private async calculateTotalStockValue(): Promise<number> {
+    const result = await this.repository
+      .createQueryBuilder('material')
+      .select('SUM(material.stockPhysique * material.prixUnitaire)', 'total')
+      .getRawOne()
+
+    return parseFloat(result?.total || '0')
+  }
+
+  private async countMaterialsEnRupture(): Promise<number> {
+    return await this.repository
+      .createQueryBuilder('material')
+      .where('material.stockPhysique <= 0')
+      .andWhere('material.status = :status', { status: MaterialStatus.ACTIF })
+      .getCount()
+  }
+
+  private async countMaterialsSousStockMinimum(): Promise<number> {
+    return await this.repository
+      .createQueryBuilder('material')
+      .where('material.stockPhysique > 0')
+      .where('material.stockPhysique < material.stockMini')
+      .andWhere('material.status = :status', { status: MaterialStatus.ACTIF })
+      .getCount()
+  }
+
+  private async countMaterialsStockageSpecial(): Promise<number> {
+    return await this.repository
+      .createQueryBuilder('material')
+      .where('material.methodeStockage IN (:...methodes)', {
+        methodes: [
+          StorageMethod.CONTROLE_HUMIDITE,
+          StorageMethod.CONTROLE_TEMPERATURE,
+          StorageMethod.SUSPENDU
+        ]
+      })
+      .getCount()
   }
 }

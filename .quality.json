@@ -1,0 +1,321 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TopSteel Quality Configuration",
+  "description": "Configuration file for code quality standards and thresholds",
+  "version": "1.0.0",
+  "thresholds": {
+    "coverage": {
+      "minimum": 80,
+      "target": 90,
+      "description": "Code coverage percentage thresholds"
+    },
+    "complexity": {
+      "cyclomatic": 10,
+      "cognitive": 15,
+      "description": "Maximum complexity allowed per function/method"
+    },
+    "duplication": {
+      "percentage": 5,
+      "minLines": 10,
+      "minTokens": 50,
+      "description": "Code duplication thresholds"
+    },
+    "bundleSize": {
+      "web": "5MB",
+      "api": "50MB",
+      "marketplace": "3MB",
+      "warning": "2MB",
+      "description": "Maximum bundle sizes for different applications"
+    },
+    "performance": {
+      "buildTime": 300,
+      "testTime": 120,
+      "lintTime": 60,
+      "description": "Maximum time in seconds for different operations"
+    },
+    "security": {
+      "vulnerabilities": {
+        "critical": 0,
+        "high": 2,
+        "moderate": 10
+      },
+      "description": "Maximum allowed vulnerabilities by severity"
+    }
+  },
+  "linting": {
+    "rules": {
+      "typescript": {
+        "noExplicitAny": "warn",
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error",
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "strictFunctionTypes": true
+      },
+      "react": {
+        "useHooksRules": "error",
+        "exhaustiveDeps": "warn",
+        "noUnusedState": "warn",
+        "propTypesRequired": false
+      },
+      "security": {
+        "noDangerouslySetInnerHTML": "warn",
+        "noEval": "error",
+        "noConsoleInProduction": "error"
+      },
+      "performance": {
+        "noFunctionInLoops": "warn",
+        "noNestedTernary": "warn",
+        "preferConst": "error"
+      }
+    },
+    "customRules": {
+      "topsteel": {
+        "requireJSDocForPublicAPI": "warn",
+        "enforceNamingConventions": "error",
+        "maxFileLength": 500,
+        "maxFunctionLength": 50,
+        "requireErrorHandling": "warn"
+      }
+    }
+  },
+  "metrics": {
+    "codeQuality": {
+      "maintainabilityIndex": {
+        "minimum": 70,
+        "target": 85,
+        "description": "Maintainability index (0-100)"
+      },
+      "technicalDebt": {
+        "maximum": "4h",
+        "target": "2h",
+        "description": "Maximum technical debt per module"
+      }
+    },
+    "performance": {
+      "loadTime": {
+        "web": "2s",
+        "api": "500ms",
+        "marketplace": "3s"
+      },
+      "memoryUsage": {
+        "maximum": "512MB",
+        "warning": "256MB"
+      },
+      "cpuUsage": {
+        "maximum": "80%",
+        "warning": "60%"
+      }
+    },
+    "reliability": {
+      "uptime": "99.9%",
+      "errorRate": "0.1%",
+      "responseTime": "200ms"
+    }
+  },
+  "standards": {
+    "fileNaming": {
+      "components": "PascalCase",
+      "hooks": "camelCase",
+      "utilities": "camelCase",
+      "constants": "UPPER_SNAKE_CASE",
+      "types": "PascalCase"
+    },
+    "codeStructure": {
+      "maxNestingLevel": 4,
+      "maxParametersPerFunction": 5,
+      "maxLinesPerFile": 500,
+      "maxFunctionsPerFile": 10
+    },
+    "documentation": {
+      "requireJSDoc": {
+        "publicAPI": true,
+        "complexFunctions": true,
+        "interfaces": true,
+        "classes": true
+      },
+      "minimumCoverage": 70,
+      "readme": {
+        "required": true,
+        "sections": [
+          "installation",
+          "usage",
+          "api",
+          "contributing",
+          "license"
+        ]
+      }
+    },
+    "testing": {
+      "unitTests": {
+        "coverage": 80,
+        "required": true
+      },
+      "integrationTests": {
+        "coverage": 60,
+        "required": true
+      },
+      "e2eTests": {
+        "coverage": 40,
+        "required": false
+      }
+    }
+  },
+  "tools": {
+    "linters": {
+      "biome": {
+        "enabled": true,
+        "config": "./biome.json"
+      },
+      "eslint": {
+        "enabled": false,
+        "config": "./.eslintrc.json"
+      }
+    },
+    "formatters": {
+      "biome": {
+        "enabled": true,
+        "config": "./biome.json"
+      },
+      "prettier": {
+        "enabled": false,
+        "config": "./.prettierrc"
+      }
+    },
+    "testing": {
+      "vitest": {
+        "enabled": true,
+        "config": "./vitest.config.ts"
+      },
+      "jest": {
+        "enabled": false,
+        "config": "./jest.config.js"
+      }
+    },
+    "bundleAnalysis": {
+      "webpack-bundle-analyzer": {
+        "enabled": true,
+        "threshold": "5MB"
+      },
+      "size-limit": {
+        "enabled": false,
+        "config": "./.size-limit.json"
+      }
+    },
+    "complexity": {
+      "complexity-report": {
+        "enabled": true,
+        "threshold": 10
+      },
+      "jscpd": {
+        "enabled": true,
+        "threshold": 5
+      }
+    }
+  },
+  "environments": {
+    "development": {
+      "strictMode": false,
+      "allowConsole": true,
+      "allowDebugger": true,
+      "performanceChecks": false
+    },
+    "staging": {
+      "strictMode": true,
+      "allowConsole": false,
+      "allowDebugger": false,
+      "performanceChecks": true
+    },
+    "production": {
+      "strictMode": true,
+      "allowConsole": false,
+      "allowDebugger": false,
+      "performanceChecks": true,
+      "securityChecks": true,
+      "bundleOptimization": true
+    }
+  },
+  "reporting": {
+    "formats": ["json", "html", "markdown"],
+    "destinations": {
+      "local": "./reports/",
+      "ci": "$GITHUB_STEP_SUMMARY",
+      "artifacts": true
+    },
+    "notifications": {
+      "slack": {
+        "enabled": false,
+        "webhook": "",
+        "channel": "#quality"
+      },
+      "email": {
+        "enabled": false,
+        "recipients": ["dev@topsteel.fr"]
+      }
+    }
+  },
+  "automation": {
+    "preCommit": {
+      "enabled": true,
+      "checks": ["lint", "typecheck", "format"]
+    },
+    "prePush": {
+      "enabled": true,
+      "checks": ["test", "build"]
+    },
+    "ci": {
+      "enabled": true,
+      "checks": ["all"]
+    },
+    "scheduled": {
+      "enabled": true,
+      "frequency": "daily",
+      "checks": ["security", "dependencies"]
+    }
+  },
+  "exclusions": {
+    "paths": [
+      "node_modules/**",
+      "dist/**",
+      ".next/**",
+      "coverage/**",
+      "*.d.ts",
+      "**/*.config.js",
+      "**/*.config.ts"
+    ],
+    "files": [
+      "*.min.js",
+      "*.min.css",
+      "*.map"
+    ],
+    "rules": {
+      "test-files": {
+        "noExplicitAny": "off",
+        "noConsole": "off"
+      },
+      "config-files": {
+        "complexity": "off"
+      }
+    }
+  },
+  "integrations": {
+    "github": {
+      "actions": true,
+      "prComments": true,
+      "statusChecks": true
+    },
+    "sonarqube": {
+      "enabled": false,
+      "server": "",
+      "token": ""
+    },
+    "codecov": {
+      "enabled": true,
+      "token": ""
+    },
+    "dependabot": {
+      "enabled": true,
+      "schedule": "weekly"
+    }
+  }
+}

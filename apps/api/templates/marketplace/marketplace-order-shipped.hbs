@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande expédiée - TopSteel Marketplace</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c5282;
+            margin-bottom: 10px;
+        }
+        .shipping-icon {
+            font-size: 64px;
+            color: #17a2b8;
+            margin-bottom: 20px;
+        }
+        .shipping-message {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .shipping-message h2 {
+            margin: 0 0 10px 0;
+            color: #0c5460;
+        }
+        .tracking-box {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .tracking-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            letter-spacing: 2px;
+            background-color: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #fff;
+            color: #17a2b8;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 15px 0;
+            border: 2px solid #fff;
+        }
+        .btn:hover {
+            background-color: rgba(255,255,255,0.9);
+        }
+        .order-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 30px 0;
+        }
+        .order-details h3 {
+            color: #2c5282;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .detail-value {
+            color: #6c757d;
+        }
+        .carrier-badge {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .timeline {
+            background-color: #e7f3ff;
+            border: 1px solid #bee5eb;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 30px 0;
+        }
+        .timeline h4 {
+            color: #004085;
+            margin: 0 0 15px 0;
+        }
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+        }
+        .timeline-step:last-child {
+            margin-bottom: 0;
+        }
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .step-done {
+            background-color: #28a745;
+            color: white;
+        }
+        .step-current {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .step-pending {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+        .step-text {
+            flex-grow: 1;
+        }
+        .step-text strong {
+            display: block;
+            color: #495057;
+        }
+        .step-text span {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .delivery-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .delivery-info h4 {
+            color: #856404;
+            margin: 0 0 10px 0;
+        }
+        .delivery-info p {
+            margin: 0;
+            color: #856404;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">TopSteel</div>
+            <div class="shipping-icon">🚛</div>
+        </div>
+
+        <div class="shipping-message">
+            <h2>Votre commande est en route !</h2>
+            <p>Bonjour {{customerName}}, nous avons le plaisir de vous informer que votre commande a été expédiée.</p>
+        </div>
+
+        <div class="tracking-box">
+            <h3 style="margin: 0 0 15px 0;">Numéro de suivi</h3>
+            <div class="tracking-number">{{trackingNumber}}</div>
+            <div style="margin: 15px 0;">
+                <span class="carrier-badge">{{carrier}}</span>
+            </div>
+            <a href="{{tracking_url}}" class="btn">Suivre ma livraison</a>
+        </div>
+
+        <div class="order-details">
+            <h3>Détails de la commande</h3>
+            <div class="detail-row">
+                <span class="detail-label">Commande :</span>
+                <span class="detail-value">{{orderNumber}}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Transporteur :</span>
+                <span class="detail-value">{{carrier}}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Date d'expédition :</span>
+                <span class="detail-value">{{formatDate (new Date)}}</span>
+            </div>
+            {{#if estimatedDelivery}}
+            <div class="detail-row">
+                <span class="detail-label">Livraison estimée :</span>
+                <span class="detail-value">{{formatDate estimatedDelivery}}</span>
+            </div>
+            {{/if}}
+        </div>
+
+        <div class="timeline">
+            <h4>📋 Suivi de votre commande</h4>
+            
+            <div class="timeline-step">
+                <div class="step-icon step-done">✓</div>
+                <div class="step-text">
+                    <strong>Commande confirmée</strong>
+                    <span>Votre paiement a été validé</span>
+                </div>
+            </div>
+            
+            <div class="timeline-step">
+                <div class="step-icon step-done">✓</div>
+                <div class="step-text">
+                    <strong>Préparation</strong>
+                    <span>Votre commande a été préparée</span>
+                </div>
+            </div>
+            
+            <div class="timeline-step">
+                <div class="step-icon step-current">🚛</div>
+                <div class="step-text">
+                    <strong>En cours de livraison</strong>
+                    <span>Votre colis est parti de notre entrepôt</span>
+                </div>
+            </div>
+            
+            <div class="timeline-step">
+                <div class="step-icon step-pending">📦</div>
+                <div class="step-text">
+                    <strong>Livrée</strong>
+                    <span>Vous recevrez une confirmation de livraison</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="delivery-info">
+            <h4>📍 Informations importantes</h4>
+            <p>
+                <strong>Horaires de livraison :</strong> Généralement entre 8h et 18h, du lundi au vendredi.<br>
+                <strong>Contact transporteur :</strong> Le transporteur vous contactera avant la livraison.<br>
+                <strong>Présence requise :</strong> Une personne doit être présente pour réceptionner le colis.
+            </p>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h4 style="color: #495057; margin: 0 0 10px 0;">💡 Conseils utiles</h4>
+            <ul style="margin: 0; color: #6c757d; font-size: 14px; padding-left: 20px;">
+                <li>Vérifiez régulièrement le statut via le lien de suivi</li>
+                <li>Préparez une pièce d'identité pour la réception</li>
+                <li>Inspectez le colis à la réception avant de signer</li>
+                <li>En cas d'absence, le transporteur laissera un avis de passage</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Une question sur votre livraison ?</strong><br>
+                📧 support@topsteel.fr<br>
+                📞 +33 1 23 45 67 89<br>
+                🕒 Lundi-Vendredi 8h-18h
+            </p>
+            
+            <p style="margin-top: 30px; font-size: 12px; color: #adb5bd;">
+                Merci de votre confiance,<br>
+                <strong>L'équipe TopSteel Marketplace</strong><br><br>
+                TopSteel SAS - 123 Rue de l'Industrie, 75000 Paris, France
+            </p>
+        </div>
+    </div>
+</body>
+</html>

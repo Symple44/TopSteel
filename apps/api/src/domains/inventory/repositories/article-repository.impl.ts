@@ -179,24 +179,100 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return await query.getMany()
   }
 
-  async hasStockMovements(_articleId: string): Promise<boolean> {
-    // TODO: Implémenter selon votre logique de mouvements de stock
-    return false
+  async hasStockMovements(articleId: string): Promise<boolean> {
+    // Vérifier s'il existe des mouvements de stock pour cet article
+    const count = await this.repository.manager
+      .createQueryBuilder('stock_movements', 'movement')
+      .where('movement.articleId = :articleId', { articleId })
+      .andWhere('movement.statut != :statut', { statut: 'ANNULE' })
+      .getCount()
+
+    return count > 0
   }
 
-  async findWithFilters(_filters: ArticleAdvancedFilters): Promise<{
+  async findWithFilters(filters: ArticleAdvancedFilters): Promise<{
     items: Article[]
     total: number
     page: number
     limit: number
   }> {
-    // TODO: Implémenter la recherche avancée avec filtres
-    const items = await this.repository.find()
+    const query = this.repository.createQueryBuilder('article')
+
+    // Filtres de stock
+    if (filters.stock) {
+      if (filters.stock.min !== undefined) {
+        query.andWhere('article.stockPhysique >= :stockMin', { stockMin: filters.stock.min })
+      }
+      if (filters.stock.max !== undefined) {
+        query.andWhere('article.stockPhysique <= :stockMax', { stockMax: filters.stock.max })
+      }
+      if (filters.stock.disponible !== undefined) {
+        query.andWhere('(article.stockPhysique - COALESCE(article.stockReserve, 0)) >= :disponible', {
+          disponible: filters.stock.disponible
+        })
+      }
+      if (filters.stock.enRupture === true) {
+        query.andWhere('article.stockPhysique <= COALESCE(article.stockMinimum, 0)')
+      }
+      if (filters.stock.sousStockMinimum === true) {
+        query.andWhere('article.stockPhysique < article.stockMinimum')
+        query.andWhere('article.stockPhysique > 0')
+      }
+    }
+
+    // Filtres de prix
+    if (filters.prix) {
+      if (filters.prix.min !== undefined) {
+        query.andWhere('article.prixVenteHT >= :prixMin', { prixMin: filters.prix.min })
+      }
+      if (filters.prix.max !== undefined) {
+        query.andWhere('article.prixVenteHT <= :prixMax', { prixMax: filters.prix.max })
+      }
+    }
+
+    // Filtre par catégories
+    if (filters.categories && filters.categories.length > 0) {
+      query.andWhere('article.famille IN (:...categories)', { categories: filters.categories })
+    }
+
+    // Filtre par fournisseurs
+    if (filters.fournisseurs && filters.fournisseurs.length > 0) {
+      query.andWhere('article.fournisseurId IN (:...fournisseurs)', { fournisseurs: filters.fournisseurs })
+    }
+
+    // Filtre par statut actif
+    if (filters.actif !== undefined) {
+      query.andWhere('article.actif = :actif', { actif: filters.actif })
+    }
+
+    // Recherche textuelle
+    if (filters.recherche) {
+      query.andWhere(
+        '(article.designation ILIKE :search OR article.reference ILIKE :search OR article.description ILIKE :search)',
+        { search: `%${filters.recherche}%` }
+      )
+    }
+
+    // Tri
+    const sortField = filters.tri?.champ || 'reference'
+    const sortOrder = filters.tri?.ordre || 'ASC'
+    query.orderBy(`article.${sortField}`, sortOrder)
+
+    // Pagination
+    const page = filters.pagination?.page || 1
+    const limit = filters.pagination?.limite || 20
+    const skip = (page - 1) * limit
+
+    query.skip(skip).take(limit)
+
+    // Exécution
+    const [items, total] = await query.getManyAndCount()
+
     return {
       items,
-      total: items.length,
-      page: 1,
-      limit: 10,
+      total,
+      page,
+      limit
     }
   }
 
@@ -255,11 +331,11 @@ export class ArticleRepositoryImpl implements IArticleRepository {
           where: { status: ArticleStatus.EN_COURS_CREATION },
         }),
       },
-      repartitionParFamille: {}, // TODO: Implémenter si nécessaire
+      repartitionParFamille: await this.getRepartitionParFamille(),
       articlesGeresEnStock: await this.repository.count({ where: { gereEnStock: true } }),
-      valeurTotaleStock: 0, // TODO: Calculer la valeur totale
-      articlesEnRupture: 0, // TODO: Calculer
-      articlesSousStockMini: 0, // TODO: Calculer
+      valeurTotaleStock: await this.calculateTotalStockValue(),
+      articlesEnRupture: await this.countArticlesEnRupture(),
+      articlesSousStockMini: await this.countArticlesSousStockMinimum(),
       articlesObsoletes: await this.repository.count({ where: { status: ArticleStatus.OBSOLETE } }),
     }
   }
@@ -395,5 +471,53 @@ export class ArticleRepositoryImpl implements IArticleRepository {
   async findBySpecification(_spec: any): Promise<Article[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
+  }
+
+  /**
+   * Méthodes privées helper
+   */
+  private async getRepartitionParFamille(): Promise<Record<string, number>> {
+    const result = await this.repository
+      .createQueryBuilder('article')
+      .select('article.famille', 'famille')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('article.famille')
+      .getRawMany()
+
+    const repartition: Record<string, number> = {}
+    result.forEach(item => {
+      if (item.famille) {
+        repartition[item.famille] = parseInt(item.count)
+      }
+    })
+    return repartition
+  }
+
+  private async calculateTotalStockValue(): Promise<number> {
+    const result = await this.repository
+      .createQueryBuilder('article')
+      .select('SUM(article.stockPhysique * article.prixVenteHT)', 'total')
+      .getRawOne()
+
+    return parseFloat(result?.total || '0')
+  }
+
+  private async countArticlesEnRupture(): Promise<number> {
+    return await this.repository
+      .createQueryBuilder('article')
+      .where('article.stockPhysique <= 0')
+      .andWhere('article.actif = true')
+      .andWhere('article.gereEnStock = true')
+      .getCount()
+  }
+
+  private async countArticlesSousStockMinimum(): Promise<number> {
+    return await this.repository
+      .createQueryBuilder('article')
+      .where('article.stockPhysique > 0')
+      .andWhere('article.stockPhysique < article.stockMinimum')
+      .andWhere('article.actif = true')
+      .andWhere('article.gereEnStock = true')
+      .getCount()
   }
 }

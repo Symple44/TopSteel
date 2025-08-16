@@ -21,6 +21,7 @@ import { UserSession } from './core/entities/user-session.entity'
 import { UserSocieteRole } from './core/entities/user-societe-role.entity'
 import { AuthRepositoryProviders } from './core/providers/auth-repository.providers'
 import { AuthCoreService } from './core/services/auth-core.service'
+import { AuditLog } from './core/entities/audit-log.entity'
 import { MFAController } from './external/controllers/mfa.controller'
 import { SessionsController } from './external/controllers/sessions.controller'
 import { CombinedSecurityGuard } from './security/guards/combined-security.guard'
@@ -32,13 +33,16 @@ import { TenantGuard } from './security/guards/tenant.guard'
 import { JwtStrategy } from './security/strategies/jwt.strategy'
 import { JwtEnhancedStrategy } from './security/strategies/jwt-enhanced.strategy'
 import { LocalStrategy } from './security/strategies/local.strategy'
+import { AuditService } from './services/audit.service'
 import { AuthPerformanceService } from './services/auth-performance.service'
 import { GeolocationService } from './services/geolocation.service'
 import { JwtUtilsService } from './services/jwt-utils.service'
 import { MFAService } from './services/mfa.service'
+import { PermissionCalculatorService } from './services/permission-calculator.service'
 import { RoleFormattingService } from './services/role-formatting.service'
 import { SessionInvalidationService } from './services/session-invalidation.service'
 import { SessionRedisService } from './services/session-redis.service'
+import { SMSService } from './services/sms.service'
 import { TOTPService } from './services/totp.service'
 import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'
@@ -84,6 +88,7 @@ import { WebAuthnService } from './services/webauthn.service'
         RolePermission,
         Societe,
         SocieteUser,
+        AuditLog,
       ],
       'auth'
     ),
@@ -104,6 +109,7 @@ import { WebAuthnService } from './services/webauthn.service'
     GeolocationService,
     TOTPService,
     WebAuthnService,
+    SMSService,
     MFAService,
     RolesGuard,
     TenantGuard,
@@ -114,8 +120,10 @@ import { WebAuthnService } from './services/webauthn.service'
     OptimizedCacheService, // Service de cache REDIS
     UserSocieteRolesService, // Service pour la nouvelle structure de rôles
     UnifiedRolesService, // Service unifié pour la gestion des rôles
+    PermissionCalculatorService, // Service de calcul des permissions
     RoleFormattingService, // Service de formatage des rôles
     AuthPerformanceService, // Service de monitoring des performances
+    AuditService, // Service d'audit et de traçabilité
   ],
   exports: [
     AuthService,
@@ -126,6 +134,7 @@ import { WebAuthnService } from './services/webauthn.service'
     GeolocationService,
     TOTPService,
     WebAuthnService,
+    SMSService,
     MFAService,
     RolesGuard,
     TenantGuard,
@@ -135,8 +144,10 @@ import { WebAuthnService } from './services/webauthn.service'
     CombinedSecurityGuard,
     UserSocieteRolesService,
     UnifiedRolesService,
+    PermissionCalculatorService,
     RoleFormattingService,
     AuthPerformanceService,
+    AuditService,
   ],
 })
 export class AuthModule {}

@@ -15,7 +15,7 @@
 [![License](https://img.shields.io/badge/license-GPL--3.0-orange)](LICENSE)
 
 > 🔧 **Système de gestion métallurgique moderne et sécurisé**  
-> ERP complet pour les entreprises de construction métallique, développé avec Next.js 14, NestJS et PostgreSQL.
+> ERP complet pour les entreprises de construction métallique avec marketplace intégré, développé avec Next.js 15, NestJS et PostgreSQL.
 
 ## ✨ Fonctionnalités principales
 
@@ -55,12 +55,12 @@
 - Analyse de performance par technicien
 - Suivi budgétaire et prévisionnel
 
-### 🛒 **Marketplace e-commerce**
-- Boutiques en ligne multi-tenant par société
-- Catalogue produits synchronisé avec l'ERP
-- Système de panier et checkout complet
-- Gestion clients et commandes marketplace
-- Thèmes personnalisables par tenant
+### 🛒 **Marketplace e-commerce intégré**
+- Architecture unifiée avec l'ERP (plus de duplication)
+- Catalogue produits utilisant directement les articles ERP
+- Système de pricing avancé avec règles complexes
+- Support multi-canal (ERP, MARKETPLACE, B2B)
+- Cache Redis pour performance optimale
 - API dédiée avec isolation des données
 
 ## 🏗️ Architecture technique
@@ -250,13 +250,14 @@ pnpm reset                # 🔄 Reset complet (node_modules)
 ### **Backend Marketplace (API NestJS)**
 | Module | Description | Statut |
 |--------|-------------|--------|
-| 🛒 **Products** | Catalogue produits, pricing, sync ERP | ✅ |
+| 🛒 **Products** | Utilise directement Article ERP, adapters | ✅ |
+| 💰 **Pricing** | Moteur de tarification avancé intégré | ✅ |
 | 👥 **Customers** | Gestion clients marketplace | ✅ |
 | 📋 **Orders** | Commandes, checkout, paiements | ✅ |
 | 🎨 **Themes** | Personnalisation par tenant | ✅ |
 | 🏪 **Storefront** | API publique pour boutiques | ✅ |
 | 🔐 **Tenant Guard** | Isolation multi-tenant | ✅ |
-| 🏢 **Auth Integration** | JWT partagé avec ERP | ✅ |
+| 🏢 **Auth Integration** | JWT séparé marketplace | ✅ |
 
 ### **Frontend ERP (Next.js)**
 | Page/Module | Route | Description | Statut |
@@ -482,6 +483,12 @@ pnpm analyze
 
 ## 📚 Documentation
 
+### **Documentation principale**
+- 📊 **État du système** : [`docs/SYSTEM_STATUS.md`](docs/SYSTEM_STATUS.md)
+- 📖 **Index complet** : [`docs/INDEX.md`](docs/INDEX.md)
+- 🛍️ **Intégration Marketplace** : [`docs/marketplace/INTEGRATION_STATUS.md`](docs/marketplace/INTEGRATION_STATUS.md)
+- 💰 **Guide Pricing** : [`docs/modules/pricing-integration.md`](docs/modules/pricing-integration.md)
+
 ### **Liens utiles**
 - 📖 **Documentation ERP** : [docs.topsteel.tech](https://docs.topsteel.tech)
 - 🔗 **API Reference ERP** : [api.topsteel.tech/docs](https://api.topsteel.tech/docs)
@@ -490,9 +497,9 @@ pnpm analyze
 - 🐛 **Rapporter un bug** : [GitHub Issues](https://github.com/YOUR_ORG/TopSteel/issues)
 
 ### **Guides techniques**
-- 🏗️ [Guide d'architecture](docs/ARCHITECTURE.md)
+- 🏗️ [Architecture multi-tenant](docs/architecture/multi-tenant.md)
 - 🔐 [Guide de sécurité](docs/SECURITY.md)
-- 🚀 [Guide de déploiement](docs/DEPLOYMENT.md)
+- 🚀 [Guide de déploiement](docs/deployment/guide.md)
 - 🧪 [Guide des tests](docs/TESTING.md)
 - 🛒 [Documentation Marketplace complète](apps/MARKETPLACE.md)
 
@@ -537,6 +544,6 @@ Merci aux équipes qui maintiennent les outils exceptionnels utilisés dans ce p
 [![Powered by Next.js](https://img.shields.io/badge/Powered%20by-Next.js-black)](https://nextjs.org/)
 [![Built with TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-blue)](https://www.typescriptlang.org/)
 
-*Version 1.0.0* • *Dernière mise à jour: Janvier 2025*
+*Version 2.0.0* • *Dernière mise à jour: 14 Août 2025*
 
 </div>

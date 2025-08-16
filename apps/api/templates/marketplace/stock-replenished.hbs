@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Reconstitué - TopSteel Marketplace</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .alert-icon {
+            font-size: 48px;
+            color: #4caf50;
+            margin-bottom: 15px;
+        }
+        .alert-title {
+            font-size: 22px;
+            color: #4caf50;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .product-info {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+            margin: 20px 0;
+        }
+        .stock-details {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .stock-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4caf50;
+        }
+        .success-alert {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .actions-taken {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">TopSteel ERP</div>
+            <div class="alert-icon">✅</div>
+            <div class="alert-title">Stock Reconstitué</div>
+        </div>
+
+        <div class="content">
+            <p>Bonjour,</p>
+            
+            <p><strong>Bonne nouvelle:</strong> Le stock d'un produit a été reconstitué sur la marketplace TopSteel.</p>
+
+            <div class="product-info">
+                <h3>Produit Réapprovisionné</h3>
+                <p><strong>Nom:</strong> {{productName}}</p>
+                <p><strong>ID Produit:</strong> {{productId}}</p>
+                
+                <div class="stock-details">
+                    <div>Nouveau Stock Disponible:</div>
+                    <div class="stock-value">{{currentStock}} unités</div>
+                </div>
+            </div>
+
+            <div class="success-alert">
+                🎉 PRODUIT AUTOMATIQUEMENT RÉACTIVÉ SUR LA MARKETPLACE
+            </div>
+
+            <div class="actions-taken">
+                <h4>Actions Automatiques Prises:</h4>
+                <ul>
+                    <li>✅ Le produit a été réactivé sur la marketplace</li>
+                    <li>✅ Les nouvelles commandes sont à nouveau possibles</li>
+                    <li>✅ Les alertes de stock ont été réinitialisées</li>
+                </ul>
+            </div>
+
+            <p>Ce produit est maintenant disponible à la vente et les clients peuvent à nouveau passer des commandes.</p>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="#" class="btn">Voir le Produit</a>
+            </div>
+
+            <p><strong>Timestamp:</strong> {{timestamp}}</p>
+        </div>
+
+        <div class="footer">
+            <p>Cet email a été envoyé automatiquement par le système TopSteel ERP Marketplace.</p>
+            <p>© {{year}} TopSteel. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>

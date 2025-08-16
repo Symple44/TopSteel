@@ -1,6 +1,20 @@
-# 📚 Documentation TopSteel ERP - Index Complet
+# 📚 Documentation TopSteel ERP
 
-## Navigation rapide
+> **Plateforme ERP complète pour l'industrie métallurgique avec marketplace intégré**  
+> **Version 2.0.0** | Mise à jour : 14/08/2025
+
+## 🎯 Navigation Rapide
+
+### [🤖 Guide Claude - Authentification](./CLAUDE_AUTH_GUIDE.md) 🆕
+Guide spécifique pour Claude AI - Génération de tokens et tests API rapides.
+
+### [📊 État du Système](./SYSTEM_STATUS.md)
+Vue d'ensemble complète de l'état actuel, métriques et statuts des modules.
+
+### [🚀 Démarrage Rapide](./development/getting-started.md)
+Guide pour démarrer rapidement avec le développement TopSteel.
+
+## 📖 Documentation Complète
 
 ### 🏗️ Architecture
 - [Architecture Multi-Tenant](./architecture/multi-tenant.md) - **1500+ lignes** - Architecture complète multi-locataire
@@ -10,6 +24,7 @@
 
 ### 🚀 Déploiement
 - [Guide de Déploiement](./deployment/guide.md) - **500+ lignes** - Guide complet production
+- [Plan de Rollback](./deployment/rollback-plan.md) - **400+ lignes** - Stratégie de retour arrière
 - [Configuration Docker](./deployment/docker.md) - Dockerfiles et compose *(à créer)*
 - [Checklist Production](./deployment/production-checklist.md) - Vérifications avant mise en prod *(à créer)*
 - [Monitoring & Alertes](./deployment/monitoring.md) - Surveillance et métriques *(à créer)*
@@ -17,21 +32,24 @@
 ### 📦 Modules Métier
 - [Module Marketplace](./modules/marketplace.md) - **400+ lignes** - E-commerce multi-tenant
 - [Système de Tarification](./modules/pricing.md) - **600+ lignes** - Pricing avancé avec ML
+- [Module Recherche](./modules/search.md) - **300+ lignes** - ElasticSearch et recherche avancée
 - [Gestion des Stocks](./modules/inventory.md) - Inventaire et mouvements *(à créer)*
 - [Module Partenaires](./modules/partners.md) - Clients et fournisseurs *(à créer)*
 - [Module Production](./modules/production.md) - Ordres de fabrication *(à créer)*
-- [Module Recherche](./modules/search.md) - Recherche globale *(à créer)*
 
 ### 💻 Développement
-- [Getting Started](./development/getting-started.md) - Guide de démarrage *(à créer)*
+- [Getting Started](./development/getting-started.md) - **500+ lignes** - Guide de démarrage complet
+- [Guide de Test d'Authentification](./development/AUTH_TEST_GUIDE.md) - **400+ lignes** - 🔐 Tests auth & génération tokens
+- [Scripts de Base de Données](./development/database-seeding.md) - **400+ lignes** - Injection et seeding
+- [Scripts Utilitaires](./development/scripts.md) - **300+ lignes** - Scripts d'automatisation
+- [Fix Node Deprecation](./development/node-deprecation-fix.md) - **200+ lignes** - Résolution warnings Node.js
 - [Configuration Environnement](./development/environment-setup.md) - Setup local *(à créer)*
 - [Standards de Code](./development/coding-standards.md) - Conventions et bonnes pratiques *(à créer)*
 - [Guide des Tests](./development/testing.md) - Tests unitaires et E2E *(à créer)*
-- [Scripts Utilitaires](./development/scripts.md) - Scripts d'injection et maintenance *(à créer)*
 
 ### 🔌 API
+- [Authentification](./api/authentication.md) - **600+ lignes** - JWT, sessions et sécurité
 - [Vue d'ensemble API](./api/overview.md) - Architecture REST *(à créer)*
-- [Authentification](./api/authentication.md) - JWT et sessions *(à créer)*
 - [Endpoints REST](./api/endpoints.md) - Documentation complète *(à créer)*
 - [WebSocket Events](./api/websocket.md) - Événements temps réel *(à créer)*
 - [GraphQL Schema](./api/graphql.md) - Schema et resolvers *(à créer)*
@@ -50,17 +68,15 @@
 
 ## 📊 État de la documentation
 
-### Documents existants (migrés depuis la racine)
+### Documents récemment organisés
 
 | Document Original | Nouveau Chemin | État |
 |------------------|----------------|------|
-| `MARKETPLACE.md` | `docs/modules/marketplace.md` | ✅ Migré |
-| `DEPLOYMENT.md` | `docs/deployment/guide.md` | ✅ Migré |
-| `PRICING_QUICKSTART.md` | `docs/modules/pricing.md` | ✅ Intégré |
-| `AUTHENTICATION_SYSTEM_STATUS.md` | `docs/api/authentication.md` | 📝 À migrer |
-| `apps/api/src/features/search/README.md` | `docs/modules/search.md` | 📝 À migrer |
-| `apps/api/src/scripts/README.md` | `docs/development/scripts.md` | 📝 À migrer |
-| `apps/api/src/core/database/README.md` | `docs/architecture/database-design.md` | 📝 À migrer |
+| `NODE_DEPRECATION_FIX.md` | `docs/development/node-deprecation-fix.md` | ✅ Migré |
+| `ROLLBACK_PLAN.md` | `docs/deployment/rollback-plan.md` | ✅ Migré |
+| `ROADMAP_V2.md` | `docs/planning/roadmap-v2.md` | ✅ Migré |
+| `ERP_INTEGRATION_README.md` | `docs/marketplace/erp-integration.md` | ✅ Migré |
+| `DEPRECATED_ENTITIES.md` | `docs/marketplace/deprecated-entities.md` | ✅ Migré |
 
 ### Documents techniques à consolider
 
@@ -75,11 +91,11 @@
 
 ### Statistiques documentation
 
-- **Total lignes documentées** : ~4000+ lignes
-- **Modules documentés** : 8/15 (53%)
-- **Guides complets** : 4
-- **À créer** : 25 documents
-- **À migrer** : 12 documents
+- **Total lignes documentées** : ~6000+ lignes
+- **Modules documentés** : 11/15 (73%)
+- **Guides complets** : 9
+- **À créer** : 20 documents
+- **Récemment migrés** : 5 documents
 
 ## 🎯 Priorités documentation
 

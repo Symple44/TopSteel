@@ -82,8 +82,17 @@ async function testSearchDirectly() {
   }
 }
 
-// Définir les variables d'environnement
-process.env.ELASTICSEARCH_USERNAME = 'elastic'
-process.env.ELASTICSEARCH_PASSWORD = 'ogAceYjRKTIMmACWwhRA'
+// Charger les variables d'environnement depuis .env
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+// Vérifier que les credentials Elasticsearch sont définis
+if (!process.env.ELASTICSEARCH_USERNAME || !process.env.ELASTICSEARCH_PASSWORD) {
+  console.error('❌ ELASTICSEARCH_USERNAME and ELASTICSEARCH_PASSWORD must be set in .env file')
+  console.log('ℹ️  Add these to your .env file:')
+  console.log('ELASTICSEARCH_USERNAME=elastic')
+  console.log('ELASTICSEARCH_PASSWORD=your_password_here')
+  process.exit(1)
+}
 
 testSearchDirectly()

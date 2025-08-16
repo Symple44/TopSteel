@@ -319,6 +319,150 @@ export class MaterialService extends BusinessService<Material> {
   }
 
   /**
+   * Recherche avancée avec filtres multiples
+   */
+  async searchAdvanced(filters: any): Promise<{
+    items: Material[]
+    total: number
+    page: number
+    limit: number
+  }> {
+    return await this.materialRepository.findWithFilters(filters)
+  }
+
+  /**
+   * Recherche textuelle
+   */
+  async searchByText(searchText: string, limit?: number): Promise<Material[]> {
+    return await this.materialRepository.searchByText(searchText, limit)
+  }
+
+  /**
+   * Obtenir les statistiques globales
+   */
+  async getStatistics(): Promise<MaterialStatistics> {
+    return await this.materialRepository.getMaterialStats()
+  }
+
+  /**
+   * Obtenir les indicateurs de performance (KPIs)
+   */
+  async getKPIs(): Promise<{
+    tauxRotation: number
+    tauxRupture: number
+    tauxCouverture: number
+    valeurImmobilisee: number
+    nombreReferences: number
+    nombreFournisseurs: number
+  }> {
+    const stats = await this.materialRepository.getMaterialStats()
+    const materials = await this.materialRepository.findByStatus(MaterialStatus.ACTIF)
+    
+    // Calculer le taux de rotation (simplifi\u00e9)
+    const materialsAvecStock = materials.filter(m => (m.stockPhysique || 0) > 0)
+    const tauxRotation = materialsAvecStock.length > 0 
+      ? (materials.length - materialsAvecStock.length) / materials.length * 100
+      : 0
+
+    // Taux de rupture
+    const tauxRupture = materials.length > 0
+      ? (stats.materialsEnRupture / materials.length) * 100
+      : 0
+
+    // Taux de couverture (% de mat\u00e9riaux avec stock suffisant)
+    const materialsStockOK = materials.filter(m => 
+      (m.stockPhysique || 0) >= (m.stockMini || 0)
+    ).length
+    const tauxCouverture = materials.length > 0
+      ? (materialsStockOK / materials.length) * 100
+      : 0
+
+    // Valeur immobilis\u00e9e
+    const valeurImmobilisee = stats.valeurTotaleStock
+
+    // Nombre de r\u00e9f\u00e9rences actives
+    const nombreReferences = materials.length
+
+    // Nombre de fournisseurs distincts
+    const fournisseurIds = new Set(
+      materials
+        .map(m => m.informationsApprovisionnement?.fournisseurPrincipalId)
+        .filter(id => id !== undefined)
+    )
+    const nombreFournisseurs = fournisseurIds.size
+
+    return {
+      tauxRotation,
+      tauxRupture,
+      tauxCouverture,
+      valeurImmobilisee,
+      nombreReferences,
+      nombreFournisseurs
+    }
+  }
+
+  /**
+   * Obtenir les tendances de stock
+   */
+  async getStockTrends(periode: number = 30): Promise<{
+    evolutionStock: Array<{ date: Date; valeur: number }>
+    previsions: Array<{ materialId: string; reference: string; rupturePrevisionnelle: Date }>
+  }> {
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - periode)
+
+    // R\u00e9cup\u00e9rer les statistiques d'usage
+    const usageStats = await this.materialRepository.getUsageStatsByPeriod(startDate, endDate)
+
+    // Calculer les pr\u00e9visions de rupture
+    const materials = await this.materialRepository.findByStatus(MaterialStatus.ACTIF)
+    const previsions: Array<{ materialId: string; reference: string; rupturePrevisionnelle: Date }> = []
+
+    for (const material of materials) {
+      const stats = usageStats.find(s => s.materialId === material.id)
+      if (stats && stats.quantiteSortie > 0) {
+        const consommationJournaliere = stats.quantiteSortie / periode
+        if (consommationJournaliere > 0) {
+          const joursRestants = Math.floor((material.stockPhysique || 0) / consommationJournaliere)
+          if (joursRestants < 30) { // Alerte si rupture pr\u00e9vue dans moins de 30 jours
+            const dateRupture = new Date()
+            dateRupture.setDate(dateRupture.getDate() + joursRestants)
+            previsions.push({
+              materialId: material.id,
+              reference: material.reference,
+              rupturePrevisionnelle: dateRupture
+            })
+          }
+        }
+      }
+    }
+
+    // G\u00e9n\u00e9rer une \u00e9volution simul\u00e9e (pourrait \u00eatre remplac\u00e9e par de vraies donn\u00e9es historiques)
+    const evolutionStock: Array<{ date: Date; valeur: number }> = []
+    for (let i = 0; i <= periode; i++) {
+      const date = new Date(startDate)
+      date.setDate(date.getDate() + i)
+      evolutionStock.push({
+        date,
+        valeur: await this.calculateStockValueAtDate(date)
+      })
+    }
+
+    return {
+      evolutionStock,
+      previsions: previsions.sort((a, b) => a.rupturePrevisionnelle.getTime() - b.rupturePrevisionnelle.getTime())
+    }
+  }
+
+  private async calculateStockValueAtDate(date: Date): Promise<number> {
+    // Pour une impl\u00e9mentation r\u00e9elle, il faudrait consulter l'historique des mouvements
+    // Ici on retourne la valeur actuelle
+    const stats = await this.materialRepository.getMaterialStats()
+    return stats.valeurTotaleStock
+  }
+
+  /**
    * Analyser la compatibilité entre matériaux
    */
   async analyserCompatibilite(materialId: string): Promise<MaterialCompatibilityAnalysis> {

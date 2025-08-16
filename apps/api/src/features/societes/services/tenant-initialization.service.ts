@@ -122,7 +122,10 @@ export class TenantInitializationService {
         await this.createDefaultNotificationSettings(savedUser.id)
 
         this.logger.log(`✅ Utilisateur créé: ${userData.email} (${userData.role})`)
-        this.logger.log(`🔑 Mot de passe: ${userData.password}`)
+        // Ne JAMAIS logger les mots de passe - Sécurité
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.debug('ℹ️  Utilisateur créé avec succès. Mot de passe envoyé par email.')
+        }
       } catch (error) {
         this.logger.error(
           `❌ Erreur création utilisateur ${userData.email}:`,

@@ -8,6 +8,7 @@ import { GlobalUserRole } from '../core/constants/roles.constants'
 import { MFASession } from '../core/entities/mfa-session.entity'
 import { UserMFA } from '../core/entities/user-mfa.entity'
 import type { GeolocationService } from './geolocation.service'
+import { SMSService } from './sms.service'
 import type { TOTPService } from './totp.service'
 import type { WebAuthnService } from './webauthn.service'
 
@@ -43,7 +44,8 @@ export class MFAService {
     public readonly totpService: TOTPService,
     private readonly webauthnService: WebAuthnService,
     private readonly geolocationService: GeolocationService,
-    private readonly cacheService: OptimizedCacheService
+    private readonly cacheService: OptimizedCacheService,
+    private readonly smsService: SMSService
   ) {}
 
   /**
@@ -237,6 +239,241 @@ export class MFAService {
     return await this.userMFARepository.find({
       where: { userId },
     })
+  }
+
+  /**
+   * Configurer SMS pour un utilisateur
+   */
+  async setupSMS(
+    userId: string,
+    phoneNumber: string
+  ): Promise<MFASetupResult> {
+    try {
+      // Vérifier si SMS est déjà configuré
+      const existingSMS = await this.userMFARepository.findOne({
+        where: { userId, type: 'sms' },
+      })
+
+      if (existingSMS?.isVerified) {
+        return {
+          success: false,
+          error: 'SMS déjà configuré pour cet utilisateur',
+        }
+      }
+
+      // Valider le format du numéro de téléphone
+      if (!this.isValidPhoneNumber(phoneNumber)) {
+        return {
+          success: false,
+          error: 'Format de numéro de téléphone invalide (requis: +33XXXXXXXXX)',
+        }
+      }
+
+      // Générer un code de vérification
+      const verificationCode = this.generateSMSVerificationCode()
+      
+      // Envoyer le SMS de vérification
+      const smsResult = await this.smsService.sendMFAVerificationCode(
+        phoneNumber,
+        verificationCode,
+        10 // 10 minutes d'expiration
+      )
+
+      if (!smsResult.success) {
+        return {
+          success: false,
+          error: `Impossible d'envoyer le SMS: ${smsResult.error}`,
+        }
+      }
+
+      // Créer ou mettre à jour l'enregistrement MFA
+      let mfaRecord: UserMFA
+      if (existingSMS) {
+        existingSMS.phoneNumber = phoneNumber
+        existingSMS.isEnabled = false
+        existingSMS.isVerified = false
+        existingSMS.metadata = {
+          ...existingSMS.metadata,
+          lastUsed: new Date().toISOString(),
+        } as any
+        // Store SMS verification code temporarily
+        ;(existingSMS.metadata as any).pendingVerificationCode = verificationCode
+        ;(existingSMS.metadata as any).pendingCodeExpiry = new Date(Date.now() + 10 * 60 * 1000).toISOString()
+        ;(existingSMS.metadata as any).smsMessageId = smsResult.messageId
+        mfaRecord = await this.userMFARepository.save(existingSMS)
+      } else {
+        mfaRecord = UserMFA.createSMS(userId, phoneNumber)
+        mfaRecord.metadata = {
+          // Store SMS verification temporarily
+          lastUsed: new Date().toISOString(),
+        } as any // Temporary fields for SMS verification
+        mfaRecord = await this.userMFARepository.save(mfaRecord)
+      }
+
+      return {
+        success: true,
+        mfaId: mfaRecord.id,
+      }
+    } catch (error) {
+      this.logger.error('Erreur lors de la configuration SMS:', error)
+      return {
+        success: false,
+        error: 'Impossible de configurer SMS',
+      }
+    }
+  }
+
+  /**
+   * Vérifier et activer SMS
+   */
+  async verifyAndEnableSMS(
+    userId: string,
+    mfaId: string,
+    verificationCode: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const mfaRecord = await this.userMFARepository.findOne({
+        where: { id: mfaId, userId, type: 'sms' },
+      })
+
+      if (!mfaRecord) {
+        return { success: false, error: 'Configuration SMS non trouvée' }
+      }
+
+      if (mfaRecord.isVerified) {
+        return { success: false, error: 'SMS déjà vérifié' }
+      }
+
+      const metadata = mfaRecord.metadata as Record<string, unknown>
+      const pendingCode = metadata?.pendingVerificationCode as string
+      const codeExpiry = metadata?.pendingCodeExpiry as string
+
+      if (!pendingCode || !codeExpiry) {
+        return { success: false, error: 'Code de vérification non trouvé' }
+      }
+
+      if (new Date() > new Date(codeExpiry)) {
+        return { success: false, error: 'Code de vérification expiré' }
+      }
+
+      if (pendingCode !== verificationCode) {
+        mfaRecord.markFailedAttempt()
+        await this.userMFARepository.save(mfaRecord)
+        return { success: false, error: 'Code de vérification invalide' }
+      }
+
+      // Activer SMS
+      mfaRecord.verify()
+      mfaRecord.enable()
+      mfaRecord.markAsUsed()
+      
+      // Nettoyer les données temporaires
+      if (mfaRecord.metadata) {
+        delete (mfaRecord.metadata as Record<string, unknown>).pendingVerificationCode
+        delete (mfaRecord.metadata as Record<string, unknown>).pendingCodeExpiry
+      }
+      
+      await this.userMFARepository.save(mfaRecord)
+
+      return { success: true }
+    } catch (error) {
+      this.logger.error('Erreur lors de la vérification SMS:', error)
+      return { success: false, error: 'Erreur de vérification' }
+    }
+  }
+
+  /**
+   * Envoyer un code SMS pour MFA
+   */
+  async sendSMSCode(
+    userId: string,
+    sessionToken?: string
+  ): Promise<{ success: boolean; error?: string; expiresIn?: number }> {
+    try {
+      const mfaRecord = await this.userMFARepository.findOne({
+        where: { userId, type: 'sms', isEnabled: true, isVerified: true },
+      })
+
+      if (!mfaRecord?.phoneNumber) {
+        return { success: false, error: 'SMS non configuré pour cet utilisateur' }
+      }
+
+      if (mfaRecord.isRateLimited()) {
+        return { success: false, error: 'Trop de tentatives, réessayez plus tard' }
+      }
+
+      // Générer un nouveau code
+      const verificationCode = this.generateSMSVerificationCode()
+      const expiryTime = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
+
+      // Envoyer le SMS
+      const smsResult = await this.smsService.sendMFAVerificationCode(
+        mfaRecord.phoneNumber,
+        verificationCode,
+        5
+      )
+
+      if (!smsResult.success) {
+        return {
+          success: false,
+          error: `Impossible d'envoyer le SMS: ${smsResult.error}`,
+        }
+      }
+
+      // Stocker le code temporairement
+      if (sessionToken) {
+        const mfaSession = await this.mfaSessionRepository.findOne({
+          where: { sessionToken },
+        })
+        
+        if (mfaSession) {
+          mfaSession.metadata = {
+            ...mfaSession.metadata,
+            smsCode: verificationCode, // Use the correct field name
+          }
+          await this.mfaSessionRepository.save(mfaSession)
+        }
+      }
+
+      // Mettre à jour les métadonnées de l'utilisateur
+      mfaRecord.metadata = {
+        ...mfaRecord.metadata,
+        lastUsed: new Date().toISOString(),
+      } as any
+      // Store message ID temporarily
+      ;(mfaRecord.metadata as any).lastSMSMessageId = smsResult.messageId
+      await this.userMFARepository.save(mfaRecord)
+
+      this.logger.log(`SMS code sent to user ${userId}`)
+
+      return {
+        success: true,
+        expiresIn: 5 * 60, // 5 minutes en secondes
+      }
+    } catch (error) {
+      this.logger.error('Erreur lors de l\'envoi du code SMS:', error)
+      return {
+        success: false,
+        error: 'Impossible d\'envoyer le code SMS',
+      }
+    }
+  }
+
+  /**
+   * Valider un numéro de téléphone
+   */
+  private isValidPhoneNumber(phoneNumber: string): boolean {
+    // Format international requis : +33123456789
+    const phoneRegex = /^\+[1-9]\d{1,14}$/
+    return phoneRegex.test(phoneNumber)
+  }
+
+  /**
+   * Générer un code de vérification SMS
+   */
+  private generateSMSVerificationCode(): string {
+    // Générer un code à 6 chiffres
+    return Math.floor(100000 + Math.random() * 900000).toString()
   }
 
   /**
@@ -617,6 +854,32 @@ export class MFAService {
             }
           }
         }
+      } else if (mfaSession.mfaType === 'sms') {
+        if (!code) {
+          return { success: false, error: 'Code SMS requis' }
+        }
+
+        // Vérifier le code SMS depuis la session
+        const sessionMetadata = mfaSession.metadata as Record<string, unknown>
+        const storedCode = sessionMetadata?.smsCode as string
+        const codeExpiry = sessionMetadata?.smsCodeExpiry as string
+
+        if (!storedCode || !codeExpiry) {
+          return { success: false, error: 'Code SMS non trouvé ou expiré' }
+        }
+
+        if (new Date() > new Date(codeExpiry)) {
+          return { success: false, error: 'Code SMS expiré' }
+        }
+
+        if (storedCode === code) {
+          isValid = true
+          // Nettoyer le code de la session
+          if (mfaSession.metadata) {
+            delete (mfaSession.metadata as Record<string, unknown>).smsCode
+            delete (mfaSession.metadata as Record<string, unknown>).smsCodeExpiry
+          }
+        }
       } else if (mfaSession.mfaType === 'webauthn') {
         if (!webauthnResponse) {
           return { success: false, error: 'Réponse WebAuthn requise' }
@@ -691,7 +954,7 @@ export class MFAService {
    */
   async disableMFA(
     userId: string,
-    mfaType: 'totp' | 'webauthn',
+    mfaType: 'totp' | 'webauthn' | 'sms',
     verificationCode?: string
   ): Promise<{
     success: boolean
@@ -713,6 +976,23 @@ export class MFAService {
           const isValid = this.totpService.verifyToken(verificationCode, secret)
 
           if (!isValid) {
+            return { success: false, error: 'Code de vérification invalide' }
+          }
+        } else if (mfaType === 'sms' && mfaRecord.phoneNumber) {
+          // Pour SMS, envoyer un code de confirmation
+          const confirmationCode = this.generateSMSVerificationCode()
+          const smsResult = await this.smsService.sendMFAVerificationCode(
+            mfaRecord.phoneNumber,
+            confirmationCode,
+            5
+          )
+          
+          if (!smsResult.success) {
+            return { success: false, error: 'Impossible d\'envoyer le code de confirmation' }
+          }
+          
+          // Vérifier que le code fourni correspond
+          if (confirmationCode !== verificationCode) {
             return { success: false, error: 'Code de vérification invalide' }
           }
         }
@@ -962,8 +1242,48 @@ export class MFAService {
       if (mfaType === 'totp' && mfaMethod.secret) {
         isValid = await this.totpService.verifyToken(code, mfaMethod.secret)
       } else if (mfaType === 'sms') {
-        // SMS verification logic would go here
-        isValid = false // TODO: Implement SMS verification
+        // Pour SMS, d'abord envoyer le code si pas déjà fait
+        if (!mfaSession.metadata?.smsCode) {
+          const smsResult = await this.sendSMSCode(mfaSession.userId, sessionToken)
+          if (!smsResult.success) {
+            return {
+              success: false,
+              error: smsResult.error || 'Impossible d\'envoyer le code SMS',
+            }
+          }
+          
+          return {
+            success: false,
+            error: 'Code SMS envoyé. Veuillez saisir le code reçu.',
+          }
+        }
+        
+        // Vérifier le code SMS
+        const sessionMetadata = mfaSession.metadata as Record<string, unknown>
+        const storedCode = sessionMetadata?.smsCode as string
+        const codeExpiry = sessionMetadata?.smsCodeExpiry as string
+
+        if (!storedCode || !codeExpiry) {
+          return {
+            success: false,
+            error: 'Code SMS non trouvé',
+          }
+        }
+
+        if (new Date() > new Date(codeExpiry)) {
+          return {
+            success: false,
+            error: 'Code SMS expiré',
+          }
+        }
+
+        isValid = storedCode === code
+        
+        if (isValid) {
+          // Nettoyer le code de la session
+          delete (mfaSession.metadata as Record<string, unknown>).smsCode
+          delete (mfaSession.metadata as Record<string, unknown>).smsCodeExpiry
+        }
       }
 
       if (!isValid) {

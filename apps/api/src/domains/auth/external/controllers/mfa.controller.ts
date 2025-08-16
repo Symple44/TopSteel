@@ -22,6 +22,19 @@ interface VerifyTOTPDto {
   token: string
 }
 
+interface SetupSMSDto {
+  phoneNumber: string
+}
+
+interface VerifySMSDto {
+  mfaId: string
+  verificationCode: string
+}
+
+interface SendSMSCodeDto {
+  sessionToken?: string
+}
+
 interface SetupWebAuthnDto {
   userName: string
 }
@@ -43,7 +56,7 @@ interface VerifyMFADto {
 }
 
 interface DisableMFADto {
-  mfaType: 'totp' | 'webauthn'
+  mfaType: 'totp' | 'webauthn' | 'sms'
   verificationCode?: string
 }
 
@@ -90,6 +103,10 @@ export class MFAController {
         isVerified: method.isVerified,
         lastUsedAt: method.lastUsedAt,
         createdAt: method.createdAt,
+        phoneNumber:
+          method.type === 'sms' && method.phoneNumber
+            ? `${method.phoneNumber.substring(0, 5)}***${method.phoneNumber.substring(method.phoneNumber.length - 2)}`
+            : undefined,
         deviceInfo:
           method.type === 'webauthn'
             ? {
@@ -180,6 +197,103 @@ export class MFAController {
       }
       throw new HttpException(
         'Erreur lors de la vérification TOTP',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      )
+    }
+  }
+
+  /**
+   * Configurer SMS
+   */
+  @Post('setup/sms')
+  async setupSMS(@Request() req: { user: { sub: string } }, @Body() body: SetupSMSDto) {
+    try {
+      const userId = req.user.sub
+
+      const result = await this.mfaService.setupSMS(userId, body.phoneNumber)
+
+      if (!result.success) {
+        throw new HttpException(result.error || 'Setup failed', HttpStatus.BAD_REQUEST)
+      }
+
+      return {
+        success: true,
+        data: {
+          mfaId: result.mfaId,
+        },
+        message: 'Code de vérification SMS envoyé. Veuillez vérifier votre téléphone.',
+      }
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
+      throw new HttpException(
+        'Erreur lors de la configuration SMS',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      )
+    }
+  }
+
+  /**
+   * Vérifier et activer SMS
+   */
+  @Post('verify/sms')
+  async verifySMS(@Request() req: { user: { sub: string } }, @Body() body: VerifySMSDto) {
+    try {
+      const userId = req.user.sub
+
+      const result = await this.mfaService.verifyAndEnableSMS(
+        userId,
+        body.mfaId,
+        body.verificationCode
+      )
+
+      if (!result.success) {
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
+      }
+
+      return {
+        success: true,
+        message: 'SMS activé avec succès',
+      }
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
+      throw new HttpException(
+        'Erreur lors de la vérification SMS',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      )
+    }
+  }
+
+  /**
+   * Envoyer un code SMS pour MFA
+   */
+  @Post('sms/send-code')
+  async sendSMSCode(@Request() req: { user: { sub: string } }, @Body() body: SendSMSCodeDto) {
+    try {
+      const userId = req.user.sub
+
+      const result = await this.mfaService.sendSMSCode(userId, body.sessionToken)
+
+      if (!result.success) {
+        throw new HttpException(result.error || 'Send failed', HttpStatus.BAD_REQUEST)
+      }
+
+      return {
+        success: true,
+        data: {
+          expiresIn: result.expiresIn,
+        },
+        message: 'Code SMS envoyé avec succès',
+      }
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
+      throw new HttpException(
+        'Erreur lors de l\'envoi du code SMS',
         HttpStatus.INTERNAL_SERVER_ERROR
       )
     }

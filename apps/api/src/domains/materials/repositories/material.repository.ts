@@ -241,7 +241,20 @@ export interface IMaterialRepository extends IBusinessRepository<Material> {
  * Filtres avancés pour la recherche de matériaux
  */
 export interface MaterialAdvancedFilters extends MaterialSearchCriteria {
+  // Critères de base
+  types?: MaterialType[]
+  formes?: MaterialShape[]
+  status?: MaterialStatus[]
+  nuances?: string[]
+  
   // Critères de stock
+  stock?: {
+    min?: number
+    max?: number
+    disponible?: number
+    enRupture?: boolean
+    sousStockMinimum?: boolean
+  }
   stockMin?: number
   stockMax?: number
   stockDisponibleMin?: number
@@ -250,16 +263,34 @@ export interface MaterialAdvancedFilters extends MaterialSearchCriteria {
   sansStock?: boolean
 
   // Critères de prix
+  prix?: {
+    min?: number
+    max?: number
+  }
   prixMin?: number
   prixMax?: number
 
   // Critères physiques
+  poids?: {
+    min?: number
+    max?: number
+  }
   poidsMin?: number
   poidsMax?: number
   densiteMin?: number
   densiteMax?: number
 
   // Critères de dimensions
+  dimensions?: {
+    longueurMin?: number
+    longueurMax?: number
+    largeurMin?: number
+    largeurMax?: number
+    epaisseurMin?: number
+    epaisseurMax?: number
+    diametreMin?: number
+    diametreMax?: number
+  }
   longueurMin?: number
   longueurMax?: number
   largeurMin?: number
@@ -286,13 +317,24 @@ export interface MaterialAdvancedFilters extends MaterialSearchCriteria {
   fournisseurPrefere?: boolean
 
   // Critères de recherche textuelle
+  recherche?: string
   searchText?: string
   searchFields?: MaterialSearchField[]
 
   // Critères de tri
+  tri?: {
+    champ?: string
+    ordre?: 'ASC' | 'DESC'
+  }
   sortBy?: MaterialSortField
   sortOrder?: 'ASC' | 'DESC'
 
+  // Critères de pagination
+  pagination?: {
+    page?: number
+    limite?: number
+  }
+  
   // Critères d'inclusion
   includeInactive?: boolean
   includeObsolete?: boolean
@@ -301,10 +343,17 @@ export interface MaterialAdvancedFilters extends MaterialSearchCriteria {
   certifications?: string[]
   normes?: string[]
 
+  // Critères de fournisseurs
+  fournisseurs?: string[]
+  
   // Critères de propriétés
   proprietesMecaniques?: MechanicalPropertiesFilters
   proprietesPhysiques?: PhysicalPropertiesFilters
   proprietesChimiques?: ChemicalPropertiesFilters
+  
+  // Motifs de mouvement
+  motifs?: string[]
+  priorite?: string
 }
 
 export enum MaterialSearchField {
@@ -338,6 +387,8 @@ export enum MaterialSortField {
 export interface MechanicalPropertiesFilters {
   limiteElastiqueMin?: number
   limiteElastiqueMax?: number
+  resistanceMin?: number
+  resistanceMax?: number
   resistanceTractionMin?: number
   resistanceTractionMax?: number
   dureteMin?: number
@@ -358,6 +409,8 @@ export interface PhysicalPropertiesFilters {
   densiteMax?: number
   pointFusionMin?: number
   pointFusionMax?: number
+  temperatureFusionMin?: number
+  temperatureFusionMax?: number
   conductiviteThermique?: {
     min?: number
     max?: number
@@ -373,7 +426,7 @@ export interface PhysicalPropertiesFilters {
  */
 export interface ChemicalPropertiesFilters {
   composition?: Record<string, { min?: number; max?: number }>
-  resistanceCorrosion?: string[]
+  resistanceCorrosion?: string
   traitementThermique?: string[]
   traitementSurface?: string[]
 }

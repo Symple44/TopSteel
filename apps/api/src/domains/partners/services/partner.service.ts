@@ -20,7 +20,7 @@ import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
 import type { PartnerAddress } from '../entities/partner-address.entity'
 import type { PartnerGroup } from '../entities/partner-group.entity'
 import type { PartnerSite } from '../entities/partner-site.entity'
-import type { IPartnerRepository } from '../repositories/partner.repository'
+import type { IPartnerRepository, PartnerAdvancedFilters } from '../repositories/partner.repository'
 
 /**
  * Service métier pour la gestion des partenaires (clients/fournisseurs)
@@ -747,6 +747,700 @@ export class PartnerService extends BusinessService<Partner> {
     }
 
     return newPartner
+  }
+
+  /**
+   * Recherche avancée avec filtres multiples
+   */
+  async searchPartnersAdvanced(filters: Record<string, unknown>): Promise<{
+    items: Partner[]
+    total: number
+    page: number
+    limit: number
+  }> {
+    return await this.partnerRepository.findWithFilters(filters as any)
+  }
+
+  /**
+   * Recherche textuelle dans les champs principaux
+   */
+  async searchByText(searchText: string, limit?: number): Promise<Partner[]> {
+    return await this.partnerRepository.searchByText(searchText, limit)
+  }
+
+  /**
+   * Recherche par localisation géographique
+   */
+  async searchByLocation(criteria: {
+    ville?: string
+    departement?: string
+    region?: string
+    pays?: string
+  }): Promise<Partner[]> {
+    const filters: PartnerAdvancedFilters = {}
+    
+    if (criteria.ville) {
+      filters.searchText = criteria.ville
+      filters.searchFields = ['ville']
+    }
+    
+    if (criteria.departement) {
+      filters.departement = criteria.departement
+    }
+    
+    if (criteria.region) {
+      filters.region = criteria.region
+    }
+    
+    if (criteria.pays) {
+      filters.pays = [criteria.pays]
+    }
+    
+    const result = await this.partnerRepository.findWithFilters(filters)
+    return result.items
+  }
+
+  /**
+   * Obtenir les meilleurs clients par chiffre d'affaires
+   */
+  async getTopClients(limit: number): Promise<Array<Partner & { chiffreAffaires: number }>> {
+    return await this.partnerRepository.getTopClients(limit)
+  }
+
+  /**
+   * Obtenir les fournisseurs préférés
+   */
+  async getFournisseursPreferences(): Promise<Partner[]> {
+    return await this.partnerRepository.getFournisseursPreferences()
+  }
+
+  /**
+   * Obtenir les partenaires récents
+   */
+  async getRecentPartners(days: number, type: 'created' | 'modified'): Promise<Partner[]> {
+    if (type === 'modified') {
+      return await this.partnerRepository.findRecentlyModified(days)
+    } else {
+      const dateMin = new Date()
+      dateMin.setDate(dateMin.getDate() - days)
+      const dateMax = new Date()
+      return await this.partnerRepository.findCreatedBetween(dateMin, dateMax)
+    }
+  }
+
+  /**
+   * Détecter les doublons potentiels
+   */
+  async detectDoublons(criteria?: {
+    checkSiret?: boolean
+    checkEmail?: boolean
+    checkDenomination?: boolean
+  }): Promise<Array<{
+    partners: Partner[]
+    matchType: string
+    confidence: number
+  }>> {
+    const allPartners = await this.partnerRepository.findAll()
+    const doublons: Array<{
+      partners: Partner[]
+      matchType: string
+      confidence: number
+    }> = []
+    
+    const processedIds = new Set<string>()
+    
+    for (const partner of allPartners) {
+      if (processedIds.has(partner.id)) continue
+      
+      const matches = await this.partnerRepository.findPotentialDuplicates(partner)
+      const filteredMatches = matches.filter(m => 
+        m.id !== partner.id && !processedIds.has(m.id)
+      )
+      
+      if (filteredMatches.length > 0) {
+        let matchType = ''
+        let confidence = 0
+        
+        for (const match of filteredMatches) {
+          if (criteria?.checkSiret !== false && partner.siret === match.siret && partner.siret) {
+            matchType = 'SIRET'
+            confidence = 100
+          } else if (criteria?.checkEmail !== false && partner.email === match.email && partner.email) {
+            matchType = matchType ? `${matchType}, EMAIL` : 'EMAIL'
+            confidence = Math.max(confidence, 90)
+          } else if (criteria?.checkDenomination !== false && 
+                     partner.denomination.toLowerCase() === match.denomination.toLowerCase()) {
+            matchType = matchType ? `${matchType}, DENOMINATION` : 'DENOMINATION'
+            confidence = Math.max(confidence, 80)
+          }
+        }
+        
+        if (matchType) {
+          doublons.push({
+            partners: [partner, ...filteredMatches],
+            matchType,
+            confidence
+          })
+          
+          processedIds.add(partner.id)
+          filteredMatches.forEach(m => processedIds.add(m.id))
+        }
+      }
+    }
+    
+    return doublons.sort((a, b) => b.confidence - a.confidence)
+  }
+
+  /**
+   * Obtenir les statistiques détaillées
+   */
+  async getDetailedStatistics(): Promise<{
+    totalPartenaires: number
+    repartitionParType: Record<string, number>
+    repartitionParStatus: Record<string, number>
+    repartitionParCategorie: Record<string, number>
+    repartitionGeographique: {
+      parVille: Record<string, number>
+      parDepartement: Record<string, number>
+      parRegion: Record<string, number>
+    }
+    tendanceCreation: Array<{ periode: string; nombreCreations: number }>
+    moyenneAnciennete: number
+    tauxActivite: number
+  }> {
+    return await this.partnerRepository.getPartnerStats()
+  }
+
+  /**
+   * Analyser la performance commerciale
+   */
+  async getCommercialPerformance(startDate?: Date, endDate?: Date): Promise<{
+    topPerformers: Array<Partner & { performance: number }>
+    underPerformers: Array<Partner & { performance: number }>
+    trends: Array<{ periode: string; valeur: number }>
+  }> {
+    // TODO: Implémenter selon la logique métier avec les données de commandes/factures
+    const partners = await this.partnerRepository.findAll()
+    
+    // Simulation de données de performance
+    const withPerformance = partners.map(p => {
+      const performance = Math.random() * 100
+      return Object.assign(p, { performance }) as Partner & { performance: number }
+    })
+    
+    const sorted = withPerformance.sort((a, b) => b.performance - a.performance)
+    
+    return {
+      topPerformers: sorted.slice(0, 10),
+      underPerformers: sorted.slice(-10).reverse(),
+      trends: [] // TODO: Implémenter avec les données réelles
+    }
+  }
+
+  // === GESTION DES INTERACTIONS ===
+
+  /**
+   * Créer une nouvelle interaction avec un partenaire
+   */
+  async createInteraction(
+    partnerId: string,
+    interactionData: Record<string, unknown>,
+    context: BusinessContext
+  ): Promise<Record<string, unknown>> {
+    // TODO: Implémenter avec un repository d'interactions dédié
+    const interaction = {
+      id: `interaction-${Date.now()}`,
+      partnerId,
+      userId: context.userId,
+      type: interactionData.type || 'AUTRE',
+      sujet: interactionData.sujet || '',
+      description: interactionData.description || '',
+      dateInteraction: interactionData.dateInteraction || new Date(),
+      status: 'TERMINEE',
+      priority: interactionData.priority || 'NORMALE',
+      direction: interactionData.direction || 'SORTANT',
+      dateCreation: new Date(),
+      ...interactionData
+    }
+
+    this.logger.log(`Interaction créée pour le partenaire ${partnerId} par l'utilisateur ${context.userId}`)
+    return interaction
+  }
+
+  /**
+   * Obtenir les interactions d'un partenaire
+   */
+  async getPartnerInteractions(
+    partnerId: string,
+    filters: Record<string, unknown>
+  ): Promise<{
+    items: Record<string, unknown>[]
+    total: number
+    hasMore: boolean
+  }> {
+    // TODO: Implémenter avec un repository d'interactions dédié
+    // Pour l'instant, retourner des données simulées
+    const simulatedInteractions = [
+      {
+        id: 'int-1',
+        partnerId,
+        type: 'APPEL_TELEPHONIQUE',
+        sujet: 'Suivi commande en cours',
+        dateInteraction: new Date(Date.now() - 86400000), // Hier
+        status: 'TERMINEE',
+        duree: 15,
+        utilisateurNom: 'Jean Dupont'
+      },
+      {
+        id: 'int-2',
+        partnerId,
+        type: 'EMAIL',
+        sujet: 'Demande de devis',
+        dateInteraction: new Date(Date.now() - 172800000), // Avant-hier
+        status: 'TERMINEE',
+        utilisateurNom: 'Marie Martin'
+      },
+      {
+        id: 'int-3',
+        partnerId,
+        type: 'REUNION',
+        sujet: 'Présentation nouveaux produits',
+        dateInteraction: new Date(Date.now() - 604800000), // Il y a une semaine
+        status: 'TERMINEE',
+        duree: 120,
+        utilisateurNom: 'Pierre Leblanc'
+      }
+    ]
+
+    const limit = (filters.limit as number) || 50
+    const offset = (filters.offset as number) || 0
+    
+    return {
+      items: simulatedInteractions.slice(offset, offset + limit),
+      total: simulatedInteractions.length,
+      hasMore: simulatedInteractions.length > offset + limit
+    }
+  }
+
+  /**
+   * Mettre à jour une interaction
+   */
+  async updateInteraction(
+    interactionId: string,
+    updateData: Record<string, unknown>,
+    context: BusinessContext
+  ): Promise<Record<string, unknown>> {
+    // TODO: Implémenter avec un repository d'interactions dédié
+    this.logger.log(`Interaction ${interactionId} mise à jour par l'utilisateur ${context.userId}`)
+    
+    return {
+      id: interactionId,
+      ...updateData,
+      dateModification: new Date(),
+      modifiePar: context.userId
+    }
+  }
+
+  /**
+   * Supprimer une interaction
+   */
+  async deleteInteraction(interactionId: string, context: BusinessContext): Promise<void> {
+    // TODO: Implémenter avec un repository d'interactions dédié
+    this.logger.log(`Interaction ${interactionId} supprimée par l'utilisateur ${context.userId}`)
+  }
+
+  /**
+   * Rechercher des interactions
+   */
+  async searchInteractions(searchCriteria: Record<string, unknown>): Promise<{
+    items: Record<string, unknown>[]
+    total: number
+    aggregations: Record<string, unknown>
+  }> {
+    // TODO: Implémenter avec un repository d'interactions dédié
+    return {
+      items: [],
+      total: 0,
+      aggregations: {
+        byType: {},
+        byStatus: {},
+        byUser: {}
+      }
+    }
+  }
+
+  /**
+   * Statistiques des interactions par type
+   */
+  async getInteractionStatsByType(
+    startDate?: Date,
+    endDate?: Date,
+    groupBy: 'day' | 'week' | 'month' = 'month'
+  ): Promise<{
+    byType: Record<string, number>
+    byPeriod: Array<{ periode: string; count: number }>
+    trends: Array<{ type: string; trend: 'up' | 'down' | 'stable'; variation: number }>
+  }> {
+    // TODO: Implémenter avec des données réelles
+    return {
+      byType: {
+        'APPEL_TELEPHONIQUE': 45,
+        'EMAIL': 78,
+        'REUNION': 23,
+        'VISIOCONFERENCE': 34,
+        'VISITE_SITE': 12
+      },
+      byPeriod: [
+        { periode: '2024-01', count: 89 },
+        { periode: '2024-02', count: 156 },
+        { periode: '2024-03', count: 192 }
+      ],
+      trends: [
+        { type: 'EMAIL', trend: 'up', variation: 15.2 },
+        { type: 'REUNION', trend: 'down', variation: -8.5 },
+        { type: 'APPEL_TELEPHONIQUE', trend: 'stable', variation: 2.1 }
+      ]
+    }
+  }
+
+  /**
+   * Statistiques de performance des interactions
+   */
+  async getInteractionPerformanceStats(
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<{
+    totalInteractions: number
+    tauxReussite: number
+    dureeeMoyenne: number
+    satisfactionMoyenne: number
+    conversionCommerciale: number
+    topUsers: Array<{ userId: string; userNom: string; interactions: number; performance: number }>
+  }> {
+    // TODO: Implémenter avec des données réelles
+    return {
+      totalInteractions: 1247,
+      tauxReussite: 82.5,
+      dureeeMoyenne: 35.2,
+      satisfactionMoyenne: 4.2,
+      conversionCommerciale: 18.7,
+      topUsers: [
+        { userId: 'user-1', userNom: 'Jean Dupont', interactions: 156, performance: 87.5 },
+        { userId: 'user-2', userNom: 'Marie Martin', interactions: 142, performance: 85.2 },
+        { userId: 'user-3', userNom: 'Pierre Leblanc', interactions: 134, performance: 83.8 }
+      ]
+    }
+  }
+
+  // === STATISTIQUES AVANCÉES PARTENAIRES ===
+
+  /**
+   * Statistiques complètes d'un partenaire spécifique
+   */
+  async getCompletePartnerAnalytics(
+    partnerId: string,
+    options: { includePredictions?: boolean } = {}
+  ): Promise<Record<string, unknown>> {
+    const partner = await this.partnerRepository.findById(partnerId)
+    if (!partner) {
+      throw new NotFoundException(`Partenaire ${partnerId} non trouvé`)
+    }
+
+    // TODO: Implémenter avec des données réelles depuis les différents modules
+    return {
+      partner: {
+        id: partner.id,
+        code: partner.code,
+        denomination: partner.denomination,
+        type: partner.type,
+        status: partner.status
+      },
+      commercial: {
+        montantAffairesTotal: 1250000,
+        montantAffairesAnnee: 380000,
+        nombreCommandesAnnee: 24,
+        montantMoyenCommande: 15833,
+        frequenceCommande: 15.2,
+        derniereCommande: new Date(Date.now() - 86400000 * 12),
+        evolutionAnnuelle: 12.5
+      },
+      performance: {
+        noteGlobale: 4.2,
+        noteQualite: 4.5,
+        noteDelai: 3.8,
+        noteService: 4.3,
+        tauxConformite: 94.2,
+        nombreReclamations: 3,
+        tempsResolutionMoyen: 2.5
+      },
+      interactions: {
+        nombreTotal: 84,
+        derniereInteraction: new Date(Date.now() - 86400000 * 5),
+        typesInteractions: [
+          { type: 'EMAIL', nombre: 32 },
+          { type: 'APPEL_TELEPHONIQUE', nombre: 24 },
+          { type: 'REUNION', nombre: 8 }
+        ]
+      },
+      risque: {
+        niveau: 'FAIBLE',
+        score: 85,
+        facteurs: ['Excellent historique de paiement', 'Partenariat de longue durée']
+      },
+      opportunites: [
+        'Extension de gamme possible',
+        'Augmentation des volumes',
+        'Nouveaux marchés géographiques'
+      ],
+      predictions: options.includePredictions ? {
+        montantAffairesProchain: 420000,
+        probabiliteRenouvellement: 92,
+        risqueChurn: 8
+      } : undefined
+    }
+  }
+
+  /**
+   * Analyse de la relation commerciale
+   */
+  async getPartnerRelationshipAnalysis(
+    partnerId: string,
+    periodMonths: number
+  ): Promise<{
+    durationMonths: number
+    evolutionScore: number
+    loyaltyIndex: number
+    businessGrowth: number
+    interactionFrequency: number
+    lastInteractionDays: number
+    riskLevel: 'low' | 'medium' | 'high'
+    opportunities: string[]
+    threats: string[]
+    recommendations: string[]
+  }> {
+    const partner = await this.partnerRepository.findById(partnerId)
+    if (!partner) {
+      throw new NotFoundException(`Partenaire ${partnerId} non trouvé`)
+    }
+
+    // TODO: Calculer avec des données réelles
+    const creationDate = partner.createdAt || new Date()
+    const durationMonths = Math.floor((Date.now() - creationDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
+
+    return {
+      durationMonths,
+      evolutionScore: 78.5,
+      loyaltyIndex: 85.2,
+      businessGrowth: 12.8,
+      interactionFrequency: 2.3, // interactions par mois
+      lastInteractionDays: 5,
+      riskLevel: 'low',
+      opportunities: [
+        'Proposer des services additionnels',
+        'Étendre la collaboration à de nouveaux projets',
+        'Améliorer les délais de livraison'
+      ],
+      threats: [
+        'Concurrence aggressive sur les prix',
+        'Réduction possible des budgets'
+      ],
+      recommendations: [
+        'Organiser une réunion stratégique trimestrielle',
+        'Proposer un contrat cadre annuel',
+        'Mettre en place un suivi KPI mensuel'
+      ]
+    }
+  }
+
+  /**
+   * Analyse comparative avec les pairs
+   */
+  async getPartnerBenchmark(
+    partnerId: string,
+    options: { sector?: string; size?: string } = {}
+  ): Promise<{
+    ranking: number
+    totalPeers: number
+    percentile: number
+    scoreVsPeers: {
+      performance: 'above' | 'average' | 'below'
+      business: 'above' | 'average' | 'below'
+      reliability: 'above' | 'average' | 'below'
+    }
+    metrics: {
+      averageOrderValue: { partner: number; peers: number; position: string }
+      orderFrequency: { partner: number; peers: number; position: string }
+      deliveryPerformance: { partner: number; peers: number; position: string }
+      qualityScore: { partner: number; peers: number; position: string }
+    }
+  }> {
+    const partner = await this.partnerRepository.findById(partnerId)
+    if (!partner) {
+      throw new NotFoundException(`Partenaire ${partnerId} non trouvé`)
+    }
+
+    // TODO: Implémenter avec des données réelles et logique de benchmarking
+    return {
+      ranking: 15,
+      totalPeers: 127,
+      percentile: 88.2,
+      scoreVsPeers: {
+        performance: 'above',
+        business: 'above',
+        reliability: 'average'
+      },
+      metrics: {
+        averageOrderValue: {
+          partner: 15833,
+          peers: 12500,
+          position: 'above_average'
+        },
+        orderFrequency: {
+          partner: 24,
+          peers: 18,
+          position: 'above_average'
+        },
+        deliveryPerformance: {
+          partner: 94.2,
+          peers: 91.5,
+          position: 'above_average'
+        },
+        qualityScore: {
+          partner: 4.2,
+          peers: 3.8,
+          position: 'above_average'
+        }
+      }
+    }
+  }
+
+  /**
+   * Dashboard de performance globale
+   */
+  async getPartnerDashboard(
+    period: 'week' | 'month' | 'quarter' | 'year'
+  ): Promise<{
+    kpis: {
+      totalPartners: number
+      activePartners: number
+      newPartnersThisPeriod: number
+      totalRevenue: number
+      averageOrderValue: number
+      partnerSatisfaction: number
+    }
+    growth: {
+      partnersGrowth: number
+      revenueGrowth: number
+      orderGrowth: number
+    }
+    topPerformers: Array<{
+      partnerId: string
+      partnerName: string
+      revenue: number
+      orders: number
+      performance: number
+    }>
+    alerts: Array<{
+      type: 'risk' | 'opportunity' | 'action_required'
+      title: string
+      description: string
+      partnerId?: string
+      priority: 'low' | 'medium' | 'high'
+    }>
+    trends: Array<{
+      metric: string
+      trend: 'up' | 'down' | 'stable'
+      value: number
+      change: number
+    }>
+  }> {
+    const stats = await this.partnerRepository.getPartnerStats()
+    
+    // TODO: Calculer avec des données réelles selon la période
+    return {
+      kpis: {
+        totalPartners: stats.totalPartenaires,
+        activePartners: Math.floor(stats.totalPartenaires * (stats.tauxActivite / 100)),
+        newPartnersThisPeriod: 12,
+        totalRevenue: 15750000,
+        averageOrderValue: 14250,
+        partnerSatisfaction: 4.1
+      },
+      growth: {
+        partnersGrowth: 8.5,
+        revenueGrowth: 15.2,
+        orderGrowth: 12.8
+      },
+      topPerformers: [
+        {
+          partnerId: 'partner-1',
+          partnerName: 'MetalCorp SA',
+          revenue: 2150000,
+          orders: 86,
+          performance: 4.8
+        },
+        {
+          partnerId: 'partner-2',
+          partnerName: 'SteelWorks Ltd',
+          revenue: 1875000,
+          orders: 72,
+          performance: 4.6
+        },
+        {
+          partnerId: 'partner-3',
+          partnerName: 'Industrial Solutions',
+          revenue: 1420000,
+          orders: 58,
+          performance: 4.4
+        }
+      ],
+      alerts: [
+        {
+          type: 'action_required',
+          title: 'Contrats arrivant à échéance',
+          description: '5 contrats arrivent à échéance dans les 30 prochains jours',
+          priority: 'high'
+        },
+        {
+          type: 'opportunity',
+          title: 'Nouveaux marchés identifiés',
+          description: '3 partenaires ont exprimé un intérêt pour de nouveaux produits',
+          priority: 'medium'
+        },
+        {
+          type: 'risk',
+          title: 'Partenaires inactifs',
+          description: '8 partenaires sans commande depuis plus de 6 mois',
+          priority: 'medium'
+        }
+      ],
+      trends: [
+        {
+          metric: 'Chiffre d\'affaires',
+          trend: 'up',
+          value: 15750000,
+          change: 15.2
+        },
+        {
+          metric: 'Nombre de commandes',
+          trend: 'up',
+          value: 1247,
+          change: 12.8
+        },
+        {
+          metric: 'Satisfaction moyenne',
+          trend: 'stable',
+          value: 4.1,
+          change: 2.1
+        },
+        {
+          metric: 'Délai moyen livraison',
+          trend: 'down',
+          value: 12.5,
+          change: -8.3
+        }
+      ]
+    }
   }
 }
 

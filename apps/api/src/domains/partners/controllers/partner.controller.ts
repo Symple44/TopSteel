@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -567,6 +568,443 @@ export class PartnerController {
       body.newCode,
       this.getContext(user)
     )
+  }
+
+  /**
+   * Recherche avancée avec filtres multiples
+   */
+  @Post('search/advanced')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Recherche avancée de partenaires',
+    description: 'Recherche avec critères multiples, filtres géographiques et commerciaux',
+  })
+  async searchPartnersAdvanced(
+    @Body() filters: Record<string, unknown>,
+    @CurrentUser() _user: User
+  ): Promise<{
+    items: Partner[]
+    total: number
+    page: number
+    limit: number
+  }> {
+    return await this.partnerService.searchPartnersAdvanced(filters)
+  }
+
+  /**
+   * Recherche textuelle rapide
+   */
+  @Get('search/text')
+  @ApiOperation({
+    summary: 'Recherche textuelle',
+    description: 'Recherche dans les champs principaux (dénomination, code, email, ville)',
+  })
+  async searchByText(
+    @Query('q') searchText: string,
+    @Query('limit') limit?: number
+  ): Promise<Partner[]> {
+    if (!searchText || searchText.trim().length < 2) {
+      throw new BadRequestException('Le texte de recherche doit contenir au moins 2 caractères')
+    }
+    return await this.partnerService.searchByText(searchText, limit)
+  }
+
+  /**
+   * Obtenir les partenaires par localisation
+   */
+  @Get('search/geo')
+  @ApiOperation({
+    summary: 'Recherche géographique',
+    description: 'Rechercher les partenaires par ville, département ou région',
+  })
+  async searchByLocation(
+    @Query('ville') ville?: string,
+    @Query('departement') departement?: string,
+    @Query('region') region?: string,
+    @Query('pays') pays?: string
+  ): Promise<Partner[]> {
+    return await this.partnerService.searchByLocation({ ville, departement, region, pays })
+  }
+
+  /**
+   * Obtenir les top clients
+   */
+  @Get('analytics/top-clients')
+  @ApiOperation({
+    summary: 'Top clients',
+    description: 'Obtenir les meilleurs clients par chiffre d\'affaires',
+  })
+  async getTopClients(
+    @Query('limit') limit: number = 10
+  ): Promise<Array<Partner & { chiffreAffaires: number }>> {
+    return await this.partnerService.getTopClients(limit)
+  }
+
+  /**
+   * Obtenir les fournisseurs préférés
+   */
+  @Get('analytics/fournisseurs-preferes')
+  @ApiOperation({
+    summary: 'Fournisseurs préférés',
+    description: 'Obtenir la liste des fournisseurs marqués comme préférés',
+  })
+  async getFournisseursPreferences(): Promise<Partner[]> {
+    return await this.partnerService.getFournisseursPreferences()
+  }
+
+  /**
+   * Obtenir les partenaires créés récemment
+   */
+  @Get('analytics/recent')
+  @ApiOperation({
+    summary: 'Partenaires récents',
+    description: 'Obtenir les partenaires créés ou modifiés récemment',
+  })
+  async getRecentPartners(
+    @Query('days') days: number = 30,
+    @Query('type') type: 'created' | 'modified' = 'created'
+  ): Promise<Partner[]> {
+    return await this.partnerService.getRecentPartners(days, type)
+  }
+
+  /**
+   * Détection de doublons
+   */
+  @Post('analytics/doublons')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Détecter les doublons',
+    description: 'Analyser la base pour détecter les partenaires potentiellement en double',
+  })
+  async detectDoublons(
+    @Body() criteria?: { 
+      checkSiret?: boolean
+      checkEmail?: boolean
+      checkDenomination?: boolean
+    }
+  ): Promise<Array<{
+    partners: Partner[]
+    matchType: string
+    confidence: number
+  }>> {
+    return await this.partnerService.detectDoublons(criteria)
+  }
+
+  /**
+   * Statistiques détaillées
+   */
+  @Get('analytics/statistics')
+  @ApiOperation({
+    summary: 'Statistiques détaillées',
+    description: 'Obtenir des statistiques complètes sur les partenaires',
+  })
+  async getDetailedStatistics(): Promise<{
+    totalPartenaires: number
+    repartitionParType: Record<string, number>
+    repartitionParStatus: Record<string, number>
+    repartitionParCategorie: Record<string, number>
+    repartitionGeographique: {
+      parVille: Record<string, number>
+      parDepartement: Record<string, number>
+      parRegion: Record<string, number>
+    }
+    tendanceCreation: Array<{ periode: string; nombreCreations: number }>
+    moyenneAnciennete: number
+    tauxActivite: number
+  }> {
+    return await this.partnerService.getDetailedStatistics()
+  }
+
+  /**
+   * Analyse de la performance commerciale
+   */
+  @Get('analytics/performance')
+  @ApiOperation({
+    summary: 'Performance commerciale',
+    description: 'Analyser la performance commerciale par partenaire',
+  })
+  async getCommercialPerformance(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string
+  ): Promise<{
+    topPerformers: Array<Partner & { performance: number }>
+    underPerformers: Array<Partner & { performance: number }>
+    trends: Array<{ periode: string; valeur: number }>
+  }> {
+    const start = startDate ? new Date(startDate) : undefined
+    const end = endDate ? new Date(endDate) : undefined
+    return await this.partnerService.getCommercialPerformance(start, end)
+  }
+
+  // === GESTION DES INTERACTIONS ===
+
+  /**
+   * Créer une nouvelle interaction avec un partenaire
+   */
+  @Post(':partnerId/interactions')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Créer une interaction',
+    description: 'Enregistrer une nouvelle interaction avec un partenaire',
+  })
+  async createInteraction(
+    @Param('partnerId') partnerId: string,
+    @Body() createDto: Record<string, unknown>,
+    @CurrentUser() user: User
+  ): Promise<Record<string, unknown>> {
+    const context = this.getContext(user)
+    return await this.partnerService.createInteraction(partnerId, createDto, context)
+  }
+
+  /**
+   * Obtenir les interactions d'un partenaire
+   */
+  @Get(':partnerId/interactions')
+  @ApiOperation({
+    summary: 'Historique des interactions',
+    description: 'Récupérer toutes les interactions avec un partenaire',
+  })
+  async getPartnerInteractions(
+    @Param('partnerId') partnerId: string,
+    @Query('limit') limit: number = 50,
+    @Query('offset') offset: number = 0,
+    @Query('type') type?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string
+  ): Promise<{
+    items: Record<string, unknown>[]
+    total: number
+    hasMore: boolean
+  }> {
+    const filters = {
+      limit,
+      offset,
+      type,
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined
+    }
+    return await this.partnerService.getPartnerInteractions(partnerId, filters)
+  }
+
+  /**
+   * Mettre à jour une interaction
+   */
+  @Patch('interactions/:interactionId')
+  @ApiOperation({
+    summary: 'Mettre à jour une interaction',
+    description: 'Modifier les informations d\'une interaction existante',
+  })
+  async updateInteraction(
+    @Param('interactionId') interactionId: string,
+    @Body() updateDto: Record<string, unknown>,
+    @CurrentUser() user: User
+  ): Promise<Record<string, unknown>> {
+    const context = this.getContext(user)
+    return await this.partnerService.updateInteraction(interactionId, updateDto, context)
+  }
+
+  /**
+   * Supprimer une interaction
+   */
+  @Delete('interactions/:interactionId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Supprimer une interaction',
+    description: 'Supprimer une interaction (soft delete)',
+  })
+  async deleteInteraction(
+    @Param('interactionId') interactionId: string,
+    @CurrentUser() user: User
+  ): Promise<void> {
+    const context = this.getContext(user)
+    await this.partnerService.deleteInteraction(interactionId, context)
+  }
+
+  /**
+   * Rechercher des interactions
+   */
+  @Post('interactions/search')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Rechercher des interactions',
+    description: 'Recherche avancée dans les interactions partenaires',
+  })
+  async searchInteractions(
+    @Body() searchCriteria: Record<string, unknown>
+  ): Promise<{
+    items: Record<string, unknown>[]
+    total: number
+    aggregations: Record<string, unknown>
+  }> {
+    return await this.partnerService.searchInteractions(searchCriteria)
+  }
+
+  /**
+   * Statistiques des interactions par type
+   */
+  @Get('interactions/stats/by-type')
+  @ApiOperation({
+    summary: 'Statistiques par type d\'interaction',
+    description: 'Répartition des interactions par type sur une période',
+  })
+  async getInteractionStatsByType(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('groupBy') groupBy: 'day' | 'week' | 'month' = 'month'
+  ): Promise<{
+    byType: Record<string, number>
+    byPeriod: Array<{ periode: string; count: number }>
+    trends: Array<{ type: string; trend: 'up' | 'down' | 'stable'; variation: number }>
+  }> {
+    const start = startDate ? new Date(startDate) : undefined
+    const end = endDate ? new Date(endDate) : undefined
+    return await this.partnerService.getInteractionStatsByType(start, end, groupBy)
+  }
+
+  /**
+   * Statistiques de performance des interactions
+   */
+  @Get('interactions/stats/performance')
+  @ApiOperation({
+    summary: 'Performance des interactions',
+    description: 'Analyser l\'efficacité et les résultats des interactions',
+  })
+  async getInteractionPerformanceStats(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string
+  ): Promise<{
+    totalInteractions: number
+    tauxReussite: number
+    dureeeMoyenne: number
+    satisfactionMoyenne: number
+    conversionCommerciale: number
+    topUsers: Array<{ userId: string; userNom: string; interactions: number; performance: number }>
+  }> {
+    const start = startDate ? new Date(startDate) : undefined
+    const end = endDate ? new Date(endDate) : undefined
+    return await this.partnerService.getInteractionPerformanceStats(start, end)
+  }
+
+  // === STATISTIQUES AVANCÉES PARTENAIRES ===
+
+  /**
+   * Statistiques complètes d'un partenaire spécifique
+   */
+  @Get(':partnerId/analytics/complete')
+  @ApiOperation({
+    summary: 'Statistiques complètes d\'un partenaire',
+    description: 'Analyse complète d\'un partenaire avec toutes ses métriques',
+  })
+  async getCompletePartnerAnalytics(
+    @Param('partnerId') partnerId: string,
+    @Query('includePredictions') includePredictions: boolean = false
+  ): Promise<Record<string, unknown>> {
+    return await this.partnerService.getCompletePartnerAnalytics(partnerId, { includePredictions })
+  }
+
+  /**
+   * Analyse de la relation commerciale
+   */
+  @Get(':partnerId/analytics/relationship')
+  @ApiOperation({
+    summary: 'Analyse de la relation commerciale',
+    description: 'Analyser l\'évolution et la qualité de la relation commerciale',
+  })
+  async getPartnerRelationshipAnalysis(
+    @Param('partnerId') partnerId: string,
+    @Query('period') period: number = 12 // mois
+  ): Promise<{
+    durationMonths: number
+    evolutionScore: number
+    loyaltyIndex: number
+    businessGrowth: number
+    interactionFrequency: number
+    lastInteractionDays: number
+    riskLevel: 'low' | 'medium' | 'high'
+    opportunities: string[]
+    threats: string[]
+    recommendations: string[]
+  }> {
+    return await this.partnerService.getPartnerRelationshipAnalysis(partnerId, period)
+  }
+
+  /**
+   * Analyse comparative avec les pairs
+   */
+  @Get(':partnerId/analytics/benchmark')
+  @ApiOperation({
+    summary: 'Analyse comparative',
+    description: 'Comparer un partenaire avec ses pairs du même secteur',
+  })
+  async getPartnerBenchmark(
+    @Param('partnerId') partnerId: string,
+    @Query('sector') sector?: string,
+    @Query('size') size?: string
+  ): Promise<{
+    ranking: number
+    totalPeers: number
+    percentile: number
+    scoreVsPeers: {
+      performance: 'above' | 'average' | 'below'
+      business: 'above' | 'average' | 'below'
+      reliability: 'above' | 'average' | 'below'
+    }
+    metrics: {
+      averageOrderValue: { partner: number; peers: number; position: string }
+      orderFrequency: { partner: number; peers: number; position: string }
+      deliveryPerformance: { partner: number; peers: number; position: string }
+      qualityScore: { partner: number; peers: number; position: string }
+    }
+  }> {
+    return await this.partnerService.getPartnerBenchmark(partnerId, { sector, size })
+  }
+
+  /**
+   * Dashboard de performance globale
+   */
+  @Get('analytics/dashboard')
+  @ApiOperation({
+    summary: 'Dashboard de performance',
+    description: 'Vue d\'ensemble des performances partenaires avec KPIs',
+  })
+  async getPartnerDashboard(
+    @Query('period') period: 'week' | 'month' | 'quarter' | 'year' = 'month'
+  ): Promise<{
+    kpis: {
+      totalPartners: number
+      activePartners: number
+      newPartnersThisPeriod: number
+      totalRevenue: number
+      averageOrderValue: number
+      partnerSatisfaction: number
+    }
+    growth: {
+      partnersGrowth: number
+      revenueGrowth: number
+      orderGrowth: number
+    }
+    topPerformers: Array<{
+      partnerId: string
+      partnerName: string
+      revenue: number
+      orders: number
+      performance: number
+    }>
+    alerts: Array<{
+      type: 'risk' | 'opportunity' | 'action_required'
+      title: string
+      description: string
+      partnerId?: string
+      priority: 'low' | 'medium' | 'high'
+    }>
+    trends: Array<{
+      metric: string
+      trend: 'up' | 'down' | 'stable'
+      value: number
+      change: number
+    }>
+  }> {
+    return await this.partnerService.getPartnerDashboard(period)
   }
 
   /**

@@ -38,7 +38,6 @@ export class MigrationManagerSimpleService {
           '002-CreateTranslationTables',
           '003-CreateSystemConfigTables',
           '004-CreateMenuConfigurationTables',
-          '005-CreateMarketplaceTables',
           '006-AddCompanySettings',
           '007-CreateParametersTables',
         ],

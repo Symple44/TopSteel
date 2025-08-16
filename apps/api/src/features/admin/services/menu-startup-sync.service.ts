@@ -1,6 +1,6 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { MenuSyncService } from './menu-sync.service'
+import { ConfigService } from '@nestjs/config'
+import { MenuSyncService } from './menu-sync.service'
 
 @Injectable()
 export class MenuStartupSyncService implements OnModuleInit {

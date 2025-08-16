@@ -1,0 +1,48 @@
+# ZAP Tuning Rules for TopSteel ERP
+# Format: IGNORE, WARN, INFO, FAIL
+# Rule ID	Threshold	URL Pattern	Parameter	Other Info
+
+# Authentication bypass rules
+10019	IGNORE	.*	.*	# Ignore certain auth bypass checks in development
+
+# SQL Injection
+40018	FAIL	.*	.*	# SQL Injection - fail on all instances
+
+# XSS
+40012	FAIL	.*	.*	# Cross Site Scripting (Reflected) - fail on all
+40014	FAIL	.*	.*	# Cross Site Scripting (Persistent) - fail on all
+40016	FAIL	.*	.*	# Cross Site Scripting (Persistent) - Prime - fail on all
+
+# CSRF
+10202	FAIL	.*	.*	# Absence of Anti-CSRF Tokens - fail on all
+
+# Information Disclosure
+10038	WARN	.*	.*	# Content Cacheability - warn only
+10040	INFO	.*	.*	# Secure Pages Include Mixed HTTP Content - info only
+
+# Server Security
+10021	FAIL	.*	.*	# X-Content-Type-Options header missing - fail
+10020	FAIL	.*	.*	# X-Frame-Options header missing - fail
+10035	FAIL	.*	.*	# Strict-Transport-Security header missing - fail
+
+# Content Security Policy
+10055	FAIL	.*	.*	# CSP not implemented - fail
+
+# API specific rules
+90019	FAIL	.*api.*	.*	# Code Injection - fail on API endpoints
+90020	FAIL	.*api.*	.*	# Command Injection - fail on API endpoints
+
+# Development and test endpoints
+0	IGNORE	.*\/test.*	.*	# Ignore test endpoints
+0	IGNORE	.*\/dev.*	.*	# Ignore dev endpoints
+0	IGNORE	.*\/debug.*	.*	# Ignore debug endpoints
+
+# Health check endpoints
+0	IGNORE	.*\/health.*	.*	# Ignore health check endpoints
+0	IGNORE	.*\/ping.*	.*	# Ignore ping endpoints
+
+# Static resources - lower severity
+10049	INFO	.*\.(js|css|png|jpg|jpeg|gif|ico|svg)$	.*	# Storable but Non-Cacheable Content - info only
+
+# Marketplace specific rules
+10017	WARN	.*\/marketplace.*	.*	# Cross-Domain Misconfiguration - warn for marketplace

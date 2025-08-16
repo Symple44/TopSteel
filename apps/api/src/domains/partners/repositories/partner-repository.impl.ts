@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
 import type { PartnerSearchCriteria } from '../services/partner.service'
-import type { IPartnerRepository, PartnerRepositoryStats } from './partner.repository'
+import type { IPartnerRepository, PartnerRepositoryStats, PartnerAdvancedFilters } from './partner.repository'
+import { PartnerSortField } from './partner.repository'
 
 /**
  * Implémentation concrète du repository Partner avec TypeORM
@@ -149,15 +150,126 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   }
 
   async findWithFilters(
-    _filters: Record<string, unknown>
+    filters: PartnerAdvancedFilters
   ): Promise<{ items: Partner[]; total: number; page: number; limit: number }> {
-    // TODO: Implémenter la pagination avancée
-    const items = await this.repository.find()
+    const query = this.repository.createQueryBuilder('partner')
+
+    // Filtres de base
+    if (filters.type?.length) {
+      query.andWhere('partner.type IN (:...types)', { types: filters.type })
+    }
+
+    if (filters.status?.length) {
+      query.andWhere('partner.status IN (:...statuses)', { statuses: filters.status })
+    }
+
+    if (filters.category?.length) {
+      query.andWhere('partner.category IN (:...categories)', { categories: filters.category })
+    }
+
+    // Filtres géographiques
+    if (filters.ville) {
+      query.andWhere('partner.ville ILIKE :ville', { ville: `%${filters.ville}%` })
+    }
+
+    if (filters.codePostal) {
+      query.andWhere('partner.codePostal = :codePostal', { codePostal: filters.codePostal })
+    }
+
+    if (filters.region) {
+      query.andWhere('partner.codePostal LIKE :region', { region: `${filters.region}%` })
+    }
+
+    if (filters.departement) {
+      query.andWhere('SUBSTRING(partner.codePostal, 1, 2) = :departement', { 
+        departement: filters.departement 
+      })
+    }
+
+    if (filters.pays?.length) {
+      query.andWhere('partner.pays IN (:...pays)', { pays: filters.pays })
+    }
+
+    // Filtres commerciaux
+    if (filters.chiffreAffairesMin !== undefined) {
+      query.andWhere('partner.chiffreAffaires >= :caMin', { caMin: filters.chiffreAffairesMin })
+    }
+
+    if (filters.chiffreAffairesMax !== undefined) {
+      query.andWhere('partner.chiffreAffaires <= :caMax', { caMax: filters.chiffreAffairesMax })
+    }
+
+    if (filters.dateCreationMin) {
+      query.andWhere('partner.createdAt >= :dateMin', { dateMin: filters.dateCreationMin })
+    }
+
+    if (filters.dateCreationMax) {
+      query.andWhere('partner.createdAt <= :dateMax', { dateMax: filters.dateCreationMax })
+    }
+
+    if (filters.ancienneteMin !== undefined) {
+      const dateMin = new Date()
+      dateMin.setFullYear(dateMin.getFullYear() - filters.ancienneteMin)
+      query.andWhere('partner.createdAt <= :ancienneteMin', { ancienneteMin: dateMin })
+    }
+
+    if (filters.ancienneteMax !== undefined) {
+      const dateMax = new Date()
+      dateMax.setFullYear(dateMax.getFullYear() - filters.ancienneteMax)
+      query.andWhere('partner.createdAt >= :ancienneteMax', { ancienneteMax: dateMax })
+    }
+
+    // Filtres spéciaux
+    if (filters.hasOrders !== undefined) {
+      // TODO: Joindre avec la table des commandes quand elle existera
+      // query.andWhere('EXISTS (SELECT 1 FROM orders WHERE orders.partnerId = partner.id)')
+    }
+
+    if (filters.hasUnpaidInvoices !== undefined) {
+      // TODO: Joindre avec la table des factures quand elle existera
+      // query.andWhere('EXISTS (SELECT 1 FROM invoices WHERE invoices.partnerId = partner.id AND invoices.status = :unpaid)', { unpaid: 'UNPAID' })
+    }
+
+    if (filters.isPreferredSupplier === true) {
+      query.andWhere('partner.fournisseurPrefere = true')
+    }
+
+    if (filters.hasContactEmail === true) {
+      query.andWhere('partner.email IS NOT NULL')
+      query.andWhere("partner.email != ''")
+    }
+
+    if (filters.hasContactPhone === true) {
+      query.andWhere('(partner.telephone IS NOT NULL OR partner.mobile IS NOT NULL)')
+    }
+
+    // Recherche textuelle
+    if (filters.searchText) {
+      const searchFields = filters.searchFields || ['denomination', 'code', 'email', 'ville']
+      const searchConditions = searchFields.map(field => `partner.${field} ILIKE :search`).join(' OR ')
+      query.andWhere(`(${searchConditions})`, { search: `%${filters.searchText}%` })
+    }
+
+    // Tri
+    const sortField = filters.sortBy || PartnerSortField.CODE
+    const sortOrder = filters.sortOrder || 'ASC'
+    query.orderBy(`partner.${sortField}`, sortOrder)
+
+    // Pagination
+    const page = filters.page || 1
+    const limit = filters.limit || 20
+    const skip = (page - 1) * limit
+
+    query.skip(skip).take(limit)
+
+    // Exécution
+    const [items, total] = await query.getManyAndCount()
+
     return {
       items,
-      total: items.length,
-      page: 1,
-      limit: 10,
+      total,
+      page,
+      limit
     }
   }
 
@@ -191,39 +303,125 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   async getPartnerStats(): Promise<PartnerRepositoryStats> {
     const totalPartenaires = await this.repository.count()
 
-    // Implémentation basique - peut être améliorée avec des requêtes optimisées
+    // Répartition par type
+    const repartitionParType = {
+      [PartnerType.CLIENT]: await this.repository.count({ where: { type: PartnerType.CLIENT } }),
+      [PartnerType.FOURNISSEUR]: await this.repository.count({
+        where: { type: PartnerType.FOURNISSEUR },
+      }),
+      [PartnerType.MIXTE]: await this.repository.count({ where: { type: PartnerType.MIXTE } }),
+    }
+
+    // Répartition par statut
+    const repartitionParStatus = {
+      [PartnerStatus.ACTIF]: await this.repository.count({
+        where: { status: PartnerStatus.ACTIF },
+      }),
+      [PartnerStatus.INACTIF]: await this.repository.count({
+        where: { status: PartnerStatus.INACTIF },
+      }),
+      [PartnerStatus.SUSPENDU]: await this.repository.count({
+        where: { status: PartnerStatus.SUSPENDU },
+      }),
+      [PartnerStatus.PROSPECT]: await this.repository.count({
+        where: { status: PartnerStatus.PROSPECT },
+      }),
+    }
+
+    // Répartition par catégorie
+    const categoriesResult = await this.repository
+      .createQueryBuilder('partner')
+      .select('partner.category', 'category')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('partner.category')
+      .getRawMany()
+
+    const repartitionParCategorie: Record<string, number> = {}
+    categoriesResult.forEach(item => {
+      if (item.category) {
+        repartitionParCategorie[item.category] = parseInt(item.count)
+      }
+    })
+
+    // Répartition géographique par ville
+    const villesResult = await this.repository
+      .createQueryBuilder('partner')
+      .select('partner.ville', 'ville')
+      .addSelect('COUNT(*)', 'count')
+      .where('partner.ville IS NOT NULL')
+      .groupBy('partner.ville')
+      .orderBy('count', 'DESC')
+      .limit(10)
+      .getRawMany()
+
+    const parVille: Record<string, number> = {}
+    villesResult.forEach(item => {
+      if (item.ville) {
+        parVille[item.ville] = parseInt(item.count)
+      }
+    })
+
+    // Répartition géographique par département
+    const departementsResult = await this.repository
+      .createQueryBuilder('partner')
+      .select('SUBSTRING(partner.codePostal, 1, 2)', 'departement')
+      .addSelect('COUNT(*)', 'count')
+      .where('partner.codePostal IS NOT NULL')
+      .groupBy('SUBSTRING(partner.codePostal, 1, 2)')
+      .orderBy('count', 'DESC')
+      .getRawMany()
+
+    const parDepartement: Record<string, number> = {}
+    departementsResult.forEach(item => {
+      if (item.departement) {
+        parDepartement[item.departement] = parseInt(item.count)
+      }
+    })
+
+    // Tendance de création sur les 12 derniers mois
+    const tendanceResult = await this.repository
+      .createQueryBuilder('partner')
+      .select("TO_CHAR(partner.createdAt, 'YYYY-MM')", 'periode')
+      .addSelect('COUNT(*)', 'count')
+      .where('partner.createdAt >= :date', { 
+        date: new Date(new Date().setMonth(new Date().getMonth() - 12)) 
+      })
+      .groupBy("TO_CHAR(partner.createdAt, 'YYYY-MM')")
+      .orderBy('periode', 'ASC')
+      .getRawMany()
+
+    const tendanceCreation = tendanceResult.map(item => ({
+      periode: item.periode,
+      nombreCreations: parseInt(item.count)
+    }))
+
+    // Calcul de l'ancienneté moyenne
+    const ancienneteResult = await this.repository
+      .createQueryBuilder('partner')
+      .select('AVG(EXTRACT(YEAR FROM AGE(NOW(), partner.createdAt)))', 'moyenne')
+      .getRawOne()
+
+    const moyenneAnciennete = parseFloat(ancienneteResult?.moyenne || '0')
+
+    // Taux d'activité
+    const partnersActifs = await this.repository.count({
+      where: { status: PartnerStatus.ACTIF }
+    })
+    const tauxActivite = totalPartenaires > 0 ? (partnersActifs / totalPartenaires) * 100 : 0
+
     return {
       totalPartenaires,
-      repartitionParType: {
-        [PartnerType.CLIENT]: await this.repository.count({ where: { type: PartnerType.CLIENT } }),
-        [PartnerType.FOURNISSEUR]: await this.repository.count({
-          where: { type: PartnerType.FOURNISSEUR },
-        }),
-        [PartnerType.MIXTE]: await this.repository.count({ where: { type: PartnerType.MIXTE } }),
-      },
-      repartitionParStatus: {
-        [PartnerStatus.ACTIF]: await this.repository.count({
-          where: { status: PartnerStatus.ACTIF },
-        }),
-        [PartnerStatus.INACTIF]: await this.repository.count({
-          where: { status: PartnerStatus.INACTIF },
-        }),
-        [PartnerStatus.SUSPENDU]: await this.repository.count({
-          where: { status: PartnerStatus.SUSPENDU },
-        }),
-        [PartnerStatus.PROSPECT]: await this.repository.count({
-          where: { status: PartnerStatus.PROSPECT },
-        }),
-      },
-      repartitionParCategorie: {}, // TODO: Implémenter si nécessaire
+      repartitionParType,
+      repartitionParStatus,
+      repartitionParCategorie,
       repartitionGeographique: {
-        parVille: {},
-        parDepartement: {},
-        parRegion: {},
+        parVille,
+        parDepartement,
+        parRegion: {} // TODO: Implémenter si nécessaire
       },
-      tendanceCreation: [],
-      moyenneAnciennete: 0,
-      tauxActivite: 0,
+      tendanceCreation,
+      moyenneAnciennete,
+      tauxActivite
     }
   }
 

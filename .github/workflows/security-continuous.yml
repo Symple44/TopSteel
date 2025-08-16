@@ -1,0 +1,374 @@
+name: Security Continuous Monitoring
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security-audit:
+    name: Security Audit & Analysis
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: NPM Security Audit
+        id: npm-audit
+        run: |
+          echo "::group::NPM Audit"
+          pnpm audit --audit-level moderate --json > npm-audit-results.json || true
+          cat npm-audit-results.json
+          echo "::endgroup::"
+          
+          # Count vulnerabilities
+          VULNERABILITIES=$(cat npm-audit-results.json | jq '.metadata.vulnerabilities // 0')
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          
+          # Fail if high or critical vulnerabilities found
+          HIGH_VULNS=$(cat npm-audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+          CRITICAL_VULNS=$(cat npm-audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+          
+          if [ "$HIGH_VULNS" -gt 0 ] || [ "$CRITICAL_VULNS" -gt 0 ]; then
+            echo "::error::High or critical vulnerabilities found!"
+            exit 1
+          fi
+
+      - name: Better NPM Audit
+        continue-on-error: true
+        run: |
+          npx better-npm-audit audit --level moderate
+
+  codeql-analysis:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript', 'typescript' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality,security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+  trufflehog-secrets:
+    name: TruffleHog Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  security-hardening:
+    name: Security Hardening Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run custom security checks
+        run: |
+          # Make security script executable
+          chmod +x ./scripts/security-check.sh
+          ./scripts/security-check.sh
+
+  owasp-zap:
+    name: OWASP ZAP Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: |
+          pnpm build:packages
+          pnpm build:apps || true
+
+      - name: Start application for testing
+        run: |
+          # Start the API in background
+          cd apps/api && npm run start:dev &
+          # Wait for API to start
+          sleep 30
+          
+          # Start web app in background  
+          cd apps/web && npm run dev &
+          # Wait for web to start
+          sleep 30
+        continue-on-error: true
+
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: 'http://localhost:3000'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
+        continue-on-error: true
+
+  dependency-check:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        id: dependency-check
+        with:
+          project: 'TopSteel-ERP'
+          path: '.'
+          format: 'HTML,JSON'
+          args: >
+            --enableRetired
+            --enableExperimental
+            --disableYarnAudit
+            --disableNodeAudit
+
+      - name: Upload Dependency Check results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: reports/
+
+  security-report:
+    name: Generate Security Report
+    runs-on: ubuntu-latest
+    needs: [security-audit, codeql-analysis, trufflehog-secrets, security-hardening, dependency-check]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: security-artifacts
+        continue-on-error: true
+
+      - name: Generate Security Report
+        run: |
+          cat > security-report.md << 'EOF'
+          # Security Continuous Monitoring Report
+          
+          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Commit:** ${{ github.sha }}
+          **Branch:** ${{ github.ref_name }}
+          
+          ## Summary
+          
+          | Check | Status | Notes |
+          |-------|--------|-------|
+          | NPM Audit | ${{ needs.security-audit.result }} | Dependencies security scan |
+          | CodeQL Analysis | ${{ needs.codeql-analysis.result }} | Static code security analysis |
+          | Secret Scanning | ${{ needs.trufflehog-secrets.result }} | TruffleHog secret detection |
+          | Security Hardening | ${{ needs.security-hardening.result }} | Custom security checks |
+          | Dependency Check | ${{ needs.dependency-check.result }} | OWASP dependency vulnerability scan |
+          
+          ## Recommendations
+          
+          ### High Priority
+          - Review any failed security checks above
+          - Address high/critical vulnerabilities in dependencies
+          - Rotate any exposed secrets found by TruffleHog
+          
+          ### Medium Priority
+          - Review CodeQL findings for potential security improvements
+          - Update dependencies with known security issues
+          - Implement additional security headers if recommended
+          
+          ### Monitoring
+          - This report is generated automatically on push/PR
+          - Daily scans run at 2 AM UTC
+          - Security team is notified of critical findings
+          
+          ## Artifacts
+          
+          Security scan artifacts are available in the workflow run for detailed analysis.
+          EOF
+
+      - name: Upload Security Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: security-report.md
+
+      - name: Create Issue on Security Failure
+        if: >-
+          needs.security-audit.result == 'failure' ||
+          needs.codeql-analysis.result == 'failure' ||
+          needs.trufflehog-secrets.result == 'failure' ||
+          needs.security-hardening.result == 'failure' ||
+          needs.dependency-check.result == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = `🚨 Security Alert - Failed checks on ${context.ref}`;
+            const body = `
+            ## Security Continuous Monitoring Alert
+            
+            **Branch:** ${context.ref}
+            **Commit:** ${context.sha}
+            **Workflow:** ${context.workflow}
+            
+            One or more security checks have failed. Please review the workflow run for details:
+            ${context.payload.repository.html_url}/actions/runs/${context.runId}
+            
+            ### Failed Checks:
+            - NPM Audit: ${{ needs.security-audit.result }}
+            - CodeQL Analysis: ${{ needs.codeql-analysis.result }}
+            - Secret Scanning: ${{ needs.trufflehog-secrets.result }}
+            - Security Hardening: ${{ needs.security-hardening.result }}
+            - Dependency Check: ${{ needs.dependency-check.result }}
+            
+            **Priority:** High
+            **Auto-generated by:** Security Continuous Monitoring Workflow
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['security', 'high-priority', 'automated']
+            });
+
+  windows-compatibility:
+    name: Windows Security Checks
+    runs-on: windows-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Windows Security Checks
+        shell: powershell
+        run: |
+          Write-Host "Running Windows-specific security checks..."
+          
+          # Check for Windows-specific vulnerabilities
+          if (Test-Path ".\scripts\Check-Security.ps1") {
+            .\scripts\Check-Security.ps1
+          }
+          
+          # Verify file permissions
+          Get-ChildItem -Recurse -File | Where-Object { 
+            $_.Name -match "\.(env|key|pem|p12|pfx)$" 
+          } | ForEach-Object {
+            Write-Warning "Sensitive file detected: $($_.FullName)"
+          }
+
+      - name: Check for Windows-specific security issues
+        shell: powershell
+        run: |
+          # Check for common Windows security misconfigurations
+          $issues = @()
+          
+          # Check for .env files with wide permissions
+          Get-ChildItem -Recurse -Filter "*.env*" | ForEach-Object {
+            $acl = Get-Acl $_.FullName
+            if ($acl.Access | Where-Object { $_.IdentityReference -eq "Everyone" -and $_.FileSystemRights -match "FullControl|Modify" }) {
+              $issues += "Environment file with excessive permissions: $($_.FullName)"
+            }
+          }
+          
+          # Check for executable files in unusual locations
+          Get-ChildItem -Recurse -Filter "*.exe" | Where-Object { $_.DirectoryName -match "(temp|tmp|uploads|public)" } | ForEach-Object {
+            $issues += "Executable in potentially unsafe location: $($_.FullName)"
+          }
+          
+          if ($issues.Count -gt 0) {
+            Write-Host "Security issues found:" -ForegroundColor Red
+            $issues | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+            exit 1
+          } else {
+            Write-Host "No Windows-specific security issues found." -ForegroundColor Green
+          }

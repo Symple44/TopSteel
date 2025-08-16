@@ -161,6 +161,13 @@ export interface IArticleRepository extends IBusinessRepository<Article> {
  */
 export interface ArticleAdvancedFilters extends ArticleSearchCriteria {
   // Critères de stock
+  stock?: {
+    min?: number
+    max?: number
+    disponible?: number
+    enRupture?: boolean
+    sousStockMinimum?: boolean
+  }
   stockMin?: number
   stockMax?: number
   stockDisponibleMin?: number
@@ -169,12 +176,19 @@ export interface ArticleAdvancedFilters extends ArticleSearchCriteria {
   sansStock?: boolean
 
   // Critères de prix
+  prix?: {
+    min?: number
+    max?: number
+  }
   prixAchatMin?: number
   prixAchatMax?: number
   prixVenteMin?: number
   prixVenteMax?: number
   margeMin?: number
   margeMax?: number
+  
+  // Critères de catégories
+  categories?: string[]
 
   // Critères physiques
   poidsMin?: number
@@ -197,16 +211,29 @@ export interface ArticleAdvancedFilters extends ArticleSearchCriteria {
   enRupture?: boolean
   sousStockMini?: boolean
   fournisseurPrefere?: boolean
+  fournisseurs?: string[]
 
   // Critères de recherche textuelle
+  recherche?: string
   searchText?: string
   searchFields?: ArticleSearchField[]
 
   // Critères de tri
+  tri?: {
+    champ?: string
+    ordre?: 'ASC' | 'DESC'
+  }
   sortBy?: ArticleSortField
   sortOrder?: 'ASC' | 'DESC'
 
+  // Critères de pagination
+  pagination?: {
+    page?: number
+    limite?: number
+  }
+
   // Critères d'inclusion
+  actif?: boolean
   includeInactive?: boolean
   includeObsolete?: boolean
 }

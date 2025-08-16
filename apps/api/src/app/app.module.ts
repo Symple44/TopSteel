@@ -77,10 +77,25 @@ import { AppService } from './app.service'
 
     // JWT pour middleware global
     JwtModule.registerAsync({
-      useFactory: () => ({
-        secret: process.env.JWT_SECRET || 'default-secret',
-        signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
-      }),
+      useFactory: () => {
+        const jwtSecret = process.env.JWT_SECRET
+        if (!jwtSecret && process.env.NODE_ENV === 'production') {
+          throw new Error('JWT_SECRET must be defined in production environment')
+        }
+        // En développement seulement, générer un secret temporaire
+        const secret = jwtSecret || (process.env.NODE_ENV === 'development' 
+          ? `dev-only-secret-${Date.now()}-min-32-chars-long` 
+          : undefined)
+        
+        if (!secret) {
+          throw new Error('JWT_SECRET is required')
+        }
+        
+        return {
+          secret,
+          signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
+        }
+      },
       global: true,
     }),
 

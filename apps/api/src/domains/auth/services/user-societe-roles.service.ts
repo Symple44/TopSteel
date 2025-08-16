@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
+import { PermissionCalculatorService } from './permission-calculator.service'
 
 export interface UserSocieteRoleWithPermissions {
   userId: string
@@ -37,7 +38,8 @@ export interface UserSocieteRoleWithPermissions {
 export class UserSocieteRolesService {
   constructor(
     @InjectRepository(UserSocieteRole, 'auth')
-    private _userSocieteRoleRepository: Repository<UserSocieteRole>
+    private _userSocieteRoleRepository: Repository<UserSocieteRole>,
+    private permissionCalculator: PermissionCalculatorService
   ) {}
 
   /**
@@ -262,7 +264,12 @@ export class UserSocieteRolesService {
       })
     }
 
-    return this._userSocieteRoleRepository.save(userRole)
+    const saved = await this._userSocieteRoleRepository.save(userRole)
+
+    // Invalider le cache des permissions
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+
+    return saved
   }
 
   /**
@@ -291,5 +298,122 @@ export class UserSocieteRolesService {
     if (result.affected === 0) {
       throw new Error(`No active access found for user ${userId} to company ${societeId}`)
     }
+
+    // Invalider le cache des permissions
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+  }
+
+  /**
+   * Ajouter une permission additionnelle à un utilisateur
+   */
+  async addAdditionalPermission(
+    userId: string,
+    societeId: string,
+    permission: string
+  ): Promise<UserSocieteRole> {
+    const userRole = await this._userSocieteRoleRepository.findOne({
+      where: { userId, societeId, isActive: true }
+    })
+
+    if (!userRole) {
+      throw new NotFoundException(`User role not found for user ${userId} in societe ${societeId}`)
+    }
+
+    userRole.addAdditionalPermission(permission)
+    const saved = await this._userSocieteRoleRepository.save(userRole)
+
+    // Invalider le cache des permissions
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+
+    return saved
+  }
+
+  /**
+   * Retirer une permission additionnelle d'un utilisateur
+   */
+  async removeAdditionalPermission(
+    userId: string,
+    societeId: string,
+    permission: string
+  ): Promise<UserSocieteRole> {
+    const userRole = await this._userSocieteRoleRepository.findOne({
+      where: { userId, societeId, isActive: true }
+    })
+
+    if (!userRole) {
+      throw new NotFoundException(`User role not found for user ${userId} in societe ${societeId}`)
+    }
+
+    userRole.removeAdditionalPermission(permission)
+    const saved = await this._userSocieteRoleRepository.save(userRole)
+
+    // Invalider le cache des permissions
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+
+    return saved
+  }
+
+  /**
+   * Ajouter une restriction de permission à un utilisateur
+   */
+  async addRestrictedPermission(
+    userId: string,
+    societeId: string,
+    permission: string
+  ): Promise<UserSocieteRole> {
+    const userRole = await this._userSocieteRoleRepository.findOne({
+      where: { userId, societeId, isActive: true }
+    })
+
+    if (!userRole) {
+      throw new NotFoundException(`User role not found for user ${userId} in societe ${societeId}`)
+    }
+
+    userRole.addRestrictedPermission(permission)
+    const saved = await this._userSocieteRoleRepository.save(userRole)
+
+    // Invalider le cache des permissions
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+
+    return saved
+  }
+
+  /**
+   * Retirer une restriction de permission d'un utilisateur
+   */
+  async removeRestrictedPermission(
+    userId: string,
+    societeId: string,
+    permission: string
+  ): Promise<UserSocieteRole> {
+    const userRole = await this._userSocieteRoleRepository.findOne({
+      where: { userId, societeId, isActive: true }
+    })
+
+    if (!userRole) {
+      throw new NotFoundException(`User role not found for user ${userId} in societe ${societeId}`)
+    }
+
+    userRole.removeRestrictedPermission(permission)
+    const saved = await this._userSocieteRoleRepository.save(userRole)
+
+    // Invalider le cache des permissions
+    await this.permissionCalculator.invalidateUserPermissions(userId, societeId)
+
+    return saved
+  }
+
+  /**
+   * Obtenir un résumé des permissions d'un utilisateur
+   */
+  async getUserPermissionsSummary(userId: string, societeId: string) {
+    return await this.permissionCalculator.getPermissionsSummary(userId, societeId)
+  }
+
+  /**
+   * Obtenir les permissions effectives d'un utilisateur
+   */
+  async getUserEffectivePermissions(userId: string, societeId: string, siteId?: string) {
+    return await this.permissionCalculator.calculateUserPermissions(userId, societeId, siteId)
   }
 }

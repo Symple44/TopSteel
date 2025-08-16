@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
+import * as mathjs from 'mathjs'
 
 export interface QueryExecutionParams {
   page?: number
@@ -224,14 +225,35 @@ export class QueryBuilderExecutorService {
       })
     }
 
-    // Basic arithmetic operations only
+    // Use mathjs for safe arithmetic evaluation
     try {
-      // Remove any non-numeric characters except operators
-      const sanitized = evaluableExpression.replace(/[^0-9+\-*/().\s]/g, '')
-      // Use Function constructor for safe evaluation
-      return new Function(`return ${sanitized}`)()
-    } catch (_error) {
-      throw new Error(`Invalid expression: ${expression}`)
+      // Create a safe parser that only allows basic math operations
+      const parser = mathjs.parser()
+      
+      // Configure mathjs to be more restrictive
+      const limitedScope = {
+        // Only allow basic arithmetic functions
+        abs: Math.abs,
+        min: Math.min,
+        max: Math.max,
+        round: Math.round,
+        floor: Math.floor,
+        ceil: Math.ceil,
+        sqrt: Math.sqrt,
+        pow: Math.pow,
+      }
+      
+      // Evaluate the expression with limited scope
+      const result = mathjs.evaluate(evaluableExpression, limitedScope)
+      
+      // Ensure the result is a number
+      if (typeof result !== 'number' || isNaN(result)) {
+        throw new Error('Expression did not evaluate to a valid number')
+      }
+      
+      return result
+    } catch (error) {
+      throw new Error(`Invalid expression: ${expression}. ${error instanceof Error ? error.message : ''}`)
     }
   }
 

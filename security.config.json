@@ -1,0 +1,485 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://topsteel.fr/schemas/security-config.json",
+  "title": "TopSteel ERP Security Configuration",
+  "description": "Configuration complète de sécurité pour le système ERP TopSteel",
+  "type": "object",
+  "version": "1.0.0",
+  
+  "cors": {
+    "description": "Configuration CORS pour sécuriser les requêtes cross-origin",
+    "enabled": true,
+    "allowedOrigins": {
+      "development": [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:4000"
+      ],
+      "staging": [
+        "https://staging.topsteel.fr",
+        "https://staging-api.topsteel.fr"
+      ],
+      "production": [
+        "https://app.topsteel.fr",
+        "https://api.topsteel.fr",
+        "https://marketplace.topsteel.fr"
+      ]
+    },
+    "allowedMethods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    "allowedHeaders": [
+      "Authorization",
+      "Content-Type",
+      "Accept",
+      "X-Requested-With",
+      "X-Tenant-ID",
+      "X-Request-ID"
+    ],
+    "credentials": true,
+    "maxAge": 86400,
+    "preflightContinue": false,
+    "optionsSuccessStatus": 204
+  },
+
+  "headers": {
+    "description": "Headers de sécurité HTTP pour protéger contre diverses attaques",
+    "security": {
+      "contentSecurityPolicy": {
+        "enabled": true,
+        "directives": {
+          "defaultSrc": ["'self'"],
+          "scriptSrc": [
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            "https://cdn.jsdelivr.net",
+            "https://unpkg.com",
+            "https://cdnjs.cloudflare.com"
+          ],
+          "styleSrc": [
+            "'self'",
+            "'unsafe-inline'",
+            "https://fonts.googleapis.com",
+            "https://cdn.jsdelivr.net"
+          ],
+          "fontSrc": [
+            "'self'",
+            "https://fonts.gstatic.com",
+            "data:"
+          ],
+          "imgSrc": [
+            "'self'",
+            "data:",
+            "https:",
+            "blob:"
+          ],
+          "connectSrc": [
+            "'self'",
+            "https://api.topsteel.fr",
+            "wss://api.topsteel.fr",
+            "https://elasticsearch.topsteel.fr"
+          ],
+          "frameSrc": ["'none'"],
+          "objectSrc": ["'none'"],
+          "mediaSrc": ["'self'"],
+          "childSrc": ["'none'"]
+        },
+        "reportUri": "/api/security/csp-report"
+      },
+      "strictTransportSecurity": {
+        "enabled": true,
+        "maxAge": 31536000,
+        "includeSubDomains": true,
+        "preload": true
+      },
+      "xFrameOptions": {
+        "enabled": true,
+        "value": "DENY"
+      },
+      "xContentTypeOptions": {
+        "enabled": true,
+        "value": "nosniff"
+      },
+      "referrerPolicy": {
+        "enabled": true,
+        "value": "strict-origin-when-cross-origin"
+      },
+      "permissionsPolicy": {
+        "enabled": true,
+        "directives": {
+          "camera": [],
+          "microphone": [],
+          "geolocation": [],
+          "payment": [],
+          "usb": [],
+          "magnetometer": [],
+          "gyroscope": [],
+          "speaker": []
+        }
+      },
+      "xXSSProtection": {
+        "enabled": true,
+        "value": "1; mode=block"
+      }
+    },
+    "custom": {
+      "X-API-Version": "1.0",
+      "X-Content-Version": "1.0",
+      "X-Powered-By-Remove": true
+    }
+  },
+
+  "rateLimit": {
+    "description": "Configuration de limitation du taux de requêtes",
+    "global": {
+      "windowMs": 900000,
+      "max": 1000,
+      "message": "Trop de requêtes, veuillez réessayer plus tard",
+      "standardHeaders": true,
+      "legacyHeaders": false
+    },
+    "auth": {
+      "windowMs": 900000,
+      "max": 5,
+      "skipSuccessfulRequests": true,
+      "message": "Trop de tentatives de connexion, compte temporairement bloqué"
+    },
+    "api": {
+      "windowMs": 60000,
+      "max": 100,
+      "message": "Limite de requêtes API atteinte"
+    },
+    "upload": {
+      "windowMs": 60000,
+      "max": 10,
+      "message": "Limite d'upload atteinte"
+    },
+    "search": {
+      "windowMs": 60000,
+      "max": 200,
+      "message": "Trop de requêtes de recherche"
+    },
+    "marketplace": {
+      "windowMs": 60000,
+      "max": 150,
+      "message": "Limite de requêtes marketplace atteinte"
+    }
+  },
+
+  "validation": {
+    "description": "Règles de validation des entrées utilisateur",
+    "input": {
+      "maxLength": {
+        "name": 100,
+        "email": 255,
+        "description": 2000,
+        "comment": 500,
+        "address": 500,
+        "phone": 20,
+        "code": 50
+      },
+      "patterns": {
+        "email": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "phone": "^\\+?[1-9]\\d{1,14}$",
+        "postalCode": "^\\d{5}$",
+        "siret": "^\\d{14}$",
+        "siren": "^\\d{9}$",
+        "alphanumeric": "^[a-zA-Z0-9]+$",
+        "uuid": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      },
+      "sanitization": {
+        "enabled": true,
+        "allowedTags": ["b", "i", "em", "strong", "p", "br"],
+        "allowedAttributes": {},
+        "stripUnknownTags": true
+      },
+      "fileUpload": {
+        "maxSize": 10485760,
+        "allowedTypes": [
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+          "application/pdf",
+          "text/csv",
+          "application/vnd.ms-excel",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ],
+        "maxFiles": 5,
+        "virusScan": true
+      }
+    },
+    "sql": {
+      "preventInjection": true,
+      "parameterizedQueries": true,
+      "allowedFunctions": [
+        "NOW()",
+        "CURRENT_TIMESTAMP",
+        "UUID_GENERATE_V4()"
+      ],
+      "blacklistedPatterns": [
+        "DROP TABLE",
+        "DELETE FROM",
+        "TRUNCATE",
+        "ALTER TABLE",
+        "CREATE TABLE",
+        "GRANT",
+        "REVOKE",
+        "EXEC",
+        "EXECUTE",
+        "xp_",
+        "sp_"
+      ]
+    }
+  },
+
+  "auth": {
+    "description": "Configuration d'authentification et autorisation",
+    "jwt": {
+      "algorithm": "HS256",
+      "expiresIn": "8h",
+      "refreshTokenExpiresIn": "7d",
+      "issuer": "topsteel-erp",
+      "audience": "topsteel-users",
+      "minSecretLength": 32,
+      "refreshOnAccess": true
+    },
+    "passwords": {
+      "minLength": 12,
+      "requireUppercase": true,
+      "requireLowercase": true,
+      "requireNumbers": true,
+      "requireSpecialChars": true,
+      "specialChars": "!@#$%^&*()_+-=[]{}|;:,.<>?",
+      "maxLength": 128,
+      "preventCommon": true,
+      "preventReuse": 5,
+      "bcryptRounds": 12
+    },
+    "session": {
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "strict",
+      "maxAge": 28800000,
+      "rolling": true
+    },
+    "mfa": {
+      "enabled": true,
+      "required": false,
+      "totpWindow": 1,
+      "backupCodes": 10,
+      "rateLimit": {
+        "attempts": 3,
+        "windowMs": 300000
+      }
+    },
+    "lockout": {
+      "enabled": true,
+      "maxAttempts": 5,
+      "lockoutDuration": 900000,
+      "resetAfterSuccess": true
+    }
+  },
+
+  "encryption": {
+    "description": "Configuration de chiffrement des données sensibles",
+    "atRest": {
+      "algorithm": "AES-256-GCM",
+      "keyRotationDays": 90,
+      "saltLength": 32
+    },
+    "inTransit": {
+      "tlsVersion": "1.2",
+      "cipherSuites": [
+        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+      ]
+    },
+    "pii": {
+      "fields": [
+        "email",
+        "phone",
+        "address",
+        "socialSecurityNumber",
+        "bankAccount"
+      ],
+      "encryptionRequired": true,
+      "maskInLogs": true
+    }
+  },
+
+  "logging": {
+    "description": "Configuration des logs de sécurité",
+    "security": {
+      "enabled": true,
+      "level": "info",
+      "events": [
+        "login_success",
+        "login_failure",
+        "logout",
+        "password_change",
+        "permission_denied",
+        "data_access",
+        "configuration_change",
+        "suspicious_activity"
+      ],
+      "retention": {
+        "days": 90,
+        "compress": true
+      },
+      "piiMasking": true
+    },
+    "audit": {
+      "enabled": true,
+      "tables": [
+        "users",
+        "roles",
+        "permissions",
+        "societes",
+        "articles",
+        "orders",
+        "payments"
+      ],
+      "actions": ["CREATE", "UPDATE", "DELETE"],
+      "includeOldValues": true
+    }
+  },
+
+  "monitoring": {
+    "description": "Configuration du monitoring de sécurité",
+    "alerts": {
+      "enabled": true,
+      "channels": ["email", "slack"],
+      "thresholds": {
+        "failedLogins": {
+          "count": 10,
+          "timeWindow": 300
+        },
+        "suspiciousIPs": {
+          "count": 50,
+          "timeWindow": 3600
+        },
+        "dataExfiltration": {
+          "sizeBytes": 104857600,
+          "timeWindow": 3600
+        }
+      }
+    },
+    "healthChecks": {
+      "enabled": true,
+      "interval": 300,
+      "endpoints": [
+        "/health/security",
+        "/health/auth",
+        "/health/database"
+      ]
+    }
+  },
+
+  "compliance": {
+    "description": "Configuration de conformité réglementaire",
+    "gdpr": {
+      "enabled": true,
+      "dataRetention": {
+        "users": 2555,
+        "logs": 90,
+        "sessions": 30
+      },
+      "rightToBeForgotten": true,
+      "dataPortability": true,
+      "consentTracking": true
+    },
+    "pci": {
+      "applicable": false,
+      "tokenization": true,
+      "encryptCardData": true
+    }
+  },
+
+  "backup": {
+    "description": "Configuration de sauvegarde sécurisée",
+    "encryption": {
+      "enabled": true,
+      "algorithm": "AES-256-GCM"
+    },
+    "retention": {
+      "daily": 30,
+      "weekly": 12,
+      "monthly": 12,
+      "yearly": 5
+    },
+    "offsite": {
+      "enabled": true,
+      "provider": "aws-s3",
+      "encryption": "aws-kms"
+    },
+    "integrity": {
+      "checksums": true,
+      "verification": "weekly"
+    }
+  },
+
+  "network": {
+    "description": "Configuration de sécurité réseau",
+    "firewall": {
+      "enabled": true,
+      "allowedPorts": [80, 443, 22],
+      "ipWhitelist": {
+        "enabled": false,
+        "ips": []
+      }
+    },
+    "ddosProtection": {
+      "enabled": true,
+      "threshold": 1000,
+      "blockDuration": 3600
+    },
+    "geoBlocking": {
+      "enabled": false,
+      "allowedCountries": ["FR", "EU"],
+      "blockedCountries": []
+    }
+  },
+
+  "api": {
+    "description": "Configuration de sécurité API",
+    "versioning": {
+      "strategy": "header",
+      "deprecationNotice": true
+    },
+    "documentation": {
+      "public": false,
+      "authentication": true
+    },
+    "endpoints": {
+      "health": {
+        "path": "/health",
+        "authentication": false,
+        "rateLimit": false
+      },
+      "auth": {
+        "path": "/auth",
+        "rateLimit": "auth",
+        "bruteForceProtection": true
+      },
+      "api": {
+        "path": "/api",
+        "authentication": true,
+        "rateLimit": "api"
+      }
+    }
+  },
+
+  "development": {
+    "description": "Configuration spécifique au développement",
+    "debug": {
+      "enabled": false,
+      "production": false
+    },
+    "testing": {
+      "mockData": false,
+      "bypassAuth": false
+    }
+  }
+}
