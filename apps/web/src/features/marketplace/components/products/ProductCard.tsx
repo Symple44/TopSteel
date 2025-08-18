@@ -1,42 +1,42 @@
-'use client';
+'use client'
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Heart, ShoppingCart, Star, Eye, Package } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Eye, Heart, Package, ShoppingCart, Star } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import type React from 'react'
+import { cn } from '@/lib/utils'
 
 export interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  price: number;
-  originalPrice?: number;
-  currency: string;
-  images: string[];
-  category: string;
-  subcategory?: string;
-  brand?: string;
-  rating?: number;
-  reviewCount?: number;
-  stockQuantity: number;
-  isNew?: boolean;
-  isFeatured?: boolean;
-  discount?: number;
-  tags?: string[];
+  id: string
+  name: string
+  slug: string
+  description?: string
+  price: number
+  originalPrice?: number
+  currency: string
+  images: string[]
+  category: string
+  subcategory?: string
+  brand?: string
+  rating?: number
+  reviewCount?: number
+  stockQuantity: number
+  isNew?: boolean
+  isFeatured?: boolean
+  discount?: number
+  tags?: string[]
 }
 
 interface ProductCardProps {
-  product: Product;
-  variant?: 'grid' | 'list' | 'compact';
-  showQuickView?: boolean;
-  showWishlist?: boolean;
-  showAddToCart?: boolean;
-  onAddToCart?: (product: Product) => void;
-  onAddToWishlist?: (product: Product) => void;
-  onQuickView?: (product: Product) => void;
-  className?: string;
+  product: Product
+  variant?: 'grid' | 'list' | 'compact'
+  showQuickView?: boolean
+  showWishlist?: boolean
+  showAddToCart?: boolean
+  onAddToCart?: (product: Product) => void
+  onAddToWishlist?: (product: Product) => void
+  onQuickView?: (product: Product) => void
+  className?: string
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -48,49 +48,51 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
   onAddToWishlist,
   onQuickView,
-  className
+  className,
 }) => {
   const discountPercentage = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
+    : 0
 
-  const isOutOfStock = product.stockQuantity === 0;
-  const isLowStock = product.stockQuantity > 0 && product.stockQuantity <= 5;
+  const isOutOfStock = product.stockQuantity === 0
+  const isLowStock = product.stockQuantity > 0 && product.stockQuantity <= 5
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: product.currency || 'EUR'
-    }).format(price);
-  };
+      currency: product.currency || 'EUR',
+    }).format(price)
+  }
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (onAddToCart && !isOutOfStock) {
-      onAddToCart(product);
+      onAddToCart(product)
     }
-  };
+  }
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (onAddToWishlist) {
-      onAddToWishlist(product);
+      onAddToWishlist(product)
     }
-  };
+  }
 
   const handleQuickView = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (onQuickView) {
-      onQuickView(product);
+      onQuickView(product)
     }
-  };
+  }
 
   if (variant === 'list') {
     return (
-      <div className={cn(
-        'group flex gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow',
-        className
-      )}>
+      <div
+        className={cn(
+          'group flex gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow',
+          className
+        )}
+      >
         {/* Image */}
         <Link href={`/marketplace/products/${product.slug}`} className="relative flex-shrink-0">
           <div className="relative w-48 h-48 overflow-hidden rounded-lg">
@@ -121,15 +123,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 {product.name}
               </h3>
             </Link>
-            
-            {product.brand && (
-              <p className="text-sm text-gray-500 mt-1">by {product.brand}</p>
-            )}
+
+            {product.brand && <p className="text-sm text-gray-500 mt-1">by {product.brand}</p>}
 
             {product.description && (
-              <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                {product.description}
-              </p>
+              <p className="text-sm text-gray-600 mt-2 line-clamp-2">{product.description}</p>
             )}
 
             {/* Rating */}
@@ -148,9 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-500">
-                  ({product.reviewCount || 0})
-                </span>
+                <span className="text-sm text-gray-500">({product.reviewCount || 0})</span>
               </div>
             )}
 
@@ -221,15 +217,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   // Grid variant (default)
   return (
-    <div className={cn(
-      'group relative bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow overflow-hidden',
-      className
-    )}>
+    <div
+      className={cn(
+        'group relative bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow overflow-hidden',
+        className
+      )}
+    >
       {/* Image */}
       <Link href={`/marketplace/products/${product.slug}`} className="block">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
@@ -239,7 +237,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          
+
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.isNew && (
@@ -296,9 +294,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Content */}
       <div className="p-4">
         {/* Category */}
-        <p className="text-xs text-gray-500 uppercase tracking-wider">
-          {product.category}
-        </p>
+        <p className="text-xs text-gray-500 uppercase tracking-wider">{product.category}</p>
 
         {/* Name */}
         <Link href={`/marketplace/products/${product.slug}`}>
@@ -308,9 +304,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </Link>
 
         {/* Brand */}
-        {product.brand && (
-          <p className="text-sm text-gray-500 mt-1">{product.brand}</p>
-        )}
+        {product.brand && <p className="text-sm text-gray-500 mt-1">{product.brand}</p>}
 
         {/* Rating */}
         {product.rating !== undefined && (
@@ -328,17 +322,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 />
               ))}
             </div>
-            <span className="text-xs text-gray-500">
-              ({product.reviewCount || 0})
-            </span>
+            <span className="text-xs text-gray-500">({product.reviewCount || 0})</span>
           </div>
         )}
 
         {/* Price */}
         <div className="flex items-baseline gap-2 mt-3">
-          <span className="text-xl font-bold text-gray-900">
-            {formatPrice(product.price)}
-          </span>
+          <span className="text-xl font-bold text-gray-900">{formatPrice(product.price)}</span>
           {product.originalPrice && (
             <span className="text-sm text-gray-500 line-through">
               {formatPrice(product.originalPrice)}
@@ -378,5 +368,5 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

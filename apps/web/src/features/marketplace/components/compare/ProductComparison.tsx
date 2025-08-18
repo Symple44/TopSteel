@@ -1,36 +1,25 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { 
-  X, 
-  Plus, 
-  Check, 
-  Minus,
-  Star,
-  Package,
-  Truck,
-  Shield,
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Product } from '../products/ProductCard';
+import { Check, Package, Plus, Star, X } from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import type { Product } from '../products/ProductCard'
 
 interface ProductComparisonProps {
-  products: Product[];
-  onRemoveProduct: (productId: string) => void;
-  onAddProduct?: () => void;
-  onClearAll?: () => void;
-  maxProducts?: number;
-  className?: string;
+  products: Product[]
+  onRemoveProduct: (productId: string) => void
+  onAddProduct?: () => void
+  onClearAll?: () => void
+  maxProducts?: number
+  className?: string
 }
 
 interface ComparisonRow {
-  label: string;
-  key: string;
-  type: 'text' | 'price' | 'rating' | 'boolean' | 'list';
-  category?: string;
+  label: string
+  key: string
+  type: 'text' | 'price' | 'rating' | 'boolean' | 'list'
+  category?: string
 }
 
 const comparisonRows: ComparisonRow[] = [
@@ -42,7 +31,7 @@ const comparisonRows: ComparisonRow[] = [
   { label: 'Brand', key: 'brand', type: 'text', category: 'Basic' },
   { label: 'Category', key: 'category', type: 'text', category: 'Basic' },
   { label: 'Stock', key: 'stock', type: 'text', category: 'Availability' },
-  
+
   // Specifications
   { label: 'Length', key: 'specifications.length', type: 'text', category: 'Specifications' },
   { label: 'Weight', key: 'specifications.weight', type: 'text', category: 'Specifications' },
@@ -52,13 +41,13 @@ const comparisonRows: ComparisonRow[] = [
   { label: 'Thickness', key: 'specifications.thickness', type: 'text', category: 'Specifications' },
   { label: 'Size', key: 'specifications.size', type: 'text', category: 'Specifications' },
   { label: 'Coating', key: 'specifications.coating', type: 'text', category: 'Specifications' },
-  
+
   // Features
   { label: 'Warranty', key: 'warranty', type: 'text', category: 'Features' },
   { label: 'Free Shipping', key: 'freeShipping', type: 'boolean', category: 'Features' },
   { label: 'Express Delivery', key: 'expressDelivery', type: 'boolean', category: 'Features' },
-  { label: 'Returns', key: 'returnsAllowed', type: 'boolean', category: 'Features' }
-];
+  { label: 'Returns', key: 'returnsAllowed', type: 'boolean', category: 'Features' },
+]
 
 export const ProductComparison: React.FC<ProductComparisonProps> = ({
   products,
@@ -66,45 +55,44 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
   onAddProduct,
   onClearAll,
   maxProducts = 4,
-  className
+  className,
 }) => {
-  const [highlightDifferences, setHighlightDifferences] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [highlightDifferences, setHighlightDifferences] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
-  const categories = ['all', ...Array.from(new Set(comparisonRows.map(r => r.category).filter(Boolean)))];
+  const categories = [
+    'all',
+    ...Array.from(new Set(comparisonRows.map((r) => r.category).filter(Boolean))),
+  ]
 
   const getNestedValue = (obj: any, path: string): any => {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
-  };
+    return path.split('.').reduce((current, key) => current?.[key], obj)
+  }
 
   const formatValue = (value: any, type: string): React.ReactNode => {
     if (value === undefined || value === null) {
-      return <span className="text-gray-400">—</span>;
+      return <span className="text-gray-400">—</span>
     }
 
     switch (type) {
       case 'price':
-        return (
-          <span className="font-semibold text-lg">
-            €{value.toFixed(2)}
-          </span>
-        );
-      
+        return <span className="font-semibold text-lg">€{value.toFixed(2)}</span>
+
       case 'rating':
         return (
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-500 fill-current" />
             <span className="font-medium">{value}</span>
           </div>
-        );
-      
+        )
+
       case 'boolean':
         return value ? (
           <Check className="w-5 h-5 text-green-600" />
         ) : (
           <X className="w-5 h-5 text-red-600" />
-        );
-      
+        )
+
       case 'list':
         return Array.isArray(value) ? (
           <ul className="text-sm space-y-1">
@@ -112,55 +100,58 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
               <li key={idx}>• {item}</li>
             ))}
           </ul>
-        ) : value;
-      
+        ) : (
+          value
+        )
+
       default:
-        return <span>{value}</span>;
+        return <span>{value}</span>
     }
-  };
+  }
 
   const areValuesDifferent = (row: ComparisonRow): boolean => {
-    if (products.length < 2) return false;
-    
-    const values = products.map(p => getNestedValue(p, row.key));
-    const firstValue = JSON.stringify(values[0]);
-    
-    return values.some(v => JSON.stringify(v) !== firstValue);
-  };
+    if (products.length < 2) return false
+
+    const values = products.map((p) => getNestedValue(p, row.key))
+    const firstValue = JSON.stringify(values[0])
+
+    return values.some((v) => JSON.stringify(v) !== firstValue)
+  }
 
   const getBestValue = (row: ComparisonRow): any => {
-    const values = products.map(p => getNestedValue(p, row.key)).filter(v => v !== undefined && v !== null);
-    
-    if (values.length === 0) return null;
-    
+    const values = products
+      .map((p) => getNestedValue(p, row.key))
+      .filter((v) => v !== undefined && v !== null)
+
+    if (values.length === 0) return null
+
     switch (row.type) {
       case 'price':
-        return Math.min(...values);
+        return Math.min(...values)
       case 'rating':
-        return Math.max(...values);
+        return Math.max(...values)
       case 'boolean':
-        return true;
+        return true
       default:
-        return null;
+        return null
     }
-  };
+  }
 
-  const filteredRows = selectedCategory === 'all' 
-    ? comparisonRows
-    : comparisonRows.filter(r => r.category === selectedCategory);
+  const filteredRows =
+    selectedCategory === 'all'
+      ? comparisonRows
+      : comparisonRows.filter((r) => r.category === selectedCategory)
 
-  const emptySlots = Math.max(0, maxProducts - products.length);
+  const emptySlots = Math.max(0, maxProducts - products.length)
 
   return (
-    <div className={cn("bg-white rounded-lg shadow-lg", className)}>
+    <div className={cn('bg-white rounded-lg shadow-lg', className)}>
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Product Comparison</h2>
-            <p className="text-gray-600 mt-1">
-              Compare up to {maxProducts} products side by side
-            </p>
+            <p className="text-gray-600 mt-1">Compare up to {maxProducts} products side by side</p>
           </div>
           {products.length > 0 && (
             <button
@@ -181,7 +172,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </option>
@@ -219,7 +210,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
                     >
                       <X className="w-4 h-4 text-gray-500 hover:text-red-600" />
                     </button>
-                    
+
                     {product.image ? (
                       <img
                         src={product.image}
@@ -231,15 +222,13 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
                         <Package className="w-8 h-8 text-gray-400" />
                       </div>
                     )}
-                    
-                    <h3 className="font-semibold text-gray-900 text-sm mb-1">
-                      {product.name}
-                    </h3>
+
+                    <h3 className="font-semibold text-gray-900 text-sm mb-1">{product.name}</h3>
                     <p className="text-xs text-gray-600">{product.brand}</p>
                   </div>
                 </th>
               ))}
-              
+
               {/* Empty Slots */}
               {Array.from({ length: emptySlots }).map((_, index) => (
                 <th key={`empty-${index}`} className="p-4 text-center min-w-[200px]">
@@ -258,44 +247,43 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
           {/* Comparison Rows */}
           <tbody>
             {filteredRows.map((row, rowIndex) => {
-              const isDifferent = highlightDifferences && areValuesDifferent(row);
-              const bestValue = getBestValue(row);
+              const isDifferent = highlightDifferences && areValuesDifferent(row)
+              const bestValue = getBestValue(row)
 
               return (
                 <tr
                   key={row.key}
                   className={cn(
-                    "border-b border-gray-200",
-                    rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    'border-b border-gray-200',
+                    rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                   )}
                 >
                   <td className="p-4 text-sm font-medium text-gray-700 sticky left-0 z-10 bg-inherit">
                     {row.label}
                   </td>
-                  
+
                   {products.map((product) => {
-                    const value = getNestedValue(product, row.key);
-                    const isBest = bestValue !== null && JSON.stringify(value) === JSON.stringify(bestValue);
+                    const value = getNestedValue(product, row.key)
+                    const isBest =
+                      bestValue !== null && JSON.stringify(value) === JSON.stringify(bestValue)
 
                     return (
                       <td
                         key={product.id}
                         className={cn(
-                          "p-4 text-center text-sm",
-                          isDifferent && "bg-yellow-50",
-                          isBest && "font-semibold text-green-700"
+                          'p-4 text-center text-sm',
+                          isDifferent && 'bg-yellow-50',
+                          isBest && 'font-semibold text-green-700'
                         )}
                       >
                         {formatValue(value, row.type)}
                         {isBest && row.type === 'price' && (
-                          <span className="block text-xs text-green-600 mt-1">
-                            Best Price
-                          </span>
+                          <span className="block text-xs text-green-600 mt-1">Best Price</span>
                         )}
                       </td>
-                    );
+                    )
                   })}
-                  
+
                   {/* Empty Slots */}
                   {Array.from({ length: emptySlots }).map((_, index) => (
                     <td key={`empty-${index}`} className="p-4 text-center">
@@ -303,7 +291,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
                     </td>
                   ))}
                 </tr>
-              );
+              )
             })}
           </tbody>
 
@@ -349,5 +337,5 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

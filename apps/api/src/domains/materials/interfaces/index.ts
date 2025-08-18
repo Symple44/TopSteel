@@ -4,31 +4,29 @@
 
 // Interfaces des mouvements de matériaux
 export {
+  ICreateMaterialMovement,
   IMaterialMovement,
   IMaterialMovementFilters,
   IMaterialMovementSortOptions,
-  ICreateMaterialMovement,
   IMaterialTraceabilityInfo,
   IMaterialTransformationInfo,
-  MaterialMovementType,
+  MaterialMovementPriority,
   MaterialMovementReason,
   MaterialMovementStatus,
-  MaterialMovementPriority,
+  MaterialMovementType,
 } from './material-movement.interface'
-
-// Interfaces des statistiques de matériaux
-export {
-  IMaterialStats,
-  ISpecificMaterialStats,
-  IMaterialPerformanceStats,
-  IMaterialStatsParams,
-} from './material-stats.interface'
-
 // Interfaces des filtres de recherche de matériaux
 export {
-  IMaterialSearchFilters,
-  IMaterialSortOptions,
-  IMaterialPagination,
   IMaterialAggregationOptions,
+  IMaterialPagination,
+  IMaterialSearchFilters,
   IMaterialSearchResult,
+  IMaterialSortOptions,
 } from './material-search-filters.interface'
+// Interfaces des statistiques de matériaux
+export {
+  IMaterialPerformanceStats,
+  IMaterialStats,
+  IMaterialStatsParams,
+  ISpecificMaterialStats,
+} from './material-stats.interface'

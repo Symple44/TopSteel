@@ -6,7 +6,7 @@ import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import compression from 'compression'
 import { config } from 'dotenv'
-import express from 'express'
+import express, { type Request, type Response, type NextFunction } from 'express'
 import helmet from 'helmet'
 import { HttpExceptionFilter } from '../core/common/filters/http-exception.filter'
 import { LoggingInterceptor } from '../core/common/interceptors/logging.interceptor'
@@ -81,7 +81,7 @@ async function bootstrap() {
   expressApp.set('x-powered-by', false)
 
   // Middleware pour gérer les trailing slashes sans redirection
-  expressApp.use((req: any, _res: any, next: any) => {
+  expressApp.use((req: Request, _res: Response, next: NextFunction) => {
     // Supprimer le trailing slash si présent (sauf pour la racine)
     if (req.path !== '/' && req.path.endsWith('/')) {
       req.url = req.url.slice(0, -1)

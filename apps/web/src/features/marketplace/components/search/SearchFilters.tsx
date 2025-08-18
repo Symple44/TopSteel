@@ -1,55 +1,55 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { 
-  X, 
-  ChevronDown, 
+import {
+  ChevronDown,
   ChevronUp,
-  SlidersHorizontal,
-  Package,
-  Tag,
   DollarSign,
-  Star,
-  Truck,
+  Package,
   Shield,
-  RefreshCw
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  SlidersHorizontal,
+  Star,
+  Tag,
+  Truck,
+  X,
+} from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 export interface FilterOption {
-  id: string;
-  label: string;
-  count?: number;
-  value?: any;
+  id: string
+  label: string
+  count?: number
+  value?: any
 }
 
 export interface FilterGroup {
-  id: string;
-  label: string;
-  icon?: React.ElementType;
-  type: 'checkbox' | 'radio' | 'range' | 'color' | 'size';
-  options?: FilterOption[];
-  min?: number;
-  max?: number;
-  step?: number;
-  unit?: string;
+  id: string
+  label: string
+  icon?: React.ElementType
+  type: 'checkbox' | 'radio' | 'range' | 'color' | 'size'
+  options?: FilterOption[]
+  min?: number
+  max?: number
+  step?: number
+  unit?: string
 }
 
 export interface ActiveFilter {
-  groupId: string;
-  optionId?: string;
-  value?: any;
-  label: string;
+  groupId: string
+  optionId?: string
+  value?: any
+  label: string
 }
 
 interface SearchFiltersProps {
-  filters: FilterGroup[];
-  activeFilters: ActiveFilter[];
-  onFilterChange: (filters: ActiveFilter[]) => void;
-  onClearAll?: () => void;
-  productCount?: number;
-  className?: string;
-  isMobile?: boolean;
+  filters: FilterGroup[]
+  activeFilters: ActiveFilter[]
+  onFilterChange: (filters: ActiveFilter[]) => void
+  onClearAll?: () => void
+  productCount?: number
+  className?: string
+  isMobile?: boolean
 }
 
 const defaultFilters: FilterGroup[] = [
@@ -64,8 +64,8 @@ const defaultFilters: FilterGroup[] = [
       { id: 'welding', label: 'Welding Equipment', count: 234 },
       { id: 'tools', label: 'Tools & Machinery', count: 412 },
       { id: 'safety', label: 'Safety Equipment', count: 67 },
-      { id: 'fasteners', label: 'Fasteners & Fixings', count: 189 }
-    ]
+      { id: 'fasteners', label: 'Fasteners & Fixings', count: 189 },
+    ],
   },
   {
     id: 'brand',
@@ -77,8 +77,8 @@ const defaultFilters: FilterGroup[] = [
       { id: 'voestalpine', label: 'Voestalpine', count: 76 },
       { id: 'thyssenkrupp', label: 'ThyssenKrupp', count: 112 },
       { id: 'tata', label: 'Tata Steel', count: 94 },
-      { id: 'nucor', label: 'Nucor', count: 58 }
-    ]
+      { id: 'nucor', label: 'Nucor', count: 58 },
+    ],
   },
   {
     id: 'price',
@@ -88,7 +88,7 @@ const defaultFilters: FilterGroup[] = [
     min: 0,
     max: 10000,
     step: 100,
-    unit: '€'
+    unit: '€',
   },
   {
     id: 'rating',
@@ -99,8 +99,8 @@ const defaultFilters: FilterGroup[] = [
       { id: '4plus', label: '4★ & above', count: 234 },
       { id: '3plus', label: '3★ & above', count: 412 },
       { id: '2plus', label: '2★ & above', count: 567 },
-      { id: 'all', label: 'All ratings', count: 891 }
-    ]
+      { id: 'all', label: 'All ratings', count: 891 },
+    ],
   },
   {
     id: 'availability',
@@ -111,8 +111,8 @@ const defaultFilters: FilterGroup[] = [
       { id: 'in-stock', label: 'In Stock', count: 678 },
       { id: 'ready-24h', label: 'Ready in 24h', count: 234 },
       { id: 'ready-week', label: 'Ready in 1 week', count: 456 },
-      { id: 'pre-order', label: 'Pre-order', count: 89 }
-    ]
+      { id: 'pre-order', label: 'Pre-order', count: 89 },
+    ],
   },
   {
     id: 'condition',
@@ -122,10 +122,10 @@ const defaultFilters: FilterGroup[] = [
     options: [
       { id: 'new', label: 'New', count: 789 },
       { id: 'refurbished', label: 'Refurbished', count: 123 },
-      { id: 'used', label: 'Used', count: 234 }
-    ]
-  }
-];
+      { id: 'used', label: 'Used', count: 234 },
+    ],
+  },
+]
 
 export const SearchFilters: React.FC<SearchFiltersProps> = ({
   filters = defaultFilters,
@@ -134,88 +134,84 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   onClearAll,
   productCount,
   className,
-  isMobile = false
+  isMobile = false,
 }) => {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
-    new Set(filters.map(f => f.id))
-  );
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
-  const [tempPriceRange, setTempPriceRange] = useState<[number, number]>([0, 10000]);
+    new Set(filters.map((f) => f.id))
+  )
+  const [_priceRange, setPriceRange] = useState<[number, number]>([0, 10000])
+  const [tempPriceRange, setTempPriceRange] = useState<[number, number]>([0, 10000])
 
   const toggleGroup = (groupId: string) => {
-    setExpandedGroups(prev => {
-      const newSet = new Set(prev);
+    setExpandedGroups((prev) => {
+      const newSet = new Set(prev)
       if (newSet.has(groupId)) {
-        newSet.delete(groupId);
+        newSet.delete(groupId)
       } else {
-        newSet.add(groupId);
+        newSet.add(groupId)
       }
-      return newSet;
-    });
-  };
+      return newSet
+    })
+  }
 
   const handleCheckboxChange = (groupId: string, optionId: string, label: string) => {
-    const existing = activeFilters.find(
-      f => f.groupId === groupId && f.optionId === optionId
-    );
+    const existing = activeFilters.find((f) => f.groupId === groupId && f.optionId === optionId)
 
-    let newFilters: ActiveFilter[];
+    let newFilters: ActiveFilter[]
     if (existing) {
-      newFilters = activeFilters.filter(
-        f => !(f.groupId === groupId && f.optionId === optionId)
-      );
+      newFilters = activeFilters.filter((f) => !(f.groupId === groupId && f.optionId === optionId))
     } else {
-      newFilters = [...activeFilters, { groupId, optionId, label }];
+      newFilters = [...activeFilters, { groupId, optionId, label }]
     }
 
-    onFilterChange(newFilters);
-  };
+    onFilterChange(newFilters)
+  }
 
   const handleRadioChange = (groupId: string, optionId: string, label: string) => {
-    const newFilters = activeFilters.filter(f => f.groupId !== groupId);
-    newFilters.push({ groupId, optionId, label });
-    onFilterChange(newFilters);
-  };
+    const newFilters = activeFilters.filter((f) => f.groupId !== groupId)
+    newFilters.push({ groupId, optionId, label })
+    onFilterChange(newFilters)
+  }
 
   const handlePriceChange = (value: [number, number]) => {
-    setTempPriceRange(value);
-  };
+    setTempPriceRange(value)
+  }
 
   const applyPriceFilter = () => {
-    setPriceRange(tempPriceRange);
-    const newFilters = activeFilters.filter(f => f.groupId !== 'price');
+    setPriceRange(tempPriceRange)
+    const newFilters = activeFilters.filter((f) => f.groupId !== 'price')
     if (tempPriceRange[0] > 0 || tempPriceRange[1] < 10000) {
       newFilters.push({
         groupId: 'price',
         value: tempPriceRange,
-        label: `€${tempPriceRange[0]} - €${tempPriceRange[1]}`
-      });
+        label: `€${tempPriceRange[0]} - €${tempPriceRange[1]}`,
+      })
     }
-    onFilterChange(newFilters);
-  };
+    onFilterChange(newFilters)
+  }
 
   const removeFilter = (filter: ActiveFilter) => {
     const newFilters = activeFilters.filter(
-      f => !(f.groupId === filter.groupId && f.optionId === filter.optionId)
-    );
-    onFilterChange(newFilters);
-  };
+      (f) => !(f.groupId === filter.groupId && f.optionId === filter.optionId)
+    )
+    onFilterChange(newFilters)
+  }
 
   const clearAllFilters = () => {
-    onFilterChange([]);
-    setPriceRange([0, 10000]);
-    setTempPriceRange([0, 10000]);
-    onClearAll?.();
-  };
+    onFilterChange([])
+    setPriceRange([0, 10000])
+    setTempPriceRange([0, 10000])
+    onClearAll?.()
+  }
 
   const isFilterActive = (groupId: string, optionId?: string): boolean => {
     return activeFilters.some(
-      f => f.groupId === groupId && (!optionId || f.optionId === optionId)
-    );
-  };
+      (f) => f.groupId === groupId && (!optionId || f.optionId === optionId)
+    )
+  }
 
   return (
-    <div className={cn("bg-white", className)}>
+    <div className={cn('bg-white', className)}>
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -227,10 +223,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
             )}
           </div>
           {activeFilters.length > 0 && (
-            <button
-              onClick={clearAllFilters}
-              className="text-sm text-blue-600 hover:text-blue-700"
-            >
+            <button onClick={clearAllFilters} className="text-sm text-blue-600 hover:text-blue-700">
               Clear all
             </button>
           )}
@@ -262,8 +255,8 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Filter Groups */}
       <div className="divide-y divide-gray-200">
         {filters.map((group) => {
-          const Icon = group.icon;
-          const isExpanded = expandedGroups.has(group.id);
+          const Icon = group.icon
+          const isExpanded = expandedGroups.has(group.id)
 
           return (
             <div key={group.id} className="p-4">
@@ -285,53 +278,57 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
               {isExpanded && (
                 <div className="space-y-2">
                   {/* Checkbox Options */}
-                  {group.type === 'checkbox' && group.options?.map((option) => (
-                    <label
-                      key={option.id}
-                      className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isFilterActive(group.id, option.id)}
-                        onChange={() => handleCheckboxChange(group.id, option.id, option.label)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="flex-1 text-sm text-gray-700">{option.label}</span>
-                      {option.count !== undefined && (
-                        <span className="text-xs text-gray-500">({option.count})</span>
-                      )}
-                    </label>
-                  ))}
+                  {group.type === 'checkbox' &&
+                    group.options?.map((option) => (
+                      <label
+                        key={option.id}
+                        className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isFilterActive(group.id, option.id)}
+                          onChange={() => handleCheckboxChange(group.id, option.id, option.label)}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="flex-1 text-sm text-gray-700">{option.label}</span>
+                        {option.count !== undefined && (
+                          <span className="text-xs text-gray-500">({option.count})</span>
+                        )}
+                      </label>
+                    ))}
 
                   {/* Radio Options */}
-                  {group.type === 'radio' && group.options?.map((option) => (
-                    <label
-                      key={option.id}
-                      className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded"
-                    >
-                      <input
-                        type="radio"
-                        name={group.id}
-                        checked={isFilterActive(group.id, option.id)}
-                        onChange={() => handleRadioChange(group.id, option.id, option.label)}
-                        className="text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="flex-1 text-sm text-gray-700">{option.label}</span>
-                      {option.count !== undefined && (
-                        <span className="text-xs text-gray-500">({option.count})</span>
-                      )}
-                    </label>
-                  ))}
+                  {group.type === 'radio' &&
+                    group.options?.map((option) => (
+                      <label
+                        key={option.id}
+                        className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded"
+                      >
+                        <input
+                          type="radio"
+                          name={group.id}
+                          checked={isFilterActive(group.id, option.id)}
+                          onChange={() => handleRadioChange(group.id, option.id, option.label)}
+                          className="text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="flex-1 text-sm text-gray-700">{option.label}</span>
+                        {option.count !== undefined && (
+                          <span className="text-xs text-gray-500">({option.count})</span>
+                        )}
+                      </label>
+                    ))}
 
                   {/* Range Slider */}
                   {group.type === 'range' && (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">
-                          {group.unit}{tempPriceRange[0]}
+                          {group.unit}
+                          {tempPriceRange[0]}
                         </span>
                         <span className="text-sm text-gray-600">
-                          {group.unit}{tempPriceRange[1]}
+                          {group.unit}
+                          {tempPriceRange[1]}
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -341,7 +338,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                           max={group.max}
                           step={group.step}
                           value={tempPriceRange[0]}
-                          onChange={(e) => handlePriceChange([parseInt(e.target.value), tempPriceRange[1]])}
+                          onChange={(e) =>
+                            handlePriceChange([parseInt(e.target.value), tempPriceRange[1]])
+                          }
                           className="w-full"
                         />
                         <input
@@ -350,7 +349,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                           max={group.max}
                           step={group.step}
                           value={tempPriceRange[1]}
-                          onChange={(e) => handlePriceChange([tempPriceRange[0], parseInt(e.target.value)])}
+                          onChange={(e) =>
+                            handlePriceChange([tempPriceRange[0], parseInt(e.target.value)])
+                          }
                           className="w-full"
                         />
                       </div>
@@ -365,7 +366,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                 </div>
               )}
             </div>
-          );
+          )
         })}
       </div>
 
@@ -379,5 +380,5 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

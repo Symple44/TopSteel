@@ -246,7 +246,7 @@ export interface MaterialAdvancedFilters extends MaterialSearchCriteria {
   formes?: MaterialShape[]
   status?: MaterialStatus[]
   nuances?: string[]
-  
+
   // Critères de stock
   stock?: {
     min?: number
@@ -334,7 +334,7 @@ export interface MaterialAdvancedFilters extends MaterialSearchCriteria {
     page?: number
     limite?: number
   }
-  
+
   // Critères d'inclusion
   includeInactive?: boolean
   includeObsolete?: boolean
@@ -345,12 +345,12 @@ export interface MaterialAdvancedFilters extends MaterialSearchCriteria {
 
   // Critères de fournisseurs
   fournisseurs?: string[]
-  
+
   // Critères de propriétés
   proprietesMecaniques?: MechanicalPropertiesFilters
   proprietesPhysiques?: PhysicalPropertiesFilters
   proprietesChimiques?: ChemicalPropertiesFilters
-  
+
   // Motifs de mouvement
   motifs?: string[]
   priorite?: string

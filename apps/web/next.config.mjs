@@ -68,7 +68,7 @@ const nextConfig = {
   // Optimisations de production pour réduire la taille des bundles
   swcMinify: true,
   productionBrowserSourceMaps: false,
-  
+
   // Optimisation des modules
   modularizeImports: {
     '@radix-ui': {

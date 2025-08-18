@@ -32,18 +32,18 @@ export enum StockMovementMotif {
   PRODUCTION = 'PRODUCTION',
   RETOUR_CLIENT = 'RETOUR_CLIENT',
   CORRECTION_INVENTAIRE = 'CORRECTION_INVENTAIRE',
-  
+
   // Sorties
   VENTE = 'VENTE',
   CONSOMMATION = 'CONSOMMATION',
   RETOUR_FOURNISSEUR = 'RETOUR_FOURNISSEUR',
   PERTE = 'PERTE',
   VOL = 'VOL',
-  
+
   // Transferts
   TRANSFERT_DEPOT = 'TRANSFERT_DEPOT',
   TRANSFERT_SERVICE = 'TRANSFERT_SERVICE',
-  
+
   // Autres
   INVENTAIRE = 'INVENTAIRE',
   AUTRE = 'AUTRE',
@@ -59,7 +59,7 @@ export enum StockMovementReason {
   RETOUR_CLIENT = 'RETOUR_CLIENT',
   CORRECTION_POSITIVE = 'CORRECTION_POSITIVE',
   INVENTAIRE_POSITIF = 'INVENTAIRE_POSITIF',
-  
+
   // Sorties
   VENTE = 'VENTE',
   CONSOMMATION = 'CONSOMMATION',
@@ -68,11 +68,11 @@ export enum StockMovementReason {
   INVENTAIRE_NEGATIF = 'INVENTAIRE_NEGATIF',
   PERTE_DETERIORATION = 'PERTE_DETERIORATION',
   VOL = 'VOL',
-  
+
   // Transferts
   TRANSFERT_DEPOT = 'TRANSFERT_DEPOT',
   TRANSFERT_SERVICE = 'TRANSFERT_SERVICE',
-  
+
   // Autres
   AUTRE = 'AUTRE',
 }
@@ -257,7 +257,13 @@ export interface IStockMovementFilters {
  */
 export interface IStockMovementSortOptions {
   /** Champ de tri */
-  champ: 'dateMovement' | 'reference' | 'articleCode' | 'quantite' | 'valeurTotale' | 'utilisateurNom'
+  champ:
+    | 'dateMovement'
+    | 'reference'
+    | 'articleCode'
+    | 'quantite'
+    | 'valeurTotale'
+    | 'utilisateurNom'
 
   /** Direction du tri */
   direction: 'ASC' | 'DESC'

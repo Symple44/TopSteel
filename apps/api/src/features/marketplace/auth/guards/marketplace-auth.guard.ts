@@ -1,9 +1,9 @@
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../../../../core/common/decorators/public.decorator';
+import { type ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
+import type { Reflector } from '@nestjs/core'
+import type { JwtService } from '@nestjs/jwt'
+import { AuthGuard } from '@nestjs/passport'
+import { IS_PUBLIC_KEY } from '../../../../core/common/decorators/public.decorator'
 
 @Injectable()
 export class MarketplaceAuthGuard extends AuthGuard('marketplace-jwt') {
@@ -12,7 +12,7 @@ export class MarketplaceAuthGuard extends AuthGuard('marketplace-jwt') {
     private jwtService: JwtService,
     private configService: ConfigService
   ) {
-    super();
+    super()
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -20,44 +20,45 @@ export class MarketplaceAuthGuard extends AuthGuard('marketplace-jwt') {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
-    ]);
+    ])
 
     if (isPublic) {
-      return true;
+      return true
     }
 
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const request = context.switchToHttp().getRequest()
+    const token = this.extractTokenFromHeader(request)
 
     if (!token) {
-      throw new UnauthorizedException('No token provided');
+      throw new UnauthorizedException('No token provided')
     }
 
     try {
-      const jwtSecret = this.configService.get<string>('MARKETPLACE_JWT_SECRET') || 
-                       this.configService.get<string>('JWT_SECRET');
-      
+      const jwtSecret =
+        this.configService.get<string>('MARKETPLACE_JWT_SECRET') ||
+        this.configService.get<string>('JWT_SECRET')
+
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtSecret
-      });
+        secret: jwtSecret,
+      })
 
       // Ensure it's a marketplace customer token
       if (payload.type !== 'marketplace_customer') {
-        throw new UnauthorizedException('Invalid token type');
+        throw new UnauthorizedException('Invalid token type')
       }
 
       // Attach user to request
-      request['customer'] = payload;
-      request['user'] = payload; // For compatibility
-      
-      return true;
-    } catch (error) {
-      throw new UnauthorizedException('Invalid token');
+      request.customer = payload
+      request.user = payload // For compatibility
+
+      return true
+    } catch (_error) {
+      throw new UnauthorizedException('Invalid token')
     }
   }
 
   private extractTokenFromHeader(request: any): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    const [type, token] = request.headers.authorization?.split(' ') ?? []
+    return type === 'Bearer' ? token : undefined
   }
 }

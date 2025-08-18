@@ -1,38 +1,29 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { 
-  MapPin, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Home, 
-  Building, 
-  Heart,
-  Check,
-  X
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Building, Check, Edit2, Heart, Home, MapPin, Plus, Trash2 } from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 interface Address {
-  id: string;
-  label: string;
-  type: 'home' | 'work' | 'other';
-  isDefault: boolean;
-  firstName: string;
-  lastName: string;
-  company?: string;
-  address: string;
-  address2?: string;
-  city: string;
-  state?: string;
-  postalCode: string;
-  country: string;
-  phone?: string;
+  id: string
+  label: string
+  type: 'home' | 'work' | 'other'
+  isDefault: boolean
+  firstName: string
+  lastName: string
+  company?: string
+  address: string
+  address2?: string
+  city: string
+  state?: string
+  postalCode: string
+  country: string
+  phone?: string
 }
 
 interface AddressBookProps {
-  className?: string;
+  className?: string
 }
 
 const mockAddresses: Address[] = [
@@ -49,7 +40,7 @@ const mockAddresses: Address[] = [
     state: 'Île-de-France',
     postalCode: '75001',
     country: 'France',
-    phone: '+33 1 23 45 67 89'
+    phone: '+33 1 23 45 67 89',
   },
   {
     id: '2',
@@ -64,7 +55,7 @@ const mockAddresses: Address[] = [
     state: 'Auvergne-Rhône-Alpes',
     postalCode: '69001',
     country: 'France',
-    phone: '+33 4 56 78 90 12'
+    phone: '+33 4 56 78 90 12',
   },
   {
     id: '3',
@@ -75,11 +66,11 @@ const mockAddresses: Address[] = [
     lastName: 'Doe',
     address: '789 Family Road',
     city: 'Marseille',
-    state: 'Provence-Alpes-Côte d\'Azur',
+    state: "Provence-Alpes-Côte d'Azur",
     postalCode: '13001',
-    country: 'France'
-  }
-];
+    country: 'France',
+  },
+]
 
 const countries = [
   { code: 'FR', name: 'France' },
@@ -89,29 +80,29 @@ const countries = [
   { code: 'BE', name: 'Belgium' },
   { code: 'NL', name: 'Netherlands' },
   { code: 'UK', name: 'United Kingdom' },
-  { code: 'US', name: 'United States' }
-];
+  { code: 'US', name: 'United States' },
+]
 
 export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
-  const [addresses, setAddresses] = useState<Address[]>(mockAddresses);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-  const [formData, setFormData] = useState<Partial<Address>>({});
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [addresses, setAddresses] = useState<Address[]>(mockAddresses)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null)
+  const [formData, setFormData] = useState<Partial<Address>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'home':
-        return Home;
+        return Home
       case 'work':
-        return Building;
+        return Building
       default:
-        return Heart;
+        return Heart
     }
-  };
+  }
 
   const handleAddNew = () => {
-    setEditingAddress(null);
+    setEditingAddress(null)
     setFormData({
       label: '',
       type: 'home',
@@ -121,95 +112,99 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
       address: '',
       city: '',
       postalCode: '',
-      country: 'FR'
-    });
-    setIsEditing(true);
-    setErrors({});
-  };
+      country: 'FR',
+    })
+    setIsEditing(true)
+    setErrors({})
+  }
 
   const handleEdit = (address: Address) => {
-    setEditingAddress(address);
-    setFormData({ ...address });
-    setIsEditing(true);
-    setErrors({});
-  };
+    setEditingAddress(address)
+    setFormData({ ...address })
+    setIsEditing(true)
+    setErrors({})
+  }
 
   const handleDelete = (addressId: string) => {
     if (window.confirm('Are you sure you want to delete this address?')) {
-      setAddresses(prev => prev.filter(addr => addr.id !== addressId));
+      setAddresses((prev) => prev.filter((addr) => addr.id !== addressId))
     }
-  };
+  }
 
   const handleSetDefault = (addressId: string) => {
-    setAddresses(prev => prev.map(addr => ({
-      ...addr,
-      isDefault: addr.id === addressId
-    })));
-  };
+    setAddresses((prev) =>
+      prev.map((addr) => ({
+        ...addr,
+        isDefault: addr.id === addressId,
+      }))
+    )
+  }
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
     }
-  };
+  }
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {}
 
-    if (!formData.label?.trim()) newErrors.label = 'Label is required';
-    if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.address?.trim()) newErrors.address = 'Address is required';
-    if (!formData.city?.trim()) newErrors.city = 'City is required';
-    if (!formData.postalCode?.trim()) newErrors.postalCode = 'Postal code is required';
-    if (!formData.country) newErrors.country = 'Country is required';
+    if (!formData.label?.trim()) newErrors.label = 'Label is required'
+    if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required'
+    if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required'
+    if (!formData.address?.trim()) newErrors.address = 'Address is required'
+    if (!formData.city?.trim()) newErrors.city = 'City is required'
+    if (!formData.postalCode?.trim()) newErrors.postalCode = 'Postal code is required'
+    if (!formData.country) newErrors.country = 'Country is required'
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSave = () => {
-    if (!validateForm()) return;
+    if (!validateForm()) return
 
     const addressData = {
       ...formData,
-      id: editingAddress?.id || Date.now().toString()
-    } as Address;
+      id: editingAddress?.id || Date.now().toString(),
+    } as Address
 
     if (editingAddress) {
-      setAddresses(prev => prev.map(addr => 
-        addr.id === editingAddress.id ? addressData : addr
-      ));
+      setAddresses((prev) =>
+        prev.map((addr) => (addr.id === editingAddress.id ? addressData : addr))
+      )
     } else {
-      setAddresses(prev => [...prev, addressData]);
+      setAddresses((prev) => [...prev, addressData])
     }
 
-    setIsEditing(false);
-    setEditingAddress(null);
-    setFormData({});
-  };
+    setIsEditing(false)
+    setEditingAddress(null)
+    setFormData({})
+  }
 
   const handleCancel = () => {
-    setIsEditing(false);
-    setEditingAddress(null);
-    setFormData({});
-    setErrors({});
-  };
+    setIsEditing(false)
+    setEditingAddress(null)
+    setFormData({})
+    setErrors({})
+  }
 
   if (isEditing) {
     return (
-      <div className={cn("p-6", className)}>
+      <div className={cn('p-6', className)}>
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {editingAddress ? 'Edit Address' : 'Add New Address'}
           </h2>
           <p className="text-gray-600">
-            {editingAddress ? 'Update your address information' : 'Add a new shipping or billing address'}
+            {editingAddress
+              ? 'Update your address information'
+              : 'Add a new shipping or billing address'}
           </p>
         </div>
 
@@ -227,19 +222,15 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
                   onChange={(e) => handleInputChange('label', e.target.value)}
                   placeholder="e.g., Home, Office, Parents"
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.label ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.label ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.label && (
-                  <p className="text-xs text-red-500 mt-1">{errors.label}</p>
-                )}
+                {errors.label && <p className="text-xs text-red-500 mt-1">{errors.label}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Type
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address Type</label>
                 <select
                   value={formData.type || 'home'}
                   onChange={(e) => handleInputChange('type', e.target.value)}
@@ -255,16 +246,14 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
             {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
                 <input
                   type="text"
                   value={formData.firstName || ''}
                   onChange={(e) => handleInputChange('firstName', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.firstName ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.firstName ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
                 {errors.firstName && (
@@ -273,21 +262,17 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
                 <input
                   type="text"
                   value={formData.lastName || ''}
                   onChange={(e) => handleInputChange('lastName', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.lastName ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.lastName ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.lastName && (
-                  <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
-                )}
+                {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>}
               </div>
             </div>
 
@@ -315,13 +300,11 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="Street address"
                 className={cn(
-                  "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                  errors.address ? "border-red-500" : "border-gray-300"
+                  'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  errors.address ? 'border-red-500' : 'border-gray-300'
                 )}
               />
-              {errors.address && (
-                <p className="text-xs text-red-500 mt-1">{errors.address}</p>
-              )}
+              {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
 
               <input
                 type="text"
@@ -335,27 +318,21 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
             {/* City, State, Postal */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
                 <input
                   type="text"
                   value={formData.city || ''}
                   onChange={(e) => handleInputChange('city', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.city ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.city ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.city && (
-                  <p className="text-xs text-red-500 mt-1">{errors.city}</p>
-                )}
+                {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State/Region
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">State/Region</label>
                 <input
                   type="text"
                   value={formData.state || ''}
@@ -373,8 +350,8 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
                   value={formData.postalCode || ''}
                   onChange={(e) => handleInputChange('postalCode', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.postalCode ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.postalCode ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
                 {errors.postalCode && (
@@ -385,15 +362,13 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
             {/* Country */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Country *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
               <select
                 value={formData.country || ''}
                 onChange={(e) => handleInputChange('country', e.target.value)}
                 className={cn(
-                  "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                  errors.country ? "border-red-500" : "border-gray-300"
+                  'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  errors.country ? 'border-red-500' : 'border-gray-300'
                 )}
               >
                 <option value="">Select a country</option>
@@ -403,9 +378,7 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
                   </option>
                 ))}
               </select>
-              {errors.country && (
-                <p className="text-xs text-red-500 mt-1">{errors.country}</p>
-              )}
+              {errors.country && <p className="text-xs text-red-500 mt-1">{errors.country}</p>}
             </div>
 
             {/* Phone */}
@@ -430,9 +403,7 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
                   onChange={(e) => handleInputChange('isDefault', e.target.checked.toString())}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">
-                  Set as default address
-                </span>
+                <span className="text-sm text-gray-700">Set as default address</span>
               </label>
             </div>
           </div>
@@ -454,18 +425,16 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className={cn("p-6", className)}>
+    <div className={cn('p-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Address Book</h2>
-          <p className="text-gray-600">
-            Manage your shipping and billing addresses
-          </p>
+          <p className="text-gray-600">Manage your shipping and billing addresses</p>
         </div>
         <button
           onClick={handleAddNew}
@@ -479,16 +448,16 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
       {/* Address Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {addresses.map((address) => {
-          const TypeIcon = getTypeIcon(address.type);
-          
+          const TypeIcon = getTypeIcon(address.type)
+
           return (
             <div
               key={address.id}
               className={cn(
-                "border rounded-lg p-6 relative",
-                address.isDefault 
-                  ? "border-blue-500 bg-blue-50" 
-                  : "border-gray-200 bg-white hover:shadow-sm"
+                'border rounded-lg p-6 relative',
+                address.isDefault
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 bg-white hover:shadow-sm'
               )}
             >
               {/* Default Badge */}
@@ -502,14 +471,15 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
               {/* Address Header */}
               <div className="flex items-center gap-3 mb-4">
-                <div className={cn(
-                  "p-2 rounded-lg",
-                  address.isDefault ? "bg-blue-100" : "bg-gray-100"
-                )}>
-                  <TypeIcon className={cn(
-                    "w-5 h-5",
-                    address.isDefault ? "text-blue-600" : "text-gray-600"
-                  )} />
+                <div
+                  className={cn(
+                    'p-2 rounded-lg',
+                    address.isDefault ? 'bg-blue-100' : 'bg-gray-100'
+                  )}
+                >
+                  <TypeIcon
+                    className={cn('w-5 h-5', address.isDefault ? 'text-blue-600' : 'text-gray-600')}
+                  />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">{address.label}</h3>
@@ -522,20 +492,14 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
                 <p className="font-medium text-gray-900">
                   {address.firstName} {address.lastName}
                 </p>
-                {address.company && (
-                  <p>{address.company}</p>
-                )}
+                {address.company && <p>{address.company}</p>}
                 <p>{address.address}</p>
-                {address.address2 && (
-                  <p>{address.address2}</p>
-                )}
+                {address.address2 && <p>{address.address2}</p>}
                 <p>
                   {address.city}, {address.state} {address.postalCode}
                 </p>
                 <p>{address.country}</p>
-                {address.phone && (
-                  <p>{address.phone}</p>
-                )}
+                {address.phone && <p>{address.phone}</p>}
               </div>
 
               {/* Actions */}
@@ -565,7 +529,7 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
                 </button>
               </div>
             </div>
-          );
+          )
         })}
       </div>
 
@@ -585,5 +549,5 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

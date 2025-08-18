@@ -5,20 +5,13 @@
   "description": "Configuration complète de sécurité pour le système ERP TopSteel",
   "type": "object",
   "version": "1.0.0",
-  
+
   "cors": {
     "description": "Configuration CORS pour sécuriser les requêtes cross-origin",
     "enabled": true,
     "allowedOrigins": {
-      "development": [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:4000"
-      ],
-      "staging": [
-        "https://staging.topsteel.fr",
-        "https://staging-api.topsteel.fr"
-      ],
+      "development": ["http://localhost:3000", "http://localhost:3001", "http://localhost:4000"],
+      "staging": ["https://staging.topsteel.fr", "https://staging-api.topsteel.fr"],
       "production": [
         "https://app.topsteel.fr",
         "https://api.topsteel.fr",
@@ -61,17 +54,8 @@
             "https://fonts.googleapis.com",
             "https://cdn.jsdelivr.net"
           ],
-          "fontSrc": [
-            "'self'",
-            "https://fonts.gstatic.com",
-            "data:"
-          ],
-          "imgSrc": [
-            "'self'",
-            "data:",
-            "https:",
-            "blob:"
-          ],
+          "fontSrc": ["'self'", "https://fonts.gstatic.com", "data:"],
+          "imgSrc": ["'self'", "data:", "https:", "blob:"],
           "connectSrc": [
             "'self'",
             "https://api.topsteel.fr",
@@ -211,11 +195,7 @@
     "sql": {
       "preventInjection": true,
       "parameterizedQueries": true,
-      "allowedFunctions": [
-        "NOW()",
-        "CURRENT_TIMESTAMP",
-        "UUID_GENERATE_V4()"
-      ],
+      "allowedFunctions": ["NOW()", "CURRENT_TIMESTAMP", "UUID_GENERATE_V4()"],
       "blacklistedPatterns": [
         "DROP TABLE",
         "DELETE FROM",
@@ -297,13 +277,7 @@
       ]
     },
     "pii": {
-      "fields": [
-        "email",
-        "phone",
-        "address",
-        "socialSecurityNumber",
-        "bankAccount"
-      ],
+      "fields": ["email", "phone", "address", "socialSecurityNumber", "bankAccount"],
       "encryptionRequired": true,
       "maskInLogs": true
     }
@@ -332,15 +306,7 @@
     },
     "audit": {
       "enabled": true,
-      "tables": [
-        "users",
-        "roles",
-        "permissions",
-        "societes",
-        "articles",
-        "orders",
-        "payments"
-      ],
+      "tables": ["users", "roles", "permissions", "societes", "articles", "orders", "payments"],
       "actions": ["CREATE", "UPDATE", "DELETE"],
       "includeOldValues": true
     }
@@ -369,11 +335,7 @@
     "healthChecks": {
       "enabled": true,
       "interval": 300,
-      "endpoints": [
-        "/health/security",
-        "/health/auth",
-        "/health/database"
-      ]
+      "endpoints": ["/health/security", "/health/auth", "/health/database"]
     }
   },
 

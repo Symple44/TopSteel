@@ -16,7 +16,7 @@ import {
   USER_MANAGEMENT_ROLES,
 } from '../core/constants/roles.constants'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
-import { PermissionCalculatorService } from './permission-calculator.service'
+import type { PermissionCalculatorService } from './permission-calculator.service'
 
 export interface UserSocieteInfo {
   userId: string
@@ -527,11 +527,7 @@ export class UnifiedRolesService {
   /**
    * Récupère toutes les permissions effectives d'un utilisateur dans une société
    */
-  async getUserEffectivePermissions(
-    userId: string,
-    societeId: string,
-    siteId?: string
-  ) {
+  async getUserEffectivePermissions(userId: string, societeId: string, siteId?: string) {
     return await this.permissionCalculator.calculateUserPermissions(userId, societeId, siteId)
   }
 
@@ -558,8 +554,8 @@ export class UnifiedRolesService {
       where: {
         societeId,
         roleType,
-        isActive: true
-      }
+        isActive: true,
+      },
     })
 
     let updatedCount = 0
@@ -615,7 +611,7 @@ export class UnifiedRolesService {
     grantedById: string
   ): Promise<UserSocieteRole> {
     const fromRole = await this.userSocieteRoleRepository.findOne({
-      where: { userId: fromUserId, societeId, isActive: true }
+      where: { userId: fromUserId, societeId, isActive: true },
     })
 
     if (!fromRole) {
@@ -624,7 +620,7 @@ export class UnifiedRolesService {
 
     // Create or update target user role
     let toRole = await this.userSocieteRoleRepository.findOne({
-      where: { userId: toUserId, societeId }
+      where: { userId: toUserId, societeId },
     })
 
     if (toRole) {
@@ -647,7 +643,7 @@ export class UnifiedRolesService {
     // Invalidate caches
     await Promise.all([
       this.permissionCalculator.invalidateUserPermissions(toUserId, societeId),
-      this.invalidateUserRoleCache(toUserId)
+      this.invalidateUserRoleCache(toUserId),
     ])
 
     return saved

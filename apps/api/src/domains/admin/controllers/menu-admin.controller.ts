@@ -1,27 +1,31 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
+  Param,
   Post,
   Put,
-  Delete,
-  Body,
-  Param,
   Query,
-  UseGuards,
   Req,
-  HttpStatus,
-  HttpCode,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { CombinedSecurityGuard, Resource, Action } from '../../auth/security/guards/combined-security.guard'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { InjectRepository } from '@nestjs/typeorm'
+import type { Repository } from 'typeorm'
 import { Roles } from '../../auth/decorators/roles.decorator'
-import { PageDiscoveryService } from '../services/page-discovery.service'
-import { MenuSyncService, MenuSyncOptions } from '../services/menu-sync.service'
+import {
+  Action,
+  CombinedSecurityGuard,
+  Resource,
+} from '../../auth/security/guards/combined-security.guard'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem } from '../entities/menu-item.entity'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { MenuSyncOptions, MenuSyncService } from '../services/menu-sync.service'
+import type { PageDiscoveryService } from '../services/page-discovery.service'
 
 @ApiTags('Admin - Menu Management')
 @ApiBearerAuth()
@@ -58,17 +62,13 @@ export class MenuAdminController {
     // Apply filters if provided
     let filteredPages = pages
     if (module) {
-      filteredPages = filteredPages.filter(p => p.module === module)
+      filteredPages = filteredPages.filter((p) => p.module === module)
     }
     if (permission) {
-      filteredPages = filteredPages.filter(p => 
-        p.metadata.permissions?.includes(permission)
-      )
+      filteredPages = filteredPages.filter((p) => p.metadata.permissions?.includes(permission))
     }
     if (isPublic !== undefined) {
-      filteredPages = filteredPages.filter(p => 
-        p.metadata.isPublic === isPublic
-      )
+      filteredPages = filteredPages.filter((p) => p.metadata.isPublic === isPublic)
     }
 
     const statistics = this.pageDiscoveryService.getModuleStatistics()
@@ -115,9 +115,7 @@ export class MenuAdminController {
   @Roles('SUPER_ADMIN')
   @Action('export')
   @ApiOperation({ summary: 'Export discovered pages documentation' })
-  async exportDiscovery(
-    @Query('format') format: 'json' | 'markdown' = 'json'
-  ) {
+  async exportDiscovery(@Query('format') format: 'json' | 'markdown' = 'json') {
     await this.pageDiscoveryService.discoverAllPages()
 
     if (format === 'markdown') {
@@ -149,9 +147,7 @@ export class MenuAdminController {
   @Action('sync')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Synchronize menus with discovered pages' })
-  async syncMenus(
-    @Body() options: MenuSyncOptions
-  ) {
+  async syncMenus(@Body() options: MenuSyncOptions) {
     const result = await this.menuSyncService.syncMenus(options)
 
     return {
@@ -168,9 +164,7 @@ export class MenuAdminController {
   @Action('preview')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Preview sync changes without applying them' })
-  async previewSync(
-    @Body() options: MenuSyncOptions
-  ) {
+  async previewSync(@Body() options: MenuSyncOptions) {
     const preview = await this.menuSyncService.previewSync(options)
 
     return {
@@ -234,9 +228,7 @@ export class MenuAdminController {
   @Roles('ADMIN')
   @Action('read')
   @ApiOperation({ summary: 'Get menu configuration with items' })
-  async getMenuConfiguration(
-    @Param('id') id: string
-  ) {
+  async getMenuConfiguration(@Param('id') id: string) {
     const menu = await this.menuConfigRepository.findOne({
       where: { id },
       relations: ['items'],
@@ -253,12 +245,12 @@ export class MenuAdminController {
     const itemsMap = new Map<string, MenuItem>()
     const rootItems: MenuItem[] = []
 
-    menu.items.forEach(item => {
+    menu.items.forEach((item) => {
       itemsMap.set(item.id, item)
       item.children = []
     })
 
-    menu.items.forEach(item => {
+    menu.items.forEach((item) => {
       if (item.parentId) {
         const parent = itemsMap.get(item.parentId)
         if (parent) {
@@ -272,7 +264,7 @@ export class MenuAdminController {
     // Sort items by orderIndex
     const sortItems = (items: MenuItem[]) => {
       items.sort((a, b) => a.orderIndex - b.orderIndex)
-      items.forEach(item => {
+      items.forEach((item) => {
         if (item.children?.length) {
           sortItems(item.children)
         }
@@ -297,9 +289,7 @@ export class MenuAdminController {
   @Roles('SUPER_ADMIN')
   @Action('create')
   @ApiOperation({ summary: 'Create menu configuration' })
-  async createMenuConfiguration(
-    @Body() data: Partial<MenuConfiguration>
-  ) {
+  async createMenuConfiguration(@Body() data: Partial<MenuConfiguration>) {
     const menu = this.menuConfigRepository.create(data)
     const saved = await this.menuConfigRepository.save(menu)
 
@@ -316,10 +306,7 @@ export class MenuAdminController {
   @Roles('SUPER_ADMIN')
   @Action('update')
   @ApiOperation({ summary: 'Update menu configuration' })
-  async updateMenuConfiguration(
-    @Param('id') id: string,
-    @Body() data: Partial<MenuConfiguration>
-  ) {
+  async updateMenuConfiguration(@Param('id') id: string, @Body() data: Partial<MenuConfiguration>) {
     const menu = await this.menuConfigRepository.findOne({ where: { id } })
 
     if (!menu) {
@@ -345,9 +332,7 @@ export class MenuAdminController {
   @Roles('SUPER_ADMIN')
   @Action('delete')
   @ApiOperation({ summary: 'Delete menu configuration' })
-  async deleteMenuConfiguration(
-    @Param('id') id: string
-  ) {
+  async deleteMenuConfiguration(@Param('id') id: string) {
     const result = await this.menuConfigRepository.delete(id)
 
     return {
@@ -365,10 +350,7 @@ export class MenuAdminController {
   @Roles('SUPER_ADMIN')
   @Action('create')
   @ApiOperation({ summary: 'Add custom menu item' })
-  async addMenuItem(
-    @Param('menuId') menuId: string,
-    @Body() data: Partial<MenuItem>
-  ) {
+  async addMenuItem(@Param('menuId') menuId: string, @Body() data: Partial<MenuItem>) {
     const item = await this.menuSyncService.addCustomMenuItem(menuId, data)
 
     return {
@@ -384,10 +366,7 @@ export class MenuAdminController {
   @Roles('SUPER_ADMIN')
   @Action('update')
   @ApiOperation({ summary: 'Update menu item' })
-  async updateMenuItem(
-    @Param('id') id: string,
-    @Body() data: Partial<MenuItem>
-  ) {
+  async updateMenuItem(@Param('id') id: string, @Body() data: Partial<MenuItem>) {
     const item = await this.menuItemRepository.findOne({ where: { id } })
 
     if (!item) {
@@ -413,9 +392,7 @@ export class MenuAdminController {
   @Roles('SUPER_ADMIN')
   @Action('delete')
   @ApiOperation({ summary: 'Delete menu item' })
-  async deleteMenuItem(
-    @Param('id') id: string
-  ) {
+  async deleteMenuItem(@Param('id') id: string) {
     const result = await this.menuItemRepository.delete(id)
 
     return {
@@ -434,9 +411,7 @@ export class MenuAdminController {
   @Action('validate')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Validate menu structure' })
-  async validateMenuStructure(
-    @Param('id') id: string
-  ) {
+  async validateMenuStructure(@Param('id') id: string) {
     const validation = await this.menuSyncService.validateMenuStructure(id)
 
     return {
@@ -451,13 +426,11 @@ export class MenuAdminController {
   @Get('preferences')
   @Action('read')
   @ApiOperation({ summary: 'Get current user menu preferences' })
-  async getUserPreferences(
-    @Req() req: any,
-    @Query('menuId') menuId?: string
-  ) {
+  async getUserPreferences(@Req() req: any, @Query('menuId') menuId?: string) {
     const userId = req.user.id
 
-    const query = this.userPreferenceRepository.createQueryBuilder('pref')
+    const query = this.userPreferenceRepository
+      .createQueryBuilder('pref')
       .where('pref.userId = :userId', { userId })
 
     if (menuId) {
@@ -489,14 +462,14 @@ export class MenuAdminController {
       where: { userId, menuId },
     })
 
-    if (!preference) {
+    if (preference) {
+      Object.assign(preference, data)
+    } else {
       preference = this.userPreferenceRepository.create({
         userId,
         menuId,
         ...data,
       })
-    } else {
-      Object.assign(preference, data)
     }
 
     const saved = await this.userPreferenceRepository.save(preference)
@@ -513,10 +486,7 @@ export class MenuAdminController {
   @Delete('preferences/:menuId')
   @Action('delete')
   @ApiOperation({ summary: 'Reset user menu preferences to defaults' })
-  async resetUserPreferences(
-    @Req() req: any,
-    @Param('menuId') menuId: string
-  ) {
+  async resetUserPreferences(@Req() req: any, @Param('menuId') menuId: string) {
     const userId = req.user.id
 
     const result = await this.userPreferenceRepository.delete({
@@ -538,16 +508,14 @@ export class MenuAdminController {
   @Get('preferences/export')
   @Action('export')
   @ApiOperation({ summary: 'Export user menu preferences' })
-  async exportUserPreferences(
-    @Req() req: any
-  ) {
+  async exportUserPreferences(@Req() req: any) {
     const userId = req.user.id
 
     const preferences = await this.userPreferenceRepository.find({
       where: { userId },
     })
 
-    const exportData = preferences.map(pref => pref.exportPreferences())
+    const exportData = preferences.map((pref) => pref.exportPreferences())
 
     return {
       success: true,
@@ -566,10 +534,7 @@ export class MenuAdminController {
   @Action('import')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Import user menu preferences' })
-  async importUserPreferences(
-    @Req() req: any,
-    @Body() data: { preferences: any[] }
-  ) {
+  async importUserPreferences(@Req() req: any, @Body() data: { preferences: any[] }) {
     const userId = req.user.id
     const imported = []
 

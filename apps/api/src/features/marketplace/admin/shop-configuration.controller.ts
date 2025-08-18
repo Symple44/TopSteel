@@ -1,43 +1,38 @@
 import {
-  Controller,
-  Get,
-  Put,
-  Post,
   Body,
-  Param,
-  Query,
-  UseGuards,
-  Logger,
+  Controller,
+  DefaultValuePipe,
+  Get,
   HttpCode,
   HttpStatus,
-  ParseBoolPipe,
-  DefaultValuePipe
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard';
-import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard';
-import { RequireMarketplacePermissions, MarketplacePermission } from '../auth/decorators/marketplace-permissions.decorator';
-import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator';
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common'
+import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import {
-  ShopConfigurationService,
+  MarketplacePermission,
+  RequireMarketplacePermissions,
+} from '../auth/decorators/marketplace-permissions.decorator'
+import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard'
+import type {
   ShopConfiguration,
-  UpdateShopConfigurationDto
-} from './shop-configuration.service';
+  ShopConfigurationService,
+  UpdateShopConfigurationDto,
+} from './shop-configuration.service'
 
 @Controller('api/marketplace/admin/shop-configuration')
 @UseGuards(JwtAuthGuard, MarketplacePermissionsGuard)
 export class ShopConfigurationController {
-  private readonly logger = new Logger(ShopConfigurationController.name);
-
-  constructor(
-    private readonly configService: ShopConfigurationService
-  ) {}
+  constructor(private readonly configService: ShopConfigurationService) {}
 
   @Get()
   @RequireMarketplacePermissions(MarketplacePermission.VIEW_ANALYTICS)
-  async getShopConfiguration(
-    @CurrentTenant() tenantId: string
-  ): Promise<ShopConfiguration> {
-    return this.configService.getShopConfiguration(tenantId);
+  async getShopConfiguration(@CurrentTenant() tenantId: string): Promise<ShopConfiguration> {
+    return this.configService.getShopConfiguration(tenantId)
   }
 
   @Put()
@@ -47,7 +42,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() updates: UpdateShopConfigurationDto
   ): Promise<ShopConfiguration> {
-    return this.configService.updateShopConfiguration(tenantId, updates);
+    return this.configService.updateShopConfiguration(tenantId, updates)
   }
 
   @Get('section/:section')
@@ -56,7 +51,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Param('section') section: keyof ShopConfiguration
   ): Promise<any> {
-    return this.configService.getConfigurationSection(tenantId, section);
+    return this.configService.getConfigurationSection(tenantId, section)
   }
 
   @Put('section/:section')
@@ -67,7 +62,7 @@ export class ShopConfigurationController {
     @Param('section') section: keyof ShopConfiguration,
     @Body() sectionData: any
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, section, sectionData);
+    return this.configService.updateConfigurationSection(tenantId, section, sectionData)
   }
 
   // General Settings
@@ -77,17 +72,17 @@ export class ShopConfigurationController {
   async updateGeneralSettings(
     @CurrentTenant() tenantId: string,
     @Body() generalData: {
-      shopName?: string;
-      shopDescription?: string;
-      shopLogo?: string;
-      shopBanner?: string;
-      contactEmail?: string;
-      supportEmail?: string;
-      phone?: string;
-      companyName?: string;
-      companyAddress?: any;
-      vatNumber?: string;
-      businessRegistration?: string;
+      shopName?: string
+      shopDescription?: string
+      shopLogo?: string
+      shopBanner?: string
+      contactEmail?: string
+      supportEmail?: string
+      phone?: string
+      companyName?: string
+      companyAddress?: any
+      vatNumber?: string
+      businessRegistration?: string
     }
   ): Promise<ShopConfiguration> {
     const updates: UpdateShopConfigurationDto = {
@@ -101,17 +96,17 @@ export class ShopConfigurationController {
       companyName: generalData.companyName,
       companyAddress: generalData.companyAddress,
       vatNumber: generalData.vatNumber,
-      businessRegistration: generalData.businessRegistration
-    };
+      businessRegistration: generalData.businessRegistration,
+    }
 
     // Remove undefined values
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       if (updates[key] === undefined) {
-        delete updates[key];
+        delete updates[key]
       }
-    });
+    })
 
-    return this.configService.updateShopConfiguration(tenantId, updates);
+    return this.configService.updateShopConfiguration(tenantId, updates)
   }
 
   // Theme Settings
@@ -121,17 +116,17 @@ export class ShopConfigurationController {
   async updateThemeSettings(
     @CurrentTenant() tenantId: string,
     @Body() themeData: {
-      primaryColor?: string;
-      secondaryColor?: string;
-      accentColor?: string;
-      backgroundColor?: string;
-      textColor?: string;
-      linkColor?: string;
-      font?: string;
-      layout?: 'grid' | 'list' | 'mixed';
+      primaryColor?: string
+      secondaryColor?: string
+      accentColor?: string
+      backgroundColor?: string
+      textColor?: string
+      linkColor?: string
+      font?: string
+      layout?: 'grid' | 'list' | 'mixed'
     }
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'theme', themeData);
+    return this.configService.updateConfigurationSection(tenantId, 'theme', themeData)
   }
 
   // Catalog Settings
@@ -142,7 +137,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() catalogData: Partial<ShopConfiguration['catalog']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'catalog', catalogData);
+    return this.configService.updateConfigurationSection(tenantId, 'catalog', catalogData)
   }
 
   // Order Settings
@@ -153,7 +148,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() orderData: Partial<ShopConfiguration['orderSettings']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'orderSettings', orderData);
+    return this.configService.updateConfigurationSection(tenantId, 'orderSettings', orderData)
   }
 
   // Payment Settings
@@ -164,7 +159,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() paymentData: Partial<ShopConfiguration['paymentSettings']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'paymentSettings', paymentData);
+    return this.configService.updateConfigurationSection(tenantId, 'paymentSettings', paymentData)
   }
 
   // Shipping Settings
@@ -175,7 +170,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() shippingData: Partial<ShopConfiguration['shippingSettings']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'shippingSettings', shippingData);
+    return this.configService.updateConfigurationSection(tenantId, 'shippingSettings', shippingData)
   }
 
   // Marketing Settings
@@ -186,7 +181,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() marketingData: Partial<ShopConfiguration['marketing']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'marketing', marketingData);
+    return this.configService.updateConfigurationSection(tenantId, 'marketing', marketingData)
   }
 
   // SEO Settings
@@ -197,7 +192,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() seoData: Partial<ShopConfiguration['seo']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'seo', seoData);
+    return this.configService.updateConfigurationSection(tenantId, 'seo', seoData)
   }
 
   // Legal Settings
@@ -208,7 +203,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() legalData: Partial<ShopConfiguration['legal']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'legal', legalData);
+    return this.configService.updateConfigurationSection(tenantId, 'legal', legalData)
   }
 
   // Notification Settings
@@ -219,7 +214,11 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() notificationData: Partial<ShopConfiguration['notifications']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'notifications', notificationData);
+    return this.configService.updateConfigurationSection(
+      tenantId,
+      'notifications',
+      notificationData
+    )
   }
 
   // Advanced Settings
@@ -230,7 +229,7 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Body() advancedData: Partial<ShopConfiguration['advanced']>
   ): Promise<ShopConfiguration> {
-    return this.configService.updateConfigurationSection(tenantId, 'advanced', advancedData);
+    return this.configService.updateConfigurationSection(tenantId, 'advanced', advancedData)
   }
 
   // Validation
@@ -239,17 +238,15 @@ export class ShopConfigurationController {
   async validateConfiguration(
     @CurrentTenant() tenantId: string
   ): Promise<{ valid: boolean; errors: string[] }> {
-    return this.configService.validateShopConfiguration(tenantId);
+    return this.configService.validateShopConfiguration(tenantId)
   }
 
   // Reset to defaults
   @Post('reset')
   @HttpCode(HttpStatus.OK)
   @RequireMarketplacePermissions(MarketplacePermission.SUPER_ADMIN)
-  async resetToDefaults(
-    @CurrentTenant() tenantId: string
-  ): Promise<ShopConfiguration> {
-    return this.configService.resetToDefaults(tenantId);
+  async resetToDefaults(@CurrentTenant() tenantId: string): Promise<ShopConfiguration> {
+    return this.configService.resetToDefaults(tenantId)
   }
 
   // Export configuration
@@ -259,25 +256,25 @@ export class ShopConfigurationController {
     @CurrentTenant() tenantId: string,
     @Query('format', new DefaultValuePipe('json')) format: 'json' | 'yaml'
   ) {
-    const exportData = await this.configService.exportConfiguration(tenantId);
+    const exportData = await this.configService.exportConfiguration(tenantId)
 
     if (format === 'yaml') {
       // Convert to YAML format (simplified)
-      const yamlContent = this.convertToYaml(exportData.config);
+      const yamlContent = this.convertToYaml(exportData.config)
       return {
         content: yamlContent,
         filename: `shop-configuration-${tenantId}-${new Date().toISOString().split('T')[0]}.yaml`,
         mimeType: 'text/yaml',
-        exportedAt: exportData.exportedAt
-      };
+        exportedAt: exportData.exportedAt,
+      }
     }
 
     return {
       content: JSON.stringify(exportData.config, null, 2),
       filename: `shop-configuration-${tenantId}-${new Date().toISOString().split('T')[0]}.json`,
       mimeType: 'application/json',
-      exportedAt: exportData.exportedAt
-    };
+      exportedAt: exportData.exportedAt,
+    }
   }
 
   // Import configuration
@@ -287,15 +284,15 @@ export class ShopConfigurationController {
   async importConfiguration(
     @CurrentTenant() tenantId: string,
     @Body() body: {
-      configData: Partial<ShopConfiguration>;
-      overwrite?: boolean;
+      configData: Partial<ShopConfiguration>
+      overwrite?: boolean
     }
   ): Promise<ShopConfiguration> {
     return this.configService.importConfiguration(
       tenantId,
       body.configData,
       body.overwrite || false
-    );
+    )
   }
 
   // Get configuration templates
@@ -307,25 +304,25 @@ export class ShopConfigurationController {
         {
           name: 'E-commerce Store',
           description: 'Standard e-commerce configuration',
-          features: ['guest-checkout', 'product-reviews', 'wishlist', 'coupons']
+          features: ['guest-checkout', 'product-reviews', 'wishlist', 'coupons'],
         },
         {
           name: 'B2B Marketplace',
           description: 'Business-to-business focused settings',
-          features: ['account-verification', 'bulk-orders', 'custom-pricing', 'approval-workflow']
+          features: ['account-verification', 'bulk-orders', 'custom-pricing', 'approval-workflow'],
         },
         {
           name: 'Digital Products',
           description: 'Optimized for digital/downloadable products',
-          features: ['instant-delivery', 'license-keys', 'no-shipping']
+          features: ['instant-delivery', 'license-keys', 'no-shipping'],
         },
         {
           name: 'Subscription Service',
           description: 'Recurring billing and subscriptions',
-          features: ['recurring-payments', 'trial-periods', 'usage-tracking']
-        }
-      ]
-    };
+          features: ['recurring-payments', 'trial-periods', 'usage-tracking'],
+        },
+      ],
+    }
   }
 
   // Apply configuration template
@@ -338,28 +335,26 @@ export class ShopConfigurationController {
     @Body() body: { preserveExisting?: boolean }
   ): Promise<ShopConfiguration> {
     // Get template configuration based on name
-    const templateConfig = this.getTemplateConfiguration(templateName);
-    
+    const templateConfig = this.getTemplateConfiguration(templateName)
+
     if (body.preserveExisting) {
       // Merge with existing configuration
-      return this.configService.updateShopConfiguration(tenantId, templateConfig);
+      return this.configService.updateShopConfiguration(tenantId, templateConfig)
     } else {
       // Replace configuration
-      return this.configService.importConfiguration(tenantId, templateConfig, true);
+      return this.configService.importConfiguration(tenantId, templateConfig, true)
     }
   }
 
   // Get maintenance status
   @Get('maintenance')
   @RequireMarketplacePermissions(MarketplacePermission.VIEW_ANALYTICS)
-  async getMaintenanceStatus(
-    @CurrentTenant() tenantId: string
-  ) {
-    const config = await this.configService.getShopConfiguration(tenantId);
+  async getMaintenanceStatus(@CurrentTenant() tenantId: string) {
+    const config = await this.configService.getShopConfiguration(tenantId)
     return {
       enabled: config.advanced.enableMaintenance,
-      message: config.advanced.maintenanceMessage || 'Site is under maintenance'
-    };
+      message: config.advanced.maintenanceMessage || 'Site is under maintenance',
+    }
   }
 
   // Toggle maintenance mode
@@ -372,43 +367,43 @@ export class ShopConfigurationController {
   ): Promise<{ success: boolean; enabled: boolean }> {
     await this.configService.updateConfigurationSection(tenantId, 'advanced', {
       enableMaintenance: body.enabled,
-      maintenanceMessage: body.message
-    });
+      maintenanceMessage: body.message,
+    })
 
     return {
       success: true,
-      enabled: body.enabled
-    };
+      enabled: body.enabled,
+    }
   }
 
   /**
    * Convert configuration to YAML format (simplified)
    */
   private convertToYaml(obj: any, indent: number = 0): string {
-    const spaces = '  '.repeat(indent);
-    let yaml = '';
+    const spaces = '  '.repeat(indent)
+    let yaml = ''
 
     for (const [key, value] of Object.entries(obj)) {
-      if (value === null || value === undefined) continue;
+      if (value === null || value === undefined) continue
 
       if (typeof value === 'object' && !Array.isArray(value)) {
-        yaml += `${spaces}${key}:\n${this.convertToYaml(value, indent + 1)}`;
+        yaml += `${spaces}${key}:\n${this.convertToYaml(value, indent + 1)}`
       } else if (Array.isArray(value)) {
-        yaml += `${spaces}${key}:\n`;
-        value.forEach(item => {
+        yaml += `${spaces}${key}:\n`
+        value.forEach((item) => {
           if (typeof item === 'object') {
-            yaml += `${spaces}  -\n${this.convertToYaml(item, indent + 2)}`;
+            yaml += `${spaces}  -\n${this.convertToYaml(item, indent + 2)}`
           } else {
-            yaml += `${spaces}  - ${item}\n`;
+            yaml += `${spaces}  - ${item}\n`
           }
-        });
+        })
       } else {
-        const valueStr = typeof value === 'string' ? `"${value}"` : value;
-        yaml += `${spaces}${key}: ${valueStr}\n`;
+        const valueStr = typeof value === 'string' ? `"${value}"` : value
+        yaml += `${spaces}${key}: ${valueStr}\n`
       }
     }
 
-    return yaml;
+    return yaml
   }
 
   /**
@@ -420,52 +415,52 @@ export class ShopConfigurationController {
         orderSettings: {
           enableGuestCheckout: true,
           autoApproveOrders: true,
-          allowOrderCancellation: true
+          allowOrderCancellation: true,
         },
         catalog: {
           allowProductReviews: true,
           enableWishlist: true,
-          enableProductComparison: true
+          enableProductComparison: true,
         },
         marketing: {
           enableCoupons: true,
-          enableAbandonedCartRecovery: true
-        }
+          enableAbandonedCartRecovery: true,
+        },
       },
-      'b2b': {
+      b2b: {
         orderSettings: {
           enableGuestCheckout: false,
           requireAccountVerification: true,
-          autoApproveOrders: false
+          autoApproveOrders: false,
         },
         paymentSettings: {
           enableCashOnDelivery: false,
-          minimumOrderAmount: 100
+          minimumOrderAmount: 100,
         },
         advanced: {
-          apiRateLimit: 2000
-        }
+          apiRateLimit: 2000,
+        },
       },
-      'digital': {
+      digital: {
         shippingSettings: {
           freeShippingThreshold: 0,
           defaultShippingCost: 0,
-          enableExpressShipping: false
+          enableExpressShipping: false,
         },
         orderSettings: {
-          enableOrderTracking: false
-        }
+          enableOrderTracking: false,
+        },
       },
-      'subscription': {
+      subscription: {
         paymentSettings: {
-          autoRefundCancelled: true
+          autoRefundCancelled: true,
         },
         orderSettings: {
-          allowOrderCancellation: false
-        }
-      }
-    };
+          allowOrderCancellation: false,
+        },
+      },
+    }
 
-    return templates[templateName] || {};
+    return templates[templateName] || {}
   }
 }

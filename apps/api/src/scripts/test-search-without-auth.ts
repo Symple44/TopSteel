@@ -84,6 +84,7 @@ async function testSearchDirectly() {
 
 // Charger les variables d'environnement depuis .env
 import * as dotenv from 'dotenv'
+
 dotenv.config()
 
 // Vérifier que les credentials Elasticsearch sont définis

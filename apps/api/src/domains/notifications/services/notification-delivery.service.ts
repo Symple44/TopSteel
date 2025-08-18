@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { EventEmitter2 } from '@nestjs/event-emitter'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
 
 /**
  * Notification delivery options
@@ -32,9 +32,7 @@ export interface NotificationDeliveryResult {
 export class NotificationDeliveryService {
   private readonly logger = new Logger(NotificationDeliveryService.name)
 
-  constructor(
-    private readonly eventEmitter: EventEmitter2
-  ) {}
+  constructor(private readonly eventEmitter: EventEmitter2) {}
 
   /**
    * Send notification through multiple channels
@@ -65,7 +63,7 @@ export class NotificationDeliveryService {
             await this.sendInAppNotification(options)
             break
         }
-        
+
         result.channels.push(channel)
         result.delivered += options.recipients.length
       } catch (error) {
@@ -91,9 +89,9 @@ export class NotificationDeliveryService {
   private async sendEmail(options: NotificationDeliveryOptions): Promise<void> {
     // Here you would integrate with your email service (SendGrid, AWS SES, etc.)
     this.logger.log(`Sending email to ${options.recipients.length} recipients`)
-    
+
     // Simulate email sending
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
   }
 
   /**
@@ -102,9 +100,9 @@ export class NotificationDeliveryService {
   private async sendSMS(options: NotificationDeliveryOptions): Promise<void> {
     // Here you would integrate with your SMS service (Twilio, AWS SNS, etc.)
     this.logger.log(`Sending SMS to ${options.recipients.length} recipients`)
-    
+
     // Simulate SMS sending
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
   }
 
   /**
@@ -113,9 +111,9 @@ export class NotificationDeliveryService {
   private async sendPushNotification(options: NotificationDeliveryOptions): Promise<void> {
     // Here you would integrate with your push notification service (FCM, APNS, etc.)
     this.logger.log(`Sending push notification to ${options.recipients.length} recipients`)
-    
+
     // Simulate push notification sending
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
   }
 
   /**
@@ -124,7 +122,7 @@ export class NotificationDeliveryService {
   private async sendInAppNotification(options: NotificationDeliveryOptions): Promise<void> {
     // Here you would save the notification to database and emit real-time event
     this.logger.log(`Creating in-app notification for ${options.recipients.length} recipients`)
-    
+
     // Emit real-time event for connected clients
     this.eventEmitter.emit('notification.in-app', {
       recipients: options.recipients,
@@ -134,9 +132,9 @@ export class NotificationDeliveryService {
       priority: options.priority,
       timestamp: new Date(),
     })
-    
+
     // Simulate in-app notification creation
-    await new Promise(resolve => setTimeout(resolve, 50))
+    await new Promise((resolve) => setTimeout(resolve, 50))
   }
 
   /**
@@ -146,24 +144,24 @@ export class NotificationDeliveryService {
     notifications: NotificationDeliveryOptions[]
   ): Promise<NotificationDeliveryResult[]> {
     const results: NotificationDeliveryResult[] = []
-    
+
     // Process in batches to avoid overwhelming services
     const batchSize = 10
     for (let i = 0; i < notifications.length; i += batchSize) {
       const batch = notifications.slice(i, i + batchSize)
       const batchResults = await Promise.all(
-        batch.map(notification => this.sendNotification(notification))
+        batch.map((notification) => this.sendNotification(notification))
       )
       results.push(...batchResults)
     }
-    
+
     return results
   }
 
   /**
    * Get delivery status
    */
-  async getDeliveryStatus(messageId: string): Promise<{
+  async getDeliveryStatus(_messageId: string): Promise<{
     status: 'pending' | 'delivered' | 'failed'
     channel: string
     timestamp: Date

@@ -1,15 +1,15 @@
+import * as mathjs from 'mathjs'
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { NotificationRule } from './notification-rule.entity'
-import * as mathjs from 'mathjs'
 
 /**
  * Condition types
@@ -189,7 +189,11 @@ export class NotificationCondition {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => NotificationRule, rule => rule.conditions, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => NotificationRule,
+    (rule) => rule.conditions,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'rule_id' })
   rule!: NotificationRule
 
@@ -234,12 +238,11 @@ export class NotificationCondition {
         true: true,
         false: false,
       }
-      
+
       // Evaluate the expression safely
       const result = mathjs.evaluate(this.expression, scope)
       return result === true
-    } catch (error) {
-      console.error('Expression evaluation error:', error)
+    } catch (_error) {
       return false
     }
   }
@@ -255,10 +258,10 @@ export class NotificationCondition {
   ): boolean {
     switch (operator) {
       case ConditionOperator.EQUALS:
-        return fieldValue == compareValue
+        return fieldValue === compareValue
 
       case ConditionOperator.NOT_EQUALS:
-        return fieldValue != compareValue
+        return fieldValue !== compareValue
 
       case ConditionOperator.GREATER_THAN:
         return fieldValue > compareValue

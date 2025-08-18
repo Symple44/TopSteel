@@ -297,13 +297,8 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
     if (!user?.roles?.includes('admin') && !user?.roles?.includes('super_admin')) {
       throw new Error('Permission denied')
     }
-
-    try {
-      const response = await apiClient.post('/search/reindex')
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    const response = await apiClient.post('/search/reindex')
+    return response.data
   }, [user])
 
   // Obtenir les facettes pour un type spécifique

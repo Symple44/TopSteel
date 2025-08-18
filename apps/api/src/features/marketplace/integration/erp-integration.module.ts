@@ -1,18 +1,17 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Article } from '@erp/entities';
-import { Partner } from '../../../domains/partners/entities/partner.entity';
-import { MarketplaceOrder } from '../entities/marketplace-order.entity';
-import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity';
-import { MarketplaceCustomer } from '../entities/marketplace-customer.entity';
-
+import { Article } from '@erp/entities'
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Partner } from '../../../domains/partners/entities/partner.entity'
+import { MarketplaceCustomerAdapter } from '../adapters/marketplace-customer.adapter'
+import { MarketplaceOrderAdapter } from '../adapters/marketplace-order.adapter'
 // Adapters
-import { MarketplaceProductAdapter } from '../adapters/marketplace-product.adapter';
-import { MarketplaceCustomerAdapter } from '../adapters/marketplace-customer.adapter';
-import { MarketplaceOrderAdapter } from '../adapters/marketplace-order.adapter';
+import { MarketplaceProductAdapter } from '../adapters/marketplace-product.adapter'
+import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
+import { MarketplaceOrder } from '../entities/marketplace-order.entity'
+import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
 
 // Integration Service
-import { ERPMarketplaceIntegrationService } from './erp-marketplace-integration.service';
+import { ERPMarketplaceIntegrationService } from './erp-marketplace-integration.service'
 
 /**
  * Module d'intégration ERP-Marketplace
@@ -25,7 +24,7 @@ import { ERPMarketplaceIntegrationService } from './erp-marketplace-integration.
       // Entités ERP
       Article,
       Partner,
-      
+
       // Entités Marketplace
       MarketplaceOrder,
       MarketplaceOrderItem,
@@ -37,7 +36,7 @@ import { ERPMarketplaceIntegrationService } from './erp-marketplace-integration.
     MarketplaceProductAdapter,
     MarketplaceCustomerAdapter,
     MarketplaceOrderAdapter,
-    
+
     // Integration Service
     ERPMarketplaceIntegrationService,
   ],
@@ -46,7 +45,7 @@ import { ERPMarketplaceIntegrationService } from './erp-marketplace-integration.
     MarketplaceProductAdapter,
     MarketplaceCustomerAdapter,
     MarketplaceOrderAdapter,
-    
+
     // Integration Service
     ERPMarketplaceIntegrationService,
   ],

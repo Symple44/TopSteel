@@ -1,45 +1,40 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
-  Delete, 
-  Body, 
-  Param, 
-  Query, 
-  UseGuards, 
-  Logger,
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   ParseIntPipe,
-  DefaultValuePipe,
-  ParseBoolPipe
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard';
-import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard';
-import { RequireMarketplacePermissions, MarketplacePermission } from '../auth/decorators/marketplace-permissions.decorator';
-import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator';
-import { 
-  ProductCatalogService, 
-  ProductFilters, 
-  ProductSortOptions, 
-  PaginationOptions,
-  ProductListResponse,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common'
+import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
+import {
+  MarketplacePermission,
+  RequireMarketplacePermissions,
+} from '../auth/decorators/marketplace-permissions.decorator'
+import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard'
+import type {
+  BulkUpdateDto,
   CreateMarketplaceProductDto as CreateProductDto,
+  PaginationOptions,
+  ProductCatalogService,
+  ProductFilters,
+  ProductListResponse,
+  ProductSortOptions,
   UpdateMarketplaceProductDto as UpdateProductDto,
-  BulkUpdateDto
-} from './product-catalog.service';
-import { Article } from '@erp/entities';
-import { MarketplaceProductView } from '../adapters/marketplace-product.adapter';
+} from './product-catalog.service'
 
 @Controller('api/marketplace/admin/products')
 @UseGuards(JwtAuthGuard, MarketplacePermissionsGuard)
 export class ProductCatalogController {
-  private readonly logger = new Logger(ProductCatalogController.name);
-
-  constructor(
-    private readonly productCatalogService: ProductCatalogService
-  ) {}
+  constructor(private readonly productCatalogService: ProductCatalogService) {}
 
   @Get()
   @RequireMarketplacePermissions(MarketplacePermission.VIEW_PRODUCTS)
@@ -72,20 +67,20 @@ export class ProductCatalogController {
       isMarketplaceEnabled,
       visibility,
       search,
-      tags: tags ? tags.split(',') : undefined
-    };
+      tags: tags ? tags.split(',') : undefined,
+    }
 
     const sort: ProductSortOptions = {
       field: sortField as any,
-      direction: sortDirection
-    };
+      direction: sortDirection,
+    }
 
     const pagination: PaginationOptions = {
       page: Math.max(1, page),
-      limit: Math.min(100, Math.max(1, limit))
-    };
+      limit: Math.min(100, Math.max(1, limit)),
+    }
 
-    return this.productCatalogService.getProducts(tenantId, filters, sort, pagination);
+    return this.productCatalogService.getProducts(tenantId, filters, sort, pagination)
   }
 
   @Get(':id')
@@ -94,7 +89,7 @@ export class ProductCatalogController {
     @CurrentTenant() tenantId: string,
     @Param('id') productId: string
   ): Promise<any> {
-    return this.productCatalogService.getProductById(tenantId, productId);
+    return this.productCatalogService.getProductById(tenantId, productId)
   }
 
   @Post()
@@ -103,7 +98,7 @@ export class ProductCatalogController {
     @CurrentTenant() tenantId: string,
     @Body() createProductDto: CreateProductDto
   ): Promise<any> {
-    return this.productCatalogService.createProduct(tenantId, createProductDto);
+    return this.productCatalogService.createProduct(tenantId, createProductDto)
   }
 
   @Put(':id')
@@ -113,8 +108,8 @@ export class ProductCatalogController {
     @Param('id') productId: string,
     @Body() updateProductDto: Omit<UpdateProductDto, 'id'>
   ): Promise<any> {
-    const updateData: UpdateProductDto = { ...updateProductDto, id: productId };
-    return this.productCatalogService.updateProduct(tenantId, updateData);
+    const updateData: UpdateProductDto = { ...updateProductDto, id: productId }
+    return this.productCatalogService.updateProduct(tenantId, updateData)
   }
 
   @Delete(':id')
@@ -124,7 +119,7 @@ export class ProductCatalogController {
     @CurrentTenant() tenantId: string,
     @Param('id') productId: string
   ): Promise<void> {
-    return this.productCatalogService.deleteProduct(tenantId, productId);
+    return this.productCatalogService.deleteProduct(tenantId, productId)
   }
 
   @Post(':id/restore')
@@ -133,7 +128,7 @@ export class ProductCatalogController {
     @CurrentTenant() tenantId: string,
     @Param('id') productId: string
   ): Promise<any> {
-    return this.productCatalogService.restoreProduct(tenantId, productId);
+    return this.productCatalogService.restoreProduct(tenantId, productId)
   }
 
   @Post('bulk-update')
@@ -142,7 +137,7 @@ export class ProductCatalogController {
     @CurrentTenant() tenantId: string,
     @Body() bulkUpdateDto: BulkUpdateDto
   ): Promise<{ updated: number }> {
-    return this.productCatalogService.bulkUpdateProducts(tenantId, bulkUpdateDto);
+    return this.productCatalogService.bulkUpdateProducts(tenantId, bulkUpdateDto)
   }
 
   @Put(':id/stock')
@@ -154,12 +149,12 @@ export class ProductCatalogController {
     @Body() body: { quantity: number; reason?: string }
   ): Promise<{ success: boolean }> {
     await this.productCatalogService.updateProductStock(
-      tenantId, 
-      productId, 
-      body.quantity, 
+      tenantId,
+      productId,
+      body.quantity,
       body.reason
-    );
-    return { success: true };
+    )
+    return { success: true }
   }
 
   @Get('metadata/categories')
@@ -167,7 +162,7 @@ export class ProductCatalogController {
   async getCategories(
     @CurrentTenant() tenantId: string
   ): Promise<Array<{ category: string; subcategories: string[]; count: number }>> {
-    return this.productCatalogService.getCategories(tenantId);
+    return this.productCatalogService.getCategories(tenantId)
   }
 
   @Get('metadata/brands')
@@ -175,7 +170,7 @@ export class ProductCatalogController {
   async getBrands(
     @CurrentTenant() tenantId: string
   ): Promise<Array<{ brand: string; count: number }>> {
-    return this.productCatalogService.getBrands(tenantId);
+    return this.productCatalogService.getBrands(tenantId)
   }
 
   @Get('export/csv')
@@ -191,50 +186,64 @@ export class ProductCatalogController {
       category,
       subcategory,
       brand,
-      isMarketplaceEnabled
-    };
+      isMarketplaceEnabled,
+    }
 
     // Get all products matching filters for export
     const result = await this.productCatalogService.getProducts(
-      tenantId, 
-      filters, 
+      tenantId,
+      filters,
       { field: 'designation', direction: 'ASC' },
       { page: 1, limit: 10000 }
-    );
+    )
 
     // Convert to CSV format
     const csvHeader = [
-      'ID', 'Name', 'SKU', 'ERP Article ID', 'Category', 'Subcategory', 'Brand',
-      'Price', 'Stock Quantity', 'Min Stock Level', 'Weight', 'Marketplace Enabled',
-      'Visibility', 'Created At', 'Updated At'
-    ].join(',');
+      'ID',
+      'Name',
+      'SKU',
+      'ERP Article ID',
+      'Category',
+      'Subcategory',
+      'Brand',
+      'Price',
+      'Stock Quantity',
+      'Min Stock Level',
+      'Weight',
+      'Marketplace Enabled',
+      'Visibility',
+      'Created At',
+      'Updated At',
+    ].join(',')
 
-    const csvRows = result.products.map(product => [
-      product.id,
-      `"${product.name?.replace(/"/g, '""') || ''}"`,
-      product.sku,
-      product.id || '',
-      product.category || '',
-      product.subcategory || '',
-      product.brand || '',
-      product.price,
-      product.stockQuantity,
-      product.minStockLevel || 0,
-      product.weight || '',
-      product.isMarketplaceEnabled,
-      product.visibility,
-      product.createdAt.toISOString(),
-      product.updatedAt.toISOString()
-    ].join(','));
+    const csvRows = result.products.map((product) =>
+      [
+        product.id,
+        `"${product.name?.replace(/"/g, '""') || ''}"`,
+        product.sku,
+        product.id || '',
+        product.category || '',
+        product.subcategory || '',
+        product.brand || '',
+        product.price,
+        product.stockQuantity,
+        product.minStockLevel || 0,
+        product.weight || '',
+        product.isMarketplaceEnabled,
+        product.visibility,
+        product.createdAt.toISOString(),
+        product.updatedAt.toISOString(),
+      ].join(',')
+    )
 
-    const csvContent = [csvHeader, ...csvRows].join('\n');
+    const csvContent = [csvHeader, ...csvRows].join('\n')
 
     return {
       content: csvContent,
       filename: `products-export-${new Date().toISOString().split('T')[0]}.csv`,
       mimeType: 'text/csv',
-      count: result.products.length
-    };
+      count: result.products.length,
+    }
   }
 
   @Get('search/suggestions')
@@ -245,7 +254,7 @@ export class ProductCatalogController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number
   ) {
     if (!query || query.length < 2) {
-      return [];
+      return []
     }
 
     const result = await this.productCatalogService.getProducts(
@@ -253,15 +262,15 @@ export class ProductCatalogController {
       { search: query, isMarketplaceEnabled: true },
       { field: 'designation', direction: 'ASC' },
       { page: 1, limit }
-    );
+    )
 
-    return result.products.map(product => ({
+    return result.products.map((product) => ({
       id: product.id,
       name: product.name,
       sku: product.sku,
       category: product.category,
       price: product.price,
-      stockQuantity: product.stockQuantity
-    }));
+      stockQuantity: product.stockQuantity,
+    }))
   }
 }

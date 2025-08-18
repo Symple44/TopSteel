@@ -1,32 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, IsNull, Not } from 'typeorm'
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
+import { type EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import * as mathjs from 'mathjs'
-import {
-  NotificationRule,
-  RuleType,
-  RuleStatus,
-  RulePriority,
-} from '../entities/notification-rule.entity'
-import {
-  NotificationCondition,
-  ConditionType,
-} from '../entities/notification-condition.entity'
-import {
-  NotificationAction,
-  ActionType,
-} from '../entities/notification-action.entity'
-import {
-  NotificationExecution,
-  ExecutionStatus,
-} from '../entities/notification-execution.entity'
-import { NotificationActionExecutor } from './notification-action-executor.service'
-import { NotificationConditionEvaluator } from './notification-condition-evaluator.service'
-import { NotificationDeliveryService } from './notification-delivery.service'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { InjectRepository } from '@nestjs/typeorm'
 import { CronExpressionParser } from 'cron-parser'
+import * as mathjs from 'mathjs'
+import type { Repository } from 'typeorm'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { ActionType, NotificationAction } from '../entities/notification-action.entity'
+import { NotificationCondition } from '../entities/notification-condition.entity'
+import { ExecutionStatus, NotificationExecution } from '../entities/notification-execution.entity'
+import { NotificationRule, RuleStatus, RuleType } from '../entities/notification-rule.entity'
+import type { NotificationActionExecutor } from './notification-action-executor.service'
+import type { NotificationConditionEvaluator } from './notification-condition-evaluator.service'
+import type { NotificationDeliveryService } from './notification-delivery.service'
 
 /**
  * Rule execution context
@@ -122,7 +108,7 @@ export class NotificationRulesEngineService {
   @Cron(CronExpression.EVERY_MINUTE)
   async processScheduledRules(): Promise<void> {
     const now = new Date()
-    
+
     // Find scheduled rules that should run now
     const rules = await this.ruleRepository.find({
       where: {
@@ -143,7 +129,7 @@ export class NotificationRulesEngineService {
         }
 
         await this.queueRuleExecution(context)
-        
+
         // Update next execution time
         rule.nextExecutionAt = this.calculateNextExecutionTime(rule)
         await this.ruleRepository.save(rule)
@@ -200,7 +186,7 @@ export class NotificationRulesEngineService {
     if (!this.executionQueue.has(queueKey)) {
       this.executionQueue.set(queueKey, [])
     }
-    this.executionQueue.get(queueKey)!.push(context)
+    this.executionQueue.get(queueKey)?.push(context)
 
     // Process queue if not already processing
     if (!this.isProcessing) {
@@ -221,16 +207,15 @@ export class NotificationRulesEngineService {
     try {
       while (this.executionQueue.size > 0) {
         // Process rules by priority
-        const sortedRules = Array.from(this.executionQueue.entries())
-          .sort((a, b) => {
-            const priorityA = a[1][0]?.rule.getPriorityWeight() || 0
-            const priorityB = b[1][0]?.rule.getPriorityWeight() || 0
-            return priorityB - priorityA
-          })
+        const sortedRules = Array.from(this.executionQueue.entries()).sort((a, b) => {
+          const priorityA = a[1][0]?.rule.getPriorityWeight() || 0
+          const priorityB = b[1][0]?.rule.getPriorityWeight() || 0
+          return priorityB - priorityA
+        })
 
         for (const [ruleId, contexts] of sortedRules) {
           const context = contexts.shift()
-          
+
           if (!context) {
             this.executionQueue.delete(ruleId)
             continue
@@ -290,11 +275,7 @@ export class NotificationRulesEngineService {
       execution.conditionsPassed = conditionsPassed
       result.conditionsPassed = conditionsPassed
 
-      if (!conditionsPassed) {
-        execution.status = ExecutionStatus.SKIPPED
-        result.status = ExecutionStatus.SKIPPED
-        this.logger.debug(`Rule ${rule.code} conditions not met`)
-      } else {
+      if (conditionsPassed) {
         // Execute actions
         const actionResults = await this.executeActions(rule, context, execution)
         result.actionsExecuted = actionResults.executed
@@ -317,6 +298,10 @@ export class NotificationRulesEngineService {
         if (rule.escalation?.enabled && actionResults.errors.length > 0) {
           await this.handleEscalation(rule, context, execution)
         }
+      } else {
+        execution.status = ExecutionStatus.SKIPPED
+        result.status = ExecutionStatus.SKIPPED
+        this.logger.debug(`Rule ${rule.code} conditions not met`)
       }
 
       // Update rule statistics
@@ -328,7 +313,6 @@ export class NotificationRulesEngineService {
       if (rule.cooldown?.enabled) {
         this.setCooldown(rule)
       }
-
     } catch (error) {
       this.logger.error(`Error executing rule ${rule.code}:`, error)
       execution.status = ExecutionStatus.FAILED
@@ -445,7 +429,7 @@ export class NotificationRulesEngineService {
     for (const action of rule.actions) {
       // Apply delay if specified
       if (action.delaySeconds) {
-        await new Promise(resolve => setTimeout(resolve, action.delaySeconds! * 1000))
+        await new Promise((resolve) => setTimeout(resolve, action.delaySeconds! * 1000))
       }
 
       const startTime = Date.now()
@@ -521,7 +505,7 @@ export class NotificationRulesEngineService {
             minutesSince: (timestamp: number) => (Date.now() - timestamp) / 60000,
             hoursSince: (timestamp: number) => (Date.now() - timestamp) / 3600000,
           }
-          
+
           const result = mathjs.evaluate(level.condition, scope)
           if (!result) {
             continue
@@ -534,16 +518,11 @@ export class NotificationRulesEngineService {
 
       // Wait for delay
       if (level.delayMinutes > 0) {
-        await new Promise(resolve => 
-          setTimeout(resolve, level.delayMinutes * 60 * 1000)
-        )
+        await new Promise((resolve) => setTimeout(resolve, level.delayMinutes * 60 * 1000))
       }
 
       // Send escalation notifications
-      const recipients = [
-        ...(level.recipients.users || []),
-        ...(level.recipients.emails || []),
-      ]
+      const recipients = [...(level.recipients.users || []), ...(level.recipients.emails || [])]
 
       await this.deliveryService.sendNotification({
         title: `Escalation: ${rule.name}`,
@@ -572,7 +551,7 @@ export class NotificationRulesEngineService {
   private async findEventRules(eventName: string): Promise<NotificationRule[]> {
     const cacheKey = `rules:event:${eventName}`
     const cached = await this.cacheService.get<NotificationRule[]>(cacheKey)
-    
+
     if (cached) {
       return cached
     }
@@ -588,7 +567,7 @@ export class NotificationRulesEngineService {
 
     // Cache for 5 minutes
     await this.cacheService.set(cacheKey, rules, 300)
-    
+
     return rules
   }
 
@@ -677,11 +656,11 @@ export class NotificationRulesEngineService {
     }
 
     let key = `rule:${rule.id}`
-    
+
     if (rule.cooldown?.perUser) {
       key += ':user'
     }
-    
+
     if (rule.cooldown?.perResource) {
       key += ':resource'
     }

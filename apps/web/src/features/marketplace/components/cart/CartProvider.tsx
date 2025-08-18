@@ -1,184 +1,183 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useSession } from 'next-auth/react';
-import { 
-  syncCart, 
-  selectCartItems,
-  clearCart,
-  addToCart
-} from '../../store/cartSlice';
-import { 
-  loadCartFromStorage, 
-  syncCartWithBackend,
+import { useSession } from 'next-auth/react'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  loadCartFromStorage,
   mergeCartsAfterLogin,
-  reserveCartStock
-} from '../../store/cartPersistence';
-import { ShoppingCart } from './ShoppingCart';
-import { CartButton } from './CartButton';
+  reserveCartStock,
+  syncCartWithBackend,
+} from '../../store/cartPersistence'
+import { addToCart, clearCart, selectCartItems, syncCart } from '../../store/cartSlice'
+import { CartButton } from './CartButton'
+import { ShoppingCart } from './ShoppingCart'
 
 interface CartProviderProps {
-  children: React.ReactNode;
-  showFloatingButton?: boolean;
-  autoSync?: boolean;
-  syncInterval?: number; // in milliseconds
+  children: React.ReactNode
+  showFloatingButton?: boolean
+  autoSync?: boolean
+  syncInterval?: number // in milliseconds
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({
   children,
   showFloatingButton = true,
   autoSync = true,
-  syncInterval = 60000 // 1 minute
+  syncInterval = 60000, // 1 minute
 }) => {
-  const dispatch = useDispatch();
-  const { data: session, status } = useSession();
-  const cartItems = useSelector(selectCartItems);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [sessionId, setSessionId] = useState<string>('');
+  const dispatch = useDispatch()
+  const { data: session, status } = useSession()
+  const cartItems = useSelector(selectCartItems)
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [sessionId, setSessionId] = useState<string>('')
 
   // Initialize cart from localStorage on mount
   useEffect(() => {
     if (!isInitialized) {
-      initializeCart();
+      initializeCart()
     }
-  }, [isInitialized]);
+  }, [isInitialized, initializeCart])
 
   // Handle user login/logout
   useEffect(() => {
     if (status === 'authenticated' && session?.user && !isSyncing) {
-      handleUserLogin();
+      handleUserLogin()
     } else if (status === 'unauthenticated' && isInitialized) {
-      handleUserLogout();
+      handleUserLogout()
     }
-  }, [status, session, isInitialized]);
+  }, [status, session, isInitialized, handleUserLogin, handleUserLogout, isSyncing])
 
   // Auto-sync with backend
   useEffect(() => {
-    if (!autoSync || !isInitialized || cartItems.length === 0) return;
+    if (!autoSync || !isInitialized || cartItems.length === 0) return
 
     const syncTimer = setInterval(() => {
-      syncWithBackend();
-    }, syncInterval);
+      syncWithBackend()
+    }, syncInterval)
 
-    return () => clearInterval(syncTimer);
-  }, [autoSync, syncInterval, cartItems, isInitialized]);
+    return () => clearInterval(syncTimer)
+  }, [autoSync, syncInterval, cartItems, isInitialized, syncWithBackend])
 
   // Reserve stock when items are added
   useEffect(() => {
     if (cartItems.length > 0 && isInitialized) {
-      reserveStock();
+      reserveStock()
     }
-  }, [cartItems, isInitialized]);
+  }, [cartItems, isInitialized, reserveStock])
 
   const initializeCart = async () => {
     try {
       // Generate or retrieve session ID for guest users
-      let storedSessionId = localStorage.getItem('marketplace_session_id');
+      let storedSessionId = localStorage.getItem('marketplace_session_id')
       if (!storedSessionId) {
-        storedSessionId = generateSessionId();
-        localStorage.setItem('marketplace_session_id', storedSessionId);
+        storedSessionId = generateSessionId()
+        localStorage.setItem('marketplace_session_id', storedSessionId)
       }
-      setSessionId(storedSessionId);
+      setSessionId(storedSessionId)
 
       // Load cart from localStorage
-      const storedCart = loadCartFromStorage();
-      if (storedCart && storedCart.items) {
-        dispatch(syncCart(storedCart.items));
+      const storedCart = loadCartFromStorage()
+      if (storedCart?.items) {
+        dispatch(syncCart(storedCart.items))
       }
 
       // Sync with backend if user is logged in
       if (status === 'authenticated' && session?.user) {
-        await syncWithBackend();
+        await syncWithBackend()
       }
 
-      setIsInitialized(true);
-    } catch (error) {
-      console.error('Error initializing cart:', error);
-      setIsInitialized(true);
+      setIsInitialized(true)
+    } catch (_error) {
+      setIsInitialized(true)
     }
-  };
+  }
 
   const handleUserLogin = async () => {
-    if (!session?.user?.id || isSyncing) return;
+    if (!session?.user?.id || isSyncing) return
 
-    setIsSyncing(true);
+    setIsSyncing(true)
     try {
       // Merge guest cart with user cart
       const mergedItems = await mergeCartsAfterLogin(
-        { items: cartItems, isOpen: false, lastUpdated: new Date(), appliedCoupon: null, shippingMethod: null },
+        {
+          items: cartItems,
+          isOpen: false,
+          lastUpdated: new Date(),
+          appliedCoupon: null,
+          shippingMethod: null,
+        },
         session.user.id
-      );
-      
+      )
+
       if (mergedItems.length > 0) {
-        dispatch(syncCart(mergedItems));
+        dispatch(syncCart(mergedItems))
       }
 
       // Clear guest session ID
-      localStorage.removeItem('marketplace_session_id');
-    } catch (error) {
-      console.error('Error merging carts after login:', error);
+      localStorage.removeItem('marketplace_session_id')
+    } catch (_error) {
     } finally {
-      setIsSyncing(false);
+      setIsSyncing(false)
     }
-  };
+  }
 
   const handleUserLogout = () => {
     // Generate new session ID for guest
-    const newSessionId = generateSessionId();
-    localStorage.setItem('marketplace_session_id', newSessionId);
-    setSessionId(newSessionId);
-  };
+    const newSessionId = generateSessionId()
+    localStorage.setItem('marketplace_session_id', newSessionId)
+    setSessionId(newSessionId)
+  }
 
   const syncWithBackend = async () => {
-    if (isSyncing || cartItems.length === 0) return;
+    if (isSyncing || cartItems.length === 0) return
 
-    setIsSyncing(true);
+    setIsSyncing(true)
     try {
-      const userId = session?.user?.id;
+      const userId = session?.user?.id
       const updatedItems = await syncCartWithBackend(
-        { items: cartItems, isOpen: false, lastUpdated: new Date(), appliedCoupon: null, shippingMethod: null },
+        {
+          items: cartItems,
+          isOpen: false,
+          lastUpdated: new Date(),
+          appliedCoupon: null,
+          shippingMethod: null,
+        },
         userId,
         userId ? undefined : sessionId
-      );
+      )
 
       // Update cart if items have changed
       if (JSON.stringify(updatedItems) !== JSON.stringify(cartItems)) {
-        dispatch(syncCart(updatedItems));
+        dispatch(syncCart(updatedItems))
       }
-    } catch (error) {
-      console.error('Error syncing cart with backend:', error);
+    } catch (_error) {
     } finally {
-      setIsSyncing(false);
+      setIsSyncing(false)
     }
-  };
+  }
 
   const reserveStock = async () => {
     try {
-      const userId = session?.user?.id;
-      const reservations = await reserveCartStock(
-        cartItems,
-        userId,
-        userId ? undefined : sessionId
-      );
+      const userId = session?.user?.id
+      const reservations = await reserveCartStock(cartItems, userId, userId ? undefined : sessionId)
 
       // Update cart items with reservation IDs
-      reservations.forEach((reservationId, productId) => {
-        const item = cartItems.find(i => i.product.id === productId);
+      reservations.forEach((_reservationId, productId) => {
+        const item = cartItems.find((i) => i.product.id === productId)
         if (item && !item.reservationId) {
           // Update reservation ID in Redux
           // Note: You might want to add a specific action for this
         }
-      });
-    } catch (error) {
-      console.error('Error reserving stock:', error);
-    }
-  };
+      })
+    } catch (_error) {}
+  }
 
   const generateSessionId = (): string => {
-    return `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  };
+    return `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
 
   // Show loading state while initializing
   if (!isInitialized) {
@@ -186,7 +185,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({
       <div className="flex items-center justify-center p-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    );
+    )
   }
 
   return (
@@ -195,25 +194,25 @@ export const CartProvider: React.FC<CartProviderProps> = ({
       <ShoppingCart />
       {showFloatingButton && <CartButton variant="floating" />}
     </>
-  );
-};
+  )
+}
 
 // Hook to use cart functionality
 export const useCart = () => {
-  const dispatch = useDispatch();
-  const cartItems = useSelector(selectCartItems);
-  
+  const dispatch = useDispatch()
+  const cartItems = useSelector(selectCartItems)
+
   const addItemToCart = (product: any, quantity: number = 1, options?: any) => {
-    dispatch(addToCart({ product, quantity, options }));
-  };
+    dispatch(addToCart({ product, quantity, options }))
+  }
 
   const clearAllItems = () => {
-    dispatch(clearCart());
-  };
+    dispatch(clearCart())
+  }
 
   return {
     items: cartItems,
     addToCart: addItemToCart,
-    clearCart: clearAllItems
-  };
-};
+    clearCart: clearAllItems,
+  }
+}

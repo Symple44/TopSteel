@@ -1,8 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ModulesContainer, MetadataScanner, Reflector } from '@nestjs/core'
-import { Controller } from '@nestjs/common/interfaces'
-import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper'
-import * as path from 'path'
+import type { MetadataScanner, ModulesContainer, Reflector } from '@nestjs/core'
+import type { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper'
 
 /**
  * Discovered page/route information
@@ -111,9 +109,7 @@ export class PageDiscoveryService {
    * Get discovered pages by module
    */
   getPagesByModule(moduleName: string): DiscoveredPage[] {
-    return Array.from(this.discoveredPages.values()).filter(
-      page => page.module === moduleName
-    )
+    return Array.from(this.discoveredPages.values()).filter((page) => page.module === moduleName)
   }
 
   /**
@@ -138,32 +134,30 @@ export class PageDiscoveryService {
 
     if (criteria.path) {
       const searchPath = criteria.path.toLowerCase()
-      pages = pages.filter(p => 
-        p.path.toLowerCase().includes(searchPath) ||
-        p.fullPath.toLowerCase().includes(searchPath)
+      pages = pages.filter(
+        (p) =>
+          p.path.toLowerCase().includes(searchPath) || p.fullPath.toLowerCase().includes(searchPath)
       )
     }
 
     if (criteria.method) {
-      pages = pages.filter(p => p.method === criteria.method.toUpperCase())
+      pages = pages.filter((p) => p.method === criteria.method.toUpperCase())
     }
 
     if (criteria.module) {
-      pages = pages.filter(p => p.module === criteria.module)
+      pages = pages.filter((p) => p.module === criteria.module)
     }
 
     if (criteria.controller) {
-      pages = pages.filter(p => p.controller === criteria.controller)
+      pages = pages.filter((p) => p.controller === criteria.controller)
     }
 
     if (criteria.permission) {
-      pages = pages.filter(p => 
-        p.metadata.permissions?.includes(criteria.permission)
-      )
+      pages = pages.filter((p) => p.metadata.permissions?.includes(criteria.permission))
     }
 
     if (criteria.isPublic !== undefined) {
-      pages = pages.filter(p => p.metadata.isPublic === criteria.isPublic)
+      pages = pages.filter((p) => p.metadata.isPublic === criteria.isPublic)
     }
 
     return pages
@@ -173,8 +167,8 @@ export class PageDiscoveryService {
    * Get pages requiring specific permission
    */
   getPagesByPermission(permission: string): DiscoveredPage[] {
-    return Array.from(this.discoveredPages.values()).filter(
-      page => page.metadata.permissions?.includes(permission)
+    return Array.from(this.discoveredPages.values()).filter((page) =>
+      page.metadata.permissions?.includes(permission)
     )
   }
 
@@ -183,7 +177,7 @@ export class PageDiscoveryService {
    */
   getPublicPages(): DiscoveredPage[] {
     return Array.from(this.discoveredPages.values()).filter(
-      page => page.metadata.isPublic || page.metadata.skipAuth
+      (page) => page.metadata.isPublic || page.metadata.skipAuth
     )
   }
 
@@ -192,7 +186,7 @@ export class PageDiscoveryService {
    */
   getProtectedPages(): DiscoveredPage[] {
     return Array.from(this.discoveredPages.values()).filter(
-      page => !page.metadata.isPublic && !page.metadata.skipAuth
+      (page) => !page.metadata.isPublic && !page.metadata.skipAuth
     )
   }
 
@@ -200,9 +194,7 @@ export class PageDiscoveryService {
    * Get deprecated pages
    */
   getDeprecatedPages(): DiscoveredPage[] {
-    return Array.from(this.discoveredPages.values()).filter(
-      page => page.metadata.deprecated
-    )
+    return Array.from(this.discoveredPages.values()).filter((page) => page.metadata.deprecated)
   }
 
   /**
@@ -237,7 +229,7 @@ export class PageDiscoveryService {
 
     for (const methodName of methodNames) {
       const method = prototype[methodName]
-      
+
       // Skip constructor and non-route methods
       if (methodName === 'constructor' || !this.isRouteHandler(method)) {
         continue
@@ -246,7 +238,7 @@ export class PageDiscoveryService {
       // Get route metadata
       const routePath = Reflect.getMetadata('path', method) || ''
       const httpMethod = this.getHttpMethod(method)
-      
+
       if (!httpMethod) {
         continue
       }
@@ -256,7 +248,7 @@ export class PageDiscoveryService {
 
       // Extract metadata
       const metadata = this.extractMetadata(controller.metatype, method)
-      
+
       // Extract parameters
       const parameters = this.extractParameters(method)
 
@@ -286,7 +278,7 @@ export class PageDiscoveryService {
       }
 
       if (metadata.permissions) {
-        metadata.permissions.forEach(p => moduleInfo.permissions.add(p))
+        metadata.permissions.forEach((p) => moduleInfo.permissions.add(p))
       }
     }
   }
@@ -307,7 +299,7 @@ export class PageDiscoveryService {
    */
   private getHttpMethod(method: Function): string | null {
     const httpMethod = Reflect.getMetadata('method', method)
-    
+
     if (httpMethod) {
       return httpMethod.toUpperCase()
     }
@@ -329,10 +321,10 @@ export class PageDiscoveryService {
   private buildFullPath(prefix: string, controllerPath: string, routePath: string): string {
     const parts = [prefix, controllerPath, routePath]
       .filter(Boolean)
-      .map(part => part.startsWith('/') ? part.slice(1) : part)
+      .map((part) => (part.startsWith('/') ? part.slice(1) : part))
       .filter(Boolean)
 
-    return '/' + parts.join('/')
+    return `/${parts.join('/')}`
   }
 
   /**
@@ -348,7 +340,10 @@ export class PageDiscoveryService {
     }
 
     // Get permissions
-    const permissions = this.reflector.getAllAndOverride<string[]>('permissions', [method, controller])
+    const permissions = this.reflector.getAllAndOverride<string[]>('permissions', [
+      method,
+      controller,
+    ])
     if (permissions) {
       metadata.permissions = permissions
     }
@@ -378,7 +373,10 @@ export class PageDiscoveryService {
     }
 
     // Get description
-    const description = this.reflector.getAllAndOverride<string>('description', [method, controller])
+    const description = this.reflector.getAllAndOverride<string>('description', [
+      method,
+      controller,
+    ])
     if (description) {
       metadata.description = description
     }
@@ -400,7 +398,7 @@ export class PageDiscoveryService {
 
     // Get parameter types
     const paramTypes = Reflect.getMetadata('design:paramtypes', method) || []
-    
+
     // Get parameter metadata
     const paramMetadata = Reflect.getMetadata('__routeArguments__', method) || {}
 
@@ -471,7 +469,7 @@ export class PageDiscoveryService {
    */
   generateDocumentation(): string {
     const lines: string[] = []
-    
+
     lines.push('# API Routes Documentation')
     lines.push(`Generated on: ${new Date().toISOString()}`)
     lines.push(`Total routes: ${this.discoveredPages.size}`)
@@ -487,10 +485,10 @@ export class PageDiscoveryService {
       lines.push('')
 
       const modulePages = this.getPagesByModule(moduleName)
-      
+
       // Group by controller
       const controllers = new Map<string, DiscoveredPage[]>()
-      modulePages.forEach(page => {
+      modulePages.forEach((page) => {
         const pages = controllers.get(page.controller) || []
         pages.push(page)
         controllers.set(page.controller, pages)
@@ -503,7 +501,7 @@ export class PageDiscoveryService {
         for (const page of pages) {
           lines.push(`#### ${page.method} ${page.fullPath}`)
           lines.push(`- Handler: ${page.handler}`)
-          
+
           if (page.metadata.description) {
             lines.push(`- Description: ${page.metadata.description}`)
           }
@@ -530,8 +528,10 @@ export class PageDiscoveryService {
 
           if (page.parameters.length > 0) {
             lines.push(`- Parameters:`)
-            page.parameters.forEach(param => {
-              lines.push(`  - ${param.name} (${param.source}): ${param.type} ${param.required ? '[required]' : '[optional]'}`)
+            page.parameters.forEach((param) => {
+              lines.push(
+                `  - ${param.name} (${param.source}): ${param.type} ${param.required ? '[required]' : '[optional]'}`
+              )
             })
           }
 

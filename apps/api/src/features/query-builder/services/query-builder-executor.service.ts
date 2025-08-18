@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
+import * as mathjs from 'mathjs'
 import type { DataSource } from 'typeorm'
 import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
-import * as mathjs from 'mathjs'
 
 export interface QueryExecutionParams {
   page?: number
@@ -228,8 +228,8 @@ export class QueryBuilderExecutorService {
     // Use mathjs for safe arithmetic evaluation
     try {
       // Create a safe parser that only allows basic math operations
-      const parser = mathjs.parser()
-      
+      const _parser = mathjs.parser()
+
       // Configure mathjs to be more restrictive
       const limitedScope = {
         // Only allow basic arithmetic functions
@@ -242,18 +242,20 @@ export class QueryBuilderExecutorService {
         sqrt: Math.sqrt,
         pow: Math.pow,
       }
-      
+
       // Evaluate the expression with limited scope
       const result = mathjs.evaluate(evaluableExpression, limitedScope)
-      
+
       // Ensure the result is a number
-      if (typeof result !== 'number' || isNaN(result)) {
+      if (typeof result !== 'number' || Number.isNaN(result)) {
         throw new Error('Expression did not evaluate to a valid number')
       }
-      
+
       return result
     } catch (error) {
-      throw new Error(`Invalid expression: ${expression}. ${error instanceof Error ? error.message : ''}`)
+      throw new Error(
+        `Invalid expression: ${expression}. ${error instanceof Error ? error.message : ''}`
+      )
     }
   }
 

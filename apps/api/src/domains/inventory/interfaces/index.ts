@@ -2,35 +2,34 @@
  * Export des interfaces du module Inventory
  */
 
-// Interfaces des mouvements de stock
+// Interfaces des filtres de recherche d'articles
 export {
-  IStockMovement,
-  IStockMovementFilters,
-  IStockMovementSortOptions,
-  IStockMovementPagination,
-  IStockMovementPageResult,
-  ICreateStockMovement,
-  IUpdateStockMovement,
-  StockMovementType,
-  StockMovementReason,
-  StockMovementStatus,
-} from './stock-movement.interface'
+  IArticleAggregationOptions,
+  IArticleAggregationResult,
+  IArticlePagination,
+  IArticleSearchFilters,
+  IArticleSearchResult,
+  IArticleSortOptions,
+} from './article-search-filters.interface'
 
 // Interfaces des statistiques d'inventaire
 export {
-  IInventoryStats,
   IArticleStats,
-  IInventoryPeriodStats,
   IInventoryPerformanceStats,
+  IInventoryPeriodStats,
+  IInventoryStats,
   IInventoryStatsParams,
 } from './inventory-stats.interface'
-
-// Interfaces des filtres de recherche d'articles
+// Interfaces des mouvements de stock
 export {
-  IArticleSearchFilters,
-  IArticleSortOptions,
-  IArticlePagination,
-  IArticleAggregationOptions,
-  IArticleAggregationResult,
-  IArticleSearchResult,
-} from './article-search-filters.interface'
+  ICreateStockMovement,
+  IStockMovement,
+  IStockMovementFilters,
+  IStockMovementPageResult,
+  IStockMovementPagination,
+  IStockMovementSortOptions,
+  IUpdateStockMovement,
+  StockMovementReason,
+  StockMovementStatus,
+  StockMovementType,
+} from './stock-movement.interface'

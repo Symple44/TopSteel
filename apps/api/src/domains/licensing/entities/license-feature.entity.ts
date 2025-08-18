@@ -1,13 +1,13 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm'
 import { License } from './license.entity'
 
@@ -89,7 +89,11 @@ export class LicenseFeature {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => License, license => license.features, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => License,
+    (license) => license.features,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'license_id' })
   license!: License
 
@@ -240,56 +244,56 @@ export const STANDARD_FEATURES = {
   MULTI_SITE: 'MULTI_SITE',
   MULTI_LANGUAGE: 'MULTI_LANGUAGE',
   AUDIT_TRAIL: 'AUDIT_TRAIL',
-  
+
   // Inventory features
   INVENTORY_MANAGEMENT: 'INVENTORY_MANAGEMENT',
   STOCK_MOVEMENTS: 'STOCK_MOVEMENTS',
   BARCODE_SCANNING: 'BARCODE_SCANNING',
   BATCH_TRACKING: 'BATCH_TRACKING',
-  
+
   // Production features
   PRODUCTION_PLANNING: 'PRODUCTION_PLANNING',
   WORK_ORDERS: 'WORK_ORDERS',
   QUALITY_CONTROL: 'QUALITY_CONTROL',
   MACHINE_MONITORING: 'MACHINE_MONITORING',
-  
+
   // Sales features
   QUOTATIONS: 'QUOTATIONS',
   ORDERS_MANAGEMENT: 'ORDERS_MANAGEMENT',
   INVOICING: 'INVOICING',
   PRICING_RULES: 'PRICING_RULES',
   DISCOUNTS: 'DISCOUNTS',
-  
+
   // Finance features
   ACCOUNTING: 'ACCOUNTING',
   PAYMENT_TRACKING: 'PAYMENT_TRACKING',
   BUDGET_MANAGEMENT: 'BUDGET_MANAGEMENT',
   FINANCIAL_REPORTS: 'FINANCIAL_REPORTS',
-  
+
   // Reporting features
   CUSTOM_REPORTS: 'CUSTOM_REPORTS',
   DASHBOARDS: 'DASHBOARDS',
   DATA_EXPORT: 'DATA_EXPORT',
   SCHEDULED_REPORTS: 'SCHEDULED_REPORTS',
-  
+
   // Integration features
   API_ACCESS: 'API_ACCESS',
   WEBHOOK_INTEGRATION: 'WEBHOOK_INTEGRATION',
   THIRD_PARTY_SYNC: 'THIRD_PARTY_SYNC',
   EDI_SUPPORT: 'EDI_SUPPORT',
-  
+
   // Customization features
   CUSTOM_FIELDS: 'CUSTOM_FIELDS',
   CUSTOM_WORKFLOWS: 'CUSTOM_WORKFLOWS',
   CUSTOM_MODULES: 'CUSTOM_MODULES',
   WHITE_LABEL: 'WHITE_LABEL',
-  
+
   // Security features
   TWO_FACTOR_AUTH: 'TWO_FACTOR_AUTH',
   SSO_INTEGRATION: 'SSO_INTEGRATION',
   IP_RESTRICTION: 'IP_RESTRICTION',
   DATA_ENCRYPTION: 'DATA_ENCRYPTION',
-  
+
   // Support features
   PRIORITY_SUPPORT: 'PRIORITY_SUPPORT',
   PHONE_SUPPORT: 'PHONE_SUPPORT',

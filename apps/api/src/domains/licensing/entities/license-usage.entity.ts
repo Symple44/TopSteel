@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm'
 import { License } from './license.entity'
 
@@ -91,7 +91,11 @@ export class LicenseUsage {
   createdAt!: Date
 
   // Relations
-  @ManyToOne(() => License, license => license.usage, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => License,
+    (license) => license.usage,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'license_id' })
   license!: License
 
@@ -137,7 +141,10 @@ export class LicenseUsage {
   /**
    * Get top consumers from breakdown
    */
-  getTopConsumers(type: 'byUser' | 'bySite' | 'byModule' | 'byAction', limit: number = 5): Array<{ key: string; value: number }> {
+  getTopConsumers(
+    type: 'byUser' | 'bySite' | 'byModule' | 'byAction',
+    limit: number = 5
+  ): Array<{ key: string; value: number }> {
     const breakdown = this.breakdown?.[type]
     if (!breakdown) {
       return []

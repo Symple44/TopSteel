@@ -54,7 +54,7 @@ export class PermissionCalculatorService {
     @InjectRepository(Permission, 'auth')
     private readonly permissionRepository: Repository<Permission>,
     @InjectRepository(RolePermission, 'auth')
-    private readonly rolePermissionRepository: Repository<RolePermission>,
+    readonly _rolePermissionRepository: Repository<RolePermission>,
     private readonly cacheService: OptimizedCacheService
   ) {}
 
@@ -67,7 +67,7 @@ export class PermissionCalculatorService {
     siteId?: string
   ): Promise<UserPermissionSet> {
     const cacheKey = `permissions:${userId}:${societeId}:${siteId || 'all'}`
-    
+
     // Vérifier le cache
     const cached = await this.cacheService.getWithMetrics<UserPermissionSet>(cacheKey)
     if (cached) {
@@ -78,7 +78,7 @@ export class PermissionCalculatorService {
       // 1. Récupérer le rôle utilisateur-société
       const userSocieteRole = await this.userSocieteRoleRepository.findOne({
         where: { userId, societeId, isActive: true },
-        relations: ['user', 'role']
+        relations: ['user', 'role'],
       })
 
       if (!userSocieteRole) {
@@ -122,7 +122,7 @@ export class PermissionCalculatorService {
         effectivePermissions: Array.from(mergedPermissions.keys()),
         isDefaultSociete: userSocieteRole.isDefaultSociete,
         allowedSiteIds: userSocieteRole.allowedSiteIds,
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       }
 
       // 7. Mettre en cache
@@ -135,7 +135,10 @@ export class PermissionCalculatorService {
 
       return result
     } catch (error) {
-      this.logger.error(`Error calculating permissions for user ${userId} in societe ${societeId}:`, error)
+      this.logger.error(
+        `Error calculating permissions for user ${userId} in societe ${societeId}:`,
+        error
+      )
       return this.createEmptyPermissionSet(userId, societeId, siteId)
     }
   }
@@ -143,19 +146,21 @@ export class PermissionCalculatorService {
   /**
    * Récupère les permissions d'un rôle global
    */
-  private async getGlobalRolePermissions(roleType: string): Promise<Map<string, CalculatedPermission>> {
+  private async getGlobalRolePermissions(
+    roleType: string
+  ): Promise<Map<string, CalculatedPermission>> {
     const permissions = new Map<string, CalculatedPermission>()
 
     // Permissions de base selon le rôle global
     const basePermissions = this.getBasePermissionsByRole(roleType)
-    
+
     for (const perm of basePermissions) {
       const key = `${perm.resource}:${perm.action}`
       permissions.set(key, {
         ...perm,
         source: 'system',
         scope: 'global',
-        isRestricted: false
+        isRestricted: false,
       })
     }
 
@@ -164,8 +169,8 @@ export class PermissionCalculatorService {
       where: {
         scope: 'system',
         isActive: true,
-        societeId: undefined // Permissions globales uniquement
-      }
+        societeId: undefined, // Permissions globales uniquement
+      },
     })
 
     for (const dbPerm of dbPermissions) {
@@ -177,7 +182,7 @@ export class PermissionCalculatorService {
           level: this.getAccessLevelForRole(roleType, dbPerm.action),
           source: 'role',
           scope: 'global',
-          isRestricted: false
+          isRestricted: false,
         })
       }
     }
@@ -199,9 +204,9 @@ export class PermissionCalculatorService {
       where: {
         parentRoleType: roleType,
         societeId,
-        isActive: true
+        isActive: true,
       },
-      relations: ['rolePermissions', 'rolePermissions.permission']
+      relations: ['rolePermissions', 'rolePermissions.permission'],
     })
 
     if (role?.rolePermissions) {
@@ -214,7 +219,7 @@ export class PermissionCalculatorService {
             level: rolePerm.accessLevel as CalculatedPermission['level'],
             source: 'role',
             scope: 'societe',
-            isRestricted: false
+            isRestricted: false,
           })
         }
       }
@@ -229,7 +234,7 @@ export class PermissionCalculatorService {
           ...perm,
           source: 'role',
           scope: 'societe',
-          isRestricted: false
+          isRestricted: false,
         })
       }
     }
@@ -272,7 +277,7 @@ export class PermissionCalculatorService {
           level: 'ADMIN', // Les permissions additionnelles donnent un accès complet
           source: 'additional',
           scope: 'societe',
-          isRestricted: false
+          isRestricted: false,
         })
       }
     }
@@ -339,11 +344,14 @@ export class PermissionCalculatorService {
   /**
    * Obtient les permissions de base pour un rôle
    */
-  private getBasePermissionsByRole(roleType: string): Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[] {
-    const basePermissions: Record<string, Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[]> = {
-      SUPER_ADMIN: [
-        { resource: '*', action: '*', level: 'ADMIN' },
-      ],
+  private getBasePermissionsByRole(
+    roleType: string
+  ): Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[] {
+    const basePermissions: Record<
+      string,
+      Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[]
+    > = {
+      SUPER_ADMIN: [{ resource: '*', action: '*', level: 'ADMIN' }],
       ADMIN: [
         { resource: 'users', action: 'read', level: 'ADMIN' },
         { resource: 'users', action: 'write', level: 'ADMIN' },
@@ -363,9 +371,7 @@ export class PermissionCalculatorService {
         { resource: 'profile', action: 'read', level: 'READ' },
         { resource: 'profile', action: 'write', level: 'WRITE' },
       ],
-      GUEST: [
-        { resource: 'public', action: 'read', level: 'READ' },
-      ]
+      GUEST: [{ resource: 'public', action: 'read', level: 'READ' }],
     }
 
     return basePermissions[roleType] || basePermissions.USER
@@ -374,8 +380,13 @@ export class PermissionCalculatorService {
   /**
    * Obtient les permissions par défaut pour un rôle société
    */
-  private getDefaultSocietePermissions(roleType: string): Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[] {
-    const societePermissions: Record<string, Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[]> = {
+  private getDefaultSocietePermissions(
+    roleType: string
+  ): Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[] {
+    const societePermissions: Record<
+      string,
+      Omit<CalculatedPermission, 'source' | 'scope' | 'isRestricted'>[]
+    > = {
       GESTIONNAIRE: [
         { resource: 'articles', action: 'read', level: 'ADMIN' },
         { resource: 'articles', action: 'write', level: 'ADMIN' },
@@ -418,7 +429,7 @@ export class PermissionCalculatorService {
       INVITE: [
         { resource: 'public', action: 'read', level: 'READ' },
         { resource: 'reports', action: 'read', level: 'READ' },
-      ]
+      ],
     }
 
     return societePermissions[roleType] || []
@@ -438,7 +449,7 @@ export class PermissionCalculatorService {
       ADMIN: ['users', 'societes', 'parameters', 'roles', 'permissions'],
       MANAGER: ['users', 'societes', 'parameters'],
       USER: ['profile'],
-      GUEST: ['public']
+      GUEST: ['public'],
     }
 
     const allowedResources = rolePermissionMatrix[roleType] || []
@@ -454,32 +465,32 @@ export class PermissionCalculatorService {
         read: 'ADMIN',
         write: 'ADMIN',
         delete: 'ADMIN',
-        admin: 'ADMIN'
+        admin: 'ADMIN',
       },
       ADMIN: {
         read: 'ADMIN',
         write: 'ADMIN',
         delete: 'DELETE',
-        admin: 'ADMIN'
+        admin: 'ADMIN',
       },
       MANAGER: {
         read: 'READ',
         write: 'WRITE',
         delete: 'BLOCKED',
-        admin: 'BLOCKED'
+        admin: 'BLOCKED',
       },
       USER: {
         read: 'READ',
         write: 'WRITE',
         delete: 'BLOCKED',
-        admin: 'BLOCKED'
+        admin: 'BLOCKED',
       },
       GUEST: {
         read: 'READ',
         write: 'BLOCKED',
         delete: 'BLOCKED',
-        admin: 'BLOCKED'
-      }
+        admin: 'BLOCKED',
+      },
     }
 
     return roleLevelMatrix[roleType]?.[action] || 'BLOCKED'
@@ -488,7 +499,11 @@ export class PermissionCalculatorService {
   /**
    * Crée un ensemble de permissions vide
    */
-  private createEmptyPermissionSet(userId: string, societeId: string, siteId?: string): UserPermissionSet {
+  private createEmptyPermissionSet(
+    userId: string,
+    societeId: string,
+    siteId?: string
+  ): UserPermissionSet {
     return {
       userId,
       societeId,
@@ -501,7 +516,7 @@ export class PermissionCalculatorService {
       effectivePermissions: [],
       isDefaultSociete: false,
       allowedSiteIds: [],
-      calculatedAt: new Date()
+      calculatedAt: new Date(),
     }
   }
 
@@ -520,28 +535,31 @@ export class PermissionCalculatorService {
   /**
    * Obtient un résumé des permissions pour l'administration
    */
-  async getPermissionsSummary(userId: string, societeId: string): Promise<{
+  async getPermissionsSummary(
+    userId: string,
+    societeId: string
+  ): Promise<{
     totalPermissions: number
     byResource: Record<string, number>
     byLevel: Record<string, number>
     bySource: Record<string, number>
   }> {
     const permissions = await this.calculateUserPermissions(userId, societeId)
-    
+
     const summary = {
       totalPermissions: permissions.permissions.size,
       byResource: {} as Record<string, number>,
       byLevel: {} as Record<string, number>,
-      bySource: {} as Record<string, number>
+      bySource: {} as Record<string, number>,
     }
 
     for (const perm of permissions.permissions.values()) {
       // Par ressource
       summary.byResource[perm.resource] = (summary.byResource[perm.resource] || 0) + 1
-      
+
       // Par niveau
       summary.byLevel[perm.level] = (summary.byLevel[perm.level] || 0) + 1
-      
+
       // Par source
       summary.bySource[perm.source] = (summary.bySource[perm.source] || 0) + 1
     }

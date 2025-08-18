@@ -1,8 +1,8 @@
-import { configureStore } from '@reduxjs/toolkit';
-import cartReducer from './cartSlice';
-import wishlistReducer from './wishlistSlice';
-import { cartPersistenceMiddleware, loadCartFromStorage } from './cartPersistence';
-import { wishlistPersistenceMiddleware, loadWishlistFromStorage } from './wishlistPersistence';
+import { configureStore } from '@reduxjs/toolkit'
+import { cartPersistenceMiddleware, loadCartFromStorage } from './cartPersistence'
+import cartReducer from './cartSlice'
+import { loadWishlistFromStorage, wishlistPersistenceMiddleware } from './wishlistPersistence'
+import wishlistReducer from './wishlistSlice'
 
 // Load initial state from localStorage
 const preloadedState = {
@@ -12,19 +12,19 @@ const preloadedState = {
     lastUpdated: null,
     appliedCoupon: null,
     shippingMethod: null,
-    ...loadCartFromStorage()
+    ...loadCartFromStorage(),
   },
   wishlist: {
     items: [],
     lastUpdated: null,
-    ...loadWishlistFromStorage()
-  }
-};
+    ...loadWishlistFromStorage(),
+  },
+}
 
 export const store = configureStore({
   reducer: {
     cart: cartReducer,
-    wishlist: wishlistReducer
+    wishlist: wishlistReducer,
   },
   preloadedState,
   middleware: (getDefaultMiddleware) =>
@@ -33,14 +33,18 @@ export const store = configureStore({
         // Ignore these action types
         ignoredActions: ['cart/addToCart', 'cart/syncCart', 'wishlist/addToWishlist'],
         // Ignore these field paths in all actions
-        ignoredActionPaths: ['payload.addedAt', 'payload.product.createdAt', 'payload.product.updatedAt'],
+        ignoredActionPaths: [
+          'payload.addedAt',
+          'payload.product.createdAt',
+          'payload.product.updatedAt',
+        ],
         // Ignore these paths in the state
-        ignoredPaths: ['cart.items', 'cart.lastUpdated', 'wishlist.items', 'wishlist.lastUpdated']
-      }
+        ignoredPaths: ['cart.items', 'cart.lastUpdated', 'wishlist.items', 'wishlist.lastUpdated'],
+      },
     })
       .concat(cartPersistenceMiddleware)
-      .concat(wishlistPersistenceMiddleware)
-});
+      .concat(wishlistPersistenceMiddleware),
+})
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

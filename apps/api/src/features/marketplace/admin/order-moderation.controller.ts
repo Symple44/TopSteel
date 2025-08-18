@@ -1,40 +1,37 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
   Body,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  HttpCode,
+  HttpStatus,
   Param,
+  ParseBoolPipe,
+  ParseIntPipe,
+  Post,
   Query,
   UseGuards,
-  Logger,
-  ParseIntPipe,
-  DefaultValuePipe,
-  ParseBoolPipe,
-  HttpCode,
-  HttpStatus
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard';
-import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard';
-import { RequireMarketplacePermissions, MarketplacePermission } from '../auth/decorators/marketplace-permissions.decorator';
-import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator';
-import { CurrentUser } from '../../../core/common/decorators/current-user.decorator';
+} from '@nestjs/common'
+import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
+import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import {
-  OrderModerationService,
+  MarketplacePermission,
+  RequireMarketplacePermissions,
+} from '../auth/decorators/marketplace-permissions.decorator'
+import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard'
+import type {
+  OrderModerationAction,
   OrderModerationFilters,
-  OrderModerationResponse,
   OrderModerationItem,
-  OrderModerationAction
-} from './order-moderation.service';
+  OrderModerationResponse,
+  OrderModerationService,
+} from './order-moderation.service'
 
 @Controller('api/marketplace/admin/order-moderation')
 @UseGuards(JwtAuthGuard, MarketplacePermissionsGuard)
 export class OrderModerationController {
-  private readonly logger = new Logger(OrderModerationController.name);
-
-  constructor(
-    private readonly moderationService: OrderModerationService
-  ) {}
+  constructor(private readonly moderationService: OrderModerationService) {}
 
   @Get()
   @RequireMarketplacePermissions(MarketplacePermission.MODERATE_ORDERS)
@@ -63,15 +60,15 @@ export class OrderModerationController {
       amountMax: amountMax ? Number(amountMax) : undefined,
       flagged,
       priority,
-      assignedTo
-    };
+      assignedTo,
+    }
 
     return this.moderationService.getOrdersForModeration(
       tenantId,
       filters,
       Math.max(1, page),
       Math.min(100, Math.max(1, limit))
-    );
+    )
   }
 
   @Get('stats')
@@ -81,21 +78,22 @@ export class OrderModerationController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string
   ) {
-    const dateRange = startDate && endDate ? {
-      start: new Date(startDate),
-      end: new Date(endDate)
-    } : undefined;
+    const dateRange =
+      startDate && endDate
+        ? {
+            start: new Date(startDate),
+            end: new Date(endDate),
+          }
+        : undefined
 
-    return this.moderationService.getModerationStats(tenantId, dateRange);
+    return this.moderationService.getModerationStats(tenantId, dateRange)
   }
 
   @Get('summary')
   @RequireMarketplacePermissions(MarketplacePermission.MODERATE_ORDERS)
-  async getModerationSummary(
-    @CurrentTenant() tenantId: string
-  ) {
-    const result = await this.moderationService.getOrdersForModeration(tenantId, {}, 1, 1);
-    return result.summary;
+  async getModerationSummary(@CurrentTenant() tenantId: string) {
+    const result = await this.moderationService.getOrdersForModeration(tenantId, {}, 1, 1)
+    return result.summary
   }
 
   @Get(':orderId')
@@ -104,7 +102,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string
   ): Promise<OrderModerationItem> {
-    return this.moderationService.getOrderForDetailedModeration(tenantId, orderId);
+    return this.moderationService.getOrderForDetailedModeration(tenantId, orderId)
   }
 
   @Post(':orderId/actions')
@@ -116,12 +114,7 @@ export class OrderModerationController {
     @Body() action: OrderModerationAction,
     @CurrentUser() user: any
   ): Promise<{ success: boolean; message: string }> {
-    return this.moderationService.performModerationAction(
-      tenantId,
-      orderId,
-      action,
-      user.id
-    );
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post(':orderId/approve')
@@ -135,10 +128,10 @@ export class OrderModerationController {
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'APPROVE',
-      reason: body.reason
-    };
+      reason: body.reason,
+    }
 
-    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id);
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post(':orderId/reject')
@@ -152,10 +145,10 @@ export class OrderModerationController {
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'REJECT',
-      reason: body.reason
-    };
+      reason: body.reason,
+    }
 
-    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id);
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post(':orderId/hold')
@@ -169,10 +162,10 @@ export class OrderModerationController {
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'HOLD',
-      reason: body.reason
-    };
+      reason: body.reason,
+    }
 
-    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id);
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post(':orderId/flag')
@@ -187,10 +180,10 @@ export class OrderModerationController {
     const action: OrderModerationAction = {
       action: 'FLAG',
       flagType: body.flagType,
-      reason: body.reason
-    };
+      reason: body.reason,
+    }
 
-    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id);
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post(':orderId/assign')
@@ -204,10 +197,10 @@ export class OrderModerationController {
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'ASSIGN',
-      assignTo: body.assignTo
-    };
+      assignTo: body.assignTo,
+    }
 
-    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id);
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post(':orderId/notes')
@@ -222,10 +215,10 @@ export class OrderModerationController {
     const action: OrderModerationAction = {
       action: 'ADD_NOTE',
       noteMessage: body.message,
-      isInternalNote: body.isInternal || false
-    };
+      isInternalNote: body.isInternal || false,
+    }
 
-    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id);
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post(':orderId/resolve-flag')
@@ -239,19 +232,17 @@ export class OrderModerationController {
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'RESOLVE_FLAG',
-      flagType: body.flagType
-    };
+      flagType: body.flagType,
+    }
 
-    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id);
+    return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
 
   @Post('auto-flag')
   @HttpCode(HttpStatus.OK)
   @RequireMarketplacePermissions(MarketplacePermission.MANAGE_SETTINGS)
-  async autoFlagOrders(
-    @CurrentTenant() tenantId: string
-  ): Promise<{ flagged: number }> {
-    return this.moderationService.autoFlagOrders(tenantId);
+  async autoFlagOrders(@CurrentTenant() tenantId: string): Promise<{ flagged: number }> {
+    return this.moderationService.autoFlagOrders(tenantId)
   }
 
   @Get('export/csv')
@@ -267,8 +258,8 @@ export class OrderModerationController {
       status,
       dateFrom: dateFrom ? new Date(dateFrom) : undefined,
       dateTo: dateTo ? new Date(dateTo) : undefined,
-      flagged
-    };
+      flagged,
+    }
 
     // Get all orders matching filters for export
     const result = await this.moderationService.getOrdersForModeration(
@@ -276,38 +267,49 @@ export class OrderModerationController {
       filters,
       1,
       10000 // Large limit for export
-    );
+    )
 
     // Convert to CSV format
     const csvHeader = [
-      'Order ID', 'Order Number', 'Customer Name', 'Customer Email', 'Total',
-      'Status', 'Payment Status', 'Priority', 'Flags', 'Assigned To',
-      'Created At', 'Updated At'
-    ].join(',');
+      'Order ID',
+      'Order Number',
+      'Customer Name',
+      'Customer Email',
+      'Total',
+      'Status',
+      'Payment Status',
+      'Priority',
+      'Flags',
+      'Assigned To',
+      'Created At',
+      'Updated At',
+    ].join(',')
 
-    const csvRows = result.orders.map(order => [
-      order.id,
-      order.orderNumber,
-      `"${order.customer.name}"`,
-      order.customer.email,
-      order.total,
-      order.status,
-      order.paymentStatus,
-      order.priority,
-      `"${order.flags.map(f => f.type).join(', ')}"`,
-      order.assignedTo || '',
-      order.createdAt.toISOString(),
-      order.updatedAt.toISOString()
-    ].join(','));
+    const csvRows = result.orders.map((order) =>
+      [
+        order.id,
+        order.orderNumber,
+        `"${order.customer.name}"`,
+        order.customer.email,
+        order.total,
+        order.status,
+        order.paymentStatus,
+        order.priority,
+        `"${order.flags.map((f) => f.type).join(', ')}"`,
+        order.assignedTo || '',
+        order.createdAt.toISOString(),
+        order.updatedAt.toISOString(),
+      ].join(',')
+    )
 
-    const csvContent = [csvHeader, ...csvRows].join('\n');
+    const csvContent = [csvHeader, ...csvRows].join('\n')
 
     return {
       content: csvContent,
       filename: `order-moderation-export-${new Date().toISOString().split('T')[0]}.csv`,
       mimeType: 'text/csv',
-      count: result.orders.length
-    };
+      count: result.orders.length,
+    }
   }
 
   @Get('queue/pending')
@@ -317,28 +319,23 @@ export class OrderModerationController {
     @Query('assignedTo') assignedTo?: string
   ) {
     const filters: OrderModerationFilters = {
-      assignedTo
-    };
+      assignedTo,
+    }
 
-    const result = await this.moderationService.getOrdersForModeration(
-      tenantId,
-      filters,
-      1,
-      50
-    );
+    const result = await this.moderationService.getOrdersForModeration(tenantId, filters, 1, 50)
 
     // Filter only pending orders and sort by priority
     const pendingOrders = result.orders
-      .filter(order => order.status === 'PENDING')
+      .filter((order) => order.status === 'PENDING')
       .sort((a, b) => {
-        const priorityOrder = { URGENT: 4, HIGH: 3, MEDIUM: 2, LOW: 1 };
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
-      });
+        const priorityOrder = { URGENT: 4, HIGH: 3, MEDIUM: 2, LOW: 1 }
+        return priorityOrder[b.priority] - priorityOrder[a.priority]
+      })
 
     return {
       orders: pendingOrders,
-      count: pendingOrders.length
-    };
+      count: pendingOrders.length,
+    }
   }
 
   @Get('flags/types')
@@ -351,8 +348,8 @@ export class OrderModerationController {
         { value: 'NEW_CUSTOMER', label: 'New Customer', severity: 'LOW' },
         { value: 'SUSPICIOUS_ACTIVITY', label: 'Suspicious Activity', severity: 'HIGH' },
         { value: 'INVENTORY_ISSUE', label: 'Inventory Issue', severity: 'MEDIUM' },
-        { value: 'CUSTOM', label: 'Custom Flag', severity: 'MEDIUM' }
-      ]
-    };
+        { value: 'CUSTOM', label: 'Custom Flag', severity: 'MEDIUM' },
+      ],
+    }
   }
 }

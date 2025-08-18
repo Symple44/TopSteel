@@ -1,22 +1,22 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { 
-  Package, 
-  MapPin, 
-  CreditCard, 
-  Heart, 
-  TrendingUp,
-  Clock,
+import {
+  ArrowRight,
   CheckCircle,
-  Truck,
+  Clock,
+  CreditCard,
+  Heart,
+  MapPin,
+  Package,
   Star,
-  ArrowRight
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  TrendingUp,
+  Truck,
+} from 'lucide-react'
+import type React from 'react'
+import { cn } from '@/lib/utils'
 
 interface AccountOverviewProps {
-  className?: string;
+  className?: string
 }
 
 const recentOrders = [
@@ -26,15 +26,15 @@ const recentOrders = [
     status: 'delivered',
     total: 299.99,
     items: 3,
-    trackingNumber: 'TRK123456789'
+    trackingNumber: 'TRK123456789',
   },
   {
     id: 'ORD-2024-002',
     date: '2024-01-10',
     status: 'shipping',
-    total: 149.50,
+    total: 149.5,
     items: 2,
-    trackingNumber: 'TRK987654321'
+    trackingNumber: 'TRK987654321',
   },
   {
     id: 'ORD-2024-003',
@@ -42,9 +42,9 @@ const recentOrders = [
     status: 'processing',
     total: 89.99,
     items: 1,
-    trackingNumber: null
-  }
-];
+    trackingNumber: null,
+  },
+]
 
 const quickActions = [
   {
@@ -52,30 +52,30 @@ const quickActions = [
     description: 'Check the status of your recent orders',
     icon: Package,
     href: '/marketplace/account/orders',
-    color: 'blue'
+    color: 'blue',
   },
   {
     title: 'Manage Addresses',
     description: 'Add or edit shipping addresses',
     icon: MapPin,
     href: '/marketplace/account/addresses',
-    color: 'green'
+    color: 'green',
   },
   {
     title: 'Payment Methods',
     description: 'Update your payment information',
     icon: CreditCard,
     href: '/marketplace/account/payment-methods',
-    color: 'purple'
+    color: 'purple',
   },
   {
     title: 'View Wishlist',
     description: 'See your saved items',
     icon: Heart,
     href: '/marketplace/account/wishlist',
-    color: 'red'
-  }
-];
+    color: 'red',
+  },
+]
 
 const accountStats = [
   {
@@ -83,72 +83,70 @@ const accountStats = [
     value: '24',
     change: '+3 this month',
     trend: 'up',
-    icon: Package
+    icon: Package,
   },
   {
     label: 'Total Spent',
     value: '€2,449',
     change: '+€299 this month',
     trend: 'up',
-    icon: TrendingUp
+    icon: TrendingUp,
   },
   {
     label: 'Avg. Order Value',
     value: '€102',
     change: '+€12 vs last month',
     trend: 'up',
-    icon: Star
+    icon: Star,
   },
   {
     label: 'Member Since',
     value: 'Jan 2023',
     change: '1 year loyalty',
     trend: 'neutral',
-    icon: Clock
-  }
-];
+    icon: Clock,
+  },
+]
 
 export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) => {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(price);
-  };
+      currency: 'EUR',
+    }).format(price)
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'delivered':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return <CheckCircle className="w-4 h-4 text-green-600" />
       case 'shipping':
-        return <Truck className="w-4 h-4 text-blue-600" />;
+        return <Truck className="w-4 h-4 text-blue-600" />
       case 'processing':
-        return <Clock className="w-4 h-4 text-yellow-600" />;
+        return <Clock className="w-4 h-4 text-yellow-600" />
       default:
-        return <Package className="w-4 h-4 text-gray-600" />;
+        return <Package className="w-4 h-4 text-gray-600" />
     }
-  };
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered':
-        return 'text-green-700 bg-green-50';
+        return 'text-green-700 bg-green-50'
       case 'shipping':
-        return 'text-blue-700 bg-blue-50';
+        return 'text-blue-700 bg-blue-50'
       case 'processing':
-        return 'text-yellow-700 bg-yellow-50';
+        return 'text-yellow-700 bg-yellow-50'
       default:
-        return 'text-gray-700 bg-gray-50';
+        return 'text-gray-700 bg-gray-50'
     }
-  };
+  }
 
   return (
-    <div className={cn("p-6", className)}>
+    <div className={cn('p-6', className)}>
       {/* Welcome Section */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome back, John!
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, John!</h2>
         <p className="text-gray-600">
           Here's an overview of your account activity and quick access to manage your preferences.
         </p>
@@ -157,31 +155,29 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
       {/* Account Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {accountStats.map((stat) => {
-          const Icon = stat.icon;
+          const Icon = stat.icon
           return (
             <div key={stat.label} className="bg-white border border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-2 bg-gray-100 rounded-lg">
                   <Icon className="w-5 h-5 text-gray-600" />
                 </div>
-                {stat.trend === 'up' && (
-                  <TrendingUp className="w-4 h-4 text-green-600" />
-                )}
+                {stat.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-600" />}
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 mb-1">
-                  {stat.value}
-                </p>
+                <p className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
                 <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                <p className={cn(
-                  "text-xs",
-                  stat.trend === 'up' ? "text-green-600" : "text-gray-500"
-                )}>
+                <p
+                  className={cn(
+                    'text-xs',
+                    stat.trend === 'up' ? 'text-green-600' : 'text-gray-500'
+                  )}
+                >
                   {stat.change}
                 </p>
               </div>
             </div>
-          );
+          )
         })}
       </div>
 
@@ -190,34 +186,38 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action) => {
-            const Icon = action.icon;
+            const Icon = action.icon
             return (
               <button
                 key={action.title}
                 className="p-4 text-left border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all group"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <div className={cn(
-                    "p-2 rounded-lg",
-                    action.color === 'blue' && "bg-blue-100",
-                    action.color === 'green' && "bg-green-100",
-                    action.color === 'purple' && "bg-purple-100",
-                    action.color === 'red' && "bg-red-100"
-                  )}>
-                    <Icon className={cn(
-                      "w-5 h-5",
-                      action.color === 'blue' && "text-blue-600",
-                      action.color === 'green' && "text-green-600",
-                      action.color === 'purple' && "text-purple-600",
-                      action.color === 'red' && "text-red-600"
-                    )} />
+                  <div
+                    className={cn(
+                      'p-2 rounded-lg',
+                      action.color === 'blue' && 'bg-blue-100',
+                      action.color === 'green' && 'bg-green-100',
+                      action.color === 'purple' && 'bg-purple-100',
+                      action.color === 'red' && 'bg-red-100'
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        'w-5 h-5',
+                        action.color === 'blue' && 'text-blue-600',
+                        action.color === 'green' && 'text-green-600',
+                        action.color === 'purple' && 'text-purple-600',
+                        action.color === 'red' && 'text-red-600'
+                      )}
+                    />
                   </div>
                   <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
                 </div>
                 <h4 className="font-medium text-gray-900 mb-1">{action.title}</h4>
                 <p className="text-sm text-gray-600">{action.description}</p>
               </button>
-            );
+            )
           })}
         </div>
       </div>
@@ -239,10 +239,12 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
                     {getStatusIcon(order.status)}
                     <span className="font-medium text-gray-900">{order.id}</span>
                   </div>
-                  <span className={cn(
-                    "px-2 py-1 rounded-full text-xs font-medium capitalize",
-                    getStatusColor(order.status)
-                  )}>
+                  <span
+                    className={cn(
+                      'px-2 py-1 rounded-full text-xs font-medium capitalize',
+                      getStatusColor(order.status)
+                    )}
+                  >
                     {order.status}
                   </span>
                 </div>
@@ -255,15 +257,11 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
                       {order.items} item{order.items > 1 ? 's' : ''}
                     </p>
                     {order.trackingNumber && (
-                      <p className="text-xs text-blue-600 mt-1">
-                        Tracking: {order.trackingNumber}
-                      </p>
+                      <p className="text-xs text-blue-600 mt-1">Tracking: {order.trackingNumber}</p>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">
-                      {formatPrice(order.total)}
-                    </p>
+                    <p className="font-semibold text-gray-900">{formatPrice(order.total)}</p>
                   </div>
                 </div>
               </div>
@@ -321,5 +319,5 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

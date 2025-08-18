@@ -1,29 +1,21 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { 
-  Grid, 
-  List, 
-  ChevronDown,
-  Filter,
-  X,
-  Package,
-  AlertCircle,
-  Loader2
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ProductCard, Product } from '../products/ProductCard';
-import { SearchFilters, FilterGroup, ActiveFilter } from './SearchFilters';
-import { Pagination } from '../common/Pagination';
+import { Filter, Grid, List, Loader2, Package, X } from 'lucide-react'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
+import { Pagination } from '../common/Pagination'
+import { type Product, ProductCard } from '../products/ProductCard'
+import { type ActiveFilter, SearchFilters } from './SearchFilters'
 
 interface SearchResultsProps {
-  query?: string;
-  initialFilters?: ActiveFilter[];
-  className?: string;
+  query?: string
+  initialFilters?: ActiveFilter[]
+  className?: string
 }
 
-type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'rating' | 'newest' | 'bestselling';
-type ViewMode = 'grid' | 'list';
+type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'rating' | 'newest' | 'bestselling'
+type ViewMode = 'grid' | 'list'
 
 const mockProducts: Product[] = [
   {
@@ -42,14 +34,14 @@ const mockProducts: Product[] = [
     specifications: {
       length: '10m',
       weight: '150kg',
-      grade: 'S355'
-    }
+      grade: 'S355',
+    },
   },
   {
     id: '2',
     name: 'Professional Welding Machine',
     description: 'Industrial grade MIG/TIG welding equipment',
-    price: 1899.00,
+    price: 1899.0,
     image: '/images/welding-machine.jpg',
     category: 'Welding Equipment',
     brand: 'Lincoln Electric',
@@ -60,8 +52,8 @@ const mockProducts: Product[] = [
     specifications: {
       power: '250A',
       voltage: '220V',
-      weight: '45kg'
-    }
+      weight: '45kg',
+    },
   },
   {
     id: '3',
@@ -77,10 +69,10 @@ const mockProducts: Product[] = [
     specifications: {
       thickness: '2mm',
       size: '2m x 1m',
-      coating: 'Zinc'
-    }
-  }
-];
+      coating: 'Zinc',
+    },
+  },
+]
 
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'relevance', label: 'Most Relevant' },
@@ -88,106 +80,95 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'price-desc', label: 'Price: High to Low' },
   { value: 'rating', label: 'Highest Rated' },
   { value: 'newest', label: 'Newest First' },
-  { value: 'bestselling', label: 'Best Selling' }
-];
+  { value: 'bestselling', label: 'Best Selling' },
+]
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
   query = '',
   initialFilters = [],
-  className
+  className,
 }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [sortBy, setSortBy] = useState<SortOption>('relevance');
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(initialFilters);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(10);
-  const [totalResults, setTotalResults] = useState(0);
-  const itemsPerPage = 24;
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [sortBy, setSortBy] = useState<SortOption>('relevance')
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(initialFilters)
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(10)
+  const [totalResults, setTotalResults] = useState(0)
+  const itemsPerPage = 24
 
   // Simulate loading products
   useEffect(() => {
-    loadProducts();
-  }, [query, activeFilters, sortBy, currentPage]);
+    loadProducts()
+  }, [loadProducts])
 
   const loadProducts = async () => {
-    setIsLoading(true);
-    
+    setIsLoading(true)
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       // Apply filters and sorting to mock data
-      let filtered = [...mockProducts];
-      
+      const filtered = [...mockProducts]
+
       // Apply sorting
       switch (sortBy) {
         case 'price-asc':
-          filtered.sort((a, b) => a.price - b.price);
-          break;
+          filtered.sort((a, b) => a.price - b.price)
+          break
         case 'price-desc':
-          filtered.sort((a, b) => b.price - a.price);
-          break;
+          filtered.sort((a, b) => b.price - a.price)
+          break
         case 'rating':
-          filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-          break;
+          filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+          break
         // Add more sorting logic as needed
       }
-      
+
       // Duplicate products to simulate pagination
-      const allProducts = Array(10).fill(filtered).flat();
-      setProducts(allProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage));
-      setTotalResults(allProducts.length);
-      setTotalPages(Math.ceil(allProducts.length / itemsPerPage));
-    } catch (error) {
-      console.error('Error loading products:', error);
-      setProducts([]);
+      const allProducts = Array(10).fill(filtered).flat()
+      setProducts(allProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage))
+      setTotalResults(allProducts.length)
+      setTotalPages(Math.ceil(allProducts.length / itemsPerPage))
+    } catch (_error) {
+      setProducts([])
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSortChange = (value: SortOption) => {
-    setSortBy(value);
-    setCurrentPage(1);
-  };
+    setSortBy(value)
+    setCurrentPage(1)
+  }
 
   const handleFilterChange = (filters: ActiveFilter[]) => {
-    setActiveFilters(filters);
-    setCurrentPage(1);
-  };
+    setActiveFilters(filters)
+    setCurrentPage(1)
+  }
 
   const clearAllFilters = () => {
-    setActiveFilters([]);
-    setCurrentPage(1);
-  };
+    setActiveFilters([])
+    setCurrentPage(1)
+  }
 
-  const handleAddToCart = (product: Product) => {
-    console.log('Add to cart:', product);
-  };
+  const handleAddToCart = (_product: Product) => {}
 
-  const handleAddToWishlist = (product: Product) => {
-    console.log('Add to wishlist:', product);
-  };
+  const handleAddToWishlist = (_product: Product) => {}
 
-  const handleQuickView = (product: Product) => {
-    console.log('Quick view:', product);
-  };
+  const handleQuickView = (_product: Product) => {}
 
   return (
-    <div className={cn("min-h-screen bg-gray-50", className)}>
+    <div className={cn('min-h-screen bg-gray-50', className)}>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Search Header */}
         {query && (
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Search results for "{query}"
-            </h1>
-            <p className="text-gray-600 mt-1">
-              {totalResults} products found
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900">Search results for "{query}"</h1>
+            <p className="text-gray-600 mt-1">{totalResults} products found</p>
           </div>
         )}
 
@@ -230,10 +211,10 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                   <button
                     onClick={() => setViewMode('grid')}
                     className={cn(
-                      "p-2 rounded",
-                      viewMode === 'grid' 
-                        ? "bg-gray-900 text-white" 
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      'p-2 rounded',
+                      viewMode === 'grid'
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     )}
                   >
                     <Grid className="w-4 h-4" />
@@ -241,10 +222,10 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                   <button
                     onClick={() => setViewMode('list')}
                     className={cn(
-                      "p-2 rounded",
-                      viewMode === 'list' 
-                        ? "bg-gray-900 text-white" 
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      'p-2 rounded',
+                      viewMode === 'list'
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     )}
                   >
                     <List className="w-4 h-4" />
@@ -259,7 +240,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                     onChange={(e) => handleSortChange(e.target.value as SortOption)}
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {sortOptions.map(option => (
+                    {sortOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -286,12 +267,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             {!isLoading && products.length === 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No products found
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Try adjusting your filters or search terms
-                </p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+                <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
                 {activeFilters.length > 0 && (
                   <button
                     onClick={clearAllFilters}
@@ -306,11 +283,13 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             {/* Product Grid/List */}
             {!isLoading && products.length > 0 && (
               <>
-                <div className={cn(
-                  viewMode === 'grid' 
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                    : "space-y-4"
-                )}>
+                <div
+                  className={cn(
+                    viewMode === 'grid'
+                      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                      : 'space-y-4'
+                  )}
+                >
                   {products.map((product) => (
                     <ProductCard
                       key={product.id}
@@ -340,7 +319,10 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
       {/* Mobile Filters Modal */}
       {showMobileFilters && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowMobileFilters(false)} />
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowMobileFilters(false)}
+          />
           <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold">Filters</h2>
@@ -365,5 +347,5 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

@@ -4,6 +4,7 @@ import {
   MarketplaceCategory,
   PricingType,
 } from '../../features/marketplace/entities/marketplace-module.entity'
+import type { CreateModuleDto } from '../../features/marketplace/dto/create-module.dto'
 import { MarketplaceService } from '../../features/marketplace/services/marketplace.service'
 
 async function seedMarketplaceModules() {
@@ -376,7 +377,7 @@ async function seedMarketplaceModules() {
 
   try {
     for (const moduleData of modulesToCreate) {
-      const module = await marketplaceService.createModule(moduleData as any, 'system')
+      const module = await marketplaceService.createModule(moduleData as CreateModuleDto, 'system')
 
       // Publier automatiquement le module
       await marketplaceService.publishModule(module.id)

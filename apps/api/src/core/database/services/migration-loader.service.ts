@@ -8,7 +8,6 @@ import { CreateInitialTables1737178800000 } from '../migrations/1737178800000-Cr
 @Injectable()
 export class MigrationLoaderService {
   private readonly logger = new Logger(MigrationLoaderService.name)
-  private readonly isDevelopment: boolean
 
   constructor(
     private readonly dataSource: DataSource,

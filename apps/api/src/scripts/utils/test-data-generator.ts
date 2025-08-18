@@ -27,9 +27,9 @@ export class TestDataGenerator {
    * Génère un UUID v4
    */
   static generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0
-      const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
       return v.toString(16)
     })
   }
@@ -38,9 +38,9 @@ export class TestDataGenerator {
    * Génère une société de test
    */
   static generateSociete(overrides?: Partial<TestSociete>): TestSociete {
-    const id = overrides?.id || this.generateUUID()
-    const code = overrides?.code || this.generateSocieteCode()
-    
+    const id = overrides?.id || TestDataGenerator.generateUUID()
+    const code = overrides?.code || TestDataGenerator.generateSocieteCode()
+
     return {
       id,
       code,
@@ -49,7 +49,7 @@ export class TestDataGenerator {
       status: overrides?.status || 'ACTIVE',
       plan: overrides?.plan || 'PROFESSIONAL',
       databaseName: overrides?.databaseName || `erp_topsteel_${code.toLowerCase()}`,
-      ...overrides
+      ...overrides,
     }
   }
 
@@ -68,23 +68,25 @@ export class TestDataGenerator {
    * Génère un utilisateur de test
    */
   static generateUser(societe?: TestSociete, overrides?: Partial<TestUser>): TestUser {
-    const testSociete = societe || this.generateSociete()
+    const testSociete = societe || TestDataGenerator.generateSociete()
     const prenoms = ['Jean', 'Marie', 'Pierre', 'Sophie', 'Luc', 'Anne']
     const noms = ['Dupont', 'Martin', 'Bernard', 'Thomas', 'Robert', 'Petit']
-    
+
     const prenom = overrides?.prenom || prenoms[Math.floor(Math.random() * prenoms.length)]
     const nom = overrides?.nom || noms[Math.floor(Math.random() * noms.length)]
     const role = overrides?.role || 'user'
-    
+
     return {
-      id: overrides?.id || this.generateUUID(),
-      email: overrides?.email || `${prenom.toLowerCase()}.${nom.toLowerCase()}@${testSociete.code.toLowerCase()}.com`,
+      id: overrides?.id || TestDataGenerator.generateUUID(),
+      email:
+        overrides?.email ||
+        `${prenom.toLowerCase()}.${nom.toLowerCase()}@${testSociete.code.toLowerCase()}.com`,
       prenom,
       nom,
       role,
       societeId: testSociete.id,
       societeCode: testSociete.code,
-      ...overrides
+      ...overrides,
     }
   }
 
@@ -94,65 +96,65 @@ export class TestDataGenerator {
   static generateTestEnvironment() {
     // Sociétés de test
     const societes = {
-      topsteel: this.generateSociete({
+      topsteel: TestDataGenerator.generateSociete({
         code: 'TOPSTEEL',
         nom: 'TopSteel SA',
         email: 'contact@topsteel.com',
         status: 'ACTIVE',
-        plan: 'ENTERPRISE'
+        plan: 'ENTERPRISE',
       }),
-      metalux: this.generateSociete({
+      metalux: TestDataGenerator.generateSociete({
         code: 'METALUX',
         nom: 'Metalux Industries',
         email: 'info@metalux.com',
         status: 'ACTIVE',
-        plan: 'PROFESSIONAL'
+        plan: 'PROFESSIONAL',
       }),
-      demo: this.generateSociete({
+      demo: TestDataGenerator.generateSociete({
         code: 'DEMO',
         nom: 'Demo Company',
         email: 'demo@example.com',
         status: 'TRIAL',
-        plan: 'STARTER'
-      })
+        plan: 'STARTER',
+      }),
     }
 
     // Utilisateurs de test
     const users = {
       // TopSteel users
-      topsteelAdmin: this.generateUser(societes.topsteel, {
+      topsteelAdmin: TestDataGenerator.generateUser(societes.topsteel, {
         email: 'admin@topsteel.com',
         prenom: 'Admin',
         nom: 'TopSteel',
-        role: 'admin'
+        role: 'admin',
       }),
-      topsteelUser: this.generateUser(societes.topsteel, {
+      topsteelUser: TestDataGenerator.generateUser(societes.topsteel, {
         email: 'user@topsteel.com',
         prenom: 'Jean',
         nom: 'Dupont',
-        role: 'user'
+        role: 'user',
       }),
-      
+
       // Metalux users
-      metaluxAdmin: this.generateUser(societes.metalux, {
+      metaluxAdmin: TestDataGenerator.generateUser(societes.metalux, {
         email: 'admin@metalux.com',
         prenom: 'Admin',
         nom: 'Metalux',
-        role: 'admin'
+        role: 'admin',
       }),
-      
+
       // Demo user
-      demoUser: this.generateUser(societes.demo, {
+      demoUser: TestDataGenerator.generateUser(societes.demo, {
         email: 'demo@example.com',
         prenom: 'Demo',
         nom: 'User',
-        role: 'viewer'
-      })
+        role: 'viewer',
+      }),
     }
 
     return {
       societes,
-      users
+      users,
     }
   }
 
@@ -169,10 +171,10 @@ export class TestDataGenerator {
       societeCode: societe.code,
       societeName: societe.nom,
       role: user.role,
-      permissions: this.getPermissionsByRole(user.role),
+      permissions: TestDataGenerator.getPermissionsByRole(user.role),
       isTest: true,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 3600 // 1 heure
+      exp: Math.floor(Date.now() / 1000) + 3600, // 1 heure
     }
   }
 
@@ -182,13 +184,13 @@ export class TestDataGenerator {
   static getPermissionsByRole(role: string): string[] {
     const permissionsMap: Record<string, string[]> = {
       'super-admin': ['*'],
-      'admin': ['users:*', 'societes:read', 'settings:*', 'reports:*'],
-      'manager': ['users:read', 'users:update', 'reports:*', 'inventory:*'],
-      'user': ['inventory:read', 'inventory:update', 'reports:read'],
-      'viewer': ['inventory:read', 'reports:read'],
-      'guest': ['public:read']
+      admin: ['users:*', 'societes:read', 'settings:*', 'reports:*'],
+      manager: ['users:read', 'users:update', 'reports:*', 'inventory:*'],
+      user: ['inventory:read', 'inventory:update', 'reports:read'],
+      viewer: ['inventory:read', 'reports:read'],
+      guest: ['public:read'],
     }
-    
+
     return permissionsMap[role] || ['read']
   }
 
@@ -196,8 +198,8 @@ export class TestDataGenerator {
    * Affiche les données de test générées
    */
   static displayTestData() {
-    const env = this.generateTestEnvironment()
-    
+    const env = TestDataGenerator.generateTestEnvironment()
+
     console.log('🏢 SOCIÉTÉS DE TEST')
     console.log('='.repeat(80))
     Object.entries(env.societes).forEach(([key, societe]) => {
@@ -209,7 +211,7 @@ export class TestDataGenerator {
       console.log(`  Plan: ${societe.plan}`)
       console.log(`  Database: ${societe.databaseName}`)
     })
-    
+
     console.log('\n👥 UTILISATEURS DE TEST')
     console.log('='.repeat(80))
     Object.entries(env.users).forEach(([key, user]) => {

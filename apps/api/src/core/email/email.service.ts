@@ -1,42 +1,41 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createTransport } from 'nodemailer';
-import { Transporter } from 'nodemailer';
-import * as handlebars from 'handlebars';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { Injectable, Logger } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
+import * as handlebars from 'handlebars'
+import { createTransport, type Transporter } from 'nodemailer'
 
 export interface SendEmailOptions {
-  to: string | string[];
-  subject: string;
-  template?: string;
-  context?: Record<string, any>;
-  html?: string;
-  text?: string;
+  to: string | string[]
+  subject: string
+  template?: string
+  context?: Record<string, unknown>
+  html?: string
+  text?: string
   attachments?: Array<{
-    filename: string;
-    content: Buffer | string;
-    contentType?: string;
-  }>;
+    filename: string
+    content: Buffer | string
+    contentType?: string
+  }>
 }
 
 export interface EmailResult {
-  success: boolean;
-  messageId?: string;
-  error?: string;
+  success: boolean
+  messageId?: string
+  error?: string
 }
 
 @Injectable()
 export class EmailService {
-  private readonly logger = new Logger(EmailService.name);
-  private transporter: Transporter;
-  private templatesPath: string;
-  private compiledTemplates = new Map<string, HandlebarsTemplateDelegate>();
+  private readonly logger = new Logger(EmailService.name)
+  private transporter: Transporter
+  private templatesPath: string
+  private compiledTemplates = new Map<string, HandlebarsTemplateDelegate>()
 
   constructor(private readonly configService: ConfigService) {
-    this.initializeTransporter();
-    this.templatesPath = path.join(process.cwd(), 'apps', 'api', 'templates');
-    this.precompileTemplates();
+    this.initializeTransporter()
+    this.templatesPath = path.join(process.cwd(), 'apps', 'api', 'templates')
+    this.precompileTemplates()
   }
 
   private initializeTransporter(): void {
@@ -46,59 +45,58 @@ export class EmailService {
       secure: this.configService.get<boolean>('SMTP_SECURE', false),
       auth: {
         user: this.configService.get<string>('SMTP_USER'),
-        pass: this.configService.get<string>('SMTP_PASSWORD')
+        pass: this.configService.get<string>('SMTP_PASSWORD'),
       },
       // Security settings
       tls: {
         rejectUnauthorized: true,
-        minVersion: 'TLSv1.2'
-      }
-    };
+        minVersion: 'TLSv1.2',
+      },
+    }
 
     // Validate required SMTP configuration
     if (!smtpConfig.host || !smtpConfig.auth.user || !smtpConfig.auth.pass) {
-      this.logger.warn('SMTP configuration incomplete - email sending disabled');
-      return;
+      this.logger.warn('SMTP configuration incomplete - email sending disabled')
+      return
     }
 
     try {
-      this.transporter = createTransport(smtpConfig as any);
-      
+      this.transporter = createTransport(smtpConfig)
+
       // Verify connection
-      this.transporter.verify((error, success) => {
+      this.transporter.verify((error, _success) => {
         if (error) {
-          this.logger.error('SMTP connection failed:', error);
+          this.logger.error('SMTP connection failed:', error)
         } else {
-          this.logger.log('SMTP server connection verified');
+          this.logger.log('SMTP server connection verified')
         }
-      });
+      })
     } catch (error) {
-      this.logger.error('Failed to initialize email transporter:', error);
+      this.logger.error('Failed to initialize email transporter:', error)
     }
   }
 
   private precompileTemplates(): void {
     try {
-      const templatesDir = path.join(this.templatesPath, 'marketplace');
-      
+      const templatesDir = path.join(this.templatesPath, 'marketplace')
+
       if (!fs.existsSync(templatesDir)) {
-        this.logger.warn(`Templates directory not found: ${templatesDir}`);
-        return;
+        this.logger.warn(`Templates directory not found: ${templatesDir}`)
+        return
       }
 
-      const templateFiles = fs.readdirSync(templatesDir)
-        .filter(file => file.endsWith('.hbs'));
+      const templateFiles = fs.readdirSync(templatesDir).filter((file) => file.endsWith('.hbs'))
 
       for (const file of templateFiles) {
-        const templatePath = path.join(templatesDir, file);
-        const templateContent = fs.readFileSync(templatePath, 'utf-8');
-        const templateName = path.basename(file, '.hbs');
-        
-        this.compiledTemplates.set(templateName, handlebars.compile(templateContent));
-        this.logger.log(`Compiled email template: ${templateName}`);
+        const templatePath = path.join(templatesDir, file)
+        const templateContent = fs.readFileSync(templatePath, 'utf-8')
+        const templateName = path.basename(file, '.hbs')
+
+        this.compiledTemplates.set(templateName, handlebars.compile(templateContent))
+        this.logger.log(`Compiled email template: ${templateName}`)
       }
     } catch (error) {
-      this.logger.error('Failed to precompile email templates:', error);
+      this.logger.error('Failed to precompile email templates:', error)
     }
   }
 
@@ -106,26 +104,26 @@ export class EmailService {
     if (!this.transporter) {
       return {
         success: false,
-        error: 'Email transporter not configured'
-      };
+        error: 'Email transporter not configured',
+      }
     }
 
     try {
-      let htmlContent = options.html;
-      let textContent = options.text;
+      let htmlContent = options.html
+      const textContent = options.text
 
       // Process template if specified
       if (options.template) {
-        const compiledTemplate = this.compiledTemplates.get(options.template);
-        
+        const compiledTemplate = this.compiledTemplates.get(options.template)
+
         if (!compiledTemplate) {
           return {
             success: false,
-            error: `Template not found: ${options.template}`
-          };
+            error: `Template not found: ${options.template}`,
+          }
         }
 
-        htmlContent = compiledTemplate(options.context || {});
+        htmlContent = compiledTemplate(options.context || {})
       }
 
       const emailOptions = {
@@ -134,31 +132,34 @@ export class EmailService {
         subject: options.subject,
         html: htmlContent,
         text: textContent,
-        attachments: options.attachments
-      };
+        attachments: options.attachments,
+      }
 
-      const result = await this.transporter.sendMail(emailOptions);
-      
-      this.logger.log(`Email sent successfully: ${result.messageId}`);
-      
+      const result = await this.transporter.sendMail(emailOptions)
+
+      this.logger.log(`Email sent successfully: ${result.messageId}`)
+
       return {
         success: true,
-        messageId: result.messageId
-      };
-
+        messageId: result.messageId,
+      }
     } catch (error) {
-      this.logger.error(`Failed to send email: ${error.message}`, error.stack);
-      
+      this.logger.error(`Failed to send email: ${error.message}`, error.stack)
+
       return {
         success: false,
-        error: error.message
-      };
+        error: error.message,
+      }
     }
   }
 
-  async sendWelcomeEmail(email: string, name: string, verificationToken: string): Promise<EmailResult> {
-    const verificationUrl = `${this.configService.get<string>('APP_URL')}/verify-email?token=${verificationToken}`;
-    
+  async sendWelcomeEmail(
+    email: string,
+    name: string,
+    verificationToken: string
+  ): Promise<EmailResult> {
+    const verificationUrl = `${this.configService.get<string>('APP_URL')}/verify-email?token=${verificationToken}`
+
     return this.sendEmail({
       to: email,
       subject: 'Bienvenue sur TopSteel Marketplace',
@@ -166,14 +167,18 @@ export class EmailService {
       context: {
         customerName: name,
         verificationUrl,
-        year: new Date().getFullYear()
-      }
-    });
+        year: new Date().getFullYear(),
+      },
+    })
   }
 
-  async sendPasswordResetEmail(email: string, name: string, resetToken: string): Promise<EmailResult> {
-    const resetUrl = `${this.configService.get<string>('APP_URL')}/reset-password?token=${resetToken}`;
-    
+  async sendPasswordResetEmail(
+    email: string,
+    name: string,
+    resetToken: string
+  ): Promise<EmailResult> {
+    const resetUrl = `${this.configService.get<string>('APP_URL')}/reset-password?token=${resetToken}`
+
     return this.sendEmail({
       to: email,
       subject: 'Réinitialisation de votre mot de passe',
@@ -181,16 +186,16 @@ export class EmailService {
       context: {
         customerName: name,
         resetUrl,
-        year: new Date().getFullYear()
-      }
-    });
+        year: new Date().getFullYear(),
+      },
+    })
   }
 
   async sendOrderConfirmationEmail(
-    email: string, 
-    customerName: string, 
+    email: string,
+    customerName: string,
     orderNumber: string,
-    orderDetails: any
+    orderDetails: Record<string, unknown>
   ): Promise<EmailResult> {
     return this.sendEmail({
       to: email,
@@ -200,9 +205,9 @@ export class EmailService {
         customerName,
         orderNumber,
         orderDetails,
-        year: new Date().getFullYear()
-      }
-    });
+        year: new Date().getFullYear(),
+      },
+    })
   }
 
   async sendPaymentConfirmationEmail(
@@ -221,9 +226,9 @@ export class EmailService {
         orderNumber,
         amount: (amount / 100).toFixed(2), // Convert cents to euros
         currency: currency.toUpperCase(),
-        year: new Date().getFullYear()
-      }
-    });
+        year: new Date().getFullYear(),
+      },
+    })
   }
 
   async sendShippingNotificationEmail(
@@ -242,9 +247,9 @@ export class EmailService {
         orderNumber,
         trackingNumber,
         carrierName,
-        year: new Date().getFullYear()
-      }
-    });
+        year: new Date().getFullYear(),
+      },
+    })
   }
 
   /**
@@ -252,15 +257,15 @@ export class EmailService {
    */
   async isHealthy(): Promise<boolean> {
     if (!this.transporter) {
-      return false;
+      return false
     }
 
     try {
-      await this.transporter.verify();
-      return true;
+      await this.transporter.verify()
+      return true
     } catch (error) {
-      this.logger.error('Email service health check failed:', error);
-      return false;
+      this.logger.error('Email service health check failed:', error)
+      return false
     }
   }
 }

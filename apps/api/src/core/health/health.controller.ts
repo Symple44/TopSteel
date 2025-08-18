@@ -30,7 +30,7 @@ export class HealthController {
   @Get()
   async check() {
     try {
-      const healthChecks: Array<() => Promise<unknown>> = [
+      const healthChecks = [
         // Vérifier les bases de données multi-tenant
         () => this.checkMultiTenantDatabase('auth'),
         () => this.checkMultiTenantDatabase('shared'),
@@ -49,7 +49,7 @@ export class HealthController {
         )
       }
 
-      const healthResult = await this.health.check(healthChecks as any)
+      const healthResult = await this.health.check(healthChecks)
 
       // Informations additionnelles pour le modal ERP
       const uptime = this.formatUptime(Date.now() - this.startTime)
@@ -177,7 +177,7 @@ export class HealthController {
 
       // Test de connexion direct
       const { DataSource } = await import('typeorm')
-      const configObj = config as any
+      const configObj = config as Record<string, unknown>
       const testConnection = new DataSource({
         type: configObj.type as DataSourceOptions['type'],
         host: configObj.host,
@@ -186,7 +186,7 @@ export class HealthController {
         password: configObj.password,
         database: configObj.database,
         entities: [],
-      } as any)
+      })
 
       await testConnection.initialize()
       await testConnection.query('SELECT 1')

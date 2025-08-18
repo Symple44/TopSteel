@@ -293,7 +293,7 @@ export class MFAController {
         throw error
       }
       throw new HttpException(
-        'Erreur lors de l\'envoi du code SMS',
+        "Erreur lors de l'envoi du code SMS",
         HttpStatus.INTERNAL_SERVER_ERROR
       )
     }

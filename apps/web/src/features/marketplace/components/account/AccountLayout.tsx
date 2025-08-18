@@ -1,23 +1,23 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { 
-  User, 
-  Package, 
-  MapPin, 
-  CreditCard, 
-  Heart, 
-  Settings, 
+import {
+  Bell,
+  CreditCard,
+  Heart,
   LogOut,
+  MapPin,
+  Package,
+  Settings,
   Shield,
-  Bell
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  User,
+} from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import type React from 'react'
+import { cn } from '@/lib/utils'
 
 interface AccountLayoutProps {
-  children: React.ReactNode;
-  className?: string;
+  children: React.ReactNode
+  className?: string
 }
 
 const navigation = [
@@ -25,73 +25,68 @@ const navigation = [
     name: 'Overview',
     href: '/marketplace/account',
     icon: User,
-    description: 'Account summary and recent activity'
+    description: 'Account summary and recent activity',
   },
   {
     name: 'Orders',
     href: '/marketplace/account/orders',
     icon: Package,
-    description: 'Order history and tracking'
+    description: 'Order history and tracking',
   },
   {
     name: 'Addresses',
     href: '/marketplace/account/addresses',
     icon: MapPin,
-    description: 'Shipping and billing addresses'
+    description: 'Shipping and billing addresses',
   },
   {
     name: 'Payment Methods',
     href: '/marketplace/account/payment-methods',
     icon: CreditCard,
-    description: 'Saved payment methods'
+    description: 'Saved payment methods',
   },
   {
     name: 'Wishlist',
     href: '/marketplace/account/wishlist',
     icon: Heart,
-    description: 'Saved items and favorites'
+    description: 'Saved items and favorites',
   },
   {
     name: 'Notifications',
     href: '/marketplace/account/notifications',
     icon: Bell,
-    description: 'Email and SMS preferences'
+    description: 'Email and SMS preferences',
   },
   {
     name: 'Security',
     href: '/marketplace/account/security',
     icon: Shield,
-    description: 'Password and security settings'
+    description: 'Password and security settings',
   },
   {
     name: 'Settings',
     href: '/marketplace/account/settings',
     icon: Settings,
-    description: 'Account preferences'
-  }
-];
+    description: 'Account preferences',
+  },
+]
 
-export const AccountLayout: React.FC<AccountLayoutProps> = ({ 
-  children, 
-  className 
-}) => {
-  const router = useRouter();
-  const pathname = usePathname();
+export const AccountLayout: React.FC<AccountLayoutProps> = ({ children, className }) => {
+  const router = useRouter()
+  const pathname = usePathname()
 
   const handleLogout = () => {
     // Implement logout logic
-    router.push('/auth/login');
-  };
+    router.push('/auth/login')
+  }
 
   return (
-    <div className={cn("min-h-screen bg-gray-50", className)}>
+    <div className={cn('min-h-screen bg-gray-50', className)}>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Account</h1>
-          <p className="text-gray-600 mt-2">
-            Manage your account settings and preferences
-          </p>
+          <p className="text-gray-600 mt-2">Manage your account settings and preferences</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -114,39 +109,38 @@ export const AccountLayout: React.FC<AccountLayoutProps> = ({
               {/* Navigation Links */}
               <nav className="p-2">
                 {navigation.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = pathname === item.href;
-                  
+                  const Icon = item.icon
+                  const isActive = pathname === item.href
+
                   return (
                     <button
                       key={item.name}
                       onClick={() => router.push(item.href)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-colors",
+                        'w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-colors',
                         isActive
-                          ? "bg-blue-50 text-blue-700 border-r-2 border-blue-600"
-                          : "text-gray-700 hover:bg-gray-50"
+                          ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
+                          : 'text-gray-700 hover:bg-gray-50'
                       )}
                     >
-                      <Icon className={cn(
-                        "w-5 h-5",
-                        isActive ? "text-blue-600" : "text-gray-400"
-                      )} />
+                      <Icon
+                        className={cn('w-5 h-5', isActive ? 'text-blue-600' : 'text-gray-400')}
+                      />
                       <div className="flex-1 min-w-0">
-                        <p className={cn(
-                          "font-medium",
-                          isActive ? "text-blue-700" : "text-gray-900"
-                        )}>
+                        <p
+                          className={cn(
+                            'font-medium',
+                            isActive ? 'text-blue-700' : 'text-gray-900'
+                          )}
+                        >
                           {item.name}
                         </p>
-                        <p className="text-xs text-gray-500 hidden lg:block">
-                          {item.description}
-                        </p>
+                        <p className="text-xs text-gray-500 hidden lg:block">{item.description}</p>
                       </div>
                     </button>
-                  );
+                  )
                 })}
-                
+
                 {/* Logout Button */}
                 <button
                   onClick={handleLogout}
@@ -184,12 +178,10 @@ export const AccountLayout: React.FC<AccountLayoutProps> = ({
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              {children}
-            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">{children}</div>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

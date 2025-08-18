@@ -1,24 +1,22 @@
-import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm'
-import { EventEmitter2 } from '@nestjs/event-emitter'
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { 
-  License, 
-  LicenseType, 
-  LicenseStatus, 
-  BillingCycle 
-} from '../entities/license.entity'
-import { 
-  LicenseFeature, 
+import { InjectRepository } from '@nestjs/typeorm'
+import { Between, LessThanOrEqual, type Repository } from 'typeorm'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { BillingCycle, License, LicenseStatus, LicenseType } from '../entities/license.entity'
+import { ActivationStatus, LicenseActivation } from '../entities/license-activation.entity'
+import {
   FeatureCategory,
-  STANDARD_FEATURES 
+  LicenseFeature,
+  STANDARD_FEATURES,
 } from '../entities/license-feature.entity'
-import { LicenseActivation, ActivationStatus } from '../entities/license-activation.entity'
-import { LicenseUsage, UsageMetricType, AggregationPeriod } from '../entities/license-usage.entity'
-import { LicenseValidationService } from './license-validation.service'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import * as crypto from 'crypto'
+import {
+  AggregationPeriod,
+  LicenseUsage,
+  type UsageMetricType,
+} from '../entities/license-usage.entity'
+import type { LicenseValidationService } from './license-validation.service'
 
 /**
  * License creation options
@@ -96,7 +94,7 @@ export class LicenseManagementService {
     private readonly activationRepository: Repository<LicenseActivation>,
     @InjectRepository(LicenseUsage, 'auth')
     private readonly usageRepository: Repository<LicenseUsage>,
-    private readonly validationService: LicenseValidationService,
+    readonly _validationService: LicenseValidationService,
     private readonly cacheService: OptimizedCacheService,
     private readonly eventEmitter: EventEmitter2
   ) {
@@ -120,7 +118,8 @@ export class LicenseManagementService {
       expiresAt: options.expiresAt || this.calculateExpirationDate(options.billingCycle),
       maxUsers: options.maxUsers || this.getDefaultLimit('users', options.type),
       maxSites: options.maxSites || this.getDefaultLimit('sites', options.type),
-      maxTransactions: options.maxTransactions || this.getDefaultLimit('transactions', options.type),
+      maxTransactions:
+        options.maxTransactions || this.getDefaultLimit('transactions', options.type),
       maxStorage: options.maxStorage || this.getDefaultLimit('storage', options.type),
       maxApiCalls: options.maxApiCalls || this.getDefaultLimit('apiCalls', options.type),
       price: options.price,
@@ -170,10 +169,7 @@ export class LicenseManagementService {
   /**
    * Update a license
    */
-  async updateLicense(
-    licenseId: string,
-    options: UpdateLicenseOptions
-  ): Promise<License> {
+  async updateLicense(licenseId: string, options: UpdateLicenseOptions): Promise<License> {
     const license = await this.licenseRepository.findOne({
       where: { id: licenseId },
       relations: ['features'],
@@ -210,11 +206,7 @@ export class LicenseManagementService {
   /**
    * Activate a license
    */
-  async activateLicense(
-    licenseKey: string,
-    societeId: string,
-    userId: string
-  ): Promise<License> {
+  async activateLicense(licenseKey: string, societeId: string, userId: string): Promise<License> {
     const license = await this.licenseRepository.findOne({
       where: { licenseKey, societeId },
     })
@@ -255,10 +247,7 @@ export class LicenseManagementService {
   /**
    * Suspend a license
    */
-  async suspendLicense(
-    licenseId: string,
-    reason: string
-  ): Promise<License> {
+  async suspendLicense(licenseId: string, reason: string): Promise<License> {
     const license = await this.licenseRepository.findOne({
       where: { id: licenseId },
     })
@@ -276,7 +265,11 @@ export class LicenseManagementService {
     // Deactivate all activations
     await this.activationRepository.update(
       { licenseId },
-      { status: ActivationStatus.DEACTIVATED, deactivatedAt: new Date(), deactivationReason: reason }
+      {
+        status: ActivationStatus.DEACTIVATED,
+        deactivatedAt: new Date(),
+        deactivationReason: reason,
+      }
     )
 
     // Clear cache
@@ -297,10 +290,7 @@ export class LicenseManagementService {
   /**
    * Revoke a license
    */
-  async revokeLicense(
-    licenseId: string,
-    reason: string
-  ): Promise<License> {
+  async revokeLicense(licenseId: string, reason: string): Promise<License> {
     const license = await this.licenseRepository.findOne({
       where: { id: licenseId },
     })
@@ -383,10 +373,7 @@ export class LicenseManagementService {
   /**
    * Add features to a license
    */
-  async addFeatures(
-    licenseId: string,
-    featureCodes: string[]
-  ): Promise<LicenseFeature[]> {
+  async addFeatures(licenseId: string, featureCodes: string[]): Promise<LicenseFeature[]> {
     const features: LicenseFeature[] = []
 
     for (const code of featureCodes) {
@@ -455,7 +442,7 @@ export class LicenseManagementService {
 
     // Group by metric type
     const metricGroups = new Map<UsageMetricType, LicenseUsage[]>()
-    usage.forEach(u => {
+    usage.forEach((u) => {
       const group = metricGroups.get(u.metricType) || []
       group.push(u)
       metricGroups.set(u.metricType, group)
@@ -463,7 +450,7 @@ export class LicenseManagementService {
 
     // Calculate statistics for each metric
     const metrics = Array.from(metricGroups.entries()).map(([type, data]) => {
-      const values = data.map(d => d.value)
+      const values = data.map((d) => d.value)
       const total = values.reduce((sum, val) => sum + val, 0)
       const average = values.length > 0 ? total / values.length : 0
       const max = Math.max(...values, 0)
@@ -473,7 +460,7 @@ export class LicenseManagementService {
       const midPoint = Math.floor(data.length / 2)
       const firstHalf = data.slice(0, midPoint)
       const secondHalf = data.slice(midPoint)
-      
+
       const firstAvg = firstHalf.reduce((sum, d) => sum + d.value, 0) / (firstHalf.length || 1)
       const secondAvg = secondHalf.reduce((sum, d) => sum + d.value, 0) / (secondHalf.length || 1)
       const trend = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg) * 100 : 0
@@ -485,7 +472,7 @@ export class LicenseManagementService {
         max,
         min,
         trend,
-        data: data.map(d => ({
+        data: data.map((d) => ({
           date: d.date,
           value: d.value,
         })),
@@ -520,9 +507,14 @@ export class LicenseManagementService {
 
     for (const license of licensesNeedingRenewal) {
       const daysUntilExpiration = license.getDaysUntilExpiration()
-      
+
       // Emit renewal reminder events
-      if (daysUntilExpiration === 30 || daysUntilExpiration === 14 || daysUntilExpiration === 7 || daysUntilExpiration === 1) {
+      if (
+        daysUntilExpiration === 30 ||
+        daysUntilExpiration === 14 ||
+        daysUntilExpiration === 7 ||
+        daysUntilExpiration === 1
+      ) {
         this.eventEmitter.emit('license.renewal.reminder', {
           license,
           daysUntilExpiration,
@@ -703,7 +695,7 @@ export class LicenseManagementService {
     return code
       .toLowerCase()
       .replace(/_/g, ' ')
-      .replace(/\b\w/g, l => l.toUpperCase())
+      .replace(/\b\w/g, (l) => l.toUpperCase())
   }
 
   /**

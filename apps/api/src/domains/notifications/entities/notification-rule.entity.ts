@@ -1,14 +1,14 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   Index,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
-import { NotificationCondition } from './notification-condition.entity'
 import { NotificationAction } from './notification-action.entity'
+import { NotificationCondition } from './notification-condition.entity'
 import { NotificationExecution } from './notification-execution.entity'
 
 /**
@@ -254,13 +254,22 @@ export class NotificationRule {
   updatedBy?: string
 
   // Relations
-  @OneToMany(() => NotificationCondition, condition => condition.rule)
+  @OneToMany(
+    () => NotificationCondition,
+    (condition) => condition.rule
+  )
   conditions!: NotificationCondition[]
 
-  @OneToMany(() => NotificationAction, action => action.rule)
+  @OneToMany(
+    () => NotificationAction,
+    (action) => action.rule
+  )
   actions!: NotificationAction[]
 
-  @OneToMany(() => NotificationExecution, execution => execution.rule)
+  @OneToMany(
+    () => NotificationExecution,
+    (execution) => execution.rule
+  )
   executions!: NotificationExecution[]
 
   // Utility methods
@@ -356,9 +365,8 @@ export class NotificationRule {
 
     const threshold = this.threshold
     const numValue = typeof value === 'string' ? parseFloat(value) : value
-    const thresholdValue = typeof threshold.value === 'string' 
-      ? parseFloat(threshold.value) 
-      : threshold.value
+    const thresholdValue =
+      typeof threshold.value === 'string' ? parseFloat(threshold.value) : threshold.value
 
     switch (threshold.operator) {
       case 'gt':
@@ -373,11 +381,11 @@ export class NotificationRule {
         return numValue === thresholdValue
       case 'neq':
         return numValue !== thresholdValue
-      case 'between':
-        const value2 = typeof threshold.value2 === 'string'
-          ? parseFloat(threshold.value2)
-          : threshold.value2
+      case 'between': {
+        const value2 =
+          typeof threshold.value2 === 'string' ? parseFloat(threshold.value2) : threshold.value2
         return value2 !== undefined && numValue >= thresholdValue && numValue <= value2
+      }
       default:
         return false
     }
@@ -386,7 +394,7 @@ export class NotificationRule {
   /**
    * Check if rule is in cooldown
    */
-  isInCooldown(lastExecutionTime?: Date, key?: string): boolean {
+  isInCooldown(lastExecutionTime?: Date, _key?: string): boolean {
     if (!this.cooldown?.enabled || !lastExecutionTime) {
       return false
     }

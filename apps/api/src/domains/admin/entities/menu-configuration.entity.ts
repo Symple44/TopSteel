@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
+  Entity,
   Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { MenuItem } from './menu-item.entity'
 import { UserMenuPreference } from './user-menu-preference.entity'
@@ -58,10 +58,10 @@ export class MenuConfiguration {
   roleType?: string
 
   @Column({ type: 'jsonb', default: {} })
-  config!: Record<string, any>
+  config!: Record<string, unknown>
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
@@ -76,10 +76,16 @@ export class MenuConfiguration {
   updatedBy?: string
 
   // Relations
-  @OneToMany(() => MenuItem, menuItem => menuItem.menu)
+  @OneToMany(
+    () => MenuItem,
+    (menuItem) => menuItem.menu
+  )
   items!: MenuItem[]
 
-  @OneToMany(() => UserMenuPreference, preference => preference.menu)
+  @OneToMany(
+    () => UserMenuPreference,
+    (preference) => preference.menu
+  )
   userPreferences!: UserMenuPreference[]
 
   // Utility methods

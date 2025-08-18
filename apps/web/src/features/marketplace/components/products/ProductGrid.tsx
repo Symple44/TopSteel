@@ -1,23 +1,24 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, Grid, List, SlidersHorizontal, X } from 'lucide-react';
-import { ProductCard, Product } from './ProductCard';
-import { ProductFilters } from './ProductFilters';
-import { cn } from '@/lib/utils';
+import { ChevronDown, Grid, List, SlidersHorizontal, X } from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import { type Product, ProductCard } from './ProductCard'
+import { ProductFilters } from './ProductFilters'
 
 interface ProductGridProps {
-  products: Product[];
-  totalProducts: number;
-  currentPage: number;
-  productsPerPage?: number;
-  onPageChange: (page: number) => void;
-  onSortChange?: (sort: string) => void;
-  onFilterChange?: (filters: any) => void;
-  showFilters?: boolean;
-  loading?: boolean;
-  gridCols?: 2 | 3 | 4;
-  viewMode?: 'grid' | 'list';
+  products: Product[]
+  totalProducts: number
+  currentPage: number
+  productsPerPage?: number
+  onPageChange: (page: number) => void
+  onSortChange?: (sort: string) => void
+  onFilterChange?: (filters: any) => void
+  showFilters?: boolean
+  loading?: boolean
+  gridCols?: 2 | 3 | 4
+  viewMode?: 'grid' | 'list'
 }
 
 const sortOptions = [
@@ -26,8 +27,8 @@ const sortOptions = [
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
   { value: 'rating', label: 'Customer Rating' },
-  { value: 'bestseller', label: 'Best Sellers' }
-];
+  { value: 'bestseller', label: 'Best Sellers' },
+]
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
   products,
@@ -40,59 +41,56 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   showFilters = true,
   loading = false,
   gridCols = 4,
-  viewMode: initialViewMode = 'grid'
+  viewMode: initialViewMode = 'grid',
 }) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(initialViewMode);
-  const [selectedSort, setSelectedSort] = useState('featured');
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(true);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(initialViewMode)
+  const [selectedSort, setSelectedSort] = useState('featured')
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(true)
 
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const totalPages = Math.ceil(totalProducts / productsPerPage)
 
   const handleSortChange = (value: string) => {
-    setSelectedSort(value);
-    onSortChange?.(value);
-  };
+    setSelectedSort(value)
+    onSortChange?.(value)
+  }
 
-  const handleAddToCart = (product: Product) => {
-    console.log('Add to cart:', product);
+  const handleAddToCart = (_product: Product) => {
     // Implement cart logic
-  };
+  }
 
-  const handleAddToWishlist = (product: Product) => {
-    console.log('Add to wishlist:', product);
+  const handleAddToWishlist = (_product: Product) => {
     // Implement wishlist logic
-  };
+  }
 
-  const handleQuickView = (product: Product) => {
-    console.log('Quick view:', product);
+  const handleQuickView = (_product: Product) => {
     // Implement quick view modal
-  };
+  }
 
   const getGridClass = () => {
-    if (viewMode === 'list') return 'space-y-4';
-    
+    if (viewMode === 'list') return 'space-y-4'
+
     const gridClasses = {
       2: 'grid-cols-1 sm:grid-cols-2',
       3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-    };
-    
-    return `grid gap-4 ${gridClasses[gridCols]}`;
-  };
+      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+    }
+
+    return `grid gap-4 ${gridClasses[gridCols]}`
+  }
 
   const renderPagination = () => {
-    const pageNumbers = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const pageNumbers = []
+    const maxVisiblePages = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
 
     if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
     }
 
     for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
+      pageNumbers.push(i)
     }
 
     return (
@@ -122,10 +120,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             key={page}
             onClick={() => onPageChange(page)}
             className={cn(
-              "px-3 py-2 text-sm border rounded-lg transition-colors",
+              'px-3 py-2 text-sm border rounded-lg transition-colors',
               currentPage === page
-                ? "bg-blue-600 text-white border-blue-600"
-                : "border-gray-300 hover:bg-gray-50"
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'border-gray-300 hover:bg-gray-50'
             )}
           >
             {page}
@@ -152,8 +150,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           Next
         </button>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="relative">
@@ -161,8 +159,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       {showFilters && (
         <div
           className={cn(
-            "fixed inset-0 z-40 bg-black/50 lg:hidden transition-opacity",
-            mobileFiltersOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            'fixed inset-0 z-40 bg-black/50 lg:hidden transition-opacity',
+            mobileFiltersOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
           )}
           onClick={() => setMobileFiltersOpen(false)}
         />
@@ -182,8 +180,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         {showFilters && (
           <div
             className={cn(
-              "fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-xl lg:hidden transition-transform",
-              mobileFiltersOpen ? "translate-x-0" : "-translate-x-full"
+              'fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-xl lg:hidden transition-transform',
+              mobileFiltersOpen ? 'translate-x-0' : '-translate-x-full'
             )}
           >
             <div className="flex items-center justify-between p-4 border-b">
@@ -257,10 +255,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
                 <button
                   onClick={() => setViewMode('grid')}
                   className={cn(
-                    "p-2 transition-colors",
+                    'p-2 transition-colors',
                     viewMode === 'grid'
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-500 hover:text-gray-700"
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-500 hover:text-gray-700'
                   )}
                   title="Grid view"
                 >
@@ -269,10 +267,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
                 <button
                   onClick={() => setViewMode('list')}
                   className={cn(
-                    "p-2 transition-colors",
+                    'p-2 transition-colors',
                     viewMode === 'list'
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-500 hover:text-gray-700"
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-500 hover:text-gray-700'
                   )}
                   title="List view"
                 >
@@ -314,5 +312,5 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

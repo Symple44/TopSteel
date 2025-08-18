@@ -1,29 +1,29 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto'
+import { Injectable, Logger } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
 
 interface EdgeWorkerConfig {
-  accountId: string;
-  apiToken: string;
-  scriptName: string;
-  kvNamespaceId: string;
-  durableObjectNamespaceId?: string;
+  accountId: string
+  apiToken: string
+  scriptName: string
+  kvNamespaceId: string
+  durableObjectNamespaceId?: string
 }
 
 interface CacheRule {
-  pattern: string;
-  ttl: number;
-  cacheKey?: string;
-  bypassCache?: boolean;
-  edgeTTL?: number;
-  browserTTL?: number;
+  pattern: string
+  ttl: number
+  cacheKey?: string
+  bypassCache?: boolean
+  edgeTTL?: number
+  browserTTL?: number
 }
 
 @Injectable()
 export class EdgeWorkerService {
-  private readonly logger = new Logger(EdgeWorkerService.name);
-  private readonly config: EdgeWorkerConfig;
-  private readonly workerScript: string;
+  private readonly logger = new Logger(EdgeWorkerService.name)
+  private readonly config: EdgeWorkerConfig
+  private readonly workerScript: string
 
   constructor(private configService: ConfigService) {
     this.config = {
@@ -32,9 +32,9 @@ export class EdgeWorkerService {
       scriptName: this.configService.get('CLOUDFLARE_WORKER_SCRIPT_NAME') || 'marketplace-edge',
       kvNamespaceId: this.configService.get('CLOUDFLARE_KV_NAMESPACE_ID') || '',
       durableObjectNamespaceId: this.configService.get('CLOUDFLARE_DO_NAMESPACE_ID'),
-    };
+    }
 
-    this.workerScript = this.generateWorkerScript();
+    this.workerScript = this.generateWorkerScript()
   }
 
   /**
@@ -219,7 +219,7 @@ function getClosestOrigin(request) {
   
   return origins[country] || origins.default
 }
-    `.trim();
+    `.trim()
   }
 
   /**
@@ -232,25 +232,25 @@ function getClosestOrigin(request) {
         {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
             'Content-Type': 'application/javascript',
           },
           body: this.workerScript,
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        this.logger.error(`Worker deployment failed: ${JSON.stringify(data.errors)}`);
-        return false;
+        this.logger.error(`Worker deployment failed: ${JSON.stringify(data.errors)}`)
+        return false
       }
 
-      this.logger.log(`Worker deployed successfully: ${this.config.scriptName}`);
-      return true;
+      this.logger.log(`Worker deployed successfully: ${this.config.scriptName}`)
+      return true
     } catch (error) {
-      this.logger.error('Error deploying worker:', error);
-      return false;
+      this.logger.error('Error deploying worker:', error)
+      return false
     }
   }
 
@@ -264,25 +264,25 @@ function getClosestOrigin(request) {
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ title: name }),
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        this.logger.error(`KV namespace creation failed: ${JSON.stringify(data.errors)}`);
-        return null;
+        this.logger.error(`KV namespace creation failed: ${JSON.stringify(data.errors)}`)
+        return null
       }
 
-      this.logger.log(`KV namespace created: ${data.result.id}`);
-      return data.result.id;
+      this.logger.log(`KV namespace created: ${data.result.id}`)
+      return data.result.id
     } catch (error) {
-      this.logger.error('Error creating KV namespace:', error);
-      return null;
+      this.logger.error('Error creating KV namespace:', error)
+      return null
     }
   }
 
@@ -299,10 +299,10 @@ function getClosestOrigin(request) {
       const body: any = {
         value: JSON.stringify(value),
         metadata,
-      };
+      }
 
       if (ttl) {
-        body.expiration_ttl = ttl;
+        body.expiration_ttl = ttl
       }
 
       const response = await fetch(
@@ -310,22 +310,22 @@ function getClosestOrigin(request) {
         {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(body),
         }
-      );
+      )
 
       if (!response.ok) {
-        this.logger.error(`KV put failed for key ${key}`);
-        return false;
+        this.logger.error(`KV put failed for key ${key}`)
+        return false
       }
 
-      return true;
+      return true
     } catch (error) {
-      this.logger.error('Error storing in KV:', error);
-      return false;
+      this.logger.error('Error storing in KV:', error)
+      return false
     }
   }
 
@@ -339,20 +339,20 @@ function getClosestOrigin(request) {
         {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
           },
         }
-      );
+      )
 
       if (!response.ok) {
-        return null;
+        return null
       }
 
-      const text = await response.text();
-      return JSON.parse(text);
+      const text = await response.text()
+      return JSON.parse(text)
     } catch (error) {
-      this.logger.error('Error getting from KV:', error);
-      return null;
+      this.logger.error('Error getting from KV:', error)
+      return null
     }
   }
 
@@ -366,15 +366,15 @@ function getClosestOrigin(request) {
         {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
           },
         }
-      );
+      )
 
-      return response.ok;
+      return response.ok
     } catch (error) {
-      this.logger.error('Error deleting from KV:', error);
-      return false;
+      this.logger.error('Error deleting from KV:', error)
+      return false
     }
   }
 
@@ -383,43 +383,43 @@ function getClosestOrigin(request) {
    */
   async bulkWriteKV(
     items: Array<{
-      key: string;
-      value: any;
-      ttl?: number;
-      metadata?: Record<string, any>;
+      key: string
+      value: any
+      ttl?: number
+      metadata?: Record<string, any>
     }>
   ): Promise<boolean> {
     try {
-      const bulk = items.map(item => ({
+      const bulk = items.map((item) => ({
         key: item.key,
         value: JSON.stringify(item.value),
         expiration_ttl: item.ttl,
         metadata: item.metadata,
-      }));
+      }))
 
       const response = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${this.config.accountId}/storage/kv/namespaces/${this.config.kvNamespaceId}/bulk`,
         {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(bulk),
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        this.logger.error(`Bulk write failed: ${JSON.stringify(data.errors)}`);
-        return false;
+        this.logger.error(`Bulk write failed: ${JSON.stringify(data.errors)}`)
+        return false
       }
 
-      return true;
+      return true
     } catch (error) {
-      this.logger.error('Error in bulk write:', error);
-      return false;
+      this.logger.error('Error in bulk write:', error)
+      return false
     }
   }
 
@@ -433,10 +433,10 @@ function getClosestOrigin(request) {
     try {
       const params = new URLSearchParams({
         limit: limit.toString(),
-      });
+      })
 
       if (prefix) {
-        params.append('prefix', prefix);
+        params.append('prefix', prefix)
       }
 
       const response = await fetch(
@@ -444,49 +444,45 @@ function getClosestOrigin(request) {
         {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
           },
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        this.logger.error(`List keys failed: ${JSON.stringify(data.errors)}`);
-        return [];
+        this.logger.error(`List keys failed: ${JSON.stringify(data.errors)}`)
+        return []
       }
 
-      return data.result.keys;
+      return data.result.keys
     } catch (error) {
-      this.logger.error('Error listing KV keys:', error);
-      return [];
+      this.logger.error('Error listing KV keys:', error)
+      return []
     }
   }
 
   /**
    * Generate cache key
    */
-  generateCacheKey(
-    path: string,
-    params?: Record<string, any>,
-    userId?: string
-  ): string {
-    const parts = [path];
-    
+  generateCacheKey(path: string, params?: Record<string, any>, userId?: string): string {
+    const parts = [path]
+
     if (params) {
       const sortedParams = Object.entries(params)
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([k, v]) => `${k}=${v}`)
-        .join('&');
-      parts.push(sortedParams);
+        .join('&')
+      parts.push(sortedParams)
     }
-    
+
     if (userId) {
-      parts.push(`user:${userId}`);
+      parts.push(`user:${userId}`)
     }
-    
-    const key = parts.join(':');
-    return crypto.createHash('md5').update(key).digest('hex');
+
+    const key = parts.join(':')
+    return crypto.createHash('md5').update(key).digest('hex')
   }
 
   /**
@@ -494,29 +490,29 @@ function getClosestOrigin(request) {
    */
   async invalidateCache(patterns: string[]): Promise<boolean> {
     try {
-      const keys: string[] = [];
-      
+      const keys: string[] = []
+
       for (const pattern of patterns) {
-        const matchingKeys = await this.listKVKeys(pattern);
-        keys.push(...matchingKeys.map(k => k.name));
+        const matchingKeys = await this.listKVKeys(pattern)
+        keys.push(...matchingKeys.map((k) => k.name))
       }
-      
+
       if (keys.length === 0) {
-        return true;
+        return true
       }
-      
+
       // Delete in batches
-      const batchSize = 100;
+      const batchSize = 100
       for (let i = 0; i < keys.length; i += batchSize) {
-        const batch = keys.slice(i, i + batchSize);
-        await Promise.all(batch.map(key => this.deleteKV(key)));
+        const batch = keys.slice(i, i + batchSize)
+        await Promise.all(batch.map((key) => this.deleteKV(key)))
       }
-      
-      this.logger.log(`Invalidated ${keys.length} cache entries`);
-      return true;
+
+      this.logger.log(`Invalidated ${keys.length} cache entries`)
+      return true
     } catch (error) {
-      this.logger.error('Error invalidating cache:', error);
-      return false;
+      this.logger.error('Error invalidating cache:', error)
+      return false
     }
   }
 
@@ -525,19 +521,19 @@ function getClosestOrigin(request) {
    */
   async warmUpCache(
     endpoints: Array<{
-      path: string;
-      params?: Record<string, any>;
-      data: any;
-      ttl?: number;
+      path: string
+      params?: Record<string, any>
+      data: any
+      ttl?: number
     }>
   ): Promise<void> {
-    const items = endpoints.map(endpoint => ({
+    const items = endpoints.map((endpoint) => ({
       key: this.generateCacheKey(endpoint.path, endpoint.params),
       value: endpoint.data,
       ttl: endpoint.ttl || 3600,
-    }));
+    }))
 
-    await this.bulkWriteKV(items);
-    this.logger.log(`Warmed up cache with ${items.length} entries`);
+    await this.bulkWriteKV(items)
+    this.logger.log(`Warmed up cache with ${items.length} entries`)
   }
 }

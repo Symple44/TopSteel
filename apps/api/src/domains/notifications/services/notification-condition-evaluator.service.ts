@@ -1,13 +1,10 @@
+import type { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
-import { HttpService } from '@nestjs/axios'
-import { firstValueFrom } from 'rxjs'
-import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import {
-  NotificationCondition,
-  ConditionType,
-} from '../entities/notification-condition.entity'
-import { RuleExecutionContext } from './notification-rules-engine.service'
+import { firstValueFrom } from 'rxjs'
+import type { Repository } from 'typeorm'
+import { ConditionType, NotificationCondition } from '../entities/notification-condition.entity'
+import type { RuleExecutionContext } from './notification-rules-engine.service'
 
 /**
  * Notification condition evaluator service
@@ -19,7 +16,7 @@ export class NotificationConditionEvaluator {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(NotificationCondition, 'auth')
-    private readonly conditionRepository: Repository<NotificationCondition>
+    readonly _conditionRepository: Repository<NotificationCondition>
   ) {}
 
   /**
@@ -35,25 +32,25 @@ export class NotificationConditionEvaluator {
       switch (condition.type) {
         case ConditionType.FIELD:
           return await this.evaluateFieldCondition(condition, context)
-        
+
         case ConditionType.EXPRESSION:
           return await this.evaluateExpressionCondition(condition, context)
-        
+
         case ConditionType.QUERY:
           return await this.evaluateQueryCondition(condition, context)
-        
+
         case ConditionType.API:
           return await this.evaluateApiCondition(condition, context)
-        
+
         case ConditionType.AGGREGATE:
           return await this.evaluateAggregateCondition(condition, context)
-        
+
         case ConditionType.TIME:
           return await this.evaluateTimeCondition(condition, context)
-        
+
         case ConditionType.COUNT:
           return await this.evaluateCountCondition(condition, context)
-        
+
         default:
           throw new Error(`Unknown condition type: ${condition.type}`)
       }
@@ -97,7 +94,7 @@ export class NotificationConditionEvaluator {
    */
   private async evaluateQueryCondition(
     condition: NotificationCondition,
-    context: RuleExecutionContext
+    _context: RuleExecutionContext
   ): Promise<boolean> {
     if (!condition.query) {
       return false
@@ -106,7 +103,7 @@ export class NotificationConditionEvaluator {
     // Here you would execute the query against the appropriate database
     // For now, we'll simulate it
     this.logger.debug(`Would execute query: ${condition.query}`)
-    
+
     // Simulate query result
     return true
   }
@@ -116,7 +113,7 @@ export class NotificationConditionEvaluator {
    */
   private async evaluateApiCondition(
     condition: NotificationCondition,
-    context: RuleExecutionContext
+    _context: RuleExecutionContext
   ): Promise<boolean> {
     if (!condition.apiUrl) {
       return false
@@ -139,9 +136,7 @@ export class NotificationConditionEvaluator {
           this.httpService.post(condition.apiUrl, condition.apiBody || {}, requestConfig)
         )
       } else {
-        response = await firstValueFrom(
-          this.httpService.get(condition.apiUrl, requestConfig)
-        )
+        response = await firstValueFrom(this.httpService.get(condition.apiUrl, requestConfig))
       }
 
       // Extract value from response if path is specified
@@ -163,12 +158,14 @@ export class NotificationConditionEvaluator {
    */
   private async evaluateAggregateCondition(
     condition: NotificationCondition,
-    context: RuleExecutionContext
+    _context: RuleExecutionContext
   ): Promise<boolean> {
     // Here you would perform the aggregation query
     // For now, we'll simulate it
-    this.logger.debug(`Would perform aggregation: ${condition.aggregateFunction} on ${condition.aggregateField}`)
-    
+    this.logger.debug(
+      `Would perform aggregation: ${condition.aggregateFunction} on ${condition.aggregateField}`
+    )
+
     // Simulate aggregation result
     const simulatedValue = 100
     return this.evaluateValue(simulatedValue, condition)
@@ -193,9 +190,10 @@ export class NotificationConditionEvaluator {
         referenceTime = new Date(context.triggerData?.timestamp || now)
         break
       case 'field_value':
-        referenceTime = new Date(context.triggerData?.[condition.aggregateField || 'createdAt'] || now)
+        referenceTime = new Date(
+          context.triggerData?.[condition.aggregateField || 'createdAt'] || now
+        )
         break
-      case 'now':
       default:
         referenceTime = now
         break
@@ -232,12 +230,12 @@ export class NotificationConditionEvaluator {
    */
   private async evaluateCountCondition(
     condition: NotificationCondition,
-    context: RuleExecutionContext
+    _context: RuleExecutionContext
   ): Promise<boolean> {
     // Here you would count entities based on filters
     // For now, we'll simulate it
     this.logger.debug(`Would count ${condition.countEntity} with filters:`, condition.countFilters)
-    
+
     // Simulate count result
     const simulatedCount = 5
     return this.evaluateValue(simulatedCount, condition)

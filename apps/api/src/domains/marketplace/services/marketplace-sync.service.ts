@@ -1,32 +1,32 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { Article, ArticleStatus } from '../../inventory/entities/article.entity';
-import { Partner, PartnerType } from '../../partners/entities/partner.entity';
-import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import { Redis } from 'ioredis';
+import { InjectQueue } from '@nestjs/bull'
+import { Injectable, Logger } from '@nestjs/common'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { Cron, CronExpression } from '@nestjs/schedule'
+import { InjectRepository } from '@nestjs/typeorm'
+import { InjectRedis } from '@nestjs-modules/ioredis'
+import type { Queue } from 'bull'
+import type { Redis } from 'ioredis'
+import type { Repository } from 'typeorm'
+import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
+import { Article, ArticleStatus } from '../../inventory/entities/article.entity'
+import { Partner, PartnerType } from '../../partners/entities/partner.entity'
 
 interface SyncResult {
-  synced: number;
-  failed: number;
-  errors: Array<{ articleId: string; error: string }>;
+  synced: number
+  failed: number
+  errors: Array<{ articleId: string; error: string }>
 }
 
 interface OrderSyncPayload {
-  marketplaceOrderId: string;
-  tenantId: string;
-  action: 'CREATE_ERP_DOCUMENTS' | 'UPDATE_STATUS' | 'SYNC_PAYMENT';
+  marketplaceOrderId: string
+  tenantId: string
+  action: 'CREATE_ERP_DOCUMENTS' | 'UPDATE_STATUS' | 'SYNC_PAYMENT'
 }
 
 @Injectable()
 export class MarketplaceSyncService {
-  private readonly logger = new Logger(MarketplaceSyncService.name);
-  private readonly SYNC_LOCK_TTL = 300; // 5 minutes
+  private readonly logger = new Logger(MarketplaceSyncService.name)
+  private readonly SYNC_LOCK_TTL = 300 // 5 minutes
 
   constructor(
     @InjectRepository(Article, 'tenant')
@@ -40,67 +40,67 @@ export class MarketplaceSyncService {
     @InjectQueue('marketplace-sync')
     private readonly syncQueue: Queue
   ) {
-    this.setupEventListeners();
+    this.setupEventListeners()
   }
 
   private setupEventListeners() {
     // Écoute les changements d'articles ERP
-    this.eventEmitter.on('article.created', this.handleArticleCreated.bind(this));
-    this.eventEmitter.on('article.updated', this.handleArticleUpdated.bind(this));
-    this.eventEmitter.on('article.deleted', this.handleArticleDeleted.bind(this));
-    
+    this.eventEmitter.on('article.created', this.handleArticleCreated.bind(this))
+    this.eventEmitter.on('article.updated', this.handleArticleUpdated.bind(this))
+    this.eventEmitter.on('article.deleted', this.handleArticleDeleted.bind(this))
+
     // Écoute les changements de stock
-    this.eventEmitter.on('stock.updated', this.handleStockUpdated.bind(this));
-    
+    this.eventEmitter.on('stock.updated', this.handleStockUpdated.bind(this))
+
     // Écoute les commandes marketplace
-    this.eventEmitter.on('marketplace.order.created', this.handleMarketplaceOrderCreated.bind(this));
-    this.eventEmitter.on('marketplace.order.paid', this.handleMarketplaceOrderPaid.bind(this));
+    this.eventEmitter.on('marketplace.order.created', this.handleMarketplaceOrderCreated.bind(this))
+    this.eventEmitter.on('marketplace.order.paid', this.handleMarketplaceOrderPaid.bind(this))
   }
 
   /**
    * Synchronise tous les articles ERP vers le marketplace
    */
   async syncAllArticlesToMarketplace(tenantId: string): Promise<SyncResult> {
-    const lockKey = `sync:articles:${tenantId}`;
-    const lock = await this.acquireLock(lockKey);
-    
+    const lockKey = `sync:articles:${tenantId}`
+    const lock = await this.acquireLock(lockKey)
+
     if (!lock) {
-      throw new Error('Synchronization already in progress');
+      throw new Error('Synchronization already in progress')
     }
 
     try {
       const articles = await this.articleRepository.find({
-        where: { 
+        where: {
           isMarketplaceEnabled: true,
-          status: ArticleStatus.ACTIF 
+          status: ArticleStatus.ACTIF,
         },
-        relations: ['famille', 'materials']
-      });
+        relations: ['famille', 'materials'],
+      })
 
       const result: SyncResult = {
         synced: 0,
         failed: 0,
-        errors: []
-      };
+        errors: [],
+      }
 
       for (const article of articles) {
         try {
-          await this.syncArticleToMarketplace(article, tenantId);
-          result.synced++;
+          await this.syncArticleToMarketplace(article, tenantId)
+          result.synced++
         } catch (error) {
-          result.failed++;
+          result.failed++
           result.errors.push({
             articleId: article.id,
-            error: error.message
-          });
-          this.logger.error(`Failed to sync article ${article.id}:`, error);
+            error: error.message,
+          })
+          this.logger.error(`Failed to sync article ${article.id}:`, error)
         }
       }
 
-      this.logger.log(`Sync completed: ${result.synced} synced, ${result.failed} failed`);
-      return result;
+      this.logger.log(`Sync completed: ${result.synced} synced, ${result.failed} failed`)
+      return result
     } finally {
-      await this.releaseLock(lockKey);
+      await this.releaseLock(lockKey)
     }
   }
 
@@ -110,7 +110,12 @@ export class MarketplaceSyncService {
   private async syncArticleToMarketplace(article: Article, tenantId: string): Promise<void> {
     // L'article est déjà prêt pour le marketplace
     // On met juste à jour ses paramètres marketplace
-    if (!article.marketplaceSettings) {
+    if (article.marketplaceSettings) {
+      // Mise à jour des tags et SEO
+      article.marketplaceSettings.tags = this.generateTags(article)
+      article.marketplaceSettings.seoTitle = article.designation
+      article.marketplaceSettings.seoDescription = article.description || article.designation
+    } else {
       article.marketplaceSettings = {
         basePrice: article.prixVenteHT,
         categories: article.famille ? [article.famille] : [],
@@ -118,25 +123,20 @@ export class MarketplaceSyncService {
         images: [],
         seoTitle: article.designation,
         seoDescription: article.description || article.designation,
-        tags: this.generateTags(article)
-      };
-    } else {
-      // Mise à jour des tags et SEO
-      article.marketplaceSettings.tags = this.generateTags(article);
-      article.marketplaceSettings.seoTitle = article.designation;
-      article.marketplaceSettings.seoDescription = article.description || article.designation;
+        tags: this.generateTags(article),
+      }
     }
 
     // Activer pour le marketplace si ce n'est pas déjà fait
-    article.isMarketplaceEnabled = true;
+    article.isMarketplaceEnabled = true
 
-    await this.articleRepository.save(article);
+    await this.articleRepository.save(article)
 
     // Émettre événement de synchronisation
     this.eventEmitter.emit('marketplace.product.synced', {
       articleId: article.id,
-      tenantId
-    });
+      tenantId,
+    })
   }
 
   /**
@@ -145,36 +145,36 @@ export class MarketplaceSyncService {
   async syncMarketplaceOrderToERP(marketplaceOrderId: string, tenantId: string): Promise<void> {
     const order = await this.marketplaceOrderRepository.findOne({
       where: { id: marketplaceOrderId },
-      relations: ['items', 'customer']
-    });
+      relations: ['items', 'customer'],
+    })
 
     if (!order) {
-      throw new Error('Marketplace order not found');
+      throw new Error('Marketplace order not found')
     }
 
     // Créer ou récupérer le partenaire ERP
     let partner = await this.partnerRepository.findOne({
-      where: { email: order.customer.email }
-    });
+      where: { email: order.customer.email },
+    })
 
     if (!partner) {
-      partner = await this.createPartnerFromMarketplaceCustomer(order.customer, tenantId);
+      partner = await this.createPartnerFromMarketplaceCustomer(order.customer, tenantId)
     }
 
     // Créer le bon de livraison
-    const deliveryNote = await this.createDeliveryNote(order, partner, tenantId);
-    
+    const deliveryNote = await this.createDeliveryNote(order, partner, tenantId)
+
     // Créer la facture si la commande est payée
     if (order.paymentStatus === 'PAID') {
-      await this.createInvoice(order, partner, deliveryNote, tenantId);
+      await this.createInvoice(order, partner, deliveryNote, tenantId)
     }
 
     // Mettre à jour le statut de la commande
     // order.erpSyncStatus = 'SYNCED'; // Property not available
     // order.erpDocumentIds = {...}; // Property not available
-    await this.marketplaceOrderRepository.save(order);
+    await this.marketplaceOrderRepository.save(order)
 
-    this.logger.log(`Order ${marketplaceOrderId} synced to ERP successfully`);
+    this.logger.log(`Order ${marketplaceOrderId} synced to ERP successfully`)
   }
 
   /**
@@ -184,48 +184,48 @@ export class MarketplaceSyncService {
     await this.syncQueue.add('sync-article', {
       articleId: payload.id,
       tenantId: payload.tenantId,
-      action: 'CREATE'
-    });
+      action: 'CREATE',
+    })
   }
 
   private async handleArticleUpdated(payload: any) {
     await this.syncQueue.add('sync-article', {
       articleId: payload.id,
       tenantId: payload.tenantId,
-      action: 'UPDATE'
-    });
+      action: 'UPDATE',
+    })
   }
 
   private async handleArticleDeleted(payload: any) {
     await this.syncQueue.add('sync-article', {
       articleId: payload.id,
       tenantId: payload.tenantId,
-      action: 'DELETE'
-    });
+      action: 'DELETE',
+    })
   }
 
   private async handleStockUpdated(payload: any) {
     await this.syncQueue.add('sync-stock', {
       articleId: payload.articleId,
       tenantId: payload.tenantId,
-      newStock: payload.quantity
-    });
+      newStock: payload.quantity,
+    })
   }
 
   private async handleMarketplaceOrderCreated(payload: any) {
     await this.syncQueue.add('sync-order', {
       marketplaceOrderId: payload.orderId,
       tenantId: payload.tenantId,
-      action: 'CREATE_ERP_DOCUMENTS'
-    } as OrderSyncPayload);
+      action: 'CREATE_ERP_DOCUMENTS',
+    } as OrderSyncPayload)
   }
 
   private async handleMarketplaceOrderPaid(payload: any) {
     await this.syncQueue.add('sync-order', {
       marketplaceOrderId: payload.orderId,
       tenantId: payload.tenantId,
-      action: 'SYNC_PAYMENT'
-    } as OrderSyncPayload);
+      action: 'SYNC_PAYMENT',
+    } as OrderSyncPayload)
   }
 
   /**
@@ -233,16 +233,16 @@ export class MarketplaceSyncService {
    */
   @Cron(CronExpression.EVERY_30_MINUTES)
   async performPeriodicSync() {
-    this.logger.log('Starting periodic marketplace sync...');
-    
+    this.logger.log('Starting periodic marketplace sync...')
+
     // Récupérer tous les tenants actifs
-    const tenants = await this.getTenantsList();
-    
+    const tenants = await this.getTenantsList()
+
     for (const tenantId of tenants) {
       await this.syncQueue.add('full-sync', {
         tenantId,
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
     }
   }
 
@@ -250,10 +250,10 @@ export class MarketplaceSyncService {
    * Vérification de la cohérence des données
    */
   async validateDataConsistency(tenantId: string): Promise<{
-    valid: boolean;
-    issues: string[];
+    valid: boolean
+    issues: string[]
   }> {
-    const issues: string[] = [];
+    const issues: string[] = []
 
     // Vérifier les articles marketplace sans configuration
     const articlesWithoutConfig = await this.articleRepository
@@ -261,22 +261,22 @@ export class MarketplaceSyncService {
       .where('a.tenantId = :tenantId', { tenantId })
       .andWhere('a.isMarketplaceEnabled = true')
       .andWhere('a.marketplaceSettings IS NULL')
-      .getCount();
+      .getCount()
 
     if (articlesWithoutConfig > 0) {
-      issues.push(`${articlesWithoutConfig} marketplace articles without configuration`);
+      issues.push(`${articlesWithoutConfig} marketplace articles without configuration`)
     }
 
     // Vérifier les écarts de stock
-    const stockMismatches = await this.checkStockConsistency(tenantId);
+    const stockMismatches = await this.checkStockConsistency(tenantId)
     if (stockMismatches.length > 0) {
-      issues.push(`${stockMismatches.length} products with stock mismatches`);
+      issues.push(`${stockMismatches.length} products with stock mismatches`)
     }
 
     return {
       valid: issues.length === 0,
-      issues
-    };
+      issues,
+    }
   }
 
   /**
@@ -289,38 +289,31 @@ export class MarketplaceSyncService {
       'EX',
       this.SYNC_LOCK_TTL,
       'NX'
-    );
-    return result === 'OK';
+    )
+    return result === 'OK'
   }
 
   private async releaseLock(key: string): Promise<void> {
-    await this.redisService.del(`lock:${key}`);
+    await this.redisService.del(`lock:${key}`)
   }
 
   private generateTags(article: Article): string[] {
-    const tags: string[] = [];
-    if (article.famille) tags.push(article.famille);
-    if (article.sousFamille) tags.push(article.sousFamille);
-    if (article.marque) tags.push(article.marque);
+    const tags: string[] = []
+    if (article.famille) tags.push(article.famille)
+    if (article.sousFamille) tags.push(article.sousFamille)
+    if (article.marque) tags.push(article.marque)
     // Ajouter des tags basés sur les caractéristiques
     if (article.caracteristiquesTechniques) {
-      const techTags = Object.keys(article.caracteristiquesTechniques).slice(0, 3);
-      tags.push(...techTags);
+      const techTags = Object.keys(article.caracteristiquesTechniques).slice(0, 3)
+      tags.push(...techTags)
     }
-    return [...new Set(tags)];
+    return [...new Set(tags)]
   }
 
-  private generateKeywords(article: Article): string[] {
-    const keywords = [
-      article.designation,
-      article.reference,
-      article.famille
-    ].filter(Boolean);
-    
-    return keywords.join(', ').toLowerCase().split(/\s+/);
-  }
-
-  private async createPartnerFromMarketplaceCustomer(customer: any, tenantId: string): Promise<Partner> {
+  private async createPartnerFromMarketplaceCustomer(
+    customer: any,
+    _tenantId: string
+  ): Promise<Partner> {
     const partner = this.partnerRepository.create({
       type: PartnerType.CLIENT,
       denomination: `${customer.firstName} ${customer.lastName}`.trim() || customer.email,
@@ -329,56 +322,50 @@ export class MarketplaceSyncService {
       adresse: customer.defaultAddress?.street,
       codePostal: customer.defaultAddress?.postalCode,
       ville: customer.defaultAddress?.city,
-      pays: customer.defaultAddress?.country || 'FR'
-    } as any);
+      pays: customer.defaultAddress?.country || 'FR',
+    } as any)
 
-    return await this.partnerRepository.save(partner) as unknown as Partner;
+    return (await this.partnerRepository.save(partner)) as unknown as Partner
   }
 
-  private async createDeliveryNote(order: any, partner: Partner, tenantId: string): Promise<any> {
+  private async createDeliveryNote(order: any, partner: Partner, _tenantId: string): Promise<any> {
     // Création du bon de livraison - sera implémenté avec le module Documents
     // Pour le moment, retourne un placeholder pour maintenir la compatibilité
-    this.logger.log(`Bon de livraison à créer pour la commande ${order.orderNumber}`);
-    return { 
+    this.logger.log(`Bon de livraison à créer pour la commande ${order.orderNumber}`)
+    return {
       id: `BL-${order.orderNumber}-${Date.now()}`,
       orderNumber: order.orderNumber,
       partnerId: partner.id,
-      status: 'pending'
-    };
+      status: 'pending',
+    }
   }
 
-  private async createInvoice(order: any, partner: Partner, deliveryNote: any, tenantId: string): Promise<any> {
+  private async createInvoice(
+    order: any,
+    partner: Partner,
+    deliveryNote: any,
+    _tenantId: string
+  ): Promise<any> {
     // Création de la facture - sera implémenté avec le module Documents
     // Pour le moment, retourne un placeholder pour maintenir la compatibilité
-    this.logger.log(`Facture à créer pour la commande ${order.orderNumber}`);
-    return { 
+    this.logger.log(`Facture à créer pour la commande ${order.orderNumber}`)
+    return {
       id: `FAC-${order.orderNumber}-${Date.now()}`,
       orderNumber: order.orderNumber,
       partnerId: partner.id,
       deliveryNoteId: deliveryNote.id,
       status: 'draft',
-      total: order.total
-    };
-  }
-
-  private async generateDocumentReference(prefix: string, tenantId: string): Promise<string> {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    
-    // Generate a simple counter for now
-    const timestamp = Date.now().toString().slice(-5);
-    
-    return `${prefix}-${year}${month}-${timestamp}`;
+      total: order.total,
+    }
   }
 
   private async getTenantsList(): Promise<string[]> {
     // À implémenter : récupérer la liste des tenants actifs
-    return [];
+    return []
   }
 
-  private async checkStockConsistency(tenantId: string): Promise<any[]> {
+  private async checkStockConsistency(_tenantId: string): Promise<any[]> {
     // À implémenter : vérifier la cohérence des stocks
-    return [];
+    return []
   }
 }

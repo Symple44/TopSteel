@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
 
 /**
  * Entity for storing audit log entries
@@ -132,11 +126,7 @@ export class AuditLog {
    * Check if this is a data modification event
    */
   isDataModificationEvent(): boolean {
-    const dataEvents = [
-      'DATA_CREATED',
-      'DATA_UPDATED',
-      'DATA_DELETED',
-    ]
+    const dataEvents = ['DATA_CREATED', 'DATA_UPDATED', 'DATA_DELETED']
     return dataEvents.includes(this.eventType)
   }
 
@@ -144,9 +134,11 @@ export class AuditLog {
    * Check if this is a critical event
    */
   isCriticalEvent(): boolean {
-    return this.severity === 'CRITICAL' || 
-           this.eventType === 'SUSPICIOUS_ACTIVITY' ||
-           (this.eventType === 'LOGIN_FAILED' && this.metadata?.attemptCount > 5)
+    return (
+      this.severity === 'CRITICAL' ||
+      this.eventType === 'SUSPICIOUS_ACTIVITY' ||
+      (this.eventType === 'LOGIN_FAILED' && this.metadata?.attemptCount > 5)
+    )
   }
 
   /**
@@ -201,9 +193,11 @@ export class AuditLog {
    * Check if event requires immediate attention
    */
   requiresAttention(): boolean {
-    return this.isCriticalEvent() || 
-           this.getRiskScore() > 75 ||
-           (this.eventType === 'ACCESS_DENIED' && this.metadata?.attemptCount > 10)
+    return (
+      this.isCriticalEvent() ||
+      this.getRiskScore() > 75 ||
+      (this.eventType === 'ACCESS_DENIED' && this.metadata?.attemptCount > 10)
+    )
   }
 
   /**

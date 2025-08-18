@@ -37,36 +37,36 @@ export enum PermissionType {
  * Contexte d'application d'une permission
  */
 export enum PermissionContext {
-  GLOBAL = 'GLOBAL',              // Permission globale
-  TENANT = 'TENANT',              // Limitée au tenant
-  SITE = 'SITE',                  // Limitée au site
-  DEPARTMENT = 'DEPARTMENT',      // Limitée au département
-  PROJECT = 'PROJECT',            // Limitée au projet
-  RESOURCE = 'RESOURCE',          // Limitée à une ressource spécifique
-  OWNED = 'OWNED',                // Limitée aux ressources possédées
+  GLOBAL = 'GLOBAL', // Permission globale
+  TENANT = 'TENANT', // Limitée au tenant
+  SITE = 'SITE', // Limitée au site
+  DEPARTMENT = 'DEPARTMENT', // Limitée au département
+  PROJECT = 'PROJECT', // Limitée au projet
+  RESOURCE = 'RESOURCE', // Limitée à une ressource spécifique
+  OWNED = 'OWNED', // Limitée aux ressources possédées
 }
 
 /**
  * Niveaux de permission
  */
 export enum PermissionLevel {
-  NONE = 'NONE',                  // Aucune permission
-  READ_ONLY = 'READ_ONLY',        // Lecture seule
-  READ_WRITE = 'READ_WRITE',      // Lecture et écriture
-  FULL_ACCESS = 'FULL_ACCESS',    // Accès complet
-  ADMIN = 'ADMIN',                // Administration
-  SUPER_ADMIN = 'SUPER_ADMIN',    // Super administration
+  NONE = 'NONE', // Aucune permission
+  READ_ONLY = 'READ_ONLY', // Lecture seule
+  READ_WRITE = 'READ_WRITE', // Lecture et écriture
+  FULL_ACCESS = 'FULL_ACCESS', // Accès complet
+  ADMIN = 'ADMIN', // Administration
+  SUPER_ADMIN = 'SUPER_ADMIN', // Super administration
 }
 
 /**
  * Statut d'une permission
  */
 export enum PermissionStatus {
-  ACTIVE = 'ACTIVE',              // Permission active
-  INACTIVE = 'INACTIVE',          // Permission inactive
-  SUSPENDED = 'SUSPENDED',        // Permission suspendue
-  REVOKED = 'REVOKED',            // Permission révoquée
-  EXPIRED = 'EXPIRED',            // Permission expirée
+  ACTIVE = 'ACTIVE', // Permission active
+  INACTIVE = 'INACTIVE', // Permission inactive
+  SUSPENDED = 'SUSPENDED', // Permission suspendue
+  REVOKED = 'REVOKED', // Permission révoquée
+  EXPIRED = 'EXPIRED', // Permission expirée
 }
 
 /**

@@ -4,9 +4,9 @@
  * Script pour tester et valider un token JWT
  */
 
+import * as dotenv from 'dotenv'
 import * as jwt from 'jsonwebtoken'
 import { TestAuthHelper } from './utils/test-auth-helper'
-import * as dotenv from 'dotenv'
 
 dotenv.config()
 
@@ -24,7 +24,7 @@ async function testTokenValidation() {
     societeId: 'test-societe-456',
     role: 'admin',
     permissions: ['*'],
-    expiresIn: '1h'
+    expiresIn: '1h',
   })
 
   console.log('✅ Token generated successfully\n')
@@ -39,7 +39,7 @@ async function testTokenValidation() {
   console.log('🔍 Validating token fields:')
   const requiredFields = ['sub', 'email', 'societeId', 'role', 'permissions', 'iat', 'exp']
   let allFieldsPresent = true
-  
+
   for (const field of requiredFields) {
     const present = field in decoded
     console.log(`  ${present ? '✅' : '❌'} ${field}: ${present ? 'Present' : 'Missing'}`)
@@ -62,7 +62,7 @@ async function testTokenValidation() {
   // Vérifier la signature (avec le secret)
   try {
     const jwtSecret = process.env.JWT_SECRET || 'test-secret-min-32-chars-for-testing'
-    const verified = jwt.verify(testToken, jwtSecret) as any
+    const _verified = jwt.verify(testToken, jwtSecret) as any
     console.log('🔐 Signature Verification: ✅ VALID')
     console.log(`  Algorithm: ${jwt.decode(testToken, { complete: true })?.header.alg}`)
   } catch (error) {
@@ -74,16 +74,18 @@ async function testTokenValidation() {
   // Test avec différents rôles
   console.log('👥 Testing different roles:')
   const roles = ['admin', 'user', 'viewer', 'super-admin']
-  
+
   for (const role of roles) {
     const roleToken = TestAuthHelper.generateTestToken({
       email: `${role}@test.com`,
       role: role,
-      permissions: role === 'admin' ? ['*'] : ['read']
+      permissions: role === 'admin' ? ['*'] : ['read'],
     })
-    
+
     const roleDecoded = jwt.decode(roleToken) as any
-    console.log(`  ${role}: ${roleDecoded.email} - Permissions: ${JSON.stringify(roleDecoded.permissions)}`)
+    console.log(
+      `  ${role}: ${roleDecoded.email} - Permissions: ${JSON.stringify(roleDecoded.permissions)}`
+    )
   }
   console.log()
 
@@ -91,9 +93,9 @@ async function testTokenValidation() {
   console.log('⏰ Testing expired token:')
   const expiredToken = TestAuthHelper.generateTestToken({
     email: 'expired@test.com',
-    expiresIn: '0s' // Expire immédiatement
+    expiresIn: '0s', // Expire immédiatement
   })
-  
+
   try {
     const jwtSecret = process.env.JWT_SECRET || 'test-secret-min-32-chars-for-testing'
     jwt.verify(expiredToken, jwtSecret)
@@ -111,7 +113,9 @@ async function testTokenValidation() {
   console.log('='.repeat(80))
   console.log('📊 Test Summary:')
   console.log(`  Token Generation: ✅ Working`)
-  console.log(`  Token Structure: ${allFieldsPresent ? '✅' : '❌'} ${allFieldsPresent ? 'Valid' : 'Invalid'}`)
+  console.log(
+    `  Token Structure: ${allFieldsPresent ? '✅' : '❌'} ${allFieldsPresent ? 'Valid' : 'Invalid'}`
+  )
   console.log(`  Token Expiration: ✅ Working`)
   console.log(`  Role Management: ✅ Working`)
   console.log(`  Security: ✅ Expired tokens rejected`)
@@ -121,7 +125,7 @@ async function testTokenValidation() {
 }
 
 // Exécuter le test
-testTokenValidation().catch(error => {
+testTokenValidation().catch((error) => {
   console.error('❌ Test failed:', error)
   process.exit(1)
 })

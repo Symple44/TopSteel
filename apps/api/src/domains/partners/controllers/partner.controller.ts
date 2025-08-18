@@ -632,7 +632,7 @@ export class PartnerController {
   @Get('analytics/top-clients')
   @ApiOperation({
     summary: 'Top clients',
-    description: 'Obtenir les meilleurs clients par chiffre d\'affaires',
+    description: "Obtenir les meilleurs clients par chiffre d'affaires",
   })
   async getTopClients(
     @Query('limit') limit: number = 10
@@ -677,16 +677,14 @@ export class PartnerController {
     description: 'Analyser la base pour détecter les partenaires potentiellement en double',
   })
   async detectDoublons(
-    @Body() criteria?: { 
-      checkSiret?: boolean
-      checkEmail?: boolean
-      checkDenomination?: boolean
-    }
-  ): Promise<Array<{
-    partners: Partner[]
-    matchType: string
-    confidence: number
-  }>> {
+    @Body() criteria?: { checkSiret?: boolean; checkEmail?: boolean; checkDenomination?: boolean }
+  ): Promise<
+    Array<{
+      partners: Partner[]
+      matchType: string
+      confidence: number
+    }>
+  > {
     return await this.partnerService.detectDoublons(criteria)
   }
 
@@ -781,7 +779,7 @@ export class PartnerController {
       offset,
       type,
       startDate: startDate ? new Date(startDate) : undefined,
-      endDate: endDate ? new Date(endDate) : undefined
+      endDate: endDate ? new Date(endDate) : undefined,
     }
     return await this.partnerService.getPartnerInteractions(partnerId, filters)
   }
@@ -792,7 +790,7 @@ export class PartnerController {
   @Patch('interactions/:interactionId')
   @ApiOperation({
     summary: 'Mettre à jour une interaction',
-    description: 'Modifier les informations d\'une interaction existante',
+    description: "Modifier les informations d'une interaction existante",
   })
   async updateInteraction(
     @Param('interactionId') interactionId: string,
@@ -829,9 +827,7 @@ export class PartnerController {
     summary: 'Rechercher des interactions',
     description: 'Recherche avancée dans les interactions partenaires',
   })
-  async searchInteractions(
-    @Body() searchCriteria: Record<string, unknown>
-  ): Promise<{
+  async searchInteractions(@Body() searchCriteria: Record<string, unknown>): Promise<{
     items: Record<string, unknown>[]
     total: number
     aggregations: Record<string, unknown>
@@ -844,7 +840,7 @@ export class PartnerController {
    */
   @Get('interactions/stats/by-type')
   @ApiOperation({
-    summary: 'Statistiques par type d\'interaction',
+    summary: "Statistiques par type d'interaction",
     description: 'Répartition des interactions par type sur une période',
   })
   async getInteractionStatsByType(
@@ -867,7 +863,7 @@ export class PartnerController {
   @Get('interactions/stats/performance')
   @ApiOperation({
     summary: 'Performance des interactions',
-    description: 'Analyser l\'efficacité et les résultats des interactions',
+    description: "Analyser l'efficacité et les résultats des interactions",
   })
   async getInteractionPerformanceStats(
     @Query('startDate') startDate?: string,
@@ -892,8 +888,8 @@ export class PartnerController {
    */
   @Get(':partnerId/analytics/complete')
   @ApiOperation({
-    summary: 'Statistiques complètes d\'un partenaire',
-    description: 'Analyse complète d\'un partenaire avec toutes ses métriques',
+    summary: "Statistiques complètes d'un partenaire",
+    description: "Analyse complète d'un partenaire avec toutes ses métriques",
   })
   async getCompletePartnerAnalytics(
     @Param('partnerId') partnerId: string,
@@ -908,7 +904,7 @@ export class PartnerController {
   @Get(':partnerId/analytics/relationship')
   @ApiOperation({
     summary: 'Analyse de la relation commerciale',
-    description: 'Analyser l\'évolution et la qualité de la relation commerciale',
+    description: "Analyser l'évolution et la qualité de la relation commerciale",
   })
   async getPartnerRelationshipAnalysis(
     @Param('partnerId') partnerId: string,
@@ -965,7 +961,7 @@ export class PartnerController {
   @Get('analytics/dashboard')
   @ApiOperation({
     summary: 'Dashboard de performance',
-    description: 'Vue d\'ensemble des performances partenaires avec KPIs',
+    description: "Vue d'ensemble des performances partenaires avec KPIs",
   })
   async getPartnerDashboard(
     @Query('period') period: 'week' | 'month' | 'quarter' | 'year' = 'month'

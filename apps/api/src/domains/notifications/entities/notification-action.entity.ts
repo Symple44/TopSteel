@@ -1,12 +1,12 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { NotificationRule } from './notification-rule.entity'
 
@@ -192,7 +192,11 @@ export class NotificationAction {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => NotificationRule, rule => rule.actions, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => NotificationRule,
+    (rule) => rule.actions,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'rule_id' })
   rule!: NotificationRule
 

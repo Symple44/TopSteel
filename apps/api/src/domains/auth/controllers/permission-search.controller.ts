@@ -1,25 +1,25 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
-  Body,
-  Param,
   UseGuards,
-  BadRequestException,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { CombinedSecurityGuard, Resource, Action } from '../security/guards/combined-security.guard'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Roles } from '../decorators/roles.decorator'
+import { Action, CombinedSecurityGuard, Resource } from '../security/guards/combined-security.guard'
 import {
-  PermissionQueryBuilderService,
+  type PermissionCondition,
+  type PermissionConflict,
   PermissionOperator,
-  PermissionScope,
-  PermissionCondition,
-  PermissionQueryOptions,
-  PermissionQueryResult,
-  UserPermissionQueryResult,
-  PermissionConflict,
+  type PermissionQueryBuilderService,
+  type PermissionQueryOptions,
+  type PermissionQueryResult,
+  type PermissionScope,
+  type UserPermissionQueryResult,
 } from '../services/permission-query-builder.service'
 
 /**
@@ -75,9 +75,7 @@ export class PermissionConflictAnalysisDto {
 @UseGuards(CombinedSecurityGuard)
 @Resource('permissions')
 export class PermissionSearchController {
-  constructor(
-    private readonly queryBuilder: PermissionQueryBuilderService
-  ) {}
+  constructor(private readonly queryBuilder: PermissionQueryBuilderService) {}
 
   /**
    * Search permissions with complex queries
@@ -87,9 +85,7 @@ export class PermissionSearchController {
   @Action('search')
   @ApiOperation({ summary: 'Search permissions with complex queries' })
   @ApiResponse({ status: 200, description: 'Search results' })
-  async searchPermissions(
-    @Body() dto: PermissionSearchDto
-  ): Promise<PermissionQueryResult> {
+  async searchPermissions(@Body() dto: PermissionSearchDto): Promise<PermissionQueryResult> {
     // Validate conditions
     if (!dto.conditions || dto.conditions.length === 0) {
       throw new BadRequestException('At least one condition is required')
@@ -130,16 +126,13 @@ export class PermissionSearchController {
       throw new BadRequestException('At least one condition is required')
     }
 
-    return await this.queryBuilder.queryUsersByPermissions(
-      dto.conditions,
-      {
-        logic: dto.logic,
-        sortBy: dto.sortBy,
-        sortOrder: dto.sortOrder,
-        limit: dto.limit || 100,
-        offset: dto.offset || 0,
-      }
-    )
+    return await this.queryBuilder.queryUsersByPermissions(dto.conditions, {
+      logic: dto.logic,
+      sortBy: dto.sortBy,
+      sortOrder: dto.sortOrder,
+      limit: dto.limit || 100,
+      offset: dto.offset || 0,
+    })
   }
 
   /**
@@ -155,17 +148,13 @@ export class PermissionSearchController {
     @Query('societeId') societeId?: string,
     @Query('siteId') siteId?: string
   ) {
-    const users = await this.queryBuilder.findUsersWithPermission(
-      permission,
-      societeId,
-      siteId
-    )
+    const users = await this.queryBuilder.findUsersWithPermission(permission, societeId, siteId)
 
     return {
       permission,
       societeId,
       siteId,
-      users: users.map(u => ({
+      users: users.map((u) => ({
         id: u.id,
         email: u.email,
         name: `${u.prenom || ''} ${u.nom || ''}`.trim(),
@@ -182,9 +171,7 @@ export class PermissionSearchController {
   @Action('search')
   @ApiOperation({ summary: 'Find permissions by pattern' })
   @ApiResponse({ status: 200, description: 'Permissions matching pattern' })
-  async findPermissionsByPattern(
-    @Body() dto: PermissionPatternSearchDto
-  ) {
+  async findPermissionsByPattern(@Body() dto: PermissionPatternSearchDto) {
     const permissions = await this.queryBuilder.findPermissionsByPattern(
       dto.pattern,
       dto.operator || PermissionOperator.MATCHES
@@ -193,7 +180,7 @@ export class PermissionSearchController {
     return {
       pattern: dto.pattern,
       operator: dto.operator || PermissionOperator.MATCHES,
-      permissions: permissions.map(p => ({
+      permissions: permissions.map((p) => ({
         code: `${p.resource}:${p.action}`,
         name: p.name,
         description: p.description,
@@ -211,18 +198,13 @@ export class PermissionSearchController {
   @Action('analyze')
   @ApiOperation({ summary: 'Analyze permission conflicts for a user' })
   @ApiResponse({ status: 200, description: 'Permission conflicts' })
-  async analyzePermissionConflicts(
-    @Body() dto: PermissionConflictAnalysisDto
-  ): Promise<{
+  async analyzePermissionConflicts(@Body() dto: PermissionConflictAnalysisDto): Promise<{
     userId: string
     societeId: string
     conflicts: PermissionConflict[]
     total: number
   }> {
-    const conflicts = await this.queryBuilder.analyzePermissionConflicts(
-      dto.userId,
-      dto.societeId
-    )
+    const conflicts = await this.queryBuilder.analyzePermissionConflicts(dto.userId, dto.societeId)
 
     return {
       userId: dto.userId,
@@ -240,9 +222,7 @@ export class PermissionSearchController {
   @Action('read')
   @ApiOperation({ summary: 'Get permission hierarchy' })
   @ApiResponse({ status: 200, description: 'Permission hierarchy tree' })
-  async getPermissionHierarchy(
-    @Query('root') rootPermission?: string
-  ) {
+  async getPermissionHierarchy(@Query('root') rootPermission?: string) {
     const hierarchy = await this.queryBuilder.getPermissionHierarchy(rootPermission)
 
     return {
@@ -260,9 +240,7 @@ export class PermissionSearchController {
   @Action('read')
   @ApiOperation({ summary: 'Get permission statistics' })
   @ApiResponse({ status: 200, description: 'Permission usage statistics' })
-  async getPermissionStatistics(
-    @Query('societeId') societeId?: string
-  ) {
+  async getPermissionStatistics(@Query('societeId') societeId?: string) {
     const stats = await this.queryBuilder.getPermissionStatistics(societeId)
 
     return {
@@ -419,7 +397,7 @@ export class PermissionSearchController {
         logic: 'OR',
         cache: false,
       })
-      excludedPermissions = mustNotResults.permissions.map(p => p.code)
+      excludedPermissions = mustNotResults.permissions.map((p) => p.code)
     }
 
     // Combine results
@@ -427,18 +405,14 @@ export class PermissionSearchController {
 
     // Add should results if any matched
     if (shouldResults) {
-      const mainCodes = new Set(mainResults.permissions.map(p => p.code))
-      const additionalPerms = shouldResults.permissions.filter(
-        p => !mainCodes.has(p.code)
-      )
+      const mainCodes = new Set(mainResults.permissions.map((p) => p.code))
+      const additionalPerms = shouldResults.permissions.filter((p) => !mainCodes.has(p.code))
       finalPermissions = [...finalPermissions, ...additionalPerms]
     }
 
     // Remove excluded permissions
     if (excludedPermissions.length > 0) {
-      finalPermissions = finalPermissions.filter(
-        p => !excludedPermissions.includes(p.code)
-      )
+      finalPermissions = finalPermissions.filter((p) => !excludedPermissions.includes(p.code))
     }
 
     return {
@@ -464,12 +438,12 @@ export class PermissionSearchController {
    * Generate cache key for search
    */
   private generateCacheKey(prefix: string, dto: any): string {
-    const hash = require('crypto')
+    const hash = require('node:crypto')
       .createHash('sha256')
       .update(JSON.stringify(dto))
       .digest('hex')
       .substring(0, 16)
-    
+
     return `perm:search:${prefix}:${hash}`
   }
 }

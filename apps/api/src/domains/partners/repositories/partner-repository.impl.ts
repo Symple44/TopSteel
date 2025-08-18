@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
 import type { PartnerSearchCriteria } from '../services/partner.service'
-import type { IPartnerRepository, PartnerRepositoryStats, PartnerAdvancedFilters } from './partner.repository'
+import type {
+  IPartnerRepository,
+  PartnerAdvancedFilters,
+  PartnerRepositoryStats,
+} from './partner.repository'
 import { PartnerSortField } from './partner.repository'
 
 /**
@@ -181,8 +185,8 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     }
 
     if (filters.departement) {
-      query.andWhere('SUBSTRING(partner.codePostal, 1, 2) = :departement', { 
-        departement: filters.departement 
+      query.andWhere('SUBSTRING(partner.codePostal, 1, 2) = :departement', {
+        departement: filters.departement,
       })
     }
 
@@ -246,7 +250,9 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     // Recherche textuelle
     if (filters.searchText) {
       const searchFields = filters.searchFields || ['denomination', 'code', 'email', 'ville']
-      const searchConditions = searchFields.map(field => `partner.${field} ILIKE :search`).join(' OR ')
+      const searchConditions = searchFields
+        .map((field) => `partner.${field} ILIKE :search`)
+        .join(' OR ')
       query.andWhere(`(${searchConditions})`, { search: `%${filters.searchText}%` })
     }
 
@@ -269,7 +275,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       items,
       total,
       page,
-      limit
+      limit,
     }
   }
 
@@ -337,7 +343,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       .getRawMany()
 
     const repartitionParCategorie: Record<string, number> = {}
-    categoriesResult.forEach(item => {
+    categoriesResult.forEach((item) => {
       if (item.category) {
         repartitionParCategorie[item.category] = parseInt(item.count)
       }
@@ -355,7 +361,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       .getRawMany()
 
     const parVille: Record<string, number> = {}
-    villesResult.forEach(item => {
+    villesResult.forEach((item) => {
       if (item.ville) {
         parVille[item.ville] = parseInt(item.count)
       }
@@ -372,7 +378,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       .getRawMany()
 
     const parDepartement: Record<string, number> = {}
-    departementsResult.forEach(item => {
+    departementsResult.forEach((item) => {
       if (item.departement) {
         parDepartement[item.departement] = parseInt(item.count)
       }
@@ -383,16 +389,16 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       .createQueryBuilder('partner')
       .select("TO_CHAR(partner.createdAt, 'YYYY-MM')", 'periode')
       .addSelect('COUNT(*)', 'count')
-      .where('partner.createdAt >= :date', { 
-        date: new Date(new Date().setMonth(new Date().getMonth() - 12)) 
+      .where('partner.createdAt >= :date', {
+        date: new Date(new Date().setMonth(new Date().getMonth() - 12)),
       })
       .groupBy("TO_CHAR(partner.createdAt, 'YYYY-MM')")
       .orderBy('periode', 'ASC')
       .getRawMany()
 
-    const tendanceCreation = tendanceResult.map(item => ({
+    const tendanceCreation = tendanceResult.map((item) => ({
       periode: item.periode,
-      nombreCreations: parseInt(item.count)
+      nombreCreations: parseInt(item.count),
     }))
 
     // Calcul de l'ancienneté moyenne
@@ -405,7 +411,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
 
     // Taux d'activité
     const partnersActifs = await this.repository.count({
-      where: { status: PartnerStatus.ACTIF }
+      where: { status: PartnerStatus.ACTIF },
     })
     const tauxActivite = totalPartenaires > 0 ? (partnersActifs / totalPartenaires) * 100 : 0
 
@@ -417,11 +423,11 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       repartitionGeographique: {
         parVille,
         parDepartement,
-        parRegion: {} // TODO: Implémenter si nécessaire
+        parRegion: {}, // TODO: Implémenter si nécessaire
       },
       tendanceCreation,
       moyenneAnciennete,
-      tauxActivite
+      tauxActivite,
     }
   }
 

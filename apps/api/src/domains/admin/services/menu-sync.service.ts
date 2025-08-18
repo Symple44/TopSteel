@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In } from 'typeorm'
-import { EventEmitter2 } from '@nestjs/event-emitter'
-import { PageDiscoveryService, DiscoveredPage } from './page-discovery.service'
+import { In, type Repository } from 'typeorm'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem } from '../entities/menu-item.entity'
 import { MenuItemAction } from '../entities/menu-item-action.entity'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { DiscoveredPage, PageDiscoveryService } from './page-discovery.service'
 
 /**
  * Sync options for menu synchronization
@@ -203,7 +203,7 @@ export class MenuSyncService {
     @InjectRepository(MenuItem, 'auth')
     private readonly menuItemRepository: Repository<MenuItem>,
     @InjectRepository(MenuItemAction, 'auth')
-    private readonly menuActionRepository: Repository<MenuItemAction>,
+    readonly _menuActionRepository: Repository<MenuItemAction>,
     private readonly pageDiscoveryService: PageDiscoveryService,
     private readonly cacheService: OptimizedCacheService,
     private readonly eventEmitter: EventEmitter2
@@ -245,7 +245,7 @@ export class MenuSyncService {
 
       // Filter pages by modules if specified
       const pagesToProcess = modules
-        ? discoveredPages.filter(p => modules.includes(p.module))
+        ? discoveredPages.filter((p) => modules.includes(p.module))
         : discoveredPages
 
       // Get menus to sync
@@ -263,13 +263,13 @@ export class MenuSyncService {
         })
 
         const existingItemsMap = new Map(
-          existingItems.map(item => [item.route || item.code, item])
+          existingItems.map((item) => [item.route || item.code, item])
         )
 
         // Process discovered pages
         for (const page of pagesToProcess) {
           // Skip if matches skip patterns
-          if (skipPatterns.some(pattern => pattern.test(page.fullPath))) {
+          if (skipPatterns.some((pattern) => pattern.test(page.fullPath))) {
             result.skipped++
             continue
           }
@@ -293,12 +293,7 @@ export class MenuSyncService {
           if (existingItem) {
             if (updateExisting) {
               // Update existing item
-              const updated = await this.updateMenuItem(
-                existingItem,
-                page,
-                mapping,
-                dryRun
-              )
+              const updated = await this.updateMenuItem(existingItem, page, mapping, dryRun)
               if (updated) {
                 result.updated++
                 result.items.updated.push(updated)
@@ -306,12 +301,7 @@ export class MenuSyncService {
             }
           } else if (autoCreate) {
             // Create new item
-            const created = await this.createMenuItem(
-              menu,
-              page,
-              mapping,
-              dryRun
-            )
+            const created = await this.createMenuItem(menu, page, mapping, dryRun)
             if (created) {
               result.created++
               result.items.created.push(created)
@@ -321,8 +311,8 @@ export class MenuSyncService {
 
         // Remove orphaned items
         if (autoRemove && !preserveCustom) {
-          const pagePathsSet = new Set(pagesToProcess.map(p => p.fullPath))
-          
+          const pagePathsSet = new Set(pagesToProcess.map((p) => p.fullPath))
+
           for (const item of existingItems) {
             if (item.route && !pagePathsSet.has(item.route) && !item.metadata?.custom) {
               if (!dryRun) {
@@ -338,7 +328,7 @@ export class MenuSyncService {
       // Clear cache after sync
       if (!dryRun) {
         await this.cacheService.invalidateGroup('menus')
-        
+
         // Emit sync completed event
         this.eventEmitter.emit('menu.sync.completed', {
           result,
@@ -349,7 +339,6 @@ export class MenuSyncService {
       this.logger.log(
         `Menu sync completed: ${result.created} created, ${result.updated} updated, ${result.removed} removed, ${result.skipped} skipped`
       )
-
     } catch (error) {
       this.logger.error('Menu sync failed:', error)
       result.errors.push(error.message)
@@ -409,13 +398,13 @@ export class MenuSyncService {
    */
   private generateDefaultMapping(page: DiscoveredPage): MenuItemMapping | null {
     const pathSegments = page.fullPath.split('/').filter(Boolean)
-    
+
     if (pathSegments.length === 0) {
       return null
     }
 
     const label = this.humanizeString(pathSegments[pathSegments.length - 1])
-    const code = pathSegments.join('_')
+    const _code = pathSegments.join('_')
 
     return {
       pathPattern: new RegExp(`^${page.fullPath}$`),
@@ -497,7 +486,7 @@ export class MenuSyncService {
     dryRun: boolean
   ): Promise<MenuItem | null> {
     // Check if update is needed
-    const needsUpdate = 
+    const needsUpdate =
       item.permission !== page.metadata.permissions?.[0] ||
       item.requiredRoles?.roles?.join(',') !== page.metadata.roles?.join(',') ||
       item.label !== mapping.label ||
@@ -517,7 +506,7 @@ export class MenuSyncService {
 
     item.permission = page.metadata.permissions?.[0]
     item.requiredRoles = page.metadata.roles ? { roles: page.metadata.roles } : null
-    
+
     // Update metadata
     item.metadata = {
       ...item.metadata,
@@ -550,7 +539,7 @@ export class MenuSyncService {
       .replace(/[-_]/g, ' ')
       .replace(/([A-Z])/g, ' $1')
       .trim()
-      .replace(/\b\w/g, l => l.toUpperCase())
+      .replace(/\b\w/g, (l) => l.toUpperCase())
   }
 
   /**
@@ -567,22 +556,20 @@ export class MenuSyncService {
     const menuItems = await this.menuItemRepository.find()
 
     const pagePathsSet = new Set(
-      pages
-        .filter(p => !this.shouldSkipPage(p))
-        .map(p => p.fullPath)
+      pages.filter((p) => !this.shouldSkipPage(p)).map((p) => p.fullPath)
     )
 
     const orphanedItems = menuItems.filter(
-      item => item.route && !pagePathsSet.has(item.route) && !item.metadata?.custom
+      (item) => item.route && !pagePathsSet.has(item.route) && !item.metadata?.custom
     ).length
 
-    const mappedPaths = new Set(menuItems.map(item => item.route).filter(Boolean))
+    const mappedPaths = new Set(menuItems.map((item) => item.route).filter(Boolean))
     const unmappedPages = pages.filter(
-      page => !this.shouldSkipPage(page) && !mappedPaths.has(page.fullPath)
+      (page) => !this.shouldSkipPage(page) && !mappedPaths.has(page.fullPath)
     ).length
 
     const lastSync = menuItems
-      .map(item => item.metadata?.lastSyncedAt)
+      .map((item) => item.metadata?.lastSyncedAt)
       .filter(Boolean)
       .sort()
       .pop()
@@ -607,16 +594,16 @@ export class MenuSyncService {
     const result = await this.syncMenus({ ...options, dryRun: true })
 
     return {
-      toCreate: result.items.created.map(item => ({
+      toCreate: result.items.created.map((item) => ({
         path: item.route || '',
         label: item.label,
         module: item.metadata?.module || 'unknown',
       })),
-      toUpdate: result.items.updated.map(item => ({
+      toUpdate: result.items.updated.map((item) => ({
         path: item.route || '',
         changes: ['permissions', 'roles'], // Simplified for now
       })),
-      toRemove: result.items.removed.map(item => ({
+      toRemove: result.items.removed.map((item) => ({
         path: item.route || '',
         label: item.label,
       })),
@@ -626,10 +613,7 @@ export class MenuSyncService {
   /**
    * Add custom menu item
    */
-  async addCustomMenuItem(
-    menuId: string,
-    item: Partial<MenuItem>
-  ): Promise<MenuItem> {
+  async addCustomMenuItem(menuId: string, item: Partial<MenuItem>): Promise<MenuItem> {
     const menu = await this.menuConfigRepository.findOne({
       where: { id: menuId },
     })
@@ -673,7 +657,7 @@ export class MenuSyncService {
     })
 
     // Check for orphaned parent references
-    const itemIds = new Set(menuItems.map(item => item.id))
+    const itemIds = new Set(menuItems.map((item) => item.id))
     for (const item of menuItems) {
       if (item.parentId && !itemIds.has(item.parentId)) {
         errors.push(`Item ${item.code} references non-existent parent ${item.parentId}`)
@@ -687,18 +671,18 @@ export class MenuSyncService {
         errors.push(`Circular reference detected: ${path.join(' -> ')} -> ${itemId}`)
         return true
       }
-      
+
       if (visited.has(itemId)) {
         return false
       }
-      
+
       visited.add(itemId)
-      const item = menuItems.find(i => i.id === itemId)
-      
+      const item = menuItems.find((i) => i.id === itemId)
+
       if (item?.parentId) {
         return checkCircular(item.parentId, [...path, itemId])
       }
-      
+
       return false
     }
 

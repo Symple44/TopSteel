@@ -1,8 +1,8 @@
-import { Module, Global } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { ConfigModule } from '@nestjs/config';
-import { SentryConfig } from './sentry.config';
-import { SentryInterceptor } from './sentry.interceptor';
+import { Global, Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { APP_INTERCEPTOR } from '@nestjs/core'
+import { SentryConfig } from './sentry.config'
+import { SentryInterceptor } from './sentry.interceptor'
 
 @Global()
 @Module({
@@ -19,6 +19,6 @@ import { SentryInterceptor } from './sentry.interceptor';
 export class SentryModule {
   constructor(private sentryConfig: SentryConfig) {
     // Initialize Sentry on module instantiation
-    this.sentryConfig.initialize();
+    this.sentryConfig.initialize()
   }
 }

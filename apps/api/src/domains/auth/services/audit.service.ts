@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { EventEmitter2 } from '@nestjs/event-emitter'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { AuditLog } from '../core/entities/audit-log.entity'
 
 /**
@@ -14,34 +14,34 @@ export enum AuditEventType {
   LOGIN_FAILED = 'LOGIN_FAILED',
   LOGOUT = 'LOGOUT',
   SESSION_EXPIRED = 'SESSION_EXPIRED',
-  
+
   // MFA
   MFA_ENABLED = 'MFA_ENABLED',
   MFA_DISABLED = 'MFA_DISABLED',
   MFA_VERIFIED = 'MFA_VERIFIED',
   MFA_FAILED = 'MFA_FAILED',
-  
+
   // Authorization
   ACCESS_GRANTED = 'ACCESS_GRANTED',
   ACCESS_DENIED = 'ACCESS_DENIED',
   PERMISSION_CHANGED = 'PERMISSION_CHANGED',
   ROLE_ASSIGNED = 'ROLE_ASSIGNED',
   ROLE_REVOKED = 'ROLE_REVOKED',
-  
+
   // Data Access
   DATA_VIEWED = 'DATA_VIEWED',
   DATA_CREATED = 'DATA_CREATED',
   DATA_UPDATED = 'DATA_UPDATED',
   DATA_DELETED = 'DATA_DELETED',
   DATA_EXPORTED = 'DATA_EXPORTED',
-  
+
   // Security
   PASSWORD_CHANGED = 'PASSWORD_CHANGED',
   PASSWORD_RESET = 'PASSWORD_RESET',
   SUSPICIOUS_ACTIVITY = 'SUSPICIOUS_ACTIVITY',
   RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
   INVALID_TOKEN = 'INVALID_TOKEN',
-  
+
   // Administration
   USER_CREATED = 'USER_CREATED',
   USER_UPDATED = 'USER_UPDATED',
@@ -174,7 +174,9 @@ export class AuditService {
     }
 
     // Log localement pour debug
-    this.logger.debug(`Audit: ${auditEntry.eventType} - ${auditEntry.success ? 'SUCCESS' : 'FAILED'}`)
+    this.logger.debug(
+      `Audit: ${auditEntry.eventType} - ${auditEntry.success ? 'SUCCESS' : 'FAILED'}`
+    )
   }
 
   /**
@@ -405,11 +407,11 @@ export class AuditService {
 
     // Pagination
     const total = await query.getCount()
-    
+
     if (filter.limit) {
       query.limit(filter.limit)
     }
-    
+
     if (filter.offset) {
       query.offset(filter.offset)
     }
@@ -418,9 +420,9 @@ export class AuditService {
     query.orderBy('audit.timestamp', 'DESC')
 
     const logs = await query.getMany()
-    
+
     // Map AuditLog to AuditEntry
-    const entries: AuditEntry[] = logs.map(log => ({
+    const entries: AuditEntry[] = logs.map((log) => ({
       id: log.id,
       timestamp: log.timestamp,
       eventType: log.eventType as AuditEventType,
@@ -450,7 +452,7 @@ export class AuditService {
     societeId?: string
   ): Promise<AuditStatistics> {
     const cacheKey = `audit_stats:${startDate.getTime()}:${endDate.getTime()}:${societeId || 'all'}`
-    
+
     // Vérifier le cache
     const cached = await this.cacheService.get<AuditStatistics>(cacheKey)
     if (cached) {
@@ -483,15 +485,11 @@ export class AuditService {
       .getRawMany()
 
     // Taux d'échec
-    const failures = await baseQuery
-      .andWhere('audit.success = false')
-      .getCount()
+    const failures = await baseQuery.andWhere('audit.success = false').getCount()
     const failureRate = totalEvents > 0 ? (failures / totalEvents) * 100 : 0
 
     // Durée moyenne
-    const avgDurationResult = await baseQuery
-      .select('AVG(audit.duration)', 'avg')
-      .getRawOne()
+    const avgDurationResult = await baseQuery.select('AVG(audit.duration)', 'avg').getRawOne()
     const avgDuration = avgDurationResult?.avg || 0
 
     // Top utilisateurs
@@ -515,8 +513,8 @@ export class AuditService {
 
     // Activités suspectes
     const suspiciousActivities = await baseQuery
-      .andWhere('audit.eventType = :suspicious', { 
-        suspicious: AuditEventType.SUSPICIOUS_ACTIVITY 
+      .andWhere('audit.eventType = :suspicious', {
+        suspicious: AuditEventType.SUSPICIOUS_ACTIVITY,
       })
       .getCount()
 
@@ -540,18 +538,18 @@ export class AuditService {
       }, {}),
       failureRate,
       avgDuration,
-      topUsers: topUsers.map(u => ({ 
-        userId: u.userId, 
-        count: parseInt(u.count) 
+      topUsers: topUsers.map((u) => ({
+        userId: u.userId,
+        count: parseInt(u.count),
       })),
-      topResources: topResources.map(r => ({ 
-        resource: r.resource, 
-        count: parseInt(r.count) 
+      topResources: topResources.map((r) => ({
+        resource: r.resource,
+        count: parseInt(r.count),
       })),
       suspiciousActivities,
-      timeDistribution: timeDistribution.map(t => ({ 
-        hour: parseInt(t.hour), 
-        count: parseInt(t.count) 
+      timeDistribution: timeDistribution.map((t) => ({
+        hour: parseInt(t.hour),
+        count: parseInt(t.count),
       })),
     }
 
@@ -574,15 +572,20 @@ export class AuditService {
       .where('timestamp < :cutoffDate', { cutoffDate })
       .execute()
 
-    this.logger.log(`Cleaned up ${result.affected} audit log entries older than ${retentionDays} days`)
-    
+    this.logger.log(
+      `Cleaned up ${result.affected} audit log entries older than ${retentionDays} days`
+    )
+
     return result.affected || 0
   }
 
   /**
    * Détecte les anomalies dans les patterns d'audit
    */
-  async detectAnomalies(userId: string, windowMinutes: number = 30): Promise<{
+  async detectAnomalies(
+    userId: string,
+    windowMinutes: number = 30
+  ): Promise<{
     hasAnomalies: boolean
     anomalies: string[]
   }> {
@@ -600,7 +603,7 @@ export class AuditService {
 
     // Détection d'anomalies
     const failedLogins = recentActivity.filter(
-      a => a.eventType === AuditEventType.LOGIN_FAILED
+      (a) => a.eventType === AuditEventType.LOGIN_FAILED
     ).length
 
     if (failedLogins > 5) {
@@ -608,7 +611,7 @@ export class AuditService {
     }
 
     const deniedAccess = recentActivity.filter(
-      a => a.eventType === AuditEventType.ACCESS_DENIED
+      (a) => a.eventType === AuditEventType.ACCESS_DENIED
     ).length
 
     if (deniedAccess > 10) {
@@ -616,13 +619,13 @@ export class AuditService {
     }
 
     // Vérifier les changements de localisation rapides
-    const uniqueIPs = new Set(recentActivity.map(a => a.ipAddress).filter(Boolean))
+    const uniqueIPs = new Set(recentActivity.map((a) => a.ipAddress).filter(Boolean))
     if (uniqueIPs.size > 3) {
       anomalies.push(`Activity from ${uniqueIPs.size} different IP addresses`)
     }
 
     // Vérifier l'activité inhabituelle
-    const unusualHours = recentActivity.filter(a => {
+    const unusualHours = recentActivity.filter((a) => {
       const hour = a.timestamp.getHours()
       return hour < 6 || hour > 22 // Activité en dehors des heures normales
     })
@@ -642,10 +645,7 @@ export class AuditService {
    */
   private determineSeverity(entry: AuditEntry): AuditSeverity {
     // Événements critiques
-    const criticalEvents = [
-      AuditEventType.SUSPICIOUS_ACTIVITY,
-      AuditEventType.RATE_LIMIT_EXCEEDED,
-    ]
+    const criticalEvents = [AuditEventType.SUSPICIOUS_ACTIVITY, AuditEventType.RATE_LIMIT_EXCEEDED]
 
     if (criticalEvents.includes(entry.eventType)) {
       return AuditSeverity.CRITICAL
@@ -680,7 +680,7 @@ export class AuditService {
   private startBatchProcessor(): void {
     this.flushTimer = setInterval(() => {
       if (this.auditQueue.length > 0) {
-        this.flush().catch(error => {
+        this.flush().catch((error) => {
           this.logger.error('Error flushing audit queue:', error)
         })
       }

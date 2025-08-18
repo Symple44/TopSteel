@@ -1,15 +1,16 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Check } from 'lucide-react';
-import { CheckoutData } from '../CheckoutFlow';
-import { cn } from '@/lib/utils';
+import { Check, Plus } from 'lucide-react'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
+import type { CheckoutData } from '../CheckoutFlow'
 
 interface ShippingStepProps {
-  data: CheckoutData;
-  onUpdate: (data: Partial<CheckoutData>) => void;
-  onNext: () => void;
-  isValid: boolean;
+  data: CheckoutData
+  onUpdate: (data: Partial<CheckoutData>) => void
+  onNext: () => void
+  isValid: boolean
 }
 
 const countries = [
@@ -20,8 +21,8 @@ const countries = [
   { code: 'BE', name: 'Belgium' },
   { code: 'NL', name: 'Netherlands' },
   { code: 'UK', name: 'United Kingdom' },
-  { code: 'US', name: 'United States' }
-];
+  { code: 'US', name: 'United States' },
+]
 
 const shippingMethods = [
   {
@@ -29,39 +30,37 @@ const shippingMethods = [
     name: 'Standard Shipping',
     cost: 9.99,
     estimatedDays: 5,
-    description: 'Delivered in 3-5 business days'
+    description: 'Delivered in 3-5 business days',
   },
   {
     id: 'express',
     name: 'Express Shipping',
     cost: 19.99,
     estimatedDays: 2,
-    description: 'Delivered in 1-2 business days'
+    description: 'Delivered in 1-2 business days',
   },
   {
     id: 'overnight',
     name: 'Overnight Shipping',
     cost: 39.99,
     estimatedDays: 1,
-    description: 'Delivered next business day'
-  }
-];
+    description: 'Delivered next business day',
+  },
+]
 
-export const ShippingStep: React.FC<ShippingStepProps> = ({
-  data,
-  onUpdate,
-  onNext,
-  isValid
-}) => {
-  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-  const [showNewAddress, setShowNewAddress] = useState(true);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNext, isValid }) => {
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([])
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
+  const [showNewAddress, setShowNewAddress] = useState(true)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     // Load saved addresses from API or localStorage
-    loadSavedAddresses();
-  }, []);
+    loadSavedAddresses()
+  }, [
+    // Load saved addresses from API or localStorage
+    loadSavedAddresses,
+  ])
 
   const loadSavedAddresses = async () => {
     try {
@@ -75,7 +74,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
           address: '123 Main St',
           city: 'Paris',
           postalCode: '75001',
-          country: 'FR'
+          country: 'FR',
         },
         {
           id: 'addr_2',
@@ -85,47 +84,45 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
           address: '456 Business Ave',
           city: 'Lyon',
           postalCode: '69001',
-          country: 'FR'
-        }
-      ];
-      setSavedAddresses(addresses);
-    } catch (error) {
-      console.error('Error loading addresses:', error);
-    }
-  };
+          country: 'FR',
+        },
+      ]
+      setSavedAddresses(addresses)
+    } catch (_error) {}
+  }
 
   const handleInputChange = (field: string, value: string) => {
     onUpdate({
       shipping: {
         ...data.shipping,
-        [field]: value
-      }
-    });
-    
+        [field]: value,
+      },
+    })
+
     // Clear error for this field
     if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
     }
-  };
+  }
 
-  const handleShippingMethodChange = (method: typeof shippingMethods[0]) => {
+  const handleShippingMethodChange = (method: (typeof shippingMethods)[0]) => {
     onUpdate({
       shippingMethod: {
         id: method.id,
         name: method.name,
         cost: method.cost,
-        estimatedDays: method.estimatedDays
-      }
-    });
-  };
+        estimatedDays: method.estimatedDays,
+      },
+    })
+  }
 
   const handleSelectSavedAddress = (address: any) => {
-    setSelectedAddress(address.id);
-    setShowNewAddress(false);
+    setSelectedAddress(address.id)
+    setShowNewAddress(false)
     onUpdate({
       shipping: {
         ...data.shipping,
@@ -136,66 +133,64 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
         city: address.city,
         state: address.state || '',
         postalCode: address.postalCode,
-        country: address.country
-      }
-    });
-  };
+        country: address.country,
+      },
+    })
+  }
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    const s = data.shipping;
+    const newErrors: Record<string, string> = {}
+    const s = data.shipping
 
-    if (!s.firstName?.trim()) newErrors.firstName = 'First name is required';
-    if (!s.lastName?.trim()) newErrors.lastName = 'Last name is required';
+    if (!s.firstName?.trim()) newErrors.firstName = 'First name is required'
+    if (!s.lastName?.trim()) newErrors.lastName = 'Last name is required'
     if (!s.email?.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = 'Email is required'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email)) {
-      newErrors.email = 'Invalid email address';
+      newErrors.email = 'Invalid email address'
     }
-    if (!s.phone?.trim()) newErrors.phone = 'Phone number is required';
-    if (!s.address?.trim()) newErrors.address = 'Address is required';
-    if (!s.city?.trim()) newErrors.city = 'City is required';
-    if (!s.postalCode?.trim()) newErrors.postalCode = 'Postal code is required';
-    if (!s.country) newErrors.country = 'Country is required';
+    if (!s.phone?.trim()) newErrors.phone = 'Phone number is required'
+    if (!s.address?.trim()) newErrors.address = 'Address is required'
+    if (!s.city?.trim()) newErrors.city = 'City is required'
+    if (!s.postalCode?.trim()) newErrors.postalCode = 'Postal code is required'
+    if (!s.country) newErrors.country = 'Country is required'
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleContinue = () => {
     if (validateForm()) {
-      onNext();
+      onNext()
     }
-  };
+  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(price);
-  };
+      currency: 'EUR',
+    }).format(price)
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
-        
+
         {/* Saved Addresses */}
         {savedAddresses.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Saved Addresses
-            </h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Saved Addresses</h3>
             <div className="space-y-2">
               {savedAddresses.map((address) => (
                 <button
                   key={address.id}
                   onClick={() => handleSelectSavedAddress(address)}
                   className={cn(
-                    "w-full p-4 text-left border rounded-lg transition-colors",
+                    'w-full p-4 text-left border rounded-lg transition-colors',
                     selectedAddress === address.id
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
                   )}
                 >
                   <div className="flex items-start justify-between">
@@ -218,11 +213,11 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                   </div>
                 </button>
               ))}
-              
+
               <button
                 onClick={() => {
-                  setShowNewAddress(true);
-                  setSelectedAddress(null);
+                  setShowNewAddress(true)
+                  setSelectedAddress(null)
                 }}
                 className="w-full p-4 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
               >
@@ -240,39 +235,33 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
                 <input
                   type="text"
                   value={data.shipping.firstName}
                   onChange={(e) => handleInputChange('firstName', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.firstName ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.firstName ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
                 {errors.firstName && (
                   <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>
                 )}
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
                 <input
                   type="text"
                   value={data.shipping.lastName}
                   onChange={(e) => handleInputChange('lastName', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.lastName ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.lastName ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.lastName && (
-                  <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
-                )}
+                {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>}
               </div>
             </div>
 
@@ -286,15 +275,13 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                   value={data.shipping.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.email ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.email ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.email && (
-                  <p className="text-xs text-red-500 mt-1">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Phone Number *
@@ -304,13 +291,11 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                   value={data.shipping.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.phone ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.phone ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.phone && (
-                  <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
-                )}
+                {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
               </div>
             </div>
 
@@ -324,14 +309,12 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="Street address"
                 className={cn(
-                  "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                  errors.address ? "border-red-500" : "border-gray-300"
+                  'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  errors.address ? 'border-red-500' : 'border-gray-300'
                 )}
               />
-              {errors.address && (
-                <p className="text-xs text-red-500 mt-1">{errors.address}</p>
-              )}
-              
+              {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
+
               <input
                 type="text"
                 value={data.shipping.address2 || ''}
@@ -343,27 +326,21 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
                 <input
                   type="text"
                   value={data.shipping.city}
                   onChange={(e) => handleInputChange('city', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.city ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.city ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.city && (
-                  <p className="text-xs text-red-500 mt-1">{errors.city}</p>
-                )}
+                {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State/Region
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">State/Region</label>
                 <input
                   type="text"
                   value={data.shipping.state}
@@ -371,7 +348,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Postal Code *
@@ -381,8 +358,8 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                   value={data.shipping.postalCode}
                   onChange={(e) => handleInputChange('postalCode', e.target.value)}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.postalCode ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.postalCode ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
                 {errors.postalCode && (
@@ -392,15 +369,13 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Country *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
               <select
                 value={data.shipping.country}
                 onChange={(e) => handleInputChange('country', e.target.value)}
                 className={cn(
-                  "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                  errors.country ? "border-red-500" : "border-gray-300"
+                  'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  errors.country ? 'border-red-500' : 'border-gray-300'
                 )}
               >
                 <option value="">Select a country</option>
@@ -410,9 +385,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                   </option>
                 ))}
               </select>
-              {errors.country && (
-                <p className="text-xs text-red-500 mt-1">{errors.country}</p>
-              )}
+              {errors.country && <p className="text-xs text-red-500 mt-1">{errors.country}</p>}
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer">
@@ -422,9 +395,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
                 onChange={(e) => handleInputChange('saveAddress', e.target.checked.toString())}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">
-                Save this address for future orders
-              </span>
+              <span className="text-sm text-gray-700">Save this address for future orders</span>
             </label>
           </div>
         )}
@@ -438,10 +409,10 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
             <label
               key={method.id}
               className={cn(
-                "flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors",
+                'flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors',
                 data.shippingMethod.id === method.id
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
               )}
             >
               <div className="flex items-center gap-3">
@@ -479,5 +450,5 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+}

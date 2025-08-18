@@ -1,20 +1,20 @@
 import {
-  Controller,
-  Post,
+  BadRequestException,
   Body,
+  Controller,
   Headers,
   HttpCode,
   HttpStatus,
   Logger,
+  Post,
   Req,
-  BadRequestException
-} from '@nestjs/common';
-import { Request } from 'express';
-import { StripePaymentService } from './stripe-payment.service';
+} from '@nestjs/common'
+import type { Request } from 'express'
+import type { StripePaymentService } from './stripe-payment.service'
 
 @Controller('webhooks/stripe/marketplace')
 export class MarketplaceWebhookController {
-  private readonly logger = new Logger(MarketplaceWebhookController.name);
+  private readonly logger = new Logger(MarketplaceWebhookController.name)
 
   constructor(private readonly stripePaymentService: StripePaymentService) {}
 
@@ -26,43 +26,43 @@ export class MarketplaceWebhookController {
     @Req() request: Request
   ) {
     if (!signature) {
-      throw new BadRequestException('Missing Stripe signature');
+      throw new BadRequestException('Missing Stripe signature')
     }
 
     try {
       // Get origin from request headers for security validation
-      const origin = request.headers.origin || 
-                    request.headers.referer ||
-                    request.headers['x-forwarded-for'] as string;
+      const origin =
+        request.headers.origin ||
+        request.headers.referer ||
+        (request.headers['x-forwarded-for'] as string)
 
       // Log webhook attempt
       this.logger.log('Stripe webhook received', {
         origin,
-        signature: signature.substring(0, 20) + '...',
-        userAgent: request.headers['user-agent']
-      });
+        signature: `${signature.substring(0, 20)}...`,
+        userAgent: request.headers['user-agent'],
+      })
 
       // Convert body to raw string (needed for Stripe signature verification)
-      const rawBody = JSON.stringify(body);
+      const rawBody = JSON.stringify(body)
 
-      await this.stripePaymentService.handleWebhook(rawBody, signature, origin);
+      await this.stripePaymentService.handleWebhook(rawBody, signature, origin)
 
-      this.logger.log('Stripe webhook processed successfully');
-      
-      return { received: true };
+      this.logger.log('Stripe webhook processed successfully')
 
+      return { received: true }
     } catch (error) {
       this.logger.error(`Stripe webhook processing failed: ${error.message}`, {
-        signature: signature?.substring(0, 20) + '...',
+        signature: `${signature?.substring(0, 20)}...`,
         error: error.message,
-        stack: error.stack
-      });
+        stack: error.stack,
+      })
 
       if (error instanceof BadRequestException) {
-        throw error;
+        throw error
       }
 
-      throw new BadRequestException('Webhook processing failed');
+      throw new BadRequestException('Webhook processing failed')
     }
   }
 }

@@ -357,25 +357,23 @@ export class MaterialService extends BusinessService<Material> {
   }> {
     const stats = await this.materialRepository.getMaterialStats()
     const materials = await this.materialRepository.findByStatus(MaterialStatus.ACTIF)
-    
+
     // Calculer le taux de rotation (simplifi\u00e9)
-    const materialsAvecStock = materials.filter(m => (m.stockPhysique || 0) > 0)
-    const tauxRotation = materialsAvecStock.length > 0 
-      ? (materials.length - materialsAvecStock.length) / materials.length * 100
-      : 0
+    const materialsAvecStock = materials.filter((m) => (m.stockPhysique || 0) > 0)
+    const tauxRotation =
+      materialsAvecStock.length > 0
+        ? ((materials.length - materialsAvecStock.length) / materials.length) * 100
+        : 0
 
     // Taux de rupture
-    const tauxRupture = materials.length > 0
-      ? (stats.materialsEnRupture / materials.length) * 100
-      : 0
+    const tauxRupture =
+      materials.length > 0 ? (stats.materialsEnRupture / materials.length) * 100 : 0
 
     // Taux de couverture (% de mat\u00e9riaux avec stock suffisant)
-    const materialsStockOK = materials.filter(m => 
-      (m.stockPhysique || 0) >= (m.stockMini || 0)
+    const materialsStockOK = materials.filter(
+      (m) => (m.stockPhysique || 0) >= (m.stockMini || 0)
     ).length
-    const tauxCouverture = materials.length > 0
-      ? (materialsStockOK / materials.length) * 100
-      : 0
+    const tauxCouverture = materials.length > 0 ? (materialsStockOK / materials.length) * 100 : 0
 
     // Valeur immobilis\u00e9e
     const valeurImmobilisee = stats.valeurTotaleStock
@@ -386,8 +384,8 @@ export class MaterialService extends BusinessService<Material> {
     // Nombre de fournisseurs distincts
     const fournisseurIds = new Set(
       materials
-        .map(m => m.informationsApprovisionnement?.fournisseurPrincipalId)
-        .filter(id => id !== undefined)
+        .map((m) => m.informationsApprovisionnement?.fournisseurPrincipalId)
+        .filter((id) => id !== undefined)
     )
     const nombreFournisseurs = fournisseurIds.size
 
@@ -397,7 +395,7 @@ export class MaterialService extends BusinessService<Material> {
       tauxCouverture,
       valeurImmobilisee,
       nombreReferences,
-      nombreFournisseurs
+      nombreFournisseurs,
     }
   }
 
@@ -417,21 +415,26 @@ export class MaterialService extends BusinessService<Material> {
 
     // Calculer les pr\u00e9visions de rupture
     const materials = await this.materialRepository.findByStatus(MaterialStatus.ACTIF)
-    const previsions: Array<{ materialId: string; reference: string; rupturePrevisionnelle: Date }> = []
+    const previsions: Array<{
+      materialId: string
+      reference: string
+      rupturePrevisionnelle: Date
+    }> = []
 
     for (const material of materials) {
-      const stats = usageStats.find(s => s.materialId === material.id)
+      const stats = usageStats.find((s) => s.materialId === material.id)
       if (stats && stats.quantiteSortie > 0) {
         const consommationJournaliere = stats.quantiteSortie / periode
         if (consommationJournaliere > 0) {
           const joursRestants = Math.floor((material.stockPhysique || 0) / consommationJournaliere)
-          if (joursRestants < 30) { // Alerte si rupture pr\u00e9vue dans moins de 30 jours
+          if (joursRestants < 30) {
+            // Alerte si rupture pr\u00e9vue dans moins de 30 jours
             const dateRupture = new Date()
             dateRupture.setDate(dateRupture.getDate() + joursRestants)
             previsions.push({
               materialId: material.id,
               reference: material.reference,
-              rupturePrevisionnelle: dateRupture
+              rupturePrevisionnelle: dateRupture,
             })
           }
         }
@@ -445,17 +448,19 @@ export class MaterialService extends BusinessService<Material> {
       date.setDate(date.getDate() + i)
       evolutionStock.push({
         date,
-        valeur: await this.calculateStockValueAtDate(date)
+        valeur: await this.calculateStockValueAtDate(date),
       })
     }
 
     return {
       evolutionStock,
-      previsions: previsions.sort((a, b) => a.rupturePrevisionnelle.getTime() - b.rupturePrevisionnelle.getTime())
+      previsions: previsions.sort(
+        (a, b) => a.rupturePrevisionnelle.getTime() - b.rupturePrevisionnelle.getTime()
+      ),
     }
   }
 
-  private async calculateStockValueAtDate(date: Date): Promise<number> {
+  private async calculateStockValueAtDate(_date: Date): Promise<number> {
     // Pour une impl\u00e9mentation r\u00e9elle, il faudrait consulter l'historique des mouvements
     // Ici on retourne la valeur actuelle
     const stats = await this.materialRepository.getMaterialStats()

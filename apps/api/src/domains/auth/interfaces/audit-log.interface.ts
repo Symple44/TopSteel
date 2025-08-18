@@ -72,40 +72,40 @@ export enum AuditEventType {
  * Niveaux de sévérité
  */
 export enum AuditSeverity {
-  INFO = 'INFO',              // Information
-  LOW = 'LOW',                // Faible importance
-  MEDIUM = 'MEDIUM',          // Importance moyenne
-  HIGH = 'HIGH',              // Haute importance
-  CRITICAL = 'CRITICAL',      // Critique
-  EMERGENCY = 'EMERGENCY',    // Urgence
+  INFO = 'INFO', // Information
+  LOW = 'LOW', // Faible importance
+  MEDIUM = 'MEDIUM', // Importance moyenne
+  HIGH = 'HIGH', // Haute importance
+  CRITICAL = 'CRITICAL', // Critique
+  EMERGENCY = 'EMERGENCY', // Urgence
 }
 
 /**
  * Statut de l'événement
  */
 export enum AuditEventStatus {
-  SUCCESS = 'SUCCESS',        // Succès
-  FAILURE = 'FAILURE',        // Échec
-  WARNING = 'WARNING',        // Avertissement
-  ERROR = 'ERROR',            // Erreur
-  PENDING = 'PENDING',        // En attente
+  SUCCESS = 'SUCCESS', // Succès
+  FAILURE = 'FAILURE', // Échec
+  WARNING = 'WARNING', // Avertissement
+  ERROR = 'ERROR', // Erreur
+  PENDING = 'PENDING', // En attente
 }
 
 /**
  * Catégories d'audit
  */
 export enum AuditCategory {
-  SECURITY = 'SECURITY',              // Sécurité
+  SECURITY = 'SECURITY', // Sécurité
   AUTHENTICATION = 'AUTHENTICATION', // Authentification
-  AUTHORIZATION = 'AUTHORIZATION',    // Autorisation
+  AUTHORIZATION = 'AUTHORIZATION', // Autorisation
   USER_MANAGEMENT = 'USER_MANAGEMENT', // Gestion utilisateurs
-  DATA_ACCESS = 'DATA_ACCESS',        // Accès aux données
-  SYSTEM_ADMIN = 'SYSTEM_ADMIN',      // Administration système
-  BUSINESS_LOGIC = 'BUSINESS_LOGIC',  // Logique métier
-  INTEGRATION = 'INTEGRATION',        // Intégration
-  COMPLIANCE = 'COMPLIANCE',          // Conformité
-  PERFORMANCE = 'PERFORMANCE',        // Performance
-  OTHER = 'OTHER',                    // Autre
+  DATA_ACCESS = 'DATA_ACCESS', // Accès aux données
+  SYSTEM_ADMIN = 'SYSTEM_ADMIN', // Administration système
+  BUSINESS_LOGIC = 'BUSINESS_LOGIC', // Logique métier
+  INTEGRATION = 'INTEGRATION', // Intégration
+  COMPLIANCE = 'COMPLIANCE', // Conformité
+  PERFORMANCE = 'PERFORMANCE', // Performance
+  OTHER = 'OTHER', // Autre
 }
 
 /**

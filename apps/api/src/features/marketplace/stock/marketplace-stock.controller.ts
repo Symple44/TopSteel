@@ -1,45 +1,37 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Param, 
-  UseGuards, 
-  HttpCode, 
-  HttpStatus,
-  Query,
-  Logger
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard';
-import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard';
-import { RequireMarketplacePermissions, MarketplacePermission } from '../auth/decorators/marketplace-permissions.decorator';
-import { MarketplaceStockService, StockReservation, StockUpdateResult } from './marketplace-stock.service';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
+import {
+  MarketplacePermission,
+  RequireMarketplacePermissions,
+} from '../auth/decorators/marketplace-permissions.decorator'
+import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard'
+import type {
+  MarketplaceStockService,
+  StockReservation,
+  StockUpdateResult,
+} from './marketplace-stock.service'
 
 export class ReserveStockDto {
-  productId: string;
-  quantity: number;
-  customerId: string;
-  orderId?: string;
+  productId: string
+  quantity: number
+  customerId: string
+  orderId?: string
 }
 
 export class UpdateStockDto {
-  quantity: number;
-  reason?: string;
+  quantity: number
+  reason?: string
 }
 
 @Controller('api/marketplace/stock')
 @UseGuards(JwtAuthGuard)
 export class MarketplaceStockController {
-  private readonly logger = new Logger(MarketplaceStockController.name);
-
-  constructor(
-    private readonly stockService: MarketplaceStockService
-  ) {}
+  constructor(private readonly stockService: MarketplaceStockService) {}
 
   @Get('available/:productId')
   async getAvailableStock(@Param('productId') productId: string): Promise<{ available: number }> {
-    const available = await this.stockService.getAvailableStock(productId);
-    return { available };
+    const available = await this.stockService.getAvailableStock(productId)
+    return { available }
   }
 
   @Post('reserve')
@@ -50,25 +42,31 @@ export class MarketplaceStockController {
       reserveStockDto.quantity,
       reserveStockDto.customerId,
       reserveStockDto.orderId
-    );
+    )
   }
 
   @Post('confirm/:reservationId')
   @HttpCode(HttpStatus.OK)
-  async confirmReservation(@Param('reservationId') reservationId: string): Promise<StockUpdateResult> {
-    return this.stockService.confirmReservation(reservationId);
+  async confirmReservation(
+    @Param('reservationId') reservationId: string
+  ): Promise<StockUpdateResult> {
+    return this.stockService.confirmReservation(reservationId)
   }
 
   @Post('release/:reservationId')
   @HttpCode(HttpStatus.OK)
-  async releaseReservation(@Param('reservationId') reservationId: string): Promise<{ success: boolean }> {
-    await this.stockService.releaseReservation(reservationId);
-    return { success: true };
+  async releaseReservation(
+    @Param('reservationId') reservationId: string
+  ): Promise<{ success: boolean }> {
+    await this.stockService.releaseReservation(reservationId)
+    return { success: true }
   }
 
   @Get('reservation/:reservationId')
-  async getReservation(@Param('reservationId') reservationId: string): Promise<StockReservation | null> {
-    return this.stockService.getReservation(reservationId);
+  async getReservation(
+    @Param('reservationId') reservationId: string
+  ): Promise<StockReservation | null> {
+    return this.stockService.getReservation(reservationId)
   }
 
   @Post('update/:productId')
@@ -79,11 +77,7 @@ export class MarketplaceStockController {
     @Param('productId') productId: string,
     @Body() updateStockDto: UpdateStockDto
   ): Promise<StockUpdateResult> {
-    return this.stockService.updateStock(
-      productId,
-      updateStockDto.quantity,
-      updateStockDto.reason
-    );
+    return this.stockService.updateStock(productId, updateStockDto.quantity, updateStockDto.reason)
   }
 
   @Post('cleanup')
@@ -91,7 +85,7 @@ export class MarketplaceStockController {
   @UseGuards(MarketplacePermissionsGuard)
   @RequireMarketplacePermissions(MarketplacePermission.MANAGE_PRODUCTS)
   async cleanupExpiredReservations(): Promise<{ success: boolean }> {
-    await this.stockService.cleanupExpiredReservations();
-    return { success: true };
+    await this.stockService.cleanupExpiredReservations()
+    return { success: true }
   }
 }

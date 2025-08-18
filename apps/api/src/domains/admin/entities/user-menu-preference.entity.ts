@@ -1,13 +1,13 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm'
 import { MenuConfiguration } from './menu-configuration.entity'
 
@@ -68,7 +68,11 @@ export class UserMenuPreference {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => MenuConfiguration, menu => menu.userPreferences, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => MenuConfiguration,
+    (menu) => menu.userPreferences,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'menu_id' })
   menu!: MenuConfiguration
 
@@ -134,14 +138,9 @@ export class UserMenuPreference {
   /**
    * Add to favorites
    */
-  addToFavorites(item: {
-    itemId: string
-    label: string
-    route: string
-    icon?: string
-  }): void {
+  addToFavorites(item: { itemId: string; label: string; route: string; icon?: string }): void {
     // Check if already in favorites
-    if (!this.favorites.some(fav => fav.itemId === item.itemId)) {
+    if (!this.favorites.some((fav) => fav.itemId === item.itemId)) {
       this.favorites.push({
         ...item,
         addedAt: new Date(),
@@ -153,27 +152,20 @@ export class UserMenuPreference {
    * Remove from favorites
    */
   removeFromFavorites(itemId: string): void {
-    this.favorites = this.favorites.filter(fav => fav.itemId !== itemId)
+    this.favorites = this.favorites.filter((fav) => fav.itemId !== itemId)
   }
 
   /**
    * Add to recent items
    */
-  addToRecentItems(item: {
-    itemId: string
-    label: string
-    route: string
-    icon?: string
-  }): void {
-    const existingIndex = this.recentItems.findIndex(
-      recent => recent.itemId === item.itemId
-    )
+  addToRecentItems(item: { itemId: string; label: string; route: string; icon?: string }): void {
+    const existingIndex = this.recentItems.findIndex((recent) => recent.itemId === item.itemId)
 
     if (existingIndex > -1) {
       // Update existing item
       this.recentItems[existingIndex].accessedAt = new Date()
       this.recentItems[existingIndex].accessCount++
-      
+
       // Move to front
       const [recentItem] = this.recentItems.splice(existingIndex, 1)
       this.recentItems.unshift(recentItem)

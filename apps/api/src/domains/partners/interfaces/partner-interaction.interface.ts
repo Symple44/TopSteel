@@ -85,8 +85,8 @@ export enum PartnerInteractionPriority {
  * Direction d'une interaction
  */
 export enum PartnerInteractionDirection {
-  ENTRANT = 'ENTRANT',      // Le partenaire nous contacte
-  SORTANT = 'SORTANT',      // Nous contactons le partenaire
+  ENTRANT = 'ENTRANT', // Le partenaire nous contacte
+  SORTANT = 'SORTANT', // Nous contactons le partenaire
   BIDIRECTIONNEL = 'BIDIRECTIONNEL', // Échange mutuel
 }
 

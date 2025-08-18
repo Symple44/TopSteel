@@ -1,30 +1,31 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { 
-  Package, 
-  MapPin, 
-  CreditCard, 
-  Truck, 
-  Edit2, 
+import {
   AlertCircle,
   CheckCircle,
+  CreditCard,
+  Edit2,
+  FileText,
   Loader2,
-  FileText
-} from 'lucide-react';
-import { CheckoutData } from '../CheckoutFlow';
-import { CartItem } from '../../store/cartSlice';
-import { cn } from '@/lib/utils';
+  MapPin,
+  Package,
+  Truck,
+} from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import type { CartItem } from '../../store/cartSlice'
+import type { CheckoutData } from '../CheckoutFlow'
 
 interface ReviewStepProps {
-  data: CheckoutData;
-  cartItems: CartItem[];
-  total: number;
-  onUpdate: (data: Partial<CheckoutData>) => void;
-  onBack: () => void;
-  onPlaceOrder: () => void;
-  isProcessing: boolean;
-  error: string | null;
+  data: CheckoutData
+  cartItems: CartItem[]
+  total: number
+  onUpdate: (data: Partial<CheckoutData>) => void
+  onBack: () => void
+  onPlaceOrder: () => void
+  isProcessing: boolean
+  error: string | null
 }
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
@@ -35,33 +36,33 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   onBack,
   onPlaceOrder,
   isProcessing,
-  error
+  error,
 }) => {
-  const [showOrderNotes, setShowOrderNotes] = useState(false);
+  const [showOrderNotes, setShowOrderNotes] = useState(false)
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(price);
-  };
+      currency: 'EUR',
+    }).format(price)
+  }
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-  const shipping = data.shippingMethod.cost;
-  const tax = subtotal * 0.20; // 20% VAT
-  const finalTotal = subtotal + shipping + tax;
+  const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+  const shipping = data.shippingMethod.cost
+  const tax = subtotal * 0.2 // 20% VAT
+  const finalTotal = subtotal + shipping + tax
 
   const handleOrderNotesChange = (notes: string) => {
-    onUpdate({ orderNotes: notes });
-  };
+    onUpdate({ orderNotes: notes })
+  }
 
   const handleTermsChange = (checked: boolean) => {
-    onUpdate({ agreeToTerms: checked });
-  };
+    onUpdate({ agreeToTerms: checked })
+  }
 
   const handleNewsletterChange = (checked: boolean) => {
-    onUpdate({ subscribeNewsletter: checked });
-  };
+    onUpdate({ subscribeNewsletter: checked })
+  }
 
   return (
     <div className="space-y-6">
@@ -84,8 +85,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <div key={item.product.id} className="p-4 flex items-center gap-4">
                 <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
                   {item.product.image ? (
-                    <img 
-                      src={item.product.image} 
+                    <img
+                      src={item.product.image}
                       alt={item.product.name}
                       className="w-full h-full object-cover rounded-lg"
                     />
@@ -122,7 +123,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <MapPin className="w-4 h-4" />
               Shipping Address
             </h3>
-            <button 
+            <button
               onClick={onBack}
               className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1"
             >
@@ -164,7 +165,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <CreditCard className="w-4 h-4" />
               Billing & Payment
             </h3>
-            <button 
+            <button
               onClick={onBack}
               className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1"
             >
@@ -180,9 +181,13 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                   <p className="text-sm text-gray-600">Same as shipping address</p>
                 ) : (
                   <div className="text-sm text-gray-600">
-                    <p>{data.billing.firstName} {data.billing.lastName}</p>
+                    <p>
+                      {data.billing.firstName} {data.billing.lastName}
+                    </p>
                     <p>{data.billing.address}</p>
-                    <p>{data.billing.city}, {data.billing.state} {data.billing.postalCode}</p>
+                    <p>
+                      {data.billing.city}, {data.billing.state} {data.billing.postalCode}
+                    </p>
                     <p>{data.billing.country}</p>
                   </div>
                 )}
@@ -193,12 +198,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                   {data.payment.method === 'card' && (
                     <p>Credit Card ending in {data.payment.cardNumber?.slice(-4)}</p>
                   )}
-                  {data.payment.method === 'paypal' && (
-                    <p>PayPal</p>
-                  )}
-                  {data.payment.method === 'bank_transfer' && (
-                    <p>Bank Transfer</p>
-                  )}
+                  {data.payment.method === 'paypal' && <p>PayPal</p>}
+                  {data.payment.method === 'bank_transfer' && <p>Bank Transfer</p>}
                 </div>
               </div>
             </div>
@@ -336,8 +337,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <CheckCircle className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="text-blue-900 font-medium">
-                  {data.payment.method === 'paypal' 
-                    ? 'PayPal Payment' 
+                  {data.payment.method === 'paypal'
+                    ? 'PayPal Payment'
                     : 'Bank Transfer Instructions'}
                 </p>
                 <p className="text-blue-700 text-sm mt-1">
@@ -364,10 +365,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           onClick={onPlaceOrder}
           disabled={!data.agreeToTerms || isProcessing}
           className={cn(
-            "px-8 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors",
+            'px-8 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors',
             data.agreeToTerms && !isProcessing
-              ? "bg-green-600 text-white hover:bg-green-700"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              ? 'bg-green-600 text-white hover:bg-green-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           )}
         >
           {isProcessing ? (
@@ -384,5 +385,5 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+}

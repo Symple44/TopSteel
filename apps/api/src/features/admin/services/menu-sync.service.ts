@@ -4,7 +4,7 @@ import type { Repository } from 'typeorm'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem } from '../entities/menu-item.entity'
 import { MenuItemRole } from '../entities/menu-item-role.entity'
-import { MenuConfigurationService } from './menu-configuration.service'
+import type { MenuConfigurationService } from './menu-configuration.service'
 
 interface SidebarNavItem {
   title: string

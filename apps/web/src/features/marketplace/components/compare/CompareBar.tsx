@@ -1,68 +1,59 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { 
-  X, 
-  ChevronUp, 
-  ChevronDown,
-  Package,
-  Layers,
-  Trash2
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { 
-  selectCompareProducts, 
+import { ChevronDown, ChevronUp, Layers, Package, Trash2, X } from 'lucide-react'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { cn } from '@/lib/utils'
+import {
+  clearCompare,
+  removeFromCompare,
+  selectCompareProducts,
   selectIsCompareOpen,
   selectMaxCompareProducts,
-  removeFromCompare,
-  clearCompare,
-  setCompareOpen
-} from '../../store/compareSlice';
-import { Product } from '../products/ProductCard';
+  setCompareOpen,
+} from '../../store/compareSlice'
 
 interface CompareBarProps {
-  onViewComparison?: () => void;
-  className?: string;
+  onViewComparison?: () => void
+  className?: string
 }
 
-export const CompareBar: React.FC<CompareBarProps> = ({
-  onViewComparison,
-  className
-}) => {
-  const dispatch = useDispatch();
-  const products = useSelector(selectCompareProducts);
-  const isOpen = useSelector(selectIsCompareOpen);
-  const maxProducts = useSelector(selectMaxCompareProducts);
-  const [isMinimized, setIsMinimized] = React.useState(false);
+export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, className }) => {
+  const dispatch = useDispatch()
+  const products = useSelector(selectCompareProducts)
+  const _isOpen = useSelector(selectIsCompareOpen)
+  const maxProducts = useSelector(selectMaxCompareProducts)
+  const [isMinimized, setIsMinimized] = React.useState(false)
 
-  if (products.length === 0) return null;
+  if (products.length === 0) return null
 
   const handleRemoveProduct = (productId: string) => {
-    dispatch(removeFromCompare(productId));
-  };
+    dispatch(removeFromCompare(productId))
+  }
 
   const handleClearAll = () => {
-    dispatch(clearCompare());
-  };
+    dispatch(clearCompare())
+  }
 
   const handleToggleMinimize = () => {
-    setIsMinimized(!isMinimized);
-  };
+    setIsMinimized(!isMinimized)
+  }
 
   const handleViewComparison = () => {
     if (products.length >= 2) {
-      dispatch(setCompareOpen(true));
-      onViewComparison?.();
+      dispatch(setCompareOpen(true))
+      onViewComparison?.()
     }
-  };
+  }
 
   return (
-    <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300",
-      isMinimized && "translate-y-[calc(100%-60px)]",
-      className
-    )}>
+    <div
+      className={cn(
+        'fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300',
+        isMinimized && 'translate-y-[calc(100%-60px)]',
+        className
+      )}
+    >
       <div className="bg-white border-t border-gray-200 shadow-lg">
         {/* Header */}
         <div className="px-4 py-3 bg-gray-900 text-white">
@@ -73,7 +64,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({
                 Compare Products ({products.length}/{maxProducts})
               </span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {products.length >= 2 && (
                 <button
@@ -83,7 +74,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({
                   Compare Now
                 </button>
               )}
-              
+
               <button
                 onClick={handleClearAll}
                 className="p-1 hover:bg-gray-800 rounded transition-colors"
@@ -91,11 +82,11 @@ export const CompareBar: React.FC<CompareBarProps> = ({
               >
                 <Trash2 className="w-4 h-4" />
               </button>
-              
+
               <button
                 onClick={handleToggleMinimize}
                 className="p-1 hover:bg-gray-800 rounded transition-colors"
-                title={isMinimized ? "Expand" : "Minimize"}
+                title={isMinimized ? 'Expand' : 'Minimize'}
               >
                 {isMinimized ? (
                   <ChevronUp className="w-4 h-4" />
@@ -122,7 +113,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({
                   >
                     <X className="w-3 h-3 text-gray-500 hover:text-red-600" />
                   </button>
-                  
+
                   <div className="flex gap-3">
                     {product.image ? (
                       <img
@@ -135,11 +126,9 @@ export const CompareBar: React.FC<CompareBarProps> = ({
                         <Package className="w-6 h-6 text-gray-400" />
                       </div>
                     )}
-                    
+
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900 truncate">
-                        {product.name}
-                      </h4>
+                      <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
                       <p className="text-xs text-gray-600">{product.brand}</p>
                       <p className="text-sm font-semibold text-gray-900 mt-1">
                         €{product.price.toFixed(2)}
@@ -148,7 +137,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({
                   </div>
                 </div>
               ))}
-              
+
               {/* Add more products slot */}
               {products.length < maxProducts && (
                 <div className="flex-shrink-0 w-48 border-2 border-dashed border-gray-300 rounded-lg p-3 flex items-center justify-center">
@@ -161,7 +150,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({
                 </div>
               )}
             </div>
-            
+
             {/* Hint */}
             {products.length === 1 && (
               <p className="text-sm text-gray-600 mt-3 text-center">
@@ -172,5 +161,5 @@ export const CompareBar: React.FC<CompareBarProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

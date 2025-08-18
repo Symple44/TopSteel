@@ -58,7 +58,7 @@ export function InjectTenantContext() {
 
     descriptor.value = async function (...args: unknown[]) {
       // Récupérer le contexte depuis le premier argument si c'est un objet
-      const firstArg = args[0] as Record<string, any> | undefined
+      const firstArg = args[0] as Record<string, unknown> | undefined
       const context = firstArg?.tenantContext
 
       if (context && this instanceof Repository) {

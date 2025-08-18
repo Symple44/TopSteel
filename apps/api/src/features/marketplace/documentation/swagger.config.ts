@@ -1,5 +1,5 @@
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 export function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
@@ -55,11 +55,7 @@ export function setupSwagger(app: INestApplication): void {
       \`\`\`
     `)
     .setVersion('1.0.0')
-    .setContact(
-      'TopSteel Support',
-      'https://topsteel.com/support',
-      'api@topsteel.com',
-    )
+    .setContact('TopSteel Support', 'https://topsteel.com/support', 'api@topsteel.com')
     .setLicense('Proprietary', 'https://topsteel.com/license')
     .addServer('https://api.topsteel.com', 'Production')
     .addServer('https://staging-api.topsteel.com', 'Staging')
@@ -71,7 +67,7 @@ export function setupSwagger(app: INestApplication): void {
         bearerFormat: 'JWT',
         description: 'JWT authentication token',
       },
-      'JWT',
+      'JWT'
     )
     .addApiKey(
       {
@@ -80,7 +76,7 @@ export function setupSwagger(app: INestApplication): void {
         name: 'X-API-Key',
         description: 'API key for service-to-service communication',
       },
-      'ApiKey',
+      'ApiKey'
     )
     .addGlobalParameters({
       name: 'X-Tenant-Id',
@@ -114,14 +110,14 @@ export function setupSwagger(app: INestApplication): void {
     .addTag('Admin', 'Administrative operations')
     .addTag('Webhooks', 'Webhook endpoints for external integrations')
     .addTag('Health', 'System health and monitoring')
-    .build();
+    .build()
 
   const document = SwaggerModule.createDocument(app, config, {
     operationIdFactory: (controllerKey: string, methodKey: string) =>
       `${controllerKey.replace('Controller', '')}_${methodKey}`,
     deepScanRoutes: true,
     extraModels: [],
-  });
+  })
 
   // Add custom CSS for better UI
   const customCss = `
@@ -134,7 +130,7 @@ export function setupSwagger(app: INestApplication): void {
     .swagger-ui .opblock.opblock-get .opblock-summary { border-color: #61affe; }
     .swagger-ui .opblock.opblock-put .opblock-summary { border-color: #fca130; }
     .swagger-ui .opblock.opblock-delete .opblock-summary { border-color: #f93e3e; }
-  `;
+  `
 
   // Add custom JavaScript for enhanced functionality
   const customJs = `
@@ -161,7 +157,7 @@ export function setupSwagger(app: INestApplication): void {
         block.parentElement.appendChild(button);
       });
     });
-  `;
+  `
 
   SwaggerModule.setup('api/docs', app, document, {
     customCss,
@@ -215,14 +211,13 @@ export function setupSwagger(app: INestApplication): void {
         },
       },
     },
-  });
+  })
 
   // Also generate OpenAPI JSON for external tools
-  const fs = require('fs');
-  const path = require('path');
-  const outputPath = path.resolve(process.cwd(), 'openapi.json');
-  fs.writeFileSync(outputPath, JSON.stringify(document, null, 2));
-  console.log(`OpenAPI specification saved to ${outputPath}`);
+  const fs = require('node:fs')
+  const path = require('node:path')
+  const outputPath = path.resolve(process.cwd(), 'openapi.json')
+  fs.writeFileSync(outputPath, JSON.stringify(document, null, 2))
 }
 
 export const swaggerSchemas = {
@@ -264,4 +259,4 @@ export const swaggerSchemas = {
       data: { type: 'object' },
     },
   },
-};
+}

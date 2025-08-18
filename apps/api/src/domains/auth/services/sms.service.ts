@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 
 /**
  * Configuration pour le fournisseur SMS
@@ -64,12 +64,12 @@ export class SMSService {
     expirationMinutes: number = 5
   ): Promise<SendSMSResponse> {
     const message = this.buildMFAMessage(verificationCode, expirationMinutes)
-    
+
     return await this.sendSMS({
       phoneNumber,
       message,
       messageType: 'verification',
-      templateId: 'mfa_verification'
+      templateId: 'mfa_verification',
     })
   }
 
@@ -82,12 +82,12 @@ export class SMSService {
     location?: string
   ): Promise<SendSMSResponse> {
     const message = this.buildSecurityAlertMessage(alertType, location)
-    
+
     return await this.sendSMS({
       phoneNumber,
       message,
       messageType: 'alert',
-      templateId: 'security_alert'
+      templateId: 'security_alert',
     })
   }
 
@@ -96,13 +96,15 @@ export class SMSService {
    */
   async sendSMS(request: SendSMSRequest): Promise<SendSMSResponse> {
     try {
-      this.logger.log(`Sending SMS to ${this.maskPhoneNumber(request.phoneNumber)} via ${this.config.provider}`)
+      this.logger.log(
+        `Sending SMS to ${this.maskPhoneNumber(request.phoneNumber)} via ${this.config.provider}`
+      )
 
       // Validation du numéro de téléphone
       if (!this.isValidPhoneNumber(request.phoneNumber)) {
         return {
           success: false,
-          error: 'Invalid phone number format'
+          error: 'Invalid phone number format',
         }
       }
 
@@ -114,7 +116,6 @@ export class SMSService {
           return await this.sendViaVonage(request)
         case 'aws-sns':
           return await this.sendViaAWSSNS(request)
-        case 'mock':
         default:
           return await this.sendViaMock(request)
       }
@@ -122,7 +123,7 @@ export class SMSService {
       this.logger.error('Error sending SMS:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -195,25 +196,25 @@ export class SMSService {
   private async sendViaMock(request: SendSMSRequest): Promise<SendSMSResponse> {
     this.logger.log(`[MOCK SMS] To: ${request.phoneNumber}`)
     this.logger.log(`[MOCK SMS] Message: ${request.message}`)
-    
+
     // Simuler un délai d'envoi
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
     // Simuler un succès avec probabilité de 95%
     const success = Math.random() > 0.05
-    
+
     if (success) {
       return {
         success: true,
         messageId: `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         status: 'delivered',
         cost: 0.05,
-        segmentCount: 1
+        segmentCount: 1,
       }
     } else {
       return {
         success: false,
-        error: 'Mock SMS delivery failed'
+        error: 'Mock SMS delivery failed',
       }
     }
   }
@@ -222,8 +223,8 @@ export class SMSService {
    * Obtenir les statistiques d'envoi
    */
   async getSMSStatistics(
-    startDate: Date,
-    endDate: Date
+    _startDate: Date,
+    _endDate: Date
   ): Promise<{
     totalSent: number
     successRate: number
@@ -237,12 +238,12 @@ export class SMSService {
       successRate: 98.5,
       totalCost: 62.35,
       byProvider: {
-        [this.config.provider]: 1247
+        [this.config.provider]: 1247,
       },
       byType: {
         verification: 1089,
-        alert: 158
-      }
+        alert: 158,
+      },
     }
   }
 
@@ -271,7 +272,7 @@ export class SMSService {
     return {
       isValid: errors.length === 0,
       errors,
-      provider: this.config.provider
+      provider: this.config.provider,
     }
   }
 
@@ -285,27 +286,27 @@ export class SMSService {
     error?: string
   }> {
     const startTime = Date.now()
-    
+
     try {
       // Test d'envoi avec un numéro factice
       const result = await this.sendSMS({
         phoneNumber: '+33123456789',
         message: 'Test connectivity message',
-        messageType: 'info'
+        messageType: 'info',
       })
-      
+
       return {
         success: result.success,
         provider: this.config.provider,
         responseTime: Date.now() - startTime,
-        error: result.error
+        error: result.error,
       }
     } catch (error) {
       return {
         success: false,
         provider: this.config.provider,
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }

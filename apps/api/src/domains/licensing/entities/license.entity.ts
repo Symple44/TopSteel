@@ -1,17 +1,17 @@
+import * as crypto from 'node:crypto'
 import {
-  Entity,
-  PrimaryGeneratedColumn,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   Index,
   OneToMany,
-  BeforeInsert,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
+import { LicenseActivation } from './license-activation.entity'
 import { LicenseFeature } from './license-feature.entity'
 import { LicenseUsage } from './license-usage.entity'
-import { LicenseActivation } from './license-activation.entity'
-import * as crypto from 'crypto'
 
 /**
  * License types
@@ -186,13 +186,22 @@ export class License {
   updatedBy?: string
 
   // Relations
-  @OneToMany(() => LicenseFeature, feature => feature.license)
+  @OneToMany(
+    () => LicenseFeature,
+    (feature) => feature.license
+  )
   features!: LicenseFeature[]
 
-  @OneToMany(() => LicenseUsage, usage => usage.license)
+  @OneToMany(
+    () => LicenseUsage,
+    (usage) => usage.license
+  )
   usage!: LicenseUsage[]
 
-  @OneToMany(() => LicenseActivation, activation => activation.license)
+  @OneToMany(
+    () => LicenseActivation,
+    (activation) => activation.license
+  )
   activations!: LicenseActivation[]
 
   // Hooks
@@ -247,7 +256,7 @@ export class License {
 
     const renewalDate = new Date(this.expiresAt)
     renewalDate.setDate(renewalDate.getDate() - daysBefore)
-    
+
     return new Date() >= renewalDate
   }
 
@@ -268,16 +277,14 @@ export class License {
    * Check if feature is enabled
    */
   hasFeature(featureCode: string): boolean {
-    return this.features?.some(f => 
-      f.featureCode === featureCode && f.isEnabled
-    ) || false
+    return this.features?.some((f) => f.featureCode === featureCode && f.isEnabled) || false
   }
 
   /**
    * Get feature limit
    */
   getFeatureLimit(featureCode: string): number | null {
-    const feature = this.features?.find(f => f.featureCode === featureCode)
+    const feature = this.features?.find((f) => f.featureCode === featureCode)
     return feature?.limit ?? null
   }
 
@@ -300,9 +307,7 @@ export class License {
       return true
     }
 
-    return this.restrictions.domainWhitelist.some(allowed => 
-      domain.endsWith(allowed)
-    )
+    return this.restrictions.domainWhitelist.some((allowed) => domain.endsWith(allowed))
   }
 
   /**
@@ -358,7 +363,7 @@ export class License {
       societeId: this.societeId,
       type: this.type,
       expiresAt: this.expiresAt?.toISOString(),
-      features: this.features?.map(f => ({
+      features: this.features?.map((f) => ({
         code: f.featureCode,
         enabled: f.isEnabled,
         limit: f.limit,
@@ -368,7 +373,7 @@ export class License {
     const sign = crypto.createSign('SHA256')
     sign.update(data)
     sign.end()
-    
+
     this.signature = sign.sign(privateKey, 'hex')
   }
 
@@ -386,7 +391,7 @@ export class License {
       societeId: this.societeId,
       type: this.type,
       expiresAt: this.expiresAt?.toISOString(),
-      features: this.features?.map(f => ({
+      features: this.features?.map((f) => ({
         code: f.featureCode,
         enabled: f.isEnabled,
         limit: f.limit,
@@ -450,7 +455,7 @@ export class License {
   toJSON(): Record<string, any> {
     return {
       ...this.getSummary(),
-      features: this.features?.map(f => f.toJSON()),
+      features: this.features?.map((f) => f.toJSON()),
       restrictions: this.restrictions,
       metadata: this.metadata,
       notes: this.notes,

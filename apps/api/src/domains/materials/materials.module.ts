@@ -12,13 +12,8 @@ import { MaterialMovementService } from './services/material-movement.service'
  * Module pour la gestion des matériaux industriels
  */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Material, MaterialMovement], 'tenant')
-  ],
-  controllers: [
-    MaterialController,
-    MaterialMovementController
-  ],
+  imports: [TypeOrmModule.forFeature([Material, MaterialMovement], 'tenant')],
+  controllers: [MaterialController, MaterialMovementController],
   providers: [
     MaterialService,
     MaterialMovementService,

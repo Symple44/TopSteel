@@ -186,7 +186,7 @@ export interface ArticleAdvancedFilters extends ArticleSearchCriteria {
   prixVenteMax?: number
   margeMin?: number
   margeMax?: number
-  
+
   // Critères de catégories
   categories?: string[]
 

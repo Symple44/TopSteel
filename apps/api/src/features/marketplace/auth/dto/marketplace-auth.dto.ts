@@ -1,167 +1,172 @@
-import { IsEmail, IsString, MinLength, MaxLength, Matches, IsOptional, IsBoolean } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator'
 
 export class RegisterDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'john.doe@example.com',
-    description: 'Customer email address'
+    description: 'Customer email address',
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @MaxLength(254, { message: 'Email address is too long' })
   @Transform(({ value }) => value?.toLowerCase().trim())
-  email: string;
+  email: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'SecureP@ssw0rd!',
-    description: 'Strong password with uppercase, lowercase, number and special character'
+    description: 'Strong password with uppercase, lowercase, number and special character',
   })
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @MaxLength(128, { message: 'Password is too long' })
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-    { message: 'Password must contain uppercase, lowercase, number and special character' }
-  )
-  password: string;
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
+    message: 'Password must contain uppercase, lowercase, number and special character',
+  })
+  password: string
 
   @ApiProperty({ example: 'John' })
   @IsString()
   @MinLength(1, { message: 'First name is required' })
   @MaxLength(50, { message: 'First name is too long' })
   @Transform(({ value }) => value?.trim())
-  firstName: string;
+  firstName: string
 
   @ApiProperty({ example: 'Doe' })
   @IsString()
   @MinLength(1, { message: 'Last name is required' })
   @MaxLength(50, { message: 'Last name is too long' })
   @Transform(({ value }) => value?.trim())
-  lastName: string;
+  lastName: string
 
   @ApiPropertyOptional({ example: '+33612345678' })
   @IsOptional()
   @IsString()
-  @Matches(/^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/, {
-    message: 'Please provide a valid phone number'
+  @Matches(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, {
+    message: 'Please provide a valid phone number',
   })
   @Transform(({ value }) => value?.trim())
-  phone?: string;
+  phone?: string
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: true,
-    description: 'Accept marketing emails'
+    description: 'Accept marketing emails',
   })
   @IsOptional()
   @IsBoolean()
-  acceptMarketing?: boolean;
+  acceptMarketing?: boolean
 }
 
 export class LoginDto {
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @Transform(({ value }) => value?.toLowerCase().trim())
-  email: string;
+  email: string
 
   @ApiProperty({ example: 'SecureP@ssw0rd!' })
   @IsString()
   @MinLength(1, { message: 'Password is required' })
-  password: string;
+  password: string
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: false,
-    description: 'Keep user logged in for 30 days'
+    description: 'Keep user logged in for 30 days',
   })
   @IsOptional()
   @IsBoolean()
-  rememberMe?: boolean;
+  rememberMe?: boolean
 }
 
 export class RefreshTokenDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'JWT refresh token',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   @IsString()
   @MinLength(1, { message: 'Refresh token is required' })
-  refreshToken: string;
+  refreshToken: string
 }
 
 export class RequestPasswordResetDto {
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @Transform(({ value }) => value?.toLowerCase().trim())
-  email: string;
+  email: string
 }
 
 export class ResetPasswordDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Password reset token from email',
-    example: 'a1b2c3d4e5f6...'
+    example: 'a1b2c3d4e5f6...',
   })
   @IsString()
   @MinLength(1, { message: 'Reset token is required' })
-  token: string;
+  token: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'NewSecureP@ssw0rd!',
-    description: 'New password'
+    description: 'New password',
   })
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @MaxLength(128, { message: 'Password is too long' })
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-    { message: 'Password must contain uppercase, lowercase, number and special character' }
-  )
-  newPassword: string;
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
+    message: 'Password must contain uppercase, lowercase, number and special character',
+  })
+  newPassword: string
 }
 
 export class VerifyEmailDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Email verification token',
-    example: 'a1b2c3d4e5f6...'
+    example: 'a1b2c3d4e5f6...',
   })
   @IsString()
   @MinLength(1, { message: 'Verification token is required' })
-  token: string;
+  token: string
 }
 
 export class ChangePasswordDto {
   @ApiProperty({ example: 'CurrentP@ssw0rd!' })
   @IsString()
   @MinLength(1, { message: 'Current password is required' })
-  currentPassword: string;
+  currentPassword: string
 
   @ApiProperty({ example: 'NewSecureP@ssw0rd!' })
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @MaxLength(128, { message: 'Password is too long' })
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-    { message: 'Password must contain uppercase, lowercase, number and special character' }
-  )
-  newPassword: string;
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
+    message: 'Password must contain uppercase, lowercase, number and special character',
+  })
+  newPassword: string
 }
 
 export class AuthTokensResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'JWT access token',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  accessToken: string;
+  accessToken: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'JWT refresh token for getting new access tokens',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  refreshToken: string;
+  refreshToken: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Access token expiry time in seconds',
-    example: 3600
+    example: 3600,
   })
-  expiresIn: number;
+  expiresIn: number
 
   @ApiPropertyOptional({
     description: 'Customer information',
@@ -169,25 +174,25 @@ export class AuthTokensResponse {
       id: 'uuid',
       email: 'john.doe@example.com',
       firstName: 'John',
-      lastName: 'Doe'
-    }
+      lastName: 'Doe',
+    },
   })
   customer?: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
+    id: string
+    email: string
+    firstName: string
+    lastName: string
+  }
 }
 
 export class MessageResponse {
-  @ApiProperty({ 
-    example: 'Operation completed successfully'
+  @ApiProperty({
+    example: 'Operation completed successfully',
   })
-  message: string;
+  message: string
 
   @ApiPropertyOptional({
-    example: true
+    example: true,
   })
-  success?: boolean;
+  success?: boolean
 }

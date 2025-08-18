@@ -247,9 +247,12 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
         query.andWhere('material.stockPhysique <= :stockMax', { stockMax: filters.stock.max })
       }
       if (filters.stock.disponible !== undefined) {
-        query.andWhere('(material.stockPhysique - COALESCE(material.stockReserve, 0)) >= :disponible', {
-          disponible: filters.stock.disponible
-        })
+        query.andWhere(
+          '(material.stockPhysique - COALESCE(material.stockReserve, 0)) >= :disponible',
+          {
+            disponible: filters.stock.disponible,
+          }
+        )
       }
       if (filters.stock.enRupture === true) {
         query.andWhere('material.stockPhysique <= 0')
@@ -274,42 +277,42 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     if (filters.dimensions) {
       if (filters.dimensions.longueurMin !== undefined) {
         query.andWhere("CAST(material.dimensions->>'longueur' AS FLOAT) >= :longueurMin", {
-          longueurMin: filters.dimensions.longueurMin
+          longueurMin: filters.dimensions.longueurMin,
         })
       }
       if (filters.dimensions.longueurMax !== undefined) {
         query.andWhere("CAST(material.dimensions->>'longueur' AS FLOAT) <= :longueurMax", {
-          longueurMax: filters.dimensions.longueurMax
+          longueurMax: filters.dimensions.longueurMax,
         })
       }
       if (filters.dimensions.largeurMin !== undefined) {
         query.andWhere("CAST(material.dimensions->>'largeur' AS FLOAT) >= :largeurMin", {
-          largeurMin: filters.dimensions.largeurMin
+          largeurMin: filters.dimensions.largeurMin,
         })
       }
       if (filters.dimensions.largeurMax !== undefined) {
         query.andWhere("CAST(material.dimensions->>'largeur' AS FLOAT) <= :largeurMax", {
-          largeurMax: filters.dimensions.largeurMax
+          largeurMax: filters.dimensions.largeurMax,
         })
       }
       if (filters.dimensions.epaisseurMin !== undefined) {
         query.andWhere("CAST(material.dimensions->>'epaisseur' AS FLOAT) >= :epaisseurMin", {
-          epaisseurMin: filters.dimensions.epaisseurMin
+          epaisseurMin: filters.dimensions.epaisseurMin,
         })
       }
       if (filters.dimensions.epaisseurMax !== undefined) {
         query.andWhere("CAST(material.dimensions->>'epaisseur' AS FLOAT) <= :epaisseurMax", {
-          epaisseurMax: filters.dimensions.epaisseurMax
+          epaisseurMax: filters.dimensions.epaisseurMax,
         })
       }
       if (filters.dimensions.diametreMin !== undefined) {
         query.andWhere("CAST(material.dimensions->>'diametre' AS FLOAT) >= :diametreMin", {
-          diametreMin: filters.dimensions.diametreMin
+          diametreMin: filters.dimensions.diametreMin,
         })
       }
       if (filters.dimensions.diametreMax !== undefined) {
         query.andWhere("CAST(material.dimensions->>'diametre' AS FLOAT) <= :diametreMax", {
-          diametreMax: filters.dimensions.diametreMax
+          diametreMax: filters.dimensions.diametreMax,
         })
       }
     }
@@ -327,96 +330,114 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     // Filtres mécaniques
     if (filters.proprietesMecaniques) {
       if (filters.proprietesMecaniques.resistanceMin !== undefined) {
-        query.andWhere("CAST(material.proprietesMecaniques->>'resistanceTraction' AS FLOAT) >= :resistanceMin", {
-          resistanceMin: filters.proprietesMecaniques.resistanceMin
-        })
+        query.andWhere(
+          "CAST(material.proprietesMecaniques->>'resistanceTraction' AS FLOAT) >= :resistanceMin",
+          {
+            resistanceMin: filters.proprietesMecaniques.resistanceMin,
+          }
+        )
       }
       if (filters.proprietesMecaniques.resistanceMax !== undefined) {
-        query.andWhere("CAST(material.proprietesMecaniques->>'resistanceTraction' AS FLOAT) <= :resistanceMax", {
-          resistanceMax: filters.proprietesMecaniques.resistanceMax
-        })
+        query.andWhere(
+          "CAST(material.proprietesMecaniques->>'resistanceTraction' AS FLOAT) <= :resistanceMax",
+          {
+            resistanceMax: filters.proprietesMecaniques.resistanceMax,
+          }
+        )
       }
       if (filters.proprietesMecaniques.dureteMin !== undefined) {
         query.andWhere("CAST(material.proprietesMecaniques->>'durete' AS FLOAT) >= :dureteMin", {
-          dureteMin: filters.proprietesMecaniques.dureteMin
+          dureteMin: filters.proprietesMecaniques.dureteMin,
         })
       }
       if (filters.proprietesMecaniques.dureteMax !== undefined) {
         query.andWhere("CAST(material.proprietesMecaniques->>'durete' AS FLOAT) <= :dureteMax", {
-          dureteMax: filters.proprietesMecaniques.dureteMax
+          dureteMax: filters.proprietesMecaniques.dureteMax,
         })
       }
       if (filters.proprietesMecaniques.limiteElastiqueMin !== undefined) {
-        query.andWhere("CAST(material.proprietesMecaniques->>'limiteElastique' AS FLOAT) >= :limiteElastiqueMin", {
-          limiteElastiqueMin: filters.proprietesMecaniques.limiteElastiqueMin
-        })
+        query.andWhere(
+          "CAST(material.proprietesMecaniques->>'limiteElastique' AS FLOAT) >= :limiteElastiqueMin",
+          {
+            limiteElastiqueMin: filters.proprietesMecaniques.limiteElastiqueMin,
+          }
+        )
       }
     }
 
     // Filtres physiques
     if (filters.proprietesPhysiques) {
       if (filters.proprietesPhysiques.densiteMin !== undefined) {
-        query.andWhere('material.densite >= :densiteMin', { 
-          densiteMin: filters.proprietesPhysiques.densiteMin 
+        query.andWhere('material.densite >= :densiteMin', {
+          densiteMin: filters.proprietesPhysiques.densiteMin,
         })
       }
       if (filters.proprietesPhysiques.densiteMax !== undefined) {
-        query.andWhere('material.densite <= :densiteMax', { 
-          densiteMax: filters.proprietesPhysiques.densiteMax 
+        query.andWhere('material.densite <= :densiteMax', {
+          densiteMax: filters.proprietesPhysiques.densiteMax,
         })
       }
       if (filters.proprietesPhysiques.temperatureFusionMin !== undefined) {
-        query.andWhere("CAST(material.proprietesPhysiques->>'temperatureFusion' AS FLOAT) >= :tempFusionMin", {
-          tempFusionMin: filters.proprietesPhysiques.temperatureFusionMin
-        })
+        query.andWhere(
+          "CAST(material.proprietesPhysiques->>'temperatureFusion' AS FLOAT) >= :tempFusionMin",
+          {
+            tempFusionMin: filters.proprietesPhysiques.temperatureFusionMin,
+          }
+        )
       }
       if (filters.proprietesPhysiques.temperatureFusionMax !== undefined) {
-        query.andWhere("CAST(material.proprietesPhysiques->>'temperatureFusion' AS FLOAT) <= :tempFusionMax", {
-          tempFusionMax: filters.proprietesPhysiques.temperatureFusionMax
-        })
+        query.andWhere(
+          "CAST(material.proprietesPhysiques->>'temperatureFusion' AS FLOAT) <= :tempFusionMax",
+          {
+            tempFusionMax: filters.proprietesPhysiques.temperatureFusionMax,
+          }
+        )
       }
     }
 
     // Filtres chimiques
     if (filters.proprietesChimiques) {
       if (filters.proprietesChimiques.resistanceCorrosion !== undefined) {
-        query.andWhere("material.proprietesChimiques->>'resistanceCorrosion' = :resistanceCorrosion", {
-          resistanceCorrosion: filters.proprietesChimiques.resistanceCorrosion
-        })
+        query.andWhere(
+          "material.proprietesChimiques->>'resistanceCorrosion' = :resistanceCorrosion",
+          {
+            resistanceCorrosion: filters.proprietesChimiques.resistanceCorrosion,
+          }
+        )
       }
       if (filters.proprietesChimiques.traitementSurface?.length) {
         query.andWhere("material.proprietesChimiques->>'traitementSurface' IN (:...traitements)", {
-          traitements: filters.proprietesChimiques.traitementSurface
+          traitements: filters.proprietesChimiques.traitementSurface,
         })
       }
     }
 
     // Filtres par fournisseurs
     if (filters.fournisseurs?.length) {
-      query.andWhere("material.informationsApprovisionnement->>'fournisseurPrincipalId' IN (:...fournisseurs)", {
-        fournisseurs: filters.fournisseurs
-      })
+      query.andWhere(
+        "material.informationsApprovisionnement->>'fournisseurPrincipalId' IN (:...fournisseurs)",
+        {
+          fournisseurs: filters.fournisseurs,
+        }
+      )
     }
 
     // Filtre par certifications
     if (filters.certifications?.length) {
       query.andWhere("material.conformiteNormes->>'certifications' ?| ARRAY[:...certs]", {
-        certs: filters.certifications
+        certs: filters.certifications,
       })
     }
 
     // Filtre par stockage spécial
     if (filters.stockageSpecial === true) {
-      query.andWhere(
-        "material.methodeStockage IN (:...methodes)",
-        { 
-          methodes: [
-            StorageMethod.CONTROLE_HUMIDITE,
-            StorageMethod.CONTROLE_TEMPERATURE,
-            StorageMethod.SUSPENDU
-          ]
-        }
-      )
+      query.andWhere('material.methodeStockage IN (:...methodes)', {
+        methodes: [
+          StorageMethod.CONTROLE_HUMIDITE,
+          StorageMethod.CONTROLE_TEMPERATURE,
+          StorageMethod.SUSPENDU,
+        ],
+      })
     }
 
     // Filtres booléens
@@ -455,7 +476,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       items,
       total,
       page,
-      limit
+      limit,
     }
   }
 
@@ -487,11 +508,11 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       materialsSousStockMini,
       materialsObsoletes,
       materialsDangereux,
-      materialsStockageSpecial
+      materialsStockageSpecial,
     ] = await Promise.all([
       // Total des matériaux
       this.repository.count(),
-      
+
       // Répartition par type
       this.repository
         .createQueryBuilder('material')
@@ -499,7 +520,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
         .addSelect('COUNT(*)', 'count')
         .groupBy('material.type')
         .getRawMany(),
-      
+
       // Répartition par forme
       this.repository
         .createQueryBuilder('material')
@@ -507,7 +528,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
         .addSelect('COUNT(*)', 'count')
         .groupBy('material.forme')
         .getRawMany(),
-      
+
       // Répartition par status
       this.repository
         .createQueryBuilder('material')
@@ -515,7 +536,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
         .addSelect('COUNT(*)', 'count')
         .groupBy('material.status')
         .getRawMany(),
-      
+
       // Répartition par méthode de stockage
       this.repository
         .createQueryBuilder('material')
@@ -523,29 +544,29 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
         .addSelect('COUNT(*)', 'count')
         .groupBy('material.methodeStockage')
         .getRawMany(),
-      
+
       // Valeur totale du stock
       this.calculateTotalStockValue(),
-      
+
       // Matériaux en rupture
       this.countMaterialsEnRupture(),
-      
+
       // Matériaux sous stock minimum
       this.countMaterialsSousStockMinimum(),
-      
+
       // Matériaux obsolètes
       this.repository.count({ where: { obsolete: true } }),
-      
+
       // Matériaux dangereux
       this.repository.count({ where: { dangereux: true } }),
-      
+
       // Matériaux nécessitant un stockage spécial
-      this.countMaterialsStockageSpecial()
+      this.countMaterialsStockageSpecial(),
     ])
 
     // Construire les objets de répartition
     const repartitionParType: Record<MaterialType, number> = {} as any
-    Object.values(MaterialType).forEach(type => {
+    Object.values(MaterialType).forEach((type) => {
       repartitionParType[type] = 0
     })
     typeStats.forEach((stat) => {
@@ -553,7 +574,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     })
 
     const repartitionParForme: Record<MaterialShape, number> = {} as any
-    Object.values(MaterialShape).forEach(forme => {
+    Object.values(MaterialShape).forEach((forme) => {
       repartitionParForme[forme] = 0
     })
     formeStats.forEach((stat) => {
@@ -561,7 +582,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     })
 
     const repartitionParStatus: Record<MaterialStatus, number> = {} as any
-    Object.values(MaterialStatus).forEach(status => {
+    Object.values(MaterialStatus).forEach((status) => {
       repartitionParStatus[status] = 0
     })
     statusStats.forEach((stat) => {
@@ -569,7 +590,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     })
 
     const repartitionParStockage: Record<StorageMethod, number> = {} as any
-    Object.values(StorageMethod).forEach(method => {
+    Object.values(StorageMethod).forEach((method) => {
       repartitionParStockage[method] = 0
     })
     stockageStats.forEach((stat) => {
@@ -587,7 +608,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       materialsSousStockMini,
       materialsObsoletes,
       materialsDangereux,
-      materialsStockageSpecial
+      materialsStockageSpecial,
     }
   }
 
@@ -751,7 +772,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     const valuation: Record<MaterialType, { quantite: number; valeur: number }> = {} as any
 
     // Initialiser avec 0 pour tous les types
-    Object.values(MaterialType).forEach(type => {
+    Object.values(MaterialType).forEach((type) => {
       valuation[type] = { quantite: 0, valeur: 0 }
     })
 
@@ -759,7 +780,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     result.forEach((row) => {
       valuation[row.type] = {
         quantite: parseFloat(row.quantite || '0'),
-        valeur: parseFloat(row.valeur || '0')
+        valeur: parseFloat(row.valeur || '0'),
       }
     })
 
@@ -782,7 +803,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     const valuation: Record<MaterialShape, { quantite: number; valeur: number }> = {} as any
 
     // Initialiser avec 0 pour toutes les formes
-    Object.values(MaterialShape).forEach(shape => {
+    Object.values(MaterialShape).forEach((shape) => {
       valuation[shape] = { quantite: 0, valeur: 0 }
     })
 
@@ -790,7 +811,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     result.forEach((row) => {
       valuation[row.forme] = {
         quantite: parseFloat(row.quantite || '0'),
-        valeur: parseFloat(row.valeur || '0')
+        valeur: parseFloat(row.valeur || '0'),
       }
     })
 
@@ -810,7 +831,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       .limit(limit)
       .getRawMany()
 
-    return movements.map(movement => ({
+    return movements.map((movement) => ({
       id: movement.movement_id,
       type: movement.movement_type,
       quantite: movement.movement_quantite,
@@ -818,7 +839,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       reference: movement.movement_reference,
       motif: movement.movement_motif,
       stockAvant: movement.movement_stockAvant,
-      stockApres: movement.movement_stockApres
+      stockApres: movement.movement_stockApres,
     }))
   }
 
@@ -826,21 +847,18 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     limit: number,
     periode?: { debut: Date; fin: Date }
   ): Promise<Array<Material & { quantiteUtilisee: number }>> {
-    let subQuery = '(SELECT "materialId", SUM(quantite) as total_usage FROM material_movements WHERE type IN (\'SORTIE\', \'TRANSFERT\') AND status = \'COMPLETE\''
-    
+    let subQuery =
+      "(SELECT \"materialId\", SUM(quantite) as total_usage FROM material_movements WHERE type IN ('SORTIE', 'TRANSFERT') AND status = 'COMPLETE'"
+
     if (periode) {
       subQuery += ' AND "dateCreation" BETWEEN :debut AND :fin'
     }
-    
+
     subQuery += ' GROUP BY "materialId")'
-    
+
     const query = this.repository
       .createQueryBuilder('material')
-      .leftJoin(
-        subQuery,
-        'usage',
-        'usage."materialId" = material.id'
-      )
+      .leftJoin(subQuery, 'usage', 'usage."materialId" = material.id')
       .addSelect('COALESCE(usage.total_usage, 0)', 'quantiteUtilisee')
       .where('material.status = :status', { status: MaterialStatus.ACTIF })
       .orderBy('quantiteUtilisee', 'DESC')
@@ -851,10 +869,12 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     }
 
     const results = await query.getRawAndEntities()
-    
+
     return results.entities.map((material, index) => {
       const quantiteUtilisee = parseFloat(results.raw[index]?.quantiteUtilisee || '0')
-      return Object.assign(material, { quantiteUtilisee }) as Material & { quantiteUtilisee: number }
+      return Object.assign(material, { quantiteUtilisee }) as Material & {
+        quantiteUtilisee: number
+      }
     })
   }
 
@@ -897,7 +917,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     // Compatibilité par type et forme
     query.andWhere('(material.type = :type OR material.forme = :forme)', {
       type: material.type,
-      forme: material.forme
+      forme: material.forme,
     })
 
     // Exclure les matériaux avec des incompatibilités connues
@@ -908,7 +928,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     // Méthode de stockage compatible
     if (material.methodeStockage !== StorageMethod.STANDARD) {
       query.andWhere('material.methodeStockage = :methodeStockage', {
-        methodeStockage: material.methodeStockage
+        methodeStockage: material.methodeStockage,
       })
     }
 
@@ -989,7 +1009,9 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
           .createQueryBuilder('material_movements', 'movement')
           .select('SUM(movement.quantite)', 'total')
           .where('movement.materialId = :materialId', { materialId: material.id })
-          .andWhere('movement.type IN (:...types)', { types: ['ENTREE', 'RETOUR', 'CORRECTION_POSITIVE'] })
+          .andWhere('movement.type IN (:...types)', {
+            types: ['ENTREE', 'RETOUR', 'CORRECTION_POSITIVE'],
+          })
           .andWhere('movement.dateCreation BETWEEN :debut AND :fin', { debut, fin })
           .andWhere('movement.status = :status', { status: 'COMPLETE' })
           .getRawOne()
@@ -999,7 +1021,9 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
           .createQueryBuilder('material_movements', 'movement')
           .select('SUM(movement.quantite)', 'total')
           .where('movement.materialId = :materialId', { materialId: material.id })
-          .andWhere('movement.type IN (:...types)', { types: ['SORTIE', 'TRANSFERT', 'CORRECTION_NEGATIVE'] })
+          .andWhere('movement.type IN (:...types)', {
+            types: ['SORTIE', 'TRANSFERT', 'CORRECTION_NEGATIVE'],
+          })
           .andWhere('movement.dateCreation BETWEEN :debut AND :fin', { debut, fin })
           .andWhere('movement.status = :status', { status: 'COMPLETE' })
           .getRawOne()
@@ -1011,13 +1035,13 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
           quantiteEntree: parseFloat(entrees?.total || '0'),
           quantiteSortie: parseFloat(sorties?.total || '0'),
           quantiteStock: material.stockPhysique || 0,
-          valeurStock: (material.stockPhysique || 0) * (material.prixUnitaire || 0)
+          valeurStock: (material.stockPhysique || 0) * (material.prixUnitaire || 0),
         }
       })
     )
 
     // Filtrer pour ne garder que les matériaux avec des mouvements
-    return stats.filter(s => s.quantiteEntree > 0 || s.quantiteSortie > 0)
+    return stats.filter((s) => s.quantiteEntree > 0 || s.quantiteSortie > 0)
   }
 
   // Méthodes de l'interface IBusinessRepository
@@ -1066,8 +1090,8 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
         methodes: [
           StorageMethod.CONTROLE_HUMIDITE,
           StorageMethod.CONTROLE_TEMPERATURE,
-          StorageMethod.SUSPENDU
-        ]
+          StorageMethod.SUSPENDU,
+        ],
       })
       .getCount()
   }

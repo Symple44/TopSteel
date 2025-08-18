@@ -1,12 +1,12 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { MenuItem } from './menu-item.entity'
 
@@ -33,7 +33,7 @@ export class MenuItemAction {
   action!: string
 
   @Column({ type: 'jsonb', nullable: true })
-  actionParams?: Record<string, any>
+  actionParams?: Record<string, unknown>
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   shortcutKeys?: string
@@ -54,7 +54,11 @@ export class MenuItemAction {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => MenuItem, menuItem => menuItem.actions, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => MenuItem,
+    (menuItem) => menuItem.actions,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'menu_item_id' })
   menuItem!: MenuItem
 
@@ -63,7 +67,7 @@ export class MenuItemAction {
   /**
    * Execute the action
    */
-  async execute(context?: Record<string, any>): Promise<any> {
+  async execute(context?: Record<string, unknown>): Promise<unknown> {
     // This would be implemented based on the action type
     // For now, return action details
     return {
@@ -91,8 +95,8 @@ export class MenuItemAction {
     // Format shortcut keys for display
     return this.shortcutKeys
       .split('+')
-      .map(key => key.trim())
-      .map(key => {
+      .map((key) => key.trim())
+      .map((key) => {
         // Capitalize modifier keys
         if (['ctrl', 'alt', 'shift', 'cmd', 'meta'].includes(key.toLowerCase())) {
           return key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()
@@ -105,13 +109,22 @@ export class MenuItemAction {
   /**
    * Check if shortcut matches keyboard event
    */
-  matchesKeyboardEvent(event: { key: string; ctrlKey?: boolean; altKey?: boolean; shiftKey?: boolean; metaKey?: boolean }): boolean {
+  matchesKeyboardEvent(event: {
+    key: string
+    ctrlKey?: boolean
+    altKey?: boolean
+    shiftKey?: boolean
+    metaKey?: boolean
+  }): boolean {
     if (!this.shortcutKeys) {
       return false
     }
 
-    const parts = this.shortcutKeys.toLowerCase().split('+').map(p => p.trim())
-    
+    const parts = this.shortcutKeys
+      .toLowerCase()
+      .split('+')
+      .map((p) => p.trim())
+
     // Check modifiers
     if (parts.includes('ctrl') && !event.ctrlKey) return false
     if (parts.includes('alt') && !event.altKey) return false
@@ -119,9 +132,7 @@ export class MenuItemAction {
     if ((parts.includes('cmd') || parts.includes('meta')) && !event.metaKey) return false
 
     // Get the main key (non-modifier)
-    const mainKey = parts.find(p => 
-      !['ctrl', 'alt', 'shift', 'cmd', 'meta'].includes(p)
-    )
+    const mainKey = parts.find((p) => !['ctrl', 'alt', 'shift', 'cmd', 'meta'].includes(p))
 
     if (mainKey) {
       // Check if the pressed key matches
@@ -134,7 +145,7 @@ export class MenuItemAction {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       actionType: this.actionType,

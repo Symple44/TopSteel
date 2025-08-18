@@ -1,44 +1,56 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { MarketplaceOrder } from './marketplace-order.entity';
-import { Article } from '@erp/entities';
+import { Article } from '@erp/entities'
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
+import { MarketplaceOrder } from './marketplace-order.entity'
 
 @Entity('marketplace_order_items')
 export class MarketplaceOrderItem {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @Column({ name: 'order_id' })
-  orderId: string;
+  orderId: string
 
-  @ManyToOne(() => MarketplaceOrder, order => order.items, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => MarketplaceOrder,
+    (order) => order.items,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'order_id' })
-  order: MarketplaceOrder;
+  order: MarketplaceOrder
 
   @Column({ name: 'product_id' })
-  productId: string; // Référence vers Article.id ERP
+  productId: string // Référence vers Article.id ERP
 
   @ManyToOne(() => Article, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'product_id' })
-  product: Article; // Article ERP au lieu de MarketplaceProduct
+  product: Article // Article ERP au lieu de MarketplaceProduct
 
   @Column()
-  quantity: number;
+  quantity: number
 
   @Column('decimal', { precision: 10, scale: 2 })
-  price: number; // Prix unitaire au moment de la commande
+  price: number // Prix unitaire au moment de la commande
 
   @Column({ name: 'total_price', type: 'decimal', precision: 10, scale: 2 })
-  totalPrice: number; // Prix total de la ligne
+  totalPrice: number // Prix total de la ligne
 
   @Column('decimal', { precision: 10, scale: 2, default: 0 })
-  discount: number;
+  discount: number
 
   @Column('jsonb', { nullable: true })
-  customizations: Record<string, any>;
+  customizations: Record<string, any>
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt: Date
 }

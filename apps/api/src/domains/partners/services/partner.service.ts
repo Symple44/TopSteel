@@ -778,24 +778,24 @@ export class PartnerService extends BusinessService<Partner> {
     pays?: string
   }): Promise<Partner[]> {
     const filters: PartnerAdvancedFilters = {}
-    
+
     if (criteria.ville) {
       filters.searchText = criteria.ville
       filters.searchFields = ['ville']
     }
-    
+
     if (criteria.departement) {
       filters.departement = criteria.departement
     }
-    
+
     if (criteria.region) {
       filters.region = criteria.region
     }
-    
+
     if (criteria.pays) {
       filters.pays = [criteria.pays]
     }
-    
+
     const result = await this.partnerRepository.findWithFilters(filters)
     return result.items
   }
@@ -835,59 +835,65 @@ export class PartnerService extends BusinessService<Partner> {
     checkSiret?: boolean
     checkEmail?: boolean
     checkDenomination?: boolean
-  }): Promise<Array<{
-    partners: Partner[]
-    matchType: string
-    confidence: number
-  }>> {
+  }): Promise<
+    Array<{
+      partners: Partner[]
+      matchType: string
+      confidence: number
+    }>
+  > {
     const allPartners = await this.partnerRepository.findAll()
     const doublons: Array<{
       partners: Partner[]
       matchType: string
       confidence: number
     }> = []
-    
+
     const processedIds = new Set<string>()
-    
+
     for (const partner of allPartners) {
       if (processedIds.has(partner.id)) continue
-      
+
       const matches = await this.partnerRepository.findPotentialDuplicates(partner)
-      const filteredMatches = matches.filter(m => 
-        m.id !== partner.id && !processedIds.has(m.id)
-      )
-      
+      const filteredMatches = matches.filter((m) => m.id !== partner.id && !processedIds.has(m.id))
+
       if (filteredMatches.length > 0) {
         let matchType = ''
         let confidence = 0
-        
+
         for (const match of filteredMatches) {
           if (criteria?.checkSiret !== false && partner.siret === match.siret && partner.siret) {
             matchType = 'SIRET'
             confidence = 100
-          } else if (criteria?.checkEmail !== false && partner.email === match.email && partner.email) {
+          } else if (
+            criteria?.checkEmail !== false &&
+            partner.email === match.email &&
+            partner.email
+          ) {
             matchType = matchType ? `${matchType}, EMAIL` : 'EMAIL'
             confidence = Math.max(confidence, 90)
-          } else if (criteria?.checkDenomination !== false && 
-                     partner.denomination.toLowerCase() === match.denomination.toLowerCase()) {
+          } else if (
+            criteria?.checkDenomination !== false &&
+            partner.denomination.toLowerCase() === match.denomination.toLowerCase()
+          ) {
             matchType = matchType ? `${matchType}, DENOMINATION` : 'DENOMINATION'
             confidence = Math.max(confidence, 80)
           }
         }
-        
+
         if (matchType) {
           doublons.push({
             partners: [partner, ...filteredMatches],
             matchType,
-            confidence
+            confidence,
           })
-          
+
           processedIds.add(partner.id)
-          filteredMatches.forEach(m => processedIds.add(m.id))
+          filteredMatches.forEach((m) => processedIds.add(m.id))
         }
       }
     }
-    
+
     return doublons.sort((a, b) => b.confidence - a.confidence)
   }
 
@@ -914,26 +920,29 @@ export class PartnerService extends BusinessService<Partner> {
   /**
    * Analyser la performance commerciale
    */
-  async getCommercialPerformance(startDate?: Date, endDate?: Date): Promise<{
+  async getCommercialPerformance(
+    _startDate?: Date,
+    _endDate?: Date
+  ): Promise<{
     topPerformers: Array<Partner & { performance: number }>
     underPerformers: Array<Partner & { performance: number }>
     trends: Array<{ periode: string; valeur: number }>
   }> {
     // TODO: Implémenter selon la logique métier avec les données de commandes/factures
     const partners = await this.partnerRepository.findAll()
-    
+
     // Simulation de données de performance
-    const withPerformance = partners.map(p => {
+    const withPerformance = partners.map((p) => {
       const performance = Math.random() * 100
       return Object.assign(p, { performance }) as Partner & { performance: number }
     })
-    
+
     const sorted = withPerformance.sort((a, b) => b.performance - a.performance)
-    
+
     return {
       topPerformers: sorted.slice(0, 10),
       underPerformers: sorted.slice(-10).reverse(),
-      trends: [] // TODO: Implémenter avec les données réelles
+      trends: [], // TODO: Implémenter avec les données réelles
     }
   }
 
@@ -960,10 +969,12 @@ export class PartnerService extends BusinessService<Partner> {
       priority: interactionData.priority || 'NORMALE',
       direction: interactionData.direction || 'SORTANT',
       dateCreation: new Date(),
-      ...interactionData
+      ...interactionData,
     }
 
-    this.logger.log(`Interaction créée pour le partenaire ${partnerId} par l'utilisateur ${context.userId}`)
+    this.logger.log(
+      `Interaction créée pour le partenaire ${partnerId} par l'utilisateur ${context.userId}`
+    )
     return interaction
   }
 
@@ -989,7 +1000,7 @@ export class PartnerService extends BusinessService<Partner> {
         dateInteraction: new Date(Date.now() - 86400000), // Hier
         status: 'TERMINEE',
         duree: 15,
-        utilisateurNom: 'Jean Dupont'
+        utilisateurNom: 'Jean Dupont',
       },
       {
         id: 'int-2',
@@ -998,7 +1009,7 @@ export class PartnerService extends BusinessService<Partner> {
         sujet: 'Demande de devis',
         dateInteraction: new Date(Date.now() - 172800000), // Avant-hier
         status: 'TERMINEE',
-        utilisateurNom: 'Marie Martin'
+        utilisateurNom: 'Marie Martin',
       },
       {
         id: 'int-3',
@@ -1008,17 +1019,17 @@ export class PartnerService extends BusinessService<Partner> {
         dateInteraction: new Date(Date.now() - 604800000), // Il y a une semaine
         status: 'TERMINEE',
         duree: 120,
-        utilisateurNom: 'Pierre Leblanc'
-      }
+        utilisateurNom: 'Pierre Leblanc',
+      },
     ]
 
     const limit = (filters.limit as number) || 50
     const offset = (filters.offset as number) || 0
-    
+
     return {
       items: simulatedInteractions.slice(offset, offset + limit),
       total: simulatedInteractions.length,
-      hasMore: simulatedInteractions.length > offset + limit
+      hasMore: simulatedInteractions.length > offset + limit,
     }
   }
 
@@ -1032,12 +1043,12 @@ export class PartnerService extends BusinessService<Partner> {
   ): Promise<Record<string, unknown>> {
     // TODO: Implémenter avec un repository d'interactions dédié
     this.logger.log(`Interaction ${interactionId} mise à jour par l'utilisateur ${context.userId}`)
-    
+
     return {
       id: interactionId,
       ...updateData,
       dateModification: new Date(),
-      modifiePar: context.userId
+      modifiePar: context.userId,
     }
   }
 
@@ -1052,7 +1063,7 @@ export class PartnerService extends BusinessService<Partner> {
   /**
    * Rechercher des interactions
    */
-  async searchInteractions(searchCriteria: Record<string, unknown>): Promise<{
+  async searchInteractions(_searchCriteria: Record<string, unknown>): Promise<{
     items: Record<string, unknown>[]
     total: number
     aggregations: Record<string, unknown>
@@ -1064,8 +1075,8 @@ export class PartnerService extends BusinessService<Partner> {
       aggregations: {
         byType: {},
         byStatus: {},
-        byUser: {}
-      }
+        byUser: {},
+      },
     }
   }
 
@@ -1073,9 +1084,9 @@ export class PartnerService extends BusinessService<Partner> {
    * Statistiques des interactions par type
    */
   async getInteractionStatsByType(
-    startDate?: Date,
-    endDate?: Date,
-    groupBy: 'day' | 'week' | 'month' = 'month'
+    _startDate?: Date,
+    _endDate?: Date,
+    _groupBy: 'day' | 'week' | 'month' = 'month'
   ): Promise<{
     byType: Record<string, number>
     byPeriod: Array<{ periode: string; count: number }>
@@ -1084,22 +1095,22 @@ export class PartnerService extends BusinessService<Partner> {
     // TODO: Implémenter avec des données réelles
     return {
       byType: {
-        'APPEL_TELEPHONIQUE': 45,
-        'EMAIL': 78,
-        'REUNION': 23,
-        'VISIOCONFERENCE': 34,
-        'VISITE_SITE': 12
+        APPEL_TELEPHONIQUE: 45,
+        EMAIL: 78,
+        REUNION: 23,
+        VISIOCONFERENCE: 34,
+        VISITE_SITE: 12,
       },
       byPeriod: [
         { periode: '2024-01', count: 89 },
         { periode: '2024-02', count: 156 },
-        { periode: '2024-03', count: 192 }
+        { periode: '2024-03', count: 192 },
       ],
       trends: [
         { type: 'EMAIL', trend: 'up', variation: 15.2 },
         { type: 'REUNION', trend: 'down', variation: -8.5 },
-        { type: 'APPEL_TELEPHONIQUE', trend: 'stable', variation: 2.1 }
-      ]
+        { type: 'APPEL_TELEPHONIQUE', trend: 'stable', variation: 2.1 },
+      ],
     }
   }
 
@@ -1107,8 +1118,8 @@ export class PartnerService extends BusinessService<Partner> {
    * Statistiques de performance des interactions
    */
   async getInteractionPerformanceStats(
-    startDate?: Date,
-    endDate?: Date
+    _startDate?: Date,
+    _endDate?: Date
   ): Promise<{
     totalInteractions: number
     tauxReussite: number
@@ -1127,8 +1138,8 @@ export class PartnerService extends BusinessService<Partner> {
       topUsers: [
         { userId: 'user-1', userNom: 'Jean Dupont', interactions: 156, performance: 87.5 },
         { userId: 'user-2', userNom: 'Marie Martin', interactions: 142, performance: 85.2 },
-        { userId: 'user-3', userNom: 'Pierre Leblanc', interactions: 134, performance: 83.8 }
-      ]
+        { userId: 'user-3', userNom: 'Pierre Leblanc', interactions: 134, performance: 83.8 },
+      ],
     }
   }
 
@@ -1153,7 +1164,7 @@ export class PartnerService extends BusinessService<Partner> {
         code: partner.code,
         denomination: partner.denomination,
         type: partner.type,
-        status: partner.status
+        status: partner.status,
       },
       commercial: {
         montantAffairesTotal: 1250000,
@@ -1162,7 +1173,7 @@ export class PartnerService extends BusinessService<Partner> {
         montantMoyenCommande: 15833,
         frequenceCommande: 15.2,
         derniereCommande: new Date(Date.now() - 86400000 * 12),
-        evolutionAnnuelle: 12.5
+        evolutionAnnuelle: 12.5,
       },
       performance: {
         noteGlobale: 4.2,
@@ -1171,7 +1182,7 @@ export class PartnerService extends BusinessService<Partner> {
         noteService: 4.3,
         tauxConformite: 94.2,
         nombreReclamations: 3,
-        tempsResolutionMoyen: 2.5
+        tempsResolutionMoyen: 2.5,
       },
       interactions: {
         nombreTotal: 84,
@@ -1179,24 +1190,26 @@ export class PartnerService extends BusinessService<Partner> {
         typesInteractions: [
           { type: 'EMAIL', nombre: 32 },
           { type: 'APPEL_TELEPHONIQUE', nombre: 24 },
-          { type: 'REUNION', nombre: 8 }
-        ]
+          { type: 'REUNION', nombre: 8 },
+        ],
       },
       risque: {
         niveau: 'FAIBLE',
         score: 85,
-        facteurs: ['Excellent historique de paiement', 'Partenariat de longue durée']
+        facteurs: ['Excellent historique de paiement', 'Partenariat de longue durée'],
       },
       opportunites: [
         'Extension de gamme possible',
         'Augmentation des volumes',
-        'Nouveaux marchés géographiques'
+        'Nouveaux marchés géographiques',
       ],
-      predictions: options.includePredictions ? {
-        montantAffairesProchain: 420000,
-        probabiliteRenouvellement: 92,
-        risqueChurn: 8
-      } : undefined
+      predictions: options.includePredictions
+        ? {
+            montantAffairesProchain: 420000,
+            probabiliteRenouvellement: 92,
+            risqueChurn: 8,
+          }
+        : undefined,
     }
   }
 
@@ -1205,7 +1218,7 @@ export class PartnerService extends BusinessService<Partner> {
    */
   async getPartnerRelationshipAnalysis(
     partnerId: string,
-    periodMonths: number
+    _periodMonths: number
   ): Promise<{
     durationMonths: number
     evolutionScore: number
@@ -1225,7 +1238,9 @@ export class PartnerService extends BusinessService<Partner> {
 
     // TODO: Calculer avec des données réelles
     const creationDate = partner.createdAt || new Date()
-    const durationMonths = Math.floor((Date.now() - creationDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
+    const durationMonths = Math.floor(
+      (Date.now() - creationDate.getTime()) / (1000 * 60 * 60 * 24 * 30)
+    )
 
     return {
       durationMonths,
@@ -1238,17 +1253,14 @@ export class PartnerService extends BusinessService<Partner> {
       opportunities: [
         'Proposer des services additionnels',
         'Étendre la collaboration à de nouveaux projets',
-        'Améliorer les délais de livraison'
+        'Améliorer les délais de livraison',
       ],
-      threats: [
-        'Concurrence aggressive sur les prix',
-        'Réduction possible des budgets'
-      ],
+      threats: ['Concurrence aggressive sur les prix', 'Réduction possible des budgets'],
       recommendations: [
         'Organiser une réunion stratégique trimestrielle',
         'Proposer un contrat cadre annuel',
-        'Mettre en place un suivi KPI mensuel'
-      ]
+        'Mettre en place un suivi KPI mensuel',
+      ],
     }
   }
 
@@ -1257,7 +1269,7 @@ export class PartnerService extends BusinessService<Partner> {
    */
   async getPartnerBenchmark(
     partnerId: string,
-    options: { sector?: string; size?: string } = {}
+    _options: { sector?: string; size?: string } = {}
   ): Promise<{
     ranking: number
     totalPeers: number
@@ -1287,39 +1299,37 @@ export class PartnerService extends BusinessService<Partner> {
       scoreVsPeers: {
         performance: 'above',
         business: 'above',
-        reliability: 'average'
+        reliability: 'average',
       },
       metrics: {
         averageOrderValue: {
           partner: 15833,
           peers: 12500,
-          position: 'above_average'
+          position: 'above_average',
         },
         orderFrequency: {
           partner: 24,
           peers: 18,
-          position: 'above_average'
+          position: 'above_average',
         },
         deliveryPerformance: {
           partner: 94.2,
           peers: 91.5,
-          position: 'above_average'
+          position: 'above_average',
         },
         qualityScore: {
           partner: 4.2,
           peers: 3.8,
-          position: 'above_average'
-        }
-      }
+          position: 'above_average',
+        },
+      },
     }
   }
 
   /**
    * Dashboard de performance globale
    */
-  async getPartnerDashboard(
-    period: 'week' | 'month' | 'quarter' | 'year'
-  ): Promise<{
+  async getPartnerDashboard(_period: 'week' | 'month' | 'quarter' | 'year'): Promise<{
     kpis: {
       totalPartners: number
       activePartners: number
@@ -1355,7 +1365,7 @@ export class PartnerService extends BusinessService<Partner> {
     }>
   }> {
     const stats = await this.partnerRepository.getPartnerStats()
-    
+
     // TODO: Calculer avec des données réelles selon la période
     return {
       kpis: {
@@ -1364,12 +1374,12 @@ export class PartnerService extends BusinessService<Partner> {
         newPartnersThisPeriod: 12,
         totalRevenue: 15750000,
         averageOrderValue: 14250,
-        partnerSatisfaction: 4.1
+        partnerSatisfaction: 4.1,
       },
       growth: {
         partnersGrowth: 8.5,
         revenueGrowth: 15.2,
-        orderGrowth: 12.8
+        orderGrowth: 12.8,
       },
       topPerformers: [
         {
@@ -1377,69 +1387,69 @@ export class PartnerService extends BusinessService<Partner> {
           partnerName: 'MetalCorp SA',
           revenue: 2150000,
           orders: 86,
-          performance: 4.8
+          performance: 4.8,
         },
         {
           partnerId: 'partner-2',
           partnerName: 'SteelWorks Ltd',
           revenue: 1875000,
           orders: 72,
-          performance: 4.6
+          performance: 4.6,
         },
         {
           partnerId: 'partner-3',
           partnerName: 'Industrial Solutions',
           revenue: 1420000,
           orders: 58,
-          performance: 4.4
-        }
+          performance: 4.4,
+        },
       ],
       alerts: [
         {
           type: 'action_required',
           title: 'Contrats arrivant à échéance',
           description: '5 contrats arrivent à échéance dans les 30 prochains jours',
-          priority: 'high'
+          priority: 'high',
         },
         {
           type: 'opportunity',
           title: 'Nouveaux marchés identifiés',
           description: '3 partenaires ont exprimé un intérêt pour de nouveaux produits',
-          priority: 'medium'
+          priority: 'medium',
         },
         {
           type: 'risk',
           title: 'Partenaires inactifs',
           description: '8 partenaires sans commande depuis plus de 6 mois',
-          priority: 'medium'
-        }
+          priority: 'medium',
+        },
       ],
       trends: [
         {
-          metric: 'Chiffre d\'affaires',
+          metric: "Chiffre d'affaires",
           trend: 'up',
           value: 15750000,
-          change: 15.2
+          change: 15.2,
         },
         {
           metric: 'Nombre de commandes',
           trend: 'up',
           value: 1247,
-          change: 12.8
+          change: 12.8,
         },
         {
           metric: 'Satisfaction moyenne',
           trend: 'stable',
           value: 4.1,
-          change: 2.1
+          change: 2.1,
         },
         {
           metric: 'Délai moyen livraison',
           trend: 'down',
           value: 12.5,
-          change: -8.3
-        }
-      ]
+          change: -8.3,
+        },
+      ],
     }
   }
 }

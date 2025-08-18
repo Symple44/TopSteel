@@ -26,7 +26,7 @@ export enum MaterialMovementReason {
   CORRECTION_POSITIVE = 'CORRECTION_POSITIVE',
   INVENTAIRE_POSITIF = 'INVENTAIRE_POSITIF',
   RECEPTION_TRANSFERT = 'RECEPTION_TRANSFERT',
-  
+
   // Sorties
   CONSOMMATION_PRODUCTION = 'CONSOMMATION_PRODUCTION',
   VENTE = 'VENTE',
@@ -39,7 +39,7 @@ export enum MaterialMovementReason {
   REBUT = 'REBUT',
   DETERIORATION = 'DETERIORATION',
   VOL_PERTE = 'VOL_PERTE',
-  
+
   // Transformations
   DECOUPE = 'DECOUPE',
   USINAGE = 'USINAGE',
@@ -47,7 +47,7 @@ export enum MaterialMovementReason {
   SOUDAGE = 'SOUDAGE',
   TRAITEMENT_THERMIQUE = 'TRAITEMENT_THERMIQUE',
   TRAITEMENT_SURFACE = 'TRAITEMENT_SURFACE',
-  
+
   // Autres
   MAINTENANCE = 'MAINTENANCE',
   CONTROLE_QUALITE = 'CONTROLE_QUALITE',
@@ -453,7 +453,7 @@ export interface IMaterialMovementFilters {
  */
 export interface IMaterialMovementSortOptions {
   /** Champ de tri */
-  champ: 
+  champ:
     | 'dateMovement'
     | 'reference'
     | 'materialCode'

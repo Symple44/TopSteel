@@ -1,67 +1,67 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, IsNull } from 'typeorm';
-import { MarketplaceOrder } from '../entities/marketplace-order.entity';
-import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity';
-import { Article } from '@erp/entities';
-import { Partner } from '../../../domains/partners/entities/partner.entity';
-import { MarketplaceCustomer } from '../entities/marketplace-customer.entity';
+import { Article } from '@erp/entities'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Not, type Repository } from 'typeorm'
+import { Partner } from '../../../domains/partners/entities/partner.entity'
+import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
+import { MarketplaceOrder } from '../entities/marketplace-order.entity'
+import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
 
 export interface ERPOrderView {
-  id: string;
-  orderNumber: string;
-  status: string;
+  id: string
+  orderNumber: string
+  status: string
   // Client ERP
-  partnerId?: string;
-  partnerCode?: string;
-  partnerName?: string;
+  partnerId?: string
+  partnerCode?: string
+  partnerName?: string
   // Articles ERP
   items: Array<{
-    articleId: string;
-    articleReference: string;
-    articleDesignation: string;
-    quantity: number;
-    unitPrice: number;
-    totalPrice: number;
-    unitStock: string;
-  }>;
+    articleId: string
+    articleReference: string
+    articleDesignation: string
+    quantity: number
+    unitPrice: number
+    totalPrice: number
+    unitStock: string
+  }>
   // Montants
-  subtotalHT: number;
-  taxAmount: number;
-  totalTTC: number;
-  shippingCost: number;
-  discountAmount: number;
+  subtotalHT: number
+  taxAmount: number
+  totalTTC: number
+  shippingCost: number
+  discountAmount: number
   // Adresses
-  shippingAddress?: any;
-  billingAddress?: any;
+  shippingAddress?: any
+  billingAddress?: any
   // Dates
-  orderDate: Date;
-  deliveryDate?: Date;
+  orderDate: Date
+  deliveryDate?: Date
   // Métadonnées ERP
   erpMetadata?: {
-    paymentMethod?: string;
-    paymentStatus?: string;
-    conditions?: string;
-    notes?: string;
-    commercialReference?: string;
-  };
+    paymentMethod?: string
+    paymentStatus?: string
+    conditions?: string
+    notes?: string
+    commercialReference?: string
+  }
 }
 
 export interface MarketplaceOrderFilters {
-  customerId?: string;
-  status?: string;
-  paymentStatus?: string;
-  dateFrom?: Date;
-  dateTo?: Date;
-  search?: string; // order number, customer name
+  customerId?: string
+  status?: string
+  paymentStatus?: string
+  dateFrom?: Date
+  dateTo?: Date
+  search?: string // order number, customer name
 }
 
 export interface OrderSyncStats {
-  totalOrders: number;
-  withERPPartner: number;
-  withoutERPPartner: number;
-  processed: number;
-  failed: number;
+  totalOrders: number
+  withERPPartner: number
+  withoutERPPartner: number
+  processed: number
+  failed: number
 }
 
 /**
@@ -70,7 +70,7 @@ export interface OrderSyncStats {
  */
 @Injectable()
 export class MarketplaceOrderAdapter {
-  private readonly logger = new Logger(MarketplaceOrderAdapter.name);
+  private readonly logger = new Logger(MarketplaceOrderAdapter.name)
 
   constructor(
     @InjectRepository(MarketplaceOrder)
@@ -79,10 +79,9 @@ export class MarketplaceOrderAdapter {
     private readonly orderItemRepository: Repository<MarketplaceOrderItem>,
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
-    @InjectRepository(Partner)
-    private readonly partnerRepository: Repository<Partner>,
+    @InjectRepository(Partner) readonly _partnerRepository: Repository<Partner>,
     @InjectRepository(MarketplaceCustomer)
-    private readonly customerRepository: Repository<MarketplaceCustomer>
+    readonly _customerRepository: Repository<MarketplaceCustomer>
   ) {}
 
   /**
@@ -91,14 +90,14 @@ export class MarketplaceOrderAdapter {
   async getERPOrderView(tenantId: string, orderId: string): Promise<ERPOrderView | null> {
     const order = await this.orderRepository.findOne({
       where: { id: orderId, tenantId },
-      relations: ['items', 'customer', 'customer.erpPartner']
-    });
+      relations: ['items', 'customer', 'customer.erpPartner'],
+    })
 
     if (!order) {
-      return null;
+      return null
     }
 
-    return await this.convertToERPView(order);
+    return await this.convertToERPView(order)
   }
 
   /**
@@ -109,11 +108,11 @@ export class MarketplaceOrderAdapter {
     filters: MarketplaceOrderFilters = {},
     pagination: { page: number; limit: number } = { page: 1, limit: 20 }
   ): Promise<{
-    orders: ERPOrderView[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+    orders: ERPOrderView[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
   }> {
     const queryBuilder = this.orderRepository
       .createQueryBuilder('order')
@@ -121,55 +120,55 @@ export class MarketplaceOrderAdapter {
       .leftJoinAndSelect('order.customer', 'customer')
       .leftJoinAndSelect('customer.erpPartner', 'partner')
       .where('order.tenantId = :tenantId', { tenantId })
-      .andWhere('order.status != :cartStatus', { cartStatus: 'CART' }); // Exclure les paniers
+      .andWhere('order.status != :cartStatus', { cartStatus: 'CART' }) // Exclure les paniers
 
     // Appliquer les filtres
     if (filters.customerId) {
-      queryBuilder.andWhere('order.customerId = :customerId', { customerId: filters.customerId });
+      queryBuilder.andWhere('order.customerId = :customerId', { customerId: filters.customerId })
     }
 
     if (filters.status) {
-      queryBuilder.andWhere('order.status = :status', { status: filters.status });
+      queryBuilder.andWhere('order.status = :status', { status: filters.status })
     }
 
     if (filters.paymentStatus) {
-      queryBuilder.andWhere('order.paymentStatus = :paymentStatus', { paymentStatus: filters.paymentStatus });
+      queryBuilder.andWhere('order.paymentStatus = :paymentStatus', {
+        paymentStatus: filters.paymentStatus,
+      })
     }
 
     if (filters.dateFrom) {
-      queryBuilder.andWhere('order.createdAt >= :dateFrom', { dateFrom: filters.dateFrom });
+      queryBuilder.andWhere('order.createdAt >= :dateFrom', { dateFrom: filters.dateFrom })
     }
 
     if (filters.dateTo) {
-      queryBuilder.andWhere('order.createdAt <= :dateTo', { dateTo: filters.dateTo });
+      queryBuilder.andWhere('order.createdAt <= :dateTo', { dateTo: filters.dateTo })
     }
 
     if (filters.search) {
       queryBuilder.andWhere(
         '(order.orderNumber ILIKE :search OR customer.firstName ILIKE :search OR customer.lastName ILIKE :search OR customer.email ILIKE :search)',
         { search: `%${filters.search}%` }
-      );
+      )
     }
 
-    const total = await queryBuilder.getCount();
+    const total = await queryBuilder.getCount()
 
     queryBuilder
       .orderBy('order.createdAt', 'DESC')
       .skip((pagination.page - 1) * pagination.limit)
-      .take(pagination.limit);
+      .take(pagination.limit)
 
-    const orders = await queryBuilder.getMany();
-    const erpOrders = await Promise.all(
-      orders.map(order => this.convertToERPView(order))
-    );
+    const orders = await queryBuilder.getMany()
+    const erpOrders = await Promise.all(orders.map((order) => this.convertToERPView(order)))
 
     return {
       orders: erpOrders,
       total,
       page: pagination.page,
       limit: pagination.limit,
-      totalPages: Math.ceil(total / pagination.limit)
-    };
+      totalPages: Math.ceil(total / pagination.limit),
+    }
   }
 
   /**
@@ -177,11 +176,11 @@ export class MarketplaceOrderAdapter {
    */
   async getOrderSyncStats(tenantId: string): Promise<OrderSyncStats> {
     const totalOrders = await this.orderRepository.count({
-      where: { 
+      where: {
         tenantId,
-        status: Not('CART') // Exclure les paniers
-      }
-    });
+        status: Not('CART'), // Exclure les paniers
+      },
+    })
 
     const ordersWithPartner = await this.orderRepository
       .createQueryBuilder('order')
@@ -189,64 +188,64 @@ export class MarketplaceOrderAdapter {
       .where('order.tenantId = :tenantId', { tenantId })
       .andWhere('order.status != :cartStatus', { cartStatus: 'CART' })
       .andWhere('customer.erpPartnerId IS NOT NULL')
-      .getCount();
+      .getCount()
 
     return {
       totalOrders,
       withERPPartner: ordersWithPartner,
       withoutERPPartner: totalOrders - ordersWithPartner,
       processed: ordersWithPartner, // Considéré comme traité si lié à un partenaire ERP
-      failed: 0 // À implémenter si nécessaire
-    };
+      failed: 0, // À implémenter si nécessaire
+    }
   }
 
   /**
    * Synchroniser toutes les commandes avec les partenaires ERP
    */
   async syncOrdersWithERP(tenantId: string): Promise<{
-    processed: number;
-    errors: string[];
+    processed: number
+    errors: string[]
   }> {
     const orders = await this.orderRepository.find({
-      where: { 
+      where: {
         tenantId,
-        status: Not('CART')
+        status: Not('CART'),
       },
-      relations: ['customer']
-    });
+      relations: ['customer'],
+    })
 
-    let processed = 0;
-    const errors: string[] = [];
+    let processed = 0
+    const errors: string[] = []
 
     for (const order of orders) {
       try {
         if (!order.customer.erpPartnerId) {
           // Le client n'a pas de partenaire ERP - créer ou synchroniser
-          this.logger.warn(`Order ${order.orderNumber} customer has no ERP partner`);
-          errors.push(`Order ${order.orderNumber}: Customer has no ERP partner`);
-          continue;
+          this.logger.warn(`Order ${order.orderNumber} customer has no ERP partner`)
+          errors.push(`Order ${order.orderNumber}: Customer has no ERP partner`)
+          continue
         }
 
         // Vérifier que les articles des commandes sont bien des articles ERP
         const items = await this.orderItemRepository.find({
-          where: { orderId: order.id }
-        });
+          where: { orderId: order.id },
+        })
 
         for (const item of items) {
           // Les articles marketplace seront maintenant synchronisés avec les articles ERP
           // Nous devons vérifier via l'ID du produit marketplace
-          this.logger.debug(`Checking item ${item.productId} for order ${order.orderNumber}`);
+          this.logger.debug(`Checking item ${item.productId} for order ${order.orderNumber}`)
         }
 
-        processed++;
+        processed++
       } catch (error) {
-        this.logger.error(`Failed to sync order ${order.orderNumber}:`, error);
-        errors.push(`Order ${order.orderNumber}: ${error.message}`);
+        this.logger.error(`Failed to sync order ${order.orderNumber}:`, error)
+        errors.push(`Order ${order.orderNumber}: ${error.message}`)
       }
     }
 
-    this.logger.log(`Processed ${processed} orders, ${errors.length} errors`);
-    return { processed, errors };
+    this.logger.log(`Processed ${processed} orders, ${errors.length} errors`)
+    return { processed, errors }
   }
 
   /**
@@ -256,62 +255,64 @@ export class MarketplaceOrderAdapter {
   async prepareERPOrderData(marketplaceOrder: MarketplaceOrder): Promise<any> {
     // Cette fonction prépare les données pour créer une commande ERP
     // Elle sera utilisée quand le module commandes ERP sera implémenté
-    
+
     const items = await this.orderItemRepository.find({
-      where: { orderId: marketplaceOrder.id }
-    });
+      where: { orderId: marketplaceOrder.id },
+    })
 
     const erpOrderData = {
       // Données de base
       numeroCommande: marketplaceOrder.orderNumber,
       dateCommande: marketplaceOrder.createdAt,
       clientId: marketplaceOrder.customer?.erpPartnerId,
-      
+
       // Articles
-      lignes: await Promise.all(items.map(async item => {
-        // Note: Avec la nouvelle architecture, productId référence maintenant un Article ERP
-        const article = await this.articleRepository.findOne({
-          where: { id: item.productId }
-        });
-        
-        return {
-          articleId: item.productId,
-          articleReference: article?.reference || 'UNKNOWN',
-          designation: article?.designation || 'Unknown Product',
-          quantite: item.quantity,
-          prixUnitaireHT: item.price,
-          montantHT: item.totalPrice,
-          tauxTVA: article?.tauxTVA || 20,
-        };
-      })),
-      
+      lignes: await Promise.all(
+        items.map(async (item) => {
+          // Note: Avec la nouvelle architecture, productId référence maintenant un Article ERP
+          const article = await this.articleRepository.findOne({
+            where: { id: item.productId },
+          })
+
+          return {
+            articleId: item.productId,
+            articleReference: article?.reference || 'UNKNOWN',
+            designation: article?.designation || 'Unknown Product',
+            quantite: item.quantity,
+            prixUnitaireHT: item.price,
+            montantHT: item.totalPrice,
+            tauxTVA: article?.tauxTVA || 20,
+          }
+        })
+      ),
+
       // Montants
       sousTotal: marketplaceOrder.subtotal,
       montantTVA: marketplaceOrder.tax,
       fraisLivraison: marketplaceOrder.shippingCost,
       remise: marketplaceOrder.discountAmount,
       totalTTC: marketplaceOrder.total,
-      
+
       // Adresses
       adresseLivraison: marketplaceOrder.shippingAddress,
       adresseFacturation: marketplaceOrder.billingAddress,
-      
+
       // Statut et paiement
       statut: this.mapMarketplaceStatusToERP(marketplaceOrder.status),
       statutPaiement: this.mapPaymentStatusToERP(marketplaceOrder.paymentStatus),
       modePaiement: marketplaceOrder.paymentMethod,
-      
+
       // Métadonnées
       notes: marketplaceOrder.notes,
       metadonnees: {
         sourceMarketplace: true,
         marketplaceOrderId: marketplaceOrder.id,
         paymentProvider: marketplaceOrder.paymentProvider,
-        appliedPromotions: marketplaceOrder.appliedPromotions
-      }
-    };
+        appliedPromotions: marketplaceOrder.appliedPromotions,
+      },
+    }
 
-    return erpOrderData;
+    return erpOrderData
   }
 
   /**
@@ -319,15 +320,15 @@ export class MarketplaceOrderAdapter {
    */
   private async convertToERPView(order: MarketplaceOrder): Promise<ERPOrderView> {
     const items = await this.orderItemRepository.find({
-      where: { orderId: order.id }
-    });
+      where: { orderId: order.id },
+    })
 
     const erpItems = await Promise.all(
-      items.map(async item => {
+      items.map(async (item) => {
         // Avec la nouvelle architecture, productId référence directement un Article ERP
         const article = await this.articleRepository.findOne({
-          where: { id: item.productId }
-        });
+          where: { id: item.productId },
+        })
 
         return {
           articleId: item.productId,
@@ -336,10 +337,10 @@ export class MarketplaceOrderAdapter {
           quantity: item.quantity,
           unitPrice: item.price,
           totalPrice: item.totalPrice,
-          unitStock: article?.uniteStock || 'PCS'
-        };
+          unitStock: article?.uniteStock || 'PCS',
+        }
       })
-    );
+    )
 
     return {
       id: order.id,
@@ -347,7 +348,9 @@ export class MarketplaceOrderAdapter {
       status: this.mapMarketplaceStatusToERP(order.status),
       partnerId: order.customer?.erpPartnerId,
       partnerCode: order.customer?.erpPartner?.code,
-      partnerName: order.customer?.erpPartner?.denomination || `${order.customer?.firstName} ${order.customer?.lastName}`,
+      partnerName:
+        order.customer?.erpPartner?.denomination ||
+        `${order.customer?.firstName} ${order.customer?.lastName}`,
       items: erpItems,
       subtotalHT: order.subtotal,
       taxAmount: order.tax,
@@ -363,9 +366,9 @@ export class MarketplaceOrderAdapter {
         paymentStatus: this.mapPaymentStatusToERP(order.paymentStatus),
         conditions: '30J', // Conditions par défaut
         notes: order.notes,
-        commercialReference: order.orderNumber
-      }
-    };
+        commercialReference: order.orderNumber,
+      },
+    }
   }
 
   /**
@@ -373,17 +376,17 @@ export class MarketplaceOrderAdapter {
    */
   private mapMarketplaceStatusToERP(marketplaceStatus: string): string {
     const statusMap: Record<string, string> = {
-      'CART': 'BROUILLON',
-      'PENDING': 'EN_ATTENTE',
-      'CONFIRMED': 'CONFIRMEE',
-      'PROCESSING': 'EN_COURS',
-      'SHIPPED': 'EXPEDIEE',
-      'DELIVERED': 'LIVREE',
-      'CANCELLED': 'ANNULEE',
-      'REFUNDED': 'REMBOURSEE'
-    };
+      CART: 'BROUILLON',
+      PENDING: 'EN_ATTENTE',
+      CONFIRMED: 'CONFIRMEE',
+      PROCESSING: 'EN_COURS',
+      SHIPPED: 'EXPEDIEE',
+      DELIVERED: 'LIVREE',
+      CANCELLED: 'ANNULEE',
+      REFUNDED: 'REMBOURSEE',
+    }
 
-    return statusMap[marketplaceStatus] || marketplaceStatus;
+    return statusMap[marketplaceStatus] || marketplaceStatus
   }
 
   /**
@@ -391,14 +394,14 @@ export class MarketplaceOrderAdapter {
    */
   private mapPaymentStatusToERP(paymentStatus: string): string {
     const statusMap: Record<string, string> = {
-      'PENDING': 'EN_ATTENTE',
-      'PAID': 'PAYE',
-      'FAILED': 'ECHEC',
-      'CANCELLED': 'ANNULE',
-      'REFUNDED': 'REMBOURSE',
-      'PARTIALLY_REFUNDED': 'PARTIELLEMENT_REMBOURSE'
-    };
+      PENDING: 'EN_ATTENTE',
+      PAID: 'PAYE',
+      FAILED: 'ECHEC',
+      CANCELLED: 'ANNULE',
+      REFUNDED: 'REMBOURSE',
+      PARTIALLY_REFUNDED: 'PARTIELLEMENT_REMBOURSE',
+    }
 
-    return statusMap[paymentStatus] || paymentStatus;
+    return statusMap[paymentStatus] || paymentStatus
   }
 }

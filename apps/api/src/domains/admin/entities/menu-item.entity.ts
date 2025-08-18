@@ -1,16 +1,16 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
-  JoinColumn,
-  Index,
+  PrimaryGeneratedColumn,
   Tree,
   TreeChildren,
   TreeParent,
+  UpdateDateColumn,
 } from 'typeorm'
 import { MenuConfiguration } from './menu-configuration.entity'
 import { MenuItemAction } from './menu-item-action.entity'
@@ -129,7 +129,11 @@ export class MenuItem {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => MenuConfiguration, menu => menu.items, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => MenuConfiguration,
+    (menu) => menu.items,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'menu_id' })
   menu!: MenuConfiguration
 
@@ -140,7 +144,10 @@ export class MenuItem {
   @TreeChildren()
   children!: MenuItem[]
 
-  @OneToMany(() => MenuItemAction, action => action.menuItem)
+  @OneToMany(
+    () => MenuItemAction,
+    (action) => action.menuItem
+  )
   actions!: MenuItemAction[]
 
   // Utility methods
@@ -201,9 +208,7 @@ export class MenuItem {
 
     // Check required roles
     if (this.requiredRoles?.roles?.length) {
-      const hasRequiredRole = this.requiredRoles.roles.some(role => 
-        userRoles.includes(role)
-      )
+      const hasRequiredRole = this.requiredRoles.roles.some((role) => userRoles.includes(role))
       if (!hasRequiredRole) {
         return false
       }
@@ -211,9 +216,7 @@ export class MenuItem {
 
     // Check excluded roles
     if (this.excludedRoles?.roles?.length) {
-      const hasExcludedRole = this.excludedRoles.roles.some(role => 
-        userRoles.includes(role)
-      )
+      const hasExcludedRole = this.excludedRoles.roles.some((role) => userRoles.includes(role))
       if (hasExcludedRole) {
         return false
       }
@@ -288,7 +291,7 @@ export class MenuItem {
       isNavigable: this.isNavigable(),
       url: this.getUrl(),
       metadata: this.metadata,
-      children: this.children?.map(child => child.toJSON()),
+      children: this.children?.map((child) => child.toJSON()),
     }
   }
 }

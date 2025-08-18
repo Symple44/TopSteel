@@ -2,47 +2,44 @@
  * Export des interfaces du module Auth
  */
 
+// Interfaces des logs d'audit
+export {
+  AuditCategory,
+  AuditEventStatus,
+  AuditEventType,
+  AuditSeverity,
+  IAuditConfiguration,
+  IAuditLog,
+  IAuditLogFilters,
+  IAuditLogSortOptions,
+  IAuditStatistics,
+} from './audit-log.interface'
 // Interfaces JWT existantes
 export {
   JwtPayload,
   MultiTenantJwtPayload,
 } from './jwt-payload.interface'
-
 // Interfaces de vérification MFA
 export {
-  IMFAVerification,
   IInitiateMFAVerification,
-  IVerifyMFACode,
+  IMFAStatistics,
+  IMFAVerification,
+  IMFAVerificationFilters,
   IMFAVerificationResult,
   IUserMFAConfiguration,
-  IMFAVerificationFilters,
-  IMFAStatistics,
+  IVerifyMFACode,
   MFAMethodType,
   MFAVerificationStatus,
 } from './mfa-verification.interface'
-
 // Interfaces des permissions utilisateur
 export {
-  IUserPermission,
-  IUserPermissions,
   IPermissionRequest,
-  IUserPermissionFilters,
   IPermissionStatistics,
-  PermissionType,
+  IUserPermission,
+  IUserPermissionFilters,
+  IUserPermissions,
   PermissionContext,
   PermissionLevel,
   PermissionStatus,
+  PermissionType,
 } from './user-permissions.interface'
-
-// Interfaces des logs d'audit
-export {
-  IAuditLog,
-  IAuditLogFilters,
-  IAuditLogSortOptions,
-  IAuditStatistics,
-  IAuditConfiguration,
-  AuditEventType,
-  AuditSeverity,
-  AuditEventStatus,
-  AuditCategory,
-} from './audit-log.interface'

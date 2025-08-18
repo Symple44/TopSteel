@@ -20,14 +20,14 @@ async function resetAdminPassword() {
 
     // Récupérer le mot de passe depuis les arguments ou l'environnement
     const newPassword = process.argv[3] || process.env.RESET_PASSWORD
-    
+
     if (!newPassword || newPassword.length < 8) {
       console.error('❌ Password must be provided and at least 8 characters')
       console.log('Usage: npm run reset-password <email> <new-password>')
       console.log('Or set RESET_PASSWORD environment variable')
       process.exit(1)
     }
-    
+
     const hashedPassword = await bcrypt.hash(newPassword, 10)
 
     const result = await dataSource.query(

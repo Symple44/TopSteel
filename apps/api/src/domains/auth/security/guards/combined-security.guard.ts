@@ -7,7 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import type { Reflector } from '@nestjs/core'
-import { AuditService, AuditEventType, AuditSeverity } from '../../services/audit.service'
+import { AuditEventType, type AuditService, AuditSeverity } from '../../services/audit.service'
 import type { EnhancedRolesGuard } from './enhanced-roles.guard'
 import type { EnhancedTenantGuard } from './enhanced-tenant.guard'
 import type { ResourceOwnershipGuard } from './resource-ownership.guard'
@@ -179,26 +179,21 @@ export class CombinedSecurityGuard implements CanActivate {
       return
     }
 
-    await this.auditService.logAccessGranted(
-      user?.id,
-      resource,
-      action,
-      {
-        route: request.route?.path || request.url,
-        method: request.method,
-        societeId: tenant?.societeId,
-        siteId: tenant?.siteId,
-        statusCode: response.statusCode,
-        duration,
-        ipAddress: this.getClientIp(request),
-        userAgent: request.headers['user-agent'],
-        sessionId: request.session?.id,
-        requestId: request.id,
-        query: request.query,
-        params: request.params,
-        bodySize: JSON.stringify(request.body || {}).length,
-      }
-    )
+    await this.auditService.logAccessGranted(user?.id, resource, action, {
+      route: request.route?.path || request.url,
+      method: request.method,
+      societeId: tenant?.societeId,
+      siteId: tenant?.siteId,
+      statusCode: response.statusCode,
+      duration,
+      ipAddress: this.getClientIp(request),
+      userAgent: request.headers['user-agent'],
+      sessionId: request.session?.id,
+      requestId: request.id,
+      query: request.query,
+      params: request.params,
+      bodySize: JSON.stringify(request.body || {}).length,
+    })
   }
 
   /**
@@ -210,8 +205,9 @@ export class CombinedSecurityGuard implements CanActivate {
     const controller = context.getClass()
 
     // Essayer d'obtenir depuis les métadonnées
-    const resource = this.reflector.get<string>('resource', handler) ||
-                    this.reflector.get<string>('resource', controller)
+    const resource =
+      this.reflector.get<string>('resource', handler) ||
+      this.reflector.get<string>('resource', controller)
 
     if (resource) {
       return resource
@@ -260,11 +256,13 @@ export class CombinedSecurityGuard implements CanActivate {
    * Obtient l'adresse IP du client
    */
   private getClientIp(request: any): string {
-    return request.ip ||
-           request.headers['x-forwarded-for']?.split(',')[0] ||
-           request.headers['x-real-ip'] ||
-           request.connection?.remoteAddress ||
-           'unknown'
+    return (
+      request.ip ||
+      request.headers['x-forwarded-for']?.split(',')[0] ||
+      request.headers['x-real-ip'] ||
+      request.connection?.remoteAddress ||
+      'unknown'
+    )
   }
 }
 

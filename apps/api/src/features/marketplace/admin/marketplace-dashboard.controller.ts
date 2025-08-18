@@ -1,29 +1,22 @@
-import { 
-  Controller, 
-  Get, 
-  Query, 
-  UseGuards, 
-  Logger,
-  ParseDatePipe,
-  HttpCode,
-  HttpStatus,
-  Post
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard';
-import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard';
-import { RequireMarketplacePermissions, MarketplacePermission } from '../auth/decorators/marketplace-permissions.decorator';
-import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator';
-import { MarketplaceDashboardService, DashboardMetrics, DateRange } from './marketplace-dashboard.service';
+import { Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common'
+import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
+import {
+  MarketplacePermission,
+  RequireMarketplacePermissions,
+} from '../auth/decorators/marketplace-permissions.decorator'
+import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard'
+import type {
+  DashboardMetrics,
+  DateRange,
+  MarketplaceDashboardService,
+} from './marketplace-dashboard.service'
 
 @Controller('api/marketplace/admin/dashboard')
 @UseGuards(JwtAuthGuard, MarketplacePermissionsGuard)
 @RequireMarketplacePermissions(MarketplacePermission.VIEW_ANALYTICS)
 export class MarketplaceDashboardController {
-  private readonly logger = new Logger(MarketplaceDashboardController.name);
-
-  constructor(
-    private readonly dashboardService: MarketplaceDashboardService
-  ) {}
+  constructor(private readonly dashboardService: MarketplaceDashboardService) {}
 
   @Get('metrics')
   async getDashboardMetrics(
@@ -31,12 +24,15 @@ export class MarketplaceDashboardController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string
   ): Promise<DashboardMetrics> {
-    const dateRange: DateRange | undefined = startDate && endDate ? {
-      startDate: new Date(startDate),
-      endDate: new Date(endDate)
-    } : undefined;
+    const dateRange: DateRange | undefined =
+      startDate && endDate
+        ? {
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+          }
+        : undefined
 
-    return this.dashboardService.getDashboardMetrics(tenantId, dateRange);
+    return this.dashboardService.getDashboardMetrics(tenantId, dateRange)
   }
 
   @Get('overview')
@@ -46,26 +42,26 @@ export class MarketplaceDashboardController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string
   ) {
-    let dateRange: DateRange | undefined;
+    let dateRange: DateRange | undefined
 
     if (period === 'custom' && startDate && endDate) {
       dateRange = {
         startDate: new Date(startDate),
-        endDate: new Date(endDate)
-      };
+        endDate: new Date(endDate),
+      }
     } else if (period) {
-      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90
       dateRange = {
         startDate: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
-        endDate: new Date()
-      };
+        endDate: new Date(),
+      }
     }
 
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange);
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange)
     return {
       overview: metrics.overview,
-      recentActivity: metrics.recentActivity
-    };
+      recentActivity: metrics.recentActivity,
+    }
   }
 
   @Get('analytics')
@@ -75,40 +71,37 @@ export class MarketplaceDashboardController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string
   ) {
-    let dateRange: DateRange | undefined;
+    let dateRange: DateRange | undefined
 
     if (period === 'custom' && startDate && endDate) {
       dateRange = {
         startDate: new Date(startDate),
-        endDate: new Date(endDate)
-      };
+        endDate: new Date(endDate),
+      }
     } else if (period) {
-      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90
       dateRange = {
         startDate: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
-        endDate: new Date()
-      };
+        endDate: new Date(),
+      }
     }
 
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange);
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange)
     return {
       analytics: metrics.analytics,
-      performance: metrics.performance
-    };
+      performance: metrics.performance,
+    }
   }
 
   @Get('sales-trend')
-  async getSalesTrend(
-    @CurrentTenant() tenantId: string,
-    @Query('days') days: number = 30
-  ) {
+  async getSalesTrend(@CurrentTenant() tenantId: string, @Query('days') days: number = 30) {
     const dateRange: DateRange = {
       startDate: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
-      endDate: new Date()
-    };
+      endDate: new Date(),
+    }
 
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange);
-    return metrics.analytics.salesTrend;
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange)
+    return metrics.analytics.salesTrend
   }
 
   @Get('top-products')
@@ -117,18 +110,18 @@ export class MarketplaceDashboardController {
     @Query('period') period?: '7d' | '30d' | '90d',
     @Query('limit') limit: number = 10
   ) {
-    let dateRange: DateRange | undefined;
+    let dateRange: DateRange | undefined
 
     if (period) {
-      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90
       dateRange = {
         startDate: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
-        endDate: new Date()
-      };
+        endDate: new Date(),
+      }
     }
 
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange);
-    return metrics.analytics.topProducts.slice(0, limit);
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange)
+    return metrics.analytics.topProducts.slice(0, limit)
   }
 
   @Get('order-status')
@@ -136,40 +129,35 @@ export class MarketplaceDashboardController {
     @CurrentTenant() tenantId: string,
     @Query('period') period?: '7d' | '30d' | '90d'
   ) {
-    let dateRange: DateRange | undefined;
+    let dateRange: DateRange | undefined
 
     if (period) {
-      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90
       dateRange = {
         startDate: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
-        endDate: new Date()
-      };
+        endDate: new Date(),
+      }
     }
 
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange);
-    return metrics.analytics.orderStatusBreakdown;
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange)
+    return metrics.analytics.orderStatusBreakdown
   }
 
   @Get('customer-growth')
-  async getCustomerGrowth(
-    @CurrentTenant() tenantId: string,
-    @Query('days') days: number = 30
-  ) {
+  async getCustomerGrowth(@CurrentTenant() tenantId: string, @Query('days') days: number = 30) {
     const dateRange: DateRange = {
       startDate: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
-      endDate: new Date()
-    };
+      endDate: new Date(),
+    }
 
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange);
-    return metrics.analytics.customerGrowth;
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange)
+    return metrics.analytics.customerGrowth
   }
 
   @Get('recent-activity')
-  async getRecentActivity(
-    @CurrentTenant() tenantId: string
-  ) {
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId);
-    return metrics.recentActivity;
+  async getRecentActivity(@CurrentTenant() tenantId: string) {
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId)
+    return metrics.recentActivity
   }
 
   @Get('performance')
@@ -177,25 +165,25 @@ export class MarketplaceDashboardController {
     @CurrentTenant() tenantId: string,
     @Query('period') period?: '7d' | '30d' | '90d'
   ) {
-    let dateRange: DateRange | undefined;
+    let dateRange: DateRange | undefined
 
     if (period) {
-      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+      const days = period === '7d' ? 7 : period === '30d' ? 30 : 90
       dateRange = {
         startDate: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
-        endDate: new Date()
-      };
+        endDate: new Date(),
+      }
     }
 
-    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange);
-    return metrics.performance;
+    const metrics = await this.dashboardService.getDashboardMetrics(tenantId, dateRange)
+    return metrics.performance
   }
 
   @Post('refresh-cache')
   @HttpCode(HttpStatus.OK)
   @RequireMarketplacePermissions(MarketplacePermission.MANAGE_SETTINGS)
   async refreshCache(@CurrentTenant() tenantId: string): Promise<{ success: boolean }> {
-    await this.dashboardService.clearCache(tenantId);
-    return { success: true };
+    await this.dashboardService.clearCache(tenantId)
+    return { success: true }
   }
 }

@@ -263,7 +263,14 @@ export interface IPartnerSearchFilters {
     nombreCommandesMax?: number
 
     /** Fréquence de commandes */
-    frequenceCommandes?: ('QUOTIDIENNE' | 'HEBDOMADAIRE' | 'MENSUELLE' | 'TRIMESTRIELLE' | 'ANNUELLE' | 'OCCASIONNELLE')[]
+    frequenceCommandes?: (
+      | 'QUOTIDIENNE'
+      | 'HEBDOMADAIRE'
+      | 'MENSUELLE'
+      | 'TRIMESTRIELLE'
+      | 'ANNUELLE'
+      | 'OCCASIONNELLE'
+    )[]
 
     /** Contrat cadre actif */
     contratCadreActif?: boolean

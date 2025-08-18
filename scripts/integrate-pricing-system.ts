@@ -28,8 +28,6 @@ class PricingSystemIntegrator {
   private readonly rootDir = process.cwd()
   private readonly backupDir = join(this.rootDir, '.pricing-backup')
 
-  constructor() {}
-
   async run(): Promise<void> {
     // Créer le backup avant modifications
     await this.createBackup()

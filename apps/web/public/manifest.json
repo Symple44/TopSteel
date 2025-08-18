@@ -170,11 +170,7 @@
   "edge_side_panel": {
     "preferred_width": 400
   },
-  "display_override": [
-    "window-controls-overlay",
-    "standalone",
-    "browser"
-  ],
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
   "launch_handler": {
     "client_mode": "focus-existing"
   },

@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm'
 import { NotificationRule } from './notification-rule.entity'
 
@@ -157,7 +157,11 @@ export class NotificationExecution {
   createdAt!: Date
 
   // Relations
-  @ManyToOne(() => NotificationRule, rule => rule.executions, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => NotificationRule,
+    (rule) => rule.executions,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'rule_id' })
   rule!: NotificationRule
 
@@ -255,7 +259,7 @@ export class NotificationExecution {
       this.actionResults = []
     }
     this.actionResults.push(result)
-    
+
     this.totalActions++
     if (result.success) {
       this.successfulActions++
@@ -287,17 +291,11 @@ export class NotificationExecution {
   /**
    * Mark recipient as delivered
    */
-  markRecipientDelivered(
-    recipientId: string,
-    channel: string,
-    messageId?: string
-  ): void {
+  markRecipientDelivered(recipientId: string, channel: string, messageId?: string): void {
     if (!this.recipients) return
 
-    const recipient = this.recipients.find(r => 
-      r.id === recipientId || r.email === recipientId
-    )
-    
+    const recipient = this.recipients.find((r) => r.id === recipientId || r.email === recipientId)
+
     if (recipient) {
       recipient.delivered = true
       recipient.deliveredAt = new Date().toISOString()
@@ -324,10 +322,8 @@ export class NotificationExecution {
   markRecipientFailed(recipientId: string, error: string): void {
     if (!this.recipients) return
 
-    const recipient = this.recipients.find(r => 
-      r.id === recipientId || r.email === recipientId
-    )
-    
+    const recipient = this.recipients.find((r) => r.id === recipientId || r.email === recipientId)
+
     if (recipient) {
       recipient.delivered = false
       recipient.error = error
@@ -338,11 +334,7 @@ export class NotificationExecution {
   /**
    * Add escalation
    */
-  addEscalation(escalation: {
-    level: number
-    recipients: string[]
-    reason: string
-  }): void {
+  addEscalation(escalation: { level: number; recipients: string[]; reason: string }): void {
     if (!this.escalations) {
       this.escalations = []
     }
@@ -413,11 +405,13 @@ export class NotificationExecution {
       errorDetails: this.errorDetails,
       escalations: this.escalations,
       metadata: this.metadata,
-      acknowledgment: this.acknowledged ? {
-        by: this.acknowledgedBy,
-        at: this.acknowledgedAt,
-        note: this.acknowledgmentNote,
-      } : null,
+      acknowledgment: this.acknowledged
+        ? {
+            by: this.acknowledgedBy,
+            at: this.acknowledgedAt,
+            note: this.acknowledgmentNote,
+          }
+        : null,
       createdAt: this.createdAt,
     }
   }

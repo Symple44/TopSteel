@@ -1,147 +1,150 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { X, ShoppingBag, Plus, Minus, Trash2, AlertCircle, ArrowRight, Tag } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useDispatch, useSelector } from 'react-redux';
+import { AlertCircle, ArrowRight, Minus, Plus, ShoppingBag, Tag, Trash2, X } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { cn } from '@/lib/utils'
+import { validateCart } from '../../store/cartPersistence'
 import {
-  selectCartItems,
-  selectCartItemCount,
-  selectCartSubtotal,
+  applyCoupon,
+  clearCart,
+  removeCoupon,
+  removeFromCart,
+  selectAppliedCoupon,
   selectCartDiscount,
-  selectShippingCost,
+  selectCartItemCount,
+  selectCartItems,
+  selectCartSubtotal,
   selectCartTotal,
   selectIsCartOpen,
-  selectAppliedCoupon,
-  updateQuantity,
-  removeFromCart,
-  clearCart,
+  selectShippingCost,
   setCartOpen,
-  applyCoupon,
-  removeCoupon
-} from '../../store/cartSlice';
-import { cn } from '@/lib/utils';
-import { validateCart } from '../../store/cartPersistence';
+  updateQuantity,
+} from '../../store/cartSlice'
 
 interface ShoppingCartProps {
-  className?: string;
+  className?: string
 }
 
 export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
-  const dispatch = useDispatch();
-  const items = useSelector(selectCartItems);
-  const itemCount = useSelector(selectCartItemCount);
-  const subtotal = useSelector(selectCartSubtotal);
-  const discount = useSelector(selectCartDiscount);
-  const shipping = useSelector(selectShippingCost);
-  const total = useSelector(selectCartTotal);
-  const isOpen = useSelector(selectIsCartOpen);
-  const appliedCoupon = useSelector(selectAppliedCoupon);
-  
-  const [couponCode, setCouponCode] = useState('');
-  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
-  const [validationIssues, setValidationIssues] = useState<any[]>([]);
-  const [isValidating, setIsValidating] = useState(false);
+  const dispatch = useDispatch()
+  const items = useSelector(selectCartItems)
+  const itemCount = useSelector(selectCartItemCount)
+  const subtotal = useSelector(selectCartSubtotal)
+  const discount = useSelector(selectCartDiscount)
+  const shipping = useSelector(selectShippingCost)
+  const total = useSelector(selectCartTotal)
+  const isOpen = useSelector(selectIsCartOpen)
+  const appliedCoupon = useSelector(selectAppliedCoupon)
+
+  const [couponCode, setCouponCode] = useState('')
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false)
+  const [validationIssues, setValidationIssues] = useState<any[]>([])
+  const [_isValidating, setIsValidating] = useState(false)
 
   useEffect(() => {
     // Validate cart when it opens or items change
     if (isOpen && items.length > 0) {
-      validateCartItems();
+      validateCartItems()
     }
-  }, [isOpen, items]);
+  }, [isOpen, items, validateCartItems])
 
   const validateCartItems = async () => {
-    setIsValidating(true);
+    setIsValidating(true)
     try {
-      const validation = await validateCart({ 
-        items, 
-        isOpen, 
-        lastUpdated: new Date(), 
-        appliedCoupon, 
-        shippingMethod: null 
-      });
-      setValidationIssues(validation.issues);
-    } catch (error) {
-      console.error('Cart validation error:', error);
+      const validation = await validateCart({
+        items,
+        isOpen,
+        lastUpdated: new Date(),
+        appliedCoupon,
+        shippingMethod: null,
+      })
+      setValidationIssues(validation.issues)
+    } catch (_error) {
     } finally {
-      setIsValidating(false);
+      setIsValidating(false)
     }
-  };
+  }
 
   const handleQuantityChange = (productId: string, newQuantity: number, options?: any) => {
     if (newQuantity >= 0) {
-      dispatch(updateQuantity({ productId, quantity: newQuantity, options }));
+      dispatch(updateQuantity({ productId, quantity: newQuantity, options }))
     }
-  };
+  }
 
   const handleRemoveItem = (productId: string, options?: any) => {
-    dispatch(removeFromCart({ productId, options }));
-  };
+    dispatch(removeFromCart({ productId, options }))
+  }
 
   const handleClearCart = () => {
     if (confirm('Are you sure you want to clear your cart?')) {
-      dispatch(clearCart());
+      dispatch(clearCart())
     }
-  };
+  }
 
   const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return;
-    
-    setIsApplyingCoupon(true);
+    if (!couponCode.trim()) return
+
+    setIsApplyingCoupon(true)
     try {
       // Call API to validate coupon
       const response = await fetch('/api/marketplace/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: couponCode, cartTotal: subtotal })
-      });
-      
+        body: JSON.stringify({ code: couponCode, cartTotal: subtotal }),
+      })
+
       if (response.ok) {
-        const data = await response.json();
-        dispatch(applyCoupon({
-          code: couponCode,
-          discount: data.discount,
-          type: data.type
-        }));
-        setCouponCode('');
+        const data = await response.json()
+        dispatch(
+          applyCoupon({
+            code: couponCode,
+            discount: data.discount,
+            type: data.type,
+          })
+        )
+        setCouponCode('')
       } else {
-        alert('Invalid coupon code');
+        alert('Invalid coupon code')
       }
-    } catch (error) {
-      console.error('Error applying coupon:', error);
-      alert('Failed to apply coupon');
+    } catch (_error) {
+      alert('Failed to apply coupon')
     } finally {
-      setIsApplyingCoupon(false);
+      setIsApplyingCoupon(false)
     }
-  };
+  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(price);
-  };
+      currency: 'EUR',
+    }).format(price)
+  }
 
   const getValidationIssue = (productId: string) => {
-    return validationIssues.find(issue => issue.productId === productId);
-  };
+    return validationIssues.find((issue) => issue.productId === productId)
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <>
       {/* Overlay */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 z-40"
         onClick={() => dispatch(setCartOpen(false))}
       />
-      
+
       {/* Cart Drawer */}
-      <div className={cn(
-        "fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl z-50 flex flex-col",
-        className
-      )}>
+      <div
+        className={cn(
+          'fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl z-50 flex flex-col',
+          className
+        )}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
@@ -187,15 +190,15 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
 
               {/* Cart Items List */}
               {items.map((item) => {
-                const issue = getValidationIssue(item.product.id);
-                
+                const issue = getValidationIssue(item.product.id)
+
                 return (
-                  <div 
+                  <div
                     key={`${item.product.id}-${JSON.stringify(item.selectedOptions)}`}
                     className="flex gap-3 p-3 bg-gray-50 rounded-lg"
                   >
                     {/* Product Image */}
-                    <Link 
+                    <Link
                       href={`/marketplace/products/${item.product.slug}`}
                       onClick={() => dispatch(setCartOpen(false))}
                       className="relative w-20 h-20 flex-shrink-0"
@@ -210,14 +213,14 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
 
                     {/* Product Details */}
                     <div className="flex-1">
-                      <Link 
+                      <Link
                         href={`/marketplace/products/${item.product.slug}`}
                         onClick={() => dispatch(setCartOpen(false))}
                         className="font-medium text-gray-900 hover:text-blue-600 line-clamp-2"
                       >
                         {item.product.name}
                       </Link>
-                      
+
                       {/* Selected Options */}
                       {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
                         <div className="text-xs text-gray-500 mt-0.5">
@@ -241,11 +244,13 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleQuantityChange(
-                              item.product.id,
-                              item.quantity - 1,
-                              item.selectedOptions
-                            )}
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.product.id,
+                                item.quantity - 1,
+                                item.selectedOptions
+                              )
+                            }
                             disabled={item.quantity <= 1}
                             className="p-1 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -253,18 +258,20 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                           </button>
                           <span className="w-8 text-center text-sm">{item.quantity}</span>
                           <button
-                            onClick={() => handleQuantityChange(
-                              item.product.id,
-                              item.quantity + 1,
-                              item.selectedOptions
-                            )}
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.product.id,
+                                item.quantity + 1,
+                                item.selectedOptions
+                              )
+                            }
                             disabled={item.quantity >= item.product.stockQuantity}
                             className="p-1 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
                             {formatPrice(item.product.price * item.quantity)}
@@ -279,7 +286,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
 
               {/* Coupon Section */}
@@ -371,7 +378,11 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
             {/* Security Badge */}
             <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               Secure Checkout
             </div>
@@ -379,5 +390,5 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
         )}
       </div>
     </>
-  );
-};
+  )
+}

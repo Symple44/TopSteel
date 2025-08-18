@@ -1,33 +1,37 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { PricingEngineService, PricingContext, PriceCalculationResult } from '../../pricing/services/pricing-engine.service';
-import { PriceRuleChannel } from '@erp/entities';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import { Redis } from 'ioredis';
+import { PriceRuleChannel } from '@erp/entities'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectRedis } from '@nestjs-modules/ioredis'
+import type { Redis } from 'ioredis'
+import type {
+  PriceCalculationResult,
+  PricingContext,
+  PricingEngineService,
+} from '../../pricing/services/pricing-engine.service'
 
 export interface MarketplacePricingOptions {
-  quantity: number;
-  customerId?: string;
-  customerGroup?: string;
-  promotionCode?: string;
-  isFirstOrder?: boolean;
-  orderTotal?: number;
-  channel?: 'WEB' | 'MOBILE' | 'API';
+  quantity: number
+  customerId?: string
+  customerGroup?: string
+  promotionCode?: string
+  isFirstOrder?: boolean
+  orderTotal?: number
+  channel?: 'WEB' | 'MOBILE' | 'API'
 }
 
 export interface MarketplacePriceResult extends PriceCalculationResult {
-  displayPrice: number; // Prix affiché (TTC ou HT selon config)
-  originalPrice?: number; // Prix barré si promotion
-  savings?: number; // Économies réalisées
-  taxAmount?: number; // Montant TVA
-  shippingCost?: number; // Frais de port calculés
-  totalWithShipping?: number; // Total avec frais de port
+  displayPrice: number // Prix affiché (TTC ou HT selon config)
+  originalPrice?: number // Prix barré si promotion
+  savings?: number // Économies réalisées
+  taxAmount?: number // Montant TVA
+  shippingCost?: number // Frais de port calculés
+  totalWithShipping?: number // Total avec frais de port
 }
 
 @Injectable()
 export class MarketplacePricingIntegrationService {
-  private readonly logger = new Logger(MarketplacePricingIntegrationService.name);
-  private readonly CACHE_TTL = 300; // 5 minutes
-  private readonly TVA_RATE = 0.20; // 20% TVA par défaut
+  private readonly logger = new Logger(MarketplacePricingIntegrationService.name)
+  private readonly CACHE_TTL = 300 // 5 minutes
+  private readonly TVA_RATE = 0.2 // 20% TVA par défaut
 
   constructor(
     private readonly pricingEngine: PricingEngineService,
@@ -42,12 +46,12 @@ export class MarketplacePricingIntegrationService {
     tenantId: string,
     options: MarketplacePricingOptions
   ): Promise<MarketplacePriceResult> {
-    const cacheKey = this.getCacheKey(articleId, tenantId, options);
-    
+    const cacheKey = this.getCacheKey(articleId, tenantId, options)
+
     // Vérifier le cache
-    const cached = await this.redis.get(cacheKey);
+    const cached = await this.redis.get(cacheKey)
     if (cached) {
-      return JSON.parse(cached);
+      return JSON.parse(cached)
     }
 
     try {
@@ -61,25 +65,25 @@ export class MarketplacePricingIntegrationService {
         channel: PriceRuleChannel.MARKETPLACE,
         promotionCode: options.promotionCode,
         isFirstOrder: options.isFirstOrder,
-        orderTotal: options.orderTotal
-      };
+        orderTotal: options.orderTotal,
+      }
 
       // Calculer avec le moteur de pricing ERP
       const erpResult = await this.pricingEngine.calculatePrice(pricingContext, {
         detailed: true,
-        includeMargins: true
-      });
+        includeMargins: true,
+      })
 
       // Enrichir avec les données marketplace
-      const result = this.enrichWithMarketplaceData(erpResult, options);
+      const result = this.enrichWithMarketplaceData(erpResult, options)
 
       // Mettre en cache
-      await this.redis.setex(cacheKey, this.CACHE_TTL, JSON.stringify(result));
+      await this.redis.setex(cacheKey, this.CACHE_TTL, JSON.stringify(result))
 
-      return result;
+      return result
     } catch (error) {
-      this.logger.error(`Failed to calculate marketplace price for article ${articleId}:`, error);
-      throw error;
+      this.logger.error(`Failed to calculate marketplace price for article ${articleId}:`, error)
+      throw error
     }
   }
 
@@ -91,22 +95,22 @@ export class MarketplacePricingIntegrationService {
     tenantId: string,
     customerId?: string
   ): Promise<Map<string, MarketplacePriceResult>> {
-    const results = new Map<string, MarketplacePriceResult>();
+    const results = new Map<string, MarketplacePriceResult>()
 
     // Calculer le total provisoire pour les règles basées sur le montant total
-    const provisionalTotal = await this.calculateProvisionalTotal(items, tenantId);
+    const provisionalTotal = await this.calculateProvisionalTotal(items, tenantId)
 
     // Calculer chaque article avec le contexte du panier
     for (const item of items) {
       const price = await this.calculateMarketplacePrice(item.articleId, tenantId, {
         quantity: item.quantity,
         customerId,
-        orderTotal: provisionalTotal
-      });
-      results.set(item.articleId, price);
+        orderTotal: provisionalTotal,
+      })
+      results.set(item.articleId, price)
     }
 
-    return results;
+    return results
   }
 
   /**
@@ -114,34 +118,34 @@ export class MarketplacePricingIntegrationService {
    */
   async calculateShippingCost(
     items: Array<{ articleId: string; quantity: number; weight?: number }>,
-    destinationPostalCode: string,
+    _destinationPostalCode: string,
     tenantId: string
   ): Promise<number> {
     // Logique de calcul des frais de port
     // Peut être basée sur le poids, le volume, la distance, etc.
-    let totalWeight = 0;
-    let totalValue = 0;
+    let totalWeight = 0
+    let totalValue = 0
 
     for (const item of items) {
-      totalWeight += (item.weight || 0) * item.quantity;
+      totalWeight += (item.weight || 0) * item.quantity
       const price = await this.calculateMarketplacePrice(item.articleId, tenantId, {
-        quantity: item.quantity
-      });
-      totalValue += price.finalPrice;
+        quantity: item.quantity,
+      })
+      totalValue += price.finalPrice
     }
 
     // Frais de port gratuits au-dessus d'un certain montant
     if (totalValue >= 500) {
-      return 0;
+      return 0
     }
 
     // Calcul basé sur le poids
     if (totalWeight <= 5) {
-      return 9.90; // Forfait petit colis
+      return 9.9 // Forfait petit colis
     } else if (totalWeight <= 30) {
-      return 19.90; // Forfait moyen
+      return 19.9 // Forfait moyen
     } else {
-      return 29.90 + (totalWeight - 30) * 0.50; // Forfait + supplément
+      return 29.9 + (totalWeight - 30) * 0.5 // Forfait + supplément
     }
   }
 
@@ -153,32 +157,32 @@ export class MarketplacePricingIntegrationService {
     currentPrice: number,
     articleId: string,
     tenantId: string
-  ): Promise<{ 
-    success: boolean; 
-    newPrice?: number; 
-    discount?: number; 
-    message?: string 
+  ): Promise<{
+    success: boolean
+    newPrice?: number
+    discount?: number
+    message?: string
   }> {
     // Vérifier la validité du code promo
-    const promoRule = await this.validatePromotionCode(code, articleId, tenantId);
-    
+    const promoRule = await this.validatePromotionCode(code, articleId, tenantId)
+
     if (!promoRule) {
-      return { 
-        success: false, 
-        message: 'Code promo invalide ou expiré' 
-      };
+      return {
+        success: false,
+        message: 'Code promo invalide ou expiré',
+      }
     }
 
     // Appliquer la réduction
-    const discount = this.calculatePromoDiscount(currentPrice, promoRule);
-    const newPrice = currentPrice - discount;
+    const discount = this.calculatePromoDiscount(currentPrice, promoRule)
+    const newPrice = currentPrice - discount
 
     return {
       success: true,
       newPrice,
       discount,
-      message: `Code promo ${code} appliqué avec succès`
-    };
+      message: `Code promo ${code} appliqué avec succès`,
+    }
   }
 
   /**
@@ -186,25 +190,25 @@ export class MarketplacePricingIntegrationService {
    */
   private enrichWithMarketplaceData(
     erpResult: PriceCalculationResult,
-    options: MarketplacePricingOptions
+    _options: MarketplacePricingOptions
   ): MarketplacePriceResult {
-    const taxAmount = erpResult.finalPrice * this.TVA_RATE;
-    const displayPrice = erpResult.finalPrice * (1 + this.TVA_RATE); // Prix TTC
+    const taxAmount = erpResult.finalPrice * this.TVA_RATE
+    const displayPrice = erpResult.finalPrice * (1 + this.TVA_RATE) // Prix TTC
 
     const result: MarketplacePriceResult = {
       ...erpResult,
       displayPrice,
       taxAmount,
-      totalWithShipping: displayPrice // Sera mis à jour avec les frais de port
-    };
+      totalWithShipping: displayPrice, // Sera mis à jour avec les frais de port
+    }
 
     // Si des règles ont été appliquées, calculer les économies
     if (erpResult.appliedRules && erpResult.appliedRules.length > 0) {
-      result.originalPrice = erpResult.basePrice * (1 + this.TVA_RATE);
-      result.savings = result.originalPrice - result.displayPrice;
+      result.originalPrice = erpResult.basePrice * (1 + this.TVA_RATE)
+      result.savings = result.originalPrice - result.displayPrice
     }
 
-    return result;
+    return result
   }
 
   /**
@@ -222,10 +226,10 @@ export class MarketplacePricingIntegrationService {
       options.quantity,
       options.customerId || 'anonymous',
       options.customerGroup || 'default',
-      options.promotionCode || 'none'
-    ].join(':');
-    
-    return key;
+      options.promotionCode || 'none',
+    ].join(':')
+
+    return key
   }
 
   /**
@@ -235,22 +239,22 @@ export class MarketplacePricingIntegrationService {
     items: Array<{ articleId: string; quantity: number }>,
     tenantId: string
   ): Promise<number> {
-    let total = 0;
-    
+    let total = 0
+
     for (const item of items) {
       // Calcul simple sans règles complexes pour éviter la récursion
       const context: PricingContext = {
         articleId: item.articleId,
         quantity: item.quantity,
         societeId: tenantId,
-        channel: PriceRuleChannel.MARKETPLACE
-      };
-      
-      const result = await this.pricingEngine.calculatePrice(context);
-      total += result.finalPrice;
+        channel: PriceRuleChannel.MARKETPLACE,
+      }
+
+      const result = await this.pricingEngine.calculatePrice(context)
+      total += result.finalPrice
     }
-    
-    return total;
+
+    return total
   }
 
   /**
@@ -258,42 +262,45 @@ export class MarketplacePricingIntegrationService {
    */
   private async validatePromotionCode(
     code: string,
-    articleId: string,
-    tenantId: string
+    _articleId: string,
+    _tenantId: string
   ): Promise<{ type: 'percentage' | 'fixed'; value: number } | null> {
     // Implémentation simplifiée - à remplacer par une vraie table promotions
     const promotions: Record<string, { type: 'percentage' | 'fixed'; value: number }> = {
-      'SUMMER2024': { type: 'percentage', value: 15 },
-      'WELCOME10': { type: 'percentage', value: 10 },
-      'FIRSTORDER': { type: 'fixed', value: 20 }
-    };
+      SUMMER2024: { type: 'percentage', value: 15 },
+      WELCOME10: { type: 'percentage', value: 10 },
+      FIRSTORDER: { type: 'fixed', value: 20 },
+    }
 
-    const promo = promotions[code.toUpperCase()];
-    return promo || null;
+    const promo = promotions[code.toUpperCase()]
+    return promo || null
   }
 
   /**
    * Calcule la réduction d'un code promo
    */
-  private calculatePromoDiscount(price: number, promoRule: { type: 'percentage' | 'fixed'; value: number }): number {
+  private calculatePromoDiscount(
+    price: number,
+    promoRule: { type: 'percentage' | 'fixed'; value: number }
+  ): number {
     if (promoRule.type === 'percentage') {
-      return price * (promoRule.value / 100);
+      return price * (promoRule.value / 100)
     } else if (promoRule.type === 'fixed') {
-      return Math.min(promoRule.value, price); // Ne pas dépasser le prix
+      return Math.min(promoRule.value, price) // Ne pas dépasser le prix
     }
-    return 0;
+    return 0
   }
 
   /**
    * Invalide le cache pour un article
    */
   async invalidateCache(articleId: string, tenantId: string): Promise<void> {
-    const pattern = `marketplace-price:${tenantId}:${articleId}:*`;
-    const keys = await this.redis.keys(pattern);
-    
+    const pattern = `marketplace-price:${tenantId}:${articleId}:*`
+    const keys = await this.redis.keys(pattern)
+
     if (keys.length > 0) {
-      await this.redis.del(...keys);
-      this.logger.debug(`Invalidated ${keys.length} cache entries for article ${articleId}`);
+      await this.redis.del(...keys)
+      this.logger.debug(`Invalidated ${keys.length} cache entries for article ${articleId}`)
     }
   }
 
@@ -301,12 +308,12 @@ export class MarketplacePricingIntegrationService {
    * Invalide tout le cache d'un tenant
    */
   async invalidateTenantCache(tenantId: string): Promise<void> {
-    const pattern = `marketplace-price:${tenantId}:*`;
-    const keys = await this.redis.keys(pattern);
-    
+    const pattern = `marketplace-price:${tenantId}:*`
+    const keys = await this.redis.keys(pattern)
+
     if (keys.length > 0) {
-      await this.redis.del(...keys);
-      this.logger.log(`Invalidated ${keys.length} cache entries for tenant ${tenantId}`);
+      await this.redis.del(...keys)
+      this.logger.log(`Invalidated ${keys.length} cache entries for tenant ${tenantId}`)
     }
   }
 }

@@ -1,73 +1,79 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity('marketplace_coupons')
 export class MarketplaceCoupon {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @Column({ name: 'tenant_id', length: 50 })
-  tenantId: string;
+  tenantId: string
 
   @Column({ length: 50, unique: true })
-  code: string;
+  code: string
 
   @Column({ type: 'text', nullable: true })
-  description: string;
+  description: string
 
   @Column({
     type: 'enum',
-    enum: ['PERCENTAGE', 'FIXED_AMOUNT', 'FREE_SHIPPING']
+    enum: ['PERCENTAGE', 'FIXED_AMOUNT', 'FREE_SHIPPING'],
   })
-  type: string;
+  type: string
 
   @Column('decimal', { precision: 10, scale: 2 })
-  value: number;
+  value: number
 
   @Column({ name: 'start_date', type: 'timestamp', nullable: true })
-  startDate: Date;
+  startDate: Date
 
   @Column({ name: 'end_date', type: 'timestamp', nullable: true })
-  endDate: Date;
+  endDate: Date
 
   @Column({ name: 'is_active', default: true })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ name: 'max_usages', nullable: true })
-  maxUsages: number;
+  maxUsages: number
 
   @Column({ name: 'max_usages_per_customer', nullable: true })
-  maxUsagesPerCustomer: number;
+  maxUsagesPerCustomer: number
 
   @Column({ name: 'usage_count', default: 0 })
-  usageCount: number;
+  usageCount: number
 
-  @Column({ name: 'minimum_order_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
-  minimumOrderAmount: number;
+  @Column({
+    name: 'minimum_order_amount',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
+  minimumOrderAmount: number
 
   @Column('simple-array', { name: 'applicable_products', nullable: true })
-  applicableProducts: string[];
+  applicableProducts: string[]
 
   @Column('simple-array', { name: 'applicable_categories', nullable: true })
-  applicableCategories: string[];
+  applicableCategories: string[]
 
   @Column('simple-array', { name: 'excluded_products', nullable: true })
-  excludedProducts: string[];
+  excludedProducts: string[]
 
   @Column('simple-array', { name: 'excluded_categories', nullable: true })
-  excludedCategories: string[];
+  excludedCategories: string[]
 
   @Column('simple-array', { name: 'customer_groups', nullable: true })
-  customerGroups: string[];
+  customerGroups: string[]
 
   @Column('simple-array', { name: 'customer_emails', nullable: true })
-  customerEmails: string[];
+  customerEmails: string[]
 
   @Column('jsonb', { nullable: true })
-  metadata: Record<string, any>;
+  metadata: Record<string, any>
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt: Date
 }

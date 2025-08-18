@@ -5,7 +5,7 @@ export interface SystemHealth {
   status: 'healthy' | 'degraded' | 'unhealthy'
   timestamp: string
   message: string
-  databases?: any
+  databases?: Record<string, unknown>
 }
 
 @Injectable()

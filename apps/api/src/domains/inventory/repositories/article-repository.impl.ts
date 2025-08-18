@@ -207,9 +207,12 @@ export class ArticleRepositoryImpl implements IArticleRepository {
         query.andWhere('article.stockPhysique <= :stockMax', { stockMax: filters.stock.max })
       }
       if (filters.stock.disponible !== undefined) {
-        query.andWhere('(article.stockPhysique - COALESCE(article.stockReserve, 0)) >= :disponible', {
-          disponible: filters.stock.disponible
-        })
+        query.andWhere(
+          '(article.stockPhysique - COALESCE(article.stockReserve, 0)) >= :disponible',
+          {
+            disponible: filters.stock.disponible,
+          }
+        )
       }
       if (filters.stock.enRupture === true) {
         query.andWhere('article.stockPhysique <= COALESCE(article.stockMinimum, 0)')
@@ -237,7 +240,9 @@ export class ArticleRepositoryImpl implements IArticleRepository {
 
     // Filtre par fournisseurs
     if (filters.fournisseurs && filters.fournisseurs.length > 0) {
-      query.andWhere('article.fournisseurId IN (:...fournisseurs)', { fournisseurs: filters.fournisseurs })
+      query.andWhere('article.fournisseurId IN (:...fournisseurs)', {
+        fournisseurs: filters.fournisseurs,
+      })
     }
 
     // Filtre par statut actif
@@ -272,7 +277,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
       items,
       total,
       page,
-      limit
+      limit,
     }
   }
 
@@ -485,7 +490,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
       .getRawMany()
 
     const repartition: Record<string, number> = {}
-    result.forEach(item => {
+    result.forEach((item) => {
       if (item.famille) {
         repartition[item.famille] = parseInt(item.count)
       }

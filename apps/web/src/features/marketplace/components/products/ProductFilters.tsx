@@ -1,126 +1,138 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronDown, ChevronUp, X } from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 interface FilterOption {
-  value: string;
-  label: string;
-  count?: number;
+  value: string
+  label: string
+  count?: number
 }
 
 interface PriceRange {
-  min: number;
-  max: number;
+  min: number
+  max: number
 }
 
 interface ProductFiltersProps {
-  categories?: FilterOption[];
-  brands?: FilterOption[];
+  categories?: FilterOption[]
+  brands?: FilterOption[]
   onFilterChange?: (filters: {
-    categories: string[];
-    brands: string[];
-    priceRange: PriceRange;
-    rating: number | null;
-    inStock: boolean;
-    onSale: boolean;
-    tags: string[];
-  }) => void;
-  className?: string;
+    categories: string[]
+    brands: string[]
+    priceRange: PriceRange
+    rating: number | null
+    inStock: boolean
+    onSale: boolean
+    tags: string[]
+  }) => void
+  className?: string
 }
 
 export const ProductFilters: React.FC<ProductFiltersProps> = ({
   categories = [],
   brands = [],
   onFilterChange,
-  className
+  className,
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['category', 'price', 'brand'])
-  );
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
-  const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
-  const [priceRange, setPriceRange] = useState<PriceRange>({ min: 0, max: 1000 });
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [inStock, setInStock] = useState(false);
-  const [onSale, setOnSale] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  )
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set())
+  const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set())
+  const [priceRange, setPriceRange] = useState<PriceRange>({ min: 0, max: 1000 })
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
+  const [selectedRating, setSelectedRating] = useState<number | null>(null)
+  const [inStock, setInStock] = useState(false)
+  const [onSale, setOnSale] = useState(false)
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
 
   // Sample data - replace with actual data
-  const sampleCategories: FilterOption[] = categories.length > 0 ? categories : [
-    { value: 'steel-products', label: 'Steel Products', count: 245 },
-    { value: 'tools', label: 'Tools & Equipment', count: 189 },
-    { value: 'fasteners', label: 'Fasteners', count: 156 },
-    { value: 'safety', label: 'Safety Equipment', count: 98 },
-    { value: 'welding', label: 'Welding Supplies', count: 76 },
-    { value: 'construction', label: 'Construction Materials', count: 134 }
-  ];
+  const sampleCategories: FilterOption[] =
+    categories.length > 0
+      ? categories
+      : [
+          { value: 'steel-products', label: 'Steel Products', count: 245 },
+          { value: 'tools', label: 'Tools & Equipment', count: 189 },
+          { value: 'fasteners', label: 'Fasteners', count: 156 },
+          { value: 'safety', label: 'Safety Equipment', count: 98 },
+          { value: 'welding', label: 'Welding Supplies', count: 76 },
+          { value: 'construction', label: 'Construction Materials', count: 134 },
+        ]
 
-  const sampleBrands: FilterOption[] = brands.length > 0 ? brands : [
-    { value: 'topsteel', label: 'TopSteel', count: 89 },
-    { value: 'steelmax', label: 'SteelMax', count: 67 },
-    { value: 'protools', label: 'ProTools', count: 54 },
-    { value: 'safeguard', label: 'SafeGuard', count: 43 },
-    { value: 'weldpro', label: 'WeldPro', count: 38 }
-  ];
+  const sampleBrands: FilterOption[] =
+    brands.length > 0
+      ? brands
+      : [
+          { value: 'topsteel', label: 'TopSteel', count: 89 },
+          { value: 'steelmax', label: 'SteelMax', count: 67 },
+          { value: 'protools', label: 'ProTools', count: 54 },
+          { value: 'safeguard', label: 'SafeGuard', count: 43 },
+          { value: 'weldpro', label: 'WeldPro', count: 38 },
+        ]
 
   const popularTags = [
-    'Industrial', 'Heavy Duty', 'Premium', 'Eco-Friendly', 
-    'Certified', 'Professional', 'Bulk Available'
-  ];
+    'Industrial',
+    'Heavy Duty',
+    'Premium',
+    'Eco-Friendly',
+    'Certified',
+    'Professional',
+    'Bulk Available',
+  ]
 
   const toggleSection = (section: string) => {
-    const newExpanded = new Set(expandedSections);
+    const newExpanded = new Set(expandedSections)
     if (newExpanded.has(section)) {
-      newExpanded.delete(section);
+      newExpanded.delete(section)
     } else {
-      newExpanded.add(section);
+      newExpanded.add(section)
     }
-    setExpandedSections(newExpanded);
-  };
+    setExpandedSections(newExpanded)
+  }
 
   const handleCategoryChange = (category: string) => {
-    const newCategories = new Set(selectedCategories);
+    const newCategories = new Set(selectedCategories)
     if (newCategories.has(category)) {
-      newCategories.delete(category);
+      newCategories.delete(category)
     } else {
-      newCategories.add(category);
+      newCategories.add(category)
     }
-    setSelectedCategories(newCategories);
-    applyFilters({ categories: newCategories });
-  };
+    setSelectedCategories(newCategories)
+    applyFilters({ categories: newCategories })
+  }
 
   const handleBrandChange = (brand: string) => {
-    const newBrands = new Set(selectedBrands);
+    const newBrands = new Set(selectedBrands)
     if (newBrands.has(brand)) {
-      newBrands.delete(brand);
+      newBrands.delete(brand)
     } else {
-      newBrands.add(brand);
+      newBrands.add(brand)
     }
-    setSelectedBrands(newBrands);
-    applyFilters({ brands: newBrands });
-  };
+    setSelectedBrands(newBrands)
+    applyFilters({ brands: newBrands })
+  }
 
   const handlePriceChange = () => {
-    const min = parseFloat(minPrice) || 0;
-    const max = parseFloat(maxPrice) || 1000;
-    setPriceRange({ min, max });
-    applyFilters({ priceRange: { min, max } });
-  };
+    const min = parseFloat(minPrice) || 0
+    const max = parseFloat(maxPrice) || 1000
+    setPriceRange({ min, max })
+    applyFilters({ priceRange: { min, max } })
+  }
 
   const handleTagToggle = (tag: string) => {
-    const newTags = new Set(selectedTags);
+    const newTags = new Set(selectedTags)
     if (newTags.has(tag)) {
-      newTags.delete(tag);
+      newTags.delete(tag)
     } else {
-      newTags.add(tag);
+      newTags.add(tag)
     }
-    setSelectedTags(newTags);
-    applyFilters({ tags: newTags });
-  };
+    setSelectedTags(newTags)
+    applyFilters({ tags: newTags })
+  }
 
   const applyFilters = (updates: any = {}) => {
     onFilterChange?.({
@@ -130,21 +142,21 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       rating: updates.rating !== undefined ? updates.rating : selectedRating,
       inStock: updates.inStock !== undefined ? updates.inStock : inStock,
       onSale: updates.onSale !== undefined ? updates.onSale : onSale,
-      tags: Array.from(updates.tags || selectedTags)
-    });
-  };
+      tags: Array.from(updates.tags || selectedTags),
+    })
+  }
 
   const clearAllFilters = () => {
-    setSelectedCategories(new Set());
-    setSelectedBrands(new Set());
-    setPriceRange({ min: 0, max: 1000 });
-    setMinPrice('');
-    setMaxPrice('');
-    setSelectedRating(null);
-    setInStock(false);
-    setOnSale(false);
-    setSelectedTags(new Set());
-    
+    setSelectedCategories(new Set())
+    setSelectedBrands(new Set())
+    setPriceRange({ min: 0, max: 1000 })
+    setMinPrice('')
+    setMaxPrice('')
+    setSelectedRating(null)
+    setInStock(false)
+    setOnSale(false)
+    setSelectedTags(new Set())
+
     onFilterChange?.({
       categories: [],
       brands: [],
@@ -152,29 +164,27 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       rating: null,
       inStock: false,
       onSale: false,
-      tags: []
-    });
-  };
+      tags: [],
+    })
+  }
 
-  const hasActiveFilters = 
+  const hasActiveFilters =
     selectedCategories.size > 0 ||
     selectedBrands.size > 0 ||
-    (minPrice !== '' || maxPrice !== '') ||
+    minPrice !== '' ||
+    maxPrice !== '' ||
     selectedRating !== null ||
     inStock ||
     onSale ||
-    selectedTags.size > 0;
+    selectedTags.size > 0
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Filters</h3>
         {hasActiveFilters && (
-          <button
-            onClick={clearAllFilters}
-            className="text-sm text-blue-600 hover:text-blue-700"
-          >
+          <button onClick={clearAllFilters} className="text-sm text-blue-600 hover:text-blue-700">
             Clear all
           </button>
         )}
@@ -188,11 +198,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               key={cat}
               className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded-full"
             >
-              {sampleCategories.find(c => c.value === cat)?.label}
-              <button
-                onClick={() => handleCategoryChange(cat)}
-                className="hover:text-blue-900"
-              >
+              {sampleCategories.find((c) => c.value === cat)?.label}
+              <button onClick={() => handleCategoryChange(cat)} className="hover:text-blue-900">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -202,11 +209,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               key={brand}
               className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded-full"
             >
-              {sampleBrands.find(b => b.value === brand)?.label}
-              <button
-                onClick={() => handleBrandChange(brand)}
-                className="hover:text-blue-900"
-              >
+              {sampleBrands.find((b) => b.value === brand)?.label}
+              <button onClick={() => handleBrandChange(brand)} className="hover:text-blue-900">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -344,8 +348,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                   name="rating"
                   checked={selectedRating === rating}
                   onChange={() => {
-                    setSelectedRating(rating);
-                    applyFilters({ rating });
+                    setSelectedRating(rating)
+                    applyFilters({ rating })
                   }}
                   className="text-blue-600 focus:ring-blue-500"
                 />
@@ -356,8 +360,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       <svg
                         key={i}
                         className={cn(
-                          "w-4 h-4",
-                          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+                          'w-4 h-4',
+                          i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
                         )}
                         viewBox="0 0 20 20"
                       >
@@ -392,8 +396,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 type="checkbox"
                 checked={inStock}
                 onChange={(e) => {
-                  setInStock(e.target.checked);
-                  applyFilters({ inStock: e.target.checked });
+                  setInStock(e.target.checked)
+                  applyFilters({ inStock: e.target.checked })
                 }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
@@ -404,8 +408,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 type="checkbox"
                 checked={onSale}
                 onChange={(e) => {
-                  setOnSale(e.target.checked);
-                  applyFilters({ onSale: e.target.checked });
+                  setOnSale(e.target.checked)
+                  applyFilters({ onSale: e.target.checked })
                 }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
@@ -435,10 +439,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 key={tag}
                 onClick={() => handleTagToggle(tag)}
                 className={cn(
-                  "px-3 py-1 text-sm rounded-full border transition-colors",
+                  'px-3 py-1 text-sm rounded-full border transition-colors',
                   selectedTags.has(tag)
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
                 )}
               >
                 {tag}
@@ -448,5 +452,5 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

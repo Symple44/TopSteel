@@ -1,47 +1,46 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import sharp from 'sharp';
-import * as crypto from 'crypto';
-import * as path from 'path';
-import * as fs from 'fs/promises';
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
+import { Injectable, Logger } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
+import sharp from 'sharp'
 
 export interface CloudflareConfig {
-  accountId: string;
-  apiToken: string;
-  zoneId: string;
-  imagesApiToken: string;
-  imagesAccountHash: string;
-  customDomain?: string;
+  accountId: string
+  apiToken: string
+  zoneId: string
+  imagesApiToken: string
+  imagesAccountHash: string
+  customDomain?: string
 }
 
 export interface ImageTransformOptions {
-  width?: number;
-  height?: number;
-  quality?: number;
-  format?: 'webp' | 'avif' | 'jpeg' | 'png';
-  fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
-  gravity?: 'auto' | 'center' | 'north' | 'south' | 'east' | 'west';
-  sharpen?: number;
-  blur?: number;
-  background?: string;
+  width?: number
+  height?: number
+  quality?: number
+  format?: 'webp' | 'avif' | 'jpeg' | 'png'
+  fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad'
+  gravity?: 'auto' | 'center' | 'north' | 'south' | 'east' | 'west'
+  sharpen?: number
+  blur?: number
+  background?: string
 }
 
 export interface UploadedImage {
-  id: string;
-  filename: string;
-  uploaded: Date;
-  requireSignedURLs: boolean;
-  variants: string[];
-  meta?: Record<string, any>;
-  draft?: boolean;
+  id: string
+  filename: string
+  uploaded: Date
+  requireSignedURLs: boolean
+  variants: string[]
+  meta?: Record<string, any>
+  draft?: boolean
 }
 
 @Injectable()
 export class CloudflareConfigService {
-  private readonly logger = new Logger(CloudflareConfigService.name);
-  private readonly config: CloudflareConfig;
-  private readonly baseUrl: string;
-  private readonly cacheDir: string;
+  private readonly logger = new Logger(CloudflareConfigService.name)
+  private readonly config: CloudflareConfig
+  private readonly baseUrl: string
+  private readonly cacheDir: string
 
   constructor(private configService: ConfigService) {
     this.config = {
@@ -51,21 +50,21 @@ export class CloudflareConfigService {
       imagesApiToken: this.configService.get('CLOUDFLARE_IMAGES_API_TOKEN') || '',
       imagesAccountHash: this.configService.get('CLOUDFLARE_IMAGES_ACCOUNT_HASH') || '',
       customDomain: this.configService.get('CLOUDFLARE_CUSTOM_DOMAIN'),
-    };
+    }
 
-    this.baseUrl = this.config.customDomain 
+    this.baseUrl = this.config.customDomain
       ? `https://${this.config.customDomain}`
-      : `https://imagedelivery.net/${this.config.imagesAccountHash}`;
+      : `https://imagedelivery.net/${this.config.imagesAccountHash}`
 
-    this.cacheDir = path.join(process.cwd(), 'cache', 'cloudflare');
-    this.initializeCacheDir();
+    this.cacheDir = path.join(process.cwd(), 'cache', 'cloudflare')
+    this.initializeCacheDir()
   }
 
   private async initializeCacheDir(): Promise<void> {
     try {
-      await fs.mkdir(this.cacheDir, { recursive: true });
+      await fs.mkdir(this.cacheDir, { recursive: true })
     } catch (error) {
-      this.logger.error('Failed to create cache directory:', error);
+      this.logger.error('Failed to create cache directory:', error)
     }
   }
 
@@ -78,14 +77,14 @@ export class CloudflareConfigService {
     metadata?: Record<string, string>
   ): Promise<UploadedImage> {
     try {
-      const formData = new FormData();
-      const blob = new Blob([buffer]);
-      formData.append('file', blob, filename);
-      
+      const formData = new FormData()
+      const blob = new Blob([buffer])
+      formData.append('file', blob, filename)
+
       if (metadata) {
         Object.entries(metadata).forEach(([key, value]) => {
-          formData.append(`metadata.${key}`, value);
-        });
+          formData.append(`metadata.${key}`, value)
+        })
       }
 
       const response = await fetch(
@@ -93,20 +92,20 @@ export class CloudflareConfigService {
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${this.config.imagesApiToken}`,
+            Authorization: `Bearer ${this.config.imagesApiToken}`,
           },
           body: formData,
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        throw new Error(`Cloudflare upload failed: ${JSON.stringify(data.errors)}`);
+        throw new Error(`Cloudflare upload failed: ${JSON.stringify(data.errors)}`)
       }
 
-      this.logger.log(`Image uploaded successfully: ${data.result.id}`);
-      
+      this.logger.log(`Image uploaded successfully: ${data.result.id}`)
+
       return {
         id: data.result.id,
         filename: data.result.filename,
@@ -115,65 +114,62 @@ export class CloudflareConfigService {
         variants: data.result.variants,
         meta: data.result.meta,
         draft: data.result.draft,
-      };
+      }
     } catch (error) {
-      this.logger.error('Error uploading image to Cloudflare:', error);
-      throw error;
+      this.logger.error('Error uploading image to Cloudflare:', error)
+      throw error
     }
   }
 
   /**
    * Generate optimized image URL with transformations
    */
-  generateImageUrl(
-    imageId: string,
-    options: ImageTransformOptions = {}
-  ): string {
-    const variant = this.buildVariantString(options);
-    return `${this.baseUrl}/${imageId}/${variant}`;
+  generateImageUrl(imageId: string, options: ImageTransformOptions = {}): string {
+    const variant = this.buildVariantString(options)
+    return `${this.baseUrl}/${imageId}/${variant}`
   }
 
   /**
    * Build variant string for Cloudflare Images
    */
   private buildVariantString(options: ImageTransformOptions): string {
-    const parts: string[] = [];
+    const parts: string[] = []
 
     if (options.width || options.height) {
-      const width = options.width || '';
-      const height = options.height || '';
-      parts.push(`w=${width},h=${height}`);
+      const width = options.width || ''
+      const height = options.height || ''
+      parts.push(`w=${width},h=${height}`)
     }
 
     if (options.quality) {
-      parts.push(`q=${options.quality}`);
+      parts.push(`q=${options.quality}`)
     }
 
     if (options.format) {
-      parts.push(`f=${options.format}`);
+      parts.push(`f=${options.format}`)
     }
 
     if (options.fit) {
-      parts.push(`fit=${options.fit}`);
+      parts.push(`fit=${options.fit}`)
     }
 
     if (options.gravity) {
-      parts.push(`g=${options.gravity}`);
+      parts.push(`g=${options.gravity}`)
     }
 
     if (options.sharpen) {
-      parts.push(`sharpen=${options.sharpen}`);
+      parts.push(`sharpen=${options.sharpen}`)
     }
 
     if (options.blur) {
-      parts.push(`blur=${options.blur}`);
+      parts.push(`blur=${options.blur}`)
     }
 
     if (options.background) {
-      parts.push(`bg=${options.background}`);
+      parts.push(`bg=${options.background}`)
     }
 
-    return parts.length > 0 ? parts.join(',') : 'public';
+    return parts.length > 0 ? parts.join(',') : 'public'
   }
 
   /**
@@ -182,43 +178,43 @@ export class CloudflareConfigService {
   async optimizeImage(
     buffer: Buffer,
     options: {
-      maxWidth?: number;
-      maxHeight?: number;
-      quality?: number;
-      format?: 'webp' | 'avif' | 'jpeg' | 'png';
+      maxWidth?: number
+      maxHeight?: number
+      quality?: number
+      format?: 'webp' | 'avif' | 'jpeg' | 'png'
     } = {}
   ): Promise<Buffer> {
     try {
-      let pipeline = sharp(buffer);
+      let pipeline = sharp(buffer)
 
       // Resize if needed
       if (options.maxWidth || options.maxHeight) {
         pipeline = pipeline.resize(options.maxWidth, options.maxHeight, {
           fit: 'inside',
           withoutEnlargement: true,
-        });
+        })
       }
 
       // Convert format
       switch (options.format) {
         case 'webp':
-          pipeline = pipeline.webp({ quality: options.quality || 85 });
-          break;
+          pipeline = pipeline.webp({ quality: options.quality || 85 })
+          break
         case 'avif':
-          pipeline = pipeline.avif({ quality: options.quality || 80 });
-          break;
+          pipeline = pipeline.avif({ quality: options.quality || 80 })
+          break
         case 'jpeg':
-          pipeline = pipeline.jpeg({ quality: options.quality || 85 });
-          break;
+          pipeline = pipeline.jpeg({ quality: options.quality || 85 })
+          break
         case 'png':
-          pipeline = pipeline.png({ quality: options.quality || 90 });
-          break;
+          pipeline = pipeline.png({ quality: options.quality || 90 })
+          break
       }
 
-      return await pipeline.toBuffer();
+      return await pipeline.toBuffer()
     } catch (error) {
-      this.logger.error('Error optimizing image:', error);
-      throw error;
+      this.logger.error('Error optimizing image:', error)
+      throw error
     }
   }
 
@@ -232,23 +228,23 @@ export class CloudflareConfigService {
         {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${this.config.imagesApiToken}`,
+            Authorization: `Bearer ${this.config.imagesApiToken}`,
           },
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        this.logger.error(`Failed to delete image: ${JSON.stringify(data.errors)}`);
-        return false;
+        this.logger.error(`Failed to delete image: ${JSON.stringify(data.errors)}`)
+        return false
       }
 
-      this.logger.log(`Image deleted successfully: ${imageId}`);
-      return true;
+      this.logger.log(`Image deleted successfully: ${imageId}`)
+      return true
     } catch (error) {
-      this.logger.error('Error deleting image from Cloudflare:', error);
-      return false;
+      this.logger.error('Error deleting image from Cloudflare:', error)
+      return false
     }
   }
 
@@ -262,15 +258,15 @@ export class CloudflareConfigService {
         {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${this.config.imagesApiToken}`,
+            Authorization: `Bearer ${this.config.imagesApiToken}`,
           },
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        throw new Error(`Failed to list images: ${JSON.stringify(data.errors)}`);
+        throw new Error(`Failed to list images: ${JSON.stringify(data.errors)}`)
       }
 
       return data.result.images.map((img: any) => ({
@@ -281,10 +277,10 @@ export class CloudflareConfigService {
         variants: img.variants,
         meta: img.meta,
         draft: img.draft,
-      }));
+      }))
     } catch (error) {
-      this.logger.error('Error listing images from Cloudflare:', error);
-      throw error;
+      this.logger.error('Error listing images from Cloudflare:', error)
+      throw error
     }
   }
 
@@ -298,25 +294,25 @@ export class CloudflareConfigService {
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${this.config.apiToken}`,
+            Authorization: `Bearer ${this.config.apiToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ files: urls }),
         }
-      );
+      )
 
-      const data = await response.json() as any;
-      
+      const data = (await response.json()) as any
+
       if (!data.success) {
-        this.logger.error(`Cache purge failed: ${JSON.stringify(data.errors)}`);
-        return false;
+        this.logger.error(`Cache purge failed: ${JSON.stringify(data.errors)}`)
+        return false
       }
 
-      this.logger.log(`Cache purged for ${urls.length} URLs`);
-      return true;
+      this.logger.log(`Cache purged for ${urls.length} URLs`)
+      return true
     } catch (error) {
-      this.logger.error('Error purging cache:', error);
-      return false;
+      this.logger.error('Error purging cache:', error)
+      return false
     }
   }
 
@@ -329,11 +325,11 @@ export class CloudflareConfigService {
     format: 'webp' | 'avif' | 'jpeg' | 'png' = 'webp'
   ): string {
     return sizes
-      .map(size => {
-        const url = this.generateImageUrl(imageId, { width: size, format });
-        return `${url} ${size}w`;
+      .map((size) => {
+        const url = this.generateImageUrl(imageId, { width: size, format })
+        return `${url} ${size}w`
       })
-      .join(', ');
+      .join(', ')
   }
 
   /**
@@ -345,10 +341,10 @@ export class CloudflareConfigService {
     sizes: string = '100vw',
     breakpoints: number[] = [320, 640, 768, 1024, 1280, 1920]
   ): string {
-    const avifSrcSet = this.generateSrcSet(imageId, breakpoints, 'avif');
-    const webpSrcSet = this.generateSrcSet(imageId, breakpoints, 'webp');
-    const jpegSrcSet = this.generateSrcSet(imageId, breakpoints, 'jpeg');
-    const defaultSrc = this.generateImageUrl(imageId, { width: 1024, format: 'jpeg' });
+    const avifSrcSet = this.generateSrcSet(imageId, breakpoints, 'avif')
+    const webpSrcSet = this.generateSrcSet(imageId, breakpoints, 'webp')
+    const jpegSrcSet = this.generateSrcSet(imageId, breakpoints, 'jpeg')
+    const defaultSrc = this.generateImageUrl(imageId, { width: 1024, format: 'jpeg' })
 
     return `
       <picture>
@@ -357,56 +353,7 @@ export class CloudflareConfigService {
         <source type="image/jpeg" srcset="${jpegSrcSet}" sizes="${sizes}">
         <img src="${defaultSrc}" alt="${alt}" loading="lazy" decoding="async">
       </picture>
-    `.trim();
-  }
-
-  /**
-   * Cache image locally
-   */
-  private async cacheImageLocally(
-    imageId: string,
-    buffer: Buffer,
-    variant: string
-  ): Promise<void> {
-    try {
-      const hash = crypto.createHash('md5').update(`${imageId}-${variant}`).digest('hex');
-      const cachePath = path.join(this.cacheDir, `${hash}.cache`);
-      
-      await fs.writeFile(cachePath, buffer);
-      
-      // Clean old cache files (older than 7 days)
-      const files = await fs.readdir(this.cacheDir);
-      const now = Date.now();
-      const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-      
-      for (const file of files) {
-        const filePath = path.join(this.cacheDir, file);
-        const stats = await fs.stat(filePath);
-        
-        if (now - stats.mtimeMs > maxAge) {
-          await fs.unlink(filePath);
-        }
-      }
-    } catch (error) {
-      this.logger.error('Error caching image locally:', error);
-    }
-  }
-
-  /**
-   * Get cached image
-   */
-  private async getCachedImage(
-    imageId: string,
-    variant: string
-  ): Promise<Buffer | null> {
-    try {
-      const hash = crypto.createHash('md5').update(`${imageId}-${variant}`).digest('hex');
-      const cachePath = path.join(this.cacheDir, `${hash}.cache`);
-      
-      return await fs.readFile(cachePath);
-    } catch (error) {
-      return null;
-    }
+    `.trim()
   }
 
   /**
@@ -414,44 +361,44 @@ export class CloudflareConfigService {
    */
   async batchUploadImages(
     images: Array<{
-      buffer: Buffer;
-      filename: string;
-      metadata?: Record<string, string>;
+      buffer: Buffer
+      filename: string
+      metadata?: Record<string, string>
     }>
   ): Promise<UploadedImage[]> {
-    const uploadPromises = images.map(img =>
+    const uploadPromises = images.map((img) =>
       this.uploadImage(img.buffer, img.filename, img.metadata)
-    );
+    )
 
-    return Promise.all(uploadPromises);
+    return Promise.all(uploadPromises)
   }
 
   /**
    * Generate image statistics
    */
   async getImageStatistics(): Promise<{
-    totalImages: number;
-    totalSize: number;
-    averageSize: number;
-    formats: Record<string, number>;
+    totalImages: number
+    totalSize: number
+    averageSize: number
+    formats: Record<string, number>
   }> {
     try {
-      const images = await this.listImages();
-      
+      const images = await this.listImages()
+
       const stats = {
         totalImages: images.length,
         totalSize: 0,
         averageSize: 0,
         formats: {} as Record<string, number>,
-      };
+      }
 
       // Note: Cloudflare API doesn't provide size info directly
       // This would need additional implementation to track sizes
-      
-      return stats;
+
+      return stats
     } catch (error) {
-      this.logger.error('Error getting image statistics:', error);
-      throw error;
+      this.logger.error('Error getting image statistics:', error)
+      throw error
     }
   }
 }

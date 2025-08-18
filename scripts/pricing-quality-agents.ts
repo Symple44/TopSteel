@@ -36,8 +36,6 @@ class PricingQualityOrchestrator {
 
   private results: Map<string, QualityResult> = new Map()
 
-  constructor() {}
-
   /**
    * Agent Principal - Orchestre tous les autres agents
    */

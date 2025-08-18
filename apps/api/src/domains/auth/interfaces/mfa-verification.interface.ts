@@ -2,25 +2,25 @@
  * Types de méthodes d'authentification multifacteur (MFA)
  */
 export enum MFAMethodType {
-  TOTP = 'TOTP',                    // Time-based One-Time Password (Google Authenticator, Authy)
-  SMS = 'SMS',                      // Code par SMS
-  EMAIL = 'EMAIL',                  // Code par email
-  WEBAUTHN = 'WEBAUTHN',            // WebAuthn (clé de sécurité, biométrie)
-  BACKUP_CODES = 'BACKUP_CODES',    // Codes de récupération
-  APP_PUSH = 'APP_PUSH',            // Notification push mobile
-  VOICE_CALL = 'VOICE_CALL',        // Appel vocal
+  TOTP = 'TOTP', // Time-based One-Time Password (Google Authenticator, Authy)
+  SMS = 'SMS', // Code par SMS
+  EMAIL = 'EMAIL', // Code par email
+  WEBAUTHN = 'WEBAUTHN', // WebAuthn (clé de sécurité, biométrie)
+  BACKUP_CODES = 'BACKUP_CODES', // Codes de récupération
+  APP_PUSH = 'APP_PUSH', // Notification push mobile
+  VOICE_CALL = 'VOICE_CALL', // Appel vocal
 }
 
 /**
  * Statut de la vérification MFA
  */
 export enum MFAVerificationStatus {
-  PENDING = 'PENDING',              // En attente de vérification
-  VERIFIED = 'VERIFIED',            // Vérifié avec succès
-  FAILED = 'FAILED',                // Échec de vérification
-  EXPIRED = 'EXPIRED',              // Code expiré
-  BLOCKED = 'BLOCKED',              // Compte bloqué après trop de tentatives
-  CANCELLED = 'CANCELLED',          // Annulé par l'utilisateur
+  PENDING = 'PENDING', // En attente de vérification
+  VERIFIED = 'VERIFIED', // Vérifié avec succès
+  FAILED = 'FAILED', // Échec de vérification
+  EXPIRED = 'EXPIRED', // Code expiré
+  BLOCKED = 'BLOCKED', // Compte bloqué après trop de tentatives
+  CANCELLED = 'CANCELLED', // Annulé par l'utilisateur
 }
 
 /**

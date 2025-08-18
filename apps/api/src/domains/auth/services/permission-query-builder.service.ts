@@ -1,12 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, SelectQueryBuilder, Brackets, WhereExpressionBuilder } from 'typeorm'
+import {
+  Brackets,
+  type Repository,
+  type SelectQueryBuilder,
+  type WhereExpressionBuilder,
+} from 'typeorm'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { User } from '../../users/entities/user.entity'
 import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
 /**
  * Permission query operators
@@ -129,8 +134,6 @@ export interface PermissionConflict {
  */
 @Injectable()
 export class PermissionQueryBuilderService {
-  private readonly logger = new Logger(PermissionQueryBuilderService.name)
-
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -184,11 +187,7 @@ export class PermissionQueryBuilderService {
 
     // Cache if enabled
     if (options.cache && options.cacheKey) {
-      await this.cacheService.set(
-        options.cacheKey,
-        result,
-        options.cacheTTL || 300
-      )
+      await this.cacheService.set(options.cacheKey, result, options.cacheTTL || 300)
     }
 
     return result
@@ -204,7 +203,8 @@ export class PermissionQueryBuilderService {
     const startTime = Date.now()
 
     // Build user query
-    const query = this.userRepository.createQueryBuilder('user')
+    const query = this.userRepository
+      .createQueryBuilder('user')
       .leftJoinAndSelect('user.userSocieteRoles', 'userRole')
       .leftJoinAndSelect('userRole.role', 'role')
       .leftJoinAndSelect('role.permissions', 'rolePermission')
@@ -258,12 +258,13 @@ export class PermissionQueryBuilderService {
     societeId?: string,
     siteId?: string
   ): Promise<User[]> {
-    const query = this.userRepository.createQueryBuilder('user')
+    const query = this.userRepository
+      .createQueryBuilder('user')
       .innerJoin('user.userSocieteRoles', 'userRole')
       .innerJoin('userRole.role', 'role')
       .innerJoin('role.permissions', 'rolePermission')
       .innerJoin('rolePermission.permission', 'permission')
-      .where('(permission.resource || \':\' || permission.action) = :permission', { permission })
+      .where("(permission.resource || ':' || permission.action) = :permission", { permission })
 
     if (societeId) {
       query.andWhere('userRole.societeId = :societeId', { societeId })
@@ -287,17 +288,22 @@ export class PermissionQueryBuilderService {
 
     switch (operator) {
       case PermissionOperator.STARTS_WITH:
-        query.where('(permission.resource || \':\' || permission.action) LIKE :pattern', { pattern: `${pattern}%` })
+        query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
+          pattern: `${pattern}%`,
+        })
         break
       case PermissionOperator.ENDS_WITH:
-        query.where('(permission.resource || \':\' || permission.action) LIKE :pattern', { pattern: `%${pattern}` })
+        query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
+          pattern: `%${pattern}`,
+        })
         break
       case PermissionOperator.CONTAINS:
-        query.where('(permission.resource || \':\' || permission.action) LIKE :pattern', { pattern: `%${pattern}%` })
+        query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
+          pattern: `%${pattern}%`,
+        })
         break
-      case PermissionOperator.MATCHES:
       default:
-        query.where('(permission.resource || \':\' || permission.action) ~ :pattern', { pattern })
+        query.where("(permission.resource || ':' || permission.action) ~ :pattern", { pattern })
         break
     }
 
@@ -371,15 +377,7 @@ export class PermissionQueryBuilderService {
       for (const resPerm of userRole.restrictedPermissions || []) {
         let conflict = permissionMap.get(resPerm)
 
-        if (!conflict) {
-          conflict = {
-            permission: resPerm,
-            sources: [],
-            resolution: 'denied',
-            reason: 'Explicitly restricted',
-          }
-          permissionMap.set(resPerm, conflict)
-        } else {
+        if (conflict) {
           conflict.sources.push({
             type: 'restricted',
             source: 'Direct restriction',
@@ -388,6 +386,14 @@ export class PermissionQueryBuilderService {
           })
           conflict.resolution = 'denied'
           conflict.reason = 'Restriction overrides grants'
+        } else {
+          conflict = {
+            permission: resPerm,
+            sources: [],
+            resolution: 'denied',
+            reason: 'Explicitly restricted',
+          }
+          permissionMap.set(resPerm, conflict)
         }
       }
     }
@@ -396,8 +402,8 @@ export class PermissionQueryBuilderService {
     for (const conflict of permissionMap.values()) {
       if (conflict.sources.length > 1) {
         // Check if there are both grant and deny actions
-        const hasGrant = conflict.sources.some(s => s.action === 'grant')
-        const hasDeny = conflict.sources.some(s => s.action === 'deny')
+        const hasGrant = conflict.sources.some((s) => s.action === 'grant')
+        const hasDeny = conflict.sources.some((s) => s.action === 'deny')
 
         if (hasGrant && hasDeny) {
           conflicts.push(conflict)
@@ -411,14 +417,14 @@ export class PermissionQueryBuilderService {
   /**
    * Get permission hierarchy
    */
-  async getPermissionHierarchy(
-    rootPermission?: string
-  ): Promise<Array<{
-    permission: string
-    level: number
-    children: string[]
-    parent?: string
-  }>> {
+  async getPermissionHierarchy(rootPermission?: string): Promise<
+    Array<{
+      permission: string
+      level: number
+      children: string[]
+      parent?: string
+    }>
+  > {
     const permissions = await this.permissionRepository.find()
     const hierarchy: Array<{
       permission: string
@@ -477,7 +483,7 @@ export class PermissionQueryBuilderService {
       // Find root nodes (no parent)
       const allChildren = new Set<string>()
       for (const children of permissionTree.values()) {
-        children.forEach(child => allChildren.add(child))
+        children.forEach((child) => allChildren.add(child))
       }
 
       for (const node of permissionTree.keys()) {
@@ -534,7 +540,7 @@ export class PermissionQueryBuilderService {
     stats.totalUsers = await userQuery
       .select('COUNT(DISTINCT userRole.userId)', 'count')
       .getRawOne()
-      .then(r => parseInt(r.count))
+      .then((r) => parseInt(r.count))
 
     // Most used permissions
     const permissionUsage = await this.rolePermissionRepository
@@ -548,7 +554,7 @@ export class PermissionQueryBuilderService {
       .limit(10)
       .getRawMany()
 
-    stats.mostUsedPermissions = permissionUsage.map(p => ({
+    stats.mostUsedPermissions = permissionUsage.map((p) => ({
       permission: p.code,
       count: parseInt(p.count),
     }))
@@ -565,7 +571,7 @@ export class PermissionQueryBuilderService {
       .limit(10)
       .getRawMany()
 
-    stats.leastUsedPermissions = leastUsed.map(p => ({
+    stats.leastUsedPermissions = leastUsed.map((p) => ({
       permission: p.code,
       count: parseInt(p.count),
     }))
@@ -581,7 +587,7 @@ export class PermissionQueryBuilderService {
       .limit(10)
       .getRawMany()
 
-    stats.rolesWithMostPermissions = rolePermCounts.map(r => ({
+    stats.rolesWithMostPermissions = rolePermCounts.map((r) => ({
       role: r.name,
       count: parseInt(r.count),
     }))
@@ -605,18 +611,24 @@ export class PermissionQueryBuilderService {
     // Apply conditions
     if (options.conditions.length > 0) {
       if (options.logic === 'OR') {
-        query.where(new Brackets(qb => {
-          for (const condition of options.conditions) {
-            qb.orWhere(new Brackets(subQb => {
-              this.applyPermissionCondition(subQb, condition)
-            }))
-          }
-        }))
+        query.where(
+          new Brackets((qb) => {
+            for (const condition of options.conditions) {
+              qb.orWhere(
+                new Brackets((subQb) => {
+                  this.applyPermissionCondition(subQb, condition)
+                })
+              )
+            }
+          })
+        )
       } else {
         for (const condition of options.conditions) {
-          query.andWhere(new Brackets(qb => {
-            this.applyPermissionCondition(qb, condition)
-          }))
+          query.andWhere(
+            new Brackets((qb) => {
+              this.applyPermissionCondition(qb, condition)
+            })
+          )
         }
       }
     }
@@ -653,7 +665,7 @@ export class PermissionQueryBuilderService {
     switch (condition.operator) {
       case PermissionOperator.HAS:
         if (condition.permissions?.length) {
-          query.where('(permission.resource || \':\' || permission.action) IN (:...permissions)', {
+          query.where("(permission.resource || ':' || permission.action) IN (:...permissions)", {
             permissions: condition.permissions,
           })
         }
@@ -661,21 +673,26 @@ export class PermissionQueryBuilderService {
 
       case PermissionOperator.HAS_NONE:
         if (condition.permissions?.length) {
-          query.where('(permission.resource || \':\' || permission.action) NOT IN (:...permissions)', {
-            permissions: condition.permissions,
-          })
+          query.where(
+            "(permission.resource || ':' || permission.action) NOT IN (:...permissions)",
+            {
+              permissions: condition.permissions,
+            }
+          )
         }
         break
 
       case PermissionOperator.MATCHES:
         if (condition.pattern) {
-          query.where('(permission.resource || \':\' || permission.action) ~ :pattern', { pattern: condition.pattern })
+          query.where("(permission.resource || ':' || permission.action) ~ :pattern", {
+            pattern: condition.pattern,
+          })
         }
         break
 
       case PermissionOperator.STARTS_WITH:
         if (condition.pattern) {
-          query.where('(permission.resource || \':\' || permission.action) LIKE :pattern', {
+          query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
             pattern: `${condition.pattern}%`,
           })
         }
@@ -683,7 +700,7 @@ export class PermissionQueryBuilderService {
 
       case PermissionOperator.ENDS_WITH:
         if (condition.pattern) {
-          query.where('(permission.resource || \':\' || permission.action) LIKE :pattern', {
+          query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
             pattern: `%${condition.pattern}`,
           })
         }
@@ -691,7 +708,7 @@ export class PermissionQueryBuilderService {
 
       case PermissionOperator.CONTAINS:
         if (condition.pattern) {
-          query.where('(permission.resource || \':\' || permission.action) LIKE :pattern', {
+          query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
             pattern: `%${condition.pattern}%`,
           })
         }
@@ -709,20 +726,23 @@ export class PermissionQueryBuilderService {
   ): void {
     if (conditions.length === 0) return
 
-    const brackets = new Brackets(qb => {
+    const brackets = new Brackets((qb) => {
       for (let i = 0; i < conditions.length; i++) {
         const condition = conditions[i]
-        const subBrackets = new Brackets(subQb => {
+        const subBrackets = new Brackets((subQb) => {
           switch (condition.operator) {
             case PermissionOperator.HAS:
               if (condition.permissions?.length === 1) {
-                subQb.where('(permission.resource || \':\' || permission.action) = :perm' + i, {
-                  ['perm' + i]: condition.permissions[0],
+                subQb.where(`(permission.resource || \':\' || permission.action) = :perm${i}`, {
+                  [`perm${i}`]: condition.permissions[0],
                 })
               } else if (condition.permissions?.length) {
-                subQb.where('(permission.resource || \':\' || permission.action) IN (:...perms' + i + ')', {
-                  ['perms' + i]: condition.permissions,
-                })
+                subQb.where(
+                  `(permission.resource || \':\' || permission.action) IN (:...perms${i})`,
+                  {
+                    [`perms${i}`]: condition.permissions,
+                  }
+                )
               }
               break
 
@@ -747,55 +767,67 @@ export class PermissionQueryBuilderService {
 
             case PermissionOperator.HAS_ANY:
               if (condition.permissions?.length) {
-                subQb.where('(permission.resource || \':\' || permission.action) IN (:...perms' + i + ')', {
-                  ['perms' + i]: condition.permissions,
-                })
+                subQb.where(
+                  `(permission.resource || \':\' || permission.action) IN (:...perms${i})`,
+                  {
+                    [`perms${i}`]: condition.permissions,
+                  }
+                )
               }
               break
 
             case PermissionOperator.HAS_NONE:
               if (condition.permissions?.length) {
-                subQb.where('(permission.resource || \':\' || permission.action) NOT IN (:...perms' + i + ')', {
-                  ['perms' + i]: condition.permissions,
-                })
+                subQb.where(
+                  `(permission.resource || \':\' || permission.action) NOT IN (:...perms${i})`,
+                  {
+                    [`perms${i}`]: condition.permissions,
+                  }
+                )
               }
               break
 
             case PermissionOperator.MATCHES:
               if (condition.pattern) {
-                subQb.where('(permission.resource || \':\' || permission.action) ~ :pattern' + i, {
-                  ['pattern' + i]: condition.pattern,
+                subQb.where(`(permission.resource || \':\' || permission.action) ~ :pattern${i}`, {
+                  [`pattern${i}`]: condition.pattern,
                 })
               }
               break
 
             case PermissionOperator.STARTS_WITH:
               if (condition.pattern) {
-                subQb.where('(permission.resource || \':\' || permission.action) LIKE :pattern' + i, {
-                  ['pattern' + i]: `${condition.pattern}%`,
-                })
+                subQb.where(
+                  `(permission.resource || \':\' || permission.action) LIKE :pattern${i}`,
+                  {
+                    [`pattern${i}`]: `${condition.pattern}%`,
+                  }
+                )
               }
               break
 
             case PermissionOperator.CONTAINS:
               if (condition.pattern) {
-                subQb.where('(permission.resource || \':\' || permission.action) LIKE :pattern' + i, {
-                  ['pattern' + i]: `%${condition.pattern}%`,
-                })
+                subQb.where(
+                  `(permission.resource || \':\' || permission.action) LIKE :pattern${i}`,
+                  {
+                    [`pattern${i}`]: `%${condition.pattern}%`,
+                  }
+                )
               }
               break
           }
 
           // Apply scope filters
           if (condition.societeId) {
-            subQb.andWhere('userRole.societeId = :societeId' + i, {
-              ['societeId' + i]: condition.societeId,
+            subQb.andWhere(`userRole.societeId = :societeId${i}`, {
+              [`societeId${i}`]: condition.societeId,
             })
           }
 
           if (condition.siteId) {
-            subQb.andWhere(':siteId' + i + ' = ANY(userRole.allowedSites)', {
-              ['siteId' + i]: condition.siteId,
+            subQb.andWhere(`:siteId${i} = ANY(userRole.allowedSites)`, {
+              [`siteId${i}`]: condition.siteId,
             })
           }
         })
@@ -831,8 +863,10 @@ export class PermissionQueryBuilderService {
 
       if (options.includeUsers) {
         // Get users with this permission
-        const users = await this.findUsersWithPermission(`${permission.resource}:${permission.action}`)
-        result.users = users.map(u => ({
+        const users = await this.findUsersWithPermission(
+          `${permission.resource}:${permission.action}`
+        )
+        result.users = users.map((u) => ({
           id: u.id,
           email: u.email,
           name: `${u.prenom || ''} ${u.nom || ''}`.trim(),
@@ -915,36 +949,34 @@ export class PermissionQueryBuilderService {
   /**
    * Check if permissions match condition
    */
-  private checkConditionMatch(
-    permissions: string[],
-    condition: PermissionCondition
-  ): boolean {
+  private checkConditionMatch(permissions: string[], condition: PermissionCondition): boolean {
     switch (condition.operator) {
       case PermissionOperator.HAS:
-        return condition.permissions?.some(p => permissions.includes(p)) || false
+        return condition.permissions?.some((p) => permissions.includes(p)) || false
 
       case PermissionOperator.HAS_ALL:
-        return condition.permissions?.every(p => permissions.includes(p)) || false
+        return condition.permissions?.every((p) => permissions.includes(p)) || false
 
       case PermissionOperator.HAS_ANY:
-        return condition.permissions?.some(p => permissions.includes(p)) || false
+        return condition.permissions?.some((p) => permissions.includes(p)) || false
 
       case PermissionOperator.HAS_NONE:
-        return !condition.permissions?.some(p => permissions.includes(p)) || true
+        return !condition.permissions?.some((p) => permissions.includes(p)) || true
 
-      case PermissionOperator.MATCHES:
+      case PermissionOperator.MATCHES: {
         if (!condition.pattern) return false
         const regex = new RegExp(condition.pattern)
-        return permissions.some(p => regex.test(p))
+        return permissions.some((p) => regex.test(p))
+      }
 
       case PermissionOperator.STARTS_WITH:
-        return permissions.some(p => p.startsWith(condition.pattern || ''))
+        return permissions.some((p) => p.startsWith(condition.pattern || ''))
 
       case PermissionOperator.ENDS_WITH:
-        return permissions.some(p => p.endsWith(condition.pattern || ''))
+        return permissions.some((p) => p.endsWith(condition.pattern || ''))
 
       case PermissionOperator.CONTAINS:
-        return permissions.some(p => p.includes(condition.pattern || ''))
+        return permissions.some((p) => p.includes(condition.pattern || ''))
 
       default:
         return false

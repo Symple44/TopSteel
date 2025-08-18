@@ -1,65 +1,70 @@
-import { 
-  Controller, 
-  Post, 
-  Body, 
-  UseGuards, 
-  HttpCode, 
-  HttpStatus,
+import {
   BadRequestException,
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
   Logger,
-  Req
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard';
-import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard';
-import { RequireMarketplacePermissions, MarketplacePermission } from '../auth/decorators/marketplace-permissions.decorator';
-import { StripePaymentService, CreatePaymentIntentDto, RefundResult } from './stripe-payment.service';
-import { Request } from 'express';
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common'
+import type { Request } from 'express'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
+import {
+  MarketplacePermission,
+  RequireMarketplacePermissions,
+} from '../auth/decorators/marketplace-permissions.decorator'
+import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard'
+import type {
+  CreatePaymentIntentDto,
+  RefundResult,
+  StripePaymentService,
+} from './stripe-payment.service'
 
 export class CreateRefundDto {
-  paymentIntentId: string;
-  amount?: number; // Optional for partial refunds
-  reason?: string;
+  paymentIntentId: string
+  amount?: number // Optional for partial refunds
+  reason?: string
 }
 
 export class ConfirmPaymentDto {
-  paymentIntentId: string;
-  paymentMethodId?: string;
+  paymentIntentId: string
+  paymentMethodId?: string
 }
 
 @Controller('api/marketplace/payments')
 @UseGuards(JwtAuthGuard)
 export class MarketplacePaymentController {
-  private readonly logger = new Logger(MarketplacePaymentController.name);
+  private readonly logger = new Logger(MarketplacePaymentController.name)
 
-  constructor(
-    private readonly stripePaymentService: StripePaymentService
-  ) {}
+  constructor(private readonly stripePaymentService: StripePaymentService) {}
 
   @Post('intents')
   @HttpCode(HttpStatus.CREATED)
   async createPaymentIntent(@Body() createPaymentDto: CreatePaymentIntentDto) {
     if (!createPaymentDto.orderId || !createPaymentDto.customerId || !createPaymentDto.amount) {
-      throw new BadRequestException('Missing required fields: orderId, customerId, amount');
+      throw new BadRequestException('Missing required fields: orderId, customerId, amount')
     }
 
     if (createPaymentDto.amount < 50) {
-      throw new BadRequestException('Amount must be at least 50 cents');
+      throw new BadRequestException('Amount must be at least 50 cents')
     }
 
-    return this.stripePaymentService.createPaymentIntent(createPaymentDto);
+    return this.stripePaymentService.createPaymentIntent(createPaymentDto)
   }
 
   @Post('intents/confirm')
   @HttpCode(HttpStatus.OK)
   async confirmPayment(@Body() confirmPaymentDto: ConfirmPaymentDto) {
     if (!confirmPaymentDto.paymentIntentId) {
-      throw new BadRequestException('Payment intent ID is required');
+      throw new BadRequestException('Payment intent ID is required')
     }
 
     return this.stripePaymentService.confirmPayment(
       confirmPaymentDto.paymentIntentId,
       confirmPaymentDto.paymentMethodId
-    );
+    )
   }
 
   @Post('refunds')
@@ -71,47 +76,41 @@ export class MarketplacePaymentController {
     @Req() request: Request
   ): Promise<RefundResult> {
     if (!createRefundDto.paymentIntentId) {
-      throw new BadRequestException('Payment intent ID is required');
+      throw new BadRequestException('Payment intent ID is required')
     }
 
     // Log refund attempt for audit purposes
     this.logger.log(
-      `Refund requested by user ${request.user?.['id']} for payment ${createRefundDto.paymentIntentId.substring(0, 8)}...`,
+      `Refund requested by user ${request.user?.id} for payment ${createRefundDto.paymentIntentId.substring(0, 8)}...`,
       {
-        userId: request.user?.['id'],
+        userId: request.user?.id,
         paymentIntentId: createRefundDto.paymentIntentId,
         amount: createRefundDto.amount,
-        reason: createRefundDto.reason
+        reason: createRefundDto.reason,
       }
-    );
+    )
 
     const result = await this.stripePaymentService.createRefund(
       createRefundDto.paymentIntentId,
       createRefundDto.amount,
       createRefundDto.reason
-    );
+    )
 
     // Log refund result
     if (result.success) {
-      this.logger.log(
-        `Refund processed successfully: ${result.refundId}`,
-        {
-          userId: request.user?.['id'],
-          refundId: result.refundId,
-          amount: result.amount
-        }
-      );
+      this.logger.log(`Refund processed successfully: ${result.refundId}`, {
+        userId: request.user?.id,
+        refundId: result.refundId,
+        amount: result.amount,
+      })
     } else {
-      this.logger.error(
-        `Refund failed: ${result.error}`,
-        {
-          userId: request.user?.['id'],
-          paymentIntentId: createRefundDto.paymentIntentId,
-          error: result.error
-        }
-      );
+      this.logger.error(`Refund failed: ${result.error}`, {
+        userId: request.user?.id,
+        paymentIntentId: createRefundDto.paymentIntentId,
+        error: result.error,
+      })
     }
 
-    return result;
+    return result
   }
 }

@@ -4,9 +4,9 @@
  * Test complet du système d'authentification
  */
 
-import axios, { AxiosError } from 'axios'
-import { TestAuthHelper } from './utils/test-auth-helper'
+import axios, { type AxiosError } from 'axios'
 import * as dotenv from 'dotenv'
+import { TestAuthHelper } from './utils/test-auth-helper'
 
 dotenv.config()
 
@@ -52,15 +52,15 @@ class AuthSystemTester {
     try {
       const response = await axios.get(`${API_URL.replace('/api/v1', '')}/health`, {
         timeout: 5000,
-        validateStatus: () => true
+        validateStatus: () => true,
       })
-      
+
       if (response.status === 200 || response.status === 404) {
         console.log('✅ API is reachable')
       } else {
         console.log(`⚠️  API returned status ${response.status}`)
       }
-    } catch (error) {
+    } catch (_error) {
       console.log('❌ API is not accessible. Please start the API server:')
       console.log('   cd apps/api && npm run start:dev')
       console.log()
@@ -72,13 +72,13 @@ class AuthSystemTester {
   private async generateTestToken() {
     console.log('🔑 Generating Test Token...')
     TestAuthHelper.initialize()
-    
+
     this.token = TestAuthHelper.generateTestToken({
       email: 'admin@test.com',
       userId: 'test-user-123',
       societeId: 'test-societe-456',
       role: 'admin',
-      permissions: ['*']
+      permissions: ['*'],
     })
 
     console.log('✅ Token generated')
@@ -90,7 +90,7 @@ class AuthSystemTester {
 
   private async testPublicEndpoints() {
     console.log('🌐 Testing Public Endpoints...')
-    
+
     const publicEndpoints = [
       { path: '/health', method: 'GET' },
       { path: '/api/v1/auth/login', method: 'POST' },
@@ -110,7 +110,7 @@ class AuthSystemTester {
 
   private async testProtectedEndpoints() {
     console.log('🔐 Testing Protected Endpoints...')
-    
+
     const protectedEndpoints = [
       { path: '/api/v1/auth/me', method: 'GET' },
       { path: '/api/v1/users', method: 'GET' },
@@ -143,7 +143,7 @@ class AuthSystemTester {
 
   private async testRoleBasedAccess() {
     console.log('👥 Testing Role-Based Access...')
-    
+
     // Test avec différents rôles
     const roles = [
       { role: 'admin', permissions: ['*'], shouldAccess: true },
@@ -155,7 +155,7 @@ class AuthSystemTester {
       const roleToken = TestAuthHelper.generateTestToken({
         email: `${roleTest.role}@test.com`,
         role: roleTest.role,
-        permissions: roleTest.permissions
+        permissions: roleTest.permissions,
       })
 
       console.log(`  Testing ${roleTest.role} role:`)
@@ -171,21 +171,20 @@ class AuthSystemTester {
 
   private async testInvalidToken() {
     console.log('❌ Testing Invalid Tokens...')
-    
+
     const invalidTokens = [
       { name: 'Malformed', token: 'not-a-valid-token' },
-      { name: 'Wrong signature', token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' },
+      {
+        name: 'Wrong signature',
+        token:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      },
       { name: 'Expired', token: TestAuthHelper.generateTestToken({ expiresIn: '0s' }) },
     ]
 
     for (const invalidToken of invalidTokens) {
       console.log(`  ${invalidToken.name} token:`)
-      await this.testEndpointWithToken(
-        '/api/v1/auth/me',
-        'GET',
-        invalidToken.token,
-        [401, 403]
-      )
+      await this.testEndpointWithToken('/api/v1/auth/me', 'GET', invalidToken.token, [401, 403])
     }
     console.log()
   }
@@ -198,7 +197,7 @@ class AuthSystemTester {
   ) {
     const url = path.startsWith('http') ? path : `${API_URL}${path}`
     const headers: any = {}
-    
+
     if (withAuth) {
       headers.Authorization = `Bearer ${this.token}`
     }
@@ -207,7 +206,7 @@ class AuthSystemTester {
       endpoint: path,
       method,
       expectedStatus: expectedStatuses[0],
-      success: false
+      success: false,
     }
 
     try {
@@ -216,12 +215,12 @@ class AuthSystemTester {
         url,
         headers,
         timeout: 5000,
-        validateStatus: () => true
+        validateStatus: () => true,
       })
 
       result.actualStatus = response.status
       result.success = expectedStatuses.includes(response.status)
-      
+
       const icon = result.success ? '✅' : '❌'
       const authStatus = withAuth ? 'AUTH' : 'PUBLIC'
       console.log(`    ${icon} ${method} ${path} [${authStatus}] - Status: ${response.status}`)
@@ -246,16 +245,16 @@ class AuthSystemTester {
     expectedStatuses: number[]
   ) {
     const url = `${API_URL}${path}`
-    
+
     try {
       const response = await axios({
         method,
         url,
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         timeout: 5000,
-        validateStatus: () => true
+        validateStatus: () => true,
       })
 
       const success = expectedStatuses.includes(response.status)
@@ -277,9 +276,9 @@ class AuthSystemTester {
     console.log('='.repeat(80))
 
     const totalTests = this.results.length
-    const successfulTests = this.results.filter(r => r.success).length
-    const failedTests = this.results.filter(r => !r.success && !r.error).length
-    const errorTests = this.results.filter(r => r.error).length
+    const successfulTests = this.results.filter((r) => r.success).length
+    const failedTests = this.results.filter((r) => !r.success && !r.error).length
+    const errorTests = this.results.filter((r) => r.error).length
 
     console.log(`Total Tests: ${totalTests}`)
     console.log(`✅ Successful: ${successfulTests}`)
@@ -300,7 +299,7 @@ class AuthSystemTester {
 
 // Exécuter les tests
 const tester = new AuthSystemTester()
-tester.runTests().catch(error => {
+tester.runTests().catch((error) => {
   console.error('❌ Test suite failed:', error)
   process.exit(1)
 })

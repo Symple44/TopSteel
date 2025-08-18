@@ -1,12 +1,12 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { License } from './license.entity'
 
@@ -127,7 +127,11 @@ export class LicenseActivation {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => License, license => license.activations, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => License,
+    (license) => license.activations,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'license_id' })
   license!: License
 
@@ -195,7 +199,7 @@ export class LicenseActivation {
    * Generate activation key
    */
   static generateActivationKey(licenseKey: string, machineId: string): string {
-    const crypto = require('crypto')
+    const crypto = require('node:crypto')
     const hash = crypto.createHash('sha256')
     hash.update(`${licenseKey}-${machineId}-${Date.now()}`)
     return hash.digest('hex').substring(0, 32).toUpperCase()
@@ -205,17 +209,19 @@ export class LicenseActivation {
    * Get machine fingerprint
    */
   getMachineFingerprint(): string {
-    const crypto = require('crypto')
+    const crypto = require('node:crypto')
     const hash = crypto.createHash('sha256')
-    
+
     const data = [
       this.machineId,
       this.macAddress,
       this.hostname,
       this.hardwareInfo?.cpu?.model,
       this.hardwareInfo?.network?.interfaces?.[0]?.mac,
-    ].filter(Boolean).join('-')
-    
+    ]
+      .filter(Boolean)
+      .join('-')
+
     hash.update(data)
     return hash.digest('hex')
   }

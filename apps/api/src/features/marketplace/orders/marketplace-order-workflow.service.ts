@@ -1,16 +1,16 @@
-import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { MarketplaceOrder } from '../entities/marketplace-order.entity';
-import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity';
-import { Article } from '@erp/entities';
-import { MarketplaceCustomer } from '../entities/marketplace-customer.entity';
-import { PricingEngineService } from '../../pricing/services/pricing-engine.service';
-import { EmailService } from '../../../core/email/email.service';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import { Redis } from 'ioredis';
-import { MarketplaceStockService } from '../stock/marketplace-stock.service';
+import { Article } from '@erp/entities'
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { InjectRepository } from '@nestjs/typeorm'
+import { InjectRedis } from '@nestjs-modules/ioredis'
+import type { Redis } from 'ioredis'
+import type { DataSource, Repository } from 'typeorm'
+import type { EmailService } from '../../../core/email/email.service'
+import type { PricingEngineService } from '../../pricing/services/pricing-engine.service'
+import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
+import { MarketplaceOrder } from '../entities/marketplace-order.entity'
+import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
+import type { MarketplaceStockService } from '../stock/marketplace-stock.service'
 
 export enum OrderStatus {
   CART = 'CART',
@@ -20,7 +20,7 @@ export enum OrderStatus {
   SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',
   CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED'
+  REFUNDED = 'REFUNDED',
 }
 
 export enum PaymentStatus {
@@ -28,117 +28,134 @@ export enum PaymentStatus {
   PROCESSING = 'PROCESSING',
   PAID = 'PAID',
   FAILED = 'FAILED',
-  REFUNDED = 'REFUNDED'
+  REFUNDED = 'REFUNDED',
 }
 
 interface CreateOrderDto {
-  customerId: string;
+  customerId: string
   items: Array<{
-    productId: string;
-    quantity: number;
-    customizations?: Record<string, any>;
-  }>;
+    productId: string
+    quantity: number
+    customizations?: Record<string, any>
+  }>
   shippingAddress: {
-    street: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    additionalInfo?: string;
-  };
+    street: string
+    city: string
+    postalCode: string
+    country: string
+    additionalInfo?: string
+  }
   billingAddress?: {
-    street: string;
-    city: string;
-    postalCode: string;
-    country: string;
-  };
-  paymentMethod: string;
-  notes?: string;
+    street: string
+    city: string
+    postalCode: string
+    country: string
+  }
+  paymentMethod: string
+  notes?: string
 }
 
 interface OrderTransition {
-  from: OrderStatus[];
-  to: OrderStatus;
-  handler: (order: MarketplaceOrder) => Promise<void>;
-  notifyCustomer: boolean;
+  from: OrderStatus[]
+  to: OrderStatus
+  handler: (order: MarketplaceOrder) => Promise<void>
+  notifyCustomer: boolean
 }
 
 @Injectable()
 export class MarketplaceOrderWorkflowService {
-  private readonly logger = new Logger(MarketplaceOrderWorkflowService.name);
-  private readonly transitions: Map<OrderStatus, OrderTransition>;
+  private readonly logger = new Logger(MarketplaceOrderWorkflowService.name)
+  private readonly transitions: Map<OrderStatus, OrderTransition>
 
   constructor(
     @InjectRepository(MarketplaceOrder)
     private readonly orderRepository: Repository<MarketplaceOrder>,
     @InjectRepository(MarketplaceOrderItem)
-    private readonly orderItemRepository: Repository<MarketplaceOrderItem>,
-    @InjectRepository(Article)
-    private readonly productRepository: Repository<Article>,
+    readonly _orderItemRepository: Repository<MarketplaceOrderItem>,
+    @InjectRepository(Article) readonly _productRepository: Repository<Article>,
     @InjectRepository(MarketplaceCustomer)
-    private readonly customerRepository: Repository<MarketplaceCustomer>,
+    readonly _customerRepository: Repository<MarketplaceCustomer>,
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
     private readonly pricingEngine: PricingEngineService,
     private readonly emailService: EmailService,
     @InjectRedis() private readonly redisService: Redis,
-    private readonly stockService: MarketplaceStockService,
+    private readonly stockService: MarketplaceStockService
   ) {
-    this.setupTransitions();
+    this.setupTransitions()
   }
 
   private setupTransitions() {
-    (this as any).transitions = new Map([
-      [OrderStatus.PENDING, {
-        from: [OrderStatus.CART],
-        to: OrderStatus.PENDING,
-        handler: this.handlePendingTransition.bind(this),
-        notifyCustomer: true
-      }],
-      [OrderStatus.CONFIRMED, {
-        from: [OrderStatus.PENDING],
-        to: OrderStatus.CONFIRMED,
-        handler: this.handleConfirmedTransition.bind(this),
-        notifyCustomer: true
-      }],
-      [OrderStatus.PROCESSING, {
-        from: [OrderStatus.CONFIRMED],
-        to: OrderStatus.PROCESSING,
-        handler: this.handleProcessingTransition.bind(this),
-        notifyCustomer: true
-      }],
-      [OrderStatus.SHIPPED, {
-        from: [OrderStatus.PROCESSING],
-        to: OrderStatus.SHIPPED,
-        handler: this.handleShippedTransition.bind(this),
-        notifyCustomer: true
-      }],
-      [OrderStatus.DELIVERED, {
-        from: [OrderStatus.SHIPPED],
-        to: OrderStatus.DELIVERED,
-        handler: this.handleDeliveredTransition.bind(this),
-        notifyCustomer: true
-      }],
-      [OrderStatus.CANCELLED, {
-        from: [OrderStatus.CART, OrderStatus.PENDING, OrderStatus.CONFIRMED],
-        to: OrderStatus.CANCELLED,
-        handler: this.handleCancelledTransition.bind(this),
-        notifyCustomer: true
-      }]
-    ]);
+    ;(this as any).transitions = new Map([
+      [
+        OrderStatus.PENDING,
+        {
+          from: [OrderStatus.CART],
+          to: OrderStatus.PENDING,
+          handler: this.handlePendingTransition.bind(this),
+          notifyCustomer: true,
+        },
+      ],
+      [
+        OrderStatus.CONFIRMED,
+        {
+          from: [OrderStatus.PENDING],
+          to: OrderStatus.CONFIRMED,
+          handler: this.handleConfirmedTransition.bind(this),
+          notifyCustomer: true,
+        },
+      ],
+      [
+        OrderStatus.PROCESSING,
+        {
+          from: [OrderStatus.CONFIRMED],
+          to: OrderStatus.PROCESSING,
+          handler: this.handleProcessingTransition.bind(this),
+          notifyCustomer: true,
+        },
+      ],
+      [
+        OrderStatus.SHIPPED,
+        {
+          from: [OrderStatus.PROCESSING],
+          to: OrderStatus.SHIPPED,
+          handler: this.handleShippedTransition.bind(this),
+          notifyCustomer: true,
+        },
+      ],
+      [
+        OrderStatus.DELIVERED,
+        {
+          from: [OrderStatus.SHIPPED],
+          to: OrderStatus.DELIVERED,
+          handler: this.handleDeliveredTransition.bind(this),
+          notifyCustomer: true,
+        },
+      ],
+      [
+        OrderStatus.CANCELLED,
+        {
+          from: [OrderStatus.CART, OrderStatus.PENDING, OrderStatus.CONFIRMED],
+          to: OrderStatus.CANCELLED,
+          handler: this.handleCancelledTransition.bind(this),
+          notifyCustomer: true,
+        },
+      ],
+    ])
   }
 
   /**
    * Créer une nouvelle commande
    */
   async createOrder(data: CreateOrderDto, tenantId: string): Promise<MarketplaceOrder> {
-    return await this.dataSource.transaction(async manager => {
+    return await this.dataSource.transaction(async (manager) => {
       // Vérifier le client
       const customer = await manager.findOne(MarketplaceCustomer, {
-        where: { id: data.customerId }
-      });
+        where: { id: data.customerId },
+      })
 
       if (!customer) {
-        throw new NotFoundException('Customer not found');
+        throw new NotFoundException('Customer not found')
       }
 
       // Créer la commande
@@ -152,22 +169,22 @@ export class MarketplaceOrderWorkflowService {
         paymentMethod: data.paymentMethod,
         notes: data.notes,
         currency: 'EUR',
-        orderNumber: await this.generateOrderNumber(tenantId)
-      });
+        orderNumber: await this.generateOrderNumber(tenantId),
+      })
 
-      const savedOrder = await manager.save(order);
+      const savedOrder = await manager.save(order)
 
       // Ajouter les items
-      let subtotal = 0;
-      const items: MarketplaceOrderItem[] = [];
+      let subtotal = 0
+      const items: MarketplaceOrderItem[] = []
 
       for (const itemData of data.items) {
         const product = await manager.findOne(Article, {
-          where: { id: itemData.productId }
-        });
+          where: { id: itemData.productId },
+        })
 
         if (!product) {
-          throw new NotFoundException(`Product ${itemData.productId} not found`);
+          throw new NotFoundException(`Product ${itemData.productId} not found`)
         }
 
         // Réserver le stock pour cette commande
@@ -177,19 +194,20 @@ export class MarketplaceOrderWorkflowService {
             itemData.quantity,
             customer.id,
             savedOrder.id
-          );
-          
+          )
+
           // Store reservation ID for later confirmation or release
           if (!savedOrder.metadata) {
-            savedOrder.metadata = {};
+            savedOrder.metadata = {}
           }
           if (!savedOrder.metadata.stockReservations) {
-            savedOrder.metadata.stockReservations = [];
+            savedOrder.metadata.stockReservations = []
           }
-          savedOrder.metadata.stockReservations.push(reservation.id);
-          
+          savedOrder.metadata.stockReservations.push(reservation.id)
         } catch (error) {
-          throw new BadRequestException(`Cannot reserve stock for ${product.designation}: ${error.message}`);
+          throw new BadRequestException(
+            `Cannot reserve stock for ${product.designation}: ${error.message}`
+          )
         }
 
         // Calculer le prix avec le moteur de pricing
@@ -198,8 +216,8 @@ export class MarketplaceOrderWorkflowService {
           quantity: itemData.quantity,
           customerId: customer.erpPartnerId,
           channel: 'MARKETPLACE' as any,
-          societeId: tenantId
-        });
+          societeId: tenantId,
+        })
 
         const item = manager.create(MarketplaceOrderItem, {
           order: savedOrder,
@@ -208,36 +226,36 @@ export class MarketplaceOrderWorkflowService {
           price: priceCalculation.basePrice,
           totalPrice: priceCalculation.finalPrice,
           customizations: itemData.customizations,
-          discount: priceCalculation.totalDiscount || 0
-        });
+          discount: priceCalculation.totalDiscount || 0,
+        })
 
-        items.push(item);
-        subtotal += priceCalculation.finalPrice;
+        items.push(item)
+        subtotal += priceCalculation.finalPrice
       }
 
-      await manager.save(items);
+      await manager.save(items)
 
       // Calculer les totaux
-      const shippingCost = await this.calculateShipping(savedOrder, items);
-      const tax = this.calculateTax(subtotal + shippingCost);
+      const shippingCost = await this.calculateShipping(savedOrder, items)
+      const tax = this.calculateTax(subtotal + shippingCost)
 
-      savedOrder.items = items;
-      savedOrder.subtotal = subtotal;
-      savedOrder.shippingCost = shippingCost;
-      savedOrder.tax = tax;
-      savedOrder.total = subtotal + shippingCost + tax;
+      savedOrder.items = items
+      savedOrder.subtotal = subtotal
+      savedOrder.shippingCost = shippingCost
+      savedOrder.tax = tax
+      savedOrder.total = subtotal + shippingCost + tax
 
-      await manager.save(savedOrder);
+      await manager.save(savedOrder)
 
       // Émettre l'événement
       this.eventEmitter.emit('marketplace.order.created', {
         orderId: savedOrder.id,
         tenantId,
-        customerId: customer.id
-      });
+        customerId: customer.id,
+      })
 
-      return savedOrder;
-    });
+      return savedOrder
+    })
   }
 
   /**
@@ -246,41 +264,39 @@ export class MarketplaceOrderWorkflowService {
   async transitionOrder(orderId: string, toStatus: OrderStatus): Promise<MarketplaceOrder> {
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
-      relations: ['customer', 'items', 'items.product']
-    });
+      relations: ['customer', 'items', 'items.product'],
+    })
 
     if (!order) {
-      throw new NotFoundException('Order not found');
+      throw new NotFoundException('Order not found')
     }
 
-    const transition = this.transitions.get(toStatus);
+    const transition = this.transitions.get(toStatus)
     if (!transition) {
-      throw new BadRequestException(`Invalid transition to ${toStatus}`);
+      throw new BadRequestException(`Invalid transition to ${toStatus}`)
     }
 
     if (!transition.from.includes(order.status as OrderStatus)) {
-      throw new BadRequestException(
-        `Cannot transition from ${order.status} to ${toStatus}`
-      );
+      throw new BadRequestException(`Cannot transition from ${order.status} to ${toStatus}`)
     }
 
     // Exécuter la transition
-    await transition.handler(order);
+    await transition.handler(order)
 
     // Mettre à jour le statut
-    order.status = toStatus;
-    order.statusHistory = order.statusHistory || [];
+    order.status = toStatus
+    order.statusHistory = order.statusHistory || []
     order.statusHistory.push({
       status: toStatus,
       timestamp: new Date(),
-      notes: `Transitioned from ${order.status} to ${toStatus}`
-    });
+      notes: `Transitioned from ${order.status} to ${toStatus}`,
+    })
 
-    const updatedOrder = await this.orderRepository.save(order);
+    const updatedOrder = await this.orderRepository.save(order)
 
     // Notifier le client si nécessaire
     if (transition.notifyCustomer) {
-      await this.notifyCustomer(updatedOrder, toStatus);
+      await this.notifyCustomer(updatedOrder, toStatus)
     }
 
     // Émettre l'événement
@@ -288,10 +304,10 @@ export class MarketplaceOrderWorkflowService {
       orderId: order.id,
       fromStatus: order.status,
       toStatus,
-      tenantId: order.tenantId
-    });
+      tenantId: order.tenantId,
+    })
 
-    return updatedOrder;
+    return updatedOrder
   }
 
   /**
@@ -300,75 +316,77 @@ export class MarketplaceOrderWorkflowService {
   async checkout(orderId: string, paymentDetails: any): Promise<MarketplaceOrder> {
     const order = await this.orderRepository.findOne({
       where: { id: orderId, status: OrderStatus.CART },
-      relations: ['customer', 'items', 'items.product']
-    });
+      relations: ['customer', 'items', 'items.product'],
+    })
 
     if (!order) {
-      throw new NotFoundException('Order not found or not in cart status');
+      throw new NotFoundException('Order not found or not in cart status')
     }
 
-    return await this.dataSource.transaction(async manager => {
+    return await this.dataSource.transaction(async (manager) => {
       // Vérifier à nouveau le stock
       for (const item of order.items) {
         const product = await manager.findOne(Article, {
           where: { id: item.product.id },
-          lock: { mode: 'pessimistic_write' }
-        });
+          lock: { mode: 'pessimistic_write' },
+        })
 
         if ((product.stockDisponible || 0) < item.quantity) {
-          throw new BadRequestException(`Insufficient stock for ${product.designation}`);
+          throw new BadRequestException(`Insufficient stock for ${product.designation}`)
         }
 
         // Réserver le stock
-        product.stockReserve = (product.stockReserve || 0) + item.quantity;
-        product.stockDisponible = (product.stockPhysique || 0) - (product.stockReserve || 0);
-        await manager.save(product);
+        product.stockReserve = (product.stockReserve || 0) + item.quantity
+        product.stockDisponible = (product.stockPhysique || 0) - (product.stockReserve || 0)
+        await manager.save(product)
       }
 
       // Passer la commande en PENDING
-      order.status = OrderStatus.PENDING;
-      order.paymentStatus = PaymentStatus.PROCESSING;
-      order.paymentDetails = paymentDetails;
-      order.placedAt = new Date();
+      order.status = OrderStatus.PENDING
+      order.paymentStatus = PaymentStatus.PROCESSING
+      order.paymentDetails = paymentDetails
+      order.placedAt = new Date()
 
-      const updatedOrder = await manager.save(order);
+      const updatedOrder = await manager.save(order)
 
       // Créer une tâche de paiement asynchrone
-      await this.processPayment(updatedOrder);
+      await this.processPayment(updatedOrder)
 
-      return updatedOrder;
-    });
+      return updatedOrder
+    })
   }
 
   /**
    * Handlers de transition
    */
   private async handlePendingTransition(order: MarketplaceOrder): Promise<void> {
-    this.logger.log(`Order ${order.orderNumber} moved to PENDING`);
-    
+    this.logger.log(`Order ${order.orderNumber} moved to PENDING`)
+
     // Vérifier le paiement
     if (order.paymentStatus !== PaymentStatus.PROCESSING) {
-      order.paymentStatus = PaymentStatus.PROCESSING;
+      order.paymentStatus = PaymentStatus.PROCESSING
     }
   }
 
   private async handleConfirmedTransition(order: MarketplaceOrder): Promise<void> {
-    this.logger.log(`Order ${order.orderNumber} CONFIRMED`);
-    
+    this.logger.log(`Order ${order.orderNumber} CONFIRMED`)
+
     // Le paiement doit être validé
     if (order.paymentStatus !== PaymentStatus.PAID) {
-      throw new BadRequestException('Order must be paid before confirmation');
+      throw new BadRequestException('Order must be paid before confirmation')
     }
 
     // Confirmer les réservations de stock
     if (order.metadata?.stockReservations) {
       for (const reservationId of order.metadata.stockReservations) {
         try {
-          await this.stockService.confirmReservation(reservationId);
-          this.logger.log(`Stock reservation confirmed: ${reservationId} for order ${order.orderNumber}`);
+          await this.stockService.confirmReservation(reservationId)
+          this.logger.log(
+            `Stock reservation confirmed: ${reservationId} for order ${order.orderNumber}`
+          )
         } catch (error) {
-          this.logger.error(`Failed to confirm stock reservation ${reservationId}:`, error);
-          throw new BadRequestException(`Stock confirmation failed for order ${order.orderNumber}`);
+          this.logger.error(`Failed to confirm stock reservation ${reservationId}:`, error)
+          throw new BadRequestException(`Stock confirmation failed for order ${order.orderNumber}`)
         }
       }
     }
@@ -376,54 +394,56 @@ export class MarketplaceOrderWorkflowService {
     // Synchroniser avec l'ERP
     this.eventEmitter.emit('marketplace.order.confirmed', {
       orderId: order.id,
-      tenantId: order.tenantId
-    });
+      tenantId: order.tenantId,
+    })
   }
 
   private async handleProcessingTransition(order: MarketplaceOrder): Promise<void> {
-    this.logger.log(`Order ${order.orderNumber} in PROCESSING`);
-    
+    this.logger.log(`Order ${order.orderNumber} in PROCESSING`)
+
     // Créer les documents ERP
     this.eventEmitter.emit('marketplace.order.processing', {
       orderId: order.id,
-      tenantId: order.tenantId
-    });
+      tenantId: order.tenantId,
+    })
   }
 
   private async handleShippedTransition(order: MarketplaceOrder): Promise<void> {
-    this.logger.log(`Order ${order.orderNumber} SHIPPED`);
-    
+    this.logger.log(`Order ${order.orderNumber} SHIPPED`)
+
     // Ajouter les informations de livraison
     order.shippingInfo = {
       carrier: 'DHL', // À récupérer dynamiquement
-      trackingNumber: await this.generateTrackingNumber()
-    };
-    order.shippedAt = new Date();
+      trackingNumber: await this.generateTrackingNumber(),
+    }
+    order.shippedAt = new Date()
   }
 
   private async handleDeliveredTransition(order: MarketplaceOrder): Promise<void> {
-    this.logger.log(`Order ${order.orderNumber} DELIVERED`);
-    
-    order.deliveredAt = new Date();
-    
+    this.logger.log(`Order ${order.orderNumber} DELIVERED`)
+
+    order.deliveredAt = new Date()
+
     // Déclencher le processus de facturation finale
     this.eventEmitter.emit('marketplace.order.delivered', {
       orderId: order.id,
-      tenantId: order.tenantId
-    });
+      tenantId: order.tenantId,
+    })
   }
 
   private async handleCancelledTransition(order: MarketplaceOrder): Promise<void> {
-    this.logger.log(`Order ${order.orderNumber} CANCELLED`);
-    
+    this.logger.log(`Order ${order.orderNumber} CANCELLED`)
+
     // Libérer les réservations de stock
     if (order.metadata?.stockReservations) {
       for (const reservationId of order.metadata.stockReservations) {
         try {
-          await this.stockService.releaseReservation(reservationId);
-          this.logger.log(`Stock reservation released: ${reservationId} for cancelled order ${order.orderNumber}`);
+          await this.stockService.releaseReservation(reservationId)
+          this.logger.log(
+            `Stock reservation released: ${reservationId} for cancelled order ${order.orderNumber}`
+          )
         } catch (error) {
-          this.logger.error(`Failed to release stock reservation ${reservationId}:`, error);
+          this.logger.error(`Failed to release stock reservation ${reservationId}:`, error)
           // Continue with other reservations even if one fails
         }
       }
@@ -431,56 +451,51 @@ export class MarketplaceOrderWorkflowService {
 
     // Initier le remboursement si nécessaire
     if (order.paymentStatus === PaymentStatus.PAID) {
-      order.paymentStatus = PaymentStatus.REFUNDED;
-      await this.processRefund(order);
+      order.paymentStatus = PaymentStatus.REFUNDED
+      await this.processRefund(order)
     }
 
-    order.cancelledAt = new Date();
+    order.cancelledAt = new Date()
   }
 
   /**
    * Méthodes utilitaires
    */
   private async generateOrderNumber(tenantId: string): Promise<string> {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    
-    const counter = await this.redisService.incr(
-      `order:counter:${tenantId}:${year}${month}${day}`
-    );
-    
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+
+    const counter = await this.redisService.incr(`order:counter:${tenantId}:${year}${month}${day}`)
+
     // Expirer le compteur après 48h
-    await this.redisService.expire(
-      `order:counter:${tenantId}:${year}${month}${day}`,
-      172800
-    );
-    
-    return `ORD-${year}${month}${day}-${String(counter).padStart(5, '0')}`;
+    await this.redisService.expire(`order:counter:${tenantId}:${year}${month}${day}`, 172800)
+
+    return `ORD-${year}${month}${day}-${String(counter).padStart(5, '0')}`
   }
 
   private async calculateShipping(
-    order: MarketplaceOrder,
+    _order: MarketplaceOrder,
     items: MarketplaceOrderItem[]
   ): Promise<number> {
     // Logique de calcul des frais de port
     const totalWeight = items.reduce((acc, item) => {
-      return acc + (item.product.poids || 0) * item.quantity;
-    }, 0);
+      return acc + (item.product.poids || 0) * item.quantity
+    }, 0)
 
     // Tarifs de base
-    if (totalWeight <= 1) return 5.90;
-    if (totalWeight <= 5) return 8.90;
-    if (totalWeight <= 10) return 12.90;
-    if (totalWeight <= 30) return 19.90;
-    
-    return 29.90 + Math.ceil((totalWeight - 30) / 10) * 5;
+    if (totalWeight <= 1) return 5.9
+    if (totalWeight <= 5) return 8.9
+    if (totalWeight <= 10) return 12.9
+    if (totalWeight <= 30) return 19.9
+
+    return 29.9 + Math.ceil((totalWeight - 30) / 10) * 5
   }
 
   private calculateTax(amount: number): number {
     // TVA 20%
-    return Math.round(amount * 0.2 * 100) / 100;
+    return Math.round(amount * 0.2 * 100) / 100
   }
 
   private async notifyCustomer(order: MarketplaceOrder, newStatus: OrderStatus): Promise<void> {
@@ -490,10 +505,10 @@ export class MarketplaceOrderWorkflowService {
       [OrderStatus.PROCESSING]: 'order-processing',
       [OrderStatus.SHIPPED]: 'order-shipped',
       [OrderStatus.DELIVERED]: 'order-delivered',
-      [OrderStatus.CANCELLED]: 'order-cancelled'
-    };
+      [OrderStatus.CANCELLED]: 'order-cancelled',
+    }
 
-    const template = emailTemplates[newStatus];
+    const template = emailTemplates[newStatus]
     if (template) {
       // Notification par email - intégration avec le service EmailService externe
       try {
@@ -505,11 +520,14 @@ export class MarketplaceOrderWorkflowService {
             orderNumber: order.orderNumber,
             status: this.getStatusLabel(newStatus),
             customerName: order.customer.firstName,
-            total: order.total
-          }
-        });
+            total: order.total,
+          },
+        })
       } catch (error) {
-        this.logger.error(`Failed to send email notification for order ${order.orderNumber}:`, error);
+        this.logger.error(
+          `Failed to send email notification for order ${order.orderNumber}:`,
+          error
+        )
       }
     }
   }
@@ -523,22 +541,22 @@ export class MarketplaceOrderWorkflowService {
       [OrderStatus.SHIPPED]: 'Expédiée',
       [OrderStatus.DELIVERED]: 'Livrée',
       [OrderStatus.CANCELLED]: 'Annulée',
-      [OrderStatus.REFUNDED]: 'Remboursée'
-    };
-    return labels[status] || status;
+      [OrderStatus.REFUNDED]: 'Remboursée',
+    }
+    return labels[status] || status
   }
 
   private async processPayment(order: MarketplaceOrder): Promise<void> {
     // À implémenter avec Stripe/PayPal
-    this.logger.log(`Processing payment for order ${order.orderNumber}`);
+    this.logger.log(`Processing payment for order ${order.orderNumber}`)
   }
 
   private async processRefund(order: MarketplaceOrder): Promise<void> {
     // À implémenter avec Stripe/PayPal
-    this.logger.log(`Processing refund for order ${order.orderNumber}`);
+    this.logger.log(`Processing refund for order ${order.orderNumber}`)
   }
 
   private async generateTrackingNumber(): Promise<string> {
-    return `TRK-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;
+    return `TRK-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`
   }
 }

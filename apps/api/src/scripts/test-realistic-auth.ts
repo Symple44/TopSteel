@@ -4,12 +4,12 @@
  * Test du système d'authentification avec des données réalistes
  */
 
+import * as jwt from 'jsonwebtoken'
 import { TestAuthHelper } from './utils/test-auth-helper'
 import { TestDataGenerator } from './utils/test-data-generator'
-import * as jwt from 'jsonwebtoken'
 
 async function testRealisticAuth() {
-  console.log('🔒 Test d\'Authentification avec Données Réalistes')
+  console.log("🔒 Test d'Authentification avec Données Réalistes")
   console.log('='.repeat(80))
   console.log()
 
@@ -38,7 +38,7 @@ async function testRealisticAuth() {
     email: testEnv.users.topsteelAdmin.email,
     societeId: testEnv.societes.topsteel.id,
     role: 'admin',
-    permissions: ['*']
+    permissions: ['*'],
   })
 
   const adminDecoded = jwt.decode(adminToken) as any
@@ -59,7 +59,7 @@ async function testRealisticAuth() {
     email: testEnv.users.topsteelUser.email,
     societeId: testEnv.societes.topsteel.id,
     role: 'user',
-    permissions: ['inventory:read', 'inventory:update', 'reports:read']
+    permissions: ['inventory:read', 'inventory:update', 'reports:read'],
   })
 
   const userDecoded = jwt.decode(userToken) as any
@@ -78,7 +78,7 @@ async function testRealisticAuth() {
     email: testEnv.users.metaluxAdmin.email,
     societeId: testEnv.societes.metalux.id,
     role: 'admin',
-    permissions: ['*']
+    permissions: ['*'],
   })
 
   const metaluxDecoded = jwt.decode(metaluxToken) as any
@@ -97,7 +97,7 @@ async function testRealisticAuth() {
     email: testEnv.users.demoUser.email,
     societeId: testEnv.societes.demo.id,
     role: 'viewer',
-    permissions: ['inventory:read', 'reports:read']
+    permissions: ['inventory:read', 'reports:read'],
   })
 
   const demoDecoded = jwt.decode(demoToken) as any
@@ -109,32 +109,32 @@ async function testRealisticAuth() {
   console.log(`  Rôle: ${demoDecoded.role}`)
   console.log(`  Permissions: ${JSON.stringify(demoDecoded.permissions)}`)
 
-  console.log('\n' + '='.repeat(80))
-  console.log('🔐 VÉRIFICATION DE L\'ISOLATION MULTI-TENANT')
+  console.log(`\n${'='.repeat(80)}`)
+  console.log("🔐 VÉRIFICATION DE L'ISOLATION MULTI-TENANT")
   console.log('='.repeat(80))
-  
+
   console.log('\n✅ Chaque utilisateur a:')
   console.log('  - Son propre societeId unique')
   console.log('  - Ses propres permissions basées sur son rôle')
   console.log('  - Accès uniquement aux données de sa société')
-  
+
   console.log('\n🛡️ Sécurité Multi-Tenant:')
   console.log('  - TopSteel Admin ne peut PAS accéder aux données Metalux')
   console.log('  - Metalux Admin ne peut PAS accéder aux données TopSteel')
   console.log('  - Les sociétés sont complètement isolées')
-  
+
   console.log('\n📊 Structure des IDs:')
   console.log(`  - Format UUID v4: ${testEnv.societes.topsteel.id}`)
   console.log(`  - Unique par société`)
   console.log(`  - Utilisé pour filtrer les données`)
 
-  console.log('\n' + '='.repeat(80))
+  console.log(`\n${'='.repeat(80)}`)
   console.log('✨ Test Réussi! Le système multi-tenant fonctionne correctement.')
   console.log('='.repeat(80))
 }
 
 // Exécuter le test
-testRealisticAuth().catch(error => {
+testRealisticAuth().catch((error) => {
   console.error('❌ Erreur:', error)
   process.exit(1)
 })

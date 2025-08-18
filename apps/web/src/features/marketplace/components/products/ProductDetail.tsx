@@ -1,96 +1,113 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { 
-  Heart, ShoppingCart, Star, ChevronLeft, ChevronRight, 
-  Package, Truck, Shield, RefreshCw, Info, Share2,
-  Minus, Plus, Check, X, ZoomIn
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Product } from './ProductCard';
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Info,
+  Minus,
+  Package,
+  Plus,
+  RefreshCw,
+  Share2,
+  Shield,
+  ShoppingCart,
+  Star,
+  Truck,
+  ZoomIn,
+} from 'lucide-react'
+import Image from 'next/image'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import type { Product } from './ProductCard'
 
 interface ProductDetailProps {
   product: Product & {
-    longDescription?: string;
-    specifications?: Record<string, any>;
-    features?: string[];
-    weight?: number;
+    longDescription?: string
+    specifications?: Record<string, any>
+    features?: string[]
+    weight?: number
     dimensions?: {
-      length: number;
-      width: number;
-      height: number;
-    };
-    warranty?: string;
-    returnPolicy?: string;
-    shippingInfo?: string;
-    relatedProducts?: Product[];
-  };
-  onAddToCart?: (product: Product, quantity: number) => void;
-  onAddToWishlist?: (product: Product) => void;
-  onShare?: (product: Product) => void;
+      length: number
+      width: number
+      height: number
+    }
+    warranty?: string
+    returnPolicy?: string
+    shippingInfo?: string
+    relatedProducts?: Product[]
+  }
+  onAddToCart?: (product: Product, quantity: number) => void
+  onAddToWishlist?: (product: Product) => void
+  onShare?: (product: Product) => void
 }
 
 export const ProductDetail: React.FC<ProductDetailProps> = ({
   product,
   onAddToCart,
   onAddToWishlist,
-  onShare
+  onShare,
 }) => {
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedTab, setSelectedTab] = useState<'description' | 'specifications' | 'reviews' | 'shipping'>('description');
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [quantity, setQuantity] = useState(1)
+  const [selectedTab, setSelectedTab] = useState<
+    'description' | 'specifications' | 'reviews' | 'shipping'
+  >('description')
+  const [isZoomed, setIsZoomed] = useState(false)
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
 
-  const isOutOfStock = product.stockQuantity === 0;
-  const isLowStock = product.stockQuantity > 0 && product.stockQuantity <= 5;
+  const isOutOfStock = product.stockQuantity === 0
+  const isLowStock = product.stockQuantity > 0 && product.stockQuantity <= 5
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: product.currency || 'EUR'
-    }).format(price);
-  };
+      currency: product.currency || 'EUR',
+    }).format(price)
+  }
 
   const discountPercentage = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
+    : 0
 
   const handleQuantityChange = (delta: number) => {
-    const newQuantity = quantity + delta;
+    const newQuantity = quantity + delta
     if (newQuantity >= 1 && newQuantity <= product.stockQuantity) {
-      setQuantity(newQuantity);
+      setQuantity(newQuantity)
     }
-  };
+  }
 
   const handleAddToCart = () => {
     if (onAddToCart && !isOutOfStock) {
-      onAddToCart(product, quantity);
+      onAddToCart(product, quantity)
     }
-  };
+  }
 
   const handleImageNavigation = (direction: 'prev' | 'next') => {
-    const totalImages = product.images.length;
+    const totalImages = product.images.length
     if (direction === 'prev') {
-      setSelectedImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
+      setSelectedImageIndex((prev) => (prev - 1 + totalImages) % totalImages)
     } else {
-      setSelectedImageIndex((prev) => (prev + 1) % totalImages);
+      setSelectedImageIndex((prev) => (prev + 1) % totalImages)
     }
-  };
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setZoomPosition({ x, y });
-  };
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    setZoomPosition({ x, y })
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <a href="/marketplace" className="hover:text-gray-700">Marketplace</a>
+        <a href="/marketplace" className="hover:text-gray-700">
+          Marketplace
+        </a>
         <span>/</span>
         <a href={`/marketplace/category/${product.category}`} className="hover:text-gray-700">
           {product.category}
@@ -98,7 +115,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         {product.subcategory && (
           <>
             <span>/</span>
-            <a href={`/marketplace/category/${product.category}/${product.subcategory}`} className="hover:text-gray-700">
+            <a
+              href={`/marketplace/category/${product.category}/${product.subcategory}`}
+              className="hover:text-gray-700"
+            >
               {product.subcategory}
             </a>
           </>
@@ -111,7 +131,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         {/* Images Section */}
         <div className="space-y-4">
           {/* Main Image */}
-          <div 
+          <div
             className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-zoom-in"
             onMouseEnter={() => setIsZoomed(true)}
             onMouseLeave={() => setIsZoomed(false)}
@@ -122,14 +142,18 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
               alt={product.name}
               fill
               className={cn(
-                "object-cover transition-transform duration-300",
-                isZoomed && "scale-150"
+                'object-cover transition-transform duration-300',
+                isZoomed && 'scale-150'
               )}
-              style={isZoomed ? {
-                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-              } : {}}
+              style={
+                isZoomed
+                  ? {
+                      transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                    }
+                  : {}
+              }
             />
-            
+
             {/* Image Navigation */}
             {product.images.length > 1 && (
               <>
@@ -178,10 +202,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
                   className={cn(
-                    "relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors",
+                    'relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors',
                     selectedImageIndex === index
-                      ? "border-blue-500"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? 'border-blue-500'
+                      : 'border-gray-200 hover:border-gray-300'
                   )}
                 >
                   <Image
@@ -201,9 +225,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           {/* Title and Brand */}
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-            {product.brand && (
-              <p className="text-lg text-gray-600 mt-1">by {product.brand}</p>
-            )}
+            {product.brand && <p className="text-lg text-gray-600 mt-1">by {product.brand}</p>}
           </div>
 
           {/* Rating and Reviews */}
@@ -234,9 +256,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           {/* Price */}
           <div className="space-y-2">
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold text-gray-900">
-                {formatPrice(product.price)}
-              </span>
+              <span className="text-3xl font-bold text-gray-900">{formatPrice(product.price)}</span>
               {product.originalPrice && (
                 <span className="text-xl text-gray-500 line-through">
                   {formatPrice(product.originalPrice)}
@@ -251,9 +271,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           </div>
 
           {/* Short Description */}
-          {product.description && (
-            <p className="text-gray-600">{product.description}</p>
-          )}
+          {product.description && <p className="text-gray-600">{product.description}</p>}
 
           {/* Stock Status */}
           <div className="flex items-center gap-2">
@@ -285,9 +303,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   type="number"
                   value={quantity}
                   onChange={(e) => {
-                    const val = parseInt(e.target.value);
-                    if (!isNaN(val) && val >= 1 && val <= product.stockQuantity) {
-                      setQuantity(val);
+                    const val = parseInt(e.target.value)
+                    if (!Number.isNaN(val) && val >= 1 && val <= product.stockQuantity) {
+                      setQuantity(val)
                     }
                   }}
                   className="w-16 text-center border-x border-gray-300 py-2 focus:outline-none"
@@ -309,16 +327,16 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
                 className={cn(
-                  "flex-1 px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2",
+                  'flex-1 px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2',
                   isOutOfStock
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
                 )}
               >
                 <ShoppingCart className="w-5 h-5" />
                 {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
               </button>
-              
+
               <button
                 onClick={() => onAddToWishlist?.(product)}
                 className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -326,7 +344,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
               >
                 <Heart className="w-5 h-5" />
               </button>
-              
+
               <button
                 onClick={() => onShare?.(product)}
                 className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -382,10 +400,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 key={tab}
                 onClick={() => setSelectedTab(tab)}
                 className={cn(
-                  "py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors",
+                  'py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors',
                   selectedTab === tab
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 )}
               >
                 {tab}
@@ -401,7 +419,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
               <p className="text-gray-600 whitespace-pre-line">
                 {product.longDescription || product.description}
               </p>
-              
+
               {product.features && product.features.length > 0 && (
                 <>
                   <h4 className="text-lg font-semibold mt-6 mb-3">Key Features</h4>
@@ -452,25 +470,28 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           {selectedTab === 'shipping' && (
             <div className="space-y-4">
               <h3 className="text-xl font-semibold mb-4">Shipping & Returns</h3>
-              
+
               <div>
                 <h4 className="font-semibold mb-2">Shipping Information</h4>
                 <p className="text-gray-600">
-                  {product.shippingInfo || 'Standard shipping available. Free shipping on orders over €100. Express shipping available at checkout.'}
+                  {product.shippingInfo ||
+                    'Standard shipping available. Free shipping on orders over €100. Express shipping available at checkout.'}
                 </p>
               </div>
 
               <div>
                 <h4 className="font-semibold mb-2">Return Policy</h4>
                 <p className="text-gray-600">
-                  {product.returnPolicy || '30-day return policy. Items must be unused and in original packaging. Contact customer service to initiate a return.'}
+                  {product.returnPolicy ||
+                    '30-day return policy. Items must be unused and in original packaging. Contact customer service to initiate a return.'}
                 </p>
               </div>
 
               <div>
                 <h4 className="font-semibold mb-2">Warranty</h4>
                 <p className="text-gray-600">
-                  {product.warranty || '2-year manufacturer warranty included. Extended warranty available at checkout.'}
+                  {product.warranty ||
+                    '2-year manufacturer warranty included. Extended warranty available at checkout.'}
                 </p>
               </div>
             </div>
@@ -478,5 +499,5 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

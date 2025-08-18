@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
-import { PermissionCalculatorService } from './permission-calculator.service'
+import type { PermissionCalculatorService } from './permission-calculator.service'
 
 export interface UserSocieteRoleWithPermissions {
   userId: string
@@ -312,7 +312,7 @@ export class UserSocieteRolesService {
     permission: string
   ): Promise<UserSocieteRole> {
     const userRole = await this._userSocieteRoleRepository.findOne({
-      where: { userId, societeId, isActive: true }
+      where: { userId, societeId, isActive: true },
     })
 
     if (!userRole) {
@@ -337,7 +337,7 @@ export class UserSocieteRolesService {
     permission: string
   ): Promise<UserSocieteRole> {
     const userRole = await this._userSocieteRoleRepository.findOne({
-      where: { userId, societeId, isActive: true }
+      where: { userId, societeId, isActive: true },
     })
 
     if (!userRole) {
@@ -362,7 +362,7 @@ export class UserSocieteRolesService {
     permission: string
   ): Promise<UserSocieteRole> {
     const userRole = await this._userSocieteRoleRepository.findOne({
-      where: { userId, societeId, isActive: true }
+      where: { userId, societeId, isActive: true },
     })
 
     if (!userRole) {
@@ -387,7 +387,7 @@ export class UserSocieteRolesService {
     permission: string
   ): Promise<UserSocieteRole> {
     const userRole = await this._userSocieteRoleRepository.findOne({
-      where: { userId, societeId, isActive: true }
+      where: { userId, societeId, isActive: true },
     })
 
     if (!userRole) {

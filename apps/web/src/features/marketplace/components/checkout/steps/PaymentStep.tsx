@@ -1,17 +1,18 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { CreditCard, Shield, Lock, Info, Check } from 'lucide-react';
-import { CheckoutData } from '../CheckoutFlow';
-import { cn } from '@/lib/utils';
+import { CreditCard, Info, Lock, Shield } from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import type { CheckoutData } from '../CheckoutFlow'
 
 interface PaymentStepProps {
-  data: CheckoutData;
-  onUpdate: (data: Partial<CheckoutData>) => void;
-  onNext: () => void;
-  onBack: () => void;
-  isValid: boolean;
-  total: number;
+  data: CheckoutData
+  onUpdate: (data: Partial<CheckoutData>) => void
+  onNext: () => void
+  onBack: () => void
+  isValid: boolean
+  total: number
 }
 
 const paymentMethods = [
@@ -19,21 +20,21 @@ const paymentMethods = [
     id: 'card',
     name: 'Credit/Debit Card',
     description: 'Visa, Mastercard, American Express',
-    icon: CreditCard
+    icon: CreditCard,
   },
   {
     id: 'paypal',
     name: 'PayPal',
     description: 'Pay with your PayPal account',
-    icon: Shield
+    icon: Shield,
   },
   {
     id: 'bank_transfer',
     name: 'Bank Transfer',
     description: 'Direct bank transfer (3-5 business days)',
-    icon: Lock
-  }
-];
+    icon: Lock,
+  },
+]
 
 export const PaymentStep: React.FC<PaymentStepProps> = ({
   data,
@@ -41,10 +42,10 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
   onNext,
   onBack,
   isValid,
-  total
+  total,
 }) => {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [cardType, setCardType] = useState<string>('');
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [cardType, setCardType] = useState<string>('')
 
   const handlePaymentMethodChange = (method: 'card' | 'paypal' | 'bank_transfer') => {
     onUpdate({
@@ -56,113 +57,118 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           cardNumber: undefined,
           cardHolder: undefined,
           expiryDate: undefined,
-          cvv: undefined
-        })
-      }
-    });
-    setErrors({});
-  };
+          cvv: undefined,
+        }),
+      },
+    })
+    setErrors({})
+  }
 
   const handleInputChange = (field: string, value: string) => {
-    let processedValue = value;
+    let processedValue = value
 
     // Format card number with spaces
     if (field === 'cardNumber') {
-      processedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
-      
+      processedValue = value
+        .replace(/\s/g, '')
+        .replace(/(\d{4})/g, '$1 ')
+        .trim()
+
       // Detect card type
-      const cardNumber = value.replace(/\s/g, '');
+      const cardNumber = value.replace(/\s/g, '')
       if (cardNumber.startsWith('4')) {
-        setCardType('Visa');
+        setCardType('Visa')
       } else if (cardNumber.startsWith('5')) {
-        setCardType('Mastercard');
+        setCardType('Mastercard')
       } else if (cardNumber.startsWith('3')) {
-        setCardType('American Express');
+        setCardType('American Express')
       } else {
-        setCardType('');
+        setCardType('')
       }
     }
 
     // Format expiry date
     if (field === 'expiryDate') {
-      processedValue = value.replace(/\D/g, '').replace(/(\d{2})(\d{0,2})/, '$1/$2');
+      processedValue = value.replace(/\D/g, '').replace(/(\d{2})(\d{0,2})/, '$1/$2')
     }
 
     // Limit CVV to numbers only
     if (field === 'cvv') {
-      processedValue = value.replace(/\D/g, '').slice(0, 4);
+      processedValue = value.replace(/\D/g, '').slice(0, 4)
     }
 
     onUpdate({
       payment: {
         ...data.payment,
-        [field]: processedValue
-      }
-    });
+        [field]: processedValue,
+      },
+    })
 
     // Clear error for this field
     if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
     }
-  };
+  }
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    const p = data.payment;
+    const newErrors: Record<string, string> = {}
+    const p = data.payment
 
     if (p.method === 'card') {
       if (!p.cardNumber?.trim()) {
-        newErrors.cardNumber = 'Card number is required';
+        newErrors.cardNumber = 'Card number is required'
       } else if (p.cardNumber.replace(/\s/g, '').length < 13) {
-        newErrors.cardNumber = 'Invalid card number';
+        newErrors.cardNumber = 'Invalid card number'
       }
 
       if (!p.cardHolder?.trim()) {
-        newErrors.cardHolder = 'Cardholder name is required';
+        newErrors.cardHolder = 'Cardholder name is required'
       }
 
-      if (!p.expiryDate?.trim()) {
-        newErrors.expiryDate = 'Expiry date is required';
-      } else {
-        const [month, year] = p.expiryDate.split('/');
-        const currentYear = new Date().getFullYear() % 100;
-        const currentMonth = new Date().getMonth() + 1;
-        
+      if (p.expiryDate?.trim()) {
+        const [month, year] = p.expiryDate.split('/')
+        const currentYear = new Date().getFullYear() % 100
+        const currentMonth = new Date().getMonth() + 1
+
         if (parseInt(month) > 12 || parseInt(month) < 1) {
-          newErrors.expiryDate = 'Invalid month';
-        } else if (parseInt(year) < currentYear || 
-                  (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
-          newErrors.expiryDate = 'Card has expired';
+          newErrors.expiryDate = 'Invalid month'
+        } else if (
+          parseInt(year) < currentYear ||
+          (parseInt(year) === currentYear && parseInt(month) < currentMonth)
+        ) {
+          newErrors.expiryDate = 'Card has expired'
         }
+      } else {
+        newErrors.expiryDate = 'Expiry date is required'
       }
 
       if (!p.cvv?.trim()) {
-        newErrors.cvv = 'CVV is required';
+        newErrors.cvv = 'CVV is required'
       } else if (p.cvv.length < 3) {
-        newErrors.cvv = 'Invalid CVV';
+        newErrors.cvv = 'Invalid CVV'
       }
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleContinue = () => {
     if (validateForm()) {
-      onNext();
+      onNext()
     }
-  };
+  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(price);
-  };
+      currency: 'EUR',
+    }).format(price)
+  }
 
   return (
     <div className="space-y-6">
@@ -172,15 +178,15 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         {/* Payment Methods */}
         <div className="space-y-3 mb-6">
           {paymentMethods.map((method) => {
-            const Icon = method.icon;
+            const Icon = method.icon
             return (
               <label
                 key={method.id}
                 className={cn(
-                  "flex items-center p-4 border rounded-lg cursor-pointer transition-colors",
+                  'flex items-center p-4 border rounded-lg cursor-pointer transition-colors',
                   data.payment.method === method.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
                 )}
               >
                 <input
@@ -199,7 +205,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                   <p className="text-sm text-gray-600 mt-1">{method.description}</p>
                 </div>
               </label>
-            );
+            )
           })}
         </div>
 
@@ -207,9 +213,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         {data.payment.method === 'card' && (
           <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Card Number *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Card Number *</label>
               <div className="relative">
                 <input
                   type="text"
@@ -218,8 +222,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                   placeholder="1234 5678 9012 3456"
                   maxLength={19}
                   className={cn(
-                    "w-full px-3 py-2 pr-16 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.cardNumber ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 pr-16 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.cardNumber ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
                 {cardType && (
@@ -243,8 +247,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                 onChange={(e) => handleInputChange('cardHolder', e.target.value)}
                 placeholder="John Doe"
                 className={cn(
-                  "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                  errors.cardHolder ? "border-red-500" : "border-gray-300"
+                  'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  errors.cardHolder ? 'border-red-500' : 'border-gray-300'
                 )}
               />
               {errors.cardHolder && (
@@ -264,8 +268,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                   placeholder="MM/YY"
                   maxLength={5}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.expiryDate ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.expiryDate ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
                 {errors.expiryDate && (
@@ -274,9 +278,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  CVV *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">CVV *</label>
                 <input
                   type="text"
                   value={data.payment.cvv || ''}
@@ -284,13 +286,11 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                   placeholder="123"
                   maxLength={4}
                   className={cn(
-                    "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    errors.cvv ? "border-red-500" : "border-gray-300"
+                    'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    errors.cvv ? 'border-red-500' : 'border-gray-300'
                   )}
                 />
-                {errors.cvv && (
-                  <p className="text-xs text-red-500 mt-1">{errors.cvv}</p>
-                )}
+                {errors.cvv && <p className="text-xs text-red-500 mt-1">{errors.cvv}</p>}
               </div>
             </div>
 
@@ -301,9 +301,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                 onChange={(e) => handleInputChange('saveCard', e.target.checked.toString())}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">
-                Save this card for future purchases
-              </span>
+              <span className="text-sm text-gray-700">Save this card for future purchases</span>
             </label>
 
             {/* Security Info */}
@@ -315,8 +313,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                     Your payment information is secure
                   </p>
                   <p className="text-xs text-blue-700 mt-1">
-                    We use industry-standard encryption to protect your payment details.
-                    Your card information is never stored on our servers.
+                    We use industry-standard encryption to protect your payment details. Your card
+                    information is never stored on our servers.
                   </p>
                 </div>
               </div>
@@ -338,8 +336,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             </div>
             <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-sm text-yellow-800">
-                After clicking "Continue", you'll be redirected to PayPal's secure checkout
-                to log in and confirm your payment of {formatPrice(total)}.
+                After clicking "Continue", you'll be redirected to PayPal's secure checkout to log
+                in and confirm your payment of {formatPrice(total)}.
               </p>
             </div>
           </div>
@@ -414,5 +412,5 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+}

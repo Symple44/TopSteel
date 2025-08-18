@@ -5,9 +5,9 @@
  * Usage: npm run generate-token [email] [role] [societeId]
  */
 
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import { TestAuthHelper } from './utils/test-auth-helper'
-import * as fs from 'fs'
-import * as path from 'path'
 
 async function generateTestToken() {
   console.log('🔑 Generating test JWT token...\n')
@@ -28,7 +28,7 @@ async function generateTestToken() {
     societeId,
     role,
     permissions: role === 'admin' ? ['*'] : ['read'],
-    expiresIn: '24h'
+    expiresIn: '24h',
   })
 
   console.log('✅ Token generated successfully!\n')
@@ -51,7 +51,7 @@ async function generateTestToken() {
   console.log(`   export TEST_AUTH_TOKEN="${token}"`)
   console.log('3. Add to .env.test file:')
   console.log(`   TEST_AUTH_TOKEN=${token}`)
-  
+
   // Sauvegarder dans un fichier si demandé
   if (process.argv.includes('--save')) {
     const tokenFile = await TestAuthHelper.saveTokenToFile(token)
@@ -90,7 +90,7 @@ TEST_USER_ID=${userId}
 }
 
 // Exécuter le script
-generateTestToken().catch(error => {
+generateTestToken().catch((error) => {
   console.error('❌ Error generating token:', error)
   process.exit(1)
 })

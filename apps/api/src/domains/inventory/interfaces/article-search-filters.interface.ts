@@ -350,7 +350,7 @@ export interface IArticleSearchFilters {
  */
 export interface IArticleSortOptions {
   /** Champ de tri */
-  champ: 
+  champ:
     | 'code'
     | 'libelle'
     | 'stock'

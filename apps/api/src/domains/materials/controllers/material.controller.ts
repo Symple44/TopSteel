@@ -13,7 +13,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
 import type { BusinessContext } from '../../core/interfaces/business-service.interface'
@@ -27,10 +34,10 @@ import type {
   MaterialCompatibilityAnalysis,
   MaterialStockAlert,
 } from '../repositories/material.repository'
-import {
+import type {
   MaterialService,
-  type MaterialStatistics,
-  type MaterialStockValorisation,
+  MaterialStatistics,
+  MaterialStockValorisation,
 } from '../services/material.service'
 
 /**
@@ -225,7 +232,6 @@ export class MaterialController {
     return await this.materialService.getMaterialsObsoletes()
   }
 
-
   /**
    * Recherche textuelle rapide
    */
@@ -235,7 +241,12 @@ export class MaterialController {
     description: 'Recherche dans les champs nom, référence, description et nuance',
   })
   @ApiQuery({ name: 'q', required: true, description: 'Texte à rechercher' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Nombre maximum de résultats' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Nombre maximum de résultats',
+  })
   async searchByText(
     @Query('q') searchText: string,
     @Query('limit') limit?: number
@@ -270,9 +281,9 @@ export class MaterialController {
         materialsSousStockMini: { type: 'number' },
         materialsObsoletes: { type: 'number' },
         materialsDangereux: { type: 'number' },
-        materialsStockageSpecial: { type: 'number' }
-      }
-    }
+        materialsStockageSpecial: { type: 'number' },
+      },
+    },
   })
   async getStatistics() {
     return await this.materialService.getStatistics()
@@ -444,9 +455,9 @@ export class MaterialController {
         tauxCouverture: { type: 'number', description: 'Taux de couverture du stock en %' },
         valeurImmobilisee: { type: 'number', description: 'Valeur totale immobilisée' },
         nombreReferences: { type: 'number', description: 'Nombre de références actives' },
-        nombreFournisseurs: { type: 'number', description: 'Nombre de fournisseurs distincts' }
-      }
-    }
+        nombreFournisseurs: { type: 'number', description: 'Nombre de fournisseurs distincts' },
+      },
+    },
   })
   async getKPIs() {
     return await this.materialService.getKPIs()
@@ -460,11 +471,11 @@ export class MaterialController {
     summary: 'Tendances du stock',
     description: 'Analyser les tendances et prévisions de stock',
   })
-  @ApiQuery({ 
-    name: 'periode', 
-    required: false, 
-    type: Number, 
-    description: 'Période d\'analyse en jours (défaut: 30)' 
+  @ApiQuery({
+    name: 'periode',
+    required: false,
+    type: Number,
+    description: "Période d'analyse en jours (défaut: 30)",
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -478,9 +489,9 @@ export class MaterialController {
             type: 'object',
             properties: {
               date: { type: 'string', format: 'date' },
-              valeur: { type: 'number' }
-            }
-          }
+              valeur: { type: 'number' },
+            },
+          },
         },
         previsions: {
           type: 'array',
@@ -489,12 +500,12 @@ export class MaterialController {
             properties: {
               materialId: { type: 'string' },
               reference: { type: 'string' },
-              rupturePrevisionnelle: { type: 'string', format: 'date' }
-            }
-          }
-        }
-      }
-    }
+              rupturePrevisionnelle: { type: 'string', format: 'date' },
+            },
+          },
+        },
+      },
+    },
   })
   async getStockTrends(@Query('periode') periode?: number) {
     return await this.materialService.getStockTrends(periode)
@@ -517,10 +528,10 @@ export class MaterialController {
         type: 'object',
         properties: {
           quantite: { type: 'number' },
-          valeur: { type: 'number' }
-        }
-      }
-    }
+          valeur: { type: 'number' },
+        },
+      },
+    },
   })
   async getValorisationParType() {
     return await this.materialRepository.getStockValuationByType()
@@ -543,10 +554,10 @@ export class MaterialController {
         type: 'object',
         properties: {
           quantite: { type: 'number' },
-          valeur: { type: 'number' }
-        }
-      }
-    }
+          valeur: { type: 'number' },
+        },
+      },
+    },
   })
   async getValorisationParForme() {
     return await this.materialRepository.getStockValuationByShape()
@@ -560,7 +571,12 @@ export class MaterialController {
     summary: 'Matériaux les plus utilisés',
     description: 'Obtenir la liste des matériaux les plus consommés',
   })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Nombre de résultats (défaut: 10)' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Nombre de résultats (défaut: 10)',
+  })
   @ApiQuery({ name: 'dateDebut', required: false, type: String, format: 'date' })
   @ApiQuery({ name: 'dateFin', required: false, type: String, format: 'date' })
   async getMostUsedMaterials(
@@ -568,9 +584,8 @@ export class MaterialController {
     @Query('dateDebut') dateDebut?: string,
     @Query('dateFin') dateFin?: string
   ) {
-    const periode = dateDebut && dateFin 
-      ? { debut: new Date(dateDebut), fin: new Date(dateFin) }
-      : undefined
+    const periode =
+      dateDebut && dateFin ? { debut: new Date(dateDebut), fin: new Date(dateFin) } : undefined
     return await this.materialRepository.getMostUsedMaterials(limit, periode)
   }
 
@@ -582,11 +597,11 @@ export class MaterialController {
     summary: 'Matériaux à faible rotation',
     description: 'Identifier les matériaux sans mouvement depuis X jours',
   })
-  @ApiQuery({ 
-    name: 'jours', 
-    required: false, 
-    type: Number, 
-    description: 'Nombre de jours sans mouvement (défaut: 90)' 
+  @ApiQuery({
+    name: 'jours',
+    required: false,
+    type: Number,
+    description: 'Nombre de jours sans mouvement (défaut: 90)',
   })
   async getSlowMovingMaterials(@Query('jours') jours: number = 90) {
     return await this.materialRepository.getSlowMovingMaterials(jours)
@@ -630,26 +645,26 @@ export class MaterialController {
             max: { type: 'number' },
             disponible: { type: 'number' },
             enRupture: { type: 'boolean' },
-            sousStockMinimum: { type: 'boolean' }
-          }
+            sousStockMinimum: { type: 'boolean' },
+          },
         },
         recherche: { type: 'string', description: 'Recherche textuelle' },
         tri: {
           type: 'object',
           properties: {
             champ: { type: 'string' },
-            ordre: { type: 'string', enum: ['ASC', 'DESC'] }
-          }
+            ordre: { type: 'string', enum: ['ASC', 'DESC'] },
+          },
         },
         pagination: {
           type: 'object',
           properties: {
             page: { type: 'number', minimum: 1 },
-            limite: { type: 'number', minimum: 1, maximum: 100 }
-          }
-        }
-      }
-    }
+            limite: { type: 'number', minimum: 1, maximum: 100 },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -660,16 +675,16 @@ export class MaterialController {
         items: { type: 'array', items: { $ref: '#/components/schemas/Material' } },
         total: { type: 'number' },
         page: { type: 'number' },
-        limit: { type: 'number' }
-      }
-    }
+        limit: { type: 'number' },
+      },
+    },
   })
   async searchAdvanced(
     @Body() searchCriteria: Record<string, unknown>,
     @CurrentUser() _user: User
   ): Promise<{
     items: Material[]
-    total: number  
+    total: number
     page: number
     limit: number
   }> {

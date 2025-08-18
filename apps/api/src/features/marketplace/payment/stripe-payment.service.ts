@@ -1,50 +1,55 @@
-import { Injectable, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import Stripe from 'stripe';
-import { MarketplaceOrder } from '../entities/marketplace-order.entity';
-import { MarketplaceCustomer } from '../entities/marketplace-customer.entity';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import { Redis } from 'ioredis';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { InjectRepository } from '@nestjs/typeorm'
+import { InjectRedis } from '@nestjs-modules/ioredis'
+import type { Redis } from 'ioredis'
+import Stripe from 'stripe'
+import type { Repository } from 'typeorm'
+import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
+import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 
 export interface CreatePaymentIntentDto {
-  orderId: string;
-  customerId: string;
-  amount: number; // in cents
-  currency: string;
-  paymentMethodId?: string;
-  savePaymentMethod?: boolean;
-  returnUrl?: string;
+  orderId: string
+  customerId: string
+  amount: number // in cents
+  currency: string
+  paymentMethodId?: string
+  savePaymentMethod?: boolean
+  returnUrl?: string
 }
 
 export interface PaymentResult {
-  success: boolean;
-  paymentIntentId: string;
-  clientSecret?: string;
-  status: string;
-  error?: string;
+  success: boolean
+  paymentIntentId: string
+  clientSecret?: string
+  status: string
+  error?: string
 }
 
 export interface RefundResult {
-  success: boolean;
-  refundId?: string;
-  amount: number;
-  error?: string;
+  success: boolean
+  refundId?: string
+  amount: number
+  error?: string
 }
 
 export interface PaymentMethodResult {
-  success: boolean;
-  paymentMethodId?: string;
-  error?: string;
+  success: boolean
+  paymentMethodId?: string
+  error?: string
 }
 
 @Injectable()
 export class StripePaymentService {
-  private readonly logger = new Logger(StripePaymentService.name);
-  private readonly stripe: Stripe;
-  private readonly webhookSecret: string;
+  private readonly logger = new Logger(StripePaymentService.name)
+  private readonly stripe: Stripe
+  private readonly webhookSecret: string
 
   constructor(
     private readonly configService: ConfigService,
@@ -55,26 +60,28 @@ export class StripePaymentService {
     @InjectRepository(MarketplaceCustomer)
     private readonly customerRepository: Repository<MarketplaceCustomer>
   ) {
-    const apiKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+    const apiKey = this.configService.get<string>('STRIPE_SECRET_KEY')
     if (!apiKey) {
-      throw new Error('STRIPE_SECRET_KEY is required');
+      throw new Error('STRIPE_SECRET_KEY is required')
     }
 
     this.stripe = new Stripe(apiKey, {
       apiVersion: '2025-07-30.basil' as any,
       typescript: true,
       telemetry: false, // Disable telemetry for security
-    });
+    })
 
-    this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET') || '';
-    
+    this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET') || ''
+
     // Production security: Webhook secret is mandatory
     if (!this.webhookSecret) {
-      const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+      const isProduction = this.configService.get<string>('NODE_ENV') === 'production'
       if (isProduction) {
-        throw new Error('STRIPE_WEBHOOK_SECRET is required in production environment');
+        throw new Error('STRIPE_WEBHOOK_SECRET is required in production environment')
       }
-      this.logger.warn('STRIPE_WEBHOOK_SECRET not configured - webhook validation disabled in development');
+      this.logger.warn(
+        'STRIPE_WEBHOOK_SECRET not configured - webhook validation disabled in development'
+      )
     }
   }
 
@@ -86,22 +93,22 @@ export class StripePaymentService {
       // Validate order
       const order = await this.orderRepository.findOne({
         where: { id: data.orderId },
-        relations: ['customer']
-      });
+        relations: ['customer'],
+      })
 
       if (!order) {
-        throw new BadRequestException('Order not found');
+        throw new BadRequestException('Order not found')
       }
 
       if (order.paymentStatus === 'PAID') {
-        throw new BadRequestException('Order is already paid');
+        throw new BadRequestException('Order is already paid')
       }
 
       // Get or create Stripe customer
-      const stripeCustomer = await this.getOrCreateStripeCustomer(order.customer);
+      const stripeCustomer = await this.getOrCreateStripeCustomer(order.customer)
 
       // Calculate final amount (ensure minimum charge)
-      const finalAmount = Math.max(data.amount, 50); // Stripe minimum 50 cents
+      const finalAmount = Math.max(data.amount, 50) // Stripe minimum 50 cents
 
       // Create payment intent
       const paymentIntent = await this.stripe.paymentIntents.create({
@@ -117,26 +124,28 @@ export class StripePaymentService {
           orderId: data.orderId,
           // Note: Avoid sensitive data in Stripe metadata
           type: 'marketplace_order',
-          environment: this.configService.get<string>('NODE_ENV') || 'development'
+          environment: this.configService.get<string>('NODE_ENV') || 'development',
         },
         description: `TopSteel Marketplace Order #${order.orderNumber}`,
         receipt_email: order.customer.email,
-        shipping: order.shippingAddress ? {
-          name: `${order.customer.firstName} ${order.customer.lastName}`,
-          address: {
-            line1: order.shippingAddress.street,
-            line2: order.shippingAddress.additionalInfo || undefined,
-            city: order.shippingAddress.city,
-            postal_code: order.shippingAddress.postalCode,
-            country: order.shippingAddress.country,
-          }
-        } : undefined,
-      });
+        shipping: order.shippingAddress
+          ? {
+              name: `${order.customer.firstName} ${order.customer.lastName}`,
+              address: {
+                line1: order.shippingAddress.street,
+                line2: order.shippingAddress.additionalInfo || undefined,
+                city: order.shippingAddress.city,
+                postal_code: order.shippingAddress.postalCode,
+                country: order.shippingAddress.country,
+              },
+            }
+          : undefined,
+      })
 
       // Store payment intent ID in order
-      order.paymentIntentId = paymentIntent.id;
-      order.paymentProvider = 'stripe';
-      await this.orderRepository.save(order);
+      order.paymentIntentId = paymentIntent.id
+      order.paymentProvider = 'stripe'
+      await this.orderRepository.save(order)
 
       // Cache payment intent for quick access
       await this.redisService.setex(
@@ -146,32 +155,31 @@ export class StripePaymentService {
           orderId: data.orderId,
           customerId: data.customerId,
           amount: finalAmount,
-          currency: data.currency
+          currency: data.currency,
         })
-      );
+      )
 
-      this.logger.log(`Payment intent created for order ${data.orderId.substring(0, 8)}...`);
+      this.logger.log(`Payment intent created for order ${data.orderId.substring(0, 8)}...`)
 
       return {
         success: true,
         paymentIntentId: paymentIntent.id,
         clientSecret: paymentIntent.client_secret,
-        status: paymentIntent.status
-      };
-
+        status: paymentIntent.status,
+      }
     } catch (error) {
-      this.logger.error(`Failed to create payment intent: ${error.message}`, error.stack);
-      
+      this.logger.error(`Failed to create payment intent: ${error.message}`, error.stack)
+
       if ((error as any).type === 'StripeError') {
         return {
           success: false,
           paymentIntentId: '',
           status: 'failed',
-          error: `Payment processing error: ${error.message}`
-        };
+          error: `Payment processing error: ${error.message}`,
+        }
       }
 
-      throw new InternalServerErrorException('Payment processing failed');
+      throw new InternalServerErrorException('Payment processing failed')
     }
   }
 
@@ -180,67 +188,70 @@ export class StripePaymentService {
    */
   async confirmPayment(paymentIntentId: string, paymentMethodId?: string): Promise<PaymentResult> {
     try {
-      const updateData: any = {};
-      
+      const updateData: any = {}
+
       if (paymentMethodId) {
-        updateData.payment_method = paymentMethodId;
+        updateData.payment_method = paymentMethodId
       }
 
-      const paymentIntent = await this.stripe.paymentIntents.confirm(paymentIntentId, updateData);
+      const paymentIntent = await this.stripe.paymentIntents.confirm(paymentIntentId, updateData)
 
       // Handle different statuses
       switch (paymentIntent.status) {
         case 'succeeded':
-          await this.handlePaymentSuccess(paymentIntent);
-          break;
+          await this.handlePaymentSuccess(paymentIntent)
+          break
         case 'requires_action':
         case 'requires_source_action' as any:
           // 3D Secure or similar authentication required
-          break;
+          break
         case 'requires_payment_method':
           return {
             success: false,
             paymentIntentId,
             status: paymentIntent.status,
-            error: 'Payment method required'
-          };
+            error: 'Payment method required',
+          }
         case 'canceled':
-          await this.handlePaymentFailure(paymentIntent, 'Payment was canceled');
-          break;
+          await this.handlePaymentFailure(paymentIntent, 'Payment was canceled')
+          break
       }
 
       return {
         success: paymentIntent.status === 'succeeded',
         paymentIntentId,
         clientSecret: paymentIntent.client_secret,
-        status: paymentIntent.status
-      };
-
+        status: paymentIntent.status,
+      }
     } catch (error) {
-      this.logger.error(`Failed to confirm payment: ${error.message}`, error.stack);
-      
+      this.logger.error(`Failed to confirm payment: ${error.message}`, error.stack)
+
       if ((error as any).type === 'StripeError') {
         return {
           success: false,
           paymentIntentId,
           status: 'failed',
-          error: error.message
-        };
+          error: error.message,
+        }
       }
 
-      throw new InternalServerErrorException('Payment confirmation failed');
+      throw new InternalServerErrorException('Payment confirmation failed')
     }
   }
 
   /**
    * Process refund
    */
-  async createRefund(paymentIntentId: string, amount?: number, reason?: string): Promise<RefundResult> {
+  async createRefund(
+    paymentIntentId: string,
+    amount?: number,
+    reason?: string
+  ): Promise<RefundResult> {
     try {
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
-      
+      const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId)
+
       if (paymentIntent.status !== 'succeeded') {
-        throw new BadRequestException('Cannot refund unsuccessful payment');
+        throw new BadRequestException('Cannot refund unsuccessful payment')
       }
 
       const refund = await this.stripe.refunds.create({
@@ -249,79 +260,80 @@ export class StripePaymentService {
         reason: reason as any,
         metadata: {
           orderId: paymentIntent.metadata.orderId || '',
-          processedBy: 'marketplace_system'
-        }
-      });
+          processedBy: 'marketplace_system',
+        },
+      })
 
       // Update order status
-      const orderId = paymentIntent.metadata.orderId;
+      const orderId = paymentIntent.metadata.orderId
       if (orderId) {
-        await this.updateOrderPaymentStatus(orderId, 'REFUNDED');
-        
+        await this.updateOrderPaymentStatus(orderId, 'REFUNDED')
+
         // Emit refund event
         this.eventEmitter.emit('marketplace.payment.refunded', {
           orderId,
           paymentIntentId,
           refundId: refund.id,
           amount: refund.amount,
-          reason
-        });
+          reason,
+        })
       }
 
-      this.logger.log(`Refund created: ${refund.id} for payment ${paymentIntentId}`);
+      this.logger.log(`Refund created: ${refund.id} for payment ${paymentIntentId}`)
 
       return {
         success: true,
         refundId: refund.id,
-        amount: refund.amount
-      };
-
+        amount: refund.amount,
+      }
     } catch (error) {
-      this.logger.error(`Failed to create refund: ${error.message}`, error.stack);
-      
+      this.logger.error(`Failed to create refund: ${error.message}`, error.stack)
+
       return {
         success: false,
         amount: amount || 0,
-        error: error.message
-      };
+        error: error.message,
+      }
     }
   }
 
   /**
    * Save payment method for future use
    */
-  async savePaymentMethod(customerId: string, paymentMethodId: string): Promise<PaymentMethodResult> {
+  async savePaymentMethod(
+    customerId: string,
+    paymentMethodId: string
+  ): Promise<PaymentMethodResult> {
     try {
       const customer = await this.customerRepository.findOne({
-        where: { id: customerId }
-      });
+        where: { id: customerId },
+      })
 
       if (!customer) {
-        throw new BadRequestException('Customer not found');
+        throw new BadRequestException('Customer not found')
       }
 
       // Get or create Stripe customer
-      const stripeCustomer = await this.getOrCreateStripeCustomer(customer);
+      const stripeCustomer = await this.getOrCreateStripeCustomer(customer)
 
       // Attach payment method to customer
       await this.stripe.paymentMethods.attach(paymentMethodId, {
         customer: stripeCustomer.id,
-      });
+      })
 
-      this.logger.log(`Payment method ${paymentMethodId} saved for customer ${customerId}`);
+      this.logger.log(`Payment method ${paymentMethodId} saved for customer ${customerId}`)
 
       return {
         success: true,
-        paymentMethodId
-      };
-
+        paymentMethodId,
+      }
     } catch (error) {
-      this.logger.error(`Failed to save payment method: ${error.message}`, error.stack);
-      
+      this.logger.error(`Failed to save payment method: ${error.message}`, error.stack)
+
       return {
         success: false,
-        error: error.message
-      };
+        error: error.message,
+      }
     }
   }
 
@@ -331,23 +343,22 @@ export class StripePaymentService {
   async getPaymentMethods(customerId: string): Promise<any[]> {
     try {
       const customer = await this.customerRepository.findOne({
-        where: { id: customerId }
-      });
+        where: { id: customerId },
+      })
 
       if (!customer || !customer.metadata?.stripeCustomerId) {
-        return [];
+        return []
       }
 
       const paymentMethods = await this.stripe.paymentMethods.list({
         customer: customer.metadata.stripeCustomerId,
         type: 'card',
-      });
+      })
 
-      return paymentMethods.data;
-
+      return paymentMethods.data
     } catch (error) {
-      this.logger.error(`Failed to get payment methods: ${error.message}`, error.stack);
-      return [];
+      this.logger.error(`Failed to get payment methods: ${error.message}`, error.stack)
+      return []
     }
   }
 
@@ -356,58 +367,51 @@ export class StripePaymentService {
    */
   async handleWebhook(body: string, signature: string, originUrl?: string): Promise<void> {
     if (!this.webhookSecret) {
-      throw new BadRequestException('Webhook secret not configured');
+      throw new BadRequestException('Webhook secret not configured')
     }
 
     // Validate webhook origin in production
     if (originUrl) {
-      this.validateWebhookOrigin(originUrl);
+      this.validateWebhookOrigin(originUrl)
     }
 
     try {
-      const event = this.stripe.webhooks.constructEvent(body, signature, this.webhookSecret);
+      const event = this.stripe.webhooks.constructEvent(body, signature, this.webhookSecret)
 
       this.logger.log(`Stripe webhook received: ${event.type}`, {
         eventId: event.id,
         origin: originUrl,
-        type: event.type
-      });
+        type: event.type,
+      })
 
       switch (event.type) {
         case 'payment_intent.succeeded':
-          await this.handlePaymentSuccess(event.data.object as any);
-          break;
-          
+          await this.handlePaymentSuccess(event.data.object as any)
+          break
+
         case 'payment_intent.payment_failed':
-          await this.handlePaymentFailure(
-            event.data.object as any,
-            'Payment failed'
-          );
-          break;
-          
+          await this.handlePaymentFailure(event.data.object as any, 'Payment failed')
+          break
+
         case 'payment_intent.canceled':
-          await this.handlePaymentFailure(
-            event.data.object as any,
-            'Payment was canceled'
-          );
-          break;
-          
+          await this.handlePaymentFailure(event.data.object as any, 'Payment was canceled')
+          break
+
         case 'refund.created':
-          await this.handleRefundCreated(event.data.object as any);
-          break;
-          
+          await this.handleRefundCreated(event.data.object as any)
+          break
+
         default:
           this.logger.log(`Unhandled webhook event type: ${event.type}`, {
             eventId: event.id,
-            type: event.type
-          });
+            type: event.type,
+          })
       }
-
     } catch (error) {
       this.logger.error(`Webhook handling failed: ${error.message}`, error.stack, {
-        origin: originUrl
-      });
-      throw new BadRequestException('Webhook verification failed');
+        origin: originUrl,
+      })
+      throw new BadRequestException('Webhook verification failed')
     }
   }
 
@@ -415,41 +419,44 @@ export class StripePaymentService {
    * Validate webhook origin against whitelist
    */
   private validateWebhookOrigin(originUrl: string): void {
-    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
-    
+    const isProduction = this.configService.get<string>('NODE_ENV') === 'production'
+
     if (!isProduction) {
       // Skip validation in development
-      return;
+      return
     }
 
     // Get allowed domains from configuration
-    const allowedDomains = this.configService.get<string>('STRIPE_WEBHOOK_ALLOWED_DOMAINS', 'stripe.com');
-    const domainWhitelist = allowedDomains.split(',').map(d => d.trim());
+    const allowedDomains = this.configService.get<string>(
+      'STRIPE_WEBHOOK_ALLOWED_DOMAINS',
+      'stripe.com'
+    )
+    const domainWhitelist = allowedDomains.split(',').map((d) => d.trim())
 
     try {
-      const url = new URL(originUrl);
-      const hostname = url.hostname;
+      const url = new URL(originUrl)
+      const hostname = url.hostname
 
       // Check if hostname is in whitelist or is a subdomain of whitelisted domain
-      const isAllowed = domainWhitelist.some(allowedDomain => {
-        return hostname === allowedDomain || hostname.endsWith(`.${allowedDomain}`);
-      });
+      const isAllowed = domainWhitelist.some((allowedDomain) => {
+        return hostname === allowedDomain || hostname.endsWith(`.${allowedDomain}`)
+      })
 
       if (!isAllowed) {
         this.logger.error(`Webhook origin not allowed: ${hostname}`, {
           hostname,
-          allowedDomains: domainWhitelist
-        });
-        throw new BadRequestException('Webhook origin not allowed');
+          allowedDomains: domainWhitelist,
+        })
+        throw new BadRequestException('Webhook origin not allowed')
       }
 
-      this.logger.log(`Webhook origin validated: ${hostname}`);
+      this.logger.log(`Webhook origin validated: ${hostname}`)
     } catch (error) {
       if (error instanceof BadRequestException) {
-        throw error;
+        throw error
       }
-      this.logger.error(`Invalid webhook origin URL: ${originUrl}`, error);
-      throw new BadRequestException('Invalid webhook origin URL');
+      this.logger.error(`Invalid webhook origin URL: ${originUrl}`, error)
+      throw new BadRequestException('Invalid webhook origin URL')
     }
   }
 
@@ -458,13 +465,13 @@ export class StripePaymentService {
    */
   private async getOrCreateStripeCustomer(customer: MarketplaceCustomer): Promise<any> {
     // Check if customer already has Stripe ID
-    const existingStripeId = customer.metadata?.stripeCustomerId;
-    
+    const existingStripeId = customer.metadata?.stripeCustomerId
+
     if (existingStripeId) {
       try {
-        return await this.stripe.customers.retrieve(existingStripeId) as any;
-      } catch (error) {
-        this.logger.warn(`Stripe customer ${existingStripeId} not found, creating new one`);
+        return (await this.stripe.customers.retrieve(existingStripeId)) as any
+      } catch (_error) {
+        this.logger.warn(`Stripe customer ${existingStripeId} not found, creating new one`)
       }
     }
 
@@ -475,71 +482,75 @@ export class StripePaymentService {
       phone: customer.phone,
       metadata: {
         marketplaceCustomerId: customer.id,
-        tenantId: customer.tenantId
-      }
-    });
+        tenantId: customer.tenantId,
+      },
+    })
 
     // Save Stripe customer ID
     customer.metadata = {
       ...customer.metadata,
-      stripeCustomerId: stripeCustomer.id
-    };
-    await this.customerRepository.save(customer);
+      stripeCustomerId: stripeCustomer.id,
+    }
+    await this.customerRepository.save(customer)
 
-    return stripeCustomer;
+    return stripeCustomer
   }
 
   private async handlePaymentSuccess(paymentIntent: any): Promise<void> {
-    const orderId = paymentIntent.metadata.orderId;
-    
+    const orderId = paymentIntent.metadata.orderId
+
     if (!orderId) {
-      this.logger.warn(`Payment succeeded but no orderId in metadata: ${paymentIntent.id}`);
-      return;
+      this.logger.warn(`Payment succeeded but no orderId in metadata: ${paymentIntent.id}`)
+      return
     }
 
-    await this.updateOrderPaymentStatus(orderId, 'PAID');
+    await this.updateOrderPaymentStatus(orderId, 'PAID')
 
     // Emit payment success event
     this.eventEmitter.emit('marketplace.payment.succeeded', {
       orderId,
       paymentIntentId: paymentIntent.id,
       amount: paymentIntent.amount,
-      currency: paymentIntent.currency
-    });
+      currency: paymentIntent.currency,
+    })
 
-    this.logger.log(`Payment succeeded for order ${orderId ? orderId.substring(0, 8) + '...' : 'unknown'}`);
+    this.logger.log(
+      `Payment succeeded for order ${orderId ? `${orderId.substring(0, 8)}...` : 'unknown'}`
+    )
   }
 
   private async handlePaymentFailure(paymentIntent: any, reason: string): Promise<void> {
-    const orderId = paymentIntent.metadata.orderId;
-    
+    const orderId = paymentIntent.metadata.orderId
+
     if (!orderId) {
-      return;
+      return
     }
 
-    await this.updateOrderPaymentStatus(orderId, 'FAILED');
+    await this.updateOrderPaymentStatus(orderId, 'FAILED')
 
     // Emit payment failure event
     this.eventEmitter.emit('marketplace.payment.failed', {
       orderId,
       paymentIntentId: paymentIntent.id,
       reason,
-      amount: paymentIntent.amount
-    });
+      amount: paymentIntent.amount,
+    })
 
-    this.logger.log(`Payment failed for order ${orderId ? orderId.substring(0, 8) + '...' : 'unknown'}: ${reason}`);
+    this.logger.log(
+      `Payment failed for order ${orderId ? `${orderId.substring(0, 8)}...` : 'unknown'}: ${reason}`
+    )
   }
 
   private async handleRefundCreated(refund: any): Promise<void> {
-    this.logger.log(`Refund created: ${refund.id}, amount: ${refund.amount}`);
-    
+    this.logger.log(`Refund created: ${refund.id}, amount: ${refund.amount}`)
+
     // Additional refund handling logic if needed
   }
 
   private async updateOrderPaymentStatus(orderId: string, status: string): Promise<void> {
     await this.orderRepository.update(orderId, {
       paymentStatus: status,
-      paidAt: status === 'PAID' ? new Date() : undefined
-    });
+      paidAt: status === 'PAID' ? new Date() : undefined,
+    })
   }
 }

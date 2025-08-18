@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table, TableIndex } from 'typeorm'
 
 export class CreateMenuConfigurationTables1737600000000 implements MigrationInterface {
   name = 'CreateMenuConfigurationTables1737600000000'
@@ -749,14 +749,30 @@ export class CreateMenuConfigurationTables1737600000000 implements MigrationInte
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop foreign key constraints
-    await queryRunner.query('ALTER TABLE menu_access_logs DROP CONSTRAINT IF EXISTS FK_menu_access_logs_menu_id')
-    await queryRunner.query('ALTER TABLE menu_access_logs DROP CONSTRAINT IF EXISTS FK_menu_access_logs_menu_item_id')
-    await queryRunner.query('ALTER TABLE menu_access_logs DROP CONSTRAINT IF EXISTS FK_menu_access_logs_user_id')
-    await queryRunner.query('ALTER TABLE user_menu_preferences DROP CONSTRAINT IF EXISTS FK_user_menu_preferences_menu_id')
-    await queryRunner.query('ALTER TABLE user_menu_preferences DROP CONSTRAINT IF EXISTS FK_user_menu_preferences_user_id')
-    await queryRunner.query('ALTER TABLE menu_item_actions DROP CONSTRAINT IF EXISTS FK_menu_item_actions_menu_item_id')
-    await queryRunner.query('ALTER TABLE menu_items DROP CONSTRAINT IF EXISTS FK_menu_items_parent_id')
-    await queryRunner.query('ALTER TABLE menu_items DROP CONSTRAINT IF EXISTS FK_menu_items_menu_id')
+    await queryRunner.query(
+      'ALTER TABLE menu_access_logs DROP CONSTRAINT IF EXISTS FK_menu_access_logs_menu_id'
+    )
+    await queryRunner.query(
+      'ALTER TABLE menu_access_logs DROP CONSTRAINT IF EXISTS FK_menu_access_logs_menu_item_id'
+    )
+    await queryRunner.query(
+      'ALTER TABLE menu_access_logs DROP CONSTRAINT IF EXISTS FK_menu_access_logs_user_id'
+    )
+    await queryRunner.query(
+      'ALTER TABLE user_menu_preferences DROP CONSTRAINT IF EXISTS FK_user_menu_preferences_menu_id'
+    )
+    await queryRunner.query(
+      'ALTER TABLE user_menu_preferences DROP CONSTRAINT IF EXISTS FK_user_menu_preferences_user_id'
+    )
+    await queryRunner.query(
+      'ALTER TABLE menu_item_actions DROP CONSTRAINT IF EXISTS FK_menu_item_actions_menu_item_id'
+    )
+    await queryRunner.query(
+      'ALTER TABLE menu_items DROP CONSTRAINT IF EXISTS FK_menu_items_parent_id'
+    )
+    await queryRunner.query(
+      'ALTER TABLE menu_items DROP CONSTRAINT IF EXISTS FK_menu_items_menu_id'
+    )
 
     // Drop indexes
     await queryRunner.dropIndex('menu_access_logs', 'IDX_menu_access_logs_accessed_at')

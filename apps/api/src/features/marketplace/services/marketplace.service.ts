@@ -84,7 +84,7 @@ export interface InstallationResult {
 
 @Injectable()
 export class MarketplaceService {
-  private readonly logger = new Logger(MarketplaceService.name);
+  private readonly logger = new Logger(MarketplaceService.name)
 
   constructor(
     @InjectRepository(MarketplaceModuleEntity, 'auth')
@@ -596,11 +596,11 @@ export class MarketplaceService {
       installation.addLog('INFO', 'Suppression de la configuration de menu')
       // La configuration de menu sera automatiquement désactivée
       // lors de la désactivation du module
-      
+
       // 2. Nettoyer les routes API
       installation.addLog('INFO', 'Nettoyage des routes API')
       // Les routes sont automatiquement désactivées avec le module NestJS
-      
+
       // 3. Supprimer les permissions (si pas utilisées par d'autres modules)
       installation.addLog('INFO', 'Nettoyage des permissions')
       // Les permissions restent dans le système pour maintenir l'intégrité

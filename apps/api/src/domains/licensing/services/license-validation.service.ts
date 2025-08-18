@@ -1,14 +1,14 @@
+import * as crypto from 'node:crypto'
+import * as os from 'node:os'
 import { Injectable, Logger } from '@nestjs/common'
+import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
-import { EventEmitter2 } from '@nestjs/event-emitter'
-import { License, LicenseStatus, LicenseType } from '../entities/license.entity'
-import { LicenseFeature, STANDARD_FEATURES } from '../entities/license-feature.entity'
-import { LicenseActivation, ActivationStatus } from '../entities/license-activation.entity'
+import { MoreThanOrEqual, type Repository } from 'typeorm'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { License, LicenseStatus } from '../entities/license.entity'
+import { ActivationStatus, LicenseActivation } from '../entities/license-activation.entity'
+import { LicenseFeature } from '../entities/license-feature.entity'
 import { LicenseUsage, UsageMetricType } from '../entities/license-usage.entity'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import * as crypto from 'crypto'
-import * as os from 'os'
 
 /**
  * License validation result
@@ -63,7 +63,7 @@ export class LicenseValidationService {
     @InjectRepository(License, 'auth')
     private readonly licenseRepository: Repository<License>,
     @InjectRepository(LicenseFeature, 'auth')
-    private readonly featureRepository: Repository<LicenseFeature>,
+    readonly _featureRepository: Repository<LicenseFeature>,
     @InjectRepository(LicenseActivation, 'auth')
     private readonly activationRepository: Repository<LicenseActivation>,
     @InjectRepository(LicenseUsage, 'auth')
@@ -152,11 +152,11 @@ export class LicenseValidationService {
       // Check usage limits
       const usageCheck = await this.checkUsageLimits(license)
       result.limits = usageCheck.limits
-      
+
       if (!usageCheck.valid) {
         result.errors.push(...usageCheck.errors)
       }
-      
+
       if (usageCheck.warnings.length > 0) {
         result.warnings.push(...usageCheck.warnings)
       }
@@ -191,7 +191,6 @@ export class LicenseValidationService {
       })
 
       return result
-
     } catch (error) {
       this.logger.error('License validation error:', error)
       result.errors.push('Validation error occurred')
@@ -315,10 +314,7 @@ export class LicenseValidationService {
     today.setHours(0, 0, 0, 0)
 
     // Check users
-    const userUsage = await this.getCurrentUsage(
-      license.id,
-      UsageMetricType.USERS
-    )
+    const userUsage = await this.getCurrentUsage(license.id, UsageMetricType.USERS)
     limits.users = {
       current: userUsage,
       max: license.maxUsers,
@@ -331,10 +327,7 @@ export class LicenseValidationService {
     }
 
     // Check sites
-    const siteUsage = await this.getCurrentUsage(
-      license.id,
-      UsageMetricType.SITES
-    )
+    const siteUsage = await this.getCurrentUsage(license.id, UsageMetricType.SITES)
     limits.sites = {
       current: siteUsage,
       max: license.maxSites,
@@ -359,16 +352,15 @@ export class LicenseValidationService {
       if (transactionUsage > license.maxTransactions) {
         errors.push(`Transaction limit exceeded (${transactionUsage}/${license.maxTransactions})`)
       } else if (transactionUsage >= license.maxTransactions * 0.9) {
-        warnings.push(`Approaching transaction limit (${transactionUsage}/${license.maxTransactions})`)
+        warnings.push(
+          `Approaching transaction limit (${transactionUsage}/${license.maxTransactions})`
+        )
       }
     }
 
     // Check storage (if limited)
     if (license.maxStorage > 0) {
-      const storageUsage = await this.getCurrentUsage(
-        license.id,
-        UsageMetricType.STORAGE
-      )
+      const storageUsage = await this.getCurrentUsage(license.id, UsageMetricType.STORAGE)
       limits.storage = {
         current: storageUsage,
         max: license.maxStorage,
@@ -383,11 +375,7 @@ export class LicenseValidationService {
 
     // Check API calls (if limited)
     if (license.maxApiCalls > 0) {
-      const apiUsage = await this.getCurrentUsage(
-        license.id,
-        UsageMetricType.API_CALLS,
-        'daily'
-      )
+      const apiUsage = await this.getCurrentUsage(license.id, UsageMetricType.API_CALLS, 'daily')
       limits.apiCalls = {
         current: apiUsage,
         max: license.maxApiCalls,
@@ -442,17 +430,19 @@ export class LicenseValidationService {
   /**
    * Get feature status
    */
-  private async getFeatureStatus(license: License): Promise<Array<{
-    code: string
-    name: string
-    enabled: boolean
-    available: boolean
-    limit?: number
-    used?: number
-  }>> {
+  private async getFeatureStatus(license: License): Promise<
+    Array<{
+      code: string
+      name: string
+      enabled: boolean
+      available: boolean
+      limit?: number
+      used?: number
+    }>
+  > {
     const features = license.features || []
-    
-    return features.map(feature => ({
+
+    return features.map((feature) => ({
       code: feature.featureCode,
       name: feature.featureName,
       enabled: feature.isEnabled,
@@ -465,13 +455,9 @@ export class LicenseValidationService {
   /**
    * Check if a specific feature is available
    */
-  async checkFeature(
-    licenseKey: string,
-    societeId: string,
-    featureCode: string
-  ): Promise<boolean> {
+  async checkFeature(licenseKey: string, societeId: string, featureCode: string): Promise<boolean> {
     const cacheKey = `license:feature:${licenseKey}:${featureCode}`
-    
+
     // Check cache
     const cached = await this.cacheService.get<boolean>(cacheKey)
     if (cached !== null) {
@@ -488,10 +474,10 @@ export class LicenseValidationService {
     }
 
     const hasFeature = license.hasFeature(featureCode)
-    
+
     // Cache for 5 minutes
     await this.cacheService.set(cacheKey, hasFeature, 300)
-    
+
     return hasFeature
   }
 
@@ -505,7 +491,7 @@ export class LicenseValidationService {
     breakdown?: any
   ): Promise<void> {
     const now = new Date()
-    
+
     const usage = this.usageRepository.create({
       licenseId,
       metricType,
@@ -542,7 +528,7 @@ export class LicenseValidationService {
     }
 
     let limit: number | null = null
-    let metricName: string = metricType
+    const _metricName: string = metricType
 
     switch (metricType) {
       case UsageMetricType.USERS:
@@ -590,7 +576,7 @@ export class LicenseValidationService {
     const dayNum = d.getUTCDay() || 7
     d.setUTCDate(d.getUTCDate() + 4 - dayNum)
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-    return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+    return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
   }
 
   /**
@@ -600,7 +586,7 @@ export class LicenseValidationService {
     const interfaces = os.networkInterfaces()
     const primaryInterface = Object.values(interfaces)
       .flat()
-      .find(iface => iface && !iface.internal && iface.family === 'IPv4')
+      .find((iface) => iface && !iface.internal && iface.family === 'IPv4')
 
     return {
       machineId: this.generateMachineId(),
@@ -636,16 +622,11 @@ export class LicenseValidationService {
     const interfaces = os.networkInterfaces()
     const macs = Object.values(interfaces)
       .flat()
-      .filter(iface => iface && !iface.internal && iface.mac)
-      .map(iface => iface!.mac)
+      .filter((iface) => iface && !iface.internal && iface.mac)
+      .map((iface) => iface?.mac)
       .sort()
 
-    const data = [
-      os.hostname(),
-      os.platform(),
-      os.arch(),
-      ...macs,
-    ].join('-')
+    const data = [os.hostname(), os.platform(), os.arch(), ...macs].join('-')
 
     const hash = crypto.createHash('sha256')
     hash.update(data)

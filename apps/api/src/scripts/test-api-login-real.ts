@@ -10,7 +10,7 @@ import axios from 'axios'
 const API_URL = process.env.API_URL || 'http://localhost:3002'
 
 async function testRealAPILogin() {
-  console.log('🔐 TEST DU LOGIN AVEC L\'API RÉELLE')
+  console.log("🔐 TEST DU LOGIN AVEC L'API RÉELLE")
   console.log('='.repeat(80))
   console.log(`\n📡 API URL: ${API_URL}`)
   console.log()
@@ -19,18 +19,18 @@ async function testRealAPILogin() {
     // Étape 1: Login initial
     console.log('📋 ÉTAPE 1: Login Initial')
     console.log('-'.repeat(40))
-    
+
     const loginData = {
-      login: 'admin@topsteel.com',  // Utilisateur de test
-      password: 'Admin123!@#'        // Mot de passe par défaut
+      login: 'admin@topsteel.com', // Utilisateur de test
+      password: 'Admin123!@#', // Mot de passe par défaut
     }
-    
+
     console.log(`📧 Email: ${loginData.login}`)
     console.log('🔑 Tentative de connexion...\n')
 
     try {
       const loginResponse = await axios.post(`${API_URL}/auth/login`, loginData)
-      
+
       if (loginResponse.data.requiresMFA) {
         console.log('⚠️  MFA requis - non géré dans ce test')
         return
@@ -48,11 +48,11 @@ async function testRealAPILogin() {
 
       console.log('\n🏢 SOCIÉTÉS DISPONIBLES:')
       console.log('-'.repeat(40))
-      
+
       if (societes && societes.length > 0) {
         console.log(`Nombre de sociétés: ${societes.length}`)
         console.log()
-        
+
         societes.forEach((societe: any, index: number) => {
           console.log(`${index + 1}. ${societe.nom} (${societe.code})`)
           console.log(`   ID: ${societe.id}`)
@@ -73,19 +73,19 @@ async function testRealAPILogin() {
       // Si une seule société ou société par défaut, tester la connexion à cette société
       if (societes && societes.length > 0) {
         const defaultSociete = societes.find((s: any) => s.isDefault) || societes[0]
-        
+
         console.log('\n📋 ÉTAPE 2: Sélection de Société')
         console.log('-'.repeat(40))
         console.log(`🏢 Sélection de: ${defaultSociete.nom}`)
-        
+
         try {
           const societeResponse = await axios.post(
             `${API_URL}/auth/login-societe/${defaultSociete.id}`,
             {},
             {
               headers: {
-                'Authorization': `Bearer ${accessToken}`
-              }
+                Authorization: `Bearer ${accessToken}`,
+              },
             }
           )
 
@@ -93,7 +93,7 @@ async function testRealAPILogin() {
           console.log('\n📊 Détails de la session:')
           console.log(`   Session ID: ${societeResponse.data.sessionId}`)
           console.log(`   Token expiré dans: ${societeResponse.data.tokens.expiresIn} secondes`)
-          
+
           const userInfo = societeResponse.data.user
           console.log('\n👤 Contexte utilisateur:')
           console.log(`   Email: ${userInfo.email}`)
@@ -101,37 +101,37 @@ async function testRealAPILogin() {
           console.log(`   Société: ${userInfo.societe.nom} (${userInfo.societe.code})`)
           console.log(`   Database: ${userInfo.societe.databaseName}`)
           console.log(`   Permissions: ${userInfo.permissions?.slice(0, 3).join(', ')}...`)
-
         } catch (error: any) {
-          console.log('❌ Erreur lors de la sélection de société:', error.response?.data?.message || error.message)
+          console.log(
+            '❌ Erreur lors de la sélection de société:',
+            error.response?.data?.message || error.message
+          )
         }
       }
-
     } catch (error: any) {
       if (error.response) {
         console.log('❌ Erreur de connexion:')
         console.log(`   Status: ${error.response.status}`)
         console.log(`   Message: ${error.response.data?.message || 'Erreur inconnue'}`)
       } else if (error.request) {
-        console.log('❌ Impossible de contacter l\'API')
-        console.log('   Vérifiez que l\'API est démarrée sur le port 3002')
+        console.log("❌ Impossible de contacter l'API")
+        console.log("   Vérifiez que l'API est démarrée sur le port 3002")
       } else {
         console.log('❌ Erreur:', error.message)
       }
     }
-
   } catch (error: any) {
     console.error('❌ Erreur fatale:', error.message)
   }
 
-  console.log('\n' + '='.repeat(80))
+  console.log(`\n${'='.repeat(80)}`)
   console.log('📊 FIN DU TEST')
   console.log('='.repeat(80))
 }
 
 // Exécuter le test
 if (require.main === module) {
-  testRealAPILogin().catch(error => {
+  testRealAPILogin().catch((error) => {
     console.error('❌ Erreur:', error)
     process.exit(1)
   })

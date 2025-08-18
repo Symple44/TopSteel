@@ -95,7 +95,7 @@ export class EnhancedDatabaseService {
       }
     )
 
-    return (result as any).data || (result as T)
+    return (result as { data?: T }).data || (result as T)
   }
 
   /**
