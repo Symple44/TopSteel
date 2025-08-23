@@ -1,6 +1,7 @@
 'use client'
 
 import { Dialog, DialogContent, DialogTitle } from '@erp/ui'
+import DOMPurify from 'dompurify'
 import {
   ArrowRight,
   Bell,
@@ -414,7 +415,17 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
 
     // Pour simplifier, on prend juste le premier highlight
     const highlighted = highlights[0]
-    return <span dangerouslySetInnerHTML={{ __html: highlighted }} />
+    
+    // Sanitize HTML content to prevent XSS attacks from search highlights
+    const sanitizedHTML = DOMPurify.sanitize(highlighted, {
+      ALLOWED_TAGS: ['mark', 'strong', 'em', 'span'],
+      ALLOWED_ATTR: ['class'],
+      KEEP_CONTENT: true
+    })
+    
+    // Using dangerouslySetInnerHTML is necessary here to render search highlights from the API
+    // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
+    return <span dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
   }
 
   return (

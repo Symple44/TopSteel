@@ -1,5 +1,6 @@
 'use client'
 
+import DOMPurify from 'isomorphic-dompurify'
 import {
   Check,
   ChevronDown,
@@ -429,7 +430,7 @@ export function DataTable<T = any>({
         const column = orderedColumns.find((col) => col.id === filterField)
         const value = column?.getValue
           ? column.getValue(row)
-          : column?.key 
+          : column?.key
             ? (row as any)[column.key]
             : filterField
               ? (row as any)[filterField]
@@ -1154,15 +1155,15 @@ export function DataTable<T = any>({
       }
 
       if (column.type === 'richtext') {
-        // Nettoyage HTML basique pour la sécurité
+        // HTML sanitization for security using DOMPurify
         const sanitizeHtml = (html: string): string => {
           if (!html) return ''
-          return html
-            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-            .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-            .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
-            .replace(/on\w+\s*=\s*'[^']*'/gi, '')
-            .replace(/javascript:/gi, '')
+          return DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'div', 'span'],
+            ALLOWED_ATTR: ['class', 'style'],
+            ALLOW_DATA_ATTR: false,
+            FORBID_TAGS: ['script', 'iframe']
+          }) as unknown as string
         }
 
         const sanitizedValue = value
@@ -1180,6 +1181,8 @@ export function DataTable<T = any>({
               lineHeight: '1.4',
             }}
           >
+            {/* Using dangerouslySetInnerHTML is necessary for rich text cell display */}
+            {/* Content is sanitized with DOMPurify to prevent XSS vulnerabilities */}
             <div dangerouslySetInnerHTML={{ __html: sanitizedValue }} />
             <button
               type="button"
@@ -1771,7 +1774,9 @@ export function DataTable<T = any>({
                             currentSort={
                               sortConfig.find((s) => s.column === column.id)?.direction || null
                             }
-                            currentFilters={filters.find((f) => (f.field || f.column) === column.id)?.value}
+                            currentFilters={
+                              filters.find((f) => (f.field || f.column) === column.id)?.value
+                            }
                             onSort={(direction) => handleSort(column.id, direction)}
                             onFilter={(filter) => {
                               if (filter) {
@@ -1780,7 +1785,9 @@ export function DataTable<T = any>({
                                   { field: column.id, value: filter, operator: 'equals' as const },
                                 ])
                               } else {
-                                setFilters((prev) => prev.filter((f) => (f.field || f.column) !== column.id))
+                                setFilters((prev) =>
+                                  prev.filter((f) => (f.field || f.column) !== column.id)
+                                )
                               }
                             }}
                           />

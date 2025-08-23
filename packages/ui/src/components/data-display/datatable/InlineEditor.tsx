@@ -1,6 +1,6 @@
 'use client'
 
-// import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify'
 import { AlertTriangle, Calculator, Check, X } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -293,14 +293,15 @@ export function InlineEditor<T = Record<string, unknown>>({
               !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
               validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
+            // Using dangerouslySetInnerHTML is necessary for inline rich text editing
+            // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
             dangerouslySetInnerHTML={{
-              __html:
-                typeof window !== 'undefined'
-                  ? (value as any) || ''
-                  : ((value as any) || '').replace(
-                      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                      ''
-                    ),
+              __html: DOMPurify.sanitize((value as any) || '', {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'div', 'span'],
+                ALLOWED_ATTR: ['class', 'style'],
+                ALLOW_DATA_ATTR: false,
+                FORBID_TAGS: ['script', 'iframe']
+              }) as unknown as string,
             }}
             onInput={(e) => {
               const target = e.target as HTMLDivElement

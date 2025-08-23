@@ -1,6 +1,6 @@
 'use client'
 
-// import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify'
 import {
   AlignCenter,
   AlignLeft,
@@ -27,17 +27,16 @@ import { Label, Separator } from '../../primitives'
 import { Button } from '../../primitives/button'
 import { Input } from '../../primitives/input'
 
-// Nettoyage HTML basique pour la sécurité
+// HTML sanitization for security using DOMPurify
 const sanitizeHtml = (html: string): string => {
   if (!html) return ''
-
-  // Supprimer les scripts et événements dangereux
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-    .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
-    .replace(/on\w+\s*=\s*'[^']*'/gi, '')
-    .replace(/javascript:/gi, '')
+  
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'div', 'span'],
+    ALLOWED_ATTR: ['class', 'style'],
+    ALLOW_DATA_ATTR: false,
+    FORBID_TAGS: ['script', 'iframe']
+  }) as unknown as string
 }
 
 interface RichTextEditorProps {
@@ -432,17 +431,10 @@ export function RichTextEditor({
           data-placeholder={placeholder}
           onInput={updateContent}
           onBlur={updateContent}
+          // Using dangerouslySetInnerHTML is necessary for rich text editing functionality
+          // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
           dangerouslySetInnerHTML={{
-            __html:
-              typeof window !== 'undefined'
-                ? (initialContent || '').replace(
-                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                    ''
-                  )
-                : (initialContent || '').replace(
-                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                    ''
-                  ),
+            __html: sanitizeHtml(initialContent || ''),
           }}
           role="textbox"
           aria-label={placeholder || 'Rich text editor'}
@@ -697,17 +689,10 @@ export function RichTextEditor({
                   <div
                     className="flex-1 p-4 overflow-y-auto bg-gray-50 preview-content"
                     style={{ fontSize: '14px', lineHeight: '1.6' }}
+                    // Using dangerouslySetInnerHTML is necessary for rich text preview
+                    // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
                     dangerouslySetInnerHTML={{
-                      __html:
-                        typeof window !== 'undefined'
-                          ? (content || '').replace(
-                              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                              ''
-                            )
-                          : (content || '').replace(
-                              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                              ''
-                            ),
+                      __html: sanitizeHtml(content || ''),
                     }}
                   />
                 </div>

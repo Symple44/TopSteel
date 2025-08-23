@@ -1,4 +1,4 @@
-// import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify'
 import React from 'react'
 import type { ColumnConfig } from './types'
 
@@ -319,17 +319,17 @@ export class RenderUtils {
       }
 
       case 'richtext':
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized with DOMPurify for XSS protection
+        // Using dangerouslySetInnerHTML is necessary for rich text cell editing
+        // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
         return React.createElement('div', {
           contentEditable: true,
           dangerouslySetInnerHTML: {
-            __html:
-              typeof window !== 'undefined'
-                ? (value as string) || ''
-                : ((value as string) || '').replace(
-                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                    ''
-                  ),
+            __html: DOMPurify.sanitize((value as string) || '', {
+              ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'div', 'span'],
+              ALLOWED_ATTR: ['class', 'style'],
+              ALLOW_DATA_ATTR: false,
+              FORBID_TAGS: ['script', 'iframe']
+            }) as unknown as string,
           },
           onBlur: (e: React.FocusEvent<HTMLDivElement>) => handleChange(e.target.innerHTML),
           className:

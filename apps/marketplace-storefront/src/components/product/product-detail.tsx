@@ -1,6 +1,6 @@
 'use client'
 
-// import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify'
 import {
   ChevronLeft,
   ChevronRight,
@@ -381,18 +381,15 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                 {product.description ? (
                   <div
                     className="prose prose-sm max-w-none"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized with DOMPurify for XSS protection
+                    // Using dangerouslySetInnerHTML is necessary to render rich text product descriptions
+                    // Content is properly sanitized with DOMPurify to prevent XSS vulnerabilities
                     dangerouslySetInnerHTML={{
-                      __html:
-                        typeof window !== 'undefined'
-                          ? (product.description || '').replace(
-                              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                              ''
-                            )
-                          : (product.description || '').replace(
-                              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-                              ''
-                            ),
+                      __html: DOMPurify.sanitize(product.description || '', {
+                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img'],
+                        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel', 'class'],
+                        ALLOW_DATA_ATTR: false,
+                        FORBID_SCRIPT: true
+                      })
                     }}
                   />
                 ) : (
