@@ -231,3 +231,99 @@ export const sidebarVariants = cva('flex h-full flex-col overflow-y-auto border-
 })
 
 export type SidebarVariants = VariantProps<typeof sidebarVariants>
+
+// === TOOLTIP VARIANTS ===
+export const tooltipVariants = cva(
+  'z-50 overflow-hidden rounded-md px-3 py-1.5 text-xs animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+  {
+    variants: {
+      variant: {
+        default: 'bg-popover text-popover-foreground shadow-md',
+        inverse: 'bg-primary text-primary-foreground',
+        destructive: 'bg-destructive text-destructive-foreground',
+        success: 'bg-green-500 text-white',
+        warning: 'bg-amber-500 text-white',
+      },
+      size: {
+        sm: 'text-xs px-2 py-1',
+        default: 'text-sm px-3 py-1.5',
+        lg: 'text-base px-4 py-2',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+)
+
+export type TooltipVariants = VariantProps<typeof tooltipVariants>
+
+// === THEME CONFIGURATION ===
+export interface ThemeConfig {
+  name: string
+  colors: Record<string, string>
+}
+
+export interface ResolvedTheme {
+  name: string
+  colors: Record<string, string>
+  isDark: boolean
+}
+
+export const lightTheme: ThemeConfig = {
+  name: 'light',
+  colors: {
+    background: 'hsl(0 0% 100%)',
+    foreground: 'hsl(240 10% 3.9%)',
+    primary: 'hsl(240 5.9% 10%)',
+    'primary-foreground': 'hsl(0 0% 98%)',
+    secondary: 'hsl(240 4.8% 95.9%)',
+    'secondary-foreground': 'hsl(240 5.9% 10%)',
+    muted: 'hsl(240 4.8% 95.9%)',
+    'muted-foreground': 'hsl(240 3.8% 46.1%)',
+    accent: 'hsl(240 4.8% 95.9%)',
+    'accent-foreground': 'hsl(240 5.9% 10%)',
+    border: 'hsl(240 5.9% 90%)',
+    input: 'hsl(240 5.9% 90%)',
+    ring: 'hsl(240 5.9% 10%)',
+  }
+}
+
+export const darkTheme: ThemeConfig = {
+  name: 'dark',
+  colors: {
+    background: 'hsl(240 10% 3.9%)',
+    foreground: 'hsl(0 0% 98%)',
+    primary: 'hsl(0 0% 98%)',
+    'primary-foreground': 'hsl(240 5.9% 10%)',
+    secondary: 'hsl(240 3.7% 15.9%)',
+    'secondary-foreground': 'hsl(0 0% 98%)',
+    muted: 'hsl(240 3.7% 15.9%)',
+    'muted-foreground': 'hsl(240 5% 64.9%)',
+    accent: 'hsl(240 3.7% 15.9%)',
+    'accent-foreground': 'hsl(0 0% 98%)',
+    border: 'hsl(240 3.7% 15.9%)',
+    input: 'hsl(240 3.7% 15.9%)',
+    ring: 'hsl(240 4.9% 83.9%)',
+  }
+}
+
+export const vibrantTheme: ThemeConfig = {
+  name: 'vibrant',
+  colors: {
+    background: 'hsl(210 100% 98%)',
+    foreground: 'hsl(220 15% 20%)',
+    primary: 'hsl(220 100% 50%)',
+    'primary-foreground': 'hsl(0 0% 100%)',
+    secondary: 'hsl(210 100% 95%)',
+    'secondary-foreground': 'hsl(220 15% 20%)',
+    muted: 'hsl(210 100% 95%)',
+    'muted-foreground': 'hsl(220 10% 50%)',
+    accent: 'hsl(210 100% 95%)',
+    'accent-foreground': 'hsl(220 15% 20%)',
+    border: 'hsl(210 40% 85%)',
+    input: 'hsl(210 40% 85%)',
+    ring: 'hsl(220 100% 50%)',
+  }
+}

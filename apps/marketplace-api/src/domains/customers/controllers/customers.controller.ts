@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 
@@ -27,7 +28,10 @@ import type {
 @Controller('customers')
 @UseGuards(TenantGuard)
 export class CustomersController {
-  constructor(private customersService: MarketplaceCustomersService) {}
+  constructor(
+    private customersService: MarketplaceCustomersService,
+    private jwtService: JwtService
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register new customer account' })
@@ -54,12 +58,33 @@ export class CustomersController {
 
     const customer = await this.customersService.authenticateCustomer(tenant.societeId, loginDto)
 
-    // TODO: Générer JWT token
+    // Generate JWT tokens
+    const payload = {
+      customerId: customer.id,
+      email: customer.email,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      societeId: tenant.societeId,
+      hasAccount: customer.hasAccount,
+      isActive: customer.isActive
+    }
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '15m'
+    })
+
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '7d'
+    })
+
     const { passwordHash: _passwordHash, ...customerData } = customer
 
     return {
       customer: customerData,
-      // token: jwt.sign({ customerId: customer.id, societeId: tenant.societeId }, JWT_SECRET)
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: 900, // 15 minutes in seconds
+      token_type: 'Bearer'
     }
   }
 

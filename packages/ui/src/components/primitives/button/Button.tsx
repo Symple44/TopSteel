@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * 🎯 BUTTON UNIFIÉ - TOPSTEEL ERP
  * Composant Button robuste avec variants étendus et support asChild
@@ -6,8 +8,8 @@
 
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
-import type { ButtonVariants } from '../../../design-system/variants'
-import { buttonVariants } from '../../../design-system/variants'
+import type { ButtonVariants } from '../../../lib/design-system'
+import { buttonVariants } from '../../../lib/design-system'
 import { cn } from '../../../lib/utils'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, ButtonVariants {
@@ -73,3 +75,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = 'Button'
 
 export { Button, buttonVariants }
+export type { ButtonVariants }

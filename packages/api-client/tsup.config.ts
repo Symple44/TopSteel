@@ -12,7 +12,7 @@ export default defineConfig({
     'users/index': 'src/users/index.ts',
   },
   format: ['cjs', 'esm'],
-  dts: true,
+  dts: false, // Disabled - will use tsc instead
   clean: true,
   sourcemap: true,
   target: 'es2022',

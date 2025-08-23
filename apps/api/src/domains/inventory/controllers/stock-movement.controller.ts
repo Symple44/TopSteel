@@ -287,7 +287,7 @@ export class StockMovementController {
     page: number
     limit: number
   }> {
-    return await this.stockMovementService.findMovements({
+    return await this.stockMovementService.findWithFilters({
       ...filters,
       tenantId,
     } as IStockMovementFilters)
@@ -310,10 +310,7 @@ export class StockMovementController {
     @Query('limit') limit?: number,
     @Query('includeAnnule') includeAnnule?: boolean
   ): Promise<IStockMovement[]> {
-    return await this.stockMovementService.getArticleMovementHistory(articleId, {
-      limit,
-      includeAnnule,
-    })
+    return await this.stockMovementService.getAllByArticle(articleId)
   }
 
   /**
@@ -369,17 +366,7 @@ export class StockMovementController {
     description: 'Mouvement non trouvé',
   })
   async getMovement(@Param('id', ParseUUIDPipe) id: string): Promise<IStockMovement> {
-    const movement = await this.stockMovementService.findMovements({
-      id,
-      page: 1,
-      limit: 1,
-    } as any)
-
-    if (movement.items.length === 0) {
-      throw new NotFoundException(`Mouvement ${id} non trouvé`)
-    }
-
-    return movement.items[0]
+    return await this.stockMovementService.getById(id)
   }
 }
 

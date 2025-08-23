@@ -1,13 +1,10 @@
 'use client'
-
 import { Building2 } from 'lucide-react'
 import { cn } from '../../../lib/utils'
-
 export interface CompanyInfo {
   name?: string
   logo?: string
 }
-
 export interface CompanyLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
   showName?: boolean
@@ -16,21 +13,18 @@ export interface CompanyLogoProps {
   companyInfo?: CompanyInfo
   loading?: boolean
 }
-
 const sizeClasses = {
   sm: 'h-8 w-8',
   md: 'h-12 w-12',
   lg: 'h-16 w-16',
   xl: 'h-24 w-24',
 }
-
 const textSizeClasses = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg',
   xl: 'text-xl',
 }
-
 export function CompanyLogo({
   size = 'md',
   showName = false,
@@ -51,7 +45,6 @@ export function CompanyLogo({
       </div>
     )
   }
-
   const logoElement = companyInfo?.logo ? (
     <img
       src={companyInfo.logo}
@@ -83,7 +76,6 @@ export function CompanyLogo({
       <Building2 className="h-1/2 w-1/2" />
     </div>
   ) : null
-
   return (
     <div className={cn('flex items-center space-x-3', className)}>
       {logoElement}
@@ -95,5 +87,4 @@ export function CompanyLogo({
     </div>
   )
 }
-
 export default CompanyLogo

@@ -5,56 +5,65 @@ All notable changes to the TopSteel ERP project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2025-08-13
+## [1.0.0] - 2025-08-21
 
 ### Added
-- Comprehensive CI/CD pipeline with GitHub Actions
-  - Security scanning workflow (SAST, dependency scanning, secret detection)
-  - Automated test runner (unit, integration, E2E, performance tests)
-  - Container security scanning
-- Enhanced Dependabot configuration with intelligent grouping
-- Production deployment scripts for Windows and Unix systems
-- Bundle optimization for Next.js application
-  - SWC minification enabled
-  - Modularized imports for Radix UI and Lucide React
-  - Console removal in production builds
+- Complete ERP system for metallurgical industry
+- Multi-tenant architecture with company isolation
+- Advanced inventory management with real-time tracking
+- Production planning and scheduling module
+- CRM with client and supplier management
+- Quotation and invoicing system
+- B2B marketplace integration
+- Real-time notifications system
+- Business analytics dashboard
+- Document management system
+- Quality control module
+- Multi-factor authentication (2FA)
+- Role-based access control (RBAC)
+- API documentation with Swagger
+- Comprehensive UI component library
 
 ### Changed
-- Updated dependencies to latest secure versions:
-  - @tanstack/react-query: 5.83.0 → 5.85.0
-  - @types/node: 22.6.0 → 24.2.1
-  - @types/react: 18.3.2 → 19.1.10
-  - eslint: 9.7.0 → 9.33.0
-  - zod: 3.23.8 → 4.0.17
-- Improved TypeScript configurations across all packages
-- Enhanced build process with better error handling
-
-### Fixed
-- Missing property declaration in ImageElasticsearchService class
-- TypeScript build errors in @erp/domains package
-- Multiple dependency conflicts across workspace packages
-- Biome linting errors (reduced from 738 to 46)
+- Migrated to Next.js 14 App Router
+- Updated to TypeScript 5.5 with strict mode
+- Improved database schema with better indexing
+- Enhanced security with JWT improvements
+- Optimized bundle size and performance
 
 ### Security
-- Implemented comprehensive security scanning in CI/CD
-- Added automated dependency vulnerability checks
-- Configured secret detection in workflows
-- Enhanced container security scanning
+- Implemented secure authentication flow
+- Added input validation on all endpoints
+- Enhanced data encryption for sensitive information
+- Configured security headers
+- Added rate limiting
 
-### Performance
-- Optimized bundle sizes through Next.js configuration
-- Implemented code splitting strategies
-- Added performance testing in CI/CD pipeline
-- Improved build times with parallel processing
+## [0.9.0] - 2025-08-13
 
-## Previous Releases
+### Added
+- CI/CD pipeline with GitHub Actions
+- Automated testing infrastructure
+- Container security scanning
+- Dependency vulnerability checks
 
-### [1.0.0] - Initial Release
-- Initial monorepo setup with pnpm workspaces
-- Next.js 15.4.6 frontend application
-- NestJS 11.1.6 backend API
-- PostgreSQL database with TypeORM
-- Redis caching layer
-- ElasticSearch integration
+### Changed
+- Updated dependencies to latest versions
+- Improved TypeScript configurations
+- Enhanced build process
+
+### Fixed
+- TypeScript build errors
+- Dependency conflicts
+- Performance issues
+
+## [0.8.0] - 2025-07-01
+
+### Added
+- Initial project structure
 - Basic authentication system
-- Pricing module implementation
+- Core database schema
+- Initial UI components
+
+---
+
+For detailed migration guides and breaking changes, please refer to the documentation.

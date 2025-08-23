@@ -177,7 +177,7 @@ export default function ArticlesPage() {
         sortable: true,
         searchable: true,
         width: 150,
-        render: (value) => value || '-',
+        render: (value) => <span>{String(value || '-')}</span>,
       },
       {
         id: 'status',
@@ -304,20 +304,76 @@ export default function ArticlesPage() {
       handleView,
       handleDuplicate,
       handleInventory,
-      statusColors[article.status],
-      statusLabels[article.status],
-      typeColors[article.type],
-      typeLabels[article.type],
+      statusColors,
+      statusLabels,
+      typeColors,
+      typeLabels,
     ]
   )
 
   // Actions globales pour le DataTable
-  const handleExport = useCallback((_format: 'csv' | 'excel' | 'pdf') => {
-    // TODO: Implémenter l'export
-  }, [])
+  const _handleExport = useCallback(
+    async (format: 'csv' | 'excel' | 'pdf') => {
+      try {
+        const response = await fetch('/api/articles/export', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            format,
+            filters,
+            articles: articles.map((a) => ({
+              reference: a.reference,
+              designation: a.designation,
+              type: typeLabels[a.type],
+              famille: a.famille || '-',
+              status: statusLabels[a.status],
+              stockPhysique: a.gereEnStock ? `${a.stockPhysique} ${a.uniteStock}` : 'Non géré',
+              prixVenteHT: a.prixVenteHT || 0,
+            })),
+          }),
+        })
+
+        if (response.ok) {
+          const blob = await response.blob()
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `articles_${new Date().toISOString().split('T')[0]}.${format}`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          window.URL.revokeObjectURL(url)
+        }
+      } catch (_error) {}
+    },
+    [articles, filters, statusLabels, typeLabels]
+  )
 
   const handleImport = useCallback(() => {
-    // TODO: Implémenter l'import
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.csv,.xlsx'
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const response = await fetch('/api/articles/import', {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (response.ok) {
+          window.location.reload()
+        }
+      } catch (_error) {}
+    }
+    input.click()
   }, [])
 
   const handleCreate = useCallback(() => {
@@ -427,13 +483,15 @@ export default function ArticlesPage() {
             columns={columns}
             keyField="id"
             tableId="articles-table"
-            userId="current-user" // TODO: Récupérer l'ID utilisateur réel
-            // Fonctionnalités
+            userId={
+              typeof window !== 'undefined'
+                ? localStorage.getItem('userId') || 'default-user'
+                : 'default-user'
+            }
+            // Fonctionnalités supportées
             sortable={true}
             searchable={true}
             filterable={true}
-            resizable={true}
-            reorderable={true}
             selectable={true}
             editable={false} // On gère l'édition via les dialogs
             // Pagination
@@ -444,36 +502,9 @@ export default function ArticlesPage() {
               showSizeChanger: true,
               pageSizeOptions: [10, 25, 50, 100],
             }}
-            // Export
-            exportable={true}
-            onExport={handleExport}
-            // Vues
-            views={[
-              { id: 'table', name: 'Table', icon: 'table' },
-              { id: 'cards', name: 'Cartes', icon: 'cards' },
-              { id: 'kanban', name: 'Kanban', icon: 'kanban', groupBy: 'status' },
-            ]}
-            // Colonnes calculées
-            calculatedColumns={[
-              {
-                id: 'valeurStock',
-                title: 'Valeur Stock',
-                formula: '=stockPhysique * prixVenteHT',
-                format: { currency: 'EUR', decimals: 2 },
-              },
-            ]}
-            // Indicateurs colorés
-            colorRules={[
-              { column: 'stockPhysique', operator: 'equals', value: 0, color: '#ef4444' },
-              { column: 'status', operator: 'equals', value: 'OBSOLETE', color: '#f59e0b' },
-            ]}
             // État
             loading={isLoading}
             error={error}
-            // Messages
-            emptyMessage="Aucun article trouvé"
-            loadingMessage="Chargement des articles..."
-            errorMessage="Erreur lors du chargement des articles"
           />
         </CardContent>
       </Card>

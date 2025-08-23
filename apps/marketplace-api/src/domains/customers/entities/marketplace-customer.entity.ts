@@ -44,6 +44,10 @@ export class MarketplaceCustomer {
   @Column({ type: 'uuid' })
   societeId!: string
 
+  @Column({ type: 'uuid' })
+  @Index()
+  tenantId!: string
+
   @Column({ type: 'uuid', nullable: true })
   @Index()
   erpCustomerId?: string // Référence vers client ERP
@@ -76,8 +80,14 @@ export class MarketplaceCustomer {
   @Column({ type: 'boolean', default: false })
   emailVerified!: boolean
 
+  @Column({ type: 'boolean', default: false })
+  isVerified!: boolean
+
   @Column({ type: 'varchar', length: 255, nullable: true })
   emailVerificationToken?: string
+
+  @Column({ type: 'timestamp', nullable: true })
+  emailVerificationExpires?: Date
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   resetPasswordToken?: string
@@ -94,14 +104,24 @@ export class MarketplaceCustomer {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: {
     source: 'marketplace' | 'erp'
+    registrationSource?: 'web' | 'api' | 'import' | 'admin'
     lastLogin?: string
     loginCount?: number
     notes?: string
     tags?: string[]
   }
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  resetToken?: string
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetTokenExpiry?: Date
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  registrationDate!: Date
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date

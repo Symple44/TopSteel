@@ -1,11 +1,18 @@
 import { Injectable, Logger, Optional } from '@nestjs/common'
 import type { DatabaseHealthService } from '../../features/database-core/services/database-health.service'
 
+export interface SystemDatabaseHealth {
+  auth: { status: 'healthy' | 'unhealthy' }
+  shared: { status: 'healthy' | 'unhealthy' }
+  tenant: { status: 'healthy' | 'unhealthy' }
+  overallStatus: 'healthy' | 'degraded' | 'unhealthy'
+}
+
 export interface SystemHealth {
   status: 'healthy' | 'degraded' | 'unhealthy'
   timestamp: string
   message: string
-  databases?: Record<string, unknown>
+  databases?: SystemDatabaseHealth
 }
 
 @Injectable()

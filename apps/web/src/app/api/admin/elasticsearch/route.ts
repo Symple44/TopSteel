@@ -5,11 +5,13 @@ export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Add authentication when implemented
-    // const session = await auth()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    // Vérifier l'authentification admin
+    const authHeader = request.headers.get('authorization')
+    const userRole = request.headers.get('x-user-role')
+
+    if (!authHeader || userRole !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 })
+    }
 
     const elasticsearchClient = await getElasticsearchClient()
     const migrationService = await getMigrationService()
@@ -57,11 +59,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Add authentication when implemented
-    // const session = await auth()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    // Vérifier l'authentification admin
+    const authHeader = request.headers.get('authorization')
+    const userRole = request.headers.get('x-user-role')
+
+    if (!authHeader || userRole !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 })
+    }
 
     const migrationService = await getMigrationService()
 

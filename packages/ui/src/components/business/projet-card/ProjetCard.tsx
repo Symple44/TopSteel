@@ -2,7 +2,6 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils'
 import { Badge } from '../../data-display/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../layout/card'
-
 export interface ProjetCardProps extends React.HTMLAttributes<HTMLDivElement> {
   project?: {
     nom?: string
@@ -17,7 +16,6 @@ export interface ProjetCardProps extends React.HTMLAttributes<HTMLDivElement> {
   onView?: () => void
   onEdit?: () => void
 }
-
 const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
   ({ project, onView, onEdit, className, ...props }, ref) => {
     const getStatusVariant = (statut?: string) => {
@@ -38,7 +36,6 @@ const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
           return 'outline'
       }
     }
-
     return (
       <Card
         ref={ref}
@@ -62,7 +59,6 @@ const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
             )}
           </div>
         </CardHeader>
-
         <CardContent className="space-y-3">
           {project?.client && (
             <div className="text-sm">
@@ -70,7 +66,6 @@ const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
               <span>{project.client}</span>
             </div>
           )}
-
           {project?.montant && (
             <div className="text-sm">
               <span className="font-medium text-muted-foreground">Montant: </span>
@@ -82,7 +77,6 @@ const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
               </span>
             </div>
           )}
-
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             {project?.dateDebut && (
               <span>Début: {new Date(project.dateDebut).toLocaleDateString('fr-FR')}</span>
@@ -94,7 +88,5 @@ const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
     )
   }
 )
-
 ProjetCard.displayName = 'ProjetCard'
-
 export { ProjetCard }

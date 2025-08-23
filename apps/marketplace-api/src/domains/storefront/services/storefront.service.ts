@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { Societe } from '../../../shared/entities/erp/societe.entity'
+import { EmailService } from '../../email/email.service'
 import { MarketplaceTheme } from '../../themes/entities/marketplace-theme.entity'
+import { NewsletterSubscription, SubscriptionStatus } from '../entities/newsletter-subscription.entity'
 
 export interface StorefrontConfig {
   storeName: string
@@ -66,7 +68,12 @@ export class StorefrontService {
     private societeRepo: Repository<Societe>,
 
     @InjectRepository(MarketplaceTheme, 'marketplace')
-    private themeRepo: Repository<MarketplaceTheme>
+    private themeRepo: Repository<MarketplaceTheme>,
+
+    @InjectRepository(NewsletterSubscription, 'marketplace')
+    private newsletterRepo: Repository<NewsletterSubscription>,
+
+    private emailService: EmailService
   ) {}
 
   async getStorefrontConfig(societeId: string): Promise<StorefrontConfig> {
@@ -379,30 +386,351 @@ export class StorefrontService {
   }
 
   async subscribeNewsletter(
-    _societeId: string,
-    _email: string
+    societeId: string,
+    email: string,
+    data?: {
+      firstName?: string
+      lastName?: string
+      preferences?: {
+        categories?: string[]
+        frequency?: 'daily' | 'weekly' | 'monthly'
+        language?: string
+      }
+      source?: string
+      ipAddress?: string
+      userAgent?: string
+    }
   ): Promise<{ success: boolean; message: string }> {
-    // TODO: Implémenter l'inscription newsletter
-    // Pour l'instant, simuler le succès
-    return {
-      success: true,
-      message: 'Inscription à la newsletter réussie',
+    try {
+      // Check if subscription already exists
+      let subscription = await this.newsletterRepo.findOne({
+        where: { societeId, email: email.toLowerCase() },
+      })
+
+      if (subscription) {
+        if (subscription.status === SubscriptionStatus.ACTIVE) {
+          return {
+            success: false,
+            message: 'Cette adresse email est déjà inscrite à notre newsletter',
+          }
+        }
+        
+        // Reactivate if previously unsubscribed
+        subscription.status = SubscriptionStatus.PENDING
+        subscription.unsubscribedAt = null
+        subscription.unsubscribeReason = null
+        subscription.firstName = data?.firstName || subscription.firstName
+        subscription.lastName = data?.lastName || subscription.lastName
+        subscription.preferences = {
+          ...subscription.preferences,
+          ...data?.preferences,
+        }
+      } else {
+        // Create new subscription
+        subscription = this.newsletterRepo.create({
+          societeId,
+          email: email.toLowerCase(),
+          firstName: data?.firstName,
+          lastName: data?.lastName,
+          status: SubscriptionStatus.PENDING,
+          preferences: {
+            categories: data?.preferences?.categories || [],
+            frequency: data?.preferences?.frequency || 'weekly',
+            language: data?.preferences?.language || 'fr',
+            format: 'html',
+          },
+          ipAddress: data?.ipAddress,
+          userAgent: data?.userAgent,
+          source: data?.source || 'storefront',
+          metadata: {
+            emailsSentCount: 0,
+            openCount: 0,
+            clickCount: 0,
+          },
+        })
+      }
+
+      // Generate confirmation token
+      const confirmationToken = subscription.generateConfirmationToken()
+      await this.newsletterRepo.save(subscription)
+
+      // Send confirmation email
+      await this.sendNewsletterConfirmationEmail(subscription, confirmationToken)
+
+      return {
+        success: true,
+        message: 'Un email de confirmation a été envoyé à votre adresse',
+      }
+    } catch (error) {
+      console.error('Error subscribing to newsletter:', error)
+      return {
+        success: false,
+        message: 'Une erreur est survenue lors de l\'inscription',
+      }
     }
   }
 
   async sendContactMessage(
-    _societeId: string,
-    _message: {
+    societeId: string,
+    messageData: {
       name: string
       email: string
       subject: string
       message: string
       phone?: string
+      company?: string
     }
   ): Promise<{ success: boolean; message: string }> {
-    return {
-      success: true,
-      message: 'Message envoyé avec succès',
+    try {
+      // Get company info for recipient email
+      const societe = await this.societeRepo.findOne({
+        where: { id: societeId },
+      })
+
+      if (!societe) {
+        return {
+          success: false,
+          message: 'Entreprise non trouvée',
+        }
+      }
+
+      // Send email to company
+      const companyEmail = societe.email || (societe.configuration?.marketplace as any)?.contactEmail
+      if (companyEmail) {
+        await this.sendContactEmailToCompany({
+          companyEmail,
+          companyName: societe.nom,
+          sender: messageData,
+        })
+      }
+
+      // Send confirmation email to sender
+      await this.sendContactConfirmationEmail({
+        senderEmail: messageData.email,
+        senderName: messageData.name,
+        companyName: societe.nom,
+        subject: messageData.subject,
+      })
+
+      return {
+        success: true,
+        message: 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
+      }
+    } catch (error) {
+      console.error('Error sending contact message:', error)
+      return {
+        success: false,
+        message: 'Une erreur est survenue lors de l\'envoi du message',
+      }
     }
+  }
+
+  // Newsletter confirmation methods
+  private async sendNewsletterConfirmationEmail(
+    subscription: NewsletterSubscription,
+    token: string
+  ): Promise<void> {
+    const confirmationUrl = `${process.env.MARKETPLACE_URL || 'https://marketplace.topsteel.fr'}/newsletter/confirm?token=${token}`
+
+    const html = this.getNewsletterConfirmationTemplate({
+      email: subscription.email,
+      firstName: subscription.firstName || subscription.email.split('@')[0],
+      confirmationUrl,
+    })
+
+    await this.emailService.sendEmail({
+      to: subscription.email,
+      subject: 'Confirmez votre abonnement à la newsletter - TopSteel',
+      html,
+    })
+  }
+
+  private getNewsletterConfirmationTemplate(data: {
+    email: string
+    firstName: string
+    confirmationUrl: string
+  }): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Confirmation d'abonnement newsletter</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #10b981; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9f9f9; }
+          .button { display: inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 4px; }
+          .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🎉 Confirmez votre abonnement</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour ${data.firstName},</p>
+            <p>Merci de vous être inscrit(e) à notre newsletter ! Pour finaliser votre abonnement, veuillez cliquer sur le bouton ci-dessous :</p>
+            <p style="text-align: center; margin: 30px 0;">
+              <a href="${data.confirmationUrl}" class="button">Confirmer mon abonnement</a>
+            </p>
+            <p>Une fois confirmé, vous recevrez nos dernières actualités, offres spéciales et nouveautés directement dans votre boîte email.</p>
+            <hr style="margin: 20px 0;">
+            <p style="font-size: 12px; color: #666;">
+              Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
+              <a href="${data.confirmationUrl}" style="color: #10b981;">${data.confirmationUrl}</a>
+            </p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} TopSteel. Tous droits réservés.</p>
+            <p>Cet email a été envoyé à ${data.email}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+
+  // Contact message methods
+  private async sendContactEmailToCompany(data: {
+    companyEmail: string
+    companyName: string
+    sender: {
+      name: string
+      email: string
+      subject: string
+      message: string
+      phone?: string
+      company?: string
+    }
+  }): Promise<void> {
+    const html = this.getContactEmailTemplate(data)
+
+    await this.emailService.sendEmail({
+      to: data.companyEmail,
+      subject: `Nouveau message de contact: ${data.sender.subject}`,
+      html,
+    })
+  }
+
+  private async sendContactConfirmationEmail(data: {
+    senderEmail: string
+    senderName: string
+    companyName: string
+    subject: string
+  }): Promise<void> {
+    const html = this.getContactConfirmationTemplate(data)
+
+    await this.emailService.sendEmail({
+      to: data.senderEmail,
+      subject: `Confirmation: Votre message a été envoyé à ${data.companyName}`,
+      html,
+    })
+  }
+
+  private getContactEmailTemplate(data: {
+    companyName: string
+    sender: {
+      name: string
+      email: string
+      subject: string
+      message: string
+      phone?: string
+      company?: string
+    }
+  }): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Nouveau message de contact</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #2563eb; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9f9f9; }
+          .info-box { background: white; padding: 15px; border-radius: 4px; margin: 15px 0; }
+          .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📧 Nouveau message de contact</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour ${data.companyName},</p>
+            <p>Vous avez reçu un nouveau message via votre boutique en ligne :</p>
+            
+            <div class="info-box">
+              <h3>Informations de l'expéditeur :</h3>
+              <p><strong>Nom :</strong> ${data.sender.name}</p>
+              <p><strong>Email :</strong> ${data.sender.email}</p>
+              ${data.sender.phone ? `<p><strong>Téléphone :</strong> ${data.sender.phone}</p>` : ''}
+              ${data.sender.company ? `<p><strong>Entreprise :</strong> ${data.sender.company}</p>` : ''}
+            </div>
+            
+            <div class="info-box">
+              <h3>Sujet :</h3>
+              <p>${data.sender.subject}</p>
+            </div>
+            
+            <div class="info-box">
+              <h3>Message :</h3>
+              <p>${data.sender.message.replace(/\n/g, '<br>')}</p>
+            </div>
+            
+            <p>Vous pouvez répondre directement à cet email ou contacter le client à l'adresse : <a href="mailto:${data.sender.email}">${data.sender.email}</a></p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} TopSteel. Tous droits réservés.</p>
+            <p>Message reçu le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+
+  private getContactConfirmationTemplate(data: {
+    senderName: string
+    companyName: string
+    subject: string
+  }): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Confirmation de votre message</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #10b981; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9f9f9; }
+          .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✅ Message envoyé avec succès</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour ${data.senderName},</p>
+            <p>Nous avons bien reçu votre message concernant : <strong>"${data.subject}"</strong></p>
+            <p>Notre équipe de ${data.companyName} vous répondra dans les plus brefs délais, généralement sous 24 heures ouvrées.</p>
+            <p>Merci de nous avoir contactés !</p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} TopSteel. Tous droits réservés.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
   }
 }

@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const endpoint = `admin/societes/${params.id}/stats`
+    const { id } = await params
+    const endpoint = `admin/societes/${id}/stats`
 
     // Appel vers le backend
     const response = await callBackendFromApi(request, endpoint, {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     } else {
       // Fallback avec des données mock
       const mockStats = {
-        societeId: params.id,
+        societeId: id,
         societeName: 'TopSteel Production',
         totalUsers: 12,
         activeUsers: 11,

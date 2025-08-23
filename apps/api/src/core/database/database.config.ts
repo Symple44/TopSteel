@@ -54,7 +54,7 @@ export const createDatabaseConfig = (configService: ConfigService): TypeOrmModul
   if (isDevelopment) {
     Object.assign(baseConfig, {
       logging: true,
-      logger: 'advanced-console',
+      logger: 'advanced-console' as const,
       maxQueryExecutionTime: 1000, // Log des requêtes lentes
     })
   }

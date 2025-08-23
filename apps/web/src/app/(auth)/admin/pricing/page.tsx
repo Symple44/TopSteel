@@ -11,10 +11,7 @@ import {
   CardHeader,
   CardTitle,
   type ColumnConfig,
-  DataTable,
-  // PriceRuleCard,  // Commented out - component doesn't exist
-  // PriceRuleForm,  // Commented out - component doesn't exist
-  // PriceSimulator, // Commented out - component doesn't exist
+  AdvancedDataTable as DataTable,
   Dialog,
   DialogContent,
   DialogHeader,

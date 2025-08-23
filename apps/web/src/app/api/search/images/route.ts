@@ -5,7 +5,11 @@ export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Add authentication when implemented
+    // Vérifier l'authentification
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     const elasticsearchClient = await getElasticsearchClient()
     const imageElasticsearchService = await getImageElasticsearchService()
@@ -82,7 +86,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Add authentication when implemented
+    // Vérifier l'authentification
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     const elasticsearchClient = await getElasticsearchClient()
     const _imageElasticsearchService = await getImageElasticsearchService()

@@ -24,7 +24,13 @@ out/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.vault
+.env.vault.local
+.env.encrypted
 *.env
+*.env.backup.*
+**/secrets/**
+**/certificates/**
 
 # Logs
 logs/
@@ -67,6 +73,7 @@ Desktop.ini
 # Turbo
 .turbo/
 turbo-*.log
+.turbo/**/*.log
 
 # Next.js
 .next/

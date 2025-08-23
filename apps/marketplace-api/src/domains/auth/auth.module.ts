@@ -1,19 +1,26 @@
 import { Module } from '@nestjs/common'
-
-// TODO: Implémenter auth marketplace
-// import { AuthService } from './services/auth.service'
-// import { AuthController } from './controllers/auth.controller'
+import { JwtModule } from '@nestjs/jwt'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { AuthService } from './services/auth.service'
+import { AuthController } from './controllers/auth.controller'
+import { MarketplaceCustomer } from '../customers/entities/marketplace-customer.entity'
 
 @Module({
-  imports: [],
+  imports: [
+    TypeOrmModule.forFeature([MarketplaceCustomer], 'marketplace'),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'marketplace-secret-key',
+      signOptions: { expiresIn: '15m' }
+    })
+  ],
   providers: [
-    // AuthService,
+    AuthService,
   ],
   controllers: [
-    // AuthController,
+    AuthController,
   ],
   exports: [
-    // AuthService,
+    AuthService,
   ],
 })
 export class AuthModule {}

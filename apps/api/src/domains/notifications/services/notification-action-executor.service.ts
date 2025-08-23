@@ -153,7 +153,7 @@ export class NotificationActionExecutor {
       throw new Error('API config is missing')
     }
 
-    const headers = {
+    const headers: Record<string, string> = {
       ...config.headers,
       'Content-Type': 'application/json',
     }

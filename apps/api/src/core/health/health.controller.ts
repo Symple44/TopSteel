@@ -4,6 +4,8 @@ import {
   type DiskHealthIndicator,
   HealthCheck,
   type HealthCheckService,
+  type HealthIndicatorFunction,
+  type HealthIndicatorResult,
   type MemoryHealthIndicator,
 } from '@nestjs/terminus'
 import type { DataSourceOptions } from 'typeorm'
@@ -30,7 +32,7 @@ export class HealthController {
   @Get()
   async check() {
     try {
-      const healthChecks = [
+      const healthChecks: HealthIndicatorFunction[] = [
         // Vérifier les bases de données multi-tenant
         () => this.checkMultiTenantDatabase('auth'),
         () => this.checkMultiTenantDatabase('shared'),
@@ -164,7 +166,7 @@ export class HealthController {
   /**
    * Vérifie une base de données multi-tenant directement
    */
-  private async checkMultiTenantDatabase(type: 'auth' | 'shared') {
+  private async checkMultiTenantDatabase(type: 'auth' | 'shared'): Promise<HealthIndicatorResult> {
     try {
       let config: unknown
       const key = `database_${type}`
@@ -179,14 +181,16 @@ export class HealthController {
       const { DataSource } = await import('typeorm')
       const configObj = config as Record<string, unknown>
       const testConnection = new DataSource({
-        type: configObj.type as DataSourceOptions['type'],
-        host: configObj.host,
-        port: configObj.port,
-        username: configObj.username,
-        password: configObj.password,
-        database: configObj.database,
+        type: (configObj.type as string) as DataSourceOptions['type'],
+        host: configObj.host as string,
+        port: configObj.port as number,
+        username: configObj.username as string,
+        password: configObj.password as string,
+        database: configObj.database as string,
         entities: [],
-      })
+        synchronize: false,
+        logging: false,
+      } as DataSourceOptions)
 
       await testConnection.initialize()
       await testConnection.query('SELECT 1')

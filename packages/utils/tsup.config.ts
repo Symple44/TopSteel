@@ -1,12 +1,20 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: {
+    'index': 'src/index.ts',
+    'format/index': 'src/format/index.ts',
+    'validation/index': 'src/validation/index.ts',
+    'calculation/index': 'src/calculation/index.ts',
+    'helpers/index': 'src/helpers/index.ts',
+    'constants/index': 'src/constants/index.ts',
+    'lib/index': 'src/lib/index.ts'
+  },
   format: ['esm', 'cjs'],
-  dts: true,
+  dts: false, // Disabled - will use tsc instead
   clean: true,
   sourcemap: true,
-  minify: false,
+  minify: process.env.NODE_ENV === 'production',
   splitting: false,
   treeshake: true,
   target: 'es2022',
@@ -23,7 +31,4 @@ export default defineConfig({
 
   // Messages de succès
   onSuccess: 'echo "✅ @erp/utils build réussi"',
-
-  // Gestion d'erreurs gracieuse
-  onFailure: 'echo "❌ @erp/utils build échoué"',
 })

@@ -119,8 +119,11 @@ export function DataTablePreview({
   const handleRefresh = async () => {
     setLoading(true)
     try {
-      // TODO: Refetch data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Trigger parent component refresh
+      const refreshEvent = new CustomEvent('query-preview-refresh')
+      window.dispatchEvent(refreshEvent)
+      // Simulate loading delay
+      await new Promise((resolve) => setTimeout(resolve, 500))
     } finally {
       setLoading(false)
     }

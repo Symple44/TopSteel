@@ -1,0 +1,89 @@
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
+import { Observable } from 'rxjs'
+import { tap, catchError } from 'rxjs/operators'
+import * as Sentry from '@sentry/node'
+import { SentryService } from './sentry.service'
+
+@Injectable()
+export class SentryInterceptor implements NestInterceptor {
+  constructor(private readonly sentryService: SentryService) {}
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const request = context.switchToHttp().getRequest()
+    const response = context.switchToHttp().getResponse()
+    
+    // Start a transaction for this request
+    const transaction = this.sentryService.startTransaction(
+      `${request.method} ${request.route?.path || request.url}`,
+      'http.server'
+    )
+    
+    // Add request metadata
+    if (transaction) {
+      transaction.setHttpStatus(response.statusCode)
+      transaction.setTag('http.method', request.method)
+      transaction.setTag('http.url', request.url)
+      
+      // Add user context if available
+      if (request.user) {
+        this.sentryService.setUser({
+          id: request.user.id,
+          username: request.user.username,
+        })
+      }
+    }
+    
+    // Add breadcrumb for this request
+    this.sentryService.addBreadcrumb({
+      message: `${request.method} ${request.url}`,
+      category: 'http',
+      level: 'info',
+      data: {
+        method: request.method,
+        url: request.url,
+        ip: request.ip,
+        userAgent: request.headers['user-agent'],
+      },
+    })
+    
+    const startTime = Date.now()
+    
+    return next.handle().pipe(
+      tap(() => {
+        const responseTime = Date.now() - startTime
+        
+        // Add response metadata
+        if (transaction) {
+          transaction.setHttpStatus(response.statusCode)
+          transaction.setData('response_time', responseTime)
+          
+          // Add performance breadcrumb for slow requests
+          if (responseTime > 1000) {
+            this.sentryService.addBreadcrumb({
+              message: `Slow request: ${request.method} ${request.url}`,
+              category: 'performance',
+              level: 'warning',
+              data: {
+                responseTime,
+                method: request.method,
+                url: request.url,
+              },
+            })
+          }
+          
+          // Finish the transaction
+          this.sentryService.finishTransaction(transaction)
+        }
+      }),
+      catchError((error) => {
+        // The error will be caught by the exception filter
+        // Just finish the transaction here
+        if (transaction) {
+          transaction.setHttpStatus(error.status || 500)
+          this.sentryService.finishTransaction(transaction)
+        }
+        throw error
+      }),
+    )
+  }
+}

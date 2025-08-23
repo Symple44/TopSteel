@@ -285,8 +285,12 @@ export function useKeyboardShortcuts(
           case 'F2':
             if (finalConfig.editCell && actions.onEditCell) {
               event.preventDefault()
-              // TODO: Déterminer quelle cellule éditer
-              // actions.onEditCell(rowIndex, columnId)
+              // Éditer la première cellule éditable de la ligne sélectionnée
+              const selectedRow = context.selectedRows?.[0]
+              const firstEditableColumn = context.columns?.find(col => col.editable)
+              if (selectedRow && firstEditableColumn) {
+                actions.onEditCell(selectedRow, firstEditableColumn.id)
+              }
               handled = true
             }
             break

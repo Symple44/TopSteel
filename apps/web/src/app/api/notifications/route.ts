@@ -106,7 +106,11 @@ export async function GET(request: NextRequest) {
   try {
     // Récupérer les paramètres de requête
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId') || 'user-1' // TODO: Récupérer depuis l'auth
+    // Récupérer l'userId depuis les headers ou cookies
+    const authHeader = request.headers.get('authorization')
+    const userId = authHeader
+      ? authHeader.replace('Bearer ', '')
+      : searchParams.get('userId') || 'default-user'
 
     const filters: NotificationFilters = {
       category: searchParams.get('category')?.split(',') as NotificationCategory[],

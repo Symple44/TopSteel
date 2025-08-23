@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useState } from 'react'
 import type { HierarchicalDatatableConfig, HierarchicalItem } from './use-hierarchical-reorder'
 

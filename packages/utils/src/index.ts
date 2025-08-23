@@ -7,15 +7,24 @@ export { formatCurrency, formatDate, formatNumber } from './lib/formatters'
 export { debounce, throttle } from './lib/functions'
 export { validateCNPJ, validateEmail, validatePhone } from './lib/validators'
 
+// Export du logger centralisé
+export { 
+  logger, 
+  apiLogger, 
+  dbLogger, 
+  authLogger, 
+  webLogger, 
+  createLogger, 
+  LogLevel,
+  type LoggerConfig 
+} from './logger'
+
 // Export des types utilitaires
 export type { DeepPartial, DeepRequired } from './types'
 
 // Fonction de debug sécurisée
 export function safeLog(..._args: unknown[]) {
   // biome-ignore lint/suspicious/noConsole: Debug function that safely checks for console availability
-  if (typeof console !== 'undefined' && typeof console.log === 'function') {
-    // console.log(...args) // Uncomment if needed for debugging
-  }
 }
 
 // Fonction pour générer un ID unique (browser/server safe)

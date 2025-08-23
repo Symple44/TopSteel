@@ -1,5 +1,4 @@
 'use client'
-
 import {
   AlertCircle,
   CheckCircle,
@@ -15,7 +14,6 @@ import {
 import { createPortal } from 'react-dom'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../primitives'
-
 export interface BackendHealthInfo {
   status: 'online' | 'offline' | 'error' | 'checking'
   responseTime?: number
@@ -27,7 +25,6 @@ export interface BackendHealthInfo {
   lastCheck?: Date
   error?: string
 }
-
 export interface ErpInfoModalProps {
   isOpen: boolean
   onClose: () => void
@@ -60,7 +57,6 @@ export interface ErpInfoModalProps {
     tagline?: string
   }
 }
-
 export function ErpInfoModal({
   isOpen,
   onClose,
@@ -95,14 +91,12 @@ export function ErpInfoModal({
       trademark: 'TopSteel© ERP',
       tagline: 'Solid as your expertise',
     }
-
     return (
       translations[key as keyof typeof translations] ||
       defaultTranslations[key as keyof typeof defaultTranslations] ||
       key
     )
   }
-
   // Définir les fonctions utilitaires en premier
   const getStatusIcon = (status: BackendHealthInfo['status']) => {
     switch (status) {
@@ -118,7 +112,6 @@ export function ErpInfoModal({
         return <AlertCircle className="h-5 w-5 text-gray-500" />
     }
   }
-
   const getStatusText = (status: BackendHealthInfo['status']) => {
     switch (status) {
       case 'online':
@@ -133,7 +126,6 @@ export function ErpInfoModal({
         return t('unknown')
     }
   }
-
   const getStatusColor = (status: BackendHealthInfo['status']) => {
     switch (status) {
       case 'online':
@@ -148,9 +140,7 @@ export function ErpInfoModal({
         return 'text-muted-foreground bg-muted/50'
     }
   }
-
   if (!isOpen) return null
-
   // Utiliser un portal pour rendre le modal au niveau racine du DOM
   const modalContent = (
     <div
@@ -164,7 +154,6 @@ export function ErpInfoModal({
         onClick={onClose}
         aria-label="Close modal"
       />
-
       {/* Modal */}
       <div className="relative bg-card border border-border rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
@@ -182,7 +171,6 @@ export function ErpInfoModal({
             <X className="h-4 w-4" />
           </Button>
         </div>
-
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* Status général */}
@@ -206,7 +194,6 @@ export function ErpInfoModal({
                 )}
               </Button>
             </div>
-
             <div
               className={cn(
                 'flex items-center gap-3 p-3 rounded-lg border',
@@ -222,11 +209,9 @@ export function ErpInfoModal({
               </div>
             </div>
           </div>
-
           {/* Informations détaillées */}
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-foreground">{t('detailedInfo')}</h3>
-
             <div className="grid gap-3">
               {/* Version */}
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
@@ -238,7 +223,6 @@ export function ErpInfoModal({
                   {health.version || 'N/A'}
                 </span>
               </div>
-
               {/* Environnement */}
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-2">
@@ -258,7 +242,6 @@ export function ErpInfoModal({
                   {health.environment || 'N/A'}
                 </span>
               </div>
-
               {/* Database */}
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-2">
@@ -285,7 +268,6 @@ export function ErpInfoModal({
                   </span>
                 </div>
               </div>
-
               {/* Utilisateurs connectés */}
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-2">
@@ -299,7 +281,6 @@ export function ErpInfoModal({
                   </span>
                 </div>
               </div>
-
               {/* Uptime */}
               {health.uptime && (
                 <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
@@ -312,14 +293,12 @@ export function ErpInfoModal({
               )}
             </div>
           </div>
-
           {/* Dernière vérification */}
           {health.lastCheck && (
             <div className="text-center text-xs text-muted-foreground">
               {t('lastCheck')}: {health.lastCheck.toLocaleTimeString('fr-FR')}
             </div>
           )}
-
           {/* Message d'erreur */}
           {health.error && (
             <div className="p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg">
@@ -330,7 +309,6 @@ export function ErpInfoModal({
             </div>
           )}
         </div>
-
         {/* Footer */}
         <div className="px-6 py-4 bg-muted/30 border-t border-border">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -341,7 +319,6 @@ export function ErpInfoModal({
       </div>
     </div>
   )
-
   // Rendre le modal dans un portal pour qu'il soit au centre de l'écran
   return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null
 }

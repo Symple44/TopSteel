@@ -139,11 +139,30 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
     }
   }
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
     if (selectedNotification && transferUserId) {
-      // TODO: Implémenter l'API de transfert
-      setShowTransferModal(false)
-      setTransferUserId('')
+      try {
+        const response = await fetch('/api/notifications/transfer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notificationId: selectedNotification.id,
+            targetUserId: transferUserId,
+          }),
+        })
+
+        if (response.ok) {
+          // Retirer la notification de la liste après transfert
+          actions.markAsRead(selectedNotification.id)
+          setSelectedNotification(null)
+        }
+      } catch (_error) {
+      } finally {
+        setShowTransferModal(false)
+        setTransferUserId('')
+      }
     }
   }
 

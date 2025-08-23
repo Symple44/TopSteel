@@ -340,7 +340,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     /* 
     // Code WebSocket original - temporairement désactivé
     const wsUrl = (process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001').replace('http://', 'ws://').replace('https://', 'wss://')
-    console.log('[NotificationsProvider] Tentative connexion WebSocket:', wsUrl)
 
     try {
       const ws = new WebSocket(`${wsUrl}?userId=${user.id}`)
@@ -362,7 +361,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       socketRef.current = socketWrapper
 
       ws.onopen = () => {
-        console.log('[NotificationsProvider] WebSocket connecté')
         socketWrapper.connected = true
         socketWrapper.readyState = ws.readyState
         dispatch({ type: 'SET_CONNECTED', payload: true })
@@ -374,7 +372,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }
 
       ws.onclose = (event) => {
-        console.log('[NotificationsProvider] WebSocket fermé:', event.code, event.reason)
         socketWrapper.connected = false
         socketWrapper.readyState = ws.readyState
         dispatch({ type: 'SET_CONNECTED', payload: false })

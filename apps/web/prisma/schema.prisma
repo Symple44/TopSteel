@@ -1,0 +1,27 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// UI Preferences model
+model UiPreference {
+  id          String   @id @default(cuid())
+  userId      String
+  componentId String
+  theme       Json?
+  preferences Json?
+  layout      Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, componentId])
+  @@index([userId])
+  @@index([componentId])
+}

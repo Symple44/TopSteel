@@ -12,6 +12,7 @@ export {
   SimpleDataTableExample,
   usePersistedTableSettings,
 } from './datatable'
+// Les types du DataTable sont déjà exportés via ./datatable
 export * from './progress'
 export * from './reorderable-list'
 export * from './table'

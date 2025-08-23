@@ -14,7 +14,8 @@ export default defineConfig({
   format: ['cjs', 'esm'],
   dts: true,
   clean: true,
-  sourcemap: true,
+  sourcemap: process.env.NODE_ENV === 'production' ? false : true,
+  minify: process.env.NODE_ENV === 'production',
   target: 'es2022',
   external: [
     'react',
@@ -23,6 +24,7 @@ export default defineConfig({
     '@elastic/transport',
     'apache-arrow',
     'sharp',
+    /^@img\//,
     'fs',
     'path',
     'crypto',

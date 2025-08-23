@@ -1,3 +1,5 @@
+'use client'
+
 import { Card } from '@erp/ui'
 import { AlertTriangle, CheckCircle, Clock, FileText, Scale, XCircle } from 'lucide-react'
 import Link from 'next/link'

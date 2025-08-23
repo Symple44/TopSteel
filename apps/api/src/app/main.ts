@@ -16,6 +16,7 @@ import { GracefulShutdownService } from '../core/config/graceful-shutdown.servic
 import { listenWithPortFallback } from '../core/config/port-helper'
 import { MetricsSafeInterceptor } from '../infrastructure/monitoring/metrics-safe.interceptor'
 import { EnhancedThrottlerGuard } from '../infrastructure/security/guards/enhanced-throttler.guard'
+import { envValidator } from '../core/config/env-validator'
 import { AppModule } from './app.module'
 
 // ============================================================================
@@ -51,6 +52,50 @@ try {
 async function bootstrap() {
   const logger = new Logger('Bootstrap')
 
+  // ============================================================================
+  // VALIDATION SÉCURISÉE DES VARIABLES D'ENVIRONNEMENT
+  // ============================================================================
+  
+  try {
+    logger.log('🔍 Validation des variables d\'environnement...')
+    
+    // Valider les variables d'environnement avec rapport de sécurité
+    const validationResult = await envValidator.validate({
+      throwOnError: false,
+      logValidation: false,
+      validateSecrets: true
+    })
+
+    if (!validationResult.success) {
+      logger.error('❌ Échec de la validation des variables d\'environnement:')
+      validationResult.errors?.forEach(error => logger.error(`  • ${error}`))
+      
+      if (process.env.NODE_ENV === 'production') {
+        logger.error('🚨 ARRÊT: Variables d\'environnement invalides en production')
+        process.exit(1)
+      } else {
+        logger.warn('⚠️  Continuation en développement avec des variables invalides')
+      }
+    } else {
+      logger.log('✅ Variables d\'environnement validées avec succès')
+      
+      // Afficher les avertissements de sécurité s'il y en a
+      if (validationResult.warnings && validationResult.warnings.length > 0) {
+        logger.warn('⚠️  Avertissements de sécurité détectés:')
+        validationResult.warnings.forEach(warning => logger.warn(`  • ${warning}`))
+        
+        if (process.env.NODE_ENV === 'production') {
+          logger.warn('🔐 IMPORTANT: Corrigez ces problèmes de sécurité avant le déploiement en production!')
+        }
+      }
+    }
+  } catch (error) {
+    logger.error('❌ Erreur lors de la validation des variables d\'environnement:', error)
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1)
+    }
+  }
+
   try {
     // Nettoyage silencieux sauf si problème détecté
     const targetPort = parseInt(process.env.PORT || process.env.API_PORT || '3002')
@@ -85,7 +130,7 @@ async function bootstrap() {
     // Supprimer le trailing slash si présent (sauf pour la racine)
     if (req.path !== '/' && req.path.endsWith('/')) {
       req.url = req.url.slice(0, -1)
-      req.path = req.path.slice(0, -1)
+      // Note: req.path est en lecture seule, on modifie seulement req.url
     }
     next()
   })

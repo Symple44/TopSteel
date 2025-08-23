@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../table'

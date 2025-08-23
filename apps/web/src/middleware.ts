@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { areTokensExpired, getTokensFromCookies } from './lib/auth/cookie-auth'
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = [
@@ -256,15 +257,26 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('X-XSS-Protection', '1; mode=block')
 
-  // Content Security Policy strict
+  // Content Security Policy strict - Production ready
+  const isDevelopment = process.env.NODE_ENV === 'development'
+
+  // Generate nonce for inline scripts/styles
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  response.headers.set('X-Nonce', nonce)
+
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // TODO: Remove unsafe-* in production
-    "style-src 'self' 'unsafe-inline'",
+    isDevelopment
+      ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`
+      : `script-src 'self' 'nonce-${nonce}'`,
+    `style-src 'self' 'nonce-${nonce}'`,
     "img-src 'self' data: https:",
-    "font-src 'self'",
-    "connect-src 'self'",
+    "font-src 'self' data:",
+    "connect-src 'self' https:",
     "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    'upgrade-insecure-requests',
   ].join('; ')
 
   response.headers.set('Content-Security-Policy', csp)
@@ -272,7 +284,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   return response
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // === ÉTAPE 0: Gestion des redirections ===
@@ -297,7 +309,12 @@ export function middleware(request: NextRequest) {
   }
 
   // === ÉTAPE 2: Récupération et validation du token ===
-  const accessToken = request.cookies.get('accessToken')?.value
+  // Récupérer les tokens depuis les cookies HttpOnly
+  const tokens = await getTokensFromCookies(request)
+
+  // Essayer aussi depuis le cookie non-HttpOnly pour la compatibilité
+  const legacyToken = request.cookies.get('accessToken')?.value
+  const accessToken = tokens?.accessToken || legacyToken
 
   // Pas de token du tout
   if (!accessToken) {
@@ -307,6 +324,12 @@ export function middleware(request: NextRequest) {
         : createApiErrorResponse("Token d'accès manquant")
     }
     return createLoginRedirect(request)
+  }
+
+  // Vérifier si le token doit être rafraîchi (seulement pour les tokens depuis cookies HttpOnly)
+  if (tokens && areTokensExpired(tokens) && tokens.refreshToken) {
+    // Note: Le rafraîchissement automatique peut être géré par un intercepteur côté client
+    // ou dans les routes API individuelles
   }
 
   // Validation de la structure du token

@@ -1,103 +1,66 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '../../primitives/button'
-import { DataTable } from './DataTable'
-import type { ColumnConfig } from './types'
+/**
+ * Exemple d'utilisation du DataTable refactorisé
+ */
 
-interface ExampleData {
+import React from 'react'
+import { DataTable } from './DataTableV2'
+import type { ColumnConfig } from './types'
+import { Edit, Trash, Eye } from 'lucide-react'
+
+// Type des données d'exemple
+interface User {
   id: number
-  nom: string
-  age: number
+  name: string
   email: string
-  salaire: number
-  dateEmbauche: Date
-  actif: boolean
-  statut: 'actif' | 'inactif' | 'suspendu'
-  competences: string[]
-  total?: number
-  commentaires?: string
+  role: string
+  status: 'active' | 'inactive' | 'pending'
+  createdAt: Date
+  credits: number
 }
 
-const exampleData: ExampleData[] = [
+// Données d'exemple
+const sampleData: User[] = [
   {
     id: 1,
-    nom: 'Jean Dupont',
-    age: 35,
+    name: 'Jean Dupont',
     email: 'jean.dupont@example.com',
-    salaire: 45000,
-    dateEmbauche: new Date('2020-01-15'),
-    actif: true,
-    statut: 'actif',
-    competences: ['JavaScript', 'React', 'TypeScript'],
-    commentaires:
-      '<p><strong>Excellent développeur</strong> avec une grande expérience en <em>React</em>.</p><ul><li>Très motivé</li><li>Travail en équipe exemplaire</li><li>Formation continue</li></ul>',
+    role: 'Admin',
+    status: 'active',
+    createdAt: new Date('2024-01-15'),
+    credits: 1250.50,
   },
   {
     id: 2,
-    nom: 'Marie Martin',
-    age: 28,
+    name: 'Marie Martin',
     email: 'marie.martin@example.com',
-    salaire: 52000,
-    dateEmbauche: new Date('2021-03-22'),
-    actif: true,
-    statut: 'actif',
-    competences: ['Python', 'Django', 'PostgreSQL'],
-    commentaires:
-      '<p>Développeuse <strong>backend</strong> talentueuse.</p><p style="color: #0066cc;">Spécialiste en optimisation de bases de données.</p>',
+    role: 'User',
+    status: 'active',
+    createdAt: new Date('2024-02-20'),
+    credits: 500.00,
   },
   {
     id: 3,
-    nom: 'Pierre Durand',
-    age: 42,
-    email: 'pierre.durand@example.com',
-    salaire: 38000,
-    dateEmbauche: new Date('2019-07-10'),
-    actif: false,
-    statut: 'suspendu',
-    competences: ['PHP', 'Laravel'],
-    commentaires:
-      '<p><span style="color: #ff0000;">⚠️ Suspension temporaire</span></p><blockquote>En attente de formation sur les nouvelles technologies.</blockquote>',
+    name: 'Pierre Bernard',
+    email: 'pierre.bernard@example.com',
+    role: 'Manager',
+    status: 'pending',
+    createdAt: new Date('2024-03-10'),
+    credits: 750.25,
   },
 ]
 
-const columns: ColumnConfig<ExampleData>[] = [
+// Configuration des colonnes
+const columns: ColumnConfig<User>[] = [
   {
-    id: 'nom',
-    key: 'nom',
+    id: 'name',
+    key: 'name',
     title: 'Nom',
-    description: "Nom complet de l'employé (prénom et nom)",
     type: 'text',
     sortable: true,
     searchable: true,
     editable: true,
-    required: true,
-    locked: true, // Colonne verrouillée (non déplaçable)
-    width: 200,
-    validation: {
-      minLength: 2,
-      maxLength: 50,
-      pattern: /^[a-zA-ZÀ-ÿ\s-]+$/,
-    },
-  },
-  {
-    id: 'age',
-    key: 'age',
-    title: 'Âge',
-    description: "Âge de l'employé (entre 18 et 65 ans)",
-    type: 'number',
-    sortable: true,
-    editable: true,
-    required: true,
-    width: 80,
-    validation: {
-      min: 18,
-      max: 65,
-    },
-    format: {
-      suffix: ' ans',
-    },
-    render: (value) => `${value || 0} ans`,
   },
   {
     id: 'email',
@@ -106,295 +69,185 @@ const columns: ColumnConfig<ExampleData>[] = [
     type: 'text',
     sortable: true,
     searchable: true,
-    editable: true,
-    required: true,
-    width: 250,
-    validation: {
-      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      custom: (value) => {
-        if (value && typeof value === 'string' && !value.includes('@')) {
-          return 'Adresse email invalide'
-        }
-        return null
-      },
-    },
   },
   {
-    id: 'salaire',
-    key: 'salaire',
-    title: 'Salaire',
-    type: 'number',
-    sortable: true,
-    editable: true,
-    width: 120,
-    validation: {
-      min: 20000,
-      max: 200000,
-    },
-    format: {
-      currency: 'EUR',
-    },
-    render: (value) => {
-      if (typeof value === 'number') {
-        return new Intl.NumberFormat('fr-FR', {
-          style: 'currency',
-          currency: 'EUR',
-        }).format(value)
-      }
-      return String(value || 0)
-    },
-  },
-  {
-    id: 'dateEmbauche',
-    key: 'dateEmbauche',
-    title: "Date d'embauche",
-    type: 'date',
-    sortable: true,
-    editable: true,
-    width: 150,
-    validation: {
-      custom: (value) => {
-        if (value instanceof Date && value > new Date()) {
-          return 'La date ne peut pas être dans le futur'
-        }
-        return null
-      },
-    },
-    render: (value) => {
-      if (value instanceof Date) {
-        return value.toLocaleDateString('fr-FR')
-      }
-      return String(value || '')
-    },
-  },
-  {
-    id: 'actif',
-    key: 'actif',
-    title: 'Actif',
-    type: 'boolean',
-    sortable: true,
-    editable: true,
-    width: 80,
-  },
-  {
-    id: 'statut',
-    key: 'statut',
-    title: 'Statut',
+    id: 'role',
+    key: 'role',
+    title: 'Rôle',
     type: 'select',
     sortable: true,
     editable: true,
-    width: 120,
     options: [
-      { value: 'actif', label: 'Actif', color: '#10b981' },
-      { value: 'inactif', label: 'Inactif', color: '#6b7280' },
-      { value: 'suspendu', label: 'Suspendu', color: '#ef4444' },
+      { value: 'Admin', label: 'Administrateur' },
+      { value: 'Manager', label: 'Gestionnaire' },
+      { value: 'User', label: 'Utilisateur' },
     ],
   },
   {
-    id: 'competences',
-    key: 'competences',
-    title: 'Compétences',
-    type: 'multiselect',
-    editable: true,
-    width: 200,
-    render: (value) => {
-      if (Array.isArray(value)) {
-        return (
-          <div className="flex flex-wrap gap-1">
-            {value.slice(0, 2).map((skill, index) => (
-              <span
-                key={`skill-${skill}-${index}`}
-                className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
-              >
-                {skill}
-              </span>
-            ))}
-            {value.length > 2 && <span className="text-xs text-gray-500">+{value.length - 2}</span>}
-          </div>
-        )
-      }
-      return null
-    },
+    id: 'status',
+    key: 'status',
+    title: 'Statut',
+    type: 'select',
+    sortable: true,
+    options: [
+      { value: 'active', label: 'Actif', color: '#10b981' },
+      { value: 'inactive', label: 'Inactif', color: '#ef4444' },
+      { value: 'pending', label: 'En attente', color: '#f59e0b' },
+    ],
   },
   {
-    id: 'commentaires',
-    key: 'commentaires',
-    title: 'Commentaires',
-    description: 'Notes et commentaires avec mise en forme',
-    type: 'richtext',
-    sortable: false,
-    searchable: true,
-    editable: true,
-    width: 300,
-    validation: {
-      maxLength: 5000,
-    },
-  },
-  {
-    id: 'total',
-    key: 'total',
-    title: 'Total (Formule)',
-    type: 'formula',
-    width: 120,
-    formula: {
-      expression: '=C1*12', // Âge * 12 (exemple simple)
-      dependencies: ['age'],
-    },
+    id: 'credits',
+    key: 'credits',
+    title: 'Crédits',
+    type: 'number',
+    sortable: true,
     format: {
-      decimals: 0,
-      suffix: ' points',
+      decimals: 2,
+      prefix: '€ ',
     },
-    render: (value) => {
-      if (typeof value === 'number') {
-        return `${value.toFixed(0)} points`
-      }
-      return String(value || 0)
-    },
+  },
+  {
+    id: 'createdAt',
+    key: 'createdAt',
+    title: 'Date de création',
+    type: 'date',
+    sortable: true,
   },
 ]
 
+/**
+ * Composant d'exemple montrant l'utilisation du DataTable
+ */
 export function DataTableExample() {
-  const [data, setData] = useState(exampleData)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [data, setData] = React.useState(sampleData)
+  const [selectedRows, setSelectedRows] = React.useState<Set<string | number>>(new Set())
 
-  const handleCellEdit = (
-    newValue: unknown,
-    row: ExampleData,
-    column: ColumnConfig<ExampleData>
-  ) => {
-    setData((prevData) =>
-      prevData.map((item) => (item.id === row.id ? { ...item, [column.key]: newValue } : item))
+  // Actions sur les lignes
+  const actions = [
+    {
+      label: 'Voir',
+      icon: <Eye className="h-4 w-4" />,
+      onClick: (row: User) => {
+        console.log('Voir:', row)
+      },
+    },
+    {
+      label: 'Modifier',
+      icon: <Edit className="h-4 w-4" />,
+      onClick: (row: User) => {
+        console.log('Modifier:', row)
+      },
+    },
+    {
+      label: 'Supprimer',
+      icon: <Trash className="h-4 w-4" />,
+      variant: 'destructive' as const,
+      onClick: (row: User) => {
+        setData(prev => prev.filter(u => u.id !== row.id))
+      },
+      separator: true,
+    },
+  ]
+
+  // Gestion de l'édition de cellule
+  const handleCellEdit = (row: User, column: ColumnConfig<User>, value: any) => {
+    console.log('Edit:', { row, column, value })
+    setData(prev => 
+      prev.map(u => 
+        u.id === row.id 
+          ? { ...u, [column.key]: value }
+          : u
+      )
     )
   }
 
-  const handleCreate = () => {
-    const newId = Math.max(...data.map((item) => item.id)) + 1
-    const newRow: ExampleData = {
-      id: newId,
-      nom: '',
-      age: 25,
-      email: '',
-      salaire: 30000,
-      dateEmbauche: new Date(),
-      actif: true,
-      statut: 'actif',
-      competences: [],
+  // Gestion de la sélection
+  const handleSelectionChange = (selection: any) => {
+    setSelectedRows(selection.selectedRows)
+    console.log('Selection:', selection)
+  }
+
+  // Ajout d'un nouvel utilisateur
+  const handleAddNew = () => {
+    const newUser: User = {
+      id: Math.max(...data.map(u => u.id)) + 1,
+      name: 'Nouvel utilisateur',
+      email: 'nouveau@example.com',
+      role: 'User',
+      status: 'pending',
+      createdAt: new Date(),
+      credits: 0,
     }
-    setData([...data, newRow])
-  }
-
-  const handleDelete = (rows: ExampleData[]) => {
-    const idsToDelete = rows.map((row) => row.id)
-    setData(data.filter((item) => !idsToDelete.includes(item.id)))
-  }
-
-  const handleEdit = (row: ExampleData) => {
-    // Ici on pourrait ouvrir un modal ou naviger vers une page d'édition
-    alert(`Édition de ${row.nom}`)
-  }
-
-  const simulateLoading = () => {
-    setLoading(true)
-    setError(null)
-    setTimeout(() => {
-      setLoading(false)
-    }, 2000)
-  }
-
-  const simulateError = () => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setError('Erreur de connexion au serveur. Veuillez réessayer.')
-    }, 1000)
+    setData(prev => [...prev, newUser])
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Exemple DataTable avec Validation</h2>
-        <div className="flex gap-2">
-          <Button onClick={simulateLoading} variant="outline" size="sm">
-            Simuler Chargement
-          </Button>
-          <Button onClick={simulateError} variant="outline" size="sm">
-            Simuler Erreur
-          </Button>
-          <Button
-            onClick={() => {
-              setError(null)
-              setLoading(false)
-            }}
-            variant="outline"
-            size="sm"
-          >
-            Reset
-          </Button>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Exemple DataTable Refactorisé</h1>
+      
+      {/* Affichage des lignes sélectionnées */}
+      {selectedRows.size > 0 && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+          <p className="text-sm">
+            {selectedRows.size} ligne(s) sélectionnée(s): {Array.from(selectedRows).join(', ')}
+          </p>
         </div>
-      </div>
+      )}
 
+      {/* DataTable */}
       <DataTable
+        title="Gestion des utilisateurs"
         data={data}
         columns={columns}
         keyField="id"
-        tableId="example-employees" // ID unique pour la persistence
-        editable
-        selectable
-        sortable
-        searchable
-        filterable
-        height={600}
-        actions={{
-          create: handleCreate,
-          edit: handleEdit,
-          delete: handleDelete,
+        
+        // Fonctionnalités activées
+        sortable={true}
+        filterable={true}
+        searchable={true}
+        selectable={true}
+        editable={true}
+        exportable={true}
+        pagination={{
+          page: 1,
+          pageSize: 10,
+          total: data.length,
         }}
+        
+        // Apparence
+        striped={true}
+        bordered={true}
+        hoverable={true}
+        height="600px"
+        
+        // Actions et callbacks
+        actions={actions}
+        onAddNew={handleAddNew}
         onCellEdit={handleCellEdit}
-        loading={loading}
-        error={error}
-        className="border rounded-lg"
+        onSelectionChange={handleSelectionChange}
+        onRowClick={(row) => console.log('Row clicked:', row)}
+        onRowDoubleClick={(row) => console.log('Row double-clicked:', row)}
+        
+        // Pour la persistance des paramètres
+        tableId="users-table"
       />
 
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-semibold mb-2">Fonctionnalités :</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <h4 className="font-medium mb-1">Validation :</h4>
-            <ul className="list-disc list-inside space-y-1">
-              <li>
-                <strong>Nom :</strong> 2-50 caractères, lettres uniquement
-              </li>
-              <li>
-                <strong>Âge :</strong> Entre 18 et 65 ans
-              </li>
-              <li>
-                <strong>Email :</strong> Format email valide
-              </li>
-              <li>
-                <strong>Salaire :</strong> Entre 20k et 200k €
-              </li>
-              <li>
-                <strong>Date :</strong> Pas dans le futur
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-medium mb-1">Interactions :</h4>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Cliquer sur une cellule pour éditer</li>
-              <li>Drag & drop des en-têtes pour réorganiser</li>
-              <li>Ctrl+C / Ctrl+V pour copier-coller</li>
-              <li>Tri par colonne (cliquer en-tête)</li>
-              <li>Recherche globale en temps réel</li>
-              <li>Sauvegarde automatique des paramètres</li>
-              <li>Export/réinitialisation des paramètres</li>
-            </ul>
-          </div>
-        </div>
+      {/* Instructions */}
+      <div className="mt-6 p-4 bg-gray-50 rounded">
+        <h3 className="font-semibold mb-2">Fonctionnalités disponibles:</h3>
+        <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+          <li>✅ Tri des colonnes (cliquer sur l'en-tête)</li>
+          <li>✅ Recherche globale</li>
+          <li>✅ Filtres par colonne</li>
+          <li>✅ Sélection multiple</li>
+          <li>✅ Édition inline (double-clic sur une cellule éditable)</li>
+          <li>✅ Export CSV/Excel/JSON</li>
+          <li>✅ Pagination</li>
+          <li>✅ Actions sur les lignes</li>
+          <li>✅ Colonnes redimensionnables et réorganisables</li>
+          <li>✅ Sauvegarde des préférences utilisateur</li>
+        </ul>
       </div>
     </div>
   )
 }
-
-export default DataTableExample

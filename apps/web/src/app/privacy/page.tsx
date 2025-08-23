@@ -1,3 +1,5 @@
+'use client'
+
 import { Card } from '@erp/ui'
 import { Database, Eye, Lock, Mail, Shield, Users } from 'lucide-react'
 import Link from 'next/link'

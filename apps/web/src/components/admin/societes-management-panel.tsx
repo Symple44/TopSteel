@@ -93,6 +93,8 @@ export default function SocietesManagementPanel() {
   const [selectedSocieteStats, setSelectedSocieteStats] = useState<SocieteStats | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [isStatsOpen, setIsStatsOpen] = useState(false)
+  const [_isCreateSocieteOpen, setIsCreateSocieteOpen] = useState(false)
+  const [_isEditSocieteOpen, setIsEditSocieteOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
 
   // Charger les sociétés
@@ -181,7 +183,7 @@ export default function SocietesManagementPanel() {
         </div>
         <Button
           onClick={() => {
-            // TODO: Implémenter la création de société
+            setIsCreateSocieteOpen(true)
           }}
           className="flex items-center gap-2"
         >
@@ -344,7 +346,8 @@ export default function SocietesManagementPanel() {
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            // TODO: Implémenter l'édition
+                            setSelectedSociete(societe)
+                            setIsEditSocieteOpen(true)
                           }}
                         >
                           <Edit className="h-4 w-4" />

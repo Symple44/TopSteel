@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -40,6 +41,8 @@ import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-
 @RequireSystemAdmin()
 @ApiBearerAuth('JWT-auth')
 export class AdminUsersController {
+  private readonly logger = new Logger(AdminUsersController.name)
+
   constructor(
     private readonly usersService: UsersService,
     private readonly unifiedRolesService: UnifiedRolesService,
@@ -120,7 +123,7 @@ export class AdminUsersController {
             : [],
           societeRoles,
           groups: [], // Pas de groupes dans notre système actuel
-          permissions: [], // TODO: Récupérer les vraies permissions si nécessaire
+          permissions: query.includePermissions ? await this.getUserPermissions(user.id) : []
         }
       })
     )
@@ -496,6 +499,41 @@ export class AdminUsersController {
       })),
       message: 'Liste des sociétés récupérée avec succès',
       statusCode: 200,
+    }
+  }
+
+  /**
+   * Récupère les permissions d'un utilisateur
+   */
+  private async getUserPermissions(userId: string): Promise<string[]> {
+    try {
+      // Récupérer les permissions via le service unifié de rôles
+      const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(userId)
+      
+      // Collecter toutes les permissions des différents rôles
+      const allPermissions = new Set<string>()
+      
+      for (const roleInfo of userSocieteRoles) {
+        // Ajouter les permissions du rôle
+        if (roleInfo.permissions) {
+          roleInfo.permissions.forEach(permission => allPermissions.add(permission))
+        }
+        
+        // Ajouter les permissions additionnelles
+        if (roleInfo.additionalPermissions) {
+          roleInfo.additionalPermissions.forEach(permission => allPermissions.add(permission))
+        }
+        
+        // Retirer les permissions restreintes
+        if (roleInfo.restrictedPermissions) {
+          roleInfo.restrictedPermissions.forEach(permission => allPermissions.delete(permission))
+        }
+      }
+      
+      return Array.from(allPermissions)
+    } catch (error) {
+      this.logger?.warn('Erreur lors de la récupération des permissions utilisateur:', error)
+      return []
     }
   }
 

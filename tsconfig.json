@@ -1,33 +1,17 @@
 {
-  "include": ["apps/**/*", "packages/**/*"],
-  "exclude": ["node_modules", "dist", ".next", ".turbo", "coverage"],
-  "compilerOptions": {
-    "module": "ESNext",
-    "noEmit": true,
-    "paths": {
-      "@erp/ui": ["./packages/ui/dist", "./packages/ui/src"],
-      "@erp/types": ["./packages/types/dist", "./packages/types/src"],
-      "@erp/utils": ["./packages/utils/dist", "./packages/utils/src"],
-      "@erp/utils/*": ["./packages/utils/dist/*", "./packages/utils/src/*"],
-      "@erp/types/*": ["./packages/types/dist/*", "./packages/types/src/*"],
-      "@erp/config": ["./packages/config"],
-      "@erp/config/*": ["./packages/config/*"],
-      "@erp/ui/*": ["./packages/ui/dist/*", "./packages/ui/src/*"],
-      "@erp/domains": ["./packages/domains/dist", "./packages/domains/src"],
-      "@erp/domains/*": ["./packages/domains/dist/*", "./packages/domains/src/*"],
-      "@erp/api-client": ["./packages/api-client/dist", "./packages/api-client/src"],
-      "@erp/api-client/*": ["./packages/api-client/dist/*", "./packages/api-client/src/*"]
-    },
-    "resolveJsonModule": true,
-    "incremental": true,
-    "moduleResolution": "bundler",
-    "isolatedModules": true,
-    "baseUrl": ".",
-    "skipLibCheck": true,
-    "target": "ES2022",
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "preserve",
-    "esModuleInterop": true,
-    "strict": true
-  }
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/utils" },
+    { "path": "./packages/config" },
+    { "path": "./packages/entities" },
+    { "path": "./packages/domains" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/api-client" },
+    { "path": "./apps/api" },
+    { "path": "./apps/web" },
+    { "path": "./apps/marketplace-api" },
+    { "path": "./apps/marketplace-storefront" }
+  ]
 }

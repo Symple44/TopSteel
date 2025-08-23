@@ -1,5 +1,4 @@
 'use client'
-
 import { AlertCircle, Check, Copy, Grid, List, Trash2, X } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useMemo, useState } from 'react'
@@ -14,20 +13,19 @@ import {
   TableRow,
 } from '../../../data-display/table'
 import { Alert, AlertDescription } from '../../../feedback/alert'
-import { Label } from '../../../forms/label'
+import { Label } from '../../../forms/label/Label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
-import { Button } from '../../../primitives/button'
-import { Input } from '../../../primitives/input'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../primitives/select'
+} from '../../../primitives/select/select'
 import { SimpleTooltip } from '../../../primitives/tooltip'
 import type { PriceRule } from '../PriceRuleCard/PriceRuleCard'
-
 export interface PriceMatrixProps {
   rules: PriceRule[]
   onUpdate: (rules: PriceRule[]) => void
@@ -39,19 +37,16 @@ export interface PriceMatrixProps {
   showTotals?: boolean
   compact?: boolean
 }
-
 interface EditableCell {
   ruleId: string
   field: keyof PriceRule
   value: any
 }
-
 interface GroupedRules {
   groupKey: string
   groupLabel: string
   rules: PriceRule[]
 }
-
 const ADJUSTMENT_TYPES = [
   { value: 'PERCENTAGE', label: '%', color: 'bg-blue-100' },
   { value: 'FIXED_AMOUNT', label: '€', color: 'bg-green-100' },
@@ -62,7 +57,6 @@ const ADJUSTMENT_TYPES = [
   { value: 'PRICE_PER_VOLUME', label: 'm³', color: 'bg-indigo-100' },
   { value: 'FORMULA', label: 'f(x)', color: 'bg-gray-100' },
 ]
-
 const CHANNELS = [
   { value: 'ALL', label: 'Tous', color: 'default' },
   { value: 'ERP', label: 'ERP', color: 'secondary' },
@@ -70,7 +64,6 @@ const CHANNELS = [
   { value: 'B2B', label: 'B2B', color: 'secondary' },
   { value: 'API', label: 'API', color: 'secondary' },
 ]
-
 export function PriceMatrix({
   rules = [],
   onUpdate,
@@ -86,19 +79,15 @@ export function PriceMatrix({
   const [selectedRules, setSelectedRules] = useState<Set<string>>(new Set())
   const [tempValue, setTempValue] = useState<any>(null)
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
-
   // Grouper les règles selon le critère sélectionné
   const groupedRules = useMemo(() => {
     if (groupBy === 'none') {
       return [{ groupKey: 'all', groupLabel: 'Toutes les règles', rules }]
     }
-
     const groups = new Map<string, PriceRule[]>()
-
     rules.forEach((rule) => {
       let key = ''
       let _label = ''
-
       switch (groupBy) {
         case 'article':
           key = rule.articleFamily || rule.articleId || 'general'
@@ -113,33 +102,27 @@ export function PriceMatrix({
           _label = CHANNELS.find((c) => c.value === rule.channel)?.label || rule.channel
           break
       }
-
       if (!groups.has(key)) {
         groups.set(key, [])
       }
       groups.get(key)?.push(rule)
     })
-
     return Array.from(groups.entries()).map(([key, rules]) => ({
       groupKey: key,
       groupLabel: key,
       rules,
     }))
   }, [rules, groupBy])
-
   // Calculer les totaux
   const totals = useMemo(() => {
     if (!showTotals) return null
-
     const activeRules = rules.filter((r) => r.isActive)
     const totalDiscount = activeRules
       .filter((r) => r.adjustmentType === 'PERCENTAGE' && r.adjustmentValue < 0)
       .reduce((sum, r) => sum + Math.abs(r.adjustmentValue), 0)
-
     const totalSurcharge = activeRules
       .filter((r) => r.adjustmentType === 'PERCENTAGE' && r.adjustmentValue > 0)
       .reduce((sum, r) => sum + r.adjustmentValue, 0)
-
     return {
       total: rules.length,
       active: activeRules.length,
@@ -148,7 +131,6 @@ export function PriceMatrix({
       averageSurcharge: totalSurcharge / activeRules.length || 0,
     }
   }, [rules, showTotals])
-
   const startEditing = useCallback(
     (ruleId: string, field: keyof PriceRule, value: any) => {
       if (!editable) return
@@ -157,15 +139,12 @@ export function PriceMatrix({
     },
     [editable]
   )
-
   const cancelEditing = useCallback(() => {
     setEditingCell(null)
     setTempValue(null)
   }, [])
-
   const saveEdit = useCallback(() => {
     if (!editingCell) return
-
     const updatedRules = rules.map((rule) => {
       if (rule.id === editingCell.ruleId) {
         return {
@@ -175,11 +154,9 @@ export function PriceMatrix({
       }
       return rule
     })
-
     onUpdate(updatedRules)
     cancelEditing()
   }, [editingCell, tempValue, rules, onUpdate, cancelEditing])
-
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') {
@@ -190,7 +167,6 @@ export function PriceMatrix({
     },
     [saveEdit, cancelEditing]
   )
-
   const toggleRuleSelection = useCallback((ruleId: string) => {
     setSelectedRules((prev) => {
       const newSet = new Set(prev)
@@ -202,7 +178,6 @@ export function PriceMatrix({
       return newSet
     })
   }, [])
-
   const selectAllRules = useCallback(() => {
     if (selectedRules.size === rules.length) {
       setSelectedRules(new Set())
@@ -210,16 +185,13 @@ export function PriceMatrix({
       setSelectedRules(new Set(rules.map((r) => r.id)))
     }
   }, [selectedRules, rules])
-
   const deleteSelectedRules = useCallback(() => {
     if (!onDelete) return
     selectedRules.forEach((ruleId) => onDelete(ruleId))
     setSelectedRules(new Set())
   }, [selectedRules, onDelete])
-
   const renderEditableCell = (rule: PriceRule, field: keyof PriceRule, value: any) => {
     const isEditing = editingCell?.ruleId === rule.id && editingCell?.field === field
-
     if (isEditing) {
       switch (field) {
         case 'adjustmentType':
@@ -237,7 +209,6 @@ export function PriceMatrix({
               </SelectContent>
             </Select>
           )
-
         case 'channel':
           return (
             <Select value={tempValue} onValueChange={setTempValue}>
@@ -253,7 +224,6 @@ export function PriceMatrix({
               </SelectContent>
             </Select>
           )
-
         case 'isActive':
           return (
             <input
@@ -263,7 +233,6 @@ export function PriceMatrix({
               className="w-4 h-4"
             />
           )
-
         case 'priority':
         case 'adjustmentValue':
         case 'minQuantity':
@@ -278,7 +247,6 @@ export function PriceMatrix({
               autoFocus
             />
           )
-
         default:
           return (
             <Input
@@ -291,7 +259,6 @@ export function PriceMatrix({
           )
       }
     }
-
     // Affichage normal (non édition)
     switch (field) {
       case 'adjustmentType': {
@@ -306,7 +273,6 @@ export function PriceMatrix({
           </Badge>
         )
       }
-
       case 'channel': {
         const channel = CHANNELS.find((c) => c.value === value)
         return (
@@ -319,7 +285,6 @@ export function PriceMatrix({
           </Badge>
         )
       }
-
       case 'isActive':
         return (
           <div className="cursor-pointer" onClick={() => startEditing(rule.id, field, value)}>
@@ -330,7 +295,6 @@ export function PriceMatrix({
             )}
           </div>
         )
-
       case 'adjustmentValue':
         return (
           <span
@@ -340,7 +304,6 @@ export function PriceMatrix({
             {rule.adjustmentType === 'PERCENTAGE' ? `${value}%` : `${value}€`}
           </span>
         )
-
       default:
         return (
           <span className="cursor-pointer" onClick={() => startEditing(rule.id, field, value)}>
@@ -349,7 +312,6 @@ export function PriceMatrix({
         )
     }
   }
-
   const renderTableView = () => (
     <div className="overflow-x-auto">
       <Table className={cn('min-w-full', compact && 'text-sm')}>
@@ -458,7 +420,6 @@ export function PriceMatrix({
       </Table>
     </div>
   )
-
   const renderGridView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {rules.map((rule) => (
@@ -528,7 +489,6 @@ export function PriceMatrix({
       ))}
     </div>
   )
-
   return (
     <div className={cn('space-y-4', className)}>
       {/* Barre d'outils */}
@@ -545,7 +505,6 @@ export function PriceMatrix({
               </Button>
             </div>
           )}
-
           <Select value={groupBy} onValueChange={(_value: any) => {}}>
             <SelectTrigger className="w-40">
               <SelectValue />
@@ -558,7 +517,6 @@ export function PriceMatrix({
             </SelectContent>
           </Select>
         </div>
-
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -569,7 +527,6 @@ export function PriceMatrix({
           </Button>
         </div>
       </div>
-
       {/* Message d'édition */}
       {editingCell && (
         <Alert>
@@ -579,10 +536,8 @@ export function PriceMatrix({
           </AlertDescription>
         </Alert>
       )}
-
       {/* Vue principale */}
       {viewMode === 'table' ? renderTableView() : renderGridView()}
-
       {/* Totaux */}
       {showTotals && totals && (
         <Card>
@@ -615,7 +570,6 @@ export function PriceMatrix({
           </CardContent>
         </Card>
       )}
-
       {/* Message vide */}
       {rules.length === 0 && (
         <Card>

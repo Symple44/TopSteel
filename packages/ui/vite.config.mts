@@ -2,6 +2,7 @@ import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
+import { preserveUseClientDirective } from './vite-rollup-preserve-directives.mts'
 
 export default defineConfig({
   plugins: [
@@ -42,6 +43,7 @@ export default defineConfig({
         'lucide-react',
         'class-variance-authority',
       ],
+      plugins: [preserveUseClientDirective()],
     },
     sourcemap: false,
     minify: false,

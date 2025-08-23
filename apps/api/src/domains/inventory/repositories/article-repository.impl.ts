@@ -436,36 +436,133 @@ export class ArticleRepositoryImpl implements IArticleRepository {
   }
 
   async getStockValuationByFamily(): Promise<Record<string, { quantite: number; valeur: number }>> {
-    // TODO: Implémenter avec une requête optimisée
-    return {}
+    const result = await this.repository
+      .createQueryBuilder('article')
+      .select('article.famille', 'famille')
+      .addSelect('SUM(article.stockPhysique)', 'quantite')
+      .addSelect('SUM(article.stockPhysique * article.prixVenteHT)', 'valeur')
+      .where('article.gereEnStock = :gereEnStock', { gereEnStock: true })
+      .andWhere('article.actif = :actif', { actif: true })
+      .andWhere('article.famille IS NOT NULL')
+      .groupBy('article.famille')
+      .getRawMany()
+
+    const stockValuation: Record<string, { quantite: number; valeur: number }> = {}
+    result.forEach((item) => {
+      if (item.famille) {
+        stockValuation[item.famille] = {
+          quantite: parseFloat(item.quantite || '0'),
+          valeur: parseFloat(item.valeur || '0'),
+        }
+      }
+    })
+
+    return stockValuation
   }
 
   async getRecentStockMovements(
-    _articleId: string,
-    _limit: number
+    articleId: string,
+    limit: number
   ): Promise<Record<string, unknown>[]> {
-    // TODO: Implémenter selon votre système de mouvements
-    return []
+    // Utiliser le manager pour accéder à la table stock_movements
+    const movements = await this.repository.manager
+      .createQueryBuilder()
+      .select([
+        'movement.id',
+        'movement.articleId',
+        'movement.quantite',
+        'movement.typeOperation',
+        'movement.statut',
+        'movement.dateOperation',
+        'movement.numeroDocumentSource',
+        'movement.commentaire',
+        'movement.utilisateur',
+        'movement.dateCreation',
+      ])
+      .from('stock_movements', 'movement')
+      .where('movement.articleId = :articleId', { articleId })
+      .andWhere('movement.statut != :statut', { statut: 'ANNULE' })
+      .orderBy('movement.dateOperation', 'DESC')
+      .limit(limit)
+      .getRawMany()
+
+    return movements.map((movement) => ({
+      id: movement.movement_id,
+      articleId: movement.movement_articleId,
+      quantite: parseFloat(movement.movement_quantite || '0'),
+      typeOperation: movement.movement_typeOperation,
+      statut: movement.movement_statut,
+      dateOperation: movement.movement_dateOperation,
+      numeroDocumentSource: movement.movement_numeroDocumentSource,
+      commentaire: movement.movement_commentaire,
+      utilisateur: movement.movement_utilisateur,
+      dateCreation: movement.movement_dateCreation,
+    }))
   }
 
   async getBestSellers(
     limit: number,
-    _periode?: { debut: Date; fin: Date }
+    periode?: { debut: Date; fin: Date }
   ): Promise<Array<Article & { quantiteVendue: number }>> {
-    // TODO: Implémenter avec les données de vente
-    const articles = await this.repository.find({ take: limit })
-    return articles.map((article) => {
-      const result = Object.assign(article, { quantiteVendue: 0 })
-      return result as Article & { quantiteVendue: number }
+    // Construire la requête avec jointure sur les mouvements de vente
+    const query = this.repository
+      .createQueryBuilder('article')
+      .leftJoin(
+        'stock_movements',
+        'movement',
+        'movement.articleId = article.id AND movement.typeOperation IN (:...saleTypes) AND movement.statut != :cancelledStatus',
+        {
+          saleTypes: ['VENTE', 'LIVRAISON_CLIENT', 'SORTIE_PRODUCTION'],
+          cancelledStatus: 'ANNULE',
+        }
+      )
+      .select('article.*')
+      .addSelect('COALESCE(SUM(ABS(movement.quantite)), 0)', 'quantiteVendue')
+      .where('article.actif = :actif', { actif: true })
+      .groupBy('article.id')
+      .orderBy('quantiteVendue', 'DESC')
+      .limit(limit)
+
+    // Ajouter le filtre de période si spécifié
+    if (periode?.debut) {
+      query.andWhere('movement.dateOperation >= :dateDebut', { dateDebut: periode.debut })
+    }
+    if (periode?.fin) {
+      query.andWhere('movement.dateOperation <= :dateFin', { dateFin: periode.fin })
+    }
+
+    const result = await query.getRawAndEntities()
+
+    // Combiner les entités Article avec les quantités vendues
+    return result.entities.map((article, index) => {
+      const quantiteVendue = parseInt(result.raw[index].quantiteVendue || '0')
+      return Object.assign(article, { quantiteVendue }) as Article & { quantiteVendue: number }
     })
   }
 
   async getSlowMovingArticles(nbJoursSansVente: number): Promise<Article[]> {
-    const date = new Date()
-    date.setDate(date.getDate() - nbJoursSansVente)
+    const dateLimite = new Date()
+    dateLimite.setDate(dateLimite.getDate() - nbJoursSansVente)
 
-    // TODO: Implémenter avec les données de mouvement
-    return await this.repository.find()
+    // Articles qui n'ont pas eu de mouvement de sortie récent
+    const articles = await this.repository
+      .createQueryBuilder('article')
+      .leftJoin(
+        'stock_movements',
+        'recent_movement',
+        `recent_movement.articleId = article.id 
+         AND recent_movement.typeOperation IN ('VENTE', 'LIVRAISON_CLIENT', 'SORTIE_PRODUCTION')
+         AND recent_movement.statut != 'ANNULE'
+         AND recent_movement.dateOperation > :dateLimite`
+      )
+      .where('article.actif = :actif', { actif: true })
+      .andWhere('article.gereEnStock = :gereEnStock', { gereEnStock: true })
+      .andWhere('article.stockPhysique > :stockMin', { stockMin: 0 })
+      .andWhere('recent_movement.id IS NULL') // Aucun mouvement récent
+      .setParameter('dateLimite', dateLimite)
+      .getMany()
+
+    return articles
   }
 
   // Méthodes de l'interface IBusinessRepository

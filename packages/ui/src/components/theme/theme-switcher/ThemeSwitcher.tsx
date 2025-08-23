@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * 🎨 THEME SWITCHER UNIFIÉ - TOPSTEEL ERP
  * Composant de commutation de thème connecté au provider unifié

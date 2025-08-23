@@ -33,8 +33,6 @@ export async function GET(request: NextRequest) {
       headers.Cookie = cookieHeader
     }
 
-    // console.log(`[API Route] Tentative de connexion à: ${apiUrl}`)
-
     const response = await callBackendFromApi(request, 'admin/database/migrations/status', {
       method: 'GET',
       signal: AbortSignal.timeout(15000),

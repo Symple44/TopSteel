@@ -157,7 +157,7 @@ export class NotificationDatabaseService implements NotificationService {
       notifications,
       total: notifications.length,
       unreadCount,
-      hasMore: false, // TODO: Implémenter la pagination
+      hasMore: notifications.length >= (filters?.limit || 50), // Indique s'il pourrait y avoir plus de résultats
     }
   }
 

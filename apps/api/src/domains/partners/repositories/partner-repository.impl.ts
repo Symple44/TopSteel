@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { In } from 'typeorm'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
 import type { PartnerSearchCriteria } from '../services/partner.service'
 import type {
@@ -9,6 +10,8 @@ import type {
   PartnerRepositoryStats,
 } from './partner.repository'
 import { PartnerSortField } from './partner.repository'
+import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
+import { SalesHistory } from '../../../features/pricing/entities/sales-history.entity'
 
 /**
  * Implémentation concrète du repository Partner avec TypeORM
@@ -17,7 +20,11 @@ import { PartnerSortField } from './partner.repository'
 export class PartnerRepositoryImpl implements IPartnerRepository {
   constructor(
     @InjectRepository(Partner, 'tenant')
-    private readonly repository: Repository<Partner>
+    private readonly repository: Repository<Partner>,
+    @InjectRepository(MarketplaceOrder)
+    private readonly marketplaceOrderRepository: Repository<MarketplaceOrder>,
+    @InjectRepository(SalesHistory)
+    private readonly salesHistoryRepository: Repository<SalesHistory>
   ) {}
 
   async findById(id: string): Promise<Partner | null> {
@@ -143,14 +150,28 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   }
 
   // Méthodes manquantes de IPartnerRepository
-  async hasActiveOrders(_partnerId: string): Promise<boolean> {
-    // TODO: Implémenter la logique selon vos besoins métier
-    return false
+  async hasActiveOrders(partnerId: string): Promise<boolean> {
+    // Vérifier les commandes marketplace actives
+    const activeOrder = await this.marketplaceOrderRepository.findOne({
+      where: {
+        customerId: partnerId,
+        status: In(['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'])
+      }
+    })
+    
+    return !!activeOrder
   }
 
-  async hasUnpaidInvoices(_partnerId: string): Promise<boolean> {
-    // TODO: Implémenter la logique selon vos besoins métier
-    return false
+  async hasUnpaidInvoices(partnerId: string): Promise<boolean> {
+    // Vérifier les commandes marketplace non payées
+    const unpaidOrder = await this.marketplaceOrderRepository.findOne({
+      where: {
+        customerId: partnerId,
+        paymentStatus: In(['PENDING', 'FAILED', 'CANCELLED'])
+      }
+    })
+    
+    return !!unpaidOrder
   }
 
   async findWithFilters(
@@ -225,13 +246,35 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
 
     // Filtres spéciaux
     if (filters.hasOrders !== undefined) {
-      // TODO: Joindre avec la table des commandes quand elle existera
-      // query.andWhere('EXISTS (SELECT 1 FROM orders WHERE orders.partnerId = partner.id)')
+      if (filters.hasOrders) {
+        query.andWhere(`EXISTS (
+          SELECT 1 FROM marketplace_orders mo 
+          WHERE mo.customer_id = partner.id 
+          AND mo.status IN ('PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED')
+        )`)
+      } else {
+        query.andWhere(`NOT EXISTS (
+          SELECT 1 FROM marketplace_orders mo 
+          WHERE mo.customer_id = partner.id 
+          AND mo.status IN ('PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED')
+        )`)
+      }
     }
 
     if (filters.hasUnpaidInvoices !== undefined) {
-      // TODO: Joindre avec la table des factures quand elle existera
-      // query.andWhere('EXISTS (SELECT 1 FROM invoices WHERE invoices.partnerId = partner.id AND invoices.status = :unpaid)', { unpaid: 'UNPAID' })
+      if (filters.hasUnpaidInvoices) {
+        query.andWhere(`EXISTS (
+          SELECT 1 FROM marketplace_orders mo 
+          WHERE mo.customer_id = partner.id 
+          AND mo.payment_status IN ('PENDING', 'FAILED', 'CANCELLED')
+        )`)
+      } else {
+        query.andWhere(`NOT EXISTS (
+          SELECT 1 FROM marketplace_orders mo 
+          WHERE mo.customer_id = partner.id 
+          AND mo.payment_status IN ('PENDING', 'FAILED', 'CANCELLED')
+        )`)
+      }
     }
 
     if (filters.isPreferredSupplier === true) {
@@ -423,7 +466,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       repartitionGeographique: {
         parVille,
         parDepartement,
-        parRegion: {}, // TODO: Implémenter si nécessaire
+        parRegion: await this.getRegionalDistribution(),
       },
       tendanceCreation,
       moyenneAnciennete,
@@ -479,15 +522,121 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   }
 
   async getTopClients(limit: number): Promise<Array<Partner & { chiffreAffaires: number }>> {
-    // TODO: Implémenter avec les données de chiffre d'affaires réelles
-    const partners = await this.repository.find({
-      where: { type: PartnerType.CLIENT },
-      take: limit,
+    // Calculer le chiffre d'affaires réel depuis l'historique des ventes et les commandes marketplace
+    const query = `
+      SELECT 
+        p.*,
+        COALESCE(sales_revenue.total, 0) + COALESCE(marketplace_revenue.total, 0) as "chiffreAffaires"
+      FROM partners p
+      LEFT JOIN (
+        SELECT 
+          "customerId",
+          SUM(revenue) as total
+        FROM sales_history 
+        WHERE "customerId" IS NOT NULL
+        GROUP BY "customerId"
+      ) sales_revenue ON sales_revenue."customerId" = p.id
+      LEFT JOIN (
+        SELECT 
+          customer_id,
+          SUM(total) as total
+        FROM marketplace_orders 
+        WHERE payment_status = 'PAID'
+        GROUP BY customer_id
+      ) marketplace_revenue ON marketplace_revenue.customer_id = p.id
+      WHERE p.type = 'CLIENT'
+      ORDER BY (COALESCE(sales_revenue.total, 0) + COALESCE(marketplace_revenue.total, 0)) DESC
+      LIMIT $1
+    `
+    
+    const result = await this.repository.query(query, [limit])
+    
+    return result.map((row: any) => {
+      const partner = this.repository.create(row)
+      return Object.assign(partner, { chiffreAffaires: Number(row.chiffreAffaires || 0) })
+    })
+  }
+
+  /**
+   * Calculer la répartition par région basée sur les codes postaux
+   */
+  private async getRegionalDistribution(): Promise<Record<string, number>> {
+    // Mapping des départements vers les régions (France métropolitaine)
+    const departmentToRegion = {
+      // Auvergne-Rhône-Alpes
+      '01': 'Auvergne-Rhône-Alpes', '03': 'Auvergne-Rhône-Alpes', '07': 'Auvergne-Rhône-Alpes',
+      '15': 'Auvergne-Rhône-Alpes', '26': 'Auvergne-Rhône-Alpes', '38': 'Auvergne-Rhône-Alpes',
+      '42': 'Auvergne-Rhône-Alpes', '43': 'Auvergne-Rhône-Alpes', '63': 'Auvergne-Rhône-Alpes',
+      '69': 'Auvergne-Rhône-Alpes', '73': 'Auvergne-Rhône-Alpes', '74': 'Auvergne-Rhône-Alpes',
+      
+      // Bourgogne-Franche-Comté
+      '21': 'Bourgogne-Franche-Comté', '25': 'Bourgogne-Franche-Comté', '39': 'Bourgogne-Franche-Comté',
+      '58': 'Bourgogne-Franche-Comté', '70': 'Bourgogne-Franche-Comté', '71': 'Bourgogne-Franche-Comté',
+      '89': 'Bourgogne-Franche-Comté', '90': 'Bourgogne-Franche-Comté',
+      
+      // Bretagne
+      '22': 'Bretagne', '29': 'Bretagne', '35': 'Bretagne', '56': 'Bretagne',
+      
+      // Centre-Val de Loire
+      '18': 'Centre-Val de Loire', '28': 'Centre-Val de Loire', '36': 'Centre-Val de Loire',
+      '37': 'Centre-Val de Loire', '41': 'Centre-Val de Loire', '45': 'Centre-Val de Loire',
+      
+      // Grand Est
+      '08': 'Grand Est', '10': 'Grand Est', '51': 'Grand Est', '52': 'Grand Est',
+      '54': 'Grand Est', '55': 'Grand Est', '57': 'Grand Est', '67': 'Grand Est',
+      '68': 'Grand Est', '88': 'Grand Est',
+      
+      // Hauts-de-France
+      '02': 'Hauts-de-France', '59': 'Hauts-de-France', '60': 'Hauts-de-France',
+      '62': 'Hauts-de-France', '80': 'Hauts-de-France',
+      
+      // Île-de-France
+      '75': 'Île-de-France', '77': 'Île-de-France', '78': 'Île-de-France',
+      '91': 'Île-de-France', '92': 'Île-de-France', '93': 'Île-de-France',
+      '94': 'Île-de-France', '95': 'Île-de-France',
+      
+      // Normandie
+      '14': 'Normandie', '27': 'Normandie', '50': 'Normandie', '61': 'Normandie', '76': 'Normandie',
+      
+      // Nouvelle-Aquitaine
+      '16': 'Nouvelle-Aquitaine', '17': 'Nouvelle-Aquitaine', '19': 'Nouvelle-Aquitaine',
+      '23': 'Nouvelle-Aquitaine', '24': 'Nouvelle-Aquitaine', '33': 'Nouvelle-Aquitaine',
+      '40': 'Nouvelle-Aquitaine', '47': 'Nouvelle-Aquitaine', '64': 'Nouvelle-Aquitaine',
+      '79': 'Nouvelle-Aquitaine', '86': 'Nouvelle-Aquitaine', '87': 'Nouvelle-Aquitaine',
+      
+      // Occitanie
+      '09': 'Occitanie', '11': 'Occitanie', '12': 'Occitanie', '30': 'Occitanie',
+      '31': 'Occitanie', '32': 'Occitanie', '34': 'Occitanie', '46': 'Occitanie',
+      '48': 'Occitanie', '65': 'Occitanie', '66': 'Occitanie', '81': 'Occitanie', '82': 'Occitanie',
+      
+      // Pays de la Loire
+      '44': 'Pays de la Loire', '49': 'Pays de la Loire', '53': 'Pays de la Loire',
+      '72': 'Pays de la Loire', '85': 'Pays de la Loire',
+      
+      // Provence-Alpes-Côte d\'Azur
+      '04': 'Provence-Alpes-Côte d\'Azur', '05': 'Provence-Alpes-Côte d\'Azur', '06': 'Provence-Alpes-Côte d\'Azur',
+      '13': 'Provence-Alpes-Côte d\'Azur', '83': 'Provence-Alpes-Côte d\'Azur', '84': 'Provence-Alpes-Côte d\'Azur',
+    }
+
+    const departementsResult = await this.repository
+      .createQueryBuilder('partner')
+      .select('SUBSTRING(partner.codePostal, 1, 2)', 'departement')
+      .addSelect('COUNT(*)', 'count')
+      .where('partner.codePostal IS NOT NULL')
+      .andWhere("partner.codePostal ~ '^[0-9]{5}$'") // Codes postaux français valides
+      .groupBy('SUBSTRING(partner.codePostal, 1, 2)')
+      .getRawMany()
+
+    const parRegion: Record<string, number> = {}
+    
+    departementsResult.forEach((item) => {
+      const departement = item.departement
+      const region = departmentToRegion[departement] || 'Autre'
+      const count = parseInt(item.count)
+      
+      parRegion[region] = (parRegion[region] || 0) + count
     })
 
-    return partners.map((partner) => {
-      const result = Object.assign(partner, { chiffreAffaires: 0 })
-      return result as Partner & { chiffreAffaires: number }
-    })
+    return parRegion
   }
 }

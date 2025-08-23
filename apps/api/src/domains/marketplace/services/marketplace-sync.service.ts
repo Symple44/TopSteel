@@ -107,7 +107,7 @@ export class MarketplaceSyncService {
   /**
    * Synchronise un article ERP vers le marketplace
    */
-  private async syncArticleToMarketplace(article: Article, tenantId: string): Promise<void> {
+  async syncArticleToMarketplace(article: Article, tenantId: string): Promise<void> {
     // L'article est déjà prêt pour le marketplace
     // On met juste à jour ses paramètres marketplace
     if (article.marketplaceSettings) {

@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { type CellPosition, type RangeSelection, RangeSelectionManager } from './range-selection'
 

@@ -1,11 +1,9 @@
 'use client'
 
 import {
-  AdvancedDataTable,
   Badge,
   Button,
   Checkbox,
-  type ColumnConfig,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -19,6 +17,7 @@ import {
   SelectValue,
   Switch,
 } from '@erp/ui'
+import { AdvancedDataTable, type ColumnConfig } from '@erp/ui/data-display'
 import { Building, MapPin, Save, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from '@/hooks/use-toast'

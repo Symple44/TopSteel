@@ -1,13 +1,11 @@
 /**
- * 🏗️ PACKAGES DOMAINS - EXPORTS SERVEUR UNIQUEMENT
- * Services qui nécessitent des dépendances serveur (Sharp, etc.)
+ * 🏗️ PACKAGES DOMAINS - SERVER-ONLY EXPORTS
+ * Exports for server-side usage only (includes Sharp and other Node.js dependencies)
  */
 
-export { ImageElasticsearchService, imageElasticsearchService } from './image/elasticsearch-service'
-// Services d'images (utilisent Sharp, Node.js uniquement)
-export { ImageService, imageService } from './image/service'
-export type * from './image/types'
+// Re-export everything from main index
+export * from './index'
 
-// Services de recherche avec dépendances serveur
-export { elasticsearchClient } from './search/elasticsearch-client'
-export { migrationService } from './search/migration-service'
+// Server-only exports (with Sharp dependency)
+export { ImageService } from './image/service'
+export { imageElasticsearchService } from './image/elasticsearch-service'

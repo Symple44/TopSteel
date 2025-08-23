@@ -40,9 +40,15 @@
       "require": "./dist/image/index.cjs"
     },
     "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+      "node": {
+        "types": "./dist/server.d.ts",
+        "import": "./dist/server.js",
+        "require": "./dist/server.cjs"
+      },
+      "edge": null,
+      "worker": null,
+      "browser": null,
+      "default": null
     }
   },
   "main": "./dist/index.cjs",
@@ -78,10 +84,12 @@
     "ms": "^2.1.3",
     "secure-json-parse": "^4.0.0",
     "semver": "^7.7.2",
-    "sharp": "^0.34.3",
     "simple-swizzle": "^0.2.2",
     "tslib": "^2.8.1",
     "undici": "^7.13.0"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",

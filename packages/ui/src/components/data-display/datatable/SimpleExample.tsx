@@ -81,62 +81,116 @@ const _simpleColumns: ColumnConfig<SimpleEmployee>[] = [
   },
 ]
 
+import { useState } from 'react'
+// import { AdvancedDataTable } from './AdvancedDataTable' // File doesn't exist yet
+
 export function SimpleDataTableExample() {
-  // TODO: This component needs to be refactored to work without app-specific hooks
-  // const { data, selection, selectedData, tableConfig, handleRowAdd, clearSelection } = useDataTable(
-  //   {
-  //     tableId: 'simple-employees',
-  //     initialData: sampleData,
-  //     columns: simpleColumns,
-  //     keyField: 'id',
-  //   }
-  // )
+  const [data, setData] = useState<SimpleEmployee[]>(sampleData)
+  const [selectedRows, setSelectedRows] = useState<string[]>([])
+
+  // Configuration pour AdvancedDataTable
+  const simpleColumns: ColumnConfig<SimpleEmployee>[] = [
+    {
+      id: 'nom',
+      key: 'nom',
+      title: 'Nom',
+      type: 'text',
+      width: 200,
+      sortable: true,
+      searchable: true,
+    },
+    {
+      id: 'poste',
+      key: 'poste',
+      title: 'Poste',
+      type: 'text',
+      width: 150,
+      sortable: true,
+    },
+    {
+      id: 'salaire',
+      key: 'salaire',
+      title: 'Salaire',
+      type: 'number',
+      width: 120,
+      sortable: true,
+      render: (value) => {
+        if (typeof value === 'number') {
+          return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR',
+          }).format(value)
+        }
+        return String(value || 0)
+      },
+    },
+    {
+      id: 'actif',
+      key: 'actif',
+      title: 'Actif',
+      type: 'boolean',
+      width: 80,
+      render: (value) => (value ? '✓' : '✗'),
+    },
+  ]
 
   // Action pour ajouter un nouvel employé
-  const _handleAddEmployee = () => {
-    const _newEmployee: SimpleEmployee = {
-      id: Math.max(...sampleData.map((e: SimpleEmployee) => e.id)) + 1,
+  const handleAddEmployee = () => {
+    const newEmployee: SimpleEmployee = {
+      id: Math.max(...data.map((e: SimpleEmployee) => e.id)) + 1,
       nom: 'Nouvel Employé',
       poste: 'Développeur',
       salaire: 35000,
       actif: true,
     }
-    // handleRowAdd(newEmployee) // Commented out for now
+    setData([...data, newEmployee])
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Exemple Simplifié</h3>
+          <h3 className="text-lg font-semibold">Exemple de DataTable</h3>
           <p className="text-sm text-gray-600">
-            This component requires app-specific hooks and needs to be refactored
+            Exemple fonctionnel d'utilisation du composant DataTable
           </p>
         </div>
+        <button
+          onClick={handleAddEmployee}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Ajouter un employé
+        </button>
       </div>
 
-      <div className="p-4 border rounded-lg bg-gray-50">
-        <p className="text-sm text-gray-600">
-          This component is temporarily disabled because it depends on app-specific hooks. To use
-          this component, implement the required data management logic.
-        </p>
+      {/* <AdvancedDataTable
+        data={data}
+        columns={simpleColumns}
+        keyField="id"
+        tableId="simple-employees"
+        userId="demo-user"
+        sortable
+        searchable
+        selectable
+        selectedRows={selectedRows}
+        onSelectionChange={setSelectedRows}
+        pagination={{
+          page: 1,
+          pageSize: 10,
+          total: data.length,
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 20],
+        }}
+      /> */}
+      <div className="p-4 border rounded">
+        <p>AdvancedDataTable component not yet implemented</p>
       </div>
 
-      <div className="text-xs text-gray-500 space-y-1">
-        <p>
-          <strong>Code simplifié :</strong>
-        </p>
-        <code className="block p-2 bg-gray-100 rounded text-xs">
-          {`const { tableConfig, handleRowAdd } = useDataTable({
-  tableId: 'simple-employees',
-  initialData: sampleData,
-  columns: simpleColumns,
-  keyField: 'id'
-})
-
-<DataTable {...tableConfig} />`}
-        </code>
-      </div>
+      {selectedRows.length > 0 && (
+        <div className="text-sm text-gray-600">
+          {selectedRows.length} ligne(s) sélectionnée(s)
+        </div>
+      )}
     </div>
   )
 }

@@ -1,30 +1,32 @@
 import type { ReorderableListConfig } from '@erp/ui'
 import { type NextRequest, NextResponse } from 'next/server'
-
-// Mock database - À remplacer par votre vraie base de données
-const mockDB = new Map<string, ReorderableListConfig>()
+import { getAuthenticatedUser } from '@/lib/auth/jwt-utils-server'
+import { UIPreferencesService } from '@/lib/services/ui-preferences.service'
 
 // GET - Récupérer la configuration d'un composant
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ componentId: string }> }
 ) {
   try {
     const { componentId } = await params
 
-    // TODO: Récupérer l'utilisateur depuis la session/JWT
-    const userId = 'mock-user-id' // À remplacer par la vraie logique d'auth
+    // Récupérer l'utilisateur authentifié
+    const user = await getAuthenticatedUser(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
 
-    const configKey = `${userId}-${componentId}`
-    const config = mockDB.get(configKey)
+    // Récupérer la configuration depuis la base de données
+    const config = await UIPreferencesService.getConfig(user.id, componentId)
 
     if (!config) {
-      return NextResponse.json({ error: 'Configuration non trouvée' }, { status: 404 })
+      return NextResponse.json({ error: 'Configuration not found' }, { status: 404 })
     }
 
     return NextResponse.json(config)
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -35,78 +37,55 @@ export async function POST(
 ) {
   try {
     const { componentId } = await params
-    const body = (await request.json()) as ReorderableListConfig
+    const body = (await request.json()) as Partial<ReorderableListConfig>
 
     // Validation basique
-    if (!body || !body.componentId || body.componentId !== componentId) {
-      return NextResponse.json({ error: 'Données invalides' }, { status: 400 })
+    if (!body || (body.componentId && body.componentId !== componentId)) {
+      return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
     }
 
-    // TODO: Récupérer l'utilisateur depuis la session/JWT
-    const userId = 'mock-user-id' // À remplacer par la vraie logique d'auth
-
-    // Enrichir avec les métadonnées
-    const config: ReorderableListConfig = {
-      ...body,
-      userId,
-      componentId,
-      updatedAt: new Date(),
+    // Récupérer l'utilisateur authentifié
+    const user = await getAuthenticatedUser(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    // Si pas d'ID, c'est une création
-    if (!config.id) {
-      config.id = `${componentId}-${userId}-${Date.now()}`
-      config.createdAt = new Date()
-    }
-
-    const configKey = `${userId}-${componentId}`
-    mockDB.set(configKey, config)
-
-    // TODO: Sauvegarder en base de données
-    /*
-    const savedConfig = await db.uiPreferences.upsert({
-      where: {
-        userId_componentId: {
-          userId,
-          componentId
-        }
-      },
-      update: {
-        theme: config.theme,
-        preferences: config.preferences,
-        layout: config.layout,
-        updatedAt: config.updatedAt
-      },
-      create: config
+    // Sauvegarder en base de données
+    const savedConfig = await UIPreferencesService.saveConfig(user.id, componentId, {
+      theme: body.theme,
+      preferences: body.preferences,
+      layout: body.layout,
     })
-    */
 
-    return NextResponse.json(config)
+    return NextResponse.json(savedConfig)
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 // DELETE - Supprimer la configuration (reset)
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ componentId: string }> }
 ) {
   try {
     const { componentId } = await params
 
-    // TODO: Récupérer l'utilisateur depuis la session/JWT
-    const userId = 'mock-user-id'
+    // Récupérer l'utilisateur authentifié
+    const user = await getAuthenticatedUser(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
 
-    const configKey = `${userId}-${componentId}`
-    const deleted = mockDB.delete(configKey)
+    // Supprimer de la base de données
+    const deleted = await UIPreferencesService.deleteConfig(user.id, componentId)
 
     if (!deleted) {
-      return NextResponse.json({ error: 'Configuration non trouvée' }, { status: 404 })
+      return NextResponse.json({ error: 'Configuration not found' }, { status: 404 })
     }
 
     return NextResponse.json({ success: true })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

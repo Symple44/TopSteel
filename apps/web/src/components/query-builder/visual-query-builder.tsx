@@ -599,7 +599,9 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                           columnName: col.column,
                           tableName: col.table,
                           label: col.alias || col.column,
-                          dataType: 'text', // TODO: get actual data type from schema
+                          dataType:
+                            selectedTable?.columns.find((c) => c.name === col.column)?.type ||
+                            'text',
                           isVisible: true,
                           isSortable: true,
                           isFilterable: true,

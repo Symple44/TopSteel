@@ -410,7 +410,6 @@ class BusinessMetrics {
     // Envoyer les derniers événements
     if (this.events.length > 0) {
       // biome-ignore lint/suspicious/noConsole: Legitimate warning for failed event flush
-      this.flushEvents().catch(console.warn)
     }
   }
 }

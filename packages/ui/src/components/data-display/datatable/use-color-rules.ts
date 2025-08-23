@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo } from 'react'
 import type { ColorRule } from './ColorRuleManager'
 import type { ColumnConfig } from './types'

@@ -4,6 +4,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
 import * as handlebars from 'handlebars'
 import { createTransport, type Transporter } from 'nodemailer'
+import type SMTPTransport from 'nodemailer/lib/smtp-transport'
 
 export interface SendEmailOptions {
   to: string | string[]
@@ -39,7 +40,7 @@ export class EmailService {
   }
 
   private initializeTransporter(): void {
-    const smtpConfig = {
+    const smtpConfig: SMTPTransport.Options = {
       host: this.configService.get<string>('SMTP_HOST'),
       port: this.configService.get<number>('SMTP_PORT', 587),
       secure: this.configService.get<boolean>('SMTP_SECURE', false),
@@ -55,7 +56,11 @@ export class EmailService {
     }
 
     // Validate required SMTP configuration
-    if (!smtpConfig.host || !smtpConfig.auth.user || !smtpConfig.auth.pass) {
+    const host = this.configService.get<string>('SMTP_HOST')
+    const user = this.configService.get<string>('SMTP_USER')
+    const pass = this.configService.get<string>('SMTP_PASSWORD')
+    
+    if (!host || !user || !pass) {
       this.logger.warn('SMTP configuration incomplete - email sending disabled')
       return
     }

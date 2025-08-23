@@ -3,7 +3,7 @@ import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { User } from '../../../domains/users/entities/user.entity'
 import { QueryBuilder } from './query-builder.entity'
 
-export type PermissionType = 'view' | 'edit' | 'delete' | 'execute'
+export type PermissionType = 'view' | 'edit' | 'delete' | 'execute' | 'share' | 'export'
 
 @Entity('query_builder_permissions')
 export class QueryBuilderPermission {

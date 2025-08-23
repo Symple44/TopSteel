@@ -182,8 +182,18 @@
       "Bash(git merge:*)",
       "Bash(git push:*)",
       "WebSearch",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(NEXT_BIOME_SKIP=true npm run build)",
+      "Bash(NODE_ENV=production NEXT_BIOME_SKIP=1 npx next build)",
+      "Bash(cloc:*)"
     ],
-    "deny": []
+    "deny": [],
+    "additionalDirectories": [
+      "D:\\d\\GitHub\\TopSteel\\packages",
+      "D:\\d\\GitHub\\TopSteel\\apps",
+      "D:\\d\\GitHub\\TopSteel\\packages\\ui\\src",
+      "D:\\D\\GitHub\\TopSteel\\apps",
+      "D:\\D\\GitHub"
+    ]
   }
 }

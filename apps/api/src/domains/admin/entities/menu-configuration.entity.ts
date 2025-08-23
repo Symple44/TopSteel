@@ -139,7 +139,7 @@ export class MenuConfiguration {
    * Get configuration value
    */
   getConfig<T>(key: string, defaultValue?: T): T | undefined {
-    return this.config?.[key] ?? defaultValue
+    return (this.config?.[key] as T) ?? defaultValue
   }
 
   /**
@@ -163,7 +163,7 @@ export class MenuConfiguration {
    * Get metadata value
    */
   getMetadata<T>(key: string, defaultValue?: T): T | undefined {
-    return this.metadata?.[key] ?? defaultValue
+    return (this.metadata?.[key] as T) ?? defaultValue
   }
 
   /**

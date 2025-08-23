@@ -73,6 +73,9 @@ export interface ColumnConfig<T = Record<string, unknown>> {
 
   // Fonction pour obtenir la valeur personnalisée (utile pour des propriétés imbriquées)
   getValue?: (row: T) => unknown
+  
+  // Alias pour getValue (compatibilité)
+  accessor?: ((row: T) => unknown) | string
 
   // Actions
   onEdit?: (value: unknown, row: T, column: ColumnConfig<T>) => void
@@ -87,9 +90,9 @@ export interface SortConfig {
 
 // Configuration des filtres
 export interface FilterConfig {
-  column: string
-  value: DataValue
-  operator:
+  field: string  // Identifiant de la colonne à filtrer
+  value: DataValue | Record<string, unknown>  // Valeur du filtre (peut être complexe)
+  operator?:  // Opérateur de comparaison (optionnel pour les filtres complexes)
     | 'equals'
     | 'contains'
     | 'startsWith'
@@ -101,6 +104,44 @@ export interface FilterConfig {
     | 'between'
     | 'in'
     | 'notIn'
+  column?: string  // Alias pour field (compatibilité)
+}
+
+// Opérateurs de filtrage avancé
+export type FilterOperator =
+  | 'equals'
+  | 'not_equals'
+  | 'contains'
+  | 'not_contains'
+  | 'starts_with'
+  | 'ends_with'
+  | 'gt'
+  | 'gte'
+  | 'lt'
+  | 'lte'
+  | 'is_empty'
+  | 'is_not_empty'
+  | 'in'
+  | 'not_in'
+  | 'between'
+
+// Règle de filtrage avancé
+export interface AdvancedFilterRule {
+  id: string
+  field: string  // Identifiant de la colonne
+  column?: string  // Alias pour field (compatibilité)
+  operator: FilterOperator
+  value: any
+  value2?: any  // Pour l'opérateur "between"
+  enabled: boolean
+}
+
+// Groupe de filtres avancés
+export interface AdvancedFilterGroup {
+  id: string
+  logic: 'AND' | 'OR'  // Pour filtres combinés
+  condition?: 'AND' | 'OR'  // Alias pour logic
+  rules: (AdvancedFilterRule | AdvancedFilterGroup)[]  // Support des groupes imbriqués
 }
 
 // État de sélection

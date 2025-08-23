@@ -3,21 +3,26 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { MarketplaceOrder } from './entities/marketplace-order.entity'
 import { MarketplaceOrderItem } from './entities/marketplace-order-item.entity'
-
-// TODO: Implémenter services et contrôleurs orders
-// import { MarketplaceOrdersService } from './services/marketplace-orders.service'
-// import { OrdersController } from './controllers/orders.controller'
+import { MarketplaceCustomer } from '../customers/entities/marketplace-customer.entity'
+import { OrdersService } from './services/orders.service'
+import { OrdersController } from './controllers/orders.controller'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MarketplaceOrder, MarketplaceOrderItem], 'marketplace')],
+  imports: [
+    TypeOrmModule.forFeature([
+      MarketplaceOrder, 
+      MarketplaceOrderItem,
+      MarketplaceCustomer
+    ], 'marketplace')
+  ],
   providers: [
-    // MarketplaceOrdersService,
+    OrdersService,
   ],
   controllers: [
-    // OrdersController,
+    OrdersController,
   ],
   exports: [
-    // MarketplaceOrdersService,
+    OrdersService,
   ],
 })
 export class OrdersModule {}

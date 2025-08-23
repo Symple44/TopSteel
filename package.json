@@ -103,7 +103,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.1.4",
     "@changesets/changelog-github": "^0.5.1",
-    "@changesets/cli": "^2.29.5",
+    "@changesets/cli": "^2.29.6",
     "@nestjs/cli": "^11.0.10",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.2.1",
@@ -115,12 +115,18 @@
     "better-npm-audit": "^3.11.0",
     "depcheck": "^1.4.7",
     "eslint": "^9.33.0",
+    "glob": "^11.0.3",
     "null-loader": "^4.0.1",
     "rimraf": "^6.0.1",
     "tsup": "^8.5.0",
     "turbo": "^2.5.4",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "commander": "^12.1.0",
+    "chalk": "^5.3.0",
+    "inquirer": "^12.1.0",
+    "@types/inquirer": "^9.0.7",
+    "tsx": "^4.19.2"
   },
   "packageManager": "pnpm@10.13.1",
   "workspaces": [
@@ -170,11 +176,20 @@
     "setup": "pnpm install && pnpm build:packages",
     "ci:install": "pnpm install --frozen-lockfile",
     "ci:build": "pnpm build:packages && pnpm build:apps",
+    "test:coverage": "turbo test:coverage",
+    "secrets:generate": "tsx scripts/secrets-cli.ts generate",
+    "secrets:validate": "tsx scripts/secrets-cli.ts validate",
+    "secrets:rotate": "tsx scripts/secrets-cli.ts rotate",
+    "secrets:encrypt": "tsx scripts/secrets-cli.ts encrypt",
+    "update:deps": "sh scripts/update-dependencies.sh",
+    "coverage:report": "node scripts/check-coverage.js",
     "ci:test": "turbo test",
     "version:update": "node scripts/set-version.mjs",
     "version:set": "node scripts/set-version.mjs",
     "version:info": "node --input-type=module -e \"import pkg from './package.json' assert { type: 'json' }; console.log('Version:', pkg.version)\"",
-    "verify:packages": "node scripts/verify-package-consistency.js"
+    "verify:packages": "node scripts/verify-package-consistency.js",
+    "secrets": "tsx scripts/secrets-cli.ts",
+    "secrets:mask": "tsx scripts/secrets-cli.ts mask"
   },
   "author": {
     "name": "TopSteel",

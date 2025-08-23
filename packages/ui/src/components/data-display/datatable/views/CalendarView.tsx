@@ -4,7 +4,7 @@ import { Calendar, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-reac
 import { useMemo, useState } from 'react'
 import { Button } from '../../../primitives/button'
 import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
-import { Badge } from '../../badge'
+import { Badge } from '../..//badge'
 import type { CalendarEvent } from '../use-data-views'
 
 interface CalendarViewProps {

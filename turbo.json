@@ -1,14 +1,28 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["NODE_ENV"],
-  "globalPassThroughEnv": ["PORT", "HOST"],
+  "globalEnv": ["NODE_ENV", "CI", "VERCEL", "VERCEL_ENV"],
+  "globalPassThroughEnv": ["PORT", "HOST", "DATABASE_URL"],
+  "globalDependencies": [".env", ".env.local"],
   "concurrency": "15",
+  "remoteCache": {
+    "signature": true
+  },
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "build/**"],
-      "cache": true
+      "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts", "vite.config.ts", "next.config.mjs", "!**/*.test.ts", "!**/*.test.tsx", "!**/__tests__/**", "!**/*.stories.tsx"],
+      "outputs": ["dist/**", ".next/**", "build/**", "!dist/cache/**", "!.next/cache/**"],
+      "cache": true,
+      "outputLogs": "errors-only",
+      "env": ["NODE_ENV", "NEXT_PUBLIC_*"]
+    },
+    "build:packages": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts", "!**/*.test.ts", "!**/__tests__/**"],
+      "outputs": ["dist/**"],
+      "cache": true,
+      "outputLogs": "errors-only"
     },
     "dev": {
       "cache": false,

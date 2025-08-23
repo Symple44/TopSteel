@@ -425,10 +425,15 @@ export function DataTable<T = any>({
     filters.forEach((filter) => {
       result = result.filter((row) => {
         // Trouver la colonne correspondante pour utiliser getValue si défini
-        const column = orderedColumns.find((col) => col.id === filter.column)
+        const filterField = filter.field || filter.column
+        const column = orderedColumns.find((col) => col.id === filterField)
         const value = column?.getValue
           ? column.getValue(row)
-          : (row as any)[column?.key || filter.column]
+          : column?.key 
+            ? (row as any)[column.key]
+            : filterField
+              ? (row as any)[filterField]
+              : undefined
         return applyFilter(value, filter)
       })
     })
@@ -1766,16 +1771,16 @@ export function DataTable<T = any>({
                             currentSort={
                               sortConfig.find((s) => s.column === column.id)?.direction || null
                             }
-                            currentFilters={filters.find((f) => f.column === column.id)?.value}
+                            currentFilters={filters.find((f) => (f.field || f.column) === column.id)?.value}
                             onSort={(direction) => handleSort(column.id, direction)}
                             onFilter={(filter) => {
                               if (filter) {
                                 setFilters((prev) => [
-                                  ...prev.filter((f) => f.column !== column.id),
-                                  { column: column.id, value: filter, operator: 'equals' as const },
+                                  ...prev.filter((f) => (f.field || f.column) !== column.id),
+                                  { field: column.id, value: filter, operator: 'equals' as const },
                                 ])
                               } else {
-                                setFilters((prev) => prev.filter((f) => f.column !== column.id))
+                                setFilters((prev) => prev.filter((f) => (f.field || f.column) !== column.id))
                               }
                             }}
                           />

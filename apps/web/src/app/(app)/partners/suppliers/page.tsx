@@ -1,6 +1,7 @@
 'use client'
 
 import type { Partner, PartnerFilters, PartnerStatus } from '@erp/types'
+import { PartnerType } from '@erp/types'
 import {
   Badge,
   Button,
@@ -8,7 +9,8 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  DataTable,
+  type ColumnConfig,
+  AdvancedDataTable as DataTable,
   Select,
   SelectContent,
   SelectItem,
@@ -22,7 +24,7 @@ import { PartnerFormDialog } from '@/components/partners/partner-form-dialog'
 import { useDeletePartner, usePartnerStatistics, usePartners } from '@/hooks/use-partners'
 
 export default function SuppliersPage() {
-  const [filters, setFilters] = useState<PartnerFilters>({ type: ['FOURNISSEUR'] })
+  const [filters, setFilters] = useState<PartnerFilters>({ type: [PartnerType.FOURNISSEUR] })
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -53,51 +55,51 @@ export default function SuppliersPage() {
     }
   }
 
-  const columns = [
+  const columns: ColumnConfig<Partner>[] = [
     {
       key: 'code',
-      label: 'Code',
+      header: 'Code',
       sortable: true,
       width: 120,
     },
     {
       key: 'denomination',
-      label: 'Dénomination',
+      header: 'Dénomination',
       sortable: true,
       searchable: true,
     },
     {
       key: 'category',
-      label: 'Catégorie',
+      header: 'Catégorie',
       width: 150,
     },
     {
       key: 'ville',
-      label: 'Ville',
+      header: 'Ville',
       sortable: true,
       searchable: true,
     },
     {
       key: 'telephone',
-      label: 'Téléphone',
+      header: 'Téléphone',
       width: 150,
     },
     {
       key: 'email',
-      label: 'Email',
+      header: 'Email',
       width: 200,
     },
     {
       key: 'delaiPaiement',
-      label: 'Délai paiement',
+      header: 'Délai paiement',
       width: 150,
-      render: (value: number) => (value ? `${value} jours` : '-'),
+      render: (partner) => (partner.delaiPaiement ? `${partner.delaiPaiement} jours` : '-'),
     },
     {
       key: 'status',
-      label: 'Statut',
+      header: 'Statut',
       width: 120,
-      render: (value: PartnerStatus) => {
+      render: (partner) => {
         const variants: Record<PartnerStatus, 'default' | 'secondary' | 'destructive' | 'outline'> =
           {
             ACTIF: 'default',
@@ -106,28 +108,28 @@ export default function SuppliersPage() {
             SUSPENDU: 'destructive',
             ARCHIVE: 'secondary',
           }
-        return <Badge variant={variants[value]}>{value}</Badge>
+        return <Badge variant={variants[partner.status]}>{partner.status}</Badge>
       },
     },
     {
-      key: 'group.name',
-      label: 'Groupe',
+      key: 'group',
+      header: 'Groupe',
       width: 150,
-      render: (_: string | undefined, partner: Partner) => partner.group?.name || '-',
+      render: (partner) => partner.group?.name || '-',
     },
   ]
 
-  const actions = [
+  const _actions = [
     {
-      label: 'Voir',
+      header: 'Voir',
       onClick: handleView,
     },
     {
-      label: 'Modifier',
+      header: 'Modifier',
       onClick: handleEdit,
     },
     {
-      label: 'Supprimer',
+      header: 'Supprimer',
       onClick: handleDelete,
       variant: 'destructive' as const,
     },
@@ -230,14 +232,28 @@ export default function SuppliersPage() {
       <Card>
         <CardContent className="p-0">
           <DataTable
-            columns={columns}
             data={partners}
-            actions={actions}
+            columns={columns}
+            keyField="id"
             loading={isLoading}
             searchable
+            sortable
             selectable
-            exportable
-            pageSize={20}
+            actions={[
+              {
+                label: 'Voir',
+                onClick: handleView,
+              },
+              {
+                label: 'Modifier',
+                onClick: handleEdit,
+              },
+              {
+                label: 'Supprimer',
+                onClick: handleDelete,
+                variant: 'destructive' as const,
+              },
+            ]}
           />
         </CardContent>
       </Card>

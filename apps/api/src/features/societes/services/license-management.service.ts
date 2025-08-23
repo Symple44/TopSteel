@@ -7,6 +7,8 @@ import { UserSession } from '../../../domains/auth/core/entities/user-session.en
 import { User } from '../../../domains/users/entities/user.entity'
 import { Societe } from '../entities/societe.entity'
 import { LicenseStatus, LicenseType, SocieteLicense } from '../entities/societe-license.entity'
+import { Notifications, NotificationType, NotificationCategory, RecipientType, NotificationPriority } from '../../../features/notifications/entities/notifications.entity'
+import { GlobalUserRole } from '../../../domains/auth/core/constants/roles.constants'
 
 export interface LicenseCheckResult {
   isValid: boolean
@@ -43,6 +45,8 @@ export class LicenseManagementService {
     private userRepository: Repository<User>,
     @InjectRepository(UserSession, 'auth')
     private sessionRepository: Repository<UserSession>,
+    @InjectRepository(Notifications, 'auth')
+    private notificationRepository: Repository<Notifications>,
     private configService: ConfigService
   ) {}
 
@@ -243,6 +247,9 @@ export class LicenseManagementService {
     // Déconnecter tous les utilisateurs de cette société
     await this.disconnectAllUsers(license.societeId)
 
+    // Créer une notification de suspension
+    await this.createSuspensionNotification(license, reason)
+
     this.logger.warn(`Licence suspendue pour la société ${license.societeId}: ${reason}`)
   }
 
@@ -321,9 +328,13 @@ export class LicenseManagementService {
 
     for (const license of licensesToNotify) {
       if (license.needsRenewalNotification()) {
-        // TODO: Implémenter l'envoi de notification
+        const daysUntilExpiration = license.getDaysUntilExpiration()
+        
+        // Create renewal notification
+        await this.createRenewalNotification(license, daysUntilExpiration)
+
         this.logger.log(
-          `Notification de renouvellement pour société ${license.societeId} - ${license.getDaysUntilExpiration()} jours restants`
+          `Notification de renouvellement envoyée pour société ${license.societeId} - ${daysUntilExpiration} jours restants`
         )
 
         license.lastNotificationAt = new Date()
@@ -528,5 +539,226 @@ export class LicenseManagementService {
         (error as Error).message
       )
     }
+  }
+
+  /**
+   * Créer une notification de renouvellement de licence
+   */
+  private async createRenewalNotification(
+    license: SocieteLicense,
+    daysUntilExpiration: number
+  ): Promise<void> {
+    const societe = await this.societeRepository.findOne({
+      where: { id: license.societeId },
+      relations: ['administrateurs']
+    })
+
+    if (!societe) {
+      this.logger.warn(`Société ${license.societeId} non trouvée pour notification de renouvellement`)
+      return
+    }
+
+    const priority = this.getRenewalNotificationPriority(daysUntilExpiration)
+    const urgencyLevel = this.getUrgencyLevel(daysUntilExpiration)
+
+    // Créer la notification pour les administrateurs de la société
+    const notification = this.notificationRepository.create({
+      title: `${urgencyLevel} - Renouvellement de licence requis`,
+      message: this.buildRenewalMessage(license, daysUntilExpiration, societe.nom),
+      type: NotificationType.SYSTEM,
+      category: NotificationCategory.LICENSE,
+      priority,
+      source: 'license_management',
+      entityType: 'societe_license',
+      entityId: license.id,
+      data: {
+        societeId: license.societeId,
+        societeDenomination: societe.nom,
+        licenseId: license.id,
+        licenseType: license.type,
+        expirationDate: license.expiresAt,
+        daysUntilExpiration,
+        currentUsers: license.currentUsers,
+        maxUsers: license.maxUsers,
+        utilizationPercent: license.getUserUtilizationPercent()
+      },
+      recipientType: RecipientType.ROLE,
+      recipientId: 'admin', // Pour les administrateurs de la société
+      actionUrl: `/admin/licenses/${license.id}`,
+      actionLabel: 'Renouveler maintenant',
+      actionType: 'primary',
+      expiresAt: license.expiresAt, // Notification expire avec la licence
+      persistent: true,
+      autoRead: false,
+      isArchived: false,
+    })
+
+    await this.notificationRepository.save(notification)
+
+    // Créer des notifications individuelles pour les super-administrateurs
+    const adminUsers = await this.userRepository.find({
+      where: { 
+        role: GlobalUserRole.SUPER_ADMIN,
+        actif: true 
+      }
+    })
+
+    for (const admin of adminUsers) {
+      const adminNotification = this.notificationRepository.create({
+        ...notification,
+        id: undefined, // Nouvelle notification
+        recipientType: RecipientType.USER,
+        recipientId: admin.id,
+        title: `[${societe.nom}] ${urgencyLevel} - Licence arrivant à expiration`,
+      })
+
+      await this.notificationRepository.save(adminNotification)
+    }
+
+    this.logger.log(
+      `Notifications de renouvellement créées pour la société ${societe.nom} (${daysUntilExpiration} jours restants)`
+    )
+  }
+
+  /**
+   * Construire le message de notification de renouvellement
+   */
+  private buildRenewalMessage(
+    license: SocieteLicense,
+    daysUntilExpiration: number,
+    societeNom: string
+  ): string {
+    const baseMessage = `La licence ${license.type} de la société "${societeNom}" `
+
+    if (daysUntilExpiration <= 0) {
+      return `${baseMessage}a expiré. L'accès aux services est maintenant restreint. Veuillez renouveler immédiatement votre licence.`
+    } else if (daysUntilExpiration <= 3) {
+      return `${baseMessage}expire dans ${daysUntilExpiration} jour(s) ! Renouvellement urgent requis pour éviter l'interruption de service.`
+    } else if (daysUntilExpiration <= 7) {
+      return `${baseMessage}expire dans ${daysUntilExpiration} jours. Veuillez planifier le renouvellement rapidement.`
+    } else if (daysUntilExpiration <= 15) {
+      return `${baseMessage}expire dans ${daysUntilExpiration} jours. Il est temps de préparer le renouvellement.`
+    } else {
+      return `${baseMessage}expire dans ${daysUntilExpiration} jours. Pensez à planifier le renouvellement prochainement.`
+    }
+  }
+
+  /**
+   * Déterminer la priorité de la notification selon l'urgence
+   */
+  private getRenewalNotificationPriority(daysUntilExpiration: number): NotificationPriority {
+    if (daysUntilExpiration <= 0) return NotificationPriority.URGENT
+    if (daysUntilExpiration <= 3) return NotificationPriority.URGENT
+    if (daysUntilExpiration <= 7) return NotificationPriority.HIGH
+    if (daysUntilExpiration <= 15) return NotificationPriority.NORMAL
+    return NotificationPriority.LOW
+  }
+
+  /**
+   * Déterminer le niveau d'urgence pour le titre
+   */
+  private getUrgencyLevel(daysUntilExpiration: number): string {
+    if (daysUntilExpiration <= 0) return 'LICENCE EXPIRÉE'
+    if (daysUntilExpiration <= 3) return 'URGENT'
+    if (daysUntilExpiration <= 7) return 'ATTENTION'
+    return 'RAPPEL'
+  }
+
+  /**
+   * Créer une notification de violation de licence
+   */
+  async createViolationNotification(
+    license: SocieteLicense,
+    violationType: string,
+    details: string
+  ): Promise<void> {
+    const societe = await this.societeRepository.findOne({
+      where: { id: license.societeId }
+    })
+
+    if (!societe) {
+      return
+    }
+
+    const notification = this.notificationRepository.create({
+      title: `Violation de licence détectée - ${societe.nom}`,
+      message: `Une violation de licence de type "${violationType}" a été détectée pour la société "${societe.nom}". ${details}`,
+      type: NotificationType.SYSTEM,
+      category: NotificationCategory.SYSTEM,
+      priority: NotificationPriority.URGENT,
+      source: 'license_management',
+      entityType: 'societe_license',
+      entityId: license.id,
+      data: {
+        societeId: license.societeId,
+        societeDenomination: societe.nom,
+        licenseId: license.id,
+        violationType,
+        details,
+        violationTime: new Date(),
+      },
+      recipientType: RecipientType.ROLE,
+      recipientId: 'super_admin',
+      actionUrl: `/admin/licenses/${license.id}/violations`,
+      actionLabel: 'Examiner la violation',
+      actionType: 'primary',
+      persistent: true,
+      autoRead: false,
+      isArchived: false,
+    })
+
+    await this.notificationRepository.save(notification)
+
+    this.logger.warn(
+      `Notification de violation de licence créée pour ${societe.nom}: ${violationType} - ${details}`
+    )
+  }
+
+  /**
+   * Créer une notification de suspension de licence
+   */
+  async createSuspensionNotification(
+    license: SocieteLicense,
+    reason: string
+  ): Promise<void> {
+    const societe = await this.societeRepository.findOne({
+      where: { id: license.societeId }
+    })
+
+    if (!societe) {
+      return
+    }
+
+    const notification = this.notificationRepository.create({
+      title: `Licence suspendue - ${societe.nom}`,
+      message: `La licence de la société "${societe.nom}" a été suspendue. Raison: ${reason}. Tous les utilisateurs ont été déconnectés.`,
+      type: NotificationType.SYSTEM,
+      category: NotificationCategory.SYSTEM,
+      priority: NotificationPriority.URGENT,
+      source: 'license_management',
+      entityType: 'societe_license',
+      entityId: license.id,
+      data: {
+        societeId: license.societeId,
+        societeDenomination: societe.nom,
+        licenseId: license.id,
+        suspensionReason: reason,
+        suspensionTime: new Date(),
+      },
+      recipientType: RecipientType.ROLE,
+      recipientId: 'super_admin',
+      actionUrl: `/admin/licenses/${license.id}`,
+      actionLabel: 'Gérer la suspension',
+      actionType: 'primary',
+      persistent: true,
+      autoRead: false,
+      isArchived: false,
+    })
+
+    await this.notificationRepository.save(notification)
+
+    this.logger.error(
+      `Notification de suspension créée pour ${societe.nom}: ${reason}`
+    )
   }
 }

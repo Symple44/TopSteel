@@ -178,7 +178,7 @@ export function TemplateSelector({ className }: TemplateSelectorProps) {
                   <TemplateCard
                     key={template.id}
                     template={template}
-                    isApplied={false} // TODO: Comparer avec les settings actuels
+                    isApplied={isTemplateApplied(template.id)}
                     onApply={() => applyTemplate(template)}
                     onPreview={() => setPreviewTemplate(template)}
                     showFullDescription

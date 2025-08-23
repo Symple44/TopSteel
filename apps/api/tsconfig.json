@@ -9,11 +9,16 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": false, // À activer progressivement
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictPropertyInitialization": false,
-    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false, // TODO: À activer progressivement
+    "strictPropertyInitialization": false, // Temporaire pour NestJS decorators
+    "noFallthroughCasesInSwitch": true, // Activé : évite les erreurs de switch
+    "strictNullChecks": false, // À activer plus tard
+    "strictFunctionTypes": false, // À activer plus tard
+    "strictBindCallApply": true, // Activé : meilleur typage des fonctions
+    "noImplicitThis": true, // Activé : évite les erreurs de contexte
+    "alwaysStrict": true, // Activé : mode strict JS
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": false,
@@ -24,6 +29,7 @@
     "importHelpers": true,
     "baseUrl": "./",
     "paths": {
+      "@/*": ["./src/*"],
       "@erp/entities": ["../../packages/erp-entities/src"],
       "@erp/entities/*": ["../../packages/erp-entities/src/*"],
       "@erp/domains": ["../../packages/domains/src"],

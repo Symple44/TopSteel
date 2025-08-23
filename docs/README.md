@@ -3,9 +3,10 @@
 ## 📚 Table des matières
 
 ### Architecture
-- [Multi-Tenant Architecture](./architecture/multi-tenant.md) - Architecture multi-locataire complète
-- [Technical Architecture](./architecture/technical-overview.md) - Vue d'ensemble technique
-- [Database Design](./architecture/database-design.md) - Conception des bases de données
+- [Architecture Technique](./ARCHITECTURE.md) - Structure détaillée du projet
+- [Documentation API](./API.md) - Endpoints et utilisation de l'API
+- [Monitoring](./MONITORING.md) - Système de monitoring et métriques
+- [Multi-Tenant Architecture](./architecture/multi-tenant.md) - Architecture multi-locataire
 - [Security Architecture](./architecture/security.md) - Architecture de sécurité
 
 ### Guides de développement
@@ -57,7 +58,7 @@ Cette documentation couvre l'ensemble du système TopSteel ERP, une solution com
 
 ### Version
 - **Version actuelle**: 1.0.0
-- **Dernière mise à jour**: Janvier 2025
+- **Dernière mise à jour**: Août 2025
 
 ### Support
 - **Email**: support@topsteel.fr

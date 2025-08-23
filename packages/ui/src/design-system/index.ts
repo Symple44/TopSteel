@@ -79,6 +79,7 @@ export const sizes = designTokens.sizes
 export const themeNames = Object.keys(themeRegistry) as Array<keyof typeof themeRegistry>
 
 // ===== COMPATIBILITÉ BACKWARD =====
+// Note: ButtonVariants and CardVariants are now exported by their respective components
 
 export type {
   AlertVariants,

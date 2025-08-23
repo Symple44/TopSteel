@@ -439,7 +439,6 @@ export class AuthService {
 
     if (suspiciousActivity.isSuspicious) {
       // Log de sécurité
-      console.warn(`Activité suspecte détectée pour ${user.email}:`, suspiciousActivity.reasons)
       
       // Ajouter des métadonnées de sécurité
       dbSession.metadata = {

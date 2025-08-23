@@ -57,7 +57,7 @@ export class MarketplaceSyncProcessor {
             relations: ['famille', 'materials'],
           })
 
-          if (article?.isMarketplaceEnabled) {
+          if (article?.isMarketplaceEnabled === true) {
             await this.syncService.syncArticleToMarketplace(article, tenantId)
             this.logger.log(`Article ${articleId} synced to marketplace`)
           }

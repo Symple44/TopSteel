@@ -32,7 +32,7 @@ export abstract class BaseRepository<T extends ObjectLiteral> implements IBaseRe
   }
 
   async update(id: string | number, data: DeepPartial<T>): Promise<T> {
-    await this.repository.update(id, data)
+    await this.repository.update(id, data as Parameters<Repository<T>['update']>[1])
     const updated = await this.findById(id)
     if (!updated) throw new Error(`Entity with id ${id} not found`)
     return updated

@@ -3,7 +3,7 @@
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from '../../../primitives/button'
 import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
-import { Badge } from '../../badge'
+import { Badge } from '../..//badge'
 import type { Card } from '../use-data-views'
 
 interface CardsViewProps {

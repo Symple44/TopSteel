@@ -20,10 +20,12 @@ import { RolePermission } from './core/entities/role-permission.entity'
 import { UserMFA } from './core/entities/user-mfa.entity'
 import { UserSession } from './core/entities/user-session.entity'
 import { UserSocieteRole } from './core/entities/user-societe-role.entity'
+import { SMSLog } from './entities/sms-log.entity'
 import { AuthRepositoryProviders } from './core/providers/auth-repository.providers'
 import { AuthCoreService } from './core/services/auth-core.service'
 import { MFAController } from './external/controllers/mfa.controller'
 import { SessionsController } from './external/controllers/sessions.controller'
+import { SMSAdminController } from './external/controllers/sms-admin.controller'
 import { CombinedSecurityGuard } from './security/guards/combined-security.guard'
 import { EnhancedRolesGuard } from './security/guards/enhanced-roles.guard'
 import { EnhancedTenantGuard } from './security/guards/enhanced-tenant.guard'
@@ -47,6 +49,7 @@ import { TOTPService } from './services/totp.service'
 import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'
 import { WebAuthnService } from './services/webauthn.service'
+import { PermissionService } from './services/permission.service'
 
 @Module({
   imports: [
@@ -89,13 +92,14 @@ import { WebAuthnService } from './services/webauthn.service'
         Societe,
         SocieteUser,
         AuditLog,
+        SMSLog,
       ],
       'auth'
     ),
     UsersModule,
     SocietesModule,
   ],
-  controllers: [AuthController, SessionsController, MFAController],
+  controllers: [AuthController, SessionsController, MFAController, SMSAdminController],
   providers: [
     AuthService,
     AuthCoreService, // Service principal
@@ -121,6 +125,7 @@ import { WebAuthnService } from './services/webauthn.service'
     UserSocieteRolesService, // Service pour la nouvelle structure de rôles
     UnifiedRolesService, // Service unifié pour la gestion des rôles
     PermissionCalculatorService, // Service de calcul des permissions
+    PermissionService, // Service de gestion des permissions
     RoleFormattingService, // Service de formatage des rôles
     AuthPerformanceService, // Service de monitoring des performances
     AuditService, // Service d'audit et de traçabilité
@@ -145,6 +150,7 @@ import { WebAuthnService } from './services/webauthn.service'
     UserSocieteRolesService,
     UnifiedRolesService,
     PermissionCalculatorService,
+    PermissionService,
     RoleFormattingService,
     AuthPerformanceService,
     AuditService,

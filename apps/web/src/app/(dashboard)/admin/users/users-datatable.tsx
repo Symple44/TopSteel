@@ -1,13 +1,7 @@
 'use client'
 
-import {
-  AdvancedDataTable,
-  Avatar,
-  AvatarFallback,
-  Badge,
-  Button,
-  type ColumnConfig,
-} from '@erp/ui'
+import { Avatar, AvatarFallback, Badge, Button } from '@erp/ui'
+import { AdvancedDataTable, type ColumnConfig } from '@erp/ui/data-display'
 import {
   Building,
   Calendar,

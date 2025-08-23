@@ -1,5 +1,4 @@
 'use client'
-
 import {
   AlertCircle,
   Calculator,
@@ -17,21 +16,20 @@ import { useCallback, useMemo, useState } from 'react'
 import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Alert, AlertDescription, AlertTitle } from '../../../feedback/alert'
-import { Label } from '../../../forms/label'
+import { Label } from '../../../forms/label/Label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
 import { Separator } from '../../../layout/separator'
-import { Button } from '../../../primitives/button'
-import { Input } from '../../../primitives/input'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../primitives/select'
+} from '../../../primitives/select/select'
 import type { PriceRule } from '../PriceRuleCard/PriceRuleCard'
 import { PriceRuleChannel } from '../PriceRuleCard/PriceRuleCard'
-
 export interface SimulationContext {
   articleId?: string
   articleReference?: string
@@ -42,7 +40,6 @@ export interface SimulationContext {
   quantity: number
   channel: PriceRuleChannel
   societeId?: string
-
   // Données article pour simulation
   article?: {
     id: string
@@ -61,7 +58,6 @@ export interface SimulationContext {
     coefficientVente?: number
   }
 }
-
 export interface SimulationResult {
   basePrice: number
   finalPrice: number
@@ -88,7 +84,6 @@ export interface SimulationResult {
   }
   warnings?: string[]
 }
-
 export interface PriceSimulatorProps {
   onSimulate: (context: SimulationContext) => Promise<SimulationResult>
   availableArticles?: Array<{
@@ -103,7 +98,6 @@ export interface PriceSimulatorProps {
   className?: string
   defaultContext?: Partial<SimulationContext>
 }
-
 const SAMPLE_ARTICLES = [
   {
     id: '1',
@@ -131,7 +125,6 @@ const SAMPLE_ARTICLES = [
     surface: 2,
   },
 ]
-
 const CUSTOMER_GROUPS = [
   { value: '', label: 'Aucun groupe' },
   { value: 'VIP', label: 'Client VIP' },
@@ -139,7 +132,6 @@ const CUSTOMER_GROUPS = [
   { value: 'PROFESSIONNEL', label: 'Professionnel' },
   { value: 'PARTICULIER', label: 'Particulier' },
 ]
-
 export function PriceSimulator({
   onSimulate,
   availableArticles = SAMPLE_ARTICLES,
@@ -152,22 +144,18 @@ export function PriceSimulator({
     channel: PriceRuleChannel.ERP,
     ...defaultContext,
   })
-
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showDetails, setShowDetails] = useState(true)
   const [showAdvanced, setShowAdvanced] = useState(false)
-
   const selectedArticle = useMemo(() => {
     return availableArticles.find((a) => a.id === context.articleId)
   }, [context.articleId, availableArticles])
-
   const updateContext = useCallback(
     (field: keyof SimulationContext, value: string | number | undefined | PriceRuleChannel) => {
       setContext((prev) => {
         const updated = { ...prev, [field]: value }
-
         // Si on change l'article, mettre à jour les données
         if (field === 'articleId') {
           const article = availableArticles.find((a) => a.id === value)
@@ -181,25 +169,20 @@ export function PriceSimulator({
             updated.articleFamily = article.famille
           }
         }
-
         return updated
       })
-
       // Réinitialiser le résultat si on change le contexte
       setResult(null)
     },
     [availableArticles]
   )
-
   const handleSimulate = useCallback(async () => {
     if (!context.articleId) {
       setError('Veuillez sélectionner un article')
       return
     }
-
     setLoading(true)
     setError(null)
-
     try {
       const simulationResult = await onSimulate(context)
       setResult(simulationResult)
@@ -209,7 +192,6 @@ export function PriceSimulator({
       setLoading(false)
     }
   }, [context, onSimulate])
-
   const handleReset = useCallback(() => {
     setContext({
       quantity: 1,
@@ -219,19 +201,16 @@ export function PriceSimulator({
     setResult(null)
     setError(null)
   }, [defaultContext])
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR',
     }).format(price)
   }
-
   const formatPercentage = (value: number) => {
     const sign = value > 0 ? '+' : ''
     return `${sign}${value.toFixed(1)}%`
   }
-
   return (
     <div className={cn('space-y-6', className)}>
       {/* Formulaire de simulation */}
@@ -245,7 +224,6 @@ export function PriceSimulator({
             Testez l'application des règles de prix sur vos articles
           </CardDescription>
         </CardHeader>
-
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -273,7 +251,6 @@ export function PriceSimulator({
                 </SelectContent>
               </Select>
             </div>
-
             <div>
               <Label htmlFor="quantity">Quantité</Label>
               <Input
@@ -285,7 +262,6 @@ export function PriceSimulator({
               />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="channel">Canal de vente</Label>
@@ -304,7 +280,6 @@ export function PriceSimulator({
                 </SelectContent>
               </Select>
             </div>
-
             <div>
               <Label htmlFor="customerGroup">Groupe client</Label>
               <Select
@@ -324,7 +299,6 @@ export function PriceSimulator({
               </Select>
             </div>
           </div>
-
           {/* Options avancées */}
           <div>
             <Button
@@ -340,7 +314,6 @@ export function PriceSimulator({
               )}
               Options avancées
             </Button>
-
             {showAdvanced && (
               <div className="grid grid-cols-2 gap-4 pl-6">
                 <div>
@@ -352,7 +325,6 @@ export function PriceSimulator({
                     placeholder="UUID du client"
                   />
                 </div>
-
                 <div>
                   <Label htmlFor="customerEmail">Email client</Label>
                   <Input
@@ -366,7 +338,6 @@ export function PriceSimulator({
               </div>
             )}
           </div>
-
           {/* Article sélectionné */}
           {selectedArticle && (
             <Alert>
@@ -396,7 +367,6 @@ export function PriceSimulator({
               </AlertDescription>
             </Alert>
           )}
-
           {/* Erreur */}
           {error && (
             <Alert variant="destructive">
@@ -405,14 +375,12 @@ export function PriceSimulator({
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
           {/* Actions */}
           <div className="flex justify-between">
             <Button variant="outline" onClick={handleReset}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Réinitialiser
             </Button>
-
             <Button onClick={handleSimulate} disabled={loading || !context.articleId}>
               {loading ? (
                 <>
@@ -429,7 +397,6 @@ export function PriceSimulator({
           </div>
         </CardContent>
       </Card>
-
       {/* Résultats */}
       {result && (
         <Card>
@@ -439,20 +406,17 @@ export function PriceSimulator({
                 <Zap className="w-5 h-5" />
                 Résultat de la simulation
               </CardTitle>
-
               <Button variant="ghost" size="sm" onClick={() => setShowDetails(!showDetails)}>
                 {showDetails ? 'Masquer les détails' : 'Afficher les détails'}
               </Button>
             </div>
           </CardHeader>
-
           <CardContent>
             <div className="grid grid-cols-3 gap-6 mb-6">
               <div>
                 <span className="text-sm text-muted-foreground">Prix de base</span>
                 <p className="text-2xl font-bold">{formatPrice(result.basePrice)}</p>
               </div>
-
               <div>
                 <span className="text-sm text-muted-foreground">Prix final</span>
                 <p className="text-2xl font-bold text-primary">{formatPrice(result.finalPrice)}</p>
@@ -462,7 +426,6 @@ export function PriceSimulator({
                   </p>
                 )}
               </div>
-
               <div>
                 <span className="text-sm text-muted-foreground">
                   {result.totalDiscount < 0 ? 'Remise totale' : 'Majoration totale'}
@@ -481,7 +444,6 @@ export function PriceSimulator({
                 </p>
               </div>
             </div>
-
             {context.quantity > 1 && (
               <div className="bg-muted/50 rounded-lg p-4 mb-6">
                 <div className="flex items-center justify-between">
@@ -494,11 +456,9 @@ export function PriceSimulator({
                 </div>
               </div>
             )}
-
             {showDetails && (
               <>
                 <Separator className="my-6" />
-
                 {/* Règles appliquées */}
                 {result.appliedRules.length > 0 && (
                   <div className="space-y-3">
@@ -506,7 +466,6 @@ export function PriceSimulator({
                       <Check className="w-4 h-4 text-green-600" />
                       Règles appliquées ({result.appliedRules.length})
                     </h4>
-
                     <div className="space-y-2">
                       {result.appliedRules.map((rule, index) => (
                         <div
@@ -522,7 +481,6 @@ export function PriceSimulator({
                               <p className="text-sm text-muted-foreground">Type: {rule.ruleType}</p>
                             </div>
                           </div>
-
                           <div className="text-right">
                             <p className="font-medium">
                               {rule.discountAmount < 0 ? (
@@ -544,7 +502,6 @@ export function PriceSimulator({
                     </div>
                   </div>
                 )}
-
                 {/* Règles non appliquées */}
                 {result.skippedRules && result.skippedRules.length > 0 && (
                   <div className="space-y-3 mt-6">
@@ -552,7 +509,6 @@ export function PriceSimulator({
                       <Info className="w-4 h-4" />
                       Règles non appliquées ({result.skippedRules.length})
                     </h4>
-
                     <div className="space-y-2">
                       {result.skippedRules.map((rule) => (
                         <div
@@ -568,7 +524,6 @@ export function PriceSimulator({
                     </div>
                   </div>
                 )}
-
                 {/* Avertissements */}
                 {result.warnings && result.warnings.length > 0 && (
                   <Alert className="mt-6">
@@ -588,7 +543,6 @@ export function PriceSimulator({
           </CardContent>
         </Card>
       )}
-
       {/* Règles disponibles */}
       {availableRules.length > 0 && (
         <Card>
@@ -601,7 +555,6 @@ export function PriceSimulator({
               {availableRules.length} règles peuvent potentiellement s'appliquer
             </CardDescription>
           </CardHeader>
-
           <CardContent>
             <div className="space-y-2">
               {availableRules.map((rule) => (
@@ -618,7 +571,6 @@ export function PriceSimulator({
                       )}
                     </div>
                   </div>
-
                   <div className="flex items-center gap-2">
                     {rule.priority > 0 && (
                       <Badge variant="secondary">Priorité: {rule.priority}</Badge>

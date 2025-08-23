@@ -1,0 +1,150 @@
+name: Test Coverage
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run tests with coverage (UI package)
+        run: pnpm --filter @erp/ui test:coverage
+        
+      - name: Run tests with coverage (API)
+        run: pnpm --filter @erp/api test:cov
+        continue-on-error: true
+        
+      - name: Run tests with coverage (Web)
+        run: pnpm --filter @erp/web test:coverage
+        continue-on-error: true
+      
+      - name: Upload UI coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./packages/ui/coverage/lcov.info
+          flags: ui
+          name: ui-coverage
+          fail_ci_if_error: false
+      
+      - name: Upload API coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./apps/api/coverage/lcov.info
+          flags: api
+          name: api-coverage
+          fail_ci_if_error: false
+          
+      - name: Upload Web coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./apps/web/coverage/lcov.info
+          flags: web
+          name: web-coverage
+          fail_ci_if_error: false
+      
+      - name: Coverage Summary
+        if: always()
+        run: |
+          echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "packages/ui/coverage/coverage-summary.json" ]; then
+            echo "### UI Package Coverage" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              const coverage = require('./packages/ui/coverage/coverage-summary.json');
+              const total = coverage.total;
+              console.log('| Metric | Coverage | Threshold |');
+              console.log('|--------|----------|-----------|');
+              console.log(\`| Lines | \${total.lines.pct}% | 80% |\`);
+              console.log(\`| Statements | \${total.statements.pct}% | 80% |\`);
+              console.log(\`| Functions | \${total.functions.pct}% | 80% |\`);
+              console.log(\`| Branches | \${total.branches.pct}% | 80% |\`);
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let coverageComment = '## 📊 Test Coverage Report\n\n';
+            
+            // Read UI coverage if exists
+            try {
+              const uiCoverage = JSON.parse(fs.readFileSync('packages/ui/coverage/coverage-summary.json', 'utf8'));
+              const total = uiCoverage.total;
+              
+              coverageComment += '### UI Package\n';
+              coverageComment += '| Metric | Coverage | Threshold | Status |\n';
+              coverageComment += '|--------|----------|-----------|--------|\n';
+              
+              const metrics = ['lines', 'statements', 'functions', 'branches'];
+              metrics.forEach(metric => {
+                const pct = total[metric].pct;
+                const status = pct >= 80 ? '✅' : '❌';
+                coverageComment += `| ${metric.charAt(0).toUpperCase() + metric.slice(1)} | ${pct}% | 80% | ${status} |\n`;
+              });
+            } catch (e) {
+              coverageComment += '### UI Package\n';
+              coverageComment += '⚠️ Coverage data not available\n';
+            }
+            
+            // Find and update or create comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && comment.body.includes('Test Coverage Report')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: coverageComment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: coverageComment
+              });
+            }

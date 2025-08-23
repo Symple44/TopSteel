@@ -8,6 +8,21 @@ import type { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Repository } from 'typeorm'
 
+interface TenantContext {
+  societeId: string | number
+  siteId?: string | number
+}
+
+function isValidTenantContext(context: unknown): context is TenantContext {
+  return (
+    typeof context === 'object' &&
+    context !== null &&
+    'societeId' in context &&
+    (typeof (context as { societeId: unknown }).societeId === 'string' ||
+      typeof (context as { societeId: unknown }).societeId === 'number')
+  )
+}
+
 /**
  * Intercepteur pour injecter automatiquement societeId et siteId dans les opérations
  */
@@ -61,7 +76,7 @@ export function InjectTenantContext() {
       const firstArg = args[0] as Record<string, unknown> | undefined
       const context = firstArg?.tenantContext
 
-      if (context && this instanceof Repository) {
+      if (context && this instanceof Repository && isValidTenantContext(context)) {
         // Créer un query builder avec les filtres société
         const qb = this.createQueryBuilder()
 

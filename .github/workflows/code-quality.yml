@@ -1,0 +1,97 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  typescript:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build packages
+        run: pnpm build:packages
+      
+      - name: TypeScript check
+        run: pnpm type-check
+
+  lint:
+    name: ESLint Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Lint code
+        run: pnpm lint
+
+  security:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Security audit
+        run: pnpm audit
+      
+      - name: Validate environment
+        run: pnpm secrets:validate
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-min-32-chars-long-for-testing
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build all packages
+        run: pnpm build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_API_URL: http://localhost:3002

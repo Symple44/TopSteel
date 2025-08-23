@@ -179,6 +179,9 @@ export class MarketplaceTheme {
     authorUrl?: string
     preview?: string
     tags?: string[]
+    imported?: boolean
+    importedAt?: string
+    overwritten?: boolean
     changelog?: Array<{
       version: string
       date: string

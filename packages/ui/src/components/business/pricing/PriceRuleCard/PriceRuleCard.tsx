@@ -1,5 +1,4 @@
 'use client'
-
 import {
   Activity,
   Box,
@@ -31,14 +30,13 @@ import {
   CardHeader,
   CardTitle,
 } from '../../../layout/card'
-import { Button } from '../../../primitives/button'
+import { Button } from '../../../primitives/button/Button'
 import {
   DropdownItem,
   DropdownPortal,
   DropdownSeparator,
 } from '../../../primitives/dropdown-portal'
 import { SimpleTooltip } from '../../../primitives/tooltip'
-
 export enum AdjustmentType {
   PERCENTAGE = 'PERCENTAGE',
   FIXED_AMOUNT = 'FIXED_AMOUNT',
@@ -49,7 +47,6 @@ export enum AdjustmentType {
   PRICE_PER_VOLUME = 'PRICE_PER_VOLUME',
   FORMULA = 'FORMULA',
 }
-
 export enum PriceRuleChannel {
   ALL = 'ALL',
   ERP = 'ERP',
@@ -57,7 +54,6 @@ export enum PriceRuleChannel {
   B2B = 'B2B',
   API = 'API',
 }
-
 export interface PricingCondition {
   type:
     | 'customer_group'
@@ -85,7 +81,6 @@ export interface PricingCondition {
   value: string | number | string[] | { from: string | number; to: string | number }
   field?: string
 }
-
 export interface PriceRule {
   id: string
   ruleName: string
@@ -118,7 +113,6 @@ export interface PriceRule {
     [key: string]: string | undefined
   }
 }
-
 export interface PriceRuleCardProps {
   rule: PriceRule
   className?: string
@@ -133,7 +127,6 @@ export interface PriceRuleCardProps {
   selected?: boolean
   onSelect?: (rule: PriceRule) => void
 }
-
 const getAdjustmentIcon = (type: AdjustmentType) => {
   switch (type) {
     case AdjustmentType.PERCENTAGE:
@@ -155,7 +148,6 @@ const getAdjustmentIcon = (type: AdjustmentType) => {
       return <Activity className="w-4 h-4" />
   }
 }
-
 const getAdjustmentLabel = (type: AdjustmentType) => {
   switch (type) {
     case AdjustmentType.PERCENTAGE:
@@ -178,27 +170,21 @@ const getAdjustmentLabel = (type: AdjustmentType) => {
       return type
   }
 }
-
 const formatAdjustmentValue = (rule: PriceRule) => {
   const { adjustmentType, adjustmentValue, adjustmentUnit, formula } = rule
-
   if (adjustmentType === AdjustmentType.FORMULA) {
     return formula || 'Non définie'
   }
-
   if (adjustmentType === AdjustmentType.PERCENTAGE) {
     const sign = adjustmentValue >= 0 ? '+' : ''
     return `${sign}${adjustmentValue}%`
   }
-
   if (adjustmentUnit) {
     return `${adjustmentValue}€/${adjustmentUnit}`
   }
-
   const sign = adjustmentValue >= 0 && adjustmentType === AdjustmentType.FIXED_AMOUNT ? '+' : ''
   return `${sign}${adjustmentValue}€`
 }
-
 const getChannelColor = (channel: PriceRuleChannel) => {
   switch (channel) {
     case PriceRuleChannel.ALL:
@@ -215,7 +201,6 @@ const getChannelColor = (channel: PriceRuleChannel) => {
       return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
   }
 }
-
 export function PriceRuleCard({
   rule,
   className,
@@ -232,11 +217,9 @@ export function PriceRuleCard({
 }: PriceRuleCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
-
   const isExpired = rule.validUntil && new Date(rule.validUntil) < new Date()
   const isUpcoming = rule.validFrom && new Date(rule.validFrom) > new Date()
   const isLimited = rule.usageLimit && rule.usageCount >= rule.usageLimit
-
   const statusColor = rule.isActive
     ? isExpired
       ? 'text-red-500'
@@ -246,7 +229,6 @@ export function PriceRuleCard({
           ? 'text-yellow-500'
           : 'text-green-500'
     : 'text-gray-500'
-
   const statusText = rule.isActive
     ? isExpired
       ? 'Expirée'
@@ -256,7 +238,6 @@ export function PriceRuleCard({
           ? 'Limite atteinte'
           : 'Active'
     : 'Inactive'
-
   const renderCompactView = () => (
     <div className="flex items-center justify-between p-4">
       <div className="flex items-center gap-3 flex-1">
@@ -269,16 +250,13 @@ export function PriceRuleCard({
             aria-label={`Sélectionner la règle ${rule.ruleName}`}
           />
         )}
-
         <div className="flex items-center gap-2">
           {getAdjustmentIcon(rule.adjustmentType)}
           <span className="font-medium">{rule.ruleName}</span>
         </div>
-
         <Badge variant="outline" className={cn('ml-2', getChannelColor(rule.channel))}>
           {rule.channel}
         </Badge>
-
         <span
           className={cn(
             'font-semibold ml-2',
@@ -287,7 +265,6 @@ export function PriceRuleCard({
         >
           {formatAdjustmentValue(rule)}
         </span>
-
         {rule.priority > 0 && (
           <Badge variant="outline" className="ml-2">
             <Hash className="w-3 h-3 mr-1" />
@@ -295,12 +272,10 @@ export function PriceRuleCard({
           </Badge>
         )}
       </div>
-
       <div className="flex items-center gap-2">
         <SimpleTooltip content={statusText}>
           <div className={cn('w-2 h-2 rounded-full', statusColor.replace('text-', 'bg-'))} />
         </SimpleTooltip>
-
         {showActions && (
           <Button variant="ghost" size="sm" onClick={() => onToggle?.(rule)}>
             <Power className="w-4 h-4" />
@@ -309,7 +284,6 @@ export function PriceRuleCard({
       </div>
     </div>
   )
-
   if (variant === 'compact') {
     return (
       <Card
@@ -323,7 +297,6 @@ export function PriceRuleCard({
       </Card>
     )
   }
-
   return (
     <Card
       className={cn(
@@ -345,24 +318,20 @@ export function PriceRuleCard({
                   aria-label={`Sélectionner la règle ${rule.ruleName}`}
                 />
               )}
-
               <CardTitle className="flex items-center gap-2">
                 {getAdjustmentIcon(rule.adjustmentType)}
                 {rule.ruleName}
               </CardTitle>
-
               <SimpleTooltip content={statusText}>
                 <div
                   className={cn('w-2 h-2 rounded-full ml-2', statusColor.replace('text-', 'bg-'))}
                 />
               </SimpleTooltip>
             </div>
-
             {rule.description && variant === 'detailed' && (
               <CardDescription className="mt-2">{rule.description}</CardDescription>
             )}
           </div>
-
           {showActions && (
             <DropdownPortal
               open={dropdownOpen}
@@ -377,24 +346,19 @@ export function PriceRuleCard({
                 <Edit className="w-4 h-4 mr-2" />
                 Modifier
               </DropdownItem>
-
               <DropdownItem onClick={() => onDuplicate?.(rule)}>
                 <Copy className="w-4 h-4 mr-2" />
                 Dupliquer
               </DropdownItem>
-
               <DropdownItem onClick={() => onPreview?.(rule)}>
                 <Activity className="w-4 h-4 mr-2" />
                 Prévisualiser
               </DropdownItem>
-
               <DropdownSeparator />
-
               <DropdownItem onClick={() => onToggle?.(rule)}>
                 <Power className="w-4 h-4 mr-2" />
                 {rule.isActive ? 'Désactiver' : 'Activer'}
               </DropdownItem>
-
               <DropdownItem onClick={() => onDelete?.(rule)} className="text-red-600">
                 <Trash2 className="w-4 h-4 mr-2" />
                 Supprimer
@@ -402,24 +366,18 @@ export function PriceRuleCard({
             </DropdownPortal>
           )}
         </div>
-
         <div className="flex flex-wrap gap-2 mt-3">
           <Badge variant="outline" className={getChannelColor(rule.channel)}>
             {rule.channel}
           </Badge>
-
           <Badge variant="outline">{getAdjustmentLabel(rule.adjustmentType)}</Badge>
-
           <Badge variant={rule.adjustmentValue < 0 ? 'secondary' : 'outline'}>
             {formatAdjustmentValue(rule)}
           </Badge>
-
           {rule.priority > 0 && <Badge variant="outline">Priorité: {rule.priority}</Badge>}
-
           {!rule.combinable && <Badge variant="destructive">Non combinable</Badge>}
         </div>
       </CardHeader>
-
       <CardContent>
         <div className="space-y-3">
           {rule.conditions.length > 0 && (
@@ -436,7 +394,6 @@ export function PriceRuleCard({
                   </Button>
                 )}
               </div>
-
               {(expanded || variant === 'detailed') && (
                 <div className="space-y-1">
                   {rule.conditions.map((condition, index) => (
@@ -451,7 +408,6 @@ export function PriceRuleCard({
               )}
             </div>
           )}
-
           {(rule.articleFamily || rule.articleId) && (
             <div className="flex items-center gap-2 text-sm">
               <Package className="w-4 h-4 text-muted-foreground" />
@@ -464,14 +420,12 @@ export function PriceRuleCard({
               </span>
             </div>
           )}
-
           {rule.customerGroups && rule.customerGroups.length > 0 && (
             <div className="flex items-center gap-2 text-sm">
               <Users className="w-4 h-4 text-muted-foreground" />
               <span>Groupes: {rule.customerGroups.join(', ')}</span>
             </div>
           )}
-
           {(rule.validFrom || rule.validUntil) && (
             <div className="flex items-center gap-2 text-sm">
               <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -482,7 +436,6 @@ export function PriceRuleCard({
               </span>
             </div>
           )}
-
           {(rule.usageLimit || rule.usageLimitPerCustomer) && (
             <div className="flex items-center gap-4 text-sm">
               {rule.usageLimit && (
@@ -495,7 +448,6 @@ export function PriceRuleCard({
           )}
         </div>
       </CardContent>
-
       {variant === 'detailed' && rule.metadata && (
         <CardFooter className="text-xs text-muted-foreground">
           {rule.metadata.createdBy && <span>Créé par {rule.metadata.createdBy}</span>}

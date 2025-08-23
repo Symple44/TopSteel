@@ -8,7 +8,11 @@ import {
   type IStockMovementFilters,
   StockMovementStatus,
   StockMovementType,
+  StockMovementMotif,
+  StockMovementPriority,
 } from '../interfaces/stock-movement.interface'
+import { StockMovement } from '../entities/stock-movement.entity'
+import { StockMovementRepository } from '../repositories/stock-movement.repository'
 
 /**
  * Service de gestion des mouvements de stock
@@ -20,11 +24,12 @@ export class StockMovementService {
   constructor(
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
+    @InjectRepository(StockMovement)
+    private readonly movementRepository: Repository<StockMovement>,
+    private readonly stockMovementRepository: StockMovementRepository,
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2
-  ) {
-    // TODO: Add StockMovement repository when entity is created
-  }
+  ) {}
 
   /**
    * Créer un mouvement de stock
@@ -65,20 +70,24 @@ export class StockMovementService {
 
     try {
       // Créer le mouvement
-      // TODO: Save to StockMovement table when entity is created
-      const movement = {
+      const reference = await this.stockMovementRepository.generateReference(data.type)
+      const stockAvant = article.stockPhysique
+      const stockApres = this.calculateNewStock(article.stockPhysique, data.quantite, data.type)
+      
+      const movement = await this.stockMovementRepository.create({
         ...data,
-        id: `temp-${Date.now()}`,
-        status: data.status || StockMovementStatus.EN_ATTENTE,
-        dateCreation: new Date(),
-        reference: await this.generateReference(data.type),
-        // Calculer le nouveau stock
-        stockAvant: article.stockPhysique,
-        stockApres: this.calculateNewStock(article.stockPhysique, data.quantite, data.type),
-      } as IStockMovement
+        reference,
+        statut: data.status || StockMovementStatus.EN_ATTENTE,
+        stockAvant,
+        stockApres,
+        tenantId: (data as any).tenantId || article.societeId,
+        creeParId: data.utilisateurId || 'SYSTEM',
+        creeParNom: data.utilisateurNom || 'System',
+        motif: data.motif as any, // Convert StockMovementReason to StockMovementMotif
+      } as Partial<StockMovement>)
 
       // Mettre à jour l'article si demandé
-      if (updateArticle && movement.status === StockMovementStatus.COMPLETE) {
+      if (updateArticle && movement.statut === StockMovementStatus.COMPLETE) {
         await this.updateArticleStock(queryRunner, article, movement.quantite, movement.type)
       }
 
@@ -97,7 +106,7 @@ export class StockMovementService {
         `Mouvement de stock créé: ${movement.reference} - Article: ${article.reference} - Quantité: ${movement.quantite}`
       )
 
-      return movement
+      return this.mapToInterface(movement)
     } catch (error) {
       await queryRunner.rollbackTransaction()
       throw error
@@ -114,22 +123,17 @@ export class StockMovementService {
     options?: {
       forceProcess?: boolean
       skipValidation?: boolean
+      userId?: string
+      userName?: string
     }
   ): Promise<IStockMovement> {
-    // TODO: Uncomment when StockMovement entity is created
-    // const movement = await this.movementRepository.findOne({
-    //   where: { id: movementId }
-    // });
+    const movement = await this.stockMovementRepository.findById(movementId)
 
-    // if (!movement) {
-    //   throw new NotFoundException(`Mouvement ${movementId} non trouvé`);
-    // }
+    if (!movement) {
+      throw new NotFoundException(`Mouvement ${movementId} non trouvé`)
+    }
 
-    // Temporary placeholder
-    const movement = {} as IStockMovement
-    throw new NotFoundException(`Mouvement ${movementId} non trouvé`)
-
-    if (movement.status !== StockMovementStatus.EN_ATTENTE && !options?.forceProcess) {
+    if (movement.statut !== StockMovementStatus.EN_ATTENTE && !options?.forceProcess) {
       throw new BadRequestException(`Le mouvement ${movement.reference} n'est pas en attente`)
     }
 
@@ -145,9 +149,8 @@ export class StockMovementService {
     if (!options?.skipValidation && movement.type === StockMovementType.SORTIE) {
       const stockDisponible = article.stockPhysique - (article.stockReserve || 0)
       if (stockDisponible < movement.quantite) {
-        movement.status = StockMovementStatus.ANNULE
+        movement.statut = StockMovementStatus.ANNULE
         movement.notes = 'Stock insuffisant'
-        // TODO: Uncomment when StockMovement entity is created
         // await this.movementRepository.save(movement);
 
         throw new BadRequestException(`Stock insuffisant pour le mouvement ${movement.reference}`)
@@ -164,14 +167,17 @@ export class StockMovementService {
       await this.updateArticleStock(queryRunner, article, movement.quantite, movement.type)
 
       // Mettre à jour le mouvement
-      movement.status = StockMovementStatus.COMPLETE
+      movement.statut = StockMovementStatus.COMPLETE
       movement.stockApres = this.calculateNewStock(
         article.stockPhysique,
         movement.quantite,
         movement.type
       )
+      movement.dateTraitement = new Date()
+      movement.traiteParId = options?.userId || 'SYSTEM'
+      movement.traiteParNom = options?.userName || 'System'
 
-      await queryRunner.manager.save('StockMovement', movement)
+      await this.stockMovementRepository.save(movement)
       await queryRunner.commitTransaction()
 
       // Émettre l'événement
@@ -182,7 +188,7 @@ export class StockMovementService {
 
       this.logger.log(`Mouvement ${movement.reference} traité avec succès`)
 
-      return movement
+      return this.mapToInterface(movement)
     } catch (error) {
       await queryRunner.rollbackTransaction()
       throw error
@@ -197,19 +203,19 @@ export class StockMovementService {
   async cancelMovement(
     movementId: string,
     motif: string,
-    options?: { reverseStock?: boolean }
+    options?: { 
+      reverseStock?: boolean
+      userId?: string
+      userName?: string
+    }
   ): Promise<IStockMovement> {
-    // TODO: Uncomment when StockMovement entity is created
-    // const movement = await this.movementRepository.findOne({
-    //   where: { id: movementId }
-    // });
-    const movement = {} as IStockMovement
+    const movement = await this.stockMovementRepository.findById(movementId)
 
     if (!movement) {
       throw new NotFoundException(`Mouvement ${movementId} non trouvé`)
     }
 
-    if (movement.status === StockMovementStatus.ANNULE) {
+    if (movement.statut === StockMovementStatus.ANNULE) {
       throw new BadRequestException(`Le mouvement ${movement.reference} est déjà annulé`)
     }
 
@@ -219,7 +225,7 @@ export class StockMovementService {
 
     try {
       // Si le mouvement était complété et qu'on veut inverser le stock
-      if (movement.status === StockMovementStatus.COMPLETE && options?.reverseStock) {
+      if (movement.statut === StockMovementStatus.COMPLETE && options?.reverseStock) {
         const article = await this.articleRepository.findOne({
           where: { id: movement.articleId },
         })
@@ -236,10 +242,14 @@ export class StockMovementService {
       }
 
       // Mettre à jour le mouvement
-      movement.status = StockMovementStatus.ANNULE
+      movement.statut = StockMovementStatus.ANNULE
+      movement.motifAnnulation = motif
+      movement.annuleParId = options?.userId || 'SYSTEM'
+      movement.annuleParNom = options?.userName || 'System'
+      movement.dateAnnulation = new Date()
       movement.notes = `Annulé: ${motif}`
 
-      await queryRunner.manager.save('StockMovement', movement)
+      await this.stockMovementRepository.save(movement)
       await queryRunner.commitTransaction()
 
       // Émettre l'événement
@@ -250,7 +260,7 @@ export class StockMovementService {
 
       this.logger.log(`Mouvement ${movement.reference} annulé: ${motif}`)
 
-      return movement
+      return this.mapToInterface(movement)
     } catch (error) {
       await queryRunner.rollbackTransaction()
       throw error
@@ -263,133 +273,74 @@ export class StockMovementService {
    * Rechercher les mouvements avec filtres
    */
   async findMovements(filters: IStockMovementFilters): Promise<{
-    items: IStockMovement[]
+    items: StockMovement[]
     total: number
     page: number
     limit: number
   }> {
-    // TODO: Implement when StockMovement entity is created
-    // const query = this.movementRepository.createQueryBuilder('movement');
-    //
-    // // Appliquer les filtres
-    // if (filters.articleIds?.length) {
-    //   query.andWhere('movement.articleId IN (:...articleIds)', { articleIds: filters.articleIds });
-    // }
-    //
-    // if (filters.types?.length) {
-    //   query.andWhere('movement.type IN (:...types)', { types: filters.types });
-    // }
-    //
-    // if (filters.status?.length) {
-    //   query.andWhere('movement.status IN (:...status)', { status: filters.status });
-    // }
-    //
-    // if (filters.dateDebut && filters.dateFin) {
-    //   query.andWhere('movement.dateCreation BETWEEN :dateDebut AND :dateFin', {
-    //     dateDebut: filters.dateDebut,
-    //     dateFin: filters.dateFin
-    //   });
-    // }
-    //
-    // if (filters.recherche) {
-    //   query.andWhere('movement.reference ILIKE :search', {
-    //     search: `%${filters.recherche}%`
-    //   });
-    // }
-    //
-    // if (filters.motifs?.length) {
-    //   query.andWhere('movement.motif IN (:...motifs)', { motifs: filters.motifs });
-    // }
-    //
-    // if (filters.priorite) {
-    //   query.andWhere('movement.priorite = :priorite', { priorite: filters.priorite });
-    // }
-    //
-    // // Tri
-    // const sortField = filters.sortBy || 'dateCreation';
-    // const sortOrder = filters.sortOrder || 'DESC';
-    // query.orderBy(`movement.${sortField}`, sortOrder);
-    //
-    // // Pagination
-    const page = filters.page || 1
-    const limit = filters.limit || 20
-    // const skip = (page - 1) * limit;
-    //
-    // query.skip(skip).take(limit);
-
-    // Exécution
-    // TODO: Uncomment when StockMovement entity is created
-    // const [items, total] = await query.getManyAndCount();
-
-    return {
-      items: [],
-      total: 0,
-      page,
-      limit,
-    }
+    return await this.stockMovementRepository.findWithFilters({
+      articleIds: filters.articleIds?.[0] ? [filters.articleIds[0]] : undefined, // Use first articleId if available
+      types: filters.types,
+      status: filters.status,
+      motifs: filters.motifs,
+      priorite: filters.priorite,
+      dateDebut: filters.dateDebut,
+      dateFin: filters.dateFin,
+      recherche: filters.recherche,
+      utilisateurIds: filters.utilisateurIds?.[0] ? [filters.utilisateurIds[0]] : undefined, // Use first utilisateurId if available
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder as 'ASC' | 'DESC',
+      page: filters.page || 1,
+      limit: filters.limit || 20,
+    })
   }
 
   /**
    * Obtenir l'historique des mouvements d'un article
    */
   async getArticleMovementHistory(
-    _articleId: string,
-    _options?: {
+    articleId: string,
+    options?: {
       limit?: number
       includeAnnule?: boolean
     }
-  ): Promise<IStockMovement[]> {
-    // TODO: Implement when StockMovement entity is created
-    // const query = this.movementRepository.createQueryBuilder('movement')
-    //   .where('movement.articleId = :articleId', { articleId });
-    //
-    // if (!options?.includeAnnule) {
-    //   query.andWhere('movement.statut != :statut', {
-    //     statut: StockMovementStatus.ANNULE
-    //   });
-    // }
-    //
-    // query.orderBy('movement.dateCreation', 'DESC');
-    //
-    // if (options?.limit) {
-    //   query.limit(options.limit);
-    // }
+  ): Promise<StockMovement[]> {
+    const status = options?.includeAnnule 
+      ? undefined 
+      : [StockMovementStatus.EN_ATTENTE, StockMovementStatus.COMPLETE]
 
-    // TODO: Uncomment when StockMovement entity is created
-    // return await query.getMany();
-    return []
+    return await this.stockMovementRepository.findByArticle(articleId, {
+      limit: options?.limit,
+      status,
+    })
   }
 
   /**
    * Calculer le solde des mouvements pour une période
    */
   async calculatePeriodBalance(
-    _articleId: string,
-    _dateDebut: Date,
-    _dateFin: Date
+    articleId: string,
+    dateDebut: Date,
+    dateFin: Date
   ): Promise<{
     entrees: number
     sorties: number
     solde: number
     mouvements: number
   }> {
-    // TODO: Uncomment when StockMovement entity is created
-    // const movements = await this.movementRepository.find({
-    //   where: {
-    //     articleId,
-    //     dateCreation: Between(dateDebut, dateFin),
-    //     status: StockMovementStatus.COMPLETE
-    //   }
-    // });
-    const movements: IStockMovement[] = []
+    const movements = await this.stockMovementRepository.findByArticle(articleId, {
+      dateMin: dateDebut,
+      dateMax: dateFin,
+      status: [StockMovementStatus.COMPLETE],
+    })
 
     const entrees = movements
-      .filter((m) => m.type === StockMovementType.ENTREE)
-      .reduce((sum, m) => sum + m.quantite, 0)
+      .filter((m) => m.isEntree())
+      .reduce((sum, m) => sum + Number(m.quantite), 0)
 
     const sorties = movements
-      .filter((m) => m.type === StockMovementType.SORTIE)
-      .reduce((sum, m) => sum + m.quantite, 0)
+      .filter((m) => m.isSortie())
+      .reduce((sum, m) => sum + Number(m.quantite), 0)
 
     return {
       entrees,
@@ -397,6 +348,78 @@ export class StockMovementService {
       solde: entrees - sorties,
       mouvements: movements.length,
     }
+  }
+
+  /**
+   * Obtenir les statistiques de stock pour un article
+   */
+  async getStockStatistics(
+    articleId: string,
+    period?: { start: Date; end: Date }
+  ): Promise<any> {
+    return await this.stockMovementRepository.getStatsByArticle(articleId, period)
+  }
+
+  /**
+   * Obtenir l'analyse de stock pour un article
+   */
+  async getStockAnalysis(articleId: string): Promise<any> {
+    return await this.stockMovementRepository.getStockAnalysis(articleId)
+  }
+
+  /**
+   * Obtenir les tendances de mouvements
+   */
+  async getMovementTrends(
+    articleId: string,
+    groupBy: 'day' | 'week' | 'month',
+    period: { start: Date; end: Date }
+  ): Promise<any> {
+    return await this.stockMovementRepository.getMovementTrends(articleId, groupBy, period)
+  }
+
+  /**
+   * Obtenir les mouvements en attente
+   */
+  async getPendingMovements(
+    options?: {
+      articleId?: string
+      type?: StockMovementType[]
+      priorite?: StockMovementPriority[]
+      limit?: number
+    }
+  ): Promise<StockMovement[]> {
+    return await this.stockMovementRepository.findPendingMovements(options)
+  }
+
+  /**
+   * Traiter plusieurs mouvements en batch
+   */
+  async processBatchMovements(
+    movementIds: string[],
+    options?: {
+      skipValidation?: boolean
+      userId?: string
+      userName?: string
+    }
+  ): Promise<{ success: string[]; failed: string[]; errors: Record<string, string> }> {
+    const result = {
+      success: [] as string[],
+      failed: [] as string[],
+      errors: {} as Record<string, string>,
+    }
+
+    for (const movementId of movementIds) {
+      try {
+        await this.processMovement(movementId, options)
+        result.success.push(movementId)
+      } catch (error) {
+        result.failed.push(movementId)
+        result.errors[movementId] = error.message
+      }
+    }
+
+    return result
   }
 
   /**
@@ -458,43 +481,91 @@ export class StockMovementService {
     }
   }
 
-  private async generateReference(type: StockMovementType): Promise<string> {
-    const prefix = this.getMovementPrefix(type)
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
 
-    // Compter les mouvements du jour
-    const _startOfDay = new Date(date.setHours(0, 0, 0, 0))
-    const _endOfDay = new Date(date.setHours(23, 59, 59, 999))
+  /**
+   * Récupérer un mouvement par ID
+   */
+  async getById(id: string): Promise<IStockMovement> {
+    const movement = await this.movementRepository.findOne({
+      where: { id },
+      relations: ['article']
+    })
 
-    // TODO: Uncomment when StockMovement entity is created
-    // const count = await this.movementRepository.count({
-    //   where: {
-    //     dateCreation: Between(startOfDay, endOfDay)
-    //   }
-    // });
-    const count = 0
-
-    const sequence = String(count + 1).padStart(4, '0')
-
-    return `${prefix}-${year}${month}${day}-${sequence}`
-  }
-
-  private getMovementPrefix(type: StockMovementType): string {
-    const prefixes: Record<StockMovementType, string> = {
-      [StockMovementType.ENTREE]: 'ENT',
-      [StockMovementType.SORTIE]: 'SOR',
-      [StockMovementType.TRANSFERT]: 'TRA',
-      [StockMovementType.INVENTAIRE]: 'INV',
-      [StockMovementType.CORRECTION_POSITIVE]: 'CRP',
-      [StockMovementType.CORRECTION_NEGATIVE]: 'CRN',
-      [StockMovementType.RETOUR]: 'RET',
-      [StockMovementType.RESERVATION]: 'RES',
-      [StockMovementType.LIBERATION]: 'LIB',
+    if (!movement) {
+      throw new NotFoundException(`Mouvement ${id} non trouvé`)
     }
 
-    return prefixes[type] || 'MVT'
+    return this.mapToInterface(movement)
   }
+
+  /**
+   * Lister les mouvements avec filtres
+   */
+  async findWithFilters(filters: IStockMovementFilters): Promise<{
+    items: IStockMovement[]
+    total: number
+    page: number
+    limit: number
+  }> {
+    const result = await this.stockMovementRepository.findWithFilters(filters)
+    
+    return {
+      ...result,
+      items: result.items.map(item => this.mapToInterface(item))
+    }
+  }
+
+  /**
+   * Lister tous les mouvements d'un article
+   */
+  async getAllByArticle(articleId: string): Promise<IStockMovement[]> {
+    const movements = await this.movementRepository.find({
+      where: { articleId },
+      relations: ['article'],
+      order: { dateCreation: 'DESC' }
+    })
+
+    return movements.map(movement => this.mapToInterface(movement))
+  }
+
+  /**
+   * Mapper pour convertir l'entité StockMovement vers l'interface IStockMovement
+   */
+  private mapToInterface(entity: StockMovement): IStockMovement {
+    return {
+      id: entity.id,
+      reference: entity.reference,
+      articleId: entity.articleId,
+      articleCode: entity.article?.reference,
+      articleLibelle: entity.article?.designation,
+      type: entity.type,
+      motif: entity.motif as any, // Convert StockMovementMotif to StockMovementReason
+      quantite: entity.quantite,
+      unite: entity.unite || '',
+      stockAvant: entity.stockAvant,
+      stockApres: entity.stockApres,
+      prixUnitaire: entity.coutUnitaire,
+      valeurTotale: entity.coutTotal,
+      devise: 'EUR', // Default currency
+      dateMovement: entity.dateCreation, // Map dateCreation to dateMovement
+      numeroLot: entity.numeroLot,
+      datePeremption: entity.datePeremption,
+      emplacementSource: entity.emplacementSource,
+      emplacementDestination: entity.emplacementDestination,
+      documentSourceId: entity.documentId,
+      typeDocumentSource: entity.documentType,
+      numeroDocumentSource: entity.documentReference,
+      utilisateurId: entity.creeParId, // Map creeParId to utilisateurId
+      utilisateurNom: entity.creeParNom,
+      status: entity.statut, // Map statut to status
+      notes: entity.notes,
+      metadonnees: entity.metadata,
+      dateCreation: entity.dateCreation,
+      dateModification: entity.dateModification,
+      dateValidation: entity.dateTraitement,
+      validateurId: entity.traiteParId,
+      validateurNom: entity.traiteParNom,
+    }
+  }
+
 }

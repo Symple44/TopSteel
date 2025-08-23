@@ -10,6 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import type { Request } from 'express'
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string
+    email: string
+    role: string
+  }
+}
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import {
   MarketplacePermission,
@@ -73,7 +81,7 @@ export class MarketplacePaymentController {
   @RequireMarketplacePermissions(MarketplacePermission.PROCESS_REFUNDS)
   async createRefund(
     @Body() createRefundDto: CreateRefundDto,
-    @Req() request: Request
+    @Req() request: AuthenticatedRequest
   ): Promise<RefundResult> {
     if (!createRefundDto.paymentIntentId) {
       throw new BadRequestException('Payment intent ID is required')
@@ -81,9 +89,9 @@ export class MarketplacePaymentController {
 
     // Log refund attempt for audit purposes
     this.logger.log(
-      `Refund requested by user ${request.user?.id} for payment ${createRefundDto.paymentIntentId.substring(0, 8)}...`,
+      `Refund requested by user ${request.user.id} for payment ${createRefundDto.paymentIntentId.substring(0, 8)}...`,
       {
-        userId: request.user?.id,
+        userId: request.user.id,
         paymentIntentId: createRefundDto.paymentIntentId,
         amount: createRefundDto.amount,
         reason: createRefundDto.reason,
@@ -99,13 +107,13 @@ export class MarketplacePaymentController {
     // Log refund result
     if (result.success) {
       this.logger.log(`Refund processed successfully: ${result.refundId}`, {
-        userId: request.user?.id,
+        userId: request.user.id,
         refundId: result.refundId,
         amount: result.amount,
       })
     } else {
       this.logger.error(`Refund failed: ${result.error}`, {
-        userId: request.user?.id,
+        userId: request.user.id,
         paymentIntentId: createRefundDto.paymentIntentId,
         error: result.error,
       })

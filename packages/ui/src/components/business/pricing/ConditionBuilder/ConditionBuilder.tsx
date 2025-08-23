@@ -1,5 +1,4 @@
 'use client'
-
 import {
   AlertCircle,
   Calendar,
@@ -22,20 +21,19 @@ import { useCallback, useMemo, useState } from 'react'
 import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Alert, AlertDescription, AlertTitle } from '../../../feedback/alert'
-import { Label } from '../../../forms/label'
+import { Label } from '../../../forms/label/Label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
-import { Button } from '../../../primitives/button'
-import { Input } from '../../../primitives/input'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../primitives/select'
+} from '../../../primitives/select/select'
 import { SimpleTooltip } from '../../../primitives/tooltip'
 import type { PricingCondition } from '../PriceRuleCard/PriceRuleCard'
-
 export interface ConditionBuilderProps {
   conditions: PricingCondition[]
   onChange: (conditions: PricingCondition[]) => void
@@ -45,20 +43,17 @@ export interface ConditionBuilderProps {
   allowGroups?: boolean
   templates?: ConditionTemplate[]
 }
-
 export interface ConditionTemplate {
   name: string
   description: string
   icon?: React.ReactNode
   conditions: PricingCondition[]
 }
-
 interface ConditionGroup {
   id: string
   operator: 'AND' | 'OR'
   conditions: (PricingCondition & { id: string })[]
 }
-
 const CONDITION_TYPES = [
   {
     value: 'quantity',
@@ -135,7 +130,6 @@ const CONDITION_TYPES = [
     valueType: 'mixed',
   },
 ]
-
 const CONDITION_OPERATORS = [
   { value: 'equals', label: 'Égal à', symbol: '=' },
   { value: 'not_equals', label: 'Différent de', symbol: '≠' },
@@ -150,7 +144,6 @@ const CONDITION_OPERATORS = [
   { value: 'after', label: 'Après', symbol: '>' },
   { value: 'before', label: 'Avant', symbol: '<' },
 ]
-
 const DEFAULT_TEMPLATES: ConditionTemplate[] = [
   {
     name: 'Remise volume',
@@ -192,7 +185,6 @@ const DEFAULT_TEMPLATES: ConditionTemplate[] = [
     ],
   },
 ]
-
 export function ConditionBuilder({
   conditions = [],
   onChange,
@@ -210,37 +202,31 @@ export function ConditionBuilder({
     article_reference: 'REF001',
     article_family: 'ACIER',
   })
-
   // Ajouter des IDs uniques aux conditions pour le suivi
   const conditionsWithIds = useMemo(
     () => conditions.map((c, i) => ({ ...c, id: `condition-${i}` })),
     [conditions]
   )
-
   const addCondition = useCallback(
     (template?: PricingCondition) => {
       if (conditions.length >= maxConditions) {
         return
       }
-
       const newCondition: PricingCondition = template || {
         type: 'quantity',
         operator: 'equals',
         value: '',
       }
-
       onChange([...conditions, newCondition])
       setExpandedConditions((prev) => new Set(prev).add(conditions.length))
     },
     [conditions, onChange, maxConditions]
   )
-
   const removeCondition = useCallback(
     (index: number) => {
       const newConditions = [...conditions]
       newConditions.splice(index, 1)
       onChange(newConditions)
-
       // Mettre à jour les indices expandés
       setExpandedConditions((prev) => {
         const newSet = new Set<number>()
@@ -253,44 +239,37 @@ export function ConditionBuilder({
     },
     [conditions, onChange]
   )
-
   const updateCondition = useCallback(
     (index: number, updates: Partial<PricingCondition>) => {
       const newConditions = [...conditions]
       newConditions[index] = { ...newConditions[index], ...updates }
-
       // Réinitialiser la valeur si on change d'opérateur vers 'between'
       if (updates.operator === 'between' && typeof newConditions[index].value !== 'object') {
         newConditions[index].value = { from: '', to: '' }
       } else if (updates.operator !== 'between' && typeof newConditions[index].value === 'object') {
         newConditions[index].value = ''
       }
-
       onChange(newConditions)
     },
     [conditions, onChange]
   )
-
   const duplicateCondition = useCallback(
     (index: number) => {
       if (conditions.length >= maxConditions) {
         return
       }
-
       const newConditions = [...conditions]
       newConditions.splice(index + 1, 0, { ...conditions[index] })
       onChange(newConditions)
     },
     [conditions, onChange, maxConditions]
   )
-
   const applyTemplate = useCallback(
     (template: ConditionTemplate) => {
       onChange([...conditions, ...template.conditions])
     },
     [conditions, onChange]
   )
-
   const toggleExpanded = useCallback((index: number) => {
     setExpandedConditions((prev) => {
       const newSet = new Set(prev)
@@ -302,11 +281,9 @@ export function ConditionBuilder({
       return newSet
     })
   }, [])
-
   const evaluateCondition = useCallback(
     (condition: PricingCondition, context: Record<string, any>): boolean => {
       const contextValue = context[condition.type] || context[condition.field || '']
-
       switch (condition.operator) {
         case 'equals':
           return contextValue === condition.value
@@ -352,20 +329,16 @@ export function ConditionBuilder({
     },
     []
   )
-
   const allConditionsMet = useMemo(() => {
     return conditions.every((condition) => evaluateCondition(condition, testContext))
   }, [conditions, testContext, evaluateCondition])
-
   const renderConditionValue = (condition: PricingCondition, index: number) => {
     const conditionType = CONDITION_TYPES.find((t) => t.value === condition.type)
-
     if (condition.operator === 'between') {
       const value =
         typeof condition.value === 'object' && 'from' in condition.value
           ? condition.value
           : { from: '', to: '' }
-
       return (
         <div className="flex items-center gap-2">
           <Input
@@ -394,7 +367,6 @@ export function ConditionBuilder({
         </div>
       )
     }
-
     if (conditionType?.valueType === 'select' && conditionType.options) {
       if (condition.operator === 'in' || condition.operator === 'not_in') {
         // Multi-select pour les opérateurs 'in' et 'not_in'
@@ -404,7 +376,6 @@ export function ConditionBuilder({
               .split(',')
               .map((s) => s.trim())
               .filter(Boolean)
-
         return (
           <div className="flex flex-wrap gap-2">
             {conditionType.options.map((option) => (
@@ -445,14 +416,12 @@ export function ConditionBuilder({
         )
       }
     }
-
     if (conditionType?.valueType === 'date_range' || condition.type === 'date_range') {
       if (['between', 'after', 'before'].includes(condition.operator)) {
         const value =
           typeof condition.value === 'object' && 'from' in condition.value
             ? condition.value
             : { from: '', to: '' }
-
         return (
           <div className="flex items-center gap-2">
             <Input
@@ -491,7 +460,6 @@ export function ConditionBuilder({
         )
       }
     }
-
     return (
       <Input
         value={String(condition.value || '')}
@@ -510,7 +478,6 @@ export function ConditionBuilder({
       />
     )
   }
-
   return (
     <div className={cn('space-y-4', className)}>
       {/* Templates */}
@@ -541,7 +508,6 @@ export function ConditionBuilder({
           </CardContent>
         </Card>
       )}
-
       {/* Liste des conditions */}
       <div className="space-y-3">
         {conditionsWithIds.map((condition, index) => {
@@ -549,7 +515,6 @@ export function ConditionBuilder({
           const operator = CONDITION_OPERATORS.find((o) => o.value === condition.operator)
           const isExpanded = expandedConditions.has(index)
           const isValid = evaluateCondition(condition, testContext)
-
           return (
             <Card
               key={condition.id}
@@ -565,11 +530,9 @@ export function ConditionBuilder({
                       {conditionType?.icon}
                       <span className="font-medium">{conditionType?.label}</span>
                     </div>
-
                     {!isExpanded && (
                       <>
                         <Badge variant="outline">{operator?.symbol || operator?.label}</Badge>
-
                         <span className="text-sm text-muted-foreground">
                           {typeof condition.value === 'object'
                             ? JSON.stringify(condition.value)
@@ -577,14 +540,12 @@ export function ConditionBuilder({
                         </span>
                       </>
                     )}
-
                     {showPreview && (
                       <Badge variant={isValid ? 'default' : 'destructive'} className="ml-auto">
                         {isValid ? 'Valide' : 'Non valide'}
                       </Badge>
                     )}
                   </div>
-
                   <div className="flex items-center gap-2">
                     <SimpleTooltip content="Dupliquer">
                       <Button
@@ -596,7 +557,6 @@ export function ConditionBuilder({
                         <Copy className="w-4 h-4" />
                       </Button>
                     </SimpleTooltip>
-
                     <SimpleTooltip content={isExpanded ? 'Réduire' : 'Développer'}>
                       <Button variant="ghost" size="sm" onClick={() => toggleExpanded(index)}>
                         {isExpanded ? (
@@ -606,7 +566,6 @@ export function ConditionBuilder({
                         )}
                       </Button>
                     </SimpleTooltip>
-
                     <SimpleTooltip content="Supprimer">
                       <Button variant="ghost" size="sm" onClick={() => removeCondition(index)}>
                         <Trash2 className="w-4 h-4" />
@@ -615,7 +574,6 @@ export function ConditionBuilder({
                   </div>
                 </div>
               </CardHeader>
-
               {isExpanded && (
                 <CardContent>
                   <div className="space-y-4">
@@ -652,7 +610,6 @@ export function ConditionBuilder({
                           </p>
                         )}
                       </div>
-
                       <div>
                         <Label>Opérateur</Label>
                         <Select
@@ -682,13 +639,11 @@ export function ConditionBuilder({
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div>
                         <Label>Valeur</Label>
                         {renderConditionValue(condition, index)}
                       </div>
                     </div>
-
                     {condition.type === 'custom' && (
                       <div>
                         <Label>Champ personnalisé</Label>
@@ -706,7 +661,6 @@ export function ConditionBuilder({
           )
         })}
       </div>
-
       {/* Bouton d'ajout */}
       {conditions.length < maxConditions && (
         <Button onClick={() => addCondition()} variant="outline" className="w-full">
@@ -714,7 +668,6 @@ export function ConditionBuilder({
           Ajouter une condition ({conditions.length}/{maxConditions})
         </Button>
       )}
-
       {/* Aperçu du test */}
       {showPreview && conditions.length > 0 && (
         <Card>
@@ -747,7 +700,6 @@ export function ConditionBuilder({
                 )
               })}
             </div>
-
             <Alert variant={allConditionsMet ? 'default' : 'destructive'}>
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>
@@ -764,7 +716,6 @@ export function ConditionBuilder({
           </CardContent>
         </Card>
       )}
-
       {/* Message d'information */}
       {conditions.length === 0 && (
         <Alert>

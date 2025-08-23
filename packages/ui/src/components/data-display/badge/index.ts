@@ -1,2 +1,3 @@
 export type { BadgeVariants } from '../../../lib/design-system'
-export * from './Badge'
+export { Badge } from './Badge'
+export type { BadgeProps } from './Badge'

@@ -1,5 +1,4 @@
 'use client'
-
 import {
   Calculator,
   CheckCircle,
@@ -33,7 +32,7 @@ import {
   TableRow,
 } from '../../../data-display/table'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
-import { Button } from '../../../primitives/button'
+import { Button } from '../../../primitives/button/Button'
 import {
   Collapsible,
   CollapsibleContent,
@@ -42,7 +41,6 @@ import {
 import { Progress } from '../../../primitives/progress'
 import { Separator } from '../../../primitives/separator'
 import { SimpleTooltip } from '../../../primitives/tooltip'
-
 export interface PriceBreakdownProps {
   breakdown: {
     steps: Array<{
@@ -112,30 +110,25 @@ export interface PriceBreakdownProps {
   onExport?: () => void
   onCopy?: () => void
 }
-
 const formatCurrency = (value: number, currency = 'EUR') => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency,
   }).format(value)
 }
-
 const formatPercentage = (value: number) => {
   return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`
 }
-
 const getAdjustmentIcon = (adjustment: number) => {
   if (adjustment > 0) return <TrendingUp className="w-4 h-4 text-red-500" />
   if (adjustment < 0) return <TrendingDown className="w-4 h-4 text-green-500" />
   return <Minus className="w-4 h-4 text-gray-400" />
 }
-
 const getAdjustmentColor = (adjustment: number) => {
   if (adjustment > 0) return 'text-red-600'
   if (adjustment < 0) return 'text-green-600'
   return 'text-gray-600'
 }
-
 export function PriceBreakdown({
   breakdown,
   basePrice,
@@ -154,7 +147,6 @@ export function PriceBreakdown({
     margins: true,
     metadata: false,
   })
-
   const toggleSection = (section: keyof typeof expandedSections) => {
     if (!collapsible && section === 'context') return
     setExpandedSections((prev) => ({
@@ -162,13 +154,10 @@ export function PriceBreakdown({
       [section]: !prev[section],
     }))
   }
-
   const totalDiscount = basePrice - finalPrice
   const totalDiscountPercentage = basePrice > 0 ? (totalDiscount / basePrice) * 100 : 0
-
   const _priceEvolution = useMemo(() => {
     if (!breakdown.steps.length) return []
-
     const evolution = [{ step: 0, price: basePrice, label: 'Prix de base' }]
     breakdown.steps.forEach((step) => {
       evolution.push({
@@ -179,7 +168,6 @@ export function PriceBreakdown({
     })
     return evolution
   }, [breakdown.steps, basePrice])
-
   const renderStepsTimeline = () => (
     <div className="space-y-4">
       {/* Prix de base */}
@@ -194,23 +182,19 @@ export function PriceBreakdown({
           </div>
         </div>
       </div>
-
       {/* Étapes de calcul */}
       {breakdown.steps.map((step, index) => {
         const isLastStep = index === breakdown.steps.length - 1
         const adjustmentPercent =
           step.priceBefore > 0 ? ((step.priceAfter - step.priceBefore) / step.priceBefore) * 100 : 0
-
         return (
           <div key={step.ruleId} className="relative">
             {/* Ligne de connexion */}
             {!isLastStep && <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-gray-200" />}
-
             <div className="flex items-start gap-4">
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white border-2 border-gray-200 text-sm font-medium z-10">
                 {step.stepNumber}
               </div>
-
               <div className="flex-1 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -221,9 +205,7 @@ export function PriceBreakdown({
                   </div>
                   {getAdjustmentIcon(step.adjustment)}
                 </div>
-
                 <p className="text-sm text-muted-foreground">{step.description}</p>
-
                 <div className="flex items-center gap-4 text-sm">
                   <span className="font-mono">{formatCurrency(step.priceBefore, currency)}</span>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -244,7 +226,6 @@ export function PriceBreakdown({
           </div>
         )
       })}
-
       {/* Prix final */}
       <div className="flex items-center gap-4 pt-2 border-t">
         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white">
@@ -268,7 +249,6 @@ export function PriceBreakdown({
       </div>
     </div>
   )
-
   const renderSection = (
     title: string,
     icon: React.ReactNode,
@@ -300,7 +280,6 @@ export function PriceBreakdown({
         </Collapsible>
       )
     }
-
     return (
       <div>
         <div className="flex items-center gap-2 p-4">
@@ -312,7 +291,6 @@ export function PriceBreakdown({
       </div>
     )
   }
-
   return (
     <Card className={cn('overflow-hidden', className)}>
       <CardHeader className="pb-4">
@@ -339,7 +317,6 @@ export function PriceBreakdown({
           </div>
         </div>
       </CardHeader>
-
       <CardContent className="p-0 space-y-px">
         {/* Résumé principal */}
         <div className="p-4 bg-gray-50">
@@ -362,9 +339,7 @@ export function PriceBreakdown({
             </div>
           </div>
         </div>
-
         <Separator />
-
         {/* Étapes de calcul */}
         {renderSection(
           'Étapes de calcul',
@@ -373,11 +348,9 @@ export function PriceBreakdown({
           renderStepsTimeline(),
           <Badge variant="secondary">{breakdown.steps.length} règles</Badge>
         )}
-
         {showDetails && (
           <>
             <Separator />
-
             {/* Contexte */}
             {renderSection(
               'Contexte',
@@ -406,7 +379,6 @@ export function PriceBreakdown({
                     )}
                   </div>
                 </div>
-
                 {breakdown.context.customer && (
                   <div>
                     <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
@@ -429,7 +401,6 @@ export function PriceBreakdown({
                     </div>
                   </div>
                 )}
-
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <Hash className="w-4 h-4" />
@@ -444,7 +415,6 @@ export function PriceBreakdown({
                 </div>
               </div>
             )}
-
             {/* Règles non appliquées */}
             {breakdown.skippedRules && breakdown.skippedRules.length > 0 && (
               <>
@@ -477,7 +447,6 @@ export function PriceBreakdown({
                 )}
               </>
             )}
-
             {/* Marges */}
             {breakdown.margins && (
               <>
@@ -521,7 +490,6 @@ export function PriceBreakdown({
                 )}
               </>
             )}
-
             {/* Métadonnées */}
             {breakdown.metadata && (
               <>

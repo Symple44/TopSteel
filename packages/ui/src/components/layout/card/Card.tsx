@@ -1,9 +1,11 @@
-import * as React from 'react'
+'use client'
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'ghost' | 'outline'
-  padding?: 'none' | 'sm' | 'default' | 'lg'
-}
+import * as React from 'react'
+import type { CardVariants } from '../../../lib/design-system'
+import { cardVariants } from '../../../lib/design-system'
+import { cn } from '../../../lib/utils'
+
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement>, CardVariants {}
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   (
@@ -24,37 +26,17 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     },
     ref
   ) => {
-    const baseClasses = 'rounded-lg border bg-card text-card-foreground shadow'
-
-    const variantClasses = {
-      default: 'border-border',
-      elevated: 'border-transparent shadow-lg',
-      ghost: 'border-transparent shadow-none',
-      outline: 'border-border shadow-none',
-    }
-
-    const paddingClasses = {
-      none: 'p-0',
-      sm: 'p-4',
-      default: 'p-6',
-      lg: 'p-8',
-    }
-
     // Add cursor pointer and proper accessibility attributes when interactive
     const isInteractive = Boolean(onClick)
     const interactiveClasses = isInteractive
       ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
       : ''
 
-    const finalClassName = [
-      baseClasses,
-      variantClasses[variant],
-      paddingClasses[padding],
+    const finalClassName = cn(
+      cardVariants({ variant, padding }),
       interactiveClasses,
-      className,
-    ]
-      .filter(Boolean)
-      .join(' ')
+      className
+    )
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
@@ -314,3 +296,4 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardFooter.displayName = 'CardFooter'
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export type { CardVariants }

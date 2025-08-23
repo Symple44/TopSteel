@@ -28,13 +28,17 @@ export class ImageService {
 
   private async getImageDimensions(buffer: Buffer): Promise<{ width: number; height: number }> {
     try {
+      // Check if Sharp is available as an optional dependency
       const sharp = await import('sharp')
+      if (!sharp || !sharp.default) {
+        return { width: 0, height: 0 }
+      }
       const metadata = await sharp.default(buffer).metadata()
       return {
         width: metadata.width || 0,
         height: metadata.height || 0,
       }
-    } catch (_error) {
+    } catch (error) {
       return { width: 0, height: 0 }
     }
   }
@@ -45,7 +49,18 @@ export class ImageService {
     outputPath: string
   ): Promise<{ width: number; height: number; size: number }> {
     try {
+      // Check if Sharp is available as an optional dependency
       const sharp = await import('sharp')
+      if (!sharp || !sharp.default) {
+        // Fallback: save original file as variant
+        await fs.writeFile(outputPath, buffer)
+        return {
+          width: variant.width,
+          height: variant.height,
+          size: buffer.length,
+        }
+      }
+
       const result = await sharp
         .default(buffer)
         .resize(variant.width, variant.height, {
@@ -60,7 +75,7 @@ export class ImageService {
         height: result.height,
         size: result.size,
       }
-    } catch (_error) {
+    } catch (error) {
       // Fallback: save original file as variant
       await fs.writeFile(outputPath, buffer)
       return {

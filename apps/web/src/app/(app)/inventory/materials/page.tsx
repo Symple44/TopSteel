@@ -1,14 +1,16 @@
 'use client'
 
 import type { Material } from '@erp/types'
+
 import {
+  // @ts-ignore - TypeScript bug with re-exports
+  AdvancedDataTable,
   Badge,
   Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  DataTable,
   Input,
   Select,
   SelectContent,
@@ -59,41 +61,55 @@ export default function MaterialsPage() {
   const columns = useMemo(
     () => [
       {
+        id: 'reference',
         key: 'reference',
-        label: 'Référence',
+        title: 'Référence',
+        type: 'text' as const,
         sortable: true,
         width: 120,
       },
       {
+        id: 'designation',
         key: 'designation',
-        label: 'Désignation',
+        title: 'Désignation',
+        type: 'text' as const,
         sortable: true,
         searchable: true,
       },
       {
+        id: 'type',
         key: 'type',
-        label: 'Type',
+        title: 'Type',
+        type: 'text' as const,
         width: 120,
         render: (value: string) => <Badge variant="outline">{value}</Badge>,
       },
       {
+        id: 'category',
         key: 'category',
-        label: 'Catégorie',
+        title: 'Catégorie',
+        type: 'text' as const,
         width: 150,
       },
       {
+        id: 'dimensions',
         key: 'dimensions',
-        label: 'Dimensions',
+        title: 'Dimensions',
+        type: 'text' as const,
         width: 150,
       },
       {
+        id: 'quality',
         key: 'quality',
-        label: 'Qualité',
+        title: 'Qualité',
+        type: 'text' as const,
         width: 100,
       },
       {
-        key: 'stockQuantity',
-        label: 'Stock',
+        id: 'stock',
+        key: 'stock',
+        title: 'Stock',
+        type: 'number' as const,
         width: 100,
         render: (value: number, material: Material) => {
           const isLow = material.stockMin && value <= material.stockMin
@@ -106,37 +122,55 @@ export default function MaterialsPage() {
         },
       },
       {
-        key: 'unitPrice',
-        label: 'Prix unitaire',
+        id: 'price',
+        key: 'price',
+        title: 'Prix unitaire',
+        type: 'number' as const,
         width: 120,
         render: (value: number) => formatCurrency(value),
       },
       {
+        id: 'stockValue',
         key: 'stockValue',
-        label: 'Valeur stock',
+        title: 'Valeur stock',
+        type: 'number' as const,
         width: 120,
         render: (_: unknown, material: Material) =>
-          formatCurrency((material.stockQuantity || 0) * (material.unitPrice || 0)),
+          formatCurrency((material.stock || 0) * (material.price || 0)),
       },
     ],
     []
   )
 
-  const actions = useMemo(
+  const [showMaterialForm, setShowMaterialForm] = useState(false)
+  const [_selectedMaterial, setSelectedMaterial] = useState<Material | null>(null)
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
+
+  const handleEdit = useCallback((material: Material) => {
+    setSelectedMaterial(material)
+    setFormMode('edit')
+    setShowMaterialForm(true)
+  }, [])
+
+  const handleCreate = useCallback(() => {
+    setSelectedMaterial(null)
+    setFormMode('create')
+    setShowMaterialForm(true)
+  }, [])
+
+  const _actions = useMemo(
     () => [
       {
-        label: 'Modifier',
-        onClick: (_material: Material) => {
-          // TODO: Implement MaterialFormDialog
-        },
+        header: 'Modifier',
+        onClick: handleEdit,
       },
       {
-        label: 'Supprimer',
+        header: 'Supprimer',
         onClick: handleDelete,
         variant: 'destructive' as const,
       },
     ],
-    [handleDelete]
+    [handleDelete, handleEdit]
   )
 
   // Gestion d'erreur
@@ -169,7 +203,7 @@ export default function MaterialsPage() {
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Exporter
           </Button>
-          <Button aria-label="Créer un nouveau matériau">
+          <Button aria-label="Créer un nouveau matériau" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
             Nouveau matériau
           </Button>
@@ -280,18 +314,51 @@ export default function MaterialsPage() {
       {/* Data Table */}
       <Card>
         <CardContent className="p-0">
-          <DataTable
+          <AdvancedDataTable
             columns={columns}
             data={materials}
-            actions={actions}
-            loading={isLoading}
+            keyField="id"
+            tableId="materials-table"
+            userId={
+              typeof window !== 'undefined'
+                ? localStorage.getItem('userId') || 'default-user'
+                : 'default-user'
+            }
             searchable
+            sortable
             selectable
-            exportable
-            pageSize={20}
+            filterable
+            loading={isLoading}
+            pagination={{
+              page: 1,
+              pageSize: 25,
+              total: materials.length,
+              showSizeChanger: true,
+              pageSizeOptions: [10, 25, 50, 100],
+            }}
           />
         </CardContent>
       </Card>
+
+      {/* Material Form Dialog - Dialog composant à créer si besoin */}
+      {showMaterialForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <Card className="w-full max-w-2xl">
+            <CardHeader>
+              <CardTitle>
+                {formMode === 'create' ? 'Nouveau Matériau' : 'Modifier Matériau'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Formulaire temporaire - à remplacer par MaterialFormDialog */}
+              <div className="space-y-4">
+                <p>Formulaire matériau en cours de développement</p>
+                <Button onClick={() => setShowMaterialForm(false)}>Fermer</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

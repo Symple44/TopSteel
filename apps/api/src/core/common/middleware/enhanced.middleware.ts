@@ -20,14 +20,10 @@ export class EnhancedMiddleware implements NestMiddleware {
 
     // Intercepter writeHead pour ajouter le header de temps de réponse avant l'envoi
     const originalWriteHead = res.writeHead.bind(res)
-    ;(res as { writeHead: typeof res.writeHead }).writeHead = (
-      statusCode: number,
-      statusMessage?: string | undefined,
-      headers?: OutgoingHttpHeaders
-    ): Response => {
+    res.writeHead = function (statusCode: number, ...args: any[]) {
       const duration = performance.now() - start
       res.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`)
-      return originalWriteHead(statusCode, statusMessage as string, headers)
+      return originalWriteHead.call(this, statusCode, ...args)
     }
 
     res.on('finish', () => {

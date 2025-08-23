@@ -2,7 +2,6 @@
 
 import {
   Badge,
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -79,9 +78,12 @@ export default function ArticleDetailPage() {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <Button variant="ghost" onClick={() => router.back()} className="h-8 w-8 p-0">
+          <button type="button"
+            onClick={() => router.back()}
+            className="h-8 w-8 p-0 inline-flex items-center justify-center text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground rounded-md"
+          >
             <ArrowLeft className="h-4 w-4" />
-          </Button>
+          </button>
           <div className="h-8 w-48 bg-gray-200 animate-pulse rounded" />
         </div>
         <div className="space-y-6">
@@ -100,9 +102,12 @@ export default function ArticleDetailPage() {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <Button variant="ghost" onClick={() => router.back()} className="h-8 w-8 p-0">
+          <button type="button"
+            onClick={() => router.back()}
+            className="h-8 w-8 p-0 inline-flex items-center justify-center text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground rounded-md"
+          >
             <ArrowLeft className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
         <Card className="mx-auto max-w-md">
           <CardContent className="flex flex-col items-center py-8">
@@ -111,7 +116,12 @@ export default function ArticleDetailPage() {
             <p className="text-gray-600 text-center mb-4">
               L'article demandé n'existe pas ou vous n'avez pas les permissions pour le voir.
             </p>
-            <Button onClick={() => router.push('/inventory/articles')}>Retour à la liste</Button>
+            <button type="button"
+              onClick={() => router.push('/inventory/articles')}
+              className="inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 rounded-md"
+            >
+              Retour à la liste
+            </button>
           </CardContent>
         </Card>
       </div>
@@ -130,9 +140,12 @@ export default function ArticleDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" onClick={() => router.back()} className="h-8 w-8 p-0">
+          <button type="button"
+            onClick={() => router.back()}
+            className="h-8 w-8 p-0 inline-flex items-center justify-center text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground rounded-md"
+          >
             <ArrowLeft className="h-4 w-4" />
-          </Button>
+          </button>
           <div>
             <h1 className="text-2xl font-bold">{article.designation}</h1>
             <div className="flex items-center space-x-2 mt-1">
@@ -145,18 +158,27 @@ export default function ArticleDetailPage() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={() => setShowInventoryDialog(true)} className="h-8">
+          <button type="button"
+            onClick={() => setShowInventoryDialog(true)}
+            className="h-8 inline-flex items-center justify-center text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3 rounded-md"
+          >
             <Warehouse className="h-4 w-4 mr-2" />
             Inventaire
-          </Button>
-          <Button variant="outline" onClick={() => setShowDuplicateDialog(true)} className="h-8">
+          </button>
+          <button type="button"
+            onClick={() => setShowDuplicateDialog(true)}
+            className="h-8 inline-flex items-center justify-center text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3 rounded-md"
+          >
             <Copy className="h-4 w-4 mr-2" />
             Dupliquer
-          </Button>
-          <Button onClick={() => setShowEditDialog(true)} className="h-8">
+          </button>
+          <button type="button"
+            onClick={() => setShowEditDialog(true)}
+            className="h-8 inline-flex items-center justify-center text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 px-3 rounded-md"
+          >
             <Edit className="h-4 w-4 mr-2" />
             Modifier
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -248,19 +270,19 @@ export default function ArticleDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Référence</label>
+                  <div className="text-sm font-medium text-gray-600">Référence</div>
                   <p className="text-sm">{article.reference}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Désignation</label>
+                  <div className="text-sm font-medium text-gray-600">Désignation</div>
                   <p className="text-sm">{article.designation}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Description</label>
+                  <div className="text-sm font-medium text-gray-600">Description</div>
                   <p className="text-sm">{article.description || 'Aucune description'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Marque</label>
+                  <div className="text-sm font-medium text-gray-600">Marque</div>
                   <p className="text-sm">{article.marque || '-'}</p>
                 </div>
               </CardContent>
@@ -275,19 +297,19 @@ export default function ArticleDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Type</label>
+                  <div className="text-sm font-medium text-gray-600">Type</div>
                   <p className="text-sm">{articleTypeLabels[article.type]}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Famille</label>
+                  <div className="text-sm font-medium text-gray-600">Famille</div>
                   <p className="text-sm">{article.famille || '-'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Sous-famille</label>
+                  <div className="text-sm font-medium text-gray-600">Sous-famille</div>
                   <p className="text-sm">{article.sousFamille || '-'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Statut</label>
+                  <div className="text-sm font-medium text-gray-600">Statut</div>
                   <Badge className={getStatusColor(article.status)}>
                     {articleStatusLabels[article.status]}
                   </Badge>
@@ -308,21 +330,21 @@ export default function ArticleDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Géré en stock</label>
+                  <div className="text-sm font-medium text-gray-600">Géré en stock</div>
                   <p className="text-sm">{article.gereEnStock ? 'Oui' : 'Non'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Stock physique</label>
+                  <div className="text-sm font-medium text-gray-600">Stock physique</div>
                   <p className="text-sm font-bold">
                     {Number(article.stockPhysique || 0).toFixed(2)}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Stock minimum</label>
+                  <div className="text-sm font-medium text-gray-600">Stock minimum</div>
                   <p className="text-sm">{Number(article.stockMini || 0).toFixed(2)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Stock maximum</label>
+                  <div className="text-sm font-medium text-gray-600">Stock maximum</div>
                   <p className="text-sm">{Number(article.stockMaxi || 0).toFixed(2)}</p>
                 </div>
               </CardContent>
@@ -384,21 +406,21 @@ export default function ArticleDetailPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Prix d'achat standard</label>
+                  <div className="text-sm font-medium text-gray-600">Prix d'achat standard</div>
                   <p className="text-lg font-bold">
                     {formatCurrency(article.prixAchatStandard ?? 0)}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Prix de vente HT</label>
+                  <div className="text-sm font-medium text-gray-600">Prix de vente HT</div>
                   <p className="text-lg font-bold">{formatCurrency(article.prixVenteHT ?? 0)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Taux de TVA</label>
+                  <div className="text-sm font-medium text-gray-600">Taux de TVA</div>
                   <p className="text-sm">{article.tauxTVA ? `${article.tauxTVA}%` : '-'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Taux de marge</label>
+                  <div className="text-sm font-medium text-gray-600">Taux de marge</div>
                   <p className="text-sm">{article.tauxMarge ? `${article.tauxMarge}%` : '-'}</p>
                 </div>
               </div>
@@ -416,11 +438,11 @@ export default function ArticleDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-600">Créé le</label>
+                <div className="text-sm font-medium text-gray-600">Créé le</div>
                 <p className="text-sm">{article.createdAt ? formatDate(article.createdAt) : '-'}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">Modifié le</label>
+                <div className="text-sm font-medium text-gray-600">Modifié le</div>
                 <p className="text-sm">{article.updatedAt ? formatDate(article.updatedAt) : '-'}</p>
               </div>
             </CardContent>

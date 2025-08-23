@@ -6,6 +6,7 @@ export enum NotificationType {
   WARNING = 'warning',
   ERROR = 'error',
   SUCCESS = 'success',
+  SYSTEM = 'system',
 }
 
 export enum NotificationCategory {
@@ -18,6 +19,7 @@ export enum NotificationCategory {
   FACTURATION = 'facturation',
   SAUVEGARDE = 'sauvegarde',
   UTILISATEUR = 'utilisateur',
+  LICENSE = 'license',
 }
 
 export enum NotificationPriority {

@@ -33,9 +33,31 @@ export const envConfig = {
 
   // JWT
   jwt: {
-    secret: process.env.JWT_SECRET ?? 'fallback-secret',
+    secret: (() => {
+      const secret = process.env.JWT_SECRET
+      if (!secret || secret.length < 32) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('JWT_SECRET must be set and at least 32 characters in production')
+        }
+        // Generate a random secret for development only
+        const crypto = require('crypto')
+        return crypto.randomBytes(32).toString('hex')
+      }
+      return secret
+    })(),
     expiresIn: process.env.JWT_EXPIRES_IN ?? '24h',
-    refreshSecret: process.env.JWT_REFRESH_SECRET ?? 'fallback-refresh',
+    refreshSecret: (() => {
+      const secret = process.env.JWT_REFRESH_SECRET
+      if (!secret || secret.length < 32) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('JWT_REFRESH_SECRET must be set and at least 32 characters in production')
+        }
+        // Generate a random secret for development only
+        const crypto = require('crypto')
+        return crypto.randomBytes(32).toString('hex')
+      }
+      return secret
+    })(),
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
     issuer: process.env.JWT_ISSUER ?? 'topsteel-erp',
     audience: process.env.JWT_AUDIENCE ?? 'topsteel-users',

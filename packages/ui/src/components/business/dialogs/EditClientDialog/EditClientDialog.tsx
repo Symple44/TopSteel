@@ -1,52 +1,642 @@
 'use client'
-
-import { useState } from 'react'
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives'
-
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useState, useEffect } from 'react'
+import { Button } from '../../../primitives/button/Button'
+import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import { FormMessage } from '../../../forms/form/form'
+import { CardFooter } from '../../../layout/card'
+import { SelectValue } from '../../../primitives/select/select'
+import { Switch } from '../../../primitives/switch/switch'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+// Client validation schema (same as AddClientDialog)
+const clientSchema = z.object({
+  id: z.string().optional(), // For editing existing client
+  companyName: z.string().min(1, 'Le nom de l\'entreprise est requis'),
+  siret: z.string().optional(),
+  tvaNumber: z.string().optional(),
+  companyType: z.enum(['SARL', 'SAS', 'SA', 'EI', 'EURL', 'SCI', 'Autre']),
+  // Contact Information
+  contactFirstName: z.string().min(1, 'Le prénom du contact est requis'),
+  contactLastName: z.string().min(1, 'Le nom du contact est requis'),
+  contactEmail: z.string().email('Email invalide').min(1, 'L\'email est requis'),
+  contactPhone: z.string().min(1, 'Le téléphone est requis'),
+  contactPosition: z.string().optional(),
+  // Address Information
+  address: z.string().min(1, 'L\'adresse est requise'),
+  postalCode: z.string().min(1, 'Le code postal est requis'),
+  city: z.string().min(1, 'La ville est requise'),
+  country: z.string().default('France'),
+  // Billing Information
+  billingAddress: z.string().optional(),
+  billingPostalCode: z.string().optional(),
+  billingCity: z.string().optional(),
+  billingCountry: z.string().optional(),
+  useSameAddress: z.boolean().default(true),
+  paymentTerms: z.enum(['immediate', '15days', '30days', '45days', '60days']).default('30days'),
+  paymentMethod: z.enum(['transfer', 'check', 'card', 'cash']).default('transfer'),
+  // Credit Information
+  creditLimit: z.number().min(0, 'La limite de crédit doit être positive').default(0),
+  creditUsed: z.number().min(0, 'Le crédit utilisé doit être positif').default(0),
+  // Business Information
+  sector: z.string().optional(),
+  notes: z.string().optional(),
+  isActive: z.boolean().default(true),
+  preferredLanguage: z.enum(['fr', 'en']).default('fr'),
+  // Metadata for editing
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+})
+type ClientFormData = z.infer<typeof clientSchema>
+export interface ClientData extends ClientFormData {
+  id: string
+}
 interface EditClientDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit?: (data: unknown) => void
+  onSubmit?: (data: ClientFormData) => void | Promise<void>
+  clientData?: ClientData | null // Data of client to edit
 }
-
-export function EditClientDialog({ open, onOpenChange, onSubmit }: EditClientDialogProps) {
+export function EditClientDialog({ open, onOpenChange, onSubmit, clientData }: EditClientDialogProps) {
   const [loading, setLoading] = useState(false)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    // TODO: Implement Modifier un client logic
-    setTimeout(() => {
-      onSubmit?.({})
-      setLoading(false)
+  const [error, setError] = useState<string | null>(null)
+  const form = useForm<ClientFormData>({
+    resolver: zodResolver(clientSchema),
+    defaultValues: {
+      companyType: 'SARL',
+      country: 'France',
+      useSameAddress: true,
+      paymentTerms: '30days',
+      paymentMethod: 'transfer',
+      creditLimit: 0,
+      creditUsed: 0,
+      isActive: true,
+      preferredLanguage: 'fr',
+    },
+  })
+  const watchUseSameAddress = form.watch('useSameAddress')
+  // Load client data when dialog opens
+  useEffect(() => {
+    if (open && clientData) {
+      form.reset({
+        ...clientData,
+        // Determine if using same address
+        useSameAddress: 
+          !clientData.billingAddress || 
+          (clientData.billingAddress === clientData.address &&
+           clientData.billingPostalCode === clientData.postalCode &&
+           clientData.billingCity === clientData.city &&
+           clientData.billingCountry === clientData.country),
+      })
+    }
+  }, [open, clientData, form])
+  const handleSubmit = async (data: ClientFormData) => {
+    try {
+      setLoading(true)
+      setError(null)
+      // If using same address, copy main address to billing
+      if (data.useSameAddress) {
+        data.billingAddress = data.address
+        data.billingPostalCode = data.postalCode
+        data.billingCity = data.city
+        data.billingCountry = data.country
+      }
+      // Include the ID for updates
+      if (clientData?.id) {
+        data.id = clientData.id
+      }
+      data.updatedAt = new Date()
+      await onSubmit?.(data)
       onOpenChange(false)
-    }, 1000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue')
+    } finally {
+      setLoading(false)
+    }
   }
-
+  const handleClose = () => {
+    form.reset()
+    setError(null)
+    onOpenChange(false)
+  }
+  if (!clientData) {
+    return null
+  }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Modifier un client</DialogTitle>
+          <DialogTitle>
+            Modifier le client: {clientData.companyName}
+          </DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* TODO: Add form fields */}
-
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Annuler
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'En cours...' : 'Valider'}
-            </Button>
-          </div>
-        </form>
+        <ScrollArea className="max-h-[70vh] pr-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              {error && (
+                <div className="rounded-md bg-red-50 p-4 border border-red-200">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+              {/* Client Metadata */}
+              {clientData && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="grid gap-2 text-sm">
+                    <div>
+                      <span className="font-medium">ID Client: </span>
+                      <span className="font-mono">{clientData.id}</span>
+                    </div>
+                    {clientData.createdAt && (
+                      <div>
+                        <span className="font-medium">Créé le: </span>
+                        <span>{new Date(clientData.createdAt).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    )}
+                    {clientData.updatedAt && (
+                      <div>
+                        <span className="font-medium">Modifié le: </span>
+                        <span>{new Date(clientData.updatedAt).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              {/* Company Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Informations de l'entreprise</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="companyName"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>Nom de l'entreprise *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nom de l'entreprise" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="companyType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type d'entreprise</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Sélectionner le type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="SARL">SARL</SelectItem>
+                            <SelectItem value="SAS">SAS</SelectItem>
+                            <SelectItem value="SA">SA</SelectItem>
+                            <SelectItem value="EI">EI</SelectItem>
+                            <SelectItem value="EURL">EURL</SelectItem>
+                            <SelectItem value="SCI">SCI</SelectItem>
+                            <SelectItem value="Autre">Autre</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="siret"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SIRET</FormLabel>
+                        <FormControl>
+                          <Input placeholder="123 456 789 01234" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="tvaNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Numéro de TVA</FormLabel>
+                        <FormControl>
+                          <Input placeholder="FR12345678901" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="sector"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Secteur d'activité</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Construction, Industrie..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+              {/* Contact Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Contact principal</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="contactFirstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Prénom *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Prénom" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactLastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nom" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactEmail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="contact@entreprise.com" type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Téléphone *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="01 23 45 67 89" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactPosition"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>Fonction</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Directeur, Chef de projet..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+              {/* Address Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Adresse de l'entreprise</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4 md:grid-cols-3">
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-3">
+                        <FormLabel>Adresse *</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="123 Rue de la Paix" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Code postal *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="75001" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ville *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Paris" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pays</FormLabel>
+                        <FormControl>
+                          <Input placeholder="France" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+              {/* Billing Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Informations de facturation</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="useSameAddress"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">
+                          Utiliser la même adresse que l'entreprise
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  {!watchUseSameAddress && (
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <FormField
+                        control={form.control}
+                        name="billingAddress"
+                        render={({ field }) => (
+                          <FormItem className="md:col-span-3">
+                            <FormLabel>Adresse de facturation</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="Adresse de facturation" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="billingPostalCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Code postal</FormLabel>
+                            <FormControl>
+                              <Input placeholder="75001" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="billingCity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Ville</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Paris" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="billingCountry"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pays</FormLabel>
+                            <FormControl>
+                              <Input placeholder="France" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="paymentTerms"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Conditions de paiement</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Conditions de paiement" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="immediate">Immédiat</SelectItem>
+                              <SelectItem value="15days">15 jours</SelectItem>
+                              <SelectItem value="30days">30 jours</SelectItem>
+                              <SelectItem value="45days">45 jours</SelectItem>
+                              <SelectItem value="60days">60 jours</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="paymentMethod"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mode de paiement préféré</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Mode de paiement" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="transfer">Virement</SelectItem>
+                              <SelectItem value="check">Chèque</SelectItem>
+                              <SelectItem value="card">Carte bancaire</SelectItem>
+                              <SelectItem value="cash">Espèces</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              {/* Credit Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Gestion du crédit</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="creditLimit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Limite de crédit (€)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="creditUsed"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Crédit utilisé (€)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+              {/* Additional Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Informations complémentaires</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="preferredLanguage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Langue préférée</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="max-w-xs">
+                              <SelectValue placeholder="Langue" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="fr">Français</SelectItem>
+                            <SelectItem value="en">English</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Notes</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Informations complémentaires sur le client..."
+                            className="min-h-[100px]"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">
+                          Client actif
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+              <div className="flex gap-2 pt-4 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  disabled={loading}
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+                <Button type="submit" disabled={loading} className="flex-1">
+                  {loading ? 'Modification en cours...' : 'Enregistrer les modifications'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   )

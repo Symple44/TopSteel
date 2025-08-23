@@ -9,8 +9,10 @@ export { ColumnFilterDropdownSimple } from './ColumnFilterDropdownSimple'
 export { CustomSelect } from './CustomSelect'
 // Utilities
 export { ClipboardUtils } from './clipboard-utils'
-// Main DataTable components
-export { DataTable as default, DataTable } from './DataTable'
+// Main DataTable components - Utiliser le nouveau DataTable refactorisé
+export { DataTable as default, DataTable } from './DataTableV2'
+// Garder l'ancien DataTable disponible temporairement sous un autre nom si besoin
+export { DataTable as DataTableLegacy } from './DataTable'
 export { DataTableEmpty } from './DataTableEmpty'
 export { DataTableError } from './DataTableError'
 export { DataTableExample } from './DataTableExample'

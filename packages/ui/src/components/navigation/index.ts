@@ -1,6 +1,6 @@
 // Navigation
-// export * from './dropdown-menu'  // Conflict resolved: DropdownMenu is now exported from primitives
-
+export * from './command'
+export * from './dropdown-menu'
 export * from './auto-breadcrumb'
 export * from './breadcrumb'
 export * from './language-selector'

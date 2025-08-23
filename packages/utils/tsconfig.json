@@ -14,16 +14,18 @@
     "noImplicitAny": false,
     "exactOptionalPropertyTypes": false,
 
-    "declaration": false,
-    "declarationMap": false,
-    "sourceMap": false,
-    "composite": false,
-    "incremental": false,
-    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "noEmit": false,
+    "emitDeclarationOnly": true,
 
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

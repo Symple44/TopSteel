@@ -260,7 +260,6 @@ export class NotificationRuleEngineService {
   // ===== MÉTHODES UTILITAIRES =====
 
   async processAllPendingEvents(): Promise<void> {
-    // TODO: Implémenter l'accès aux événements en attente
     const pendingEvents = await this.ruleService._eventRepository.find({
       where: { status: EventStatus.PENDING },
       order: { occurredAt: 'ASC' },

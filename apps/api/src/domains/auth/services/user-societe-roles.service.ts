@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 import type { PermissionCalculatorService } from './permission-calculator.service'
+import { PermissionService, Permission } from './permission.service'
 
 export interface UserSocieteRoleWithPermissions {
   userId: string
@@ -39,7 +40,8 @@ export class UserSocieteRolesService {
   constructor(
     @InjectRepository(UserSocieteRole, 'auth')
     private _userSocieteRoleRepository: Repository<UserSocieteRole>,
-    private permissionCalculator: PermissionCalculatorService
+    private permissionCalculator: PermissionCalculatorService,
+    private permissionService: PermissionService
   ) {}
 
   /**
@@ -113,7 +115,13 @@ export class UserSocieteRolesService {
         effectiveRoleType = userRole.user.role // Rôle global
       }
 
-      // Récupérer les permissions du rôle (pour l'instant vide, à implémenter avec la nouvelle structure)
+      // Récupérer les permissions du rôle avec la nouvelle structure
+      const userPermissions = await this.permissionService.getUserPermissions(
+        userRole.userId,
+        userRole.societeId
+      )
+
+      // Convertir les permissions au format attendu
       const permissions: Array<{
         id: string
         name: string
@@ -121,21 +129,17 @@ export class UserSocieteRolesService {
         action: string
         accessLevel: 'BLOCKED' | 'READ' | 'WRITE' | 'DELETE' | 'ADMIN'
         isGranted: boolean
-      }> = []
-
-      // TODO: Implémenter la récupération des permissions avec la nouvelle structure
-      // if (userRole.role?.permissions) {
-      //   permissions = userRole.role.permissions
-      //     .filter(rp => rp.isActive)
-      //     .map(rp => ({
-      //       id: rp.permission.id,
-      //       name: rp.permission.name,
-      //       resource: rp.permission.resource,
-      //       action: rp.permission.action,
-      //       accessLevel: rp.accessLevel,
-      //       isGranted: rp.isGranted
-      //     }))
-      // }
+      }> = userPermissions.map(perm => {
+        const [resource, action] = perm.split('.')
+        return {
+          id: perm,
+          name: perm,
+          resource,
+          action,
+          accessLevel: this.getAccessLevelForPermission(perm),
+          isGranted: true
+        }
+      })
 
       result.push({
         userId: userRole.userId,
@@ -191,40 +195,54 @@ export class UserSocieteRolesService {
   async hasPermission(
     userId: string,
     societeId: string,
-    _resource: string,
-    _action: string,
-    _requiredLevel: 'READ' | 'WRITE' | 'DELETE' | 'ADMIN' = 'READ'
+    resource: string,
+    action: string,
+    requiredLevel: 'READ' | 'WRITE' | 'DELETE' | 'ADMIN' = 'READ'
   ): Promise<boolean> {
-    const userRole = await this._userSocieteRoleRepository.findOne({
-      where: { userId, societeId, isActive: true },
-      relations: ['role', 'role.rolePermissions', 'role.rolePermissions.permission'],
-    })
+    // Construire le nom de la permission
+    const permissionName = `${resource}.${action}` as Permission
+    
+    // Vérifier si l'utilisateur a la permission
+    const hasPermission = await this.permissionService.hasPermission(
+      userId,
+      permissionName,
+      societeId
+    )
 
-    if (!userRole?.role) {
+    if (!hasPermission) {
       return false
     }
 
-    // Vérifier les permissions du rôle
-    // TODO: Implémenter avec la nouvelle structure de permissions
-    // const rolePermission = userRole.role.permissions.find(rp =>
-    //   rp.permission.resource === resource &&
-    //   rp.permission.action === action &&
-    //   rp.isActive &&
-    //   rp.isGranted
-    // )
-    const rolePermission = null // Temporaire
+    // Vérifier le niveau d'accès
+    const accessLevel = this.getAccessLevelForPermission(permissionName)
+    const levels = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
+    const userLevel = levels.indexOf(accessLevel)
+    const requiredLevelIndex = levels.indexOf(requiredLevel)
+    
+    return userLevel >= requiredLevelIndex && userLevel > 0 // BLOCKED = 0
+  }
 
-    if (!rolePermission) {
-      return false
+  /**
+   * Détermine le niveau d'accès pour une permission
+   */
+  private getAccessLevelForPermission(permission: string): 'BLOCKED' | 'READ' | 'WRITE' | 'DELETE' | 'ADMIN' {
+    const [, action] = permission.split('.')
+    
+    switch (action) {
+      case 'view':
+        return 'READ'
+      case 'create':
+      case 'edit':
+        return 'WRITE'
+      case 'delete':
+        return 'DELETE'
+      case 'manage':
+      case 'approve':
+      case 'super':
+        return 'ADMIN'
+      default:
+        return 'READ'
     }
-
-    // Vérifier le niveau d'accès (temporairement désactivé car rolePermission est null)
-    // const levels = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
-    // const userLevel = levels.indexOf(rolePermission.accessLevel)
-    // const requiredLevelIndex = levels.indexOf(requiredLevel)
-    // return userLevel >= requiredLevelIndex && userLevel > 0 // BLOCKED = 0
-
-    return false // Temporaire - à implémenter avec la nouvelle structure
   }
 
   /**

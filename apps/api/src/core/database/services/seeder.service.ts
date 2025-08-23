@@ -176,15 +176,168 @@ export class SeederService {
   /**
    * Seed de la configuration des menus (temporairement désactivé)
    */
-  private async seedMenuConfiguration(_manager: unknown): Promise<void> {
+  private async seedMenuConfiguration(manager: EntityManager): Promise<void> {
     this.logger.log('🎛️  Initialisation de la configuration des menus...')
 
-    // Temporairement désactivé - les tables menu_configurations et menu_items
-    // ne sont pas encore créées dans la migration
-    this.logger.log('⏭️  Configuration des menus temporairement désactivée')
+    try {
+      // Vérifier si les tables existent
+      const tablesExist = await this.checkMenuTablesExist(manager)
+      if (!tablesExist) {
+        this.logger.warn('⚠️  Tables de menu non trouvées, passage de la configuration des menus')
+        return
+      }
 
-    // TODO: Ajouter les tables menu_configurations et menu_items dans une prochaine migration
-    // puis réactiver ce code
+      // Vérifier si une configuration par défaut existe déjà
+      const existingConfig = await manager.query(`
+        SELECT id FROM menu_configurations 
+        WHERE name = 'Configuration par défaut' AND is_system = true
+        LIMIT 1
+      `)
+
+      if (existingConfig.length > 0) {
+        this.logger.log('🎛️  Configuration des menus par défaut déjà présente')
+        return
+      }
+
+      // Créer la configuration par défaut
+      const configId = await this.createDefaultMenuConfiguration(manager)
+      
+      // Créer les items de menu par défaut
+      await this.createDefaultMenuItems(manager, configId)
+      
+      // Activer cette configuration
+      await manager.query(`
+        UPDATE menu_configurations 
+        SET is_active = true 
+        WHERE id = $1
+      `, [configId])
+
+      this.logger.log('✅ Configuration des menus par défaut créée avec succès')
+    } catch (error) {
+      this.logger.warn('⚠️  Erreur lors de la configuration des menus:', error)
+      // Ne pas faire échouer le seed complet pour les menus
+    }
+  }
+
+  /**
+   * Vérifie si les tables de menu existent
+   */
+  private async checkMenuTablesExist(manager: EntityManager): Promise<boolean> {
+    try {
+      const result = await manager.query(`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name IN ('menu_configurations', 'menu_items', 'menu_item_permissions', 'menu_item_roles')
+      `)
+      
+      return result.length >= 2 // Au minimum menu_configurations et menu_items
+    } catch (error) {
+      this.logger.warn('Erreur lors de la vérification des tables de menu:', error)
+      return false
+    }
+  }
+
+  /**
+   * Crée la configuration de menu par défaut
+   */
+  private async createDefaultMenuConfiguration(manager: EntityManager): Promise<string> {
+    const result = await manager.query(`
+      INSERT INTO menu_configurations (
+        id, name, description, is_system, is_active, 
+        created_by, updated_by, created_at, updated_at
+      )
+      VALUES (
+        gen_random_uuid(), $1, $2, true, false,
+        'system', 'system', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+      )
+      RETURNING id
+    `, [
+      'Configuration par défaut',
+      'Configuration de menu par défaut du système TopSteel'
+    ])
+
+    return result[0].id
+  }
+
+  /**
+   * Crée les items de menu par défaut
+   */
+  private async createDefaultMenuItems(manager: EntityManager, configId: string): Promise<void> {
+    // Tableau de bord
+    await manager.query(`
+      INSERT INTO menu_items (
+        id, config_id, title, title_key, type, program_id, href, icon,
+        order_index, is_visible, module_id, created_at, updated_at
+      )
+      VALUES (
+        gen_random_uuid(), $1, 'Tableau de bord', 'dashboard', 'PROGRAM', 
+        '/dashboard', '/dashboard', 'Home', 1, true, 'DASHBOARD', 
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+      )
+    `, [configId])
+
+    // Dossier Administration
+    const adminFolderId = (await manager.query(`
+      INSERT INTO menu_items (
+        id, config_id, title, title_key, type, icon,
+        order_index, is_visible, created_at, updated_at
+      )
+      VALUES (
+        gen_random_uuid(), $1, 'Administration', 'administration', 'FOLDER', 'Shield',
+        100, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+      )
+      RETURNING id
+    `, [configId]))[0].id
+
+    // Items d'administration
+    const adminItems = [
+      {
+        title: 'Gestion des utilisateurs',
+        titleKey: 'users_management',
+        programId: '/admin/users',
+        href: '/admin/users',
+        icon: 'Users',
+        moduleId: 'USER_MANAGEMENT',
+        orderIndex: 1
+      },
+      {
+        title: 'Gestion des rôles',
+        titleKey: 'roles_management', 
+        programId: '/admin/roles',
+        href: '/admin/roles',
+        icon: 'Shield',
+        moduleId: 'ROLE_MANAGEMENT',
+        orderIndex: 2
+      },
+      {
+        title: 'Gestion des menus',
+        titleKey: 'menu_management',
+        programId: '/admin/menus', 
+        href: '/admin/menus',
+        icon: 'Menu',
+        moduleId: 'MENU_MANAGEMENT',
+        orderIndex: 3
+      }
+    ]
+
+    for (const item of adminItems) {
+      await manager.query(`
+        INSERT INTO menu_items (
+          id, config_id, parent_id, title, title_key, type, program_id, href, icon,
+          order_index, is_visible, module_id, created_at, updated_at
+        )
+        VALUES (
+          gen_random_uuid(), $1, $2, $3, $4, 'PROGRAM', $5, $6, $7,
+          $8, true, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        )
+      `, [
+        configId, adminFolderId, item.title, item.titleKey, 
+        item.programId, item.href, item.icon, item.orderIndex, item.moduleId
+      ])
+    }
+
+    this.logger.log('📋 Items de menu par défaut créés')
   }
 
   /**

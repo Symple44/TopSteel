@@ -8,7 +8,8 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  DataTable,
+  type ColumnConfig,
+  AdvancedDataTable as DataTable,
   Select,
   SelectContent,
   SelectItem,
@@ -54,65 +55,60 @@ export default function PartnersPage() {
     }
   }
 
-  const columns = [
+  const columns: ColumnConfig<Partner>[] = [
     {
       key: 'code',
-      label: 'Code',
+      header: 'Code',
       sortable: true,
-      width: 120,
     },
     {
       key: 'type',
-      label: 'Type',
-      width: 120,
-      render: (value: PartnerType) => (
+      header: 'Type',
+      render: (partner) => (
         <Badge
           variant={
-            value === 'CLIENT' ? 'default' : value === 'FOURNISSEUR' ? 'secondary' : 'outline'
+            partner.type === 'CLIENT'
+              ? 'default'
+              : partner.type === 'FOURNISSEUR'
+                ? 'secondary'
+                : 'outline'
           }
         >
-          {value}
+          {partner.type}
         </Badge>
       ),
     },
     {
       key: 'denomination',
-      label: 'Dénomination',
+      header: 'Dénomination',
       sortable: true,
-      searchable: true,
     },
     {
       key: 'category',
-      label: 'Catégorie',
-      width: 150,
+      header: 'Catégorie',
     },
     {
       key: 'ville',
-      label: 'Ville',
+      header: 'Ville',
       sortable: true,
-      searchable: true,
     },
     {
       key: 'telephone',
-      label: 'Téléphone',
-      width: 150,
+      header: 'Téléphone',
     },
     {
       key: 'email',
-      label: 'Email',
-      width: 200,
+      header: 'Email',
     },
     {
       key: 'plafondCredit',
-      label: 'Plafond crédit',
-      width: 150,
-      render: (value: number) => (value ? formatCurrency(value) : '-'),
+      header: 'Plafond crédit',
+      render: (partner) => (partner.plafondCredit ? formatCurrency(partner.plafondCredit) : '-'),
     },
     {
       key: 'status',
-      label: 'Statut',
-      width: 120,
-      render: (value: PartnerStatus) => {
+      header: 'Statut',
+      render: (partner) => {
         const variants: Record<PartnerStatus, 'default' | 'secondary' | 'destructive' | 'outline'> =
           {
             ACTIF: 'default',
@@ -121,18 +117,17 @@ export default function PartnersPage() {
             SUSPENDU: 'destructive',
             ARCHIVE: 'secondary',
           }
-        return <Badge variant={variants[value]}>{value}</Badge>
+        return <Badge variant={variants[partner.status]}>{partner.status}</Badge>
       },
     },
     {
-      key: 'group.name',
-      label: 'Groupe',
-      width: 150,
-      render: (_: string | undefined, partner: Partner) => partner.group?.name || '-',
+      key: 'group',
+      header: 'Groupe',
+      render: (partner) => partner.group?.name || '-',
     },
   ]
 
-  const actions = [
+  const _actions = [
     {
       label: 'Voir',
       onClick: handleView,
@@ -278,14 +273,28 @@ export default function PartnersPage() {
       <Card>
         <CardContent className="p-0">
           <DataTable
-            columns={columns}
             data={partners}
-            actions={actions}
+            columns={columns}
+            keyField="id"
             loading={isLoading}
             searchable
+            sortable
             selectable
-            exportable
-            pageSize={20}
+            actions={[
+              {
+                label: 'Voir',
+                onClick: handleView,
+              },
+              {
+                label: 'Modifier',
+                onClick: handleEdit,
+              },
+              {
+                label: 'Supprimer',
+                onClick: handleDelete,
+                variant: 'destructive' as const,
+              },
+            ]}
           />
         </CardContent>
       </Card>

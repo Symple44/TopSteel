@@ -1,5 +1,4 @@
 'use client'
-
 import {
   ArrowLeft,
   ArrowRight,
@@ -23,22 +22,21 @@ import { useCallback, useState } from 'react'
 import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Alert, AlertDescription, AlertTitle } from '../../../feedback/alert'
-import { Label } from '../../../forms/label'
+import { Label } from '../../../forms/label/Label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../layout/card'
-import { Button } from '../../../primitives/button'
-import { Input } from '../../../primitives/input'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../primitives/select'
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch'
-import { Textarea } from '../../../primitives/textarea'
+import { Textarea } from '../../../primitives/textarea/Textarea'
 import type { PriceRule, PricingCondition } from '../PriceRuleCard/PriceRuleCard'
 import { AdjustmentType, PriceRuleChannel } from '../PriceRuleCard/PriceRuleCard'
-
 export interface PriceRuleFormProps {
   rule?: Partial<PriceRule>
   mode?: 'wizard' | 'simple'
@@ -46,7 +44,6 @@ export interface PriceRuleFormProps {
   onCancel: () => void
   className?: string
 }
-
 interface FormStep {
   id: string
   title: string
@@ -54,7 +51,6 @@ interface FormStep {
   icon: React.ReactNode
   fields: string[]
 }
-
 const FORM_STEPS: FormStep[] = [
   {
     id: 'basic',
@@ -99,7 +95,6 @@ const FORM_STEPS: FormStep[] = [
     fields: ['priority', 'combinable', 'isActive'],
   },
 ]
-
 const CONDITION_TYPES = [
   { value: 'quantity', label: 'Quantité' },
   { value: 'customer_group', label: 'Groupe client' },
@@ -110,7 +105,6 @@ const CONDITION_TYPES = [
   { value: 'article_family', label: 'Famille article' },
   { value: 'custom', label: 'Personnalisé' },
 ]
-
 const CONDITION_OPERATORS = [
   { value: 'equals', label: 'Égal à' },
   { value: 'in', label: 'Dans' },
@@ -120,7 +114,6 @@ const CONDITION_OPERATORS = [
   { value: 'contains', label: 'Contient' },
   { value: 'starts_with', label: 'Commence par' },
 ]
-
 // Fonction de validation de formule sécurisée
 const validateFormula = (formula: string): boolean => {
   // Vérifier que la formule ne contient que des caractères autorisés
@@ -128,7 +121,6 @@ const validateFormula = (formula: string): boolean => {
   if (!allowedPattern.test(formula)) {
     return false
   }
-
   // Vérifier que les variables utilisées sont autorisées
   const allowedVariables = [
     'price',
@@ -142,7 +134,6 @@ const validateFormula = (formula: string): boolean => {
   ]
   const variablePattern = /\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g
   const matches = formula.match(variablePattern)
-
   if (matches) {
     for (const match of matches) {
       // Ignorer les nombres et les mots-clés JavaScript autorisés
@@ -155,10 +146,8 @@ const validateFormula = (formula: string): boolean => {
       }
     }
   }
-
   return true
 }
-
 const RULE_TEMPLATES = [
   {
     name: 'Remise quantité',
@@ -210,7 +199,6 @@ const RULE_TEMPLATES = [
     },
   },
 ]
-
 export function PriceRuleForm({
   rule,
   mode = 'wizard',
@@ -231,9 +219,7 @@ export function PriceRuleForm({
     isActive: true,
     ...rule,
   })
-
   const [errors, setErrors] = useState<Record<string, string>>({})
-
   const updateFormData = useCallback(
     (
       field: string,
@@ -253,11 +239,9 @@ export function PriceRuleForm({
     },
     []
   )
-
   const applyTemplate = useCallback((template: Partial<PriceRule>) => {
     setFormData((prev) => ({ ...prev, ...template }))
   }, [])
-
   const addCondition = useCallback(() => {
     const newCondition: PricingCondition = {
       type: 'quantity',
@@ -266,7 +250,6 @@ export function PriceRuleForm({
     }
     updateFormData('conditions', [...(formData.conditions || []), newCondition])
   }, [formData.conditions, updateFormData])
-
   const removeCondition = useCallback(
     (index: number) => {
       const conditions = [...(formData.conditions || [])]
@@ -275,7 +258,6 @@ export function PriceRuleForm({
     },
     [formData.conditions, updateFormData]
   )
-
   const updateCondition = useCallback(
     (index: number, field: string, value: string | number | string[]) => {
       const conditions = [...(formData.conditions || [])]
@@ -284,22 +266,18 @@ export function PriceRuleForm({
     },
     [formData.conditions, updateFormData]
   )
-
   const validateStep = useCallback(
     (step: FormStep) => {
       const newErrors: Record<string, string> = {}
-
       if (step.id === 'basic') {
         if (!formData.ruleName) {
           newErrors.ruleName = 'Le nom est requis'
         }
       }
-
       if (step.id === 'adjustment') {
         if (formData.adjustmentValue === undefined || formData.adjustmentValue === null) {
           newErrors.adjustmentValue = 'La valeur est requise'
         }
-
         if (
           [
             AdjustmentType.PRICE_PER_WEIGHT,
@@ -311,7 +289,6 @@ export function PriceRuleForm({
         ) {
           newErrors.adjustmentUnit = "L'unité est requise pour ce type"
         }
-
         if (formData.adjustmentType === AdjustmentType.FORMULA) {
           if (!formData.formula) {
             newErrors.formula = 'La formule est requise'
@@ -321,23 +298,19 @@ export function PriceRuleForm({
           }
         }
       }
-
       setErrors(newErrors)
       return Object.keys(newErrors).length === 0
     },
     [formData]
   )
-
   const handleNext = useCallback(() => {
     if (validateStep(FORM_STEPS[currentStep])) {
       setCurrentStep((prev) => Math.min(prev + 1, FORM_STEPS.length - 1))
     }
   }, [currentStep, validateStep])
-
   const handlePrevious = useCallback(() => {
     setCurrentStep((prev) => Math.max(prev - 1, 0))
   }, [])
-
   const handleSubmit = useCallback(() => {
     let isValid = true
     for (const step of FORM_STEPS) {
@@ -345,12 +318,10 @@ export function PriceRuleForm({
         isValid = false
       }
     }
-
     if (isValid) {
       onSubmit(formData)
     }
   }, [formData, onSubmit, validateStep])
-
   const renderStepIndicator = () => (
     <div className="flex items-center justify-between mb-6">
       {FORM_STEPS.map((step, index) => (
@@ -367,7 +338,6 @@ export function PriceRuleForm({
           >
             {index < currentStep ? <Check className="w-5 h-5" /> : step.icon}
           </div>
-
           {index < FORM_STEPS.length - 1 && (
             <div
               className={cn(
@@ -380,7 +350,6 @@ export function PriceRuleForm({
       ))}
     </div>
   )
-
   const renderBasicStep = () => (
     <div className="space-y-4">
       <div>
@@ -394,7 +363,6 @@ export function PriceRuleForm({
         />
         {errors.ruleName && <p className="text-sm text-red-500 mt-1">{errors.ruleName}</p>}
       </div>
-
       <div>
         <Label htmlFor="description">Description</Label>
         <Textarea
@@ -405,7 +373,6 @@ export function PriceRuleForm({
           rows={3}
         />
       </div>
-
       <div>
         <Label htmlFor="channel">Canal de vente</Label>
         <Select
@@ -426,7 +393,6 @@ export function PriceRuleForm({
       </div>
     </div>
   )
-
   const renderTargetStep = () => (
     <div className="space-y-4">
       <div>
@@ -441,7 +407,6 @@ export function PriceRuleForm({
           Laissez vide pour appliquer à tous les articles
         </p>
       </div>
-
       <div>
         <Label htmlFor="articleId">Article spécifique (ID)</Label>
         <Input
@@ -451,7 +416,6 @@ export function PriceRuleForm({
           placeholder="UUID de l'article"
         />
       </div>
-
       <div>
         <Label htmlFor="customerGroups">Groupes clients</Label>
         <Input
@@ -472,7 +436,6 @@ export function PriceRuleForm({
       </div>
     </div>
   )
-
   const renderAdjustmentStep = () => (
     <div className="space-y-4">
       <div>
@@ -536,7 +499,6 @@ export function PriceRuleForm({
           </SelectContent>
         </Select>
       </div>
-
       <div>
         <Label htmlFor="adjustmentValue">
           {formData.adjustmentType === AdjustmentType.PERCENTAGE
@@ -545,7 +507,6 @@ export function PriceRuleForm({
               ? 'Variables disponibles'
               : 'Valeur (€)'}
         </Label>
-
         {formData.adjustmentType === AdjustmentType.FORMULA ? (
           <div className="space-y-2">
             <div className="flex flex-wrap gap-2 mb-2">
@@ -582,14 +543,12 @@ export function PriceRuleForm({
         {errors.adjustmentValue && (
           <p className="text-sm text-red-500 mt-1">{errors.adjustmentValue}</p>
         )}
-
         {formData.adjustmentType === AdjustmentType.PERCENTAGE && (
           <p className="text-sm text-muted-foreground mt-1">
             Utilisez des valeurs négatives pour des remises
           </p>
         )}
       </div>
-
       {[
         AdjustmentType.PRICE_PER_WEIGHT,
         AdjustmentType.PRICE_PER_LENGTH,
@@ -644,7 +603,6 @@ export function PriceRuleForm({
       )}
     </div>
   )
-
   const renderConditionsStep = () => (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
@@ -654,7 +612,6 @@ export function PriceRuleForm({
           Ajouter une condition
         </Button>
       </div>
-
       {formData.conditions?.length === 0 && (
         <Alert>
           <Info className="h-4 w-4" />
@@ -664,7 +621,6 @@ export function PriceRuleForm({
           </AlertDescription>
         </Alert>
       )}
-
       {formData.conditions?.map((condition, index) => (
         <Card key={index}>
           <CardContent className="pt-4">
@@ -687,7 +643,6 @@ export function PriceRuleForm({
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <Label>Opérateur</Label>
                 <Select
@@ -706,7 +661,6 @@ export function PriceRuleForm({
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="flex items-end gap-2">
                 <div className="flex-1">
                   <Label>Valeur</Label>
@@ -735,7 +689,6 @@ export function PriceRuleForm({
       ))}
     </div>
   )
-
   const renderValidityStep = () => (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -750,7 +703,6 @@ export function PriceRuleForm({
             onChange={(e) => updateFormData('validFrom', e.target.value)}
           />
         </div>
-
         <div>
           <Label htmlFor="validUntil">Date de fin</Label>
           <Input
@@ -763,7 +715,6 @@ export function PriceRuleForm({
           />
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="usageLimit">Limite d'utilisation totale</Label>
@@ -778,7 +729,6 @@ export function PriceRuleForm({
             placeholder="Illimité"
           />
         </div>
-
         <div>
           <Label htmlFor="usageLimitPerCustomer">Limite par client</Label>
           <Input
@@ -798,7 +748,6 @@ export function PriceRuleForm({
       </div>
     </div>
   )
-
   const renderAdvancedStep = () => (
     <div className="space-y-4">
       <div>
@@ -815,7 +764,6 @@ export function PriceRuleForm({
           Les règles avec une priorité plus élevée sont appliquées en premier
         </p>
       </div>
-
       <div className="flex items-center justify-between">
         <div>
           <Label htmlFor="combinable">Combinable avec d'autres règles</Label>
@@ -829,7 +777,6 @@ export function PriceRuleForm({
           onCheckedChange={(checked) => updateFormData('combinable', checked)}
         />
       </div>
-
       <div className="flex items-center justify-between">
         <div>
           <Label htmlFor="isActive">Règle active</Label>
@@ -845,10 +792,8 @@ export function PriceRuleForm({
       </div>
     </div>
   )
-
   const renderCurrentStep = () => {
     const step = FORM_STEPS[currentStep]
-
     switch (step.id) {
       case 'basic':
         return renderBasicStep()
@@ -866,7 +811,6 @@ export function PriceRuleForm({
         return null
     }
   }
-
   if (mode === 'simple') {
     return (
       <div className={cn('space-y-6', className)}>
@@ -890,14 +834,12 @@ export function PriceRuleForm({
             ))}
           </div>
         </div>
-
         {renderBasicStep()}
         {renderTargetStep()}
         {renderAdjustmentStep()}
         {renderConditionsStep()}
         {renderValidityStep()}
         {renderAdvancedStep()}
-
         <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={onCancel}>
             Annuler
@@ -907,11 +849,9 @@ export function PriceRuleForm({
       </div>
     )
   }
-
   return (
     <div className={cn('space-y-6', className)}>
       {renderStepIndicator()}
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -920,7 +860,6 @@ export function PriceRuleForm({
           </CardTitle>
           <CardDescription>{FORM_STEPS[currentStep].description}</CardDescription>
         </CardHeader>
-
         <CardContent>
           {currentStep === 0 && (
             <div className="mb-6">
@@ -944,11 +883,9 @@ export function PriceRuleForm({
               </div>
             </div>
           )}
-
           {renderCurrentStep()}
         </CardContent>
       </Card>
-
       <div className="flex justify-between">
         <Button
           variant="outline"
@@ -964,7 +901,6 @@ export function PriceRuleForm({
             </>
           )}
         </Button>
-
         <Button onClick={currentStep === FORM_STEPS.length - 1 ? handleSubmit : handleNext}>
           {currentStep === FORM_STEPS.length - 1 ? (
             rule ? (

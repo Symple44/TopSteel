@@ -1,10 +1,8 @@
 'use client'
-
 import { Image as ImageIcon, Loader2, Upload, X } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../primitives'
-
 export interface ImageUploadProps {
   category: 'avatar' | 'logo' | 'document'
   entityType?: 'user' | 'company' | 'project'
@@ -28,7 +26,6 @@ export interface ImageUploadProps {
     upload?: string
   }
 }
-
 export function ImageUpload({
   category,
   entityType,
@@ -66,45 +63,36 @@ export function ImageUpload({
   const [dragOver, setDragOver] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
   const handleFileSelect = useCallback(
     async (file: File) => {
       if (disabled) return
-
       // Validation de la taille
       const maxFileSize = maxSize || (category === 'avatar' ? 2 * 1024 * 1024 : 5 * 1024 * 1024)
       if (file.size > maxFileSize) {
         onUploadError?.(`File size exceeds ${Math.round(maxFileSize / 1024 / 1024)}MB`)
         return
       }
-
       // Validation du type
       const allowedFileTypes = allowedTypes || ['image/jpeg', 'image/png', 'image/webp']
       if (!allowedFileTypes.includes(file.type)) {
         onUploadError?.('Invalid file type')
         return
       }
-
       setIsUploading(true)
-
       try {
         if (!uploadApi) {
           throw new Error('Upload API not provided')
         }
-
         const formData = new FormData()
         formData.append('file', file)
         formData.append('category', category)
         if (entityType) formData.append('entityType', entityType)
         if (entityId) formData.append('entityId', entityId)
-
         const response = await uploadApi(formData)
         const result = await response.json()
-
         if (!response.ok) {
           throw new Error(result.error || 'Upload failed')
         }
-
         // Mise à jour de la preview
         setPreviewUrl(result.data?.urls?.medium || result.data?.urls?.original || result.url)
         onUploadSuccess?.(result.data || result)
@@ -126,12 +114,10 @@ export function ImageUpload({
       uploadApi,
     ]
   )
-
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault()
       setDragOver(false)
-
       const files = Array.from(e.dataTransfer.files)
       if (files.length > 0) {
         handleFileSelect(files[0])
@@ -139,17 +125,14 @@ export function ImageUpload({
     },
     [handleFileSelect]
   )
-
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setDragOver(true)
   }, [])
-
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setDragOver(false)
   }, [])
-
   const handleFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files
@@ -159,20 +142,17 @@ export function ImageUpload({
     },
     [handleFileSelect]
   )
-
   const handleClick = useCallback(() => {
     if (!disabled) {
       fileInputRef.current?.click()
     }
   }, [disabled])
-
   const handleRemove = useCallback(() => {
     setPreviewUrl(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
   }, [])
-
   const renderDefault = () => (
     <button
       type="button"
@@ -199,7 +179,6 @@ export function ImageUpload({
         onChange={handleFileInputChange}
         disabled={disabled}
       />
-
       <div className="flex flex-col items-center justify-center space-y-4">
         {previewUrl && showPreview ? (
           <div className="relative">
@@ -239,7 +218,6 @@ export function ImageUpload({
       </div>
     </button>
   )
-
   const renderAvatar = () => (
     <div className="flex items-center space-x-4">
       <div className="relative">
@@ -289,7 +267,6 @@ export function ImageUpload({
       />
     </div>
   )
-
   const renderCompact = () => (
     <Button
       type="button"
@@ -314,7 +291,6 @@ export function ImageUpload({
       />
     </Button>
   )
-
   switch (variant) {
     case 'avatar':
       return renderAvatar()
@@ -324,5 +300,4 @@ export function ImageUpload({
       return renderDefault()
   }
 }
-
 export default ImageUpload

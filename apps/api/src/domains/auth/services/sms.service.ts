@@ -1,5 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository, Between } from 'typeorm'
+import * as Twilio from 'twilio'
+import { Vonage } from '@vonage/server-sdk'
+import { Auth } from '@vonage/auth'
+import { SNSClient, PublishCommand } from '@aws-sdk/client-sns'
+import { SMSLog } from '../entities/sms-log.entity'
 
 /**
  * Configuration pour le fournisseur SMS
@@ -10,6 +17,8 @@ interface SMSProviderConfig {
   apiSecret?: string
   senderId?: string
   region?: string
+  twilioAccountSid?: string
+  twilioPhoneNumber?: string
 }
 
 /**
@@ -42,17 +51,76 @@ export interface SendSMSResponse {
 export class SMSService {
   private readonly logger = new Logger(SMSService.name)
   private readonly config: SMSProviderConfig
+  private twilioClient?: Twilio.Twilio
+  private vonageClient?: Vonage
+  private snsClient?: SNSClient
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @InjectRepository(SMSLog)
+    private readonly smsLogRepository: Repository<SMSLog>,
+  ) {
     this.config = {
       provider: this.configService.get<string>('SMS_PROVIDER', 'mock') as any,
       apiKey: this.configService.get<string>('SMS_API_KEY', ''),
       apiSecret: this.configService.get<string>('SMS_API_SECRET', ''),
       senderId: this.configService.get<string>('SMS_SENDER_ID', 'TopSteel'),
       region: this.configService.get<string>('SMS_REGION', 'eu-west-1'),
+      twilioAccountSid: this.configService.get<string>('TWILIO_ACCOUNT_SID', ''),
+      twilioPhoneNumber: this.configService.get<string>('TWILIO_PHONE_NUMBER', ''),
     }
 
+    this.initializeProvider()
     this.logger.log(`SMS Service initialized with provider: ${this.config.provider}`)
+  }
+
+  /**
+   * Initialiser le fournisseur SMS selon la configuration
+   */
+  private initializeProvider(): void {
+    try {
+      switch (this.config.provider) {
+        case 'twilio':
+          if (this.config.twilioAccountSid && this.config.apiKey) {
+            this.twilioClient = Twilio.default(
+              this.config.twilioAccountSid,
+              this.config.apiKey
+            )
+            this.logger.log('Twilio client initialized successfully')
+          }
+          break
+
+        case 'vonage':
+          if (this.config.apiKey && this.config.apiSecret) {
+            this.vonageClient = new Vonage(
+              new Auth({
+                apiKey: this.config.apiKey,
+                apiSecret: this.config.apiSecret,
+              })
+            )
+            this.logger.log('Vonage client initialized successfully')
+          }
+          break
+
+        case 'aws-sns':
+          if (this.config.apiKey && this.config.apiSecret) {
+            this.snsClient = new SNSClient({
+              region: this.config.region || 'eu-west-1',
+              credentials: {
+                accessKeyId: this.config.apiKey,
+                secretAccessKey: this.config.apiSecret,
+              },
+            })
+            this.logger.log('AWS SNS client initialized successfully')
+          }
+          break
+
+        default:
+          this.logger.log('Using mock SMS provider')
+      }
+    } catch (error) {
+      this.logger.error(`Failed to initialize ${this.config.provider} client:`, error)
+    }
   }
 
   /**
@@ -95,6 +163,9 @@ export class SMSService {
    * Envoyer un SMS générique
    */
   async sendSMS(request: SendSMSRequest): Promise<SendSMSResponse> {
+    const startTime = Date.now()
+    let response: SendSMSResponse
+    
     try {
       this.logger.log(
         `Sending SMS to ${this.maskPhoneNumber(request.phoneNumber)} via ${this.config.provider}`
@@ -102,29 +173,74 @@ export class SMSService {
 
       // Validation du numéro de téléphone
       if (!this.isValidPhoneNumber(request.phoneNumber)) {
-        return {
+        response = {
           success: false,
           error: 'Invalid phone number format',
         }
+        await this.logSMS(request, response, Date.now() - startTime)
+        return response
       }
 
       // Envoi selon le fournisseur configuré
       switch (this.config.provider) {
         case 'twilio':
-          return await this.sendViaTwilio(request)
+          response = await this.sendViaTwilio(request)
+          break
         case 'vonage':
-          return await this.sendViaVonage(request)
+          response = await this.sendViaVonage(request)
+          break
         case 'aws-sns':
-          return await this.sendViaAWSSNS(request)
+          response = await this.sendViaAWSSNS(request)
+          break
         default:
-          return await this.sendViaMock(request)
+          response = await this.sendViaMock(request)
       }
+
+      // Enregistrer le log
+      await this.logSMS(request, response, Date.now() - startTime)
+      
+      return response
     } catch (error) {
       this.logger.error('Error sending SMS:', error)
-      return {
+      response = {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
       }
+      
+      await this.logSMS(request, response, Date.now() - startTime)
+      return response
+    }
+  }
+
+  /**
+   * Enregistrer un log SMS dans la base de données
+   */
+  private async logSMS(
+    request: SendSMSRequest,
+    response: SendSMSResponse,
+    responseTime: number
+  ): Promise<void> {
+    try {
+      const log = this.smsLogRepository.create({
+        phoneNumber: this.maskPhoneNumber(request.phoneNumber),
+        message: request.message.substring(0, 160), // Stocker seulement les 160 premiers caractères
+        messageType: request.messageType || 'info',
+        provider: this.config.provider,
+        status: response.success ? 'sent' : 'failed',
+        messageId: response.messageId,
+        cost: response.cost,
+        segmentCount: response.segmentCount || 1,
+        error: response.error,
+        metadata: {
+          templateId: request.templateId,
+          variables: request.variables,
+          responseTime,
+        },
+      })
+
+      await this.smsLogRepository.save(log)
+    } catch (error) {
+      this.logger.error('Failed to log SMS:', error)
     }
   }
 
@@ -167,27 +283,127 @@ export class SMSService {
    * Envoi via Twilio
    */
   private async sendViaTwilio(request: SendSMSRequest): Promise<SendSMSResponse> {
-    // TODO: Implémenter l'intégration Twilio
-    this.logger.warn('Twilio integration not implemented - using mock')
-    return await this.sendViaMock(request)
+    if (!this.twilioClient) {
+      this.logger.error('Twilio client not initialized')
+      return {
+        success: false,
+        error: 'Twilio client not configured properly',
+      }
+    }
+
+    try {
+      const message = await this.twilioClient.messages.create({
+        body: request.message,
+        from: this.config.twilioPhoneNumber || this.config.senderId,
+        to: request.phoneNumber,
+      })
+
+      this.logger.log(`Twilio SMS sent successfully: ${message.sid}`)
+
+      return {
+        success: true,
+        messageId: message.sid,
+        status: message.status,
+        cost: message.price ? parseFloat(message.price) : undefined,
+        segmentCount: message.numSegments ? parseInt(message.numSegments) : 1,
+      }
+    } catch (error) {
+      this.logger.error('Twilio SMS sending failed:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Twilio sending failed',
+      }
+    }
   }
 
   /**
    * Envoi via Vonage (anciennement Nexmo)
    */
   private async sendViaVonage(request: SendSMSRequest): Promise<SendSMSResponse> {
-    // TODO: Implémenter l'intégration Vonage
-    this.logger.warn('Vonage integration not implemented - using mock')
-    return await this.sendViaMock(request)
+    if (!this.vonageClient) {
+      this.logger.error('Vonage client not initialized')
+      return {
+        success: false,
+        error: 'Vonage client not configured properly',
+      }
+    }
+
+    try {
+      const response = await this.vonageClient.sms.send({
+        from: this.config.senderId || 'TopSteel',
+        to: request.phoneNumber.replace('+', ''),
+        text: request.message,
+      })
+
+      const messageData = response.messages?.[0]
+      
+      if (messageData?.status === '0') {
+        this.logger.log(`Vonage SMS sent successfully: ${messageData.messageId}`)
+        
+        return {
+          success: true,
+          messageId: messageData.messageId,
+          status: 'sent',
+          cost: messageData.messagePrice ? parseFloat(messageData.messagePrice) : undefined,
+          segmentCount: 1,
+        }
+      } else {
+        throw new Error(messageData?.errorText || 'Unknown Vonage error')
+      }
+    } catch (error) {
+      this.logger.error('Vonage SMS sending failed:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Vonage sending failed',
+      }
+    }
   }
 
   /**
    * Envoi via AWS SNS
    */
   private async sendViaAWSSNS(request: SendSMSRequest): Promise<SendSMSResponse> {
-    // TODO: Implémenter l'intégration AWS SNS
-    this.logger.warn('AWS SNS integration not implemented - using mock')
-    return await this.sendViaMock(request)
+    if (!this.snsClient) {
+      this.logger.error('AWS SNS client not initialized')
+      return {
+        success: false,
+        error: 'AWS SNS client not configured properly',
+      }
+    }
+
+    try {
+      const command = new PublishCommand({
+        PhoneNumber: request.phoneNumber,
+        Message: request.message,
+        MessageAttributes: {
+          'AWS.SNS.SMS.SenderID': {
+            DataType: 'String',
+            StringValue: this.config.senderId || 'TopSteel',
+          },
+          'AWS.SNS.SMS.SMSType': {
+            DataType: 'String',
+            StringValue: request.messageType === 'verification' ? 'Transactional' : 'Promotional',
+          },
+        },
+      })
+
+      const response = await this.snsClient.send(command)
+      
+      this.logger.log(`AWS SNS SMS sent successfully: ${response.MessageId}`)
+
+      return {
+        success: true,
+        messageId: response.MessageId,
+        status: 'sent',
+        segmentCount: 1,
+      }
+    } catch (error) {
+      this.logger.error('AWS SNS SMS sending failed:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'AWS SNS sending failed',
+      }
+    }
   }
 
   /**
@@ -223,8 +439,8 @@ export class SMSService {
    * Obtenir les statistiques d'envoi
    */
   async getSMSStatistics(
-    _startDate: Date,
-    _endDate: Date
+    startDate: Date,
+    endDate: Date
   ): Promise<{
     totalSent: number
     successRate: number
@@ -232,18 +448,58 @@ export class SMSService {
     byProvider: Record<string, number>
     byType: Record<string, number>
   }> {
-    // TODO: Implémenter avec une base de données de logs SMS
-    return {
-      totalSent: 1247,
-      successRate: 98.5,
-      totalCost: 62.35,
-      byProvider: {
-        [this.config.provider]: 1247,
-      },
-      byType: {
-        verification: 1089,
-        alert: 158,
-      },
+    try {
+      // Récupérer tous les logs dans la période
+      const logs = await this.smsLogRepository.find({
+        where: {
+          createdAt: Between(startDate, endDate),
+        },
+      })
+
+      if (logs.length === 0) {
+        return {
+          totalSent: 0,
+          successRate: 0,
+          totalCost: 0,
+          byProvider: {},
+          byType: {},
+        }
+      }
+
+      // Calculer les statistiques
+      const totalSent = logs.length
+      const successCount = logs.filter(log => log.status === 'sent').length
+      const successRate = (successCount / totalSent) * 100
+      const totalCost = logs.reduce((sum, log) => sum + (log.cost || 0), 0)
+
+      // Grouper par fournisseur
+      const byProvider: Record<string, number> = {}
+      logs.forEach(log => {
+        byProvider[log.provider] = (byProvider[log.provider] || 0) + 1
+      })
+
+      // Grouper par type
+      const byType: Record<string, number> = {}
+      logs.forEach(log => {
+        byType[log.messageType] = (byType[log.messageType] || 0) + 1
+      })
+
+      return {
+        totalSent,
+        successRate: Math.round(successRate * 100) / 100,
+        totalCost: Math.round(totalCost * 100) / 100,
+        byProvider,
+        byType,
+      }
+    } catch (error) {
+      this.logger.error('Failed to get SMS statistics:', error)
+      return {
+        totalSent: 0,
+        successRate: 0,
+        totalCost: 0,
+        byProvider: {},
+        byType: {},
+      }
     }
   }
 

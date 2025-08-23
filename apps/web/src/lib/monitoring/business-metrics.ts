@@ -83,10 +83,58 @@ class BusinessMetrics {
     })
   }
 
+  private pendingEvents: BusinessEvent[] = []
+  private batchTimer: NodeJS.Timeout | null = null
+
   private async sendToBackend(event: BusinessEvent) {
-    // TODO: Implémenter l'envoi vers le backend
-    // Batch les événements toutes les 10 secondes ou quand il y en a plus de 50
-    void event // Éviter l'avertissement de paramètre non utilisé
+    // Ajouter l'événement au batch
+    this.pendingEvents.push(event)
+
+    // Envoyer immédiatement si plus de 50 événements
+    if (this.pendingEvents.length >= 50) {
+      await this.flushEvents()
+      return
+    }
+
+    // Sinon, démarrer un timer pour batch les événements
+    if (!this.batchTimer) {
+      this.batchTimer = setTimeout(async () => {
+        await this.flushEvents()
+      }, 10000) // 10 secondes
+    }
+  }
+
+  private async flushEvents() {
+    if (this.pendingEvents.length === 0) return
+
+    const eventsToSend = [...this.pendingEvents]
+    this.pendingEvents = []
+
+    if (this.batchTimer) {
+      clearTimeout(this.batchTimer)
+      this.batchTimer = null
+    }
+
+    try {
+      const response = await fetch('/api/metrics/track', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          events: eventsToSend,
+          sessionId: this.sessionId,
+        }),
+      })
+
+      if (!response.ok) {
+        // Re-queue events if sending failed
+        this.pendingEvents.unshift(...eventsToSend)
+      }
+    } catch (_error) {
+      // Re-queue events if network error
+      this.pendingEvents.unshift(...eventsToSend)
+    }
   }
 
   getEvents() {

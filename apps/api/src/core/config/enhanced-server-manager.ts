@@ -148,7 +148,7 @@ export async function isPortAvailable(port: number, host: string = 'localhost'):
       resolve(false)
     }, 5000)
 
-    server.once('error', (_error) => {
+    server.once('error', (_error: Error) => {
       clearTimeout(timeout)
       cleanup()
       resolve(false)
