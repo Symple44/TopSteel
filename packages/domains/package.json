@@ -81,7 +81,7 @@
     "sharp": "^0.34.3",
     "simple-swizzle": "^0.2.2",
     "tslib": "^2.8.1",
-    "undici": "^7.13.0"
+    "undici": "^7.15.0"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
