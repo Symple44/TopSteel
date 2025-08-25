@@ -13,7 +13,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "typeorm": "^0.3.25"
+    "typeorm": "^0.3.26"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
