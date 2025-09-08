@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
+import type { DeepPartial } from 'typeorm'
 import {
   type QualityStandardType,
   SharedQualityStandard,
@@ -40,7 +41,7 @@ export class SharedQualityStandardService {
     id: string,
     standardData: Partial<SharedQualityStandard>
   ): Promise<SharedQualityStandard> {
-    await this._sharedQualityStandardRepository.update(id, standardData as unknown)
+    await this._sharedQualityStandardRepository.update(id, standardData as DeepPartial<any>)
     const standard = await this._sharedQualityStandardRepository.findOne({ where: { id } })
     if (!standard) {
       throw new NotFoundException(`Quality standard with ID ${id} not found`)

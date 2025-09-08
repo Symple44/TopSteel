@@ -56,7 +56,7 @@ export class SearchCacheInvalidationService implements OnModuleInit {
       this.logger.debug(`Cache invalidated for ${entityType}:${entityId} in tenant ${tenantId}`)
 
       // Emit event for potential listeners
-      this.eventEmitter.emit('cache.invalidated', {
+      (this as any).eventEmitter.emit('cache.invalidated', {
         tenantId,
         entityType,
         entityId,
@@ -81,7 +81,7 @@ export class SearchCacheInvalidationService implements OnModuleInit {
 
       this.logger.debug(`All cache invalidated for tenant ${tenantId}`)
 
-      this.eventEmitter.emit('cache.tenant.invalidated', {
+      (this as any).eventEmitter.emit('cache.tenant.invalidated', {
         tenantId,
         timestamp: new Date(),
       })
@@ -305,12 +305,12 @@ export function InvalidateCache(entityType: string, operation: 'create' | 'updat
       // Try to extract tenant and entity information from result or arguments
       // This is a simplified implementation - you might need to customize based on your data structure
       try {
-        const tenantId = args[0]?.tenantId || result?.tenantId
-        const entityId = args[0]?.id || result?.id
+        const tenantId = (args[0] as any)?.tenantId || (result as any)?.tenantId
+        const entityId = (args[0] as any)?.id || (result as any)?.id
 
         // Check if the class instance has an eventEmitter property
-        if (tenantId && entityId && this.eventEmitter) {
-          emitCacheInvalidationEvent(this.eventEmitter, tenantId, entityType, entityId, operation)
+        if (tenantId && entityId && (this as any).eventEmitter) {
+          emitCacheInvalidationEvent((this as any).eventEmitter, tenantId, entityType, entityId, operation)
         }
       } catch (_error) {}
 

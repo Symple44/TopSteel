@@ -696,7 +696,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
 
     departementsResult.forEach((item) => {
       const departement = item.departement as string
-      const region = (departmentToRegion as unknown)[departement] || 'Autre'
+      const region = (departmentToRegion as Record<string, string>)[departement] || 'Autre'
       const count = parseInt(item.count, 10)
 
       parRegion[region] = (parRegion[region] || 0) + count

@@ -15,7 +15,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
-import type { BusinessContext } from '../../core/interfaces/business-service.interface'
+import type { BusinessContext, BusinessOperation } from '../../core/interfaces/business-service.interface'
 import type { User } from '../../users/entities/user.entity'
 import type {
   CreateContactDto,
@@ -51,7 +51,7 @@ export class PartnerController {
     private readonly partnerParametersService: PartnerParametersInitService
   ) {}
 
-  private getContext(user: unknown): BusinessContext {
+  private getContext(user: any): BusinessContext {
     return {
       userId: user.id,
       tenantId: 'current-tenant',
@@ -1111,7 +1111,7 @@ export class PartnerController {
         if (partner) {
           const validation = await this.partnerService.validateBusinessRules(
             partner,
-            'VALIDATE' as unknown
+            'VALIDATE' as BusinessOperation
           )
           results.push({
             id: partnerId,

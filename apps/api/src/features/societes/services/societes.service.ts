@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DeepPartial, IsNull, type Repository } from 'typeorm'
+import type { DeepPartial } from 'typeorm'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 
 @Injectable()
@@ -51,7 +52,7 @@ export class SocietesService {
   }
 
   async update(id: string, societeData: Partial<Societe>): Promise<Societe> {
-    await this._societeRepository.update(id, societeData as DeepPartial<Societe>)
+    await this._societeRepository.update(id, societeData as DeepPartial<Societe> as DeepPartial<any>)
     const societe = await this._societeRepository.findOne({
       where: { id },
       relations: ['sites'],
@@ -70,7 +71,7 @@ export class SocietesService {
     await this._societeRepository.update(id, {
       status: SocieteStatus.ACTIVE,
       dateActivation: new Date(),
-    })
+    } as DeepPartial<any>)
     const societe = await this.findById(id)
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)
@@ -81,7 +82,7 @@ export class SocietesService {
   async suspend(id: string): Promise<Societe> {
     await this._societeRepository.update(id, {
       status: SocieteStatus.SUSPENDED,
-    })
+    } as DeepPartial<any>)
     const societe = await this.findById(id)
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)

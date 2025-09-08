@@ -209,7 +209,7 @@ export class PartnerParametersInitService {
           const newParam = this.parameterSystemRepository.create({
             ...param,
             arrayValues: param.arrayValues, // TypeORM convertira automatiquement en JSONB
-          } as unknown)
+          } as any)
 
           await this.parameterSystemRepository.save(newParam)
           this.logger.log(`Created parameter: ${param.group}.${param.key}`)

@@ -124,7 +124,7 @@ export class SearchCacheService implements OnModuleInit {
         ? Object.keys(options.filters)
             .sort()
             .reduce((acc, key) => {
-              acc[key] = options.filters?.[key]
+              (acc as any)[key] = options.filters?.[key]
               return acc
             }, {} as unknown)
         : undefined,

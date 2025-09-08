@@ -252,7 +252,7 @@ export class NotificationConditionEvaluator {
       if (value === null || value === undefined) {
         return undefined
       }
-      value = value[key]
+      value = (value as any)[key]
     }
 
     return value

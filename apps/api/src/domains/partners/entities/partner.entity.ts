@@ -41,7 +41,7 @@ export class Partner extends BusinessEntity {
   @Index()
   groupId?: string
 
-  @ManyToOne('PartnerGroup', (group: unknown) => group.partners, {
+  @ManyToOne('PartnerGroup', (group: any) => group.partners, {
     nullable: true,
   })
   @JoinColumn({ name: 'groupId' })

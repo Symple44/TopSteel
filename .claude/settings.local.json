@@ -40,7 +40,8 @@
       "Bash(timeout 10 pnpm --filter @erp/web dev)",
       "Bash(timeout 30 pnpm run build:packages)",
       "Bash(cat:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": [],

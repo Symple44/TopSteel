@@ -469,6 +469,6 @@ export class NotificationCondition {
         break
     }
 
-    return config as ConditionConfig
+    return (config || {}) as unknown as ConditionConfig
   }
 }

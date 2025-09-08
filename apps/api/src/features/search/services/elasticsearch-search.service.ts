@@ -70,10 +70,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
         this.logger.debug('ElasticSearch query:', JSON.stringify(searchBody, null, 2))
       }
 
-      const response = (await this.client.search({
-        index: this.indexName,
-        ...searchBody,
-      } as unknown)) as ElasticsearchSearchResponse
+      const response = (await this.client.search(searchBody as any)) as ElasticsearchSearchResponse
 
       if (process.env.NODE_ENV === 'development') {
         this.logger.debug(
