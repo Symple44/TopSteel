@@ -97,7 +97,7 @@ export interface DetailedBreakdown {
   margins?: BreakdownMargins
 }
 
-export interface EnrichedPricingContext {
+export interface EnrichedPricingContext extends Record<string, unknown> {
   // Base context
   articleId?: string
   articleReference?: string
@@ -139,8 +139,8 @@ export interface FormulaPriceResult {
 
 // Build result parameters interface
 export interface BuildFinalResultParams {
-  article: NonNullable<PricingContext['article']>
-  context: PricingContext
+  article: NonNullable<any>
+  context: any
   options?: {
     detailed?: boolean
     includeMargins?: boolean
@@ -156,8 +156,8 @@ export interface BuildFinalResultParams {
 
 // Build detailed breakdown parameters interface
 export interface BuildDetailedBreakdownParams {
-  article: NonNullable<PricingContext['article']>
-  context: PricingContext
+  article: NonNullable<any>
+  context: any
   options?: {
     includeMargins?: boolean
     includeSkippedRules?: boolean

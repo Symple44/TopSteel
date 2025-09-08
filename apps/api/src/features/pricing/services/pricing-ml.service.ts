@@ -276,11 +276,13 @@ export class PricingMLService {
     }
 
     const input = tf.tensor2d([features])
-    const prediction = this.model.predict(input) as unknown
+    const prediction = this.model.predict(input) as any
     const result = await prediction.data()
 
     input.dispose()
-    prediction.dispose()
+    if (prediction.dispose) {
+      prediction.dispose()
+    }
 
     return result[0] * 1000 // Dénormalisation
   }

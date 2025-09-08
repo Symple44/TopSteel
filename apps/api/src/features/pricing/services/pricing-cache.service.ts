@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { PriceRuleChannel } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
@@ -179,7 +180,7 @@ export class PricingCacheService {
             societeId,
             quantity,
             customerGroup,
-            channel: 'ERP' as unknown,
+            channel: PriceRuleChannel.ERP,
           })
         }
       }
