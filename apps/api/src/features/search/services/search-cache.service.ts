@@ -123,7 +123,7 @@ export class SearchCacheService implements OnModuleInit {
       filters: options.filters
         ? Object.keys(options.filters)
             .sort()
-            .reduce((acc, key) => {
+            .reduce((acc: any, key) => {
               acc[key] = options.filters?.[key]
               return acc
             }, {} as unknown)

@@ -2,6 +2,8 @@
  * Utilitaires de sécurité pour l'application TopSteel ERP
  */
 
+import { xssProtection } from './xss-protection'
+
 /**
  * Nettoie et valide une requête de recherche
  */
@@ -10,10 +12,12 @@ export function sanitizeSearchQuery(query: string): string {
     return ''
   }
 
-  // Supprimer les caractères potentiellement dangereux
-  return query
-    .replace(/[<>"']/g, '') // Supprimer les caractères XSS
-    .replace(/[;()=]/g, '') // Supprimer les caractères d'injection SQL
+  // Utiliser DOMPurify pour une sanitisation robuste
+  const sanitized = xssProtection.sanitizeUserInput(query)
+  
+  // Supprimer également les caractères d'injection SQL
+  return sanitized
+    .replace(/[;()=]/g, '')
     .trim()
     .slice(0, 100) // Limiter la longueur
 }
@@ -102,10 +106,8 @@ export function sanitizeInput(input: string): string {
     return ''
   }
 
-  return input
-    .replace(/[<>"'&]/g, '') // Caractères XSS
-    .replace(/[;()=]/g, '') // Caractères d'injection SQL
-    .trim()
+  // Utiliser DOMPurify pour la protection XSS
+  return xssProtection.sanitizeUserInput(input)
     .slice(0, 1000) // Limiter la longueur
 }
 
@@ -113,12 +115,8 @@ export function sanitizeInput(input: string): string {
  * Échappe le contenu HTML pour éviter les attaques XSS
  */
 export function escapeHtml(unsafe: string): string {
-  return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
+  // Utiliser la méthode d'échappement de XSSProtection
+  return xssProtection.escapeHtml(unsafe)
 }
 
 // Add missing exports that are referenced in index.ts

@@ -51,7 +51,7 @@ export class PartnerController {
     private readonly partnerParametersService: PartnerParametersInitService
   ) {}
 
-  private getContext(user: unknown): BusinessContext {
+  private getContext(user: { id: string; role: string; societeId?: string; currentSocieteId?: string }): BusinessContext {
     return {
       userId: user.id,
       tenantId: 'current-tenant',
@@ -1111,7 +1111,7 @@ export class PartnerController {
         if (partner) {
           const validation = await this.partnerService.validateBusinessRules(
             partner,
-            'VALIDATE' as unknown
+            'VALIDATE' as BusinessOperation
           )
           results.push({
             id: partnerId,

@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { areTokensExpired, getTokensFromCookies } from './lib/auth/cookie-auth'
+import { csrfMiddleware } from './lib/csrf-protection'
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = [
@@ -357,6 +358,17 @@ function addSecurityHeaders(response: NextResponse, _request: NextRequest): Next
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // === Protection CSRF pour les routes API ===
+  if (pathname.startsWith('/api')) {
+    // Skip CSRF for public API routes
+    if (!isPublicApiRoute(pathname)) {
+      const csrfResult = csrfMiddleware(request)
+      if (csrfResult) {
+        return csrfResult
+      }
+    }
+  }
 
   // === ÉTAPE 0: Gestion des redirections ===
   // Vérifier si l'URL nécessite une redirection

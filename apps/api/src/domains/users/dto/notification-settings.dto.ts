@@ -172,12 +172,12 @@ export class GetNotificationSettingsResponseDto {
     end: string
   }
 
-  constructor(data: Record<string, unknown>) {
-    this.email = data.email as unknown
-    this.push = data.push as unknown
-    this.sms = data.sms as unknown
-    this.emailTypes = data.emailTypes as unknown
-    this.pushTypes = data.pushTypes as unknown
-    this.quietHours = data.quietHours as unknown
+  constructor(data: Record<string, boolean | Record<string, boolean>>) {
+    this.email = data.email as boolean | Record<string, boolean>
+    this.push = data.push as boolean | Record<string, boolean>
+    this.sms = data.sms as boolean | Record<string, boolean>
+    this.emailTypes = data.emailTypes as boolean | Record<string, boolean>
+    this.pushTypes = data.pushTypes as boolean | Record<string, boolean>
+    this.quietHours = data.quietHours as boolean | Record<string, boolean>
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
+import type { DeepPartial } from 'typeorm'
 import { SharedSupplier, type SupplierType } from '../entities/shared-supplier.entity'
 
 @Injectable()
@@ -34,7 +35,7 @@ export class SharedSupplierService {
   }
 
   async update(id: string, supplierData: Partial<SharedSupplier>): Promise<SharedSupplier> {
-    await this._sharedSupplierRepository.update(id, supplierData as unknown)
+    await this._sharedSupplierRepository.update(id, supplierData as unknown as DeepPartial<any>)
     const supplier = await this._sharedSupplierRepository.findOne({ where: { id } })
     if (!supplier) {
       throw new NotFoundException(`Supplier with ID ${id} not found`)

@@ -881,17 +881,17 @@ export class MaterialMovementService {
     return 0
   }
 
-  private async validateTransformation(transformation: IMaterialTransformationInfo): Promise<void> {
-    if (!transformation.materiauxSources?.length) {
+  private async validateTransformation(transformation: Partial<IMaterialTransformationInfo>): Promise<void> {
+    if (!transformation.materiauxSources || transformation.materiauxSources.length === 0) {
       throw new BadRequestException('Une transformation doit avoir des matériaux sources')
     }
 
-    if (!transformation.materiauxProduits?.length) {
+    if (!transformation.materiauxProduits || transformation.materiauxProduits.length === 0) {
       throw new BadRequestException('Une transformation doit avoir des matériaux produits')
     }
 
     // Vérifier que les matériaux sources existent
-    for (const source of transformation.materiauxSources) {
+    for (const source of (transformation.materiauxSources || [])) {
       const material = await this.materialRepository.findOne({
         where: { id: source.materialId },
       })

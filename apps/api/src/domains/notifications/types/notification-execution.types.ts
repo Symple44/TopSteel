@@ -158,7 +158,7 @@ export interface FunctionExecutionResult extends ActionExecutionResult {
   returnValue?: unknown
 }
 
-export interface ApiCallResult extends ActionExecutionResult {
+export interface ApiCallResult extends Omit<ActionExecutionResult, "data"> {
   status: number
   data: unknown
   responseHeaders?: Record<string, string>

@@ -107,8 +107,8 @@ export class NotificationActionExecutor {
       recipientsNotified: recipients.length,
       channels: config.channels || ['email'],
       data: {
-        template: config.template,
-        subject: config.subject,
+        template: config.templateId,
+        subject: (config as any).subject,
         priority: config.priority,
       },
     }
@@ -262,10 +262,10 @@ export class NotificationActionExecutor {
       created: true,
       data: {
         description: config.description,
-        assignee: config.assignee,
+        assignee: config.assignTo,
         priority: config.priority,
         dueDate: config.dueDate,
-        labels: config.labels,
+        labels: config.tags,
         timestamp: new Date().toISOString(),
       },
     }
@@ -293,8 +293,8 @@ export class NotificationActionExecutor {
       triggered: true,
       executionId: `execution-${Date.now()}`,
       data: {
-        version: config.version,
-        input: config.input,
+        version: (config as any).version,
+        input: config.parameters,
         timestamp: new Date().toISOString(),
       },
     }

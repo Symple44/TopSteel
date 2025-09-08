@@ -40,7 +40,16 @@
       "Bash(timeout 10 pnpm --filter @erp/web dev)",
       "Bash(timeout 30 pnpm run build:packages)",
       "Bash(cat:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Read(//c/Program Files/GitHub CLI//**)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" --version)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth status)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --limit 5)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17549005261)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17549005261 --log-failed)",
+      "Bash(git reset:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": [],
