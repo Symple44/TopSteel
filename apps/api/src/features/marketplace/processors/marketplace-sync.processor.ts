@@ -194,7 +194,7 @@ export class MarketplaceSyncProcessor {
    */
   @Process('bulk-update')
   async handleBulkUpdate(job: Job<unknown>) {
-    const { operations, tenantId } = job.data
+    const { operations, tenantId } = job.data as { operations: any[]; tenantId: string }
 
     this.logger.log(`Processing ${operations.length} bulk operations for tenant ${tenantId}`)
 

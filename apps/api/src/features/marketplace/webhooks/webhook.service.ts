@@ -194,7 +194,7 @@ export class WebhookService {
 
     try {
       // Update order status to confirmed
-      await this.orderWorkflowService.transitionOrder(event.orderId, 'CONFIRMED' as unknown)
+      await this.orderWorkflowService.transitionOrder(event.orderId, 'CONFIRMED' as any)
 
       // Send payment confirmation email
       const order = await this.orderRepository.findOne({

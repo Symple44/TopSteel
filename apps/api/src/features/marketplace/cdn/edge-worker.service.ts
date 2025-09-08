@@ -230,7 +230,7 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as unknown
+      const data = (await response.json()) as { success: boolean; errors?: unknown }
 
       if (!data.success) {
         this.logger.error(`Worker deployment failed: ${JSON.stringify(data.errors)}`)
@@ -262,15 +262,15 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as unknown
+      const data = (await response.json()) as { success: boolean; errors?: unknown; result?: { id: string } }
 
       if (!data.success) {
         this.logger.error(`KV namespace creation failed: ${JSON.stringify(data.errors)}`)
         return null
       }
 
-      this.logger.log(`KV namespace created: ${data.result.id}`)
-      return data.result.id
+      this.logger.log(`KV namespace created: ${data.result?.id}`)
+      return data.result?.id || null
     } catch (error) {
       this.logger.error('Error creating KV namespace:', error)
       return null
@@ -400,7 +400,7 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as unknown
+      const data = (await response.json()) as { success: boolean; errors?: unknown }
 
       if (!data.success) {
         this.logger.error(`Bulk write failed: ${JSON.stringify(data.errors)}`)
@@ -440,14 +440,14 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as unknown
+      const data = (await response.json()) as { success: boolean; errors?: unknown; result?: { keys: Array<{ name: string; metadata?: any }> } }
 
       if (!data.success) {
         this.logger.error(`List keys failed: ${JSON.stringify(data.errors)}`)
         return []
       }
 
-      return data.result.keys
+      return data.result?.keys || []
     } catch (error) {
       this.logger.error('Error listing KV keys:', error)
       return []

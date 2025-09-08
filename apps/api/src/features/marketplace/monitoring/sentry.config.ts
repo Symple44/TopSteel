@@ -16,7 +16,7 @@ export class SentryConfig {
   private async loadSentry(): Promise<void> {
     try {
       // Essayer de charger Sentry dynamiquement
-      this.sentry = await import('@sentry/node' as unknown).catch(() => null)
+      this.sentry = await import('@sentry/node').catch(() => null)
       if (this.sentry) {
         this.logger.log('Sentry module loaded successfully')
       }
@@ -59,28 +59,29 @@ export class SentryConfig {
       // Environment filtering
       beforeSend(event: unknown, hint: any) {
         // Filter out sensitive data
-        if (event.request) {
+        const sentryEvent = event as { request?: { headers?: Record<string, unknown>; query_string?: string; data?: Record<string, unknown> } }
+        if (sentryEvent.request) {
           // Remove authorization headers
-          if (event.request.headers) {
-            delete event.request.headers.authorization
-            delete event.request.headers.cookie
-            delete event.request.headers['x-api-key']
+          if (sentryEvent.request.headers) {
+            delete sentryEvent.request.headers.authorization
+            delete sentryEvent.request.headers.cookie
+            delete sentryEvent.request.headers['x-api-key']
           }
 
           // Remove sensitive query params
-          if (event.request.query_string) {
-            event.request.query_string = event.request.query_string
+          if (sentryEvent.request.query_string) {
+            sentryEvent.request.query_string = sentryEvent.request.query_string
               .replace(/token=[^&]+/gi, 'token=[REDACTED]')
               .replace(/api_key=[^&]+/gi, 'api_key=[REDACTED]')
               .replace(/password=[^&]+/gi, 'password=[REDACTED]')
           }
 
           // Remove sensitive body data
-          if (event.request.data) {
+          if (sentryEvent.request?.data) {
             const sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'creditCard']
             sensitiveFields.forEach((field) => {
-              if (event.request.data[field]) {
-                event.request.data[field] = '[REDACTED]'
+              if (sentryEvent.request?.data?.[field]) {
+                sentryEvent.request.data[field] = '[REDACTED]'
               }
             })
           }

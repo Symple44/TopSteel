@@ -405,7 +405,7 @@ export class NotificationRuleService {
 
     const recentActivity = await this._eventRepository.find({
       where: {
-        occurredAt: yesterday as unknown,
+        occurredAt: yesterday as any,
       },
       order: { occurredAt: 'DESC' },
       take: 10,

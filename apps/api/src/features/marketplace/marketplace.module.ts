@@ -84,7 +84,7 @@ import { MarketplaceSyncProcessor } from './processors/marketplace-sync.processo
             limit: configService.get<number>('THROTTLE_LIMIT') || 10,
           },
         ],
-        storage: 'redis' as unknown, // Use Redis for distributed rate limiting
+        // Note: storage property should be configured with a proper ThrottlerStorage instance if needed
       }),
     }),
 

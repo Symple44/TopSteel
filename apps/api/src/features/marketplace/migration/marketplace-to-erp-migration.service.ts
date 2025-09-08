@@ -101,7 +101,7 @@ export class MarketplaceToERPMigrationService {
 
     // Vérifier les clients sans partenaire ERP
     const customersWithoutPartner = await this.marketplaceCustomerRepository.count({
-      where: { erpPartnerId: null as unknown },
+      where: { erpPartnerId: null } as any,
     })
 
     if (customersWithoutPartner > 0) {
@@ -190,7 +190,7 @@ export class MarketplaceToERPMigrationService {
       this.updateProgress('CUSTOMERS', 0, 'Starting customer migration...')
 
       const customersWithoutPartner = await this.marketplaceCustomerRepository.find({
-        where: { erpPartnerId: null as unknown },
+        where: { erpPartnerId: null } as any,
       })
 
       for (let i = 0; i < customersWithoutPartner.length; i++) {
@@ -309,7 +309,7 @@ export class MarketplaceToERPMigrationService {
    * Créer un partenaire ERP pour un client marketplace
    */
   private async createPartnerForCustomer(
-    queryRunner: unknown,
+    queryRunner: any,
     customer: MarketplaceCustomer,
     tenantId: string
   ): Promise<void> {
@@ -353,7 +353,7 @@ export class MarketplaceToERPMigrationService {
    * Mettre à jour les références des commandes
    */
   private async updateOrderReferences(
-    queryRunner: unknown,
+    queryRunner: any,
     order: MarketplaceOrder,
     _tenantId: string
   ): Promise<void> {

@@ -269,7 +269,7 @@ export class CachedGlobalSearchService implements ISearchStrategy {
   private extractTenantId(options: SearchOptions): string | null {
     // Check if tenant ID is in the options context
     if ((options as SearchOptions).tenantId) {
-      return (options as SearchOptions).tenantId
+      return (options as SearchOptions).tenantId || null
     }
 
     // Check if tenant ID is in filters

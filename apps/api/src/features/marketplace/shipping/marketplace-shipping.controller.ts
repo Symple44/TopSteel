@@ -67,7 +67,7 @@ export class MarketplaceShippingController {
     const trackingUpdate: TrackingUpdate = {
       ...updateTrackingDto,
       timestamp: new Date(),
-      status: updateTrackingDto.status as unknown,
+      status: updateTrackingDto.status as any,
     }
 
     return this.shippingService.updateTrackingInfo(shipmentId, trackingUpdate)

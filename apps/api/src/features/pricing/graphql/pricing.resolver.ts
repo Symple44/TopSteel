@@ -15,23 +15,33 @@ interface AuthenticatedUser {
   [key: string]: unknown
 }
 
-interface PricingContext {
+interface PricingRequestContext {
   articleId: string
   quantity?: number
   societeId?: string
   customerId?: string
   customerGroup?: string
-  channel?: string
+  channel?: PriceRuleChannel
+  promotionCode?: string
+}
+
+interface PricingContext extends PricingRequestContext {
   [key: string]: unknown
 }
 
 interface Scenario {
   name?: string
+  quantity?: number
+  customerGroup?: string
+  channel?: PriceRuleChannel
   [key: string]: unknown
 }
 
 interface RuleDefinition {
-  channel?: string
+  channel?: PriceRuleChannel
+  ruleName?: string
+  adjustmentType?: string
+  adjustmentValue?: number
   [key: string]: unknown
 }
 
@@ -49,10 +59,9 @@ interface CustomerGroup {
   count: number
 }
 
-interface RuleWithPeakUsage {
+interface RuleWithPeakUsage extends Record<string, unknown> {
   peakUsageHours?: Array<{ hour: number; count: number }>
   topCustomerGroups?: Array<{ group: string; count: number }>
-  [key: string]: unknown
 }
 
 // GraphQL Types
@@ -88,7 +97,7 @@ export class PricingResolver {
       ...context,
     }
 
-    return await this.pricingEngine.calculatePrice(pricingContext as unknown, {
+    return await this.pricingEngine.calculatePrice(pricingContext, {
       detailed: true,
       includeMargins: true,
       includeSkippedRules: true,
@@ -117,7 +126,7 @@ export class PricingResolver {
         societeId: user?.societeId || '',
       }
 
-      const result = await this.pricingEngine.calculatePrice(context as unknown)
+      const result = await this.pricingEngine.calculatePrice(context)
       results.push({
         scenario: scenario.name || 'Scenario',
         ...result,
@@ -156,7 +165,7 @@ export class PricingResolver {
           channel: PriceRuleChannel.ERP,
         }
 
-        const result = await this.pricingEngine.calculatePrice(context as unknown)
+        const result = await this.pricingEngine.calculatePrice(context)
 
         matrix.push({
           quantity,
@@ -251,8 +260,8 @@ export class PricingResolver {
         .sort((a, b) => b.totalRevenue - a.totalRevenue)
         .slice(0, 3),
       underperformingRules: dashboard.topRules.filter((r) => r.conversionRate < 20).slice(0, 3),
-      peakHours: this.aggregatePeakHours(dashboard.topRules as unknown),
-      customerSegmentation: this.aggregateCustomerGroups(dashboard.topRules as unknown),
+      peakHours: this.aggregatePeakHours(dashboard.topRules as RuleWithPeakUsage[]),
+      customerSegmentation: this.aggregateCustomerGroups(dashboard.topRules as RuleWithPeakUsage[]),
     }
 
     return {

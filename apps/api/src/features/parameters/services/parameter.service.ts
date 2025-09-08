@@ -598,7 +598,7 @@ export class ParameterService {
         break
     }
 
-    const param = repository.create(data as unknown)
+    const param = repository.create(data as any)
     const result = await (repository as Repository<ParameterEntity>).save(param as ParameterEntity)
 
     // Invalider le cache si c'est un paramètre de rôles

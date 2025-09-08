@@ -99,7 +99,7 @@ export class QueryBuilderSecurityGuard implements CanActivate {
   private async checkUserAccess(
     userId: string,
     requiredLevel: QueryBuilderSecurityLevel,
-    request: any
+    request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
   ): Promise<boolean> {
     switch (requiredLevel) {
       case QueryBuilderSecurityLevel.READ:
@@ -119,7 +119,10 @@ export class QueryBuilderSecurityGuard implements CanActivate {
   /**
    * Check read access (view existing queries, execute whitelisted queries)
    */
-  private async checkReadAccess(userId: string, request: any): Promise<boolean> {
+  private async checkReadAccess(
+    userId: string, 
+    request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
+  ): Promise<boolean> {
     // Check if user has any query builder permissions
     const hasGeneralAccess = await this.hasQueryBuilderPermission(userId, 'view')
 
@@ -140,7 +143,10 @@ export class QueryBuilderSecurityGuard implements CanActivate {
   /**
    * Check write access (create, modify queries)
    */
-  private async checkWriteAccess(userId: string, request: any): Promise<boolean> {
+  private async checkWriteAccess(
+    userId: string, 
+    request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
+  ): Promise<boolean> {
     // Check if user has edit permissions
     const hasEditAccess = await this.hasQueryBuilderPermission(userId, 'edit')
 
@@ -160,7 +166,10 @@ export class QueryBuilderSecurityGuard implements CanActivate {
   /**
    * Check admin access (raw SQL execution, system queries)
    */
-  private async checkAdminAccess(userId: string, _request: any): Promise<boolean> {
+  private async checkAdminAccess(
+    userId: string, 
+    _request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
+  ): Promise<boolean> {
     // Admin access is highly restricted
     // Check if user has admin role or specific admin permissions
 
@@ -205,22 +214,24 @@ export class QueryBuilderSecurityGuard implements CanActivate {
   /**
    * Extract query builder ID from request parameters
    */
-  private extractQueryBuilderId(request: unknown): string | null {
-    return request.params?.id || request.body?.queryBuilderId || null
+  private extractQueryBuilderId(
+    request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
+  ): string | null {
+    return request.params?.id || request.body?.queryBuilderId as string || null
   }
 
   /**
    * Validate request content for additional security checks
    */
   private async validateRequestContent(
-    request: unknown,
+    request: Request & { params?: Record<string, string>; body?: Record<string, unknown> },
     userId: string,
     securityLevel: QueryBuilderSecurityLevel
   ): Promise<void> {
     const body = request.body || {}
 
     // Validate table access if tables are specified
-    if (body.fromTable) {
+    if (body.fromTable && typeof body.fromTable === 'string') {
       try {
         this.securityService.validateTable(body.fromTable)
       } catch (_error) {
@@ -232,15 +243,24 @@ export class QueryBuilderSecurityGuard implements CanActivate {
     // Validate column access if columns are specified
     if (body.selectColumns && Array.isArray(body.selectColumns)) {
       for (const column of body.selectColumns) {
-        try {
-          this.securityService.validateColumn(column.tableName, column.columnName, 'select')
-        } catch (_error) {
-          this.logger.warn(
-            `Invalid column access attempted by user ${userId}: ${column.tableName}.${column.columnName}`
-          )
-          throw new ForbiddenException(
-            `Access to column '${column.columnName}' in table '${column.tableName}' is not allowed`
-          )
+        if (column && typeof column === 'object' && 
+            'tableName' in column && 'columnName' in column) {
+          try {
+            this.securityService.validateColumn(
+              column.tableName as string, 
+              column.columnName as string, 
+              'select'
+            )
+          } catch (_error) {
+            const tableName = column.tableName as string
+            const columnName = column.columnName as string
+            this.logger.warn(
+              `Invalid column access attempted by user ${userId}: ${tableName}.${columnName}`
+            )
+            throw new ForbiddenException(
+              `Access to column '${columnName}' in table '${tableName}' is not allowed`
+            )
+          }
         }
       }
     }
@@ -248,21 +268,29 @@ export class QueryBuilderSecurityGuard implements CanActivate {
     // Validate joins if specified
     if (body.joins && Array.isArray(body.joins)) {
       for (const join of body.joins) {
-        try {
-          this.securityService.validateJoin(join.fromTable, join.toTable)
-        } catch (_error) {
-          this.logger.warn(
-            `Invalid join attempted by user ${userId}: ${join.fromTable} -> ${join.toTable}`
-          )
-          throw new ForbiddenException(
-            `Join from '${join.fromTable}' to '${join.toTable}' is not allowed`
-          )
+        if (join && typeof join === 'object' && 
+            'fromTable' in join && 'toTable' in join) {
+          try {
+            this.securityService.validateJoin(
+              join.fromTable as string, 
+              join.toTable as string
+            )
+          } catch (_error) {
+            const fromTable = join.fromTable as string
+            const toTable = join.toTable as string
+            this.logger.warn(
+              `Invalid join attempted by user ${userId}: ${fromTable} -> ${toTable}`
+            )
+            throw new ForbiddenException(
+              `Join from '${fromTable}' to '${toTable}' is not allowed`
+            )
+          }
         }
       }
     }
 
     // For raw SQL (admin level only), validate SQL content
-    if (body.sql && securityLevel === QueryBuilderSecurityLevel.ADMIN) {
+    if (body.sql && typeof body.sql === 'string' && securityLevel === QueryBuilderSecurityLevel.ADMIN) {
       try {
         // This validation is performed in the service layer as well,
         // but we do an early check here for security

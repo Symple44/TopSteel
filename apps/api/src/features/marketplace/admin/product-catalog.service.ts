@@ -143,7 +143,7 @@ export class ProductCatalogService {
         isMarketplaceEnabled: true,
         stockPhysique: productData.stockPhysique || 0,
         stockDisponible: productData.stockPhysique || 0,
-      } as unknown)
+      } as any)
 
       const savedArticle = (await this.articleRepository.save(article)) as unknown as Article
 

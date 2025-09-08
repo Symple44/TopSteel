@@ -101,8 +101,8 @@ export class ShopConfigurationController {
 
     // Remove undefined values
     Object.keys(updates).forEach((key) => {
-      if ((updates as unknown)[key] === undefined) {
-        delete (updates as unknown)[key]
+      if ((updates as Record<string, unknown>)[key] === undefined) {
+        delete (updates as Record<string, unknown>)[key]
       }
     })
 
@@ -383,7 +383,7 @@ export class ShopConfigurationController {
     const spaces = '  '.repeat(indent)
     let yaml = ''
 
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
       if (value === null || value === undefined) continue
 
       if (typeof value === 'object' && !Array.isArray(value)) {
@@ -461,6 +461,6 @@ export class ShopConfigurationController {
       },
     }
 
-    return (templates as unknown)[templateName] || {}
+    return (templates as Record<string, unknown>)[templateName] || {}
   }
 }

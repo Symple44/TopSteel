@@ -288,7 +288,7 @@ export class MarketplacePromotionsController {
     return this.promotionsService.calculateOrderDiscount(
       tenantId,
       orderId,
-      customerId || user.customerId,
+      customerId || (user as any).customerId,
       couponCode
     )
   }

@@ -24,7 +24,7 @@ export class SentryInterceptor implements NestInterceptor {
 
   private async loadSentry(): Promise<void> {
     try {
-      this.sentry = await import('@sentry/node' as unknown).catch(() => null)
+      this.sentry = await import('@sentry/node').catch(() => null)
     } catch (_error) {
       this.logger.debug('Sentry not available for interceptor')
     }
@@ -52,7 +52,7 @@ export class SentryInterceptor implements NestInterceptor {
     })
 
     // Set transaction on scope
-    this.sentry.getCurrentHub().configureScope((scope: unknown) => {
+    this.sentry.getCurrentHub().configureScope((scope: any) => {
       scope.setSpan(transaction)
 
       // Add request context
@@ -66,13 +66,13 @@ export class SentryInterceptor implements NestInterceptor {
       })
 
       // Set user if available
-      if ((request as unknown).user) {
-        const user = (request as unknown).user
+      const req = request as Request & { user?: { id: string; email: string; username: string; tenantId: string } }
+      if (req.user) {
         scope.setUser({
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          tenant_id: user.tenantId,
+          id: req.user.id,
+          email: req.user.email,
+          username: req.user.username,
+          tenant_id: req.user.tenantId,
         })
       }
 
@@ -138,7 +138,7 @@ export class SentryInterceptor implements NestInterceptor {
           statusCode = error.getStatus()
           const response = error.getResponse()
           if (typeof response === 'object') {
-            errorMessage = (response as unknown).message || errorMessage
+            errorMessage = (response as any).message || errorMessage
             errorData = response
           } else {
             errorMessage = response
@@ -152,7 +152,7 @@ export class SentryInterceptor implements NestInterceptor {
 
         // Capture to Sentry if it's a server error
         if (statusCode >= 500 && this.sentry) {
-          this.sentry.withScope((scope: unknown) => {
+          this.sentry.withScope((scope: any) => {
             scope.setLevel('error')
             scope.setContext('error', {
               statusCode,
@@ -243,7 +243,7 @@ export class SentryInterceptor implements NestInterceptor {
         return obj
       }
 
-      const result = Array.isArray(obj) ? [...obj] : { ...obj }
+      const result: any = Array.isArray(obj) ? [...obj] : { ...obj }
 
       Object.keys(result).forEach((key) => {
         if (sensitiveFields.includes(key.toLowerCase())) {

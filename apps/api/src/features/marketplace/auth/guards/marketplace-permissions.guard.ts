@@ -52,7 +52,8 @@ export class MarketplacePermissionsGuard implements CanActivate {
 
   private hasPermission(user: unknown, permission: MarketplacePermission): boolean {
     // Check user roles for permission
-    const userRoles = user.roles || (user.role ? [user.role] : [])
+    const userData = user as { roles?: string[]; role?: string; permissions?: string[] }
+    const userRoles = userData.roles || (userData.role ? [userData.role] : [])
 
     // Admin and super admin have all permissions
     if (userRoles.includes('admin') || userRoles.includes('super_admin')) {
@@ -60,7 +61,7 @@ export class MarketplacePermissionsGuard implements CanActivate {
     }
 
     // Check specific marketplace permissions
-    const userPermissions = user.permissions || []
+    const userPermissions = userData.permissions || []
     return userPermissions.includes(permission)
   }
 }

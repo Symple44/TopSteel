@@ -5,6 +5,33 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Between, type Repository } from 'typeorm'
 import { PricingLog } from '../entities/pricing-log.entity'
 
+export interface PricingLogData {
+  ruleId: string
+  societeId: string
+  customerId?: string
+  customerGroup?: string
+  articleId?: string
+  basePrice: number
+  finalPrice: number
+  discount: number
+  channel: string
+  calculationTime: number
+  applied: boolean
+  reason?: string
+  timestamp: Date
+}
+
+interface RuleStatsAccumulator {
+  ruleId: string
+  usageCount: number
+  appliedCount: number
+  totalDiscount: number
+  totalRevenue: number
+  customerGroups: Map<string, number>
+  hourlyUsage: number[]
+  lastUsed: Date
+}
+
 export interface RuleAnalytics {
   ruleId: string
   ruleName: string
@@ -42,7 +69,7 @@ export interface PricingDashboard {
 @Injectable()
 export class PricingAnalyticsService {
   private readonly logger = new Logger(PricingAnalyticsService.name)
-  private metricsBuffer: Map<string, any[]> = new Map()
+  private metricsBuffer: Map<string, PricingLogData[]> = new Map()
 
   constructor(
     @InjectRepository(PriceRule, 'tenant')
@@ -138,7 +165,7 @@ export class PricingAnalyticsService {
         : 0
 
     // Analyser les règles les plus utilisées
-    const ruleStats = new Map<string, any>()
+    const ruleStats = new Map<string, RuleStatsAccumulator>()
 
     for (const log of logs) {
       if (!log.ruleId) continue
@@ -157,26 +184,30 @@ export class PricingAnalyticsService {
       }
 
       const stats = ruleStats.get(log.ruleId)
-      stats.usageCount++
-      if (log.applied) {
-        stats.appliedCount++
-        stats.totalDiscount += log.discount
-        stats.totalRevenue += log.finalPrice
+      if (stats) {
+        stats.usageCount++
+        if (log.applied) {
+          stats.appliedCount++
+          stats.totalDiscount += log.discount
+          stats.totalRevenue += log.finalPrice
+        }
       }
 
       // Tracking par groupe client
-      if (log.customerGroup) {
+      if (log.customerGroup && stats) {
         const count = stats.customerGroups.get(log.customerGroup) || 0
         stats.customerGroups.set(log.customerGroup, count + 1)
       }
 
       // Tracking par heure
-      const hour = new Date(log.createdAt).getHours()
-      stats.hourlyUsage[hour]++
+      if (stats) {
+        const hour = new Date(log.createdAt).getHours()
+        stats.hourlyUsage[hour]++
 
-      // Mettre à jour lastUsed
-      if (log.createdAt > stats.lastUsed) {
-        stats.lastUsed = log.createdAt
+        // Mettre à jour lastUsed
+        if (log.createdAt > stats.lastUsed) {
+          stats.lastUsed = log.createdAt
+        }
       }
     }
 
@@ -213,8 +244,8 @@ export class PricingAnalyticsService {
         // Heures de pointe
         const peakUsageHours = stats.hourlyUsage
           .map((count: number, hour: number) => ({ hour, count }))
-          .filter((h: unknown) => h.count > 0)
-          .sort((a: unknown, b: any) => b.count - a.count)
+          .filter((h) => h.count > 0)
+          .sort((a, b) => b.count - a.count)
           .slice(0, 5)
 
         return {

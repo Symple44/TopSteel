@@ -71,7 +71,7 @@ export class ProductCatalogController {
     }
 
     const sort: ProductSortOptions = {
-      field: sortField as unknown,
+      field: sortField as ProductSortOptions['field'],
       direction: sortDirection,
     }
 

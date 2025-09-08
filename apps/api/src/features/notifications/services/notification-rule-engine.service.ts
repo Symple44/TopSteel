@@ -283,7 +283,7 @@ export class NotificationRuleEngineService {
     const failedEvents = await this.ruleService._eventRepository.find({
       where: {
         status: EventStatus.FAILED,
-        occurredAt: maxAgeDate as unknown,
+        occurredAt: maxAgeDate as any,
       },
       order: { occurredAt: 'ASC' },
       take: 50,

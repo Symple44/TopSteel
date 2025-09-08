@@ -283,8 +283,9 @@ export class MarketplaceShippingService {
       let cost = baseRates[shippingMethod]
 
       // Add weight-based pricing
+      const orderData = order as any
       const totalWeight =
-        order.items?.reduce(
+        orderData.items?.reduce(
           (weight: number, item: any) => weight + (item.product?.weight || 1) * item.quantity,
           0
         ) || 1
@@ -294,7 +295,7 @@ export class MarketplaceShippingService {
       }
 
       // Free shipping for orders over €100
-      if (order.total >= 100) {
+      if (orderData.total >= 100) {
         cost = shippingMethod === ShippingMethod.PICKUP ? 0 : Math.max(0, cost - 5.99)
       }
 

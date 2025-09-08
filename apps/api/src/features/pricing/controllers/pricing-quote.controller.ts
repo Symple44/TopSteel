@@ -181,14 +181,14 @@ export class PricingQuoteController {
     const totalDiscountPercentage = subtotal > 0 ? (totalDiscount / subtotal) * 100 : 0
 
     // Calculer la TVA si demandée (20% par défaut pour la France)
-    const taxRate = request.metadata?.taxRate || 0.2
+    const taxRate = (request.metadata?.taxRate as number) || 0.2
     const taxAmount = request.metadata?.includeTax ? totalBeforeTax * taxRate : undefined
     const totalIncludingTax = taxAmount ? totalBeforeTax + taxAmount : undefined
 
     const processingTime = Date.now() - startTime
 
     // Créer la date d'expiration (30 jours par défaut)
-    const expirationDays = request.metadata?.expirationDays || 30
+    const expirationDays = (request.metadata?.expirationDays as number) || 30
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + expirationDays)
 

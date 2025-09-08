@@ -136,7 +136,7 @@ export class QueryBuilderService {
         const columnsData = updateDto.columns.map((col) => ({
           ...col,
           queryBuilderId: id,
-        })) as DeepPartial<QueryBuilderColumn>[]
+        }))
         const columns = this._columnRepository.create(columnsData)
         await this._columnRepository.save(columns)
       }
@@ -149,7 +149,7 @@ export class QueryBuilderService {
         const joinsData = updateDto.joins.map((join) => ({
           ...join,
           queryBuilderId: id,
-        })) as DeepPartial<QueryBuilderJoin>[]
+        }))
         const joins = this._joinRepository.create(joinsData)
         await this._joinRepository.save(joins)
       }
@@ -162,7 +162,7 @@ export class QueryBuilderService {
         const fieldsData = updateDto.calculatedFields.map((field) => ({
           ...field,
           queryBuilderId: id,
-        })) as DeepPartial<QueryBuilderCalculatedField>[]
+        }))
         const fields = this._calculatedFieldRepository.create(fieldsData)
         await this._calculatedFieldRepository.save(fields)
       }
@@ -211,13 +211,13 @@ export class QueryBuilderService {
 
     // Duplicate columns
     if (original.columns && original.columns.length > 0) {
-      const columns = original.columns.map((col) =>
-        this._columnRepository.create({
-          ...col,
-          id: undefined,
+      const columns = original.columns.map((col) => {
+        const { id, ...columnData } = col
+        return this._columnRepository.create({
+          ...columnData,
           queryBuilderId: savedEntity.id,
-        })
-      )
+        } as DeepPartial<QueryBuilderColumn>)
+      })
       await this._columnRepository.save(columns)
     }
 
@@ -228,7 +228,7 @@ export class QueryBuilderService {
         return this._joinRepository.create({
           ...joinData,
           queryBuilderId: savedEntity.id,
-        })
+        } as DeepPartial<QueryBuilderJoin>)
       })
       await this._joinRepository.save(joins)
     }
@@ -238,15 +238,10 @@ export class QueryBuilderService {
       const fields = original.calculatedFields.map((field) => {
         const { id, ...fieldData } = field
         
-        // Ensure format is properly structured
-        if (typeof fieldData.format === 'string') {
-          fieldData.format = { type: 'custom' as const, pattern: fieldData.format }
-        }
-        
         return this._calculatedFieldRepository.create({
           ...fieldData,
           queryBuilderId: savedEntity.id,
-        })
+        } as DeepPartial<QueryBuilderCalculatedField>)
       })
       await this._calculatedFieldRepository.save(fields)
     }

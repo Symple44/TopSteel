@@ -4,7 +4,7 @@ import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
-import { MoreThan, type Repository } from 'typeorm'
+import { MoreThan, type Repository, type SelectQueryBuilder } from 'typeorm'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
@@ -61,14 +61,16 @@ export interface OrderModerationItem {
   }[]
 }
 
+export type OrderFlagType = 
+  | 'PAYMENT_FAILED'
+  | 'HIGH_VALUE'
+  | 'NEW_CUSTOMER'
+  | 'SUSPICIOUS_ACTIVITY'
+  | 'INVENTORY_ISSUE'
+  | 'CUSTOM'
+
 export interface OrderFlag {
-  type:
-    | 'PAYMENT_FAILED'
-    | 'HIGH_VALUE'
-    | 'NEW_CUSTOMER'
-    | 'SUSPICIOUS_ACTIVITY'
-    | 'INVENTORY_ISSUE'
-    | 'CUSTOM'
+  type: OrderFlagType
   severity: 'LOW' | 'MEDIUM' | 'HIGH'
   message: string
   createdAt: Date
@@ -344,7 +346,7 @@ export class OrderModerationService {
   /**
    * Apply moderation filters to query
    */
-  private applyModerationFilters(queryBuilder: unknown, filters: OrderModerationFilters): void {
+  private applyModerationFilters(queryBuilder: SelectQueryBuilder<MarketplaceOrder>, filters: OrderModerationFilters): void {
     if (filters.status) {
       queryBuilder.andWhere('order.status = :status', { status: filters.status })
     }
@@ -550,8 +552,8 @@ export class OrderModerationService {
     const flags = this.parseOrderFlags(order.flags)
 
     flags.push({
-      type: flagType as unknown,
-      severity: 'MEDIUM',
+      type: flagType as OrderFlagType,
+      severity: 'MEDIUM' as const,
       message: reason,
       createdAt: new Date(),
     })

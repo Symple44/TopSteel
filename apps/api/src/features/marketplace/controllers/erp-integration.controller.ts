@@ -100,8 +100,8 @@ export class ERPIntegrationController {
     }
 
     const sort: ProductSortOptions = {
-      field: (query.sortField as unknown) || 'createdAt',
-      direction: (query.sortDirection as unknown) || 'DESC',
+      field: (query.sortField as ProductSortOptions['field']) || 'createdAt',
+      direction: (query.sortDirection as ProductSortOptions['direction']) || 'DESC',
     }
 
     const pagination: PaginationOptions = {

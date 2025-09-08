@@ -577,11 +577,11 @@ export class ShopConfigurationService {
    * Deep merge objects
    */
   private deepMerge(target: unknown, source: any): any {
-    const result = { ...target }
+    const result = { ...(target as Record<string, unknown>) }
 
     for (const key in source) {
       if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        result[key] = this.deepMerge(target[key] || {}, source[key])
+        result[key] = this.deepMerge((target as Record<string, unknown>)[key] || {}, source[key])
       } else {
         result[key] = source[key]
       }

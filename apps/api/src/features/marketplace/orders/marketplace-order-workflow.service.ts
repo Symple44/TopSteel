@@ -87,7 +87,7 @@ export class MarketplaceOrderWorkflowService {
   }
 
   private setupTransitions() {
-    ;(this as unknown).transitions = new Map([
+    ;(this as any).transitions = new Map([
       [
         OrderStatus.PENDING,
         {
@@ -216,7 +216,7 @@ export class MarketplaceOrderWorkflowService {
           articleId: product.id,
           quantity: itemData.quantity,
           customerId: customer.erpPartnerId,
-          channel: 'MARKETPLACE' as unknown,
+          channel: 'MARKETPLACE' as any,
           societeId: tenantId,
         })
 
@@ -228,13 +228,13 @@ export class MarketplaceOrderWorkflowService {
           totalPrice: priceCalculation.finalPrice,
           customizations: itemData.customizations,
           discount: priceCalculation.totalDiscount || 0,
-        })
+        } as any)
 
         items.push(item)
         subtotal += priceCalculation.finalPrice
       }
 
-      await manager.save(items)
+      await manager.save(MarketplaceOrderItem, items)
 
       // Calculer les totaux
       const shippingCost = await this.calculateShipping(savedOrder, items)
