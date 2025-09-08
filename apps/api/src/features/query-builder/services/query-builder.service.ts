@@ -200,14 +200,21 @@ export class QueryBuilderService {
 
     // Duplicate calculated fields
     if (original.calculatedFields && original.calculatedFields.length > 0) {
-      const fields = original.calculatedFields.map((field) =>
-        this._calculatedFieldRepository.create({
+      const fields = original.calculatedFields.map((field) => {
+        const fieldData = {
           ...field,
           id: undefined,
           queryBuilderId: savedEntity.id,
-        })
-      )
-      await this._calculatedFieldRepository.save(fields as unknown)
+        }
+        
+        // Ensure format is properly structured
+        if (typeof fieldData.format === 'string') {
+          fieldData.format = { type: 'custom' as const, pattern: fieldData.format }
+        }
+        
+        return this._calculatedFieldRepository.create(fieldData)
+      })
+      await this._calculatedFieldRepository.save(fields)
     }
 
     return this.findOne(savedEntity.id, userId)

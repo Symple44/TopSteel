@@ -35,6 +35,20 @@ import type { UserQueryDto } from '../../../domains/users/dto/user-query.dto'
 import type { UsersService } from '../../../domains/users/users.service'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
+// Interface for database errors
+interface DatabaseError {
+  code?: string
+  message?: string
+  [key: string]: unknown
+}
+
+// Interface for authenticated user with tenant info
+interface AuthenticatedUserWithTenant {
+  id: string
+  societeId?: string
+  [key: string]: unknown
+}
+
 @Controller('admin/users')
 @ApiTags('🔧 Admin - Users')
 @UseGuards(CombinedSecurityGuard)
@@ -277,7 +291,7 @@ export class AdminUsersController {
         statusCode: 201,
       }
     } catch (error: unknown) {
-      if ((error as unknown).code === '23505') {
+      if ((error as DatabaseError).code === '23505') {
         // Violation de contrainte unique PostgreSQL
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
@@ -332,7 +346,7 @@ export class AdminUsersController {
         statusCode: 200,
       }
     } catch (error: unknown) {
-      if ((error as unknown).code === '23505') {
+      if ((error as DatabaseError).code === '23505') {
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
       throw error
@@ -404,8 +418,8 @@ export class AdminUsersController {
     },
     request: Record<string, unknown>
   ) {
-    const tenant = request.tenant
-    const currentUser = request.user
+    const tenant = request.tenant as AuthenticatedUserWithTenant
+    const currentUser = request.user as AuthenticatedUserWithTenant
 
     // Vérifier que l'utilisateur existe
     const user = await this.usersService.findById(userId)
@@ -421,9 +435,9 @@ export class AdminUsersController {
     try {
       const userSocieteRole = await this.unifiedRolesService.assignUserToSociete(
         userId,
-        (tenant as unknown).societeId,
+        tenant.societeId!,
         body.roleType,
-        (currentUser as unknown).id,
+        currentUser.id,
         {
           isDefault: body.isDefault || false,
           additionalPermissions: body.additionalPermissions || [],

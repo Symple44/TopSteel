@@ -15,6 +15,14 @@ import type {
 } from '../types/search-types'
 import type { SearchResultFormatterService } from './search-result-formatter.service'
 
+// Interface for Elasticsearch errors
+interface ElasticsearchError {
+  meta?: {
+    statusCode?: number
+  }
+  message?: string
+}
+
 @Injectable()
 export class ElasticsearchSearchService implements IElasticsearchSearchService {
   private readonly logger = new Logger(ElasticsearchSearchService.name)
@@ -219,7 +227,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
       })
     } catch (error) {
       // Don't throw error if document doesn't exist
-      const err = toError(error) as unknown
+      const err = toError(error) as ElasticsearchError
       if (err.meta?.statusCode !== 404) {
         throw error
       }

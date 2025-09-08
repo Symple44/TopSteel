@@ -30,7 +30,7 @@ export class AdminRolesService {
         roleId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
       ) {
         role = await this._rolesRepository.findOne({
-          where: { id: roleId } as unknown,
+          where: { id: roleId },
         })
       }
 
@@ -39,7 +39,7 @@ export class AdminRolesService {
       }
 
       const rolePermissions = await this._rolePermissionsRepository.find({
-        where: { roleId: (role as unknown).id },
+        where: { roleId: role.id },
         relations: ['permission'],
       })
 

@@ -5,6 +5,13 @@ import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanc
 import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
+// Interface for performance metrics
+interface PerformanceMetrics {
+  responseTime?: number
+  successRate?: number
+  [key: string]: unknown
+}
+
 @Controller('admin/auth-performance')
 @ApiTags('🔧 Admin - Performance Monitoring')
 @UseGuards(CombinedSecurityGuard)
@@ -116,7 +123,7 @@ export class AuthPerformanceController {
         },
         recommendations: this.generateRecommendations(
           isHealthy,
-          metrics as unknown,
+          metrics as PerformanceMetrics,
           cacheStats,
           memoryUsage
         ),
@@ -203,7 +210,7 @@ export class AuthPerformanceController {
 
   private generateRecommendations(
     isHealthy: Record<string, boolean>,
-    _metrics: Record<string, unknown>,
+    _metrics: PerformanceMetrics,
     _cacheStats: Record<string, unknown>,
     _memoryUsage: Record<string, unknown>
   ): string[] {

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsBoolean, IsOptional, IsString } from 'class-validator'
+import type { NotificationSettings } from '../entities/user-settings.entity'
 
 export class NotificationEmailTypesUpdateDto {
   @ApiProperty({ description: 'Notifications pour nouveaux messages', required: false })
@@ -172,7 +173,7 @@ export class GetNotificationSettingsResponseDto {
     end: string
   }
 
-  constructor(data: Record<string, unknown>) {
+  constructor(data: Record<string, unknown> | NotificationSettings) {
     this.email = data.email as boolean
     this.push = data.push as boolean
     this.sms = data.sms as boolean

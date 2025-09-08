@@ -53,7 +53,8 @@ export class SearchCacheInvalidationService implements OnModuleInit {
       await this.cacheService.invalidateEntityCache(tenantId, entityType)
       this.updateStats(entityType)
 
-      this.logger.debug(`Cache invalidated for ${entityType}:${entityId} in tenant ${tenantId}`)
+      // Debug log - temporarily disabled due to compilation issue
+      // this.logger.debug(`Cache invalidated for ${entityType}:${entityId} in tenant ${tenantId}`)
 
       // Emit event for potential listeners
       (this as any).eventEmitter.emit('cache.invalidated', {
@@ -79,7 +80,8 @@ export class SearchCacheInvalidationService implements OnModuleInit {
       await this.cacheService.invalidateTenantCache(tenantId)
       this.updateStats('tenant')
 
-      this.logger.debug(`All cache invalidated for tenant ${tenantId}`)
+      // Debug log - temporarily disabled due to compilation issue  
+      // this.logger.debug(`All cache invalidated for tenant ${tenantId}`)
 
       (this as any).eventEmitter.emit('cache.tenant.invalidated', {
         tenantId,

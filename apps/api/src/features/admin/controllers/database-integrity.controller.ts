@@ -8,6 +8,23 @@ import type {
 } from '../services/database-integrity.service'
 import type { DatabaseStatsService } from '../services/database-stats.service'
 
+// Interface for database stats
+interface DatabaseStats {
+  tableCount?: number
+  totalSize?: number
+  connections?: number
+  [key: string]: unknown
+}
+
+// Interface for backup info
+interface BackupInfo {
+  id: string
+  name: string
+  size: number
+  createdAt: Date
+  [key: string]: unknown
+}
+
 @ApiTags('Database Management')
 @Controller('admin/database')
 // @UseGuards(JwtAuthGuard) // Temporairement désactivé pour debug
@@ -79,7 +96,7 @@ export class DatabaseIntegrityController {
 
     return {
       success: true,
-      data: stats as unknown,
+      data: stats as DatabaseStats,
     }
   }
 
@@ -95,12 +112,12 @@ export class DatabaseIntegrityController {
 
   @Get('backups')
   @ApiOperation({ summary: 'Lister les sauvegardes disponibles' })
-  async listBackups(): Promise<{ success: boolean; data: Record<string, unknown>[] }> {
+  async listBackups(): Promise<{ success: boolean; data: BackupInfo[] }> {
     const backups = await this.databaseBackupService.listBackups()
 
     return {
       success: true,
-      data: backups as unknown,
+      data: backups as BackupInfo[],
     }
   }
 

@@ -163,7 +163,7 @@ export class UsersController {
     @CurrentUser() user: AuthenticatedUser
   ): Promise<GetNotificationSettingsResponseDto> {
     const settings = await this.usersService.getUserSettings(user.id)
-    return new GetNotificationSettingsResponseDto(settings.preferences.notifications as Record<string, unknown>)
+    return new GetNotificationSettingsResponseDto(settings.preferences.notifications)
   }
 
   @Patch('notifications/me')
@@ -180,7 +180,7 @@ export class UsersController {
     const updatedSettings = await this.usersService.updateUserSettings(user.id, {
       preferences: { notifications: updateDto },
     })
-    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications as Record<string, unknown>)
+    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications)
   }
 
   // Endpoints avec paramètre ID (DOIVENT être APRÈS les endpoints spécifiques)
