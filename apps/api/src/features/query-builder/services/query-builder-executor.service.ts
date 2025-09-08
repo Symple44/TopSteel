@@ -6,6 +6,15 @@ import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
 import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
 import type { SqlSanitizationService } from '../security/sql-sanitization.service'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
+import type {
+  QueryBuilderData,
+  QueryBuilderColumn,
+  QueryBuilderJoin,
+  QueryBuilderCondition,
+  QueryExecutionContext,
+  QueryExecutionResult as TypedQueryExecutionResult,
+  QueryOperator
+} from '../../../types/query-builder/query-builder.types'
 
 export interface QueryExecutionParams {
   page?: number
@@ -15,8 +24,8 @@ export interface QueryExecutionParams {
   filters?: Record<string, unknown>
 }
 
-export interface QueryExecutionResult {
-  data: unknown[]
+export interface QueryExecutionResultWithPagination {
+  data: Record<string, unknown>[]
   total: number
   page: number
   pageSize: number
@@ -39,7 +48,7 @@ export class QueryBuilderExecutorService {
     queryBuilder: QueryBuilder,
     params: QueryExecutionParams,
     userId: string
-  ): Promise<QueryExecutionResult> {
+  ): Promise<QueryExecutionResultWithPagination> {
     // Check execute permission
     const canExecute = await this.permissionService.checkPermission(
       queryBuilder.id,
@@ -92,11 +101,11 @@ export class QueryBuilderExecutorService {
       const countResult = await this._dataSource.query(
         countQuery,
         sanitizedQuery.parameters.slice(0, -2)
-      ) // Remove LIMIT and OFFSET params
+      ) as Array<{ total: string }> // Remove LIMIT and OFFSET params
       const total = parseInt(countResult[0].total, 10)
 
       // Execute main query
-      const data = await this._dataSource.query(mainQuery, sanitizedQuery.parameters)
+      const data = await this._dataSource.query(mainQuery, sanitizedQuery.parameters) as Record<string, unknown>[]
 
       // Apply calculated fields
       const processedData = this.processCalculatedFields(data, queryBuilder.calculatedFields)
@@ -153,8 +162,8 @@ export class QueryBuilderExecutorService {
     filters: Array<{
       tableName: string
       columnName: string
-      operator: string
-      value: any
+      operator: QueryOperator
+      value: unknown
       tableAlias?: string
     }>
     sorts: Array<{
@@ -191,16 +200,16 @@ export class QueryBuilderExecutorService {
     const filters: Array<{
       tableName: string
       columnName: string
-      operator: string
-      value: any
+      operator: QueryOperator
+      value: unknown
       tableAlias?: string
     }> = []
     Object.entries(params.filters || {}).forEach(([columnAlias, filterValue]) => {
       const column = queryBuilder.columns.find((col) => col.alias === columnAlias)
       if (column?.isFilterable) {
         // Determine operator based on value type
-        let operator = '='
-        let value = filterValue
+        let operator: QueryOperator = '='
+        let value: unknown = filterValue
 
         if (Array.isArray(filterValue)) {
           operator = 'IN'
@@ -279,7 +288,7 @@ export class QueryBuilderExecutorService {
          WHERE u.id = $1 AND su.isDefault = true AND su.actif = true
          LIMIT 1`,
         [userId]
-      )
+      ) as Array<{ company_id: string }>
 
       return result?.[0]?.company_id || undefined
     } catch (error) {
@@ -304,15 +313,22 @@ export class QueryBuilderExecutorService {
   }
 
   private processCalculatedFields(
-    data: unknown[],
-    calculatedFields: QueryBuilderCalculatedField[]
-  ): unknown[] {
+    data: Record<string, unknown>[],
+    calculatedFields: Array<{
+      id: string
+      name: string
+      expression: string
+      isVisible: boolean
+      dataType?: string
+      format?: string
+    }>
+  ): Record<string, unknown>[] {
     if (!calculatedFields || calculatedFields.length === 0) {
       return data
     }
 
     return data.map((row) => {
-      const processedRow = { ...(row as Record<string, unknown>) }
+      const processedRow = { ...row }
 
       calculatedFields
         .filter((field) => field.isVisible)
@@ -330,18 +346,16 @@ export class QueryBuilderExecutorService {
     })
   }
 
-  private evaluateExpression(expression: string, row: unknown): unknown {
+  private evaluateExpression(expression: string, row: Record<string, unknown>): unknown {
     // This is a simplified implementation
     // In production, use a proper expression evaluator like math.js
 
     // Replace column references with values
     let evaluableExpression = expression
-    if (row && typeof row === 'object' && row !== null) {
-      Object.entries(row as Record<string, unknown>).forEach(([key, value]) => {
-        const regex = new RegExp(`\\b${key}\\b`, 'g')
-        evaluableExpression = evaluableExpression.replace(regex, String(value))
-      })
-    }
+    Object.entries(row).forEach(([key, value]) => {
+      const regex = new RegExp(`\\b${key}\\b`, 'g')
+      evaluableExpression = evaluableExpression.replace(regex, String(value))
+    })
 
     // Use mathjs for safe arithmetic evaluation
     try {
@@ -430,10 +444,10 @@ export class QueryBuilderExecutorService {
    */
   async executeRawSql(
     sql: string,
-    limit: number = 100,
+    limit = 100,
     userId: string,
     companyId?: string
-  ): Promise<unknown[]> {
+  ): Promise<Record<string, unknown>[]> {
     this.logger.log('Raw SQL execution requested', {
       userId,
       sqlPreview: sql.substring(0, 50),
@@ -454,7 +468,7 @@ export class QueryBuilderExecutorService {
       // Execute with proper limits and parameterization
       const limitedSql = `${sql} LIMIT ${Math.min(limit, 1000)}`
 
-      const result = await this._dataSource.query(limitedSql)
+      const result = await this._dataSource.query(limitedSql) as Record<string, unknown>[]
 
       this.logger.log('Raw SQL execution successful', {
         userId,

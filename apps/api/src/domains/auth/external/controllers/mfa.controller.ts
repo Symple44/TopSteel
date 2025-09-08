@@ -10,7 +10,9 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common'
+import type { Request as ExpressRequest } from 'express'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
+import type { WebAuthnAuthenticationResponse } from '../../../../types/auth/webauthn.types'
 import type { MFAService } from '../../services/mfa.service'
 
 interface SetupTOTPDto {
@@ -350,7 +352,7 @@ export class MFAController {
       const result = await this.mfaService.verifyAndAddWebAuthn(
         userId,
         body.mfaId,
-        body.response as Record<string, unknown>,
+        body.response as WebAuthnAuthenticationResponse,
         body.deviceName,
         userAgent
       )
@@ -378,11 +380,11 @@ export class MFAController {
    * Initier une session MFA (pour l'authentification)
    */
   @Post('initiate')
-  async initiateMFA(@Request() req: { user: { sub: string } }, @Body() body: InitiateMFADto) {
+  async initiateMFA(@Request() req: ExpressRequest & { user: { sub: string } }, @Body() body: InitiateMFADto) {
     try {
       const userId = req.user.sub
 
-      const result = await this.mfaService.initiateMFASession(userId, body.mfaType, req)
+      const result = await this.mfaService.initiateMFASession(userId, body.mfaType, { headers: req.headers as Record<string, string>, ip: req.ip, userAgent: req.get('user-agent') })
 
       if (!result.success) {
         throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
@@ -412,7 +414,7 @@ export class MFAController {
       const result = await this.mfaService.verifyMFA(
         body.sessionToken,
         body.code,
-        body.webauthnResponse as Record<string, unknown> | undefined
+        body.webauthnResponse as WebAuthnAuthenticationResponse | undefined
       )
 
       if (!result.success) {

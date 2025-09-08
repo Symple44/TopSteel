@@ -12,6 +12,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
+import type {
+  SocieteData,
+  SocieteFiltered,
+  SiteData,
+} from '../../../types/entities/societe.types'
+import type { UserData, UserSocieteRole } from '../../../types/entities/user.types'
 import {
   ApiBearerAuth,
   ApiBody,
@@ -60,7 +66,7 @@ export class AdminSocietesController {
   async findAllSocietes(@Query() query: SocieteQueryDto) {
     try {
       // Récupérer les sociétés selon les filtres
-      let societes: unknown[]
+      let societes: any[]
       if (query.status === 'ALL') {
         societes = await this.societesService.findAll()
       } else {
@@ -71,7 +77,7 @@ export class AdminSocietesController {
       if (query.search) {
         const searchTerm = query.search.toLowerCase()
         societes = societes.filter(
-          (societe: unknown) =>
+          (societe: any) =>
             societe.nom.toLowerCase().includes(searchTerm) ||
             societe.code.toLowerCase().includes(searchTerm)
         )
@@ -86,24 +92,24 @@ export class AdminSocietesController {
 
       // Formatter les données avec les utilisateurs si demandé
       const formattedSocietes = await Promise.all(
-        paginatedSocietes.map(async (societe: unknown) => {
-          let users: Record<string, unknown>[] = []
+        paginatedSocietes.map(async (societe: any) => {
+          let users: any[] = []
           let userCount = 0
 
           if (query.includeUsers) {
             // Récupérer tous les utilisateurs ayant accès à cette société
-            const allUsers = await this.usersService.findAll({})
-            const usersWithAccess: Record<string, unknown>[] = []
+            const allUsers: any[] = await this.usersService.findAll({})
+            const usersWithAccess: any[] = []
 
             for (const user of allUsers) {
-              const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+              const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccessToSociete = userSocieteRoles.some(
-                (role: unknown) => role.societeId === societe.id && role.isActive
+                (role: any) => role.societeId === societe.id && role.isActive
               )
 
               if (hasAccessToSociete) {
                 const userRoleInSociete = userSocieteRoles.find(
-                  (role: unknown) => role.societeId === societe.id
+                  (role: any) => role.societeId === societe.id
                 )
 
                 usersWithAccess.push({
@@ -111,12 +117,12 @@ export class AdminSocietesController {
                   email: user.email,
                   firstName: user.prenom || '',
                   lastName: user.nom || '',
-                  globalRole: this.roleFormattingService.formatGlobalRole(user.role),
+                  globalRole: this.roleFormattingService.formatGlobalRole(user.role || 'USER'),
                   societeRole: userRoleInSociete
-                    ? this.roleFormattingService.formatSocieteRole(userRoleInSociete.effectiveRole)
+                    ? this.roleFormattingService.formatSocieteRole(userRoleInSociete.effectiveRole || 'USER')
                     : null,
                   isDefault: userRoleInSociete?.isDefaultSociete || false,
-                  grantedAt: userRoleInSociete?.expiresAt || user.createdAt,
+                  grantedAt: userRoleInSociete?.grantedAt || user.createdAt,
                 })
               }
             }
@@ -125,11 +131,11 @@ export class AdminSocietesController {
             userCount = usersWithAccess.length
           } else {
             // Compter seulement les utilisateurs
-            const allUsers = await this.usersService.findAll({})
+            const allUsers: any[] = await this.usersService.findAll({})
             for (const user of allUsers) {
-              const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+              const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccess = userSocieteRoles.some(
-                (role: unknown) => role.societeId === societe.id && role.isActive
+                (role: any) => role.societeId === societe.id && role.isActive
               )
               if (hasAccess) {
                 userCount++
@@ -142,13 +148,12 @@ export class AdminSocietesController {
             nom: societe.nom,
             code: societe.code,
             status: societe.status || 'ACTIVE',
-            databaseName: societe.databaseName,
             createdAt: societe.createdAt,
             updatedAt: societe.updatedAt,
             userCount,
             users: query.includeUsers ? users : undefined,
             sites:
-              societe.sites?.map((site: unknown) => ({
+              societe.sites?.map((site: any) => ({
                 id: site.id,
                 nom: site.nom,
                 code: site.code,
@@ -169,7 +174,7 @@ export class AdminSocietesController {
           includeUsers: query.includeUsers || false,
         },
       }
-    } catch (_error: unknown) {
+    } catch (_error) {
       throw new BadRequestException('Erreur lors de la récupération des sociétés')
     }
   }
@@ -186,13 +191,13 @@ export class AdminSocietesController {
     }
 
     // Récupérer tous les utilisateurs ayant accès à cette société
-    const allUsers = await this.usersService.findAll({})
-    const usersWithAccess: Record<string, unknown>[] = []
+    const allUsers: any[] = await this.usersService.findAll({})
+    const usersWithAccess: any[] = []
 
     for (const user of allUsers) {
-      const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+      const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
       const userRoleInSociete = userSocieteRoles.find(
-        (role) => role.societeId === societe.id && role.isActive
+        (role: any) => role.societeId === societe.id && role.isActive
       )
 
       if (userRoleInSociete) {
@@ -201,13 +206,13 @@ export class AdminSocietesController {
           email: user.email,
           firstName: user.prenom || '',
           lastName: user.nom || '',
-          globalRole: this.roleFormattingService.formatGlobalRole(user.role),
+          globalRole: this.roleFormattingService.formatGlobalRole(user.role || 'USER'),
           societeRole: this.roleFormattingService.formatSocieteRole(
-            userRoleInSociete.effectiveRole
+            userRoleInSociete.effectiveRole || 'USER'
           ),
           isDefault: userRoleInSociete.isDefaultSociete,
           isActive: userRoleInSociete.isActive,
-          grantedAt: userRoleInSociete.expiresAt,
+          grantedAt: userRoleInSociete.grantedAt,
           expiresAt: userRoleInSociete.expiresAt,
           additionalPermissions: userRoleInSociete.additionalPermissions,
           restrictedPermissions: userRoleInSociete.restrictedPermissions,
@@ -227,7 +232,7 @@ export class AdminSocietesController {
         updatedAt: societe.updatedAt,
         users: usersWithAccess,
         sites:
-          societe.sites?.map((site) => ({
+          societe.sites?.map((site: any) => ({
             id: site.id,
             nom: site.nom,
             code: site.code,
@@ -264,7 +269,7 @@ export class AdminSocietesController {
       restrictedPermissions?: string[]
       expiresAt?: Date
     },
-    @Req() request: Record<string, unknown>
+    @Req() request: { user: any }
   ) {
     // Vérifier que la société existe
     const societe = await this.societesService.findById(societeId)
@@ -284,12 +289,12 @@ export class AdminSocietesController {
     }
 
     try {
-      const currentUser = request.user
-      const userSocieteRole = await this.unifiedRolesService.assignUserToSociete(
+      const currentUser: any = request.user
+      const userSocieteRole: any = await this.unifiedRolesService.assignUserToSociete(
         userId,
         societeId,
         body.roleType,
-        (currentUser as unknown).id,
+        currentUser.id,
         {
           isDefault: body.isDefault || false,
           additionalPermissions: body.additionalPermissions || [],
@@ -308,12 +313,12 @@ export class AdminSocietesController {
           isDefault: userSocieteRole.isDefaultSociete,
           isActive: userSocieteRole.isActive,
           grantedAt: userSocieteRole.grantedAt,
-          grantedBy: (currentUser as unknown).id,
+          grantedBy: currentUser.id,
         },
         message: 'Utilisateur ajouté à la société avec succès',
         statusCode: 201,
       }
-    } catch (_error: unknown) {
+    } catch (_error) {
       throw new BadRequestException("Erreur lors de l'ajout de l'utilisateur à la société")
     }
   }
@@ -366,7 +371,7 @@ export class AdminSocietesController {
       restrictedPermissions?: string[]
       expiresAt?: Date
     },
-    @Req() request: Record<string, unknown>
+    @Req() request: { user: any }
   ) {
     // Vérifier que l'utilisateur a déjà un rôle dans cette société
     const existingRole = await this.unifiedRolesService.getUserSocieteRole(userId, societeId)
@@ -380,12 +385,12 @@ export class AdminSocietesController {
     }
 
     try {
-      const currentUser = request.user
-      const updatedRole = await this.unifiedRolesService.assignUserToSociete(
+      const currentUser: any = request.user
+      const updatedRole: any = await this.unifiedRolesService.assignUserToSociete(
         userId,
         societeId,
         body.roleType,
-        (currentUser as unknown).id,
+        currentUser.id,
         {
           isDefault: body.isDefault !== undefined ? body.isDefault : existingRole.isDefaultSociete,
           additionalPermissions: body.additionalPermissions || existingRole.additionalPermissions,
@@ -408,7 +413,7 @@ export class AdminSocietesController {
         message: "Rôle de l'utilisateur modifié avec succès",
         statusCode: 200,
       }
-    } catch (_error: unknown) {
+    } catch (_error) {
       throw new BadRequestException('Erreur lors de la modification du rôle')
     }
   }
@@ -424,14 +429,14 @@ export class AdminSocietesController {
     }
 
     // Compter les utilisateurs par rôle
-    const allUsers = await this.usersService.findAll({})
+    const allUsers: any[] = await this.usersService.findAll({})
     const roleStats: Record<string, number> = {}
     let totalUsers = 0
     let activeUsers = 0
 
     for (const user of allUsers) {
-      const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
-      const userRoleInSociete = userSocieteRoles.find((role) => role.societeId === societe.id)
+      const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+      const userRoleInSociete = userSocieteRoles.find((role: any) => role.societeId === societe.id)
 
       if (userRoleInSociete) {
         totalUsers++
@@ -439,7 +444,7 @@ export class AdminSocietesController {
           activeUsers++
         }
 
-        const roleType = userRoleInSociete.effectiveRole
+        const roleType = userRoleInSociete.effectiveRole || 'UNKNOWN'
         roleStats[roleType] = (roleStats[roleType] || 0) + 1
       }
     }

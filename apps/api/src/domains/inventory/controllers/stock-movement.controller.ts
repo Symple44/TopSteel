@@ -378,7 +378,7 @@ import { BadRequestException, Injectable, type PipeTransform } from '@nestjs/com
 @Injectable()
 export class ParseDatePipe implements PipeTransform {
   transform(value: unknown): Date {
-    const date = new Date(value)
+    const date = new Date(value as string | number | Date)
     if (Number.isNaN(date.getTime())) {
       throw new BadRequestException('Date invalide')
     }

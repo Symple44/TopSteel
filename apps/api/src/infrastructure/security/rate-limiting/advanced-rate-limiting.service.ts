@@ -10,6 +10,7 @@ import {
   GlobalUserRole,
   type SocieteRoleType,
 } from '../../../domains/auth/core/constants/roles.constants'
+import type { CombinedRateLimitResult } from './types/rate-limiting.types'
 
 export interface RateLimitConfig {
   windowSizeMs: number
@@ -173,7 +174,7 @@ export class AdvancedRateLimitingService {
     ipConfig: RateLimitConfig,
     userConfig: RateLimitConfig,
     userContext: UserContext
-  ): Promise<{ ip: RateLimitResult; user?: RateLimitResult; combined: RateLimitResult }> {
+  ): Promise<CombinedRateLimitResult> {
     const ipResult = await this.checkRateLimit(
       `ip:${userContext.ip}:${endpoint}`,
       ipConfig,
@@ -190,7 +191,18 @@ export class AdvancedRateLimitingService {
     }
 
     // Combined result - both must allow
-    const combined: RateLimitResult = {
+    let limitingFactor: 'ip' | 'user' | 'both'
+    if (!ipResult.isAllowed && !userResult?.isAllowed) {
+      limitingFactor = 'both'
+    } else if (!ipResult.isAllowed) {
+      limitingFactor = 'ip'
+    } else if (!userResult?.isAllowed) {
+      limitingFactor = 'user'
+    } else {
+      limitingFactor = 'both' // Default when both are allowed
+    }
+
+    const combined = {
       isAllowed: ipResult.isAllowed && (userResult?.isAllowed ?? true),
       remainingRequests: Math.min(
         ipResult.remainingRequests,
@@ -203,6 +215,7 @@ export class AdvancedRateLimitingService {
         ipResult.windowStartTime,
         userResult?.windowStartTime ?? Date.now()
       ),
+      limitingFactor,
     }
 
     return { ip: ipResult, user: userResult, combined }

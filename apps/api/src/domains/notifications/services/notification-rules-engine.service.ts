@@ -12,9 +12,14 @@ import { NotificationCondition } from '../entities/notification-condition.entity
 import { ExecutionStatus, NotificationExecution } from '../entities/notification-execution.entity'
 import { NotificationRule, RuleStatus, RuleType } from '../entities/notification-rule.entity'
 import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
+import type {
+  NotificationActionResult,
+  ActionExecutionResult,
+  NotificationConfig
+} from '../types/notification-execution.types'
 import type { NotificationActionExecutor } from './notification-action-executor.service'
 import type { NotificationConditionEvaluator } from './notification-condition-evaluator.service'
-import type { NotificationDeliveryService } from './notification-delivery.service'
+import type { NotificationDeliveryService, NotificationDeliveryOptions } from './notification-delivery.service'
 
 /**
  * Notification rules engine service
@@ -48,7 +53,7 @@ export class NotificationRulesEngineService {
    * Handle any event for rule processing
    */
   @OnEvent('**')
-  async handleEvent(eventName: string, eventData: any): Promise<void> {
+  async handleEvent(eventName: string, eventData: Record<string, unknown>): Promise<void> {
     // Skip notification system events to avoid loops
     if (eventName.startsWith('notification.')) {
       return
@@ -63,9 +68,9 @@ export class NotificationRulesEngineService {
         triggerType: 'event',
         triggerSource: eventName,
         triggerData: eventData,
-        societeId: eventData?.societeId,
-        siteId: eventData?.siteId,
-        userId: eventData?.userId,
+        societeId: typeof eventData?.societeId === 'string' ? eventData.societeId : undefined,
+        siteId: typeof eventData?.siteId === 'string' ? eventData.siteId : undefined,
+        userId: typeof eventData?.userId === 'string' ? eventData.userId : undefined,
         metadata: {
           eventName,
           timestamp: new Date(),
@@ -293,7 +298,7 @@ export class NotificationRulesEngineService {
       execution.status = ExecutionStatus.FAILED
       const errorMessage = getErrorMessage(error)
       execution.errorMessage = errorMessage
-      execution.errorDetails = error
+      execution.errorDetails = error as Record<string, unknown>
       result.status = ExecutionStatus.FAILED
       result.errors.push(errorMessage)
     } finally {
@@ -335,9 +340,15 @@ export class NotificationRulesEngineService {
     }
 
     let overallResult = true
-    const results: unknown[] = []
+    const results: Array<{
+      conditionId: string
+      name: string
+      result: boolean
+      evaluationTime: number
+      error?: string
+    }> = []
 
-    for (const condition of rule.conditions) {
+    for (const condition of rule.conditions as NotificationCondition[]) {
       const startTime = Date.now()
       let result = false
       let error: string | undefined
@@ -402,7 +413,7 @@ export class NotificationRulesEngineService {
     let recipientsNotified = 0
     const errors: string[] = []
 
-    for (const action of rule.actions) {
+    for (const action of rule.actions as NotificationAction[]) {
       // Apply delay if specified
       if (action.delaySeconds) {
         await new Promise((resolve) => setTimeout(resolve, action.delaySeconds! * 1000))
@@ -410,7 +421,7 @@ export class NotificationRulesEngineService {
 
       const startTime = Date.now()
       let success = false
-      let result: any
+      let result: ActionExecutionResult | undefined
       let error: string | undefined
 
       try {
@@ -419,8 +430,9 @@ export class NotificationRulesEngineService {
         executed++
 
         // Track recipients for notification actions
-        if (action.type === ActionType.SEND_NOTIFICATION) {
-          recipientsNotified += result.recipientsNotified || 0
+        if (action.type === ActionType.SEND_NOTIFICATION && result) {
+          const notificationResult = result as NotificationActionResult
+          recipientsNotified += notificationResult.recipientsNotified || 0
         }
 
         action.updateStatistics(true)
@@ -444,7 +456,7 @@ export class NotificationRulesEngineService {
         type: action.type,
         success,
         executionTime: Date.now() - startTime,
-        result,
+        result: result || null,
         error,
       })
     }
@@ -473,7 +485,7 @@ export class NotificationRulesEngineService {
       if (level.condition) {
         try {
           // Use mathjs for safe expression evaluation
-          const scope = {
+          const scope: Record<string, unknown> = {
             context,
             execution,
             // Add commonly used functions
@@ -500,10 +512,12 @@ export class NotificationRulesEngineService {
       // Send escalation notifications
       const recipients = [...(level.recipients.users || []), ...(level.recipients.emails || [])]
 
-      await this.deliveryService.sendNotification({
+      const notificationOptions: NotificationDeliveryOptions = {
         title: `Escalation: ${rule.name}`,
         body: `Rule execution requires attention. Execution ID: ${execution.id}`,
-        channels: level.channels as unknown,
+        channels: (level.channels as string[] || ['email']).filter((channel): channel is 'email' | 'sms' | 'push' | 'in_app' => 
+          ['email', 'sms', 'push', 'in_app'].includes(channel)
+        ),
         recipients,
         priority: 'high',
         metadata: {
@@ -511,13 +525,17 @@ export class NotificationRulesEngineService {
           executionId: execution.id,
           escalationLevel: level,
         },
-      })
+      }
 
-      execution.addEscalation({
+      await this.deliveryService.sendNotification(notificationOptions)
+
+      const escalationData = {
         level: rule.escalation.levels.indexOf(level),
         recipients,
         reason: 'Action failures detected',
-      })
+      }
+
+      execution.addEscalation(escalationData)
     }
   }
 

@@ -12,8 +12,9 @@ import type { Redis } from 'ioredis'
 import Stripe from 'stripe'
 import type { Repository } from 'typeorm'
 import { getErrorMessage, hasStack } from '../../../core/common/utils'
+import type { StripePaymentIntent, StripeCustomer, StripeCheckoutSession, MarketplaceOrder } from '../../../types/marketplace/marketplace.types'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
-import { MarketplaceOrder } from '../entities/marketplace-order.entity'
+import { MarketplaceOrder as MarketplaceOrderEntity } from '../entities/marketplace-order.entity'
 
 export interface CreatePaymentIntentDto {
   orderId: string
@@ -56,8 +57,8 @@ export class StripePaymentService {
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
     @InjectRedis() private readonly redisService: Redis,
-    @InjectRepository(MarketplaceOrder)
-    private readonly orderRepository: Repository<MarketplaceOrder>,
+    @InjectRepository(MarketplaceOrderEntity)
+    private readonly orderRepository: Repository<MarketplaceOrderEntity>,
     @InjectRepository(MarketplaceCustomer)
     private readonly customerRepository: Repository<MarketplaceCustomer>
   ) {
@@ -67,7 +68,7 @@ export class StripePaymentService {
     }
 
     this.stripe = new Stripe(apiKey, {
-      apiVersion: '2025-07-30.basil' as unknown,
+      apiVersion: '2025-07-30.basil',
       typescript: true,
       telemetry: false, // Disable telemetry for security
     })
@@ -174,7 +175,7 @@ export class StripePaymentService {
         hasStack(error) ? error.stack : undefined
       )
 
-      if ((error as unknown).type === 'StripeError') {
+      if ((error as any).type === 'StripeError') {
         return {
           success: false,
           paymentIntentId: '',
@@ -192,7 +193,7 @@ export class StripePaymentService {
    */
   async confirmPayment(paymentIntentId: string, paymentMethodId?: string): Promise<PaymentResult> {
     try {
-      const updateData: any = {}
+      const updateData: Stripe.PaymentIntentConfirmParams = {}
 
       if (paymentMethodId) {
         updateData.payment_method = paymentMethodId
@@ -206,7 +207,7 @@ export class StripePaymentService {
           await this.handlePaymentSuccess(paymentIntent)
           break
         case 'requires_action':
-        case 'requires_source_action' as unknown:
+        case 'requires_source_action' as Stripe.PaymentIntent.Status:
           // 3D Secure or similar authentication required
           break
         case 'requires_payment_method':
@@ -233,7 +234,7 @@ export class StripePaymentService {
         hasStack(error) ? error.stack : undefined
       )
 
-      if ((error as unknown).type === 'StripeError') {
+      if ((error as any).type === 'StripeError') {
         return {
           success: false,
           paymentIntentId,
@@ -264,7 +265,7 @@ export class StripePaymentService {
       const refund = await this.stripe.refunds.create({
         payment_intent: paymentIntentId,
         amount: amount, // undefined = full refund
-        reason: reason as unknown,
+        reason: reason as Stripe.RefundCreateParams.Reason,
         metadata: {
           orderId: paymentIntent.metadata.orderId || '',
           processedBy: 'marketplace_system',
@@ -353,7 +354,7 @@ export class StripePaymentService {
   /**
    * Get customer's saved payment methods
    */
-  async getPaymentMethods(customerId: string): Promise<any[]> {
+  async getPaymentMethods(customerId: string): Promise<Stripe.PaymentMethod[]> {
     try {
       const customer = await this.customerRepository.findOne({
         where: { id: customerId },
@@ -402,19 +403,19 @@ export class StripePaymentService {
 
       switch (event.type) {
         case 'payment_intent.succeeded':
-          await this.handlePaymentSuccess(event.data.object as unknown)
+          await this.handlePaymentSuccess(event.data.object as Stripe.PaymentIntent)
           break
 
         case 'payment_intent.payment_failed':
-          await this.handlePaymentFailure(event.data.object as unknown, 'Payment failed')
+          await this.handlePaymentFailure(event.data.object as Stripe.PaymentIntent, 'Payment failed')
           break
 
         case 'payment_intent.canceled':
-          await this.handlePaymentFailure(event.data.object as unknown, 'Payment was canceled')
+          await this.handlePaymentFailure(event.data.object as Stripe.PaymentIntent, 'Payment was canceled')
           break
 
         case 'refund.created':
-          await this.handleRefundCreated(event.data.object as unknown)
+          await this.handleRefundCreated(event.data.object as Stripe.Refund)
           break
 
         default:
@@ -483,13 +484,13 @@ export class StripePaymentService {
   /**
    * Private helper methods
    */
-  private async getOrCreateStripeCustomer(customer: MarketplaceCustomer): Promise<unknown> {
+  private async getOrCreateStripeCustomer(customer: MarketplaceCustomer): Promise<Stripe.Customer> {
     // Check if customer already has Stripe ID
     const existingStripeId = customer.metadata?.stripeCustomerId
 
     if (existingStripeId) {
       try {
-        return (await this.stripe.customers.retrieve(existingStripeId)) as unknown
+        return await this.stripe.customers.retrieve(existingStripeId) as Stripe.Customer
       } catch (_error) {
         this.logger.warn(`Stripe customer ${existingStripeId} not found, creating new one`)
       }
@@ -516,8 +517,8 @@ export class StripePaymentService {
     return stripeCustomer
   }
 
-  private async handlePaymentSuccess(paymentIntent: unknown): Promise<void> {
-    const orderId = paymentIntent.metadata.orderId
+  private async handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent): Promise<void> {
+    const orderId = paymentIntent.metadata?.orderId
 
     if (!orderId) {
       this.logger.warn(`Payment succeeded but no orderId in metadata: ${paymentIntent.id}`)
@@ -539,8 +540,8 @@ export class StripePaymentService {
     )
   }
 
-  private async handlePaymentFailure(paymentIntent: unknown, reason: string): Promise<void> {
-    const orderId = paymentIntent.metadata.orderId
+  private async handlePaymentFailure(paymentIntent: Stripe.PaymentIntent, reason: string): Promise<void> {
+    const orderId = paymentIntent.metadata?.orderId
 
     if (!orderId) {
       return
@@ -561,16 +562,21 @@ export class StripePaymentService {
     )
   }
 
-  private async handleRefundCreated(refund: unknown): Promise<void> {
+  private async handleRefundCreated(refund: Stripe.Refund): Promise<void> {
     this.logger.log(`Refund created: ${refund.id}, amount: ${refund.amount}`)
 
     // Additional refund handling logic if needed
   }
 
   private async updateOrderPaymentStatus(orderId: string, status: string): Promise<void> {
-    await this.orderRepository.update(orderId, {
+    const updateData: any = {
       paymentStatus: status,
-      paidAt: status === 'PAID' ? new Date() : undefined,
-    })
+    }
+    
+    if (status === 'PAID') {
+      updateData.paidAt = new Date()
+    }
+    
+    await this.orderRepository.update(orderId, updateData)
   }
 }

@@ -14,11 +14,12 @@ import {
 import type { ConfigService } from '@nestjs/config'
 import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
+import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
 import type {
-  AdvancedRateLimitingService,
   RateLimitConfig,
+  RateLimitResult,
   UserContext,
-} from '../advanced-rate-limiting.service'
+} from '../types/rate-limiting.types'
 import type { RateLimitingConfiguration } from '../rate-limiting.config'
 
 interface RequestWithUser extends Request {

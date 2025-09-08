@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { MFAMethod, MFAVerificationRequest, WebAuthnAuthenticationResponse } from '../../../types/auth/webauthn.types'
 import { User } from '../../users/entities/user.entity'
 import { GlobalUserRole } from '../core/constants/roles.constants'
 import { MFASession } from '../core/entities/mfa-session.entity'
@@ -292,20 +293,19 @@ export class MFAService {
         existingSMS.metadata = {
           ...existingSMS.metadata,
           lastUsed: new Date().toISOString(),
-        } as { qrCode?: string; deviceInfo?: { deviceName: string; userAgent: string; ipAddress: string }; lastUsed?: string; usageCount?: number; failedAttempts?: number; lastFailedAttempt?: string }
+        } as MFAMethod['metadata']
         // Store SMS verification code temporarily
-        ;(existingSMS.metadata as { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }).pendingVerificationCode = verificationCode
-        ;(existingSMS.metadata as { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }).pendingCodeExpiry = new Date(
-          Date.now() + 10 * 60 * 1000
-        ).toISOString()
-        ;(existingSMS.metadata as { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }).smsMessageId = smsResult.messageId
+        const metadata = existingSMS.metadata as MFAMethod['metadata'] & { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }
+        metadata.pendingVerificationCode = verificationCode
+        metadata.pendingCodeExpiry = new Date(Date.now() + 10 * 60 * 1000).toISOString()
+        metadata.smsMessageId = smsResult.messageId
         mfaRecord = await this.userMFARepository.save(existingSMS)
       } else {
         mfaRecord = UserMFA.createSMS(userId, phoneNumber)
         mfaRecord.metadata = {
           // Store SMS verification temporarily
           lastUsed: new Date().toISOString(),
-        } as { qrCode?: string; deviceInfo?: { deviceName: string; userAgent: string; ipAddress: string }; lastUsed?: string; usageCount?: number; failedAttempts?: number; lastFailedAttempt?: string } // Temporary fields for SMS verification
+        } as MFAMethod['metadata']
         mfaRecord = await this.userMFARepository.save(mfaRecord)
       }
 
@@ -438,9 +438,10 @@ export class MFAService {
       mfaRecord.metadata = {
         ...mfaRecord.metadata,
         lastUsed: new Date().toISOString(),
-      } as { qrCode?: string; deviceInfo?: { deviceName: string; userAgent: string; ipAddress: string }; lastUsed?: string; usageCount?: number; failedAttempts?: number; lastFailedAttempt?: string }
+      } as MFAMethod['metadata']
       // Store message ID temporarily
-      ;(mfaRecord.metadata as { lastSMSMessageId?: string }).lastSMSMessageId = smsResult.messageId
+      const metadata = mfaRecord.metadata as MFAMethod['metadata'] & { lastSMSMessageId?: string }
+      metadata.lastSMSMessageId = smsResult.messageId
       await this.userMFARepository.save(mfaRecord)
 
       this.logger.log(`SMS code sent to user ${userId}`)
@@ -648,7 +649,7 @@ export class MFAService {
   async verifyAndAddWebAuthn(
     userId: string,
     mfaId: string,
-    response: Record<string, unknown>,
+    response: WebAuthnAuthenticationResponse,
     deviceName?: string,
     userAgent?: string
   ): Promise<{ success: boolean; error?: string }> {
@@ -720,7 +721,7 @@ export class MFAService {
   async initiateMFASession(
     userId: string,
     mfaType: 'totp' | 'webauthn' | 'sms',
-    request?: Record<string, unknown>
+    request?: { headers?: Record<string, string>; ip?: string; userAgent?: string }
   ): Promise<{
     success: boolean
     sessionToken?: string
@@ -745,8 +746,8 @@ export class MFAService {
       let userAgent: string | undefined
 
       if (request) {
-        ipAddress = this.geolocationService.extractRealIP(request as unknown)
-        userAgent = (request as unknown).headers['user-agent']
+        ipAddress = request.ip || this.geolocationService.extractRealIP(request as any)
+        userAgent = request.userAgent || request.headers?.['user-agent']
       }
 
       let mfaSession: MFASession
@@ -797,7 +798,7 @@ export class MFAService {
   async verifyMFA(
     sessionToken: string,
     code?: string,
-    webauthnResponse?: Record<string, unknown>
+    webauthnResponse?: WebAuthnAuthenticationResponse
   ): Promise<MFAVerificationResult> {
     try {
       const mfaSession = await this.mfaSessionRepository.findOne({
@@ -886,7 +887,7 @@ export class MFAService {
 
         // Trouver le credential correspondant
         const credentials = mfaRecord.getActiveWebAuthnCredentials() || []
-        const credentialId = webauthnResponse.id as string
+        const credentialId = webauthnResponse.id
         const credential = credentials.find((c) => c.credentialId === credentialId)
 
         if (!credential) {

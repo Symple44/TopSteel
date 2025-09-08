@@ -1,6 +1,7 @@
 import * as crypto from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
+import type { WebAuthnRegistrationResponse, WebAuthnAuthenticationResponse } from '../../../types/auth/webauthn.types'
 
 interface WebAuthnCredential {
   credentialId: string
@@ -97,7 +98,8 @@ export class WebAuthnService {
       // Implémentation simplifiée pour la compatibilité
       // En production, utiliser une vraie vérification WebAuthn
 
-      if (!response || !response.id) {
+      const typedResponse = response as WebAuthnRegistrationResponse
+      if (!typedResponse || !typedResponse.id) {
         return {
           verified: false,
           error: 'Réponse WebAuthn invalide',
@@ -107,8 +109,8 @@ export class WebAuthnService {
       return {
         verified: true,
         registrationInfo: {
-          credentialId: response.id as string,
-          publicKey: (response.response as unknown)?.publicKey || 'mock-public-key',
+          credentialId: typedResponse.id,
+          publicKey: typedResponse.response.publicKey || 'mock-public-key',
           counter: 0,
           credentialDeviceType: 'platform',
           credentialBackedUp: false,
@@ -175,7 +177,8 @@ export class WebAuthnService {
       // Implémentation simplifiée pour la compatibilité
       // En production, utiliser une vraie vérification WebAuthn
 
-      if (!response || !response.id || response.id !== credential.credentialId) {
+      const typedResponse = response as WebAuthnAuthenticationResponse
+      if (!typedResponse || !typedResponse.id || typedResponse.id !== credential.credentialId) {
         return {
           verified: false,
           error: 'Credential WebAuthn invalide',

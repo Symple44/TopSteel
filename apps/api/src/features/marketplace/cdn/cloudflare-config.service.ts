@@ -3,15 +3,8 @@ import * as path from 'node:path'
 import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
 import sharp from 'sharp'
+import type { CloudflareConfig, CloudflareImageUploadResponse, CloudflareZone } from '../../../types/marketplace/marketplace.types'
 
-export interface CloudflareConfig {
-  accountId: string
-  apiToken: string
-  zoneId: string
-  imagesApiToken: string
-  imagesAccountHash: string
-  customDomain?: string
-}
 
 export interface ImageTransformOptions {
   width?: number
@@ -98,22 +91,22 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as unknown
+      const data = (await response.json()) as CloudflareImageUploadResponse
 
       if (!data.success) {
         throw new Error(`Cloudflare upload failed: ${JSON.stringify(data.errors)}`)
       }
 
-      this.logger.log(`Image uploaded successfully: ${data.result.id}`)
+      this.logger.log(`Image uploaded successfully: ${data.id}`)
 
       return {
-        id: data.result.id,
-        filename: data.result.filename,
-        uploaded: new Date(data.result.uploaded),
-        requireSignedURLs: data.result.requireSignedURLs,
-        variants: data.result.variants,
-        meta: data.result.meta,
-        draft: data.result.draft,
+        id: data.id,
+        filename: data.filename,
+        uploaded: new Date(data.uploaded),
+        requireSignedURLs: data.requireSignedURLs,
+        variants: data.variants,
+        meta: {},
+        draft: false,
       }
     } catch (error) {
       this.logger.error('Error uploading image to Cloudflare:', error)
@@ -233,7 +226,7 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as unknown
+      const data = (await response.json()) as CloudflareImageUploadResponse
 
       if (!data.success) {
         this.logger.error(`Failed to delete image: ${JSON.stringify(data.errors)}`)
@@ -263,20 +256,36 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as unknown
+      interface CloudflareListResponse {
+        success: boolean
+        result: {
+          images: Array<{
+            id: string
+            filename: string
+            uploaded: string
+            requireSignedURLs: boolean
+            variants: string[]
+            meta?: Record<string, unknown>
+            draft?: boolean
+          }>
+        }
+        errors?: Array<{ code: number; message: string }>
+      }
+
+      const data = (await response.json()) as CloudflareListResponse
 
       if (!data.success) {
         throw new Error(`Failed to list images: ${JSON.stringify(data.errors)}`)
       }
 
-      return data.result.images.map((img: unknown) => ({
+      return data.result.images.map((img) => ({
         id: img.id,
         filename: img.filename,
         uploaded: new Date(img.uploaded),
         requireSignedURLs: img.requireSignedURLs,
         variants: img.variants,
-        meta: img.meta,
-        draft: img.draft,
+        meta: img.meta || {},
+        draft: img.draft || false,
       }))
     } catch (error) {
       this.logger.error('Error listing images from Cloudflare:', error)
@@ -301,7 +310,12 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as unknown
+      interface CloudflarePurgeResponse {
+        success: boolean
+        errors?: Array<{ code: number; message: string }>
+      }
+
+      const data = (await response.json()) as CloudflarePurgeResponse
 
       if (!data.success) {
         this.logger.error(`Cache purge failed: ${JSON.stringify(data.errors)}`)

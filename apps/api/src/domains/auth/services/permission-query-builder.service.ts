@@ -7,6 +7,7 @@ import {
   type WhereExpressionBuilder,
 } from 'typeorm'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { UserSocieteRole as UserSocieteRoleType, PermissionData, RolePermission as RolePermissionType } from '../../../types/entities/user.types'
 import { User } from '../../users/entities/user.entity'
 import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
@@ -335,7 +336,7 @@ export class PermissionQueryBuilderService {
 
       for (const rolePerm of role.rolePermissions || []) {
         const rp = rolePerm as IRolePermission
-        const permission = rp.permission as IPermission
+        const permission = rp.permission as unknown as PermissionData
         const permCode = `${permission.resource}:${permission.action}`
         let conflict = permissionMap.get(permCode)
 
@@ -667,7 +668,7 @@ export class PermissionQueryBuilderService {
    * Apply permission condition to query
    */
   private applyPermissionCondition(
-    query: SelectQueryBuilder<unknown> | WhereExpressionBuilder,
+    query: SelectQueryBuilder<Permission> | WhereExpressionBuilder,
     condition: PermissionCondition
   ): void {
     switch (condition.operator) {
@@ -903,7 +904,8 @@ export class PermissionQueryBuilderService {
       // Collect permissions and roles
       // Note: userSocieteRoles relation would need to be loaded separately
       // For now, we'll skip this part as the relation isn't defined in the User entity
-      for (const userRole of [] as unknown[]) {
+      const userSocieteRoles = [] as UserSocieteRoleType[]
+      for (const userRole of userSocieteRoles) {
         if (userRole.role) {
           roles.push({
             code: userRole.role.parentRoleType || userRole.role.name, // Use parentRoleType or name as code

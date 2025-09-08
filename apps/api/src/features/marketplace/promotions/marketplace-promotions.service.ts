@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
 import { LessThan, MoreThan, type Repository } from 'typeorm'
+import type { PromotionType } from '../../../types/marketplace/marketplace.types'
 import { MarketplaceCoupon } from '../entities/marketplace-coupon.entity'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
@@ -13,7 +14,7 @@ import { MarketplacePromotion } from '../entities/marketplace-promotion.entity'
 export interface CreatePromotionDto {
   name: string
   description?: string
-  type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'BUY_X_GET_Y' | 'FREE_SHIPPING' | 'BUNDLE'
+  type: PromotionType | 'BUNDLE'
   value: number
   conditions?: PromotionConditions
   startDate: Date
@@ -93,6 +94,16 @@ export interface PromotionValidationResult {
   reason?: string
   discount?: number
   appliedTo?: string[] // Product IDs
+}
+
+interface OrderItemWithProduct {
+  productId: string
+  quantity: number
+  price: number
+  totalPrice: number
+  product: {
+    famille: string
+  }
 }
 
 @Injectable()
@@ -209,10 +220,10 @@ export class MarketplacePromotionsService {
       if (updateData.type || updateData.value !== undefined || updateData.conditions) {
         const validationData = { ...promotion, ...updateData }
         if (updateData.type) {
-          validationData.type = updateData.type as unknown
+          validationData.type = updateData.type
         }
         // Type check workaround for validation
-        this.validatePromotionData(validationData as unknown)
+        this.validatePromotionData(validationData as CreatePromotionDto)
       }
 
       Object.assign(promotion, updateData)
@@ -780,7 +791,7 @@ export class MarketplacePromotionsService {
   private calculatePromotionDiscount(
     promotion: MarketplacePromotion,
     order: MarketplaceOrder,
-    applicableItems: unknown[]
+    applicableItems: OrderItemWithProduct[]
   ): number {
     const applicableTotal = applicableItems.reduce((sum, item) => sum + item.totalPrice, 0)
 
@@ -808,8 +819,8 @@ export class MarketplacePromotionsService {
   /**
    * Get applicable order items for promotion
    */
-  private getApplicableOrderItems(order: MarketplaceOrder, promotion: MarketplacePromotion): unknown[] {
-    return order.items.filter((item) => {
+  private getApplicableOrderItems(order: MarketplaceOrder, promotion: MarketplacePromotion): OrderItemWithProduct[] {
+    return (order.items as OrderItemWithProduct[]).filter((item) => {
       // Check excluded products
       if (promotion.excludedProducts?.includes(item.productId)) {
         return false
@@ -847,7 +858,7 @@ export class MarketplacePromotionsService {
     const getQuantity = promotion.conditions?.getQuantity || 1
 
     // Count buy products in order
-    const buyCount = order.items
+    const buyCount = (order.items as OrderItemWithProduct[])
       .filter((item) => buyProducts.includes(item.productId))
       .reduce((sum, item) => sum + item.quantity, 0)
 
@@ -856,7 +867,7 @@ export class MarketplacePromotionsService {
     if (qualifyingTimes === 0) return 0
 
     // Calculate discount on get products
-    const getItems = order.items.filter((item) => getProducts.includes(item.productId))
+    const getItems = (order.items as OrderItemWithProduct[]).filter((item) => getProducts.includes(item.productId))
     const freeQuantity = qualifyingTimes * getQuantity
 
     let discount = 0
@@ -882,13 +893,13 @@ export class MarketplacePromotionsService {
     const bundleProducts = promotion.conditions?.bundleProducts || []
 
     // Check if all bundle products are in order
-    const orderProductIds = order.items.map((item) => item.productId)
+    const orderProductIds = (order.items as OrderItemWithProduct[]).map((item) => item.productId)
     const hasAllProducts = bundleProducts.every((productId) => orderProductIds.includes(productId))
 
     if (!hasAllProducts) return 0
 
     // Calculate bundle discount
-    const bundleItems = order.items.filter((item) => bundleProducts.includes(item.productId))
+    const bundleItems = (order.items as OrderItemWithProduct[]).filter((item) => bundleProducts.includes(item.productId))
     const bundleTotal = bundleItems.reduce((sum, item) => sum + item.totalPrice, 0)
 
     return promotion.type === 'PERCENTAGE'

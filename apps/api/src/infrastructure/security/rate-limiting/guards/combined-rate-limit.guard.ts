@@ -15,11 +15,12 @@ import type { ConfigService } from '@nestjs/config'
 import type { Reflector } from '@nestjs/core'
 import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
+import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
 import type {
-  AdvancedRateLimitingService,
+  CombinedRateLimitResult,
   RateLimitConfig,
   UserContext,
-} from '../advanced-rate-limiting.service'
+} from '../types/rate-limiting.types'
 import {
   RATE_LIMIT_BYPASS_KEY,
   RATE_LIMIT_KEY,
@@ -35,27 +36,7 @@ interface RequestWithUser extends Request {
   }
 }
 
-interface CombinedRateLimitResult {
-  ip: {
-    isAllowed: boolean
-    remainingRequests: number
-    resetTime: number
-    retryAfter?: number
-  }
-  user?: {
-    isAllowed: boolean
-    remainingRequests: number
-    resetTime: number
-    retryAfter?: number
-  }
-  combined: {
-    isAllowed: boolean
-    remainingRequests: number
-    resetTime: number
-    retryAfter?: number
-    limitingFactor: 'ip' | 'user' | 'both'
-  }
-}
+// CombinedRateLimitResult is now imported from types
 
 @Injectable()
 export class CombinedRateLimitGuard implements CanActivate {

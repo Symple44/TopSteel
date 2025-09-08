@@ -240,7 +240,7 @@ export class StockMovementRepository {
     // Exclure les propriétés de relation pour l'update
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { article: _article, ...updateData } = data
-    await this.repository.update(id, updateData as unknown)
+    await this.repository.update(id, updateData as any)
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Movement ${id} not found`)

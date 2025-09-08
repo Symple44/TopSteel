@@ -15,7 +15,15 @@ import type { ConfigService } from '@nestjs/config'
 import type { Reflector } from '@nestjs/core'
 import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
-import type { AdvancedRateLimitingService, UserContext } from '../advanced-rate-limiting.service'
+import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
+import type {
+  BanStatus,
+  CombinedRateLimitResult,
+  CustomRateLimitConfig,
+  RateLimitResult,
+  RateLimitStats,
+  UserContext,
+} from '../types/rate-limiting.types'
 import {
   RATE_LIMIT_BYPASS_KEY,
   RATE_LIMIT_CUSTOM_KEY,
@@ -227,7 +235,7 @@ export class AdvancedRateLimitGuard implements CanActivate {
    * Process custom rate limiting configuration
    */
   private async processCustomConfig(
-    customConfig: unknown,
+    customConfig: CustomRateLimitConfig,
     userContext: UserContext
   ): Promise<RateLimitDecoratorConfig | null> {
     switch (customConfig.type) {
@@ -244,11 +252,11 @@ export class AdvancedRateLimitGuard implements CanActivate {
    * Process role-based rate limiting configuration
    */
   private processRoleBasedConfig(
-    config: unknown,
+    config: CustomRateLimitConfig & { type: 'role-based' },
     userContext: UserContext
   ): RateLimitDecoratorConfig | null {
     if (!userContext.globalRole || !config.roleConfigs[userContext.globalRole]) {
-      return config.defaultConfig || null
+      return config.defaultConfig as RateLimitDecoratorConfig || null
     }
 
     const roleConfig = config.roleConfigs[userContext.globalRole]
@@ -262,12 +270,14 @@ export class AdvancedRateLimitGuard implements CanActivate {
   /**
    * Process burst rate limiting configuration
    */
-  private processBurstConfig(config: unknown, _userContext: UserContext): RateLimitDecoratorConfig {
+  private processBurstConfig(
+    config: CustomRateLimitConfig & { type: 'burst' },
+    _userContext: UserContext
+  ): RateLimitDecoratorConfig {
     // For now, use short term config. Could implement dual-window checking here
     return {
       windowSizeMs: config.shortTerm.windowSizeMs,
       maxRequests: config.shortTerm.maxRequests,
-      ...config,
     }
   }
 
@@ -278,7 +288,7 @@ export class AdvancedRateLimitGuard implements CanActivate {
     endpoint: string,
     config: RateLimitDecoratorConfig,
     userContext: UserContext
-  ) {
+  ): Promise<CombinedRateLimitResult> {
     const ipConfig = {
       windowSizeMs: config.windowSizeMs,
       maxRequests: config.ipMaxRequests || Math.floor(config.maxRequests * 0.8),
@@ -304,7 +314,7 @@ export class AdvancedRateLimitGuard implements CanActivate {
   /**
    * Check ban status for user/IP
    */
-  private async checkBanStatus(userContext: UserContext) {
+  private async checkBanStatus(userContext: UserContext): Promise<BanStatus> {
     const identifier = userContext.userId ? `user:${userContext.userId}` : `ip:${userContext.ip}`
     return await this.rateLimitService.checkBanStatus(identifier)
   }
@@ -328,18 +338,20 @@ export class AdvancedRateLimitGuard implements CanActivate {
 
     if (!stats) return
 
+    const rateLimitStats = stats as RateLimitStats
+
     // Check if violations exceed any ban threshold
     for (const threshold of this.config.penalties.banThresholds) {
-      if (stats.violations >= threshold.violations) {
+      if (rateLimitStats.violations >= threshold.violations) {
         await this.rateLimitService.imposeBan(
           identifier,
           threshold.banDurationMs,
-          `Automatic ban after ${stats.violations} violations`
+          `Automatic ban after ${rateLimitStats.violations} violations`
         )
 
         this.logger.warn(`Progressive penalty imposed`, {
           identifier,
-          violations: stats.violations,
+          violations: rateLimitStats.violations,
           banDuration: threshold.banDurationMs,
           userContext,
         })
@@ -351,7 +363,7 @@ export class AdvancedRateLimitGuard implements CanActivate {
   /**
    * Add rate limit headers to response
    */
-  private addRateLimitHeaders(response: Response, result: any): void {
+  private addRateLimitHeaders(response: Response, result: RateLimitResult): void {
     response.setHeader('X-RateLimit-Limit', result.remainingRequests + result.totalRequests || 0)
     response.setHeader('X-RateLimit-Remaining', Math.max(0, result.remainingRequests))
     response.setHeader('X-RateLimit-Reset', Math.ceil(result.resetTime / 1000))

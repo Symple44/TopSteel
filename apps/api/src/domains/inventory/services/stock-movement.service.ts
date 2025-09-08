@@ -82,7 +82,7 @@ export class StockMovementService {
         statut: data.status || StockMovementStatus.EN_ATTENTE,
         stockAvant,
         stockApres,
-        tenantId: (data as unknown).tenantId || article.societeId,
+        tenantId: (data as any).tenantId || article.societeId,
         creeParId: data.utilisateurId || 'SYSTEM',
         creeParNom: data.utilisateurNom || 'System',
         motif: data.motif as unknown, // Convert StockMovementReason to StockMovementMotif
@@ -535,7 +535,7 @@ export class StockMovementService {
       articleCode: entity.article?.reference,
       articleLibelle: entity.article?.designation,
       type: entity.type,
-      motif: entity.motif as unknown, // Convert StockMovementMotif to StockMovementReason
+      motif: entity.motif as any, // Convert StockMovementMotif to StockMovementReason
       quantite: entity.quantite,
       unite: entity.unite || '',
       stockAvant: entity.stockAvant,

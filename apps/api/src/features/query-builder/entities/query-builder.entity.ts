@@ -82,19 +82,44 @@ export class QueryBuilder {
     cascade: true,
     lazy: true,
   })
-  columns: unknown[]
+  columns: Array<{
+    id: string
+    tableName: string
+    columnName: string
+    alias?: string
+    isVisible: boolean
+    isSortable: boolean
+    isFilterable: boolean
+    dataType?: string
+    format?: string
+  }>
 
   @OneToMany('QueryBuilderJoin', 'queryBuilder', {
     cascade: true,
     lazy: true,
   })
-  joins: unknown[]
+  joins: Array<{
+    id: string
+    joinType: string
+    fromTable: string
+    fromColumn: string
+    toTable: string
+    toColumn: string
+    alias?: string
+  }>
 
   @OneToMany('QueryBuilderCalculatedField', 'queryBuilder', {
     cascade: true,
     lazy: true,
   })
-  calculatedFields: unknown[]
+  calculatedFields: Array<{
+    id: string
+    name: string
+    expression: string
+    isVisible: boolean
+    dataType?: string
+    format?: string
+  }>
 
   @OneToMany('QueryBuilderPermission', 'queryBuilder', {
     cascade: true,

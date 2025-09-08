@@ -34,6 +34,7 @@ import { RolesGuard } from '../../../../domains/auth/security/guards/roles.guard
 import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
 import type { ProgressivePenaltyService } from '../services/progressive-penalty.service'
 import type { RateLimitingMonitoringService } from '../services/rate-limiting-monitoring.service'
+import type { AlertData, RateLimitMetrics } from '../types/rate-limiting.types'
 
 class RateLimitMetricsDto {
   @ApiProperty({ description: 'Total number of requests' })
@@ -398,7 +399,7 @@ export class RateLimitingAdminController {
   /**
    * Calculate system health score based on metrics and alerts
    */
-  private calculateHealthScore(metrics: unknown, alerts: unknown[]): number {
+  private calculateHealthScore(metrics: RateLimitMetrics, alerts: AlertData[]): number {
     let score = 100
 
     // Deduct points for high block rate

@@ -18,11 +18,8 @@ import {
   GLOBAL_ROLE_HIERARCHY,
   GlobalUserRole,
 } from '../../../../domains/auth/core/constants/roles.constants'
-import type {
-  AdvancedRateLimitingService,
-  RateLimitConfig,
-  UserContext,
-} from '../advanced-rate-limiting.service'
+import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
+import type { RateLimitConfig, RateLimitResult, UserContext } from '../types/rate-limiting.types'
 import type { RateLimitingConfiguration } from '../rate-limiting.config'
 
 interface RequestWithUser extends Request {
@@ -158,7 +155,7 @@ export class RoleBasedRateLimitGuard implements CanActivate {
     userContext: UserContext & { permissions?: string[] },
     roleConfig: RateLimitConfig,
     request: RequestWithUser
-  ) {
+  ): Promise<RateLimitResult> {
     const rateLimitKey = this.buildRateLimitKey(userContext, request)
 
     return await this.rateLimitService.checkRateLimit(rateLimitKey, roleConfig, userContext)
@@ -177,7 +174,7 @@ export class RoleBasedRateLimitGuard implements CanActivate {
    */
   private handleRateLimitExceeded(
     userContext: UserContext,
-    result: unknown,
+    result: RateLimitResult,
     request: RequestWithUser
   ): never {
     const operationType = this.getOperationType(request)
@@ -187,14 +184,14 @@ export class RoleBasedRateLimitGuard implements CanActivate {
       role: userContext.globalRole,
       operationType,
       path: request.path,
-      remaining: (result as { remainingRequests?: number }).remainingRequests,
+      remaining: result.remainingRequests,
     })
 
     throw new HttpException(
       {
         message: this.getRoleLimitMessage(userContext.globalRole, operationType),
         statusCode: HttpStatus.TOO_MANY_REQUESTS,
-        retryAfter: (result as { retryAfter?: number }).retryAfter,
+        retryAfter: result.retryAfter,
         roleLimit: true,
       },
       HttpStatus.TOO_MANY_REQUESTS
@@ -376,14 +373,13 @@ export class RoleBasedRateLimitGuard implements CanActivate {
   /**
    * Add role-specific headers
    */
-  private addRoleRateLimitHeaders(response: Response, result: unknown, userContext: UserContext): void {
-    const typedResult = result as { totalRequests?: number; remainingRequests?: number; resetTime?: number; retryAfter?: number }
+  private addRoleRateLimitHeaders(response: Response, result: RateLimitResult, userContext: UserContext): void {
     response.setHeader(
       'X-Role-RateLimit-Limit',
-      (typedResult.totalRequests ?? 0) + (typedResult.remainingRequests ?? 0) || 0
+      result.totalRequests + result.remainingRequests || 0
     )
-    response.setHeader('X-Role-RateLimit-Remaining', Math.max(0, typedResult.remainingRequests ?? 0))
-    response.setHeader('X-Role-RateLimit-Reset', Math.ceil((typedResult.resetTime ?? 0) / 1000))
+    response.setHeader('X-Role-RateLimit-Remaining', Math.max(0, result.remainingRequests))
+    response.setHeader('X-Role-RateLimit-Reset', Math.ceil(result.resetTime / 1000))
     response.setHeader('X-Role-RateLimit-Policy', 'role-based-sliding-window')
 
     if (userContext.globalRole) {
@@ -394,8 +390,8 @@ export class RoleBasedRateLimitGuard implements CanActivate {
       response.setHeader('X-Role-Hierarchy-Level', hierarchy.toString())
     }
 
-    if (typedResult.retryAfter) {
-      response.setHeader('X-Role-Retry-After', typedResult.retryAfter)
+    if (result.retryAfter) {
+      response.setHeader('X-Role-Retry-After', result.retryAfter)
     }
   }
 }

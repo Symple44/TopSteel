@@ -162,7 +162,7 @@ export class ArticleController {
       userRoles: [user.role],
       permissions: [],
     }
-    return await this.articleService.create(createData as unknown, context)
+    return await this.articleService.create(createData as Partial<Article>, context)
   }
 
   @Patch(':id')
@@ -180,7 +180,7 @@ export class ArticleController {
       userRoles: [user.role],
       permissions: [],
     }
-    return await this.articleService.update(id, updateData as unknown, context)
+    return await this.articleService.update(id, updateData as Partial<Article>, context)
   }
 
   @Delete(':id')
