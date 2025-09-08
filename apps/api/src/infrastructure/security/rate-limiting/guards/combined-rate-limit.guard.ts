@@ -278,17 +278,18 @@ export class CombinedRateLimitGuard implements CanActivate {
    * Combine IP and user limit results
    */
   private combineLimitResults(ipResult: unknown, userResult?: any): any {
-    let isAllowed = ipResult.isAllowed
+    const typedIpResult = ipResult as { isAllowed?: boolean; remainingRequests?: number; resetTime?: number; retryAfter?: number }
+    let isAllowed = typedIpResult.isAllowed ?? false
     let limitingFactor: 'ip' | 'user' | 'both' = 'ip'
 
     if (userResult) {
-      if (ipResult.isAllowed && !userResult.isAllowed) {
+      if (typedIpResult.isAllowed && !userResult.isAllowed) {
         isAllowed = false
         limitingFactor = 'user'
-      } else if (!ipResult.isAllowed && !userResult.isAllowed) {
+      } else if (!typedIpResult.isAllowed && !userResult.isAllowed) {
         isAllowed = false
         limitingFactor = 'both'
-      } else if (ipResult.isAllowed && userResult.isAllowed) {
+      } else if (typedIpResult.isAllowed && userResult.isAllowed) {
         isAllowed = true
         limitingFactor = 'ip' // Default to IP when both allow
       }
@@ -297,11 +298,11 @@ export class CombinedRateLimitGuard implements CanActivate {
     return {
       isAllowed,
       remainingRequests: Math.min(
-        ipResult.remainingRequests,
+        typedIpResult.remainingRequests ?? 0,
         userResult?.remainingRequests ?? Number.MAX_SAFE_INTEGER
       ),
-      resetTime: Math.max(ipResult.resetTime, userResult?.resetTime ?? 0),
-      retryAfter: Math.max((ipResult as { retryAfter?: number }).retryAfter ?? 0, (userResult as { retryAfter?: number } | undefined)?.retryAfter ?? 0) || undefined,
+      resetTime: Math.max(typedIpResult.resetTime ?? 0, userResult?.resetTime ?? 0),
+      retryAfter: Math.max(typedIpResult.retryAfter ?? 0, (userResult as { retryAfter?: number } | undefined)?.retryAfter ?? 0) || undefined,
       limitingFactor,
     }
   }

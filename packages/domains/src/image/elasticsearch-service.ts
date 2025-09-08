@@ -36,6 +36,7 @@ export interface ElasticsearchImageDocument {
     input: string[]
     weight: number
   }
+  [key: string]: unknown // Add index signature for compatibility
 }
 
 export class ImageElasticsearchService {
