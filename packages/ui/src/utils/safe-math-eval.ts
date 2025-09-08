@@ -1,3 +1,5 @@
+import { SafeExpressionEvaluator } from './safe-expression-evaluator'
+
 /**
  * Safe mathematical expression evaluator
  * Only allows numbers and basic math operations
@@ -26,20 +28,16 @@ export function safeMathEval(expression: string): number {
     throw new Error('Invalid number format')
   }
 
-  // Use Function constructor instead of eval for slightly better isolation
-  // This is still not perfect but much safer than raw eval
-  try {
-    // Create a function that returns the result of the expression
-    // This prevents access to the global scope
-    const func = new Function(`return ${cleaned}`)
-    const result = func()
-
-    if (typeof result !== 'number' || !Number.isFinite(result)) {
-      throw new Error('Invalid result')
-    }
-
-    return result
-  } catch (_error) {
-    throw new Error('Invalid mathematical expression')
+  // Use SafeExpressionEvaluator instead of Function constructor
+  const result = SafeExpressionEvaluator.evaluateMath(cleaned)
+  
+  if (!result.success) {
+    throw new Error(result.error || 'Invalid mathematical expression')
   }
+
+  if (typeof result.value !== 'number' || !Number.isFinite(result.value)) {
+    throw new Error('Invalid result')
+  }
+
+  return result.value
 }

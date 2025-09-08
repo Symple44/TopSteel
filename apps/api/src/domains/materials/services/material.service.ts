@@ -14,6 +14,7 @@ import {
 } from '../entities/material.entity'
 import type { IMaterialRepository } from '../repositories/material.repository'
 import type {
+  MaterialAdvancedFilters,
   MaterialCompatibilityAnalysis,
   MaterialSearchCriteria,
   MaterialStatistics,
@@ -174,7 +175,7 @@ export class MaterialService extends BusinessService<Material> {
         if (updateValue !== undefined && key in existing) {
           const existingKey = key as keyof Material
           const oldValue = existing[existingKey]
-          ;(existing as unknown)[existingKey] = updateValue
+          Object.assign(existing, { [existingKey]: updateValue })
 
           // Ajouter à l'historique si la valeur a changé
           if (oldValue !== updateValue) {
@@ -333,7 +334,7 @@ export class MaterialService extends BusinessService<Material> {
   /**
    * Recherche avancée avec filtres multiples
    */
-  async searchAdvanced(filters: unknown): Promise<{
+  async searchAdvanced(filters: MaterialAdvancedFilters): Promise<{
     items: Material[]
     total: number
     page: number

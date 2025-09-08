@@ -196,7 +196,7 @@ export class LogSanitizerService {
       return obj.map((item) => this.sanitizeLogObject(item))
     }
 
-    const sanitizedObj = { ...obj }
+    const sanitizedObj: Record<string, any> = { ...obj }
 
     for (const [key, value] of Object.entries(sanitizedObj)) {
       // Masquer complètement certaines clés sensibles

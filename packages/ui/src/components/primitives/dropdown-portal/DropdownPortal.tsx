@@ -246,7 +246,7 @@ export function DropdownPortal({
         })
       }
       // Forward ref si le trigger en a une
-      const originalRef = (trigger as unknown).ref || (trigger.props as unknown)?.ref
+      const originalRef = (trigger as any).ref || trigger.props?.ref
       if (typeof originalRef === 'function') {
         originalRef(node)
       } else if (
@@ -269,11 +269,11 @@ export function DropdownPortal({
       e.nativeEvent.stopImmediatePropagation()
       toggleDropdown()
       // Appeler l'onClick original si présent
-      if (trigger.props && typeof (trigger.props as unknown).onClick === 'function') {
-        ;(trigger.props as unknown).onClick(e)
+      if (trigger.props && typeof trigger.props.onClick === 'function') {
+        trigger.props.onClick(e)
       }
     },
-  } as unknown)
+  } as any)
 
   // Portal pour le contenu du dropdown
   const dropdownContent =

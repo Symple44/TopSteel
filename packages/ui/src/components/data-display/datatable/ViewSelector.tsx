@@ -150,7 +150,7 @@ function ViewSettingsForm<T = any>({
 
   const updateSettings = (key: string, value: any) => {
     if (viewType === 'kanban') {
-      setSettings((prev: unknown) => ({
+      setSettings((prev: ViewSettings) => ({
         ...prev,
         kanban: {
           ...prev.kanban,
@@ -158,7 +158,7 @@ function ViewSettingsForm<T = any>({
         },
       }))
     } else if (viewType === 'cards') {
-      setSettings((prev: unknown) => ({
+      setSettings((prev: ViewSettings) => ({
         ...prev,
         cards: {
           ...prev.cards,
@@ -166,7 +166,7 @@ function ViewSettingsForm<T = any>({
         },
       }))
     } else if (viewType === 'timeline') {
-      setSettings((prev: unknown) => ({
+      setSettings((prev: ViewSettings) => ({
         ...prev,
         timeline: {
           ...prev.timeline,
@@ -174,7 +174,7 @@ function ViewSettingsForm<T = any>({
         },
       }))
     } else if (viewType === 'calendar') {
-      setSettings((prev: unknown) => ({
+      setSettings((prev: ViewSettings) => ({
         ...prev,
         calendar: {
           ...prev.calendar,
@@ -183,7 +183,7 @@ function ViewSettingsForm<T = any>({
       }))
     } else {
       // Fallback for other view types
-      setSettings((prev: unknown) => ({
+      setSettings((prev: ViewSettings) => ({
         ...prev,
         [viewType]: {
           ...prev[viewType as keyof ViewSettings],

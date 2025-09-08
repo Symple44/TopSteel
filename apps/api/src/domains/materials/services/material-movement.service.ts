@@ -8,6 +8,7 @@ import {
   type ICreateMaterialMovement,
   type IMaterialMovement,
   type IMaterialMovementFilters,
+  type IMaterialTransformationInfo,
   MaterialMovementPriority,
   MaterialMovementReason,
   MaterialMovementStatus,
@@ -880,7 +881,7 @@ export class MaterialMovementService {
     return 0
   }
 
-  private async validateTransformation(transformation: unknown): Promise<void> {
+  private async validateTransformation(transformation: IMaterialTransformationInfo): Promise<void> {
     if (!transformation.materiauxSources?.length) {
       throw new BadRequestException('Une transformation doit avoir des matériaux sources')
     }

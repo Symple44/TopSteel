@@ -32,7 +32,7 @@ const clientSchema = z.object({
   companyName: z.string().min(1, "Le nom de l'entreprise est requis"),
   siret: z.string().optional(),
   tvaNumber: z.string().optional(),
-  companyType: z.enum(['SARL', 'SAS', 'SA', 'EI', 'EURL', 'SCI', 'Autre']).default('SARL'),
+  companyType: z.enum(['SARL', 'SAS', 'SA', 'EI', 'EURL', 'SCI', 'Autre'] as const),
   // Contact Information
   contactFirstName: z.string().min(1, 'Le prénom du contact est requis'),
   contactLastName: z.string().min(1, 'Le nom du contact est requis'),

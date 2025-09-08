@@ -1,4 +1,5 @@
 import type { FormulaContext } from './types'
+import { SafeExpressionEvaluator } from '../../../utils/safe-expression-evaluator'
 
 /**
  * Moteur de formules pour le DataTable
@@ -306,16 +307,15 @@ export class FormulaEngine<T = any> {
         return '#SECURITY_ERROR'
       }
 
-      // Créer une fonction qui limite l'accès au contexte global
-      const func = new Function(
-        'Math',
-        'Date',
-        'String',
-        'Number',
-        'Boolean',
-        `'use strict'; return ${expression}`
-      )
-      return func(Math, Date, String, Number, Boolean)
+      // Utiliser SafeExpressionEvaluator au lieu de new Function
+      const result = SafeExpressionEvaluator.evaluateMath(expression)
+      
+      if (result.success) {
+        return result.value
+      } else {
+        console.warn('Formula evaluation failed:', result.error)
+        return '#ERROR'
+      }
     } catch (_error) {
       return '#ERROR'
     }

@@ -11,7 +11,7 @@ import {
 } from 'typeorm'
 // Removed imports to avoid circular dependencies
 // import { MarketplaceCustomer } from './marketplace-customer.entity'
-// import { MarketplaceOrderItem } from './marketplace-order-item.entity'
+import type { MarketplaceOrderItem } from './marketplace-order-item.entity'
 import type { SafeObject } from '../../../../../../packages/ui/src/types/common'
 
 @Entity('marketplace_orders')
@@ -38,7 +38,7 @@ export class MarketplaceOrder {
   customer: any
 
   @OneToMany('MarketplaceOrderItem', 'order', { cascade: true, lazy: true })
-  items: unknown[]
+  items: MarketplaceOrderItem[]
 
   @Column({ name: 'order_number', length: 50, unique: true })
   @Index({ unique: true }) // Unique index for order number lookups

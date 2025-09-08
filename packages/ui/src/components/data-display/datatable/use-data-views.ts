@@ -55,7 +55,7 @@ export interface ViewSettings {
 export interface KanbanColumn {
   id: string
   title: string
-  items: unknown[]
+  items: Card[]
   color?: string
 }
 
@@ -156,7 +156,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
 
   // Transformer une ligne en carte
   const transformToCard = useCallback(
-    (item: T, config: unknown, columns: ColumnConfig<T>[]): Card => {
+    (item: T, config: any, columns: ColumnConfig<T>[]): Card => {
       // Handle different config structures (kanban vs cards vs other views)
       const titleColumnId = config.cardTitleColumn || config.titleColumn
       const subtitleColumnId = config.cardSubtitleColumn || config.subtitleColumn

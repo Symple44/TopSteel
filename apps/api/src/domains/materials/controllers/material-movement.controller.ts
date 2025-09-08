@@ -644,7 +644,7 @@ export class MaterialMovementController {
     const result = await this.materialMovementService.findMovements({
       materialIds: [id],
       tenantId,
-    } as unknown)
+    } as IMaterialMovementFilters & { tenantId: string })
 
     if (result.items.length === 0) {
       throw new NotFoundException(`Mouvement ${id} non trouvé`)

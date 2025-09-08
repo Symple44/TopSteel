@@ -9,9 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-// import { LicenseActivation } from './license-activation.entity';
-// import { LicenseFeature } from './license-feature.entity';
-// import { LicenseUsage } from './license-usage.entity';
+import type { LicenseFeature } from './license-feature.entity'
 
 /**
  * License types
@@ -212,7 +210,7 @@ export class License {
 
   // Relations
   @OneToMany('LicenseFeature', 'license')
-  features!: unknown[]
+  features!: LicenseFeature[]
 
   @OneToMany('LicenseUsage', 'license')
   usage!: unknown[]

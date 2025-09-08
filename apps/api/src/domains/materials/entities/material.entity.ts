@@ -562,9 +562,19 @@ export class Material extends BusinessEntity {
     utilisateur: string
   ): void {
     if (!this.metadonnees) this.metadonnees = {}
-    if (!(this.metadonnees as Record<string, unknown>).historique)
-      (this.metadonnees as Record<string, unknown>).historique = []
-    ;(this.metadonnees as unknown).historique.push({
+    const metadata = this.metadonnees as Record<string, unknown>
+    if (!metadata.historique) {
+      metadata.historique = []
+    }
+    const historique = metadata.historique as Array<{
+      date: Date
+      utilisateur: string
+      champ: string
+      ancienneValeur: unknown
+      nouvelleValeur: unknown
+    }>
+    
+    historique.push({
       date: new Date(),
       utilisateur,
       champ,
@@ -573,8 +583,8 @@ export class Material extends BusinessEntity {
     })
 
     // Garder seulement les 100 dernières modifications
-    if ((this.metadonnees as unknown).historique.length > 100) {
-      ;(this.metadonnees as unknown).historique = (this.metadonnees as unknown).historique.slice(-100)
+    if (historique.length > 100) {
+      metadata.historique = historique.slice(-100)
     }
   }
 

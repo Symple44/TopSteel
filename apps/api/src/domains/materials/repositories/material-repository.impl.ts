@@ -566,7 +566,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     ])
 
     // Construire les objets de répartition
-    const repartitionParType: Record<MaterialType, number> = {} as unknown
+    const repartitionParType: Record<MaterialType, number> = {} as Record<MaterialType, number>
     Object.values(MaterialType).forEach((type) => {
       repartitionParType[type] = 0
     })
@@ -576,7 +576,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       }
     })
 
-    const repartitionParForme: Record<MaterialShape, number> = {} as unknown
+    const repartitionParForme: Record<MaterialShape, number> = {} as Record<MaterialShape, number>
     Object.values(MaterialShape).forEach((forme) => {
       repartitionParForme[forme] = 0
     })
@@ -586,7 +586,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       }
     })
 
-    const repartitionParStatus: Record<MaterialStatus, number> = {} as unknown
+    const repartitionParStatus: Record<MaterialStatus, number> = {} as Record<MaterialStatus, number>
     Object.values(MaterialStatus).forEach((status) => {
       repartitionParStatus[status] = 0
     })
@@ -596,7 +596,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       }
     })
 
-    const repartitionParStockage: Record<StorageMethod, number> = {} as unknown
+    const repartitionParStockage: Record<StorageMethod, number> = {} as Record<StorageMethod, number>
     Object.values(StorageMethod).forEach((method) => {
       repartitionParStockage[method] = 0
     })
@@ -778,7 +778,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       .groupBy('material.type')
       .getRawMany()
 
-    const valuation: Record<MaterialType, { quantite: number; valeur: number }> = {} as unknown
+    const valuation: Record<MaterialType, { quantite: number; valeur: number }> = {} as Record<MaterialType, { quantite: number; valeur: number }>
 
     // Initialiser avec 0 pour tous les types
     Object.values(MaterialType).forEach((type) => {
@@ -811,7 +811,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       .groupBy('material.forme')
       .getRawMany()
 
-    const valuation: Record<MaterialShape, { quantite: number; valeur: number }> = {} as unknown
+    const valuation: Record<MaterialShape, { quantite: number; valeur: number }> = {} as Record<MaterialShape, { quantite: number; valeur: number }>
 
     // Initialiser avec 0 pour toutes les formes
     Object.values(MaterialShape).forEach((shape) => {

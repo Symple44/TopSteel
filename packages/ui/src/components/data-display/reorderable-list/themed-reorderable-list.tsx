@@ -509,7 +509,7 @@ export function ThemedReorderableList<T extends ReorderableItem>({
   }, [])
 
   const handleConfigChange = useCallback(
-    (newConfig: unknown) => {
+    (newConfig: any) => {
       // Appliquer les changements de configuration
       if (newConfig.theme) updateTheme(newConfig.theme)
       if (newConfig.preferences) updatePreferences(newConfig.preferences)

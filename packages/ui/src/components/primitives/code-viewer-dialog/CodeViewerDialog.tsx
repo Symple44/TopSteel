@@ -369,7 +369,7 @@ export function CodeViewerDialog({
                                 onClick={(e) => handleLineClick(lineNumber, e)}
                                 onKeyDown={(e) =>
                                   (e.key === 'Enter' || e.key === ' ') &&
-                                  handleLineClick(lineNumber, e as unknown)
+                                  handleLineClick(lineNumber, e as any)
                                 }
                                 tabIndex={0}
                                 aria-label={`Toggle selection for line ${lineNumber}`}

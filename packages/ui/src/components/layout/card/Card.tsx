@@ -37,7 +37,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown)
+        onClick(e as any)
       }
     }
 
@@ -91,7 +91,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown)
+        onClick(e as any)
       }
     }
 
@@ -133,7 +133,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
         onClick={onClick}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            onClick?.(e as unknown)
+            onClick?.(e as any)
           }
         }}
         onMouseEnter={onMouseEnter}
@@ -165,7 +165,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionPr
         onClick={onClick}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            onClick?.(e as unknown)
+            onClick?.(e as any)
           }
         }}
         onMouseEnter={onMouseEnter}
@@ -208,7 +208,7 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown)
+        onClick(e as any)
       }
     }
 
@@ -261,7 +261,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown)
+        onClick(e as any)
       }
     }
 

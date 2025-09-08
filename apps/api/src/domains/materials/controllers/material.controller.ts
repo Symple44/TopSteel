@@ -23,12 +23,12 @@ import {
 } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
-import type { BusinessContext } from '../../core/interfaces/business-service.interface'
+import { BusinessOperation, type BusinessContext } from '../../core/interfaces/business-service.interface'
 import type { User } from '../../users/entities/user.entity'
 import type { CreateMaterialDto } from '../dto/create-material.dto'
 import type { InventoryFiltersDto, MaterialFiltersDto } from '../dto/material-filters.dto'
 import type { UpdateMaterialDto } from '../dto/update-material.dto'
-import type { Material } from '../entities/material.entity'
+import type { Material, MaterialType } from '../entities/material.entity'
 import type {
   IMaterialRepository,
   MaterialCompatibilityAnalysis,
@@ -421,7 +421,7 @@ export class MaterialController {
   async calculerValorisationStock(
     @Query('type') type?: string
   ): Promise<MaterialStockValorisation> {
-    return await this.materialService.calculerValorisationStock(type as unknown)
+    return await this.materialService.calculerValorisationStock(type as MaterialType)
   }
 
   /**
@@ -872,7 +872,7 @@ export class MaterialController {
         if (material) {
           const validation = await this.materialService.validateBusinessRules(
             material,
-            'VALIDATE' as unknown
+            BusinessOperation.VALIDATE
           )
           results.push({
             id: materialId,

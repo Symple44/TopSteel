@@ -140,7 +140,7 @@ export function AddTaskDialog({
   const [selectedTab, setSelectedTab] = useState<'basic' | 'advanced' | 'resources' | 'quality'>(
     'basic'
   )
-  const form = useForm({
+  const form = useForm<TaskFormData>({
     resolver: zodResolver(taskFormSchema),
     defaultValues: {
       title: initialData?.title || '',

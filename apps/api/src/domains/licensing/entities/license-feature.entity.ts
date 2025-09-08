@@ -194,8 +194,9 @@ export class LicenseFeature {
   /**
    * Get configuration value
    */
-  getConfig<T>(key: string, defaultValue?: T): T | undefined {
-    return this.configuration?.[key] ?? defaultValue
+  getConfig<T = unknown>(key: string, defaultValue?: T): T | undefined {
+    const value = this.configuration?.[key]
+    return (value !== undefined ? value : defaultValue) as T | undefined
   }
 
   /**
