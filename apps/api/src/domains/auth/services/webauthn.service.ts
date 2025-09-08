@@ -78,7 +78,7 @@ export class WebAuthnService {
    * Vérifier la réponse d'enregistrement WebAuthn
    */
   async verifyRegistrationResponse(
-    response: any,
+    response: unknown,
     _expectedChallenge: string,
     _expectedOrigin: string = this.origin,
     _expectedRPID: string = this.rpID
@@ -108,7 +108,7 @@ export class WebAuthnService {
         verified: true,
         registrationInfo: {
           credentialId: response.id as string,
-          publicKey: (response.response as any)?.publicKey || 'mock-public-key',
+          publicKey: (response.response as unknown)?.publicKey || 'mock-public-key',
           counter: 0,
           credentialDeviceType: 'platform',
           credentialBackedUp: false,
@@ -161,7 +161,7 @@ export class WebAuthnService {
    * Vérifier la réponse d'authentification WebAuthn
    */
   async verifyAuthenticationResponse(
-    response: any,
+    response: unknown,
     _expectedChallenge: string,
     credential: WebAuthnCredential,
     _expectedOrigin: string = this.origin,

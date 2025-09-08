@@ -49,8 +49,6 @@ export {
 } from './projet.store'
 
 // ===== STORES SPÉCIALISÉS =====
-// export { useStockStore } from './stock.store'
-// export { useProductionStore } from './production.store'
 
 // ===== TYPES RÉEXPORTÉS DEPUIS @erp/types (SANS CONFLIT) =====
 export type {
@@ -64,8 +62,6 @@ export type {
   FilterState,
   InitialState,
   MetricsState,
-  // ProductionFilters, // Importé depuis @erp/domains
-  // ProjetFilters, // Importé depuis @erp/domains
   // Stats et métriques
   ProjetStats,
   SessionState,
@@ -86,7 +82,7 @@ import type {
   OperationFilters,
   ProductionFilters,
   ProjetFilters,
-} from '@erp/domains/core'
+} from '@erp/domains'
 
 // Re-exports des filtres depuis @erp/domains
 export type { ProjetFilters, OperationFilters, ProductionFilters, FacturationFilters }
@@ -192,9 +188,9 @@ export const storeHelpers = {
    */
   isStorePersisted: (storeName: string) => {
     try {
-      const key = storeHelpers.createStorageKey(storeName)
+      const key = storeHelpers?.createStorageKey(storeName)
 
-      return localStorage.getItem(key) !== null
+      return localStorage?.getItem(key) !== null
     } catch {
       return false
     }
@@ -207,22 +203,22 @@ export const storeHelpers = {
     try {
       return {
         app: {
-          size: JSON.stringify(useAppStore.getState()).length,
-          lastUpdate: useAppStore.getState().lastUpdate,
-          isLoading: useAppStore.getState().loading,
-          hasError: !!useAppStore.getState().error,
+          size: JSON.stringify(useAppStore?.getState()).length,
+          lastUpdate: useAppStore?.getState().lastUpdate,
+          isLoading: useAppStore?.getState().loading,
+          hasError: !!useAppStore?.getState().error,
         },
         auth: {
-          size: JSON.stringify(useAuthStore.getState()).length,
-          lastUpdate: useAuthStore.getState().lastUpdate,
-          isAuthenticated: useAuthStore.getState().isAuthenticated,
+          size: JSON.stringify(useAuthStore?.getState()).length,
+          lastUpdate: useAuthStore?.getState().lastUpdate,
+          isAuthenticated: useAuthStore?.getState().isAuthenticated,
         },
         projet: {
-          size: JSON.stringify(useProjetStore.getState()).length,
-          lastUpdate: useProjetStore.getState().lastUpdate,
-          projetsCount: useProjetStore.getState().projets.length,
+          size: JSON.stringify(useProjetStore?.getState()).length,
+          lastUpdate: useProjetStore?.getState().lastUpdate,
+          projetsCount: useProjetStore?.getState().projets.length,
         },
-        monitor: StoreMonitor.getStats(),
+        monitor: StoreMonitor?.getStats(),
       }
     } catch (_error) {
       return null
@@ -236,43 +232,43 @@ export const storeHelpers = {
     const issues: string[] = []
 
     try {
-      const appState = useAppStore.getState()
-      const authState = useAuthStore.getState()
-      const projetState = useProjetStore.getState()
+      const appState = useAppStore?.getState()
+      const authState = useAuthStore?.getState()
+      const projetState = useProjetStore?.getState()
 
       // Validation App Store
-      if (typeof appState.loading !== 'boolean') {
-        issues.push('App Store: loading doit être un boolean')
+      if (typeof appState?.loading !== 'boolean') {
+        issues?.push('App Store: loading doit être un boolean')
       }
 
-      if (appState.error !== null && typeof appState.error !== 'string') {
-        issues.push('App Store: error doit être null ou string')
+      if (appState?.error !== null && typeof appState?.error !== 'string') {
+        issues?.push('App Store: error doit être null ou string')
       }
 
       // Validation Auth Store
-      if (typeof authState.isAuthenticated !== 'boolean') {
-        issues.push('Auth Store: isAuthenticated doit être un boolean')
+      if (typeof authState?.isAuthenticated !== 'boolean') {
+        issues?.push('Auth Store: isAuthenticated doit être un boolean')
       }
 
-      if (authState.isAuthenticated && !authState.user) {
-        issues.push('Auth Store: utilisateur manquant malgré authentification')
+      if (authState?.isAuthenticated && !authState?.user) {
+        issues?.push('Auth Store: utilisateur manquant malgré authentification')
       }
 
       // Validation Projet Store
       if (!Array.isArray(projetState.projets)) {
-        issues.push('Projet Store: projets doit être un array')
+        issues?.push('Projet Store: projets doit être un array')
       }
 
-      if (typeof projetState.loading !== 'boolean') {
-        issues.push('Projet Store: loading doit être un boolean')
+      if (typeof projetState?.loading !== 'boolean') {
+        issues?.push('Projet Store: loading doit être un boolean')
       }
 
       // Cohérence entre stores
-      if (appState.user && authState.user && appState.user.id !== authState.user.id) {
-        issues.push('Incohérence: utilisateurs différents entre App et Auth stores')
+      if (appState?.user && authState?.user && appState?.user?.id !== authState?.user?.id) {
+        issues?.push('Incohérence: utilisateurs différents entre App et Auth stores')
       }
     } catch (error) {
-      issues.push(`Erreur de validation: ${error}`)
+      issues?.push(`Erreur de validation: ${error}`)
     }
 
     return issues
@@ -283,9 +279,9 @@ export const storeHelpers = {
    */
   resetAllStores: () => {
     try {
-      useAppStore.getState().reset()
-      useAuthStore.getState().reset()
-      useProjetStore.getState().reset()
+      useAppStore?.getState().reset()
+      useAuthStore?.getState().reset()
+      useProjetStore?.getState().reset()
     } catch (_error) {}
   },
 
@@ -293,13 +289,13 @@ export const storeHelpers = {
    * Debug helper pour visualiser l'état complet
    */
   debugStoresState: () => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process?.env?.NODE_ENV === 'development') {
     }
   },
 }
 
 // ===== GLOBAL DEVTOOLS (DÉVELOPPEMENT UNIQUEMENT) =====
-if (process.env.NODE_ENV === 'development') {
+if (process?.env?.NODE_ENV === 'development') {
   // Ajouter les stores au window pour debug
   if (typeof window !== 'undefined') {
     ;(window as typeof window & { __TOPSTEEL_STORES__?: unknown }).__TOPSTEEL_STORES__ = {

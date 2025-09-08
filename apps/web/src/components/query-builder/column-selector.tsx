@@ -1,6 +1,5 @@
 'use client'
 
-// import { useDrag, useDrop } from 'react-dnd' // Temporairement désactivé
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, ScrollArea } from '@erp/ui'
 import { Checkbox, Input } from '@erp/ui/primitives'
 import {
@@ -18,7 +17,7 @@ import {
   Type,
   X,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { callClientApi } from '@/utils/backend-api'
 
@@ -51,21 +50,25 @@ const DraggableColumn = ({
   onRemove,
   selected,
   onSelect,
-}: any) => {
+}: unknown) => {
   // Temporairement désactivé le drag & drop
   const isDragging = false
 
   const getDataTypeIcon = (dataType: string) => {
-    if (dataType.includes('int') || dataType.includes('numeric') || dataType.includes('decimal')) {
+    if (
+      dataType?.includes('int') ||
+      dataType?.includes('numeric') ||
+      dataType?.includes('decimal')
+    ) {
       return <Hash className="h-3 w-3" />
     }
-    if (dataType.includes('char') || dataType.includes('text')) {
+    if (dataType?.includes('char') || dataType?.includes('text')) {
       return <Type className="h-3 w-3" />
     }
-    if (dataType.includes('date') || dataType.includes('time')) {
+    if (dataType?.includes('date') || dataType?.includes('time')) {
       return <Calendar className="h-3 w-3" />
     }
-    if (dataType.includes('bool')) {
+    if (dataType?.includes('bool')) {
       return <ToggleLeft className="h-3 w-3" />
     }
     return null
@@ -104,6 +107,7 @@ const DraggableColumn = ({
         </div>
         <div className="flex items-center gap-1">
           <Button
+            type="button"
             size="sm"
             variant="ghost"
             onClick={() => toggleVisibility(index)}
@@ -116,6 +120,7 @@ const DraggableColumn = ({
             )}
           </Button>
           <Button
+            type="button"
             size="sm"
             variant="ghost"
             onClick={() => onRemove(index)}
@@ -136,18 +141,18 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
   const [selectedColumns, setSelectedColumns] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
 
-  const fetchColumnsForTables = async (tables: string[]) => {
+  const fetchColumnsForTables = useCallback(async (tables: string[]) => {
     setLoading(true)
     try {
-      const allColumns = []
+      const allColumns: unknown[] = []
 
       for (const table of tables) {
         const response = await callClientApi(`query-builder/schema/tables/${table}/columns`)
-        if (response.ok) {
-          const result = await response.json()
+        if (response?.ok) {
+          const result = await response?.json()
           // Assurer que nous avons bien un tableau
           const tableColumns = Array.isArray(result) ? result : result.data || result.columns || []
-          allColumns.push(...tableColumns)
+          allColumns?.push(...tableColumns)
         }
       }
 
@@ -156,7 +161,7 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (selectedTables.length > 0) {
@@ -166,7 +171,7 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
 
   // Synchroniser selectedColumns avec les colonnes importées
   useEffect(() => {
-    const importedColumnIds = new Set(columns.map((col) => `${col.tableName}.${col.columnName}`))
+    const importedColumnIds = new Set(columns?.map((col) => `${col.tableName}.${col.columnName}`))
     setSelectedColumns(importedColumnIds)
   }, [columns])
 
@@ -174,13 +179,14 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
     const newColumns: Column[] = []
     let maxOrder = Math.max(...columns.map((c) => c.displayOrder), -1)
 
-    selectedColumns.forEach((colId) => {
+    selectedColumns?.forEach((colId) => {
+      if (!colId) return
       const [tableName, columnName] = colId.split('.')
-      const sourceColumn = availableColumns.find(
+      const sourceColumn = availableColumns?.find(
         (c) => c.tableName === tableName && c.columnName === columnName
       )
 
-      if (sourceColumn && !columns.some((c) => c.alias === colId)) {
+      if (sourceColumn && !columns?.some((c) => c.alias === colId)) {
         newColumns.push({
           tableName,
           columnName,
@@ -198,7 +204,7 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
       }
     })
 
-    if (newColumns.length > 0) {
+    if (newColumns?.length > 0) {
       onColumnsChange([...columns, ...newColumns])
       setSelectedColumns(new Set())
     }
@@ -210,7 +216,7 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
     newColumns.splice(toIndex, 0, movedColumn)
 
     // Update display order
-    newColumns.forEach((col, index) => {
+    newColumns?.forEach((col, index) => {
       col.displayOrder = index
     })
 
@@ -219,18 +225,20 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
 
   const toggleColumnVisibility = (index: number) => {
     const newColumns = [...columns]
-    newColumns[index].isVisible = !newColumns[index].isVisible
+    if (newColumns[index]) {
+      newColumns[index].isVisible = !newColumns[index].isVisible
+    }
     onColumnsChange(newColumns)
   }
 
   const removeColumn = (index: number) => {
-    onColumnsChange(columns.filter((_, i) => i !== index))
+    onColumnsChange(columns?.filter((_, i) => i !== index))
   }
 
-  const filteredAvailableColumns = availableColumns.filter(
+  const filteredAvailableColumns = availableColumns?.filter(
     (col) =>
-      col.columnName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      col.tableName.toLowerCase().includes(searchTerm.toLowerCase())
+      col?.columnName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      col?.tableName?.toLowerCase().includes(searchTerm?.toLowerCase())
   )
 
   return (
@@ -246,11 +254,12 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
               <Input
                 placeholder="Search columns..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => setSearchTerm(e?.target?.value)}
                 className="pl-8"
               />
             </div>
             <Button
+              type="button"
               onClick={handleAddColumns}
               disabled={selectedColumns.size === 0}
               className="w-full bg-primary text-white hover:bg-primary/90 font-medium"
@@ -270,10 +279,10 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
               </div>
             ) : (
               <div className="space-y-1">
-                {filteredAvailableColumns.map((col) => {
+                {filteredAvailableColumns?.map((col) => {
                   const colId = `${col.tableName}.${col.columnName}`
-                  const isSelected = selectedColumns.has(colId)
-                  const isAdded = columns.some((c) => c.alias === colId)
+                  const isSelected = selectedColumns?.has(colId)
+                  const isAdded = columns?.some((c) => c.alias === colId)
 
                   return (
                     <button
@@ -287,10 +296,10 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
                         if (!isAdded) {
                           setSelectedColumns((prev) => {
                             const newSet = new Set(prev)
-                            if (newSet.has(colId)) {
-                              newSet.delete(colId)
+                            if (newSet?.has(colId)) {
+                              newSet?.delete(colId)
                             } else {
-                              newSet.add(colId)
+                              newSet?.add(colId)
                             }
                             return newSet
                           })
@@ -330,7 +339,7 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
               <div className="text-center py-8 text-muted-foreground">No columns selected</div>
             ) : (
               <div className="space-y-1">
-                {columns.map((column, index) => (
+                {columns?.map((column, index) => (
                   <DraggableColumn
                     key={column.alias}
                     column={column}

@@ -1,13 +1,17 @@
 // apps/web/src/components/production/ordre-qualite-tab.tsx
-import type { ControleQualite, OrdrePriorite, OrdreStatut } from '@erp/domains/production'
-import { QualiteStatut } from '@erp/domains/production'
+import {
+  type ControleQualite,
+  type OrdrePriorite,
+  type OrdreStatut,
+  QualiteStatut,
+} from '@erp/domains'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 interface OrdreSimple {
   id: string
   numero: string
-  statut: OrdreStatut
-  priorite: OrdrePriorite
+  statut: (typeof OrdreStatut)[keyof typeof OrdreStatut]
+  priorite: (typeof OrdrePriorite)[keyof typeof OrdrePriorite]
   avancement: number
   description?: string
   projetId: string
@@ -22,7 +26,7 @@ interface OrdreQualiteTabProps {
   ordre: OrdreSimple
 }
 
-export function OrdreQualiteTab({ _ordre }: OrdreQualiteTabProps) {
+export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
   // Simulation de contrôles pour la démo (ordre.controlesIds contiendrait les IDs)
   const controles: ControleQualite[] = []
 
@@ -45,7 +49,7 @@ export function OrdreQualiteTab({ _ordre }: OrdreQualiteTabProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              {controles.map((controle: ControleQualite, index: number) => (
+              {controles?.map((controle: ControleQualite, index: number) => (
                 <div
                   key={controle.id || `controle-${controle.type}-${index}`}
                   className="border rounded-lg p-4"
@@ -85,7 +89,9 @@ export function OrdreQualiteTab({ _ordre }: OrdreQualiteTabProps) {
                   {controle?.actions && controle.actions.length > 0 && (
                     <div className="mt-2">
                       <span className="text-sm font-medium">Actions</span>
-                      <p className="text-sm text-muted-foreground">{controle.actions.join(', ')}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {controle?.actions?.join(', ')}
+                      </p>
                     </div>
                   )}
                 </div>

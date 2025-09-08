@@ -1,14 +1,26 @@
 'use client'
-import { useState, useCallback } from 'react'
-import { Filter, Folder, Users, Calendar, MapPin, X } from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { Input } from '../../../primitives/input/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
-import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Calendar, Filter, Folder, MapPin, Users, X } from 'lucide-react'
+import { useCallback, useId, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-export type ProjectStatus = 'draft' | 'planning' | 'in_progress' | 'on_hold' | 'completed' | 'cancelled'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+export type ProjectStatus =
+  | 'draft'
+  | 'planning'
+  | 'in_progress'
+  | 'on_hold'
+  | 'completed'
+  | 'cancelled'
 export type ProjectPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type ProjectType = 'manufacturing' | 'maintenance' | 'installation' | 'design' | 'consulting'
 export interface ProjectFiltersState {
@@ -70,25 +82,32 @@ export function ProjectFilters({
   availableLocations = [],
   className,
 }: ProjectFiltersProps) {
-  const [filters, setFilters] = useState<ProjectFiltersState>(value || {
-    statuses: [],
-    priorities: [],
-    types: [],
-    clientIds: [],
-    teamMemberIds: [],
-    managerIds: [],
-    locations: [],
-  })
+  const overdueId = useId()
+  const activeTasksId = useId()
+  const hasIssuesId = useId()
+
+  const [filters, setFilters] = useState<ProjectFiltersState>(
+    value || {
+      statuses: [],
+      priorities: [],
+      types: [],
+      clientIds: [],
+      teamMemberIds: [],
+      managerIds: [],
+      locations: [],
+    }
+  )
   const [isExpanded, setIsExpanded] = useState(false)
-  const updateFilters = useCallback((updates: Partial<ProjectFiltersState>) => {
-    const newFilters = { ...filters, ...updates }
-    setFilters(newFilters)
-    onChange?.(newFilters)
-  }, [filters, onChange])
+  const updateFilters = useCallback(
+    (updates: Partial<ProjectFiltersState>) => {
+      const newFilters = { ...filters, ...updates }
+      setFilters(newFilters)
+      onChange?.(newFilters)
+    },
+    [filters, onChange]
+  )
   const toggleArrayValue = <T,>(array: T[], value: T): T[] => {
-    return array.includes(value)
-      ? array.filter(item => item !== value)
-      : [...array, value]
+    return array.includes(value) ? array.filter((item) => item !== value) : [...array, value]
   }
   const handleStatusToggle = (status: ProjectStatus) => {
     updateFilters({ statuses: toggleArrayValue(filters.statuses, status) })
@@ -143,9 +162,7 @@ export function ProjectFilters({
         >
           <Filter className="h-4 w-4" />
           Filtres projets
-          {activeFiltersCount > 0 && (
-            <Badge variant="secondary">{activeFiltersCount}</Badge>
-          )}
+          {activeFiltersCount > 0 && <Badge variant="secondary">{activeFiltersCount}</Badge>}
         </Button>
         {activeFiltersCount > 0 && (
           <Button
@@ -230,7 +247,10 @@ export function ProjectFilters({
                       onCheckedChange={() => handleTypeToggle(option.value as ProjectType)}
                       disabled={disabled}
                     />
-                    <Label htmlFor={`type-${option.value}`} className="text-sm flex items-center gap-2">
+                    <Label
+                      htmlFor={`type-${option.value}`}
+                      className="text-sm flex items-center gap-2"
+                    >
                       <option.icon className="h-3 w-3" />
                       {option.label}
                     </Label>
@@ -249,9 +269,14 @@ export function ProjectFilters({
                   type="number"
                   placeholder="0"
                   value={filters.budgetRange?.min || ''}
-                  onChange={(e) => updateFilters({
-                    budgetRange: { ...filters.budgetRange, min: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      budgetRange: {
+                        ...filters.budgetRange,
+                        min: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -261,9 +286,14 @@ export function ProjectFilters({
                   type="number"
                   placeholder="Illimité"
                   value={filters.budgetRange?.max || ''}
-                  onChange={(e) => updateFilters({
-                    budgetRange: { ...filters.budgetRange, max: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      budgetRange: {
+                        ...filters.budgetRange,
+                        max: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -280,17 +310,21 @@ export function ProjectFilters({
                 <Input
                   type="date"
                   value={filters.startDateRange?.from || ''}
-                  onChange={(e) => updateFilters({
-                    startDateRange: { ...filters.startDateRange, from: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      startDateRange: { ...filters.startDateRange, from: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
                 <Input
                   type="date"
                   value={filters.startDateRange?.to || ''}
-                  onChange={(e) => updateFilters({
-                    startDateRange: { ...filters.startDateRange, to: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      startDateRange: { ...filters.startDateRange, to: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -301,17 +335,21 @@ export function ProjectFilters({
                 <Input
                   type="date"
                   value={filters.endDateRange?.from || ''}
-                  onChange={(e) => updateFilters({
-                    endDateRange: { ...filters.endDateRange, from: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      endDateRange: { ...filters.endDateRange, from: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
                 <Input
                   type="date"
                   value={filters.endDateRange?.to || ''}
-                  onChange={(e) => updateFilters({
-                    endDateRange: { ...filters.endDateRange, to: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      endDateRange: { ...filters.endDateRange, to: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -338,7 +376,7 @@ export function ProjectFilters({
                 </SelectTrigger>
                 <SelectContent>
                   {availableLocations
-                    .filter(location => !filters.locations.includes(location))
+                    .filter((location) => !filters.locations.includes(location))
                     .map((location) => (
                       <SelectItem key={location} value={location}>
                         {location}
@@ -352,9 +390,11 @@ export function ProjectFilters({
                     {location}
                     <X
                       className="h-3 w-3 ml-1 cursor-pointer"
-                      onClick={() => updateFilters({
-                        locations: filters.locations.filter(l => l !== location)
-                      })}
+                      onClick={() =>
+                        updateFilters({
+                          locations: filters.locations.filter((l) => l !== location),
+                        })
+                      }
                     />
                   </Badge>
                 ))}
@@ -384,7 +424,7 @@ export function ProjectFilters({
                   </SelectTrigger>
                   <SelectContent>
                     {availableTeamMembers
-                      .filter(member => !filters.teamMemberIds.includes(member.id))
+                      .filter((member) => !filters.teamMemberIds.includes(member.id))
                       .map((member) => (
                         <SelectItem key={member.id} value={member.id}>
                           {member.name}
@@ -412,7 +452,7 @@ export function ProjectFilters({
                   </SelectTrigger>
                   <SelectContent>
                     {availableManagers
-                      .filter(manager => !filters.managerIds.includes(manager.id))
+                      .filter((manager) => !filters.managerIds.includes(manager.id))
                       .map((manager) => (
                         <SelectItem key={manager.id} value={manager.id}>
                           {manager.name}
@@ -429,36 +469,48 @@ export function ProjectFilters({
             <div className="grid gap-3 md:grid-cols-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="is-overdue"
+                  id={overdueId}
                   checked={filters.isOverdue === true}
-                  onCheckedChange={(checked) => updateFilters({ isOverdue: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ isOverdue: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="is-overdue" className="text-sm">En retard</Label>
+                <Label htmlFor={overdueId} className="text-sm">
+                  En retard
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="has-active-tasks"
+                  id={activeTasksId}
                   checked={filters.hasActiveTasks === true}
-                  onCheckedChange={(checked) => updateFilters({ hasActiveTasks: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ hasActiveTasks: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="has-active-tasks" className="text-sm">Tâches actives</Label>
+                <Label htmlFor={activeTasksId} className="text-sm">
+                  Tâches actives
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="has-issues"
+                  id={hasIssuesId}
                   checked={filters.hasIssues === true}
-                  onCheckedChange={(checked) => updateFilters({ hasIssues: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ hasIssues: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="has-issues" className="text-sm">Avec problèmes</Label>
+                <Label htmlFor={hasIssuesId} className="text-sm">
+                  Avec problèmes
+                </Label>
               </div>
             </div>
           </div>
           {onApply && (
             <div className="flex justify-end pt-4 border-t">
-              <Button onClick={() => onApply(filters)} disabled={disabled}>
+              <Button type="button" onClick={() => onApply(filters)} disabled={disabled}>
                 Appliquer les filtres
               </Button>
             </div>

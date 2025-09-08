@@ -8,9 +8,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { MenuConfiguration } from './menu-configuration.entity'
-import { MenuItemPermission } from './menu-item-permission.entity'
-import { MenuItemRole } from './menu-item-role.entity'
+// Removed direct imports to avoid circular dependencies
+// import { MenuConfiguration } from './menu-configuration.entity'
+// import { MenuItemPermission } from './menu-item-permission.entity'
+// import { MenuItemRole } from './menu-item-role.entity'
 
 export enum MenuItemType {
   FOLDER = 'M', // Dossier - pour regrouper des éléments
@@ -20,6 +21,14 @@ export enum MenuItemType {
 }
 
 @Entity('menu_items')
+@Index(['configId', 'parentId']) // For hierarchical menu queries
+@Index(['configId', 'orderIndex']) // For ordered menu items
+@Index(['configId', 'isVisible', 'orderIndex']) // For visible menu items ordering
+@Index(['parentId', 'orderIndex']) // For sibling ordering
+@Index(['type']) // For menu type filtering
+@Index(['programId']) // For program-based menu lookups
+@Index(['queryBuilderId']) // For query builder menu items
+@Index(['createdBy']) // For audit tracking
 export class MenuItem {
   @PrimaryGeneratedColumn('uuid')
   id!: string
@@ -33,6 +42,7 @@ export class MenuItem {
   parentId?: string
 
   @Column({ type: 'varchar', length: 255 })
+  @Index() // Index for title-based searches
   title!: string
 
   // titleKey, href, icon, gradient, badge n'existent pas en base
@@ -42,6 +52,7 @@ export class MenuItem {
   orderIndex!: number
 
   @Column({ type: 'boolean', default: true, name: 'isVisible' })
+  @Index() // Index for visibility filtering
   isVisible!: boolean
 
   // moduleId, target n'existent pas en base
@@ -52,6 +63,7 @@ export class MenuItem {
     default: MenuItemType.PROGRAM,
     comment: 'Type de menu: M=Dossier, P=Programme, L=Lien, D=Vue Data',
   })
+  @Index() // Index for menu type filtering
   type!: MenuItemType
 
   @Column({
@@ -61,6 +73,7 @@ export class MenuItem {
     name: 'programId',
     comment: 'Identifiant du programme pour les menus de type P',
   })
+  @Index({ where: 'programId IS NOT NULL' }) // Partial index for program lookup
   programId?: string
 
   @Column({
@@ -78,9 +91,11 @@ export class MenuItem {
     name: 'queryBuilderId',
     comment: 'ID de la vue Query Builder pour les menus de type D',
   })
+  @Index({ where: 'queryBuilderId IS NOT NULL' }) // Partial index for query builder lookups
   queryBuilderId?: string
 
   @Column({ type: 'json', nullable: true })
+  @Index() // GIN index for metadata queries
   metadata?: Record<string, unknown>
 
   @CreateDateColumn({ name: 'createdAt' })
@@ -95,9 +110,11 @@ export class MenuItem {
   updatedAt?: Date
 
   @Column({ type: 'uuid', nullable: true, name: 'createdBy' })
+  @Index() // Index for audit queries
   createdBy?: string
 
   @Column({ type: 'uuid', nullable: true, name: 'updatedBy' })
+  @Index() // Index for audit queries
   updatedBy?: string
 
   // Propriétés virtuelles (non mappées en base)
@@ -110,37 +127,22 @@ export class MenuItem {
   target?: string // _blank, _self, etc.
 
   // Relations
-  @ManyToOne(
-    () => MenuConfiguration,
-    (config) => config.items
-  )
+  @ManyToOne('MenuConfiguration', 'items', { lazy: true })
   @JoinColumn({ name: 'configId' })
-  configuration!: MenuConfiguration
+  configuration!: any
 
-  @ManyToOne(
-    () => MenuItem,
-    (item) => item.children
-  )
+  @ManyToOne('MenuItem', 'children', { lazy: true })
   @JoinColumn({ name: 'parentId' })
-  parent?: MenuItem
+  parent?: any
 
-  @OneToMany(
-    () => MenuItem,
-    (item) => item.parent
-  )
-  children!: MenuItem[]
+  @OneToMany('MenuItem', 'parent', { lazy: true })
+  children!: unknown[]
 
-  @OneToMany(
-    () => MenuItemPermission,
-    (permission) => permission.menuItem
-  )
-  permissions!: MenuItemPermission[]
+  @OneToMany('MenuItemPermission', 'menuItem', { lazy: true })
+  permissions!: unknown[]
 
-  @OneToMany(
-    () => MenuItemRole,
-    (role) => role.menuItem
-  )
-  roles!: MenuItemRole[]
+  @OneToMany('MenuItemRole', 'menuItem', { lazy: true })
+  roles!: unknown[]
 
   // Méthodes utilitaires
   static create(

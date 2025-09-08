@@ -1,37 +1,38 @@
 'use client'
-import { useState, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { 
-  Building, 
-  Users, 
-  AlertTriangle, 
-  ArrowRight, 
-  CheckCircle,
-  Mail,
-  Phone,
-  MapPin,
-  Credit,
-  FileText,
-} from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
-import { Textarea } from '../../../primitives/textarea/Textarea'
-import { Badge } from '../../../data-display/badge'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import {
-  Alert,
-  RadioGroup,
-  RadioGroupItem,
-  Label,
-  Avatar,
-  AvatarFallback,
-  Separator,
-} from '../../../'
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle,
+  CreditCard,
+  FileText,
+  Mail,
+  MapPin,
+  Users,
+} from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { useRadioGroupIds } from '../../../../hooks/useFormFieldIds'
+import { Avatar, AvatarFallback } from '../../../data-display/avatar'
+import { Badge } from '../../../data-display/badge'
+import { Alert } from '../../../feedback/alert'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Label } from '../../../forms/label/Label'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+import { Separator } from '../../../layout/separator'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { RadioGroup, RadioGroupItem } from '../../../primitives/radio-group/radio-group'
+import { Textarea } from '../../../primitives/textarea/Textarea'
 // Extended client interface for merge operations
 export interface MergeableClient {
   id: string
@@ -75,41 +76,49 @@ const mergeSchema = z.object({
     billing: z.enum(['primary', 'secondary', 'combine']).default('combine'),
     notes: z.enum(['primary', 'secondary', 'combine']).default('combine'),
   }),
-  customValues: z.object({
-    companyName: z.string().optional(),
-    contactFirstName: z.string().optional(),
-    contactLastName: z.string().optional(),
-    contactEmail: z.string().optional(),
-    contactPhone: z.string().optional(),
-    notes: z.string().optional(),
-  }).optional(),
+  customValues: z
+    .object({
+      companyName: z.string().optional(),
+      contactFirstName: z.string().optional(),
+      contactLastName: z.string().optional(),
+      contactEmail: z.string().optional(),
+      contactPhone: z.string().optional(),
+      notes: z.string().optional(),
+    })
+    .optional(),
   mergeNotes: z.string().min(1, 'Veuillez indiquer la raison de cette fusion'),
-  confirmDeletion: z.boolean().refine(val => val === true, {
-    message: 'Vous devez confirmer la suppression du client secondaire'
+  confirmDeletion: z.boolean().refine((val) => val === true, {
+    message: 'Vous devez confirmer la suppression du client secondaire',
   }),
 })
 type MergeFormData = z.infer<typeof mergeSchema>
 interface ClientMergeDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit?: (mergeConfig: MergeFormData & { 
-    primaryClient: MergeableClient
-    secondaryClient: MergeableClient
-  }) => void | Promise<void>
+  onSubmit?: (
+    mergeConfig: MergeFormData & {
+      primaryClient: MergeableClient
+      secondaryClient: MergeableClient
+    }
+  ) => void | Promise<void>
   clients?: MergeableClient[]
   preselectedClients?: [string, string] // [primary, secondary]
 }
-export function ClientMergeDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function ClientMergeDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   clients = [],
-  preselectedClients 
+  preselectedClients,
 }: ClientMergeDialogProps) {
+  // Generate unique IDs for radio groups
+  const contactRadioIds = useRadioGroupIds('contact', ['primary', 'secondary'])
+  const billingRadioIds = useRadioGroupIds('billing', ['combine', 'primary'])
+  const nameRadioIds = useRadioGroupIds('name', ['primary', 'secondary'])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState<'selection' | 'configuration' | 'preview'>('selection')
-  const form = useForm<MergeFormData>({
+  const form = useForm({
     resolver: zodResolver(mergeSchema),
     defaultValues: {
       primaryClientId: preselectedClients?.[0] || '',
@@ -127,12 +136,12 @@ export function ClientMergeDialog({
   const watchPrimaryId = form.watch('primaryClientId')
   const watchSecondaryId = form.watch('secondaryClientId')
   const watchMergeStrategy = form.watch('mergeStrategy')
-  const primaryClient = useMemo(() => 
-    clients.find(c => c.id === watchPrimaryId), 
+  const primaryClient = useMemo(
+    () => clients.find((c) => c.id === watchPrimaryId),
     [clients, watchPrimaryId]
   )
-  const secondaryClient = useMemo(() => 
-    clients.find(c => c.id === watchSecondaryId), 
+  const secondaryClient = useMemo(
+    () => clients.find((c) => c.id === watchSecondaryId),
     [clients, watchSecondaryId]
   )
   // Generate preview of merged client
@@ -141,16 +150,36 @@ export function ClientMergeDialog({
     const strategy = watchMergeStrategy
     const customValues = form.getValues('customValues') || {}
     return {
-      companyName: strategy.companyName === 'manual' ? customValues.companyName || primaryClient.companyName :
-                  strategy.companyName === 'primary' ? primaryClient.companyName : secondaryClient.companyName,
-      contactFirstName: strategy.contactInfo === 'manual' ? customValues.contactFirstName || primaryClient.contactFirstName :
-                       strategy.contactInfo === 'primary' ? primaryClient.contactFirstName : secondaryClient.contactFirstName,
-      contactLastName: strategy.contactInfo === 'manual' ? customValues.contactLastName || primaryClient.contactLastName :
-                      strategy.contactInfo === 'primary' ? primaryClient.contactLastName : secondaryClient.contactLastName,
-      contactEmail: strategy.contactInfo === 'manual' ? customValues.contactEmail || primaryClient.contactEmail :
-                   strategy.contactInfo === 'primary' ? primaryClient.contactEmail : secondaryClient.contactEmail,
-      contactPhone: strategy.contactInfo === 'manual' ? customValues.contactPhone || primaryClient.contactPhone :
-                   strategy.contactInfo === 'primary' ? primaryClient.contactPhone : secondaryClient.contactPhone,
+      companyName:
+        strategy.companyName === 'manual'
+          ? customValues.companyName || primaryClient.companyName
+          : strategy.companyName === 'primary'
+            ? primaryClient.companyName
+            : secondaryClient.companyName,
+      contactFirstName:
+        strategy.contactInfo === 'manual'
+          ? customValues.contactFirstName || primaryClient.contactFirstName
+          : strategy.contactInfo === 'primary'
+            ? primaryClient.contactFirstName
+            : secondaryClient.contactFirstName,
+      contactLastName:
+        strategy.contactInfo === 'manual'
+          ? customValues.contactLastName || primaryClient.contactLastName
+          : strategy.contactInfo === 'primary'
+            ? primaryClient.contactLastName
+            : secondaryClient.contactLastName,
+      contactEmail:
+        strategy.contactInfo === 'manual'
+          ? customValues.contactEmail || primaryClient.contactEmail
+          : strategy.contactInfo === 'primary'
+            ? primaryClient.contactEmail
+            : secondaryClient.contactEmail,
+      contactPhone:
+        strategy.contactInfo === 'manual'
+          ? customValues.contactPhone || primaryClient.contactPhone
+          : strategy.contactInfo === 'primary'
+            ? primaryClient.contactPhone
+            : secondaryClient.contactPhone,
       address: strategy.address === 'primary' ? primaryClient.address : secondaryClient.address,
       city: strategy.address === 'primary' ? primaryClient.city : secondaryClient.city,
       creditLimit: Math.max(primaryClient.creditLimit, secondaryClient.creditLimit),
@@ -158,9 +187,12 @@ export function ClientMergeDialog({
       totalOrders: primaryClient.totalOrders + secondaryClient.totalOrders,
       totalRevenue: primaryClient.totalRevenue + secondaryClient.totalRevenue,
       unpaidAmount: primaryClient.unpaidAmount + secondaryClient.unpaidAmount,
-      notes: strategy.notes === 'combine' ? 
-        `${primaryClient.notes || ''}\n\n--- Fusion avec ${secondaryClient.companyName} ---\n${secondaryClient.notes || ''}`.trim() :
-        strategy.notes === 'primary' ? primaryClient.notes : secondaryClient.notes,
+      notes:
+        strategy.notes === 'combine'
+          ? `${primaryClient.notes || ''}\n\n--- Fusion avec ${secondaryClient.companyName} ---\n${secondaryClient.notes || ''}`.trim()
+          : strategy.notes === 'primary'
+            ? primaryClient.notes
+            : secondaryClient.notes,
     }
   }, [primaryClient, secondaryClient, watchMergeStrategy, form])
   const handleSubmit = async (data: MergeFormData) => {
@@ -194,7 +226,11 @@ export function ClientMergeDialog({
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
   }
   const renderClientCard = (client: MergeableClient, role: 'primary' | 'secondary') => (
-    <Card className={role === 'primary' ? 'border-green-200 bg-green-50' : 'border-orange-200 bg-orange-50'}>
+    <Card
+      className={
+        role === 'primary' ? 'border-green-200 bg-green-50' : 'border-orange-200 bg-orange-50'
+      }
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Avatar className="h-8 w-8">
@@ -215,7 +251,9 @@ export function ClientMergeDialog({
               <Mail className="h-3 w-3" />
               Contact
             </div>
-            <div>{client.contactFirstName} {client.contactLastName}</div>
+            <div>
+              {client.contactFirstName} {client.contactLastName}
+            </div>
             <div className="text-gray-500">{client.contactEmail}</div>
             <div className="text-gray-500">{client.contactPhone}</div>
           </div>
@@ -243,11 +281,15 @@ export function ClientMergeDialog({
               <CreditCard className="h-3 w-3" />
               Crédit
             </div>
-            <div>{client.creditUsed.toLocaleString()}€ / {client.creditLimit.toLocaleString()}€</div>
+            <div>
+              {client.creditUsed.toLocaleString()}€ / {client.creditLimit.toLocaleString()}€
+            </div>
           </div>
           <div>
             <div className="font-medium">Impayés</div>
-            <div className={client.unpaidAmount > 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
+            <div
+              className={client.unpaidAmount > 0 ? 'text-red-600 font-medium' : 'text-green-600'}
+            >
               {client.unpaidAmount.toLocaleString()}€
             </div>
           </div>
@@ -269,8 +311,12 @@ export function ClientMergeDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Fusionner des clients - {step === 'selection' ? 'Sélection' : 
-                                   step === 'configuration' ? 'Configuration' : 'Prévisualisation'}
+            Fusionner des clients -{' '}
+            {step === 'selection'
+              ? 'Sélection'
+              : step === 'configuration'
+                ? 'Configuration'
+                : 'Prévisualisation'}
           </DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[70vh] pr-4">
@@ -289,7 +335,10 @@ export function ClientMergeDialog({
                     <AlertTriangle className="h-4 w-4" />
                     <div>
                       <div className="font-semibold">Attention</div>
-                      <div>La fusion de clients est irréversible. Le client secondaire sera supprimé et toutes ses données seront transférées vers le client principal.</div>
+                      <div>
+                        La fusion de clients est irréversible. Le client secondaire sera supprimé et
+                        toutes ses données seront transférées vers le client principal.
+                      </div>
                     </div>
                   </Alert>
                   <div className="grid md:grid-cols-2 gap-6">
@@ -304,23 +353,25 @@ export function ClientMergeDialog({
                               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                                 {clients.map((client) => (
                                   <div key={client.id} className="flex items-start space-x-2">
-                                    <RadioGroupItem 
-                                      value={client.id} 
+                                    <RadioGroupItem
+                                      value={client.id}
                                       id={`primary-${client.id}`}
                                       disabled={client.id === watchSecondaryId}
                                     />
-                                    <Label 
-                                      htmlFor={`primary-${client.id}`} 
+                                    <Label
+                                      htmlFor={`primary-${client.id}`}
                                       className="flex-1 cursor-pointer"
                                     >
                                       <Card className="hover:bg-gray-50">
                                         <CardContent className="p-3">
                                           <div className="font-medium">{client.companyName}</div>
                                           <div className="text-sm text-gray-500">
-                                            {client.contactFirstName} {client.contactLastName} • {client.city}
+                                            {client.contactFirstName} {client.contactLastName} •{' '}
+                                            {client.city}
                                           </div>
                                           <div className="text-xs text-gray-400">
-                                            {client.totalOrders} commandes • {client.totalRevenue.toLocaleString()}€
+                                            {client.totalOrders} commandes •{' '}
+                                            {client.totalRevenue.toLocaleString()}€
                                           </div>
                                         </CardContent>
                                       </Card>
@@ -345,23 +396,25 @@ export function ClientMergeDialog({
                               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                                 {clients.map((client) => (
                                   <div key={client.id} className="flex items-start space-x-2">
-                                    <RadioGroupItem 
-                                      value={client.id} 
+                                    <RadioGroupItem
+                                      value={client.id}
                                       id={`secondary-${client.id}`}
                                       disabled={client.id === watchPrimaryId}
                                     />
-                                    <Label 
-                                      htmlFor={`secondary-${client.id}`} 
+                                    <Label
+                                      htmlFor={`secondary-${client.id}`}
                                       className="flex-1 cursor-pointer"
                                     >
                                       <Card className="hover:bg-gray-50">
                                         <CardContent className="p-3">
                                           <div className="font-medium">{client.companyName}</div>
                                           <div className="text-sm text-gray-500">
-                                            {client.contactFirstName} {client.contactLastName} • {client.city}
+                                            {client.contactFirstName} {client.contactLastName} •{' '}
+                                            {client.city}
                                           </div>
                                           <div className="text-xs text-gray-400">
-                                            {client.totalOrders} commandes • {client.totalRevenue.toLocaleString()}€
+                                            {client.totalOrders} commandes •{' '}
+                                            {client.totalRevenue.toLocaleString()}€
                                           </div>
                                         </CardContent>
                                       </Card>
@@ -378,8 +431,8 @@ export function ClientMergeDialog({
                   </div>
                   {primaryClient && secondaryClient && (
                     <div className="pt-4">
-                      <Button 
-                        type="button" 
+                      <Button
+                        type="button"
                         onClick={() => setStep('configuration')}
                         className="w-full"
                       >
@@ -410,12 +463,16 @@ export function ClientMergeDialog({
                             <FormControl>
                               <RadioGroup value={field.value} onValueChange={field.onChange}>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="primary" id="name-primary" />
-                                  <Label htmlFor="name-primary">Conserver "{primaryClient.companyName}"</Label>
+                                  <RadioGroupItem value="primary" id={nameRadioIds.primary} />
+                                  <Label htmlFor={nameRadioIds.primary}>
+                                    Conserver "{primaryClient.companyName}"
+                                  </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="secondary" id="name-secondary" />
-                                  <Label htmlFor="name-secondary">Utiliser "{secondaryClient.companyName}"</Label>
+                                  <RadioGroupItem value="secondary" id={nameRadioIds.secondary} />
+                                  <Label htmlFor={nameRadioIds.secondary}>
+                                    Utiliser "{secondaryClient.companyName}"
+                                  </Label>
                                 </div>
                               </RadioGroup>
                             </FormControl>
@@ -432,15 +489,20 @@ export function ClientMergeDialog({
                             <FormControl>
                               <RadioGroup value={field.value} onValueChange={field.onChange}>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="primary" id="contact-primary" />
-                                  <Label htmlFor="contact-primary">
-                                    Conserver {primaryClient.contactFirstName} {primaryClient.contactLastName}
+                                  <RadioGroupItem value="primary" id={contactRadioIds.primary} />
+                                  <Label htmlFor={contactRadioIds.primary}>
+                                    Conserver {primaryClient.contactFirstName}{' '}
+                                    {primaryClient.contactLastName}
                                   </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="secondary" id="contact-secondary" />
-                                  <Label htmlFor="contact-secondary">
-                                    Utiliser {secondaryClient.contactFirstName} {secondaryClient.contactLastName}
+                                  <RadioGroupItem
+                                    value="secondary"
+                                    id={contactRadioIds.secondary}
+                                  />
+                                  <Label htmlFor={contactRadioIds.secondary}>
+                                    Utiliser {secondaryClient.contactFirstName}{' '}
+                                    {secondaryClient.contactLastName}
                                   </Label>
                                 </div>
                               </RadioGroup>
@@ -458,14 +520,16 @@ export function ClientMergeDialog({
                             <FormControl>
                               <RadioGroup value={field.value} onValueChange={field.onChange}>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="combine" id="billing-combine" />
-                                  <Label htmlFor="billing-combine">
+                                  <RadioGroupItem value="combine" id={billingRadioIds.combine} />
+                                  <Label htmlFor={billingRadioIds.combine}>
                                     Combiner (crédit utilisé, commandes, chiffre d'affaires)
                                   </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="primary" id="billing-primary" />
-                                  <Label htmlFor="billing-primary">Conserver uniquement les données du client principal</Label>
+                                  <RadioGroupItem value="primary" id={billingRadioIds.primary} />
+                                  <Label htmlFor={billingRadioIds.primary}>
+                                    Conserver uniquement les données du client principal
+                                  </Label>
                                 </div>
                               </RadioGroup>
                             </FormControl>
@@ -480,7 +544,7 @@ export function ClientMergeDialog({
                           <FormItem>
                             <FormLabel>Raison de la fusion *</FormLabel>
                             <FormControl>
-                              <Textarea 
+                              <Textarea
                                 placeholder="Expliquez pourquoi ces clients doivent être fusionnés..."
                                 {...field}
                               />
@@ -492,18 +556,10 @@ export function ClientMergeDialog({
                     </CardContent>
                   </Card>
                   <div className="flex gap-2">
-                    <Button 
-                      type="button" 
-                      variant="outline"
-                      onClick={() => setStep('selection')}
-                    >
+                    <Button type="button" variant="outline" onClick={() => setStep('selection')}>
                       Retour
                     </Button>
-                    <Button 
-                      type="button" 
-                      onClick={() => setStep('preview')}
-                      className="flex-1"
-                    >
+                    <Button type="button" onClick={() => setStep('preview')} className="flex-1">
                       Prévisualiser la fusion <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
@@ -525,17 +581,26 @@ export function ClientMergeDialog({
                           <div>
                             <div className="font-semibold">Informations générales</div>
                             <div>Entreprise: {mergedPreview.companyName}</div>
-                            <div>Contact: {mergedPreview.contactFirstName} {mergedPreview.contactLastName}</div>
+                            <div>
+                              Contact: {mergedPreview.contactFirstName}{' '}
+                              {mergedPreview.contactLastName}
+                            </div>
                             <div>Email: {mergedPreview.contactEmail}</div>
                             <div>Téléphone: {mergedPreview.contactPhone}</div>
-                            <div>Adresse: {mergedPreview.address}, {mergedPreview.city}</div>
+                            <div>
+                              Adresse: {mergedPreview.address}, {mergedPreview.city}
+                            </div>
                           </div>
                           <div>
                             <div className="font-semibold">Données consolidées</div>
                             <div>Total commandes: {mergedPreview.totalOrders}</div>
-                            <div>Chiffre d'affaires: {mergedPreview.totalRevenue.toLocaleString()}€</div>
+                            <div>
+                              Chiffre d'affaires: {mergedPreview.totalRevenue.toLocaleString()}€
+                            </div>
                             <div>Crédit utilisé: {mergedPreview.creditUsed.toLocaleString()}€</div>
-                            <div>Limite de crédit: {mergedPreview.creditLimit.toLocaleString()}€</div>
+                            <div>
+                              Limite de crédit: {mergedPreview.creditLimit.toLocaleString()}€
+                            </div>
                             <div>Impayés: {mergedPreview.unpaidAmount.toLocaleString()}€</div>
                           </div>
                         </div>
@@ -554,7 +619,11 @@ export function ClientMergeDialog({
                     <AlertTriangle className="h-4 w-4" />
                     <div>
                       <div className="font-semibold">Confirmation requise</div>
-                      <div>Cette action supprimera définitivement le client "{secondaryClient.companyName}" et transférera toutes ses données vers "{primaryClient.companyName}".</div>
+                      <div>
+                        Cette action supprimera définitivement le client "
+                        {secondaryClient.companyName}" et transférera toutes ses données vers "
+                        {primaryClient.companyName}".
+                      </div>
                     </div>
                   </Alert>
                   <FormField
@@ -572,7 +641,8 @@ export function ClientMergeDialog({
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel className="text-sm font-medium">
-                            Je confirme vouloir supprimer le client "{secondaryClient.companyName}" et transférer ses données vers "{primaryClient.companyName}"
+                            Je confirme vouloir supprimer le client "{secondaryClient.companyName}"
+                            et transférer ses données vers "{primaryClient.companyName}"
                           </FormLabel>
                         </div>
                         <FormMessage />
@@ -580,15 +650,15 @@ export function ClientMergeDialog({
                     )}
                   />
                   <div className="flex gap-2">
-                    <Button 
-                      type="button" 
+                    <Button
+                      type="button"
                       variant="outline"
                       onClick={() => setStep('configuration')}
                     >
                       Retour
                     </Button>
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={loading || !form.watch('confirmDeletion')}
                       className="flex-1 bg-red-600 hover:bg-red-700"
                     >
@@ -599,12 +669,7 @@ export function ClientMergeDialog({
               )}
               {step === 'selection' && (
                 <div className="flex gap-2 pt-4 border-t">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleClose}
-                    className="flex-1"
-                  >
+                  <Button type="button" variant="outline" onClick={handleClose} className="flex-1">
                     Annuler
                   </Button>
                 </div>

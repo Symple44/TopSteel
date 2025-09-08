@@ -1,23 +1,34 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { Building, Eye, EyeOff, Shield, User } from 'lucide-react'
 import { useState } from 'react'
-import { User, Mail, Phone, Shield, Building, Users, Eye, EyeOff } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Alert } from '../../../feedback/alert'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { Badge } from '../../../data-display/badge'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
-import {
-  FormDescription,
-  Alert,
-} from '../../../'
+
 // User roles for steel manufacturing ERP
 const USER_ROLES = [
   'admin',
@@ -32,7 +43,7 @@ const USER_ROLES = [
   'operator',
   'supervisor',
   'analyst',
-  'employee'
+  'employee',
 ] as const
 // Departments specific to steel manufacturing
 const DEPARTMENTS = [
@@ -48,7 +59,7 @@ const DEPARTMENTS = [
   'maintenance',
   'research_development',
   'safety_environment',
-  'human_resources'
+  'human_resources',
 ] as const
 // Permissions categories for steel manufacturing ERP
 const PERMISSION_CATEGORIES = {
@@ -61,18 +72,18 @@ const PERMISSION_CATEGORIES = {
   finance: ['view', 'create', 'edit', 'approve_payments', 'manage_budgets'],
   projects: ['view', 'create', 'edit', 'assign_resources', 'manage_timeline'],
   reports: ['view', 'create', 'export', 'advanced_analytics'],
-  administration: ['system_settings', 'backup_restore', 'audit_logs']
+  administration: ['system_settings', 'backup_restore', 'audit_logs'],
 } as const
 // User validation schema
 const userSchema = z.object({
   // Personal Information
   firstName: z.string().min(1, 'Le prénom est requis'),
   lastName: z.string().min(1, 'Le nom est requis'),
-  email: z.string().email('Email invalide').min(1, 'L\'email est requis'),
+  email: z.string().email('Email invalide').min(1, "L'email est requis"),
   phone: z.string().optional(),
   position: z.string().optional(),
   // Account Information
-  username: z.string().min(3, 'Le nom d\'utilisateur doit contenir au moins 3 caractères'),
+  username: z.string().min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères"),
   temporaryPassword: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
   mustChangePassword: z.boolean().default(true),
   // Role and Department
@@ -81,18 +92,31 @@ const userSchema = z.object({
   manager: z.string().optional(),
   team: z.string().optional(),
   // Permissions
-  permissions: z.object({
-    users: z.array(z.string()).default([]),
-    clients: z.array(z.string()).default([]),
-    materials: z.array(z.string()).default([]),
-    inventory: z.array(z.string()).default([]),
-    production: z.array(z.string()).default([]),
-    sales: z.array(z.string()).default([]),
-    finance: z.array(z.string()).default([]),
-    projects: z.array(z.string()).default([]),
-    reports: z.array(z.string()).default([]),
-    administration: z.array(z.string()).default([])
-  }).default({}),
+  permissions: z
+    .object({
+      users: z.array(z.string()).default([]),
+      clients: z.array(z.string()).default([]),
+      materials: z.array(z.string()).default([]),
+      inventory: z.array(z.string()).default([]),
+      production: z.array(z.string()).default([]),
+      sales: z.array(z.string()).default([]),
+      finance: z.array(z.string()).default([]),
+      projects: z.array(z.string()).default([]),
+      reports: z.array(z.string()).default([]),
+      administration: z.array(z.string()).default([]),
+    })
+    .default({
+      users: [],
+      clients: [],
+      materials: [],
+      inventory: [],
+      production: [],
+      sales: [],
+      finance: [],
+      projects: [],
+      reports: [],
+      administration: [],
+    }),
   // Work Information
   startDate: z.string().optional(),
   contractType: z.enum(['full_time', 'part_time', 'contractor', 'intern']).default('full_time'),
@@ -111,17 +135,17 @@ interface AddUserDialogProps {
   availableManagers?: Array<{ id: string; name: string }>
   availableTeams?: Array<{ id: string; name: string }>
 }
-export function AddUserDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function AddUserDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   availableManagers = [],
-  availableTeams = []
+  availableTeams = [],
 }: AddUserDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
-  const form = useForm<UserFormData>({
+  const form = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
       role: 'employee',
@@ -141,12 +165,12 @@ export function AddUserDialog({
         finance: [],
         projects: [],
         reports: [],
-        administration: []
-      }
+        administration: [],
+      },
     },
   })
-  const watchRole = form.watch('role')
-  const watchDepartment = form.watch('department')
+  const _watchRole = form.watch('role')
+  const _watchDepartment = form.watch('department')
   // Auto-assign default permissions based on role
   const assignDefaultPermissions = (role: string) => {
     const defaultPermissions: Record<string, Partial<UserFormData['permissions']>> = {
@@ -160,7 +184,7 @@ export function AddUserDialog({
         finance: ['view', 'create', 'edit', 'approve_payments', 'manage_budgets'],
         projects: ['view', 'create', 'edit', 'assign_resources', 'manage_timeline'],
         reports: ['view', 'create', 'export', 'advanced_analytics'],
-        administration: ['system_settings', 'backup_restore', 'audit_logs']
+        administration: ['system_settings', 'backup_restore', 'audit_logs'],
       },
       manager: {
         users: ['view', 'create', 'edit'],
@@ -171,7 +195,7 @@ export function AddUserDialog({
         sales: ['view', 'create', 'edit'],
         finance: ['view'],
         projects: ['view', 'create', 'edit', 'assign_resources'],
-        reports: ['view', 'create', 'export']
+        reports: ['view', 'create', 'export'],
       },
       employee: {
         clients: ['view'],
@@ -180,8 +204,8 @@ export function AddUserDialog({
         production: ['view'],
         sales: ['view'],
         projects: ['view'],
-        reports: ['view']
-      }
+        reports: ['view'],
+      },
     }
     const permissions = defaultPermissions[role] || defaultPermissions.employee
     form.setValue('permissions', permissions as UserFormData['permissions'])
@@ -223,7 +247,7 @@ export function AddUserDialog({
       operator: 'Opérateur',
       supervisor: 'Superviseur',
       analyst: 'Analyste',
-      employee: 'Employé'
+      employee: 'Employé',
     }
     return labels[role] || role
   }
@@ -241,7 +265,7 @@ export function AddUserDialog({
       maintenance: 'Maintenance',
       research_development: 'R&D',
       safety_environment: 'Sécurité & Environnement',
-      human_resources: 'Ressources humaines'
+      human_resources: 'Ressources humaines',
     }
     return labels[department] || department
   }
@@ -267,7 +291,7 @@ export function AddUserDialog({
       advanced_analytics: 'Analytics avancés',
       system_settings: 'Paramètres système',
       backup_restore: 'Sauvegarde/Restauration',
-      audit_logs: 'Logs d\'audit'
+      audit_logs: "Logs d'audit",
     }
     return labels[permission] || permission
   }
@@ -330,10 +354,10 @@ export function AddUserDialog({
                       <FormItem>
                         <FormLabel>Email *</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="email" 
-                            placeholder="utilisateur@entreprise.com" 
-                            {...field} 
+                          <Input
+                            type="email"
+                            placeholder="utilisateur@entreprise.com"
+                            {...field}
                             className="flex-1"
                           />
                         </FormControl>
@@ -387,9 +411,7 @@ export function AddUserDialog({
                         <FormControl>
                           <Input placeholder="nom.utilisateur" {...field} />
                         </FormControl>
-                        <FormDescription>
-                          Utilisé pour se connecter au système
-                        </FormDescription>
+                        <FormDescription>Utilisé pour se connecter au système</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -403,7 +425,7 @@ export function AddUserDialog({
                         <FormControl>
                           <div className="relative">
                             <Input
-                              type={showPassword ? "text" : "password"}
+                              type={showPassword ? 'text' : 'password'}
                               placeholder="••••••••"
                               {...field}
                             />
@@ -432,10 +454,7 @@ export function AddUserDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="text-sm font-normal">
                           Obliger le changement de mot de passe à la première connexion
@@ -455,7 +474,7 @@ export function AddUserDialog({
                             min="1"
                             max="24"
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 8)}
+                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 8)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -479,11 +498,11 @@ export function AddUserDialog({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Rôle *</FormLabel>
-                        <Select 
+                        <Select
                           onValueChange={(value) => {
                             field.onChange(value)
                             assignDefaultPermissions(value)
-                          }} 
+                          }}
                           value={field.value}
                         >
                           <FormControl>
@@ -492,7 +511,7 @@ export function AddUserDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {USER_ROLES.map(role => (
+                            {USER_ROLES.map((role) => (
                               <SelectItem key={role} value={role}>
                                 {getRoleLabel(role)}
                               </SelectItem>
@@ -519,7 +538,7 @@ export function AddUserDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {DEPARTMENTS.map(dept => (
+                            {DEPARTMENTS.map((dept) => (
                               <SelectItem key={dept} value={dept}>
                                 {getDepartmentLabel(dept)}
                               </SelectItem>
@@ -544,7 +563,7 @@ export function AddUserDialog({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {availableManagers.map(manager => (
+                              {availableManagers.map((manager) => (
                                 <SelectItem key={manager.id} value={manager.id}>
                                   {manager.name}
                                 </SelectItem>
@@ -570,7 +589,7 @@ export function AddUserDialog({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {availableTeams.map(team => (
+                              {availableTeams.map((team) => (
                                 <SelectItem key={team.id} value={team.id}>
                                   {team.name}
                                 </SelectItem>
@@ -592,7 +611,8 @@ export function AddUserDialog({
                     Permissions
                   </CardTitle>
                   <FormDescription>
-                    Les permissions ont été définies automatiquement selon le rôle. Vous pouvez les modifier si nécessaire.
+                    Les permissions ont été définies automatiquement selon le rôle. Vous pouvez les
+                    modifier si nécessaire.
                   </FormDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -602,7 +622,7 @@ export function AddUserDialog({
                         {category.replace('_', ' ')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
-                        {permissions.map(permission => (
+                        {permissions.map((permission) => (
                           <FormField
                             key={`${category}-${permission}`}
                             control={form.control}
@@ -617,7 +637,7 @@ export function AddUserDialog({
                                       if (checked) {
                                         field.onChange([...currentPerms, permission])
                                       } else {
-                                        field.onChange(currentPerms.filter(p => p !== permission))
+                                        field.onChange(currentPerms.filter((p) => p !== permission))
                                       }
                                     }}
                                   />
@@ -688,7 +708,9 @@ export function AddUserDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormDescription>
@@ -713,14 +735,9 @@ export function AddUserDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Compte actif
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Compte actif</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -730,10 +747,7 @@ export function AddUserDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Accès application mobile
@@ -772,7 +786,7 @@ export function AddUserDialog({
                   Annuler
                 </Button>
                 <Button type="submit" disabled={loading} className="flex-1">
-                  {loading ? 'Création en cours...' : 'Créer l\'utilisateur'}
+                  {loading ? 'Création en cours...' : "Créer l'utilisateur"}
                 </Button>
               </div>
             </form>

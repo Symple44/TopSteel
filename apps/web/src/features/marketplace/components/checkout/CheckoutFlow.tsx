@@ -6,57 +6,12 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { cn } from '@/lib/utils'
 import { clearCart, selectCartItems, selectCartTotal } from '../../store/cartSlice'
+import type { CheckoutData, CheckoutStep } from '../../types/checkout.types'
 import { CartSummary } from '../cart/CartSummary'
 import { BillingStep } from './steps/BillingStep'
 import { PaymentStep } from './steps/PaymentStep'
 import { ReviewStep } from './steps/ReviewStep'
 import { ShippingStep } from './steps/ShippingStep'
-
-export type CheckoutStep = 'shipping' | 'billing' | 'payment' | 'review'
-
-export interface CheckoutData {
-  shipping: {
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-    address: string
-    address2?: string
-    city: string
-    state: string
-    postalCode: string
-    country: string
-    saveAddress?: boolean
-  }
-  billing: {
-    sameAsShipping: boolean
-    firstName?: string
-    lastName?: string
-    address?: string
-    address2?: string
-    city?: string
-    state?: string
-    postalCode?: string
-    country?: string
-  }
-  shippingMethod: {
-    id: string
-    name: string
-    cost: number
-    estimatedDays: number
-  }
-  payment: {
-    method: 'card' | 'paypal' | 'bank_transfer'
-    cardNumber?: string
-    cardHolder?: string
-    expiryDate?: string
-    cvv?: string
-    saveCard?: boolean
-  }
-  orderNotes?: string
-  agreeToTerms: boolean
-  subscribeNewsletter?: boolean
-}
 
 const steps: Array<{
   id: CheckoutStep
@@ -137,21 +92,21 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
 
   useEffect(() => {
     // Redirect if cart is empty
-    if (cartItems.length === 0 && !isProcessing) {
-      router.push('/marketplace/cart')
+    if (cartItems?.length === 0 && !isProcessing) {
+      router?.push('/marketplace/cart')
     }
   }, [cartItems, router, isProcessing])
 
   const getCurrentStepIndex = () => {
-    return steps.findIndex((step) => step.id === currentStep)
+    return steps?.findIndex((step) => step.id === currentStep)
   }
 
   const handleStepClick = (stepId: CheckoutStep) => {
-    const clickedStepIndex = steps.findIndex((step) => step.id === stepId)
+    const clickedStepIndex = steps?.findIndex((step) => step.id === stepId)
     const currentStepIndex = getCurrentStepIndex()
 
     // Allow going back to previous steps or completed steps
-    if (clickedStepIndex < currentStepIndex || completedSteps.has(stepId)) {
+    if (clickedStepIndex < currentStepIndex || completedSteps?.has(stepId)) {
       setCurrentStep(stepId)
     }
   }
@@ -164,14 +119,14 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
 
     // Move to next step
     if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1].id)
+      setCurrentStep(steps?.[currentIndex + 1]?.id)
     }
   }
 
   const handleBack = () => {
     const currentIndex = getCurrentStepIndex()
     if (currentIndex > 0) {
-      setCurrentStep(steps[currentIndex - 1].id)
+      setCurrentStep(steps?.[currentIndex - 1]?.id)
     }
   }
 
@@ -187,27 +142,34 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
       case 'shipping': {
         const s = checkoutData.shipping
         return !!(
-          s.firstName &&
-          s.lastName &&
-          s.email &&
-          s.phone &&
-          s.address &&
-          s.city &&
-          s.postalCode &&
-          s.country
+          s?.firstName &&
+          s?.lastName &&
+          s?.email &&
+          s?.phone &&
+          s?.address &&
+          s?.city &&
+          s?.postalCode &&
+          s?.country
         )
       }
 
       case 'billing': {
-        if (checkoutData.billing.sameAsShipping) return true
+        if (checkoutData?.billing?.sameAsShipping) return true
         const b = checkoutData.billing
-        return !!(b.firstName && b.lastName && b.address && b.city && b.postalCode && b.country)
+        return !!(
+          b?.firstName &&
+          b?.lastName &&
+          b?.address &&
+          b?.city &&
+          b?.postalCode &&
+          b?.country
+        )
       }
 
       case 'payment': {
         const p = checkoutData.payment
-        if (p.method === 'card') {
-          return !!(p.cardNumber && p.cardHolder && p.expiryDate && p.cvv)
+        if (p?.method === 'card') {
+          return !!(p?.cardNumber && p?.cardHolder && p?.expiryDate && p?.cvv)
         }
         return true
       }
@@ -232,19 +194,21 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
     try {
       // Create order payload
       const orderPayload = {
-        items: cartItems.map((item) => ({
-          productId: item.product.id,
+        items: cartItems?.map((item) => ({
+          productId: item?.product?.id,
           quantity: item.quantity,
-          price: item.product.price,
+          price: item?.product?.price,
           options: item.selectedOptions,
         })),
         shipping: checkoutData.shipping,
-        billing: checkoutData.billing.sameAsShipping ? checkoutData.shipping : checkoutData.billing,
+        billing: checkoutData?.billing?.sameAsShipping
+          ? checkoutData.shipping
+          : checkoutData.billing,
         shippingMethod: checkoutData.shippingMethod,
         payment: {
-          method: checkoutData.payment.method,
+          method: checkoutData?.payment?.method,
           // Don't send sensitive card data directly
-          ...(checkoutData.payment.method === 'card' && {
+          ...(checkoutData?.payment?.method === 'card' && {
             last4: checkoutData.payment.cardNumber?.slice(-4),
           }),
         },
@@ -262,14 +226,14 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
         body: JSON.stringify(orderPayload),
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Failed to place order')
       }
 
-      const order = await response.json()
+      const order = await response?.json()
 
       // Process payment if card
-      if (checkoutData.payment.method === 'card') {
+      if (checkoutData?.payment?.method === 'card') {
         const paymentResponse = await fetch('/api/marketplace/payments/process', {
           method: 'POST',
           headers: {
@@ -287,7 +251,7 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
           }),
         })
 
-        if (!paymentResponse.ok) {
+        if (!paymentResponse?.ok) {
           throw new Error('Payment failed')
         }
       }
@@ -296,7 +260,7 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
       dispatch(clearCart())
 
       // Redirect to success page
-      router.push(`/marketplace/order-confirmation/${order.id}`)
+      router?.push(`/marketplace/order-confirmation/${order?.id}`)
     } catch (_error) {
       setError('An error occurred while processing your order. Please try again.')
     } finally {
@@ -358,7 +322,7 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
     }
   }
 
-  if (cartItems.length === 0 && !isProcessing) {
+  if (cartItems?.length === 0 && !isProcessing) {
     return null
   }
 
@@ -374,10 +338,10 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            {steps.map((step, index) => {
+            {steps?.map((step, index) => {
               const Icon = step.icon
               const isActive = step.id === currentStep
-              const isCompleted = completedSteps.has(step.id)
+              const isCompleted = completedSteps?.has(step.id)
               const isPending = !isActive && !isCompleted
 
               return (
@@ -424,7 +388,7 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
                     <div
                       className={cn(
                         'flex-1 h-0.5 bg-gray-200 mx-4 relative top-6',
-                        completedSteps.has(steps[index + 1].id) && 'bg-green-600'
+                        completedSteps?.has(steps?.[index + 1]?.id) && 'bg-green-600'
                       )}
                     />
                   )}
@@ -466,7 +430,7 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ className }) => {
                     <Truck className="w-4 h-4 text-gray-400" />
                     <span className="font-medium">Estimated delivery:</span>
                     <span className="text-gray-600">
-                      {checkoutData.shippingMethod.estimatedDays} business days
+                      {checkoutData?.shippingMethod?.estimatedDays} business days
                     </span>
                   </div>
                 </div>

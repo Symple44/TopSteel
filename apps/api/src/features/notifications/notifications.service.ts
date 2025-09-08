@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import type { PaginationResultDto } from '../../core/common/dto/base.dto'
+import { toTypeORMUpdate } from '../../core/database/typeorm-helpers'
 import type { CreateNotificationsDto } from './dto/create-notifications.dto'
 import type { NotificationsQueryDto } from './dto/notifications-query.dto'
 import type { UpdateNotificationsDto } from './dto/update-notifications.dto'
@@ -67,7 +68,7 @@ export class NotificationsService {
   }
 
   async update(id: string, updateDto: UpdateNotificationsDto): Promise<Notifications> {
-    await this._repository.update(id, updateDto as unknown)
+    await this._repository.update(id, toTypeORMUpdate(updateDto))
     return this.findOne(id)
   }
 

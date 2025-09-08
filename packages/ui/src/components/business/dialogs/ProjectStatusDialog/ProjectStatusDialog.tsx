@@ -1,25 +1,18 @@
 'use client'
-import { useState, useMemo } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Plus, Trash2, Calendar, MessageSquare, Activity, Target, AlertTriangle } from 'lucide-react'
 import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-  Badge,
-  Label
-} from '../../../primitives'
+  Activity,
+  AlertTriangle,
+  Calendar,
+  MessageSquare,
+  Plus,
+  Target,
+  Trash2,
+} from 'lucide-react'
+import { useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Badge } from '../../../data-display/badge'
 import {
   Form,
   FormControl,
@@ -27,19 +20,31 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '../../../forms'
+  FormMessage,
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Status update schema
 const statusUpdateSchema = z.object({
   message: z.string().min(1, 'Le message est obligatoire'),
-  type: z.enum(['info', 'success', 'warning', 'error']).default('info')
+  type: z.enum(['info', 'success', 'warning', 'error']).default('info'),
 })
 // Timeline entry schema
 const timelineEntrySchema = z.object({
   date: z.string().min(1, 'La date est obligatoire'),
   title: z.string().min(1, 'Le titre est obligatoire'),
   description: z.string().optional(),
-  type: z.enum(['milestone', 'task', 'issue', 'note']).default('note')
+  type: z.enum(['milestone', 'task', 'issue', 'note']).default('note'),
 })
 // Project status schema
 const projectStatusSchema = z.object({
@@ -53,7 +58,7 @@ const projectStatusSchema = z.object({
   blockers: z.string().optional(),
   achievements: z.string().optional(),
   nextSteps: z.string().optional(),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 })
 type ProjectStatusFormData = z.infer<typeof projectStatusSchema>
 interface Project {
@@ -73,15 +78,15 @@ interface ProjectStatusDialogProps {
   onSubmit?: (data: ProjectStatusFormData) => void | Promise<void>
   project?: Project
 }
-export function ProjectStatusDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
-  project
+export function ProjectStatusDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+  project,
 }: ProjectStatusDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<ProjectStatusFormData>({
+  const form = useForm({
     resolver: zodResolver(projectStatusSchema),
     defaultValues: {
       status: project?.status || 'planning',
@@ -89,26 +94,36 @@ export function ProjectStatusDialog({
       nextMilestone: '',
       estimatedCompletion: '',
       riskLevel: 'low',
-      statusUpdates: [{
-        message: '',
-        type: 'info'
-      }],
+      statusUpdates: [
+        {
+          message: '',
+          type: 'info',
+        },
+      ],
       timelineEntries: [],
       blockers: '',
       achievements: '',
       nextSteps: '',
-      notes: ''
-    }
+      notes: '',
+    },
   })
-  const { fields: updateFields, append: appendUpdate, remove: removeUpdate } = useFieldArray({
+  const {
+    fields: updateFields,
+    append: appendUpdate,
+    remove: removeUpdate,
+  } = useFieldArray({
     control: form.control,
-    name: 'statusUpdates'
+    name: 'statusUpdates',
   })
-  const { fields: timelineFields, append: appendTimeline, remove: removeTimeline } = useFieldArray({
+  const {
+    fields: timelineFields,
+    append: appendTimeline,
+    remove: removeTimeline,
+  } = useFieldArray({
     control: form.control,
-    name: 'timelineEntries'
+    name: 'timelineEntries',
   })
-  const watchedStatus = form.watch('status')
+  const _watchedStatus = form.watch('status')
   const watchedProgress = form.watch('progress')
   const watchedRiskLevel = form.watch('riskLevel')
   const handleSubmit = async (data: ProjectStatusFormData) => {
@@ -134,7 +149,7 @@ export function ProjectStatusDialog({
   const addStatusUpdate = () => {
     appendUpdate({
       message: '',
-      type: 'info'
+      type: 'info',
     })
   }
   const addTimelineEntry = () => {
@@ -142,25 +157,35 @@ export function ProjectStatusDialog({
       date: new Date().toISOString().split('T')[0],
       title: '',
       description: '',
-      type: 'note'
+      type: 'note',
     })
   }
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'planning': return 'bg-gray-100 text-gray-800'
-      case 'in_progress': return 'bg-blue-100 text-blue-800'
-      case 'on_hold': return 'bg-orange-100 text-orange-800'
-      case 'completed': return 'bg-green-100 text-green-800'
-      case 'cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'planning':
+        return 'bg-gray-100 text-gray-800'
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800'
+      case 'on_hold':
+        return 'bg-orange-100 text-orange-800'
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'cancelled':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'low': return 'bg-green-100 text-green-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'high': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'low':
+        return 'bg-green-100 text-green-800'
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'high':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
   const getProgressColor = (progress: number) => {
@@ -168,12 +193,16 @@ export function ProjectStatusDialog({
     if (progress < 70) return 'bg-yellow-500'
     return 'bg-green-500'
   }
-  const getUpdateTypeIcon = (type: string) => {
+  const _getUpdateTypeIcon = (type: string) => {
     switch (type) {
-      case 'success': return <Target className="w-4 h-4 text-green-600" />
-      case 'warning': return <AlertTriangle className="w-4 h-4 text-yellow-600" />
-      case 'error': return <AlertTriangle className="w-4 h-4 text-red-600" />
-      default: return <MessageSquare className="w-4 h-4 text-blue-600" />
+      case 'success':
+        return <Target className="w-4 h-4 text-green-600" />
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4 text-yellow-600" />
+      case 'error':
+        return <AlertTriangle className="w-4 h-4 text-red-600" />
+      default:
+        return <MessageSquare className="w-4 h-4 text-blue-600" />
     }
   }
   return (
@@ -205,16 +234,20 @@ export function ProjectStatusDialog({
                   <div>
                     <span className="text-gray-600">Statut actuel:</span>
                     <Badge className={`ml-2 ${getStatusColor(project.status)}`}>
-                      {project.status === 'in_progress' ? 'En cours' : 
-                       project.status === 'completed' ? 'Terminé' : 
-                       project.status === 'on_hold' ? 'En attente' : 'Planification'}
+                      {project.status === 'in_progress'
+                        ? 'En cours'
+                        : project.status === 'completed'
+                          ? 'Terminé'
+                          : project.status === 'on_hold'
+                            ? 'En attente'
+                            : 'Planification'}
                     </Badge>
                   </div>
                   <div>
                     <span className="text-gray-600">Progrès:</span>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex-1 bg-gray-200 rounded-full h-2">
-                        <div 
+                        <div
                           className={`h-2 rounded-full ${getProgressColor(project.progress)}`}
                           style={{ width: `${project.progress}%` }}
                         />
@@ -297,12 +330,12 @@ export function ProjectStatusDialog({
                             max="100"
                             step="5"
                             {...field}
-                            onChange={e => field.onChange(parseInt(e.target.value))}
+                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                             className="w-full"
                           />
                           <div className="flex justify-between text-sm text-gray-500">
                             <span>0%</span>
-                            <Badge className={getRiskColor(watchedRiskLevel)}>
+                            <Badge className={getRiskColor(watchedRiskLevel || 'low')}>
                               {watchedProgress}%
                             </Badge>
                             <span>100%</span>
@@ -338,9 +371,7 @@ export function ProjectStatusDialog({
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
-                      <FormDescription>
-                        Estimation révisée de la date de fin
-                      </FormDescription>
+                      <FormDescription>Estimation révisée de la date de fin</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -383,9 +414,9 @@ export function ProjectStatusDialog({
                           <FormItem>
                             <FormLabel>Message *</FormLabel>
                             <FormControl>
-                              <Textarea 
+                              <Textarea
                                 placeholder="Décrire la mise à jour ou l'événement..."
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -503,10 +534,7 @@ export function ProjectStatusDialog({
                           <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Détails de l'événement..."
-                                {...field} 
-                              />
+                              <Textarea placeholder="Détails de l'événement..." {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -533,9 +561,7 @@ export function ProjectStatusDialog({
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Mettez en avant les progrès et succès
-                      </FormDescription>
+                      <FormDescription>Mettez en avant les progrès et succès</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -553,9 +579,7 @@ export function ProjectStatusDialog({
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Planifiez les actions à venir
-                      </FormDescription>
+                      <FormDescription>Planifiez les actions à venir</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -575,9 +599,7 @@ export function ProjectStatusDialog({
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Documentez les problèmes rencontrés
-                      </FormDescription>
+                      <FormDescription>Documentez les problèmes rencontrés</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -602,12 +624,7 @@ export function ProjectStatusDialog({
               </div>
             </div>
             <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                 Annuler
               </Button>
               <Button type="submit" disabled={loading}>

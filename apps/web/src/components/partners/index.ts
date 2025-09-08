@@ -1,0 +1,5 @@
+export { AddressesManager } from './addresses-manager'
+export { ContactsManager } from './contacts-manager'
+export { PartnerDetailDialog } from './partner-detail-dialog'
+export { PartnerFormDialog } from './partner-form-dialog'
+export { SitesManager } from './sites-manager'

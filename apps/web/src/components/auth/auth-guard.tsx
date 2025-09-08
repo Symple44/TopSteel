@@ -19,7 +19,7 @@ export function AuthGuard({ children, requireAuth = true, redirectTo = '/login' 
 
   useEffect(() => {
     if (!isLoading && requireAuth && !isAuthenticated) {
-      router.push(redirectTo)
+      router?.push(redirectTo)
     }
   }, [isAuthenticated, isLoading, requireAuth, redirectTo, router])
 
@@ -83,23 +83,23 @@ export function AuthGuardOLD({
       // Add current pathname as redirect parameter
       const currentPath = window?.location?.pathname || '/dashboard'
       const redirectUrl = currentPath === '/login' ? fallbackUrl : `${fallbackUrl}?redirect=${encodeURIComponent(currentPath)}`
-      router.replace(redirectUrl)
+      router?.replace(redirectUrl)
       return
     }
 
     if (!isLoading && isAuthenticated && user && requiredRoles.length > 0) {
       // Vérifier les rôles si spécifiés
       // Get user roles array (new system) or single role (legacy)  
-      const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+      const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
       
-      const hasRequiredRole = requiredRoles.some(requiredRole => {
+      const hasRequiredRole = requiredRoles?.some(requiredRole => {
         // Check if user has the permission directly
         if (user.permissions?.includes(requiredRole)) {
           return true
         }
         
         // Check if any user role matches the required role
-        return userRoles.some((role: any) => {
+        return userRoles?.some((role: unknown) => {
           const roleValue = typeof role === 'object' ? role.name || role.role : role
           return roleValue === requiredRole
         })
@@ -107,7 +107,7 @@ export function AuthGuardOLD({
       
       if (!hasRequiredRole) {
         // Rediriger vers une page d'erreur ou dashboard si pas les bonnes permissions
-        router.replace('/dashboard')
+        router?.replace('/dashboard')
         return
       }
     }
@@ -150,16 +150,16 @@ export function AuthGuardOLD({
   // Vérifier les rôles si spécifiés
   if (requiredRoles.length > 0) {
     // Get user roles array (new system) or single role (legacy)  
-    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
     
-    const hasRequiredRole = requiredRoles.some(requiredRole => {
+    const hasRequiredRole = requiredRoles?.some(requiredRole => {
       // Check if user has the permission directly
       if (user.permissions?.includes(requiredRole)) {
         return true
       }
       
       // Check if any user role matches the required role
-      return userRoles.some((role: any) => {
+      return userRoles?.some((role: unknown) => {
         const roleValue = typeof role === 'object' ? role.name || role.role : role
         return roleValue === requiredRole
       })
@@ -173,7 +173,7 @@ export function AuthGuardOLD({
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('accessDenied')}</h1>
             <p className="text-gray-600 mb-4">{t('insufficientPermissionsText')}</p>
             <button
-              onClick={() => router.back()}
+              onClick={() => router?.back()}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
               {t('back')}

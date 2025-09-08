@@ -61,9 +61,9 @@ export class ProductCatalogController {
       subcategory,
       brand,
       priceMin: priceMin || undefined,
-      priceMax: priceMax ? parseInt(priceMax.toString()) : undefined,
+      priceMax: priceMax ? parseInt(priceMax.toString(), 10) : undefined,
       stockMin: stockMin || undefined,
-      stockMax: stockMax ? parseInt(stockMax.toString()) : undefined,
+      stockMax: stockMax ? parseInt(stockMax.toString(), 10) : undefined,
       isMarketplaceEnabled,
       visibility,
       search,
@@ -71,7 +71,7 @@ export class ProductCatalogController {
     }
 
     const sort: ProductSortOptions = {
-      field: sortField as any,
+      field: sortField as unknown,
       direction: sortDirection,
     }
 
@@ -88,7 +88,7 @@ export class ProductCatalogController {
   async getProduct(
     @CurrentTenant() tenantId: string,
     @Param('id') productId: string
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.productCatalogService.getProductById(tenantId, productId)
   }
 
@@ -97,7 +97,7 @@ export class ProductCatalogController {
   async createProduct(
     @CurrentTenant() tenantId: string,
     @Body() createProductDto: CreateProductDto
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.productCatalogService.createProduct(tenantId, createProductDto)
   }
 
@@ -107,7 +107,7 @@ export class ProductCatalogController {
     @CurrentTenant() tenantId: string,
     @Param('id') productId: string,
     @Body() updateProductDto: Omit<UpdateProductDto, 'id'>
-  ): Promise<any> {
+  ): Promise<unknown> {
     const updateData: UpdateProductDto = { ...updateProductDto, id: productId }
     return this.productCatalogService.updateProduct(tenantId, updateData)
   }
@@ -127,7 +127,7 @@ export class ProductCatalogController {
   async restoreProduct(
     @CurrentTenant() tenantId: string,
     @Param('id') productId: string
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.productCatalogService.restoreProduct(tenantId, productId)
   }
 

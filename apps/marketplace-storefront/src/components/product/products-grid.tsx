@@ -33,7 +33,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
     featured: searchParams.featured === 'true',
     page: currentPage,
     limit: itemsPerPage,
-    sortBy: sortBy as any,
+    sortBy: sortBy as 'name' | 'price' | 'date' | 'popularity',
     sortOrder,
   }
 

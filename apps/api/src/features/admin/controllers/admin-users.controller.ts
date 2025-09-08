@@ -123,7 +123,7 @@ export class AdminUsersController {
             : [],
           societeRoles,
           groups: [], // Pas de groupes dans notre système actuel
-          permissions: query.includePermissions ? await this.getUserPermissions(user.id) : []
+          permissions: query.includePermissions ? await this.getUserPermissions(user.id) : [],
         }
       })
     )
@@ -277,7 +277,7 @@ export class AdminUsersController {
         statusCode: 201,
       }
     } catch (error: unknown) {
-      if ((error as any).code === '23505') {
+      if ((error as unknown).code === '23505') {
         // Violation de contrainte unique PostgreSQL
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
@@ -332,7 +332,7 @@ export class AdminUsersController {
         statusCode: 200,
       }
     } catch (error: unknown) {
-      if ((error as any).code === '23505') {
+      if ((error as unknown).code === '23505') {
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
       throw error
@@ -421,9 +421,9 @@ export class AdminUsersController {
     try {
       const userSocieteRole = await this.unifiedRolesService.assignUserToSociete(
         userId,
-        (tenant as any).societeId,
+        (tenant as unknown).societeId,
         body.roleType,
-        (currentUser as any).id,
+        (currentUser as unknown).id,
         {
           isDefault: body.isDefault || false,
           additionalPermissions: body.additionalPermissions || [],
@@ -509,27 +509,33 @@ export class AdminUsersController {
     try {
       // Récupérer les permissions via le service unifié de rôles
       const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(userId)
-      
+
       // Collecter toutes les permissions des différents rôles
       const allPermissions = new Set<string>()
-      
+
       for (const roleInfo of userSocieteRoles) {
         // Ajouter les permissions du rôle
         if (roleInfo.permissions) {
-          roleInfo.permissions.forEach(permission => allPermissions.add(permission))
+          roleInfo.permissions.forEach((permission) => {
+            allPermissions.add(permission)
+          })
         }
-        
+
         // Ajouter les permissions additionnelles
         if (roleInfo.additionalPermissions) {
-          roleInfo.additionalPermissions.forEach(permission => allPermissions.add(permission))
+          roleInfo.additionalPermissions.forEach((permission) => {
+            allPermissions.add(permission)
+          })
         }
-        
+
         // Retirer les permissions restreintes
         if (roleInfo.restrictedPermissions) {
-          roleInfo.restrictedPermissions.forEach(permission => allPermissions.delete(permission))
+          roleInfo.restrictedPermissions.forEach((permission) => {
+            allPermissions.delete(permission)
+          })
         }
       }
-      
+
       return Array.from(allPermissions)
     } catch (error) {
       this.logger?.warn('Erreur lors de la récupération des permissions utilisateur:', error)

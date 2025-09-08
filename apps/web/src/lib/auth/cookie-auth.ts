@@ -10,7 +10,7 @@ import type { AuthTokens, Company, User } from './auth-types'
 // Configuration des cookies
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
+  secure: process?.env?.NODE_ENV === 'production',
   sameSite: 'strict' as const,
   path: '/',
 }
@@ -30,21 +30,21 @@ export async function saveTokensInCookies(
   const maxAge = rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60 // 7 jours ou 24h
 
   // Access token
-  response.cookies.set(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
+  response?.cookies?.set(ACCESS_TOKEN_COOKIE, tokens?.accessToken, {
     ...COOKIE_OPTIONS,
     maxAge,
   })
 
   // Refresh token (durée plus longue)
-  if (tokens.refreshToken) {
-    response.cookies.set(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
+  if (tokens?.refreshToken) {
+    response?.cookies?.set(REFRESH_TOKEN_COOKIE, tokens?.refreshToken, {
       ...COOKIE_OPTIONS,
       maxAge: rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60, // 30 jours ou 7 jours
     })
   }
 
   // Stocker l'expiration
-  response.cookies.set('topsteel-token-expiry', tokens.expiresAt.toString(), {
+  response?.cookies?.set('topsteel-token-expiry', tokens?.expiresAt?.toString(), {
     ...COOKIE_OPTIONS,
     httpOnly: false, // Accessible côté client pour vérifier l'expiration
     maxAge,
@@ -68,7 +68,7 @@ export async function saveUserInfoInCookie(
     email: user.email,
     prenom: user.prenom,
     nom: user.nom,
-    isSuperAdmin: user.isSuperAdmin,
+    isSuperAdmin: (user as unknown).isSuperAdmin || false,
     company: company
       ? {
           id: company.id,
@@ -78,7 +78,7 @@ export async function saveUserInfoInCookie(
       : null,
   }
 
-  response.cookies.set(USER_INFO_COOKIE, JSON.stringify(userInfo), {
+  response?.cookies?.set(USER_INFO_COOKIE, JSON.stringify(userInfo), {
     ...COOKIE_OPTIONS,
     httpOnly: false, // Accessible côté client pour l'UI
     maxAge,
@@ -90,11 +90,11 @@ export async function saveUserInfoInCookie(
  */
 export async function getTokensFromCookies(request?: NextRequest): Promise<AuthTokens | null> {
   try {
-    const cookieStore = request ? request.cookies : cookies()
+    const cookieStore = request ? request.cookies : await cookies()
 
-    const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value
-    const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value
-    const expiresAt = cookieStore.get('topsteel-token-expiry')?.value
+    const accessToken = cookieStore?.get(ACCESS_TOKEN_COOKIE)?.value
+    const refreshToken = cookieStore?.get(REFRESH_TOKEN_COOKIE)?.value
+    const expiresAt = cookieStore?.get('topsteel-token-expiry')?.value
 
     if (!accessToken) {
       return null
@@ -104,7 +104,7 @@ export async function getTokensFromCookies(request?: NextRequest): Promise<AuthT
       accessToken,
       refreshToken: refreshToken || '',
       expiresIn: 0,
-      expiresAt: expiresAt ? parseInt(expiresAt) : Date.now(),
+      expiresAt: expiresAt ? parseInt(expiresAt, 10) : Date.now(),
     }
   } catch {
     return null
@@ -119,8 +119,8 @@ export async function getUserInfoFromCookie(request?: NextRequest): Promise<{
   company: Partial<Company> | null
 }> {
   try {
-    const cookieStore = request ? request.cookies : cookies()
-    const userInfoCookie = cookieStore.get(USER_INFO_COOKIE)?.value
+    const cookieStore = request ? request.cookies : await cookies()
+    const userInfoCookie = cookieStore?.get(USER_INFO_COOKIE)?.value
 
     if (!userInfoCookie) {
       return { user: null, company: null }
@@ -134,7 +134,7 @@ export async function getUserInfoFromCookie(request?: NextRequest): Promise<{
         prenom: userInfo.prenom,
         nom: userInfo.nom,
         isSuperAdmin: userInfo.isSuperAdmin,
-      },
+      } as Partial<User>,
       company: userInfo.company,
     }
   } catch {
@@ -153,8 +153,8 @@ export function clearAuthCookies(response: NextResponse): void {
     'topsteel-token-expiry',
   ]
 
-  cookiesToClear.forEach((cookieName) => {
-    response.cookies.set(cookieName, '', {
+  cookiesToClear?.forEach((cookieName) => {
+    response?.cookies?.set(cookieName, '', {
       ...COOKIE_OPTIONS,
       maxAge: 0,
     })
@@ -165,14 +165,14 @@ export function clearAuthCookies(response: NextResponse): void {
  * Vérifier si les tokens sont expirés
  */
 export function areTokensExpired(tokens: AuthTokens): boolean {
-  if (!tokens.expiresAt) {
+  if (!tokens?.expiresAt) {
     return true
   }
 
   // Ajouter une marge de 5 minutes
   const now = Date.now()
   const buffer = 5 * 60 * 1000 // 5 minutes
-  return now >= tokens.expiresAt - buffer
+  return now >= tokens?.expiresAt - buffer
 }
 
 /**
@@ -184,16 +184,16 @@ export async function refreshTokenMiddleware(
 ): Promise<NextResponse | null> {
   const tokens = await getTokensFromCookies(request)
 
-  if (!tokens || !tokens.refreshToken) {
+  if (!tokens || !tokens?.refreshToken) {
     return null
   }
 
   if (areTokensExpired(tokens)) {
     try {
-      const newTokens = await refreshTokenFunction(tokens.refreshToken)
+      const newTokens = await refreshTokenFunction(tokens?.refreshToken)
 
       if (newTokens) {
-        const response = NextResponse.next()
+        const response = NextResponse?.next()
         await saveTokensInCookies(newTokens, response)
         return response
       }
@@ -210,12 +210,77 @@ export async function refreshTokenMiddleware(
  */
 export function extractAccessToken(request: NextRequest): string | null {
   // Vérifier d'abord l'en-tête Authorization
-  const authHeader = request.headers.get('authorization')
+  const authHeader = request?.headers?.get('authorization')
   if (authHeader?.startsWith('Bearer ')) {
-    return authHeader.substring(7)
+    return authHeader?.substring(7)
   }
 
   // Sinon, récupérer depuis les cookies
-  const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value
+  const accessToken = request.cookies?.get(ACCESS_TOKEN_COOKIE)?.value
   return accessToken || null
+}
+
+/**
+ * Définir les cookies d'authentification (version simplifiée pour les tests)
+ */
+export function setAuthCookies(
+  tokens: AuthTokens,
+  response: NextResponse,
+  rememberMe = false
+): void {
+  saveTokensInCookies(tokens, response, rememberMe)
+}
+
+/**
+ * Récupérer l'authentification depuis les cookies (version simplifiée)
+ */
+export function getAuthFromCookies(request?: NextRequest): Promise<AuthTokens | null> {
+  return getTokensFromCookies(request)
+}
+
+/**
+ * Rafraîchir les tokens d'authentification
+ */
+export async function refreshAuthTokens(
+  refreshToken: string,
+  refreshFunction: (token: string) => Promise<AuthTokens | null>
+): Promise<AuthTokens | null> {
+  try {
+    return await refreshFunction(refreshToken)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Vérifier si un token est expiré
+ */
+export function isTokenExpired(expiresAt: number): boolean {
+  const now = Date.now()
+  const buffer = 5 * 60 * 1000 // 5 minutes
+  return now >= expiresAt - buffer
+}
+
+/**
+ * Extraire les informations utilisateur depuis un token JWT
+ */
+export function extractUserFromToken(token: string): Partial<User> | null {
+  try {
+    // Décoder le JWT sans vérification (pour les tests)
+    const parts = token?.split('.')
+    if (parts?.length !== 3) {
+      return null
+    }
+
+    const payload = JSON.parse(atob(parts?.[1]))
+    return {
+      id: payload.sub || payload.id,
+      email: payload.email,
+      prenom: payload.prenom,
+      nom: payload.nom,
+      isSuperAdmin: payload.isSuperAdmin ?? false,
+    } as Partial<User>
+  } catch {
+    return null
+  }
 }

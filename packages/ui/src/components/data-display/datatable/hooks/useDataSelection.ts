@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { SelectionState } from '../types'
 
 export interface UseDataSelectionProps<T> {
@@ -32,7 +32,7 @@ export interface UseDataSelectionReturn<T> {
 /**
  * Hook pour gérer la sélection des lignes dans une DataTable
  */
-export function useDataSelection<T extends Record<string, any>>({
+export function useDataSelection<T extends Record<string, unknown>>({
   data,
   keyField,
   selectable = true,
@@ -45,62 +45,87 @@ export function useDataSelection<T extends Record<string, any>>({
   })
 
   // Setter avec callback
-  const setSelection = useCallback((newSelection: SelectionState) => {
-    setSelectionState(newSelection)
-    onSelectionChange?.(newSelection)
-  }, [onSelectionChange])
+  const setSelection = useCallback(
+    (newSelection: SelectionState) => {
+      setSelectionState(newSelection)
+      onSelectionChange?.(newSelection)
+    },
+    [onSelectionChange]
+  )
 
   // Obtenir l'ID d'une ligne
-  const getRowId = useCallback((row: T): string | number => {
-    return row[keyField] as string | number
-  }, [keyField])
+  const getRowId = useCallback(
+    (row: T): string | number => {
+      return row[keyField] as string | number
+    },
+    [keyField]
+  )
 
   // Vérifier si une ligne est sélectionnée
-  const isSelected = useCallback((rowId: string | number): boolean => {
-    if (!selectable) return false
-    return selection.selectedRows.has(rowId)
-  }, [selectable, selection.selectedRows])
+  const isSelected = useCallback(
+    (rowId: string | number): boolean => {
+      if (!selectable) return false
+      return selection.selectedRows.has(rowId)
+    },
+    [selectable, selection.selectedRows]
+  )
 
   // Sélectionner une ligne
-  const selectRow = useCallback((rowId: string | number) => {
-    if (!selectable) return
-    
-    setSelection({
-      ...selection,
-      selectedRows: new Set([...selection.selectedRows, rowId]),
-      selectAll: false,
-    })
-  }, [selectable, selection, setSelection])
+  const selectRow = useCallback(
+    (rowId: string | number) => {
+      if (!selectable) return
+
+      setSelectionState((prevSelection) => {
+        const newSelection = {
+          selectedRows: new Set([...prevSelection.selectedRows, rowId]),
+          selectAll: false,
+        }
+        onSelectionChange?.(newSelection)
+        return newSelection
+      })
+    },
+    [selectable, onSelectionChange]
+  )
 
   // Désélectionner une ligne
-  const deselectRow = useCallback((rowId: string | number) => {
-    if (!selectable) return
-    
-    const newSelectedRows = new Set(selection.selectedRows)
-    newSelectedRows.delete(rowId)
-    
-    setSelection({
-      selectedRows: newSelectedRows,
-      selectAll: false,
-    })
-  }, [selectable, selection, setSelection])
+  const deselectRow = useCallback(
+    (rowId: string | number) => {
+      if (!selectable) return
+
+      setSelectionState((prevSelection) => {
+        const newSelectedRows = new Set(prevSelection.selectedRows)
+        newSelectedRows.delete(rowId)
+
+        const newSelection = {
+          selectedRows: newSelectedRows,
+          selectAll: false,
+        }
+        onSelectionChange?.(newSelection)
+        return newSelection
+      })
+    },
+    [selectable, onSelectionChange]
+  )
 
   // Basculer la sélection d'une ligne
-  const toggleRow = useCallback((rowId: string | number) => {
-    if (!selectable) return
-    
-    if (isSelected(rowId)) {
-      deselectRow(rowId)
-    } else {
-      selectRow(rowId)
-    }
-  }, [selectable, isSelected, selectRow, deselectRow])
+  const toggleRow = useCallback(
+    (rowId: string | number) => {
+      if (!selectable) return
+
+      if (isSelected(rowId)) {
+        deselectRow(rowId)
+      } else {
+        selectRow(rowId)
+      }
+    },
+    [selectable, isSelected, selectRow, deselectRow]
+  )
 
   // Sélectionner toutes les lignes
   const selectAll = useCallback(() => {
     if (!selectable) return
-    
-    const allIds = data.map(row => getRowId(row))
+
+    const allIds = data.map((row) => getRowId(row))
     setSelection({
       selectedRows: new Set(allIds),
       selectAll: true,
@@ -125,35 +150,36 @@ export function useDataSelection<T extends Record<string, any>>({
   }, [selection, data.length, selectAll, deselectAll])
 
   // Sélectionner une plage de lignes
-  const selectRange = useCallback((startId: string | number, endId: string | number) => {
-    if (!selectable) return
-    
-    const startIndex = data.findIndex(row => getRowId(row) === startId)
-    const endIndex = data.findIndex(row => getRowId(row) === endId)
-    
-    if (startIndex === -1 || endIndex === -1) return
-    
-    const minIndex = Math.min(startIndex, endIndex)
-    const maxIndex = Math.max(startIndex, endIndex)
-    
-    const rangeIds = data
-      .slice(minIndex, maxIndex + 1)
-      .map(row => getRowId(row))
-    
-    setSelection({
-      ...selection,
-      selectedRows: new Set([...selection.selectedRows, ...rangeIds]),
-      selectAll: false,
-    })
-  }, [selectable, data, getRowId, selection, setSelection])
+  const selectRange = useCallback(
+    (startId: string | number, endId: string | number) => {
+      if (!selectable) return
+
+      const startIndex = data.findIndex((row) => getRowId(row) === startId)
+      const endIndex = data.findIndex((row) => getRowId(row) === endId)
+
+      if (startIndex === -1 || endIndex === -1) return
+
+      const minIndex = Math.min(startIndex, endIndex)
+      const maxIndex = Math.max(startIndex, endIndex)
+
+      const rangeIds = data.slice(minIndex, maxIndex + 1).map((row) => getRowId(row))
+
+      setSelection({
+        ...selection,
+        selectedRows: new Set([...selection.selectedRows, ...rangeIds]),
+        selectAll: false,
+      })
+    },
+    [selectable, data, getRowId, selection, setSelection]
+  )
 
   // Calculer les données sélectionnées
   const selectedData = useMemo(() => {
     if (!selectable || selection.selectedRows.size === 0) {
       return []
     }
-    
-    return data.filter(row => isSelected(getRowId(row)))
+
+    return data.filter((row) => isSelected(getRowId(row)))
   }, [selectable, data, selection.selectedRows, isSelected, getRowId])
 
   // IDs sélectionnés

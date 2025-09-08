@@ -1,13 +1,26 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { MapPin, Building, Navigation, Crosshair, AlertCircle, Search, Plus, Eye, EyeOff } from 'lucide-react'
+import {
+  AlertCircle,
+  Building,
+  Crosshair,
+  Eye,
+  EyeOff,
+  MapPin,
+  Navigation,
+  Search,
+} from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
 import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../primitives/tooltip'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export interface GPSCoordinates {
   latitude: number
   longitude: number
@@ -112,35 +125,37 @@ export function LocationInput({
   useEffect(() => {
     setLocation(value)
   }, [value])
-  useEffect(() => {
-    if (showValidator && onValidate) {
-      performValidation()
-    }
-  }, [location, onValidate, showValidator])
   const performValidation = useCallback(async () => {
     if (!onValidate) return
     setIsValidating(true)
     try {
       const result = await onValidate(location)
       setValidation(result)
-    } catch (error) {
-      console.error('Error validating location:', error)
+    } catch (_error) {
       setValidation({
         isValid: false,
-        errors: ['Erreur de validation de la localisation']
+        errors: ['Erreur de validation de la localisation'],
       })
     } finally {
       setIsValidating(false)
     }
   }, [location, onValidate])
-  const handleLocationChange = (field: keyof LocationValue, newValue: any) => {
-    const updatedLocation = {
-      ...location,
-      [field]: newValue,
+  useEffect(() => {
+    if (showValidator && onValidate) {
+      performValidation()
     }
-    setLocation(updatedLocation)
-    onChange?.(updatedLocation)
-  }
+  }, [onValidate, showValidator, performValidation])
+  const handleLocationChange = useCallback(
+    (field: keyof LocationValue, newValue: any) => {
+      const updatedLocation = {
+        ...location,
+        [field]: newValue,
+      }
+      setLocation(updatedLocation)
+      onChange?.(updatedLocation)
+    },
+    [location, onChange]
+  )
   const handleWarehouseChange = (field: keyof WarehouseLocation, newValue: string) => {
     const updatedWarehouse = {
       ...location.warehouse,
@@ -149,7 +164,7 @@ export function LocationInput({
     const updatedLocation = {
       ...location,
       warehouse: updatedWarehouse,
-    }
+    } as Partial<LocationValue>
     setLocation(updatedLocation)
     onChange?.(updatedLocation)
   }
@@ -173,7 +188,7 @@ export function LocationInput({
     const updatedLocation = {
       ...location,
       gps: updatedGPS,
-    }
+    } as Partial<LocationValue>
     setLocation(updatedLocation)
     onChange?.(updatedLocation)
   }
@@ -183,29 +198,30 @@ export function LocationInput({
     try {
       const coordinates = await onGPSDetect()
       handleLocationChange('gps', coordinates)
-    } catch (error) {
-      console.error('Error detecting GPS:', error)
+    } catch (_error) {
     } finally {
       setIsDetectingGPS(false)
     }
-  }, [onGPSDetect])
-  const handleLocationSearch = useCallback(async (query: string) => {
-    if (!onLocationSearch || !query.trim()) {
-      setSuggestions([])
-      return
-    }
-    setIsSearching(true)
-    try {
-      const results = await onLocationSearch(query)
-      setSuggestions(results.slice(0, maxSuggestions))
-      setShowSuggestionsList(true)
-    } catch (error) {
-      console.error('Error searching locations:', error)
-      setSuggestions([])
-    } finally {
-      setIsSearching(false)
-    }
-  }, [onLocationSearch, maxSuggestions])
+  }, [onGPSDetect, handleLocationChange])
+  const handleLocationSearch = useCallback(
+    async (query: string) => {
+      if (!onLocationSearch || !query.trim()) {
+        setSuggestions([])
+        return
+      }
+      setIsSearching(true)
+      try {
+        const results = await onLocationSearch(query)
+        setSuggestions(results.slice(0, maxSuggestions))
+        setShowSuggestionsList(true)
+      } catch (_error) {
+        setSuggestions([])
+      } finally {
+        setIsSearching(false)
+      }
+    },
+    [onLocationSearch, maxSuggestions]
+  )
   const handleSuggestionSelect = (suggestion: LocationSuggestion) => {
     const updatedLocation = {
       ...location,
@@ -249,7 +265,7 @@ export function LocationInput({
         <Select
           value={location.warehouse?.warehouseId || ''}
           onValueChange={(value) => {
-            const warehouse = warehouses.find(w => w.warehouseId === value)
+            const warehouse = warehouses.find((w) => w.warehouseId === value)
             if (warehouse) {
               handleLocationChange('warehouse', warehouse)
             }
@@ -413,7 +429,9 @@ export function LocationInput({
           <div className="flex items-center gap-2">
             <Select
               value={location.type}
-              onValueChange={(value) => handleLocationChange('type', value as LocationValue['type'])}
+              onValueChange={(value) =>
+                handleLocationChange('type', value as LocationValue['type'])
+              }
               disabled={disabled}
             >
               <SelectTrigger className="w-32">
@@ -533,7 +551,10 @@ export function LocationInput({
           <div className="aspect-video bg-background rounded border flex items-center justify-center text-muted-foreground">
             <div className="text-center">
               <MapPin className="h-8 w-8 mx-auto mb-2" />
-              <p className="text-sm">Carte à {formatGPSCoordinate(location.gps.latitude)}, {formatGPSCoordinate(location.gps.longitude)}</p>
+              <p className="text-sm">
+                Carte à {formatGPSCoordinate(location.gps.latitude)},{' '}
+                {formatGPSCoordinate(location.gps.longitude)}
+              </p>
               <p className="text-xs text-muted-foreground mt-1">Intégration carte nécessaire</p>
             </div>
           </div>
@@ -578,9 +599,7 @@ export function LocationInput({
           )}
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

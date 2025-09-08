@@ -30,6 +30,7 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
+  useUniqueId,
 } from '@erp/ui'
 import {
   AlertTriangle,
@@ -51,7 +52,7 @@ import { callClientApi } from '@/utils/backend-api'
 // Fonction utilitaire pour formater les dates
 const formatDate = (date: string | Date) => {
   const d = new Date(date)
-  return d.toLocaleDateString('fr-FR', {
+  return d?.toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -81,9 +82,9 @@ export default function MenuConfigurationPage() {
   const loadConfigurations = useCallback(async () => {
     try {
       const response = await callClientApi('admin/menu-config')
-      const data = await response.json()
-      if (data.success) {
-        setConfigurations(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setConfigurations(data?.data)
       }
     } catch (_error) {
     } finally {
@@ -105,7 +106,7 @@ export default function MenuConfigurationPage() {
         method: 'POST',
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         loadConfigurations()
         // Recharger la page pour appliquer le nouveau menu
         window.location.reload()
@@ -123,7 +124,7 @@ export default function MenuConfigurationPage() {
         method: 'DELETE',
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         loadConfigurations()
       }
     } catch (_error) {}
@@ -141,13 +142,13 @@ export default function MenuConfigurationPage() {
         method: 'POST',
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         loadConfigurations()
       }
     } catch (_error) {}
   }
 
-  const activeConfig = configurations.find((c) => c.isActive)
+  const activeConfig = configurations?.find((c) => c.isActive)
 
   if (loading) {
     return (
@@ -202,8 +203,8 @@ export default function MenuConfigurationPage() {
         <Alert>
           <Check className="h-4 w-4" />
           <AlertDescription>
-            {t('menuConfig.activeConfiguration')} : <strong>{activeConfig.name}</strong>
-            {activeConfig.description && ` - ${activeConfig.description}`}
+            {t('menuConfig.activeConfiguration')} : <strong>{activeConfig?.name}</strong>
+            {activeConfig?.description && ` - ${activeConfig?.description}`}
           </AlertDescription>
         </Alert>
       )}
@@ -235,7 +236,7 @@ export default function MenuConfigurationPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {configurations.map((config) => (
+                  {configurations?.map((config) => (
                     <TableRow key={config.id}>
                       <TableCell>
                         <div className="flex items-center space-x-2">
@@ -381,8 +382,12 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
     description: '',
   })
 
+  // Generate unique ID for form fields
+  const nameFieldId = useUniqueId('name')
+  const descriptionFieldId = useUniqueId('description')
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     try {
       const response = await callClientApi('admin/menu-config', {
@@ -393,7 +398,7 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
         }),
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         onSave()
       }
     } catch (_error) {}
@@ -402,35 +407,35 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">{t('menuConfig.name')}</Label>
+        <Label htmlFor={nameFieldId}>{t('menuConfig.name')}</Label>
         <Input
-          id="name"
+          id={nameFieldId}
           value={formData.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setFormData((prev) => ({ ...prev, name: e.target.value }))
+            setFormData((prev) => ({ ...prev, name: e?.target?.value }))
           }
-          placeholder={t('menuConfig.form.namePlaceholder')}
+          placeholder={t('menuConfig?.form?.namePlaceholder')}
           required
         />
       </div>
 
       <div>
-        <Label htmlFor="description">{t('menuConfig.description')}</Label>
+        <Label htmlFor={descriptionFieldId}>{t('menuConfig.description')}</Label>
         <Textarea
-          id="description"
+          id={descriptionFieldId}
           value={formData.description}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setFormData((prev) => ({ ...prev, description: e.target.value }))
+            setFormData((prev) => ({ ...prev, description: e?.target?.value }))
           }
-          placeholder={t('menuConfig.form.descriptionPlaceholder')}
+          placeholder={t('menuConfig?.form?.descriptionPlaceholder')}
         />
       </div>
 
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
-          {t('menuConfig.form.cancel')}
+          {t('menuConfig?.form?.cancel')}
         </Button>
-        <Button type="submit">{t('menuConfig.form.create')}</Button>
+        <Button type="submit">{t('menuConfig?.form?.create')}</Button>
       </div>
     </form>
   )
@@ -452,13 +457,13 @@ function MenuConfigEditor({
       <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          {t('menuConfig.editor.advancedEditorSoon')}
+          {t('menuConfig?.editor?.advancedEditorSoon')}
           {t('menuConfig.editor.exportImportInfo')}
         </AlertDescription>
       </Alert>
 
       <div className="flex justify-end">
-        <Button onClick={onSave}>{t('menuConfig.editor.close')}</Button>
+        <Button onClick={onSave}>{t('menuConfig?.editor?.close')}</Button>
       </div>
     </div>
   )
@@ -475,9 +480,9 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
 
     try {
       const response = await callClientApi(`admin/menu-config/tree?configId=${config.id}`)
-      const data = await response.json()
-      if (data.success) {
-        setMenuTree(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setMenuTree(data?.data)
       }
     } catch (_error) {
     } finally {
@@ -492,7 +497,7 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
   }, [config, loadMenuTree])
 
   if (loading) {
-    return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
+    return <div className="text-center py-8">{t('menuConfig?.preview?.loadingPreview')}</div>
   }
 
   const renderMenuItem = (item: MenuItem, depth: number = 0) => (
@@ -516,12 +521,12 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
     <div className="space-y-4">
       <div className="bg-gray-50 rounded-lg p-4 border">
         <h3 className="font-medium mb-3">
-          {t('menuConfig.preview.menuStructure', { fallback: 'Structure du menu' })}
+          {t('menuConfig?.preview?.menuStructure', { fallback: 'Structure du menu' })}
         </h3>
         {menuTree.length > 0 ? (
-          <div className="space-y-1">{menuTree.map((item) => renderMenuItem(item))}</div>
+          <div className="space-y-1">{menuTree?.map((item) => renderMenuItem(item))}</div>
         ) : (
-          <p className="text-muted-foreground">{t('menuConfig.preview.noItems')}</p>
+          <p className="text-muted-foreground">{t('menuConfig?.preview?.noItems')}</p>
         )}
       </div>
     </div>
@@ -537,9 +542,9 @@ function MenuPreview() {
   const loadCurrentMenu = useCallback(async () => {
     try {
       const response = await callClientApi('admin/menu-config/tree/filtered')
-      const data = await response.json()
-      if (data.success) {
-        setMenuTree(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setMenuTree(data?.data)
       }
     } catch (_error) {
     } finally {
@@ -552,7 +557,7 @@ function MenuPreview() {
   }, [loadCurrentMenu])
 
   if (loading) {
-    return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
+    return <div className="text-center py-8">{t('menuConfig?.preview?.loadingPreview')}</div>
   }
 
   const renderMenuItem = (item: MenuItem, depth: number = 0) => (
@@ -581,10 +586,12 @@ function MenuPreview() {
     <Card>
       <CardHeader>
         <CardTitle>
-          {t('menuConfig.preview.currentNavigationMenu', { fallback: 'Menu de navigation actuel' })}
+          {t('menuConfig?.preview?.currentNavigationMenu', {
+            fallback: 'Menu de navigation actuel',
+          })}
         </CardTitle>
         <CardDescription>
-          {t('menuConfig.preview.userMenuPreview', {
+          {t('menuConfig?.preview?.userMenuPreview', {
             fallback: "Aperçu du menu tel qu'il apparaît pour votre utilisateur",
           })}
         </CardDescription>
@@ -592,13 +599,13 @@ function MenuPreview() {
       <CardContent>
         {menuTree.length > 0 ? (
           <div className="space-y-0 border rounded-lg">
-            {menuTree.map((item) => renderMenuItem(item))}
+            {menuTree?.map((item) => renderMenuItem(item))}
           </div>
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>
-              {t('menuConfig.preview.noMenuConfigured', {
+              {t('menuConfig?.preview?.noMenuConfigured', {
                 fallback: 'Aucun menu configuré ou accessible',
               })}
             </p>

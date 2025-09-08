@@ -1,23 +1,21 @@
 'use client'
-import React from 'react'
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Gauge,
+  Pause,
+  Play,
+  Square,
+  Thermometer,
+  Wrench,
+} from 'lucide-react'
 import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Card } from '../../../layout/card'
 import { Progress } from '../../../primitives/progress'
-import { 
-  Cog, 
-  Play, 
-  Pause, 
-  Square, 
-  AlertCircle, 
-  CheckCircle, 
-  Clock, 
-  Thermometer, 
-  Gauge,
-  Wrench,
-  Calendar,
-  TrendingUp
-} from 'lucide-react'
+
 interface MachineParameter {
   name: string
   value: number
@@ -60,14 +58,14 @@ interface MachineStatusDisplayProps {
   onStatusClick?: (machine: MachineStatus) => void
   onParameterClick?: (parameter: MachineParameter) => void
 }
-export function MachineStatusDisplay({ 
-  className, 
+export function MachineStatusDisplay({
+  className,
   machine,
   compact = false,
   showParameters = true,
   showAlerts = true,
   onStatusClick,
-  onParameterClick
+  onParameterClick,
 }: MachineStatusDisplayProps) {
   const getStatusIcon = (status: MachineStatus['status']) => {
     switch (status) {
@@ -88,21 +86,45 @@ export function MachineStatusDisplay({
   const getStatusBadge = (status: MachineStatus['status']) => {
     switch (status) {
       case 'running':
-        return <Badge variant="success" className="text-xs">Running</Badge>
+        return (
+          <Badge variant="default" className="text-xs">
+            Running
+          </Badge>
+        )
       case 'idle':
-        return <Badge variant="secondary" className="text-xs">Idle</Badge>
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Idle
+          </Badge>
+        )
       case 'maintenance':
-        return <Badge variant="outline" className="text-xs border-blue-200 text-blue-600">Maintenance</Badge>
+        return (
+          <Badge variant="outline" className="text-xs border-blue-200 text-blue-600">
+            Maintenance
+          </Badge>
+        )
       case 'error':
-        return <Badge variant="destructive" className="text-xs">Error</Badge>
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Error
+          </Badge>
+        )
       case 'offline':
-        return <Badge variant="outline" className="text-xs text-gray-600">Offline</Badge>
+        return (
+          <Badge variant="outline" className="text-xs text-gray-600">
+            Offline
+          </Badge>
+        )
       default:
-        return <Badge variant="outline" className="text-xs">Unknown</Badge>
+        return (
+          <Badge variant="outline" className="text-xs">
+            Unknown
+          </Badge>
+        )
     }
   }
   const getParameterStatus = (param: MachineParameter) => {
-    const { value, min, max, optimal, status } = param
+    const { value, optimal, status } = param
     if (status === 'critical') return 'text-red-600 bg-red-50'
     if (status === 'warning') return 'text-orange-600 bg-orange-50'
     if (optimal && value >= optimal.min && value <= optimal.max) return 'text-green-600 bg-green-50'
@@ -128,23 +150,36 @@ export function MachineStatusDisplay({
   }
   const getMaintenanceStatus = () => {
     const now = new Date()
-    const daysUntilMaintenance = Math.ceil((machine.nextMaintenance.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    if (daysUntilMaintenance < 0) return { status: 'overdue', days: Math.abs(daysUntilMaintenance), color: 'text-red-600' }
-    if (daysUntilMaintenance <= 7) return { status: 'due_soon', days: daysUntilMaintenance, color: 'text-orange-600' }
+    const daysUntilMaintenance = Math.ceil(
+      (machine.nextMaintenance.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    )
+    if (daysUntilMaintenance < 0)
+      return { status: 'overdue', days: Math.abs(daysUntilMaintenance), color: 'text-red-600' }
+    if (daysUntilMaintenance <= 7)
+      return { status: 'due_soon', days: daysUntilMaintenance, color: 'text-orange-600' }
     return { status: 'scheduled', days: daysUntilMaintenance, color: 'text-green-600' }
   }
   const maintenanceStatus = getMaintenanceStatus()
   if (compact) {
     return (
-      <div 
+      // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+      <div
         className={cn(
-          "p-3 border rounded-lg transition-colors",
-          onStatusClick && "cursor-pointer hover:bg-muted/50",
-          machine.status === 'error' && "border-red-200 bg-red-50",
-          machine.status === 'running' && "border-green-200 bg-green-50",
+          'p-3 border rounded-lg transition-colors',
+          onStatusClick && 'cursor-pointer hover:bg-muted/50',
+          machine.status === 'error' && 'border-red-200 bg-red-50',
+          machine.status === 'running' && 'border-green-200 bg-green-50',
           className
         )}
+        role={onStatusClick ? 'button' : undefined}
+        tabIndex={onStatusClick ? 0 : undefined}
         onClick={() => onStatusClick?.(machine)}
+        onKeyDown={(e) => {
+          if (onStatusClick && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault()
+            onStatusClick(machine)
+          }
+        }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -172,7 +207,7 @@ export function MachineStatusDisplay({
     )
   }
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -217,23 +252,28 @@ export function MachineStatusDisplay({
           </div>
           <div className="text-center p-3 bg-purple-50 rounded-lg">
             <Clock className="w-6 h-6 mx-auto mb-1 text-purple-600" />
-            <div className="text-lg font-bold text-purple-600">{machine.operatingHours.toLocaleString()}</div>
+            <div className="text-lg font-bold text-purple-600">
+              {machine.operatingHours.toLocaleString()}
+            </div>
             <div className="text-xs text-muted-foreground">Operating Hours</div>
           </div>
           <div className="text-center p-3 bg-green-50 rounded-lg">
             <CheckCircle className="w-6 h-6 mx-auto mb-1 text-green-600" />
             <div className="text-lg font-bold text-green-600">
-              {Math.ceil((new Date().getTime() - machine.lastMaintenance.getTime()) / (1000 * 60 * 60 * 24))}
+              {Math.ceil((Date.now() - machine.lastMaintenance.getTime()) / (1000 * 60 * 60 * 24))}
             </div>
             <div className="text-xs text-muted-foreground">Days Since Maintenance</div>
           </div>
-          <div className={cn("text-center p-3 rounded-lg", 
-            maintenanceStatus.status === 'overdue' && "bg-red-50",
-            maintenanceStatus.status === 'due_soon' && "bg-orange-50",
-            maintenanceStatus.status === 'scheduled' && "bg-green-50"
-          )}>
-            <Calendar className={cn("w-6 h-6 mx-auto mb-1", maintenanceStatus.color)} />
-            <div className={cn("text-lg font-bold", maintenanceStatus.color)}>
+          <div
+            className={cn(
+              'text-center p-3 rounded-lg',
+              maintenanceStatus.status === 'overdue' && 'bg-red-50',
+              maintenanceStatus.status === 'due_soon' && 'bg-orange-50',
+              maintenanceStatus.status === 'scheduled' && 'bg-green-50'
+            )}
+          >
+            <Calendar className={cn('w-6 h-6 mx-auto mb-1', maintenanceStatus.color)} />
+            <div className={cn('text-lg font-bold', maintenanceStatus.color)}>
               {maintenanceStatus.days}
             </div>
             <div className="text-xs text-muted-foreground">
@@ -252,14 +292,23 @@ export function MachineStatusDisplay({
               {machine.parameters.map((param, index) => {
                 const progressValue = ((param.value - param.min) / (param.max - param.min)) * 100
                 return (
-                  <div 
+                  // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+                  <div
                     key={index}
                     className={cn(
-                      "p-3 rounded-lg border transition-colors",
+                      'p-3 rounded-lg border transition-colors',
                       getParameterStatus(param),
-                      onParameterClick && "cursor-pointer hover:bg-opacity-70"
+                      onParameterClick && 'cursor-pointer hover:bg-opacity-70'
                     )}
+                    role={onParameterClick ? 'button' : undefined}
+                    tabIndex={onParameterClick ? 0 : undefined}
                     onClick={() => onParameterClick?.(param)}
+                    onKeyDown={(e) => {
+                      if (onParameterClick && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault()
+                        onParameterClick(param)
+                      }
+                    }}
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium text-sm">{param.name}</span>
@@ -267,19 +316,21 @@ export function MachineStatusDisplay({
                         {param.value.toFixed(1)} {param.unit}
                       </span>
                     </div>
-                    <Progress 
-                      value={progressValue} 
+                    <Progress
+                      value={progressValue}
                       className={cn(
-                        "h-2 mb-1",
-                        param.status === 'critical' && "[&>div]:bg-red-500",
-                        param.status === 'warning' && "[&>div]:bg-orange-500",
-                        param.status === 'normal' && "[&>div]:bg-green-500"
+                        'h-2 mb-1',
+                        param.status === 'critical' && '[&>div]:bg-red-500',
+                        param.status === 'warning' && '[&>div]:bg-orange-500',
+                        param.status === 'normal' && '[&>div]:bg-green-500'
                       )}
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>Min: {param.min}</span>
                       {param.optimal && (
-                        <span>Optimal: {param.optimal.min}-{param.optimal.max}</span>
+                        <span>
+                          Optimal: {param.optimal.min}-{param.optimal.max}
+                        </span>
                       )}
                       <span>Max: {param.max}</span>
                     </div>
@@ -298,13 +349,13 @@ export function MachineStatusDisplay({
             </h4>
             <div className="space-y-2">
               {machine.alerts.slice(0, 3).map((alert) => (
-                <div 
+                <div
                   key={alert.id}
                   className={cn(
-                    "p-3 rounded-lg border-l-4",
-                    alert.type === 'error' && "border-l-red-500 bg-red-50",
-                    alert.type === 'warning' && "border-l-orange-500 bg-orange-50",
-                    alert.type === 'info' && "border-l-blue-500 bg-blue-50"
+                    'p-3 rounded-lg border-l-4',
+                    alert.type === 'error' && 'border-l-red-500 bg-red-50',
+                    alert.type === 'warning' && 'border-l-orange-500 bg-orange-50',
+                    alert.type === 'info' && 'border-l-blue-500 bg-blue-50'
                   )}
                 >
                   <div className="flex justify-between items-start">

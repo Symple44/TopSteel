@@ -18,9 +18,9 @@ interface HeaderProps {
 }
 
 export function Header({
-  _onToggleSidebar,
-  _isSidebarCollapsed = false,
-  onShowCompanySelector,
+  onToggleSidebar: _onToggleSidebar,
+  isSidebarCollapsed: _isSidebarCollapsed = false,
+  onShowCompanySelector: _onShowCompanySelector,
 }: HeaderProps) {
   const [showCommandPalette, setShowCommandPalette] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -33,7 +33,7 @@ export function Header({
   // Fermer le menu si on clique à l'extérieur
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (menuRef?.current && !menuRef?.current?.contains(event.target as Node)) {
         setShowUserMenu(false)
       }
     }
@@ -64,7 +64,7 @@ export function Header({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
+        e?.preventDefault()
         setShowCommandPalette(true)
       }
     }
@@ -76,7 +76,7 @@ export function Header({
   const handleLogout = async () => {
     try {
       await logout()
-      router.push('/login')
+      router?.push('/login')
     } catch (_error) {}
   }
 
@@ -97,6 +97,7 @@ export function Header({
         {/* Section centre - Recherche */}
         <div className="flex-1 max-w-md mx-6">
           <button
+            type="button"
             onClick={() => setShowCommandPalette(true)}
             className="w-full flex items-center px-4 py-2 bg-muted border border-input rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all group"
           >
@@ -116,9 +117,10 @@ export function Header({
           {/* Sélecteur de société */}
           <div className="hidden md:flex items-center space-x-2">
             <Button
+              type="button"
               variant="outline"
               size="sm"
-              onClick={() => onShowCompanySelector?.()}
+              onClick={() => _onShowCompanySelector?.()}
               className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
               title={
                 company
@@ -147,6 +149,7 @@ export function Header({
           {/* Menu utilisateur */}
           <div className="relative" ref={menuRef}>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -181,7 +184,7 @@ export function Header({
                   <button
                     type="button"
                     onClick={() => {
-                      router.push('/profile')
+                      router?.push('/profile')
                       setShowUserMenu(false)
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
@@ -193,7 +196,7 @@ export function Header({
                   <button
                     type="button"
                     onClick={() => {
-                      router.push('/settings')
+                      router?.push('/settings')
                       setShowUserMenu(false)
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"

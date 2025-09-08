@@ -1,6 +1,6 @@
 'use client'
 
-import type { Projet } from '@erp/domains/core'
+import type { Projet } from '@erp/domains'
 import * as UI from '@erp/ui'
 
 const Badge = UI.Badge
@@ -119,10 +119,10 @@ export function ProjetDocumentsTab({
     )
   }
 
-  const filteredDocuments = mockDocuments.filter((doc) => {
+  const filteredDocuments = mockDocuments?.filter((doc) => {
     const matchesSearch =
-      doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.auteur.toLowerCase().includes(searchTerm.toLowerCase())
+      doc?.nom?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      doc?.auteur?.toLowerCase().includes(searchTerm?.toLowerCase())
     const matchesCategory = selectedCategory === 'tous' || doc.categorie === selectedCategory
     const matchesType = selectedType === 'tous' || doc.type === selectedType
 
@@ -145,7 +145,7 @@ export function ProjetDocumentsTab({
           <h3 className="text-lg font-medium">Documents du projet</h3>
           <p className="text-sm text-muted-foreground">Gérez tous les documents liés à ce projet</p>
         </div>
-        <Button>
+        <Button type="button">
           <Upload className="h-4 w-4 mr-2" />
           Ajouter des fichiers
         </Button>
@@ -162,7 +162,7 @@ export function ProjetDocumentsTab({
                   placeholder="Rechercher par nom ou auteur..."
                   value={searchTerm}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setSearchTerm(e.target.value)
+                    setSearchTerm(e?.target?.value)
                   }
                   className="pl-10"
                 />
@@ -212,7 +212,7 @@ export function ProjetDocumentsTab({
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockDocuments.filter((d) => d.type === 'PDF').length}
+              {mockDocuments?.filter((d) => d.type === 'PDF').length}
             </div>
             <p className="text-xs text-muted-foreground">Documents PDF</p>
           </CardContent>
@@ -220,7 +220,7 @@ export function ProjetDocumentsTab({
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockDocuments.filter((d) => d.type === 'Image').length}
+              {mockDocuments?.filter((d) => d.type === 'Image').length}
             </div>
             <p className="text-xs text-muted-foreground">Images</p>
           </CardContent>
@@ -230,7 +230,7 @@ export function ProjetDocumentsTab({
             <div className="text-2xl font-bold">
               {mockDocuments
                 .reduce((acc, doc) => {
-                  const size = Number.parseFloat(doc.taille.replace(/[^\d.]/g, ''))
+                  const size = Number?.parseFloat(doc?.taille?.replace(/[^\d.]/g, ''))
 
                   return acc + size
                 }, 0)
@@ -245,10 +245,10 @@ export function ProjetDocumentsTab({
       {/* Liste des documents */}
       <Card>
         <CardHeader>
-          <CardTitle>Documents ({filteredDocuments.length})</CardTitle>
+          <CardTitle>Documents ({filteredDocuments?.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredDocuments.length === 0 ? (
+          {filteredDocuments?.length === 0 ? (
             <div className="text-center py-8">
               <File className="h-12 w-12 mx-auto text-gray-300 mb-4" />
               <p className="text-gray-500">Aucun document trouvé</p>
@@ -260,7 +260,7 @@ export function ProjetDocumentsTab({
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredDocuments.map((document) => (
+              {filteredDocuments?.map((document) => (
                 <div
                   key={document.id}
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
@@ -281,6 +281,7 @@ export function ProjetDocumentsTab({
 
                     <div className="flex gap-1">
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => handleView(document)}
@@ -289,6 +290,7 @@ export function ProjetDocumentsTab({
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDownload(document)}
@@ -297,6 +299,7 @@ export function ProjetDocumentsTab({
                         <Download className="h-4 w-4" />
                       </Button>
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(document)}
@@ -305,6 +308,7 @@ export function ProjetDocumentsTab({
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(document)}

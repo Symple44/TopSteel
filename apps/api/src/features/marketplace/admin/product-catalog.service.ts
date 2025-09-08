@@ -39,7 +39,7 @@ export interface CreateMarketplaceProductDto {
   longueur?: number // Article.longueur
   largeur?: number // Article.largeur
   hauteur?: number // Article.hauteur
-  caracteristiquesTechniques?: Record<string, any> // Article.caracteristiquesTechniques
+  caracteristiquesTechniques?: Record<string, unknown> // Article.caracteristiquesTechniques
   marketplaceSettings?: {
     basePrice?: number
     categories?: string[]
@@ -143,7 +143,7 @@ export class ProductCatalogService {
         isMarketplaceEnabled: true,
         stockPhysique: productData.stockPhysique || 0,
         stockDisponible: productData.stockPhysique || 0,
-      } as any)
+      } as unknown)
 
       const savedArticle = (await this.articleRepository.save(article)) as unknown as Article
 

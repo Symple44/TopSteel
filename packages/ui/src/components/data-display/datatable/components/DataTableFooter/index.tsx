@@ -1,11 +1,11 @@
 'use client'
 
-import React from 'react'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import React from 'react'
+import { cn } from '../../../../../lib/utils'
 import { Button } from '../../../../primitives/button'
 import { Select } from '../../../../primitives/select'
 import { useDataTableContext } from '../../contexts/DataTableContext'
-import { cn } from '../../../../../lib/utils'
 
 export interface DataTableFooterProps {
   showPagination?: boolean
@@ -23,25 +23,18 @@ export function DataTableFooter({
   pageSizeOptions = [10, 25, 50, 100],
   className,
 }: DataTableFooterProps) {
-  const {
-    state,
-    goToPage,
-    nextPage,
-    prevPage,
-    setPageSize,
-    clearSelection,
-  } = useDataTableContext()
+  const { state, goToPage, nextPage, prevPage, setPageSize, clearSelection } = useDataTableContext()
 
   const { paginationInfo, selection, processedData, data } = state
 
   // Générer les numéros de page
   const getPageNumbers = () => {
     if (!paginationInfo) return []
-    
+
     const { currentPage, totalPages } = paginationInfo
     const pages: (number | string)[] = []
     const maxVisible = 7
-    
+
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i)
@@ -49,35 +42,37 @@ export function DataTableFooter({
     } else {
       // Toujours afficher la première page
       pages.push(1)
-      
+
       if (currentPage > 3) {
         pages.push('...')
       }
-      
+
       // Pages autour de la page courante
       const start = Math.max(2, currentPage - 1)
       const end = Math.min(totalPages - 1, currentPage + 1)
-      
+
       for (let i = start; i <= end; i++) {
         pages.push(i)
       }
-      
+
       if (currentPage < totalPages - 2) {
         pages.push('...')
       }
-      
+
       // Toujours afficher la dernière page
       pages.push(totalPages)
     }
-    
+
     return pages
   }
 
   return (
-    <div className={cn(
-      'flex items-center justify-between px-4 py-3 border-t bg-background',
-      className
-    )}>
+    <div
+      className={cn(
+        'flex items-center justify-between px-4 py-3 border-t bg-background',
+        className
+      )}
+    >
       {/* Infos de sélection et résumé */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         {showSelection && selection.selectedRows.size > 0 && (
@@ -86,6 +81,7 @@ export function DataTableFooter({
               {selection.selectedRows.size} sélectionné{selection.selectedRows.size > 1 ? 's' : ''}
             </span>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={clearSelection}
@@ -95,7 +91,7 @@ export function DataTableFooter({
             </Button>
           </div>
         )}
-        
+
         {/* Résumé des données */}
         <div>
           {state.isFiltered ? (
@@ -104,7 +100,8 @@ export function DataTableFooter({
             </span>
           ) : paginationInfo ? (
             <span>
-              {paginationInfo.startIndex} - {paginationInfo.endIndex} sur {paginationInfo.totalItems}
+              {paginationInfo.startIndex} - {paginationInfo.endIndex} sur{' '}
+              {paginationInfo.totalItems}
             </span>
           ) : (
             <span>
@@ -124,7 +121,7 @@ export function DataTableFooter({
               value={String(paginationInfo.pageSize)}
               onValueChange={(value) => setPageSize(Number(value))}
             >
-              {pageSizeOptions.map(size => (
+              {pageSizeOptions.map((size) => (
                 <option key={size} value={size}>
                   {size}
                 </option>
@@ -135,6 +132,7 @@ export function DataTableFooter({
           <div className="flex items-center gap-1">
             {/* Première page */}
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => goToPage(1)}
@@ -146,6 +144,7 @@ export function DataTableFooter({
 
             {/* Page précédente */}
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={prevPage}
@@ -163,6 +162,7 @@ export function DataTableFooter({
                     <span className="px-2 text-muted-foreground">...</span>
                   ) : (
                     <Button
+                      type="button"
                       variant={page === paginationInfo.currentPage ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => goToPage(page as number)}
@@ -177,6 +177,7 @@ export function DataTableFooter({
 
             {/* Page suivante */}
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={nextPage}
@@ -188,6 +189,7 @@ export function DataTableFooter({
 
             {/* Dernière page */}
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => goToPage(paginationInfo.totalPages)}

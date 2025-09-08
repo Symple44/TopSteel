@@ -19,7 +19,16 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Label } from '@erp/ui'
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Label,
+  useFormFieldIds,
+} from '@erp/ui'
 import {
   Button,
   Dialog,
@@ -86,10 +95,11 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { TranslationFieldWrapper } from '@/components/wrappers/translation-field-wrapper'
-import { apiClient } from '@/lib/api-client-instance'
+import { fetchTyped, postTyped } from '@/lib/api-typed'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { translator } from '@/lib/i18n/translator'
-import { getTranslatedTitle } from '@/utils/menu-translations'
+import type { TranslationFunction } from '@/lib/i18n/types'
+import { getTranslatedTitle, type TranslatableMenuItem } from '@/utils/menu-translations'
 
 interface MenuItemConfig {
   id: string
@@ -189,9 +199,9 @@ const _getAvailableIcons = () => {
   return Object.keys(iconMap).sort()
 }
 
-const getIconsByCategory = (t: unknown) => {
+const getIconsByCategory = (t: TranslationFunction) => {
   return {
-    [t('settings.menu.iconCategories.navigation')]: [
+    [t('settings?.menu?.iconCategories.navigation')]: [
       'Home',
       'LayoutDashboard',
       'FolderOpen',
@@ -199,9 +209,14 @@ const getIconsByCategory = (t: unknown) => {
       'Search',
       'Eye',
     ],
-    [t('settings.menu.iconCategories.security')]: ['Shield', 'Users', 'User', 'Key', 'Lock'],
-    [t('settings.menu.iconCategories.enterprise')]: ['Building', 'Building2', 'Globe', 'Briefcase'],
-    [t('settings.menu.iconCategories.data')]: [
+    [t('settings?.menu?.iconCategories.security')]: ['Shield', 'Users', 'User', 'Key', 'Lock'],
+    [t('settings?.menu?.iconCategories.enterprise')]: [
+      'Building',
+      'Building2',
+      'Globe',
+      'Briefcase',
+    ],
+    [t('settings?.menu?.iconCategories.data')]: [
       'Database',
       'BarChart3',
       'PieChart',
@@ -209,16 +224,16 @@ const getIconsByCategory = (t: unknown) => {
       'TrendingUp',
       'FileText',
     ],
-    [t('settings.menu.iconCategories.production')]: ['Package', 'Wrench', 'Truck'],
-    [t('settings.menu.iconCategories.communication')]: ['Mail', 'Phone', 'Calendar', 'Bell'],
-    [t('settings.menu.iconCategories.actions')]: [
+    [t('settings?.menu?.iconCategories.production')]: ['Package', 'Wrench', 'Truck'],
+    [t('settings?.menu?.iconCategories.communication')]: ['Mail', 'Phone', 'Calendar', 'Bell'],
+    [t('settings?.menu?.iconCategories.actions')]: [
       'Download',
       'Upload',
       'CheckCircle',
       'AlertTriangle',
       'RefreshCw',
     ],
-    [t('settings.menu.iconCategories.finance')]: [
+    [t('settings?.menu?.iconCategories.finance')]: [
       'CreditCard',
       'Monitor',
       'ExternalLink',
@@ -232,23 +247,23 @@ const getIconComponent = (iconName: string) => {
   return iconMap[iconName] || Settings
 }
 
-const getAvailableColors = (t: unknown) => {
+const getAvailableColors = (t: TranslationFunction) => {
   return {
-    [t('settings.menu.colors.blue')]: '#3b82f6',
-    [t('settings.menu.colors.green')]: '#10b981',
-    [t('settings.menu.colors.orange')]: '#f97316',
-    [t('settings.menu.colors.red')]: '#ef4444',
-    [t('settings.menu.colors.purple')]: '#8b5cf6',
-    [t('settings.menu.colors.pink')]: '#ec4899',
-    [t('settings.menu.colors.yellow')]: '#eab308',
-    [t('settings.menu.colors.cyan')]: '#06b6d4',
-    [t('settings.menu.colors.gray')]: '#6b7280',
-    [t('settings.menu.colors.slate')]: '#475569',
-    [t('settings.menu.colors.zinc')]: '#52525b',
-    [t('settings.menu.colors.indigo')]: '#6366f1',
-    [t('settings.menu.colors.emerald')]: '#059669',
-    [t('settings.menu.colors.lime')]: '#65a30d',
-    [t('settings.menu.colors.amber')]: '#d97706',
+    [t('settings?.menu?.colors.blue')]: '#3b82f6',
+    [t('settings?.menu?.colors.green')]: '#10b981',
+    [t('settings?.menu?.colors.orange')]: '#f97316',
+    [t('settings?.menu?.colors.red')]: '#ef4444',
+    [t('settings?.menu?.colors.purple')]: '#8b5cf6',
+    [t('settings?.menu?.colors.pink')]: '#ec4899',
+    [t('settings?.menu?.colors.yellow')]: '#eab308',
+    [t('settings?.menu?.colors.cyan')]: '#06b6d4',
+    [t('settings?.menu?.colors.gray')]: '#6b7280',
+    [t('settings?.menu?.colors.slate')]: '#475569',
+    [t('settings?.menu?.colors.zinc')]: '#52525b',
+    [t('settings?.menu?.colors.indigo')]: '#6366f1',
+    [t('settings?.menu?.colors.emerald')]: '#059669',
+    [t('settings?.menu?.colors.lime')]: '#65a30d',
+    [t('settings?.menu?.colors.amber')]: '#d97706',
   }
 }
 
@@ -280,21 +295,21 @@ function FolderMenuItem({
   const Icon = IconComponent
   const iconStyle = getColorStyle(item.customIconColor)
   const [isDragOver, setIsDragOver] = useState(false)
-  const hasChildren = item.children && item.children.length > 0
-  const isExpanded = expandedItems.includes(item.id)
+  const hasChildren = item.children && item?.children?.length > 0
+  const isExpanded = expandedItems?.includes(item.id)
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e?.preventDefault()
+    e?.stopPropagation()
 
     if (onDropInFolder) {
       // D'abord essayer de récupérer depuis dataTransfer
-      let draggedData = e.dataTransfer.getData('application/json')
+      let draggedData = e?.dataTransfer?.getData('application/json')
 
       // Si pas de données dans dataTransfer, essayer sessionStorage (fallback)
       if (!draggedData) {
-        draggedData = sessionStorage.getItem('draggedStandardItem') || ''
-        sessionStorage.removeItem('draggedStandardItem')
+        draggedData = sessionStorage?.getItem('draggedStandardItem') || ''
+        sessionStorage?.removeItem('draggedStandardItem')
       }
 
       // Essayer aussi de récupérer depuis un état global
@@ -322,19 +337,19 @@ function FolderMenuItem({
   }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e?.preventDefault()
+    e?.stopPropagation()
   }
 
   const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e?.preventDefault()
+    e?.stopPropagation()
     setIsDragOver(true)
   }
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e?.preventDefault()
+    e?.stopPropagation()
     setIsDragOver(false)
   }
 
@@ -356,21 +371,23 @@ function FolderMenuItem({
               <GripVertical className="h-4 w-4 text-muted-foreground" />
             </div>
             {hasChildren && onToggleExpanded && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={(e) => {
-                  e.stopPropagation()
+                  e?.stopPropagation()
                   onToggleExpanded(item.id)
                 }}
                 className="p-1 hover:bg-accent rounded transition-colors"
-                title={isExpanded ? 'Réduire le dossier' : 'Étendre le dossier'}
+                aria-label={isExpanded ? 'Réduire le dossier' : 'Étendre le dossier'}
               >
                 {isExpanded ? (
                   <ChevronDown className="h-4 w-4 text-purple-600" />
                 ) : (
                   <ChevronRight className="h-4 w-4 text-purple-600" />
                 )}
-              </button>
+              </Button>
             )}
           </div>
           <Icon className="h-4 w-4" style={iconStyle} />
@@ -403,17 +420,19 @@ function FolderMenuItem({
           </div>
           <div className="flex gap-1">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0"
               onClick={(e) => {
-                e.stopPropagation()
+                e?.stopPropagation()
                 onEdit?.(item)
               }}
             >
               <Edit className="h-3 w-3" />
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0 text-destructive hover:text-destructive"
@@ -428,7 +447,7 @@ function FolderMenuItem({
       {/* Afficher les enfants du dossier seulement si étendu */}
       {hasChildren && isExpanded && (
         <div className="ml-4 border-l-2 border-purple-200 pl-4 space-y-1">
-          {item.children.map((child) =>
+          {item?.children?.map((child) =>
             child.type === 'M' ? (
               <FolderMenuItem
                 key={child.id}
@@ -455,7 +474,7 @@ function FolderMenuItem({
       )}
 
       {/* Debug pour voir si c'est un dossier vide */}
-      {(!item.children || item.children.length === 0) && (
+      {(!item.children || item?.children?.length === 0) && (
         <div className="ml-4 text-xs text-muted-foreground italic">📁 {t('menu.folderEmpty')}</div>
       )}
     </div>
@@ -474,6 +493,7 @@ function SortableUserMenuItem({
   onRemove: (id: string) => void
   level?: number
   onDropInFolder?: (parentId: string, droppedItem: unknown) => void
+  _onDropInFolder?: (parentId: string, droppedItem: unknown) => void
   onEdit?: (item: UserMenuItem) => void
 }) {
   const { t } = useTranslation('settings')
@@ -482,7 +502,7 @@ function SortableUserMenuItem({
   })
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS?.Transform?.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   }
@@ -529,17 +549,19 @@ function SortableUserMenuItem({
           </div>
           <div className="flex gap-1">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0"
               onClick={(e) => {
-                e.stopPropagation()
+                e?.stopPropagation()
                 onEdit?.(item)
               }}
             >
               <Edit className="h-3 w-3" />
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0 text-destructive hover:text-destructive"
@@ -569,17 +591,19 @@ function StandardMenuItemDisplay({
   level?: number
   onDragStart: (item: MenuItemConfig) => void
   expanded?: boolean
+  _expanded?: boolean
   onToggleExpanded?: () => void
+  _onToggleExpanded?: () => void
   expandedItems?: string[]
   onToggleExpandedItem?: (id: string) => void
-  t: unknown
+  t: TranslationFunction
 }) {
   const Icon = getTypeIcon(item.type)
-  const hasChildren = item.children && item.children.length > 0
-  const isExpanded = expandedItems.includes(item.id)
+  const hasChildren = item.children && item?.children?.length > 0
+  const isExpanded = expandedItems?.includes(item.id)
 
   const handleItemClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
+    e?.stopPropagation()
     if (hasChildren && onToggleExpandedItem) {
       onToggleExpandedItem(item.id)
     }
@@ -597,18 +621,18 @@ function StandardMenuItemDisplay({
         onClick={hasChildren ? handleItemClick : undefined}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            hasChildren && handleItemClick()
+            e?.preventDefault()
+            hasChildren && handleItemClick(e as unknown)
           }
         }}
         draggable={true}
         onDragStart={(e) => {
           // Empêcher la propagation pour éviter les conflits avec le clic
-          e.stopPropagation()
+          e?.stopPropagation()
 
           // Fonction récursive pour mapper les enfants lors du drag
           const mapChildrenForDrag = (children: unknown[], newParentId: string): unknown[] => {
-            return children.map((child) => {
+            return children?.map((child) => {
               const childTyped = child as {
                 id?: string
                 orderIndex?: number
@@ -616,14 +640,14 @@ function StandardMenuItemDisplay({
                 children?: unknown[]
               }
               return {
-                ...child,
+                ...(child as Record<string, unknown>),
                 id: `user-child-${childTyped.id}-${Date.now()}`,
                 parentId: newParentId,
-                orderIndex: childTyped.orderIndex || 0,
+                orderIndex: childTyped.orderIndex ?? 0,
                 isVisible: childTyped.isVisible !== false,
                 children: Array.isArray(childTyped.children)
                   ? mapChildrenForDrag(
-                      childTyped.children,
+                      childTyped?.children,
                       `user-child-${childTyped.id}-${Date.now()}`
                     )
                   : [],
@@ -640,8 +664,8 @@ function StandardMenuItemDisplay({
             children: hasChildren ? mapChildrenForDrag(item.children, newId) : [], // Inclure les enfants avec mapping récursif
           }
 
-          e.dataTransfer.setData('application/json', JSON.stringify(dragData))
-          e.dataTransfer.setData('text/plain', item.title)
+          e?.dataTransfer?.setData('application/json', JSON.stringify(dragData))
+          e?.dataTransfer?.setData('text/plain', item.title)
 
           // Stocker aussi dans sessionStorage comme fallback
           sessionStorage.setItem('draggedStandardItem', JSON.stringify(dragData))
@@ -674,7 +698,7 @@ function StandardMenuItemDisplay({
                   variant="outline"
                   className="text-xs bg-blue-50 text-blue-700 border-blue-200"
                 >
-                  {t('menu.childrenCount').replace('{count}', item.children.length.toString())}
+                  {t('menu.childrenCount').replace('{count}', item?.children?.length?.toString())}
                 </Badge>
               )}
               {!hasChildren && (
@@ -702,7 +726,7 @@ function StandardMenuItemDisplay({
       {/* Afficher les enfants si déplié */}
       {hasChildren && isExpanded && (
         <div className="space-y-1">
-          {item.children.map((child, index) => (
+          {item?.children?.map((child, index) => (
             <StandardMenuItemDisplay
               key={`${child.id}-${index}`}
               item={child}
@@ -720,16 +744,16 @@ function StandardMenuItemDisplay({
 }
 
 // Fonctions utilitaires
-const getTypeLabel = (type: string, t: unknown) => {
+const getTypeLabel = (type: string, t: TranslationFunction) => {
   switch (type) {
     case 'M':
-      return t('menu.elementTypes.folder')
+      return t('menu?.elementTypes?.folder')
     case 'P':
-      return t('menu.elementTypes.program')
+      return t('menu?.elementTypes?.program')
     case 'L':
-      return t('menu.elementTypes.link')
+      return t('menu?.elementTypes?.link')
     case 'D':
-      return t('menu.elementTypes.dataView')
+      return t('menu?.elementTypes?.dataView')
     default:
       return type
   }
@@ -766,6 +790,15 @@ const getTypeIcon = (type: string) => {
 }
 
 export default function MenuDragDropPage() {
+  const ids = useFormFieldIds([
+    'folder-title',
+    'link-title',
+    'link-url',
+    'query-title',
+    'query-id',
+    'edit-url',
+    'edit-query-id',
+  ])
   const { t } = useTranslation('settings')
   const [standardMenu, setStandardMenu] = useState<MenuItemConfig[]>([])
   const [userMenu, setUserMenu] = useState<UserMenuItem[]>([])
@@ -811,18 +844,19 @@ export default function MenuDragDropPage() {
   // Définir loadStandardMenu avant de l'utiliser dans useEffect
   const loadStandardMenu = useCallback(async () => {
     try {
-      const response = await apiClient.get('/admin/menu-raw/configurations/active')
+      const response = await fetchTyped('/admin/menu-raw/configurations/active')
       if (
         (response as unknown as { data?: { success?: boolean; data?: { menuTree?: unknown[] } } })
           .data?.success &&
         (response as unknown as { data?: { data?: unknown } }).data?.data
       ) {
         const menuItems = Array.isArray(
-          (response as unknown as { data: { data: { menuTree?: unknown[] } } }).data.data.menuTree
+          (response as unknown as { data: { data: { menuTree?: unknown[] } } }).data?.data?.menuTree
         )
-          ? (response as unknown as { data: { data: { menuTree: unknown[] } } }).data.data.menuTree
+          ? (response as unknown as { data: { data: { menuTree: unknown[] } } }).data?.data
+              ?.menuTree
           : []
-        setStandardMenu(menuItems)
+        setStandardMenu(menuItems as MenuItemConfig[])
       }
     } catch {
       // Erreur lors du chargement du menu standard
@@ -852,7 +886,7 @@ export default function MenuDragDropPage() {
       return {
         id: itemTyped.id || `item-${Date.now()}-${index}`,
         parentId: parentId || itemTyped.parentId,
-        title: getTranslatedTitle(item) || 'Sans titre',
+        title: getTranslatedTitle(item as TranslatableMenuItem) || 'Sans titre',
         type: itemTyped.type || 'P',
         programId: itemTyped.programId,
         externalUrl: itemTyped.externalUrl,
@@ -860,8 +894,8 @@ export default function MenuDragDropPage() {
         orderIndex: typeof itemTyped.orderIndex === 'number' ? itemTyped.orderIndex : index,
         isVisible: typeof itemTyped.isVisible === 'boolean' ? itemTyped.isVisible : true,
         children: Array.isArray(itemTyped.children)
-          ? itemTyped.children.map((child: unknown, childIndex: number) =>
-              mapMenuItemRecursively(child, childIndex, itemTyped.id)
+          ? itemTyped?.children?.map((child: unknown, childIndex: number) =>
+              mapMenuItemRecursively(child, childIndex, itemTyped?.id)
             )
           : [],
         icon: itemTyped.customIcon || itemTyped.icon,
@@ -875,14 +909,14 @@ export default function MenuDragDropPage() {
 
   const loadUserMenu = useCallback(async () => {
     try {
-      const response = await apiClient.get('/user/menu-preferences/custom-menu')
+      const response = await fetchTyped('/user/menu-preferences/custom-menu')
 
       if (
         (response as unknown as { data?: { success?: boolean; data?: unknown[] } }).data?.success &&
         Array.isArray((response as unknown as { data: { data: unknown[] } }).data.data)
       ) {
         // Convertir les données API vers le format UserMenuItem requis avec mapping récursif
-        const menuItems = (response as unknown as { data: { data: unknown[] } }).data.data.map(
+        const menuItems = (response as unknown as { data: { data: unknown[] } }).data?.data?.map(
           (item: unknown, index: number) => mapMenuItemRecursively(item, index)
         )
 
@@ -904,7 +938,7 @@ export default function MenuDragDropPage() {
   const saveUserMenu = async () => {
     setSaving(true)
     try {
-      const response = await apiClient.post('/user/menu-preferences/custom-menu', {
+      const response = await postTyped('/user/menu-preferences/custom-menu', {
         menuItems: userMenu,
       })
 
@@ -921,7 +955,7 @@ export default function MenuDragDropPage() {
         window.dispatchEvent(event)
 
         // Notification de succès (optionnel - vous pouvez ajouter une lib de toast)
-        // toast.success('Menu sauvegardé avec succès')
+        // toast?.success('Menu sauvegardé avec succès')
       } else {
         // Erreur lors de la sauvegarde
       }
@@ -937,7 +971,7 @@ export default function MenuDragDropPage() {
   }
 
   const createFolder = () => {
-    if (!newItemTitle.trim()) return
+    if (!newItemTitle?.trim()) return
 
     const newFolder: UserMenuItem = {
       id: `folder-${Date.now()}`,
@@ -954,7 +988,7 @@ export default function MenuDragDropPage() {
   }
 
   const createLink = () => {
-    if (!newItemTitle.trim() || !newItemUrl.trim()) return
+    if (!newItemTitle?.trim() || !newItemUrl?.trim()) return
 
     const newLink: UserMenuItem = {
       id: `link-${Date.now()}`,
@@ -973,7 +1007,7 @@ export default function MenuDragDropPage() {
   }
 
   const createQuery = () => {
-    if (!newItemTitle.trim() || !newItemQueryId.trim()) return
+    if (!newItemTitle?.trim() || !newItemQueryId?.trim()) return
 
     const newQuery: UserMenuItem = {
       id: `query-${Date.now()}`,
@@ -992,7 +1026,7 @@ export default function MenuDragDropPage() {
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
+    const { active, over } = event || {}
 
     if (!over) return
 
@@ -1004,28 +1038,28 @@ export default function MenuDragDropPage() {
     // Fonction récursive pour trouver et déplacer un élément dans n'importe quel niveau
     const moveItemRecursively = (items: UserMenuItem[]): UserMenuItem[] => {
       // D'abord essayer de déplacer au niveau racine
-      const activeIndex = items.findIndex((item) => item.id === activeId)
-      const overIndex = items.findIndex((item) => item.id === overId)
+      const activeIndex = items?.findIndex((item) => item.id === activeId)
+      const overIndex = items?.findIndex((item) => item.id === overId)
 
       if (activeIndex !== -1 && overIndex !== -1) {
         // Les deux éléments sont au même niveau
         const newItems = arrayMove(items, activeIndex, overIndex)
-        newItems.forEach((item, index) => {
+        newItems?.forEach((item, index) => {
           item.orderIndex = index
         })
         return newItems
       }
 
       // Sinon, chercher dans les enfants
-      return items.map((item) => {
-        if (item.children && item.children.length > 0) {
-          const activeInChildren = item.children.findIndex((child) => child.id === activeId)
-          const overInChildren = item.children.findIndex((child) => child.id === overId)
+      return items?.map((item) => {
+        if (item.children && item?.children?.length > 0) {
+          const activeInChildren = item?.children?.findIndex((child) => child.id === activeId)
+          const overInChildren = item?.children?.findIndex((child) => child.id === overId)
 
           if (activeInChildren !== -1 && overInChildren !== -1) {
             // Les deux sont des enfants du même parent
             const newChildren = arrayMove(item.children, activeInChildren, overInChildren)
-            newChildren.forEach((child, index) => {
+            newChildren?.forEach((child, index) => {
               child.orderIndex = index
             })
             return { ...item, children: newChildren }
@@ -1051,25 +1085,25 @@ export default function MenuDragDropPage() {
     const newUserItem: UserMenuItem = {
       ...(droppedItem as UserMenuItem),
       id:
-        droppedItemTyped.id ||
+        droppedItemTyped?.id ||
         `user-${droppedItemTyped.id || droppedItemTyped.title}-${Date.now()}`,
       parentId: parentId,
       orderIndex: 0,
       children: Array.isArray(droppedItemTyped.children)
-        ? (droppedItemTyped.children as UserMenuItem[])
+        ? (droppedItemTyped?.children as UserMenuItem[])
         : [],
     }
 
     // Ajouter l'élément au dossier parent
     const updateMenuWithNewItem = (items: UserMenuItem[]): UserMenuItem[] => {
-      return items.map((item) => {
+      return items?.map((item) => {
         if (item.id === parentId) {
           return {
             ...item,
             children: [...item.children, newUserItem],
           }
         }
-        if (item.children.length > 0) {
+        if (item?.children?.length > 0) {
           return {
             ...item,
             children: updateMenuWithNewItem(item.children),
@@ -1084,15 +1118,15 @@ export default function MenuDragDropPage() {
   }
 
   const handleUserMenuDrop = (e: React.DragEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     // Essayer de récupérer les données depuis dataTransfer
-    let draggedData = e.dataTransfer.getData('application/json')
+    let draggedData = e?.dataTransfer?.getData('application/json')
 
     // Fallback vers sessionStorage si nécessaire
     if (!draggedData) {
-      draggedData = sessionStorage.getItem('draggedStandardItem') || ''
-      sessionStorage.removeItem('draggedStandardItem')
+      draggedData = sessionStorage?.getItem('draggedStandardItem') || ''
+      sessionStorage?.removeItem('draggedStandardItem')
     }
 
     if (draggedData) {
@@ -1117,14 +1151,14 @@ export default function MenuDragDropPage() {
   }
 
   const handleUserMenuDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
   }
 
   const removeFromUserMenu = (id: string) => {
     const removeFromItems = (items: UserMenuItem[]): UserMenuItem[] => {
-      return items.filter((item) => {
+      return items?.filter((item) => {
         if (item.id === id) return false
-        if (item.children.length > 0) {
+        if (item?.children?.length > 0) {
           item.children = removeFromItems(item.children)
         }
         return true
@@ -1135,13 +1169,13 @@ export default function MenuDragDropPage() {
 
   const toggleStandardItemExpansion = (itemId: string) => {
     setExpandedStandardItems((prev) =>
-      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+      prev?.includes(itemId) ? prev?.filter((id) => id !== itemId) : [...prev, itemId]
     )
   }
 
   const toggleUserItemExpansion = (itemId: string) => {
     setExpandedUserItems((prev) =>
-      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+      prev?.includes(itemId) ? prev?.filter((id) => id !== itemId) : [...prev, itemId]
     )
   }
 
@@ -1179,19 +1213,19 @@ export default function MenuDragDropPage() {
       await new Promise((resolve) => setTimeout(resolve, 800))
 
       const updateItemRecursively = (items: UserMenuItem[]): UserMenuItem[] => {
-        return items.map((item) => {
+        return items?.map((item) => {
           if (item.id === editingItem.id) {
-            const currentLanguage = translator.getCurrentLanguage()
+            const currentLanguage = translator?.getCurrentLanguage()
             const updatedTranslations = { ...editTitleTranslations }
 
             // Sauvegarder le titre dans la langue courante
-            if (editTitle.trim()) {
-              updatedTranslations[currentLanguage] = editTitle.trim()
+            if (editTitle?.trim()) {
+              updatedTranslations[currentLanguage] = editTitle?.trim()
             }
 
             return {
               ...item,
-              customTitle: editTitle.trim() || item.title, // Garder pour compatibilité
+              customTitle: editTitle?.trim() || item.title, // Garder pour compatibilité
               titleTranslations: updatedTranslations,
               customIcon: editIcon || item.icon,
               customIconColor: editIconColor || undefined,
@@ -1199,7 +1233,7 @@ export default function MenuDragDropPage() {
               queryBuilderId: editingItem.type === 'D' ? editQueryId : item.queryBuilderId,
             }
           }
-          if (item.children && item.children.length > 0) {
+          if (item.children && item?.children?.length > 0) {
             return {
               ...item,
               children: updateItemRecursively(item.children),
@@ -1214,9 +1248,9 @@ export default function MenuDragDropPage() {
 
       // Sauvegarder automatiquement en BDD après modification
       try {
-        const _currentItem = updatedMenu.find((item) => item.id === editingItem.id)
+        const _currentItem = updatedMenu?.find((item) => item.id === editingItem.id)
 
-        const response = await apiClient.post('/user/menu-preferences/custom-menu', {
+        const response = await postTyped('/user/menu-preferences/custom-menu', {
           menuItems: updatedMenu,
         })
 
@@ -1285,19 +1319,19 @@ export default function MenuDragDropPage() {
 
       // Ctrl+S pour sauvegarder (sauf si déjà en cours)
       if (e.ctrlKey && e.key === 's' && !isSaving) {
-        e.preventDefault()
+        e?.preventDefault()
         saveItemEdit()
       }
 
       // Ctrl+R pour reset (sauf si sauvegarde en cours)
       if (e.ctrlKey && e.key === 'r' && !isSaving) {
-        e.preventDefault()
+        e?.preventDefault()
         resetItemEdit()
       }
 
       // Ctrl+Escape pour forcer la fermeture (urgence)
       if (e.ctrlKey && e.key === 'Escape') {
-        e.preventDefault()
+        e?.preventDefault()
         setShowEditModal(false)
         setIsSaving(false)
       }
@@ -1307,19 +1341,20 @@ export default function MenuDragDropPage() {
       document.addEventListener('keydown', handleKeyDown)
       return () => document.removeEventListener('keydown', handleKeyDown)
     }
+    return undefined
   }, [showEditModal, showIconSelector, isSaving, resetItemEdit, saveItemEdit])
 
   // Fonction récursive pour collecter tous les IDs d'éléments déplaçables (non-dossiers)
   const getAllSortableIds = (items: UserMenuItem[]): string[] => {
     let ids: string[] = []
 
-    items.forEach((item) => {
+    items?.forEach((item) => {
       if (item.type !== 'M') {
-        ids.push(item.id)
+        ids?.push(item.id)
       }
 
-      if (item.children && item.children.length > 0) {
-        ids = ids.concat(getAllSortableIds(item.children))
+      if (item.children && item?.children?.length > 0) {
+        ids = ids?.concat(getAllSortableIds(item.children))
       }
     })
 
@@ -1342,11 +1377,11 @@ export default function MenuDragDropPage() {
           <p className="text-muted-foreground">{t('menu.subtitle')}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={resetUserMenu}>
+          <Button type="button" variant="outline" onClick={resetUserMenu}>
             <RotateCcw className="h-4 w-4 mr-2" />
             {t('menu.reset')}
           </Button>
-          <Button onClick={saveUserMenu} disabled={saving}>
+          <Button type="button" onClick={saveUserMenu} disabled={saving}>
             <Save className="h-4 w-4 mr-2" />
             {saving ? t('menu.saving') : t('menu.save')}
           </Button>
@@ -1365,7 +1400,7 @@ export default function MenuDragDropPage() {
             <div className="flex gap-2 flex-wrap">
               <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <FolderPlus className="h-4 w-4 mr-1" />
                     {t('menu.folder')}
                   </Button>
@@ -1377,27 +1412,33 @@ export default function MenuDragDropPage() {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="folder-title">{t('menu.folderName')}</Label>
+                      <Label htmlFor={ids['folder-title']}>{t('menu.folderName')}</Label>
                       <Input
-                        id="folder-title"
+                        id={ids['folder-title']}
                         value={newItemTitle}
-                        onChange={(e) => setNewItemTitle(e.target.value)}
+                        onChange={(e) => setNewItemTitle(e?.target?.value)}
                         placeholder={t('menu.folderPlaceholder')}
                       />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowCreateFolder(false)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowCreateFolder(false)}
+                    >
                       {t('menu.cancel')}
                     </Button>
-                    <Button onClick={createFolder}>{t('menu.create')}</Button>
+                    <Button type="button" onClick={createFolder}>
+                      {t('menu.create')}
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
 
               <Dialog open={showCreateLink} onOpenChange={setShowCreateLink}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <Link className="h-4 w-4 mr-1" />
                     {t('menu.link')}
                   </Button>
@@ -1409,36 +1450,42 @@ export default function MenuDragDropPage() {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="link-title">{t('menu.linkName')}</Label>
+                      <Label htmlFor={ids['link-title']}>{t('menu.linkName')}</Label>
                       <Input
-                        id="link-title"
+                        id={ids['link-title']}
                         value={newItemTitle}
-                        onChange={(e) => setNewItemTitle(e.target.value)}
+                        onChange={(e) => setNewItemTitle(e?.target?.value)}
                         placeholder={t('menu.linkPlaceholder')}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="link-url">{t('menu.url')}</Label>
+                      <Label htmlFor={ids['link-url']}>{t('menu.url')}</Label>
                       <Input
-                        id="link-url"
+                        id={ids['link-url']}
                         value={newItemUrl}
-                        onChange={(e) => setNewItemUrl(e.target.value)}
+                        onChange={(e) => setNewItemUrl(e?.target?.value)}
                         placeholder={t('menu.urlPlaceholder')}
                       />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowCreateLink(false)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowCreateLink(false)}
+                    >
                       {t('menu.cancel')}
                     </Button>
-                    <Button onClick={createLink}>{t('menu.create')}</Button>
+                    <Button type="button" onClick={createLink}>
+                      {t('menu.create')}
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
 
               <Dialog open={showCreateQuery} onOpenChange={setShowCreateQuery}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <Search className="h-4 w-4 mr-1" />
                     {t('menu.dataView')}
                   </Button>
@@ -1450,29 +1497,35 @@ export default function MenuDragDropPage() {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="query-title">{t('menu.dataViewName')}</Label>
+                      <Label htmlFor={ids['query-title']}>{t('menu.dataViewName')}</Label>
                       <Input
-                        id="query-title"
+                        id={ids['query-title']}
                         value={newItemTitle}
-                        onChange={(e) => setNewItemTitle(e.target.value)}
+                        onChange={(e) => setNewItemTitle(e?.target?.value)}
                         placeholder={t('menu.dataViewPlaceholder')}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="query-id">{t('menu.queryId')}</Label>
+                      <Label htmlFor={ids['query-id']}>{t('menu.queryId')}</Label>
                       <Input
-                        id="query-id"
+                        id={ids['query-id']}
                         value={newItemQueryId}
-                        onChange={(e) => setNewItemQueryId(e.target.value)}
+                        onChange={(e) => setNewItemQueryId(e?.target?.value)}
                         placeholder={t('menu.queryIdPlaceholder')}
                       />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowCreateQuery(false)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowCreateQuery(false)}
+                    >
                       {t('menu.cancel')}
                     </Button>
-                    <Button onClick={createQuery}>{t('menu.create')}</Button>
+                    <Button type="button" onClick={createQuery}>
+                      {t('menu.create')}
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -1506,7 +1559,7 @@ export default function MenuDragDropPage() {
                       items={getAllSortableIds(userMenu)}
                       strategy={verticalListSortingStrategy}
                     >
-                      {userMenu.map((item) =>
+                      {userMenu?.map((item) =>
                         item.type === 'M' ? (
                           <FolderMenuItem
                             key={item.id}
@@ -1546,7 +1599,7 @@ export default function MenuDragDropPage() {
           </CardHeader>
           <CardContent className="flex-1 min-h-0">
             <div className="space-y-2 h-full overflow-y-auto">
-              {standardMenu.map((item) => (
+              {standardMenu?.map((item) => (
                 <StandardMenuItemDisplay
                   key={item.id}
                   item={item}
@@ -1598,8 +1651,9 @@ export default function MenuDragDropPage() {
               <div className="flex items-center gap-4">
                 {/* Icône cliquable */}
                 <div className="flex-shrink-0">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => setShowIconSelector(!showIconSelector)}
                     className="group relative p-4 border-2 border-dashed rounded-lg hover:border-primary transition-all duration-300 hover:shadow-lg hover:scale-105"
                   >
@@ -1624,17 +1678,19 @@ export default function MenuDragDropPage() {
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/30 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-lg flex items-center justify-center backdrop-blur-sm">
                       <Edit className="h-4 w-4 text-white drop-shadow-lg" />
                     </div>
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Titre personnalisable */}
                 <div className="flex-1 space-y-3">
                   <div>
                     <TranslationFieldWrapper
-                      as
-                      TranslationField
                       value={editTitle}
-                      onChange={setEditTitle}
+                      onChange={(value) =>
+                        setEditTitle(
+                          typeof value === 'string' ? value : Object.values(value)[0] || ''
+                        )
+                      }
                       translations={editTitleTranslations}
                       onTranslationsChange={setEditTitleTranslations}
                       placeholder={editingItem.title}
@@ -1647,9 +1703,9 @@ export default function MenuDragDropPage() {
                   {/* Champs spécifiques selon le type */}
                   {editingItem.type === 'L' && (
                     <Input
-                      id="edit-url"
+                      id={ids['edit-url']}
                       value={editUrl}
-                      onChange={(e) => setEditUrl(e.target.value)}
+                      onChange={(e) => setEditUrl(e?.target?.value)}
                       placeholder="https://example.com"
                       className="transition-all duration-200"
                       disabled={isSaving}
@@ -1658,9 +1714,9 @@ export default function MenuDragDropPage() {
 
                   {editingItem.type === 'D' && (
                     <Input
-                      id="edit-query-id"
+                      id={ids['edit-query-id']}
                       value={editQueryId}
-                      onChange={(e) => setEditQueryId(e.target.value)}
+                      onChange={(e) => setEditQueryId(e?.target?.value)}
                       placeholder="query-123"
                       className="transition-all duration-200"
                       disabled={isSaving}
@@ -1676,16 +1732,17 @@ export default function MenuDragDropPage() {
                   <div>
                     <div className="grid grid-cols-8 gap-2">
                       {Object.entries(getAvailableColors(t)).map(([colorName, colorValue]) => (
-                        <button
-                          key={colorName}
+                        <Button
                           type="button"
+                          key={colorName}
+                          variant="ghost"
                           onClick={() => setEditIconColor(colorValue)}
                           className={`relative p-2 rounded border-2 transition-all duration-200 hover:scale-110 hover:shadow-lg ${
                             editIconColor === colorValue
                               ? 'border-primary shadow-md ring-2 ring-primary/20'
                               : 'border-border hover:border-primary/50'
                           }`}
-                          title={t('menu.clickToApply', { name: colorName })}
+                          aria-label={t('menu.clickToApply', { name: colorName })}
                           disabled={isSaving}
                         >
                           <div
@@ -1697,23 +1754,24 @@ export default function MenuDragDropPage() {
                               <CheckCircle className="h-3 w-3 text-primary bg-white rounded-full" />
                             </div>
                           )}
-                        </button>
+                        </Button>
                       ))}
                       {/* Bouton couleur par défaut */}
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
                         onClick={() => setEditIconColor('')}
                         className={`p-2 rounded border-2 transition-all text-xs ${
                           editIconColor
                             ? 'border-border hover:bg-accent'
                             : 'border-primary bg-primary/10'
                         }`}
-                        title={t('menu.defaultColor')}
+                        aria-label={t('menu.defaultColor')}
                       >
                         <div className="w-6 h-6 rounded-full mx-auto bg-gradient-to-br from-gray-200 to-gray-400 flex items-center justify-center">
                           <span className="text-[8px] font-bold text-gray-600">DEF</span>
                         </div>
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -1726,7 +1784,7 @@ export default function MenuDragDropPage() {
                             {categoryName}
                           </h4>
                           <div className="grid grid-cols-8 gap-1">
-                            {icons.map((iconName) => {
+                            {icons?.map((iconName) => {
                               const IconComponent = getIconComponent(iconName)
                               return (
                                 <button
@@ -1780,7 +1838,7 @@ export default function MenuDragDropPage() {
                     )
                   })()}
                   <span className="font-medium transition-all duration-300">
-                    {editTitle.trim() || editingItem.title}
+                    {editTitle?.trim() || editingItem.title}
                   </span>
                   <Badge
                     className={`text-xs ${getTypeBadgeColor(editingItem.type)} text-white transition-all duration-300`}
@@ -1805,19 +1863,18 @@ export default function MenuDragDropPage() {
                 <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div className="space-y-2">
                   <h4 className="font-semibold text-blue-900">Guide d'édition</h4>
-                  <ul className="space-y-1 text-blue-800">
-                    <li>
-                      • <strong>Icône :</strong> Cliquez sur l'icône pour ouvrir les sélecteurs
+                  <ul className="space-y-1 text-blue-800 list-disc list-inside">
+                    <li key="icon">
+                      <strong>Icône :</strong> Cliquez sur l'icône pour ouvrir les sélecteurs
                     </li>
-                    <li>
-                      • <strong>Couleurs :</strong> 16 couleurs disponibles + couleur par défaut
+                    <li key="colors">
+                      <strong>Couleurs :</strong> 16 couleurs disponibles + couleur par défaut
                     </li>
-                    <li>
-                      • <strong>Icônes :</strong> 38 icônes organisées par catégorie
+                    <li key="icons">
+                      <strong>Icônes :</strong> 38 icônes organisées par catégorie
                     </li>
-                    <li>
-                      • <strong>Raccourcis :</strong> Ctrl+S (sauver), Ctrl+R (reset), Escape
-                      (fermer)
+                    <li key="shortcuts">
+                      <strong>Raccourcis :</strong> Ctrl+S (sauver), Ctrl+R (reset), Escape (fermer)
                     </li>
                   </ul>
                 </div>
@@ -1828,6 +1885,7 @@ export default function MenuDragDropPage() {
           <DialogFooter className="gap-3 pt-3 border-t bg-muted/20">
             <div className="flex gap-2">
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={resetItemEdit}
@@ -1838,6 +1896,7 @@ export default function MenuDragDropPage() {
                 <Reset className="h-4 w-4" />
               </Button>
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowInfo(!showInfo)}
@@ -1850,6 +1909,7 @@ export default function MenuDragDropPage() {
 
             <div className="flex gap-3 ml-auto">
               <Button
+                type="button"
                 variant="outline"
                 onClick={() => !isSaving && setShowEditModal(false)}
                 disabled={isSaving}
@@ -1858,6 +1918,7 @@ export default function MenuDragDropPage() {
                 Annuler
               </Button>
               <Button
+                type="button"
                 onClick={saveItemEdit}
                 disabled={isSaving}
                 className={`transition-all duration-300 min-w-[140px] ${

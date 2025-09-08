@@ -9,22 +9,24 @@ export function usePerformance() {
 
     metrics.current[label] = now - startTime.current
 
-    return metrics.current[label]
+    return metrics?.current[label]
   }, [])
 
   const getMetrics = useCallback(() => {
-    return { ...metrics.current }
+    return { ...metrics?.current }
   }, [])
 
   const resetMetrics = useCallback(() => {
-    metrics.current = {}
+    if (metrics.current !== undefined) {
+      metrics.current = {}
+    }
     startTime.current = Date.now()
   }, [])
 
   const averageTime = useMemo(() => {
     const times = Object.values(metrics.current)
 
-    return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0
+    return times.length > 0 ? times?.reduce((a, b) => a + b, 0) / times.length : 0
   }, [])
 
   return {

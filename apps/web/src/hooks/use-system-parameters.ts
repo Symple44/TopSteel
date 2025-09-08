@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/api-client-instance'
 import { callClientApi } from '@/utils/backend-api'
 
 interface SystemParameter {
@@ -31,10 +31,10 @@ export function useSystemParameters(): UseSystemParametersReturn {
     queryKey: ['system-parameters'],
     queryFn: async () => {
       const response = await callClientApi('admin/system-parameters')
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (!response?.ok) {
+        throw new Error(`HTTP error! status: ${response?.status}`)
       }
-      return response.json()
+      return response?.json()
     },
   })
 
@@ -54,13 +54,13 @@ export function useSystemParameters(): UseSystemParametersReturn {
         method: 'PATCH',
         body: JSON.stringify(updates),
       })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (!response?.ok) {
+        throw new Error(`HTTP error! status: ${response?.status}`)
       }
-      return response.json()
+      return response?.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['system-parameters'] })
+      queryClient?.invalidateQueries({ queryKey: ['system-parameters'] })
       setPendingUpdates({})
     },
   })
@@ -77,8 +77,8 @@ export function useSystemParameters(): UseSystemParametersReturn {
       value,
     }))
 
-    if (updates.length > 0) {
-      await updateMutation.mutateAsync(updates)
+    if (updates?.length > 0) {
+      await updateMutation?.mutateAsync(updates)
     }
   }
 
@@ -95,11 +95,11 @@ export function useSystemParameters(): UseSystemParametersReturn {
         value: param.defaultValue || '',
       }))
 
-    if (updates.length === 0) {
+    if (updates?.length === 0) {
       return
     }
 
-    await updateMutation.mutateAsync(updates)
+    await updateMutation?.mutateAsync(updates)
   }
 
   return {
@@ -122,10 +122,10 @@ export function useSystemParametersByCategory(category?: string) {
         : 'admin/system-parameters/by-category'
 
       const response = await callClientApi(endpoint)
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (!response?.ok) {
+        throw new Error(`HTTP error! status: ${response?.status}`)
       }
-      return response.json()
+      return response?.json()
     },
   })
 }

@@ -1,35 +1,67 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertTriangle, Calendar, Shield, Users } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
-import { Users, Shield, Building, Calendar, AlertTriangle } from 'lucide-react'
+import { Badge } from '../../../data-display/badge'
+import { Alert } from '../../../feedback/alert'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { Badge } from '../../../data-display/badge'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
-import {
-  FormDescription,
-  Alert,
-} from '../../../'
+
 const USER_ROLES = [
-  'admin', 'manager', 'production_manager', 'quality_manager',
-  'inventory_manager', 'sales_manager', 'project_manager', 'accountant',
-  'technician', 'operator', 'supervisor', 'analyst', 'employee'
+  'admin',
+  'manager',
+  'production_manager',
+  'quality_manager',
+  'inventory_manager',
+  'sales_manager',
+  'project_manager',
+  'accountant',
+  'technician',
+  'operator',
+  'supervisor',
+  'analyst',
+  'employee',
 ] as const
 const DEPARTMENTS = [
-  'administration', 'production', 'quality_control', 'inventory_management',
-  'sales_marketing', 'engineering', 'finance_accounting', 'procurement',
-  'logistics', 'maintenance', 'research_development', 'safety_environment', 'human_resources'
+  'administration',
+  'production',
+  'quality_control',
+  'inventory_management',
+  'sales_marketing',
+  'engineering',
+  'finance_accounting',
+  'procurement',
+  'logistics',
+  'maintenance',
+  'research_development',
+  'safety_environment',
+  'human_resources',
 ] as const
 const roleAssignmentSchema = z.object({
-  userId: z.string().min(1, 'L\'utilisateur est requis'),
+  userId: z.string().min(1, "L'utilisateur est requis"),
   newRole: z.enum(USER_ROLES),
   department: z.enum(DEPARTMENTS).optional(),
   team: z.string().optional(),
@@ -65,11 +97,11 @@ export function RoleAssignmentDialog({
   userData,
   availableUsers = [],
   availableManagers = [],
-  availableTeams = []
+  availableTeams = [],
 }: RoleAssignmentDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<RoleAssignmentFormData>({
+  const form = useForm({
     resolver: zodResolver(roleAssignmentSchema),
     defaultValues: {
       temporaryAssignment: false,
@@ -83,7 +115,7 @@ export function RoleAssignmentDialog({
       form.reset({
         userId: userData.id,
         newRole: 'employee',
-        department: userData.department as any,
+        department: userData.department as unknown,
         temporaryAssignment: false,
         notifyUser: true,
       })
@@ -95,7 +127,7 @@ export function RoleAssignmentDialog({
       setError(null)
       if (data.temporaryAssignment && data.effectiveDate && data.expirationDate) {
         if (new Date(data.expirationDate) <= new Date(data.effectiveDate)) {
-          setError('La date d\'expiration doit être postérieure à la date d\'effet')
+          setError("La date d'expiration doit être postérieure à la date d'effet")
           return
         }
       }
@@ -127,7 +159,7 @@ export function RoleAssignmentDialog({
       operator: 'Opérateur',
       supervisor: 'Superviseur',
       analyst: 'Analyste',
-      employee: 'Employé'
+      employee: 'Employé',
     }
     return labels[role] || role
   }
@@ -145,12 +177,15 @@ export function RoleAssignmentDialog({
       maintenance: 'Maintenance',
       research_development: 'R&D',
       safety_environment: 'Sécurité & Environnement',
-      human_resources: 'Ressources humaines'
+      human_resources: 'Ressources humaines',
     }
     return labels[department] || department
   }
-  const selectedUser = availableUsers.find(u => u.id === watchSelectedUser) ||
-    (userData ? { id: userData.id, name: `${userData.firstName} ${userData.lastName}`, role: userData.role } : null)
+  const selectedUser =
+    availableUsers.find((u) => u.id === watchSelectedUser) ||
+    (userData
+      ? { id: userData.id, name: `${userData.firstName} ${userData.lastName}`, role: userData.role }
+      : null)
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh]">
@@ -191,9 +226,10 @@ export function RoleAssignmentDialog({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {availableUsers.map(user => (
+                              {availableUsers.map((user) => (
                                 <SelectItem key={user.id} value={user.id}>
-                                  {user.name} - <Badge variant="outline">{getRoleLabel(user.role)}</Badge>
+                                  {user.name} -{' '}
+                                  <Badge variant="outline">{getRoleLabel(user.role)}</Badge>
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -240,7 +276,7 @@ export function RoleAssignmentDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {USER_ROLES.map(role => (
+                            {USER_ROLES.map((role) => (
                               <SelectItem key={role} value={role}>
                                 {getRoleLabel(role)}
                               </SelectItem>
@@ -264,7 +300,7 @@ export function RoleAssignmentDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {DEPARTMENTS.map(dept => (
+                            {DEPARTMENTS.map((dept) => (
                               <SelectItem key={dept} value={dept}>
                                 {getDepartmentLabel(dept)}
                               </SelectItem>
@@ -290,7 +326,7 @@ export function RoleAssignmentDialog({
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="">Aucun manager</SelectItem>
-                              {availableManagers.map(manager => (
+                              {availableManagers.map((manager) => (
                                 <SelectItem key={manager.id} value={manager.id}>
                                   {manager.name}
                                 </SelectItem>
@@ -317,7 +353,7 @@ export function RoleAssignmentDialog({
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="">Aucune équipe</SelectItem>
-                              {availableTeams.map(team => (
+                              {availableTeams.map((team) => (
                                 <SelectItem key={team.id} value={team.id}>
                                   {team.name}
                                 </SelectItem>
@@ -345,10 +381,7 @@ export function RoleAssignmentDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <div>
                           <FormLabel className="text-sm font-normal">
@@ -404,9 +437,7 @@ export function RoleAssignmentDialog({
                             {...field}
                           />
                         </FormControl>
-                        <FormDescription>
-                          Requis pour l'audit et la traçabilité
-                        </FormDescription>
+                        <FormDescription>Requis pour l'audit et la traçabilité</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -417,10 +448,7 @@ export function RoleAssignmentDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="text-sm font-normal">
                           Notifier l'utilisateur par email

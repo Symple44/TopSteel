@@ -27,10 +27,11 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import { Edit, Eye, Lock, Plus, Settings, Shield, Trash2, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import GroupManagementPanel from '@/components/admin/group-management-panel'
+import { GroupManagementPanel } from '@/components/admin/group-management-panel'
 import { PermissionHide } from '@/components/auth/permission-guard'
 import {
   ACCESS_LEVEL_COLORS,
@@ -49,7 +50,7 @@ interface RoleWithStats extends Role {
   permissionCount?: number
 }
 
-export default function RoleManagementPanel() {
+export function RoleManagementPanel() {
   const [roles, setRoles] = useState<RoleWithStats[]>([])
   const [modules, setModules] = useState<Module[]>([])
   const [selectedRole, setSelectedRole] = useState<RoleWithStats | null>(null)
@@ -62,10 +63,10 @@ export default function RoleManagementPanel() {
   const loadRoles = useCallback(async () => {
     try {
       const response = await callClientApi('admin/roles')
-      const data = await response.json()
-      if (data.success) {
+      const data = await response?.json()
+      if (data?.success) {
         // Ajouter des statistiques mockées
-        const rolesWithStats = data.data.map((role: Role) => ({
+        const rolesWithStats = data?.data?.map((role: Role) => ({
           ...role,
           userCount: Math.floor(Math.random() * 20) + 1,
           moduleCount: Math.floor(Math.random() * 10) + 3,
@@ -82,9 +83,9 @@ export default function RoleManagementPanel() {
   const loadModules = useCallback(async () => {
     try {
       const response = await callClientApi('admin/modules?includePermissions=true')
-      const data = await response.json()
-      if (data.success) {
-        setModules(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setModules(data?.data)
       }
     } catch (_error) {}
   }, [])
@@ -105,7 +106,7 @@ export default function RoleManagementPanel() {
         method: 'DELETE',
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         loadRoles()
       }
     } catch (_error) {}
@@ -170,7 +171,7 @@ export default function RoleManagementPanel() {
 
         <TabsContent value="roles" className="space-y-4">
           <div className="grid gap-4">
-            {roles.map((role) => (
+            {roles?.map((role) => (
               <Card key={role.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
@@ -305,8 +306,11 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
     isActive: role?.isActive ?? true,
   })
 
+  // Generate unique IDs for form fields
+  const fieldIds = useFormFieldIds(['name', 'description', 'isActive'])
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     try {
       const method = role ? 'PUT' : 'POST'
@@ -317,7 +321,7 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
         body: JSON.stringify(body),
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         onSave()
       }
     } catch (_error) {}
@@ -326,12 +330,12 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">Nom du rôle</Label>
+        <Label htmlFor={fieldIds.name}>Nom du rôle</Label>
         <Input
-          id="name"
+          id={fieldIds.name}
           value={formData.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setFormData((prev) => ({ ...prev, name: e.target.value }))
+            setFormData((prev) => ({ ...prev, name: e?.target?.value }))
           }
           placeholder="Ex: Deviseur, Superviseur..."
           required
@@ -339,12 +343,12 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
       </div>
 
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor={fieldIds.description}>Description</Label>
         <Textarea
-          id="description"
+          id={fieldIds.description}
           value={formData.description}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setFormData((prev) => ({ ...prev, description: e.target.value }))
+            setFormData((prev) => ({ ...prev, description: e?.target?.value }))
           }
           placeholder="Décrivez les responsabilités de ce rôle..."
           required
@@ -353,13 +357,13 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
 
       <div className="flex items-center space-x-2">
         <Switch
-          id="isActive"
+          id={fieldIds.isActive}
           checked={formData.isActive}
           onCheckedChange={(checked: boolean) =>
             setFormData((prev) => ({ ...prev, isActive: checked }))
           }
         />
-        <Label htmlFor="isActive">Rôle actif</Label>
+        <Label htmlFor={fieldIds.isActive}>Rôle actif</Label>
       </div>
 
       <div className="flex justify-end space-x-2">
@@ -374,10 +378,10 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
 
 // Composant pour afficher les modules
 function ModulesView({ modules }: { modules: Module[] }) {
-  const groupedModules = modules.reduce(
+  const groupedModules = modules?.reduce(
     (acc, module) => {
       if (!acc[module.category]) acc[module.category] = []
-      acc[module.category].push(module)
+      acc?.[module.category]?.push(module)
       return acc
     },
     {} as Record<string, Module[]>
@@ -399,7 +403,7 @@ function ModulesView({ modules }: { modules: Module[] }) {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {categoryModules.map((module) => (
+              {categoryModules?.map((module) => (
                 <Card key={module.id} className="border-2 border-dashed">
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
@@ -459,7 +463,15 @@ function PermissionEditor({
   onSave: () => void
 }) {
   const [permissions, setPermissions] = useState<
-    { id: string; name: string; description: string }[]
+    {
+      id: string
+      permissionId: string
+      name: string
+      description: string
+      moduleId: string
+      accessLevel: AccessLevel
+      isGranted: boolean
+    }[]
   >([])
   const [loading, setLoading] = useState(true)
 
@@ -468,9 +480,9 @@ function PermissionEditor({
 
     try {
       const response = await callClientApi(`admin/roles/${role.id}/permissions`)
-      const data = await response.json()
-      if (data.success) {
-        setPermissions(data.data.rolePermissions)
+      const data = await response?.json()
+      if (data?.success) {
+        setPermissions(data?.data?.rolePermissions)
       }
     } catch (_error) {
     } finally {
@@ -486,7 +498,9 @@ function PermissionEditor({
 
   const updatePermission = (permissionId: string, accessLevel: AccessLevel, isGranted: boolean) => {
     setPermissions((prev) =>
-      prev.map((p) => (p.permissionId === permissionId ? { ...p, accessLevel, isGranted } : p))
+      prev?.map((p) =>
+        (p.permissionId || p.id) === permissionId ? { ...p, accessLevel, isGranted } : p
+      )
     )
   }
 
@@ -499,7 +513,7 @@ function PermissionEditor({
         body: JSON.stringify({ permissions }),
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         onSave()
       }
     } catch (_error) {}
@@ -516,8 +530,8 @@ function PermissionEditor({
       </div>
 
       <div className="space-y-6">
-        {modules.map((module) => {
-          const modulePermissions = permissions.filter((p) => p.moduleId === module.id)
+        {modules?.map((module) => {
+          const modulePermissions = permissions?.filter((p) => p.moduleId === module.id)
 
           return (
             <Card key={module.id}>
@@ -540,16 +554,16 @@ function PermissionEditor({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {modulePermissions.map((permission) => (
+                    {modulePermissions?.map((permission) => (
                       <TableRow key={permission.id}>
-                        <TableCell>{permission.permissionId}</TableCell>
+                        <TableCell>{permission.permissionId || permission.name}</TableCell>
                         <TableCell>
                           <select
                             value={permission.accessLevel}
                             onChange={(e) =>
                               updatePermission(
-                                permission.permissionId,
-                                e.target.value as AccessLevel,
+                                permission.permissionId || permission.id,
+                                e?.target?.value as AccessLevel,
                                 permission.isGranted
                               )
                             }
@@ -567,7 +581,7 @@ function PermissionEditor({
                             checked={permission.isGranted}
                             onCheckedChange={(checked: boolean) =>
                               updatePermission(
-                                permission.permissionId,
+                                permission.permissionId || permission.id,
                                 permission.accessLevel,
                                 checked
                               )

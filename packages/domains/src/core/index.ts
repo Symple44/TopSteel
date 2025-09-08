@@ -8,6 +8,7 @@ export * from './base'
 
 // ===== SOUS-DOMAINES CORE =====
 export * from './client'
+export * from './common-filters'
 export * from './organization'
 export * from './project'
 export * from './user'
@@ -33,6 +34,11 @@ export type {
   ClientStatut,
   ClientType,
 } from './client'
+export type {
+  // Common filters
+  FacturationFilters,
+  OperationFilters,
+} from './common-filters'
 export type {
   Departement,
   DepartementType,

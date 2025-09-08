@@ -14,8 +14,8 @@ import {
 import type React from 'react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { CartItem } from '../../store/cartSlice'
-import type { CheckoutData } from '../CheckoutFlow'
+import type { CartItem } from '../../../store/cartSlice'
+import type { CheckoutData } from '../../../types/checkout.types'
 
 interface ReviewStepProps {
   data: CheckoutData
@@ -47,8 +47,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     }).format(price)
   }
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
-  const shipping = data.shippingMethod.cost
+  const subtotal = cartItems?.reduce((sum, item) => sum + item?.product?.price * item.quantity, 0)
+  const shipping = data?.shippingMethod?.cost
   const tax = subtotal * 0.2 // 20% VAT
   const finalTotal = subtotal + shipping + tax
 
@@ -81,13 +81,13 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             </h3>
           </div>
           <div className="divide-y divide-gray-200">
-            {cartItems.map((item) => (
-              <div key={item.product.id} className="p-4 flex items-center gap-4">
+            {cartItems?.map((item) => (
+              <div key={item?.product?.id} className="p-4 flex items-center gap-4">
                 <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                  {item.product.image ? (
+                  {item?.product?.images?.[0] ? (
                     <img
-                      src={item.product.image}
-                      alt={item.product.name}
+                      src={item?.product?.images?.[0]}
+                      alt={item?.product?.name}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
@@ -95,20 +95,20 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                   )}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium">{item.product.name}</h4>
-                  <p className="text-sm text-gray-600">{item.product.description}</p>
+                  <h4 className="font-medium">{item?.product?.name}</h4>
+                  <p className="text-sm text-gray-600">{item?.product?.description}</p>
                   {item.selectedOptions && Object.keys(item.selectedOptions).length > 0 && (
                     <div className="mt-1">
                       {Object.entries(item.selectedOptions).map(([key, value]) => (
                         <span key={key} className="text-xs text-gray-500 mr-2">
-                          {key}: {value}
+                          {key}: {String(value)}
                         </span>
                       ))}
                     </div>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">{formatPrice(item.product.price)}</p>
+                  <p className="font-medium">{formatPrice(item?.product?.price)}</p>
                   <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                 </div>
               </div>
@@ -135,23 +135,23 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="font-medium">
-                  {data.shipping.firstName} {data.shipping.lastName}
+                  {data?.shipping?.firstName} {data?.shipping?.lastName}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">
-                  {data.shipping.address}
-                  {data.shipping.address2 && `, ${data.shipping.address2}`}
+                  {data?.shipping?.address}
+                  {data?.shipping?.address2 && `, ${data?.shipping?.address2}`}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {data.shipping.city}, {data.shipping.state} {data.shipping.postalCode}
+                  {data?.shipping?.city}, {data?.shipping?.state} {data?.shipping?.postalCode}
                 </p>
-                <p className="text-sm text-gray-600">{data.shipping.country}</p>
+                <p className="text-sm text-gray-600">{data?.shipping?.country}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">
-                  <strong>Email:</strong> {data.shipping.email}
+                  <strong>Email:</strong> {data?.shipping?.email}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Phone:</strong> {data.shipping.phone}
+                  <strong>Phone:</strong> {data?.shipping?.phone}
                 </p>
               </div>
             </div>
@@ -177,29 +177,29 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-medium mb-2">Billing Address</h4>
-                {data.billing.sameAsShipping ? (
+                {data?.billing?.sameAsShipping ? (
                   <p className="text-sm text-gray-600">Same as shipping address</p>
                 ) : (
                   <div className="text-sm text-gray-600">
                     <p>
-                      {data.billing.firstName} {data.billing.lastName}
+                      {data?.billing?.firstName} {data?.billing?.lastName}
                     </p>
-                    <p>{data.billing.address}</p>
+                    <p>{data?.billing?.address}</p>
                     <p>
-                      {data.billing.city}, {data.billing.state} {data.billing.postalCode}
+                      {data?.billing?.city}, {data?.billing?.state} {data?.billing?.postalCode}
                     </p>
-                    <p>{data.billing.country}</p>
+                    <p>{data?.billing?.country}</p>
                   </div>
                 )}
               </div>
               <div>
                 <h4 className="font-medium mb-2">Payment Method</h4>
                 <div className="text-sm text-gray-600">
-                  {data.payment.method === 'card' && (
+                  {data?.payment?.method === 'card' && (
                     <p>Credit Card ending in {data.payment.cardNumber?.slice(-4)}</p>
                   )}
-                  {data.payment.method === 'paypal' && <p>PayPal</p>}
-                  {data.payment.method === 'bank_transfer' && <p>Bank Transfer</p>}
+                  {data?.payment?.method === 'paypal' && <p>PayPal</p>}
+                  {data?.payment?.method === 'bank_transfer' && <p>Bank Transfer</p>}
                 </div>
               </div>
             </div>
@@ -217,12 +217,12 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <div className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{data.shippingMethod.name}</p>
+                <p className="font-medium">{data?.shippingMethod?.name}</p>
                 <p className="text-sm text-gray-600">
-                  Estimated delivery: {data.shippingMethod.estimatedDays} business days
+                  Estimated delivery: {data?.shippingMethod?.estimatedDays} business days
                 </p>
               </div>
-              <p className="font-medium">{formatPrice(data.shippingMethod.cost)}</p>
+              <p className="font-medium">{formatPrice(data?.shippingMethod?.cost)}</p>
             </div>
           </div>
         </div>
@@ -272,7 +272,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="p-4">
               <textarea
                 value={data.orderNotes || ''}
-                onChange={(e) => handleOrderNotesChange(e.target.value)}
+                onChange={(e) => handleOrderNotesChange(e?.target?.value)}
                 placeholder="Add any special instructions for your order..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={3}
@@ -287,7 +287,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <input
               type="checkbox"
               checked={data.agreeToTerms}
-              onChange={(e) => handleTermsChange(e.target.checked)}
+              onChange={(e) => handleTermsChange(e?.target?.checked)}
               className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <div className="flex-1">
@@ -309,7 +309,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <input
               type="checkbox"
               checked={data.subscribeNewsletter}
-              onChange={(e) => handleNewsletterChange(e.target.checked)}
+              onChange={(e) => handleNewsletterChange(e?.target?.checked)}
               className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <div className="flex-1">
@@ -331,18 +331,18 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         )}
 
         {/* Success Message for Non-Card Payments */}
-        {(data.payment.method === 'paypal' || data.payment.method === 'bank_transfer') && (
+        {(data?.payment?.method === 'paypal' || data?.payment?.method === 'bank_transfer') && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="text-blue-900 font-medium">
-                  {data.payment.method === 'paypal'
+                  {data?.payment?.method === 'paypal'
                     ? 'PayPal Payment'
                     : 'Bank Transfer Instructions'}
                 </p>
                 <p className="text-blue-700 text-sm mt-1">
-                  {data.payment.method === 'paypal'
+                  {data?.payment?.method === 'paypal'
                     ? 'You will be redirected to PayPal after placing your order.'
                     : 'Bank details will be sent to your email after order confirmation.'}
                 </p>

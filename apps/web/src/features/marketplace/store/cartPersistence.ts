@@ -19,7 +19,7 @@ export const loadCartFromStorage = (): Partial<CartState> | null => {
   try {
     if (typeof window === 'undefined') return null
 
-    const stored = localStorage.getItem(CART_STORAGE_KEY)
+    const stored = localStorage?.getItem(CART_STORAGE_KEY)
     if (!stored) return null
 
     const persisted: PersistedCart = JSON.parse(stored)
@@ -27,12 +27,12 @@ export const loadCartFromStorage = (): Partial<CartState> | null => {
     // Check if cart has expired
     const expiresAt = new Date(persisted.expiresAt)
     if (expiresAt < new Date()) {
-      localStorage.removeItem(CART_STORAGE_KEY)
+      localStorage?.removeItem(CART_STORAGE_KEY)
       return null
     }
 
     // Convert date strings back to Date objects
-    const items = persisted.items.map((item) => ({
+    const items = persisted?.items?.map((item) => ({
       ...item,
       addedAt: new Date(item.addedAt),
     }))
@@ -57,14 +57,14 @@ export const saveCartToStorage = (cart: CartState): void => {
     if (typeof window === 'undefined') return
 
     const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + CART_EXPIRY_DAYS)
+    expiresAt?.setDate(expiresAt?.getDate() + CART_EXPIRY_DAYS)
 
     const persisted: PersistedCart = {
       items: cart.items,
       appliedCoupon: cart.appliedCoupon,
       shippingMethod: cart.shippingMethod,
       lastUpdated: cart.lastUpdated?.toISOString() || new Date().toISOString(),
-      expiresAt: expiresAt.toISOString(),
+      expiresAt: expiresAt?.toISOString(),
     }
 
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(persisted))
@@ -77,7 +77,7 @@ export const saveCartToStorage = (cart: CartState): void => {
 export const clearCartFromStorage = (): void => {
   try {
     if (typeof window === 'undefined') return
-    localStorage.removeItem(CART_STORAGE_KEY)
+    localStorage?.removeItem(CART_STORAGE_KEY)
   } catch (_error) {}
 }
 
@@ -99,15 +99,15 @@ export const cartPersistenceMiddleware: Middleware = (store) => (next) => (actio
     'cart/syncCart',
   ]
 
-  if (persistActions.includes(action.type)) {
-    const state = store.getState()
-    if (state.cart) {
-      saveCartToStorage(state.cart)
+  if (persistActions?.includes((action as unknown).type)) {
+    const state = store?.getState()
+    if (state?.cart) {
+      saveCartToStorage(state?.cart)
     }
   }
 
   // Clear storage when cart is cleared
-  if (action.type === 'cart/clearCart') {
+  if ((action as unknown).type === 'cart/clearCart') {
     clearCartFromStorage()
   }
 
@@ -131,22 +131,22 @@ export const syncCartWithBackend = async (
       body: JSON.stringify({
         userId,
         sessionId,
-        items: cart.items.map((item) => ({
-          productId: item.product.id,
+        items: cart?.items?.map((item) => ({
+          productId: item?.product?.id,
           quantity: item.quantity,
           options: item.selectedOptions,
         })),
       }),
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       throw new Error('Failed to sync cart with backend')
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
     // Update items with latest product data and stock availability
-    return data.items.map((item: any) => ({
+    return data?.items?.map((item: unknown) => ({
       product: item.product,
       quantity: item.availableQuantity || item.quantity,
       selectedOptions: item.options,
@@ -173,21 +173,21 @@ export const mergeCartsAfterLogin = async (
       },
       body: JSON.stringify({
         userId,
-        guestItems: guestCart.items.map((item) => ({
-          productId: item.product.id,
+        guestItems: guestCart?.items?.map((item) => ({
+          productId: item?.product?.id,
           quantity: item.quantity,
           options: item.selectedOptions,
         })),
       }),
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       throw new Error('Failed to merge carts')
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
-    return data.items.map((item: any) => ({
+    return data?.items?.map((item: unknown) => ({
       product: item.product,
       quantity: item.quantity,
       selectedOptions: item.options,
@@ -218,21 +218,21 @@ export const reserveCartStock = async (
       body: JSON.stringify({
         userId,
         sessionId,
-        items: items.map((item) => ({
-          productId: item.product.id,
+        items: items?.map((item) => ({
+          productId: item?.product?.id,
           quantity: item.quantity,
         })),
       }),
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       throw new Error('Failed to reserve stock')
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
-    data.reservations.forEach((reservation: any) => {
-      reservations.set(reservation.productId, reservation.reservationId)
+    data?.reservations?.forEach((reservation: unknown) => {
+      reservations?.set(reservation.productId, reservation.reservationId)
     })
 
     return reservations
@@ -264,19 +264,19 @@ export const validateCart = async (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        items: cart.items.map((item) => ({
-          productId: item.product.id,
+        items: cart?.items?.map((item) => ({
+          productId: item?.product?.id,
           quantity: item.quantity,
-          price: item.product.price,
+          price: item?.product?.price,
         })),
       }),
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       throw new Error('Failed to validate cart')
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
     return {
       valid: data.valid,

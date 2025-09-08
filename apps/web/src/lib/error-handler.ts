@@ -33,7 +33,7 @@ function formatValidationError(validationError: {
   value: unknown
   constraints: Record<string, string>
 }): FormattedError {
-  const { property, constraints } = validationError
+  const { property, constraints } = validationError || {}
 
   // Prendre le premier message de contrainte
   const constraintMessage = Object.values(constraints)[0]
@@ -127,20 +127,20 @@ export function formatError(error: unknown): FormattedError {
   // Vérifier si c'est une erreur HTTP avec response
   const httpError = error as HttpError
   if (httpError?.response?.status) {
-    const apiError = httpError.response.data as ApiError
+    const apiError = httpError?.response?.data as ApiError
 
     // Erreur de validation (400) avec détails
-    if (httpError.response.status === 400 && apiError?.errors?.length) {
-      return formatValidationError(apiError.errors[0])
+    if (httpError?.response.status === 400 && apiError?.errors?.length) {
+      return formatValidationError(apiError?.errors?.[0])
     }
 
     // Erreur spécifique avec message du backend
     if (apiError?.message) {
-      return formatSpecificError(httpError.response.status, apiError.message)
+      return formatSpecificError(httpError?.response?.status, apiError?.message)
     }
 
     // Erreur HTTP générique
-    return formatHttpError(httpError.response.status)
+    return formatHttpError(httpError?.response?.status)
   }
 
   // Erreur inconnue
@@ -156,12 +156,18 @@ export function formatError(error: unknown): FormattedError {
 export function getAllValidationErrors(error: unknown): string[] {
   const httpError = error as HttpError
   if (httpError?.response?.status) {
-    const apiError = httpError.response.data as ApiError
+    const apiError = httpError?.response?.data as ApiError
 
-    if (httpError.response.status === 400 && apiError?.errors?.length) {
-      return apiError.errors.flatMap((err) => Object.values(err.constraints))
+    if (httpError?.response.status === 400 && apiError?.errors?.length) {
+      return apiError?.errors?.flatMap((err) => Object.values(err.constraints))
     }
   }
 
   return []
+}
+
+// Export default handler
+export const errorHandler = {
+  formatValidationError,
+  extractValidationErrors: getAllValidationErrors,
 }

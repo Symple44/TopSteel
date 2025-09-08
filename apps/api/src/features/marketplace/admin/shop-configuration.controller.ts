@@ -50,7 +50,7 @@ export class ShopConfigurationController {
   async getConfigurationSection(
     @CurrentTenant() tenantId: string,
     @Param('section') section: keyof ShopConfiguration
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.configService.getConfigurationSection(tenantId, section)
   }
 
@@ -101,8 +101,8 @@ export class ShopConfigurationController {
 
     // Remove undefined values
     Object.keys(updates).forEach((key) => {
-      if (updates[key] === undefined) {
-        delete updates[key]
+      if ((updates as unknown)[key] === undefined) {
+        delete (updates as unknown)[key]
       }
     })
 
@@ -379,7 +379,7 @@ export class ShopConfigurationController {
   /**
    * Convert configuration to YAML format (simplified)
    */
-  private convertToYaml(obj: any, indent: number = 0): string {
+  private convertToYaml(obj: unknown, indent: number = 0): string {
     const spaces = '  '.repeat(indent)
     let yaml = ''
 
@@ -461,6 +461,6 @@ export class ShopConfigurationController {
       },
     }
 
-    return templates[templateName] || {}
+    return (templates as unknown)[templateName] || {}
   }
 }

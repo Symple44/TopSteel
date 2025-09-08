@@ -33,22 +33,22 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
   ({ className, value, onValueChange, filter, shouldFilter = true, ...props }, ref) => {
     const [internalValue, setInternalValue] = React.useState('')
     const [search, setSearch] = React.useState('')
-    
+
     const actualValue = value ?? internalValue
     const actualOnValueChange = onValueChange ?? setInternalValue
-    
+
     const defaultFilter = React.useCallback((value: string, search: string) => {
       if (!search) return 1
       return value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
     }, [])
-    
+
     const contextValue: CommandContextValue = {
       value: actualValue,
       onValueChange: actualOnValueChange,
       search,
       onSearchChange: setSearch,
       filter: filter ?? defaultFilter,
-      shouldFilter
+      shouldFilter,
     }
 
     return (
@@ -66,12 +66,13 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
   }
 )
 
-interface CommandInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {}
+interface CommandInputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {}
 
 const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
   ({ className, ...props }, ref) => {
     const { search, onSearchChange } = useCommandContext()
-    
+
     return (
       <input
         ref={ref}
@@ -108,9 +109,9 @@ interface CommandEmptyProps extends React.HTMLAttributes<HTMLDivElement> {}
 const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
   ({ className, ...props }, ref) => {
     const { search, shouldFilter } = useCommandContext()
-    
+
     if (!shouldFilter || !search) return null
-    
+
     return (
       <div
         ref={ref}
@@ -130,9 +131,7 @@ const CommandGroup = React.forwardRef<HTMLDivElement, CommandGroupProps>(
     return (
       <div ref={ref} className={cn('overflow-hidden p-1 text-foreground', className)} {...props}>
         {heading && (
-          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-            {heading}
-          </div>
+          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">{heading}</div>
         )}
         {children}
       </div>
@@ -148,22 +147,36 @@ interface CommandItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
 
 const CommandItem = React.forwardRef<HTMLDivElement, CommandItemProps>(
   ({ className, value, onSelect, disabled, children, ...props }, ref) => {
-    const { value: selectedValue, onValueChange, search, filter, shouldFilter } = useCommandContext()
-    
+    const {
+      value: selectedValue,
+      onValueChange,
+      search,
+      filter,
+      shouldFilter,
+    } = useCommandContext()
+
     const itemValue = value ?? (typeof children === 'string' ? children : '')
     const isSelected = selectedValue === itemValue
-    
+
     const shouldShow = !shouldFilter || filter(itemValue, search) > 0
-    
+
     if (!shouldShow) return null
-    
+
     const handleClick = () => {
       if (disabled) return
       onValueChange(itemValue)
       onSelect?.(itemValue)
     }
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        handleClick()
+      }
+    }
+
     return (
+      // biome-ignore lint/a11y/noStaticElementInteractions: This div implements a command menu item with complex state management (selected/disabled states) and data attributes. It's part of a larger command palette system.
       <div
         ref={ref}
         className={cn(
@@ -173,6 +186,10 @@ const CommandItem = React.forwardRef<HTMLDivElement, CommandItemProps>(
         data-selected={isSelected}
         data-disabled={disabled}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={disabled ? -1 : 0}
+        role="option"
+        aria-selected={isSelected}
         {...props}
       >
         {children}
@@ -185,13 +202,7 @@ interface CommandSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const CommandSeparator = React.forwardRef<HTMLDivElement, CommandSeparatorProps>(
   ({ className, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className={cn('-mx-1 h-px bg-border', className)}
-        {...props}
-      />
-    )
+    return <div ref={ref} className={cn('-mx-1 h-px bg-border', className)} {...props} />
   }
 )
 

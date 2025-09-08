@@ -1,22 +1,22 @@
 'use client'
-import React from 'react'
+import {
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Factory,
+  Package,
+  Pause,
+  Play,
+  Square,
+  User,
+} from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Card } from '../../../layout/card'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
 import { Progress } from '../../../primitives/progress'
-import { 
-  Package, 
-  Clock, 
-  User, 
-  Factory, 
-  Calendar, 
-  AlertTriangle, 
-  CheckCircle,
-  Play,
-  Pause,
-  Square
-} from 'lucide-react'
+
 interface ProductionStep {
   id: string
   name: string
@@ -100,29 +100,69 @@ export function ProductionOrderCard({
   const getStatusBadge = (status: ProductionOrder['status']) => {
     switch (status) {
       case 'planned':
-        return <Badge variant="secondary" className="text-xs">Planned</Badge>
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Planned
+          </Badge>
+        )
       case 'in-progress':
-        return <Badge variant="success" className="text-xs">In Progress</Badge>
+        return (
+          <Badge variant="default" className="text-xs">
+            In Progress
+          </Badge>
+        )
       case 'paused':
-        return <Badge variant="outline" className="text-xs border-yellow-200 text-yellow-600">Paused</Badge>
+        return (
+          <Badge variant="outline" className="text-xs border-yellow-200 text-yellow-600">
+            Paused
+          </Badge>
+        )
       case 'completed':
-        return <Badge variant="success" className="text-xs">Completed</Badge>
+        return (
+          <Badge variant="default" className="text-xs">
+            Completed
+          </Badge>
+        )
       case 'cancelled':
-        return <Badge variant="destructive" className="text-xs">Cancelled</Badge>
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Cancelled
+          </Badge>
+        )
       default:
-        return <Badge variant="outline" className="text-xs">Unknown</Badge>
+        return (
+          <Badge variant="outline" className="text-xs">
+            Unknown
+          </Badge>
+        )
     }
   }
   const getPriorityBadge = (priority: ProductionOrder['priority']) => {
     switch (priority) {
       case 'urgent':
-        return <Badge variant="destructive" className="text-xs">Urgent</Badge>
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Urgent
+          </Badge>
+        )
       case 'high':
-        return <Badge variant="outline" className="text-xs border-red-200 text-red-600">High</Badge>
+        return (
+          <Badge variant="outline" className="text-xs border-red-200 text-red-600">
+            High
+          </Badge>
+        )
       case 'medium':
-        return <Badge variant="outline" className="text-xs border-yellow-200 text-yellow-600">Medium</Badge>
+        return (
+          <Badge variant="outline" className="text-xs border-yellow-200 text-yellow-600">
+            Medium
+          </Badge>
+        )
       case 'low':
-        return <Badge variant="outline" className="text-xs border-green-200 text-green-600">Low</Badge>
+        return (
+          <Badge variant="outline" className="text-xs border-green-200 text-green-600">
+            Low
+          </Badge>
+        )
       default:
         return null
     }
@@ -135,19 +175,28 @@ export function ProductionOrderCard({
   const daysUntilDue = getDaysUntilDue()
   const isOverdue = daysUntilDue < 0
   const isDueSoon = daysUntilDue <= 2 && daysUntilDue >= 0
-  const completedSteps = order.steps.filter(step => step.status === 'completed').length
+  const completedSteps = order.steps.filter((step) => step.status === 'completed').length
   const totalSteps = order.steps.length
   if (compact) {
     return (
-      <div 
+      // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+      <div
         className={cn(
-          "p-3 border rounded-lg transition-colors",
-          onClick && "cursor-pointer hover:bg-muted/50",
-          isOverdue && "border-red-200 bg-red-50",
-          isDueSoon && "border-yellow-200 bg-yellow-50",
+          'p-3 border rounded-lg transition-colors',
+          onClick && 'cursor-pointer hover:bg-muted/50',
+          isOverdue && 'border-red-200 bg-red-50',
+          isDueSoon && 'border-yellow-200 bg-yellow-50',
           className
         )}
+        role={onClick ? 'button' : undefined}
+        tabIndex={onClick ? 0 : undefined}
         onClick={() => onClick?.(order)}
+        onKeyDown={(e) => {
+          if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault()
+            onClick(order)
+          }
+        }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -175,7 +224,7 @@ export function ProductionOrderCard({
     )
   }
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -200,18 +249,22 @@ export function ProductionOrderCard({
             <div className="text-lg font-bold text-blue-600">{order.quantity}</div>
             <div className="text-xs text-muted-foreground">{order.unit}</div>
           </div>
-          <div className={cn(
-            "text-center p-3 rounded-lg",
-            isOverdue && "bg-red-50",
-            isDueSoon && "bg-yellow-50",
-            !isOverdue && !isDueSoon && "bg-green-50"
-          )}>
-            <div className={cn(
-              "text-lg font-bold",
-              isOverdue && "text-red-600",
-              isDueSoon && "text-yellow-600",
-              !isOverdue && !isDueSoon && "text-green-600"
-            )}>
+          <div
+            className={cn(
+              'text-center p-3 rounded-lg',
+              isOverdue && 'bg-red-50',
+              isDueSoon && 'bg-yellow-50',
+              !isOverdue && !isDueSoon && 'bg-green-50'
+            )}
+          >
+            <div
+              className={cn(
+                'text-lg font-bold',
+                isOverdue && 'text-red-600',
+                isDueSoon && 'text-yellow-600',
+                !isOverdue && !isDueSoon && 'text-green-600'
+              )}
+            >
               {Math.abs(daysUntilDue)}
             </div>
             <div className="text-xs text-muted-foreground">
@@ -219,7 +272,9 @@ export function ProductionOrderCard({
             </div>
           </div>
           <div className="text-center p-3 bg-purple-50 rounded-lg">
-            <div className="text-lg font-bold text-purple-600">{completedSteps}/{totalSteps}</div>
+            <div className="text-lg font-bold text-purple-600">
+              {completedSteps}/{totalSteps}
+            </div>
             <div className="text-xs text-muted-foreground">Steps Done</div>
           </div>
           <div className="text-center p-3 bg-green-50 rounded-lg">
@@ -251,11 +306,13 @@ export function ProductionOrderCard({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
             <div>
               <span className="text-muted-foreground">Due:</span>
-              <div className={cn(
-                "font-medium",
-                isOverdue && "text-red-600",
-                isDueSoon && "text-yellow-600"
-              )}>
+              <div
+                className={cn(
+                  'font-medium',
+                  isOverdue && 'text-red-600',
+                  isDueSoon && 'text-yellow-600'
+                )}
+              >
                 {order.dueDate.toLocaleDateString()}
               </div>
             </div>
@@ -281,10 +338,17 @@ export function ProductionOrderCard({
           </h4>
           <div className="space-y-1">
             {order.materials.slice(0, 3).map((material) => (
-              <div key={material.id} className="flex justify-between items-center text-xs p-2 bg-muted rounded">
-                <span>{material.name} ({material.grade})</span>
+              <div
+                key={material.id}
+                className="flex justify-between items-center text-xs p-2 bg-muted rounded"
+              >
+                <span>
+                  {material.name} ({material.grade})
+                </span>
                 <div className="flex items-center gap-2">
-                  <span>{material.quantity} {material.unit}</span>
+                  <span>
+                    {material.quantity} {material.unit}
+                  </span>
                   {material.allocated ? (
                     <CheckCircle className="w-3 h-3 text-green-600" />
                   ) : (
@@ -319,30 +383,30 @@ export function ProductionOrderCard({
         {showActions && (
           <div className="flex gap-2 pt-3 border-t">
             {order.status === 'planned' && onStart && (
-              <Button onClick={() => onStart(order)} size="sm" variant="default">
+              <Button type="button" onClick={() => onStart(order)} size="sm" variant="default">
                 <Play className="w-3 h-3 mr-1" />
                 Start
               </Button>
             )}
             {order.status === 'in-progress' && onPause && (
-              <Button onClick={() => onPause(order)} size="sm" variant="outline">
+              <Button type="button" onClick={() => onPause(order)} size="sm" variant="outline">
                 <Pause className="w-3 h-3 mr-1" />
                 Pause
               </Button>
             )}
             {(order.status === 'in-progress' || order.status === 'paused') && onComplete && (
-              <Button onClick={() => onComplete(order)} size="sm" variant="default">
+              <Button type="button" onClick={() => onComplete(order)} size="sm" variant="default">
                 <CheckCircle className="w-3 h-3 mr-1" />
                 Complete
               </Button>
             )}
             {onEdit && (
-              <Button onClick={() => onEdit(order)} size="sm" variant="outline">
+              <Button type="button" onClick={() => onEdit(order)} size="sm" variant="outline">
                 Edit
               </Button>
             )}
             {onDelete && (
-              <Button onClick={() => onDelete(order)} size="sm" variant="destructive">
+              <Button type="button" onClick={() => onDelete(order)} size="sm" variant="destructive">
                 Delete
               </Button>
             )}

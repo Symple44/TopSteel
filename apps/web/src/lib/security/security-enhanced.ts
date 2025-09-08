@@ -9,10 +9,10 @@ import { z } from 'zod'
  */
 export function sanitizeHtml(html: string): string {
   if (typeof window === 'undefined') {
-    return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    return html?.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
   }
 
-  return DOMPurify.sanitize(html, {
+  return DOMPurify?.sanitize(html, {
     ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'ul', 'ol', 'li'],
     ALLOWED_ATTR: ['class'],
     KEEP_CONTENT: false,
@@ -29,14 +29,14 @@ export function validateEmailStrict(email: string): boolean {
     .max(254)
     .refine((email) => !isDisposableEmail(email), 'Email temporaire non autorisé')
 
-  return emailSchema.safeParse(email).success
+  return emailSchema?.safeParse(email).success
 }
 
 /**
  * Détection emails temporaires
  */
 export function isDisposableEmail(email: string): boolean {
-  const domain = email.split('@')[1]?.toLowerCase()
+  const domain = email?.split('@')[1]?.toLowerCase()
   const disposableDomains = [
     'tempmail.org',
     '10minutemail.com',
@@ -46,7 +46,7 @@ export function isDisposableEmail(email: string): boolean {
     'temp-mail.org',
   ]
 
-  return disposableDomains.includes(domain)
+  return disposableDomains?.includes(domain)
 }
 
 /**
@@ -61,15 +61,15 @@ export function createRateLimiter(maxCalls: number, windowMs: number) {
       const windowStart = now - windowMs
 
       // Nettoyer les anciens appels
-      while (calls.length > 0 && calls[0] < windowStart) {
-        calls.shift()
+      while (calls.length > 0 && calls?.[0] < windowStart) {
+        calls?.shift()
       }
 
       if (calls.length >= maxCalls) {
         throw new Error('Trop de requêtes. Veuillez patienter.')
       }
 
-      calls.push(now)
+      calls?.push(now)
 
       return fn(...args)
     }) as T
@@ -112,25 +112,25 @@ export function validatePasswordStrength(password: string): {
 
   // Longueur
   if (password.length >= 8) score += 20
-  else feedback.push('Au moins 8 caractères requis')
+  else feedback?.push('Au moins 8 caractères requis')
 
   if (password.length >= 12) score += 10
 
   // Minuscules
   if (/[a-z]/.test(password)) score += 15
-  else feedback.push('Au moins une lettre minuscule')
+  else feedback?.push('Au moins une lettre minuscule')
 
   // Majuscules
   if (/[A-Z]/.test(password)) score += 15
-  else feedback.push('Au moins une lettre majuscule')
+  else feedback?.push('Au moins une lettre majuscule')
 
   // Chiffres
   if (/\d/.test(password)) score += 15
-  else feedback.push('Au moins un chiffre')
+  else feedback?.push('Au moins un chiffre')
 
   // Caractères spéciaux - ✅ CORRIGÉ sans échappement inutile
   if (/[^a-zA-Z\d]/.test(password)) score += 15
-  else feedback.push('Au moins un caractère spécial')
+  else feedback?.push('Au moins un caractère spécial')
 
   // Variété de caractères
   const uniqueChars = new Set(password).size
@@ -152,19 +152,19 @@ export function validateSecureUrl(url: string): boolean {
     const parsed = new URL(url)
 
     // Protocoles autorisés
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
+    if (!['http:', 'https:'].includes(parsed?.protocol)) {
       return false
     }
 
     // Domaines dangereux
     const dangerousDomains = ['malware.com', 'phishing.net', 'suspicious.org']
 
-    if (dangerousDomains.some((domain) => parsed.hostname.includes(domain))) {
+    if (dangerousDomains?.some((domain) => parsed?.hostname?.includes(domain))) {
       return false
     }
 
     // Pas d'injection JavaScript
-    if (parsed.href.includes('javascript:') || parsed.href.includes('data:')) {
+    if (parsed?.href?.includes('javascript:') || parsed?.href?.includes('data:')) {
       return false
     }
 
@@ -185,14 +185,14 @@ export function validateFilename(filename: string): boolean {
   if (!/^[a-zA-Z0-9._-]+$/.test(filename)) return false
 
   // Pas de fichiers cachés
-  if (filename.startsWith('.')) return false
+  if (filename?.startsWith('.')) return false
 
   // Extensions dangereuses
   const dangerousExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js']
 
-  const extension = filename.split('.').pop()?.toLowerCase()
+  const extension = filename?.split('.').pop()?.toLowerCase()
 
-  if (extension && dangerousExtensions.includes(extension)) {
+  if (extension && dangerousExtensions?.includes(extension)) {
     return false
   }
 
@@ -222,7 +222,7 @@ export function validateFrenchPhone(phone: string): boolean {
     /^(\+33|0)\s?[1-9](\s?\d{2}){4}$/, // ✅ Avec espaces
   ]
 
-  return patterns.some((pattern) => pattern.test(phone.replace(/\s/g, '')))
+  return patterns?.some((pattern) => pattern?.test(phone?.replace(/\s/g, '')))
 }
 
 /**
@@ -237,9 +237,9 @@ export function generateSecureToken(length = 32): string {
   // Navigateur
   const array = new Uint8Array(length)
 
-  crypto.getRandomValues(array)
+  crypto?.getRandomValues(array)
 
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
+  return Array.from(array, (byte) => byte?.toString(16).padStart(2, '0')).join('')
 }
 
 /**
@@ -252,11 +252,11 @@ export async function hashPassword(password: string, salt?: string): Promise<str
   }
 
   const encoder = new TextEncoder()
-  const data = encoder.encode(password + (salt || 'default-salt'))
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const data = encoder?.encode(password + (salt || 'default-salt'))
+  const hashBuffer = await crypto?.subtle?.digest('SHA-256', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
 
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  return hashArray?.map((b) => b?.toString(16).padStart(2, '0')).join('')
 }
 
 /**
@@ -266,10 +266,10 @@ export async function verifyFileIntegrity(file: File, expectedHash?: string): Pr
   if (!expectedHash) return true
 
   try {
-    const arrayBuffer = await file.arrayBuffer()
-    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer)
+    const arrayBuffer = await file?.arrayBuffer()
+    const hashBuffer = await crypto?.subtle?.digest('SHA-256', arrayBuffer)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const actualHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+    const actualHash = hashArray?.map((b) => b?.toString(16).padStart(2, '0')).join('')
 
     return actualHash === expectedHash
   } catch {
@@ -291,13 +291,13 @@ export const enhancedSecuritySchemas = {
     .max(128, 'Maximum 128 caractères')
     .refine((pwd) => validatePasswordStrength(pwd).valid, 'Mot de passe trop faible'),
 
-  secureUrl: z.string().url('URL invalide').refine(validateSecureUrl, 'URL non sécurisée'),
+  secureUrl: z?.string().url('URL invalide').refine(validateSecureUrl, 'URL non sécurisée'),
 
-  filename: z.string().max(255).refine(validateFilename, 'Nom de fichier invalide'),
+  filename: z?.string().max(255).refine(validateFilename, 'Nom de fichier invalide'),
 
-  frenchPhone: z.string().refine(validateFrenchPhone, 'Numéro de téléphone français invalide'),
+  frenchPhone: z?.string().refine(validateFrenchPhone, 'Numéro de téléphone français invalide'),
 
-  sanitizedHtml: z.string().transform(sanitizeHtml),
+  sanitizedHtml: z?.string().transform(sanitizeHtml),
 
   secureToken: z
     .string()
@@ -332,9 +332,9 @@ export async function performFullAudit(): Promise<SecurityAuditReport> {
   // Vérification HTTPS
   if (typeof window !== 'undefined') {
     if (location.protocol === 'https:' || location.hostname === 'localhost') {
-      passed.push('HTTPS activé')
+      passed?.push('HTTPS activé')
     } else {
-      issues.push({
+      issues?.push({
         severity: 'critical',
         category: 'Transport',
         description: 'Application non servie en HTTPS',
@@ -346,9 +346,9 @@ export async function performFullAudit(): Promise<SecurityAuditReport> {
     const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')
 
     if (csp) {
-      passed.push('Content Security Policy détecté')
+      passed?.push('Content Security Policy détecté')
     } else {
-      issues.push({
+      issues?.push({
         severity: 'high',
         category: 'XSS Protection',
         description: 'Content Security Policy manquant',
@@ -358,15 +358,15 @@ export async function performFullAudit(): Promise<SecurityAuditReport> {
   }
 
   const summary = {
-    critical: issues.filter((i) => i.severity === 'critical').length,
-    high: issues.filter((i) => i.severity === 'high').length,
-    medium: issues.filter((i) => i.severity === 'medium').length,
-    low: issues.filter((i) => i.severity === 'low').length,
+    critical: issues?.filter((i) => i.severity === 'critical').length,
+    high: issues?.filter((i) => i.severity === 'high').length,
+    medium: issues?.filter((i) => i.severity === 'medium').length,
+    low: issues?.filter((i) => i.severity === 'low').length,
   }
 
   const score = Math.max(
     0,
-    100 - summary.critical * 25 - summary.high * 15 - summary.medium * 10 - summary.low * 5
+    100 - summary?.critical * 25 - summary?.high * 15 - summary?.medium * 10 - summary?.low * 5
   )
 
   return {

@@ -6,26 +6,26 @@ export async function GET(request: NextRequest) {
     // Appel spécialisé pour le health check avec timeout court
     const response = await callHealthApi('health', { timeout: 5000 })
 
-    if (response.ok) {
+    if (response?.ok) {
       const responseData = await response.json()
-      const data = responseData.data || responseData
+      const data = responseData?.data || responseData
 
       // Essayer de récupérer le nombre d'utilisateurs connectés
-      let activeUsers = null
+      let activeUsers: number | null = null
       try {
         const usersResponse = await callBackendFromApi(request, 'admin/users', {
           timeout: 3000,
         } as RequestInit & { timeout?: number })
 
-        if (usersResponse.ok) {
+        if (usersResponse?.ok) {
           const usersData = await usersResponse.json()
-          const users = usersData.data?.data || usersData.data || []
+          const users = (usersData?.data?.data || usersData?.data) ?? []
 
           if (Array.isArray(users)) {
             const now = new Date()
             const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
 
-            activeUsers = users.filter((user) => {
+            activeUsers = users?.filter((user) => {
               const lastLogin =
                 user.lastLogin || user.last_login || user.lastLoginAt || user.updatedAt
               if (!lastLogin) return false

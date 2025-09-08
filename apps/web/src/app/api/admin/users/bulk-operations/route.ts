@@ -3,31 +3,37 @@ import { fetchBackend } from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { userIds, operation, reason, sendNotification, ...operationData } = body
+    const body = await request?.json()
+    const { userIds, operation, reason, sendNotification, ...operationData } = body || {}
 
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-      return NextResponse.json(
+      return NextResponse?.json(
         { success: false, error: 'User IDs array is required' },
         { status: 400 }
       )
     }
 
     if (!operation) {
-      return NextResponse.json(
+      return NextResponse?.json(
         { success: false, error: 'Operation type is required' },
         { status: 400 }
       )
     }
 
     // Traiter les opérations par batch pour éviter la surcharge
-    const results = []
+    const results: Array<{
+      success: boolean
+      userId: string
+      operation: any
+      data?: any
+      error?: any
+    }> = []
     const batchSize = 5 // Traiter 5 utilisateurs à la fois
 
     for (let i = 0; i < userIds.length; i += batchSize) {
-      const batch = userIds.slice(i, i + batchSize)
+      const batch = userIds?.slice(i, i + batchSize)
 
-      const batchPromises = batch.map(async (userId: string) => {
+      const batchPromises = batch?.map(async (userId: string) => {
         try {
           let endpoint = ''
           let method = 'POST'
@@ -88,8 +94,8 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify(requestBody),
           })
 
-          if (response.ok) {
-            const data = await response.json()
+          if (response?.ok) {
+            const data = await response?.json()
             return {
               success: true,
               userId,
@@ -97,7 +103,7 @@ export async function POST(request: NextRequest) {
               data: data?.data,
             }
           } else {
-            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+            const errorData = await response?.json().catch(() => ({ error: 'Unknown error' }))
             return {
               success: false,
               userId,
@@ -116,11 +122,11 @@ export async function POST(request: NextRequest) {
       })
 
       const batchResults = await Promise.all(batchPromises)
-      results.push(...batchResults)
+      results?.push(...batchResults)
     }
 
-    const successCount = results.filter((r) => r.success).length
-    const errorCount = results.filter((r) => !r.success).length
+    const successCount = results?.filter((r) => r.success).length
+    const errorCount = results?.filter((r) => !r.success).length
 
     // Envoyer des notifications si demandé
     if (sendNotification && successCount > 0) {
@@ -128,7 +134,7 @@ export async function POST(request: NextRequest) {
         await fetchBackend('/admin/notifications/bulk-operation', request, {
           method: 'POST',
           body: JSON.stringify({
-            userIds: results.filter((r) => r.success).map((r) => r.userId),
+            userIds: results?.filter((r) => r.success).map((r) => r.userId),
             operation,
             reason,
             timestamp: new Date().toISOString(),
@@ -137,7 +143,7 @@ export async function POST(request: NextRequest) {
       } catch (_notificationError) {}
     }
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: {
         total: userIds.length,
@@ -149,7 +155,7 @@ export async function POST(request: NextRequest) {
       message: `Opération ${operation} : ${successCount} réussies, ${errorCount} échecs`,
     })
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         error: "Erreur lors de l'opération en masse",
@@ -164,15 +170,15 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const limit = searchParams.get('limit') || '50'
-    const offset = searchParams.get('offset') || '0'
+    const limit = searchParams?.get('limit') || '50'
+    const offset = searchParams?.get('offset') || '0'
 
     const response = await fetchBackend(
       `/admin/users/bulk-operations/history?limit=${limit}&offset=${offset}`,
       request
     )
 
-    if (!response.ok) {
+    if (!response?.ok) {
       // Fallback avec des données mock
       const mockHistory = [
         {
@@ -197,25 +203,25 @@ export async function GET(request: NextRequest) {
         },
       ]
 
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: mockHistory,
         meta: {
           total: mockHistory.length,
-          limit: parseInt(limit),
-          offset: parseInt(offset),
+          limit: parseInt(limit, 10),
+          offset: parseInt(offset, 10),
         },
       })
     }
 
-    const data = await response.json()
-    return NextResponse.json({
+    const data = await response?.json()
+    return NextResponse?.json({
       success: true,
       data: data?.data || [],
-      meta: data?.meta || { total: 0, limit: parseInt(limit), offset: parseInt(offset) },
+      meta: data?.meta || { total: 0, limit: parseInt(limit, 10), offset: parseInt(offset, 10) },
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         error: "Erreur lors de la récupération de l'historique",

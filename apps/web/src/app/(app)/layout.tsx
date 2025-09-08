@@ -16,7 +16,8 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { requiresCompanySelection, company } = useAuth()
+  const authQuery = useAuth()
+  const { requiresCompanySelection, company } = authQuery
 
   return (
     <ConnectionProvider>

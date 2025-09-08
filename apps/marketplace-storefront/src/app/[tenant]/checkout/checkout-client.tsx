@@ -4,7 +4,7 @@ import { ArrowLeft, CreditCard, Lock, MapPin, ShoppingBag, User } from 'lucide-r
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { toast } from 'sonner'
 import { cn, formatPrice } from '@/lib/utils'
 import { useCart } from '@/stores/cart-store'
@@ -18,6 +18,22 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
   const { items, totalItems, totalPrice, clearCart, setTenant } = useCart()
   const [isProcessing, setIsProcessing] = useState(false)
   const [checkoutStep, setCheckoutStep] = useState<'info' | 'payment' | 'confirmation'>('info')
+
+  // Generate unique IDs for form elements
+  const emailId = useId()
+  const phoneId = useId()
+  const firstNameId = useId()
+  const lastNameId = useId()
+  const companyId = useId()
+  const addressId = useId()
+  const cityId = useId()
+  const postalCodeId = useId()
+  const countryId = useId()
+  const cardNumberId = useId()
+  const expiryDateId = useId()
+  const cvvId = useId()
+  const cardNameId = useId()
+  const passwordId = useId()
 
   // Customer information
   const [customerInfo, setCustomerInfo] = useState({
@@ -211,11 +227,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-1">
+                      <label htmlFor={emailId} className="block text-sm font-medium mb-1">
                         Email <span className="text-destructive">*</span>
                       </label>
                       <input
-                        id="email"
+                        id={emailId}
                         type="email"
                         required
                         value={customerInfo.email}
@@ -228,11 +244,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium mb-1">
+                      <label htmlFor={phoneId} className="block text-sm font-medium mb-1">
                         Téléphone <span className="text-destructive">*</span>
                       </label>
                       <input
-                        id="phone"
+                        id={phoneId}
                         type="tel"
                         required
                         value={customerInfo.phone}
@@ -245,11 +261,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium mb-1">
+                      <label htmlFor={firstNameId} className="block text-sm font-medium mb-1">
                         Prénom <span className="text-destructive">*</span>
                       </label>
                       <input
-                        id="firstName"
+                        id={firstNameId}
                         type="text"
                         required
                         value={customerInfo.firstName}
@@ -262,11 +278,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div>
-                      <label htmlFor="lastName" className="block text-sm font-medium mb-1">
+                      <label htmlFor={lastNameId} className="block text-sm font-medium mb-1">
                         Nom <span className="text-destructive">*</span>
                       </label>
                       <input
-                        id="lastName"
+                        id={lastNameId}
                         type="text"
                         required
                         value={customerInfo.lastName}
@@ -279,11 +295,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label htmlFor="company" className="block text-sm font-medium mb-1">
+                      <label htmlFor={companyId} className="block text-sm font-medium mb-1">
                         Entreprise (optionnel)
                       </label>
                       <input
-                        id="company"
+                        id={companyId}
                         type="text"
                         value={customerInfo.company}
                         onChange={(e) =>
@@ -304,11 +320,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                   <div className="space-y-4">
                     <div>
-                      <label htmlFor="address" className="block text-sm font-medium mb-1">
+                      <label htmlFor={addressId} className="block text-sm font-medium mb-1">
                         Adresse <span className="text-destructive">*</span>
                       </label>
                       <input
-                        id="address"
+                        id={addressId}
                         type="text"
                         required
                         value={customerInfo.address}
@@ -322,11 +338,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label htmlFor="postalCode" className="block text-sm font-medium mb-1">
+                        <label htmlFor={postalCodeId} className="block text-sm font-medium mb-1">
                           Code postal <span className="text-destructive">*</span>
                         </label>
                         <input
-                          id="postalCode"
+                          id={postalCodeId}
                           type="text"
                           required
                           value={customerInfo.postalCode}
@@ -339,11 +355,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                       </div>
 
                       <div>
-                        <label htmlFor="city" className="block text-sm font-medium mb-1">
+                        <label htmlFor={cityId} className="block text-sm font-medium mb-1">
                           Ville <span className="text-destructive">*</span>
                         </label>
                         <input
-                          id="city"
+                          id={cityId}
                           type="text"
                           required
                           value={customerInfo.city}
@@ -356,11 +372,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                       </div>
 
                       <div>
-                        <label htmlFor="country" className="block text-sm font-medium mb-1">
+                        <label htmlFor={countryId} className="block text-sm font-medium mb-1">
                           Pays <span className="text-destructive">*</span>
                         </label>
                         <select
-                          id="country"
+                          id={countryId}
                           required
                           value={customerInfo.country}
                           onChange={(e) =>
@@ -396,11 +412,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                     {customerInfo.createAccount && (
                       <div className="ml-6">
-                        <label htmlFor="password" className="block text-sm font-medium mb-1">
+                        <label htmlFor={passwordId} className="block text-sm font-medium mb-1">
                           Mot de passe
                         </label>
                         <input
-                          id="password"
+                          id={passwordId}
                           type="password"
                           value={customerInfo.password}
                           onChange={(e) =>
@@ -515,11 +531,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     {paymentInfo.method === 'card' && (
                       <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
                         <div>
-                          <label htmlFor="cardNumber" className="block text-sm font-medium mb-1">
+                          <label htmlFor={cardNumberId} className="block text-sm font-medium mb-1">
                             Numéro de carte
                           </label>
                           <input
-                            id="cardNumber"
+                            id={cardNumberId}
                             type="text"
                             required
                             value={paymentInfo.cardNumber}
@@ -534,11 +550,14 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                         <div className="grid grid-cols-3 gap-4">
                           <div>
-                            <label htmlFor="expiryDate" className="block text-sm font-medium mb-1">
+                            <label
+                              htmlFor={expiryDateId}
+                              className="block text-sm font-medium mb-1"
+                            >
                               MM/AA
                             </label>
                             <input
-                              id="expiryDate"
+                              id={expiryDateId}
                               type="text"
                               required
                               value={paymentInfo.expiryDate}
@@ -552,11 +571,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                           </div>
 
                           <div>
-                            <label htmlFor="cvv" className="block text-sm font-medium mb-1">
+                            <label htmlFor={cvvId} className="block text-sm font-medium mb-1">
                               CVV
                             </label>
                             <input
-                              id="cvv"
+                              id={cvvId}
                               type="text"
                               required
                               value={paymentInfo.cvv}
@@ -571,14 +590,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                         </div>
 
                         <div>
-                          <label
-                            htmlFor="cardholderName"
-                            className="block text-sm font-medium mb-1"
-                          >
+                          <label htmlFor={cardNameId} className="block text-sm font-medium mb-1">
                             Nom du porteur
                           </label>
                           <input
-                            id="cardholderName"
+                            id={cardNameId}
                             type="text"
                             required
                             value={paymentInfo.cardholderName}

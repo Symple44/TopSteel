@@ -24,11 +24,11 @@ export default function UnauthorizedPage() {
         <p className="text-gray-600 mb-8">{t('unauthorizedMessage')}</p>
 
         <div className="space-y-4">
-          <Button onClick={() => router.push('/login')} className="w-full">
+          <Button type="button" onClick={() => router?.push('/login')} className="w-full">
             {t('loginButton')}
           </Button>
 
-          <Button onClick={() => router.back()} variant="outline" className="w-full">
+          <Button type="button" onClick={() => router?.back()} variant="outline" className="w-full">
             {t('back')}
           </Button>
         </div>

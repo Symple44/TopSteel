@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { getErrorMessage } from '../../../core/common/utils'
 
 /**
  * Notification delivery options
@@ -10,9 +11,9 @@ export interface NotificationDeliveryOptions {
   channels: ('email' | 'sms' | 'push' | 'in_app')[]
   recipients: string[]
   priority?: 'low' | 'normal' | 'high'
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   templateId?: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
 }
 
 /**
@@ -69,7 +70,8 @@ export class NotificationDeliveryService {
       } catch (error) {
         this.logger.error(`Failed to send notification via ${channel}:`, error)
         result.failed += options.recipients.length
-        result.errors.push(`${channel}: ${error.message}`)
+        const errorMessage = getErrorMessage(error)
+        result.errors.push(`${channel}: ${errorMessage}`)
       }
     }
 

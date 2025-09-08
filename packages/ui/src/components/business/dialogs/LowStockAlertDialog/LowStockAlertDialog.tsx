@@ -1,26 +1,40 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+
 // Low stock alert validation schema
 const lowStockAlertSchema = z.object({
   // Alert Configuration
-  alertName: z.string().min(1, 'Le nom de l\'alerte est requis'),
+  alertName: z.string().min(1, "Le nom de l'alerte est requis"),
   alertDescription: z.string().optional(),
   alertType: z.enum(['threshold', 'days_of_supply', 'critical_level', 'custom']),
   priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
   // Material Information
-  materialId: z.string().min(1, 'L\'ID du matériau est requis'),
+  materialId: z.string().min(1, "L'ID du matériau est requis"),
   materialName: z.string().min(1, 'Le nom du matériau est requis'),
   materialCategory: z.enum(['steel', 'alloy', 'tools', 'consumables', 'equipment', 'other']),
   steelGrade: z.string().optional(),
@@ -40,16 +54,32 @@ const lowStockAlertSchema = z.object({
   unit: z.enum(['kg', 'tons', 'pieces', 'meters', 'liters', 'boxes']),
   // Automatic Reorder Configuration
   enableAutoReorder: z.boolean().default(false),
-  reorderQuantity: z.number().min(0, 'La quantité de réapprovisionnement doit être positive').optional(),
-  economicOrderQuantity: z.number().min(0, 'La quantité économique de commande doit être positive').optional(),
-  leadTimeInDays: z.number().min(0, 'Le délai d\'approvisionnement doit être positif').optional(),
+  reorderQuantity: z
+    .number()
+    .min(0, 'La quantité de réapprovisionnement doit être positive')
+    .optional(),
+  economicOrderQuantity: z
+    .number()
+    .min(0, 'La quantité économique de commande doit être positive')
+    .optional(),
+  leadTimeInDays: z.number().min(0, "Le délai d'approvisionnement doit être positif").optional(),
   preferredSupplierId: z.string().optional(),
   preferredSupplierName: z.string().optional(),
   // Days of Supply Calculation
-  averageDailyUsage: z.number().min(0, 'La consommation journalière moyenne doit être positive').optional(),
-  daysOfSupplyThreshold: z.number().min(0, 'Le seuil en jours de stock doit être positif').optional(),
+  averageDailyUsage: z
+    .number()
+    .min(0, 'La consommation journalière moyenne doit être positive')
+    .optional(),
+  daysOfSupplyThreshold: z
+    .number()
+    .min(0, 'Le seuil en jours de stock doit être positif')
+    .optional(),
   seasonalAdjustment: z.boolean().default(false),
-  seasonalFactor: z.number().min(0.1).max(10, 'Le facteur saisonnier doit être entre 0.1 et 10').optional(),
+  seasonalFactor: z
+    .number()
+    .min(0.1)
+    .max(10, 'Le facteur saisonnier doit être entre 0.1 et 10')
+    .optional(),
   // Cost and Financial Impact
   unitCost: z.number().min(0, 'Le coût unitaire doit être positif').optional(),
   totalValue: z.number().optional(),
@@ -58,21 +88,33 @@ const lowStockAlertSchema = z.object({
   carryingCost: z.number().min(0, 'Le coût de possession doit être positif').optional(),
   // Alert Frequency and Timing
   alertFrequency: z.enum(['immediate', 'daily', 'weekly', 'monthly']).default('immediate'),
-  operatingHours: z.object({
-    enabled: z.boolean().default(false),
-    startTime: z.string().optional(),
-    endTime: z.string().optional(),
-    workingDays: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])).optional(),
-  }).optional(),
+  operatingHours: z
+    .object({
+      enabled: z.boolean().default(false),
+      startTime: z.string().optional(),
+      endTime: z.string().optional(),
+      workingDays: z
+        .array(
+          z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
+        )
+        .optional(),
+    })
+    .optional(),
   // Notification Configuration
-  notificationMethods: z.array(z.enum(['email', 'sms', 'push', 'dashboard', 'webhook'])).min(1, 'Au moins une méthode de notification est requise'),
-  recipients: z.array(z.object({
-    type: z.enum(['user', 'role', 'department', 'email']),
-    value: z.string().min(1, 'La valeur du destinataire est requise'),
-    name: z.string().optional(),
-  })).min(1, 'Au moins un destinataire est requis'),
+  notificationMethods: z
+    .array(z.enum(['email', 'sms', 'push', 'dashboard', 'webhook']))
+    .min(1, 'Au moins une méthode de notification est requise'),
+  recipients: z
+    .array(
+      z.object({
+        type: z.enum(['user', 'role', 'department', 'email']),
+        value: z.string().min(1, 'La valeur du destinataire est requise'),
+        name: z.string().optional(),
+      })
+    )
+    .min(1, 'Au moins un destinataire est requis'),
   escalationLevel: z.enum(['none', 'supervisor', 'manager', 'director']).default('none'),
-  escalationDelay: z.number().min(0, 'Le délai d\'escalade doit être positif').optional(), // in hours
+  escalationDelay: z.number().min(0, "Le délai d'escalade doit être positif").optional(), // in hours
   // Advanced Configuration
   considerInTransit: z.boolean().default(true),
   considerReserved: z.boolean().default(true),
@@ -80,20 +122,37 @@ const lowStockAlertSchema = z.object({
   excludeWeekends: z.boolean().default(false),
   excludeHolidays: z.boolean().default(false),
   // Business Rules
-  businessRules: z.array(z.object({
-    condition: z.string().min(1, 'La condition est requise'),
-    action: z.enum(['increase_threshold', 'decrease_threshold', 'trigger_urgent', 'skip_alert', 'change_supplier']),
-    value: z.number().optional(),
-    description: z.string().optional(),
-  })).optional(),
+  businessRules: z
+    .array(
+      z.object({
+        condition: z.string().min(1, 'La condition est requise'),
+        action: z.enum([
+          'increase_threshold',
+          'decrease_threshold',
+          'trigger_urgent',
+          'skip_alert',
+          'change_supplier',
+        ]),
+        value: z.number().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
   // Approval and Workflow
   requiresApproval: z.boolean().default(false),
-  autoApproveUnder: z.number().min(0, 'Le montant d\'approbation automatique doit être positif').optional(),
-  approvalWorkflow: z.array(z.object({
-    level: z.number().min(1),
-    role: z.string().min(1, 'Le rôle est requis'),
-    condition: z.string().optional(),
-  })).optional(),
+  autoApproveUnder: z
+    .number()
+    .min(0, "Le montant d'approbation automatique doit être positif")
+    .optional(),
+  approvalWorkflow: z
+    .array(
+      z.object({
+        level: z.number().min(1),
+        role: z.string().min(1, 'Le rôle est requis'),
+        condition: z.string().optional(),
+      })
+    )
+    .optional(),
   // Performance and Monitoring
   trackAccuracy: z.boolean().default(true),
   alertHistory: z.boolean().default(true),
@@ -115,15 +174,15 @@ interface LowStockAlertDialogProps {
   onSubmit?: (data: LowStockAlertFormData) => void | Promise<void>
   defaultValues?: Partial<LowStockAlertFormData>
 }
-export function LowStockAlertDialog({ 
-  open, 
-  onOpenChange, 
+export function LowStockAlertDialog({
+  open,
+  onOpenChange,
   onSubmit,
-  defaultValues 
+  defaultValues,
 }: LowStockAlertDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<LowStockAlertFormData>({
+  const form = useForm({
     resolver: zodResolver(lowStockAlertSchema),
     defaultValues: {
       alertType: 'threshold',
@@ -161,7 +220,7 @@ export function LowStockAlertDialog({
   const watchUnitCost = form.watch('unitCost')
   const watchEscalationLevel = form.watch('escalationLevel')
   const watchRequiresApproval = form.watch('requiresApproval')
-  const watchOperatingHours = form.watch('operatingHours')
+  const _watchOperatingHours = form.watch('operatingHours')
   // Auto-calculate total value
   useEffect(() => {
     if (watchCurrentStock && watchUnitCost) {
@@ -180,10 +239,11 @@ export function LowStockAlertDialog({
         createdAt: new Date().toISOString(),
         isThresholdBased: data.alertType === 'threshold',
         isDaysOfSupplyBased: data.alertType === 'days_of_supply',
-        calculatedDaysOfSupply: data.averageDailyUsage && data.currentStock 
-          ? Math.floor(data.currentStock / data.averageDailyUsage) 
-          : null,
-        stockRatio: data.minimumStock > 0 ? (data.currentStock / data.minimumStock) : null,
+        calculatedDaysOfSupply:
+          data.averageDailyUsage && data.currentStock
+            ? Math.floor(data.currentStock / data.averageDailyUsage)
+            : null,
+        stockRatio: data.minimumStock > 0 ? data.currentStock / data.minimumStock : null,
       }
       await onSubmit?.(enrichedData as LowStockAlertFormData)
       form.reset()
@@ -201,14 +261,14 @@ export function LowStockAlertDialog({
   }
   const addRecipient = () => {
     const currentRecipients = form.getValues('recipients') || []
-    form.setValue('recipients', [
-      ...currentRecipients,
-      { type: 'email', value: '', name: '' }
-    ])
+    form.setValue('recipients', [...currentRecipients, { type: 'email', value: '', name: '' }])
   }
   const removeRecipient = (index: number) => {
     const currentRecipients = form.getValues('recipients') || []
-    form.setValue('recipients', currentRecipients.filter((_, i) => i !== index))
+    form.setValue(
+      'recipients',
+      currentRecipients.filter((_, i) => i !== index)
+    )
   }
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -296,10 +356,10 @@ export function LowStockAlertDialog({
                       <FormItem className="md:col-span-2">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Description de l'alerte..." 
+                          <Textarea
+                            placeholder="Description de l'alerte..."
                             className="min-h-[80px]"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -394,10 +454,7 @@ export function LowStockAlertDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="text-sm font-normal">
                           Appliquer à tous les emplacements
@@ -663,10 +720,7 @@ export function LowStockAlertDialog({
                         render={({ field }) => (
                           <FormItem className="flex items-center space-x-2 space-y-0">
                             <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
                             </FormControl>
                             <FormLabel className="text-sm font-normal">
                               Ajustement saisonnier
@@ -711,10 +765,7 @@ export function LowStockAlertDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="text-sm font-normal">
                           Activer le réapprovisionnement automatique
@@ -954,7 +1005,7 @@ export function LowStockAlertDialog({
                   <div className="space-y-2">
                     <FormLabel>Méthodes de notification</FormLabel>
                     <div className="grid gap-2 md:grid-cols-3">
-                      {['email', 'sms', 'push', 'dashboard', 'webhook'].map((method) => (
+                      {(['email', 'sms', 'push', 'dashboard', 'webhook'] as const).map((method) => (
                         <FormField
                           key={method}
                           control={form.control}
@@ -969,7 +1020,7 @@ export function LowStockAlertDialog({
                                     if (checked) {
                                       field.onChange([...current, method])
                                     } else {
-                                      field.onChange(current.filter(m => m !== method))
+                                      field.onChange(current.filter((m) => m !== method))
                                     }
                                   }}
                                 />
@@ -991,7 +1042,7 @@ export function LowStockAlertDialog({
                         Ajouter un destinataire
                       </Button>
                     </div>
-                    {form.watch('recipients')?.map((recipient, index) => (
+                    {form.watch('recipients')?.map((_recipient, index) => (
                       <div key={index} className="grid gap-2 md:grid-cols-4 items-end">
                         <FormField
                           control={form.control}
@@ -1068,10 +1119,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Considérer le stock en transit
@@ -1085,10 +1133,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Considérer le stock réservé
@@ -1102,10 +1147,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Considérer le stock bloqué qualité
@@ -1119,10 +1161,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Exclure les week-ends
@@ -1136,10 +1175,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Exclure les jours fériés
@@ -1153,10 +1189,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Validation des commandes requise
@@ -1251,14 +1284,9 @@ export function LowStockAlertDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
-                        <FormLabel className="text-sm font-normal">
-                          Alerte active
-                        </FormLabel>
+                        <FormLabel className="text-sm font-normal">Alerte active</FormLabel>
                       </FormItem>
                     )}
                   />
@@ -1277,14 +1305,9 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Suivre la précision
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Suivre la précision</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -1294,10 +1317,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Historique des alertes
@@ -1311,10 +1331,7 @@ export function LowStockAlertDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Métriques de performance
@@ -1361,7 +1378,7 @@ export function LowStockAlertDialog({
                   Annuler
                 </Button>
                 <Button type="submit" disabled={loading} className="flex-1">
-                  {loading ? 'Configuration en cours...' : 'Configurer l\'alerte'}
+                  {loading ? 'Configuration en cours...' : "Configurer l'alerte"}
                 </Button>
               </div>
             </form>

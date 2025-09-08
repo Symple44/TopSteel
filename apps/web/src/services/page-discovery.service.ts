@@ -33,7 +33,7 @@ export interface PageMetadata {
  * dans le dossier (dashboard) et les associer avec les permissions
  */
 export class PageDiscoveryService {
-  private readonly basePath = process.cwd()
+  private readonly basePath = process?.cwd()
   private readonly dashboardPath = 'src/app/(dashboard)'
 
   /**
@@ -41,9 +41,9 @@ export class PageDiscoveryService {
    */
   discoverPages(): PageCategory[] {
     try {
-      const pages = this.scanDashboardPages()
-      const pagesWithCorrectTitles = this.applyStaticMetadata(pages)
-      const categorizedPages = this.categorizePages(pagesWithCorrectTitles)
+      const pages = this?.scanDashboardPages()
+      const pagesWithCorrectTitles = this?.applyStaticMetadata(pages)
+      const categorizedPages = this?.categorizePages(pagesWithCorrectTitles)
       return categorizedPages
     } catch {
       return []
@@ -58,7 +58,7 @@ export class PageDiscoveryService {
     const fullPath = join(this.basePath, this.dashboardPath)
 
     try {
-      this.scanDirectory(fullPath, '', pages)
+      this?.scanDirectory(fullPath, '', pages)
     } catch {}
 
     return pages
@@ -75,19 +75,19 @@ export class PageDiscoveryService {
         const itemPath = join(dirPath, item)
         const itemStats = statSync(itemPath)
 
-        if (itemStats.isDirectory()) {
+        if (itemStats?.isDirectory()) {
           // Ignorer les dossiers spéciaux de Next.js
-          if (item.startsWith('_') || item.startsWith('.')) {
+          if (item?.startsWith('_') || item?.startsWith('.')) {
             continue
           }
 
           const newRelativePath = relativePath ? `${relativePath}/${item}` : item
-          this.scanDirectory(itemPath, newRelativePath, pages)
+          this?.scanDirectory(itemPath, newRelativePath, pages)
         } else if (item === 'page.tsx') {
           // Trouvé une page
-          const pageInfo = this.extractPageInfo(itemPath, relativePath)
+          const pageInfo = this?.extractPageInfo(itemPath, relativePath)
           if (pageInfo) {
-            pages.push(pageInfo)
+            pages?.push(pageInfo)
           }
         }
       }
@@ -106,16 +106,16 @@ export class PageDiscoveryService {
       const href = relativePath ? `/${relativePath}` : '/'
 
       // Extraire les métadonnées du fichier
-      const metadata = this.extractMetadata(content)
+      const metadata = this?.extractMetadata(content)
 
       // Déterminer la catégorie basée sur le chemin
-      const category = this.determineCategoryFromPath(relativePath)
+      const category = this?.determineCategoryFromPath(relativePath)
 
       // Générer un ID unique
-      const id = this.generatePageId(relativePath)
+      const id = this?.generatePageId(relativePath)
 
       // Titre par défaut basé sur le chemin
-      const defaultTitle = this.generateTitleFromPath(relativePath)
+      const defaultTitle = this?.generateTitleFromPath(relativePath)
 
       return {
         id,
@@ -143,40 +143,54 @@ export class PageDiscoveryService {
     const metadata: PageMetadata = {}
 
     // Chercher les métadonnées dans les commentaires
-    const metadataComment = content.match(/\/\*\*\s*PAGE_METADATA\s*([\s\S]*?)\*\//)
+    const metadataComment = content?.match(/\/\*\*\s*PAGE_METADATA\s*([\s\S]*?)\*\//)
     if (metadataComment) {
       try {
-        const metadataStr = metadataComment[1]
-        const lines = metadataStr.split('\n')
+        const metadataStr = metadataComment?.[1]
+        const lines = metadataStr?.split('\n')
 
         for (const line of lines) {
-          const match = line.match(/^\s*\*\s*@(\w+)\s+(.+)$/)
+          const match = line?.match(/^\s*\*\s*@(\w+)\s+(.+)$/)
           if (match) {
             const [, key, value] = match
             switch (key) {
               case 'title':
-                metadata.title = value.trim()
+                metadata.title = value?.trim()
                 break
               case 'description':
-                metadata.description = value.trim()
+                if (metadata) {
+                  metadata.description = value?.trim()
+                }
                 break
               case 'icon':
-                metadata.icon = value.trim()
+                if (metadata) {
+                  metadata.icon = value?.trim()
+                }
                 break
               case 'category':
-                metadata.category = value.trim()
+                if (metadata) {
+                  metadata.category = value?.trim()
+                }
                 break
               case 'subcategory':
-                metadata.subcategory = value.trim()
+                if (metadata) {
+                  metadata.subcategory = value?.trim()
+                }
                 break
               case 'permissions':
-                metadata.permissions = value.split(',').map((p) => p.trim())
+                if (metadata) {
+                  metadata.permissions = value?.split(',').map((p) => p?.trim())
+                }
                 break
               case 'roles':
-                metadata.roles = value.split(',').map((r) => r.trim())
+                if (metadata) {
+                  metadata.roles = value?.split(',').map((r) => r?.trim())
+                }
                 break
               case 'moduleId':
-                metadata.moduleId = value.trim()
+                if (metadata) {
+                  metadata.moduleId = value?.trim()
+                }
                 break
             }
           }
@@ -185,11 +199,11 @@ export class PageDiscoveryService {
     }
 
     // Chercher le titre dans les composants
-    if (!metadata.title) {
+    if (!metadata?.title) {
       const titleMatch =
-        content.match(/<h1[^>]*>(.*?)<\/h1>/) || content.match(/title:\s*['"`]([^'"`]+)['"`]/)
+        content?.match(/<h1[^>]*>(.*?)<\/h1>/) || content?.match(/title:\s*['"`]([^'"`]+)['"`]/)
       if (titleMatch) {
-        metadata.title = titleMatch[1].trim()
+        metadata.title = titleMatch?.[1]?.trim()
       }
     }
 
@@ -200,8 +214,8 @@ export class PageDiscoveryService {
    * Détermine la catégorie basée sur le chemin
    */
   private determineCategoryFromPath(path: string): string {
-    const segments = path.split('/')
-    const firstSegment = segments[0]
+    const segments = path?.split('/')
+    const firstSegment = segments?.[0]
 
     const categoryMap: Record<string, string> = {
       '': 'dashboard',
@@ -234,7 +248,7 @@ export class PageDiscoveryService {
    * Génère un ID unique pour une page
    */
   private generatePageId(path: string): string {
-    return path.replace(/\//g, '-') || 'home'
+    return path?.replace(/\//g, '-') || 'home'
   }
 
   /**
@@ -243,11 +257,11 @@ export class PageDiscoveryService {
   private generateTitleFromPath(path: string): string {
     if (!path) return 'Accueil'
 
-    const segments = path.split('/')
-    const lastSegment = segments[segments.length - 1]
+    const segments = path?.split('/')
+    const lastSegment = segments[segments?.length - 1]
 
     // Capitaliser et remplacer les tirets/underscores par des espaces
-    return lastSegment.replace(/[-_]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+    return lastSegment?.replace(/[-_]/g, ' ').replace(/\b\w/g, (l) => l?.toUpperCase())
   }
 
   /**
@@ -288,7 +302,7 @@ export class PageDiscoveryService {
       },
     }
 
-    return pages.map((page) => {
+    return pages?.map((page) => {
       const staticMeta = staticMetadata[page.id]
       if (staticMeta) {
         return {
@@ -309,26 +323,26 @@ export class PageDiscoveryService {
     for (const page of pages) {
       const categoryId = page.category
 
-      if (!categoryMap.has(categoryId)) {
-        categoryMap.set(categoryId, {
+      if (!categoryMap?.has(categoryId)) {
+        categoryMap?.set(categoryId, {
           id: categoryId,
-          title: this.getCategoryTitle(categoryId),
-          description: this.getCategoryDescription(categoryId),
-          icon: this.getCategoryIcon(categoryId),
+          title: this?.getCategoryTitle(categoryId),
+          description: this?.getCategoryDescription(categoryId),
+          icon: this?.getCategoryIcon(categoryId),
           pages: [],
         })
       }
 
-      const category = categoryMap.get(categoryId)!
-      category.pages.push(page)
+      const category = categoryMap?.get(categoryId)!
+      category?.pages?.push(page)
     }
 
     // Trier les pages dans chaque catégorie
     for (const category of categoryMap.values()) {
-      category.pages.sort((a, b) => a.title.localeCompare(b.title))
+      category?.pages?.sort((a, b) => a?.title?.localeCompare(b.title))
     }
 
-    return Array.from(categoryMap.values()).sort((a, b) => a.title.localeCompare(b.title))
+    return Array.from(categoryMap?.values()).sort((a, b) => a?.title?.localeCompare(b.title))
   }
 
   /**

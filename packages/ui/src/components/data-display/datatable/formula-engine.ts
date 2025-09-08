@@ -37,7 +37,7 @@ export class FormulaEngine<T = any> {
     const cellRefRegex = /([A-Z]+)(\d+)/g
 
     return formula.replace(cellRefRegex, (_match, column, row) => {
-      const rowIndex = parseInt(row) - 1
+      const rowIndex = parseInt(row, 10) - 1
       const value = this.getCellValue(column, rowIndex)
       return this.formatValueForExpression(value)
     })
@@ -72,7 +72,7 @@ export class FormulaEngine<T = any> {
   /**
    * Formate une valeur pour l'utiliser dans une expression JavaScript
    */
-  private formatValueForExpression(value: any): string {
+  private formatValueForExpression(value: unknown): string {
     if (value === null || value === undefined) return '0'
     if (typeof value === 'string') return `"${value.replace(/"/g, '\\"')}"`
     if (typeof value === 'number') return value.toString()

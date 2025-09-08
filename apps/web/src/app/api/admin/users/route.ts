@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
 
     // Construire l'endpoint avec les query params
-    const queryString = searchParams.toString()
+    const queryString = searchParams?.toString()
     const endpoint = `admin/users${queryString ? `?${queryString}` : ''}`
 
     // Appel vers le backend via l'utilitaire harmonisé
@@ -14,14 +14,14 @@ export async function GET(request: NextRequest) {
       method: 'GET',
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
+    if (response?.ok) {
+      const responseData = await response?.json()
       // Le backend NestJS enveloppe dans {data: {...}, statusCode, message}
       // On veut extraire le contenu réel pour le frontend
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
     } else {
-      const includeGroups = searchParams.get('includeGroups') === 'true'
+      const includeGroups = searchParams?.get('includeGroups') === 'true'
 
       const mockUsers = [
         {
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
         },
       ]
 
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: mockUsers,
         meta: {
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
       })
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )

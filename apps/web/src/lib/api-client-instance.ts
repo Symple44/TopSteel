@@ -1,15 +1,17 @@
 /**
- * Instance du client API avec gestion de connexion
+ * Instance du client API avec gestion de connexion et types complets
  *
- * Ce fichier exporte l'instance améliorée du client API
- * sans créer de dépendance circulaire
+ * Ce fichier exporte l'instance typée du client API
+ * avec toutes les méthodes domaine-spécifiques
  */
 
-import { apiClientEnhanced } from './api-client-enhanced'
+import type { IAPIClientFinal } from './api-client-final'
+import { apiClientFinal } from './api-client-final'
 
-// Export de l'instance améliorée
-export const apiClient = apiClientEnhanced
+// Export de l'instance typée
+export const apiClient: IAPIClientFinal = apiClientFinal
 
 // Re-export des types et classes nécessaires
 export type { APIErrorDetails, APIMetrics, RequestConfig } from './api-client'
 export { APIError } from './api-client'
+export type { IAPIClientFinal as APIClientInterface } from './api-client-final'

@@ -1,9 +1,9 @@
 import type { ReorderableListConfig } from '@erp/ui'
-import { prisma } from '@/lib/prisma'
+import { callBackendApi } from '@/utils/backend-api'
 
 /**
  * Service pour gérer les préférences UI des utilisateurs
- * Stockage en base de données avec cache Redis optionnel
+ * Utilise l'API backend TypeORM au lieu de Prisma
  */
 export class UIPreferencesService {
   /**
@@ -14,30 +14,22 @@ export class UIPreferencesService {
     componentId: string
   ): Promise<ReorderableListConfig | null> {
     try {
-      const preference = await prisma.uiPreference.findUnique({
-        where: {
-          userId_componentId: {
-            userId,
-            componentId,
-          },
+      const response = await callBackendApi(`ui-preferences/reorderable-list/${componentId}`, {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userId, // Pass user ID for server-side auth
         },
       })
 
-      if (!preference) {
-        return null
+      if (!response?.ok) {
+        if (response?.status === 404) {
+          return null
+        }
+        throw new Error(`Failed to fetch UI preference: ${response?.status}`)
       }
 
-      // Construire l'objet de configuration
-      return {
-        id: preference.id,
-        userId: preference.userId,
-        componentId: preference.componentId,
-        theme: preference.theme as any,
-        preferences: preference.preferences as any,
-        layout: preference.layout as any,
-        createdAt: preference.createdAt,
-        updatedAt: preference.updatedAt,
-      }
+      const data = await response?.json()
+      return data
     } catch (_error) {
       return null
     }
@@ -52,38 +44,24 @@ export class UIPreferencesService {
     config: Partial<ReorderableListConfig>
   ): Promise<ReorderableListConfig> {
     try {
-      const preference = await prisma.uiPreference.upsert({
-        where: {
-          userId_componentId: {
-            userId,
-            componentId,
-          },
+      const response = await callBackendApi(`ui-preferences/reorderable-list/${componentId}`, {
+        method: 'POST',
+        headers: {
+          'X-User-Id': userId,
         },
-        update: {
-          theme: config.theme || {},
-          preferences: config.preferences || {},
-          layout: config.layout || {},
-          updatedAt: new Date(),
-        },
-        create: {
-          userId,
-          componentId,
-          theme: config.theme || {},
-          preferences: config.preferences || {},
-          layout: config.layout || {},
-        },
+        body: JSON.stringify({
+          theme: config.theme,
+          preferences: config.preferences,
+          layout: config.layout,
+        }),
       })
 
-      return {
-        id: preference.id,
-        userId: preference.userId,
-        componentId: preference.componentId,
-        theme: preference.theme as any,
-        preferences: preference.preferences as any,
-        layout: preference.layout as any,
-        createdAt: preference.createdAt,
-        updatedAt: preference.updatedAt,
+      if (!response?.ok) {
+        throw new Error(`Failed to save UI preference: ${response?.status}`)
       }
+
+      const data = await response?.json()
+      return data
     } catch (_error) {
       throw new Error('Failed to save UI preference')
     }
@@ -94,20 +72,23 @@ export class UIPreferencesService {
    */
   static async deleteConfig(userId: string, componentId: string): Promise<boolean> {
     try {
-      await prisma.uiPreference.delete({
-        where: {
-          userId_componentId: {
-            userId,
-            componentId,
-          },
+      const response = await callBackendApi(`ui-preferences/reorderable-list/${componentId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-Id': userId,
         },
       })
-      return true
-    } catch (error) {
-      // Si l'erreur est "Record not found", c'est OK
-      if ((error as any).code === 'P2025') {
-        return false
+
+      if (!response?.ok) {
+        if (response?.status === 404) {
+          return false
+        }
+        throw new Error(`Failed to delete UI preference: ${response?.status}`)
       }
+
+      const data = await response?.json()
+      return data?.success
+    } catch (_error) {
       throw new Error('Failed to delete UI preference')
     }
   }
@@ -117,21 +98,19 @@ export class UIPreferencesService {
    */
   static async getAllUserConfigs(userId: string): Promise<ReorderableListConfig[]> {
     try {
-      const preferences = await prisma.uiPreference.findMany({
-        where: { userId },
-        orderBy: { updatedAt: 'desc' },
+      const response = await callBackendApi('ui-preferences/reorderable-list', {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userId,
+        },
       })
 
-      return preferences.map((pref) => ({
-        id: pref.id,
-        userId: pref.userId,
-        componentId: pref.componentId,
-        theme: pref.theme as any,
-        preferences: pref.preferences as any,
-        layout: pref.layout as any,
-        createdAt: pref.createdAt,
-        updatedAt: pref.updatedAt,
-      }))
+      if (!response?.ok) {
+        throw new Error(`Failed to fetch all UI preferences: ${response?.status}`)
+      }
+
+      const data = await response?.json()
+      return data
     } catch (_error) {
       return []
     }
@@ -142,19 +121,22 @@ export class UIPreferencesService {
    */
   static async cloneUserConfigs(sourceUserId: string, targetUserId: string): Promise<number> {
     try {
-      const sourceConfigs = await UIPreferencesService.getAllUserConfigs(sourceUserId)
+      const response = await callBackendApi('ui-preferences/reorderable-list/clone', {
+        method: 'POST',
+        headers: {
+          'X-User-Id': targetUserId,
+        },
+        body: JSON.stringify({
+          sourceUserId,
+        }),
+      })
 
-      let clonedCount = 0
-      for (const config of sourceConfigs) {
-        await UIPreferencesService.saveConfig(targetUserId, config.componentId, {
-          theme: config.theme,
-          preferences: config.preferences,
-          layout: config.layout,
-        })
-        clonedCount++
+      if (!response?.ok) {
+        throw new Error(`Failed to clone UI preferences: ${response?.status}`)
       }
 
-      return clonedCount
+      const data = await response?.json()
+      return data?.clonedCount
     } catch (_error) {
       throw new Error('Failed to clone UI preferences')
     }
@@ -165,10 +147,19 @@ export class UIPreferencesService {
    */
   static async deleteAllUserConfigs(userId: string): Promise<number> {
     try {
-      const result = await prisma.uiPreference.deleteMany({
-        where: { userId },
+      const response = await callBackendApi('ui-preferences/reorderable-list', {
+        method: 'DELETE',
+        headers: {
+          'X-User-Id': userId,
+        },
       })
-      return result.count
+
+      if (!response?.ok) {
+        throw new Error(`Failed to delete all UI preferences: ${response?.status}`)
+      }
+
+      const data = await response?.json()
+      return data?.deletedCount
     } catch (_error) {
       throw new Error('Failed to delete all UI preferences')
     }
@@ -179,8 +170,19 @@ export class UIPreferencesService {
    */
   static async exportUserConfigs(userId: string): Promise<string> {
     try {
-      const configs = await UIPreferencesService.getAllUserConfigs(userId)
-      return JSON.stringify(configs, null, 2)
+      const response = await callBackendApi('ui-preferences/reorderable-list/export', {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userId,
+        },
+      })
+
+      if (!response?.ok) {
+        throw new Error(`Failed to export UI preferences: ${response?.status}`)
+      }
+
+      const data = await response?.json()
+      return data?.data
     } catch (_error) {
       throw new Error('Failed to export UI preferences')
     }
@@ -195,27 +197,28 @@ export class UIPreferencesService {
     overwrite: boolean = false
   ): Promise<number> {
     try {
-      const configs = JSON.parse(jsonData) as ReorderableListConfig[]
+      const response = await callBackendApi('ui-preferences/reorderable-list/import', {
+        method: 'POST',
+        headers: {
+          'X-User-Id': userId,
+        },
+        body: JSON.stringify({
+          jsonData,
+          overwrite,
+        }),
+      })
 
-      if (overwrite) {
-        await UIPreferencesService.deleteAllUserConfigs(userId)
+      if (!response?.ok) {
+        throw new Error(`Failed to import UI preferences: ${response?.status}`)
       }
 
-      let importedCount = 0
-      for (const config of configs) {
-        if (config.componentId) {
-          await UIPreferencesService.saveConfig(userId, config.componentId, {
-            theme: config.theme,
-            preferences: config.preferences,
-            layout: config.layout,
-          })
-          importedCount++
-        }
-      }
-
-      return importedCount
+      const data = await response?.json()
+      return data?.importedCount
     } catch (_error) {
       throw new Error('Failed to import UI preferences')
     }
   }
 }
+
+// Export default instance
+export const uiPreferencesService = UIPreferencesService

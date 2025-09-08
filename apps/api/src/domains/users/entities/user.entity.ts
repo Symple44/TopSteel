@@ -18,6 +18,11 @@ export const UserRole = GlobalUserRole
 export type UserRole = GlobalUserRole
 
 @Entity('users')
+@Index(['role', 'actif', 'createdAt']) // Composite index for filtering by role and status
+@Index(['dernier_login']) // For last login queries
+@Index(['createdAt']) // For chronological queries
+@Index(['updatedAt']) // For recent changes queries
+@Index(['deletedAt']) // For soft delete queries
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string
@@ -40,9 +45,11 @@ export class User {
     enum: UserRole,
     default: UserRole.OPERATEUR,
   })
+  @Index() // Index on role for permission queries
   role!: UserRole
 
   @Column({ type: 'boolean', default: true })
+  @Index() // Index on actif for filtering active users
   actif!: boolean
 
   @Column({ type: 'varchar', nullable: true })
@@ -50,6 +57,7 @@ export class User {
   acronyme?: string
 
   @Column({ type: 'timestamp', nullable: true })
+  @Index() // Index for last login analytics
   dernier_login?: Date
 
   @VersionColumn({ default: 1 })
@@ -59,9 +67,11 @@ export class User {
   deletedAt?: Date
 
   @Column({ type: 'varchar', nullable: true })
+  @Index({ where: 'refreshToken IS NOT NULL' }) // Partial index for active tokens
   refreshToken?: string
 
   @Column({ type: 'jsonb', nullable: true })
+  @Index() // GIN index for JSONB metadata queries (PostgreSQL)
   metadata?: Record<string, unknown>
 
   // Note: societeId removed - relation with Societe is handled via societe_users join table
@@ -75,7 +85,8 @@ export class User {
   @BeforeInsert()
   async hashPassword() {
     if (this.password) {
-      this.password = await bcrypt.hash(this.password, 10)
+      const saltRounds = process.env.NODE_ENV === 'production' ? 12 : 10
+      this.password = await bcrypt.hash(this.password, saltRounds)
     }
   }
 }

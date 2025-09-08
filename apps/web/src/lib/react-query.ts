@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,3 +16,6 @@ export const queryClient = new QueryClient({
     },
   },
 })
+
+// Create a basic provider component for export
+export { QueryClientProvider as ReactQueryProvider }

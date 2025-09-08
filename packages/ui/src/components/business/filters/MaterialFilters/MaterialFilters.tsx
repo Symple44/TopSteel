@@ -1,14 +1,21 @@
 'use client'
-import { useState, useCallback } from 'react'
-import { Filter, Package, Wrench, Scale, Factory, X } from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { Input } from '../../../primitives/input/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
-import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Factory, Filter, Package, Scale, Wrench, X } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { useCheckboxGroupIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
-export type MaterialCategory = 'steel' | 'aluminum' | 'copper' | 'plastic' | 'composite' | 'tools' | 'consumables'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
+export type MaterialCategory =
+  | 'steel'
+  | 'aluminum'
+  | 'copper'
+  | 'plastic'
+  | 'composite'
+  | 'tools'
+  | 'consumables'
 export type MaterialGrade = 'S235' | 'S355' | '316L' | '304' | 'A36' | 'A572' | 'custom'
 export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock' | 'on_order'
 export interface MaterialFiltersState {
@@ -65,22 +72,31 @@ export function MaterialFilters({
   availableSuppliers = [],
   className,
 }: MaterialFiltersProps) {
-  const [filters, setFilters] = useState<MaterialFiltersState>(value || {
-    categories: [],
-    grades: [],
-    stockStatuses: [],
-    supplierIds: [],
-  })
+  // Generate unique IDs for checkboxes
+  const checkboxIds = useCheckboxGroupIds('material-filters', [
+    'has-specifications',
+    'is-certified',
+    'is-hazardous',
+  ])
+  const [filters, setFilters] = useState<MaterialFiltersState>(
+    value || {
+      categories: [],
+      grades: [],
+      stockStatuses: [],
+      supplierIds: [],
+    }
+  )
   const [isExpanded, setIsExpanded] = useState(false)
-  const updateFilters = useCallback((updates: Partial<MaterialFiltersState>) => {
-    const newFilters = { ...filters, ...updates }
-    setFilters(newFilters)
-    onChange?.(newFilters)
-  }, [filters, onChange])
+  const updateFilters = useCallback(
+    (updates: Partial<MaterialFiltersState>) => {
+      const newFilters = { ...filters, ...updates }
+      setFilters(newFilters)
+      onChange?.(newFilters)
+    },
+    [filters, onChange]
+  )
   const toggleArrayValue = <T,>(array: T[], value: T): T[] => {
-    return array.includes(value)
-      ? array.filter(item => item !== value)
-      : [...array, value]
+    return array.includes(value) ? array.filter((item) => item !== value) : [...array, value]
   }
   const handleCategoryToggle = (category: MaterialCategory) => {
     updateFilters({ categories: toggleArrayValue(filters.categories, category) })
@@ -130,9 +146,7 @@ export function MaterialFilters({
         >
           <Filter className="h-4 w-4" />
           Filtres matériaux
-          {activeFiltersCount > 0 && (
-            <Badge variant="secondary">{activeFiltersCount}</Badge>
-          )}
+          {activeFiltersCount > 0 && <Badge variant="secondary">{activeFiltersCount}</Badge>}
         </Button>
         {activeFiltersCount > 0 && (
           <Button
@@ -175,7 +189,10 @@ export function MaterialFilters({
                       onCheckedChange={() => handleCategoryToggle(option.value as MaterialCategory)}
                       disabled={disabled}
                     />
-                    <Label htmlFor={`category-${option.value}`} className="text-sm flex items-center gap-2">
+                    <Label
+                      htmlFor={`category-${option.value}`}
+                      className="text-sm flex items-center gap-2"
+                    >
                       <option.icon className="h-3 w-3" />
                       {option.label}
                     </Label>
@@ -236,18 +253,28 @@ export function MaterialFilters({
                   type="number"
                   placeholder="Min"
                   value={filters.priceRange?.min || ''}
-                  onChange={(e) => updateFilters({
-                    priceRange: { ...filters.priceRange, min: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      priceRange: {
+                        ...filters.priceRange,
+                        min: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.priceRange?.max || ''}
-                  onChange={(e) => updateFilters({
-                    priceRange: { ...filters.priceRange, max: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      priceRange: {
+                        ...filters.priceRange,
+                        max: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -259,18 +286,28 @@ export function MaterialFilters({
                   type="number"
                   placeholder="Min"
                   value={filters.weightRange?.min || ''}
-                  onChange={(e) => updateFilters({
-                    weightRange: { ...filters.weightRange, min: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      weightRange: {
+                        ...filters.weightRange,
+                        min: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.weightRange?.max || ''}
-                  onChange={(e) => updateFilters({
-                    weightRange: { ...filters.weightRange, max: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      weightRange: {
+                        ...filters.weightRange,
+                        max: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -282,18 +319,28 @@ export function MaterialFilters({
                   type="number"
                   placeholder="Min"
                   value={filters.stockRange?.min || ''}
-                  onChange={(e) => updateFilters({
-                    stockRange: { ...filters.stockRange, min: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      stockRange: {
+                        ...filters.stockRange,
+                        min: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.stockRange?.max || ''}
-                  onChange={(e) => updateFilters({
-                    stockRange: { ...filters.stockRange, max: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      stockRange: {
+                        ...filters.stockRange,
+                        max: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -315,36 +362,48 @@ export function MaterialFilters({
             <div className="grid gap-3 md:grid-cols-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="has-specifications"
+                  id={checkboxIds['has-specifications']}
                   checked={filters.hasSpecifications === true}
-                  onCheckedChange={(checked) => updateFilters({ hasSpecifications: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ hasSpecifications: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="has-specifications" className="text-sm">Avec spécifications</Label>
+                <Label htmlFor={checkboxIds['has-specifications']} className="text-sm">
+                  Avec spécifications
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="is-certified"
+                  id={checkboxIds['is-certified']}
                   checked={filters.isCertified === true}
-                  onCheckedChange={(checked) => updateFilters({ isCertified: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ isCertified: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="is-certified" className="text-sm">Certifié</Label>
+                <Label htmlFor={checkboxIds['is-certified']} className="text-sm">
+                  Certifié
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="is-hazardous"
+                  id={checkboxIds['is-hazardous']}
                   checked={filters.isHazardous === true}
-                  onCheckedChange={(checked) => updateFilters({ isHazardous: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ isHazardous: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="is-hazardous" className="text-sm">Dangereux</Label>
+                <Label htmlFor={checkboxIds['is-hazardous']} className="text-sm">
+                  Dangereux
+                </Label>
               </div>
             </div>
           </div>
           {onApply && (
             <div className="flex justify-end pt-4 border-t">
-              <Button onClick={() => onApply(filters)} disabled={disabled}>
+              <Button type="button" onClick={() => onApply(filters)} disabled={disabled}>
                 Appliquer les filtres
               </Button>
             </div>

@@ -28,7 +28,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     const pages: (number | string)[] = []
 
     // Always show first page
-    pages.push(1)
+    pages?.push(1)
 
     // Calculate start and end of visible pages
     let start = Math.max(2, currentPage - halfVisible + 1)
@@ -46,22 +46,22 @@ export const Pagination: React.FC<PaginationProps> = ({
 
     // Add ellipsis if needed at the beginning
     if (start > 2) {
-      pages.push('...')
+      pages?.push('...')
     }
 
     // Add visible page numbers
     for (let i = start; i <= end; i++) {
-      pages.push(i)
+      pages?.push(i)
     }
 
     // Add ellipsis if needed at the end
     if (end < totalPages - 1) {
-      pages.push('...')
+      pages?.push('...')
     }
 
     // Always show last page
     if (totalPages > 1) {
-      pages.push(totalPages)
+      pages?.push(totalPages)
     }
 
     return pages
@@ -109,7 +109,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 
         {/* Page Numbers */}
         <div className="flex items-center gap-1">
-          {pageNumbers.map((page, index) => {
+          {pageNumbers?.map((page, index) => {
             if (page === '...') {
               return (
                 <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-400">

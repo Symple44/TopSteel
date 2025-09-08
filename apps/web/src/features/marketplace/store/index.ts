@@ -35,8 +35,8 @@ export const store = configureStore({
         // Ignore these field paths in all actions
         ignoredActionPaths: [
           'payload.addedAt',
-          'payload.product.createdAt',
-          'payload.product.updatedAt',
+          'payload?.product?.createdAt',
+          'payload?.product?.updatedAt',
         ],
         // Ignore these paths in the state
         ignoredPaths: ['cart.items', 'cart.lastUpdated', 'wishlist.items', 'wishlist.lastUpdated'],

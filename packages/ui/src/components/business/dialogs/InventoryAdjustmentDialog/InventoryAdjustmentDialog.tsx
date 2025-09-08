@@ -1,36 +1,48 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+
 // Inventory adjustment validation schema
 const inventoryAdjustmentSchema = z.object({
   // Material Information
-  materialId: z.string().min(1, 'L\'ID du matériau est requis'),
+  materialId: z.string().min(1, "L'ID du matériau est requis"),
   materialName: z.string().min(1, 'Le nom du matériau est requis'),
   materialCategory: z.enum(['steel', 'alloy', 'tools', 'consumables', 'equipment', 'other']),
   steelGrade: z.string().optional(),
   dimensions: z.string().optional(),
   // Location Information
-  warehouseId: z.string().min(1, 'L\'entrepôt est requis'),
-  warehouseName: z.string().min(1, 'Le nom de l\'entrepôt est requis'),
+  warehouseId: z.string().min(1, "L'entrepôt est requis"),
+  warehouseName: z.string().min(1, "Le nom de l'entrepôt est requis"),
   location: z.string().optional(),
   binLocation: z.string().optional(),
   // Adjustment Details
   adjustmentType: z.enum(['increase', 'decrease', 'set_to_value', 'recount']),
   currentQuantity: z.number().min(0, 'La quantité actuelle doit être positive'),
-  adjustmentQuantity: z.number({
-    required_error: 'La quantité d\'ajustement est requise',
-  }),
+  adjustmentQuantity: z.coerce.number().min(0, "La quantité d'ajustement doit être positive"),
   newQuantity: z.number().min(0, 'La nouvelle quantité doit être positive'),
   unit: z.enum(['kg', 'tons', 'pieces', 'meters', 'liters', 'boxes']),
   // Reason and Documentation
@@ -45,7 +57,7 @@ const inventoryAdjustmentSchema = z.object({
     'quality_issue',
     'obsolete_stock',
     'found_stock',
-    'other'
+    'other',
   ]),
   reasonDetails: z.string().min(1, 'Les détails de la raison sont requis'),
   // Financial Impact
@@ -57,8 +69,8 @@ const inventoryAdjustmentSchema = z.object({
   qualityNotes: z.string().optional(),
   requiresQualityCheck: z.boolean().default(false),
   // Approval and Tracking
-  adjustmentDate: z.string().min(1, 'La date d\'ajustement est requise'),
-  adjustedBy: z.string().min(1, 'L\'utilisateur est requis'),
+  adjustmentDate: z.string().min(1, "La date d'ajustement est requise"),
+  adjustedBy: z.string().min(1, "L'utilisateur est requis"),
   approvedBy: z.string().optional(),
   requiresApproval: z.boolean().default(false),
   // Steel Industry Specific
@@ -93,7 +105,7 @@ export function InventoryAdjustmentDialog({
 }: InventoryAdjustmentDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<InventoryAdjustmentFormData>({
+  const form = useForm({
     resolver: zodResolver(inventoryAdjustmentSchema),
     defaultValues: {
       materialCategory: 'steel',
@@ -118,26 +130,29 @@ export function InventoryAdjustmentDialog({
   const watchMaterialCategory = form.watch('materialCategory')
   // Auto-calculate new quantity based on adjustment type
   useEffect(() => {
+    const currentQty = typeof watchCurrentQuantity === 'number' ? watchCurrentQuantity : 0
+    const adjustQty = typeof watchAdjustmentQuantity === 'number' ? watchAdjustmentQuantity : 0
+
     if (watchCurrentQuantity !== undefined && watchAdjustmentQuantity !== undefined) {
       let newQuantity = 0
       switch (watchAdjustmentType) {
         case 'increase':
-          newQuantity = watchCurrentQuantity + watchAdjustmentQuantity
+          newQuantity = currentQty + adjustQty
           break
         case 'decrease':
-          newQuantity = Math.max(0, watchCurrentQuantity - watchAdjustmentQuantity)
+          newQuantity = Math.max(0, currentQty - adjustQty)
           break
         case 'set_to_value':
-          newQuantity = watchAdjustmentQuantity
+          newQuantity = adjustQty
           break
         case 'recount':
-          newQuantity = watchAdjustmentQuantity
+          newQuantity = adjustQty
           break
       }
       form.setValue('newQuantity', newQuantity)
       // Calculate cost impact
       if (watchUnitCost) {
-        const quantityDifference = newQuantity - watchCurrentQuantity
+        const quantityDifference = newQuantity - currentQty
         const costImpact = quantityDifference * watchUnitCost
         form.setValue('totalCostImpact', parseFloat(costImpact.toFixed(2)))
       }
@@ -151,9 +166,10 @@ export function InventoryAdjustmentDialog({
       const enrichedData = {
         ...data,
         quantityDifference: data.newQuantity - data.currentQuantity,
-        adjustmentPercent: data.currentQuantity > 0 
-          ? ((data.newQuantity - data.currentQuantity) / data.currentQuantity * 100)
-          : 0,
+        adjustmentPercent:
+          data.currentQuantity > 0
+            ? ((data.newQuantity - data.currentQuantity) / data.currentQuantity) * 100
+            : 0,
         adjustmentId: `ADJ-${Date.now()}`,
         createdAt: new Date().toISOString(),
         status: data.requiresApproval ? 'pending_approval' : 'approved',
@@ -172,7 +188,7 @@ export function InventoryAdjustmentDialog({
     setError(null)
     onOpenChange(false)
   }
-  const getReasonLabel = (reason: string) => {
+  const _getReasonLabel = (reason: string) => {
     const reasons: Record<string, string> = {
       physical_count: 'Inventaire physique',
       damaged_goods: 'Marchandises endommagées',
@@ -184,7 +200,7 @@ export function InventoryAdjustmentDialog({
       quality_issue: 'Problème qualité',
       obsolete_stock: 'Stock obsolète',
       found_stock: 'Stock retrouvé',
-      other: 'Autre'
+      other: 'Autre',
     }
     return reasons[reason] || reason
   }
@@ -430,7 +446,9 @@ export function InventoryAdjustmentDialog({
                         <FormLabel>
                           {watchAdjustmentType === 'increase' && 'Quantité à ajouter *'}
                           {watchAdjustmentType === 'decrease' && 'Quantité à retirer *'}
-                          {(watchAdjustmentType === 'set_to_value' || watchAdjustmentType === 'recount') && 'Nouvelle quantité *'}
+                          {(watchAdjustmentType === 'set_to_value' ||
+                            watchAdjustmentType === 'recount') &&
+                            'Nouvelle quantité *'}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -438,6 +456,7 @@ export function InventoryAdjustmentDialog({
                             step="0.01"
                             placeholder="0"
                             {...field}
+                            value={typeof field.value === 'number' ? field.value : ''}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
@@ -663,10 +682,7 @@ export function InventoryAdjustmentDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0 pt-8">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Contrôle qualité requis
@@ -783,14 +799,9 @@ export function InventoryAdjustmentDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Validation requise
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Validation requise</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -800,14 +811,9 @@ export function InventoryAdjustmentDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Suivi requis
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Suivi requis</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -885,7 +891,7 @@ export function InventoryAdjustmentDialog({
                   Annuler
                 </Button>
                 <Button type="submit" disabled={loading} className="flex-1">
-                  {loading ? 'Ajustement en cours...' : 'Confirmer l\'ajustement'}
+                  {loading ? 'Ajustement en cours...' : "Confirmer l'ajustement"}
                 </Button>
               </div>
             </form>

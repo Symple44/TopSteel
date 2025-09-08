@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import type { DeepPartial, Repository } from 'typeorm'
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
 import {
@@ -26,11 +26,12 @@ export class QueryBuilderService {
   ) {}
 
   async create(createDto: CreateQueryBuilderDto, userId: string): Promise<QueryBuilder> {
-    const queryBuilder = this._queryBuilderRepository.create({
+    const queryData = {
       ...createDto,
       createdById: userId,
-    } as unknown)
+    } as DeepPartial<QueryBuilder>
 
+    const queryBuilder = this._queryBuilderRepository.create(queryData)
     const saved = await this._queryBuilderRepository.save(queryBuilder)
     const savedEntity = Array.isArray(saved) ? saved[0] : saved
 
@@ -97,10 +98,12 @@ export class QueryBuilderService {
     if (updateDto.columns) {
       await this._columnRepository.delete({ queryBuilderId: id })
       if (updateDto.columns.length > 0) {
-        const columns = updateDto.columns.map((col) =>
-          this._columnRepository.create({ ...col, queryBuilderId: id } as unknown)
-        )
-        await this._columnRepository.save(columns as unknown)
+        const columnsData = updateDto.columns.map((col) => ({
+          ...col,
+          queryBuilderId: id,
+        })) as DeepPartial<QueryBuilderColumn>[]
+        const columns = this._columnRepository.create(columnsData)
+        await this._columnRepository.save(columns)
       }
     }
 
@@ -108,10 +111,12 @@ export class QueryBuilderService {
     if (updateDto.joins) {
       await this._joinRepository.delete({ queryBuilderId: id })
       if (updateDto.joins.length > 0) {
-        const joins = updateDto.joins.map((join) =>
-          this._joinRepository.create({ ...join, queryBuilderId: id } as unknown)
-        )
-        await this._joinRepository.save(joins as unknown)
+        const joinsData = updateDto.joins.map((join) => ({
+          ...join,
+          queryBuilderId: id,
+        })) as DeepPartial<QueryBuilderJoin>[]
+        const joins = this._joinRepository.create(joinsData)
+        await this._joinRepository.save(joins)
       }
     }
 
@@ -119,10 +124,12 @@ export class QueryBuilderService {
     if (updateDto.calculatedFields) {
       await this._calculatedFieldRepository.delete({ queryBuilderId: id })
       if (updateDto.calculatedFields.length > 0) {
-        const fields = updateDto.calculatedFields.map((field) =>
-          this._calculatedFieldRepository.create({ ...field, queryBuilderId: id } as unknown)
-        )
-        await this._calculatedFieldRepository.save(fields as unknown)
+        const fieldsData = updateDto.calculatedFields.map((field) => ({
+          ...field,
+          queryBuilderId: id,
+        })) as DeepPartial<QueryBuilderCalculatedField>[]
+        const fields = this._calculatedFieldRepository.create(fieldsData)
+        await this._calculatedFieldRepository.save(fields)
       }
     }
 
@@ -176,7 +183,7 @@ export class QueryBuilderService {
           queryBuilderId: savedEntity.id,
         })
       )
-      await this._columnRepository.save(columns)
+      await this._columnRepository.save(columns as unknown)
     }
 
     // Duplicate joins
@@ -188,7 +195,7 @@ export class QueryBuilderService {
           queryBuilderId: savedEntity.id,
         })
       )
-      await this._joinRepository.save(joins)
+      await this._joinRepository.save(joins as unknown)
     }
 
     // Duplicate calculated fields
@@ -200,7 +207,7 @@ export class QueryBuilderService {
           queryBuilderId: savedEntity.id,
         })
       )
-      await this._calculatedFieldRepository.save(fields)
+      await this._calculatedFieldRepository.save(fields as unknown)
     }
 
     return this.findOne(savedEntity.id, userId)

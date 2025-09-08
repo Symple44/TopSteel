@@ -1,9 +1,11 @@
 'use client'
 
+import type { ColumnConfig } from '@erp/ui'
 import {
   Badge,
   Button,
   Checkbox,
+  DataTable,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -17,11 +19,11 @@ import {
   SelectValue,
   Switch,
 } from '@erp/ui'
-import { AdvancedDataTable, type ColumnConfig } from '@erp/ui/data-display'
 import { Building, MapPin, Save, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { apiClient } from '@/lib/api-client'
+import { postTyped } from '@/lib/api-typed'
 
 interface CompanyAccess {
   id: string
@@ -84,14 +86,18 @@ export function UserCompaniesDataTable({ userId }: Props) {
     try {
       setLoading(true)
       // Charger les accès actuels de l'utilisateur
-      const userAccess = await apiClient.get<CompanyAccess[]>(`/societes/users/${userId}/companies`)
+      const userAccessResponse = await apiClient.get<CompanyAccess[]>(
+        `/societes/users/${userId}/companies`
+      )
+      const userAccess = userAccessResponse ?? []
 
       // Charger toutes les sociétés
-      const allSocietes = await apiClient.get<{ id: string; name: string }[]>('/societes')
+      const societesResponse = await apiClient.get<{ id: string; name: string }[]>('/societes')
+      const allSocietes = societesResponse ?? []
 
       // Créer une entrée pour chaque société (même sans accès)
-      const fullData = allSocietes.map((societe) => {
-        const existingAccess = userAccess.find((access) => access.societeId === societe.id)
+      const fullData = allSocietes?.map((societe) => {
+        const existingAccess = userAccess?.find((access) => access.societeId === societe.id)
         if (existingAccess) {
           return existingAccess
         } else {
@@ -99,7 +105,13 @@ export function UserCompaniesDataTable({ userId }: Props) {
           return {
             id: `new-${societe.id}`,
             societeId: societe.id,
-            societe: societe,
+            societe: {
+              id: societe.id,
+              nom: societe.name,
+              code: '',
+              ville: '',
+              isActive: true,
+            },
             userId: userId,
             role: 'GUEST' as const,
             permissions: [],
@@ -132,16 +144,16 @@ export function UserCompaniesDataTable({ userId }: Props) {
 
   const handleRoleChange = async (companyAccess: CompanyAccess, newRole: string) => {
     try {
-      if (companyAccess.id.startsWith('new-')) {
+      if (companyAccess?.id?.startsWith('new-')) {
         // Créer un nouvel accès
-        await apiClient.post(`/societes/${companyAccess.societeId}/users`, {
+        await postTyped(`/societes/${companyAccess.societeId}/users`, {
           userId: userId,
           role: newRole,
           isActive: true,
         })
       } else {
         // Mettre à jour l'accès existant
-        await apiClient.patch(`/societes/users/${companyAccess.id}`, {
+        await apiClient?.patch(`/societes/users/${companyAccess.id}`, {
           role: newRole,
         })
       }
@@ -161,18 +173,18 @@ export function UserCompaniesDataTable({ userId }: Props) {
     }
   }
 
-  const handleActiveToggle = async (companyAccess: CompanyAccess) => {
+  const _handleActiveToggle = async (companyAccess: CompanyAccess) => {
     try {
-      if (companyAccess.id.startsWith('new-')) {
+      if (companyAccess?.id?.startsWith('new-')) {
         // Créer un nouvel accès actif
-        await apiClient.post(`/societes/${companyAccess.societeId}/users`, {
+        await postTyped(`/societes/${companyAccess.societeId}/users`, {
           userId: userId,
           role: 'USER',
           isActive: true,
         })
       } else {
         // Toggle l'état actif
-        await apiClient.patch(`/societes/users/${companyAccess.id}`, {
+        await apiClient?.patch(`/societes/users/${companyAccess.id}`, {
           isActive: !companyAccess.isActive,
         })
       }
@@ -194,7 +206,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
 
   const handleDefaultToggle = async (companyAccess: CompanyAccess) => {
     try {
-      await apiClient.post(`/societes/users/${userId}/default-societe`, {
+      await postTyped(`/societes/users/${userId}/default-societe`, {
         societeId: companyAccess.societeId,
       })
 
@@ -223,9 +235,9 @@ export function UserCompaniesDataTable({ userId }: Props) {
     if (!selectedCompany) return
 
     try {
-      if (selectedCompany.id.startsWith('new-')) {
+      if (selectedCompany?.id?.startsWith('new-')) {
         // Créer un nouvel accès avec permissions
-        await apiClient.post(`/societes/${selectedCompany.societeId}/users`, {
+        await postTyped(`/societes/${selectedCompany.societeId}/users`, {
           userId: userId,
           role: selectedCompany.role || 'USER',
           permissions: editingPermissions,
@@ -233,7 +245,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
         })
       } else {
         // Mettre à jour les permissions
-        await apiClient.patch(`/societes/users/${selectedCompany.id}/permissions`, {
+        await apiClient?.patch(`/societes/users/${selectedCompany.id}/permissions`, {
           permissions: editingPermissions,
         })
       }
@@ -261,35 +273,35 @@ export function UserCompaniesDataTable({ userId }: Props) {
       title: 'Société',
       type: 'text',
       sortable: true,
-      searchable: true,
       width: 250,
-      render: (_, row) => (
+      render: (_value: unknown, row: CompanyAccess, _column: ColumnConfig<CompanyAccess>) => (
         <div className="flex items-center space-x-3">
           <div className="flex-shrink-0">
             <Building className="h-8 w-8 text-gray-400" />
           </div>
           <div>
-            <p className="font-medium text-gray-900">{row.societe.nom}</p>
+            <p className="font-medium text-gray-900">{row?.societe?.nom}</p>
             <p className="text-sm text-gray-500 flex items-center">
               <MapPin className="h-3 w-3 mr-1" />
-              {row.societe.ville || 'Non renseigné'}
+              {row?.societe?.ville || 'Non renseigné'}
             </p>
           </div>
         </div>
       ),
     },
     {
-      id: 'isActive',
+      id: 'status',
       key: 'isActive',
-      title: 'Accès',
-      type: 'boolean',
-      width: 100,
-      render: (_, row) => (
-        <Switch
-          checked={row.isActive}
-          onCheckedChange={() => handleActiveToggle(row)}
-          className="data-[state=checked]:bg-green-600"
-        />
+      title: 'Statut',
+      type: 'text',
+      width: 120,
+      render: (_value: unknown, row: CompanyAccess, _column: ColumnConfig<CompanyAccess>) => (
+        <Badge
+          variant={row.isActive ? 'default' : 'secondary'}
+          className={row.isActive ? 'bg-green-600' : ''}
+        >
+          {row.isActive ? 'Actif' : 'Inactif'}
+        </Badge>
       ),
     },
     {
@@ -300,7 +312,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
       sortable: true,
       options: roleOptions,
       width: 180,
-      render: (_, row) => (
+      render: (_value: unknown, row: CompanyAccess, _column: ColumnConfig<CompanyAccess>) => (
         <Select
           value={row.role}
           onValueChange={(value: string) => handleRoleChange(row, value)}
@@ -310,7 +322,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {roleOptions.map((option) => (
+            {roleOptions?.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 <span className={`px-2 py-1 rounded-md text-xs font-medium ${option.color}`}>
                   {option.label}
@@ -327,12 +339,13 @@ export function UserCompaniesDataTable({ userId }: Props) {
       title: 'Permissions',
       type: 'text',
       width: 200,
-      render: (_, row) => (
+      render: (_value: unknown, row: CompanyAccess, _column: ColumnConfig<CompanyAccess>) => (
         <div className="flex items-center space-x-2">
           <Badge variant="outline" className="text-xs">
-            {row.permissions.length} permissions
+            {row?.permissions?.length} permissions
           </Badge>
           <Button
+            type="button"
             size="sm"
             variant="ghost"
             onClick={() => openPermissionsDialog(row)}
@@ -349,7 +362,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
       title: 'Par défaut',
       type: 'boolean',
       width: 120,
-      render: (_, row) => (
+      render: (_value: unknown, row: CompanyAccess, _column: ColumnConfig<CompanyAccess>) => (
         <Switch
           checked={row.isDefault}
           onCheckedChange={() => handleDefaultToggle(row)}
@@ -365,8 +378,8 @@ export function UserCompaniesDataTable({ userId }: Props) {
       type: 'date',
       sortable: true,
       width: 150,
-      render: (_value, row) => {
-        if (!row.updatedAt || row.id.startsWith('new-')) {
+      render: (_value: unknown, row: CompanyAccess, _column: ColumnConfig<CompanyAccess>) => {
+        if (!row.updatedAt || row?.id?.startsWith('new-')) {
           return <span className="text-gray-400">Jamais</span>
         }
         return new Date(row.updatedAt).toLocaleDateString('fr-FR')
@@ -376,7 +389,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
 
   return (
     <>
-      <AdvancedDataTable
+      <DataTable
         columns={columns}
         data={data}
         loading={loading}
@@ -397,10 +410,10 @@ export function UserCompaniesDataTable({ userId }: Props) {
 
           <div className="space-y-6 py-4">
             {Object.entries(
-              availablePermissions.reduce(
+              availablePermissions?.reduce(
                 (acc, perm) => {
                   if (!acc[perm.category]) acc[perm.category] = []
-                  acc[perm.category].push(perm)
+                  acc?.[perm.category]?.push(perm)
                   return acc
                 },
                 {} as Record<string, typeof availablePermissions>
@@ -409,19 +422,19 @@ export function UserCompaniesDataTable({ userId }: Props) {
               <div key={category}>
                 <h4 className="font-medium text-gray-900 mb-3">{category}</h4>
                 <div className="space-y-2">
-                  {perms.map((perm) => (
+                  {perms?.map((perm) => (
                     <Label
                       key={perm.value}
                       className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50"
                     >
                       <Checkbox
-                        checked={editingPermissions.includes(perm.value)}
+                        checked={editingPermissions?.includes(perm.value)}
                         onCheckedChange={(checked: boolean) => {
                           if (checked) {
                             setEditingPermissions([...editingPermissions, perm.value])
                           } else {
                             setEditingPermissions(
-                              editingPermissions.filter((p) => p !== perm.value)
+                              editingPermissions?.filter((p) => p !== perm.value)
                             )
                           }
                         }}
@@ -435,10 +448,14 @@ export function UserCompaniesDataTable({ userId }: Props) {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setIsPermissionsDialogOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsPermissionsDialogOpen(false)}
+            >
               Annuler
             </Button>
-            <Button onClick={handleSavePermissions}>
+            <Button type="button" onClick={handleSavePermissions}>
               <Save className="h-4 w-4 mr-2" />
               Enregistrer
             </Button>

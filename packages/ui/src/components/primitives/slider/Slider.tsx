@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
 
-export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
+export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   value?: number
   defaultValue?: number
   min?: number
@@ -13,17 +13,20 @@ export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputEle
 }
 
 const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
-  ({ 
-    className, 
-    value, 
-    defaultValue,
-    min = 0, 
-    max = 100, 
-    step = 1,
-    onValueChange,
-    onChange,
-    ...props 
-  }, ref) => {
+  (
+    {
+      className,
+      value,
+      defaultValue,
+      min = 0,
+      max = 100,
+      step = 1,
+      onValueChange,
+      onChange,
+      ...props
+    },
+    ref
+  ) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = parseFloat(event.target.value)
       onValueChange?.(newValue)

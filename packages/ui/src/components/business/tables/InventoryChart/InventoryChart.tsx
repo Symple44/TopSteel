@@ -1,8 +1,15 @@
 'use client'
+import {
+  AlertTriangle,
+  BarChart3,
+  Clock,
+  DollarSign,
+  Package,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Badge } from '../../../primitives'
-import { Progress } from '../../../primitives'
-import { Package, TrendingUp, TrendingDown, AlertTriangle, DollarSign, BarChart3, Clock } from 'lucide-react'
+import { Badge, Progress } from '../../../primitives'
 export interface InventoryData {
   period: string
   totalValue: number
@@ -67,7 +74,7 @@ interface InventoryChartProps {
   onCategoryClick?: (category: string) => void
   onViewDetails?: () => void
 }
-export function InventoryChart({ 
+export function InventoryChart({
   data = [],
   title = "Graphique d'inventaire",
   period = 'monthly',
@@ -80,7 +87,7 @@ export function InventoryChart({
   loading = false,
   onPeriodChange,
   onCategoryClick,
-  onViewDetails
+  onViewDetails,
 }: InventoryChartProps) {
   if (loading) {
     return (
@@ -92,7 +99,9 @@ export function InventoryChart({
           <div className="flex items-center justify-center" style={{ height }}>
             <div className="text-center">
               <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-              <p className="mt-2 text-sm text-muted-foreground">Chargement des données d'inventaire...</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Chargement des données d'inventaire...
+              </p>
             </div>
           </div>
         </CardContent>
@@ -110,7 +119,7 @@ export function InventoryChart({
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('fr-FR').format(num)
   }
-  const getStockLevelColor = (level: string) => {
+  const _getStockLevelColor = (level: string) => {
     const colors = {
       optimal: 'bg-green-500',
       overstock: 'bg-blue-500',
@@ -150,8 +159,12 @@ export function InventoryChart({
           return (
             <div key={level} className="space-y-1">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{labels[level as keyof typeof labels]}</span>
-                <span className="font-medium">{count} articles ({percentage.toFixed(1)}%)</span>
+                <span className="text-muted-foreground">
+                  {labels[level as keyof typeof labels]}
+                </span>
+                <span className="font-medium">
+                  {count} articles ({percentage.toFixed(1)}%)
+                </span>
               </div>
               <Progress value={percentage} className="h-2" />
             </div>
@@ -165,16 +178,32 @@ export function InventoryChart({
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
         <div className="flex gap-2">
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('daily')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('daily')}
+          >
             Jour
           </Badge>
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('weekly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('weekly')}
+          >
             Semaine
           </Badge>
-          <Badge variant={period === 'monthly' ? 'default' : 'outline'} className="cursor-pointer" onClick={() => onPeriodChange?.('monthly')}>
+          <Badge
+            variant={period === 'monthly' ? 'default' : 'outline'}
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('monthly')}
+          >
             Mois
           </Badge>
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('quarterly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('quarterly')}
+          >
             Trimestre
           </Badge>
         </div>
@@ -193,9 +222,7 @@ export function InventoryChart({
                   <DollarSign className="h-4 w-4" />
                   <span>Valeur totale</span>
                 </div>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(currentData.totalValue)}
-                </div>
+                <div className="text-2xl font-bold">{formatCurrency(currentData.totalValue)}</div>
                 {previousData && (
                   <div className="text-xs text-muted-foreground">
                     vs {formatCurrency(previousData.totalValue)}
@@ -207,9 +234,7 @@ export function InventoryChart({
                   <Package className="h-4 w-4" />
                   <span>Articles</span>
                 </div>
-                <div className="text-2xl font-bold">
-                  {formatNumber(currentData.totalItems)}
-                </div>
+                <div className="text-2xl font-bold">{formatNumber(currentData.totalItems)}</div>
                 <div className="text-xs text-muted-foreground">
                   Qté totale: {formatNumber(currentData.totalQuantity)}
                 </div>
@@ -240,7 +265,8 @@ export function InventoryChart({
                     <span className="text-red-600">↓ {currentData.movements.exits}</span>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Ajust: {currentData.movements.adjustments} | Transf: {currentData.movements.transfers}
+                    Ajust: {currentData.movements.adjustments} | Transf:{' '}
+                    {currentData.movements.transfers}
                   </div>
                 </div>
               </div>
@@ -257,21 +283,36 @@ export function InventoryChart({
                   <div className="text-sm font-medium mb-3">Répartition par catégorie</div>
                   <div className="space-y-2">
                     {currentData.categories.slice(0, 5).map((category) => (
-                      <div 
+                      // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+                      <div
                         key={category.name}
                         className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-1 rounded"
+                        role={onCategoryClick ? 'button' : undefined}
+                        tabIndex={onCategoryClick ? 0 : undefined}
                         onClick={() => onCategoryClick?.(category.name)}
+                        onKeyDown={(e) => {
+                          if (onCategoryClick && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault()
+                            onCategoryClick(category.name)
+                          }
+                        }}
                       >
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded-full" 
-                            style={{ backgroundColor: `hsl(${category.percentage * 3.6}, 70%, 50%)` }}
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                              backgroundColor: `hsl(${category.percentage * 3.6}, 70%, 50%)`,
+                            }}
                           />
                           <span className="text-sm">{category.name}</span>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-medium">{formatCurrency(category.value)}</div>
-                          <div className="text-xs text-muted-foreground">{category.percentage.toFixed(1)}%</div>
+                          <div className="text-sm font-medium">
+                            {formatCurrency(category.value)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {category.percentage.toFixed(1)}%
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -300,7 +341,9 @@ export function InventoryChart({
                           <td className="py-2 font-medium">{item.reference}</td>
                           <td className="py-2 text-muted-foreground">{item.name}</td>
                           <td className="py-2 text-right">{formatNumber(item.quantity)}</td>
-                          <td className="py-2 text-right font-medium">{formatCurrency(item.value)}</td>
+                          <td className="py-2 text-right font-medium">
+                            {formatCurrency(item.value)}
+                          </td>
                           <td className="py-2 text-right">{item.turnoverRate.toFixed(1)}x</td>
                         </tr>
                       ))}
@@ -325,12 +368,17 @@ export function InventoryChart({
                       reorder: '🔄',
                     }
                     return (
-                      <div key={index} className="flex items-center justify-between p-2 bg-orange-50 rounded">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-orange-50 rounded"
+                      >
                         <div className="flex items-center gap-2">
                           <span>{icons[alert.type as keyof typeof icons]}</span>
                           <div>
                             <span className="font-medium text-sm">{alert.itemReference}</span>
-                            <span className="text-sm text-muted-foreground ml-2">{alert.message}</span>
+                            <span className="text-sm text-muted-foreground ml-2">
+                              {alert.message}
+                            </span>
                           </div>
                         </div>
                         {getUrgencyBadge(alert.urgency)}
@@ -347,29 +395,34 @@ export function InventoryChart({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <div className="text-xs text-muted-foreground">Coût d'achat</div>
-                    <div className="font-medium">{formatCurrency(currentData.costBreakdown.purchaseCost)}</div>
+                    <div className="font-medium">
+                      {formatCurrency(currentData.costBreakdown.purchaseCost)}
+                    </div>
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">Coût de stockage</div>
-                    <div className="font-medium">{formatCurrency(currentData.costBreakdown.holdingCost)}</div>
+                    <div className="font-medium">
+                      {formatCurrency(currentData.costBreakdown.holdingCost)}
+                    </div>
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">Coût d'obsolescence</div>
-                    <div className="font-medium">{formatCurrency(currentData.costBreakdown.obsolescenceCost)}</div>
+                    <div className="font-medium">
+                      {formatCurrency(currentData.costBreakdown.obsolescenceCost)}
+                    </div>
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">Coût de rupture</div>
-                    <div className="font-medium">{formatCurrency(currentData.costBreakdown.shortageCost)}</div>
+                    <div className="font-medium">
+                      {formatCurrency(currentData.costBreakdown.shortageCost)}
+                    </div>
                   </div>
                 </div>
               </div>
             )}
             {onViewDetails && (
               <div className="mt-4 flex justify-center">
-                <button
-                  onClick={onViewDetails}
-                  className="text-sm text-blue-600 hover:underline"
-                >
+                <button onClick={onViewDetails} className="text-sm text-blue-600 hover:underline">
                   Voir l'analyse complète →
                 </button>
               </div>

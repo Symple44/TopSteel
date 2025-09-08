@@ -21,9 +21,9 @@ export default function SettingsPage() {
   const router = useRouter()
 
   // Vérifier l'authentification
-  React.useEffect(() => {
+  React?.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/settings')
+      router?.push('/login?redirect=/settings')
     }
   }, [isAuthenticated, authLoading, router])
 
@@ -41,29 +41,29 @@ export default function SettingsPage() {
 
   const settingsModules = [
     {
-      title: t('modules.menu.title'),
-      description: t('modules.menu.description'),
+      title: t('modules?.menu?.title'),
+      description: t('modules?.menu?.description'),
       icon: Menu,
       href: '/settings/menu',
       color: 'from-purple-500 to-pink-600',
     },
     {
-      title: t('modules.security.title'),
-      description: t('modules.security.description'),
+      title: t('modules?.security?.title'),
+      description: t('modules?.security?.description'),
       icon: Shield,
       href: '/settings/security',
       color: 'from-green-500 to-teal-600',
     },
     {
-      title: t('modules.notifications.title'),
-      description: t('modules.notifications.description'),
+      title: t('modules?.notifications?.title'),
+      description: t('modules?.notifications?.description'),
       icon: Bell,
       href: '/settings/notifications',
       color: 'from-yellow-500 to-orange-600',
     },
     {
-      title: t('modules.appearance.title'),
-      description: t('modules.appearance.description'),
+      title: t('modules?.appearance?.title'),
+      description: t('modules?.appearance?.description'),
       icon: Palette,
       href: '/settings/appearance',
       color: 'from-indigo-500 to-purple-600',
@@ -104,11 +104,11 @@ export default function SettingsPage() {
 
         {/* Settings Modules Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {settingsModules.map((module) => (
+          {settingsModules?.map((module) => (
             <Card
               key={module.href}
               className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative"
-              onClick={() => router.push(module.href)}
+              onClick={() => router?.push(module.href)}
             >
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${module.color}/10 opacity-0 group-hover:opacity-100 transition-opacity`}

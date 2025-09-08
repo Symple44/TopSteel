@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MarketplaceOrder } from '../../orders/entities/marketplace-order.entity'
 
 export interface CustomerAddress {
   id: string
@@ -130,11 +129,8 @@ export class MarketplaceCustomer {
   lastLoginAt?: Date
 
   // Relations
-  @OneToMany(
-    () => MarketplaceOrder,
-    (order) => order.customer
-  )
-  orders!: MarketplaceOrder[]
+  @OneToMany('MarketplaceOrder', (order: any) => order.customer)
+  orders!: any[]
 
   // Méthodes utilitaires
   getFullName(): string {

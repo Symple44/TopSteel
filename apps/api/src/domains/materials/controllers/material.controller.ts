@@ -421,7 +421,7 @@ export class MaterialController {
   async calculerValorisationStock(
     @Query('type') type?: string
   ): Promise<MaterialStockValorisation> {
-    return await this.materialService.calculerValorisationStock(type as any)
+    return await this.materialService.calculerValorisationStock(type as unknown)
   }
 
   /**
@@ -872,7 +872,7 @@ export class MaterialController {
         if (material) {
           const validation = await this.materialService.validateBusinessRules(
             material,
-            'VALIDATE' as any
+            'VALIDATE' as unknown
           )
           results.push({
             id: materialId,

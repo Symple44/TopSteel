@@ -4,10 +4,10 @@
  * Exemple d'utilisation du DataTable refactorisé
  */
 
+import { Edit, Eye, Trash } from 'lucide-react'
 import React from 'react'
-import { DataTable } from './DataTableV2'
-import type { ColumnConfig } from './types'
-import { Edit, Trash, Eye } from 'lucide-react'
+import { DataTable } from './DataTable'
+import type { ColumnConfig, SelectionState } from './types'
 
 // Type des données d'exemple
 interface User {
@@ -29,7 +29,7 @@ const sampleData: User[] = [
     role: 'Admin',
     status: 'active',
     createdAt: new Date('2024-01-15'),
-    credits: 1250.50,
+    credits: 1250.5,
   },
   {
     id: 2,
@@ -38,7 +38,7 @@ const sampleData: User[] = [
     role: 'User',
     status: 'active',
     createdAt: new Date('2024-02-20'),
-    credits: 500.00,
+    credits: 500.0,
   },
   {
     id: 3,
@@ -127,50 +127,38 @@ export function DataTableExample() {
     {
       label: 'Voir',
       icon: <Eye className="h-4 w-4" />,
-      onClick: (row: User) => {
-        console.log('Voir:', row)
-      },
+      onClick: (_row: User) => {},
     },
     {
       label: 'Modifier',
       icon: <Edit className="h-4 w-4" />,
-      onClick: (row: User) => {
-        console.log('Modifier:', row)
-      },
+      onClick: (_row: User) => {},
     },
     {
       label: 'Supprimer',
       icon: <Trash className="h-4 w-4" />,
       variant: 'destructive' as const,
       onClick: (row: User) => {
-        setData(prev => prev.filter(u => u.id !== row.id))
+        setData((prev) => prev.filter((u) => u.id !== row.id))
       },
       separator: true,
     },
   ]
 
   // Gestion de l'édition de cellule
-  const handleCellEdit = (row: User, column: ColumnConfig<User>, value: any) => {
-    console.log('Edit:', { row, column, value })
-    setData(prev => 
-      prev.map(u => 
-        u.id === row.id 
-          ? { ...u, [column.key]: value }
-          : u
-      )
-    )
+  const handleCellEdit = (row: User, column: ColumnConfig<User>, value: unknown) => {
+    setData((prev) => prev.map((u) => (u.id === row.id ? { ...u, [column.key]: value } : u)))
   }
 
   // Gestion de la sélection
-  const handleSelectionChange = (selection: any) => {
+  const handleSelectionChange = (selection: SelectionState) => {
     setSelectedRows(selection.selectedRows)
-    console.log('Selection:', selection)
   }
 
   // Ajout d'un nouvel utilisateur
   const handleAddNew = () => {
     const newUser: User = {
-      id: Math.max(...data.map(u => u.id)) + 1,
+      id: Math.max(...data.map((u) => u.id)) + 1,
       name: 'Nouvel utilisateur',
       email: 'nouveau@example.com',
       role: 'User',
@@ -178,13 +166,13 @@ export function DataTableExample() {
       createdAt: new Date(),
       credits: 0,
     }
-    setData(prev => [...prev, newUser])
+    setData((prev) => [...prev, newUser])
   }
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Exemple DataTable Refactorisé</h1>
-      
+
       {/* Affichage des lignes sélectionnées */}
       {selectedRows.size > 0 && (
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
@@ -200,7 +188,6 @@ export function DataTableExample() {
         data={data}
         columns={columns}
         keyField="id"
-        
         // Fonctionnalités activées
         sortable={true}
         filterable={true}
@@ -213,21 +200,18 @@ export function DataTableExample() {
           pageSize: 10,
           total: data.length,
         }}
-        
         // Apparence
         striped={true}
         bordered={true}
         hoverable={true}
         height="600px"
-        
         // Actions et callbacks
         actions={actions}
         onAddNew={handleAddNew}
         onCellEdit={handleCellEdit}
         onSelectionChange={handleSelectionChange}
-        onRowClick={(row) => console.log('Row clicked:', row)}
-        onRowDoubleClick={(row) => console.log('Row double-clicked:', row)}
-        
+        onRowClick={(_row: User) => {}}
+        onRowDoubleClick={(_row: User) => {}}
         // Pour la persistance des paramètres
         tableId="users-table"
       />

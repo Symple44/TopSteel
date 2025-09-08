@@ -1,3 +1,4 @@
+import type { JsonValue } from '../../../types/common'
 import type { ColumnConfig } from './types'
 
 /**
@@ -57,7 +58,7 @@ export class ClipboardUtils {
     const rows = data.map((row) => {
       return columns
         .map((col) => {
-          const value = (row as any)[col.key]
+          const value = (row as unknown)[col.key]
           return ClipboardUtils.formatCellForClipboard(value, col)
         })
         .join('\t')
@@ -69,7 +70,7 @@ export class ClipboardUtils {
   /**
    * Formate une cellule pour le presse-papier
    */
-  private static formatCellForClipboard<T>(value: any, column: ColumnConfig<T>): string {
+  private static formatCellForClipboard<T>(value: JsonValue, column: ColumnConfig<T>): string {
     if (value === null || value === undefined) return ''
 
     // Appliquer le formatage de colonne si défini
@@ -149,7 +150,7 @@ export class ClipboardUtils {
             })
           }
 
-          ;(processedRow as any)[column.key] = validationResult.value
+          ;(processedRow as unknown)[column.key] = validationResult.value
         } catch (_error) {
           result.errors.push({
             row: actualRowIndex,
@@ -211,7 +212,7 @@ export class ClipboardUtils {
   private static validateAndConvertValue<T>(
     rawValue: string | undefined,
     column: ColumnConfig<T>
-  ): { value: any; error?: string; warning?: string } {
+  ): { value: JsonValue; error?: string; warning?: string } {
     // Valeur vide
     if (!rawValue || rawValue.trim() === '') {
       if (column.required) {
@@ -266,7 +267,7 @@ export class ClipboardUtils {
           if (!date) {
             return { value: null, error: 'Format de date invalide' }
           }
-          return { value: date }
+          return { value: date.toISOString() }
         }
 
         case 'datetime': {
@@ -274,7 +275,7 @@ export class ClipboardUtils {
           if (Number.isNaN(datetime.getTime())) {
             return { value: null, error: 'Format de date/heure invalide' }
           }
-          return { value: datetime }
+          return { value: datetime.toISOString() }
         }
 
         case 'select':
@@ -285,7 +286,8 @@ export class ClipboardUtils {
                 opt.label.toLowerCase() === trimmedValue.toLowerCase()
             )
             if (option) {
-              return { value: option.value }
+              const value = option.value instanceof Date ? option.value.toISOString() : option.value
+              return { value: value ?? null }
             }
             return {
               value: trimmedValue,

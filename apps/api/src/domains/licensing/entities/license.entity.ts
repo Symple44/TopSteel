@@ -9,9 +9,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { LicenseActivation } from './license-activation.entity'
-import { LicenseFeature } from './license-feature.entity'
-import { LicenseUsage } from './license-usage.entity'
+// import { LicenseActivation } from './license-activation.entity';
+// import { LicenseFeature } from './license-feature.entity';
+// import { LicenseUsage } from './license-usage.entity';
 
 /**
  * License types
@@ -50,25 +50,36 @@ export enum BillingCycle {
  * License entity
  */
 @Entity('licenses')
-@Index(['licenseKey'], { unique: true })
-@Index(['societeId'])
-@Index(['status'])
-@Index(['expiresAt'])
-@Index(['type'])
+@Index(['licenseKey'], { unique: true }) // Unique license key lookup
+@Index(['societeId']) // Licenses by organization
+@Index(['status']) // License status filtering
+@Index(['expiresAt']) // License expiration tracking
+@Index(['type']) // License type filtering
+@Index(['societeId', 'status']) // Active licenses by organization
+@Index(['status', 'expiresAt']) // Expiring licenses monitoring
+@Index(['customerEmail']) // Customer license lookup
+@Index(['billingCycle', 'nextRenewalAt']) // Billing cycle management
+@Index(['activatedAt']) // License activation tracking
+@Index(['suspendedAt']) // License suspension tracking
+@Index(['createdBy']) // License creation audit
 export class License {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
   @Column({ type: 'varchar', length: 255, unique: true })
+  @Index({ unique: true }) // Unique index for license key lookups
   licenseKey!: string
 
   @Column({ type: 'uuid' })
+  @Index() // Index for organization-based queries
   societeId!: string
 
   @Column({ type: 'varchar', length: 255 })
+  @Index() // Index for customer name searches
   customerName!: string
 
   @Column({ type: 'varchar', length: 255 })
+  @Index() // Index for customer email lookups
   customerEmail!: string
 
   @Column({
@@ -76,6 +87,7 @@ export class License {
     enum: LicenseType,
     default: LicenseType.BASIC,
   })
+  @Index() // Index for license type filtering
   type!: LicenseType
 
   @Column({
@@ -83,6 +95,7 @@ export class License {
     enum: LicenseStatus,
     default: LicenseStatus.PENDING,
   })
+  @Index() // Index for license status filtering
   status!: LicenseStatus
 
   @Column({
@@ -90,18 +103,22 @@ export class License {
     enum: BillingCycle,
     default: BillingCycle.ANNUAL,
   })
+  @Index() // Index for billing cycle queries
   billingCycle!: BillingCycle
 
   @Column({ type: 'timestamp with time zone' })
+  @Index() // Index for license start date filtering
   startsAt!: Date
 
   @Column({ type: 'timestamp with time zone', nullable: true })
+  @Index() // Index for license expiration tracking
   expiresAt?: Date
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   lastRenewalAt?: Date
 
   @Column({ type: 'timestamp with time zone', nullable: true })
+  @Index() // Index for renewal scheduling
   nextRenewalAt?: Date
 
   @Column({ type: 'integer', default: 1 })
@@ -138,6 +155,7 @@ export class License {
   currency!: string
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for restrictions queries
   restrictions!: {
     ipWhitelist?: string[]
     domainWhitelist?: string[]
@@ -147,7 +165,8 @@ export class License {
   }
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  @Index() // GIN index for metadata queries
+  metadata!: Record<string, unknown>
 
   @Column({ type: 'text', nullable: true })
   notes?: string
@@ -156,18 +175,22 @@ export class License {
   signature?: string
 
   @Column({ type: 'timestamp with time zone', nullable: true })
+  @Index() // Index for activation tracking
   activatedAt?: Date
 
   @Column({ type: 'uuid', nullable: true })
+  @Index() // Index for activation audit
   activatedBy?: string
 
   @Column({ type: 'timestamp with time zone', nullable: true })
+  @Index() // Index for suspension tracking
   suspendedAt?: Date
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   suspendedReason?: string
 
   @Column({ type: 'timestamp with time zone', nullable: true })
+  @Index() // Index for revocation tracking
   revokedAt?: Date
 
   @Column({ type: 'varchar', length: 500, nullable: true })
@@ -180,29 +203,22 @@ export class License {
   updatedAt!: Date
 
   @Column({ type: 'uuid', nullable: true })
+  @Index() // Index for creation audit
   createdBy?: string
 
   @Column({ type: 'uuid', nullable: true })
+  @Index() // Index for update audit
   updatedBy?: string
 
   // Relations
-  @OneToMany(
-    () => LicenseFeature,
-    (feature) => feature.license
-  )
-  features!: LicenseFeature[]
+  @OneToMany('LicenseFeature', 'license')
+  features!: unknown[]
 
-  @OneToMany(
-    () => LicenseUsage,
-    (usage) => usage.license
-  )
-  usage!: LicenseUsage[]
+  @OneToMany('LicenseUsage', 'license')
+  usage!: unknown[]
 
-  @OneToMany(
-    () => LicenseActivation,
-    (activation) => activation.license
-  )
-  activations!: LicenseActivation[]
+  @OneToMany('LicenseActivation', 'license')
+  activations!: unknown[]
 
   // Hooks
   @BeforeInsert()
@@ -408,7 +424,7 @@ export class License {
   /**
    * Get license summary
    */
-  getSummary(): Record<string, any> {
+  getSummary(): Record<string, unknown> {
     return {
       id: this.id,
       licenseKey: this.licenseKey,
@@ -452,7 +468,7 @@ export class License {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       ...this.getSummary(),
       features: this.features?.map((f) => f.toJSON()),

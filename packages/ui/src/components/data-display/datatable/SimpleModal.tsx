@@ -56,7 +56,7 @@ export function SimpleModal({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">
             <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-            <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               <X className="h-4 w-4" />
             </Button>
           </div>

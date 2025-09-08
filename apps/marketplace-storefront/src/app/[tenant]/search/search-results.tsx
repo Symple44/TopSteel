@@ -2,7 +2,7 @@
 
 import { ChevronDown, Filter, Grid, List, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { ProductCard } from '@/components/product/product-card'
 import type { Product } from '@/lib/api/storefront'
 import { cn } from '@/lib/utils'
@@ -22,6 +22,9 @@ export function SearchResults({
   sort = 'relevance',
   page = '1',
 }: SearchResultsProps) {
+  const searchCategoryId = useId()
+  const searchMinPriceId = useId()
+  const searchMaxPriceId = useId()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,7 +38,7 @@ export function SearchResults({
   const [sortBy, setSortBy] = useState(sort)
   const [showFilters, setShowFilters] = useState(false)
 
-  const currentPage = parseInt(page)
+  const currentPage = parseInt(page, 10)
   const [totalPages, setTotalPages] = useState(1)
   const [totalResults, setTotalResults] = useState(0)
 
@@ -247,11 +250,11 @@ export function SearchResults({
           <div className="bg-muted/30 p-4 rounded-lg space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label htmlFor="search-category" className="block text-sm font-medium mb-1">
+                <label htmlFor={searchCategoryId} className="block text-sm font-medium mb-1">
                   Catégorie
                 </label>
                 <select
-                  id="search-category"
+                  id={searchCategoryId}
                   value={filters.category}
                   onChange={(e) => handleFilterChange({ ...filters, category: e.target.value })}
                   className="input-marketplace w-full text-sm"
@@ -266,11 +269,11 @@ export function SearchResults({
               </div>
 
               <div>
-                <label htmlFor="search-min-price" className="block text-sm font-medium mb-1">
+                <label htmlFor={searchMinPriceId} className="block text-sm font-medium mb-1">
                   Prix min.
                 </label>
                 <input
-                  id="search-min-price"
+                  id={searchMinPriceId}
                   type="number"
                   value={filters.minPrice}
                   onChange={(e) => handleFilterChange({ ...filters, minPrice: e.target.value })}
@@ -280,11 +283,11 @@ export function SearchResults({
               </div>
 
               <div>
-                <label htmlFor="search-max-price" className="block text-sm font-medium mb-1">
+                <label htmlFor={searchMaxPriceId} className="block text-sm font-medium mb-1">
                   Prix max.
                 </label>
                 <input
-                  id="search-max-price"
+                  id={searchMaxPriceId}
                   type="number"
                   value={filters.maxPrice}
                   onChange={(e) => handleFilterChange({ ...filters, maxPrice: e.target.value })}

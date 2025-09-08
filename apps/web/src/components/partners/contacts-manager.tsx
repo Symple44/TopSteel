@@ -47,24 +47,24 @@ import {
   useUpdateContact,
 } from '@/hooks/use-partner-details'
 
-const contactSchema = z.object({
-  civilite: z.string().optional(),
-  nom: z.string().min(1, 'Le nom est requis'),
-  prenom: z.string().optional(),
-  fonction: z.string().optional(),
-  service: z.string().optional(),
-  role: z.nativeEnum(ContactRole),
-  status: z.nativeEnum(ContactStatus).optional(),
-  telephoneDirect: z.string().optional(),
-  telephoneMobile: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
-  fax: z.string().optional(),
-  isPrincipal: z.boolean().optional(),
-  prefereEmail: z.boolean().optional(),
-  prefereSMS: z.boolean().optional(),
-  accepteMarketing: z.boolean().optional(),
-  partnerSiteId: z.string().optional(),
-  notes: z.string().optional(),
+const contactSchema = z?.object({
+  civilite: z?.string().optional(),
+  nom: z?.string().min(1, 'Le nom est requis'),
+  prenom: z?.string().optional(),
+  fonction: z?.string().optional(),
+  service: z?.string().optional(),
+  role: z?.nativeEnum(ContactRole),
+  status: z?.nativeEnum(ContactStatus).optional(),
+  telephoneDirect: z?.string().optional(),
+  telephoneMobile: z?.string().optional(),
+  email: z?.string().email().optional().or(z?.literal('')),
+  fax: z?.string().optional(),
+  isPrincipal: z?.boolean().optional(),
+  prefereEmail: z?.boolean().optional(),
+  prefereSMS: z?.boolean().optional(),
+  accepteMarketing: z?.boolean().optional(),
+  partnerSiteId: z?.string().optional(),
+  notes: z?.string().optional(),
 })
 
 type ContactFormData = z.infer<typeof contactSchema>
@@ -83,7 +83,8 @@ export function ContactsManager({
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
 
-  const { data: contacts = initialContacts } = usePartnerContacts(partnerId)
+  const contactsQuery = usePartnerContacts(partnerId)
+  const { data: contacts = initialContacts } = contactsQuery
   const createContact = useCreateContact()
   const updateContact = useUpdateContact()
   const deleteContact = useDeleteContact()
@@ -102,7 +103,7 @@ export function ContactsManager({
 
   const handleCreate = () => {
     setEditingContact(null)
-    form.reset({
+    form?.reset({
       role: ContactRole.COMMERCIAL,
       status: ContactStatus.ACTIF,
       isPrincipal: false,
@@ -115,22 +116,22 @@ export function ContactsManager({
 
   const handleEdit = (contact: Contact) => {
     setEditingContact(contact)
-    form.reset(contact as ContactFormData)
+    form?.reset(contact as ContactFormData)
     setIsFormOpen(true)
   }
 
   const handleDelete = async (contact: Contact) => {
     if (confirm(`Êtes-vous sûr de vouloir supprimer ${contact.nom} ${contact.prenom || ''} ?`)) {
-      await deleteContact.mutateAsync(contact.id)
+      await deleteContact?.mutateAsync(contact.id)
     }
   }
 
   const onSubmit = async (data: ContactFormData) => {
     try {
       if (editingContact) {
-        await updateContact.mutateAsync({ id: editingContact.id, data: data as UpdateContactDto })
+        await updateContact?.mutateAsync({ id: editingContact.id, data: data as UpdateContactDto })
       } else {
-        await createContact.mutateAsync({ partnerId, data: data as CreateContactDto })
+        await createContact?.mutateAsync({ partnerId, data: data as CreateContactDto })
       }
       setIsFormOpen(false)
       form.reset()
@@ -189,7 +190,7 @@ export function ContactsManager({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contacts.map((contact) => (
+                {contacts?.map((contact: unknown) => (
                   <TableRow key={contact.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -244,7 +245,7 @@ export function ContactsManager({
                       {contact.partnerSite ? (
                         <div className="flex items-center gap-1 text-sm">
                           <Building className="h-3 w-3" />
-                          {contact.partnerSite.nom}
+                          {contact?.partnerSite?.nom}
                         </div>
                       ) : (
                         '-'
@@ -280,10 +281,10 @@ export function ContactsManager({
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form?.handleSubmit(onSubmit as unknown)} className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="civilite"
                   render={({ field }) => (
                     <FormItem>
@@ -306,7 +307,7 @@ export function ContactsManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="nom"
                   render={({ field }) => (
                     <FormItem>
@@ -320,7 +321,7 @@ export function ContactsManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="prenom"
                   render={({ field }) => (
                     <FormItem>
@@ -336,7 +337,7 @@ export function ContactsManager({
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="fonction"
                   render={({ field }) => (
                     <FormItem>
@@ -350,7 +351,7 @@ export function ContactsManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="service"
                   render={({ field }) => (
                     <FormItem>
@@ -366,7 +367,7 @@ export function ContactsManager({
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="role"
                   render={({ field }) => (
                     <FormItem>
@@ -394,7 +395,7 @@ export function ContactsManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="status"
                   render={({ field }) => (
                     <FormItem>
@@ -419,7 +420,7 @@ export function ContactsManager({
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="telephoneDirect"
                   render={({ field }) => (
                     <FormItem>
@@ -433,7 +434,7 @@ export function ContactsManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="telephoneMobile"
                   render={({ field }) => (
                     <FormItem>
@@ -449,7 +450,7 @@ export function ContactsManager({
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
@@ -463,7 +464,7 @@ export function ContactsManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="fax"
                   render={({ field }) => (
                     <FormItem>
@@ -479,7 +480,7 @@ export function ContactsManager({
 
               {sites.length > 0 && (
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="partnerSiteId"
                   render={({ field }) => (
                     <FormItem>
@@ -492,7 +493,7 @@ export function ContactsManager({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="">Aucun</SelectItem>
-                          {sites.map((site) => (
+                          {sites?.map((site) => (
                             <SelectItem key={site.id} value={site.id}>
                               {site.nom} ({site.type})
                             </SelectItem>
@@ -507,7 +508,7 @@ export function ContactsManager({
 
               <div className="space-y-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="isPrincipal"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -523,7 +524,7 @@ export function ContactsManager({
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="prefereEmail"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -538,7 +539,7 @@ export function ContactsManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="prefereSMS"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -553,7 +554,7 @@ export function ContactsManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="accepteMarketing"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -570,7 +571,7 @@ export function ContactsManager({
               </div>
 
               <FormField
-                control={form.control}
+                control={form?.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
@@ -591,8 +592,11 @@ export function ContactsManager({
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                   Annuler
                 </Button>
-                <Button type="submit" disabled={createContact.isPending || updateContact.isPending}>
-                  {createContact.isPending || updateContact.isPending
+                <Button
+                  type="submit"
+                  disabled={createContact?.isPending || updateContact?.isPending}
+                >
+                  {createContact?.isPending || updateContact?.isPending
                     ? 'Enregistrement...'
                     : editingContact
                       ? 'Modifier'

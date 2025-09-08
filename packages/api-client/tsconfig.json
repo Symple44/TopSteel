@@ -1,11 +1,14 @@
 {
-  "extends": "../config/typescript/base.json",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist",
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "declarationDir": "./dist",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true
+  },
   "include": ["src/**/*"],
   "exclude": ["dist", "node_modules", "**/*.test.*", "**/*.spec.*"],
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "skipLibCheck": true,
-    "moduleResolution": "node"
-  }
+  "references": [{ "path": "../types" }, { "path": "../domains" }]
 }

@@ -234,9 +234,10 @@ function HierarchicalNode<T extends HierarchicalItem>({
           {hasChildren && (
             <div className="flex items-center border-r border-border">
               <Button
+                type="button"
                 variant="ghost"
                 size={displayConfig.compactMode ? 'sm' : 'default'}
-                onClick={(e: any) => {
+                onClick={(e: unknown) => {
                   e.stopPropagation()
                   onToggleExpansion(node.id)
                 }}
@@ -290,7 +291,7 @@ function HierarchicalNode<T extends HierarchicalItem>({
                     className={cn('truncate', displayConfig.compactMode ? 'text-sm' : 'text-base')}
                   >
                     {RenderUtils.renderCellValue(
-                      column.getValue ? column.getValue(item) : (item as any)[column.key],
+                      column.getValue ? column.getValue(item) : (item as unknown)[column.key],
                       column as ColumnConfig<Record<string, unknown>>,
                       item,
                       !column.editable, // readonly si la colonne n'est pas éditable
@@ -379,11 +380,11 @@ export function HierarchicalDataTable<T extends HierarchicalItem = HierarchicalI
       {/* Barre d'outils */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={expandAll}>
+          <Button type="button" variant="outline" size="sm" onClick={expandAll}>
             <Plus className="h-4 w-4 mr-1" />
             Tout étendre
           </Button>
-          <Button variant="outline" size="sm" onClick={collapseAll}>
+          <Button type="button" variant="outline" size="sm" onClick={collapseAll}>
             <Minus className="h-4 w-4 mr-1" />
             Tout réduire
           </Button>
@@ -393,6 +394,7 @@ export function HierarchicalDataTable<T extends HierarchicalItem = HierarchicalI
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               Niveaux: {config.hierarchyFilters.showOnlyLevels.join(', ')}
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => updateHierarchyFilters({ showOnlyLevels: [] })}
@@ -404,7 +406,12 @@ export function HierarchicalDataTable<T extends HierarchicalItem = HierarchicalI
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowSettings(!showSettings)}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowSettings(!showSettings)}
+          >
             <Settings className="h-4 w-4" />
           </Button>
           {actions}

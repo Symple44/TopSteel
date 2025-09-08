@@ -20,20 +20,17 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { AdminGuard } from '@/components/auth/admin-guard'
 import { useTranslation } from '@/lib/i18n/hooks'
+import type { User } from '@/types/auth'
 import { UsersDataTable } from './users-datatable'
 export default function UsersManagementPage() {
   const router = useRouter()
   const { t } = useTranslation('admin')
-  const [selectedUser] = useState<{
-    id: string
-    roles?: { id: string; name: string; description?: string }[]
-    groups?: { id: string; name: string; description?: string }[]
-  } | null>(null)
+  const [selectedUser] = useState<User | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   const handleUserEdit = (user: { id: string }) => {
     // Navigate to detail page
-    router.push(`/admin/users/${user.id}`)
+    router?.push(`/admin/users/${user.id}`)
   }
 
   const handleUserCreate = () => {}
@@ -138,13 +135,13 @@ export default function UsersManagementPage() {
                     <CardHeader>
                       <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                         <Shield className="h-5 w-5 mr-2 text-blue-600" />
-                        {t('users.rolesCount', { count: selectedUser.roles?.length || 0 })}
+                        {t('users.rolesCount', { count: selectedUser.roles?.length ?? 0 })}
                       </h3>
                     </CardHeader>
                     <CardContent>
-                      {selectedUser.roles && selectedUser.roles.length > 0 ? (
+                      {selectedUser.roles && selectedUser?.roles?.length > 0 ? (
                         <div className="space-y-3">
-                          {selectedUser.roles.map((role) => (
+                          {selectedUser?.roles?.map((role) => (
                             <div
                               key={role.id}
                               className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100"
@@ -174,13 +171,13 @@ export default function UsersManagementPage() {
                     <CardHeader>
                       <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                         <Building className="h-5 w-5 mr-2 text-purple-600" />
-                        {t('users.groupsCount', { count: selectedUser.groups?.length || 0 })}
+                        {t('users.groupsCount', { count: selectedUser.groups?.length ?? 0 })}
                       </h3>
                     </CardHeader>
                     <CardContent>
-                      {selectedUser.groups && selectedUser.groups.length > 0 ? (
+                      {selectedUser.groups && selectedUser?.groups?.length > 0 ? (
                         <div className="space-y-3">
-                          {selectedUser.groups.map((group) => (
+                          {selectedUser?.groups?.map((group) => (
                             <div
                               key={group.id}
                               className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100"

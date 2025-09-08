@@ -43,6 +43,7 @@ const ErrorAlert = React.forwardRef<HTMLDivElement, ErrorAlertProps>(
 
           {dismissible && onDismiss && (
             <Button
+              type="button"
               onClick={onDismiss}
               className="flex-shrink-0 rounded-md p-1 text-destructive/70 hover:text-destructive hover:bg-destructive/20 transition-colors"
             >

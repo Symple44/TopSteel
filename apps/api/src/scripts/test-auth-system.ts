@@ -100,7 +100,7 @@ class AuthSystemTester {
     for (const endpoint of publicEndpoints) {
       await this.testEndpoint(
         endpoint.path,
-        endpoint.method as any,
+        endpoint.method as unknown,
         false, // No auth needed
         [200, 201, 400, 404] // Expected statuses
       )
@@ -122,7 +122,7 @@ class AuthSystemTester {
     for (const endpoint of protectedEndpoints) {
       await this.testEndpoint(
         endpoint.path,
-        endpoint.method as any,
+        endpoint.method as unknown,
         false, // No auth
         [401, 403] // Should be unauthorized
       )
@@ -133,7 +133,7 @@ class AuthSystemTester {
     for (const endpoint of protectedEndpoints) {
       await this.testEndpoint(
         endpoint.path,
-        endpoint.method as any,
+        endpoint.method as unknown,
         true, // With auth
         [200, 201, 404] // Should be authorized (404 if endpoint doesn't exist)
       )

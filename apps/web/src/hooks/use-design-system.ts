@@ -220,7 +220,7 @@ const designSystemMetrics: DesignSystemMetrics = {
 }
 
 function getDesignSystemClass(key: string): string | undefined {
-  const result = designSystemClassCache.get(key)
+  const result = designSystemClassCache?.get(key)
 
   if (result) {
     designSystemMetrics.cacheHits++
@@ -230,23 +230,23 @@ function getDesignSystemClass(key: string): string | undefined {
 }
 
 function setDesignSystemClass(key: string, value: string): void {
-  if (designSystemClassCache.size >= maxCacheSize) {
-    const firstKey = designSystemClassCache.keys().next().value
+  if (designSystemClassCache?.size >= maxCacheSize) {
+    const firstKey = designSystemClassCache?.keys().next().value
 
     if (firstKey) {
-      designSystemClassCache.delete(firstKey)
+      designSystemClassCache?.delete(firstKey)
     }
   }
-  designSystemClassCache.set(key, value)
+  designSystemClassCache?.set(key, value)
 }
 
 function recordClassGeneration(durationMs: number): void {
   designSystemMetrics.classGenerations++
-  designSystemMetrics.performanceMs.push(durationMs)
+  designSystemMetrics?.performanceMs?.push(durationMs)
 
   // Garder seulement les 100 dernières mesures
-  if (designSystemMetrics.performanceMs.length > 100) {
-    designSystemMetrics.performanceMs = designSystemMetrics.performanceMs.slice(-100)
+  if (designSystemMetrics?.performanceMs?.length > 100) {
+    designSystemMetrics.performanceMs = designSystemMetrics?.performanceMs?.slice(-100)
   }
 }
 
@@ -259,8 +259,8 @@ function getDesignSystemMetrics(): DesignSystemMetrics {
 }
 
 function clearDesignSystemCache(): void {
-  designSystemClassCache.clear()
-  designSystemConfigCache.clear()
+  designSystemClassCache?.clear()
+  designSystemConfigCache?.clear()
 }
 
 // =============================================
@@ -274,7 +274,7 @@ function generateProjectCardClasses(config: DesignSystemConfig): string {
 
   if (cached) return cached
 
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   const densityConfig = DENSITY_CONFIGS[config.density]
   const animationConfig = ANIMATION_CONFIGS[config.animations]
@@ -284,12 +284,12 @@ function generateProjectCardClasses(config: DesignSystemConfig): string {
     'bg-white rounded-lg shadow-sm border border-border',
 
     // Density
-    densityConfig.padding,
-    densityConfig.gap,
+    densityConfig?.padding,
+    densityConfig?.gap,
 
     // Animations
-    animationConfig.transition,
-    config.animations !== 'none' && animationConfig.hover,
+    animationConfig?.transition,
+    config.animations !== 'none' && animationConfig?.hover,
 
     // Border radius
     config.borderRadius === 'none' && 'rounded-none',
@@ -301,7 +301,7 @@ function generateProjectCardClasses(config: DesignSystemConfig): string {
     'dark:bg-card-dark dark:border-border-dark'
   )
 
-  recordClassGeneration(performance.now() - startTime)
+  recordClassGeneration(performance?.now() - startTime)
   setDesignSystemClass(cacheKey, classes)
 
   return classes
@@ -316,7 +316,7 @@ function generateStatusBadgeClasses(
 
   if (cached) return cached
 
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   const statusConfig = STATUS_CONFIGS[status]
   const densityConfig = DENSITY_CONFIGS[config.density]
@@ -326,16 +326,16 @@ function generateStatusBadgeClasses(
     'inline-flex items-center font-medium rounded-full',
 
     // Density
-    densityConfig.text,
+    densityConfig?.text,
     config.density === 'compact' && 'px-2 py-0.5',
     config.density === 'comfortable' && 'px-2.5 py-1',
     config.density === 'spacious' && 'px-3 py-1.5',
 
     // Status colors
-    `bg-${statusConfig.bgColor} text-${statusConfig.textColor} border border-${statusConfig.color}/20`
+    `bg-${statusConfig?.bgColor} text-${statusConfig?.textColor} border border-${statusConfig?.color}/20`
   )
 
-  recordClassGeneration(performance.now() - startTime)
+  recordClassGeneration(performance?.now() - startTime)
   setDesignSystemClass(cacheKey, classes)
 
   return classes
@@ -351,7 +351,7 @@ function generateMetallurgyButtonClasses(
 
   if (cached) return cached
 
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   const animationConfig = ANIMATION_CONFIGS[config.animations]
 
@@ -362,7 +362,7 @@ function generateMetallurgyButtonClasses(
     'disabled:pointer-events-none disabled:opacity-50',
 
     // Animations
-    animationConfig.transition,
+    animationConfig?.transition,
 
     // Variant
     variant === 'default' && 'bg-metallurgy-600 text-white hover:bg-metallurgy-700',
@@ -380,7 +380,7 @@ function generateMetallurgyButtonClasses(
     size === 'xl' && 'h-12 px-10 text-lg'
   )
 
-  recordClassGeneration(performance.now() - startTime)
+  recordClassGeneration(performance?.now() - startTime)
   setDesignSystemClass(cacheKey, classes)
 
   return classes
@@ -392,7 +392,7 @@ function generateDataTableClasses(config: DesignSystemConfig): string {
 
   if (cached) return cached
 
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   const densityConfig = DENSITY_CONFIGS[config.density]
   const animationConfig = ANIMATION_CONFIGS[config.animations]
@@ -405,13 +405,13 @@ function generateDataTableClasses(config: DesignSystemConfig): string {
     'border border-border',
 
     // Density
-    `[&_th]:${densityConfig.padding}`,
-    `[&_td]:${densityConfig.padding}`,
-    `[&_th]:${densityConfig.text}`,
-    `[&_td]:${densityConfig.text}`,
+    `[&_th]:${densityConfig?.padding}`,
+    `[&_td]:${densityConfig?.padding}`,
+    `[&_th]:${densityConfig?.text}`,
+    `[&_td]:${densityConfig?.text}`,
 
     // Hover effects
-    `[&_tbody_tr]:${animationConfig.transition}`,
+    `[&_tbody_tr]:${animationConfig?.transition}`,
     config.animations !== 'none' && '[&_tbody_tr:hover]:bg-muted/50',
 
     // Striped rows
@@ -429,7 +429,7 @@ function generateDataTableClasses(config: DesignSystemConfig): string {
     '[&_tbody_tr:hover]:dark:bg-muted-dark/50'
   )
 
-  recordClassGeneration(performance.now() - startTime)
+  recordClassGeneration(performance?.now() - startTime)
   setDesignSystemClass(cacheKey, classes)
 
   return classes
@@ -454,7 +454,7 @@ export function useDesignSystem() {
 
     if (typeof window !== 'undefined') {
       try {
-        const stored = localStorage.getItem('topsteel-design-config')
+        const stored = localStorage?.getItem('topsteel-design-config')
 
         return stored ? { ...defaultConfig, ...JSON.parse(stored) } : defaultConfig
       } catch {
@@ -471,7 +471,7 @@ export function useDesignSystem() {
 
   // Theme resolution
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') return undefined
 
     const resolveTheme = (): ResolvedTheme => {
       if (config.theme === 'system') {
@@ -487,7 +487,7 @@ export function useDesignSystem() {
       setResolvedTheme(newTheme)
 
       // Update document class
-      document.documentElement.classList.toggle('dark', newTheme === 'dark')
+      document?.documentElement?.classList?.toggle('dark', newTheme === 'dark')
     }
 
     updateResolvedTheme()
@@ -501,14 +501,14 @@ export function useDesignSystem() {
       }
     }
 
-    mediaQuery.addEventListener('change', handleChange)
+    mediaQuery?.addEventListener('change', handleChange)
 
-    return () => mediaQuery.removeEventListener('change', handleChange)
+    return () => mediaQuery?.removeEventListener('change', handleChange)
   }, [config.theme])
 
   // Detect reduced motion preference
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') return undefined
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const updateReducedMotion = () => {
@@ -520,9 +520,9 @@ export function useDesignSystem() {
     }
 
     updateReducedMotion()
-    mediaQuery.addEventListener('change', updateReducedMotion)
+    mediaQuery?.addEventListener('change', updateReducedMotion)
 
-    return () => mediaQuery.removeEventListener('change', updateReducedMotion)
+    return () => mediaQuery?.removeEventListener('change', updateReducedMotion)
   }, [])
 
   // Save config to localStorage
@@ -533,11 +533,13 @@ export function useDesignSystem() {
       localStorage.setItem('topsteel-design-config', JSON.stringify(config))
 
       // Track theme switches
-      if (previousConfigRef.current.theme !== config.theme) {
+      if (previousConfigRef?.current?.theme !== config.theme) {
         recordThemeSwitch()
       }
 
-      previousConfigRef.current = config
+      if (previousConfigRef.current !== undefined) {
+        previousConfigRef.current = config
+      }
     } catch (_error) {}
   }, [config, isHydrated])
 

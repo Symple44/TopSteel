@@ -10,7 +10,7 @@ const generateTabId = () => {
   }
 
   // Vérifier d'abord si on a déjà un ID dans sessionStorage
-  const existingId = sessionStorage.getItem('topsteel-tab-id')
+  const existingId = sessionStorage?.getItem('topsteel-tab-id')
   if (existingId) {
     return existingId
   }

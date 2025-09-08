@@ -42,7 +42,7 @@ async function bootstrap() {
     // Supprimer l'index existant et le recréer
     logger.log("🗑️ Suppression de l'index existant...")
     try {
-      const elasticsearchClient = (searchService as any).elasticsearchStrategy?.client
+      const elasticsearchClient = (searchService as unknown).elasticsearchStrategy?.client
       if (elasticsearchClient) {
         try {
           await elasticsearchClient.indices.delete({ index: 'topsteel_global' })

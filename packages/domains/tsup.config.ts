@@ -12,9 +12,15 @@ export default defineConfig({
     'image/index': 'src/image/index.ts',
   },
   format: ['cjs', 'esm'],
-  dts: true,
+  dts: {
+    resolve: true,
+    compilerOptions: {
+      composite: false,
+      incremental: false,
+    },
+  },
   clean: true,
-  sourcemap: process.env.NODE_ENV === 'production' ? false : true,
+  sourcemap: process.env.NODE_ENV !== 'production',
   minify: process.env.NODE_ENV === 'production',
   target: 'es2022',
   external: [

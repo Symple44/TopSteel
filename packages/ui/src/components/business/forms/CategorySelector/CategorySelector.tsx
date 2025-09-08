@@ -1,11 +1,20 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { ChevronDown, ChevronRight, Search, Folder, FolderOpen, Check, Plus, AlertCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  Plus,
+  Search,
+} from 'lucide-react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 export interface Category {
   id: string
   name: string
@@ -49,7 +58,7 @@ export function CategorySelector({
   label,
   helperText,
   error,
-  placeholder = "Sélectionner une catégorie...",
+  placeholder = 'Sélectionner une catégorie...',
   showSearch = true,
   showCreateButton = false,
   showItemCount = true,
@@ -58,6 +67,7 @@ export function CategorySelector({
   maxDepth,
   className,
 }: CategorySelectorProps) {
+  const selectorId = useId()
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
@@ -69,7 +79,7 @@ export function CategorySelector({
     if (expandAll) {
       const allIds = new Set<string>()
       const addAllIds = (cats: Category[]) => {
-        cats.forEach(cat => {
+        cats.forEach((cat) => {
           allIds.add(cat.id)
           if (cat.children) {
             addAllIds(cat.children)
@@ -80,15 +90,8 @@ export function CategorySelector({
       setExpandedNodes(allIds)
     }
   }, [categories, expandAll])
-  useEffect(() => {
-    if (value) {
-      const category = findCategoryById(categories, value)
-      setSelectedCategory(category)
-    } else {
-      setSelectedCategory(null)
-    }
-  }, [value, categories])
-  const findCategoryById = (cats: Category[], id: string): Category | null => {
+
+  const findCategoryById = useCallback((cats: Category[], id: string): Category | null => {
     for (const category of cats) {
       if (category.id === id) {
         return category
@@ -99,8 +102,22 @@ export function CategorySelector({
       }
     }
     return null
-  }
-  const buildCategoryPath = (cats: Category[], targetId: string, path: string[] = []): string[] | null => {
+  }, [])
+
+  useEffect(() => {
+    if (value) {
+      const category = findCategoryById(categories, value)
+      setSelectedCategory(category)
+    } else {
+      setSelectedCategory(null)
+    }
+  }, [value, categories, findCategoryById])
+
+  const buildCategoryPath = (
+    cats: Category[],
+    targetId: string,
+    path: string[] = []
+  ): string[] | null => {
     for (const category of cats) {
       const currentPath = [...path, category.name]
       if (category.id === targetId) {
@@ -116,8 +133,9 @@ export function CategorySelector({
   const filterCategories = (cats: Category[], query: string): Category[] => {
     if (!query) return cats
     return cats.reduce((filtered: Category[], category) => {
-      const matchesQuery = category.name.toLowerCase().includes(query.toLowerCase()) ||
-                          category.description?.toLowerCase().includes(query.toLowerCase())
+      const matchesQuery =
+        category.name.toLowerCase().includes(query.toLowerCase()) ||
+        category.description?.toLowerCase().includes(query.toLowerCase())
       const filteredChildren = category.children ? filterCategories(category.children, query) : []
       if (matchesQuery || filteredChildren.length > 0) {
         filtered.push({
@@ -149,9 +167,7 @@ export function CategorySelector({
       setNewCategoryName('')
       setNewCategoryParent(undefined)
       setIsCreatingCategory(false)
-    } catch (error) {
-      console.error('Error creating category:', error)
-    }
+    } catch (_error) {}
   }
   const renderCategoryTree = (cats: Category[], level = 0) => {
     if (maxDepth && level >= maxDepth) return null
@@ -183,34 +199,51 @@ export function CategorySelector({
               }}
             >
               {hasChildren ? (
-                isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />
+                isExpanded ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
+                )
               ) : (
                 <div className="h-3 w-3" />
               )}
             </Button>
             {/* Category icon */}
-            <div className="flex items-center gap-2 flex-1" onClick={() => handleCategorySelect(category)}>
+            <button
+              type="button"
+              className="flex items-center gap-2 flex-1 text-left bg-transparent border-0 p-0"
+              onClick={() => handleCategorySelect(category)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  handleCategorySelect(category)
+                }
+              }}
+            >
               {hasChildren ? (
-                isExpanded ? <FolderOpen className="h-4 w-4" /> : <Folder className="h-4 w-4" />
+                isExpanded ? (
+                  <FolderOpen className="h-4 w-4" />
+                ) : (
+                  <Folder className="h-4 w-4" />
+                )
               ) : (
-                <div className="h-4 w-4 rounded-full bg-muted" style={{ backgroundColor: category.color }} />
+                <div
+                  className="h-4 w-4 rounded-full bg-muted"
+                  style={{ backgroundColor: category.color }}
+                />
               )}
-              <span className={cn('text-sm', isSelected && 'font-medium')}>
-                {category.name}
-              </span>
+              <span className={cn('text-sm', isSelected && 'font-medium')}>{category.name}</span>
               {isSelected && <Check className="h-4 w-4 text-blue-600" />}
               {showItemCount && category.itemCount !== undefined && (
                 <Badge variant="outline" className="text-xs ml-auto">
                   {category.itemCount}
                 </Badge>
               )}
-            </div>
+            </button>
           </div>
           {/* Children */}
           {hasChildren && isExpanded && (
-            <div>
-              {renderCategoryTree(category.children!, level + 1)}
-            </div>
+            <div>{renderCategoryTree(category.children!, level + 1)}</div>
           )}
         </div>
       )
@@ -228,7 +261,8 @@ export function CategorySelector({
       )}
       <div className="relative">
         <Button
-          id="category-selector"
+          type="button"
+          id={selectorId}
           type="button"
           variant="outline"
           className={cn(
@@ -239,10 +273,10 @@ export function CategorySelector({
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           disabled={disabled}
         >
-          <span className="truncate">
-            {selectedCategory ? selectedCategory.name : placeholder}
-          </span>
-          <ChevronDown className={cn('h-4 w-4 transition-transform', isDropdownOpen && 'rotate-180')} />
+          <span className="truncate">{selectedCategory ? selectedCategory.name : placeholder}</span>
+          <ChevronDown
+            className={cn('h-4 w-4 transition-transform', isDropdownOpen && 'rotate-180')}
+          />
         </Button>
         {isDropdownOpen && (
           <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border rounded-md shadow-lg max-h-80 overflow-hidden">
@@ -273,18 +307,7 @@ export function CategorySelector({
             {/* Create category */}
             {showCreateButton && onCategoryCreate && (
               <div className="border-t">
-                {!isCreatingCategory ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={() => setIsCreatingCategory(true)}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Créer une nouvelle catégorie
-                  </Button>
-                ) : (
+                {isCreatingCategory ? (
                   <div className="p-3 space-y-2">
                     <Input
                       value={newCategoryName}
@@ -316,6 +339,17 @@ export function CategorySelector({
                       </Button>
                     </div>
                   </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={() => setIsCreatingCategory(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Créer une nouvelle catégorie
+                  </Button>
                 )}
               </div>
             )}
@@ -334,9 +368,7 @@ export function CategorySelector({
           ))}
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

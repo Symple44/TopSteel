@@ -1,7 +1,7 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
-import { useDataSorting } from '../useDataSorting.simple'
+import { renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import type { SortConfig } from '../../types'
+import { useDataSorting } from '../useDataSorting.simple'
 
 describe('useDataSorting', () => {
   const sampleData = [
@@ -12,7 +12,7 @@ describe('useDataSorting', () => {
   ]
 
   it('should sort data by single column ascending', () => {
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useDataSorting(sampleData, [{ column: 'name', direction: 'asc' }])
     )
 
@@ -23,7 +23,7 @@ describe('useDataSorting', () => {
   })
 
   it('should sort data by single column descending', () => {
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useDataSorting(sampleData, [{ column: 'age', direction: 'desc' }])
     )
 
@@ -41,10 +41,10 @@ describe('useDataSorting', () => {
       { id: 4, category: 'B', priority: 2 },
     ]
 
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useDataSorting(dataWithDuplicates, [
         { column: 'category', direction: 'asc' },
-        { column: 'priority', direction: 'asc' }
+        { column: 'priority', direction: 'asc' },
       ])
     )
 
@@ -55,9 +55,7 @@ describe('useDataSorting', () => {
   })
 
   it('should return original data when no sort config', () => {
-    const { result } = renderHook(() => 
-      useDataSorting(sampleData, [])
-    )
+    const { result } = renderHook(() => useDataSorting(sampleData, []))
 
     expect(result.current).toEqual(sampleData)
   })
@@ -70,7 +68,7 @@ describe('useDataSorting', () => {
       { id: 4, value: undefined },
     ]
 
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useDataSorting(dataWithNulls, [{ column: 'value', direction: 'asc' }])
     )
 
@@ -83,10 +81,8 @@ describe('useDataSorting', () => {
 
   it('should update when sort config changes', () => {
     let sortConfig: SortConfig[] = [{ column: 'name', direction: 'asc' }]
-    
-    const { result, rerender } = renderHook(() => 
-      useDataSorting(sampleData, sortConfig)
-    )
+
+    const { result, rerender } = renderHook(() => useDataSorting(sampleData, sortConfig))
 
     expect(result.current[0].name).toBe('Alice')
 

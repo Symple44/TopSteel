@@ -1,21 +1,20 @@
 'use client'
-import React, { useState } from 'react'
-import { Badge } from '../../../data-display/badge'
-import { Button } from '../../../primitives/button/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
-import { Avatar, AvatarFallback, AvatarImage } from '../../../data-display/avatar/avatar'
-import { Progress } from '../../../data-display/progress/progress'
-import { cn } from '../../../../lib/utils'
-import { 
-  CheckCircle2, 
-  Clock, 
-  XCircle, 
-  AlertTriangle, 
-  Users, 
-  MessageSquare,
+import {
+  AlertTriangle,
   ArrowRight,
-  RotateCcw
+  CheckCircle2,
+  Clock,
+  MessageSquare,
+  Users,
+  XCircle,
 } from 'lucide-react'
+import { useState } from 'react'
+import { cn } from '../../../../lib/utils'
+import { Avatar, AvatarFallback, AvatarImage } from '../../../data-display/avatar/avatar'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
+import { Button } from '../../../primitives/button/Button'
+import { Progress } from '../../../primitives/progress'
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'reviewing' | 'escalated'
 export interface ApprovalStep {
   id: string
@@ -53,32 +52,32 @@ const statusConfig = {
   pending: {
     color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     icon: Clock,
-    label: 'En attente'
+    label: 'En attente',
   },
   reviewing: {
     color: 'bg-blue-100 text-blue-800 border-blue-200',
     icon: Users,
-    label: 'En révision'
+    label: 'En révision',
   },
   approved: {
     color: 'bg-green-100 text-green-800 border-green-200',
     icon: CheckCircle2,
-    label: 'Approuvé'
+    label: 'Approuvé',
   },
   rejected: {
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: XCircle,
-    label: 'Rejeté'
+    label: 'Rejeté',
   },
   escalated: {
     color: 'bg-orange-100 text-orange-800 border-orange-200',
     icon: AlertTriangle,
-    label: 'Escaladé'
-  }
+    label: 'Escaladé',
+  },
 }
-export function ApprovalWorkflow({ 
-  className, 
-  steps, 
+export function ApprovalWorkflow({
+  className,
+  steps,
   title = "Processus d'approbation",
   description,
   onApprove,
@@ -87,19 +86,17 @@ export function ApprovalWorkflow({
   onEscalate,
   allowComments = true,
   compact = false,
-  showProgress = true
+  showProgress = true,
 }: ApprovalWorkflowProps) {
   const [commentText, setCommentText] = useState<Record<string, string>>({})
   const [showCommentBox, setShowCommentBox] = useState<Record<string, boolean>>({})
   const totalSteps = steps.length
-  const completedSteps = steps.filter(step => 
-    step.status === 'approved' || step.status === 'rejected'
+  const completedSteps = steps.filter(
+    (step) => step.status === 'approved' || step.status === 'rejected'
   ).length
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
   const getCurrentStepIndex = () => {
-    return steps.findIndex(step => 
-      step.status === 'pending' || step.status === 'reviewing'
-    )
+    return steps.findIndex((step) => step.status === 'pending' || step.status === 'reviewing')
   }
   const currentStepIndex = getCurrentStepIndex()
   const isDeadlineApproaching = (deadline?: Date) => {
@@ -116,25 +113,25 @@ export function ApprovalWorkflow({
   const handleApprove = (stepId: string) => {
     const comments = commentText[stepId]
     onApprove?.(stepId, comments)
-    setCommentText(prev => ({ ...prev, [stepId]: '' }))
-    setShowCommentBox(prev => ({ ...prev, [stepId]: false }))
+    setCommentText((prev) => ({ ...prev, [stepId]: '' }))
+    setShowCommentBox((prev) => ({ ...prev, [stepId]: false }))
   }
   const handleReject = (stepId: string) => {
     const comments = commentText[stepId]
     if (!comments?.trim()) return
     onReject?.(stepId, comments)
-    setCommentText(prev => ({ ...prev, [stepId]: '' }))
-    setShowCommentBox(prev => ({ ...prev, [stepId]: false }))
+    setCommentText((prev) => ({ ...prev, [stepId]: '' }))
+    setShowCommentBox((prev) => ({ ...prev, [stepId]: false }))
   }
   const handleComment = (stepId: string) => {
     const comments = commentText[stepId]
     if (!comments?.trim()) return
     onComment?.(stepId, comments)
-    setCommentText(prev => ({ ...prev, [stepId]: '' }))
-    setShowCommentBox(prev => ({ ...prev, [stepId]: false }))
+    setCommentText((prev) => ({ ...prev, [stepId]: '' }))
+    setShowCommentBox((prev) => ({ ...prev, [stepId]: false }))
   }
   const toggleCommentBox = (stepId: string) => {
-    setShowCommentBox(prev => ({ ...prev, [stepId]: !prev[stepId] }))
+    setShowCommentBox((prev) => ({ ...prev, [stepId]: !prev[stepId] }))
   }
   if (compact) {
     return (
@@ -148,9 +145,7 @@ export function ApprovalWorkflow({
               </Badge>
             )}
           </div>
-          {showProgress && (
-            <Progress value={progressPercentage} className="h-2" />
-          )}
+          {showProgress && <Progress value={progressPercentage} className="h-2" />}
         </CardHeader>
         <CardContent className="space-y-2">
           {steps.map((step, index) => {
@@ -160,27 +155,26 @@ export function ApprovalWorkflow({
               <div
                 key={step.id}
                 className={cn(
-                  "flex items-center gap-3 p-2 rounded-lg border",
-                  isCurrentStep && "bg-blue-50 border-blue-200",
-                  !isCurrentStep && "border-gray-100"
+                  'flex items-center gap-3 p-2 rounded-lg border',
+                  isCurrentStep && 'bg-blue-50 border-blue-200',
+                  !isCurrentStep && 'border-gray-100'
                 )}
               >
-                <StatusIcon className={cn(
-                  "h-4 w-4",
-                  step.status === 'approved' && "text-green-600",
-                  step.status === 'rejected' && "text-red-600",
-                  step.status === 'pending' && "text-yellow-600",
-                  step.status === 'reviewing' && "text-blue-600",
-                  step.status === 'escalated' && "text-orange-600"
-                )} />
+                <StatusIcon
+                  className={cn(
+                    'h-4 w-4',
+                    step.status === 'approved' && 'text-green-600',
+                    step.status === 'rejected' && 'text-red-600',
+                    step.status === 'pending' && 'text-yellow-600',
+                    step.status === 'reviewing' && 'text-blue-600',
+                    step.status === 'escalated' && 'text-orange-600'
+                  )}
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{step.title}</p>
                   <p className="text-xs text-muted-foreground">{step.approver.name}</p>
                 </div>
-                <Badge 
-                  variant="outline" 
-                  className={cn("text-xs", statusConfig[step.status].color)}
-                >
+                <Badge variant="outline" className={cn('text-xs', statusConfig[step.status].color)}>
                   {statusConfig[step.status].label}
                 </Badge>
               </div>
@@ -196,9 +190,7 @@ export function ApprovalWorkflow({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>{title}</CardTitle>
-            {description && (
-              <p className="text-sm text-muted-foreground mt-1">{description}</p>
-            )}
+            {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
           </div>
           <Badge variant="outline">
             {completedSteps}/{totalSteps} étapes complétées
@@ -225,32 +217,33 @@ export function ApprovalWorkflow({
               {index < steps.length - 1 && (
                 <div className="absolute left-6 top-12 w-0.5 h-16 bg-gray-200" />
               )}
-              <div className={cn(
-                "relative bg-white border rounded-lg p-4 transition-all",
-                isCurrentStep && "border-blue-300 shadow-sm bg-blue-50/50",
-                step.status === 'approved' && "border-green-300 bg-green-50/30",
-                step.status === 'rejected' && "border-red-300 bg-red-50/30",
-                step.status === 'escalated' && "border-orange-300 bg-orange-50/30",
-                isOverdue && "border-red-400 bg-red-50"
-              )}>
+              <div
+                className={cn(
+                  'relative bg-white border rounded-lg p-4 transition-all',
+                  isCurrentStep && 'border-blue-300 shadow-sm bg-blue-50/50',
+                  step.status === 'approved' && 'border-green-300 bg-green-50/30',
+                  step.status === 'rejected' && 'border-red-300 bg-red-50/30',
+                  step.status === 'escalated' && 'border-orange-300 bg-orange-50/30',
+                  isOverdue && 'border-red-400 bg-red-50'
+                )}
+              >
                 <div className="flex items-start gap-4">
-                  <div className={cn(
-                    "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2",
-                    step.status === 'approved' && "bg-green-100 border-green-300",
-                    step.status === 'rejected' && "bg-red-100 border-red-300",
-                    step.status === 'pending' && "bg-yellow-100 border-yellow-300",
-                    step.status === 'reviewing' && "bg-blue-100 border-blue-300",
-                    step.status === 'escalated' && "bg-orange-100 border-orange-300"
-                  )}>
+                  <div
+                    className={cn(
+                      'flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2',
+                      step.status === 'approved' && 'bg-green-100 border-green-300',
+                      step.status === 'rejected' && 'bg-red-100 border-red-300',
+                      step.status === 'pending' && 'bg-yellow-100 border-yellow-300',
+                      step.status === 'reviewing' && 'bg-blue-100 border-blue-300',
+                      step.status === 'escalated' && 'bg-orange-100 border-orange-300'
+                    )}
+                  >
                     <StatusIcon className="h-6 w-6" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-gray-900">{step.title}</h3>
-                      <Badge 
-                        variant="outline" 
-                        className={statusConfig[step.status].color}
-                      >
+                      <Badge variant="outline" className={statusConfig[step.status].color}>
                         {statusConfig[step.status].label}
                       </Badge>
                       {step.escalationLevel && step.escalationLevel > 0 && (
@@ -267,7 +260,11 @@ export function ApprovalWorkflow({
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={step.approver.avatar} />
                           <AvatarFallback>
-                            {step.approver.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            {step.approver.name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')
+                              .toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
@@ -277,26 +274,30 @@ export function ApprovalWorkflow({
                       </div>
                       {step.requiredApprovals && step.requiredApprovals > 1 && (
                         <div className="text-sm text-muted-foreground">
-                          {step.currentApprovals || 0}/{step.requiredApprovals} approbations requises
+                          {step.currentApprovals || 0}/{step.requiredApprovals} approbations
+                          requises
                         </div>
                       )}
                     </div>
                     {step.deadline && (
-                      <div className={cn(
-                        "text-sm mb-3",
-                        isOverdue && "text-red-600 font-medium",
-                        isDeadlineNear && !isOverdue && "text-orange-600 font-medium",
-                        !isDeadlineNear && !isOverdue && "text-muted-foreground"
-                      )}>
-                        Échéance: {step.deadline.toLocaleDateString('fr-FR', {
+                      <div
+                        className={cn(
+                          'text-sm mb-3',
+                          isOverdue && 'text-red-600 font-medium',
+                          isDeadlineNear && !isOverdue && 'text-orange-600 font-medium',
+                          !isDeadlineNear && !isOverdue && 'text-muted-foreground'
+                        )}
+                      >
+                        Échéance:{' '}
+                        {step.deadline.toLocaleDateString('fr-FR', {
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric',
                           hour: '2-digit',
-                          minute: '2-digit'
+                          minute: '2-digit',
                         })}
-                        {isOverdue && " (En retard)"}
-                        {isDeadlineNear && !isOverdue && " (Échéance proche)"}
+                        {isOverdue && ' (En retard)'}
+                        {isDeadlineNear && !isOverdue && ' (Échéance proche)'}
                       </div>
                     )}
                     {step.comments && (
@@ -313,6 +314,7 @@ export function ApprovalWorkflow({
                       <div className="flex gap-2 flex-wrap">
                         {onApprove && (
                           <Button
+                            type="button"
                             size="sm"
                             onClick={() => handleApprove(step.id)}
                             className="bg-green-600 hover:bg-green-700"
@@ -323,6 +325,7 @@ export function ApprovalWorkflow({
                         )}
                         {onReject && (
                           <Button
+                            type="button"
                             size="sm"
                             variant="destructive"
                             onClick={() => toggleCommentBox(step.id)}
@@ -333,6 +336,7 @@ export function ApprovalWorkflow({
                         )}
                         {allowComments && onComment && (
                           <Button
+                            type="button"
                             size="sm"
                             variant="outline"
                             onClick={() => toggleCommentBox(step.id)}
@@ -343,6 +347,7 @@ export function ApprovalWorkflow({
                         )}
                         {onEscalate && step.deadline && isOverdue && (
                           <Button
+                            type="button"
                             size="sm"
                             variant="outline"
                             onClick={() => onEscalate(step.id)}
@@ -362,14 +367,17 @@ export function ApprovalWorkflow({
                           rows={3}
                           placeholder="Ajoutez un commentaire..."
                           value={commentText[step.id] || ''}
-                          onChange={(e) => setCommentText(prev => ({ 
-                            ...prev, 
-                            [step.id]: e.target.value 
-                          }))}
+                          onChange={(e) =>
+                            setCommentText((prev) => ({
+                              ...prev,
+                              [step.id]: e.target.value,
+                            }))
+                          }
                         />
                         <div className="flex gap-2 mt-2">
                           {onReject && (
                             <Button
+                              type="button"
                               size="sm"
                               variant="destructive"
                               onClick={() => handleReject(step.id)}
@@ -380,6 +388,7 @@ export function ApprovalWorkflow({
                           )}
                           {onComment && (
                             <Button
+                              type="button"
                               size="sm"
                               onClick={() => handleComment(step.id)}
                               disabled={!commentText[step.id]?.trim()}
@@ -388,6 +397,7 @@ export function ApprovalWorkflow({
                             </Button>
                           )}
                           <Button
+                            type="button"
                             size="sm"
                             variant="outline"
                             onClick={() => toggleCommentBox(step.id)}

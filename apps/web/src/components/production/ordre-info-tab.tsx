@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, Label } from '@erp/ui'
 interface OrdreSimple {
   id: string
   numero: string
-  statut: OrdreStatut
-  priorite: OrdrePriorite
+  statut: (typeof OrdreStatut)[keyof typeof OrdreStatut]
+  priorite: (typeof OrdrePriorite)[keyof typeof OrdrePriorite]
   avancement: number
   description?: string
   projetId: string
@@ -48,7 +48,7 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
             </div>
             <div>
               <Label className="text-sm font-medium">Avancement</Label>
-              <p className="text-sm text-muted-foreground">{ordre?.avancement || 0}%</p>
+              <p className="text-sm text-muted-foreground">{ordre?.avancement ?? 0}%</p>
             </div>
           </div>
 
@@ -63,13 +63,13 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
             <div>
               <Label className="text-sm font-medium">Date début prévue</Label>
               <p className="text-sm text-muted-foreground">
-                {ordre?.dateDebutPrevue ? ordre.dateDebutPrevue.toLocaleDateString() : 'N/A'}
+                {ordre?.dateDebutPrevue ? ordre.dateDebutPrevue?.toLocaleDateString() : 'N/A'}
               </p>
             </div>
             <div>
               <Label className="text-sm font-medium">Date fin prévue</Label>
               <p className="text-sm text-muted-foreground">
-                {ordre?.dateFinPrevue ? ordre.dateFinPrevue.toLocaleDateString() : 'N/A'}
+                {ordre?.dateFinPrevue ? ordre.dateFinPrevue?.toLocaleDateString() : 'N/A'}
               </p>
             </div>
           </div>

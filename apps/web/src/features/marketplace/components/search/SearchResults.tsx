@@ -2,7 +2,7 @@
 
 import { Filter, Grid, List, Loader2, Package, X } from 'lucide-react'
 import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Pagination } from '../common/Pagination'
 import { type Product, ProductCard } from '../products/ProductCard'
@@ -21,56 +21,62 @@ const mockProducts: Product[] = [
   {
     id: '1',
     name: 'Heavy Duty Steel Beam - 10m',
+    slug: 'heavy-duty-steel-beam-10m',
     description: 'High-quality structural steel beam for construction',
     price: 249.99,
     originalPrice: 299.99,
-    image: '/images/steel-beam.jpg',
+    currency: 'EUR',
+    images: ['/images/steel-beam.jpg'],
     category: 'Steel Beams',
     brand: 'ArcelorMittal',
     rating: 4.5,
     reviewCount: 128,
-    stock: 45,
-    badges: ['Sale', 'Best Seller'],
-    specifications: {
-      length: '10m',
-      weight: '150kg',
-      grade: 'S355',
-    },
+    stockQuantity: 45,
+    // badges: ['Sale', 'Best Seller'],
+    // specifications: {
+    //   length: '10m',
+    //   weight: '150kg',
+    //   grade: 'S355',
+    // },
   },
   {
     id: '2',
     name: 'Professional Welding Machine',
+    slug: 'professional-welding-machine',
     description: 'Industrial grade MIG/TIG welding equipment',
     price: 1899.0,
-    image: '/images/welding-machine.jpg',
+    currency: 'EUR',
+    images: ['/images/welding-machine.jpg'],
     category: 'Welding Equipment',
     brand: 'Lincoln Electric',
     rating: 4.8,
     reviewCount: 89,
-    stock: 12,
-    badges: ['New'],
-    specifications: {
-      power: '250A',
-      voltage: '220V',
-      weight: '45kg',
-    },
+    stockQuantity: 12,
+    // badges: ['New'],
+    // specifications: {
+    //   power: '250A',
+    //   voltage: '220V',
+    //   weight: '45kg',
+    // },
   },
   {
     id: '3',
     name: 'Galvanized Steel Sheet - 2mm',
+    slug: 'galvanized-steel-sheet-2mm',
     description: 'Corrosion-resistant steel sheet for various applications',
     price: 89.99,
-    image: '/images/steel-sheet.jpg',
+    currency: 'EUR',
+    images: ['/images/steel-sheet.jpg'],
     category: 'Metal Sheets',
     brand: 'Tata Steel',
     rating: 4.2,
     reviewCount: 56,
-    stock: 200,
-    specifications: {
-      thickness: '2mm',
-      size: '2m x 1m',
-      coating: 'Zinc',
-    },
+    stockQuantity: 200,
+    // specifications: {
+    //   thickness: '2mm',
+    //   size: '2m x 1m',
+    //   coating: 'Zinc',
+    // },
   },
 ]
 
@@ -99,12 +105,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   const [totalResults, setTotalResults] = useState(0)
   const itemsPerPage = 24
 
-  // Simulate loading products
-  useEffect(() => {
-    loadProducts()
-  }, [loadProducts])
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     setIsLoading(true)
 
     try {
@@ -117,28 +118,33 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
       // Apply sorting
       switch (sortBy) {
         case 'price-asc':
-          filtered.sort((a, b) => a.price - b.price)
+          filtered?.sort((a, b) => a.price - b.price)
           break
         case 'price-desc':
-          filtered.sort((a, b) => b.price - a.price)
+          filtered?.sort((a, b) => b.price - a.price)
           break
         case 'rating':
-          filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+          filtered?.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
           break
         // Add more sorting logic as needed
       }
 
       // Duplicate products to simulate pagination
       const allProducts = Array(10).fill(filtered).flat()
-      setProducts(allProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage))
-      setTotalResults(allProducts.length)
+      setProducts(allProducts?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage))
+      setTotalResults(allProducts?.length)
       setTotalPages(Math.ceil(allProducts.length / itemsPerPage))
     } catch (_error) {
       setProducts([])
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [sortBy, currentPage])
+
+  // Simulate loading products
+  useEffect(() => {
+    loadProducts()
+  }, [loadProducts])
 
   const handleSortChange = (value: SortOption) => {
     setSortBy(value)
@@ -237,10 +243,10 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                   <span className="text-sm text-gray-600">Sort by:</span>
                   <select
                     value={sortBy}
-                    onChange={(e) => handleSortChange(e.target.value as SortOption)}
+                    onChange={(e) => handleSortChange(e?.target?.value as SortOption)}
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {sortOptions.map((option) => (
+                    {sortOptions?.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -290,7 +296,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                       : 'space-y-4'
                   )}
                 >
-                  {products.map((product) => (
+                  {products?.map((product) => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -319,9 +325,16 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
       {/* Mobile Filters Modal */}
       {showMobileFilters && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div
+          <button
             className="fixed inset-0 bg-black bg-opacity-50"
             onClick={() => setShowMobileFilters(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setShowMobileFilters(false)
+              }
+            }}
+            aria-label="Close filters"
           />
           <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">

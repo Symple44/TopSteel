@@ -1,15 +1,15 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Minus, 
-  Target,
+import {
+  Activity,
   AlertTriangle,
   CheckCircle,
-  Activity
+  Minus,
+  Target,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 export interface PerformanceMetric {
   id: string
   name: string
@@ -36,7 +36,7 @@ interface PerformanceGaugeProps {
   className?: string
   loading?: boolean
 }
-export function PerformanceGauge({ 
+export function PerformanceGauge({
   metric,
   size = 'md',
   showTrend = true,
@@ -44,7 +44,7 @@ export function PerformanceGauge({
   showLabel = true,
   variant = 'circular',
   className,
-  loading = false
+  loading = false,
 }: PerformanceGaugeProps) {
   if (loading) {
     return (
@@ -146,7 +146,7 @@ export function PerformanceGauge({
           gauge: 'h-16 w-16',
           text: 'text-lg',
           label: 'text-xs',
-          icon: 'h-3 w-3'
+          icon: 'h-3 w-3',
         }
       case 'lg':
         return {
@@ -154,7 +154,7 @@ export function PerformanceGauge({
           gauge: 'h-32 w-32',
           text: 'text-3xl',
           label: 'text-sm',
-          icon: 'h-5 w-5'
+          icon: 'h-5 w-5',
         }
       case 'xl':
         return {
@@ -162,7 +162,7 @@ export function PerformanceGauge({
           gauge: 'h-40 w-40',
           text: 'text-4xl',
           label: 'text-base',
-          icon: 'h-6 w-6'
+          icon: 'h-6 w-6',
         }
       default:
         return {
@@ -170,7 +170,7 @@ export function PerformanceGauge({
           gauge: 'h-24 w-24',
           text: 'text-2xl',
           label: 'text-sm',
-          icon: 'h-4 w-4'
+          icon: 'h-4 w-4',
         }
     }
   }
@@ -187,9 +187,7 @@ export function PerformanceGauge({
           <CategoryIcon className={sizeClasses.icon} />
         </div>
         <div className="flex-1">
-          {showLabel && (
-            <p className={cn('font-medium', sizeClasses.label)}>{metric.name}</p>
-          )}
+          {showLabel && <p className={cn('font-medium', sizeClasses.label)}>{metric.name}</p>}
           <p className={cn('font-bold', sizeClasses.text, getPerformanceColor(performanceLevel))}>
             {formatValue(metric.value, metric.format, metric.precision)}
           </p>
@@ -199,11 +197,16 @@ export function PerformanceGauge({
             {trendDirection === 'up' && <TrendingUp className="h-4 w-4 text-green-600" />}
             {trendDirection === 'down' && <TrendingDown className="h-4 w-4 text-red-600" />}
             {trendDirection === 'neutral' && <Minus className="h-4 w-4 text-gray-600" />}
-            <span className={cn(
-              'text-sm font-medium',
-              trendDirection === 'up' ? 'text-green-600' : 
-              trendDirection === 'down' ? 'text-red-600' : 'text-gray-600'
-            )}>
+            <span
+              className={cn(
+                'text-sm font-medium',
+                trendDirection === 'up'
+                  ? 'text-green-600'
+                  : trendDirection === 'down'
+                    ? 'text-red-600'
+                    : 'text-gray-600'
+              )}
+            >
               {Math.abs(trendPercentage).toFixed(1)}%
             </span>
           </div>
@@ -225,11 +228,16 @@ export function PerformanceGauge({
                 {trendDirection === 'up' && <TrendingUp className="h-3 w-3 text-green-600" />}
                 {trendDirection === 'down' && <TrendingDown className="h-3 w-3 text-red-600" />}
                 {trendDirection === 'neutral' && <Minus className="h-3 w-3 text-gray-600" />}
-                <span className={cn(
-                  'text-xs',
-                  trendDirection === 'up' ? 'text-green-600' : 
-                  trendDirection === 'down' ? 'text-red-600' : 'text-gray-600'
-                )}>
+                <span
+                  className={cn(
+                    'text-xs',
+                    trendDirection === 'up'
+                      ? 'text-green-600'
+                      : trendDirection === 'down'
+                        ? 'text-red-600'
+                        : 'text-gray-600'
+                  )}
+                >
                   {Math.abs(trendPercentage).toFixed(1)}%
                 </span>
               </div>
@@ -238,7 +246,9 @@ export function PerformanceGauge({
         )}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className={cn('font-bold', sizeClasses.text, getPerformanceColor(performanceLevel))}>
+            <span
+              className={cn('font-bold', sizeClasses.text, getPerformanceColor(performanceLevel))}
+            >
               {formatValue(metric.value, metric.format, metric.precision)}
             </span>
             {showTarget && metric.target && (
@@ -249,20 +259,28 @@ export function PerformanceGauge({
           </div>
           {metric.target && (
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className={cn('h-2 rounded-full transition-all duration-300', getProgressBarColor(performanceLevel))}
+              <div
+                className={cn(
+                  'h-2 rounded-full transition-all duration-300',
+                  getProgressBarColor(performanceLevel)
+                )}
                 style={{ width: `${targetProgress}%` }}
               />
             </div>
           )}
         </div>
-        <Badge className={cn(
-          'text-xs',
-          performanceLevel === 'excellent' ? 'bg-green-100 text-green-800 border-green-200' :
-          performanceLevel === 'good' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-          performanceLevel === 'warning' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
-          'bg-red-100 text-red-800 border-red-200'
-        )}>
+        <Badge
+          className={cn(
+            'text-xs',
+            performanceLevel === 'excellent'
+              ? 'bg-green-100 text-green-800 border-green-200'
+              : performanceLevel === 'good'
+                ? 'bg-blue-100 text-blue-800 border-blue-200'
+                : performanceLevel === 'warning'
+                  ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                  : 'bg-red-100 text-red-800 border-red-200'
+          )}
+        >
           {performanceLevel === 'excellent' && 'Excellent'}
           {performanceLevel === 'good' && 'Bon'}
           {performanceLevel === 'warning' && 'Attention'}
@@ -284,16 +302,15 @@ export function PerformanceGauge({
         </div>
       )}
       <div className="relative flex items-center justify-center">
-        <svg className={sizeClasses.gauge} viewBox="0 0 100 100">
+        <svg
+          className={sizeClasses.gauge}
+          viewBox="0 0 100 100"
+          role="img"
+          aria-label={`Jauge de performance pour ${metric.name}: ${formatValue(metric.value, metric.format, metric.precision)}`}
+        >
+          <title>Jauge de performance circulaire</title>
           {/* Background circle */}
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            fill="none"
-            stroke="#e5e7eb"
-            strokeWidth="8"
-          />
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="8" />
           {/* Progress circle */}
           {metric.target && (
             <circle
@@ -310,13 +327,15 @@ export function PerformanceGauge({
                 strokeDashoffset,
                 transform: 'rotate(-90deg)',
                 transformOrigin: '50px 50px',
-                transition: 'stroke-dashoffset 0.5s ease-in-out'
+                transition: 'stroke-dashoffset 0.5s ease-in-out',
               }}
             />
           )}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={cn('font-bold', sizeClasses.text, getPerformanceColor(performanceLevel))}>
+          <span
+            className={cn('font-bold', sizeClasses.text, getPerformanceColor(performanceLevel))}
+          >
             {formatValue(metric.value, metric.format, metric.precision)}
           </span>
           {showTarget && metric.target && (
@@ -332,22 +351,33 @@ export function PerformanceGauge({
             {trendDirection === 'up' && <TrendingUp className="h-4 w-4 text-green-600" />}
             {trendDirection === 'down' && <TrendingDown className="h-4 w-4 text-red-600" />}
             {trendDirection === 'neutral' && <Minus className="h-4 w-4 text-gray-600" />}
-            <span className={cn(
-              'text-sm font-medium',
-              trendDirection === 'up' ? 'text-green-600' : 
-              trendDirection === 'down' ? 'text-red-600' : 'text-gray-600'
-            )}>
-              {trendPercentage > 0 ? '+' : ''}{trendPercentage.toFixed(1)}%
+            <span
+              className={cn(
+                'text-sm font-medium',
+                trendDirection === 'up'
+                  ? 'text-green-600'
+                  : trendDirection === 'down'
+                    ? 'text-red-600'
+                    : 'text-gray-600'
+              )}
+            >
+              {trendPercentage > 0 ? '+' : ''}
+              {trendPercentage.toFixed(1)}%
             </span>
           </div>
         )}
-        <Badge className={cn(
-          'text-xs',
-          performanceLevel === 'excellent' ? 'bg-green-100 text-green-800 border-green-200' :
-          performanceLevel === 'good' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-          performanceLevel === 'warning' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
-          'bg-red-100 text-red-800 border-red-200'
-        )}>
+        <Badge
+          className={cn(
+            'text-xs',
+            performanceLevel === 'excellent'
+              ? 'bg-green-100 text-green-800 border-green-200'
+              : performanceLevel === 'good'
+                ? 'bg-blue-100 text-blue-800 border-blue-200'
+                : performanceLevel === 'warning'
+                  ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                  : 'bg-red-100 text-red-800 border-red-200'
+          )}
+        >
           {performanceLevel === 'excellent' && 'Excellent'}
           {performanceLevel === 'good' && 'Bon'}
           {performanceLevel === 'warning' && 'Attention'}

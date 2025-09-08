@@ -160,7 +160,7 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
             </div>
             <div className="flex items-center gap-1">
               <Download className="h-4 w-4" />
-              <span>{module.downloadCount.toLocaleString()} téléchargements</span>
+              <span>{module?.downloadCount?.toLocaleString()} téléchargements</span>
             </div>
             <Badge variant="outline">{module.category}</Badge>
           </div>
@@ -189,8 +189,8 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold mb-2">{formatPrice(module.pricing)}</div>
-                  {module.pricing.description && (
-                    <p className="text-sm text-muted-foreground">{module.pricing.description}</p>
+                  {module?.pricing?.description && (
+                    <p className="text-sm text-muted-foreground">{module?.pricing?.description}</p>
                   )}
                 </CardContent>
               </Card>
@@ -221,7 +221,7 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
             <div>
               <h3 className="text-lg font-semibold mb-4">Fonctionnalités principales</h3>
               <div className="grid gap-3">
-                {MOCK_FEATURES.map((feature) => (
+                {MOCK_FEATURES?.map((feature) => (
                   <div key={feature} className="flex items-start gap-3">
                     <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                     <span className="text-sm">{feature}</span>
@@ -235,7 +235,7 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
             <div>
               <h3 className="text-lg font-semibold mb-4">Prérequis système</h3>
               <div className="grid gap-3">
-                {MOCK_REQUIREMENTS.map((requirement) => (
+                {MOCK_REQUIREMENTS?.map((requirement) => (
                   <div key={requirement} className="flex items-start gap-3">
                     <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
                     <span className="text-sm">{requirement}</span>
@@ -270,7 +270,7 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
             </div>
 
             <div className="space-y-4">
-              {MOCK_RATINGS.map((rating) => (
+              {MOCK_RATINGS?.map((rating) => (
                 <Card key={rating.id}>
                   <CardContent className="pt-4">
                     <div className="flex items-start justify-between mb-2">
@@ -317,17 +317,17 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Fermer
             </Button>
 
             {module.isInstalled ? (
-              <Button disabled>
+              <Button type="button" disabled>
                 <Check className="mr-2 h-4 w-4" />
                 Déjà installé
               </Button>
             ) : (
-              <Button onClick={handleInstall} disabled={isInstalling}>
+              <Button type="button" onClick={handleInstall} disabled={isInstalling}>
                 {isInstalling ? (
                   <>
                     <Clock className="mr-2 h-4 w-4 animate-spin" />

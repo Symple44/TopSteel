@@ -31,12 +31,12 @@ export const useToasts = () => {
 
     // Auto remove after delay
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id))
+      setToasts((prev) => prev?.filter((t) => t.id !== id))
     }, toast.duration || 5000)
   }, [])
 
   const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id))
+    setToasts((prev) => prev?.filter((t) => t.id !== id))
   }, [])
 
   const showSuccess = useCallback(

@@ -150,14 +150,26 @@ export class SeederService {
     // Vérifier si des utilisateurs existent déjà
     const userCount = await manager.query('SELECT COUNT(*) as count FROM users')
 
-    if (parseInt(userCount[0].count) > 0) {
+    if (parseInt(userCount[0].count, 10) > 0) {
       this.logger.log('👥 Utilisateurs déjà présents, passage')
       return
     }
 
-    // Créer l'utilisateur admin par défaut
+    // Créer l'utilisateur admin par défaut avec un mot de passe sécurisé
     const bcrypt = require('bcrypt')
-    const hashedPassword = await bcrypt.hash('TopSteel44!', 10)
+    
+    // Utiliser une variable d'environnement pour le mot de passe admin initial
+    const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || process.env.NODE_ENV === 'development' 
+      ? 'ChangeMe123!' // Mot de passe par défaut UNIQUEMENT en développement
+      : null
+    
+    if (!adminPassword) {
+      this.logger.error('❌ INITIAL_ADMIN_PASSWORD non défini. Utilisateur admin non créé.')
+      this.logger.warn('⚠️  Définissez INITIAL_ADMIN_PASSWORD dans vos variables d\'environnement')
+      return
+    }
+    
+    const hashedPassword = await bcrypt.hash(adminPassword, 10)
 
     await manager.query(
       `
@@ -168,9 +180,14 @@ export class SeederService {
       ['Admin', 'System', 'admin@topsteel.tech', hashedPassword, 'SUPER_ADMIN', true, 'TOP']
     )
 
-    this.logger.log('👥 Utilisateur admin créé: admin@topsteel.tech / TopSteel44! (acronyme: TOP)')
-
-    this.logger.warn('⚠️  Changez le mot de passe admin en production!')
+    if (process.env.NODE_ENV === 'development') {
+      this.logger.log('👥 Utilisateur admin créé: admin@topsteel.tech (acronyme: TOP)')
+      this.logger.warn('⚠️  Mode développement - Changez le mot de passe admin!')
+    } else {
+      this.logger.log('👥 Utilisateur admin créé avec succès')
+    }
+    
+    this.logger.warn('⚠️  IMPORTANT: Changez le mot de passe admin après la première connexion!')
   }
 
   /**
@@ -201,16 +218,19 @@ export class SeederService {
 
       // Créer la configuration par défaut
       const configId = await this.createDefaultMenuConfiguration(manager)
-      
+
       // Créer les items de menu par défaut
       await this.createDefaultMenuItems(manager, configId)
-      
+
       // Activer cette configuration
-      await manager.query(`
+      await manager.query(
+        `
         UPDATE menu_configurations 
         SET is_active = true 
         WHERE id = $1
-      `, [configId])
+      `,
+        [configId]
+      )
 
       this.logger.log('✅ Configuration des menus par défaut créée avec succès')
     } catch (error) {
@@ -230,7 +250,7 @@ export class SeederService {
         WHERE table_schema = 'public' 
         AND table_name IN ('menu_configurations', 'menu_items', 'menu_item_permissions', 'menu_item_roles')
       `)
-      
+
       return result.length >= 2 // Au minimum menu_configurations et menu_items
     } catch (error) {
       this.logger.warn('Erreur lors de la vérification des tables de menu:', error)
@@ -242,7 +262,8 @@ export class SeederService {
    * Crée la configuration de menu par défaut
    */
   private async createDefaultMenuConfiguration(manager: EntityManager): Promise<string> {
-    const result = await manager.query(`
+    const result = await manager.query(
+      `
       INSERT INTO menu_configurations (
         id, name, description, is_system, is_active, 
         created_by, updated_by, created_at, updated_at
@@ -252,10 +273,9 @@ export class SeederService {
         'system', 'system', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       RETURNING id
-    `, [
-      'Configuration par défaut',
-      'Configuration de menu par défaut du système TopSteel'
-    ])
+    `,
+      ['Configuration par défaut', 'Configuration de menu par défaut du système TopSteel']
+    )
 
     return result[0].id
   }
@@ -265,7 +285,8 @@ export class SeederService {
    */
   private async createDefaultMenuItems(manager: EntityManager, configId: string): Promise<void> {
     // Tableau de bord
-    await manager.query(`
+    await manager.query(
+      `
       INSERT INTO menu_items (
         id, config_id, title, title_key, type, program_id, href, icon,
         order_index, is_visible, module_id, created_at, updated_at
@@ -275,10 +296,14 @@ export class SeederService {
         '/dashboard', '/dashboard', 'Home', 1, true, 'DASHBOARD', 
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
-    `, [configId])
+    `,
+      [configId]
+    )
 
     // Dossier Administration
-    const adminFolderId = (await manager.query(`
+    const adminFolderId = (
+      await manager.query(
+        `
       INSERT INTO menu_items (
         id, config_id, title, title_key, type, icon,
         order_index, is_visible, created_at, updated_at
@@ -288,7 +313,10 @@ export class SeederService {
         100, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       RETURNING id
-    `, [configId]))[0].id
+    `,
+        [configId]
+      )
+    )[0].id
 
     // Items d'administration
     const adminItems = [
@@ -299,30 +327,31 @@ export class SeederService {
         href: '/admin/users',
         icon: 'Users',
         moduleId: 'USER_MANAGEMENT',
-        orderIndex: 1
+        orderIndex: 1,
       },
       {
         title: 'Gestion des rôles',
-        titleKey: 'roles_management', 
+        titleKey: 'roles_management',
         programId: '/admin/roles',
         href: '/admin/roles',
         icon: 'Shield',
         moduleId: 'ROLE_MANAGEMENT',
-        orderIndex: 2
+        orderIndex: 2,
       },
       {
         title: 'Gestion des menus',
         titleKey: 'menu_management',
-        programId: '/admin/menus', 
+        programId: '/admin/menus',
         href: '/admin/menus',
         icon: 'Menu',
         moduleId: 'MENU_MANAGEMENT',
-        orderIndex: 3
-      }
+        orderIndex: 3,
+      },
     ]
 
     for (const item of adminItems) {
-      await manager.query(`
+      await manager.query(
+        `
         INSERT INTO menu_items (
           id, config_id, parent_id, title, title_key, type, program_id, href, icon,
           order_index, is_visible, module_id, created_at, updated_at
@@ -331,10 +360,19 @@ export class SeederService {
           gen_random_uuid(), $1, $2, $3, $4, 'PROGRAM', $5, $6, $7,
           $8, true, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
-      `, [
-        configId, adminFolderId, item.title, item.titleKey, 
-        item.programId, item.href, item.icon, item.orderIndex, item.moduleId
-      ])
+      `,
+        [
+          configId,
+          adminFolderId,
+          item.title,
+          item.titleKey,
+          item.programId,
+          item.href,
+          item.icon,
+          item.orderIndex,
+          item.moduleId,
+        ]
+      )
     }
 
     this.logger.log('📋 Items de menu par défaut créés')

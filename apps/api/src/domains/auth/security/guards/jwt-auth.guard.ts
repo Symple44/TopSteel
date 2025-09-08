@@ -4,6 +4,7 @@ import type { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import type { Observable } from 'rxjs'
 import { IS_PUBLIC_KEY } from '../../../../core/common/decorators/public.decorator'
+import type { User } from '../../../users/entities/user.entity'
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -31,12 +32,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   // Signature avec types spécifiques
-  override handleRequest<TUser = any>(
+  override handleRequest<TUser = User>(
     err: Error | null,
     user: TUser,
     info: { name?: string; message?: string } | undefined,
     context: ExecutionContext,
-    _status?: any
+    _status?: number
   ): TUser {
     const request = context.switchToHttp().getRequest()
 

@@ -38,7 +38,7 @@ export function sanitizeHtml(html: string): string {
 
   temp.textContent = html
 
-  return temp.innerHTML
+  return temp?.innerHTML
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/javascript:/gi, '')
     .replace(/on\w+=/gi, '')
@@ -61,10 +61,10 @@ export function sanitizeString(input: string): string {
  * Valide et nettoie un email
  */
 export function sanitizeEmail(email: string): string | null {
-  const emailSchema = z.string().email().max(254)
+  const emailSchema = z?.string().email().max(254)
 
   try {
-    return emailSchema.parse(email.toLowerCase().trim())
+    return emailSchema?.parse(email?.toLowerCase().trim())
   } catch {
     return null
   }
@@ -78,11 +78,11 @@ export function sanitizeUrl(url: string): string | null {
     const parsed = new URL(url)
 
     // Seulement HTTP/HTTPS
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
+    if (!['http:', 'https:'].includes(parsed?.protocol)) {
       return null
     }
 
-    return parsed.toString()
+    return parsed?.toString()
   } catch {
     return null
   }
@@ -100,15 +100,15 @@ export function createRateLimiter(maxRequests: number, windowMs: number) {
       const windowStart = now - windowMs
 
       // Nettoyer les anciennes requêtes
-      while (requests.length > 0 && requests[0] < windowStart) {
-        requests.shift()
+      while (requests.length > 0 && requests?.[0] < windowStart) {
+        requests?.shift()
       }
 
       if (requests.length >= maxRequests) {
         throw new Error('Trop de requêtes. Veuillez patienter.')
       }
 
-      requests.push(now)
+      requests?.push(now)
 
       return fn(...args)
     }) as T
@@ -121,7 +121,7 @@ export function createRateLimiter(maxRequests: number, windowMs: number) {
 export function getNextAvailableSlot(requests: number[], windowMs: number): number {
   if (requests.length === 0) return Date.now()
 
-  return requests[0] + windowMs
+  return requests?.[0] + windowMs
 }
 
 /**
@@ -134,9 +134,9 @@ export function generateCSRFToken(): string {
 
   const array = new Uint8Array(32)
 
-  crypto.getRandomValues(array)
+  crypto?.getRandomValues(array)
 
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
+  return Array.from(array, (byte) => byte?.toString(16).padStart(2, '0')).join('')
 }
 
 /**
@@ -154,30 +154,30 @@ export function auditSecurity(): SecurityAuditReport {
       location.hostname !== 'localhost' &&
       location.hostname !== '127.0.0.1'
     ) {
-      issues.push('Application non servie en HTTPS')
+      issues?.push('Application non servie en HTTPS')
     }
 
     // Secure Cookies
     // biome-ignore lint: Security check for secure cookies
-    if (document.cookie && !document.cookie.includes('Secure')) {
-      warnings.push('Cookies non sécurisés détectés')
+    if (document.cookie && !document?.cookie?.includes('Secure')) {
+      warnings?.push('Cookies non sécurisés détectés')
     }
 
     // Content Security Policy
     if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
-      warnings.push('Content Security Policy non détecté')
+      warnings?.push('Content Security Policy non détecté')
     }
 
     // Mixed Content
     const insecureElements = document.querySelectorAll('[src^="http://"], [href^="http://"]')
 
-    if (insecureElements.length > 0) {
-      warnings.push(`${insecureElements.length} éléments non sécurisés détectés`)
+    if (insecureElements?.length > 0) {
+      warnings?.push(`${insecureElements?.length} éléments non sécurisés détectés`)
     }
 
     // Local Storage sensible
-    if (localStorage.getItem('password') || localStorage.getItem('token')) {
-      issues.push('Données sensibles stockées en local')
+    if (localStorage?.getItem('password') || localStorage?.getItem('token')) {
+      issues?.push('Données sensibles stockées en local')
     }
   }
 
@@ -224,7 +224,7 @@ export const secureSchemas = {
     .string()
     .email()
     .max(254)
-    .transform((val) => val.toLowerCase().trim()),
+    .transform((val) => val?.toLowerCase().trim()),
 
   password: z
     .string()
@@ -243,13 +243,13 @@ export const secureSchemas = {
       try {
         const parsed = new URL(url)
 
-        return ['http:', 'https:'].includes(parsed.protocol)
+        return ['http:', 'https:'].includes(parsed?.protocol)
       } catch {
         return false
       }
     }, 'URL non sécurisée'),
 
-  phoneNumber: z.string().regex(/^\+33[1-9]\d{8}$/, 'Numéro de téléphone français invalide'),
+  phoneNumber: z?.string().regex(/^\+33[1-9]\d{8}$/, 'Numéro de téléphone français invalide'),
 
   siret: z
     .string()
@@ -260,11 +260,11 @@ export const secureSchemas = {
     .string()
     .max(255)
     .regex(/^[a-zA-Z0-9._-]+$/, 'Nom de fichier invalide')
-    .refine((name) => !name.startsWith('.'), 'Nom de fichier invalide'),
+    .refine((name) => !name?.startsWith('.'), 'Nom de fichier invalide'),
 
-  html: z.string().transform(sanitizeHtml),
+  html: z?.string().transform(sanitizeHtml),
 
-  userInput: z.string().max(1000).transform(sanitizeString),
+  userInput: z?.string().max(1000).transform(sanitizeString),
 }
 
 // ✅ CONSTANTES DE SÉCURITÉ
@@ -301,14 +301,14 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
   }
 
   // Type MIME
-  if (!SECURITY_CONSTANTS.ALLOWED_FILE_TYPES.includes(file.type)) {
+  if (!SECURITY_CONSTANTS?.ALLOWED_FILE_TYPES?.includes(file.type)) {
     return { valid: false, error: 'Type de fichier non autorisé' }
   }
 
   // Nom de fichier
-  const filenameValidation = secureSchemas.filename.safeParse(file.name)
+  const filenameValidation = secureSchemas?.filename?.safeParse(file.name)
 
-  if (!filenameValidation.success) {
+  if (!filenameValidation?.success) {
     return { valid: false, error: 'Nom de fichier invalide' }
   }
 
@@ -319,7 +319,7 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
  * Génère un nom de fichier sécurisé
  */
 export function generateSecureFilename(originalName: string): string {
-  const extension = originalName.split('.').pop() || ''
+  const extension = originalName?.split('.').pop() || ''
   const timestamp = Date.now()
   const random = Math.random().toString(36).substring(2, 8)
 

@@ -8,6 +8,8 @@ export * from './core'
 export * from './cross-cutting'
 // Export conditionnel pour les images (côté serveur uniquement)
 export type * from './image/types'
+// Re-export notifications with proper naming to avoid conflicts
+export * as Notifications from './notifications'
 export * from './production'
 export * from './sales'
 export * from './search'
@@ -22,7 +24,11 @@ export type {
   ClientType,
   Competence,
   Departement,
+  FacturationFilters,
+  OperationFilters,
   Organization,
+  Projet,
+  ProjetFilters,
   Site,
   User,
   UserRole,
@@ -49,6 +55,7 @@ export type {
   MaterialOrder,
   Operation,
   OrdreFabrication,
+  ProductionFilters,
   ProductionStats,
 } from './production'
 export {

@@ -1,14 +1,13 @@
-import { 
-  ExceptionFilter, 
-  Catch, 
-  ArgumentsHost, 
-  HttpException, 
+import {
+  type ArgumentsHost,
+  Catch,
+  type ExceptionFilter,
+  HttpException,
   HttpStatus,
-  Logger 
+  Logger,
 } from '@nestjs/common'
-import { Request, Response } from 'express'
-import * as Sentry from '@sentry/node'
-import { SentryService } from './sentry.service'
+import type { Request, Response } from 'express'
+import type { SentryService } from './sentry.service'
 
 @Catch()
 export class SentryExceptionFilter implements ExceptionFilter {
@@ -28,9 +27,10 @@ export class SentryExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus()
       const exceptionResponse = exception.getResponse()
-      message = typeof exceptionResponse === 'string' 
-        ? exceptionResponse 
-        : (exceptionResponse as any).message || exception.message
+      message =
+        typeof exceptionResponse === 'string'
+          ? exceptionResponse
+          : (exceptionResponse as { message?: string }).message || exception.message
       error = exception
     } else if (exception instanceof Error) {
       message = exception.message
@@ -44,8 +44,8 @@ export class SentryExceptionFilter implements ExceptionFilter {
     )
 
     // Only send to Sentry if it's a server error (5xx) or specific 4xx errors
-    const shouldSendToSentry = 
-      status >= 500 || 
+    const shouldSendToSentry =
+      status >= 500 ||
       status === HttpStatus.TOO_MANY_REQUESTS ||
       status === HttpStatus.REQUEST_TIMEOUT
 
@@ -55,7 +55,7 @@ export class SentryExceptionFilter implements ExceptionFilter {
         scope.setTag('type', 'exception')
         scope.setTag('http.status_code', status.toString())
         scope.setLevel('error')
-        
+
         // Add request context
         scope.setContext('request', {
           method: request.method,
@@ -66,22 +66,26 @@ export class SentryExceptionFilter implements ExceptionFilter {
           ip: request.ip,
           userAgent: request.headers['user-agent'],
         })
-        
+
         // Add user context if available
-        if ((request as any).user) {
+        const requestWithUser = request as Request & {
+          user?: { id?: string; userId?: string; username?: string; email?: string }
+        }
+        if (requestWithUser.user) {
+          const user = requestWithUser.user
           scope.setUser({
-            id: (request as any).user.id,
-            username: (request as any).user.username,
+            id: user.id || user.userId || 'unknown',
+            username: user.username || user.email || undefined,
           })
         }
-        
+
         // Add fingerprint for better grouping
         scope.setFingerprint([
           request.method,
           request.route?.path || request.url.split('?')[0],
           status.toString(),
         ])
-        
+
         // Capture the exception
         this.sentryService.captureException(error, {
           statusCode: status,
@@ -105,7 +109,7 @@ export class SentryExceptionFilter implements ExceptionFilter {
     })
   }
 
-  private sanitizeHeaders(headers: any): any {
+  private sanitizeHeaders(headers: Record<string, unknown>): Record<string, unknown> {
     const sanitized = { ...headers }
     // Remove sensitive headers
     delete sanitized.authorization
@@ -115,9 +119,9 @@ export class SentryExceptionFilter implements ExceptionFilter {
     return sanitized
   }
 
-  private sanitizeBody(body: any): any {
+  private sanitizeBody(body: Record<string, unknown>): Record<string, unknown> {
     if (!body) return body
-    
+
     const sanitized = { ...body }
     // Remove sensitive fields
     delete sanitized.password
@@ -126,7 +130,7 @@ export class SentryExceptionFilter implements ExceptionFilter {
     delete sanitized.apiKey
     delete sanitized.creditCard
     delete sanitized.cvv
-    
+
     return sanitized
   }
 }

@@ -4,16 +4,16 @@ import { callBackendFromApi } from '@/utils/backend-api'
 export async function GET(request: NextRequest) {
   try {
     // Récupérer les headers d'authentification
-    const authHeader = request.headers.get('authorization')
-    const cookieHeader = request.headers.get('cookie')
+    const authHeader = request?.headers?.get('authorization')
+    const cookieHeader = request?.headers?.get('cookie')
 
     // Extraire le token d'accès du cookie si pas d'Authorization header
-    let accessToken = null
+    let accessToken: string | null = null
     if (cookieHeader) {
-      const cookies = cookieHeader.split(';').map((c) => c.trim())
-      const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
+      const cookies = cookieHeader?.split(';').map((c) => c?.trim())
+      const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
       if (accessTokenCookie) {
-        accessToken = accessTokenCookie.split('=')[1]
+        accessToken = accessTokenCookie?.split('=')[1]
       }
     }
 
@@ -35,16 +35,16 @@ export async function GET(request: NextRequest) {
 
     const response = await callBackendFromApi(request, 'admin/database/migrations/status', {
       method: 'GET',
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal?.timeout(15000),
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
     } else {
-      const errorText = await response.text()
-      return NextResponse.json(
+      const errorText = await response?.text()
+      return NextResponse?.json(
         {
           error: 'API backend error',
           status: response.status,
@@ -61,12 +61,12 @@ export async function GET(request: NextRequest) {
       name: error instanceof Error ? error.name : 'UnknownError',
       url: 'admin/database/migrations/status',
       env: {
-        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-        NODE_ENV: process.env.NODE_ENV,
+        NEXT_PUBLIC_API_URL: process?.env?.NEXT_PUBLIC_API_URL,
+        NODE_ENV: process?.env?.NODE_ENV,
       },
     }
 
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         error: 'API backend non disponible',
         details: errorDetails,

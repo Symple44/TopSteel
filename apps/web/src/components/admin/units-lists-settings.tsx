@@ -22,9 +22,9 @@ export function UnitsAndListsSettings() {
   const handleSave = async () => {
     try {
       await saveParameters()
-      toast.success(t('saveSuccess'))
+      toast?.success(t('saveSuccess'))
     } catch (_error) {
-      toast.error(t('saveError'))
+      toast?.error(t('saveError'))
     }
   }
 
@@ -32,9 +32,9 @@ export function UnitsAndListsSettings() {
     if (confirm(t('resetConfirm'))) {
       try {
         await resetToDefaults()
-        toast.success(t('resetSuccess'))
+        toast?.success(t('resetSuccess'))
       } catch (_error) {
-        toast.error(t('resetError'))
+        toast?.error(t('resetError'))
       }
     }
   }
@@ -78,16 +78,9 @@ export function UnitsAndListsSettings() {
   const handleDeleteItem = (listKey: string, index: number) => {
     if (window.confirm(t('units.deleteConfirm'))) {
       const items = getListItems(listKey)
-      items.splice(index, 1)
+      items?.splice(index, 1)
       updateList(listKey, items)
     }
-  }
-
-  const _handleMoveItem = (listKey: string, fromIndex: number, toIndex: number) => {
-    const items = getListItems(listKey)
-    const [removed] = items.splice(fromIndex, 1)
-    items.splice(toIndex, 0, removed)
-    updateList(listKey, items)
   }
 
   return (
@@ -95,22 +88,23 @@ export function UnitsAndListsSettings() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">{t('units.title')}</h2>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={handleReset}>
+          <Button type="button" variant="outline" onClick={handleReset}>
             <RotateCcw className="mr-2 h-4 w-4" />
             {t('common.reset')}
           </Button>
-          <Button onClick={handleSave}>
+          <Button type="button" onClick={handleSave}>
             <Save className="mr-2 h-4 w-4" />
             {t('common.save')}
           </Button>
         </div>
       </div>
 
-      {lists.map((list) => (
+      {lists?.map((list) => (
         <Card key={list.key} className="p-4">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-medium">{list.title}</h3>
             <Button
+              type="button"
               size="sm"
               variant="outline"
               onClick={() => setNewItem({ listKey: list.key, value: '' })}
@@ -130,16 +124,16 @@ export function UnitsAndListsSettings() {
 
                 {editingItem?.listKey === list.key && editingItem.item.value === item ? (
                   <Input
-                    value={editingItem.item.label}
+                    value={editingItem?.item?.label}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setEditingItem({
                         listKey: list.key,
-                        item: { ...editingItem.item, label: e.target.value },
+                        item: { ...editingItem.item, label: e?.target?.value },
                       })
                     }
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                       if (e.key === 'Enter') {
-                        handleUpdateItem(list.key, index, editingItem.item.label)
+                        handleUpdateItem(list.key, index, editingItem?.item?.label)
                       } else if (e.key === 'Escape') {
                         setEditingItem(null)
                       }
@@ -154,6 +148,7 @@ export function UnitsAndListsSettings() {
                 )}
 
                 <Button
+                  type="button"
                   size="sm"
                   variant="ghost"
                   onClick={() =>
@@ -165,7 +160,12 @@ export function UnitsAndListsSettings() {
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => handleDeleteItem(list.key, index)}>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleDeleteItem(list.key, index)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
@@ -176,7 +176,7 @@ export function UnitsAndListsSettings() {
                 <Input
                   value={newItem.value}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setNewItem({ ...newItem, value: e.target.value })
+                    setNewItem({ ...newItem, value: e?.target?.value })
                   }
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                     if (e.key === 'Enter') {
@@ -189,10 +189,15 @@ export function UnitsAndListsSettings() {
                   autoFocus
                   className="flex-1"
                 />
-                <Button size="sm" onClick={() => handleAddItem(list.key)} disabled={!newItem.value}>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => handleAddItem(list.key)}
+                  disabled={!newItem.value}
+                >
                   <Plus className="h-4 w-4" />
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => setNewItem(null)}>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setNewItem(null)}>
                   <span className="sr-only">Cancel</span>×
                 </Button>
               </div>

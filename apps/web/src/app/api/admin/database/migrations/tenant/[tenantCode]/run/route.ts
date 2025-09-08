@@ -18,16 +18,16 @@ export async function POST(
       }
     )
 
-    if (!response.ok) {
+    if (!response?.ok) {
       // Essayer de récupérer le détail de l'erreur
       let errorDetail = 'Erreur inconnue'
       try {
-        const errorData = await response.text()
+        const errorData = await response?.text()
         errorDetail = errorData
       } catch (_e) {}
 
       // Simuler une réponse d'erreur
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: `API backend non disponible - impossible d'exécuter les migrations pour le tenant ${tenantCode}`,
@@ -38,11 +38,11 @@ export async function POST(
       )
     }
 
-    const responseData = await response.json()
-    return NextResponse.json(responseData.data || responseData)
+    const responseData = await response?.json()
+    return NextResponse?.json(responseData?.data || responseData)
   } catch (_error) {
     // Simuler une réponse d'erreur
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: `Erreur interne - impossible d'exécuter les migrations pour le tenant`,

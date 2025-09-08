@@ -116,7 +116,7 @@ export class AuthPerformanceController {
         },
         recommendations: this.generateRecommendations(
           isHealthy,
-          metrics as any,
+          metrics as unknown,
           cacheStats,
           memoryUsage
         ),

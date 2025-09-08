@@ -23,7 +23,7 @@ export function sanitizeSearchQuery(query: string): string {
  */
 export function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-  return uuidRegex.test(uuid)
+  return uuidRegex?.test(uuid)
 }
 
 /**
@@ -60,14 +60,14 @@ export function sanitizeLogData(data: unknown): unknown {
   ]
 
   if (Array.isArray(data)) {
-    return data.map(sanitizeLogData)
+    return data?.map(sanitizeLogData)
   }
 
   const sanitized = { ...(data as Record<string, unknown>) }
 
   for (const key of Object.keys(sanitized)) {
-    const lowerKey = key.toLowerCase()
-    if (sensitiveKeys.some((sensitive) => lowerKey.includes(sensitive))) {
+    const lowerKey = key?.toLowerCase()
+    if (sensitiveKeys?.some((sensitive) => lowerKey?.includes(sensitive))) {
       sanitized[key] = '[REDACTED]'
     } else if (typeof sanitized[key] === 'object') {
       sanitized[key] = sanitizeLogData(sanitized[key])
@@ -120,3 +120,7 @@ export function escapeHtml(unsafe: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;')
 }
+
+// Add missing exports that are referenced in index.ts
+export const encodeForHTML = escapeHtml
+export const validateUserInput = sanitizeInput

@@ -23,7 +23,7 @@ export interface MarketplaceProductView {
     height: number
   }
   images?: string[]
-  specifications?: Record<string, any>
+  specifications?: Record<string, unknown>
   tags?: string[]
   isMarketplaceEnabled: boolean
   visibility: string
@@ -163,7 +163,7 @@ export class MarketplaceProductAdapter {
         id: productId,
         status: ArticleStatus.ACTIF,
         isMarketplaceEnabled: true,
-      } as any,
+      } as unknown,
     })
 
     return article ? this.articleToMarketplaceView(article, tenantId) : null
@@ -181,7 +181,7 @@ export class MarketplaceProductAdapter {
         reference: sku,
         status: ArticleStatus.ACTIF,
         isMarketplaceEnabled: true,
-      } as any,
+      } as unknown,
     })
 
     return article ? this.articleToMarketplaceView(article, tenantId) : null
@@ -245,7 +245,7 @@ export class MarketplaceProductAdapter {
     for (const result of results) {
       const category = result.article_famille
       const subcategory = result.article_sous_famille
-      const count = parseInt(result.count)
+      const count = parseInt(result.count, 10)
 
       if (!categoryMap.has(category)) {
         categoryMap.set(category, { subcategories: new Set(), count: 0 })
@@ -282,7 +282,7 @@ export class MarketplaceProductAdapter {
 
     return results.map((result) => ({
       brand: result.article_marque,
-      count: parseInt(result.count),
+      count: parseInt(result.count, 10),
     }))
   }
 

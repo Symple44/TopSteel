@@ -9,10 +9,8 @@ export { ColumnFilterDropdownSimple } from './ColumnFilterDropdownSimple'
 export { CustomSelect } from './CustomSelect'
 // Utilities
 export { ClipboardUtils } from './clipboard-utils'
-// Main DataTable components - Utiliser le nouveau DataTable refactorisé
-export { DataTable as default, DataTable } from './DataTableV2'
-// Garder l'ancien DataTable disponible temporairement sous un autre nom si besoin
-export { DataTable as DataTableLegacy } from './DataTable'
+// Main DataTable component - Modern ColumnConfig only
+export { DataTable as default, DataTable } from './DataTable'
 export { DataTableEmpty } from './DataTableEmpty'
 export { DataTableError } from './DataTableError'
 export { DataTableExample } from './DataTableExample'
@@ -35,9 +33,10 @@ export { default as SimpleDataTableExample } from './SimpleExample'
 export { SimpleModal } from './SimpleModal'
 export { SettingsManager, usePersistedTableSettings } from './settings-manager'
 export { TreeGroupingPanel } from './TreeGroupingPanel'
-// Types
+// Types - ColumnConfig is now the primary export (modern interface)
 export type {
-  ColumnConfig,
+  ColumnConfig, // Main export - modern interface from types.ts
+  ColumnConfig as ColumnConfigAdvanced, // Alias for clarity
   ColumnType,
   DataTableConfig,
   DataTableProps,

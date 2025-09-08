@@ -1,5 +1,5 @@
 import { PermissionGuard } from '@/components/auth/permission-guard'
-import NotificationRulesPanel from '@/components/notifications/notification-rules-panel'
+import { NotificationRulesPanel } from '@/components/notifications/notification-rules-panel'
 
 export default function NotificationRulesPage() {
   return (

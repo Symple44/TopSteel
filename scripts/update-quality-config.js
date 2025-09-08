@@ -263,7 +263,7 @@ class QualityConfigUpdater {
 
   incrementVersion(version) {
     const parts = version.split('.')
-    const patch = parseInt(parts[2] || '0') + 1
+    const patch = parseInt(parts[2] || '0', 10) + 1
     return `${parts[0]}.${parts[1]}.${patch}`
   }
 

@@ -1,15 +1,20 @@
 'use client'
-import React from 'react'
+import { Atom, Gauge, Info, Layers, Thermometer, Zap } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import type { MaterialPropertyCategory } from '../../../../types/variants'
+import {
+  getCategoryColor as getTypeCategoryColor,
+  normalizeMaterialCategory,
+} from '../../../../types/variants'
 import { Badge } from '../../../data-display/badge'
 import { Card } from '../../../layout/card'
 import { Progress } from '../../../primitives/progress'
-import { Thermometer, Zap, Gauge, Atom, Layers, Info } from 'lucide-react'
+
 interface MaterialProperty {
   name: string
   value: number | string
   unit?: string
-  category: 'physical' | 'mechanical' | 'thermal' | 'electrical' | 'chemical'
+  category: MaterialPropertyCategory
   standard?: string
   testMethod?: string
   tolerance?: {
@@ -39,14 +44,14 @@ interface MaterialPropertiesDisplayProps {
   comparisonStandard?: MaterialProperty[]
   onPropertyClick?: (property: MaterialProperty) => void
 }
-export function MaterialPropertiesDisplay({ 
-  className, 
+export function MaterialPropertiesDisplay({
+  className,
   material,
   properties,
   showCategories = true,
   showComparison = false,
   comparisonStandard,
-  onPropertyClick
+  onPropertyClick,
 }: MaterialPropertiesDisplayProps) {
   const getCategoryIcon = (category: MaterialProperty['category']) => {
     switch (category) {
@@ -66,12 +71,18 @@ export function MaterialPropertiesDisplay({
   }
   const getCategoryColor = (category: MaterialProperty['category']) => {
     switch (category) {
-      case 'physical': return 'bg-blue-50 border-blue-200 text-blue-700'
-      case 'mechanical': return 'bg-green-50 border-green-200 text-green-700'
-      case 'thermal': return 'bg-red-50 border-red-200 text-red-700'
-      case 'electrical': return 'bg-yellow-50 border-yellow-200 text-yellow-700'
-      case 'chemical': return 'bg-purple-50 border-purple-200 text-purple-700'
-      default: return 'bg-gray-50 border-gray-200 text-gray-700'
+      case 'physical':
+        return 'bg-blue-50 border-blue-200 text-blue-700'
+      case 'mechanical':
+        return 'bg-green-50 border-green-200 text-green-700'
+      case 'thermal':
+        return 'bg-red-50 border-red-200 text-red-700'
+      case 'electrical':
+        return 'bg-yellow-50 border-yellow-200 text-yellow-700'
+      case 'chemical':
+        return 'bg-purple-50 border-purple-200 text-purple-700'
+      default:
+        return 'bg-gray-50 border-gray-200 text-gray-700'
     }
   }
   const getGradeBadge = (grade?: string) => {
@@ -80,12 +91,12 @@ export function MaterialPropertiesDisplay({
       A: 'bg-green-100 text-green-800 border-green-200',
       B: 'bg-blue-100 text-blue-800 border-blue-200',
       C: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      D: 'bg-orange-100 text-orange-800 border-orange-200'
+      D: 'bg-orange-100 text-orange-800 border-orange-200',
     }
     return (
-      <Badge 
-        variant="outline" 
-        className={cn("text-xs", gradeColors[grade as keyof typeof gradeColors])}
+      <Badge
+        variant="outline"
+        className={cn('text-xs', gradeColors[grade as keyof typeof gradeColors])}
       >
         Grade {grade}
       </Badge>
@@ -102,19 +113,27 @@ export function MaterialPropertiesDisplay({
   }
   const getComparisonPercentage = (property: MaterialProperty) => {
     if (!showComparison || !comparisonStandard) return null
-    const standardProp = comparisonStandard.find(p => p.name === property.name)
-    if (!standardProp || typeof property.value !== 'number' || typeof standardProp.value !== 'number') return null
+    const standardProp = comparisonStandard.find((p) => p.name === property.name)
+    if (
+      !standardProp ||
+      typeof property.value !== 'number' ||
+      typeof standardProp.value !== 'number'
+    )
+      return null
     return ((property.value / standardProp.value) * 100).toFixed(0)
   }
-  const groupedProperties = properties.reduce((acc, property) => {
-    if (!acc[property.category]) {
-      acc[property.category] = []
-    }
-    acc[property.category].push(property)
-    return acc
-  }, {} as Record<string, MaterialProperty[]>)
+  const groupedProperties = properties.reduce(
+    (acc, property) => {
+      if (!acc[property.category]) {
+        acc[property.category] = []
+      }
+      acc[property.category].push(property)
+      return acc
+    },
+    {} as Record<string, MaterialProperty[]>
+  )
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         {/* Header */}
         <div className="space-y-3">
@@ -173,14 +192,23 @@ export function MaterialPropertiesDisplay({
                   {categoryProperties.map((property, index) => {
                     const comparisonPercent = getComparisonPercentage(property)
                     return (
-                      <div 
+                      // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+                      <div
                         key={index}
                         className={cn(
-                          "p-3 rounded-lg border transition-colors",
+                          'p-3 rounded-lg border transition-colors',
                           getCategoryColor(property.category),
-                          onPropertyClick && "cursor-pointer hover:bg-opacity-70"
+                          onPropertyClick && 'cursor-pointer hover:bg-opacity-70'
                         )}
+                        role={onPropertyClick ? 'button' : undefined}
+                        tabIndex={onPropertyClick ? 0 : undefined}
                         onClick={() => onPropertyClick?.(property)}
+                        onKeyDown={(e) => {
+                          if (onPropertyClick && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault()
+                            onPropertyClick(property)
+                          }
+                        }}
                       >
                         <div className="space-y-2">
                           <div className="flex justify-between items-start">
@@ -189,11 +217,14 @@ export function MaterialPropertiesDisplay({
                           </div>
                           <div className="text-lg font-bold">
                             {formatValue(property)}
-                            {property.unit && <span className="text-sm font-normal ml-1">{property.unit}</span>}
+                            {property.unit && (
+                              <span className="text-sm font-normal ml-1">{property.unit}</span>
+                            )}
                           </div>
                           {property.tolerance && (
                             <div className="text-xs text-muted-foreground">
-                              Tolerance: {property.tolerance.min} - {property.tolerance.max}{property.unit}
+                              Tolerance: {property.tolerance.min} - {property.tolerance.max}
+                              {property.unit}
                             </div>
                           )}
                           {comparisonPercent && (
@@ -202,8 +233,8 @@ export function MaterialPropertiesDisplay({
                                 <span>vs. Standard</span>
                                 <span>{comparisonPercent}%</span>
                               </div>
-                              <Progress 
-                                value={Math.min(parseFloat(comparisonPercent), 200)} 
+                              <Progress
+                                value={Math.min(parseFloat(comparisonPercent), 200)}
                                 className="h-1"
                               />
                             </div>
@@ -239,14 +270,23 @@ export function MaterialPropertiesDisplay({
               {properties.map((property, index) => {
                 const comparisonPercent = getComparisonPercentage(property)
                 return (
-                  <div 
+                  // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+                  <div
                     key={index}
                     className={cn(
-                      "p-3 rounded-lg border transition-colors",
+                      'p-3 rounded-lg border transition-colors',
                       getCategoryColor(property.category),
-                      onPropertyClick && "cursor-pointer hover:bg-opacity-70"
+                      onPropertyClick && 'cursor-pointer hover:bg-opacity-70'
                     )}
+                    role={onPropertyClick ? 'button' : undefined}
+                    tabIndex={onPropertyClick ? 0 : undefined}
                     onClick={() => onPropertyClick?.(property)}
+                    onKeyDown={(e) => {
+                      if (onPropertyClick && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault()
+                        onPropertyClick(property)
+                      }
+                    }}
                   >
                     <div className="space-y-2">
                       <div className="flex justify-between items-start">
@@ -258,7 +298,9 @@ export function MaterialPropertiesDisplay({
                       </div>
                       <div className="text-lg font-bold">
                         {formatValue(property)}
-                        {property.unit && <span className="text-sm font-normal ml-1">{property.unit}</span>}
+                        {property.unit && (
+                          <span className="text-sm font-normal ml-1">{property.unit}</span>
+                        )}
                       </div>
                       {comparisonPercent && (
                         <div className="space-y-1">
@@ -266,8 +308,8 @@ export function MaterialPropertiesDisplay({
                             <span>vs. Standard</span>
                             <span>{comparisonPercent}%</span>
                           </div>
-                          <Progress 
-                            value={Math.min(parseFloat(comparisonPercent), 200)} 
+                          <Progress
+                            value={Math.min(parseFloat(comparisonPercent), 200)}
                             className="h-1"
                           />
                         </div>
@@ -287,12 +329,15 @@ export function MaterialPropertiesDisplay({
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
             {Object.entries(groupedProperties).map(([category, categoryProperties]) => (
               <div key={category} className="space-y-1">
-                <div className={cn("text-lg font-semibold", getCategoryColor(category))}>
+                <div
+                  className={cn(
+                    'text-lg font-semibold',
+                    getTypeCategoryColor(normalizeMaterialCategory(category))
+                  )}
+                >
                   {categoryProperties.length}
                 </div>
-                <div className="text-xs text-muted-foreground capitalize">
-                  {category}
-                </div>
+                <div className="text-xs text-muted-foreground capitalize">{category}</div>
               </div>
             ))}
           </div>

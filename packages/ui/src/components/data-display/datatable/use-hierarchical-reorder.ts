@@ -326,8 +326,8 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
       if (dropPosition === 'inside') {
         // Déplacer à l'intérieur du target (devenir enfant)
         if (config.reorderConfig.allowLevelChange) {
-          draggedItemData[parentField as keyof T] = targetId as any
-          draggedItemData[orderField as keyof T] = 1 as any // Premier enfant
+          draggedItemData[parentField as keyof T] = targetId as unknown
+          draggedItemData[orderField as keyof T] = 1 as unknown // Premier enfant
 
           // Auto-expand le parent si configuré
           if (config.reorderConfig.autoExpand) {
@@ -340,13 +340,13 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
           const targetParentId = targetItemData[parentField as keyof T] as string
           const targetOrder = (targetItemData[orderField as keyof T] as number) || 0
 
-          draggedItemData[parentField as keyof T] = targetParentId as any
+          draggedItemData[parentField as keyof T] = targetParentId as unknown
 
           // Calculer le nouvel ordre
           if (dropPosition === 'above') {
-            draggedItemData[orderField as keyof T] = Math.max(0, targetOrder - 1) as any
+            draggedItemData[orderField as keyof T] = Math.max(0, targetOrder - 1) as unknown
           } else {
-            draggedItemData[orderField as keyof T] = (targetOrder + 1) as any
+            draggedItemData[orderField as keyof T] = (targetOrder + 1) as unknown
           }
         }
       }
@@ -359,9 +359,9 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
         if (item.id !== draggedItem.id && item[parentField as keyof T] === parentId) {
           const itemOrder = (item[orderField as keyof T] as number) || 0
           if (dropPosition === 'below' && itemOrder > newOrder - 1) {
-            item[orderField as keyof T] = (itemOrder + 1) as any
+            item[orderField as keyof T] = (itemOrder + 1) as unknown
           } else if (dropPosition === 'above' && itemOrder >= newOrder) {
-            item[orderField as keyof T] = (itemOrder + 1) as any
+            item[orderField as keyof T] = (itemOrder + 1) as unknown
           }
         }
       })

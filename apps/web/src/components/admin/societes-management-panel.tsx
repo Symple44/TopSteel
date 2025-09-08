@@ -85,7 +85,7 @@ interface SocieteStats {
   sitesCount: number
 }
 
-export default function SocietesManagementPanel() {
+export function SocietesManagementPanel() {
   const [societes, setSocietes] = useState<Societe[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -107,18 +107,18 @@ export default function SocietesManagementPanel() {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Erreur lors du chargement des sociétés')
       }
 
-      const data = await response.json()
-      if (data.success && data.data) {
-        setSocietes(data.data)
+      const data = await response?.json()
+      if (data?.success && data?.data) {
+        setSocietes(data?.data)
       } else {
         setError('Impossible de charger les sociétés')
       }
     } catch (error: unknown) {
-      setError(error.message || 'Erreur de connexion')
+      setError(error instanceof Error ? error.message : 'Erreur de connexion')
     } finally {
       setLoading(false)
     }
@@ -131,17 +131,17 @@ export default function SocietesManagementPanel() {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Erreur lors du chargement des détails')
       }
 
-      const data = await response.json()
-      if (data.success && data.data) {
-        setSelectedSociete(data.data)
+      const data = await response?.json()
+      if (data?.success && data?.data) {
+        setSelectedSociete(data?.data)
         setIsDetailsOpen(true)
       }
     } catch (error: unknown) {
-      setError(error.message || 'Erreur de connexion')
+      setError(error instanceof Error ? error.message : 'Erreur de connexion')
     }
   }, [])
 
@@ -152,17 +152,17 @@ export default function SocietesManagementPanel() {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Erreur lors du chargement des statistiques')
       }
 
-      const data = await response.json()
-      if (data.success && data.data) {
-        setSelectedSocieteStats(data.data)
+      const data = await response?.json()
+      if (data?.success && data?.data) {
+        setSelectedSocieteStats(data?.data)
         setIsStatsOpen(true)
       }
     } catch (error: unknown) {
-      setError(error.message || 'Erreur de connexion')
+      setError(error instanceof Error ? error.message : 'Erreur de connexion')
     }
   }, [])
 
@@ -182,6 +182,7 @@ export default function SocietesManagementPanel() {
           </p>
         </div>
         <Button
+          type="button"
           onClick={() => {
             setIsCreateSocieteOpen(true)
           }}
@@ -202,7 +203,7 @@ export default function SocietesManagementPanel() {
           <CardContent>
             <div className="text-2xl font-bold">{societes.length}</div>
             <p className="text-xs text-muted-foreground">
-              {societes.filter((s) => s.status === 'ACTIVE').length} actives
+              {societes?.filter((s) => s.status === 'ACTIVE').length} actives
             </p>
           </CardContent>
         </Card>
@@ -214,7 +215,7 @@ export default function SocietesManagementPanel() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {societes.reduce((sum, s) => sum + s.userCount, 0)}
+              {societes?.reduce((sum, s) => sum + s.userCount, 0)}
             </div>
             <p className="text-xs text-muted-foreground">Répartis dans toutes les sociétés</p>
           </CardContent>
@@ -227,7 +228,7 @@ export default function SocietesManagementPanel() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {societes.reduce((sum, s) => sum + s.sites.length, 0)}
+              {societes?.reduce((sum, s) => sum + s?.sites?.length, 0)}
             </div>
             <p className="text-xs text-muted-foreground">Sites de production</p>
           </CardContent>
@@ -240,7 +241,7 @@ export default function SocietesManagementPanel() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Set(societes.map((s) => s.databaseName)).size}
+              {new Set(societes?.map((s) => s.databaseName)).size}
             </div>
             <p className="text-xs text-muted-foreground">Instances uniques</p>
           </CardContent>
@@ -261,7 +262,7 @@ export default function SocietesManagementPanel() {
           ) : error ? (
             <div className="text-center py-8 text-red-600">
               <p>{error}</p>
-              <Button onClick={loadSocietes} variant="outline" className="mt-4">
+              <Button type="button" onClick={loadSocietes} variant="outline" className="mt-4">
                 Réessayer
               </Button>
             </div>
@@ -279,12 +280,12 @@ export default function SocietesManagementPanel() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {societes.map((societe) => (
+                {societes?.map((societe) => (
                   <TableRow key={societe.id}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
-                          {societe.nom.substring(0, 2).toUpperCase()}
+                          {societe?.nom?.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
                           <p className="font-semibold">{societe.nom}</p>
@@ -318,7 +319,7 @@ export default function SocietesManagementPanel() {
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{societe.sites.length}</span>
+                        <span>{societe?.sites?.length}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -329,6 +330,7 @@ export default function SocietesManagementPanel() {
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => loadSocieteDetails(societe.id)}
@@ -336,6 +338,7 @@ export default function SocietesManagementPanel() {
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => loadSocieteStats(societe.id)}
@@ -343,6 +346,7 @@ export default function SocietesManagementPanel() {
                           <Shield className="h-4 w-4" />
                         </Button>
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => {
@@ -377,9 +381,9 @@ export default function SocietesManagementPanel() {
               <TabsList>
                 <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
                 <TabsTrigger value="users">
-                  Utilisateurs ({selectedSociete.users?.length || 0})
+                  Utilisateurs ({selectedSociete.users?.length ?? 0})
                 </TabsTrigger>
-                <TabsTrigger value="sites">Sites ({selectedSociete.sites.length})</TabsTrigger>
+                <TabsTrigger value="sites">Sites ({selectedSociete?.sites?.length})</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-4">
@@ -413,7 +417,7 @@ export default function SocietesManagementPanel() {
               </TabsContent>
 
               <TabsContent value="users" className="space-y-4">
-                {selectedSociete.users && selectedSociete.users.length > 0 ? (
+                {selectedSociete.users && selectedSociete?.users?.length > 0 ? (
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -424,7 +428,7 @@ export default function SocietesManagementPanel() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {selectedSociete.users.map((user) => (
+                      {selectedSociete?.users?.map((user) => (
                         <TableRow key={user.id}>
                           <TableCell>
                             <div>
@@ -436,19 +440,19 @@ export default function SocietesManagementPanel() {
                           </TableCell>
                           <TableCell>
                             <Badge
-                              style={{ backgroundColor: user.globalRole.color }}
+                              style={{ backgroundColor: user?.globalRole?.color }}
                               className="text-white"
                             >
-                              {user.globalRole.displayName}
+                              {user?.globalRole?.displayName}
                             </Badge>
                           </TableCell>
                           <TableCell>
                             {user.societeRole ? (
                               <Badge
-                                style={{ backgroundColor: user.societeRole.color }}
+                                style={{ backgroundColor: user?.societeRole?.color }}
                                 className="text-white"
                               >
-                                {user.societeRole.displayName}
+                                {user?.societeRole?.displayName}
                               </Badge>
                             ) : (
                               <span className="text-muted-foreground">Aucun</span>
@@ -473,7 +477,7 @@ export default function SocietesManagementPanel() {
               </TabsContent>
 
               <TabsContent value="sites" className="space-y-4">
-                {selectedSociete.sites.length > 0 ? (
+                {selectedSociete?.sites?.length > 0 ? (
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -483,7 +487,7 @@ export default function SocietesManagementPanel() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {selectedSociete.sites.map((site) => (
+                      {selectedSociete?.sites?.map((site) => (
                         <TableRow key={site.id}>
                           <TableCell className="font-medium">{site.nom}</TableCell>
                           <TableCell>
@@ -560,17 +564,17 @@ export default function SocietesManagementPanel() {
               <div>
                 <h3 className="text-lg font-semibold mb-4">Répartition des rôles</h3>
                 <div className="space-y-3">
-                  {selectedSocieteStats.roleDistribution.map((roleData) => (
+                  {selectedSocieteStats?.roleDistribution?.map((roleData) => (
                     <div
-                      key={roleData.role.id}
+                      key={roleData?.role?.id}
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
                       <div className="flex items-center space-x-3">
                         <Badge
-                          style={{ backgroundColor: roleData.role.color }}
+                          style={{ backgroundColor: roleData?.role?.color }}
                           className="text-white"
                         >
-                          {roleData.role.displayName}
+                          {roleData?.role?.displayName}
                         </Badge>
                       </div>
                       <div className="text-right">

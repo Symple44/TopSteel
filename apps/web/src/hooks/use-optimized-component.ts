@@ -14,8 +14,8 @@ export function useOptimizedSearch<T>(
   // Fonction de recherche typée correctement
   const searchFunction = useCallback((...args: unknown[]) => {
     const [term, items, fields] = args as [string, T[], (keyof T)[]]
-    const filtered = items.filter((item) =>
-      fields.some((field) => String(item[field]).toLowerCase().includes(term.toLowerCase()))
+    const filtered = items?.filter((item) =>
+      fields?.some((field) => String(item[field]).toLowerCase().includes(term?.toLowerCase()))
     )
 
     setFilteredData(filtered)

@@ -15,6 +15,7 @@ export enum ArticleStatus {
   INACTIF = 'INACTIF',
   OBSOLETE = 'OBSOLETE',
   EN_COURS_CREATION = 'EN_COURS_CREATION',
+  EN_ATTENTE = 'EN_ATTENTE',
 }
 
 export enum UniteStock {
@@ -213,7 +214,7 @@ export class Article extends BusinessEntity {
     materiaux?: string[]
     certifications?: string[]
     normes?: string[]
-    specifications?: Record<string, any>
+    specifications?: Record<string, unknown>
     fichesSecurite?: string[]
   }
 

@@ -8,10 +8,10 @@ import { DataSource } from 'typeorm'
 async function setupDefaultPricingRules() {
   const dataSource = new DataSource({
     type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'postgres',
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+    username: process.env.DATABASE_USERNAME || 'postgres',
+    password: process.env.DATABASE_PASSWORD,
     database: 'erp_topsteel_topsteel',
     entities: [PriceRule],
     synchronize: false,

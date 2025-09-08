@@ -156,6 +156,7 @@ export class ArticleService {
         [ArticleStatus.INACTIF]: 0,
         [ArticleStatus.OBSOLETE]: 0,
         [ArticleStatus.EN_COURS_CREATION]: 0,
+        [ArticleStatus.EN_ATTENTE]: 0,
       },
       repartitionParFamille: {},
     }

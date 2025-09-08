@@ -17,7 +17,7 @@ export const loadWishlistFromStorage = (): Partial<WishlistState> | null => {
   try {
     if (typeof window === 'undefined') return null
 
-    const stored = localStorage.getItem(WISHLIST_STORAGE_KEY)
+    const stored = localStorage?.getItem(WISHLIST_STORAGE_KEY)
     if (!stored) return null
 
     const persisted: PersistedWishlist = JSON.parse(stored)
@@ -25,12 +25,12 @@ export const loadWishlistFromStorage = (): Partial<WishlistState> | null => {
     // Check if wishlist has expired
     const expiresAt = new Date(persisted.expiresAt)
     if (expiresAt < new Date()) {
-      localStorage.removeItem(WISHLIST_STORAGE_KEY)
+      localStorage?.removeItem(WISHLIST_STORAGE_KEY)
       return null
     }
 
     // Convert date strings back to Date objects
-    const items = persisted.items.map((item) => ({
+    const items = persisted?.items?.map((item) => ({
       ...item,
       addedAt: new Date(item.addedAt),
     }))
@@ -52,12 +52,12 @@ export const saveWishlistToStorage = (wishlist: WishlistState): void => {
     if (typeof window === 'undefined') return
 
     const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + WISHLIST_EXPIRY_DAYS)
+    expiresAt?.setDate(expiresAt?.getDate() + WISHLIST_EXPIRY_DAYS)
 
     const persisted: PersistedWishlist = {
       items: wishlist.items,
       lastUpdated: wishlist.lastUpdated?.toISOString() || new Date().toISOString(),
-      expiresAt: expiresAt.toISOString(),
+      expiresAt: expiresAt?.toISOString(),
     }
 
     localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(persisted))
@@ -70,7 +70,7 @@ export const saveWishlistToStorage = (wishlist: WishlistState): void => {
 export const clearWishlistFromStorage = (): void => {
   try {
     if (typeof window === 'undefined') return
-    localStorage.removeItem(WISHLIST_STORAGE_KEY)
+    localStorage?.removeItem(WISHLIST_STORAGE_KEY)
   } catch (_error) {}
 }
 
@@ -91,15 +91,15 @@ export const wishlistPersistenceMiddleware: Middleware = (store) => (next) => (a
     'wishlist/sortWishlist',
   ]
 
-  if (persistActions.includes(action.type)) {
-    const state = store.getState()
-    if (state.wishlist) {
-      saveWishlistToStorage(state.wishlist)
+  if (persistActions?.includes((action as unknown).type)) {
+    const state = store?.getState()
+    if (state?.wishlist) {
+      saveWishlistToStorage(state?.wishlist)
     }
   }
 
   // Clear storage when wishlist is cleared
-  if (action.type === 'wishlist/clearWishlist') {
+  if ((action as unknown).type === 'wishlist/clearWishlist') {
     clearWishlistFromStorage()
   }
 
@@ -121,8 +121,8 @@ export const syncWishlistWithBackend = async (
       },
       body: JSON.stringify({
         userId,
-        items: wishlist.items.map((item) => ({
-          productId: item.product.id,
+        items: wishlist?.items?.map((item) => ({
+          productId: item?.product?.id,
           notes: item.notes,
           priority: item.priority,
           addedAt: item.addedAt,
@@ -130,14 +130,14 @@ export const syncWishlistWithBackend = async (
       }),
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       throw new Error('Failed to sync wishlist with backend')
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
     // Update items with latest product data
-    return data.items.map((item: any) => ({
+    return data?.items?.map((item: unknown) => ({
       product: item.product,
       addedAt: new Date(item.addedAt),
       notes: item.notes,
@@ -163,17 +163,17 @@ export const shareWishlist = async (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        items: wishlist.items.map((item) => item.product.id),
+        items: wishlist?.items?.map((item) => item?.product?.id),
         method,
         recipient,
       }),
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       throw new Error('Failed to share wishlist')
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
     return {
       success: true,

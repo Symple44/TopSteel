@@ -1,9 +1,9 @@
+import * as crypto from 'node:crypto'
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { createTransport, Transporter } from 'nodemailer'
-import * as crypto from 'crypto'
+import type { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { createTransport, type Transporter } from 'nodemailer'
+import type { Repository } from 'typeorm'
 import { EmailLog } from './entities/email-log.entity'
 
 export interface EmailOptions {
@@ -12,7 +12,7 @@ export interface EmailOptions {
   html?: string
   text?: string
   template?: string
-  templateData?: Record<string, any>
+  templateData?: Record<string, unknown>
   attachments?: Array<{
     filename: string
     content?: Buffer | string
@@ -26,7 +26,7 @@ export interface TokenEmailData {
   expiresAt: Date
   type: 'password-reset' | 'email-verification' | 'account-activation'
   userId?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 @Injectable()
@@ -68,10 +68,7 @@ export class EmailService {
    * Hash un token pour le stockage sécurisé
    */
   hashToken(token: string): string {
-    return crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex')
+    return crypto.createHash('sha256').update(token).digest('hex')
   }
 
   /**
@@ -79,7 +76,7 @@ export class EmailService {
    */
   async sendPasswordResetEmail(data: TokenEmailData): Promise<void> {
     const resetUrl = `${this.baseUrl}/reset-password?token=${data.token}`
-    
+
     const html = this.getPasswordResetTemplate({
       resetUrl,
       expiresIn: this.getExpirationTime(data.expiresAt),
@@ -107,7 +104,7 @@ export class EmailService {
    */
   async sendVerificationEmail(data: TokenEmailData): Promise<void> {
     const verifyUrl = `${this.baseUrl}/verify-email?token=${data.token}`
-    
+
     const html = this.getVerificationTemplate({
       verifyUrl,
       expiresIn: this.getExpirationTime(data.expiresAt),
@@ -135,7 +132,7 @@ export class EmailService {
    */
   async sendAccountActivationEmail(data: TokenEmailData): Promise<void> {
     const activationUrl = `${this.baseUrl}/activate-account?token=${data.token}`
-    
+
     const html = this.getActivationTemplate({
       activationUrl,
       expiresIn: this.getExpirationTime(data.expiresAt),
@@ -202,8 +199,7 @@ export class EmailService {
         text: options.text,
         attachments: options.attachments,
       })
-    } catch (error) {
-      console.error('Error sending email:', error)
+    } catch (_error) {
       throw new Error('Failed to send email')
     }
   }
@@ -216,7 +212,7 @@ export class EmailService {
     type: string
     tokenHash?: string
     expiresAt?: Date
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   }): Promise<void> {
     try {
       const log = this.emailLogRepo.create({
@@ -229,9 +225,7 @@ export class EmailService {
       })
 
       await this.emailLogRepo.save(log)
-    } catch (error) {
-      console.error('Error logging email:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -242,7 +236,7 @@ export class EmailService {
     const diff = expiresAt.getTime() - now.getTime()
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    
+
     if (hours > 0) {
       return `${hours} heure${hours > 1 ? 's' : ''}`
     }

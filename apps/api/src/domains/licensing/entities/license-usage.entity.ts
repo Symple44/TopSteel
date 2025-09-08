@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { License } from './license.entity'
+// import { License } from './license.entity';
 
 /**
  * Usage metric types
@@ -81,23 +81,19 @@ export class LicenseUsage {
     bySite?: Record<string, number>
     byModule?: Record<string, number>
     byAction?: Record<string, number>
-    custom?: Record<string, any>
+    custom?: Record<string, unknown>
   }
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => License,
-    (license) => license.usage,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('License', 'usage', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'license_id' })
-  license!: License
+  license!: any
 
   // Utility methods
 
@@ -175,7 +171,7 @@ export class LicenseUsage {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       metricType: this.metricType,

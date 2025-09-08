@@ -4,7 +4,7 @@ import { AlertCircle, ArrowRight, Minus, Plus, ShoppingBag, Tag, Trash2, X } fro
 import Image from 'next/image'
 import Link from 'next/link'
 import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { cn } from '@/lib/utils'
 import { validateCart } from '../../store/cartPersistence'
@@ -45,14 +45,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
   const [validationIssues, setValidationIssues] = useState<any[]>([])
   const [_isValidating, setIsValidating] = useState(false)
 
-  useEffect(() => {
-    // Validate cart when it opens or items change
-    if (isOpen && items.length > 0) {
-      validateCartItems()
-    }
-  }, [isOpen, items, validateCartItems])
-
-  const validateCartItems = async () => {
+  const validateCartItems = useCallback(async () => {
     setIsValidating(true)
     try {
       const validation = await validateCart({
@@ -62,12 +55,19 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
         appliedCoupon,
         shippingMethod: null,
       })
-      setValidationIssues(validation.issues)
+      setValidationIssues(validation?.issues)
     } catch (_error) {
     } finally {
       setIsValidating(false)
     }
-  }
+  }, [items, isOpen, appliedCoupon])
+
+  useEffect(() => {
+    // Validate cart when it opens or items change
+    if (isOpen && items?.length > 0) {
+      validateCartItems()
+    }
+  }, [isOpen, items, validateCartItems])
 
   const handleQuantityChange = (productId: string, newQuantity: number, options?: any) => {
     if (newQuantity >= 0) {
@@ -86,7 +86,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
   }
 
   const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return
+    if (!couponCode?.trim()) return
 
     setIsApplyingCoupon(true)
     try {
@@ -97,8 +97,8 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
         body: JSON.stringify({ code: couponCode, cartTotal: subtotal }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      if (response?.ok) {
+        const data = await response?.json()
         dispatch(
           applyCoupon({
             code: couponCode,
@@ -125,7 +125,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
   }
 
   const getValidationIssue = (productId: string) => {
-    return validationIssues.find((issue) => issue.productId === productId)
+    return validationIssues?.find((issue) => issue?.productId === productId)
   }
 
   if (!isOpen) return null
@@ -133,9 +133,16 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
   return (
     <>
       {/* Overlay */}
-      <div
+      <button
         className="fixed inset-0 bg-black/50 z-40"
         onClick={() => dispatch(setCartOpen(false))}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            dispatch(setCartOpen(false))
+          }
+        }}
+        aria-label="Close shopping cart"
       />
 
       {/* Cart Drawer */}
@@ -164,7 +171,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
 
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto">
-          {items.length === 0 ? (
+          {items?.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-8">
               <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
               <p className="text-gray-500 text-center">Your cart is empty</p>
@@ -179,7 +186,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
           ) : (
             <div className="p-4 space-y-4">
               {/* Clear Cart Button */}
-              {items.length > 0 && (
+              {items?.length > 0 && (
                 <button
                   onClick={handleClearCart}
                   className="text-sm text-red-600 hover:text-red-700"
@@ -189,23 +196,23 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
               )}
 
               {/* Cart Items List */}
-              {items.map((item) => {
-                const issue = getValidationIssue(item.product.id)
+              {items?.map((item) => {
+                const issue = getValidationIssue(item?.product?.id)
 
                 return (
                   <div
-                    key={`${item.product.id}-${JSON.stringify(item.selectedOptions)}`}
+                    key={`${item?.product?.id}-${JSON.stringify(item.selectedOptions)}`}
                     className="flex gap-3 p-3 bg-gray-50 rounded-lg"
                   >
                     {/* Product Image */}
                     <Link
-                      href={`/marketplace/products/${item.product.slug}`}
+                      href={`/marketplace/products/${item?.product?.slug}`}
                       onClick={() => dispatch(setCartOpen(false))}
                       className="relative w-20 h-20 flex-shrink-0"
                     >
                       <Image
-                        src={item.product.images[0] || '/placeholder-product.jpg'}
-                        alt={item.product.name}
+                        src={item?.product?.images?.[0] || '/placeholder-product.jpg'}
+                        alt={item?.product?.name}
                         fill
                         className="object-cover rounded-lg"
                       />
@@ -214,11 +221,11 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                     {/* Product Details */}
                     <div className="flex-1">
                       <Link
-                        href={`/marketplace/products/${item.product.slug}`}
+                        href={`/marketplace/products/${item?.product?.slug}`}
                         onClick={() => dispatch(setCartOpen(false))}
                         className="font-medium text-gray-900 hover:text-blue-600 line-clamp-2"
                       >
-                        {item.product.name}
+                        {item?.product?.name}
                       </Link>
 
                       {/* Selected Options */}
@@ -236,7 +243,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                       {issue && (
                         <div className="flex items-center gap-1 mt-1 text-xs text-orange-600">
                           <AlertCircle className="w-3 h-3" />
-                          <span>{issue.message}</span>
+                          <span>{issue?.message}</span>
                         </div>
                       )}
 
@@ -246,7 +253,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                           <button
                             onClick={() =>
                               handleQuantityChange(
-                                item.product.id,
+                                item?.product?.id,
                                 item.quantity - 1,
                                 item.selectedOptions
                               )
@@ -260,12 +267,12 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                           <button
                             onClick={() =>
                               handleQuantityChange(
-                                item.product.id,
+                                item?.product?.id,
                                 item.quantity + 1,
                                 item.selectedOptions
                               )
                             }
-                            disabled={item.quantity >= item.product.stockQuantity}
+                            disabled={item.quantity >= item?.product?.stockQuantity}
                             className="p-1 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Plus className="w-3 h-3" />
@@ -274,10 +281,12 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
 
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
-                            {formatPrice(item.product.price * item.quantity)}
+                            {formatPrice(item?.product?.price * item.quantity)}
                           </span>
                           <button
-                            onClick={() => handleRemoveItem(item.product.id, item.selectedOptions)}
+                            onClick={() =>
+                              handleRemoveItem(item?.product?.id, item.selectedOptions)
+                            }
                             className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -297,7 +306,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                     <input
                       type="text"
                       value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      onChange={(e) => setCouponCode(e?.target?.value?.toUpperCase())}
                       placeholder="Enter coupon code"
                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={!!appliedCoupon || isApplyingCoupon}
@@ -313,7 +322,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                   ) : (
                     <button
                       onClick={handleApplyCoupon}
-                      disabled={!couponCode.trim() || isApplyingCoupon}
+                      disabled={!couponCode?.trim() || isApplyingCoupon}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {isApplyingCoupon ? 'Applying...' : 'Apply'}
@@ -322,7 +331,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
                 </div>
                 {appliedCoupon && (
                   <div className="mt-2 p-2 bg-green-50 text-green-700 rounded-lg text-sm">
-                    Coupon "{appliedCoupon.code}" applied! You saved {formatPrice(discount)}
+                    Coupon "{appliedCoupon?.code}" applied! You saved {formatPrice(discount)}
                   </div>
                 )}
               </div>
@@ -331,7 +340,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
         </div>
 
         {/* Footer with Summary */}
-        {items.length > 0 && (
+        {items?.length > 0 && (
           <div className="border-t p-4 space-y-3">
             {/* Price Breakdown */}
             <div className="space-y-2 text-sm">
@@ -377,7 +386,8 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ className }) => {
 
             {/* Security Badge */}
             <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <title>Icône de sécurité</title>
                 <path
                   fillRule="evenodd"
                   d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"

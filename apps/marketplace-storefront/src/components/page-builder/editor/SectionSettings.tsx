@@ -1,8 +1,21 @@
 'use client'
 
 import { Code, Eye, Layout, Palette, X } from 'lucide-react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import type { BaseSection, SectionStyles, SectionSettings as Settings } from '../sections'
+
+interface SectionContent {
+  title?: string
+  subtitle?: string
+  description?: string
+  content?: string
+  backgroundImage?: string
+  alignment?: string
+  columns?: number
+  source?: string
+  limit?: number
+  [key: string]: unknown
+}
 
 interface SectionSettingsProps {
   section: BaseSection
@@ -14,6 +27,29 @@ type TabType = 'content' | 'style' | 'responsive' | 'advanced'
 
 export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsProps) {
   const [activeTab, setActiveTab] = useState<TabType>('content')
+
+  // Generate unique IDs for form elements
+  const heroTitleId = useId()
+  const heroSubtitleId = useId()
+  const heroDescriptionId = useId()
+  const heroBgImageId = useId()
+  const heroAlignmentId = useId()
+  const textBlockTitleId = useId()
+  const textBlockContentId = useId()
+  const textBlockColumnsId = useId()
+  const productsGridTitleId = useId()
+  const productsGridSourceId = useId()
+  const productsGridLimitId = useId()
+  const styleBgColorId = useId()
+  const styleBgImageId = useId()
+  const stylePaddingTopId = useId()
+  const stylePaddingBottomId = useId()
+  const styleCustomCssId = useId()
+  const advancedSectionNameId = useId()
+  const advancedCssId = useId()
+  const advancedCssClassesId = useId()
+  const advancedContainerTypeId = useId()
+  const visibleId = useId()
 
   const tabs = [
     { id: 'content' as TabType, name: 'Contenu', icon: Layout },
@@ -40,49 +76,49 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
         return (
           <div className="space-y-4">
             <div>
-              <label htmlFor="hero-title" className="block text-sm font-medium mb-2">
+              <label htmlFor={heroTitleId} className="block text-sm font-medium mb-2">
                 Titre
               </label>
               <input
-                id="hero-title"
+                id={heroTitleId}
                 type="text"
-                value={(section.content as any)?.title || ''}
+                value={(section.content as SectionContent)?.title || ''}
                 onChange={(e) => updateContent({ title: e.target.value })}
                 className="w-full p-2 border rounded-md"
                 placeholder="Votre titre principal"
               />
             </div>
             <div>
-              <label htmlFor="hero-subtitle" className="block text-sm font-medium mb-2">
+              <label htmlFor={heroSubtitleId} className="block text-sm font-medium mb-2">
                 Sous-titre
               </label>
               <input
-                id="hero-subtitle"
+                id={heroSubtitleId}
                 type="text"
-                value={(section.content as any)?.subtitle || ''}
+                value={(section.content as SectionContent)?.subtitle || ''}
                 onChange={(e) => updateContent({ subtitle: e.target.value })}
                 className="w-full p-2 border rounded-md"
                 placeholder="Votre sous-titre"
               />
             </div>
             <div>
-              <label htmlFor="hero-description" className="block text-sm font-medium mb-2">
+              <label htmlFor={heroDescriptionId} className="block text-sm font-medium mb-2">
                 Description
               </label>
               <textarea
-                id="hero-description"
-                value={(section.content as any)?.description || ''}
+                id={heroDescriptionId}
+                value={(section.content as SectionContent)?.description || ''}
                 onChange={(e) => updateContent({ description: e.target.value })}
                 className="w-full p-2 border rounded-md h-24"
                 placeholder="Votre description"
               />
             </div>
             <div>
-              <label htmlFor="hero-bg-image" className="block text-sm font-medium mb-2">
+              <label htmlFor={heroBgImageId} className="block text-sm font-medium mb-2">
                 Image de fond
               </label>
               <input
-                id="hero-bg-image"
+                id={heroBgImageId}
                 type="url"
                 value={(section.content as any)?.backgroundImage || ''}
                 onChange={(e) => updateContent({ backgroundImage: e.target.value })}
@@ -91,11 +127,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               />
             </div>
             <div>
-              <label htmlFor="hero-alignment" className="block text-sm font-medium mb-2">
+              <label htmlFor={heroAlignmentId} className="block text-sm font-medium mb-2">
                 Alignement
               </label>
               <select
-                id="hero-alignment"
+                id={heroAlignmentId}
                 value={(section.content as any)?.alignment || 'center'}
                 onChange={(e) => updateContent({ alignment: e.target.value })}
                 className="w-full p-2 border rounded-md"
@@ -112,23 +148,23 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
         return (
           <div className="space-y-4">
             <div>
-              <label htmlFor="text-block-title" className="block text-sm font-medium mb-2">
+              <label htmlFor={textBlockTitleId} className="block text-sm font-medium mb-2">
                 Titre
               </label>
               <input
-                id="text-block-title"
+                id={textBlockTitleId}
                 type="text"
-                value={(section.content as any)?.title || ''}
+                value={(section.content as SectionContent)?.title || ''}
                 onChange={(e) => updateContent({ title: e.target.value })}
                 className="w-full p-2 border rounded-md"
               />
             </div>
             <div>
-              <label htmlFor="text-block-content" className="block text-sm font-medium mb-2">
+              <label htmlFor={textBlockContentId} className="block text-sm font-medium mb-2">
                 Contenu
               </label>
               <textarea
-                id="text-block-content"
+                id={textBlockContentId}
                 value={(section.content as any)?.content || ''}
                 onChange={(e) => updateContent({ content: e.target.value })}
                 className="w-full p-2 border rounded-md h-32"
@@ -136,13 +172,13 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               />
             </div>
             <div>
-              <label htmlFor="text-block-columns" className="block text-sm font-medium mb-2">
+              <label htmlFor={textBlockColumnsId} className="block text-sm font-medium mb-2">
                 Colonnes
               </label>
               <select
-                id="text-block-columns"
+                id={textBlockColumnsId}
                 value={(section.content as any)?.columns || 1}
-                onChange={(e) => updateContent({ columns: parseInt(e.target.value) })}
+                onChange={(e) => updateContent({ columns: parseInt(e.target.value, 10) })}
                 className="w-full p-2 border rounded-md"
               >
                 <option value={1}>1 colonne</option>
@@ -157,23 +193,23 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
         return (
           <div className="space-y-4">
             <div>
-              <label htmlFor="products-grid-title" className="block text-sm font-medium mb-2">
+              <label htmlFor={productsGridTitleId} className="block text-sm font-medium mb-2">
                 Titre
               </label>
               <input
-                id="products-grid-title"
+                id={productsGridTitleId}
                 type="text"
-                value={(section.content as any)?.title || ''}
+                value={(section.content as SectionContent)?.title || ''}
                 onChange={(e) => updateContent({ title: e.target.value })}
                 className="w-full p-2 border rounded-md"
               />
             </div>
             <div>
-              <label htmlFor="products-grid-source" className="block text-sm font-medium mb-2">
+              <label htmlFor={productsGridSourceId} className="block text-sm font-medium mb-2">
                 Source des produits
               </label>
               <select
-                id="products-grid-source"
+                id={productsGridSourceId}
                 value={(section.content as any)?.source || 'featured'}
                 onChange={(e) => updateContent({ source: e.target.value })}
                 className="w-full p-2 border rounded-md"
@@ -185,14 +221,14 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               </select>
             </div>
             <div>
-              <label htmlFor="products-grid-limit" className="block text-sm font-medium mb-2">
+              <label htmlFor={productsGridLimitId} className="block text-sm font-medium mb-2">
                 Nombre de produits
               </label>
               <input
-                id="products-grid-limit"
+                id={productsGridLimitId}
                 type="number"
                 value={(section.content as any)?.limit || 12}
-                onChange={(e) => updateContent({ limit: parseInt(e.target.value) })}
+                onChange={(e) => updateContent({ limit: parseInt(e.target.value, 10) })}
                 className="w-full p-2 border rounded-md"
                 min="1"
                 max="24"
@@ -213,11 +249,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
   const renderStyleTab = () => (
     <div className="space-y-4">
       <div>
-        <label htmlFor="style-bg-color" className="block text-sm font-medium mb-2">
+        <label htmlFor={styleBgColorId} className="block text-sm font-medium mb-2">
           Couleur de fond
         </label>
         <input
-          id="style-bg-color"
+          id={styleBgColorId}
           type="color"
           value={section.styles.backgroundColor || '#ffffff'}
           onChange={(e) => updateStyles({ backgroundColor: e.target.value })}
@@ -226,11 +262,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
       </div>
 
       <div>
-        <label htmlFor="style-bg-image" className="block text-sm font-medium mb-2">
+        <label htmlFor={styleBgImageId} className="block text-sm font-medium mb-2">
           Image de fond
         </label>
         <input
-          id="style-bg-image"
+          id={styleBgImageId}
           type="url"
           value={section.styles.backgroundImage || ''}
           onChange={(e) => updateStyles({ backgroundImage: e.target.value })}
@@ -241,11 +277,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="style-padding-top" className="block text-sm font-medium mb-2">
+          <label htmlFor={stylePaddingTopId} className="block text-sm font-medium mb-2">
             Padding haut
           </label>
           <input
-            id="style-padding-top"
+            id={stylePaddingTopId}
             type="text"
             value={section.styles.padding?.top || ''}
             onChange={(e) =>
@@ -258,11 +294,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
           />
         </div>
         <div>
-          <label htmlFor="style-padding-bottom" className="block text-sm font-medium mb-2">
+          <label htmlFor={stylePaddingBottomId} className="block text-sm font-medium mb-2">
             Padding bas
           </label>
           <input
-            id="style-padding-bottom"
+            id={stylePaddingBottomId}
             type="text"
             value={section.styles.padding?.bottom || ''}
             onChange={(e) =>
@@ -277,11 +313,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
       </div>
 
       <div>
-        <label htmlFor="style-custom-css" className="block text-sm font-medium mb-2">
+        <label htmlFor={styleCustomCssId} className="block text-sm font-medium mb-2">
           CSS personnalisé
         </label>
         <textarea
-          id="style-custom-css"
+          id={styleCustomCssId}
           value={section.styles.customCSS || ''}
           onChange={(e) => updateStyles({ customCSS: e.target.value })}
           className="w-full p-2 border rounded-md h-24 font-mono text-sm"
@@ -294,11 +330,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
   const renderAdvancedTab = () => (
     <div className="space-y-4">
       <div>
-        <label htmlFor="advanced-section-name" className="block text-sm font-medium mb-2">
+        <label htmlFor={advancedSectionNameId} className="block text-sm font-medium mb-2">
           Nom de la section
         </label>
         <input
-          id="advanced-section-name"
+          id={advancedSectionNameId}
           type="text"
           value={section.name}
           onChange={(e) => onUpdate({ name: e.target.value })}
@@ -307,11 +343,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
       </div>
 
       <div>
-        <label htmlFor="advanced-css-id" className="block text-sm font-medium mb-2">
+        <label htmlFor={advancedCssId} className="block text-sm font-medium mb-2">
           ID CSS
         </label>
         <input
-          id="advanced-css-id"
+          id={advancedCssId}
           type="text"
           value={section.settings.id || ''}
           onChange={(e) => updateSettings({ id: e.target.value })}
@@ -321,11 +357,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
       </div>
 
       <div>
-        <label htmlFor="advanced-css-classes" className="block text-sm font-medium mb-2">
+        <label htmlFor={advancedCssClassesId} className="block text-sm font-medium mb-2">
           Classes CSS
         </label>
         <input
-          id="advanced-css-classes"
+          id={advancedCssClassesId}
           type="text"
           value={section.settings.customClass || ''}
           onChange={(e) => updateSettings({ customClass: e.target.value })}
@@ -335,11 +371,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
       </div>
 
       <div>
-        <label htmlFor="advanced-container-type" className="block text-sm font-medium mb-2">
+        <label htmlFor={advancedContainerTypeId} className="block text-sm font-medium mb-2">
           Type de conteneur
         </label>
         <select
-          id="advanced-container-type"
+          id={advancedContainerTypeId}
           value={section.settings.container || 'boxed'}
           onChange={(e) =>
             updateSettings({ container: e.target.value as 'full-width' | 'boxed' | 'custom' })
@@ -355,12 +391,12 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
-          id="visible"
+          id={visibleId}
           checked={section.isVisible}
           onChange={(e) => onUpdate({ isVisible: e.target.checked })}
           className="rounded"
         />
-        <label htmlFor="visible" className="text-sm font-medium">
+        <label htmlFor={visibleId} className="text-sm font-medium">
           Section visible
         </label>
       </div>

@@ -104,7 +104,7 @@ async function testGlobalSearch() {
             console.log(`      Highlight:`, result.highlight)
           }
         })
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(`   ❌ Erreur:`, error.response?.data?.message || error.message)
       }
     }
@@ -128,7 +128,7 @@ async function testGlobalSearch() {
       console.log(`   ✅ Fallback fonctionnel`)
       console.log(`   Résultats: ${data.results.length}`)
       console.log(`   Stratégie: ${data.strategy}`)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`   ❌ Erreur:`, error.response?.data?.message || error.message)
     }
 
@@ -144,7 +144,7 @@ async function testGlobalSearch() {
       suggestResponse.data.data.forEach((suggestion: string, index: number) => {
         console.log(`   ${index + 1}. ${suggestion}`)
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`   ❌ Erreur:`, error.response?.data?.message || error.message)
     }
 
@@ -154,15 +154,15 @@ async function testGlobalSearch() {
       const historyResponse = await axios.get(`${API_URL}/search/history`, authConfig)
 
       console.log(`   Dernières recherches:`)
-      historyResponse.data.data.slice(0, 5).forEach((item: any, index: number) => {
+      historyResponse.data.data.slice(0, 5).forEach((item: unknown, index: number) => {
         console.log(`   ${index + 1}. "${item.query}" - ${item.timestamp}`)
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`   ❌ Erreur:`, error.response?.data?.message || error.message)
     }
 
     console.log('\n\n✅ Tests terminés avec succès!')
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Erreur générale:', error.message)
     if (error.response) {
       console.error('   Détails:', error.response.data)

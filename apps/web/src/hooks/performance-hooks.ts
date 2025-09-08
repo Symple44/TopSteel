@@ -37,15 +37,15 @@ interface RenderMetrics {
 export function usePerformanceMonitor(componentName: string) {
   const metricsRef = useRef<PerformanceMetric[]>([])
   const renderCountRef = useRef(0)
-  const lastRenderRef = useRef(performance.now())
+  const lastRenderRef = useRef(performance?.now())
 
   const startMeasure = useCallback(
     (measureName: string) => {
-      const startTime = performance.now()
+      const startTime = performance?.now()
 
       return {
         end: () => {
-          const endTime = performance.now()
+          const endTime = performance?.now()
           const duration = endTime - startTime
 
           const metric: PerformanceMetric = {
@@ -55,11 +55,11 @@ export function usePerformanceMonitor(componentName: string) {
             memory: (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize,
           }
 
-          metricsRef.current.push(metric)
+          metricsRef?.current?.push(metric)
 
           // Garder seulement les 100 dernières mesures
-          if (metricsRef.current.length > 100) {
-            metricsRef.current.shift()
+          if (metricsRef?.current?.length > 100) {
+            metricsRef?.current?.shift()
           }
 
           // Log si c'est lent
@@ -74,28 +74,37 @@ export function usePerformanceMonitor(componentName: string) {
   )
 
   const getMetrics = useCallback(() => {
-    const now = performance.now()
-    const currentRenderTime = now - lastRenderRef.current
+    const now = performance?.now()
+    const currentRenderTime = now - lastRenderRef?.current
 
-    renderCountRef.current++
-    lastRenderRef.current = now
+    if (renderCountRef.current !== undefined) {
+      renderCountRef.current++
+    }
+    if (lastRenderRef.current !== undefined) {
+      lastRenderRef.current = now
+    }
 
     return {
       componentName,
       renderCount: renderCountRef.current,
       lastRenderTime: currentRenderTime,
-      totalMetrics: metricsRef.current.length,
+      totalMetrics: metricsRef?.current?.length,
       averageOperationTime:
-        metricsRef.current.length > 0
-          ? metricsRef.current.reduce((acc, m) => acc + m.duration, 0) / metricsRef.current.length
+        metricsRef?.current?.length > 0
+          ? metricsRef?.current?.reduce((acc, m) => acc + m.duration, 0) /
+            metricsRef?.current?.length
           : 0,
-      slowOperations: metricsRef.current.filter((m) => m.duration > 16).length,
+      slowOperations: metricsRef?.current?.filter((m) => m.duration > 16).length,
     }
   }, [componentName])
 
   const clearMetrics = useCallback(() => {
-    metricsRef.current = []
-    renderCountRef.current = 0
+    if (metricsRef.current) {
+      metricsRef.current = []
+    }
+    if (renderCountRef.current !== undefined) {
+      renderCountRef.current = 0
+    }
   }, [])
 
   return {
@@ -115,7 +124,7 @@ export function useRenderOptimization<T>(
     equalityFn?: (prev: T, next: T) => boolean
   } = {}
 ) {
-  const { name = 'unknown', logChanges = false, equalityFn = shallow } = options
+  const { name = 'unknown', logChanges = false, equalityFn = shallow } = options || {}
 
   const prevValueRef = useRef<T>(value)
   const renderCountRef = useRef(0)
@@ -130,11 +139,11 @@ export function useRenderOptimization<T>(
         reason: `Value changed in ${name}`,
       }
 
-      changesRef.current.push(changeInfo)
+      changesRef?.current?.push(changeInfo)
 
       // Garder seulement les 50 derniers changements
-      if (changesRef.current.length > 50) {
-        changesRef.current.shift()
+      if (changesRef?.current?.length > 50) {
+        changesRef?.current?.shift()
       }
 
       if (logChanges) {
@@ -142,7 +151,9 @@ export function useRenderOptimization<T>(
     }
 
     prevValueRef.current = value
-    renderCountRef.current++
+    if (renderCountRef?.current !== undefined) {
+      renderCountRef.current++
+    }
 
     return changed
   }, [value, name, logChanges, equalityFn])
@@ -151,12 +162,12 @@ export function useRenderOptimization<T>(
     () => ({
       name,
       renderCount: renderCountRef.current,
-      changeCount: changesRef.current.length,
-      lastChange: changesRef.current[changesRef.current.length - 1],
-      unnecessaryRenders: Math.max(0, renderCountRef.current - changesRef.current.length),
+      changeCount: changesRef?.current?.length,
+      lastChange: changesRef.current[changesRef?.current?.length - 1],
+      unnecessaryRenders: Math.max(0, renderCountRef.current - changesRef?.current?.length),
       optimizationRatio:
-        changesRef.current.length > 0
-          ? (changesRef.current.length / renderCountRef.current) * 100
+        changesRef?.current?.length > 0
+          ? (changesRef?.current?.length / renderCountRef?.current) * 100
           : 100,
     }),
     [name]
@@ -180,7 +191,7 @@ export function useOptimizedDebounce<T>(
     equalityFn?: (prev: T, next: T) => boolean
   } = {}
 ) {
-  const { leading = false, trailing = true, maxWait, equalityFn = Object.is } = options
+  const { leading = false, trailing = true, maxWait, equalityFn = Object.is } = options || {}
 
   const [debouncedValue, setDebouncedValue] = useState(value)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -190,82 +201,102 @@ export function useOptimizedDebounce<T>(
 
   useEffect(() => {
     // Ne pas debouncer si la valeur n'a pas changé
-    if (equalityFn(lastValueRef.current, value)) {
-      return
+    if (equalityFn(lastValueRef?.current, value)) {
+      return undefined
     }
 
     const now = Date.now()
 
-    lastCallTimeRef.current = now
-    lastValueRef.current = value
+    if (lastCallTimeRef.current !== undefined) {
+      lastCallTimeRef.current = now
+    }
+    if (lastValueRef.current !== undefined) {
+      lastValueRef.current = value
+    }
 
     // Exécution immédiate (leading edge)
-    if (leading && !timeoutRef.current) {
+    if (leading && !timeoutRef?.current) {
       setDebouncedValue(value)
     }
 
     // Nettoyer les timeouts existants
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+    if (timeoutRef?.current) {
+      clearTimeout(timeoutRef?.current)
     }
 
     // Timeout pour trailing edge
     if (trailing) {
-      timeoutRef.current = setTimeout(() => {
-        setDebouncedValue(value)
-        timeoutRef.current = null
+      if (timeoutRef.current !== undefined) {
+        timeoutRef.current = setTimeout(() => {
+          setDebouncedValue(value)
+          if (timeoutRef.current !== undefined) {
+            timeoutRef.current = null
+          }
 
-        if (maxTimeoutRef.current) {
-          clearTimeout(maxTimeoutRef.current)
-          maxTimeoutRef.current = null
-        }
-      }, delay)
+          if (maxTimeoutRef.current) {
+            clearTimeout(maxTimeoutRef.current)
+            if (maxTimeoutRef.current !== undefined) {
+              maxTimeoutRef.current = null
+            }
+          }
+        }, delay)
+      }
     }
 
     // MaxWait timeout
-    if (maxWait && !maxTimeoutRef.current) {
-      maxTimeoutRef.current = setTimeout(() => {
-        setDebouncedValue(value)
+    if (maxWait && !maxTimeoutRef?.current) {
+      if (maxTimeoutRef.current !== undefined) {
+        maxTimeoutRef.current = setTimeout(() => {
+          setDebouncedValue(value)
 
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-          timeoutRef.current = null
-        }
-        maxTimeoutRef.current = null
-      }, maxWait)
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+            if (timeoutRef.current !== undefined) {
+              timeoutRef.current = null
+            }
+          }
+          if (maxTimeoutRef.current !== undefined) {
+            maxTimeoutRef.current = null
+          }
+        }, maxWait)
+      }
     }
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+      if (timeoutRef?.current) {
+        clearTimeout(timeoutRef?.current)
       }
-      if (maxTimeoutRef.current) {
-        clearTimeout(maxTimeoutRef.current)
+      if (maxTimeoutRef?.current) {
+        clearTimeout(maxTimeoutRef?.current)
       }
     }
   }, [value, delay, leading, trailing, maxWait, equalityFn])
 
   const cancel = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
+    if (timeoutRef?.current) {
+      clearTimeout(timeoutRef?.current)
+      if (timeoutRef.current !== undefined) {
+        timeoutRef.current = null
+      }
     }
     if (maxTimeoutRef.current) {
       clearTimeout(maxTimeoutRef.current)
-      maxTimeoutRef.current = null
+      if (maxTimeoutRef.current !== undefined) {
+        maxTimeoutRef.current = null
+      }
     }
   }, [])
 
   const flush = useCallback(() => {
     cancel()
-    setDebouncedValue(lastValueRef.current)
+    setDebouncedValue(lastValueRef?.current)
   }, [cancel])
 
   return {
     debouncedValue,
     cancel,
     flush,
-    isPending: !!timeoutRef.current,
+    isPending: !!timeoutRef?.current,
   }
 }
 
@@ -273,7 +304,7 @@ export function useOptimizedDebounce<T>(
 export function useIntelligentCache<K, V>(
   options: { maxSize?: number; ttl?: number; onEvict?: (key: K, value: V) => void } = {}
 ) {
-  const { maxSize = 100, ttl = 300000, onEvict } = options // 5 minutes par défaut
+  const { maxSize = 100, ttl = 300000, onEvict } = options || {} // 5 minutes par défaut
 
   const cacheRef = useRef(
     new Map<
@@ -290,44 +321,46 @@ export function useIntelligentCache<K, V>(
 
   const get = useCallback(
     (key: K): V | undefined => {
-      const cache = cacheRef.current
-      const entry = cache.get(key)
+      const cache = cacheRef?.current
+      const entry = cache?.get(key)
 
       if (!entry) return undefined
 
       const now = Date.now()
 
       // Vérifier la validité du cache
-      if (ttl && now - entry.timestamp > ttl) {
-        cache.delete(key)
-        setCacheSize(cache.size)
+      if (ttl && now - entry?.timestamp > ttl) {
+        cache?.delete(key)
+        setCacheSize(cache?.size)
 
         return undefined
       }
 
       // Mettre à jour les statistiques d'accès
-      entry.hitCount++
-      entry.lastAccess = now
+      if (entry) {
+        entry.hitCount++
+        entry.lastAccess = now
+      }
 
-      return entry.value
+      return entry?.value
     },
     [ttl]
   )
 
   const set = useCallback(
     (key: K, value: V): void => {
-      const cache = cacheRef.current
+      const cache = cacheRef?.current
       const now = Date.now()
 
       // Supprimer l'ancienne entrée si elle existe
-      const existingEntry = cache.get(key)
+      const existingEntry = cache?.get(key)
 
       if (existingEntry && onEvict) {
-        onEvict(key, existingEntry.value)
+        onEvict(key, existingEntry?.value)
       }
 
       // Vérifier la taille du cache
-      if (cache.size >= maxSize && !cache.has(key)) {
+      if (cache?.size >= maxSize && !cache?.has(key)) {
         // Éviction LRU (Least Recently Used)
         let lruKey: K | undefined
 
@@ -345,35 +378,35 @@ export function useIntelligentCache<K, V>(
 
           cache.delete(lruKey)
           if (evictedEntry && onEvict) {
-            onEvict(lruKey, evictedEntry.value)
+            onEvict(lruKey, evictedEntry?.value)
           }
         }
       }
 
       // Ajouter la nouvelle entrée
-      cache.set(key, {
+      cache?.set(key, {
         value,
         timestamp: now,
         hitCount: 0,
         lastAccess: now,
       })
 
-      setCacheSize(cache.size)
+      setCacheSize(cache?.size)
     },
     [maxSize, onEvict]
   )
 
   const remove = useCallback(
     (key: K): boolean => {
-      const cache = cacheRef.current
-      const entry = cache.get(key)
-      const deleted = cache.delete(key)
+      const cache = cacheRef?.current
+      const entry = cache?.get(key)
+      const deleted = cache?.delete(key)
 
       if (deleted && entry && onEvict) {
-        onEvict(key, entry.value)
+        onEvict(key, entry?.value)
       }
 
-      setCacheSize(cache.size)
+      setCacheSize(cache?.size)
 
       return deleted
     },
@@ -381,7 +414,7 @@ export function useIntelligentCache<K, V>(
   )
 
   const clear = useCallback(() => {
-    const cache = cacheRef.current
+    const cache = cacheRef?.current
 
     if (onEvict) {
       for (const [key, entry] of cache.entries()) {
@@ -394,7 +427,7 @@ export function useIntelligentCache<K, V>(
   }, [onEvict])
 
   const getStats = useCallback(() => {
-    const cache = cacheRef.current
+    const cache = cacheRef?.current
     const now = Date.now()
     let totalHits = 0
     let expiredEntries = 0
@@ -417,11 +450,11 @@ export function useIntelligentCache<K, V>(
 
   // Nettoyage automatique des entrées expirées
   useEffect(() => {
-    if (!ttl) return
+    if (!ttl) return undefined
 
     const interval = setInterval(
       () => {
-        const cache = cacheRef.current
+        const cache = cacheRef?.current
         const now = Date.now()
         const keysToDelete: K[] = []
 
@@ -434,14 +467,14 @@ export function useIntelligentCache<K, V>(
         for (const key of keysToDelete) {
           const entry = cache.get(key)
 
-          cache.delete(key)
+          cache?.delete(key)
           if (entry && onEvict) {
-            onEvict(key, entry.value)
+            onEvict(key, entry?.value)
           }
         }
 
         if (keysToDelete.length > 0) {
-          setCacheSize(cache.size)
+          setCacheSize(cache?.size)
         }
       },
       Math.min(ttl / 4, 60000)
@@ -466,13 +499,13 @@ export function useSelectorPerformanceMonitor() {
 
   const wrapSelector = useCallback(<T, R>(name: string, selector: (state: T) => R) => {
     return (state: T): R => {
-      const start = performance.now()
+      const start = performance?.now()
 
       try {
         const result = selector(state)
-        const duration = performance.now() - start
+        const duration = performance?.now() - start
 
-        const metrics = metricsRef.current.get(name) || {
+        const metrics = metricsRef?.current?.get(name) || {
           calls: 0,
           totalTime: 0,
           averageTime: 0,
@@ -482,14 +515,16 @@ export function useSelectorPerformanceMonitor() {
           lastCall: 0,
         }
 
-        metrics.calls++
-        metrics.totalTime += duration
-        metrics.averageTime = metrics.totalTime / metrics.calls
+        if (metrics) {
+          metrics.calls++
+          metrics.totalTime += duration
+          metrics.averageTime = metrics.totalTime / metrics.calls
+        }
         metrics.maxTime = Math.max(metrics.maxTime, duration)
         metrics.minTime = Math.min(metrics.minTime, duration)
         metrics.lastCall = Date.now()
 
-        metricsRef.current.set(name, metrics)
+        metricsRef?.current?.set(name, metrics)
 
         // Log si c'est lent
         if (duration > 1) {
@@ -497,7 +532,7 @@ export function useSelectorPerformanceMonitor() {
 
         return result
       } catch (error) {
-        const metrics = metricsRef.current.get(name) || {
+        const metrics = metricsRef?.current?.get(name) || {
           calls: 0,
           totalTime: 0,
           averageTime: 0,
@@ -507,8 +542,10 @@ export function useSelectorPerformanceMonitor() {
           lastCall: 0,
         }
 
-        metrics.errors++
-        metricsRef.current.set(name, metrics)
+        if (metrics) {
+          metrics.errors++
+        }
+        metricsRef?.current?.set(name, metrics)
         throw error
       }
     }
@@ -516,21 +553,21 @@ export function useSelectorPerformanceMonitor() {
 
   const getMetrics = useCallback((name?: string) => {
     if (name) {
-      return metricsRef.current.get(name) || null
+      return metricsRef?.current?.get(name) || null
     }
 
-    return Object.fromEntries(metricsRef.current.entries())
+    return Object.fromEntries(metricsRef?.current?.entries())
   }, [])
 
   const getTopSlowSelectors = useCallback((limit = 5) => {
-    return Array.from(metricsRef.current.entries())
+    return Array.from(metricsRef?.current?.entries())
       .sort(([, a], [, b]) => b.averageTime - a.averageTime)
       .slice(0, limit)
       .map(([name, metrics]) => ({ name, ...metrics }))
   }, [])
 
   const clearMetrics = useCallback(() => {
-    metricsRef.current.clear()
+    metricsRef?.current?.clear()
   }, [])
 
   return {
@@ -550,9 +587,9 @@ export function useMemoryLeakDetector(componentName: string) {
     const interval = setInterval(() => {
       const memoryAPI = (performance as { memory?: { usedJSHeapSize: number } }).memory
       if (memoryAPI) {
-        const memoryUsage = memoryAPI.usedJSHeapSize
+        const memoryUsage = memoryAPI?.usedJSHeapSize
 
-        memorySnapshotsRef.current.push({
+        memorySnapshotsRef?.current?.push({
           timestamp: Date.now(),
           memory: memoryUsage,
         })
@@ -560,14 +597,14 @@ export function useMemoryLeakDetector(componentName: string) {
         // Garder seulement les mesures des 5 dernières minutes
         const fiveMinutesAgo = Date.now() - 300000
 
-        memorySnapshotsRef.current = memorySnapshotsRef.current.filter(
+        memorySnapshotsRef.current = memorySnapshotsRef?.current?.filter(
           (snapshot) => snapshot.timestamp > fiveMinutesAgo
         )
 
         // Détecter une croissance anormale de la mémoire
-        if (memorySnapshotsRef.current.length >= 10) {
-          const recent = memorySnapshotsRef.current.slice(-10)
-          const growth = recent[recent.length - 1].memory - recent[0].memory
+        if (memorySnapshotsRef?.current?.length >= 10) {
+          const recent = memorySnapshotsRef?.current?.slice(-10)
+          const growth = recent?.[recent?.length - 1]?.memory - recent?.[0]?.memory
 
           if (growth > 50 * 1024 * 1024) {
           }
@@ -579,18 +616,18 @@ export function useMemoryLeakDetector(componentName: string) {
   }, [])
 
   const getMemoryStats = useCallback(() => {
-    if (memorySnapshotsRef.current.length === 0) return null
+    if (memorySnapshotsRef?.current?.length === 0) return null
 
-    const latest = memorySnapshotsRef.current[memorySnapshotsRef.current.length - 1]
-    const oldest = memorySnapshotsRef.current[0]
-    const growth = latest.memory - oldest.memory
+    const latest = memorySnapshotsRef.current[memorySnapshotsRef?.current?.length - 1]
+    const oldest = memorySnapshotsRef.current?.[0]
+    const growth = latest?.memory - oldest?.memory
 
     return {
       componentName,
       currentMemory: latest.memory,
       memoryGrowth: growth,
       uptime: Date.now() - mountTimeRef.current,
-      snapshots: memorySnapshotsRef.current.length,
+      snapshots: memorySnapshotsRef?.current?.length,
     }
   }, [componentName])
 

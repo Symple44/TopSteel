@@ -14,7 +14,7 @@ export class WebhookEvent {
   societeId!: string
 
   @Column('jsonb')
-  data!: Record<string, any>
+  data!: Record<string, unknown>
 
   @Column('jsonb', { nullable: true })
   metadata?: {

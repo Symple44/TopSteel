@@ -1,14 +1,23 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { RefreshCw, Check, X, AlertCircle, Hash, Copy, Eye, EyeOff } from 'lucide-react'
+import { AlertCircle, Check, Copy, Eye, EyeOff, Hash, RefreshCw, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../primitives/tooltip'
 export type ReferenceFormat = 'auto' | 'numeric' | 'alphanumeric' | 'custom'
-export type ReferenceType = 'order' | 'invoice' | 'quote' | 'material' | 'project' | 'client' | 'supplier' | 'generic'
+export type ReferenceType =
+  | 'order'
+  | 'invoice'
+  | 'quote'
+  | 'material'
+  | 'project'
+  | 'client'
+  | 'supplier'
+  | 'generic'
 export interface ReferenceConfig {
   prefix?: string
   suffix?: string
@@ -75,6 +84,7 @@ export function ReferenceInput({
   loading = false,
   className,
 }: ReferenceInputProps) {
+  const ids = useFormFieldIds(['referenceInput'])
   const [internalValue, setInternalValue] = useState(value)
   const [validation, setValidation] = useState<ReferenceValidation>({ isValid: true })
   const [isValidating, setIsValidating] = useState(false)
@@ -82,131 +92,148 @@ export function ReferenceInput({
   const [isCheckingUniqueness, setIsCheckingUniqueness] = useState(false)
   const [showPreviewMode, setShowPreviewMode] = useState(false)
   const [previewValue, setPreviewValue] = useState('')
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
   useEffect(() => {
     setInternalValue(value)
   }, [value])
+
+  const generateReference = useCallback(
+    async (refConfig: ReferenceConfig): Promise<string> => {
+      if (onGenerate) {
+        return await onGenerate(refConfig)
+      }
+      // Default generation logic
+      let reference = ''
+      const now = new Date()
+      // Add prefix
+      if (refConfig.prefix) {
+        reference += refConfig.prefix
+      }
+      // Add year
+      if (refConfig.yearFormat !== 'none') {
+        const year =
+          refConfig.yearFormat === 'YY'
+            ? now.getFullYear().toString().slice(-2)
+            : now.getFullYear().toString()
+        reference += year
+      }
+      // Add separator
+      if (refConfig.separator && reference) {
+        reference += refConfig.separator
+      }
+      // Add counter/number part
+      const counter = refConfig.counter || Math.floor(Math.random() * 10000) + 1
+      if (refConfig.format === 'numeric') {
+        const numberPart = refConfig.padWithZeros
+          ? counter.toString().padStart(refConfig.length || 6, '0')
+          : counter.toString()
+        reference += numberPart
+      } else if (refConfig.format === 'alphanumeric') {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        const randomPart = Array.from({ length: refConfig.length || 6 }, () =>
+          chars.charAt(Math.floor(Math.random() * chars.length))
+        ).join('')
+        reference += randomPart
+      } else if (refConfig.format === 'custom' && refConfig.pattern) {
+        // Simple pattern replacement
+        reference += refConfig.pattern
+          .replace(/N/g, () => Math.floor(Math.random() * 10).toString())
+          .replace(/A/g, () => String.fromCharCode(65 + Math.floor(Math.random() * 26)))
+      }
+      // Add suffix
+      if (refConfig.suffix) {
+        reference += refConfig.suffix
+      }
+      return reference
+    },
+    [onGenerate]
+  )
+
+  const generatePreview = useCallback(async () => {
+    if (!config) return
+    const preview = await generateReference(config)
+    setPreviewValue(preview)
+  }, [config, generateReference])
+
   // Auto-generate preview when config changes
   useEffect(() => {
     if (showPreview && !internalValue) {
       generatePreview()
     }
-  }, [config, showPreview])
-  const generatePreview = useCallback(async () => {
-    if (!config) return
-    const preview = await generateReference(config)
-    setPreviewValue(preview)
-  }, [config])
-  const generateReference = useCallback(async (refConfig: ReferenceConfig): Promise<string> => {
-    if (onGenerate) {
-      return await onGenerate(refConfig)
-    }
-    // Default generation logic
-    let reference = ''
-    const now = new Date()
-    // Add prefix
-    if (refConfig.prefix) {
-      reference += refConfig.prefix
-    }
-    // Add year
-    if (refConfig.yearFormat !== 'none') {
-      const year = refConfig.yearFormat === 'YY' 
-        ? now.getFullYear().toString().slice(-2)
-        : now.getFullYear().toString()
-      reference += year
-    }
-    // Add separator
-    if (refConfig.separator && reference) {
-      reference += refConfig.separator
-    }
-    // Add counter/number part
-    const counter = refConfig.counter || Math.floor(Math.random() * 10000) + 1
-    if (refConfig.format === 'numeric') {
-      const numberPart = refConfig.padWithZeros 
-        ? counter.toString().padStart(refConfig.length || 6, '0')
-        : counter.toString()
-      reference += numberPart
-    } else if (refConfig.format === 'alphanumeric') {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-      const randomPart = Array.from({ length: refConfig.length || 6 }, () => 
-        chars.charAt(Math.floor(Math.random() * chars.length))
-      ).join('')
-      reference += randomPart
-    } else if (refConfig.format === 'custom' && refConfig.pattern) {
-      // Simple pattern replacement
-      reference += refConfig.pattern
-        .replace(/N/g, () => Math.floor(Math.random() * 10).toString())
-        .replace(/A/g, () => String.fromCharCode(65 + Math.floor(Math.random() * 26)))
-    }
-    // Add suffix
-    if (refConfig.suffix) {
-      reference += refConfig.suffix
-    }
-    return reference
-  }, [onGenerate])
-  const validateReference = useCallback(async (ref: string): Promise<ReferenceValidation> => {
-    if (onValidate) {
-      return await onValidate(ref)
-    }
-    // Default validation logic
-    if (!ref) {
-      return { isValid: !required, error: required ? 'Référence requise' : undefined }
-    }
-    if (config.pattern) {
-      const regex = new RegExp(config.pattern)
-      if (!regex.test(ref)) {
-        return { 
-          isValid: false, 
-          error: 'Format de référence invalide',
-          suggestions: ['Utilisez le générateur pour créer une référence valide']
-        }
+  }, [showPreview, generatePreview, internalValue])
+
+  const validateReference = useCallback(
+    async (ref: string): Promise<ReferenceValidation> => {
+      if (onValidate) {
+        return await onValidate(ref)
       }
-    }
-    if (config.length && ref.length !== config.length) {
-      return {
-        isValid: false,
-        error: `La référence doit faire ${config.length} caractères`
+      // Default validation logic
+      if (!ref) {
+        return { isValid: !required, error: required ? 'Référence requise' : undefined }
       }
-    }
-    return { isValid: true }
-  }, [onValidate, config, required])
-  const checkReferenceUniqueness = useCallback(async (ref: string): Promise<boolean> => {
-    if (onCheckUniqueness) {
-      return await onCheckUniqueness(ref)
-    }
-    // Default: assume unique (in real implementation, this would check database)
-    return true
-  }, [onCheckUniqueness])
-  const handleValueChange = useCallback((newValue: string) => {
-    setInternalValue(newValue)
-    onChange?.(newValue)
-    if (validateOnChange) {
-      // Debounce validation
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-      debounceRef.current = setTimeout(() => {
-        validateReference(newValue).then(setValidation)
-      }, 300)
-    }
-    if (checkUniqueness && newValue) {
-      // Debounce uniqueness check
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-      debounceRef.current = setTimeout(async () => {
-        setIsCheckingUniqueness(true)
-        const isUnique = await checkReferenceUniqueness(newValue)
-        if (!isUnique) {
-          setValidation({
+      if (config.pattern) {
+        const regex = new RegExp(config.pattern)
+        if (!regex.test(ref)) {
+          return {
             isValid: false,
-            error: 'Cette référence existe déjà'
-          })
+            error: 'Format de référence invalide',
+            suggestions: ['Utilisez le générateur pour créer une référence valide'],
+          }
         }
-        setIsCheckingUniqueness(false)
-      }, 500)
-    }
-  }, [onChange, validateOnChange, checkUniqueness, validateReference, checkReferenceUniqueness])
+      }
+      if (config.length && ref.length !== config.length) {
+        return {
+          isValid: false,
+          error: `La référence doit faire ${config.length} caractères`,
+        }
+      }
+      return { isValid: true }
+    },
+    [onValidate, config, required]
+  )
+  const checkReferenceUniqueness = useCallback(
+    async (ref: string): Promise<boolean> => {
+      if (onCheckUniqueness) {
+        return await onCheckUniqueness(ref)
+      }
+      // Default: assume unique (in real implementation, this would check database)
+      return true
+    },
+    [onCheckUniqueness]
+  )
+  const handleValueChange = useCallback(
+    (newValue: string) => {
+      setInternalValue(newValue)
+      onChange?.(newValue)
+      if (validateOnChange) {
+        // Debounce validation
+        if (debounceRef.current) {
+          clearTimeout(debounceRef.current)
+        }
+        debounceRef.current = setTimeout(() => {
+          validateReference(newValue).then(setValidation)
+        }, 300)
+      }
+      if (checkUniqueness && newValue) {
+        // Debounce uniqueness check
+        if (debounceRef.current) {
+          clearTimeout(debounceRef.current)
+        }
+        debounceRef.current = setTimeout(async () => {
+          setIsCheckingUniqueness(true)
+          const isUnique = await checkReferenceUniqueness(newValue)
+          if (!isUnique) {
+            setValidation({
+              isValid: false,
+              error: 'Cette référence existe déjà',
+            })
+          }
+          setIsCheckingUniqueness(false)
+        }, 500)
+      }
+    },
+    [onChange, validateOnChange, checkUniqueness, validateReference, checkReferenceUniqueness]
+  )
   const handleBlur = useCallback(async () => {
     if (validateOnBlur) {
       setIsValidating(true)
@@ -225,8 +252,7 @@ export function ReferenceInput({
       // Validate generated reference
       const result = await validateReference(generated)
       setValidation(result)
-    } catch (error) {
-      console.error('Error generating reference:', error)
+    } catch (_error) {
     } finally {
       setIsGenerating(false)
     }
@@ -234,9 +260,7 @@ export function ReferenceInput({
   const handleCopyToClipboard = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(internalValue)
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error)
-    }
+    } catch (_error) {}
   }, [internalValue])
   const handleUsePreview = useCallback(() => {
     if (previewValue) {
@@ -254,7 +278,7 @@ export function ReferenceInput({
       project: 'PROJ',
       client: 'CLI',
       supplier: 'FOUR',
-      generic: 'REF'
+      generic: 'REF',
     }
     return prefixes[type]
   }
@@ -263,7 +287,7 @@ export function ReferenceInput({
     <div className={cn('space-y-2', className)}>
       {label && (
         <div className="flex items-center justify-between">
-          <Label htmlFor="reference-input">
+          <Label htmlFor={ids.referenceInput}>
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </Label>
@@ -315,7 +339,7 @@ export function ReferenceInput({
       )}
       <div className="relative">
         <Input
-          id="reference-input"
+          id={ids.referenceInput}
           type="text"
           value={internalValue}
           onChange={(e) => handleValueChange(e.target.value)}

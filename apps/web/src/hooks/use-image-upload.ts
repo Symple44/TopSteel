@@ -38,16 +38,16 @@ export function useImageUpload({
       if (file.size > maxFileSize) {
         const error = `File size exceeds ${Math.round(maxFileSize / 1024 / 1024)}MB`
         onError?.(error)
-        toast.error(error)
+        toast?.error(error)
         return null
       }
 
       // Validation du type
       const allowedFileTypes = allowedTypes || ['image/jpeg', 'image/png', 'image/webp']
-      if (!allowedFileTypes.includes(file.type)) {
+      if (!allowedFileTypes?.includes(file.type)) {
         const error = 'Invalid file type'
         onError?.(error)
-        toast.error(error)
+        toast?.error(error)
         return null
       }
 
@@ -56,14 +56,14 @@ export function useImageUpload({
 
       try {
         const formData = new FormData()
-        formData.append('file', file)
-        formData.append('category', category)
+        formData?.append('file', file)
+        formData?.append('category', category)
 
-        if (entityType) formData.append('entityType', entityType)
-        if (entityId) formData.append('entityId', entityId)
-        if (options.alt) formData.append('alt', options.alt)
-        if (options.description) formData.append('description', options.description)
-        if (options.tags) formData.append('tags', options.tags.join(','))
+        if (entityType) formData?.append('entityType', entityType)
+        if (entityId) formData?.append('entityId', entityId)
+        if (options.alt) formData?.append('alt', options.alt)
+        if (options.description) formData?.append('description', options.description)
+        if (options.tags) formData?.append('tags', options?.tags?.join(','))
 
         // Simulation du progrès d'upload
         const progressInterval = setInterval(() => {
@@ -78,19 +78,19 @@ export function useImageUpload({
         clearInterval(progressInterval)
         setUploadProgress(100)
 
-        const result = await response.json()
+        const result = await response?.json()
 
-        if (!response.ok) {
-          throw new Error(result.error || 'Upload failed')
+        if (!response?.ok) {
+          throw new Error(result?.error || 'Upload failed')
         }
 
-        onSuccess?.(result.data)
-        toast.success('Image uploaded successfully')
-        return result.data
+        onSuccess?.(result?.data)
+        toast?.success('Image uploaded successfully')
+        return result?.data
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Upload failed'
+        const errorMessage = error instanceof Error ? error?.message : 'Upload failed'
         onError?.(errorMessage)
-        toast.error(errorMessage)
+        toast?.error(errorMessage)
         return null
       } finally {
         setIsUploading(false)
@@ -110,17 +110,17 @@ export function useImageUpload({
           }
         )
 
-        const result = await response.json()
+        const result = await response?.json()
 
-        if (!response.ok) {
-          throw new Error(result.error || 'Delete failed')
+        if (!response?.ok) {
+          throw new Error(result?.error || 'Delete failed')
         }
 
-        toast.success('Image deleted successfully')
+        toast?.success('Image deleted successfully')
         return true
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Delete failed'
-        toast.error(errorMessage)
+        const errorMessage = error instanceof Error ? error?.message : 'Delete failed'
+        toast?.error(errorMessage)
         return false
       }
     },

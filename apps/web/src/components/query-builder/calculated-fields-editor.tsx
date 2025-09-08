@@ -60,7 +60,7 @@ export function CalculatedFieldsEditor({
   }
 
   const handleDelete = (index: number) => {
-    onFieldsChange(fields.filter((_, i) => i !== index))
+    onFieldsChange(fields?.filter((_, i) => i !== index))
   }
 
   const handleSave = () => {
@@ -72,7 +72,7 @@ export function CalculatedFieldsEditor({
     }
 
     if (editingField) {
-      const index = fields.findIndex((f) => f === editingField)
+      const index = fields?.indexOf(editingField)
       const newFields = [...fields]
       newFields[index] = newField
       onFieldsChange(newFields)
@@ -110,7 +110,7 @@ export function CalculatedFieldsEditor({
         </div>
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingField(null)}>
+            <Button type="button" onClick={() => setEditingField(null)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Calculated Field
             </Button>
@@ -125,7 +125,7 @@ export function CalculatedFieldsEditor({
                   <Label>Field Name</Label>
                   <Input
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, name: e?.target?.value })}
                     placeholder="total_price"
                   />
                 </div>
@@ -133,7 +133,7 @@ export function CalculatedFieldsEditor({
                   <Label>Display Label</Label>
                   <Input
                     value={formData.label}
-                    onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, label: e?.target?.value })}
                     placeholder="Total Price"
                   />
                 </div>
@@ -143,7 +143,7 @@ export function CalculatedFieldsEditor({
                 <Label>Description</Label>
                 <Input
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, description: e?.target?.value })}
                   placeholder="Optional description"
                 />
               </div>
@@ -170,7 +170,7 @@ export function CalculatedFieldsEditor({
                 <Label>Expression</Label>
                 <Textarea
                   value={formData.expression}
-                  onChange={(e) => setFormData({ ...formData, expression: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, expression: e?.target?.value })}
                   placeholder="[quantity] * [unit_price]"
                   rows={4}
                   className="font-mono text-sm"
@@ -181,15 +181,15 @@ export function CalculatedFieldsEditor({
                     <p className="text-sm font-medium">Available columns (click to insert):</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {columns.map((col) => (
+                    {columns?.map((col) => (
                       <Badge
-                        key={col.alias}
+                        key={col.name}
                         variant="outline"
                         className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
-                        onClick={() => handleInsertColumn(col.alias)}
+                        onClick={() => handleInsertColumn(col.name)}
                       >
-                        {col.label}
-                        <span className="ml-1 text-xs opacity-70">({col.dataType})</span>
+                        {col.label || col.name}
+                        <span className="ml-1 text-xs opacity-70">({col.type})</span>
                       </Badge>
                     ))}
                   </div>
@@ -207,10 +207,12 @@ export function CalculatedFieldsEditor({
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowDialog(false)}>
+                <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSave}>{editingField ? 'Update' : 'Create'} Field</Button>
+                <Button type="button" onClick={handleSave}>
+                  {editingField ? 'Update' : 'Create'} Field
+                </Button>
               </div>
             </div>
           </DialogContent>
@@ -228,7 +230,7 @@ export function CalculatedFieldsEditor({
             </CardContent>
           </Card>
         ) : (
-          fields.map((field, index) => (
+          fields?.map((field, index) => (
             <Card key={field.name} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
@@ -256,10 +258,20 @@ export function CalculatedFieldsEditor({
                     </div>
                   </div>
                   <div className="flex items-center gap-1 ml-4">
-                    <Button size="sm" variant="ghost" onClick={() => handleEdit(field)}>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleEdit(field)}
+                    >
                       <Edit2 className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleDelete(index)}>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(index)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

@@ -3,7 +3,7 @@ import { imageElasticsearchMapping } from './mappings/images'
 
 export interface MigrationConfig {
   indexName: string
-  mapping: Record<string, any>
+  mapping: Record<string, unknown>
   version: string
   description: string
 }
@@ -124,7 +124,7 @@ export class ElasticsearchMigrationService {
         const searchStats = stats as any
         health[indexName] = {
           exists: true,
-          documentCount: searchStats.hits?.total?.value || 0,
+          documentCount: searchStats?.hits?.total?.value || 0,
           status: 'healthy',
         }
       } catch (error) {

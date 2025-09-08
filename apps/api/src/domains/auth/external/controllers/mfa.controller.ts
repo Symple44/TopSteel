@@ -146,7 +146,7 @@ export class MFAController {
       const userId = req.user.sub
       const userEmail = (req.user as { id?: string; sub?: string; email?: string }).email
 
-      const result = await this.mfaService.setupTOTP(userId, userEmail, body.phoneNumber)
+      const result = await this.mfaService.setupTOTP(userId, userEmail || '', body.phoneNumber)
 
       if (!result.success) {
         throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
@@ -311,7 +311,7 @@ export class MFAController {
       const userId = req.user.sub
       const userEmail = (req.user as { id?: string; sub?: string; email?: string }).email
 
-      const result = await this.mfaService.setupWebAuthn(userId, userEmail, body.userName)
+      const result = await this.mfaService.setupWebAuthn(userId, userEmail || '', body.userName)
 
       if (!result.success) {
         throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
@@ -339,15 +339,18 @@ export class MFAController {
    * Vérifier et ajouter une clé WebAuthn
    */
   @Post('verify/webauthn')
-  async verifyWebAuthn(@Request() req: { user: { sub: string } }, @Body() body: VerifyWebAuthnDto) {
+  async verifyWebAuthn(
+    @Request() req: { user: { sub: string }; headers: Record<string, string> },
+    @Body() body: VerifyWebAuthnDto
+  ) {
     try {
       const userId = req.user.sub
-      const userAgent = (req as any).headers['user-agent']
+      const userAgent = req.headers['user-agent']
 
       const result = await this.mfaService.verifyAndAddWebAuthn(
         userId,
         body.mfaId,
-        body.response as any,
+        body.response as Record<string, unknown>,
         body.deviceName,
         userAgent
       )
@@ -409,7 +412,7 @@ export class MFAController {
       const result = await this.mfaService.verifyMFA(
         body.sessionToken,
         body.code,
-        body.webauthnResponse as any
+        body.webauthnResponse as Record<string, unknown> | undefined
       )
 
       if (!result.success) {

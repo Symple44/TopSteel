@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertCircle, CheckCircle, Eye, Palette, Plus, Trash2, Zap } from 'lucide-react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Label, Separator } from '../../primitives'
 import { Button } from '../../primitives/button'
 import { Input } from '../../primitives/input'
@@ -61,6 +61,7 @@ export function ColorRuleManager<T = any>({
   onRulesChange,
 }: ColorRuleManagerProps<T>) {
   const [editingRule, setEditingRule] = useState<ColorRule | null>(null)
+  const ruleNameId = useId()
 
   const createNewRule = (): ColorRule => ({
     id: crypto.randomUUID(),
@@ -112,7 +113,7 @@ export function ColorRuleManager<T = any>({
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Règles configurées ({rules.length})</h3>
-                <Button onClick={handleAddRule} size="sm">
+                <Button type="button" onClick={handleAddRule} size="sm">
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter une règle
                 </Button>
@@ -174,6 +175,7 @@ export function ColorRuleManager<T = any>({
 
                           <div className="flex items-center gap-2">
                             <Button
+                              type="button"
                               variant="ghost"
                               size="sm"
                               onClick={() => handleToggleRule(rule.id)}
@@ -181,11 +183,17 @@ export function ColorRuleManager<T = any>({
                               <Eye className="h-4 w-4" />
                             </Button>
 
-                            <Button variant="ghost" size="sm" onClick={() => setEditingRule(rule)}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingRule(rule)}
+                            >
                               <Zap className="h-4 w-4" />
                             </Button>
 
                             <Button
+                              type="button"
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteRule(rule.id)}
@@ -203,7 +211,7 @@ export function ColorRuleManager<T = any>({
         </div>
 
         <div className="p-6 border-t border-border">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Fermer
           </Button>
         </div>
@@ -223,9 +231,9 @@ export function ColorRuleManager<T = any>({
             <div className="space-y-4">
               {/* Nom de la règle */}
               <div>
-                <Label htmlFor="rule-name">Nom de la règle</Label>
+                <Label htmlFor={ruleNameId}>Nom de la règle</Label>
                 <Input
-                  id="rule-name"
+                  id={ruleNameId}
                   value={editingRule.name}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setEditingRule((prev) => (prev ? { ...prev, name: e.target.value } : null))
@@ -332,8 +340,10 @@ export function ColorRuleManager<T = any>({
                 <Label>Appliquer à</Label>
                 <CustomSelect
                   value={editingRule.applyTo}
-                  onValueChange={(value: any) =>
-                    setEditingRule((prev) => (prev ? { ...prev, applyTo: value } : null))
+                  onValueChange={(value: string) =>
+                    setEditingRule((prev) =>
+                      prev ? { ...prev, applyTo: value as 'cell' | 'row' } : null
+                    )
                   }
                   placeholder="Sélectionner où appliquer"
                   options={[
@@ -360,10 +370,12 @@ export function ColorRuleManager<T = any>({
           </div>
 
           <div className="p-6 border-t border-border flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setEditingRule(null)}>
+            <Button type="button" variant="outline" onClick={() => setEditingRule(null)}>
               Annuler
             </Button>
-            <Button onClick={handleSaveRule}>Enregistrer</Button>
+            <Button type="button" onClick={handleSaveRule}>
+              Enregistrer
+            </Button>
           </div>
         </SimpleModal>
       )}

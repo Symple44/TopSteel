@@ -1,5 +1,5 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import { useDataSelection } from '../useDataSelection'
 
 describe('useDataSelection', () => {
@@ -11,18 +11,14 @@ describe('useDataSelection', () => {
   ]
 
   it('should initialize with empty selection', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     expect(result.current.selection.selectedRows.size).toBe(0)
     expect(result.current.selection.selectAll).toBe(false)
   })
 
   it('should toggle single row selection', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     act(() => {
       result.current.toggleRow(1)
@@ -40,9 +36,7 @@ describe('useDataSelection', () => {
   })
 
   it('should select multiple rows', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     act(() => {
       result.current.toggleRow(1)
@@ -57,9 +51,7 @@ describe('useDataSelection', () => {
   })
 
   it('should toggle all rows', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     act(() => {
       result.current.toggleAll()
@@ -67,8 +59,8 @@ describe('useDataSelection', () => {
 
     expect(result.current.selection.selectAll).toBe(true)
     expect(result.current.selection.selectedRows.size).toBe(4)
-    
-    sampleData.forEach(item => {
+
+    sampleData.forEach((item) => {
       expect(result.current.selection.selectedRows.has(item.id)).toBe(true)
     })
 
@@ -81,9 +73,7 @@ describe('useDataSelection', () => {
   })
 
   it('should clear selection', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     act(() => {
       result.current.toggleRow(1)
@@ -93,7 +83,7 @@ describe('useDataSelection', () => {
     expect(result.current.selection.selectedRows.size).toBe(2)
 
     act(() => {
-      result.current.clearSelection()
+      result.current.deselectAll()
     })
 
     expect(result.current.selection.selectedRows.size).toBe(0)
@@ -101,12 +91,11 @@ describe('useDataSelection', () => {
   })
 
   it('should select specific rows', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     act(() => {
-      result.current.selectRows([1, 3])
+      result.current.selectRow(1)
+      result.current.selectRow(3)
     })
 
     expect(result.current.selection.selectedRows.size).toBe(2)
@@ -116,28 +105,25 @@ describe('useDataSelection', () => {
   })
 
   it('should check if row is selected', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     act(() => {
       result.current.toggleRow(2)
     })
 
-    expect(result.current.isRowSelected(2)).toBe(true)
-    expect(result.current.isRowSelected(1)).toBe(false)
+    expect(result.current.isSelected(2)).toBe(true)
+    expect(result.current.isSelected(1)).toBe(false)
   })
 
   it('should get selected data', () => {
-    const { result } = renderHook(() => 
-      useDataSelection({ data: sampleData, keyField: 'id' })
-    )
+    const { result } = renderHook(() => useDataSelection({ data: sampleData, keyField: 'id' }))
 
     act(() => {
-      result.current.selectRows([1, 3])
+      result.current.selectRow(1)
+      result.current.selectRow(3)
     })
 
-    const selectedData = result.current.getSelectedData()
+    const selectedData = result.current.selectedData
     expect(selectedData).toHaveLength(2)
     expect(selectedData[0].name).toBe('John')
     expect(selectedData[1].name).toBe('Bob')
@@ -145,8 +131,12 @@ describe('useDataSelection', () => {
 
   it('should call onChange callback when selection changes', () => {
     const onChange = vi.fn()
-    const { result } = renderHook(() => 
-      useDataSelection(sampleData, 'id', onChange)
+    const { result } = renderHook(() =>
+      useDataSelection({
+        data: sampleData,
+        keyField: 'id',
+        onSelectionChange: onChange,
+      })
     )
 
     act(() => {
@@ -155,7 +145,7 @@ describe('useDataSelection', () => {
 
     expect(onChange).toHaveBeenCalledWith({
       selectedRows: new Set([1]),
-      selectAll: false
+      selectAll: false,
     })
 
     act(() => {
@@ -164,7 +154,7 @@ describe('useDataSelection', () => {
 
     expect(onChange).toHaveBeenCalledWith({
       selectedRows: new Set([1, 2, 3, 4]),
-      selectAll: true
+      selectAll: true,
     })
   })
 
@@ -174,8 +164,8 @@ describe('useDataSelection', () => {
       { customId: 'b', name: 'Alice' },
     ]
 
-    const { result } = renderHook(() => 
-      useDataSelection(customData, 'customId')
+    const { result } = renderHook(() =>
+      useDataSelection({ data: customData, keyField: 'customId' })
     )
 
     act(() => {
@@ -183,14 +173,15 @@ describe('useDataSelection', () => {
     })
 
     expect(result.current.selection.selectedRows.has('a')).toBe(true)
-    expect(result.current.getSelectedData()[0].name).toBe('John')
+    expect(result.current.selectedData[0].name).toBe('John')
   })
 
   it('should handle data changes', () => {
     let data = sampleData.slice(0, 2)
-    
-    const { result, rerender } = renderHook(() => 
-      useDataSelection(data, 'id')
+
+    const { result, rerender } = renderHook(
+      ({ data }) => useDataSelection({ data, keyField: 'id' }),
+      { initialProps: { data } }
     )
 
     act(() => {
@@ -201,7 +192,7 @@ describe('useDataSelection', () => {
 
     // Change data
     data = sampleData
-    rerender()
+    rerender({ data })
 
     // Selection should be preserved for existing items
     expect(result.current.selection.selectedRows.has(1)).toBe(true)

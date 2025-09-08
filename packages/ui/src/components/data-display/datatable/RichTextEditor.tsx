@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useFormFieldIds } from '../../../hooks/useFormFieldIds'
 import { cn } from '../../../lib/utils'
 import { Label, Separator } from '../../primitives'
 import { Button } from '../../primitives/button'
@@ -30,12 +31,31 @@ import { Input } from '../../primitives/input'
 // HTML sanitization for security using DOMPurify
 const sanitizeHtml = (html: string): string => {
   if (!html) return ''
-  
+
   return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'div', 'span'],
+    ALLOWED_TAGS: [
+      'p',
+      'br',
+      'strong',
+      'b',
+      'em',
+      'i',
+      'u',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'div',
+      'span',
+    ],
     ALLOWED_ATTR: ['class', 'style'],
     ALLOW_DATA_ATTR: false,
-    FORBID_TAGS: ['script', 'iframe']
+    FORBID_TAGS: ['script', 'iframe'],
   }) as unknown as string
 }
 
@@ -104,6 +124,82 @@ const BACKGROUND_COLORS = [
 
 const FONT_SIZES = ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px']
 
+// Helper components extracted from RichTextEditor to avoid nested component definitions
+const ToolbarButton = ({
+  onClick,
+  icon: Icon,
+  title,
+  isActive = false,
+}: {
+  onClick: () => void
+  icon: React.ComponentType<unknown>
+  title: string
+  isActive?: boolean
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    title={title}
+    className={cn('p-2 rounded hover:bg-muted transition-colors', isActive && 'bg-muted')}
+  >
+    <Icon className="h-4 w-4" />
+  </button>
+)
+
+const ColorPicker = ({
+  colors,
+  onColorSelect,
+  title,
+  icon,
+}: {
+  colors: string[]
+  onColorSelect: (color: string) => void
+  title: string
+  icon: React.ComponentType<unknown>
+}) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const IconComponent = icon
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        title={title}
+        className="p-2 rounded hover:bg-muted transition-colors"
+      >
+        <IconComponent className="h-4 w-4" />
+      </button>
+      {isOpen && (
+        <div className="absolute top-full left-0 z-50 bg-white border rounded-md shadow-xl p-3 w-64">
+          <p className="text-xs font-medium mb-2">{title}</p>
+          <div className="grid grid-cols-8 gap-1">
+            {colors.map((color, index) => (
+              <button
+                key={`${color}-${index}`}
+                type="button"
+                onClick={() => {
+                  onColorSelect(color)
+                  setIsOpen(false)
+                }}
+                className="w-7 h-7 rounded border-2 border-gray-300 hover:border-blue-500 hover:scale-110 transition-all shadow-sm"
+                style={{
+                  backgroundColor: color === 'transparent' ? '#ffffff' : color,
+                  backgroundImage:
+                    color === 'transparent'
+                      ? 'repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 8px 8px'
+                      : 'none',
+                }}
+                title={color === 'transparent' ? 'Transparent' : color}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function RichTextEditor({
   open,
   onOpenChange,
@@ -112,6 +208,7 @@ export function RichTextEditor({
   placeholder = 'Commencez à taper...',
   compact = false,
 }: RichTextEditorProps) {
+  const ids = useFormFieldIds(['linkUrl', 'linkText'])
   const [content, setContent] = useState(initialContent)
   const [showPreview, setShowPreview] = useState(false)
   const [showLinkDialog, setShowLinkDialog] = useState(false)
@@ -310,81 +407,6 @@ export function RichTextEditor({
     },
     [executeCommand, insertLink]
   )
-
-  const ToolbarButton = ({
-    onClick,
-    icon: Icon,
-    title,
-    isActive = false,
-  }: {
-    onClick: () => void
-    icon: React.ComponentType<any>
-    title: string
-    isActive?: boolean
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={cn('p-2 rounded hover:bg-muted transition-colors', isActive && 'bg-muted')}
-    >
-      <Icon className="h-4 w-4" />
-    </button>
-  )
-
-  const ColorPicker = ({
-    colors,
-    onColorSelect,
-    title,
-    icon,
-  }: {
-    colors: string[]
-    onColorSelect: (color: string) => void
-    title: string
-    icon: React.ComponentType<any>
-  }) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const IconComponent = icon
-
-    return (
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          title={title}
-          className="p-2 rounded hover:bg-muted transition-colors"
-        >
-          <IconComponent className="h-4 w-4" />
-        </button>
-        {isOpen && (
-          <div className="absolute top-full left-0 z-50 bg-white border rounded-md shadow-xl p-3 w-64">
-            <p className="text-xs font-medium mb-2">{title}</p>
-            <div className="grid grid-cols-8 gap-1">
-              {colors.map((color, index) => (
-                <button
-                  key={`${color}-${index}`}
-                  type="button"
-                  onClick={() => {
-                    onColorSelect(color)
-                    setIsOpen(false)
-                  }}
-                  className="w-7 h-7 rounded border-2 border-gray-300 hover:border-blue-500 hover:scale-110 transition-all shadow-sm"
-                  style={{
-                    backgroundColor: color === 'transparent' ? '#ffffff' : color,
-                    backgroundImage:
-                      color === 'transparent'
-                        ? 'repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 8px 8px'
-                        : 'none',
-                  }}
-                  title={color === 'transparent' ? 'Transparent' : color}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    )
-  }
 
   if (compact) {
     // Version compacte pour l'édition inline
@@ -630,7 +652,7 @@ export function RichTextEditor({
 
                 {/* Taille de police */}
                 <select
-                  onChange={(e: any) => setFontSize(e.target.value)}
+                  onChange={(e: unknown) => setFontSize(e.target.value)}
                   className="px-2 py-1 border rounded text-sm"
                   title="Taille de police"
                 >
@@ -701,10 +723,10 @@ export function RichTextEditor({
           </div>
 
           <div className="p-6 border-t flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
-            <Button onClick={handleSave}>
+            <Button type="button" onClick={handleSave}>
               <Save className="h-4 w-4 mr-2" />
               Enregistrer
             </Button>
@@ -722,18 +744,18 @@ export function RichTextEditor({
 
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="link-url" className="text-sm font-medium">
+                  <Label htmlFor={ids.linkUrl} className="text-sm font-medium">
                     URL *
                   </Label>
                   <Input
-                    id="link-url"
+                    id={ids.linkUrl}
                     type="url"
                     placeholder="https://example.com"
                     value={linkData.url}
-                    onChange={(e: any) =>
-                      setLinkData((prev: any) => ({ ...prev, url: e.target.value }))
+                    onChange={(e: unknown) =>
+                      setLinkData((prev: unknown) => ({ ...prev, url: e.target.value }))
                     }
-                    onKeyDown={(e: any) => {
+                    onKeyDown={(e: unknown) => {
                       if (e.key === 'Enter' && linkData.url.trim()) {
                         handleInsertLink()
                       }
@@ -748,17 +770,17 @@ export function RichTextEditor({
                 </div>
 
                 <div>
-                  <Label htmlFor="link-text" className="text-sm font-medium">
+                  <Label htmlFor={ids.linkText} className="text-sm font-medium">
                     Texte à afficher
                   </Label>
                   <Input
-                    id="link-text"
+                    id={ids.linkText}
                     placeholder="Texte du lien (optionnel)"
                     value={linkData.text}
-                    onChange={(e: any) =>
-                      setLinkData((prev: any) => ({ ...prev, text: e.target.value }))
+                    onChange={(e: unknown) =>
+                      setLinkData((prev: unknown) => ({ ...prev, text: e.target.value }))
                     }
-                    onKeyDown={(e: any) => {
+                    onKeyDown={(e: unknown) => {
                       if (e.key === 'Enter' && linkData.url.trim()) {
                         handleInsertLink()
                       }
@@ -777,6 +799,7 @@ export function RichTextEditor({
 
               <div className="flex gap-2 mt-6 justify-end">
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={() => {
                     setShowLinkDialog(false)
@@ -785,7 +808,7 @@ export function RichTextEditor({
                 >
                   Annuler
                 </Button>
-                <Button onClick={handleInsertLink} disabled={!linkData.url.trim()}>
+                <Button type="button" onClick={handleInsertLink} disabled={!linkData.url.trim()}>
                   Insérer
                 </Button>
               </div>

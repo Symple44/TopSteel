@@ -15,15 +15,15 @@ export async function GET(
       `admin/database/migrations/${database}/${migrationName}/details`,
       {
         method: 'GET',
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal?.timeout(10000),
       }
     )
 
-    if (response.ok) {
-      const responseData = await response.json()
-      return NextResponse.json(responseData.data || responseData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      return NextResponse?.json(responseData?.data || responseData)
     } else {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message:
@@ -33,7 +33,7 @@ export async function GET(
       )
     }
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur interne - impossible de récupérer les détails de la migration',

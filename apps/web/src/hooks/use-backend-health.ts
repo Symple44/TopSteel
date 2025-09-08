@@ -45,7 +45,9 @@ const listeners: Array<(health: BackendHealthInfo) => void> = []
 
 // Fonction pour notifier tous les listeners
 function notifyListeners(health: BackendHealthInfo) {
-  listeners.forEach((listener) => listener(health))
+  listeners?.forEach((listener) => {
+    listener(health)
+  })
 }
 
 // Fonction de vérification simplifiée
@@ -55,13 +57,13 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
   try {
     const response = await callClientApi('health', {
       method: 'GET',
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal?.timeout(8000),
     })
 
     const responseTime = Date.now() - startTime
 
-    if (response.ok) {
-      const data = await response.json()
+    if (response?.ok) {
+      const data = await response?.json()
       return {
         status: 'online',
         responseTime,
@@ -82,7 +84,7 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
         uptime: null,
         database: 'unknown',
         activeUsers: null,
-        error: `HTTP ${response.status}: ${response.statusText}`,
+        error: `HTTP ${response?.status}: ${response?.statusText}`,
       }
     }
   } catch (error) {
@@ -163,7 +165,7 @@ export function useBackendStatus() {
       setHealth(newHealth)
     }
 
-    listeners.push(listener)
+    listeners?.push(listener)
 
     // Initialisation au premier montage seulement
     initializeHealthCheck().then(() => {
@@ -172,9 +174,9 @@ export function useBackendStatus() {
 
     // Cleanup: retirer le listener quand le composant se démonte
     return () => {
-      const index = listeners.indexOf(listener)
+      const index = listeners?.indexOf(listener)
       if (index > -1) {
-        listeners.splice(index, 1)
+        listeners?.splice(index, 1)
       }
     }
   }, [])
@@ -194,11 +196,11 @@ export function useBackendStatus() {
             : 'bg-gray-500',
     statusText:
       health.status === 'online'
-        ? t('backend.status.online')
+        ? t('backend?.status?.online')
         : health.status === 'offline'
-          ? t('backend.status.offline')
+          ? t('backend?.status?.offline')
           : health.status === 'error'
-            ? t('backend.status.error')
-            : t('backend.status.checking'),
+            ? t('backend?.status?.error')
+            : t('backend?.status?.checking'),
   }
 }

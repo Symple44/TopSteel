@@ -24,14 +24,14 @@ export default defineConfig({
         'src/**/__mocks__/**',
         'src/**/types.ts',
         'src/test/**',
-        'src/index.ts'
+        'src/index.ts',
       ],
       thresholds: {
-        global: { 
-          branches: 80, 
-          functions: 80, 
-          lines: 80, 
-          statements: 80 
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
         },
       },
       clean: true,

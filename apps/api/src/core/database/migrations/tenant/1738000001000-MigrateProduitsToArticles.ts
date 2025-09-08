@@ -22,14 +22,14 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
       'SELECT COUNT(*) as count FROM produits WHERE deleted_at IS NULL'
     )
 
-    if (parseInt(produitCount[0].count) === 0) {
+    if (parseInt(produitCount[0].count, 10) === 0) {
       return
     }
 
     // Compter les articles existants
     const articleCount = await queryRunner.query('SELECT COUNT(*) as count FROM articles')
 
-    if (parseInt(articleCount[0].count) > 0) {
+    if (parseInt(articleCount[0].count, 10) > 0) {
     }
 
     // Migration des données

@@ -335,6 +335,9 @@ export class ArticleRepositoryImpl implements IArticleRepository {
         [ArticleStatus.EN_COURS_CREATION]: await this.repository.count({
           where: { status: ArticleStatus.EN_COURS_CREATION },
         }),
+        [ArticleStatus.EN_ATTENTE]: await this.repository.count({
+          where: { status: ArticleStatus.EN_ATTENTE },
+        }),
       },
       repartitionParFamille: await this.getRepartitionParFamille(),
       articlesGeresEnStock: await this.repository.count({ where: { gereEnStock: true } }),
@@ -535,7 +538,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
 
     // Combiner les entités Article avec les quantités vendues
     return result.entities.map((article, index) => {
-      const quantiteVendue = parseInt(result.raw[index].quantiteVendue || '0')
+      const quantiteVendue = parseInt(result.raw[index].quantiteVendue || '0', 10)
       return Object.assign(article, { quantiteVendue }) as Article & { quantiteVendue: number }
     })
   }
@@ -570,7 +573,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: any): Promise<Article[]> {
+  async findBySpecification(_spec: unknown): Promise<Article[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }
@@ -589,7 +592,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     const repartition: Record<string, number> = {}
     result.forEach((item) => {
       if (item.famille) {
-        repartition[item.famille] = parseInt(item.count)
+        repartition[item.famille] = parseInt(item.count, 10)
       }
     })
     return repartition

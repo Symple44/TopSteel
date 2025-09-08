@@ -1,6 +1,6 @@
 import { translator } from '@/lib/i18n/translator'
 
-interface TranslatableMenuItem {
+export interface TranslatableMenuItem {
   title: string
   customTitle?: string
   titleTranslations?: Record<string, string>
@@ -11,7 +11,7 @@ interface TranslatableMenuItem {
  * Priorité : traduction courante > customTitle > title par défaut
  */
 export function getTranslatedTitle(item: TranslatableMenuItem): string {
-  const currentLanguage = translator.getCurrentLanguage()
+  const currentLanguage = translator?.getCurrentLanguage()
 
   // 1. Vérifier s'il y a une traduction pour la langue courante
   if (item.titleTranslations?.[currentLanguage]) {

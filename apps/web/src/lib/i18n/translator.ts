@@ -12,7 +12,7 @@ class Translator {
   constructor() {
     // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('topsteel-language')
+      const savedLanguage = localStorage?.getItem('topsteel-language')
       if (savedLanguage === 'auto' || !savedLanguage) {
         // Use automatic browser language detection
         this.currentLanguage = this.detectBrowserLanguage()
@@ -27,12 +27,12 @@ class Translator {
   }
 
   private isValidLanguage(lang: string): boolean {
-    return SUPPORTED_LANGUAGES.some((l) => l.code === lang)
+    return SUPPORTED_LANGUAGES?.some((l) => l.code === lang)
   }
 
   private detectBrowserLanguage(): string {
     if (typeof window !== 'undefined') {
-      const browserLang = navigator.language.split('-')[0]
+      const browserLang = navigator?.language?.split('-')[0]
       if (this.isValidLanguage(browserLang)) {
         return browserLang
       }
@@ -41,21 +41,25 @@ class Translator {
   }
 
   private updateDocumentDirection(): void {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && document?.documentElement) {
       const language = this.getLanguageInfo()
-      document.documentElement.dir = language.direction
-      document.documentElement.lang = language.code
+      if (document.documentElement && language) {
+        document.documentElement.dir = language.direction
+        document.documentElement.lang = language.code
+      }
     }
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach((listener) => listener())
+    this.listeners?.forEach((listener) => {
+      listener()
+    })
   }
 
   public subscribe(listener: () => void): () => void {
-    this.listeners.add(listener)
+    this.listeners?.add(listener)
     return () => {
-      this.listeners.delete(listener)
+      this.listeners?.delete(listener)
     }
   }
 
@@ -88,8 +92,8 @@ class Translator {
 
   public getLanguageInfo(): Language {
     return (
-      SUPPORTED_LANGUAGES.find((lang) => lang.code === this.currentLanguage) ||
-      SUPPORTED_LANGUAGES[0]
+      SUPPORTED_LANGUAGES?.find((lang) => lang.code === this.currentLanguage) ||
+      SUPPORTED_LANGUAGES?.[0]
     )
   }
 
@@ -104,8 +108,8 @@ class Translator {
     if (this.overridesLoaded) return
 
     try {
-      await overrideService.loadOverrides()
-      this.translations = overrideService.applyOverrides(baseTranslations)
+      await overrideService?.loadOverrides()
+      this.translations = overrideService?.applyOverrides(baseTranslations)
       this.overridesLoaded = true
 
       // Notifier les listeners que les traductions ont été mises à jour
@@ -118,12 +122,12 @@ class Translator {
    */
   public async refreshOverrides(): Promise<void> {
     this.overridesLoaded = false
-    await overrideService.refresh()
+    await overrideService?.refresh()
     await this.loadOverrides()
   }
 
   public translate(key: string, params?: Record<string, string | number>): string {
-    const keys = key.split('.')
+    const keys = key?.split('.')
     let value: any = this.translations[this.currentLanguage]
 
     // Navigate through the nested object
@@ -150,7 +154,7 @@ class Translator {
 
     // Replace parameters if provided
     if (params) {
-      return value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
+      return value?.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
         return params[paramKey]?.toString() || match
       })
     }
@@ -198,7 +202,7 @@ class Translator {
 export const translator = new Translator()
 
 // Export for convenience
-export const t = translator.t.bind(translator)
-export const formatDate = translator.formatDate.bind(translator)
-export const formatNumber = translator.formatNumber.bind(translator)
-export const formatCurrency = translator.formatCurrency.bind(translator)
+export const t = translator.t?.bind(translator)
+export const formatDate = translator.formatDate?.bind(translator)
+export const formatNumber = translator.formatNumber?.bind(translator)
+export const formatCurrency = translator.formatCurrency?.bind(translator)

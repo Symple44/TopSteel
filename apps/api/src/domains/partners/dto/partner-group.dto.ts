@@ -71,7 +71,7 @@ export class CreatePartnerGroupDto {
     color?: string
     icon?: string
     tags?: string[]
-    customFields?: Record<string, any>
+    customFields?: Record<string, unknown>
   }
 }
 
@@ -152,6 +152,6 @@ export class UpdatePartnerGroupDto {
     color?: string
     icon?: string
     tags?: string[]
-    customFields?: Record<string, any>
+    customFields?: Record<string, unknown>
   }
 }

@@ -86,8 +86,8 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
         try {
           const response = await callClientApi('users/notifications/me')
 
-          if (response.ok) {
-            const apiSettings = await response.json()
+          if (response?.ok) {
+            const apiSettings = await response?.json()
             setSettings(apiSettings)
             setSavedSettings(apiSettings)
             // Sauvegarder également en local pour le cache
@@ -99,7 +99,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
         }
 
         // Fallback vers le localStorage
-        const localSettings = localStorage.getItem(STORAGE_KEY)
+        const localSettings = localStorage?.getItem(STORAGE_KEY)
         if (localSettings) {
           const parsedSettings = JSON.parse(localSettings) as NotificationSettings
           setSettings(parsedSettings)
@@ -132,7 +132,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
       setSettings((prev) => ({
         ...prev,
         [category]: {
-          ...(prev[category] as unknown),
+          ...(prev[category] as Record<string, unknown>),
           [key]: value,
         },
       }))
@@ -150,8 +150,8 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
           body: JSON.stringify(settings),
         })
 
-        if (response.ok) {
-          const updatedSettings = await response.json()
+        if (response?.ok) {
+          const updatedSettings = await response?.json()
           setSavedSettings(updatedSettings)
           // Mettre à jour le cache local
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedSettings))

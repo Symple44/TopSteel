@@ -13,6 +13,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Alert, AlertDescription, AlertTitle } from '../../../feedback/alert'
@@ -139,6 +140,15 @@ export function PriceSimulator({
   className,
   defaultContext,
 }: PriceSimulatorProps) {
+  const ids = useFormFieldIds([
+    'article',
+    'quantity',
+    'channel',
+    'customerGroup',
+    'customerId',
+    'customerEmail',
+  ])
+
   const [context, setContext] = useState<SimulationContext>({
     quantity: 1,
     channel: PriceRuleChannel.ERP,
@@ -227,12 +237,12 @@ export function PriceSimulator({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="article">Article *</Label>
+              <Label htmlFor={ids.article}>Article *</Label>
               <Select
                 value={context.articleId || ''}
                 onValueChange={(value) => updateContext('articleId', value)}
               >
-                <SelectTrigger id="article">
+                <SelectTrigger id={ids.article}>
                   <SelectValue placeholder="Sélectionnez un article" />
                 </SelectTrigger>
                 <SelectContent>
@@ -252,24 +262,24 @@ export function PriceSimulator({
               </Select>
             </div>
             <div>
-              <Label htmlFor="quantity">Quantité</Label>
+              <Label htmlFor={ids.quantity}>Quantité</Label>
               <Input
-                id="quantity"
+                id={ids.quantity}
                 type="number"
                 min="1"
                 value={context.quantity}
-                onChange={(e) => updateContext('quantity', parseInt(e.target.value) || 1)}
+                onChange={(e) => updateContext('quantity', parseInt(e.target.value, 10) || 1)}
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="channel">Canal de vente</Label>
+              <Label htmlFor={ids.channel}>Canal de vente</Label>
               <Select
                 value={context.channel}
                 onValueChange={(value) => updateContext('channel', value as PriceRuleChannel)}
               >
-                <SelectTrigger id="channel">
+                <SelectTrigger id={ids.channel}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -281,12 +291,12 @@ export function PriceSimulator({
               </Select>
             </div>
             <div>
-              <Label htmlFor="customerGroup">Groupe client</Label>
+              <Label htmlFor={ids.customerGroup}>Groupe client</Label>
               <Select
                 value={context.customerGroup || ''}
                 onValueChange={(value) => updateContext('customerGroup', value || undefined)}
               >
-                <SelectTrigger id="customerGroup">
+                <SelectTrigger id={ids.customerGroup}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -302,6 +312,7 @@ export function PriceSimulator({
           {/* Options avancées */}
           <div>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => setShowAdvanced(!showAdvanced)}
@@ -317,18 +328,18 @@ export function PriceSimulator({
             {showAdvanced && (
               <div className="grid grid-cols-2 gap-4 pl-6">
                 <div>
-                  <Label htmlFor="customerId">ID Client</Label>
+                  <Label htmlFor={ids.customerId}>ID Client</Label>
                   <Input
-                    id="customerId"
+                    id={ids.customerId}
                     value={context.customerId || ''}
                     onChange={(e) => updateContext('customerId', e.target.value || undefined)}
                     placeholder="UUID du client"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="customerEmail">Email client</Label>
+                  <Label htmlFor={ids.customerEmail}>Email client</Label>
                   <Input
-                    id="customerEmail"
+                    id={ids.customerEmail}
                     type="email"
                     value={context.customerEmail || ''}
                     onChange={(e) => updateContext('customerEmail', e.target.value || undefined)}
@@ -377,11 +388,11 @@ export function PriceSimulator({
           )}
           {/* Actions */}
           <div className="flex justify-between">
-            <Button variant="outline" onClick={handleReset}>
+            <Button type="button" variant="outline" onClick={handleReset}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Réinitialiser
             </Button>
-            <Button onClick={handleSimulate} disabled={loading || !context.articleId}>
+            <Button type="button" onClick={handleSimulate} disabled={loading || !context.articleId}>
               {loading ? (
                 <>
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -406,7 +417,12 @@ export function PriceSimulator({
                 <Zap className="w-5 h-5" />
                 Résultat de la simulation
               </CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => setShowDetails(!showDetails)}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDetails(!showDetails)}
+              >
                 {showDetails ? 'Masquer les détails' : 'Afficher les détails'}
               </Button>
             </div>

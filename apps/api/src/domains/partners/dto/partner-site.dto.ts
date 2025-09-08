@@ -170,7 +170,7 @@ export class CreatePartnerSiteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  horaires?: Record<string, any>
+  horaires?: Record<string, unknown>
 
   // Instructions
   @ApiPropertyOptional()
@@ -186,12 +186,12 @@ export class CreatePartnerSiteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  documentsRequis?: Record<string, any>
+  documentsRequis?: Record<string, unknown>
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  preferences?: Record<string, any>
+  preferences?: Record<string, unknown>
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -206,7 +206,7 @@ export class CreatePartnerSiteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export class UpdatePartnerSiteDto {
@@ -370,7 +370,7 @@ export class UpdatePartnerSiteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  horaires?: Record<string, any>
+  horaires?: Record<string, unknown>
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -385,12 +385,12 @@ export class UpdatePartnerSiteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  documentsRequis?: Record<string, any>
+  documentsRequis?: Record<string, unknown>
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  preferences?: Record<string, any>
+  preferences?: Record<string, unknown>
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -405,7 +405,7 @@ export class UpdatePartnerSiteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export class PartnerSiteFilterDto {

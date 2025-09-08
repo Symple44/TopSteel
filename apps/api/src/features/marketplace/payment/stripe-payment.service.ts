@@ -11,6 +11,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
 import Stripe from 'stripe'
 import type { Repository } from 'typeorm'
+import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 
@@ -66,7 +67,7 @@ export class StripePaymentService {
     }
 
     this.stripe = new Stripe(apiKey, {
-      apiVersion: '2025-07-30.basil' as any,
+      apiVersion: '2025-07-30.basil' as unknown,
       typescript: true,
       telemetry: false, // Disable telemetry for security
     })
@@ -164,18 +165,21 @@ export class StripePaymentService {
       return {
         success: true,
         paymentIntentId: paymentIntent.id,
-        clientSecret: paymentIntent.client_secret,
+        clientSecret: paymentIntent.client_secret ?? undefined,
         status: paymentIntent.status,
       }
     } catch (error) {
-      this.logger.error(`Failed to create payment intent: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to create payment intent: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
 
-      if ((error as any).type === 'StripeError') {
+      if ((error as unknown).type === 'StripeError') {
         return {
           success: false,
           paymentIntentId: '',
           status: 'failed',
-          error: `Payment processing error: ${error.message}`,
+          error: `Payment processing error: ${getErrorMessage(error)}`,
         }
       }
 
@@ -202,7 +206,7 @@ export class StripePaymentService {
           await this.handlePaymentSuccess(paymentIntent)
           break
         case 'requires_action':
-        case 'requires_source_action' as any:
+        case 'requires_source_action' as unknown:
           // 3D Secure or similar authentication required
           break
         case 'requires_payment_method':
@@ -220,18 +224,21 @@ export class StripePaymentService {
       return {
         success: paymentIntent.status === 'succeeded',
         paymentIntentId,
-        clientSecret: paymentIntent.client_secret,
+        clientSecret: paymentIntent.client_secret ?? undefined,
         status: paymentIntent.status,
       }
     } catch (error) {
-      this.logger.error(`Failed to confirm payment: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to confirm payment: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
 
-      if ((error as any).type === 'StripeError') {
+      if ((error as unknown).type === 'StripeError') {
         return {
           success: false,
           paymentIntentId,
           status: 'failed',
-          error: error.message,
+          error: getErrorMessage(error),
         }
       }
 
@@ -257,7 +264,7 @@ export class StripePaymentService {
       const refund = await this.stripe.refunds.create({
         payment_intent: paymentIntentId,
         amount: amount, // undefined = full refund
-        reason: reason as any,
+        reason: reason as unknown,
         metadata: {
           orderId: paymentIntent.metadata.orderId || '',
           processedBy: 'marketplace_system',
@@ -287,12 +294,15 @@ export class StripePaymentService {
         amount: refund.amount,
       }
     } catch (error) {
-      this.logger.error(`Failed to create refund: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to create refund: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
 
       return {
         success: false,
         amount: amount || 0,
-        error: error.message,
+        error: getErrorMessage(error),
       }
     }
   }
@@ -328,11 +338,14 @@ export class StripePaymentService {
         paymentMethodId,
       }
     } catch (error) {
-      this.logger.error(`Failed to save payment method: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to save payment method: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
 
       return {
         success: false,
-        error: error.message,
+        error: getErrorMessage(error),
       }
     }
   }
@@ -357,7 +370,10 @@ export class StripePaymentService {
 
       return paymentMethods.data
     } catch (error) {
-      this.logger.error(`Failed to get payment methods: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to get payment methods: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       return []
     }
   }
@@ -386,19 +402,19 @@ export class StripePaymentService {
 
       switch (event.type) {
         case 'payment_intent.succeeded':
-          await this.handlePaymentSuccess(event.data.object as any)
+          await this.handlePaymentSuccess(event.data.object as unknown)
           break
 
         case 'payment_intent.payment_failed':
-          await this.handlePaymentFailure(event.data.object as any, 'Payment failed')
+          await this.handlePaymentFailure(event.data.object as unknown, 'Payment failed')
           break
 
         case 'payment_intent.canceled':
-          await this.handlePaymentFailure(event.data.object as any, 'Payment was canceled')
+          await this.handlePaymentFailure(event.data.object as unknown, 'Payment was canceled')
           break
 
         case 'refund.created':
-          await this.handleRefundCreated(event.data.object as any)
+          await this.handleRefundCreated(event.data.object as unknown)
           break
 
         default:
@@ -408,9 +424,13 @@ export class StripePaymentService {
           })
       }
     } catch (error) {
-      this.logger.error(`Webhook handling failed: ${error.message}`, error.stack, {
-        origin: originUrl,
-      })
+      this.logger.error(
+        `Webhook handling failed: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined,
+        {
+          origin: originUrl,
+        }
+      )
       throw new BadRequestException('Webhook verification failed')
     }
   }
@@ -463,13 +483,13 @@ export class StripePaymentService {
   /**
    * Private helper methods
    */
-  private async getOrCreateStripeCustomer(customer: MarketplaceCustomer): Promise<any> {
+  private async getOrCreateStripeCustomer(customer: MarketplaceCustomer): Promise<unknown> {
     // Check if customer already has Stripe ID
     const existingStripeId = customer.metadata?.stripeCustomerId
 
     if (existingStripeId) {
       try {
-        return (await this.stripe.customers.retrieve(existingStripeId)) as any
+        return (await this.stripe.customers.retrieve(existingStripeId)) as unknown
       } catch (_error) {
         this.logger.warn(`Stripe customer ${existingStripeId} not found, creating new one`)
       }
@@ -496,7 +516,7 @@ export class StripePaymentService {
     return stripeCustomer
   }
 
-  private async handlePaymentSuccess(paymentIntent: any): Promise<void> {
+  private async handlePaymentSuccess(paymentIntent: unknown): Promise<void> {
     const orderId = paymentIntent.metadata.orderId
 
     if (!orderId) {
@@ -519,7 +539,7 @@ export class StripePaymentService {
     )
   }
 
-  private async handlePaymentFailure(paymentIntent: any, reason: string): Promise<void> {
+  private async handlePaymentFailure(paymentIntent: unknown, reason: string): Promise<void> {
     const orderId = paymentIntent.metadata.orderId
 
     if (!orderId) {
@@ -541,7 +561,7 @@ export class StripePaymentService {
     )
   }
 
-  private async handleRefundCreated(refund: any): Promise<void> {
+  private async handleRefundCreated(refund: unknown): Promise<void> {
     this.logger.log(`Refund created: ${refund.id}, amount: ${refund.amount}`)
 
     // Additional refund handling logic if needed

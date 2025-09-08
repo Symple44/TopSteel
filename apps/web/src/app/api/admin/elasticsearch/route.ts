@@ -6,33 +6,33 @@ export const runtime = 'nodejs'
 export async function GET(request: NextRequest) {
   try {
     // Vérifier l'authentification admin
-    const authHeader = request.headers.get('authorization')
-    const userRole = request.headers.get('x-user-role')
+    const authHeader = request?.headers?.get('authorization')
+    const userRole = request?.headers?.get('x-user-role')
 
     if (!authHeader || userRole !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 })
+      return NextResponse?.json({ error: 'Unauthorized - Admin access required' }, { status: 401 })
     }
 
     const elasticsearchClient = await getElasticsearchClient()
     const migrationService = await getMigrationService()
 
     const { searchParams } = new URL(request.url)
-    const action = searchParams.get('action')
+    const action = searchParams?.get('action')
 
     switch (action) {
       case 'status': {
         // Utiliser un timeout plus court pour éviter les attentes trop longues
-        const connectionInfo = await elasticsearchClient.getConnectionInfo(3000)
+        const connectionInfo = await elasticsearchClient?.getConnectionInfo(3000)
 
         // Si connecté, récupérer les informations sur les index
         let indices = {}
-        if (connectionInfo.connected) {
+        if (connectionInfo?.connected) {
           try {
-            indices = await migrationService.checkIndexHealth()
+            indices = await migrationService?.checkIndexHealth()
           } catch (_error) {}
         }
 
-        return NextResponse.json({
+        return NextResponse?.json({
           connected: connectionInfo.connected,
           error: connectionInfo.error,
           version: connectionInfo.version,
@@ -42,15 +42,15 @@ export async function GET(request: NextRequest) {
       }
 
       case 'health': {
-        const indexHealth = await migrationService.checkIndexHealth()
-        return NextResponse.json(indexHealth)
+        const indexHealth = await migrationService?.checkIndexHealth()
+        return NextResponse?.json(indexHealth)
       }
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+        return NextResponse?.json({ error: 'Invalid action' }, { status: 400 })
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Admin operation failed' },
       { status: 500 }
     )
@@ -60,23 +60,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Vérifier l'authentification admin
-    const authHeader = request.headers.get('authorization')
-    const userRole = request.headers.get('x-user-role')
+    const authHeader = request?.headers?.get('authorization')
+    const userRole = request?.headers?.get('x-user-role')
 
     if (!authHeader || userRole !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 })
+      return NextResponse?.json({ error: 'Unauthorized - Admin access required' }, { status: 401 })
     }
 
     const migrationService = await getMigrationService()
 
-    const body = await request.json()
-    const { action, indexName } = body
+    const body = await request?.json()
+    const { action, indexName } = body || {}
 
     switch (action) {
       case 'migrate': {
-        const migrationSuccess = await migrationService.runAllMigrations()
+        const migrationSuccess = await migrationService?.runAllMigrations()
 
-        return NextResponse.json({
+        return NextResponse?.json({
           success: migrationSuccess,
           message: migrationSuccess
             ? 'All migrations completed successfully'
@@ -86,11 +86,11 @@ export async function POST(request: NextRequest) {
 
       case 'reset': {
         if (!indexName) {
-          return NextResponse.json({ error: 'Index name required' }, { status: 400 })
+          return NextResponse?.json({ error: 'Index name required' }, { status: 400 })
         }
-        const resetSuccess = await migrationService.resetIndex(indexName)
+        const resetSuccess = await migrationService?.resetIndex(indexName)
 
-        return NextResponse.json({
+        return NextResponse?.json({
           success: resetSuccess,
           message: resetSuccess
             ? `Index ${indexName} reset successfully`
@@ -101,16 +101,16 @@ export async function POST(request: NextRequest) {
       case 'reindex':
         // Cette action pourrait déclencher une réindexation complète
         // depuis la base de données vers Elasticsearch
-        return NextResponse.json({
+        return NextResponse?.json({
           success: false,
           message: 'Reindexing not yet implemented',
         })
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+        return NextResponse?.json({ error: 'Invalid action' }, { status: 400 })
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Admin action failed' },
       { status: 500 }
     )

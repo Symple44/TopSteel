@@ -1,8 +1,22 @@
 'use client'
+import { AlertTriangle, Calendar, Euro, Package, Truck, User } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from '../../../primitives'
-import { AlertTriangle, Package, Calendar, Euro, Truck, User } from 'lucide-react'
-export type OrderStatus = 'pending' | 'confirmed' | 'in_production' | 'ready' | 'shipped' | 'delivered'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Textarea,
+} from '../../../primitives'
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'in_production'
+  | 'ready'
+  | 'shipped'
+  | 'delivered'
 export interface OrderImpact {
   financialLoss: number
   affectedSuppliers: string[]
@@ -33,7 +47,12 @@ export interface CancelOrderConfirmationProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   order: OrderDetails
-  onConfirm: (data: { orderId: string; reason: string; notifyCustomer: boolean; processRefund: boolean }) => Promise<void>
+  onConfirm: (data: {
+    orderId: string
+    reason: string
+    notifyCustomer: boolean
+    processRefund: boolean
+  }) => Promise<void>
 }
 const statusLabels: Record<OrderStatus, string> = {
   pending: 'En attente',
@@ -41,7 +60,7 @@ const statusLabels: Record<OrderStatus, string> = {
   in_production: 'En production',
   ready: 'Prête',
   shipped: 'Expédiée',
-  delivered: 'Livrée'
+  delivered: 'Livrée',
 }
 const statusColors: Record<OrderStatus, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -49,7 +68,7 @@ const statusColors: Record<OrderStatus, string> = {
   in_production: 'bg-orange-100 text-orange-800',
   ready: 'bg-green-100 text-green-800',
   shipped: 'bg-purple-100 text-purple-800',
-  delivered: 'bg-gray-100 text-gray-800'
+  delivered: 'bg-gray-100 text-gray-800',
 }
 export function CancelOrderConfirmation({
   open,
@@ -57,6 +76,7 @@ export function CancelOrderConfirmation({
   order,
   onConfirm,
 }: CancelOrderConfirmationProps) {
+  const ids = useFormFieldIds(['reason', 'notifyCustomer', 'processRefund'])
   const [loading, setLoading] = useState(false)
   const [reason, setReason] = useState('')
   const [notifyCustomer, setNotifyCustomer] = useState(true)
@@ -65,15 +85,14 @@ export function CancelOrderConfirmation({
     e.preventDefault()
     setLoading(true)
     try {
-      await onConfirm({ 
-        orderId: order.id, 
-        reason, 
-        notifyCustomer, 
-        processRefund 
+      await onConfirm({
+        orderId: order.id,
+        reason,
+        notifyCustomer,
+        processRefund,
       })
       onOpenChange(false)
-    } catch (error) {
-      console.error('Order cancellation failed:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -81,7 +100,7 @@ export function CancelOrderConfirmation({
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'EUR',
     }).format(amount)
   }
   const formatDate = (dateString: string) => {
@@ -131,7 +150,9 @@ export function CancelOrderConfirmation({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Statut:</span>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[order.status]}`}
+              >
                 {statusLabels[order.status]}
               </span>
             </div>
@@ -152,7 +173,9 @@ export function CancelOrderConfirmation({
                     )}
                   </div>
                   <div className="text-right">
-                    <span>{item.quantity} × {formatCurrency(item.unitPrice)}</span>
+                    <span>
+                      {item.quantity} × {formatCurrency(item.unitPrice)}
+                    </span>
                     <div className="text-xs text-muted-foreground">
                       {formatCurrency(item.quantity * item.unitPrice)}
                     </div>
@@ -193,11 +216,11 @@ export function CancelOrderConfirmation({
           </div>
           {/* Cancellation Reason */}
           <div className="space-y-2">
-            <label htmlFor="reason" className="text-sm font-medium">
+            <label htmlFor={ids.reason} className="text-sm font-medium">
               Motif d'annulation <span className="text-red-500">*</span>
             </label>
             <Textarea
-              id="reason"
+              id={ids.reason}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Décrivez la raison de l'annulation..."
@@ -210,12 +233,12 @@ export function CancelOrderConfirmation({
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                id="notifyCustomer"
+                id={ids.notifyCustomer}
                 checked={notifyCustomer}
                 onChange={(e) => setNotifyCustomer(e.target.checked)}
                 className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
-              <label htmlFor="notifyCustomer" className="text-sm">
+              <label htmlFor={ids.notifyCustomer} className="text-sm">
                 Notifier le client par email
               </label>
             </div>
@@ -223,13 +246,14 @@ export function CancelOrderConfirmation({
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="processRefund"
+                  id={ids.processRefund}
                   checked={processRefund}
                   onChange={(e) => setProcessRefund(e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
-                <label htmlFor="processRefund" className="text-sm">
-                  Traiter le remboursement ({formatCurrency(order.totalAmount - order.impact.restockingFee)})
+                <label htmlFor={ids.processRefund} className="text-sm">
+                  Traiter le remboursement (
+                  {formatCurrency(order.totalAmount - order.impact.restockingFee)})
                 </label>
               </div>
             )}
@@ -243,12 +267,8 @@ export function CancelOrderConfirmation({
             >
               Annuler
             </Button>
-            <Button 
-              type="submit" 
-              disabled={loading || !reason.trim()}
-              variant="destructive"
-            >
-              {loading ? 'Annulation en cours...' : 'Confirmer l\'annulation'}
+            <Button type="submit" disabled={loading || !reason.trim()} variant="destructive">
+              {loading ? 'Annulation en cours...' : "Confirmer l'annulation"}
             </Button>
           </div>
         </form>

@@ -2,6 +2,7 @@
 
 import {
   Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -46,6 +47,7 @@ const articleStatusLabels = {
   [ArticleStatus.INACTIF]: 'Inactif',
   [ArticleStatus.OBSOLETE]: 'Obsolète',
   [ArticleStatus.EN_COURS_CREATION]: 'En cours de création',
+  [ArticleStatus.EN_ATTENTE]: 'En attente',
 }
 
 const getStatusColor = (status: ArticleStatus) => {
@@ -58,6 +60,8 @@ const getStatusColor = (status: ArticleStatus) => {
       return 'bg-red-100 text-red-800 border-red-300'
     case ArticleStatus.EN_COURS_CREATION:
       return 'bg-blue-100 text-blue-800 border-blue-300'
+    case ArticleStatus.EN_ATTENTE:
+      return 'bg-yellow-100 text-yellow-800 border-yellow-300'
     default:
       return 'bg-gray-100 text-gray-800 border-gray-300'
   }
@@ -66,24 +70,29 @@ const getStatusColor = (status: ArticleStatus) => {
 export default function ArticleDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const articleId = params.id as string
+  const articleId = params?.id as string
 
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showInventoryDialog, setShowInventoryDialog] = useState(false)
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false)
 
-  const { data: article, isLoading, error } = useArticle(articleId)
+  const articleQuery = useArticle(articleId)
+  const { data: article, isLoading, error } = articleQuery
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <button type="button"
-            onClick={() => router.back()}
-            className="h-8 w-8 p-0 inline-flex items-center justify-center text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground rounded-md"
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => router?.back()}
+            className="h-8 w-8 p-0"
+            aria-label="Retour"
           >
             <ArrowLeft className="h-4 w-4" />
-          </button>
+          </Button>
           <div className="h-8 w-48 bg-gray-200 animate-pulse rounded" />
         </div>
         <div className="space-y-6">
@@ -102,12 +111,16 @@ export default function ArticleDetailPage() {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <button type="button"
-            onClick={() => router.back()}
-            className="h-8 w-8 p-0 inline-flex items-center justify-center text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground rounded-md"
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => router?.back()}
+            className="h-8 w-8 p-0"
+            aria-label="Retour"
           >
             <ArrowLeft className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
         <Card className="mx-auto max-w-md">
           <CardContent className="flex flex-col items-center py-8">
@@ -116,12 +129,13 @@ export default function ArticleDetailPage() {
             <p className="text-gray-600 text-center mb-4">
               L'article demandé n'existe pas ou vous n'avez pas les permissions pour le voir.
             </p>
-            <button type="button"
-              onClick={() => router.push('/inventory/articles')}
-              className="inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 rounded-md"
+            <Button
+              type="button"
+              onClick={() => router?.push('/inventory/articles')}
+              variant="default"
             >
               Retour à la liste
-            </button>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -129,9 +143,9 @@ export default function ArticleDetailPage() {
   }
 
   const stockStatus =
-    Number(article.stockPhysique || 0) <= 0
+    Number(article.stockPhysique ?? 0) <= 0
       ? 'rupture'
-      : article.stockMini && Number(article.stockPhysique || 0) <= Number(article.stockMini || 0)
+      : article.stockMini && Number(article.stockPhysique ?? 0) <= Number(article.stockMini ?? 0)
         ? 'sous-mini'
         : 'normal'
 
@@ -140,12 +154,16 @@ export default function ArticleDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <button type="button"
-            onClick={() => router.back()}
-            className="h-8 w-8 p-0 inline-flex items-center justify-center text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground rounded-md"
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => router?.back()}
+            className="h-8 w-8 p-0"
+            aria-label="Retour"
           >
             <ArrowLeft className="h-4 w-4" />
-          </button>
+          </Button>
           <div>
             <h1 className="text-2xl font-bold">{article.designation}</h1>
             <div className="flex items-center space-x-2 mt-1">
@@ -158,27 +176,28 @@ export default function ArticleDetailPage() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <button type="button"
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setShowInventoryDialog(true)}
-            className="h-8 inline-flex items-center justify-center text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3 rounded-md"
           >
             <Warehouse className="h-4 w-4 mr-2" />
             Inventaire
-          </button>
-          <button type="button"
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setShowDuplicateDialog(true)}
-            className="h-8 inline-flex items-center justify-center text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3 rounded-md"
           >
             <Copy className="h-4 w-4 mr-2" />
             Dupliquer
-          </button>
-          <button type="button"
-            onClick={() => setShowEditDialog(true)}
-            className="h-8 inline-flex items-center justify-center text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 px-3 rounded-md"
-          >
+          </Button>
+          <Button type="button" variant="default" size="sm" onClick={() => setShowEditDialog(true)}>
             <Edit className="h-4 w-4 mr-2" />
             Modifier
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -191,7 +210,7 @@ export default function ArticleDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Number(article.stockPhysique || 0).toFixed(2)}
+              {Number(article.stockPhysique ?? 0).toFixed(2)}
             </div>
             <div className="flex items-center space-x-2 text-xs">
               <div
@@ -336,16 +355,16 @@ export default function ArticleDetailPage() {
                 <div>
                   <div className="text-sm font-medium text-gray-600">Stock physique</div>
                   <p className="text-sm font-bold">
-                    {Number(article.stockPhysique || 0).toFixed(2)}
+                    {Number(article.stockPhysique ?? 0).toFixed(2)}
                   </p>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-gray-600">Stock minimum</div>
-                  <p className="text-sm">{Number(article.stockMini || 0).toFixed(2)}</p>
+                  <p className="text-sm">{Number(article.stockMini ?? 0).toFixed(2)}</p>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-gray-600">Stock maximum</div>
-                  <p className="text-sm">{Number(article.stockMaxi || 0).toFixed(2)}</p>
+                  <p className="text-sm">{Number(article.stockMaxi ?? 0).toFixed(2)}</p>
                 </div>
               </CardContent>
             </Card>

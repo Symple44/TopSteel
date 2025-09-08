@@ -12,8 +12,23 @@ import {
   TreeParent,
   UpdateDateColumn,
 } from 'typeorm'
-import { MenuConfiguration } from './menu-configuration.entity'
-import { MenuItemAction } from './menu-item-action.entity'
+
+// Removed imports to avoid circular dependencies
+// import { MenuConfiguration } from './menu-configuration.entity';
+// import { MenuItemAction } from './menu-item-action.entity';
+
+// Type definitions to avoid circular dependencies
+type MenuConfiguration = {
+  id: string
+  code: string
+  // Other MenuConfiguration properties would be here
+}
+
+type MenuItemAction = {
+  id: string
+  menuItemId: string
+  // Other MenuItemAction properties would be here
+}
 
 /**
  * Menu item entity with hierarchical structure
@@ -57,7 +72,7 @@ export class MenuItem {
   route?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  routeParams?: Record<string, any>
+  routeParams?: Record<string, unknown>
 
   @Column({ type: 'varchar', length: 1000, nullable: true })
   externalUrl?: string
@@ -120,7 +135,7 @@ export class MenuItem {
   cssClasses?: string
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
@@ -129,11 +144,7 @@ export class MenuItem {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => MenuConfiguration,
-    (menu) => menu.items,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('MenuConfiguration', 'items', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'menu_id' })
   menu!: MenuConfiguration
 
@@ -144,10 +155,7 @@ export class MenuItem {
   @TreeChildren()
   children!: MenuItem[]
 
-  @OneToMany(
-    () => MenuItemAction,
-    (action) => action.menuItem
-  )
+  @OneToMany('MenuItemAction', 'menuItem')
   actions!: MenuItemAction[]
 
   // Utility methods
@@ -183,8 +191,14 @@ export class MenuItem {
 
     if (this.route) {
       if (this.routeParams && Object.keys(this.routeParams).length > 0) {
-        const params = new URLSearchParams(this.routeParams).toString()
-        return `${this.route}?${params}`
+        const params = new URLSearchParams()
+        for (const [key, value] of Object.entries(this.routeParams)) {
+          if (value != null) {
+            params.append(key, String(value))
+          }
+        }
+        const paramString = params.toString()
+        return paramString ? `${this.route}?${paramString}` : this.route
       }
       return this.route
     }
@@ -245,14 +259,15 @@ export class MenuItem {
   /**
    * Get metadata value
    */
-  getMetadata<T>(key: string, defaultValue?: T): T | undefined {
-    return this.metadata?.[key] ?? defaultValue
+  getMetadata<T = unknown>(key: string, defaultValue?: T): T | undefined {
+    const value = this.metadata?.[key]
+    return value !== undefined ? (value as T) : defaultValue
   }
 
   /**
    * Set metadata value
    */
-  setMetadata(key: string, value: any): void {
+  setMetadata(key: string, value: unknown): void {
     if (!this.metadata) {
       this.metadata = {}
     }
@@ -262,7 +277,7 @@ export class MenuItem {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       code: this.code,

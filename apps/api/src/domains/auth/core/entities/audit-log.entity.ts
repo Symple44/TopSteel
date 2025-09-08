@@ -4,11 +4,15 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 
  * Entity for storing audit log entries
  */
 @Entity('audit_logs')
-@Index(['userId', 'timestamp'])
-@Index(['societeId', 'timestamp'])
-@Index(['eventType', 'timestamp'])
-@Index(['severity', 'timestamp'])
-@Index(['resource', 'action', 'timestamp'])
+@Index(['userId', 'timestamp']) // For user activity tracking
+@Index(['societeId', 'timestamp']) // For organization-specific logs
+@Index(['eventType', 'timestamp']) // For event type filtering
+@Index(['severity', 'timestamp']) // For severity-based queries
+@Index(['resource', 'action', 'timestamp']) // For resource audit trails
+@Index(['userId', 'eventType', 'success']) // For user event success rate
+@Index(['ipAddress', 'timestamp']) // For IP-based security analysis
+@Index(['success', 'timestamp']) // For failed events monitoring
+@Index(['sessionId', 'timestamp']) // For session-based audit tracking
 export class AuditLog {
   @PrimaryGeneratedColumn('uuid')
   id!: string
@@ -59,6 +63,7 @@ export class AuditLog {
   userAgent?: string
 
   @Column({ type: 'varchar', length: 255, nullable: true })
+  @Index() // Index for session-based queries
   sessionId?: string
 
   @Column({ type: 'boolean', default: false })
@@ -66,13 +71,15 @@ export class AuditLog {
   success!: boolean
 
   @Column({ type: 'varchar', length: 100, nullable: true })
+  @Index() // Index for error code analysis
   errorCode?: string
 
   @Column({ type: 'text', nullable: true })
   errorMessage?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>
+  @Index() // GIN index for metadata queries
+  metadata?: Record<string, unknown>
 
   @Column({ type: 'integer', nullable: true })
   duration?: number // Milliseconds
@@ -81,12 +88,13 @@ export class AuditLog {
   affectedRecords?: number
 
   @Column({ type: 'jsonb', nullable: true })
-  oldValue?: any
+  oldValue?: unknown
 
   @Column({ type: 'jsonb', nullable: true })
-  newValue?: any
+  newValue?: unknown
 
   @Column({ type: 'jsonb', nullable: true })
+  @Index() // GIN index for location-based queries
   location?: {
     country?: string
     region?: string
@@ -137,7 +145,9 @@ export class AuditLog {
     return (
       this.severity === 'CRITICAL' ||
       this.eventType === 'SUSPICIOUS_ACTIVITY' ||
-      (this.eventType === 'LOGIN_FAILED' && this.metadata?.attemptCount > 5)
+      (this.eventType === 'LOGIN_FAILED' &&
+        typeof this.metadata?.attemptCount === 'number' &&
+        this.metadata.attemptCount > 5)
     )
   }
 
@@ -196,14 +206,16 @@ export class AuditLog {
     return (
       this.isCriticalEvent() ||
       this.getRiskScore() > 75 ||
-      (this.eventType === 'ACCESS_DENIED' && this.metadata?.attemptCount > 10)
+      (this.eventType === 'ACCESS_DENIED' &&
+        typeof this.metadata?.attemptCount === 'number' &&
+        this.metadata.attemptCount > 10)
     )
   }
 
   /**
    * Format for export/reporting
    */
-  toExportFormat(): Record<string, any> {
+  toExportFormat(): Record<string, unknown> {
     return {
       id: this.id,
       timestamp: this.timestamp.toISOString(),

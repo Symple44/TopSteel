@@ -563,6 +563,7 @@ function SortableItem<T extends ReorderableItem>({
             {collapsible && hasChildren && (
               <div className="flex items-center border-r border-border">
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={(e: React.MouseEvent) => {
@@ -782,7 +783,7 @@ export function ReorderableList<T extends ReorderableItem>({
     <div className={cn('space-y-4', className)}>
       {showSaveButton && (
         <div className="flex justify-end">
-          <Button onClick={handleSave} variant="default">
+          <Button type="button" onClick={handleSave} variant="default">
             {saveButtonText}
           </Button>
         </div>

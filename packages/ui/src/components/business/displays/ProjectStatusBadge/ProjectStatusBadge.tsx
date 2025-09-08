@@ -1,19 +1,26 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { Play, Pause, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, Pause, Play, XCircle } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
-export type ProjectStatus = 'draft' | 'planning' | 'in_progress' | 'on_hold' | 'completed' | 'cancelled' | 'overdue'
+import { Badge } from '../../../data-display/badge'
+export type ProjectStatus =
+  | 'draft'
+  | 'planning'
+  | 'in_progress'
+  | 'on_hold'
+  | 'completed'
+  | 'cancelled'
+  | 'overdue'
 interface ProjectStatusBadgeProps {
   status: ProjectStatus
   showIcon?: boolean
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
-export function ProjectStatusBadge({ 
-  status, 
-  showIcon = true, 
+export function ProjectStatusBadge({
+  status,
+  showIcon = true,
   size = 'md',
-  className 
+  className,
 }: ProjectStatusBadgeProps) {
   const getStatusConfig = (status: ProjectStatus) => {
     switch (status) {
@@ -90,7 +97,7 @@ export function ProjectStatusBadge({
   const config = getStatusConfig(status)
   const Icon = config.icon
   return (
-    <Badge 
+    <Badge
       variant="outline"
       className={cn(
         'inline-flex items-center gap-1.5 font-medium',

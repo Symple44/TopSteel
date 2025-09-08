@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { MenuItem } from './menu-item.entity'
+// import { MenuItem } from './menu-item.entity';
 
 @Entity('menu_item_roles')
 @Index(['menuItemId', 'roleId'], { unique: true })
@@ -30,12 +30,9 @@ export class MenuItemRole {
   createdAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => MenuItem,
-    (menuItem) => menuItem.roles
-  )
+  @ManyToOne('MenuItem', 'roles', { lazy: true })
   @JoinColumn({ name: 'menuItemId' })
-  menuItem!: MenuItem
+  menuItem!: any
 
   // Méthodes utilitaires
   static create(menuItemId: string, roleId: string, isRequired: boolean = true): MenuItemRole {

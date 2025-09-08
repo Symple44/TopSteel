@@ -46,7 +46,7 @@ export function useTreeGrouping<T = any>(
     const roots: GroupNode<T>[] = []
 
     // Fonction pour créer une clé unique pour un groupe
-    const createGroupKey = (columnId: string, value: any, level: number) => {
+    const createGroupKey = (columnId: string, value: unknown, level: number) => {
       return `${level}_${columnId}_${String(value)}`
     }
 
@@ -64,7 +64,7 @@ export function useTreeGrouping<T = any>(
       let currentParent: GroupNode<T> | undefined
 
       groupColumns.forEach((column, level) => {
-        const value = column.getValue ? column.getValue(item) : (item as any)[column.key]
+        const value = column.getValue ? column.getValue(item) : (item as unknown)[column.key]
         const groupKey = createGroupKey(column.id, value, level)
 
         let node = nodeMap.get(groupKey)
@@ -130,7 +130,9 @@ export function useTreeGrouping<T = any>(
         node.children.forEach(addToFlatList)
 
         // Puis les éléments finaux
-        node.items.forEach((item) => flatList.push(item))
+        node.items.forEach((item) => {
+          flatList.push(item)
+        })
       }
     }
 
@@ -208,7 +210,7 @@ export function useTreeGrouping<T = any>(
     expandAll,
     collapseAll,
     clearGrouping,
-    isGroupNode: (item: any): item is GroupNode<T> => {
+    isGroupNode: (item: unknown): item is GroupNode<T> => {
       return item && typeof item === 'object' && 'groupLabel' in item && 'level' in item
     },
   }

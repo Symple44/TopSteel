@@ -672,7 +672,7 @@ export interface IPartnerAggregationResult {
  */
 export interface IPartnerSearchResult {
   /** Partenaires trouvés */
-  partenaires: any[] // Remplacez par votre interface Partner
+  partenaires: unknown[] // Remplacez par votre interface Partner
 
   /** Informations de pagination */
   pagination: {

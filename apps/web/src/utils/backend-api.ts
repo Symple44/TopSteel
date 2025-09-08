@@ -2,7 +2,7 @@ import { safeFetch } from './fetch-safe'
 
 // Configuration centralisée pour les appels backend
 const BACKEND_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002',
+  baseUrl: process?.env?.NEXT_PUBLIC_API_URL || process?.env?.API_URL || 'http://localhost:3002',
   globalPrefix: 'api',
 }
 
@@ -20,7 +20,7 @@ export async function callBackendApi(
   }
 
   // Construction automatique de l'URL avec préfixe
-  const url = `${BACKEND_CONFIG.baseUrl}/${BACKEND_CONFIG.globalPrefix}/${endpoint.replace(/^\/+/, '')}`
+  const url = `${BACKEND_CONFIG?.baseUrl}/${BACKEND_CONFIG?.globalPrefix}/${endpoint?.replace(/^\/+/, '')}`
 
   // Configuration par défaut avec credentials
   const defaultOptions: RequestInit = {
@@ -44,15 +44,15 @@ export function getAuthHeaders(request: Request): Record<string, string> {
     return { 'Content-Type': 'application/json' }
   }
 
-  const authHeader = request.headers.get('authorization')
-  const cookieHeader = request.headers.get('cookie')
+  const authHeader = request?.headers?.get('authorization')
+  const cookieHeader = request?.headers?.get('cookie')
 
   let accessToken = null
   if (cookieHeader) {
-    const cookies = cookieHeader.split(';').map((c) => c.trim())
-    const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
+    const cookies = cookieHeader?.split(';').map((c) => c?.trim())
+    const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
     if (accessTokenCookie) {
-      accessToken = accessTokenCookie.split('=')[1]
+      accessToken = accessTokenCookie?.split('=')[1]
     }
   }
 
@@ -101,9 +101,9 @@ export async function callHealthApi(
   endpoint: string,
   options: RequestInit & { timeout?: number } = {}
 ): Promise<Response> {
-  const { timeout = 5000, ...fetchOptions } = options
+  const { timeout = 5000, ...fetchOptions } = options || {}
 
-  const url = `${BACKEND_CONFIG.baseUrl}/${BACKEND_CONFIG.globalPrefix}/${endpoint.replace(/^\/+/, '')}`
+  const url = `${BACKEND_CONFIG?.baseUrl}/${BACKEND_CONFIG?.globalPrefix}/${endpoint?.replace(/^\/+/, '')}`
 
   const defaultOptions: RequestInit = {
     credentials: 'include',
@@ -111,7 +111,7 @@ export async function callHealthApi(
       'Content-Type': 'application/json',
       ...fetchOptions.headers,
     },
-    signal: AbortSignal.timeout(timeout),
+    signal: AbortSignal?.timeout(timeout),
     ...fetchOptions,
   }
 
@@ -127,7 +127,7 @@ export async function callClientApi(
   options: RequestInit = {}
 ): Promise<Response> {
   // Pour les appels côté client, on utilise les routes API Next.js
-  const url = `/api/${endpoint.replace(/^\/+/, '')}`
+  const url = `/api/${endpoint?.replace(/^\/+/, '')}`
 
   const defaultOptions: RequestInit = {
     credentials: 'include',

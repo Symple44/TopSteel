@@ -1,8 +1,15 @@
 'use client'
+import {
+  AlertTriangle,
+  DollarSign,
+  Percent,
+  PieChart,
+  Target,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Badge } from '../../../primitives'
-import { Progress } from '../../../primitives'
-import { TrendingUp, TrendingDown, DollarSign, Percent, PieChart, Target, AlertTriangle } from 'lucide-react'
+import { Badge, Progress } from '../../../primitives'
 export interface ProfitabilityData {
   period: string
   revenue: number
@@ -68,9 +75,9 @@ interface ProfitabilityChartProps {
   onSegmentClick?: (segment: string) => void
   onViewDetails?: () => void
 }
-export function ProfitabilityChart({ 
+export function ProfitabilityChart({
   data = [],
-  title = "Graphique de rentabilité",
+  title = 'Graphique de rentabilité',
   period = 'monthly',
   showSegments = true,
   showProducts = true,
@@ -80,7 +87,7 @@ export function ProfitabilityChart({
   loading = false,
   onPeriodChange,
   onSegmentClick,
-  onViewDetails
+  onViewDetails,
 }: ProfitabilityChartProps) {
   if (loading) {
     return (
@@ -92,7 +99,9 @@ export function ProfitabilityChart({
           <div className="flex items-center justify-center" style={{ height }}>
             <div className="text-center">
               <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-              <p className="mt-2 text-sm text-muted-foreground">Chargement des données de rentabilité...</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Chargement des données de rentabilité...
+              </p>
             </div>
           </div>
         </CardContent>
@@ -120,9 +129,11 @@ export function ProfitabilityChart({
   }
   const getTrendIcon = (current: number, previous?: number) => {
     if (!previous) return null
-    return current >= previous ? 
-      <TrendingUp className="h-4 w-4 text-green-600" /> : 
+    return current >= previous ? (
+      <TrendingUp className="h-4 w-4 text-green-600" />
+    ) : (
       <TrendingDown className="h-4 w-4 text-red-600" />
+    )
   }
   // Cost breakdown pie chart simulation
   const renderCostBreakdown = () => {
@@ -156,18 +167,27 @@ export function ProfitabilityChart({
   }
   // Margin evolution chart
   const renderMarginTrend = () => {
-    const maxMargin = Math.max(...data.map(d => d.grossMargin))
+    const maxMargin = Math.max(...data.map((d) => d.grossMargin))
     return (
       <div className="flex items-end justify-between gap-1 h-24">
         {data.slice(0, 12).map((item, index) => {
           const height = (item.grossMargin / maxMargin) * 100
-          const color = getMarginColor(item.grossMargin)
+          const _color = getMarginColor(item.grossMargin)
           return (
-            <div 
+            // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+            <div
               key={index}
               className="flex-1 bg-gradient-to-t from-blue-500 to-green-500 rounded-t opacity-70 hover:opacity-100 transition-all cursor-pointer relative group"
               style={{ height: `${height}%` }}
+              role={onPeriodChange ? 'button' : undefined}
+              tabIndex={onPeriodChange ? 0 : undefined}
               onClick={() => onPeriodChange?.(item.period)}
+              onKeyDown={(e) => {
+                if (onPeriodChange && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  onPeriodChange(item.period)
+                }
+              }}
             >
               <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 {item.period}: {formatPercent(item.grossMargin)}
@@ -183,13 +203,25 @@ export function ProfitabilityChart({
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
         <div className="flex gap-2">
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('monthly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('monthly')}
+          >
             Mois
           </Badge>
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('quarterly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('quarterly')}
+          >
             Trimestre
           </Badge>
-          <Badge variant={period === 'yearly' ? 'default' : 'outline'} className="cursor-pointer" onClick={() => onPeriodChange?.('yearly')}>
+          <Badge
+            variant={period === 'yearly' ? 'default' : 'outline'}
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('yearly')}
+          >
             Année
           </Badge>
         </div>
@@ -209,9 +241,7 @@ export function ProfitabilityChart({
                   <span>Chiffre d'affaires</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold">
-                    {formatCurrency(currentData.revenue)}
-                  </span>
+                  <span className="text-2xl font-bold">{formatCurrency(currentData.revenue)}</span>
                   {getTrendIcon(currentData.revenue, previousData?.revenue)}
                 </div>
                 {previousData && (
@@ -255,9 +285,7 @@ export function ProfitabilityChart({
                   <PieChart className="h-4 w-4" />
                   <span>EBITDA</span>
                 </div>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(currentData.ebitda)}
-                </div>
+                <div className="text-2xl font-bold">{formatCurrency(currentData.ebitda)}</div>
                 <div className="text-xs text-muted-foreground">
                   Marge: {formatPercent(currentData.ebitdaMargin)}
                 </div>
@@ -307,20 +335,25 @@ export function ProfitabilityChart({
                     </thead>
                     <tbody>
                       {currentData.segments.map((segment, index) => (
-                        <tr 
-                          key={index} 
+                        <tr
+                          key={index}
                           className="border-b cursor-pointer hover:bg-gray-50"
                           onClick={() => onSegmentClick?.(segment.name)}
                         >
                           <td className="py-2 font-medium">{segment.name}</td>
                           <td className="py-2 text-right">{formatCurrency(segment.revenue)}</td>
                           <td className="py-2 text-right">{formatCurrency(segment.profit)}</td>
-                          <td className={`py-2 text-right font-medium ${getMarginColor(segment.margin)}`}>
+                          <td
+                            className={`py-2 text-right font-medium ${getMarginColor(segment.margin)}`}
+                          >
                             {formatPercent(segment.margin)}
                           </td>
                           <td className="py-2 text-right">
-                            <span className={segment.growth >= 0 ? 'text-green-600' : 'text-red-600'}>
-                              {segment.growth >= 0 ? '+' : ''}{formatPercent(segment.growth)}
+                            <span
+                              className={segment.growth >= 0 ? 'text-green-600' : 'text-red-600'}
+                            >
+                              {segment.growth >= 0 ? '+' : ''}
+                              {formatPercent(segment.growth)}
                             </span>
                           </td>
                           <td className="py-2 text-right">{formatPercent(segment.contribution)}</td>
@@ -337,17 +370,28 @@ export function ProfitabilityChart({
                 <div className="text-sm font-medium mb-3">Produits les plus rentables</div>
                 <div className="space-y-2">
                   {currentData.products.slice(0, 5).map((product, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 border rounded"
+                    >
                       <div>
                         <div className="font-medium text-sm">{product.reference}</div>
                         <div className="text-xs text-muted-foreground">{product.name}</div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <div className="text-sm font-medium">{formatCurrency(product.profit)}</div>
-                          <div className="text-xs text-muted-foreground">Volume: {product.volume}</div>
+                          <div className="text-sm font-medium">
+                            {formatCurrency(product.profit)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Volume: {product.volume}
+                          </div>
                         </div>
-                        <Badge className={getMarginColor(product.margin).replace('text-', 'bg-').replace('600', '100')}>
+                        <Badge
+                          className={getMarginColor(product.margin)
+                            .replace('text-', 'bg-')
+                            .replace('600', '100')}
+                        >
                           {formatPercent(product.margin)}
                         </Badge>
                       </div>
@@ -365,7 +409,9 @@ export function ProfitabilityChart({
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">BFR</div>
-                  <div className="font-medium">{formatCurrency(currentData.kpis.workingCapital)}</div>
+                  <div className="font-medium">
+                    {formatCurrency(currentData.kpis.workingCapital)}
+                  </div>
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">DSO</div>
@@ -389,16 +435,14 @@ export function ProfitabilityChart({
                   <span className="font-medium text-sm">Attention: Marge nette faible</span>
                 </div>
                 <p className="text-xs text-orange-700 mt-1">
-                  La marge nette de {formatPercent(currentData.netMargin)} est en dessous du seuil recommandé de 5%.
+                  La marge nette de {formatPercent(currentData.netMargin)} est en dessous du seuil
+                  recommandé de 5%.
                 </p>
               </div>
             )}
             {onViewDetails && (
               <div className="mt-4 flex justify-center">
-                <button
-                  onClick={onViewDetails}
-                  className="text-sm text-blue-600 hover:underline"
-                >
+                <button onClick={onViewDetails} className="text-sm text-blue-600 hover:underline">
                   Voir l'analyse financière complète →
                 </button>
               </div>

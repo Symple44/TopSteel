@@ -152,7 +152,7 @@ function getStoredTheme(): Theme | null {
   try {
     if (typeof window === 'undefined') return null
 
-    return (localStorage.getItem(DEFAULT_STORAGE_KEY) as Theme) || null
+    return (localStorage?.getItem(DEFAULT_STORAGE_KEY) as Theme) || null
   } catch (_error) {
     return null
   }
@@ -172,7 +172,7 @@ function setStoredTheme(theme: Theme): boolean {
 function removeStoredTheme(): boolean {
   try {
     if (typeof window === 'undefined') return false
-    localStorage.removeItem(DEFAULT_STORAGE_KEY)
+    localStorage?.removeItem(DEFAULT_STORAGE_KEY)
 
     return true
   } catch (_error) {
@@ -195,17 +195,17 @@ function applyTheme(theme: ResolvedTheme, attribute: string, colors: ThemeColors
 
     // Appliquer l'attribut de thème
     if (attribute === 'class') {
-      root.classList.remove('light', 'dark')
-      root.classList.add(theme)
+      root?.classList?.remove('light', 'dark')
+      root?.classList?.add(theme)
     } else {
-      root.setAttribute('data-theme', theme)
+      root?.setAttribute('data-theme', theme)
     }
 
     // Appliquer les variables CSS
     for (const [key, value] of Object.entries(colors)) {
-      const cssVar = `--${key.replace(/[A-Z]/g, '-$&').toLowerCase()}`
+      const cssVar = `--${key?.replace(/[A-Z]/g, '-$&').toLowerCase()}`
 
-      root.style.setProperty(cssVar, value)
+      root?.style?.setProperty(cssVar, value)
     }
 
     // Dispatch custom event pour les listeners externes
@@ -303,7 +303,7 @@ export function ThemeProvider({
   const hydrationStartRef = React.useRef(Date.now())
 
   // ===== RÉSOLUTION DU THÈME =====
-  const resolveTheme = React.useCallback(
+  const resolveTheme = React?.useCallback(
     (currentTheme: Theme): ResolvedTheme => {
       if (currentTheme === 'system') {
         return enableSystem ? getSystemTheme() : fallbackTheme
@@ -315,7 +315,7 @@ export function ThemeProvider({
   )
 
   // ===== MISE À JOUR DU THÈME RÉSOLU =====
-  const updateResolvedTheme = React.useCallback(
+  const updateResolvedTheme = React?.useCallback(
     (newTheme: Theme) => {
       const resolved = resolveTheme(newTheme)
 
@@ -331,14 +331,14 @@ export function ThemeProvider({
       applyTheme(resolved, attribute, colors)
 
       if (enableMetrics) {
-        ThemeMetricsCollector.recordTransition()
+        ThemeMetricsCollector?.recordTransition()
       }
     },
     [resolveTheme, attribute, customColors, enableMetrics]
   )
 
   // ===== SETTER PRINCIPAL =====
-  const setTheme = React.useCallback(
+  const setTheme = React?.useCallback(
     (newTheme: Theme) => {
       if (!['light', 'dark', 'system'].includes(newTheme)) {
         return
@@ -347,8 +347,8 @@ export function ThemeProvider({
       setIsChanging(true)
 
       // Clear any pending timeout
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+      if (timeoutRef?.current) {
+        clearTimeout(timeoutRef?.current)
       }
 
       try {
@@ -359,29 +359,31 @@ export function ThemeProvider({
         const saved = setStoredTheme(newTheme)
 
         if (!saved && enableMetrics) {
-          ThemeMetricsCollector.recordStorageError()
+          ThemeMetricsCollector?.recordStorageError()
         }
 
         if (enableMetrics) {
-          ThemeMetricsCollector.recordThemeChange()
+          ThemeMetricsCollector?.recordThemeChange()
         }
       } catch (_error) {
         if (enableMetrics) {
-          ThemeMetricsCollector.recordError()
+          ThemeMetricsCollector?.recordError()
         }
       }
 
       // Reset changing state après transition
-      timeoutRef.current = setTimeout(() => {
-        setIsChanging(false)
-      }, transitionDuration + 50)
+      if (timeoutRef.current !== undefined) {
+        timeoutRef.current = setTimeout(() => {
+          setIsChanging(false)
+        }, transitionDuration + 50)
+      }
     },
     [updateResolvedTheme, enableMetrics, transitionDuration]
   )
 
   // ===== HYDRATATION INITIALE =====
-  React.useEffect(() => {
-    const hydrationStart = hydrationStartRef.current
+  React?.useEffect(() => {
+    const hydrationStart = hydrationStartRef?.current
 
     try {
       // Obtenir le thème initial depuis le storage ou utiliser le défaut
@@ -394,21 +396,21 @@ export function ThemeProvider({
       const hydrationTime = Date.now() - hydrationStart
 
       if (enableMetrics) {
-        ThemeMetricsCollector.recordHydration(hydrationTime)
+        ThemeMetricsCollector?.recordHydration(hydrationTime)
       }
 
       setIsHydrated(true)
     } catch (_error) {
       if (enableMetrics) {
-        ThemeMetricsCollector.recordError()
+        ThemeMetricsCollector?.recordError()
       }
       setIsHydrated(true) // Set hydrated même en cas d'erreur
     }
   }, [defaultTheme, updateResolvedTheme, enableMetrics])
 
   // ===== LISTENER SYSTÈME =====
-  React.useEffect(() => {
-    if (!enableSystem || theme !== 'system') return
+  React?.useEffect(() => {
+    if (!enableSystem || theme !== 'system') return undefined
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
@@ -416,14 +418,14 @@ export function ThemeProvider({
       updateResolvedTheme('system')
     }
 
-    mediaQuery.addEventListener('change', handleChange)
+    mediaQuery?.addEventListener('change', handleChange)
 
-    return () => mediaQuery.removeEventListener('change', handleChange)
+    return () => mediaQuery?.removeEventListener('change', handleChange)
   }, [theme, enableSystem, updateResolvedTheme])
 
   // ===== SYNCHRONISATION MULTI-ONGLETS =====
-  React.useEffect(() => {
-    if (!enableSync) return
+  React?.useEffect(() => {
+    if (!enableSync) return undefined
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === storageKey && e.newValue) {
@@ -442,7 +444,7 @@ export function ThemeProvider({
   }, [theme, storageKey, enableSync, updateResolvedTheme])
 
   // ===== MÉTHODES UTILITAIRES =====
-  const toggleTheme = React.useCallback(() => {
+  const toggleTheme = React?.useCallback(() => {
     if (theme === 'system') {
       setTheme(resolvedTheme === 'light' ? 'dark' : 'light')
     } else {
@@ -450,11 +452,11 @@ export function ThemeProvider({
     }
   }, [theme, resolvedTheme, setTheme])
 
-  const setSystemTheme = React.useCallback(() => {
+  const setSystemTheme = React?.useCallback(() => {
     setTheme('system')
   }, [setTheme])
 
-  const clearTheme = React.useCallback(() => {
+  const clearTheme = React?.useCallback(() => {
     removeStoredTheme()
     setTheme(defaultTheme)
   }, [setTheme, defaultTheme])
@@ -466,7 +468,7 @@ export function ThemeProvider({
     ...customColors[resolvedTheme],
   }
   const metrics = enableMetrics
-    ? ThemeMetricsCollector.getMetrics()
+    ? ThemeMetricsCollector?.getMetrics()
     : {
         changeCount: 0,
         lastChange: 0,
@@ -492,10 +494,10 @@ export function ThemeProvider({
   }
 
   // ===== NETTOYAGE =====
-  React.useEffect(() => {
+  React?.useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+      if (timeoutRef?.current) {
+        clearTimeout(timeoutRef?.current)
       }
     }
   }, [])
@@ -510,7 +512,7 @@ export function ThemeProvider({
 // =============================================
 
 export function useTheme(): ThemeProviderContext {
-  const context = React.useContext(ThemeProviderContext)
+  const context = React?.useContext(ThemeProviderContext)
 
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider')
@@ -537,15 +539,15 @@ export function useThemeDebug(): {
 } {
   const { theme, resolvedTheme, toggleTheme } = useTheme()
 
-  const logMetrics = React.useCallback(() => {
-    const _metrics = ThemeMetricsCollector.getMetrics()
+  const logMetrics = React?.useCallback(() => {
+    const _metrics = ThemeMetricsCollector?.getMetrics()
   }, [])
 
-  const resetMetrics = React.useCallback(() => {
-    ThemeMetricsCollector.reset()
+  const resetMetrics = React?.useCallback(() => {
+    ThemeMetricsCollector?.reset()
   }, [])
 
-  const getCurrentTheme = React.useCallback(
+  const getCurrentTheme = React?.useCallback(
     () => ({
       theme,
       resolved: resolvedTheme,
@@ -553,7 +555,7 @@ export function useThemeDebug(): {
     [theme, resolvedTheme]
   )
 
-  const testThemeSwitch = React.useCallback(() => {
+  const testThemeSwitch = React?.useCallback(() => {
     toggleTheme()
     setTimeout(() => {
       toggleTheme()

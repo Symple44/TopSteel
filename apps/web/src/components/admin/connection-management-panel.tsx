@@ -40,7 +40,7 @@ interface ConnectionManagementPanelProps {
   isLoading?: boolean
 }
 
-export default function ConnectionManagementPanel({
+export function ConnectionManagementPanel({
   connections,
   onViewDetails,
   onCloseConnection,
@@ -80,13 +80,13 @@ export default function ConnectionManagementPanel({
     switch (connection.status) {
       case 'active':
         return (
-          <Badge variant="success" className="text-xs">
+          <Badge variant="default" className="text-xs">
             Active
           </Badge>
         )
       case 'idle':
         return (
-          <Badge variant="warning" className="text-xs">
+          <Badge variant="secondary" className="text-xs">
             Inactive
           </Badge>
         )
@@ -125,7 +125,7 @@ export default function ConnectionManagementPanel({
     return `${minutes}m`
   }
 
-  const filteredConnections = connections.filter((conn) => {
+  const filteredConnections = connections?.filter((conn) => {
     if (filterStatus === 'all') return true
     if (filterStatus === 'active') return conn.isInitialized && conn.status === 'active'
     if (filterStatus === 'idle') return conn.isInitialized && conn.status === 'idle'
@@ -147,14 +147,15 @@ export default function ConnectionManagementPanel({
           <h3 className="text-lg font-semibold">Gestion des Connexions</h3>
           <p className="text-sm text-muted-foreground">
             {connections.length} connexion{connections.length !== 1 ? 's' : ''} tenant
-            {filteredConnections.length !== connections.length &&
-              ` (${filteredConnections.length} affiché${filteredConnections.length !== 1 ? 's' : ''})`}
+            {filteredConnections?.length !== connections.length &&
+              ` (${filteredConnections?.length} affiché${filteredConnections?.length !== 1 ? 's' : ''})`}
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="flex rounded-lg border">
             {(['all', 'active', 'idle', 'error'] as const).map((filter) => (
               <Button
+                type="button"
                 key={filter}
                 size="sm"
                 variant={filterStatus === filter ? 'default' : 'ghost'}
@@ -169,7 +170,7 @@ export default function ConnectionManagementPanel({
                   (
                   {filter === 'all'
                     ? connections.length
-                    : connections.filter((c) =>
+                    : connections?.filter((c) =>
                         filter === 'active'
                           ? c.isInitialized && c.status === 'active'
                           : filter === 'idle'
@@ -183,7 +184,13 @@ export default function ConnectionManagementPanel({
               </Button>
             ))}
           </div>
-          <Button size="sm" variant="outline" onClick={onRefresh} disabled={isLoading}>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={onRefresh}
+            disabled={isLoading}
+          >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
@@ -197,7 +204,7 @@ export default function ConnectionManagementPanel({
               <Server className="w-4 h-4 text-blue-600" />
               <div>
                 <div className="text-2xl font-bold">
-                  {connections.filter((c) => c.isInitialized).length}
+                  {connections?.filter((c) => c.isInitialized).length}
                 </div>
                 <div className="text-xs text-muted-foreground">Initialisées</div>
               </div>
@@ -211,7 +218,7 @@ export default function ConnectionManagementPanel({
               <Activity className="w-4 h-4 text-green-600" />
               <div>
                 <div className="text-2xl font-bold">
-                  {connections.filter((c) => c.status === 'active').length}
+                  {connections?.filter((c) => c.status === 'active').length}
                 </div>
                 <div className="text-xs text-muted-foreground">Actives</div>
               </div>
@@ -225,7 +232,7 @@ export default function ConnectionManagementPanel({
               <HardDrive className="w-4 h-4 text-purple-600" />
               <div>
                 <div className="text-2xl font-bold">
-                  {connections.reduce((sum, c) => sum + (c.queryCount || 0), 0)}
+                  {connections?.reduce((sum, c) => sum + (c.queryCount ?? 0), 0)}
                 </div>
                 <div className="text-xs text-muted-foreground">Requêtes total</div>
               </div>
@@ -239,7 +246,7 @@ export default function ConnectionManagementPanel({
               <Users className="w-4 h-4 text-orange-600" />
               <div>
                 <div className="text-2xl font-bold">
-                  {connections.reduce((sum, c) => sum + (c.activeQueries || 0), 0)}
+                  {connections?.reduce((sum, c) => sum + (c.activeQueries ?? 0), 0)}
                 </div>
                 <div className="text-xs text-muted-foreground">Requêtes actives</div>
               </div>
@@ -249,9 +256,9 @@ export default function ConnectionManagementPanel({
       </div>
 
       {/* Liste des connexions */}
-      {filteredConnections.length > 0 ? (
+      {filteredConnections?.length > 0 ? (
         <div className="space-y-3">
-          {filteredConnections.map((connection) => (
+          {filteredConnections?.map((connection) => (
             <Card
               key={connection.tenant}
               className={`hover:shadow-md transition-shadow ${
@@ -335,6 +342,7 @@ export default function ConnectionManagementPanel({
                     {/* Actions */}
                     <div className="flex items-center space-x-2">
                       <Button
+                        type="button"
                         size="sm"
                         variant="outline"
                         onClick={() => {
@@ -348,6 +356,7 @@ export default function ConnectionManagementPanel({
                       </Button>
 
                       <Button
+                        type="button"
                         size="sm"
                         variant="outline"
                         onClick={() => onCloseConnection?.(connection.tenant)}
@@ -395,11 +404,11 @@ export default function ConnectionManagementPanel({
                       <div className="space-y-2">
                         <h5 className="font-medium text-sm">Actions Rapides</h5>
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="outline" className="text-xs">
+                          <Button type="button" size="sm" variant="outline" className="text-xs">
                             <Settings className="w-3 h-3 mr-1" />
                             Configurer
                           </Button>
-                          <Button size="sm" variant="outline" className="text-xs">
+                          <Button type="button" size="sm" variant="outline" className="text-xs">
                             <RefreshCw className="w-3 h-3 mr-1" />
                             Redémarrer
                           </Button>
@@ -422,7 +431,7 @@ export default function ConnectionManagementPanel({
                 : 'Aucune connexion ne correspond aux filtres'}
             </p>
             {connections.length === 0 && (
-              <Button size="sm" className="mt-4">
+              <Button type="button" size="sm" className="mt-4">
                 <Plus className="w-4 h-4 mr-2" />
                 Créer une connexion
               </Button>

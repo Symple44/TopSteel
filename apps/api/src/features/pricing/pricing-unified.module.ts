@@ -77,9 +77,9 @@ import { PricingWebhooksService } from './services/pricing-webhooks.service'
       type: 'single',
       options: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
         password: process.env.REDIS_PASSWORD || undefined,
-        db: parseInt(process.env.REDIS_DB || '0'),
+        db: parseInt(process.env.REDIS_DB || '0', 10),
       },
     }),
 
@@ -87,7 +87,7 @@ import { PricingWebhooksService } from './services/pricing-webhooks.service'
     BullModule.forRoot({
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
       },
     }),
     BullModule.registerQueue({
@@ -183,10 +183,11 @@ import { PricingWebhooksService } from './services/pricing-webhooks.service'
         ]
 
         // Créer un scope sécurisé
-        const scope = {}
+        const scope: Record<string, unknown> = {}
+        const mathjsLib = mathjs as Record<string, unknown>
         allowedFunctions.forEach((fn) => {
-          if (mathjs[fn]) {
-            scope[fn] = mathjs[fn]
+          if (mathjsLib[fn]) {
+            scope[fn] = mathjsLib[fn]
           }
         })
 
@@ -200,18 +201,18 @@ import { PricingWebhooksService } from './services/pricing-webhooks.service'
       provide: 'PRICING_CONFIG',
       useValue: {
         cache: {
-          ttl: parseInt(process.env.PRICING_CACHE_TTL || '3600'), // 1 hour
-          maxKeys: parseInt(process.env.PRICING_CACHE_MAX_KEYS || '10000'),
+          ttl: parseInt(process.env.PRICING_CACHE_TTL || '3600', 10), // 1 hour
+          maxKeys: parseInt(process.env.PRICING_CACHE_MAX_KEYS || '10000', 10),
         },
         calculations: {
-          maxBulkSize: parseInt(process.env.PRICING_MAX_BULK_SIZE || '1000'),
-          timeout: parseInt(process.env.PRICING_TIMEOUT || '30000'), // 30s
-          circuitBreakerThreshold: parseInt(process.env.PRICING_CB_THRESHOLD || '5'),
+          maxBulkSize: parseInt(process.env.PRICING_MAX_BULK_SIZE || '1000', 10),
+          timeout: parseInt(process.env.PRICING_TIMEOUT || '30000', 10), // 30s
+          circuitBreakerThreshold: parseInt(process.env.PRICING_CB_THRESHOLD || '5', 10),
         },
         webhooks: {
-          maxRetries: parseInt(process.env.WEBHOOK_MAX_RETRIES || '3'),
-          timeout: parseInt(process.env.WEBHOOK_TIMEOUT || '5000'),
-          maxSubscriptionsPerSociete: parseInt(process.env.WEBHOOK_MAX_SUBS || '50'),
+          maxRetries: parseInt(process.env.WEBHOOK_MAX_RETRIES || '3', 10),
+          timeout: parseInt(process.env.WEBHOOK_TIMEOUT || '5000', 10),
+          maxSubscriptionsPerSociete: parseInt(process.env.WEBHOOK_MAX_SUBS || '50', 10),
         },
         ml: {
           modelPath: process.env.ML_MODEL_PATH || './models/pricing',
@@ -219,8 +220,8 @@ import { PricingWebhooksService } from './services/pricing-webhooks.service'
           confidenceThreshold: parseFloat(process.env.ML_CONFIDENCE_THRESHOLD || '0.7'),
         },
         analytics: {
-          retentionDays: parseInt(process.env.ANALYTICS_RETENTION_DAYS || '90'),
-          batchSize: parseInt(process.env.ANALYTICS_BATCH_SIZE || '1000'),
+          retentionDays: parseInt(process.env.ANALYTICS_RETENTION_DAYS || '90', 10),
+          batchSize: parseInt(process.env.ANALYTICS_BATCH_SIZE || '1000', 10),
         },
       },
     },

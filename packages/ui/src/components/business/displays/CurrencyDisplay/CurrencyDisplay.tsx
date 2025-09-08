@@ -1,5 +1,5 @@
 'use client'
-import { DollarSign, Euro, PoundSterling, JapaneseYen } from 'lucide-react'
+import { DollarSign, Euro, JapaneseYen, PoundSterling } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
 export type Currency = 'EUR' | 'USD' | 'GBP' | 'JPY' | 'CHF' | 'CAD' | 'AUD'
 interface CurrencyDisplayProps {
@@ -89,7 +89,7 @@ export function CurrencyDisplay({
   const Icon = getCurrencyIcon(currency)
   const formattedAmount = formatCurrency(amount, currency)
   return (
-    <span 
+    <span
       className={cn(
         'inline-flex items-center gap-1 font-medium tabular-nums',
         getVariantClasses(),
@@ -99,9 +99,7 @@ export function CurrencyDisplay({
       title={`${amount.toLocaleString(locale)} ${currency}`}
     >
       {showIcon && (
-        <Icon className={cn(
-          size === 'sm' ? 'h-3 w-3' : size === 'lg' ? 'h-5 w-5' : 'h-4 w-4'
-        )} />
+        <Icon className={cn(size === 'sm' ? 'h-3 w-3' : size === 'lg' ? 'h-5 w-5' : 'h-4 w-4')} />
       )}
       {formattedAmount}
     </span>

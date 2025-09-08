@@ -21,7 +21,7 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
     const loadOverrides = async () => {
       try {
         // Loading translation overrides
-        await translator.loadOverrides()
+        await translator?.loadOverrides()
 
         if (mounted) {
           // Translation overrides loaded
@@ -40,7 +40,9 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
     // Écouter les événements de mise à jour des traductions
     const handleTranslationUpdate = () => {
       // Translation update received
-      translator.refreshOverrides().catch(console.error)
+      translator?.refreshOverrides().catch(() => {
+        // Translation refresh error (silenced)
+      })
     }
 
     window.addEventListener('translation-updated', handleTranslationUpdate)
@@ -76,7 +78,7 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
  */
 export function useRefreshTranslations() {
   const refresh = async () => {
-    await translator.refreshOverrides()
+    await translator?.refreshOverrides()
     // Déclencher un événement pour notifier d'autres composants
     window.dispatchEvent(new Event('translation-updated'))
   }

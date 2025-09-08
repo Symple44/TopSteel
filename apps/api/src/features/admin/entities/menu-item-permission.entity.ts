@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { MenuItem } from './menu-item.entity'
+// import { MenuItem } from './menu-item.entity';
 
 @Entity('menu_item_permissions')
 @Index(['menuItemId', 'permissionId'], { unique: true })
@@ -30,12 +30,9 @@ export class MenuItemPermission {
   createdAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => MenuItem,
-    (menuItem) => menuItem.permissions
-  )
+  @ManyToOne('MenuItem', 'permissions', { lazy: true })
   @JoinColumn({ name: 'menuItemId' })
-  menuItem!: MenuItem
+  menuItem!: any
 
   // Méthodes utilitaires
   static create(

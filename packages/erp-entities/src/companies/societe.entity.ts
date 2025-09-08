@@ -99,7 +99,7 @@ export class Societe extends CommonEntity {
   configuration!: {
     modules?: string[] // Modules activés
     features?: string[] // Fonctionnalités spécifiques
-    theme?: Record<string, any>
+    theme?: Record<string, unknown>
     locale?: string
     timezone?: string
     marketplace?: {
@@ -118,11 +118,11 @@ export class Societe extends CommonEntity {
       enableCompare?: boolean
       enableReviews?: boolean
       social?: Record<string, string>
-      settings?: Record<string, any>
+      settings?: Record<string, unknown>
     }
   }
 
   // Métadonnées
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }

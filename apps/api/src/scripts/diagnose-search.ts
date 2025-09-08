@@ -19,7 +19,7 @@ async function diagnose() {
 
     // Obtenir le client ElasticSearch directement
     const searchService = app.get('GlobalSearchService')
-    const elasticsearchClient = (searchService as any).elasticsearchStrategy?.client as Client
+    const elasticsearchClient = (searchService as unknown).elasticsearchStrategy?.client as Client
 
     if (!elasticsearchClient) {
       logger.error('Client ElasticSearch non disponible')
@@ -42,7 +42,7 @@ async function diagnose() {
     })
 
     if (sample.hits.hits.length > 0) {
-      sample.hits.hits.forEach((hit: any, i) => {
+      sample.hits.hits.forEach((hit: unknown, i) => {
         logger.log(`\nDocument ${i + 1}:`)
         logger.log(`  ID: ${hit._id}`)
         logger.log(`  Type: ${hit._source.type}`)
@@ -93,7 +93,7 @@ async function diagnose() {
 
     if (ipeSearchMulti.hits.hits.length > 0) {
       logger.log('  Premiers résultats:')
-      ipeSearchMulti.hits.hits.forEach((hit: any) => {
+      ipeSearchMulti.hits.hits.forEach((hit: unknown) => {
         logger.log(`    - ${hit._source.title || hit._source.designation} (score: ${hit._score})`)
       })
     }
@@ -148,9 +148,9 @@ async function diagnose() {
       },
     })
 
-    const buckets = (tenantAgg.aggregations?.tenants as any)?.buckets || []
+    const buckets = (tenantAgg.aggregations?.tenants as unknown)?.buckets || []
     if (buckets.length > 0) {
-      buckets.forEach((bucket: any) => {
+      buckets.forEach((bucket: unknown) => {
         logger.log(`  ${bucket.key}: ${bucket.doc_count} documents`)
       })
     } else {

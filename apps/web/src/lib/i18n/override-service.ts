@@ -32,7 +32,7 @@ class TranslationOverrideService {
       return Promise.resolve()
     }
 
-    this.loadPromise = this.fetchOverrides()
+    this.loadPromise = this?.fetchOverrides()
     return this.loadPromise
   }
 
@@ -43,13 +43,13 @@ class TranslationOverrideService {
         // Pas besoin d'authentification pour lire les traductions
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         return
       }
 
-      const data = await response.json()
-      if (data.success && data.overrides) {
-        this.overrides = data.overrides
+      const data = await response?.json()
+      if (data?.success && data?.overrides) {
+        this.overrides = data?.overrides
         this.isLoaded = true
 
         // Stocker dans localStorage pour un accès offline
@@ -62,7 +62,7 @@ class TranslationOverrideService {
       }
     } catch (_error) {
       // Essayer de charger depuis le cache localStorage
-      this.loadFromCache()
+      this?.loadFromCache()
     } finally {
       this.loadPromise = null
     }
@@ -75,11 +75,11 @@ class TranslationOverrideService {
     if (typeof window === 'undefined') return
 
     try {
-      const cached = localStorage.getItem('topsteel-translation-overrides')
-      const timestamp = localStorage.getItem('topsteel-translation-overrides-timestamp')
+      const cached = localStorage?.getItem('topsteel-translation-overrides')
+      const timestamp = localStorage?.getItem('topsteel-translation-overrides-timestamp')
 
       if (cached && timestamp) {
-        const age = Date.now() - parseInt(timestamp)
+        const age = Date.now() - parseInt(timestamp, 10)
         // Utiliser le cache s'il a moins de 24 heures
         if (age < 24 * 60 * 60 * 1000) {
           this.overrides = JSON.parse(cached)
@@ -103,7 +103,7 @@ class TranslationOverrideService {
     // Appliquer chaque override
     Object.entries(this.overrides).forEach(([overrideId, override]) => {
       // L'ID est le chemin complet de la clé (ex: "common.buttons.save")
-      const keys = overrideId.split('.')
+      const keys = overrideId?.split('.')
 
       // Appliquer l'override pour chaque langue
       Object.entries(override.translations).forEach(([lang, value]) => {
@@ -138,11 +138,11 @@ class TranslationOverrideService {
     this.loadPromise = null
 
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('topsteel-translation-overrides')
-      localStorage.removeItem('topsteel-translation-overrides-timestamp')
+      localStorage?.removeItem('topsteel-translation-overrides')
+      localStorage?.removeItem('topsteel-translation-overrides-timestamp')
     }
 
-    return this.loadOverrides()
+    return this?.loadOverrides()
   }
 
   /**

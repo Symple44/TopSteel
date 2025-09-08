@@ -1,12 +1,18 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import { Percent, AlertCircle, Calculator, Info, Euro, TrendingUp, TrendingDown } from 'lucide-react'
+import { AlertCircle, Calculator, Euro, Info, Percent } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Label } from '../../../forms/label/Label'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { RadioGroup, RadioGroupItem } from '../../../primitives/radio-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export interface VatRate {
   value: number
   label: string
@@ -42,11 +48,37 @@ export interface VatInputProps {
   variant?: 'default' | 'filled' | 'ghost'
 }
 const DEFAULT_VAT_RATES: VatRate[] = [
-  { value: 20, label: '20% (Taux normal)', code: 'STD', isDefault: true, description: 'Taux normal en France' },
-  { value: 10, label: '10% (Taux intermédiaire)', code: 'INT', description: 'Restauration, transport, hébergement' },
-  { value: 5.5, label: '5,5% (Taux réduit)', code: 'RED', description: 'Produits de première nécessité' },
-  { value: 2.1, label: '2,1% (Taux super-réduit)', code: 'SUP', description: 'Médicaments, presse' },
-  { value: 0, label: '0% (Exonéré)', code: 'EXO', description: 'Exportations, services intracommunautaires' },
+  {
+    value: 20,
+    label: '20% (Taux normal)',
+    code: 'STD',
+    isDefault: true,
+    description: 'Taux normal en France',
+  },
+  {
+    value: 10,
+    label: '10% (Taux intermédiaire)',
+    code: 'INT',
+    description: 'Restauration, transport, hébergement',
+  },
+  {
+    value: 5.5,
+    label: '5,5% (Taux réduit)',
+    code: 'RED',
+    description: 'Produits de première nécessité',
+  },
+  {
+    value: 2.1,
+    label: '2,1% (Taux super-réduit)',
+    code: 'SUP',
+    description: 'Médicaments, presse',
+  },
+  {
+    value: 0,
+    label: '0% (Exonéré)',
+    code: 'EXO',
+    description: 'Exportations, services intracommunautaires',
+  },
 ]
 export function VatInput({
   value,
@@ -75,13 +107,14 @@ export function VatInput({
   size = 'md',
   variant = 'default',
 }: VatInputProps) {
+  const ids = useFormFieldIds(['vatAmountInput'])
   const [inputValue, setInputValue] = useState<string>(
     value !== undefined ? value.toFixed(precision) : ''
   )
   const [customRate, setCustomRate] = useState<string>(vatRate.toString())
   const [selectedRateValue, setSelectedRateValue] = useState(vatRate)
   const [isCustomRateMode, setIsCustomRateMode] = useState(
-    allowCustomRate && !availableRates.some(rate => rate.value === vatRate)
+    allowCustomRate && !availableRates.some((rate) => rate.value === vatRate)
   )
   // Calculate VAT amounts
   const calculations = useMemo(() => {
@@ -95,7 +128,7 @@ export function VatInput({
         vatAmount,
         netAmount,
         grossAmount: base,
-        rate
+        rate,
       }
     } else {
       // VAT is added to the base amount
@@ -105,7 +138,7 @@ export function VatInput({
         vatAmount,
         netAmount: base,
         grossAmount,
-        rate
+        rate,
       }
     }
   }, [baseAmount, selectedRateValue, displayMode])
@@ -130,18 +163,18 @@ export function VatInput({
     if (regex.test(newValue)) {
       setInputValue(newValue)
       const numValue = parseFloat(newValue)
-      if (!isNaN(numValue)) {
+      if (!Number.isNaN(numValue)) {
         onChange?.(numValue)
       }
     }
   }
   const handleRateChange = (newRate: string) => {
     const rate = parseFloat(newRate)
-    if (!isNaN(rate)) {
+    if (!Number.isNaN(rate)) {
       setSelectedRateValue(rate)
       onVatRateChange?.(rate)
       // Check if it's a predefined rate
-      const predefinedRate = availableRates.find(r => r.value === rate)
+      const predefinedRate = availableRates.find((r) => r.value === rate)
       if (predefinedRate) {
         setIsCustomRateMode(false)
       }
@@ -151,7 +184,7 @@ export function VatInput({
     const newRate = e.target.value
     setCustomRate(newRate)
     const rate = parseFloat(newRate)
-    if (!isNaN(rate) && rate >= minRate && rate <= maxRate) {
+    if (!Number.isNaN(rate) && rate >= minRate && rate <= maxRate) {
       setSelectedRateValue(rate)
       onVatRateChange?.(rate)
     }
@@ -160,7 +193,7 @@ export function VatInput({
     setIsCustomRateMode(!isCustomRateMode)
     if (isCustomRateMode) {
       // Switch back to predefined rates
-      const defaultRate = availableRates.find(r => r.isDefault) || availableRates[0]
+      const defaultRate = availableRates.find((r) => r.isDefault) || availableRates[0]
       if (defaultRate) {
         handleRateChange(defaultRate.value.toString())
       }
@@ -184,7 +217,7 @@ export function VatInput({
     filled: 'bg-muted border-0',
     ghost: 'border-0 bg-transparent',
   }
-  const selectedRate = availableRates.find(r => r.value === selectedRateValue)
+  const selectedRate = availableRates.find((r) => r.value === selectedRateValue)
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
@@ -197,9 +230,30 @@ export function VatInput({
         {/* VAT Rate Selection */}
         <div className="space-y-2">
           <Label className="text-sm font-medium">Taux de TVA</Label>
-          {!isCustomRateMode ? (
-            <Select 
-              value={selectedRateValue.toString()} 
+          {isCustomRateMode ? (
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={customRate}
+                  onChange={handleCustomRateChange}
+                  disabled={disabled}
+                  readOnly={readOnly}
+                  placeholder="20.0"
+                  className={cn(
+                    'w-full rounded-md px-3 py-2 text-sm ring-offset-background transition-colors pr-8',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    'disabled:cursor-not-allowed disabled:opacity-50',
+                    sizeClasses[size],
+                    variantClasses[variant]
+                  )}
+                />
+                <Percent className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              </div>
+            </div>
+          ) : (
+            <Select
+              value={selectedRateValue.toString()}
               onValueChange={handleRateChange}
               disabled={disabled}
             >
@@ -222,27 +276,6 @@ export function VatInput({
                 ))}
               </SelectContent>
             </Select>
-          ) : (
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={customRate}
-                  onChange={handleCustomRateChange}
-                  disabled={disabled}
-                  readOnly={readOnly}
-                  placeholder="20.0"
-                  className={cn(
-                    'w-full rounded-md px-3 py-2 text-sm ring-offset-background transition-colors pr-8',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                    'disabled:cursor-not-allowed disabled:opacity-50',
-                    sizeClasses[size],
-                    variantClasses[variant]
-                  )}
-                />
-                <Percent className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
           )}
           {allowCustomRate && (
             <Button
@@ -260,12 +293,12 @@ export function VatInput({
         {/* VAT Amount Input (if not using automatic calculation) */}
         {!showCalculation && (
           <div className="space-y-2">
-            <Label htmlFor="vat-amount-input" className="text-sm font-medium">
+            <Label htmlFor={ids.vatAmountInput} className="text-sm font-medium">
               Montant TVA
             </Label>
             <div className="relative">
               <input
-                id="vat-amount-input"
+                id={ids.vatAmountInput}
                 type="text"
                 inputMode="decimal"
                 value={inputValue}
@@ -305,13 +338,13 @@ export function VatInput({
                   {displayMode === 'inclusive' ? 'Montant TTC' : 'Montant HT'}
                 </span>
                 <span className="font-medium">
-                  {formatCurrency(displayMode === 'inclusive' ? calculations.grossAmount : calculations.netAmount)}
+                  {formatCurrency(
+                    displayMode === 'inclusive' ? calculations.grossAmount : calculations.netAmount
+                  )}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">
-                  TVA ({selectedRateValue}%)
-                </span>
+                <span className="text-muted-foreground">TVA ({selectedRateValue}%)</span>
                 <span className="font-medium text-blue-600">
                   {formatCurrency(calculations.vatAmount)}
                 </span>
@@ -322,7 +355,11 @@ export function VatInput({
                     {displayMode === 'inclusive' ? 'Montant HT' : 'Montant TTC'}
                   </span>
                   <span className="font-bold">
-                    {formatCurrency(displayMode === 'inclusive' ? calculations.netAmount : calculations.grossAmount)}
+                    {formatCurrency(
+                      displayMode === 'inclusive'
+                        ? calculations.netAmount
+                        : calculations.grossAmount
+                    )}
                   </span>
                 </div>
               </div>
@@ -340,9 +377,7 @@ export function VatInput({
           </div>
         )}
       </div>
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

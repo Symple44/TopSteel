@@ -1,7 +1,7 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { AlertTriangle, ArrowUp, ArrowDown, Minus } from 'lucide-react'
+import { AlertTriangle, ArrowDown, ArrowUp, Minus } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low' | 'none'
 interface TaskPriorityBadgeProps {
   priority: TaskPriority
@@ -9,11 +9,11 @@ interface TaskPriorityBadgeProps {
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
-export function TaskPriorityBadge({ 
-  priority, 
-  showIcon = true, 
+export function TaskPriorityBadge({
+  priority,
+  showIcon = true,
   size = 'md',
-  className 
+  className,
 }: TaskPriorityBadgeProps) {
   const getPriorityConfig = (priority: TaskPriority) => {
     switch (priority) {
@@ -78,7 +78,7 @@ export function TaskPriorityBadge({
   const config = getPriorityConfig(priority)
   const Icon = config.icon
   return (
-    <Badge 
+    <Badge
       variant="outline"
       className={cn(
         'inline-flex items-center gap-1.5 font-medium',

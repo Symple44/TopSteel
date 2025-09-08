@@ -1,23 +1,13 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { Check, ChevronsUpDown, Search, Plus, Truck, Package, Star, AlertCircle } from 'lucide-react'
+import { AlertCircle, Check, ChevronsUpDown, Plus, Search, Star, Truck } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
-import { Button } from '../../../primitives/button/Button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '../../../navigation'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../../../primitives'
 import { Badge } from '../../../data-display/badge'
 import { Label } from '../../../forms/label/Label'
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '../../../navigation'
+import { Popover, PopoverContent, PopoverTrigger } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Supplier {
   id: string
   code: string
@@ -76,7 +66,7 @@ export function SupplierSelector({
   multiple = false,
   required = false,
   disabled = false,
-  placeholder = "Sélectionner un fournisseur...",
+  placeholder = 'Sélectionner un fournisseur...',
   label,
   helperText,
   showRating = true,
@@ -88,6 +78,7 @@ export function SupplierSelector({
   maxSelections,
   className,
 }: SupplierSelectorProps) {
+  const ids = useFormFieldIds(['supplierSelector'])
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSuppliers, setSelectedSuppliers] = useState<string[]>(
@@ -100,12 +91,10 @@ export function SupplierSelector({
       setSelectedSuppliers(value ? [value] : [])
     }
   }, [value, multiple])
-  const filteredSuppliers = suppliers.filter(supplier => {
+  const filteredSuppliers = suppliers.filter((supplier) => {
     if (filterByStatus && !filterByStatus.includes(supplier.status)) return false
     if (filterByCategories && supplier.categories) {
-      const hasCategory = filterByCategories.some(cat => 
-        supplier.categories?.includes(cat)
-      )
+      const hasCategory = filterByCategories.some((cat) => supplier.categories?.includes(cat))
       if (!hasCategory) return false
     }
     if (minRating && supplier.rating && supplier.rating < minRating) return false
@@ -115,35 +104,38 @@ export function SupplierSelector({
       supplier.name.toLowerCase().includes(query) ||
       supplier.code.toLowerCase().includes(query) ||
       supplier.email?.toLowerCase().includes(query) ||
-      supplier.categories?.some(cat => cat.toLowerCase().includes(query))
+      supplier.categories?.some((cat) => cat.toLowerCase().includes(query))
     )
   })
-  const handleSelect = useCallback((supplierId: string) => {
-    if (multiple) {
-      const newSelection = selectedSuppliers.includes(supplierId)
-        ? selectedSuppliers.filter(id => id !== supplierId)
-        : [...selectedSuppliers, supplierId]
-      if (maxSelections && newSelection.length > maxSelections) {
-        return
+  const handleSelect = useCallback(
+    (supplierId: string) => {
+      if (multiple) {
+        const newSelection = selectedSuppliers.includes(supplierId)
+          ? selectedSuppliers.filter((id) => id !== supplierId)
+          : [...selectedSuppliers, supplierId]
+        if (maxSelections && newSelection.length > maxSelections) {
+          return
+        }
+        setSelectedSuppliers(newSelection)
+        onChange?.(newSelection)
+      } else {
+        setSelectedSuppliers([supplierId])
+        onChange?.(supplierId)
+        setOpen(false)
       }
-      setSelectedSuppliers(newSelection)
-      onChange?.(newSelection)
-    } else {
-      setSelectedSuppliers([supplierId])
-      onChange?.(supplierId)
-      setOpen(false)
-    }
-  }, [selectedSuppliers, multiple, maxSelections, onChange])
+    },
+    [selectedSuppliers, multiple, maxSelections, onChange]
+  )
   const getSelectedSuppliersDisplay = () => {
     if (selectedSuppliers.length === 0) return placeholder
     if (multiple) {
       if (selectedSuppliers.length === 1) {
-        const supplier = suppliers.find(s => s.id === selectedSuppliers[0])
+        const supplier = suppliers.find((s) => s.id === selectedSuppliers[0])
         return supplier?.name || 'Fournisseur sélectionné'
       }
       return `${selectedSuppliers.length} fournisseurs sélectionnés`
     } else {
-      const supplier = suppliers.find(s => s.id === selectedSuppliers[0])
+      const supplier = suppliers.find((s) => s.id === selectedSuppliers[0])
       return supplier?.name || 'Fournisseur sélectionné'
     }
   }
@@ -183,7 +175,7 @@ export function SupplierSelector({
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <Label htmlFor="supplier-selector">
+        <Label htmlFor={ids.supplierSelector}>
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
@@ -191,7 +183,8 @@ export function SupplierSelector({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            id="supplier-selector"
+            type="button"
+            id={ids.supplierSelector}
             variant="outline"
             role="combobox"
             aria-expanded={open}
@@ -223,6 +216,7 @@ export function SupplierSelector({
                 Aucun fournisseur trouvé.
                 {showCreateButton && onSupplierCreate && (
                   <Button
+                    type="button"
                     variant="link"
                     size="sm"
                     onClick={() => {
@@ -257,15 +251,13 @@ export function SupplierSelector({
                             <div className="text-xs text-muted-foreground">
                               {supplier.code}
                               {supplier.categories && supplier.categories.length > 0 && (
-                                <> • {supplier.categories.slice(0, 2).join(', ')}</>  
+                                <> • {supplier.categories.slice(0, 2).join(', ')}</>
                               )}
                             </div>
                             {supplier.leadTime && (
                               <div className="text-xs text-muted-foreground">
                                 Délai: {supplier.leadTime} jours
-                                {supplier.minimumOrder && (
-                                  <> • Min: {supplier.minimumOrder}€</>
-                                )}
+                                {supplier.minimumOrder && <> • Min: {supplier.minimumOrder}€</>}
                               </div>
                             )}
                             {showPerformance && supplier.performance && (
@@ -283,9 +275,7 @@ export function SupplierSelector({
                         <div className="flex items-center gap-2">
                           {showRating && renderRating(supplier.rating)}
                           {getStatusBadge(supplier.status)}
-                          {selectedSuppliers.includes(supplier.id) && (
-                            <Check className="h-4 w-4" />
-                          )}
+                          {selectedSuppliers.includes(supplier.id) && <Check className="h-4 w-4" />}
                         </div>
                       </div>
                     </CommandItem>
@@ -296,6 +286,7 @@ export function SupplierSelector({
             {showCreateButton && onSupplierCreate && (
               <div className="border-t p-2">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="w-full"
@@ -312,9 +303,7 @@ export function SupplierSelector({
           </Command>
         </PopoverContent>
       </Popover>
-      {helperText && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

@@ -1,14 +1,27 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Plus, X, Search, Star, Award, AlertCircle, Hash, Filter } from 'lucide-react'
+import { AlertCircle, Award, Filter, Hash, Plus, Search, Star, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export type ProficiencyLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert'
-export type SkillCategory = 'technical' | 'soft' | 'language' | 'certification' | 'equipment' | 'safety' | 'other'
+export type SkillCategory =
+  | 'technical'
+  | 'soft'
+  | 'language'
+  | 'certification'
+  | 'equipment'
+  | 'safety'
+  | 'other'
 export interface Skill {
   id: string
   name: string
@@ -51,7 +64,7 @@ const proficiencyLevels: { value: ProficiencyLevel; label: string; color: string
   { value: 'advanced', label: 'Avancé', color: 'bg-green-100 text-green-800' },
   { value: 'expert', label: 'Expert', color: 'bg-purple-100 text-purple-800' },
 ]
-const skillCategories: { value: SkillCategory; label: string; icon: React.ComponentType<any> }[] = [
+const skillCategories: { value: SkillCategory; label: string; icon: React.ComponentType<unknown> }[] = [
   { value: 'technical', label: 'Technique', icon: Hash },
   { value: 'soft', label: 'Relationnelle', icon: Star },
   { value: 'language', label: 'Langue', icon: Award },
@@ -76,7 +89,7 @@ export function SkillsTagInput({
   showProficiency = true,
   showCategories = true,
   showVerification = false,
-  placeholder = "Ajouter une compétence...",
+  placeholder = 'Ajouter une compétence...',
   className,
 }: SkillsTagInputProps) {
   const [skills, setSkills] = useState<Skill[]>(value)
@@ -87,27 +100,29 @@ export function SkillsTagInput({
   const [selectedCategory, setSelectedCategory] = useState<SkillCategory | 'all'>('all')
   const [editingSkill, setEditingSkill] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
   useEffect(() => {
     setSkills(value)
   }, [value])
-  const searchSkills = useCallback(async (query: string) => {
-    if (!onSkillSearch || !query.trim()) {
-      setSearchSuggestions([])
-      return
-    }
-    setIsSearching(true)
-    try {
-      const results = await onSkillSearch(query)
-      setSearchSuggestions(results)
-      setShowSuggestions(true)
-    } catch (error) {
-      console.error('Error searching skills:', error)
-      setSearchSuggestions([])
-    } finally {
-      setIsSearching(false)
-    }
-  }, [onSkillSearch])
+  const searchSkills = useCallback(
+    async (query: string) => {
+      if (!onSkillSearch || !query.trim()) {
+        setSearchSuggestions([])
+        return
+      }
+      setIsSearching(true)
+      try {
+        const results = await onSkillSearch(query)
+        setSearchSuggestions(results)
+        setShowSuggestions(true)
+      } catch (_error) {
+        setSearchSuggestions([])
+      } finally {
+        setIsSearching(false)
+      }
+    },
+    [onSkillSearch]
+  )
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue)
     if (debounceRef.current) {
@@ -121,7 +136,7 @@ export function SkillsTagInput({
     if (!skillName.trim()) return
     if (maxSkills && skills.length >= maxSkills) return
     // Check if skill already exists
-    if (skills.some(skill => skill.name.toLowerCase() === skillName.toLowerCase())) {
+    if (skills.some((skill) => skill.name.toLowerCase() === skillName.toLowerCase())) {
       return
     }
     const newSkill: Skill = {
@@ -138,12 +153,12 @@ export function SkillsTagInput({
     inputRef.current?.focus()
   }
   const handleRemoveSkill = (skillId: string) => {
-    const updatedSkills = skills.filter(skill => skill.id !== skillId)
+    const updatedSkills = skills.filter((skill) => skill.id !== skillId)
     setSkills(updatedSkills)
     onChange?.(updatedSkills)
   }
   const handleUpdateSkill = (skillId: string, updates: Partial<Skill>) => {
-    const updatedSkills = skills.map(skill =>
+    const updatedSkills = skills.map((skill) =>
       skill.id === skillId ? { ...skill, ...updates } : skill
     )
     setSkills(updatedSkills)
@@ -163,20 +178,28 @@ export function SkillsTagInput({
     }
   }
   const getProficiencyLevel = (level: ProficiencyLevel) => {
-    return proficiencyLevels.find(p => p.value === level)
+    return proficiencyLevels.find((p) => p.value === level)
   }
   const getCategoryInfo = (category: SkillCategory) => {
-    return skillCategories.find(c => c.value === category)
+    return skillCategories.find((c) => c.value === category)
   }
-  const filteredSkills = selectedCategory === 'all' ? skills : skills.filter(skill => skill.category === selectedCategory)
-  const filteredSuggestions = categories ? searchSuggestions.filter(s => categories.includes(s.category)) : searchSuggestions
-  const groupedSuggestions = filteredSuggestions.reduce((acc, suggestion) => {
-    if (!acc[suggestion.category]) {
-      acc[suggestion.category] = []
-    }
-    acc[suggestion.category].push(suggestion)
-    return acc
-  }, {} as Record<SkillCategory, SkillSuggestion[]>)
+  const filteredSkills =
+    selectedCategory === 'all'
+      ? skills
+      : skills.filter((skill) => skill.category === selectedCategory)
+  const filteredSuggestions = categories
+    ? searchSuggestions.filter((s) => categories.includes(s.category))
+    : searchSuggestions
+  const groupedSuggestions = filteredSuggestions.reduce(
+    (acc, suggestion) => {
+      if (!acc[suggestion.category]) {
+        acc[suggestion.category] = []
+      }
+      acc[suggestion.category].push(suggestion)
+      return acc
+    },
+    {} as Record<SkillCategory, SkillSuggestion[]>
+  )
   return (
     <div className={cn('space-y-4', className)}>
       {label && (
@@ -276,7 +299,10 @@ export function SkillsTagInput({
       {showCategories && skills.length > 0 && (
         <div className="flex items-center gap-2">
           <Label className="text-sm">Catégorie:</Label>
-          <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as SkillCategory | 'all')}>
+          <Select
+            value={selectedCategory}
+            onValueChange={(value) => setSelectedCategory(value as SkillCategory | 'all')}
+          >
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -308,7 +334,9 @@ export function SkillsTagInput({
                   key={skill.id}
                   className={cn(
                     'flex items-center gap-2 p-2 border rounded-lg transition-colors',
-                    isEditing ? 'border-blue-500 bg-blue-50' : 'border-border bg-background hover:bg-muted'
+                    isEditing
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-border bg-background hover:bg-muted'
                   )}
                 >
                   <div className="flex items-center gap-2">
@@ -325,7 +353,9 @@ export function SkillsTagInput({
                       </Badge>
                     )}
                     {showVerification && skill.verified && (
-                      <Award className="h-3 w-3 text-green-600" title="Vérifié" />
+                      <div title="Vérifié">
+                        <Award className="h-3 w-3 text-green-600" />
+                      </div>
                     )}
                   </div>
                   <div className="flex items-center gap-1">
@@ -360,12 +390,15 @@ export function SkillsTagInput({
                         <div className="grid grid-cols-2 gap-1">
                           {proficiencyLevels.map((level) => (
                             <Button
+                              type="button"
                               key={level.value}
                               type="button"
                               variant={skill.proficiency === level.value ? 'default' : 'outline'}
                               size="sm"
                               className="text-xs"
-                              onClick={() => handleUpdateSkill(skill.id, { proficiency: level.value })}
+                              onClick={() =>
+                                handleUpdateSkill(skill.id, { proficiency: level.value })
+                              }
                             >
                               {level.label}
                             </Button>
@@ -389,7 +422,7 @@ export function SkillsTagInput({
           </div>
           <div className="flex flex-wrap gap-2">
             {skillCategories.map((category) => {
-              const count = skills.filter(skill => skill.category === category.value).length
+              const count = skills.filter((skill) => skill.category === category.value).length
               if (count === 0) return null
               const CategoryIcon = category.icon
               return (
@@ -402,9 +435,7 @@ export function SkillsTagInput({
           </div>
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

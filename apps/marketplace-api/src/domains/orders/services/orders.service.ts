@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, DataSource } from 'typeorm'
+import type { DataSource, Repository } from 'typeorm'
+import { Article } from '../../../shared/entities/erp/article.entity'
+import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
-import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
-import { Article } from '../../../shared/entities/erp/article.entity'
 
 export interface CreateOrderDto {
   customerId: string
@@ -57,8 +57,8 @@ export class OrdersService {
       where: {
         id: createOrderDto.customerId,
         tenantId,
-        isActive: true
-      }
+        isActive: true,
+      },
     })
 
     if (!customer) {
@@ -81,14 +81,14 @@ export class OrdersService {
         try {
           const articlesRepo = erpConnection.getRepository(Article)
           const article = await articlesRepo.findOne({
-            where: { id: item.productId }
+            where: { id: item.productId },
           })
 
           if (article) {
             productName = article.designation
             unitPrice = item.price || article.prixVenteHT || 0
           }
-        } catch (error) {
+        } catch (_error) {
           // Continue with default values if ERP connection fails
         }
       }
@@ -107,12 +107,12 @@ export class OrdersService {
         totalTTC: itemTotal * 1.2,
         unit: 'PCS',
         erpArticleId: item.productId,
-        productReference: `REF-${item.productId}`
+        productReference: `REF-${item.productId}`,
       })
     }
 
     // Calculate tax (example: 20% VAT)
-    const taxRate = 0.20
+    const taxRate = 0.2
     const tax = subtotal * taxRate
     const total = subtotal + tax
 
@@ -131,7 +131,7 @@ export class OrdersService {
       currency: 'EUR',
       shippingAddress: createOrderDto.shippingAddress,
       billingAddress: createOrderDto.billingAddress || createOrderDto.shippingAddress,
-      customerNotes: createOrderDto.notes
+      customerNotes: createOrderDto.notes,
     })
 
     const savedOrder = await this.orderRepository.save(order)
@@ -141,7 +141,7 @@ export class OrdersService {
       const orderItem = this.orderItemRepository.create({
         ...itemData,
         orderId: savedOrder.id,
-        order: savedOrder
+        order: savedOrder,
       })
       await this.orderItemRepository.save(orderItem)
     }
@@ -149,7 +149,7 @@ export class OrdersService {
     // Load complete order with items
     const completeOrder = await this.orderRepository.findOne({
       where: { id: savedOrder.id },
-      relations: ['items', 'customer']
+      relations: ['items', 'customer'],
     })
 
     return completeOrder!
@@ -162,7 +162,7 @@ export class OrdersService {
   ): Promise<MarketplaceOrder> {
     const where: any = {
       id: orderId,
-      societeId: tenantId
+      societeId: tenantId,
     }
 
     if (customerId) {
@@ -171,7 +171,7 @@ export class OrdersService {
 
     const order = await this.orderRepository.findOne({
       where,
-      relations: ['items', 'customer']
+      relations: ['items', 'customer'],
     })
 
     if (!order) {
@@ -190,7 +190,8 @@ export class OrdersService {
       offset?: number
     }
   ): Promise<{ orders: MarketplaceOrder[]; total: number }> {
-    const query = this.orderRepository.createQueryBuilder('order')
+    const query = this.orderRepository
+      .createQueryBuilder('order')
       .leftJoinAndSelect('order.items', 'items')
       .where('order.customerId = :customerId', { customerId })
       .andWhere('order.tenantId = :tenantId', { tenantId })
@@ -234,7 +235,7 @@ export class OrdersService {
         order.deliveredAt = new Date()
         break
     }
-    
+
     // Update notes
     if (updateDto.notes) {
       order.internalNotes = updateDto.notes
@@ -252,14 +253,14 @@ export class OrdersService {
     const order = await this.getOrderById(orderId, tenantId)
 
     order.paymentStatus = paymentStatus as any
-    
+
     if (paymentDetails) {
       if (!order.paymentData) {
         order.paymentData = {}
       }
       order.paymentData = {
         ...order.paymentData,
-        ...paymentDetails
+        ...paymentDetails,
       }
     }
 
@@ -284,7 +285,7 @@ export class OrdersService {
 
     return await this.updateOrderStatus(orderId, tenantId, {
       status: 'CANCELLED',
-      notes: reason || 'Order cancelled by customer'
+      notes: reason || 'Order cancelled by customer',
     })
   }
 
@@ -301,8 +302,8 @@ export class OrdersService {
     const count = await this.orderRepository.count({
       where: {
         societeId: tenantId,
-        createdAt: Between(startOfDay, endOfDay)
-      }
+        createdAt: Between(startOfDay, endOfDay),
+      },
     })
 
     const sequence = String(count + 1).padStart(4, '0')

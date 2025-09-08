@@ -1,13 +1,19 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { Calendar, Clock, Repeat, AlertTriangle, AlertCircle, Plus, X } from 'lucide-react'
+import { AlertCircle, AlertTriangle, Calendar, Clock, Plus, Repeat, X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
 import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export type RecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly' | 'custom'
 export type ConflictSeverity = 'low' | 'medium' | 'high'
 export interface TimeSlot {
@@ -75,30 +81,33 @@ export function SchedulePicker({
 }: SchedulePickerProps) {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(value)
   const [currentSlot, setCurrentSlot] = useState<Partial<TimeSlot>>({})
-  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern>({ type: 'none', interval: 1 })
+  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern>({
+    type: 'none',
+    interval: 1,
+  })
   const [conflicts, setConflicts] = useState<ScheduleConflict[]>([])
   const [isCheckingConflicts, setIsCheckingConflicts] = useState(false)
   const [showRecurrence, setShowRecurrence] = useState(false)
   useEffect(() => {
     setTimeSlots(value)
   }, [value])
-  useEffect(() => {
-    if (showConflictWarnings && onConflictCheck && timeSlots.length > 0) {
-      checkConflicts()
-    }
-  }, [timeSlots, onConflictCheck, showConflictWarnings])
   const checkConflicts = useCallback(async () => {
     if (!onConflictCheck) return
     setIsCheckingConflicts(true)
     try {
       const conflicts = await onConflictCheck([...timeSlots, ...existingSlots])
       setConflicts(conflicts)
-    } catch (error) {
-      console.error('Error checking conflicts:', error)
+    } catch (_error) {
     } finally {
       setIsCheckingConflicts(false)
     }
   }, [timeSlots, existingSlots, onConflictCheck])
+
+  useEffect(() => {
+    if (showConflictWarnings && onConflictCheck && timeSlots.length > 0) {
+      checkConflicts()
+    }
+  }, [timeSlots, onConflictCheck, showConflictWarnings, checkConflicts])
   const handleAddTimeSlot = () => {
     if (!currentSlot.date || !currentSlot.startTime || !currentSlot.endTime) return
     const newSlot: TimeSlot = {
@@ -126,14 +135,14 @@ export function SchedulePicker({
   const generateRecurringSlots = (baseSlot: TimeSlot, pattern: RecurrencePattern): TimeSlot[] => {
     const slots: TimeSlot[] = [baseSlot]
     const startDate = new Date(baseSlot.date)
-    let currentDate = new Date(startDate)
+    const currentDate = new Date(startDate)
     const maxSlots = pattern.maxOccurrences || 50
     const endDate = pattern.endDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year default
     for (let i = 1; i < maxSlots && currentDate <= endDate; i++) {
       if (pattern.type === 'daily') {
         currentDate.setDate(currentDate.getDate() + pattern.interval)
       } else if (pattern.type === 'weekly') {
-        currentDate.setDate(currentDate.getDate() + (7 * pattern.interval))
+        currentDate.setDate(currentDate.getDate() + 7 * pattern.interval)
       } else if (pattern.type === 'monthly') {
         currentDate.setMonth(currentDate.getMonth() + pattern.interval)
       }
@@ -151,7 +160,7 @@ export function SchedulePicker({
     return slots
   }
   const handleRemoveTimeSlot = (slotId: string) => {
-    const updatedSlots = timeSlots.filter(slot => slot.id !== slotId)
+    const updatedSlots = timeSlots.filter((slot) => slot.id !== slotId)
     setTimeSlots(updatedSlots)
     onChange?.(updatedSlots)
   }
@@ -215,7 +224,9 @@ export function SchedulePicker({
             <Input
               type="date"
               value={currentSlot.date ? formatDate(currentSlot.date) : ''}
-              onChange={(e) => setCurrentSlot(prev => ({ ...prev, date: parseDate(e.target.value) }))}
+              onChange={(e) =>
+                setCurrentSlot((prev) => ({ ...prev, date: parseDate(e.target.value) }))
+              }
               min={minDate ? formatDate(minDate) : undefined}
               max={maxDate ? formatDate(maxDate) : undefined}
               disabled={disabled}
@@ -229,7 +240,7 @@ export function SchedulePicker({
               onChange={(e) => {
                 const time = e.target.value
                 if (isTimeInWorkingHours(time)) {
-                  setCurrentSlot(prev => ({ ...prev, startTime: time }))
+                  setCurrentSlot((prev) => ({ ...prev, startTime: time }))
                 }
               }}
               disabled={disabled}
@@ -243,7 +254,7 @@ export function SchedulePicker({
               onChange={(e) => {
                 const time = e.target.value
                 if (isTimeInWorkingHours(time)) {
-                  setCurrentSlot(prev => ({ ...prev, endTime: time }))
+                  setCurrentSlot((prev) => ({ ...prev, endTime: time }))
                 }
               }}
               disabled={disabled}
@@ -255,7 +266,7 @@ export function SchedulePicker({
             <Label className="text-sm">Titre (optionnel)</Label>
             <Input
               value={currentSlot.title || ''}
-              onChange={(e) => setCurrentSlot(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) => setCurrentSlot((prev) => ({ ...prev, title: e.target.value }))}
               placeholder="Titre du créneau..."
               disabled={disabled}
             />
@@ -264,7 +275,7 @@ export function SchedulePicker({
             <Label className="text-sm">Description (optionnel)</Label>
             <Input
               value={currentSlot.description || ''}
-              onChange={(e) => setCurrentSlot(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => setCurrentSlot((prev) => ({ ...prev, description: e.target.value }))}
               placeholder="Description..."
               disabled={disabled}
             />
@@ -279,7 +290,9 @@ export function SchedulePicker({
                 <Label className="text-sm">Type</Label>
                 <Select
                   value={recurrencePattern.type}
-                  onValueChange={(value) => setRecurrencePattern(prev => ({ ...prev, type: value as RecurrenceType }))}
+                  onValueChange={(value) =>
+                    setRecurrencePattern((prev) => ({ ...prev, type: value as RecurrenceType }))
+                  }
                   disabled={disabled}
                 >
                   <SelectTrigger>
@@ -300,7 +313,12 @@ export function SchedulePicker({
                     type="number"
                     min="1"
                     value={recurrencePattern.interval}
-                    onChange={(e) => setRecurrencePattern(prev => ({ ...prev, interval: parseInt(e.target.value) || 1 }))}
+                    onChange={(e) =>
+                      setRecurrencePattern((prev) => ({
+                        ...prev,
+                        interval: parseInt(e.target.value, 10) || 1,
+                      }))
+                    }
                     disabled={disabled}
                   />
                 </div>
@@ -319,12 +337,14 @@ export function SchedulePicker({
                           const currentDays = recurrencePattern.daysOfWeek || []
                           const newDays = checked
                             ? [...currentDays, day.value]
-                            : currentDays.filter(d => d !== day.value)
-                          setRecurrencePattern(prev => ({ ...prev, daysOfWeek: newDays }))
+                            : currentDays.filter((d) => d !== day.value)
+                          setRecurrencePattern((prev) => ({ ...prev, daysOfWeek: newDays }))
                         }}
                         disabled={disabled}
                       />
-                      <Label htmlFor={`day-${day.value}`} className="text-xs">{day.label}</Label>
+                      <Label htmlFor={`day-${day.value}`} className="text-xs">
+                        {day.label}
+                      </Label>
                     </div>
                   ))}
                 </div>
@@ -336,7 +356,12 @@ export function SchedulePicker({
                 <Input
                   type="date"
                   value={recurrencePattern.endDate ? formatDate(recurrencePattern.endDate) : ''}
-                  onChange={(e) => setRecurrencePattern(prev => ({ ...prev, endDate: e.target.value ? parseDate(e.target.value) : undefined }))}
+                  onChange={(e) =>
+                    setRecurrencePattern((prev) => ({
+                      ...prev,
+                      endDate: e.target.value ? parseDate(e.target.value) : undefined,
+                    }))
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -347,7 +372,12 @@ export function SchedulePicker({
                   min="1"
                   max="365"
                   value={recurrencePattern.maxOccurrences || ''}
-                  onChange={(e) => setRecurrencePattern(prev => ({ ...prev, maxOccurrences: parseInt(e.target.value) || undefined }))}
+                  onChange={(e) =>
+                    setRecurrencePattern((prev) => ({
+                      ...prev,
+                      maxOccurrences: parseInt(e.target.value, 10) || undefined,
+                    }))
+                  }
                   placeholder="Illimité"
                   disabled={disabled}
                 />
@@ -371,7 +401,7 @@ export function SchedulePicker({
           <Label className="text-sm font-medium">Créneaux programmés ({timeSlots.length})</Label>
           <div className="space-y-2 max-h-60 overflow-auto">
             {timeSlots.map((slot) => {
-              const slotConflicts = conflicts.filter(c => c.timeSlot.id === slot.id)
+              const slotConflicts = conflicts.filter((c) => c.timeSlot.id === slot.id)
               const hasConflicts = slotConflicts.length > 0
               return (
                 <div
@@ -384,9 +414,7 @@ export function SchedulePicker({
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      <span className="font-medium">
-                        {slot.date.toLocaleDateString('fr-FR')}
-                      </span>
+                      <span className="font-medium">{slot.date.toLocaleDateString('fr-FR')}</span>
                       <Clock className="h-4 w-4" />
                       <span>
                         {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
@@ -440,8 +468,11 @@ export function SchedulePicker({
               <div key={conflict.id} className="p-3 border rounded-lg bg-red-50 border-red-200">
                 <div className="flex items-center gap-2">
                   <Badge className={getConflictSeverityColor(conflict.severity)}>
-                    {conflict.severity === 'low' ? 'Faible' :
-                     conflict.severity === 'medium' ? 'Moyen' : 'Élevé'}
+                    {conflict.severity === 'low'
+                      ? 'Faible'
+                      : conflict.severity === 'medium'
+                        ? 'Moyen'
+                        : 'Élevé'}
                   </Badge>
                   <span className="text-sm font-medium">
                     Conflit le {conflict.timeSlot.date.toLocaleDateString('fr-FR')}
@@ -455,9 +486,7 @@ export function SchedulePicker({
           </div>
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

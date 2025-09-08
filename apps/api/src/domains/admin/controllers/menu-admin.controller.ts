@@ -1,3 +1,20 @@
+import type { Request } from 'express'
+
+// RequestWithUser type definition for menu admin operations
+interface RequestWithUser extends Request {
+  user: {
+    id: string
+    email: string
+    roles?: string[]
+    permissions?: string[]
+  }
+}
+
+// Extended MenuItem interface for hierarchical operations
+interface MenuItemHierarchy extends MenuItem {
+  children: MenuItemHierarchy[]
+}
+
 import {
   Body,
   Controller,
@@ -242,15 +259,23 @@ export class MenuAdminController {
     }
 
     // Build hierarchical structure
-    const itemsMap = new Map<string, MenuItem>()
-    const rootItems: MenuItem[] = []
+    const itemsMap = new Map<string, MenuItemHierarchy>()
+    const rootItems: MenuItemHierarchy[] = []
 
-    menu.items.forEach((item) => {
+    // Convert items to hierarchical structure
+    const hierarchicalItems: MenuItemHierarchy[] = menu.items.map(
+      (item) =>
+        ({
+          ...item,
+          children: [] as MenuItemHierarchy[],
+        }) as MenuItemHierarchy
+    )
+
+    hierarchicalItems.forEach((item) => {
       itemsMap.set(item.id, item)
-      item.children = []
     })
 
-    menu.items.forEach((item) => {
+    hierarchicalItems.forEach((item) => {
       if (item.parentId) {
         const parent = itemsMap.get(item.parentId)
         if (parent) {
@@ -262,7 +287,7 @@ export class MenuAdminController {
     })
 
     // Sort items by orderIndex
-    const sortItems = (items: MenuItem[]) => {
+    const sortItems = (items: MenuItemHierarchy[]) => {
       items.sort((a, b) => a.orderIndex - b.orderIndex)
       items.forEach((item) => {
         if (item.children?.length) {
@@ -336,9 +361,9 @@ export class MenuAdminController {
     const result = await this.menuConfigRepository.delete(id)
 
     return {
-      success: result.affected > 0,
+      success: (result.affected ?? 0) > 0,
       data: {
-        deleted: result.affected,
+        deleted: result.affected ?? 0,
       },
     }
   }
@@ -396,9 +421,9 @@ export class MenuAdminController {
     const result = await this.menuItemRepository.delete(id)
 
     return {
-      success: result.affected > 0,
+      success: (result.affected ?? 0) > 0,
       data: {
-        deleted: result.affected,
+        deleted: result.affected ?? 0,
       },
     }
   }
@@ -426,7 +451,7 @@ export class MenuAdminController {
   @Get('preferences')
   @Action('read')
   @ApiOperation({ summary: 'Get current user menu preferences' })
-  async getUserPreferences(@Req() req: any, @Query('menuId') menuId?: string) {
+  async getUserPreferences(@Req() req: RequestWithUser, @Query('menuId') menuId?: string) {
     const userId = req.user.id
 
     const query = this.userPreferenceRepository
@@ -452,7 +477,7 @@ export class MenuAdminController {
   @Action('update')
   @ApiOperation({ summary: 'Update user menu preferences' })
   async updateUserPreferences(
-    @Req() req: any,
+    @Req() req: RequestWithUser,
     @Param('menuId') menuId: string,
     @Body() data: Partial<UserMenuPreference>
   ) {
@@ -486,7 +511,7 @@ export class MenuAdminController {
   @Delete('preferences/:menuId')
   @Action('delete')
   @ApiOperation({ summary: 'Reset user menu preferences to defaults' })
-  async resetUserPreferences(@Req() req: any, @Param('menuId') menuId: string) {
+  async resetUserPreferences(@Req() req: RequestWithUser, @Param('menuId') menuId: string) {
     const userId = req.user.id
 
     const result = await this.userPreferenceRepository.delete({
@@ -495,7 +520,7 @@ export class MenuAdminController {
     })
 
     return {
-      success: result.affected > 0,
+      success: (result.affected ?? 0) > 0,
       data: {
         reset: true,
       },
@@ -508,7 +533,7 @@ export class MenuAdminController {
   @Get('preferences/export')
   @Action('export')
   @ApiOperation({ summary: 'Export user menu preferences' })
-  async exportUserPreferences(@Req() req: any) {
+  async exportUserPreferences(@Req() req: RequestWithUser) {
     const userId = req.user.id
 
     const preferences = await this.userPreferenceRepository.find({
@@ -534,7 +559,10 @@ export class MenuAdminController {
   @Action('import')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Import user menu preferences' })
-  async importUserPreferences(@Req() req: any, @Body() data: { preferences: any[] }) {
+  async importUserPreferences(
+    @Req() req: RequestWithUser,
+    @Body() data: { preferences: UserMenuPreference[] }
+  ) {
     const userId = req.user.id
     const imported = []
 

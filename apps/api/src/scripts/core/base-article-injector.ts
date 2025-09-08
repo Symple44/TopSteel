@@ -335,17 +335,17 @@ export abstract class BaseArticleInjector {
     )
 
     return {
-      totalArticles: parseInt(totalResult[0].count),
+      totalArticles: parseInt(totalResult[0].count, 10),
       articlesByFamily: familyResult.reduce((acc: Record<string, number>, row: unknown) => {
         const rowTyped = row as { famille: string; count: string }
-        acc[rowTyped.famille] = parseInt(rowTyped.count)
+        acc[rowTyped.famille] = parseInt(rowTyped.count, 10)
         return acc
       }, {}),
       recentInjections: recentResult.map((row: unknown) => {
         const rowTyped = row as { famille: string; count: string; date: string }
         return {
           famille: rowTyped.famille,
-          count: parseInt(rowTyped.count),
+          count: parseInt(rowTyped.count, 10),
           date: new Date(rowTyped.date),
         }
       }),

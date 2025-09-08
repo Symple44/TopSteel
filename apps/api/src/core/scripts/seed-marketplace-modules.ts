@@ -4,7 +4,10 @@ import {
   MarketplaceCategory,
   PricingType,
 } from '../../features/marketplace/entities/marketplace-module.entity'
-import { MarketplaceService, type CreateModuleDto } from '../../features/marketplace/services/marketplace.service'
+import {
+  type CreateModuleDto,
+  MarketplaceService,
+} from '../../features/marketplace/services/marketplace.service'
 
 async function seedMarketplaceModules() {
   const app = await NestFactory.createApplicationContext(AppModule)

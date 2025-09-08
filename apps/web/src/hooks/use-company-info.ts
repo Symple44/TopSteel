@@ -30,9 +30,9 @@ export function useCompanyInfo() {
 
       const response = await callClientApi('admin/company')
 
-      if (!response.ok) {
+      if (!response?.ok) {
         // Si l'endpoint n'existe pas encore, utiliser des données par défaut
-        if (response.status === 404) {
+        if (response?.status === 404) {
           setCompanyInfo({
             id: 'main-company',
             name: 'TopSteel',
@@ -50,15 +50,15 @@ export function useCompanyInfo() {
           return
         }
 
-        throw new Error(`Erreur lors du chargement (${response.status})`)
+        throw new Error(`Erreur lors du chargement (${response?.status})`)
       }
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setCompanyInfo(data.data)
+      if (data?.success) {
+        setCompanyInfo(data?.data)
       } else {
-        throw new Error(data.message || 'Erreur lors du chargement des informations')
+        throw new Error(data?.message || 'Erreur lors du chargement des informations')
       }
     } catch (_err) {
       // Error loading company info (silenced)
@@ -93,17 +93,17 @@ export function useCompanyInfo() {
         body: JSON.stringify(updates),
       })
 
-      if (!response.ok) {
-        throw new Error(`Erreur lors de la mise à jour (${response.status})`)
+      if (!response?.ok) {
+        throw new Error(`Erreur lors de la mise à jour (${response?.status})`)
       }
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setCompanyInfo(data.data)
+      if (data?.success) {
+        setCompanyInfo(data?.data)
         return true
       } else {
-        throw new Error(data.message || 'Erreur lors de la mise à jour')
+        throw new Error(data?.message || 'Erreur lors de la mise à jour')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur de connexion')

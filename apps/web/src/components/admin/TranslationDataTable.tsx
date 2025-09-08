@@ -1,6 +1,7 @@
 'use client'
 
-import { AdvancedDataTable, type ColumnConfig } from '@erp/ui/data-display'
+import type { ColumnConfig } from '@erp/ui'
+import { DataTable } from '@erp/ui'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import type { TranslationEntry } from '@/lib/i18n/types'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
@@ -35,10 +36,10 @@ export const TranslationDataTable = memo(function TranslationDataTable({
   onEdit,
   onCellEdit,
   onCreate,
-  onDelete,
-  onExport,
-  onImport,
-  onDuplicate,
+  onDelete: _onDelete,
+  onExport: _onExport,
+  onImport: _onImport,
+  onDuplicate: _onDuplicate,
 }: TranslationDataTableProps) {
   // État de pagination local
   const [currentPage, setCurrentPage] = useState(1)
@@ -53,8 +54,8 @@ export const TranslationDataTable = memo(function TranslationDataTable({
 
   // Obtenir la liste des namespaces uniques pour les filtres
   const namespaces = useMemo(() => {
-    const uniqueNamespaces = [...new Set(entries.map((entry) => entry.namespace))]
-    return uniqueNamespaces.sort()
+    const uniqueNamespaces = [...new Set(entries?.map((entry) => entry.namespace))]
+    return uniqueNamespaces?.sort()
   }, [entries])
 
   // Obtenir la liste des catégories uniques pour les filtres
@@ -63,7 +64,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
       .map((entry) => entry.category)
       .filter((cat) => cat != null && cat !== '')
     const uniqueCategories = [...new Set(allCategories)]
-    return uniqueCategories.sort()
+    return uniqueCategories?.sort()
   }, [entries])
 
   // Configuration des colonnes
@@ -77,9 +78,13 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         type: 'text',
         width: 300,
         sortable: true,
-        searchable: true,
+
         locked: true, // Empêcher le déplacement de cette colonne importante
-        render: (_value: unknown, row: TranslationEntry) => <FullKeyCell entry={row} />,
+        render: (
+          _value: unknown,
+          row: TranslationEntry,
+          _column: ColumnConfig<TranslationEntry>
+        ) => <FullKeyCell entry={row} />,
       },
       {
         id: 'namespace',
@@ -89,13 +94,17 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         type: 'select',
         width: 150,
         sortable: true,
-        searchable: true,
-        options: namespaces.map((ns) => ({
+
+        options: namespaces?.map((ns) => ({
           value: ns,
           label: ns,
           color: '#3b82f6',
         })),
-        render: (value: unknown) => <NamespaceCell value={value} />,
+        render: (
+          value: unknown,
+          _row: TranslationEntry,
+          _column: ColumnConfig<TranslationEntry>
+        ) => <NamespaceCell value={value as string} />,
       },
       {
         id: 'category',
@@ -119,7 +128,11 @@ export const TranslationDataTable = memo(function TranslationDataTable({
           ]
           return opts
         })(),
-        render: (value: unknown) => <CategoryCell value={value} />,
+        render: (
+          value: unknown,
+          _row: TranslationEntry,
+          _column: ColumnConfig<TranslationEntry>
+        ) => <CategoryCell value={value as string | undefined} />,
       },
       {
         id: 'description',
@@ -129,9 +142,13 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         type: 'text',
         width: 200,
         sortable: true,
-        searchable: true,
+
         editable: true,
-        render: (value: unknown) => <DescriptionCell value={value} />,
+        render: (
+          value: unknown,
+          _row: TranslationEntry,
+          _column: ColumnConfig<TranslationEntry>
+        ) => <DescriptionCell value={value as string | undefined} />,
         validation: {
           maxLength: 200,
         },
@@ -144,12 +161,16 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         type: 'boolean',
         width: 100,
         sortable: true,
-        render: (value: unknown) => <StatusCell value={value} />,
+        render: (
+          value: unknown,
+          _row: TranslationEntry,
+          _column: ColumnConfig<TranslationEntry>
+        ) => <StatusCell value={value as boolean} />,
       },
     ]
 
     // Ajouter une colonne par langue supportée
-    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES.map((lang) => ({
+    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES?.map((lang) => ({
       id: `translation_${lang.code}`,
       key: 'id' as keyof TranslationEntry, // Utiliser une propriété existante comme fallback, on s'appuie sur getValue
       title: `${lang.flag} ${lang.nativeName}`,
@@ -158,8 +179,8 @@ export const TranslationDataTable = memo(function TranslationDataTable({
       width: 300,
       sortable: true,
       editable: true,
-      searchable: true,
-      render: (_value: unknown, row: TranslationEntry) => {
+
+      render: (_value: unknown, row: TranslationEntry, _column: ColumnConfig<TranslationEntry>) => {
         const translation = row.translations[lang.code] || ''
         return <TranslationCell translation={translation} />
       },
@@ -180,15 +201,15 @@ export const TranslationDataTable = memo(function TranslationDataTable({
   }, [namespaces, categories])
 
   const handleCellEdit = useCallback(
-    (value: unknown, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => {
-      if (column.id.startsWith('translation_')) {
+    (row: TranslationEntry, column: ColumnConfig<TranslationEntry>, value: unknown) => {
+      if (column?.id?.startsWith('translation_')) {
         // Éditer une traduction spécifique
-        const languageCode = column.id.replace('translation_', '')
+        const languageCode = column?.id?.replace('translation_', '')
         const updatedRow = {
           ...row,
           translations: {
             ...row.translations,
-            [languageCode]: value,
+            [languageCode]: value as string,
           },
           isModified: true,
           updatedAt: new Date(),
@@ -208,36 +229,11 @@ export const TranslationDataTable = memo(function TranslationDataTable({
     [onCellEdit]
   )
 
-  const handleCreate = useCallback(() => {
-    onCreate?.()
-  }, [onCreate])
-
-  const handleDelete = useCallback(
-    (rows: TranslationEntry[]) => {
-      onDelete?.(rows)
-    },
-    [onDelete]
-  )
-
   const handleEdit = useCallback(
     (row: TranslationEntry) => {
       onEdit(row)
     },
     [onEdit]
-  )
-
-  const _handleDuplicate = useCallback(
-    (row: TranslationEntry) => {
-      onDuplicate?.(row)
-    },
-    [onDuplicate]
-  )
-
-  const handleExport = useCallback(
-    (rows: TranslationEntry[]) => {
-      onExport?.(rows)
-    },
-    [onExport]
   )
 
   const handlePaginationChange = useCallback(
@@ -248,7 +244,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
   )
 
   return (
-    <AdvancedDataTable
+    <DataTable
       data={entries}
       columns={columns}
       keyField="id"
@@ -263,14 +259,16 @@ export const TranslationDataTable = memo(function TranslationDataTable({
       height={600}
       className="border rounded-lg"
       // Actions
-      actions={{
-        create: onCreate ? handleCreate : undefined,
-        edit: handleEdit,
-        delete: onDelete ? handleDelete : undefined,
-        // duplicate: onDuplicate ? handleDuplicate : undefined, // Not supported by DataTable
-        export: onExport ? handleExport : undefined,
-        import: onImport,
-      }}
+      actions={
+        onCreate
+          ? [
+              {
+                label: 'Éditer',
+                onClick: handleEdit,
+              },
+            ]
+          : []
+      }
       // Callbacks
       onCellEdit={handleCellEdit}
       loading={loading}

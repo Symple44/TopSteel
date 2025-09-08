@@ -511,7 +511,7 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
 
   // Écouter les changements du translator i18n
   useEffect(() => {
-    if (!hasInitialized.current) return
+    if (!hasInitialized.current) return undefined
 
     const unsubscribe = translator.subscribe(() => {
       const currentLang = translator.getCurrentLanguage()

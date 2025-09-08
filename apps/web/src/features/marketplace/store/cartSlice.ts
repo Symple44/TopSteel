@@ -4,7 +4,7 @@ import type { Product } from '../components/products/ProductCard'
 export interface CartItem {
   product: Product
   quantity: number
-  selectedOptions?: Record<string, any>
+  selectedOptions?: Record<string, string | number | boolean>
   addedAt: Date
   reservationId?: string
 }
@@ -42,7 +42,7 @@ const calculateItemTotal = (item: CartItem): number => {
 const findItemIndex = (
   items: CartItem[],
   productId: string,
-  options?: Record<string, any>
+  options?: Record<string, string | number | boolean>
 ): number => {
   return items.findIndex(
     (item) =>
@@ -60,7 +60,7 @@ export const cartSlice = createSlice({
       action: PayloadAction<{
         product: Product
         quantity: number
-        options?: Record<string, any>
+        options?: Record<string, string | number | boolean>
       }>
     ) => {
       const { product, quantity, options } = action.payload
@@ -88,7 +88,7 @@ export const cartSlice = createSlice({
       action: PayloadAction<{
         productId: string
         quantity: number
-        options?: Record<string, any>
+        options?: Record<string, string | number | boolean>
       }>
     ) => {
       const { productId, quantity, options } = action.payload
@@ -109,7 +109,7 @@ export const cartSlice = createSlice({
       state,
       action: PayloadAction<{
         productId: string
-        options?: Record<string, any>
+        options?: Record<string, string | number | boolean>
       }>
     ) => {
       const { productId, options } = action.payload
@@ -176,7 +176,7 @@ export const cartSlice = createSlice({
       action: PayloadAction<{
         productId: string
         reservationId: string
-        options?: Record<string, any>
+        options?: Record<string, string | number | boolean>
       }>
     ) => {
       const { productId, reservationId, options } = action.payload
@@ -224,7 +224,7 @@ export const selectCartDiscount = (state: { cart: CartState }) => {
     case 'FIXED_AMOUNT':
       return Math.min(discount, subtotal)
     case 'FREE_SHIPPING':
-      return state.cart.shippingMethod?.cost || 0
+      return state.cart.shippingMethod?.cost ?? 0
     default:
       return 0
   }
@@ -232,7 +232,7 @@ export const selectCartDiscount = (state: { cart: CartState }) => {
 
 export const selectShippingCost = (state: { cart: CartState }) => {
   if (state.cart.appliedCoupon?.type === 'FREE_SHIPPING') return 0
-  return state.cart.shippingMethod?.cost || 0
+  return state.cart.shippingMethod?.cost ?? 0
 }
 
 export const selectCartTotal = (state: { cart: CartState }) => {
@@ -248,7 +248,8 @@ export const selectAppliedCoupon = (state: { cart: CartState }) => state.cart.ap
 export const selectShippingMethod = (state: { cart: CartState }) => state.cart.shippingMethod
 
 export const selectCartItemByProduct =
-  (productId: string, options?: Record<string, any>) => (state: { cart: CartState }) => {
+  (productId: string, options?: Record<string, string | number | boolean>) =>
+  (state: { cart: CartState }) => {
     return state.cart.items.find(
       (item) =>
         item.product.id === productId &&

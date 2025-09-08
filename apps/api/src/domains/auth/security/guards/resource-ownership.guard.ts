@@ -144,9 +144,14 @@ export class ResourceOwnershipGuard implements CanActivate {
 
     // Utiliser le paramètre spécifié
     if (requirement.ownerIdParam) {
-      return ((request as { params?: Record<string, string> }).params[requirement.ownerIdParam] ||
-        (request as { body?: Record<string, unknown> }).body[requirement.ownerIdParam] ||
-        (request as { query?: Record<string, unknown> }).query[requirement.ownerIdParam] ||
+      const reqObj = request as {
+        params?: Record<string, string>
+        body?: Record<string, unknown>
+        query?: Record<string, unknown>
+      }
+      return (reqObj.params?.[requirement.ownerIdParam] ||
+        reqObj.body?.[requirement.ownerIdParam] ||
+        reqObj.query?.[requirement.ownerIdParam] ||
         null) as string
     }
 
@@ -154,10 +159,12 @@ export class ResourceOwnershipGuard implements CanActivate {
     const defaultParams = ['userId', 'ownerId', 'createdBy', 'authorId']
 
     for (const param of defaultParams) {
-      const value =
-        (request as { params?: Record<string, string> }).params[param] ||
-        (request as { body?: Record<string, unknown> }).body[param] ||
-        (request as { query?: Record<string, unknown> }).query[param]
+      const reqObj = request as {
+        params?: Record<string, string>
+        body?: Record<string, unknown>
+        query?: Record<string, unknown>
+      }
+      const value = reqObj.params?.[param] || reqObj.body?.[param] || reqObj.query?.[param]
       if (value) {
         return value as string
       }
@@ -168,11 +175,14 @@ export class ResourceOwnershipGuard implements CanActivate {
 
   private extractResourceId(request: unknown, requirement: ResourceOwnershipRequirement): string {
     if (requirement.resourceIdParam) {
-      return ((request as { params?: Record<string, string> }).params[
-        requirement.resourceIdParam
-      ] ||
-        (request as { body?: Record<string, unknown> }).body[requirement.resourceIdParam] ||
-        (request as { query?: Record<string, unknown> }).query[requirement.resourceIdParam] ||
+      const reqObj = request as {
+        params?: Record<string, string>
+        body?: Record<string, unknown>
+        query?: Record<string, unknown>
+      }
+      return (reqObj.params?.[requirement.resourceIdParam] ||
+        reqObj.body?.[requirement.resourceIdParam] ||
+        reqObj.query?.[requirement.resourceIdParam] ||
         '') as string
     }
 
@@ -180,10 +190,12 @@ export class ResourceOwnershipGuard implements CanActivate {
     const defaultParams = ['id', 'resourceId']
 
     for (const param of defaultParams) {
-      const value =
-        (request as { params?: Record<string, string> }).params[param] ||
-        (request as { body?: Record<string, unknown> }).body[param] ||
-        (request as { query?: Record<string, unknown> }).query[param]
+      const reqObj = request as {
+        params?: Record<string, string>
+        body?: Record<string, unknown>
+        query?: Record<string, unknown>
+      }
+      const value = reqObj.params?.[param] || reqObj.body?.[param] || reqObj.query?.[param]
       if (value) {
         return value as string
       }

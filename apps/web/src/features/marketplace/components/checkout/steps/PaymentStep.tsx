@@ -2,9 +2,9 @@
 
 import { CreditCard, Info, Lock, Shield } from 'lucide-react'
 import type React from 'react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { CheckoutData } from '../CheckoutFlow'
+import type { CheckoutData } from '../../../types/checkout.types'
 
 interface PaymentStepProps {
   data: CheckoutData
@@ -44,6 +44,11 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
   isValid,
   total,
 }) => {
+  const cardNumberId = useId()
+  const cardHolderNameId = useId()
+  const expiryDateId = useId()
+  const cvvId = useId()
+
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [cardType, setCardType] = useState<string>('')
 
@@ -75,12 +80,12 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         .trim()
 
       // Detect card type
-      const cardNumber = value.replace(/\s/g, '')
-      if (cardNumber.startsWith('4')) {
+      const cardNumber = value?.replace(/\s/g, '')
+      if (cardNumber?.startsWith('4')) {
         setCardType('Visa')
-      } else if (cardNumber.startsWith('5')) {
+      } else if (cardNumber?.startsWith('5')) {
         setCardType('Mastercard')
-      } else if (cardNumber.startsWith('3')) {
+      } else if (cardNumber?.startsWith('3')) {
         setCardType('American Express')
       } else {
         setCardType('')
@@ -89,12 +94,12 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
 
     // Format expiry date
     if (field === 'expiryDate') {
-      processedValue = value.replace(/\D/g, '').replace(/(\d{2})(\d{0,2})/, '$1/$2')
+      processedValue = value?.replace(/\D/g, '').replace(/(\d{2})(\d{0,2})/, '$1/$2')
     }
 
     // Limit CVV to numbers only
     if (field === 'cvv') {
-      processedValue = value.replace(/\D/g, '').slice(0, 4)
+      processedValue = value?.replace(/\D/g, '').slice(0, 4)
     }
 
     onUpdate({
@@ -118,27 +123,28 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
     const newErrors: Record<string, string> = {}
     const p = data.payment
 
-    if (p.method === 'card') {
-      if (!p.cardNumber?.trim()) {
+    if (p?.method === 'card') {
+      if (!p?.cardNumber?.trim()) {
         newErrors.cardNumber = 'Card number is required'
-      } else if (p.cardNumber.replace(/\s/g, '').length < 13) {
+      } else if (p?.cardNumber?.replace(/\s/g, '').length < 13) {
         newErrors.cardNumber = 'Invalid card number'
       }
 
-      if (!p.cardHolder?.trim()) {
+      if (!p?.cardHolder?.trim()) {
         newErrors.cardHolder = 'Cardholder name is required'
       }
 
-      if (p.expiryDate?.trim()) {
-        const [month, year] = p.expiryDate.split('/')
+      if (p?.expiryDate?.trim()) {
+        const parts = p?.expiryDate?.split('/') || []
+        const [month, year] = parts
         const currentYear = new Date().getFullYear() % 100
         const currentMonth = new Date().getMonth() + 1
 
-        if (parseInt(month) > 12 || parseInt(month) < 1) {
+        if (parseInt(month, 10) > 12 || parseInt(month, 10) < 1) {
           newErrors.expiryDate = 'Invalid month'
         } else if (
-          parseInt(year) < currentYear ||
-          (parseInt(year) === currentYear && parseInt(month) < currentMonth)
+          parseInt(year, 10) < currentYear ||
+          (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)
         ) {
           newErrors.expiryDate = 'Card has expired'
         }
@@ -146,9 +152,9 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         newErrors.expiryDate = 'Expiry date is required'
       }
 
-      if (!p.cvv?.trim()) {
+      if (!p?.cvv?.trim()) {
         newErrors.cvv = 'CVV is required'
-      } else if (p.cvv.length < 3) {
+      } else if (p?.cvv?.length < 3) {
         newErrors.cvv = 'Invalid CVV'
       }
     }
@@ -177,14 +183,14 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
 
         {/* Payment Methods */}
         <div className="space-y-3 mb-6">
-          {paymentMethods.map((method) => {
+          {paymentMethods?.map((method) => {
             const Icon = method.icon
             return (
               <label
                 key={method.id}
                 className={cn(
                   'flex items-center p-4 border rounded-lg cursor-pointer transition-colors',
-                  data.payment.method === method.id
+                  data?.payment?.method === method.id
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-gray-300'
                 )}
@@ -193,8 +199,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                   type="radio"
                   name="paymentMethod"
                   value={method.id}
-                  checked={data.payment.method === method.id}
-                  onChange={() => handlePaymentMethodChange(method.id as any)}
+                  checked={data?.payment?.method === method.id}
+                  onChange={() => handlePaymentMethodChange(method.id as unknown)}
                   className="text-blue-600 focus:ring-blue-500"
                 />
                 <div className="ml-3 flex-1">
@@ -210,15 +216,21 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         </div>
 
         {/* Card Details Form */}
-        {data.payment.method === 'card' && (
+        {data?.payment?.method === 'card' && (
           <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Card Number *</label>
+              <label
+                htmlFor={cardNumberId}
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Card Number *
+              </label>
               <div className="relative">
                 <input
+                  id={cardNumberId}
                   type="text"
-                  value={data.payment.cardNumber || ''}
-                  onChange={(e) => handleInputChange('cardNumber', e.target.value)}
+                  value={data?.payment?.cardNumber || ''}
+                  onChange={(e) => handleInputChange('cardNumber', e?.target?.value)}
                   placeholder="1234 5678 9012 3456"
                   maxLength={19}
                   className={cn(
@@ -238,13 +250,17 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor={cardHolderNameId}
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Cardholder Name *
               </label>
               <input
+                id={cardHolderNameId}
                 type="text"
-                value={data.payment.cardHolder || ''}
-                onChange={(e) => handleInputChange('cardHolder', e.target.value)}
+                value={data?.payment?.cardHolder || ''}
+                onChange={(e) => handleInputChange('cardHolder', e?.target?.value)}
                 placeholder="John Doe"
                 className={cn(
                   'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
@@ -258,13 +274,17 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor={expiryDateId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Expiry Date *
                 </label>
                 <input
+                  id={expiryDateId}
                   type="text"
-                  value={data.payment.expiryDate || ''}
-                  onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                  value={data?.payment?.expiryDate || ''}
+                  onChange={(e) => handleInputChange('expiryDate', e?.target?.value)}
                   placeholder="MM/YY"
                   maxLength={5}
                   className={cn(
@@ -278,11 +298,14 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">CVV *</label>
+                <label htmlFor={cvvId} className="block text-sm font-medium text-gray-700 mb-1">
+                  CVV *
+                </label>
                 <input
+                  id={cvvId}
                   type="text"
-                  value={data.payment.cvv || ''}
-                  onChange={(e) => handleInputChange('cvv', e.target.value)}
+                  value={data?.payment?.cvv || ''}
+                  onChange={(e) => handleInputChange('cvv', e?.target?.value)}
                   placeholder="123"
                   maxLength={4}
                   className={cn(
@@ -297,8 +320,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                checked={data.payment.saveCard}
-                onChange={(e) => handleInputChange('saveCard', e.target.checked.toString())}
+                checked={data?.payment?.saveCard}
+                onChange={(e) => handleInputChange('saveCard', e?.target?.checked?.toString())}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700">Save this card for future purchases</span>
@@ -323,7 +346,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         )}
 
         {/* PayPal */}
-        {data.payment.method === 'paypal' && (
+        {data?.payment?.method === 'paypal' && (
           <div className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-8 h-8 text-blue-600" />
@@ -344,7 +367,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         )}
 
         {/* Bank Transfer */}
-        {data.payment.method === 'bank_transfer' && (
+        {data?.payment?.method === 'bank_transfer' && (
           <div className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3 mb-4">
               <Lock className="w-8 h-8 text-gray-600" />

@@ -2,7 +2,7 @@
 
 import type { SimulationContext, SimulationResult } from '@erp/ui'
 import { useCallback, useState } from 'react'
-import { useApiClient } from '@/lib/api-client-enhanced'
+import { postTyped } from '@/lib/api-typed'
 
 export interface PriceCalculationDetailedResult extends SimulationResult {
   breakdown?: {
@@ -94,7 +94,7 @@ export function usePriceCalculation(
     includeMargins = false,
     includeSkippedRules = true,
     cache = true,
-  } = options
+  } = options || {}
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -102,10 +102,9 @@ export function usePriceCalculation(
     SimulationResult | PriceCalculationDetailedResult | null
   >(null)
 
-  const apiClient = useApiClient()
   const resultsCache = new Map<string, SimulationResult | PriceCalculationDetailedResult>()
 
-  const getCacheKey = (context: SimulationContext): string => {
+  const getCacheKey = useCallback((context: SimulationContext): string => {
     return JSON.stringify({
       articleId: context.articleId,
       quantity: context.quantity,
@@ -113,7 +112,7 @@ export function usePriceCalculation(
       customerGroup: context.customerGroup,
       customerId: context.customerId,
     })
-  }
+  }, [])
 
   const calculate = useCallback(
     async (context: SimulationContext): Promise<SimulationResult> => {
@@ -124,19 +123,19 @@ export function usePriceCalculation(
         // Vérifier le cache
         if (cache) {
           const cacheKey = getCacheKey(context)
-          const cached = resultsCache.get(cacheKey)
+          const cached = resultsCache?.get(cacheKey)
           if (cached && !('breakdown' in cached)) {
             setLastResult(cached)
             return cached
           }
         }
 
-        const response = await apiClient.post('/pricing/calculate', context)
-        const result = response.data as SimulationResult
+        const response = await postTyped<{ data: SimulationResult }>('/pricing/calculate', context)
+        const result = (response as { data: SimulationResult }).data
 
         // Mettre en cache
         if (cache) {
-          resultsCache.set(getCacheKey(context), result)
+          resultsCache?.set(getCacheKey(context), result)
         }
 
         setLastResult(result)
@@ -149,7 +148,7 @@ export function usePriceCalculation(
         setLoading(false)
       }
     },
-    [apiClient, cache, getCacheKey, resultsCache.get, resultsCache.set]
+    [cache, getCacheKey, resultsCache?.get, resultsCache?.set]
   )
 
   const calculateDetailed = useCallback(
@@ -161,7 +160,7 @@ export function usePriceCalculation(
         // Vérifier le cache
         if (cache) {
           const cacheKey = getCacheKey(context)
-          const cached = resultsCache.get(cacheKey)
+          const cached = resultsCache?.get(cacheKey)
           if (cached && 'breakdown' in cached) {
             setLastResult(cached)
             return cached as PriceCalculationDetailedResult
@@ -169,16 +168,19 @@ export function usePriceCalculation(
         }
 
         const params = new URLSearchParams()
-        if (includeMargins) params.append('includeMargins', 'true')
-        if (includeSkippedRules) params.append('includeSkippedRules', 'true')
-        params.append('detailed', 'true')
+        if (includeMargins) params?.append('includeMargins', 'true')
+        if (includeSkippedRules) params?.append('includeSkippedRules', 'true')
+        params?.append('detailed', 'true')
 
-        const response = await apiClient.post(`/pricing/calculate?${params.toString()}`, context)
-        const result = response.data as PriceCalculationDetailedResult
+        const response = await postTyped<{ data: PriceCalculationDetailedResult }>(
+          `/pricing/calculate?${params?.toString()}`,
+          context
+        )
+        const result = (response as { data: PriceCalculationDetailedResult }).data
 
         // Mettre en cache
         if (cache) {
-          resultsCache.set(getCacheKey(context), result)
+          resultsCache?.set(getCacheKey(context), result)
         }
 
         setLastResult(result)
@@ -192,15 +194,7 @@ export function usePriceCalculation(
         setLoading(false)
       }
     },
-    [
-      apiClient,
-      cache,
-      includeMargins,
-      includeSkippedRules,
-      getCacheKey,
-      resultsCache.get,
-      resultsCache.set,
-    ]
+    [cache, includeMargins, includeSkippedRules, getCacheKey, resultsCache?.get, resultsCache?.set]
   )
 
   const calculateBulk = useCallback(
@@ -209,15 +203,18 @@ export function usePriceCalculation(
       setError(null)
 
       try {
-        const response = await apiClient.post('/pricing/calculate-bulk', { contexts })
+        const response = await postTyped<{ data: Record<string, SimulationResult> }>(
+          '/pricing/calculate-bulk',
+          { contexts }
+        )
         const results = new Map<string, SimulationResult>()
 
         Object.entries(response.data).forEach(([key, value]) => {
-          results.set(key, value as SimulationResult)
+          results?.set(key, value as SimulationResult)
 
           // Mettre en cache si activé
-          if (cache && contexts[parseInt(key)]) {
-            resultsCache.set(getCacheKey(contexts[parseInt(key)]), value as SimulationResult)
+          if (cache && contexts[parseInt(key, 10)]) {
+            resultsCache?.set(getCacheKey(contexts[parseInt(key, 10)]), value as SimulationResult)
           }
         })
 
@@ -230,7 +227,7 @@ export function usePriceCalculation(
         setLoading(false)
       }
     },
-    [apiClient, cache, getCacheKey, resultsCache.set]
+    [cache, getCacheKey, resultsCache?.set]
   )
 
   const simulateScenarios = useCallback(
@@ -242,13 +239,12 @@ export function usePriceCalculation(
       setError(null)
 
       try {
-        const _contexts = scenarios.map((scenario) => ({ ...baseContext, ...scenario }))
-        const response = await apiClient.post('/pricing/simulate-scenarios', {
+        const response = await postTyped('/pricing/simulate-scenarios', {
           baseContext,
           scenarios,
         })
 
-        return response.data.results as SimulationResult[]
+        return (response as { data: { results: SimulationResult[] } }).data.results
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Erreur lors de la simulation de scénarios'
@@ -258,7 +254,7 @@ export function usePriceCalculation(
         setLoading(false)
       }
     },
-    [apiClient]
+    []
   )
 
   return {

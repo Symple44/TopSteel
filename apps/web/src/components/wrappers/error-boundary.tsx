@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): State {
     // Vérifie si c'est l'erreur params readonly
-    if (error.message.includes("Cannot assign to read only property 'params'")) {
+    if (error?.message?.includes("Cannot assign to read only property 'params'")) {
       // Force un refresh pour résoudre le problème
       if (typeof window !== 'undefined') {
         setTimeout(() => {
@@ -35,8 +35,8 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {}
 
   render() {
-    if (this.state.hasError) {
-      if (this.state.error?.message.includes("Cannot assign to read only property 'params'")) {
+    if (this?.state?.hasError) {
+      if (this.state.error?.message?.includes("Cannot assign to read only property 'params'")) {
         return (
           <div className="min-h-screen flex items-center justify-center bg-background p-4">
             <div className="text-center">
@@ -48,7 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        this.props.fallback || (
+        this?.props?.fallback || (
           <div className="min-h-screen flex items-center justify-center bg-background p-4">
             <div className="text-center">
               <h2 className="text-xl font-semibold mb-2">Une erreur s'est produite</h2>
@@ -66,6 +66,6 @@ export class ErrorBoundary extends Component<Props, State> {
       )
     }
 
-    return this.props.children
+    return this?.props?.children
   }
 }

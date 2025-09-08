@@ -4,7 +4,7 @@ import { Button, Card, Input, Label, Separator } from '@erp/ui'
 import { Building2, Eye, EyeOff, Lock, Mail, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import React from 'react'
+import React, { useId } from 'react'
 import CompanySelector from '@/components/auth/company-selector'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from '@/hooks/use-toast'
@@ -34,9 +34,13 @@ export default function LoginClientPage() {
   const [mfaCode, setMfaCode] = React.useState('')
   const [selectedMfaMethod, setSelectedMfaMethod] = React.useState('')
   const [isRedirecting, setIsRedirecting] = React.useState(false)
+  const mfaMethodId = useId()
+  const mfaCodeId = useId()
+  const identifierId = useId()
+  const passwordId = useId()
 
   // Gestion automatique de la redirection basée sur les états
-  React.useEffect(() => {
+  React?.useEffect(() => {
     // Attendre que l'authentification soit stabilisée
     if (authLoading || isLoading || isRedirecting) {
       return
@@ -44,11 +48,11 @@ export default function LoginClientPage() {
 
     // Si l'utilisateur est authentifié et n'a pas besoin de MFA ni de sélection de société
     if (isAuthenticated && !mfa.required && !requiresCompanySelection) {
-      const redirectTo = searchParams.get('redirect') || '/dashboard'
+      const redirectTo = searchParams?.get('redirect') || '/dashboard'
       setIsRedirecting(true)
       // Petite attente pour éviter les races conditions
       setTimeout(() => {
-        router.push(redirectTo)
+        router?.push(redirectTo)
       }, 100)
     }
   }, [
@@ -67,7 +71,7 @@ export default function LoginClientPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!formData.identifier || !formData.password) {
       toast({
@@ -100,7 +104,7 @@ export default function LoginClientPage() {
   }
 
   const handleMFASubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!selectedMfaMethod || (!mfaCode && selectedMfaMethod !== 'webauthn')) {
       toast({
@@ -199,11 +203,11 @@ export default function LoginClientPage() {
                 /* Formulaire MFA */
                 <form onSubmit={handleMFASubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="mfa-method">{t('authenticationMethod')}</Label>
+                    <Label htmlFor={mfaMethodId}>{t('authenticationMethod')}</Label>
                     <select
-                      id="mfa-method"
+                      id={mfaMethodId}
                       value={selectedMfaMethod}
-                      onChange={(e) => setSelectedMfaMethod(e.target.value)}
+                      onChange={(e) => setSelectedMfaMethod(e?.target?.value)}
                       className="w-full p-2 border rounded"
                       required
                     >
@@ -226,13 +230,13 @@ export default function LoginClientPage() {
 
                   {selectedMfaMethod && selectedMfaMethod !== 'webauthn' && (
                     <div className="space-y-2">
-                      <Label htmlFor="mfa-code">{t('verificationCode')}</Label>
+                      <Label htmlFor={mfaCodeId}>{t('verificationCode')}</Label>
                       <Input
-                        id="mfa-code"
+                        id={mfaCodeId}
                         type="text"
                         value={mfaCode}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setMfaCode(e.target.value)
+                          setMfaCode(e?.target?.value)
                         }
                         placeholder={t('verificationCodePlaceholder')}
                         maxLength={6}
@@ -261,15 +265,15 @@ export default function LoginClientPage() {
                 /* Formulaire Login normal */
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="identifier">{t('emailOrAcronym')}</Label>
+                    <Label htmlFor={identifierId}>{t('emailOrAcronym')}</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        id="identifier"
+                        id={identifierId}
                         type="text"
                         value={formData.identifier}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          handleInputChange('identifier', e.target.value)
+                          handleInputChange('identifier', e?.target?.value)
                         }
                         placeholder={t('emailOrAcronymPlaceholder')}
                         className="pl-10"
@@ -280,15 +284,15 @@ export default function LoginClientPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password">{t('password')}</Label>
+                    <Label htmlFor={passwordId}>{t('password')}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        id="password"
+                        id={passwordId}
                         type={showPassword ? 'text' : 'password'}
                         value={formData.password}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          handleInputChange('password', e.target.value)
+                          handleInputChange('password', e?.target?.value)
                         }
                         placeholder="••••••••"
                         className="pl-10 pr-10"
@@ -314,7 +318,7 @@ export default function LoginClientPage() {
                         type="checkbox"
                         checked={formData.rememberMe}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          handleInputChange('rememberMe', e.target.checked)
+                          handleInputChange('rememberMe', e?.target?.checked)
                         }
                         className="rounded border-input"
                       />

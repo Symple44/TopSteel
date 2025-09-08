@@ -71,7 +71,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Récupérer mes paramètres utilisateur' })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
   async getMySettings(@CurrentUser() user: Record<string, unknown>) {
-    return this.usersService.getUserSettings((user as any).id)
+    return this.usersService.getUserSettings((user as unknown).id)
   }
 
   @Patch('settings/me')
@@ -81,7 +81,7 @@ export class UsersController {
     @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateUserSettingsDto
   ) {
-    return this.usersService.updateUserSettings((user as any).id, updateDto)
+    return this.usersService.updateUserSettings((user as unknown).id, updateDto)
   }
 
   // Endpoints spécialisés pour les préférences d'apparence (DOIVENT être avant :id)
@@ -103,7 +103,7 @@ export class UsersController {
       return cachedResult
     }
 
-    const settings = await this.usersService.getUserSettings((user as any).id)
+    const settings = await this.usersService.getUserSettings((user as unknown).id)
     if (!settings?.preferences?.appearance) {
       throw new Error("Paramètres d'apparence non trouvés")
     }
@@ -127,7 +127,7 @@ export class UsersController {
     @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateAppearanceSettingsDto
   ): Promise<GetAppearanceSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings((user as any).id, {
+    const updatedSettings = await this.usersService.updateUserSettings((user as unknown).id, {
       preferences: { appearance: updateDto },
     })
 
@@ -154,8 +154,8 @@ export class UsersController {
   async getMyNotificationSettings(
     @CurrentUser() user: Record<string, unknown>
   ): Promise<GetNotificationSettingsResponseDto> {
-    const settings = await this.usersService.getUserSettings((user as any).id)
-    return new GetNotificationSettingsResponseDto(settings.preferences.notifications as any)
+    const settings = await this.usersService.getUserSettings((user as unknown).id)
+    return new GetNotificationSettingsResponseDto(settings.preferences.notifications as unknown)
   }
 
   @Patch('notifications/me')
@@ -169,10 +169,10 @@ export class UsersController {
     @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateNotificationSettingsDto
   ): Promise<GetNotificationSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings((user as any).id, {
+    const updatedSettings = await this.usersService.updateUserSettings((user as unknown).id, {
       preferences: { notifications: updateDto },
     })
-    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications as any)
+    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications as unknown)
   }
 
   // Endpoints avec paramètre ID (DOIVENT être APRÈS les endpoints spécifiques)

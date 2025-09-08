@@ -17,6 +17,7 @@ export enum ArticleStatus {
   INACTIF = 'INACTIF',
   OBSOLETE = 'OBSOLETE',
   EN_COURS_CREATION = 'EN_COURS_CREATION',
+  EN_ATTENTE = 'EN_ATTENTE',
 }
 
 export enum UniteStock {

@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  Index,
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
 
 /**
  * Entité pour stocker les logs SMS
@@ -71,7 +65,7 @@ export class SMSLog {
     type: 'jsonb',
     nullable: true,
   })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @CreateDateColumn()
   createdAt: Date

@@ -46,7 +46,7 @@ export function validateConfig(env: Record<string, string | undefined>): AppConf
   return ConfigSchema.parse({
     environment: env.NODE_ENV,
     api: {
-      port: Number.parseInt(env.API_PORT || '3001'),
+      port: Number.parseInt(env.API_PORT || '3001', 10),
       host: env.API_HOST,
       cors: {
         origin: env.FRONTEND_URL || 'http://127.0.0.1:3000',
@@ -55,19 +55,19 @@ export function validateConfig(env: Record<string, string | undefined>): AppConf
     },
     database: {
       host: env.DB_HOST,
-      port: Number.parseInt(env.DB_PORT || '5432'),
+      port: Number.parseInt(env.DB_PORT || '5432', 10),
       name: env.DB_NAME,
       username: env.DB_USERNAME,
       password: env.DB_PASSWORD,
       ssl: env.DB_SSL === 'true',
       synchronize: env.DB_SYNCHRONIZE === 'true',
-      maxConnections: Number.parseInt(env.DB_MAX_CONNECTIONS || '100'),
+      maxConnections: Number.parseInt(env.DB_MAX_CONNECTIONS || '100', 10),
     },
     redis: env.REDIS_HOST
       ? {
           host: env.REDIS_HOST,
-          port: Number.parseInt(env.REDIS_PORT || '6379'),
-          ttl: Number.parseInt(env.REDIS_TTL || '3600'),
+          port: Number.parseInt(env.REDIS_PORT || '6379', 10),
+          ttl: Number.parseInt(env.REDIS_TTL || '3600', 10),
         }
       : undefined,
     jwt: {
@@ -77,7 +77,7 @@ export function validateConfig(env: Record<string, string | undefined>): AppConf
       refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN || '7d',
     },
     uploads: {
-      maxSize: Number.parseInt(env.UPLOAD_MAX_SIZE || '10485760'),
+      maxSize: Number.parseInt(env.UPLOAD_MAX_SIZE || '10485760', 10),
       allowedTypes: (env.UPLOAD_ALLOWED_TYPES || 'image/*,application/pdf').split(','),
     },
   })

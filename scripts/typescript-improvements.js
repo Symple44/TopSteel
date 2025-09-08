@@ -150,7 +150,7 @@ function improveFile(filePath, _analysis) {
   const interfacesToAdd = new Set()
 
   // Appliquer les remplacements
-  replacementPatterns.forEach(({ pattern, replacement, requiredInterface, description }) => {
+  replacementPatterns.forEach(({ pattern, replacement, requiredInterface }) => {
     if (pattern.test(content)) {
       content = content.replace(pattern, replacement)
       hasChanges = true

@@ -52,7 +52,7 @@ export interface AuditLogEntry extends BaseEntity {
   resourceName?: string
   description?: string
   changes?: AuditChange[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   ipAddress?: string
   userAgent?: string
   sessionId?: string

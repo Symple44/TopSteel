@@ -16,8 +16,7 @@ export class SentryConfig {
   private async loadSentry(): Promise<void> {
     try {
       // Essayer de charger Sentry dynamiquement
-      // @ts-ignore - Module optionnel
-      this.sentry = await import('@sentry/node').catch(() => null)
+      this.sentry = await import('@sentry/node' as unknown).catch(() => null)
       if (this.sentry) {
         this.logger.log('Sentry module loaded successfully')
       }
@@ -58,7 +57,7 @@ export class SentryConfig {
       release: process.env.npm_package_version || 'unknown',
 
       // Environment filtering
-      beforeSend(event, hint) {
+      beforeSend(event: unknown, hint: any) {
         // Filter out sensitive data
         if (event.request) {
           // Remove authorization headers
@@ -159,7 +158,7 @@ export class SentryConfig {
     message: string,
     category: string,
     level: any = 'info',
-    data?: Record<string, any>
+    data?: Record<string, unknown>
   ): void {
     if (!this.sentry) return
 
@@ -177,7 +176,7 @@ export class SentryConfig {
     error: Error,
     context?: {
       tags?: Record<string, string>
-      extra?: Record<string, any>
+      extra?: Record<string, unknown>
       user?: { id?: string; email?: string }
       level?: any
     }
@@ -196,7 +195,7 @@ export class SentryConfig {
   }
 
   // Capture message
-  captureMessage(message: string, level: any = 'info', context?: Record<string, any>): string {
+  captureMessage(message: string, level: any = 'info', context?: Record<string, unknown>): string {
     if (!this.sentry) {
       this.logger.log(`Message captured (Sentry disabled): ${message}`)
       return 'sentry-disabled'

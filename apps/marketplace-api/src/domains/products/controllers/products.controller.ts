@@ -3,13 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
   Req,
   UseGuards,
-  NotFoundException,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
@@ -42,13 +42,17 @@ interface PricingQuery {
 
 import { PriceRuleChannel } from '@erp/entities'
 import type { HttpService } from '@nestjs/axios'
-import { firstValueFrom } from 'rxjs'
-import type { MarketplaceProductsService } from '../services/marketplace-products.service'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { MarketplacePriceRule, AdjustmentType, PricingCondition } from '../entities/marketplace-price-rule.entity'
-import { MarketplaceProduct } from '../entities/marketplace-product.entity'
+import { firstValueFrom } from 'rxjs'
+import type { Repository } from 'typeorm'
 import { Article } from '../../../shared/entities/erp/article.entity'
+import {
+  type AdjustmentType,
+  MarketplacePriceRule,
+  type PricingCondition,
+} from '../entities/marketplace-price-rule.entity'
+import { MarketplaceProduct } from '../entities/marketplace-product.entity'
+import type { MarketplaceProductsService } from '../services/marketplace-products.service'
 
 @ApiTags('admin-products')
 @Controller('admin/products')
@@ -73,8 +77,8 @@ export class ProductsController {
     return await this.productsService.getProducts(tenant.erpTenantConnection, tenant.societeId, {
       search: query.search,
       categories: query.categories?.split(','),
-      limit: parseInt(query.limit) || 50,
-      offset: parseInt(query.offset) || 0,
+      limit: parseInt(query.limit, 10) || 50,
+      offset: parseInt(query.offset, 10) || 0,
       sortBy: (query.sortBy as 'name' | 'price' | 'date' | 'popularity') || 'name',
       sortOrder: (query.sortOrder as 'ASC' | 'DESC') || 'ASC',
     })
@@ -135,7 +139,7 @@ export class ProductsController {
             articleId: productId,
             customerId: query.customerId,
             customerGroup: query.customerGroup,
-            quantity: parseInt(query.quantity) || 1,
+            quantity: parseInt(query.quantity, 10) || 1,
             promotionCode: query.promotionCode,
             channel: PriceRuleChannel.MARKETPLACE,
           }
@@ -191,7 +195,7 @@ export class ProductsController {
     }
   ) {
     const { tenant } = req
-    
+
     // Créer la nouvelle règle de prix
     const priceRule = this.priceRuleRepo.create({
       societeId: tenant.societeId,
@@ -209,18 +213,18 @@ export class ProductsController {
       isActive: true,
       metadata: {
         createdBy: 'admin',
-        notes: `Rule created via marketplace admin`
-      }
+        notes: `Rule created via marketplace admin`,
+      },
     })
-    
+
     const savedRule = await this.priceRuleRepo.save(priceRule)
-    
+
     // Invalider le cache du produit
     await this.productsService.invalidateProductCache(productId)
-    
+
     return {
       message: 'Pricing rule created successfully',
-      rule: savedRule
+      rule: savedRule,
     }
   }
 
@@ -245,37 +249,37 @@ export class ProductsController {
     }>
   ) {
     const { tenant } = req
-    
+
     // Vérifier que la règle existe
     const existingRule = await this.priceRuleRepo.findOne({
       where: {
         id: ruleId,
         productId,
-        societeId: tenant.societeId
-      }
+        societeId: tenant.societeId,
+      },
     })
-    
+
     if (!existingRule) {
       throw new NotFoundException('Pricing rule not found')
     }
-    
+
     // Mettre à jour la règle
     await this.priceRuleRepo.update(ruleId, {
       ...body,
       metadata: {
         ...existingRule.metadata,
-        notes: `Updated via marketplace admin at ${new Date().toISOString()}`
-      }
+        notes: `Updated via marketplace admin at ${new Date().toISOString()}`,
+      },
     })
-    
+
     // Invalider le cache du produit
     await this.productsService.invalidateProductCache(productId)
-    
+
     const updatedRule = await this.priceRuleRepo.findOne({ where: { id: ruleId } })
-    
+
     return {
       message: 'Pricing rule updated successfully',
-      rule: updatedRule
+      rule: updatedRule,
     }
   }
 
@@ -287,30 +291,30 @@ export class ProductsController {
     @Param('ruleId') ruleId: string
   ) {
     const { tenant } = req
-    
+
     // Vérifier que la règle existe
     const existingRule = await this.priceRuleRepo.findOne({
       where: {
         id: ruleId,
         productId,
-        societeId: tenant.societeId
-      }
+        societeId: tenant.societeId,
+      },
     })
-    
+
     if (!existingRule) {
       throw new NotFoundException('Pricing rule not found')
     }
-    
+
     // Supprimer la règle
     await this.priceRuleRepo.delete(ruleId)
-    
+
     // Invalider le cache du produit
     await this.productsService.invalidateProductCache(productId)
-    
+
     return {
       message: 'Pricing rule deleted successfully',
       productId,
-      ruleId
+      ruleId,
     }
   }
 
@@ -322,34 +326,34 @@ export class ProductsController {
     if (!tenant.erpTenantConnection) {
       throw new Error('Connexion ERP non disponible pour ce tenant')
     }
-    
+
     // Récupérer tous les articles marketplace depuis l'ERP
     const articlesRepo = tenant.erpTenantConnection.getRepository(Article)
     const articles = await articlesRepo.find({
       where: {
         societeId: tenant.societeId,
-        isMarketplaceEnabled: true
-      }
+        isMarketplaceEnabled: true,
+      },
     })
-    
+
     let created = 0
     let updated = 0
-    
+
     // Synchroniser chaque article
     for (const article of articles) {
       const existingProduct = await this.marketplaceProductRepo.findOne({
         where: {
           erpArticleId: article.id,
-          societeId: tenant.societeId
-        }
+          societeId: tenant.societeId,
+        },
       })
-      
+
       if (existingProduct) {
         // Mettre à jour le produit existant
         existingProduct.marketplaceData.description = article.description
         existingProduct.basePrice = article.prixVenteHT || 0
         existingProduct.updatedAt = new Date()
-        
+
         await this.marketplaceProductRepo.save(existingProduct)
         updated++
       } else {
@@ -364,13 +368,14 @@ export class ProductsController {
           marketplaceData: {
             description: article.description,
             shortDescription: article.description?.substring(0, 150),
-            categories: article.marketplaceSettings?.categories || [article.famille].filter(Boolean),
+            categories:
+              article.marketplaceSettings?.categories || [article.famille].filter(Boolean),
             tags: article.marketplaceSettings?.tags || [],
             images: (article.marketplaceSettings?.images || []).map((url, index) => ({
               url,
               isMain: index === 0,
               order: index,
-              alt: `Product image ${index + 1}`
+              alt: `Product image ${index + 1}`,
             })),
             customFields: {
               reference: article.reference,
@@ -379,28 +384,28 @@ export class ProductsController {
               dimensions: {
                 length: article.longueur,
                 width: article.largeur,
-                height: article.hauteur
-              }
-            }
-          }
+                height: article.hauteur,
+              },
+            },
+          },
         })
-        
+
         await this.marketplaceProductRepo.save(newProduct)
         created++
       }
-      
+
       // Invalider le cache
       await this.productsService.invalidateProductCache(article.id)
     }
-    
+
     return {
       message: 'Product sync completed',
       societeId: tenant.societeId,
       results: {
         total: articles.length,
         created,
-        updated
-      }
+        updated,
+      },
     }
   }
 
@@ -421,52 +426,54 @@ export class ProductsController {
     }
   ) {
     const { tenant } = req
-    
+
     // Vérifier si le produit marketplace existe
     let marketplaceProduct = await this.marketplaceProductRepo.findOne({
       where: {
         erpArticleId: productId,
-        societeId: tenant.societeId
-      }
+        societeId: tenant.societeId,
+      },
     })
-    
+
     if (!marketplaceProduct) {
       // Si le produit n'existe pas, le créer
       if (!tenant.erpTenantConnection) {
         throw new Error('Connexion ERP non disponible pour ce tenant')
       }
-      
+
       const articlesRepo = tenant.erpTenantConnection.getRepository(Article)
       const article = await articlesRepo.findOne({
         where: {
           id: productId,
-          societeId: tenant.societeId
-        }
+          societeId: tenant.societeId,
+        },
       })
-      
+
       if (!article) {
         throw new NotFoundException('Product not found in ERP')
       }
-      
+
       marketplaceProduct = this.marketplaceProductRepo.create({
         societeId: tenant.societeId,
         erpArticleId: productId,
         basePrice: article.prixVenteHT || 0,
-        marketplaceData: {}
+        marketplaceData: {},
       })
     }
-    
+
     // Mettre à jour les paramètres marketplace
     if (!marketplaceProduct.marketplaceData) {
       marketplaceProduct.marketplaceData = {}
     }
-    if (settings.images !== undefined) marketplaceProduct.marketplaceData.images = settings.images.map((url, index) => ({
-      url,
-      isMain: index === 0,
-      order: index,
-      alt: `Product image ${index + 1}`
-    }))
-    if (settings.description !== undefined) marketplaceProduct.marketplaceData.description = settings.description
+    if (settings.images !== undefined)
+      marketplaceProduct.marketplaceData.images = settings.images.map((url, index) => ({
+        url,
+        isMain: index === 0,
+        order: index,
+        alt: `Product image ${index + 1}`,
+      }))
+    if (settings.description !== undefined)
+      marketplaceProduct.marketplaceData.description = settings.description
     if (settings.seoTitle !== undefined) {
       if (!marketplaceProduct.marketplaceData.seo) marketplaceProduct.marketplaceData.seo = {}
       marketplaceProduct.marketplaceData.seo.title = settings.seoTitle
@@ -475,18 +482,19 @@ export class ProductsController {
       if (!marketplaceProduct.marketplaceData.seo) marketplaceProduct.marketplaceData.seo = {}
       marketplaceProduct.marketplaceData.seo.description = settings.seoDescription
     }
-    if (settings.categories !== undefined) marketplaceProduct.marketplaceData.categories = settings.categories
+    if (settings.categories !== undefined)
+      marketplaceProduct.marketplaceData.categories = settings.categories
     if (settings.tags !== undefined) marketplaceProduct.marketplaceData.tags = settings.tags
     if (settings.isVisible !== undefined) marketplaceProduct.isVisible = settings.isVisible
     if (settings.isFeatured !== undefined) marketplaceProduct.isFeatured = settings.isFeatured
-    
+
     marketplaceProduct.updatedAt = new Date()
-    
+
     const savedProduct = await this.marketplaceProductRepo.save(marketplaceProduct)
-    
+
     // Invalider le cache
     await this.productsService.invalidateProductCache(productId)
-    
+
     // Aussi mettre à jour l'article ERP si connecté
     if (tenant.erpTenantConnection) {
       const articlesRepo = tenant.erpTenantConnection.getRepository(Article)
@@ -499,14 +507,14 @@ export class ProductsController {
           categories: settings.categories,
           tags: settings.tags,
           isVisible: settings.isVisible,
-          isFeatured: settings.isFeatured
-        } as any
+          isFeatured: settings.isFeatured,
+        } as any,
       })
     }
-    
+
     return {
       message: 'Marketplace settings updated successfully',
-      product: savedProduct
+      product: savedProduct,
     }
   }
 }

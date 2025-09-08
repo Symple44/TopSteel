@@ -73,7 +73,7 @@ class HydrationManager {
         if (document.readyState === 'loading') {
           const onReady = () => {
             this._isHydrated = true
-            this._notifyListeners()
+            this?._notifyListeners()
             resolve()
             document.removeEventListener('DOMContentLoaded', onReady)
           }
@@ -83,7 +83,7 @@ class HydrationManager {
           // DOM déjà prêt
           setTimeout(() => {
             this._isHydrated = true
-            this._notifyListeners()
+            this?._notifyListeners()
             resolve()
           }, 0)
         }
@@ -110,9 +110,9 @@ class HydrationManager {
   }
 
   addListener(listener: () => void): () => void {
-    this._listeners.add(listener)
+    this?._listeners?.add(listener)
 
-    return () => this._listeners.delete(listener)
+    return () => this?._listeners?.delete(listener)
   }
 
   waitForHydration(): Promise<void> {
@@ -120,7 +120,7 @@ class HydrationManager {
   }
 }
 
-const hydrationManager = HydrationManager.getInstance()
+const hydrationManager = HydrationManager?.getInstance()
 
 // ===== COMPOSANT CLIENT-ONLY PRINCIPAL =====
 
@@ -147,8 +147,10 @@ export function ClientOnly({
   const childrenKey = remountOnChange ? JSON.stringify(children) : ''
 
   const handleMount = useCallback(() => {
-    if (mountedRef.current) return
-    mountedRef.current = true
+    if (mountedRef?.current) return
+    if (mountedRef.current !== undefined) {
+      mountedRef.current = true
+    }
 
     setIsHydrating(true)
     onHydrating?.()
@@ -186,10 +188,14 @@ export function ClientOnly({
 
   // Gérer le remontage si les enfants changent
   useEffect(() => {
-    if (remountOnChange && childrenKey !== childrenKeyRef.current) {
-      childrenKeyRef.current = childrenKey
-      if (mountedRef.current) {
-        mountedRef.current = false
+    if (remountOnChange && childrenKey !== childrenKeyRef?.current) {
+      if (childrenKeyRef.current !== undefined) {
+        childrenKeyRef.current = childrenKey
+      }
+      if (mountedRef?.current) {
+        if (mountedRef.current !== undefined) {
+          mountedRef.current = false
+        }
         setHasMounted(false)
         handleMount()
       }
@@ -198,7 +204,7 @@ export function ClientOnly({
 
   // Listener pour l'hydratation globale
   useEffect(() => {
-    const removeListener = hydrationManager.addListener(() => {
+    const removeListener = hydrationManager?.addListener(() => {
       if (!hasMounted) {
         setHasMounted(true)
         setIsHydrating(false)
@@ -209,7 +215,7 @@ export function ClientOnly({
   }, [hasMounted])
 
   // États de rendu
-  const isClient = hydrationManager.isClient
+  const isClient = hydrationManager?.isClient
   const shouldShowFallback = !isClient || !hasMounted || showFallback || isHydrating
 
   if (shouldShowFallback) {
@@ -243,7 +249,7 @@ export function ClientOnly({
  * Hook pour détecter si on est côté client
  */
 export function useIsClient(): boolean {
-  const [isClient, setIsClient] = useState(hydrationManager.isClient)
+  const [isClient, setIsClient] = useState(hydrationManager?.isClient)
 
   useEffect(() => {
     setIsClient(true)
@@ -272,16 +278,16 @@ export function useWindow(): Window | null {
  * Hook pour détecter si l'hydratation est terminée
  */
 export function useHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(hydrationManager.isHydrated)
+  const [hydrated, setHydrated] = useState(hydrationManager?.isHydrated)
 
   useEffect(() => {
-    if (hydrationManager.isHydrated) {
+    if (hydrationManager?.isHydrated) {
       setHydrated(true)
 
-      return
+      return undefined
     }
 
-    const removeListener = hydrationManager.addListener(() => {
+    const removeListener = hydrationManager?.addListener(() => {
       setHydrated(true)
     })
 
@@ -306,14 +312,14 @@ export function useHydrationState(): {
   })
 
   useEffect(() => {
-    if (hydrationManager.isHydrated) {
+    if (hydrationManager?.isHydrated) {
       setState({
         isClient: true,
         isHydrated: true,
         isHydrating: false,
       })
 
-      return
+      return undefined
     }
 
     setState((prev) => ({
@@ -322,7 +328,7 @@ export function useHydrationState(): {
       isHydrating: true,
     }))
 
-    const removeListener = hydrationManager.addListener(() => {
+    const removeListener = hydrationManager?.addListener(() => {
       setState({
         isClient: true,
         isHydrated: true,
@@ -385,10 +391,10 @@ export function withClientOnly<P extends Record<string, unknown>>(
   Component: ComponentType<P>,
   options: WithClientOnlyOptions = {}
 ): ComponentType<P & { clientOnlyFallback?: ReactNode }> {
-  const { fallback: FallbackComponent, displayName, forceRemount } = options
+  const { fallback: FallbackComponent, displayName, forceRemount } = options || {}
 
   const WrappedComponent = (props: P & { clientOnlyFallback?: ReactNode }) => {
-    const { clientOnlyFallback, ...componentProps } = props
+    const { clientOnlyFallback, ...componentProps } = props || {}
 
     const fallbackElement = clientOnlyFallback || (FallbackComponent ? <FallbackComponent /> : null)
 
@@ -435,7 +441,7 @@ export function ServerSideRenderingBlocker({ children }: { children: ReactNode }
 export function HydrationDebugger({ showInProduction = false }: { showInProduction?: boolean }) {
   const { isClient, isHydrated, isHydrating } = useHydrationState()
 
-  if (process.env.NODE_ENV === 'production' && !showInProduction) {
+  if (process?.env?.NODE_ENV === 'production' && !showInProduction) {
     return null
   }
 

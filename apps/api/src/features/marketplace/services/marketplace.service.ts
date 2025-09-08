@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { In, type Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import type {
   ApiRouteDefinition,
   MenuItemDto,
@@ -420,7 +421,7 @@ export class MarketplaceService {
         success: false,
         moduleId,
         message: "Erreur lors de l'installation",
-        errors: [error instanceof Error ? error.message : 'Erreur inconnue'],
+        errors: [error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'],
       }
     }
   }
@@ -477,7 +478,7 @@ export class MarketplaceService {
         success: false,
         moduleId,
         message: 'Erreur lors de la désinstallation',
-        errors: [error instanceof Error ? error.message : 'Erreur inconnue'],
+        errors: [error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'],
       }
     }
   }
@@ -582,7 +583,7 @@ export class MarketplaceService {
       installation.addLog('INFO', 'Installation terminée avec succès')
       return { success: true }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue'
+      const errorMessage = error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'
       installation.addLog('ERROR', `Erreur d'installation: ${errorMessage}`)
       return { success: false, error: errorMessage }
     }
@@ -609,7 +610,7 @@ export class MarketplaceService {
       installation.addLog('INFO', 'Désinstallation terminée avec succès')
       return { success: true }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue'
+      const errorMessage = error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'
       installation.addLog('ERROR', `Erreur de désinstallation: ${errorMessage}`)
       return { success: false, error: errorMessage }
     }

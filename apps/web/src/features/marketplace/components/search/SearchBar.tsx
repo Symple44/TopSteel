@@ -91,7 +91,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   // Load recent searches from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('marketplace_recent_searches')
+    const stored = localStorage?.getItem('marketplace_recent_searches')
     if (stored) {
       try {
         setRecentSearches(JSON.parse(stored))
@@ -102,7 +102,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (searchRef?.current && !searchRef?.current?.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
@@ -114,7 +114,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce(async (searchQuery: string) => {
-      if (!searchQuery.trim()) {
+      if (!searchQuery?.trim()) {
         setSuggestions([])
         setIsLoading(false)
         return
@@ -127,8 +127,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         await new Promise((resolve) => setTimeout(resolve, 300))
 
         // Filter mock suggestions based on query
-        const filtered = mockSuggestions.filter((item) =>
-          item.title.toLowerCase().includes(searchQuery.toLowerCase())
+        const filtered = mockSuggestions?.filter((item) =>
+          item?.title?.toLowerCase().includes(searchQuery?.toLowerCase())
         )
 
         setSuggestions(filtered)
@@ -143,11 +143,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+    const value = e?.target?.value
     setQuery(value)
     setSelectedIndex(-1)
 
-    if (value.trim()) {
+    if (value?.trim()) {
       debouncedSearch(value)
       setIsOpen(true)
     } else {
@@ -160,30 +160,30 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
 
-    if (!query.trim()) return
+    if (!query?.trim()) return
 
     // Save to recent searches
-    const newRecent = [query, ...recentSearches.filter((s) => s !== query)].slice(0, 5)
+    const newRecent = [query, ...(recentSearches?.filter((s) => s !== query) || [])].slice(0, 5)
     setRecentSearches(newRecent)
     localStorage.setItem('marketplace_recent_searches', JSON.stringify(newRecent))
 
     // Navigate to search results
-    router.push(`/marketplace/search?q=${encodeURIComponent(query)}`)
+    router?.push(`/marketplace/search?q=${encodeURIComponent(query)}`)
 
     // Call onSearch callback if provided
     onSearch?.(query)
 
     // Close suggestions
     setIsOpen(false)
-    inputRef.current?.blur()
+    inputRef?.current?.blur()
   }
 
   // Handle suggestion click
   const handleSuggestionClick = (suggestion: SearchSuggestion) => {
     if (suggestion.type === 'category') {
-      router.push(`/marketplace/categories/${suggestion.id}`)
+      router?.push(`/marketplace/categories/${suggestion.id}`)
     } else if (suggestion.type === 'brand') {
-      router.push(`/marketplace/brands/${suggestion.id}`)
+      router?.push(`/marketplace/brands/${suggestion.id}`)
     } else {
       setQuery(suggestion.title)
       handleSubmit()
@@ -198,15 +198,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault()
+        e?.preventDefault()
         setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev))
         break
       case 'ArrowUp':
-        e.preventDefault()
+        e?.preventDefault()
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1))
         break
       case 'Enter':
-        e.preventDefault()
+        e?.preventDefault()
         if (selectedIndex >= 0) {
           handleSuggestionClick(suggestions[selectedIndex])
         } else {
@@ -215,7 +215,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         break
       case 'Escape':
         setIsOpen(false)
-        inputRef.current?.blur()
+        inputRef?.current?.blur()
         break
     }
   }
@@ -225,7 +225,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     setQuery('')
     setSuggestions([])
     setIsOpen(false)
-    inputRef.current?.focus()
+    inputRef?.current?.focus()
   }
 
   // Get icon for suggestion type
@@ -284,7 +284,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             type="button"
             className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-2 text-gray-600 hover:text-gray-900"
             onClick={() =>
-              router.push(`/marketplace/search?q=${encodeURIComponent(query)}&filters=open`)
+              router?.push(`/marketplace/search?q=${encodeURIComponent(query)}&filters=open`)
             }
           >
             <Filter className="w-4 h-4" />
@@ -302,7 +302,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 Recent Searches
               </h3>
               <div className="space-y-1">
-                {recentSearches.map((search, index) => (
+                {recentSearches?.map((search, index) => (
                   <button
                     key={index}
                     onClick={() => {
@@ -346,7 +346,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           {/* Search Suggestions */}
           {query && suggestions.length > 0 && (
             <div className="py-2">
-              {suggestions.map((suggestion, index) => (
+              {suggestions?.map((suggestion, index) => (
                 <button
                   key={suggestion.id}
                   onClick={() => handleSuggestionClick(suggestion)}

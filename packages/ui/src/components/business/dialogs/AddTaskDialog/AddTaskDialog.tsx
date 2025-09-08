@@ -1,23 +1,8 @@
 'use client'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { 
-  Button, 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  Input,
-  Textarea,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Checkbox
-} from '../../../primitives'
 import {
   Form,
   FormControl,
@@ -25,7 +10,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../../../forms'
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Validation schema for task creation
 const taskFormSchema = z.object({
   title: z.string().min(1, 'Le titre est requis'),
@@ -33,7 +31,7 @@ const taskFormSchema = z.object({
   projectId: z.string().min(1, 'Le projet est requis'),
   // Task scheduling
   startDate: z.string().min(1, 'La date de début est requise'),
-  dueDate: z.string().min(1, 'La date d\'échéance est requise'),
+  dueDate: z.string().min(1, "La date d'échéance est requise"),
   estimatedHours: z.number().min(0).optional(),
   // Priority and status
   priority: z.enum(['low', 'medium', 'high', 'critical']),
@@ -55,36 +53,48 @@ const taskFormSchema = z.object({
     'cutting',
     'assembly',
     'painting',
-    'documentation'
+    'documentation',
   ]),
   // Dependencies
   dependencies: z.array(z.string()).optional(),
   blockedBy: z.array(z.string()).optional(),
   blocking: z.array(z.string()).optional(),
   // Materials and resources
-  requiredMaterials: z.array(z.object({
-    materialId: z.string(),
-    quantity: z.number().min(0),
-    unit: z.string(),
-  })).optional(),
+  requiredMaterials: z
+    .array(
+      z.object({
+        materialId: z.string(),
+        quantity: z.number().min(0),
+        unit: z.string(),
+      })
+    )
+    .optional(),
   requiredTools: z.array(z.string()).optional(),
   location: z.string().optional(),
   // Quality requirements
-  qualityChecks: z.array(z.object({
-    checkType: z.string(),
-    description: z.string(),
-    required: z.boolean().default(false),
-  })).optional(),
+  qualityChecks: z
+    .array(
+      z.object({
+        checkType: z.string(),
+        description: z.string(),
+        required: z.boolean().default(false),
+      })
+    )
+    .optional(),
   // Safety requirements
   safetyRequirements: z.array(z.string()).optional(),
   requiresSafetyBriefing: z.boolean().default(false),
   // Progress tracking
-  milestones: z.array(z.object({
-    name: z.string(),
-    description: z.string().optional(),
-    targetDate: z.string(),
-    completed: z.boolean().default(false),
-  })).optional(),
+  milestones: z
+    .array(
+      z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        targetDate: z.string(),
+        completed: z.boolean().default(false),
+      })
+    )
+    .optional(),
   // Budget and cost
   budgetAllocated: z.number().min(0).optional(),
   costCenter: z.string().optional(),
@@ -115,20 +125,22 @@ interface AddTaskDialogProps {
   availableTaskDependencies?: Array<{ id: string; title: string; status: string }>
   availableMaterials?: Array<{ id: string; name: string; unit: string; stockQuantity: number }>
 }
-export function AddTaskDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function AddTaskDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   projectId,
   initialData,
   availableProjects = [],
   availableUsers = [],
-  availableTaskDependencies = [],
+  availableTaskDependencies = [], // TODO: Implement task dependencies feature
   availableMaterials = [],
 }: AddTaskDialogProps) {
   const [loading, setLoading] = useState(false)
-  const [selectedTab, setSelectedTab] = useState<'basic' | 'advanced' | 'resources' | 'quality'>('basic')
-  const form = useForm<TaskFormData>({
+  const [selectedTab, setSelectedTab] = useState<'basic' | 'advanced' | 'resources' | 'quality'>(
+    'basic'
+  )
+  const form = useForm({
     resolver: zodResolver(taskFormSchema),
     defaultValues: {
       title: initialData?.title || '',
@@ -167,23 +179,31 @@ export function AddTaskDialog({
       recurrenceEndDate: initialData?.recurrenceEndDate || '',
     },
   })
-  const { fields: materialFields, append: addMaterial, remove: removeMaterial } = 
-    form.useFieldArray({ name: 'requiredMaterials' })
-  const { fields: milestoneFields, append: addMilestone, remove: removeMilestone } = 
-    form.useFieldArray({ name: 'milestones' })
-  const { fields: qualityFields, append: addQualityCheck, remove: removeQualityCheck } = 
-    form.useFieldArray({ name: 'qualityChecks' })
+  const {
+    fields: materialFields,
+    append: addMaterial,
+    remove: removeMaterial,
+  } = useFieldArray({ control: form.control, name: 'requiredMaterials' })
+  const {
+    fields: milestoneFields,
+    append: addMilestone,
+    remove: removeMilestone,
+  } = useFieldArray({ control: form.control, name: 'milestones' })
+  const {
+    fields: qualityFields,
+    append: addQualityCheck,
+    remove: removeQualityCheck,
+  } = useFieldArray({ control: form.control, name: 'qualityChecks' })
   const isRecurring = form.watch('isRecurring')
   const requiresApproval = form.watch('requiresApproval')
-  const taskType = form.watch('taskType')
+  const _taskType = form.watch('taskType')
   const handleSubmit = async (data: TaskFormData) => {
     setLoading(true)
     try {
       await onSubmit?.(data)
       onOpenChange(false)
       form.reset()
-    } catch (error) {
-      console.error('Error creating task:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -221,10 +241,10 @@ export function AddTaskDialog({
     { value: 'yearly', label: 'Annuelle' },
   ]
   const tabs = [
-    { key: 'basic', label: 'Informations de base' },
-    { key: 'advanced', label: 'Avancé' },
-    { key: 'resources', label: 'Ressources' },
-    { key: 'quality', label: 'Qualité & Sécurité' },
+    { key: 'basic' as const, label: 'Informations de base' },
+    { key: 'advanced' as const, label: 'Avancé' },
+    { key: 'resources' as const, label: 'Ressources' },
+    { key: 'quality' as const, label: 'Qualité & Sécurité' },
   ]
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -238,7 +258,7 @@ export function AddTaskDialog({
             <button
               key={tab.key}
               type="button"
-              onClick={() => setSelectedTab(tab.key as any)}
+              onClick={() => setSelectedTab(tab.key)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 selectedTab === tab.key
                   ? 'border-blue-500 text-blue-600'
@@ -261,10 +281,7 @@ export function AddTaskDialog({
                     <FormItem>
                       <FormLabel>Titre de la tâche *</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="ex: Découpe des poutres principales"
-                          {...field} 
-                        />
+                        <Input placeholder="ex: Découpe des poutres principales" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -277,10 +294,10 @@ export function AddTaskDialog({
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Textarea
                           placeholder="Description détaillée de la tâche..."
                           rows={3}
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -393,8 +410,8 @@ export function AddTaskDialog({
                       <FormItem>
                         <FormLabel>Heures estimées</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="0"
                             step="0.5"
                             {...field}
@@ -496,10 +513,7 @@ export function AddTaskDialog({
                     <FormItem>
                       <FormLabel>Localisation</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="ex: Atelier A, Zone de découpe"
-                          {...field} 
-                        />
+                        <Input placeholder="ex: Atelier A, Zone de découpe" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -513,8 +527,8 @@ export function AddTaskDialog({
                       <FormItem>
                         <FormLabel>Budget alloué (€)</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="0"
                             step="0.01"
                             {...field}
@@ -546,10 +560,7 @@ export function AddTaskDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2">
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel>Approbation requise</FormLabel>
                       </FormItem>
@@ -570,7 +581,9 @@ export function AddTaskDialog({
                             </FormControl>
                             <SelectContent>
                               {availableUsers
-                                .filter(user => ['manager', 'supervisor', 'admin'].includes(user.role))
+                                .filter((user) =>
+                                  ['manager', 'supervisor', 'admin'].includes(user.role)
+                                )
                                 .map((user) => (
                                   <SelectItem key={user.id} value={user.id}>
                                     {user.name} ({user.role})
@@ -591,10 +604,7 @@ export function AddTaskDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2">
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel>Tâche récurrente</FormLabel>
                       </FormItem>
@@ -633,8 +643,8 @@ export function AddTaskDialog({
                           <FormItem>
                             <FormLabel>Intervalle</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
+                              <Input
+                                type="number"
                                 min="1"
                                 {...field}
                                 onChange={(e) => field.onChange(Number(e.target.value))}
@@ -667,11 +677,7 @@ export function AddTaskDialog({
                     <FormItem>
                       <FormLabel>Notes additionnelles</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Notes et commentaires..."
-                          rows={3}
-                          {...field} 
-                        />
+                        <Textarea placeholder="Notes et commentaires..." rows={3} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -695,7 +701,10 @@ export function AddTaskDialog({
                     </Button>
                   </div>
                   {materialFields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-4 gap-4 items-end p-3 border rounded">
+                    <div
+                      key={field.id}
+                      className="grid grid-cols-4 gap-4 items-end p-3 border rounded"
+                    >
                       <FormField
                         control={form.control}
                         name={`requiredMaterials.${index}.materialId`}
@@ -711,7 +720,8 @@ export function AddTaskDialog({
                               <SelectContent>
                                 {availableMaterials.map((material) => (
                                   <SelectItem key={material.id} value={material.id}>
-                                    {material.name} (Stock: {material.stockQuantity} {material.unit})
+                                    {material.name} (Stock: {material.stockQuantity} {material.unit}
+                                    )
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -727,8 +737,8 @@ export function AddTaskDialog({
                           <FormItem>
                             <FormLabel>Quantité</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
+                              <Input
+                                type="number"
                                 min="0"
                                 step="0.01"
                                 {...field}
@@ -769,18 +779,23 @@ export function AddTaskDialog({
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => addMilestone({ 
-                        name: '', 
-                        description: '', 
-                        targetDate: '', 
-                        completed: false 
-                      })}
+                      onClick={() =>
+                        addMilestone({
+                          name: '',
+                          description: '',
+                          targetDate: '',
+                          completed: false,
+                        })
+                      }
                     >
                       Ajouter un jalon
                     </Button>
                   </div>
                   {milestoneFields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-3 gap-4 items-end p-3 border rounded">
+                    <div
+                      key={field.id}
+                      className="grid grid-cols-3 gap-4 items-end p-3 border rounded"
+                    >
                       <FormField
                         control={form.control}
                         name={`milestones.${index}.name`}
@@ -829,17 +844,22 @@ export function AddTaskDialog({
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => addQualityCheck({ 
-                        checkType: '', 
-                        description: '', 
-                        required: false 
-                      })}
+                      onClick={() =>
+                        addQualityCheck({
+                          checkType: '',
+                          description: '',
+                          required: false,
+                        })
+                      }
                     >
                       Ajouter un contrôle
                     </Button>
                   </div>
                   {qualityFields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-4 gap-4 items-end p-3 border rounded">
+                    <div
+                      key={field.id}
+                      className="grid grid-cols-4 gap-4 items-end p-3 border rounded"
+                    >
                       <FormField
                         control={form.control}
                         name={`qualityChecks.${index}.checkType`}
@@ -872,10 +892,7 @@ export function AddTaskDialog({
                         render={({ field }) => (
                           <FormItem className="flex items-center space-x-2">
                             <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
+                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                             </FormControl>
                             <FormLabel>Obligatoire</FormLabel>
                           </FormItem>
@@ -900,10 +917,7 @@ export function AddTaskDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2">
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel>Briefing sécurité requis</FormLabel>
                       </FormItem>

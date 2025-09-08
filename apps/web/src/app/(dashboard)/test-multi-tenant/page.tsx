@@ -28,11 +28,29 @@ export default function TestMultiTenantPage() {
     status: string
     data?: Record<string, unknown>[]
     error?: string
+    count?: number
+    statusCode?: number
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [tables, setTables] = useState<
-    { name: string; columns?: { name: string; type: string }[] }[]
+    {
+      name: string
+      tableName?: string
+      schema?: string
+      description?: string
+      columns?: {
+        name?: string
+        columnName?: string
+        type?: string
+        dataType?: string
+        isPrimaryKey?: boolean
+        primary?: boolean
+        isForeignKey?: boolean
+        foreign?: boolean
+        nullable?: boolean
+      }[]
+    }[]
   >([])
   const [loadingColumns, setLoadingColumns] = useState<string | null>(null) // Table en cours de chargement des colonnes
 
@@ -76,14 +94,30 @@ export default function TestMultiTenantPage() {
     try {
       const response = await callClientApi('query-builder/schema/tables')
 
-      if (response.ok) {
-        const responseData = await response.json()
+      if (response?.ok) {
+        const responseData = await response?.json()
 
-        let tables = []
+        let tables: {
+          name: string
+          tableName?: string
+          schema?: string
+          description?: string
+          columns?: {
+            name?: string
+            columnName?: string
+            type?: string
+            dataType?: string
+            isPrimaryKey?: boolean
+            primary?: boolean
+            isForeignKey?: boolean
+            foreign?: boolean
+            nullable?: boolean
+          }[]
+        }[] = []
         if (Array.isArray(responseData)) {
           tables = responseData
-        } else if (responseData.data && Array.isArray(responseData.data)) {
-          tables = responseData.data.map(
+        } else if (responseData?.data && Array.isArray(responseData?.data)) {
+          tables = responseData?.data?.map(
             (table: { tableName: string; schemaName?: string; comment?: string }) => ({
               name: table.tableName,
               schema: table.schemaName,
@@ -99,8 +133,8 @@ export default function TestMultiTenantPage() {
 
         setTables(tables)
       } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        setError(`Erreur ${response.status}: ${errorData.error}`)
+        const errorData = await response?.json().catch(() => ({ error: 'Unknown error' }))
+        setError(`Erreur ${response?.status}: ${errorData?.error}`)
       }
     } catch (err) {
       setError(
@@ -116,11 +150,11 @@ export default function TestMultiTenantPage() {
     setLoadingColumns(tableName)
     try {
       const response = await callClientApi(`query-builder/schema/tables/${tableName}/columns`)
-      if (response.ok) {
-        const columns = await response.json()
+      if (response?.ok) {
+        const columns = await response?.json()
 
         setTables((prevTables) =>
-          prevTables.map((table) =>
+          prevTables?.map((table) =>
             table.name === tableName ? { ...table, columns: columns.data || columns } : table
           )
         )
@@ -144,16 +178,16 @@ export default function TestMultiTenantPage() {
         body: JSON.stringify({ sql: query, limit: 100 }),
       })
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (response.ok) {
+      if (response?.ok) {
         setResults({
           status: 'success',
           data: data,
           count: data.length,
         })
       } else {
-        setError(data.error || 'Erreur inconnue')
+        setError(data?.error || 'Erreur inconnue')
         setResults({
           status: 'error',
           statusCode: response.status,
@@ -205,11 +239,16 @@ export default function TestMultiTenantPage() {
             <CardContent className="space-y-4">
               <Textarea
                 value={sqlQuery}
-                onChange={(e) => setSqlQuery(e.target.value)}
+                onChange={(e) => setSqlQuery(e?.target?.value)}
                 placeholder="Entrez votre requête SQL..."
                 className="font-mono text-sm h-32"
               />
-              <Button onClick={() => executeSql()} disabled={loading} className="w-full">
+              <Button
+                type="button"
+                onClick={() => executeSql()}
+                disabled={loading}
+                className="w-full"
+              >
                 {loading ? 'Exécution...' : 'Exécuter la requête'}
               </Button>
 
@@ -234,7 +273,7 @@ export default function TestMultiTenantPage() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        {Object.keys(results.data[0] || {}).map((key) => (
+                        {Object.keys(results.data?.[0] || {}).map((key) => (
                           <th
                             key={key}
                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -248,8 +287,9 @@ export default function TestMultiTenantPage() {
                       {results.data
                         .slice(0, 10)
                         .map((row: Record<string, unknown>, idx: number) => {
-                          const rowId =
+                          const rowId = String(
                             row.id || Object.values(row).slice(0, 3).join('-') || `row-${idx}`
+                          )
                           return (
                             <tr key={rowId}>
                               {Object.entries(row).map(([columnName, value]) => (
@@ -284,7 +324,7 @@ export default function TestMultiTenantPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {testQueries.map((test, idx) => (
+                {testQueries?.map((test, idx) => (
                   <div key={test.name || `test-${idx}`} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
@@ -297,6 +337,7 @@ export default function TestMultiTenantPage() {
                       </Badge>
                     </div>
                     <Button
+                      type="button"
                       size="sm"
                       variant="outline"
                       onClick={() => executeSql(test.sql)}
@@ -325,7 +366,7 @@ export default function TestMultiTenantPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Button onClick={fetchTables} disabled={loading} className="mb-4">
+              <Button type="button" onClick={fetchTables} disabled={loading} className="mb-4">
                 {loading ? 'Chargement...' : 'Charger les tables'}
               </Button>
 
@@ -335,12 +376,12 @@ export default function TestMultiTenantPage() {
                 </div>
               )}
 
-              {tables && tables.length > 0 ? (
+              {tables && tables?.length > 0 ? (
                 <div className="space-y-4">
                   <div className="mb-2 text-sm text-blue-600">
-                    Affichage de {tables.length} tables
+                    Affichage de {tables?.length} tables
                   </div>
-                  {tables.map((table, idx) => (
+                  {tables?.map((table, idx) => (
                     <div
                       key={table.name || table.tableName || `table-${idx}`}
                       className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
@@ -375,19 +416,19 @@ export default function TestMultiTenantPage() {
                           </span>
                         )}
                         <span className="text-gray-500">
-                          {table.columns?.length > 0
-                            ? `${table.columns.length} colonnes`
+                          {(table?.columns?.length ?? 0) > 0
+                            ? `${table?.columns?.length ?? 0} colonnes`
                             : 'Colonnes non chargées'}
                         </span>
                       </div>
 
-                      {table.columns && table.columns.length > 0 && (
+                      {table.columns && table?.columns?.length > 0 && (
                         <div className="mt-3 p-3 bg-gray-50 rounded">
                           <div className="text-xs font-medium text-gray-700 mb-2">
-                            Colonnes ({table.columns.length})
+                            Colonnes ({table?.columns?.length})
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {table.columns.map(
+                            {table?.columns?.map(
                               (
                                 col: {
                                   columnName?: string
@@ -452,7 +493,7 @@ export default function TestMultiTenantPage() {
                                         🛡️
                                       </span>
                                     )}
-                                    {col.nullable === false && !isPrimaryKey && (
+                                    {(col as unknown)?.nullable === false && !isPrimaryKey && (
                                       <span className="ml-1 text-red-500 text-xs" title="Non-null">
                                         *
                                       </span>
@@ -488,7 +529,7 @@ export default function TestMultiTenantPage() {
                 </div>
               )}
 
-              {!loading && tables.length === 0 && !error && (
+              {!loading && tables?.length === 0 && !error && (
                 <div className="text-center py-8 text-muted-foreground">
                   <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>Aucune table chargée</p>

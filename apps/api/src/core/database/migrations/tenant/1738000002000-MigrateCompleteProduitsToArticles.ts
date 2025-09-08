@@ -34,7 +34,7 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       `SELECT COUNT(*) as count FROM articles WHERE metadonnees->>'origine_migration' = 'produits'`
     )
 
-    if (parseInt(existingMigration[0].count) === 0) {
+    if (parseInt(existingMigration[0].count, 10) === 0) {
       await this.migrateProduitsData(queryRunner)
     }
 

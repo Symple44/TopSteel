@@ -1,19 +1,25 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { AlertTriangle, Package, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, Package, XCircle } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
-export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock' | 'on_order' | 'discontinued' | 'reserved'
+import { Badge } from '../../../data-display/badge'
+export type StockStatus =
+  | 'in_stock'
+  | 'low_stock'
+  | 'out_of_stock'
+  | 'on_order'
+  | 'discontinued'
+  | 'reserved'
 interface StockStatusBadgeProps {
   status: StockStatus
   showIcon?: boolean
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
-export function StockStatusBadge({ 
-  status, 
-  showIcon = true, 
+export function StockStatusBadge({
+  status,
+  showIcon = true,
   size = 'md',
-  className 
+  className,
 }: StockStatusBadgeProps) {
   const getStatusConfig = (status: StockStatus) => {
     switch (status) {
@@ -84,7 +90,7 @@ export function StockStatusBadge({
   const config = getStatusConfig(status)
   const Icon = config.icon
   return (
-    <Badge 
+    <Badge
       variant="outline"
       className={cn(
         'inline-flex items-center gap-1.5 font-medium',

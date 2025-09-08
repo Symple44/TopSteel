@@ -1,13 +1,15 @@
 'use client'
-import React, { useState } from 'react'
+import { Maximize, RotateCw, Scissors, Trash2, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
 import { Card } from '../../../layout/card'
 import { Button } from '../../../primitives/button/Button'
 import { Input } from '../../../primitives/input/Input'
-import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
 import { Progress } from '../../../primitives/progress'
-import { Scissors, Maximize, TrendingUp, RotateCw, Trash2 } from 'lucide-react'
+
 interface StockMaterial {
   id: string
   length: number
@@ -54,13 +56,14 @@ interface CuttingOptimizerProps {
   onOptimize?: (result: OptimizationResult) => void
   autoOptimize?: boolean
 }
-export function CuttingOptimizer({ 
-  className, 
+export function CuttingOptimizer({
+  className,
   stockMaterials = [],
   pieces = [],
   onOptimize,
-  autoOptimize = false
+  autoOptimize = false,
 }: CuttingOptimizerProps) {
+  const ids = useFormFieldIds(['allowRotation'])
   const [stock, setStock] = useState<StockMaterial[]>(stockMaterials)
   const [cutPieces, setCutPieces] = useState<CutPiece[]>(pieces)
   const [optimizing, setOptimizing] = useState(false)
@@ -75,15 +78,15 @@ export function CuttingOptimizer({
       thickness: 10,
       quantity: 1,
       material: 'Steel Sheet',
-      cost: 500
+      cost: 500,
     }
     setStock([...stock, newStock])
   }
   const updateStock = (id: string, field: keyof StockMaterial, value: any) => {
-    setStock(stock.map(s => s.id === id ? { ...s, [field]: value } : s))
+    setStock(stock.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
   }
   const removeStock = (id: string) => {
-    setStock(stock.filter(s => s.id !== id))
+    setStock(stock.filter((s) => s.id !== id))
   }
   const addPiece = () => {
     const newPiece: CutPiece = {
@@ -93,21 +96,21 @@ export function CuttingOptimizer({
       thickness: 10,
       quantity: 1,
       priority: 'medium',
-      label: `Piece ${cutPieces.length + 1}`
+      label: `Piece ${cutPieces.length + 1}`,
     }
     setCutPieces([...cutPieces, newPiece])
   }
   const updatePiece = (id: string, field: keyof CutPiece, value: any) => {
-    setCutPieces(cutPieces.map(p => p.id === id ? { ...p, [field]: value } : p))
+    setCutPieces(cutPieces.map((p) => (p.id === id ? { ...p, [field]: value } : p)))
   }
   const removePiece = (id: string) => {
-    setCutPieces(cutPieces.filter(p => p.id !== id))
+    setCutPieces(cutPieces.filter((p) => p.id !== id))
   }
   const runOptimization = async () => {
     setOptimizing(true)
     try {
       // Simulate optimization algorithm
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
       // Mock optimization result
       const mockResult: OptimizationResult = {
         patterns: stock.slice(0, Math.min(stock.length, 3)).map((s, index) => ({
@@ -118,16 +121,16 @@ export function CuttingOptimizer({
             x: (i % 2) * (s.width / 2),
             y: Math.floor(i / 2) * (s.length / 3),
             rotated: allowRotation && Math.random() > 0.5,
-            quantity: Math.min(p.quantity, 2)
+            quantity: Math.min(p.quantity, 2),
           })),
           efficiency: 75 + Math.random() * 20,
           wasteArea: s.length * s.width * (0.15 + Math.random() * 0.1),
-          totalArea: s.length * s.width
+          totalArea: s.length * s.width,
         })),
         totalEfficiency: 82.5,
         totalWaste: 12.3,
         materialUsed: 87.7,
-        costSavings: 234.50
+        costSavings: 234.5,
       }
       setResult(mockResult)
       onOptimize?.(mockResult)
@@ -137,14 +140,18 @@ export function CuttingOptimizer({
   }
   const getPriorityColor = (priority: CutPiece['priority']) => {
     switch (priority) {
-      case 'high': return 'bg-red-500'
-      case 'medium': return 'bg-yellow-500'
-      case 'low': return 'bg-green-500'
-      default: return 'bg-gray-500'
+      case 'high':
+        return 'bg-red-500'
+      case 'medium':
+        return 'bg-yellow-500'
+      case 'low':
+        return 'bg-green-500'
+      default:
+        return 'bg-gray-500'
     }
   }
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -161,8 +168,9 @@ export function CuttingOptimizer({
                 <div className="text-xs text-muted-foreground">Efficiency</div>
               </div>
             )}
-            <Button 
-              onClick={runOptimization} 
+            <Button
+              type="button"
+              onClick={runOptimization}
               disabled={optimizing || stock.length === 0 || cutPieces.length === 0}
               className="gap-2"
             >
@@ -194,18 +202,20 @@ export function CuttingOptimizer({
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
-              id="allowRotation"
+              id={ids.allowRotation}
               checked={allowRotation}
               onChange={(e) => setAllowRotation(e.target.checked)}
             />
-            <Label htmlFor="allowRotation" className="text-xs">Allow piece rotation</Label>
+            <Label htmlFor={ids.allowRotation} className="text-xs">
+              Allow piece rotation
+            </Label>
           </div>
         </div>
         {/* Stock Materials */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium">Stock Materials</h4>
-            <Button onClick={addStockMaterial} size="sm" variant="outline">
+            <Button type="button" onClick={addStockMaterial} size="sm" variant="outline">
               Add Stock
             </Button>
           </div>
@@ -225,7 +235,9 @@ export function CuttingOptimizer({
                   <Input
                     type="number"
                     value={material.length}
-                    onChange={(e) => updateStock(material.id, 'length', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateStock(material.id, 'length', parseFloat(e.target.value) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -234,7 +246,9 @@ export function CuttingOptimizer({
                   <Input
                     type="number"
                     value={material.width}
-                    onChange={(e) => updateStock(material.id, 'width', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateStock(material.id, 'width', parseFloat(e.target.value) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -244,7 +258,9 @@ export function CuttingOptimizer({
                     type="number"
                     step="0.1"
                     value={material.thickness}
-                    onChange={(e) => updateStock(material.id, 'thickness', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateStock(material.id, 'thickness', parseFloat(e.target.value) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -253,7 +269,9 @@ export function CuttingOptimizer({
                   <Input
                     type="number"
                     value={material.quantity}
-                    onChange={(e) => updateStock(material.id, 'quantity', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateStock(material.id, 'quantity', parseInt(e.target.value, 10) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -263,18 +281,23 @@ export function CuttingOptimizer({
                     type="number"
                     step="0.01"
                     value={material.cost}
-                    onChange={(e) => updateStock(material.id, 'cost', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateStock(material.id, 'cost', parseFloat(e.target.value) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
                 <div className="flex items-center">
                   <div className="text-xs text-center">
-                    <div className="font-medium">{(material.length * material.width / 1000000).toFixed(2)}</div>
+                    <div className="font-medium">
+                      {((material.length * material.width) / 1000000).toFixed(2)}
+                    </div>
                     <div className="text-muted-foreground">m²</div>
                   </div>
                 </div>
                 <div className="flex items-end">
                   <Button
+                    type="button"
                     onClick={() => removeStock(material.id)}
                     size="sm"
                     variant="destructive"
@@ -291,7 +314,7 @@ export function CuttingOptimizer({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium">Pieces to Cut</h4>
-            <Button onClick={addPiece} size="sm" variant="outline">
+            <Button type="button" onClick={addPiece} size="sm" variant="outline">
               Add Piece
             </Button>
           </div>
@@ -311,7 +334,9 @@ export function CuttingOptimizer({
                   <Input
                     type="number"
                     value={piece.length}
-                    onChange={(e) => updatePiece(piece.id, 'length', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updatePiece(piece.id, 'length', parseFloat(e.target.value) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -320,7 +345,9 @@ export function CuttingOptimizer({
                   <Input
                     type="number"
                     value={piece.width}
-                    onChange={(e) => updatePiece(piece.id, 'width', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updatePiece(piece.id, 'width', parseFloat(e.target.value) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -330,7 +357,9 @@ export function CuttingOptimizer({
                     type="number"
                     step="0.1"
                     value={piece.thickness}
-                    onChange={(e) => updatePiece(piece.id, 'thickness', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updatePiece(piece.id, 'thickness', parseFloat(e.target.value) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -339,7 +368,9 @@ export function CuttingOptimizer({
                   <Input
                     type="number"
                     value={piece.quantity}
-                    onChange={(e) => updatePiece(piece.id, 'quantity', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updatePiece(piece.id, 'quantity', parseInt(e.target.value, 10) || 0)
+                    }
                     className="h-8 text-xs"
                   />
                 </div>
@@ -347,7 +378,9 @@ export function CuttingOptimizer({
                   <Label className="text-xs">Priority</Label>
                   <select
                     value={piece.priority}
-                    onChange={(e) => updatePiece(piece.id, 'priority', e.target.value as CutPiece['priority'])}
+                    onChange={(e) =>
+                      updatePiece(piece.id, 'priority', e.target.value as CutPiece['priority'])
+                    }
                     className="h-8 px-2 border rounded text-xs"
                   >
                     <option value="high">High</option>
@@ -356,10 +389,11 @@ export function CuttingOptimizer({
                   </select>
                 </div>
                 <div className="flex items-center justify-center">
-                  <div className={cn("w-4 h-4 rounded-full", getPriorityColor(piece.priority))} />
+                  <div className={cn('w-4 h-4 rounded-full', getPriorityColor(piece.priority))} />
                 </div>
                 <div className="flex items-end">
                   <Button
+                    type="button"
                     onClick={() => removePiece(piece.id)}
                     size="sm"
                     variant="destructive"
@@ -394,9 +428,7 @@ export function CuttingOptimizer({
                 <div className="text-xs text-muted-foreground">Waste</div>
               </div>
               <div className="text-center p-3 bg-blue-50 rounded-lg">
-                <div className="text-lg font-bold text-blue-600">
-                  {result.patterns.length}
-                </div>
+                <div className="text-lg font-bold text-blue-600">{result.patterns.length}</div>
                 <div className="text-xs text-muted-foreground">Cutting Patterns</div>
               </div>
               <div className="text-center p-3 bg-purple-50 rounded-lg">
@@ -410,14 +442,15 @@ export function CuttingOptimizer({
             <div className="space-y-3">
               <h5 className="font-medium">Cutting Patterns</h5>
               {result.patterns.map((pattern, index) => {
-                const stockMaterial = stock.find(s => s.id === pattern.stockId)
+                const stockMaterial = stock.find((s) => s.id === pattern.stockId)
                 return (
                   <div key={pattern.id} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h6 className="font-medium">Pattern {index + 1}</h6>
                         <p className="text-xs text-muted-foreground">
-                          {stockMaterial?.material} - {stockMaterial?.length}x{stockMaterial?.width}mm
+                          {stockMaterial?.material} - {stockMaterial?.length}x{stockMaterial?.width}
+                          mm
                         </p>
                       </div>
                       <div className="text-right">
@@ -428,8 +461,8 @@ export function CuttingOptimizer({
                     </div>
                     <Progress value={pattern.efficiency} className="h-2 mb-2" />
                     <div className="text-xs text-muted-foreground">
-                      {pattern.pieces.length} pieces • 
-                      Waste: {((pattern.wasteArea / pattern.totalArea) * 100).toFixed(1)}%
+                      {pattern.pieces.length} pieces • Waste:{' '}
+                      {((pattern.wasteArea / pattern.totalArea) * 100).toFixed(1)}%
                     </div>
                   </div>
                 )

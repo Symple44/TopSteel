@@ -5,32 +5,13 @@ import { callBackendFromApi } from '@/utils/backend-api'
 // Force dynamic pour éviter les problèmes de cache
 export const dynamic = 'force-dynamic'
 
-interface _UserMenuItem {
-  id: string
-  parentId?: string
-  title: string
-  type: 'M' | 'P' | 'L' | 'D'
-  programId?: string
-  externalUrl?: string
-  queryBuilderId?: string
-  orderIndex: number
-  isVisible: boolean
-  children: UserMenuItem[]
-  icon?: string
-  customTitle?: string
-  titleTranslations?: Record<string, string>
-  customIcon?: string
-  customIconColor?: string
-  isUserCreated?: boolean
-}
-
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+    const token = cookieStore?.get('accessToken')?.value
 
     if (!token) {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: 'Authentification requise',
@@ -47,22 +28,22 @@ export async function GET(request: NextRequest) {
         },
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      if (response?.ok) {
+        const data = await response?.json()
 
         // Déterminer où se trouvent les données du menu
-        const menuItems = data?.data || data || []
-        const _isArray = Array.isArray(menuItems)
+        // Note: menuItems pourrait être utilisé pour validation future
+        // const menuItems = data?.data || data || []
 
-        return NextResponse.json(data)
+        return NextResponse?.json(data)
       } else {
         // Backend API error, utilisation du fallback
-        const errorText = await response.text()
-        throw new Error(`Backend API error: ${response.status} - ${errorText}`)
+        const errorText = await response?.text()
+        throw new Error(`Backend API error: ${response?.status} - ${errorText}`)
       }
     } catch (_backendError) {
       // Fallback : retourner un menu vide par défaut
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: [], // Menu vide par défaut
         message: 'Menu personnalisé récupéré (fallback - menu vide)',
@@ -71,7 +52,7 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     // Erreur lors du chargement du menu personnalisé
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors du chargement du menu personnalisé',
@@ -85,10 +66,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+    const token = cookieStore?.get('accessToken')?.value
 
     if (!token) {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: 'Authentification requise',
@@ -97,12 +78,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
-    const { menuItems } = body
+    const body = await request?.json()
+    const { menuItems } = body || {}
 
     // Validation des données
     if (!Array.isArray(menuItems)) {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: 'Format de données invalide: menuItems doit être un tableau',
@@ -123,24 +104,24 @@ export async function POST(request: NextRequest) {
         }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        return NextResponse.json({
+      if (response?.ok) {
+        const data = await response?.json()
+        return NextResponse?.json({
           success: true,
           data: data.data || menuItems,
           message: 'Menu personnalisé sauvegardé avec succès',
         })
       } else {
-        const _errorData = await response.text()
+        const _errorData = await response?.text()
         // Backend API error
-        throw new Error(`Backend API error: ${response.status}`)
+        throw new Error(`Backend API error: ${response?.status}`)
       }
     } catch (_backendError) {
       // Backend indisponible pour la sauvegarde, utilisation du fallback
 
       // Fallback : simuler la sauvegarde si backend indisponible
       // En production, vous devriez enregistrer dans une base locale ou queue
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: menuItems,
         message: 'Menu personnalisé sauvegardé (mode fallback - attention: non persisté en BDD)',
@@ -150,7 +131,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     // Erreur lors de la sauvegarde du menu personnalisé
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors de la sauvegarde du menu personnalisé',

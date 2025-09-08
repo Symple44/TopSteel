@@ -1,17 +1,20 @@
 import type React from 'react'
+import type { ItemRenderProps } from '../../../types/common'
 
 // Types de base réutilisés
 export interface ReorderableItem {
   id: string
   children?: ReorderableItem[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface RenderItemProps<T extends ReorderableItem> {
   item: T
+  index: number
   level: number
   isExpanded: boolean
   hasChildren: boolean
+  isDragging: boolean
   onToggleExpand?: (id: string) => void
   isDragOverlay?: boolean
 }
@@ -178,7 +181,7 @@ export interface ThemedReorderableListProps<T> {
   items: T[]
   onItemsChange?: (items: T[]) => void
   onSave?: (items: T[]) => void
-  renderItem: (props: any) => React.ReactNode
+  renderItem: (props: ItemRenderProps<T>) => React.ReactNode
 
   // Nouveaux props pour les thèmes
   theme?: string | ReorderableTheme

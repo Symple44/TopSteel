@@ -165,7 +165,7 @@ export class CreateArticleDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
-  @Transform(({ value }) => (value ? parseInt(value) : undefined))
+  @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
   delaiApprovisionnement?: number
 
   @ApiPropertyOptional({ description: 'Quantité minimum de commande', minimum: 0 })

@@ -26,7 +26,7 @@ const loadUniverComponents = async (): Promise<boolean> => {
 
     if (univerCore) {
       Univer = univerCore.Univer as UniverClass
-      UniverInstanceType = univerCore.UniverInstanceType as any as UniverInstanceTypeEnum
+      UniverInstanceType = univerCore.UniverInstanceType as unknown as UniverInstanceTypeEnum
       LocaleType = univerCore.LocaleType as UniverLocaleType
       // Note: IWorkbookData and IWorksheetData might not be available in all versions
     }
@@ -700,7 +700,6 @@ export class ExportUtils {
   private static async parseExcelBuffer(buffer: ArrayBuffer): Promise<UniverWorkbookData | null> {
     try {
       // Vérifier la signature du fichier Excel
-      const _view = new DataView(buffer)
       if (buffer.byteLength < 8) return null
 
       // Vérifier la signature ZIP (XLSX est un format ZIP)
@@ -1181,11 +1180,11 @@ export class ExportUtils {
       // Simulation de définition de largeur de colonnes
       // Dans une vraie implémentation, ceci utiliserait l'API Univer
       exportColumns.forEach((col, _index) => {
-        const maxLength = Math.max(
+        const _maxLength = Math.max(
           col.title.length,
           ...exportData.slice(0, 100).map((row) => String(row[col.title] || '').length)
         )
-        const _width = Math.min(Math.max(maxLength * 8, 80), 400)
+        // const width = Math.min(Math.max(maxLength * 8, 80), 400)
         // workbook.setColumnWidth(index, width)
       })
     } catch {

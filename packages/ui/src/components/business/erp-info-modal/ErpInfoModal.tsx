@@ -167,7 +167,7 @@ export function ErpInfoModal({
               <p className="text-sm text-muted-foreground">{t('systemInfo')}</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
+          <Button type="button" variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -178,6 +178,7 @@ export function ErpInfoModal({
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">{t('serverStatus')}</span>
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={onCheckHealth}

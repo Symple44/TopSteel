@@ -7,7 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { PageTemplate } from './page-template.entity'
+// Removed direct import to avoid circular dependency
+// import { PageTemplate } from './page-template.entity'
 import type { SectionContent, SectionStyles } from './types'
 
 @Entity('marketplace_page_sections')
@@ -15,15 +16,12 @@ export class PageSection {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @ManyToOne(
-    () => PageTemplate,
-    (template) => template.sections,
-    {
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('PageTemplate', 'sections', {
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'pageTemplateId' })
-  pageTemplate!: PageTemplate
+  pageTemplate!: any
 
   @Column({ type: 'uuid' })
   pageTemplateId!: string

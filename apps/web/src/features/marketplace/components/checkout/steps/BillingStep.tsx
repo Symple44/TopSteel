@@ -1,9 +1,9 @@
 'use client'
 
 import type React from 'react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { CheckoutData } from '../CheckoutFlow'
+import type { CheckoutData } from '../../../types/checkout.types'
 
 interface BillingStepProps {
   data: CheckoutData
@@ -31,6 +31,14 @@ export const BillingStep: React.FC<BillingStepProps> = ({
   onBack,
   isValid,
 }) => {
+  const firstNameId = useId()
+  const lastNameId = useId()
+  const addressId = useId()
+  const cityId = useId()
+  const stateId = useId()
+  const postalCodeId = useId()
+  const countryId = useId()
+
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleSameAsShippingChange = (checked: boolean) => {
@@ -61,19 +69,31 @@ export const BillingStep: React.FC<BillingStepProps> = ({
   }
 
   const validateForm = (): boolean => {
-    if (data.billing.sameAsShipping) {
+    if (data?.billing?.sameAsShipping) {
       return true
     }
 
     const newErrors: Record<string, string> = {}
     const b = data.billing
 
-    if (!b.firstName?.trim()) newErrors.firstName = 'First name is required'
-    if (!b.lastName?.trim()) newErrors.lastName = 'Last name is required'
-    if (!b.address?.trim()) newErrors.address = 'Address is required'
-    if (!b.city?.trim()) newErrors.city = 'City is required'
-    if (!b.postalCode?.trim()) newErrors.postalCode = 'Postal code is required'
-    if (!b.country) newErrors.country = 'Country is required'
+    if (!b?.firstName?.trim()) {
+      newErrors.firstName = 'First name is required'
+    }
+    if (!b?.lastName?.trim()) {
+      newErrors.lastName = 'Last name is required'
+    }
+    if (!b?.address?.trim()) {
+      newErrors.address = 'Address is required'
+    }
+    if (!b?.city?.trim()) {
+      newErrors.city = 'City is required'
+    }
+    if (!b?.postalCode?.trim()) {
+      newErrors.postalCode = 'Postal code is required'
+    }
+    if (!b?.country) {
+      newErrors.country = 'Country is required'
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -95,8 +115,8 @@ export const BillingStep: React.FC<BillingStepProps> = ({
           <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
             <input
               type="checkbox"
-              checked={data.billing.sameAsShipping}
-              onChange={(e) => handleSameAsShippingChange(e.target.checked)}
+              checked={data?.billing?.sameAsShipping}
+              onChange={(e) => handleSameAsShippingChange(e?.target?.checked)}
               className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
             />
             <div>
@@ -107,15 +127,21 @@ export const BillingStep: React.FC<BillingStepProps> = ({
         </div>
 
         {/* Billing Form */}
-        {!data.billing.sameAsShipping && (
+        {!data?.billing?.sameAsShipping && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                <label
+                  htmlFor={firstNameId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  First Name *
+                </label>
                 <input
+                  id={firstNameId}
                   type="text"
-                  value={data.billing.firstName || ''}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  value={data?.billing?.firstName || ''}
+                  onChange={(e) => handleInputChange('firstName', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.firstName ? 'border-red-500' : 'border-gray-300'
@@ -127,11 +153,17 @@ export const BillingStep: React.FC<BillingStepProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                <label
+                  htmlFor={lastNameId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Last Name *
+                </label>
                 <input
+                  id={lastNameId}
                   type="text"
-                  value={data.billing.lastName || ''}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  value={data?.billing?.lastName || ''}
+                  onChange={(e) => handleInputChange('lastName', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.lastName ? 'border-red-500' : 'border-gray-300'
@@ -142,13 +174,14 @@ export const BillingStep: React.FC<BillingStepProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={addressId} className="block text-sm font-medium text-gray-700 mb-1">
                 Street Address *
               </label>
               <input
+                id={addressId}
                 type="text"
-                value={data.billing.address || ''}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                value={data?.billing?.address || ''}
+                onChange={(e) => handleInputChange('address', e?.target?.value)}
                 placeholder="Street address"
                 className={cn(
                   'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
@@ -159,8 +192,8 @@ export const BillingStep: React.FC<BillingStepProps> = ({
 
               <input
                 type="text"
-                value={data.billing.address2 || ''}
-                onChange={(e) => handleInputChange('address2', e.target.value)}
+                value={data?.billing?.address2 || ''}
+                onChange={(e) => handleInputChange('address2', e?.target?.value)}
                 placeholder="Apartment, suite, etc. (optional)"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
               />
@@ -168,11 +201,14 @@ export const BillingStep: React.FC<BillingStepProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                <label htmlFor={cityId} className="block text-sm font-medium text-gray-700 mb-1">
+                  City *
+                </label>
                 <input
+                  id={cityId}
                   type="text"
-                  value={data.billing.city || ''}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  value={data?.billing?.city || ''}
+                  onChange={(e) => handleInputChange('city', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.city ? 'border-red-500' : 'border-gray-300'
@@ -182,23 +218,30 @@ export const BillingStep: React.FC<BillingStepProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State/Region</label>
+                <label htmlFor={stateId} className="block text-sm font-medium text-gray-700 mb-1">
+                  State/Region
+                </label>
                 <input
+                  id={stateId}
                   type="text"
-                  value={data.billing.state || ''}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
+                  value={data?.billing?.state || ''}
+                  onChange={(e) => handleInputChange('state', e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor={postalCodeId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Postal Code *
                 </label>
                 <input
+                  id={postalCodeId}
                   type="text"
-                  value={data.billing.postalCode || ''}
-                  onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                  value={data?.billing?.postalCode || ''}
+                  onChange={(e) => handleInputChange('postalCode', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.postalCode ? 'border-red-500' : 'border-gray-300'
@@ -211,17 +254,20 @@ export const BillingStep: React.FC<BillingStepProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+              <label htmlFor={countryId} className="block text-sm font-medium text-gray-700 mb-1">
+                Country *
+              </label>
               <select
-                value={data.billing.country || ''}
-                onChange={(e) => handleInputChange('country', e.target.value)}
+                id={countryId}
+                value={data?.billing?.country || ''}
+                onChange={(e) => handleInputChange('country', e?.target?.value)}
                 className={cn(
                   'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                   errors.country ? 'border-red-500' : 'border-gray-300'
                 )}
               >
                 <option value="">Select a country</option>
-                {countries.map((country) => (
+                {countries?.map((country) => (
                   <option key={country.code} value={country.code}>
                     {country.name}
                   </option>

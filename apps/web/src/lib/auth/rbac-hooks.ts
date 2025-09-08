@@ -20,7 +20,7 @@ function useExtendedUser(): ExtendedUser | null {
     }
 
     // Sinon, utiliser l'adaptateur pour convertir
-    return AuthAdapter.toExtendedUser(user as User)
+    return AuthAdapter?.toExtendedUser(user as unknown)
   }, [user])
 }
 
@@ -33,7 +33,7 @@ export function usePermission(permissionCode: string): boolean {
 
   return useMemo(() => {
     if (!extendedUser || !company) return false
-    return rbacService.hasPermission(extendedUser, company, permissionCode)
+    return rbacService?.hasPermission(extendedUser, company, permissionCode)
   }, [extendedUser, company, permissionCode])
 }
 
@@ -48,9 +48,9 @@ export function usePermissions(permissionCodes: string[], mode: 'ALL' | 'ANY' = 
     if (!extendedUser || !company || permissionCodes.length === 0) return false
 
     if (mode === 'ALL') {
-      return rbacService.hasAllPermissions(extendedUser, company, permissionCodes)
+      return rbacService?.hasAllPermissions(extendedUser, company, permissionCodes)
     } else {
-      return rbacService.hasAnyPermission(extendedUser, company, permissionCodes)
+      return rbacService?.hasAnyPermission(extendedUser, company, permissionCodes)
     }
   }, [extendedUser, company, permissionCodes, mode])
 }
@@ -64,7 +64,7 @@ export function useEffectivePermissions(): Permission[] {
 
   return useMemo(() => {
     if (!extendedUser || !company) return []
-    return rbacService.getEffectivePermissions(extendedUser, company)
+    return rbacService?.getEffectivePermissions(extendedUser, company)
   }, [extendedUser, company])
 }
 
@@ -83,7 +83,7 @@ export function useModuleAccess(module: string): {
       return { canAccess: false, permissions: [] }
     }
 
-    const permissions = rbacService.getPermissionsByModule(extendedUser, company, module)
+    const permissions = rbacService?.getPermissionsByModule(extendedUser, company, module)
 
     return {
       canAccess: permissions.length > 0,
@@ -110,12 +110,12 @@ export function useRoleLevel(): {
       }
     }
 
-    const level = rbacService.getHighestRoleLevel(extendedUser, company)
+    const level = rbacService?.getHighestRoleLevel(extendedUser, company)
 
     return {
       level,
       hasMinimumLevel: (minimumLevel: number) =>
-        rbacService.hasMinimumRoleLevel(extendedUser, company, minimumLevel),
+        rbacService?.hasMinimumRoleLevel(extendedUser, company, minimumLevel),
     }
   }, [extendedUser, company])
 }
@@ -134,9 +134,9 @@ export function useAccessPolicy(policy: AccessPolicy): boolean {
       user: extendedUser,
       societe: company,
       currentRole:
-        extendedUser.societeRoles?.find((r) => r.societeId === company.id && r.isActive)?.role ||
-        extendedUser.defaultRole!,
-      effectivePermissions: rbacService.getEffectivePermissions(extendedUser, company),
+        extendedUser?.societeRoles?.find((r) => r.societeId === company.id && r.isActive)?.role ||
+        extendedUser?.defaultRole!,
+      effectivePermissions: rbacService?.getEffectivePermissions(extendedUser, company),
       sessionInfo: {
         id: 'current-session', // À récupérer depuis le contexte
         ipAddress: 'unknown',
@@ -145,7 +145,7 @@ export function useAccessPolicy(policy: AccessPolicy): boolean {
       },
     }
 
-    return rbacService.checkAccess(context, policy)
+    return rbacService?.checkAccess(context, policy)
   }, [extendedUser, company, policy])
 }
 
@@ -160,12 +160,12 @@ export function useResourceActions(resource: string): {
   canExport: boolean
   canImport: boolean
 } {
-  const canCreate = usePermission(`${resource.toUpperCase()}_CREATE`)
-  const canRead = usePermission(`${resource.toUpperCase()}_READ`)
-  const canUpdate = usePermission(`${resource.toUpperCase()}_UPDATE`)
-  const canDelete = usePermission(`${resource.toUpperCase()}_DELETE`)
-  const canExport = usePermission(`${resource.toUpperCase()}_EXPORT`)
-  const canImport = usePermission(`${resource.toUpperCase()}_IMPORT`)
+  const canCreate = usePermission(`${resource?.toUpperCase()}_CREATE`)
+  const canRead = usePermission(`${resource?.toUpperCase()}_READ`)
+  const canUpdate = usePermission(`${resource?.toUpperCase()}_UPDATE`)
+  const canDelete = usePermission(`${resource?.toUpperCase()}_DELETE`)
+  const canExport = usePermission(`${resource?.toUpperCase()}_EXPORT`)
+  const canImport = usePermission(`${resource?.toUpperCase()}_IMPORT`)
 
   return {
     canCreate,

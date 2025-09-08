@@ -30,10 +30,7 @@ interface MonitoringCardProps {
   variant?: 'auth' | 'shared' | 'tenant'
 }
 
-export default function DatabaseMonitoringCard({
-  metrics,
-  variant = 'tenant',
-}: MonitoringCardProps) {
+export function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: MonitoringCardProps) {
   const [previousResponseTime, setPreviousResponseTime] = useState<number | null>(null)
   const [trend, setTrend] = useState<'up' | 'down' | 'stable'>('stable')
 
@@ -52,19 +49,6 @@ export default function DatabaseMonitoringCard({
       setPreviousResponseTime(metrics.responseTime)
     }
   }, [metrics.responseTime, previousResponseTime])
-
-  const _getStatusColor = (status: string) => {
-    switch (status) {
-      case 'healthy':
-        return 'text-green-600'
-      case 'degraded':
-        return 'text-yellow-600'
-      case 'unhealthy':
-        return 'text-red-600'
-      default:
-        return 'text-gray-600'
-    }
-  }
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {

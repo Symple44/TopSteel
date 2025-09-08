@@ -1,66 +1,116 @@
 /**
- * 📦 @erp/types - EXPORTS PRINCIPAUX
- * Types et interfaces pour l'ERP TopSteel (legacy et spécifiques app)
+ * 📦 @erp/types - MAIN EXPORT INDEX
+ * Tree-shaking optimized type exports for TopSteel ERP
+ *
+ * ORGANIZATION:
+ * - Essential common types for quick access
+ * - Domain-organized exports for better tree-shaking
+ * - Backward compatibility maintained
+ *
+ * For better tree-shaking, prefer importing from specific subpaths:
+ * - @erp/types/core
+ * - @erp/types/infrastructure
+ * - @erp/types/cross-cutting
+ * - etc.
  */
 
-// ===== EXPORTS MODULAIRES =====
-export * from './core'
-export * from './cross-cutting'
-export * from './infrastructure'
-export * from './partners'
-// export * from './domains' // DEPRECATED: Types migrés vers @erp/domains
-export * from './ui'
-
-// ===== RE-EXPORTS ESSENTIELS =====
-
-// Common types
+// ===== ESSENTIAL TYPES (Most commonly used) =====
 export type {
+  // Common essentials
   Address,
-  Color,
-  Contact,
+  // Article essentials
+  Article,
+  ArticleFilters,
+  ArticleStatistics,
+  CreateArticleDto,
+  CreateProjectDto,
+  CreateUserDto,
   Currency,
-  GenericStatus,
-  Position,
-  Size,
-  Unit,
-} from './core/common'
-// Core utilities
-export type {
-  AnyFunction,
-  ArrayElement,
-  Constructor,
+  // Utilities essentials
   DeepPartial,
-  DeepRequired,
-  EnumValues,
-  Except,
-  Indexable,
-  KeysOfType,
-  Merge,
+  GenericStatus,
+  // Material essentials
+  Material,
+  MaterialDimensions,
+  MaterialFilters,
+  MaterialStatistics,
   Nullable,
   Optional,
-  PartialBy,
-  PromiseType,
-  RequiredBy,
-} from './core/utilities'
-// API types
+  // Project essentials
+  Project,
+  ProjectFilters,
+  ProjectStatistics,
+  Projet,
+  UpdateArticleDto,
+  UpdateProjectDto,
+  UpdateUserDto,
+  // User essentials
+  User,
+  UserFilters,
+  UserStatistics,
+} from './core'
+// ===== COMPLETE DOMAIN EXPORTS =====
+// Re-export all types by domain for backward compatibility
+export * from './core'
+// ===== ENUMS (commonly needed) =====
+// Note: Enums are already exported via 'export * from' below
 export type {
+  AuthState,
+  // Auth essentials
+  AuthUser,
+  // Notification essentials
+  CreateNotificationDto,
+  LoginResponse,
+  Notification,
+  NotificationRule,
+  UpdateNotificationDto,
+} from './cross-cutting'
+export * from './cross-cutting'
+export type {
+  // API essentials
   ApiResponse,
-  ErrorResponse,
-  PaginationMetaDto,
-  PaginationResultDto,
-  SuccessResponse,
-} from './infrastructure/api'
-// Store types (app-specific)
-export type {
+  // Store essentials
   AppState,
-  AppStore,
-  AppStoreActions,
   BaseStoreActions,
   BaseStoreState,
+  ErrorResponse,
   InitialState,
-  ProjetState,
-  ProjetStore,
-  ProjetStoreActions,
+  PaginationResultDto,
   StoreConfig,
   StoreCreator,
-} from './infrastructure/stores'
+  StoreProjet,
+  UIState,
+} from './infrastructure'
+export * from './infrastructure'
+// ===== PARTNER ESSENTIALS =====
+export type {
+  Contact,
+  CreateContactDto,
+  CreatePartnerAddressDto,
+  CreatePartnerDto,
+  CreatePartnerSiteDto,
+  // Partner essentials
+  Partner,
+  PartnerAddress,
+  PartnerFilters,
+  PartnerSite,
+  PartnerStatistics,
+  UpdateContactDto,
+  UpdatePartnerAddressDto,
+  UpdatePartnerDto,
+  UpdatePartnerSiteDto,
+} from './partners'
+export * from './partners'
+export {
+  AccessibiliteType,
+  AddressStatus,
+  AddressType,
+  ContactRole,
+  ContactStatus,
+  PartnerStatus,
+  // Partner enums (commonly needed)
+  PartnerType,
+  SiteStatus,
+  SiteType,
+} from './partners'
+export * from './ui'

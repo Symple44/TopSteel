@@ -2,9 +2,9 @@
 
 import { Check, Plus } from 'lucide-react'
 import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { CheckoutData } from '../CheckoutFlow'
+import type { CheckoutData } from '../../../types/checkout.types'
 
 interface ShippingStepProps {
   data: CheckoutData
@@ -49,20 +49,22 @@ const shippingMethods = [
 ]
 
 export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNext, isValid }) => {
+  const firstNameId = useId()
+  const lastNameId = useId()
+  const emailId = useId()
+  const phoneId = useId()
+  const addressId = useId()
+  const cityId = useId()
+  const stateId = useId()
+  const postalCodeId = useId()
+  const countryId = useId()
+
   const [savedAddresses, setSavedAddresses] = useState<any[]>([])
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
   const [showNewAddress, setShowNewAddress] = useState(true)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  useEffect(() => {
-    // Load saved addresses from API or localStorage
-    loadSavedAddresses()
-  }, [
-    // Load saved addresses from API or localStorage
-    loadSavedAddresses,
-  ])
-
-  const loadSavedAddresses = async () => {
+  const loadSavedAddresses = useCallback(async () => {
     try {
       // Mock saved addresses - replace with API call
       const addresses = [
@@ -89,7 +91,15 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
       ]
       setSavedAddresses(addresses)
     } catch (_error) {}
-  }
+  }, [])
+
+  useEffect(() => {
+    // Load saved addresses from API or localStorage
+    loadSavedAddresses()
+  }, [
+    // Load saved addresses from API or localStorage
+    loadSavedAddresses,
+  ])
 
   const handleInputChange = (field: string, value: string) => {
     onUpdate({
@@ -120,7 +130,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
     })
   }
 
-  const handleSelectSavedAddress = (address: any) => {
+  const handleSelectSavedAddress = (address: unknown) => {
     setSelectedAddress(address.id)
     setShowNewAddress(false)
     onUpdate({
@@ -142,18 +152,32 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
     const newErrors: Record<string, string> = {}
     const s = data.shipping
 
-    if (!s.firstName?.trim()) newErrors.firstName = 'First name is required'
-    if (!s.lastName?.trim()) newErrors.lastName = 'Last name is required'
-    if (!s.email?.trim()) {
+    if (!s?.firstName?.trim()) {
+      newErrors.firstName = 'First name is required'
+    }
+    if (!s?.lastName?.trim()) {
+      newErrors.lastName = 'Last name is required'
+    }
+    if (!s?.email?.trim()) {
       newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s?.email)) {
       newErrors.email = 'Invalid email address'
     }
-    if (!s.phone?.trim()) newErrors.phone = 'Phone number is required'
-    if (!s.address?.trim()) newErrors.address = 'Address is required'
-    if (!s.city?.trim()) newErrors.city = 'City is required'
-    if (!s.postalCode?.trim()) newErrors.postalCode = 'Postal code is required'
-    if (!s.country) newErrors.country = 'Country is required'
+    if (!s?.phone?.trim()) {
+      newErrors.phone = 'Phone number is required'
+    }
+    if (!s?.address?.trim()) {
+      newErrors.address = 'Address is required'
+    }
+    if (!s?.city?.trim()) {
+      newErrors.city = 'City is required'
+    }
+    if (!s?.postalCode?.trim()) {
+      newErrors.postalCode = 'Postal code is required'
+    }
+    if (!s?.country) {
+      newErrors.country = 'Country is required'
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -182,7 +206,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-700 mb-3">Saved Addresses</h3>
             <div className="space-y-2">
-              {savedAddresses.map((address) => (
+              {savedAddresses?.map((address) => (
                 <button
                   key={address.id}
                   onClick={() => handleSelectSavedAddress(address)}
@@ -235,11 +259,17 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                <label
+                  htmlFor={firstNameId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  First Name *
+                </label>
                 <input
+                  id={firstNameId}
                   type="text"
-                  value={data.shipping.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  value={data?.shipping?.firstName}
+                  onChange={(e) => handleInputChange('firstName', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.firstName ? 'border-red-500' : 'border-gray-300'
@@ -251,11 +281,17 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                <label
+                  htmlFor={lastNameId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Last Name *
+                </label>
                 <input
+                  id={lastNameId}
                   type="text"
-                  value={data.shipping.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  value={data?.shipping?.lastName}
+                  onChange={(e) => handleInputChange('lastName', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.lastName ? 'border-red-500' : 'border-gray-300'
@@ -267,13 +303,14 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address *
                 </label>
                 <input
+                  id={emailId}
                   type="email"
-                  value={data.shipping.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  value={data?.shipping?.email}
+                  onChange={(e) => handleInputChange('email', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.email ? 'border-red-500' : 'border-gray-300'
@@ -283,13 +320,14 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor={phoneId} className="block text-sm font-medium text-gray-700 mb-1">
                   Phone Number *
                 </label>
                 <input
+                  id={phoneId}
                   type="tel"
-                  value={data.shipping.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  value={data?.shipping?.phone}
+                  onChange={(e) => handleInputChange('phone', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.phone ? 'border-red-500' : 'border-gray-300'
@@ -300,13 +338,14 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={addressId} className="block text-sm font-medium text-gray-700 mb-1">
                 Street Address *
               </label>
               <input
+                id={addressId}
                 type="text"
-                value={data.shipping.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                value={data?.shipping?.address}
+                onChange={(e) => handleInputChange('address', e?.target?.value)}
                 placeholder="Street address"
                 className={cn(
                   'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
@@ -317,8 +356,8 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
 
               <input
                 type="text"
-                value={data.shipping.address2 || ''}
-                onChange={(e) => handleInputChange('address2', e.target.value)}
+                value={data?.shipping?.address2 || ''}
+                onChange={(e) => handleInputChange('address2', e?.target?.value)}
                 placeholder="Apartment, suite, etc. (optional)"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
               />
@@ -326,11 +365,14 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                <label htmlFor={cityId} className="block text-sm font-medium text-gray-700 mb-1">
+                  City *
+                </label>
                 <input
+                  id={cityId}
                   type="text"
-                  value={data.shipping.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  value={data?.shipping?.city}
+                  onChange={(e) => handleInputChange('city', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.city ? 'border-red-500' : 'border-gray-300'
@@ -340,23 +382,30 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State/Region</label>
+                <label htmlFor={stateId} className="block text-sm font-medium text-gray-700 mb-1">
+                  State/Region
+                </label>
                 <input
+                  id={stateId}
                   type="text"
-                  value={data.shipping.state}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
+                  value={data?.shipping?.state}
+                  onChange={(e) => handleInputChange('state', e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor={postalCodeId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Postal Code *
                 </label>
                 <input
+                  id={postalCodeId}
                   type="text"
-                  value={data.shipping.postalCode}
-                  onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                  value={data?.shipping?.postalCode}
+                  onChange={(e) => handleInputChange('postalCode', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.postalCode ? 'border-red-500' : 'border-gray-300'
@@ -369,17 +418,20 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+              <label htmlFor={countryId} className="block text-sm font-medium text-gray-700 mb-1">
+                Country *
+              </label>
               <select
-                value={data.shipping.country}
-                onChange={(e) => handleInputChange('country', e.target.value)}
+                id={countryId}
+                value={data?.shipping?.country}
+                onChange={(e) => handleInputChange('country', e?.target?.value)}
                 className={cn(
                   'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                   errors.country ? 'border-red-500' : 'border-gray-300'
                 )}
               >
                 <option value="">Select a country</option>
-                {countries.map((country) => (
+                {countries?.map((country) => (
                   <option key={country.code} value={country.code}>
                     {country.name}
                   </option>
@@ -391,8 +443,8 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                checked={data.shipping.saveAddress}
-                onChange={(e) => handleInputChange('saveAddress', e.target.checked.toString())}
+                checked={data?.shipping?.saveAddress}
+                onChange={(e) => handleInputChange('saveAddress', e?.target?.checked?.toString())}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700">Save this address for future orders</span>
@@ -405,12 +457,12 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
       <div>
         <h3 className="text-lg font-semibold mb-4">Shipping Method</h3>
         <div className="space-y-3">
-          {shippingMethods.map((method) => (
+          {shippingMethods?.map((method) => (
             <label
               key={method.id}
               className={cn(
                 'flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors',
-                data.shippingMethod.id === method.id
+                data?.shippingMethod.id === method.id
                   ? 'border-blue-500 bg-blue-50'
                   : 'border-gray-200 hover:border-gray-300'
               )}
@@ -420,7 +472,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
                   type="radio"
                   name="shippingMethod"
                   value={method.id}
-                  checked={data.shippingMethod.id === method.id}
+                  checked={data?.shippingMethod.id === method.id}
                   onChange={() => handleShippingMethodChange(method)}
                   className="text-blue-600 focus:ring-blue-500"
                 />

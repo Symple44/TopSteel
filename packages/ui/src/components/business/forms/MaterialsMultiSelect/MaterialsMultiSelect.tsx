@@ -1,13 +1,19 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { Check, X, Search, Package, AlertTriangle, Info, Plus, AlertCircle, Filter } from 'lucide-react'
+import { AlertCircle, AlertTriangle, Info, Package, Search, X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
 import { Checkbox } from '../../../primitives/checkbox/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export interface MaterialSpecification {
   property: string
   value: string | number
@@ -93,7 +99,7 @@ export function MaterialsMultiSelect({
   label,
   helperText,
   error,
-  placeholder = "Sélectionner des matériaux...",
+  placeholder = 'Sélectionner des matériaux...',
   showSearch = true,
   showSpecifications = true,
   showAvailability = true,
@@ -117,38 +123,43 @@ export function MaterialsMultiSelect({
   useEffect(() => {
     setSelections(value)
   }, [value])
+
+  const searchMaterials = useCallback(
+    async (query: string) => {
+      if (!onMaterialSearch || !query.trim()) {
+        setSearchResults([])
+        return
+      }
+      setIsSearching(true)
+      try {
+        const results = await onMaterialSearch(query)
+        setSearchResults(results)
+      } catch (_error) {
+        setSearchResults([])
+      } finally {
+        setIsSearching(false)
+      }
+    },
+    [onMaterialSearch]
+  )
+
   useEffect(() => {
     if (onMaterialSearch && searchQuery.trim()) {
       searchMaterials(searchQuery)
     }
-  }, [searchQuery, onMaterialSearch])
-  const searchMaterials = async (query: string) => {
-    if (!onMaterialSearch || !query.trim()) {
-      setSearchResults([])
-      return
-    }
-    setIsSearching(true)
-    try {
-      const results = await onMaterialSearch(query)
-      setSearchResults(results)
-    } catch (error) {
-      console.error('Error searching materials:', error)
-      setSearchResults([])
-    } finally {
-      setIsSearching(false)
-    }
-  }
+  }, [searchQuery, onMaterialSearch, searchMaterials])
+
   const getFilteredMaterials = () => {
     let filteredMaterials = searchQuery ? searchResults : materials
     if (categories && selectedCategory !== 'all') {
-      filteredMaterials = filteredMaterials.filter(m => m.category === selectedCategory)
+      filteredMaterials = filteredMaterials.filter((m) => m.category === selectedCategory)
     }
     if (statuses && selectedStatus !== 'all') {
-      filteredMaterials = filteredMaterials.filter(m => m.status === selectedStatus)
+      filteredMaterials = filteredMaterials.filter((m) => m.status === selectedStatus)
     }
     // Filter out already selected materials
-    const selectedIds = new Set(selections.map(s => s.material.id))
-    return filteredMaterials.filter(m => !selectedIds.has(m.id))
+    const selectedIds = new Set(selections.map((s) => s.material.id))
+    return filteredMaterials.filter((m) => !selectedIds.has(m.id))
   }
   const handleMaterialToggle = (material: Material) => {
     if (maxSelections && selections.length >= maxSelections) return
@@ -161,7 +172,7 @@ export function MaterialsMultiSelect({
     onChange?.(updatedSelections)
   }
   const handleRemoveMaterial = (materialId: string) => {
-    const updatedSelections = selections.filter(s => s.material.id !== materialId)
+    const updatedSelections = selections.filter((s) => s.material.id !== materialId)
     setSelections(updatedSelections)
     onChange?.(updatedSelections)
   }
@@ -169,10 +180,8 @@ export function MaterialsMultiSelect({
     if (onQuantityValidate && !onQuantityValidate(materialId, newQuantity)) {
       return
     }
-    const updatedSelections = selections.map(selection =>
-      selection.material.id === materialId
-        ? { ...selection, quantity: newQuantity }
-        : selection
+    const updatedSelections = selections.map((selection) =>
+      selection.material.id === materialId ? { ...selection, quantity: newQuantity } : selection
     )
     setSelections(updatedSelections)
     onChange?.(updatedSelections)
@@ -210,15 +219,23 @@ export function MaterialsMultiSelect({
       available: availableQuantity,
       reserved: reservedQuantity,
       total: stockQuantity,
-      percentage: stockQuantity > 0 ? (availableQuantity / stockQuantity) * 100 : 0
+      percentage: stockQuantity > 0 ? (availableQuantity / stockQuantity) * 100 : 0,
     }
   }
   const filteredMaterials = getFilteredMaterials()
-  const displayText = selections.length === 0 ? placeholder :
-    selections.length === 1 ? selections[0].material.name :
-    `${selections.length} matériaux sélectionnés`
-  const uniqueCategories = Array.from(new Set(materials.map(m => m.category)))
-  const availableStatuses: Material['status'][] = ['available', 'low_stock', 'out_of_stock', 'discontinued']
+  const displayText =
+    selections.length === 0
+      ? placeholder
+      : selections.length === 1
+        ? selections[0].material.name
+        : `${selections.length} matériaux sélectionnés`
+  const uniqueCategories = Array.from(new Set(materials.map((m) => m.category)))
+  const availableStatuses: Material['status'][] = [
+    'available',
+    'low_stock',
+    'out_of_stock',
+    'discontinued',
+  ]
   return (
     <div className={cn('space-y-4', className)}>
       {label && (
@@ -274,8 +291,10 @@ export function MaterialsMultiSelect({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Toutes catégories</SelectItem>
-                    {uniqueCategories.map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    {uniqueCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -285,11 +304,15 @@ export function MaterialsMultiSelect({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous statuts</SelectItem>
-                    {availableStatuses.map(status => (
+                    {availableStatuses.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {status === 'available' ? 'Disponible' :
-                         status === 'low_stock' ? 'Stock faible' :
-                         status === 'out_of_stock' ? 'Rupture' : 'Discontinué'}
+                        {status === 'available'
+                          ? 'Disponible'
+                          : status === 'low_stock'
+                            ? 'Stock faible'
+                            : status === 'out_of_stock'
+                              ? 'Rupture'
+                              : 'Discontinué'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -302,7 +325,8 @@ export function MaterialsMultiSelect({
                 <div className="p-2 space-y-2">
                   {filteredMaterials.map((material) => {
                     const availability = getAvailabilityInfo(material)
-                    const canSelect = !disabled && (!maxSelections || selections.length < maxSelections)
+                    const canSelect =
+                      !disabled && (!maxSelections || selections.length < maxSelections)
                     return (
                       <div
                         key={material.id}
@@ -340,7 +364,10 @@ export function MaterialsMultiSelect({
                               <div className="text-xs text-muted-foreground">
                                 Stock: {availability.available}/{availability.total} {material.unit}
                                 {material.unitPrice && (
-                                  <span className="ml-2">• {formatPrice(material.unitPrice, material.currency)}/{material.unit}</span>
+                                  <span className="ml-2">
+                                    • {formatPrice(material.unitPrice, material.currency)}/
+                                    {material.unit}
+                                  </span>
                                 )}
                               </div>
                             )}
@@ -359,7 +386,10 @@ export function MaterialsMultiSelect({
                                     {material.specifications.slice(0, 3).map((spec, index) => (
                                       <div key={index} className="flex justify-between">
                                         <span>{spec.property}:</span>
-                                        <span>{spec.value}{spec.unit && ` ${spec.unit}`}</span>
+                                        <span>
+                                          {spec.value}
+                                          {spec.unit && ` ${spec.unit}`}
+                                        </span>
                                       </div>
                                     ))}
                                     {material.specifications.length > 3 && (
@@ -422,13 +452,15 @@ export function MaterialsMultiSelect({
                                   max={availability.available}
                                   value={quantity}
                                   onChange={(e) => {
-                                    const newQty = parseInt(e.target.value) || 1
+                                    const newQty = parseInt(e.target.value, 10) || 1
                                     handleQuantityChange(material.id, newQty)
                                   }}
                                   className="w-20 h-8"
                                   disabled={disabled}
                                 />
-                                <span className="text-xs text-muted-foreground">{material.unit}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {material.unit}
+                                </span>
                               </div>
                             ) : (
                               <button
@@ -489,11 +521,13 @@ export function MaterialsMultiSelect({
           </div>
           <div className="grid gap-2 text-xs">
             <div>Matériaux sélectionnés: {selections.length}</div>
-            {selections.some(s => s.material.unitPrice) && (
+            {selections.some((s) => s.material.unitPrice) && (
               <div>
-                Total estimé: {formatPrice(
-                  selections.reduce((total, s) => 
-                    total + (s.material.unitPrice || 0) * s.quantity, 0
+                Total estimé:{' '}
+                {formatPrice(
+                  selections.reduce(
+                    (total, s) => total + (s.material.unitPrice || 0) * s.quantity,
+                    0
                   )
                 )}
               </div>
@@ -501,9 +535,7 @@ export function MaterialsMultiSelect({
           </div>
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

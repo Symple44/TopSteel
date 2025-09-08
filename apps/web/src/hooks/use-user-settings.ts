@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/api-client-instance'
 
 // Types pour les paramètres utilisateur
 interface UserSettings {
@@ -42,13 +42,13 @@ export function useUserSettings() {
     queryKey: QUERY_KEYS.userSettings,
     queryFn: async () => {
       // En développement, utiliser les données du localStorage
-      if (process.env.NODE_ENV === 'development') {
-        const authData = localStorage.getItem('topsteel-auth')
+      if (process?.env?.NODE_ENV === 'development') {
+        const authData = localStorage?.getItem('topsteel-auth')
         if (authData) {
           const userData = JSON.parse(authData)
 
           // Récupérer la langue sauvegardée ou utiliser 'fr' par défaut
-          const savedLanguage = localStorage.getItem('topsteel-language') || 'fr'
+          const savedLanguage = localStorage?.getItem('topsteel-language') || 'fr'
 
           return {
             profile: {
@@ -92,11 +92,11 @@ export function useUpdateProfile() {
     mutationFn: (profile: Partial<UserSettings['profile']>) =>
       apiClient.patch<UserSettings>('/user/profile', profile),
     onSuccess: (updatedSettings: UserSettings) => {
-      queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
-      toast.success('Profil mis à jour avec succès')
+      queryClient?.setQueryData(QUERY_KEYS?.userSettings, updatedSettings)
+      toast?.success('Profil mis à jour avec succès')
     },
     onError: () => {
-      toast.error('Erreur lors de la mise à jour du profil')
+      toast?.error('Erreur lors de la mise à jour du profil')
     },
   })
 }
@@ -108,11 +108,11 @@ export function useUpdateCompany() {
     mutationFn: (company: Partial<UserSettings['company']>) =>
       apiClient.patch<UserSettings>('/user/settings', { company }),
     onSuccess: (updatedSettings: UserSettings) => {
-      queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
-      toast.success("Informations de l'entreprise mises à jour")
+      queryClient?.setQueryData(QUERY_KEYS?.userSettings, updatedSettings)
+      toast?.success("Informations de l'entreprise mises à jour")
     },
     onError: () => {
-      toast.error("Erreur lors de la mise à jour des informations de l'entreprise")
+      toast?.error("Erreur lors de la mise à jour des informations de l'entreprise")
     },
   })
 }
@@ -123,8 +123,8 @@ export function useUpdatePreferences() {
   return useMutation({
     mutationFn: async (preferences: Partial<UserSettings['preferences']>) => {
       // En développement, sauvegarder dans le localStorage
-      if (process.env.NODE_ENV === 'development') {
-        const authData = localStorage.getItem('topsteel-auth')
+      if (process?.env?.NODE_ENV === 'development') {
+        const authData = localStorage?.getItem('topsteel-auth')
         if (authData) {
           const userData = JSON.parse(authData)
           // Simuler la sauvegarde des préférences
@@ -168,17 +168,17 @@ export function useUpdatePreferences() {
       return apiClient.patch<UserSettings>('/user/preferences', preferences)
     },
     onSuccess: (updatedSettings: UserSettings) => {
-      queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
+      queryClient?.setQueryData(QUERY_KEYS?.userSettings, updatedSettings)
 
       // Synchroniser avec le système i18n
-      if (updatedSettings.preferences.language) {
-        localStorage.setItem('topsteel-language', updatedSettings.preferences.language)
+      if (updatedSettings?.preferences?.language) {
+        localStorage.setItem('topsteel-language', updatedSettings?.preferences?.language)
       }
 
-      toast.success('Préférences mises à jour avec succès')
+      toast?.success('Préférences mises à jour avec succès')
     },
     onError: () => {
-      toast.error('Erreur lors de la mise à jour des préférences')
+      toast?.error('Erreur lors de la mise à jour des préférences')
     },
   })
 }
@@ -189,15 +189,15 @@ export function useUpdateNotifications() {
   return useMutation({
     mutationFn: async (notifications: UserSettings['preferences']['notifications']) => {
       // En développement, sauvegarder dans le localStorage
-      if (process.env.NODE_ENV === 'development') {
-        const authData = localStorage.getItem('topsteel-auth')
+      if (process?.env?.NODE_ENV === 'development') {
+        const authData = localStorage?.getItem('topsteel-auth')
         if (authData) {
           const userData = JSON.parse(authData)
           // Simuler la sauvegarde des notifications
           await new Promise((resolve) => setTimeout(resolve, 500))
 
           // Récupérer la langue sauvegardée
-          const savedLanguage = localStorage.getItem('topsteel-language') || 'fr'
+          const savedLanguage = localStorage?.getItem('topsteel-language') || 'fr'
 
           // Retourner les données mises à jour
           return {
@@ -228,11 +228,11 @@ export function useUpdateNotifications() {
       return apiClient.patch<UserSettings>('/user/preferences', { notifications })
     },
     onSuccess: (updatedSettings: UserSettings) => {
-      queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
-      toast.success('Paramètres de notification mis à jour')
+      queryClient?.setQueryData(QUERY_KEYS?.userSettings, updatedSettings)
+      toast?.success('Paramètres de notification mis à jour')
     },
     onError: () => {
-      toast.error('Erreur lors de la mise à jour des notifications')
+      toast?.error('Erreur lors de la mise à jour des notifications')
     },
   })
 }

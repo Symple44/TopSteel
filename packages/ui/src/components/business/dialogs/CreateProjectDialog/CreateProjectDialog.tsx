@@ -1,25 +1,9 @@
 'use client'
-import { useState, useMemo } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { FolderOpen, Plus, Target, Trash2, User } from 'lucide-react'
+import { useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Plus, Trash2, Calendar, User, DollarSign, FolderOpen, Target } from 'lucide-react'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-  Badge,
-  Switch
-} from '../../../primitives'
 import {
   Form,
   FormControl,
@@ -27,20 +11,33 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '../../../forms'
+  FormMessage,
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Switch } from '../../../primitives/switch/switch'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Team member schema
 const teamMemberSchema = z.object({
-  userId: z.string().min(1, 'L\'utilisateur est obligatoire'),
+  userId: z.string().min(1, "L'utilisateur est obligatoire"),
   role: z.string().min(1, 'Le rôle est obligatoire'),
-  hourlyRate: z.number().min(0, 'Le taux horaire doit être positif ou nul').optional()
+  hourlyRate: z.number().min(0, 'Le taux horaire doit être positif ou nul').optional(),
 })
 // Milestone schema
 const milestoneSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
   description: z.string().optional(),
-  dueDate: z.string().min(1, 'La date d\'échéance est obligatoire'),
-  budget: z.number().min(0, 'Le budget doit être positif ou nul').optional()
+  dueDate: z.string().min(1, "La date d'échéance est obligatoire"),
+  budget: z.number().min(0, 'Le budget doit être positif ou nul').optional(),
 })
 // Main project schema
 const projectSchema = z.object({
@@ -58,7 +55,7 @@ const projectSchema = z.object({
   isActive: z.boolean().default(true),
   teamMembers: z.array(teamMemberSchema).optional(),
   milestones: z.array(milestoneSchema).optional(),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 })
 type ProjectFormData = z.infer<typeof projectSchema>
 interface Client {
@@ -66,7 +63,7 @@ interface Client {
   name: string
   email: string
 }
-interface User {
+interface ProjectUser {
   id: string
   firstName: string
   lastName: string
@@ -78,32 +75,23 @@ interface CreateProjectDialogProps {
   onOpenChange: (open: boolean) => void
   onSubmit?: (data: ProjectFormData) => void | Promise<void>
   clients?: Client[]
-  users?: User[]
+  users?: ProjectUser[]
   defaultClientId?: string
 }
-export function CreateProjectDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function CreateProjectDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   clients = [],
   users = [],
-  defaultClientId
+  defaultClientId,
 }: CreateProjectDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  // Mock data
-  const mockClients: Client[] = useMemo(() => [
-    { id: '1', name: 'Société ABC', email: 'contact@abc.fr' },
-    { id: '2', name: 'Construction XYZ', email: 'admin@xyz.fr' }
-  ], [])
-  const mockUsers: User[] = useMemo(() => [
-    { id: '1', firstName: 'Jean', lastName: 'Dupont', email: 'jean.dupont@company.com', role: 'Chef de projet' },
-    { id: '2', firstName: 'Marie', lastName: 'Martin', email: 'marie.martin@company.com', role: 'Ingénieur' },
-    { id: '3', firstName: 'Pierre', lastName: 'Bernard', email: 'pierre.bernard@company.com', role: 'Technicien' }
-  ], [])
-  const availableClients = clients.length > 0 ? clients : mockClients
-  const availableUsers = users.length > 0 ? users : mockUsers
-  const form = useForm<ProjectFormData>({
+  // Utiliser directement les données réelles, pas de mocks
+  const availableClients = clients || []
+  const availableUsers = users || []
+  const form = useForm({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       name: '',
@@ -120,16 +108,24 @@ export function CreateProjectDialog({
       isActive: true,
       teamMembers: [],
       milestones: [],
-      notes: ''
-    }
+      notes: '',
+    },
   })
-  const { fields: teamFields, append: appendTeam, remove: removeTeam } = useFieldArray({
+  const {
+    fields: teamFields,
+    append: appendTeam,
+    remove: removeTeam,
+  } = useFieldArray({
     control: form.control,
-    name: 'teamMembers'
+    name: 'teamMembers',
   })
-  const { fields: milestoneFields, append: appendMilestone, remove: removeMilestone } = useFieldArray({
+  const {
+    fields: milestoneFields,
+    append: appendMilestone,
+    remove: removeMilestone,
+  } = useFieldArray({
     control: form.control,
-    name: 'milestones'
+    name: 'milestones',
   })
   const handleSubmit = async (data: ProjectFormData) => {
     setLoading(true)
@@ -140,7 +136,9 @@ export function CreateProjectDialog({
         const date = new Date()
         const year = date.getFullYear()
         const month = String(date.getMonth() + 1).padStart(2, '0')
-        data.reference = `PRJ-${year}${month}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+        data.reference = `PRJ-${year}${month}-${Math.floor(Math.random() * 1000)
+          .toString()
+          .padStart(3, '0')}`
       }
       await onSubmit?.(data)
       onOpenChange(false)
@@ -162,7 +160,7 @@ export function CreateProjectDialog({
     appendTeam({
       userId: '',
       role: '',
-      hourlyRate: 0
+      hourlyRate: 0,
     })
   }
   const addMilestone = () => {
@@ -170,7 +168,7 @@ export function CreateProjectDialog({
       name: '',
       description: '',
       dueDate: '',
-      budget: 0
+      budget: 0,
     })
   }
   return (
@@ -226,10 +224,10 @@ export function CreateProjectDialog({
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Textarea
                           placeholder="Description du projet"
                           className="min-h-[80px]"
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -252,7 +250,7 @@ export function CreateProjectDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {availableClients.map(client => (
+                          {availableClients.map((client) => (
                             <SelectItem key={client.id} value={client.id}>
                               {client.name}
                             </SelectItem>
@@ -276,7 +274,7 @@ export function CreateProjectDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {availableUsers.map(user => (
+                          {availableUsers.map((user) => (
                             <SelectItem key={user.id} value={user.id}>
                               {user.firstName} {user.lastName}
                             </SelectItem>
@@ -377,7 +375,7 @@ export function CreateProjectDialog({
                         step="0.01"
                         placeholder="0.00"
                         {...field}
-                        onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -424,7 +422,7 @@ export function CreateProjectDialog({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {availableUsers.map(user => (
+                              {availableUsers.map((user) => (
                                 <SelectItem key={user.id} value={user.id}>
                                   {user.firstName} {user.lastName}
                                 </SelectItem>
@@ -460,7 +458,7 @@ export function CreateProjectDialog({
                               step="0.01"
                               placeholder="0.00"
                               {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -548,7 +546,7 @@ export function CreateProjectDialog({
                               step="0.01"
                               placeholder="0.00"
                               {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -589,10 +587,7 @@ export function CreateProjectDialog({
                       </FormDescription>
                     </div>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -616,12 +611,7 @@ export function CreateProjectDialog({
               />
             </div>
             <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                 Annuler
               </Button>
               <Button type="submit" disabled={loading}>

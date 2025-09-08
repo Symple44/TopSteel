@@ -1,37 +1,23 @@
 'use client'
-import React from 'react'
+import {
+  AlertTriangle,
+  Banknote,
+  Building,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  DollarSign,
+  FileText,
+  Receipt,
+  TrendingUp,
+} from 'lucide-react'
+import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
-import { Progress } from '../../../data-display/progress/progress'
-import { cn } from '../../../../lib/utils'
-import { 
-  CreditCard, 
-  DollarSign, 
-  CheckCircle2, 
-  Clock, 
-  AlertTriangle,
-  Calendar,
-  FileText,
-  TrendingUp,
-  Banknote,
-  Receipt,
-  Building,
-  User
-} from 'lucide-react'
-export type PaymentStatus = 
-  | 'pending' 
-  | 'partial' 
-  | 'paid' 
-  | 'overdue' 
-  | 'cancelled' 
-  | 'refunded'
-export type PaymentMethod = 
-  | 'credit_card' 
-  | 'bank_transfer' 
-  | 'check' 
-  | 'cash' 
-  | 'crypto' 
-  | 'other'
+import { Progress } from '../../../primitives/progress'
+export type PaymentStatus = 'pending' | 'partial' | 'paid' | 'overdue' | 'cancelled' | 'refunded'
+export type PaymentMethod = 'credit_card' | 'bank_transfer' | 'check' | 'cash' | 'crypto' | 'other'
 export interface PaymentMilestone {
   id: string
   title: string
@@ -64,33 +50,33 @@ const statusConfig = {
   pending: {
     color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     icon: Clock,
-    label: 'En attente'
+    label: 'En attente',
   },
   partial: {
     color: 'bg-blue-100 text-blue-800 border-blue-200',
     icon: TrendingUp,
-    label: 'Partiel'
+    label: 'Partiel',
   },
   paid: {
     color: 'bg-green-100 text-green-800 border-green-200',
     icon: CheckCircle2,
-    label: 'Payé'
+    label: 'Payé',
   },
   overdue: {
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: AlertTriangle,
-    label: 'En retard'
+    label: 'En retard',
   },
   cancelled: {
     color: 'bg-gray-100 text-gray-800 border-gray-200',
     icon: AlertTriangle,
-    label: 'Annulé'
+    label: 'Annulé',
   },
   refunded: {
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     icon: TrendingUp,
-    label: 'Remboursé'
-  }
+    label: 'Remboursé',
+  },
 }
 const paymentMethodConfig = {
   credit_card: { icon: CreditCard, label: 'Carte' },
@@ -98,7 +84,7 @@ const paymentMethodConfig = {
   check: { icon: FileText, label: 'Chèque' },
   cash: { icon: Banknote, label: 'Espèces' },
   crypto: { icon: DollarSign, label: 'Crypto' },
-  other: { icon: Receipt, label: 'Autre' }
+  other: { icon: Receipt, label: 'Autre' },
 }
 export function PaymentTimeline({
   className,
@@ -110,23 +96,23 @@ export function PaymentTimeline({
   compact = false,
   showProgress = true,
   onMilestoneClick,
-  onPaymentAction
+  onPaymentAction,
 }: PaymentTimelineProps) {
   const progressPercentage = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0
   const remainingAmount = totalAmount - paidAmount
-  const overdueMilestones = milestones.filter(m => m.status === 'overdue').length
-  const pendingMilestones = milestones.filter(m => m.status === 'pending').length
+  const overdueMilestones = milestones.filter((m) => m.status === 'overdue').length
+  const pendingMilestones = milestones.filter((m) => m.status === 'pending').length
   const totalLateFees = milestones.reduce((sum, m) => sum + (m.lateFees || 0), 0)
   const getNextPaymentDue = () => {
     const pendingPayments = milestones
-      .filter(m => m.status === 'pending' || m.status === 'overdue')
+      .filter((m) => m.status === 'pending' || m.status === 'overdue')
       .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime())
     return pendingPayments[0] || null
   }
   const nextPayment = getNextPaymentDue()
   if (compact) {
     return (
-      <Card className={cn(className, overdueMilestones > 0 && "border-red-300")}>
+      <Card className={cn(className, overdueMilestones > 0 && 'border-red-300')}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
@@ -135,15 +121,16 @@ export function PaymentTimeline({
                 {overdueMilestones > 0 && <AlertTriangle className="h-4 w-4 text-red-500" />}
               </CardTitle>
               <div className="text-sm text-muted-foreground">
-                {paidAmount.toLocaleString('fr-FR')} / {totalAmount.toLocaleString('fr-FR')} {currency}
+                {paidAmount.toLocaleString('fr-FR')} / {totalAmount.toLocaleString('fr-FR')}{' '}
+                {currency}
               </div>
             </div>
             <div className="text-right">
-              <Badge 
+              <Badge
                 variant="outline"
                 className={cn(
-                  progressPercentage === 100 && "bg-green-100 text-green-800",
-                  overdueMilestones > 0 && "bg-red-100 text-red-800"
+                  progressPercentage === 100 && 'bg-green-100 text-green-800',
+                  overdueMilestones > 0 && 'bg-red-100 text-red-800'
                 )}
               >
                 {Math.round(progressPercentage)}%
@@ -156,12 +143,9 @@ export function PaymentTimeline({
             </div>
           </div>
           {showProgress && (
-            <Progress 
-              value={progressPercentage} 
-              className={cn(
-                "h-2",
-                overdueMilestones > 0 && "progress-red"
-              )} 
+            <Progress
+              value={progressPercentage}
+              className={cn('h-2', overdueMilestones > 0 && 'progress-red')}
             />
           )}
         </CardHeader>
@@ -169,10 +153,9 @@ export function PaymentTimeline({
           <CardContent>
             <div className="flex items-center justify-between text-sm">
               <span>Prochain paiement:</span>
-              <span className={cn(
-                "font-medium",
-                nextPayment.status === 'overdue' && "text-red-600"
-              )}>
+              <span
+                className={cn('font-medium', nextPayment.status === 'overdue' && 'text-red-600')}
+              >
                 {nextPayment.amount.toLocaleString('fr-FR')} {currency}
                 <span className="text-muted-foreground ml-1">
                   le {nextPayment.dueDate.toLocaleDateString('fr-FR')}
@@ -185,7 +168,7 @@ export function PaymentTimeline({
     )
   }
   return (
-    <Card className={cn(className, overdueMilestones > 0 && "border-red-300")}>
+    <Card className={cn(className, overdueMilestones > 0 && 'border-red-300')}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -209,12 +192,12 @@ export function PaymentTimeline({
             </div>
           </div>
           <div className="text-right">
-            <Badge 
+            <Badge
               variant="outline"
               className={cn(
-                "mb-2",
-                progressPercentage === 100 && "bg-green-100 text-green-800",
-                overdueMilestones > 0 && "bg-red-100 text-red-800"
+                'mb-2',
+                progressPercentage === 100 && 'bg-green-100 text-green-800',
+                overdueMilestones > 0 && 'bg-red-100 text-red-800'
               )}
             >
               {Math.round(progressPercentage)}% payé
@@ -243,12 +226,9 @@ export function PaymentTimeline({
                 {Math.round(progressPercentage)}%
               </span>
             </div>
-            <Progress 
-              value={progressPercentage} 
-              className={cn(
-                "h-3",
-                overdueMilestones > 0 && "progress-red"
-              )} 
+            <Progress
+              value={progressPercentage}
+              className={cn('h-3', overdueMilestones > 0 && 'progress-red')}
             />
           </div>
         )}
@@ -266,10 +246,11 @@ export function PaymentTimeline({
       <CardContent className="space-y-4">
         {milestones.map((milestone, index) => {
           const StatusIcon = statusConfig[milestone.status].icon
-          const PaymentMethodIcon = milestone.paymentMethod 
-            ? paymentMethodConfig[milestone.paymentMethod].icon 
+          const PaymentMethodIcon = milestone.paymentMethod
+            ? paymentMethodConfig[milestone.paymentMethod].icon
             : Receipt
-          const isClickable = onMilestoneClick && (milestone.status === 'paid' || milestone.status === 'partial')
+          const isClickable =
+            onMilestoneClick && (milestone.status === 'paid' || milestone.status === 'partial')
           const isOverdue = milestone.status === 'overdue'
           const isPending = milestone.status === 'pending'
           return (
@@ -278,36 +259,46 @@ export function PaymentTimeline({
               {index < milestones.length - 1 && (
                 <div className="absolute left-6 top-16 w-0.5 h-8 bg-gray-200" />
               )}
-              <div 
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive */}
+              <div
                 className={cn(
-                  "flex items-start gap-4 p-4 rounded-lg border transition-all",
-                  milestone.status === 'paid' && "border-green-300 bg-green-50/30",
-                  milestone.status === 'partial' && "border-blue-300 bg-blue-50/30",
-                  milestone.status === 'overdue' && "border-red-300 bg-red-50/30",
-                  milestone.status === 'pending' && "border-yellow-300 bg-yellow-50/30",
-                  milestone.status === 'cancelled' && "border-gray-300 bg-gray-50/30",
-                  isClickable && "cursor-pointer hover:shadow-sm"
+                  'flex items-start gap-4 p-4 rounded-lg border transition-all',
+                  milestone.status === 'paid' && 'border-green-300 bg-green-50/30',
+                  milestone.status === 'partial' && 'border-blue-300 bg-blue-50/30',
+                  milestone.status === 'overdue' && 'border-red-300 bg-red-50/30',
+                  milestone.status === 'pending' && 'border-yellow-300 bg-yellow-50/30',
+                  milestone.status === 'cancelled' && 'border-gray-300 bg-gray-50/30',
+                  isClickable && 'cursor-pointer hover:shadow-sm'
                 )}
+                role={isClickable ? 'button' : undefined}
+                tabIndex={isClickable ? 0 : undefined}
                 onClick={isClickable ? () => onMilestoneClick(milestone.id) : undefined}
+                onKeyDown={(e) => {
+                  if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault()
+                    onMilestoneClick(milestone.id)
+                  }
+                }}
               >
-                <div className={cn(
-                  "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2",
-                  milestone.status === 'paid' && "bg-green-100 border-green-300 text-green-600",
-                  milestone.status === 'partial' && "bg-blue-100 border-blue-300 text-blue-600",
-                  milestone.status === 'overdue' && "bg-red-100 border-red-300 text-red-600",
-                  milestone.status === 'pending' && "bg-yellow-100 border-yellow-300 text-yellow-600",
-                  milestone.status === 'cancelled' && "bg-gray-100 border-gray-300 text-gray-600",
-                  milestone.status === 'refunded' && "bg-purple-100 border-purple-300 text-purple-600"
-                )}>
+                <div
+                  className={cn(
+                    'flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2',
+                    milestone.status === 'paid' && 'bg-green-100 border-green-300 text-green-600',
+                    milestone.status === 'partial' && 'bg-blue-100 border-blue-300 text-blue-600',
+                    milestone.status === 'overdue' && 'bg-red-100 border-red-300 text-red-600',
+                    milestone.status === 'pending' &&
+                      'bg-yellow-100 border-yellow-300 text-yellow-600',
+                    milestone.status === 'cancelled' && 'bg-gray-100 border-gray-300 text-gray-600',
+                    milestone.status === 'refunded' &&
+                      'bg-purple-100 border-purple-300 text-purple-600'
+                  )}
+                >
                   <StatusIcon className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-semibold text-gray-900">{milestone.title}</h3>
-                    <Badge 
-                      variant="outline" 
-                      className={statusConfig[milestone.status].color}
-                    >
+                    <Badge variant="outline" className={statusConfig[milestone.status].color}>
                       {statusConfig[milestone.status].label}
                     </Badge>
                     {milestone.installmentNumber && milestone.totalInstallments && (
@@ -395,9 +386,7 @@ export function PaymentTimeline({
                   {milestone.status === 'overdue' && (
                     <AlertTriangle className="h-5 w-5 text-red-600 animate-pulse" />
                   )}
-                  {milestone.status === 'pending' && (
-                    <Clock className="h-5 w-5 text-yellow-600" />
-                  )}
+                  {milestone.status === 'pending' && <Clock className="h-5 w-5 text-yellow-600" />}
                 </div>
               </div>
             </div>

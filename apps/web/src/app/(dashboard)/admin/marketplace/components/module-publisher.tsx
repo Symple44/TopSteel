@@ -25,6 +25,7 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import { Eye, Plus, X } from 'lucide-react'
 import { useState } from 'react'
@@ -113,6 +114,16 @@ export function ModulePublisher() {
   const [showPreview, setShowPreview] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
 
+  // Generate unique IDs for form fields
+  const fieldIds = useFormFieldIds([
+    'moduleKey',
+    'displayName',
+    'shortDescription',
+    'description',
+    'version',
+    'icon',
+  ])
+
   const handleInputChange = (
     field: keyof ModuleForm,
     value: string | number | boolean | string[]
@@ -129,7 +140,7 @@ export function ModulePublisher() {
 
   const addDependency = () => {
     const dependency = prompt('Clé du module requis:')
-    if (dependency && !form.dependencies.includes(dependency)) {
+    if (dependency && !form?.dependencies?.includes(dependency)) {
       setForm((prev) => ({
         ...prev,
         dependencies: [...prev.dependencies, dependency],
@@ -140,13 +151,13 @@ export function ModulePublisher() {
   const removeDependency = (index: number) => {
     setForm((prev) => ({
       ...prev,
-      dependencies: prev.dependencies.filter((_, i) => i !== index),
+      dependencies: prev?.dependencies?.filter((_, i) => i !== index),
     }))
   }
 
   const addPermission = () => {
     const permission = {
-      moduleId: form.moduleKey.toUpperCase(),
+      moduleId: form?.moduleKey?.toUpperCase(),
       action: 'VIEW',
       name: '',
       description: '',
@@ -160,7 +171,7 @@ export function ModulePublisher() {
   const updatePermission = (index: number, field: string, value: string) => {
     setForm((prev) => ({
       ...prev,
-      permissions: prev.permissions.map((perm, i) =>
+      permissions: prev?.permissions?.map((perm, i) =>
         i === index ? { ...perm, [field]: value } : perm
       ),
     }))
@@ -169,7 +180,7 @@ export function ModulePublisher() {
   const removePermission = (index: number) => {
     setForm((prev) => ({
       ...prev,
-      permissions: prev.permissions.filter((_, i) => i !== index),
+      permissions: prev?.permissions?.filter((_, i) => i !== index),
     }))
   }
 
@@ -189,7 +200,7 @@ export function ModulePublisher() {
   const updateMenuItem = (index: number, field: string, value: string) => {
     setForm((prev) => ({
       ...prev,
-      menuConfiguration: prev.menuConfiguration.map((item, i) =>
+      menuConfiguration: prev?.menuConfiguration?.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       ),
     }))
@@ -198,7 +209,7 @@ export function ModulePublisher() {
   const removeMenuItem = (index: number) => {
     setForm((prev) => ({
       ...prev,
-      menuConfiguration: prev.menuConfiguration.filter((_, i) => i !== index),
+      menuConfiguration: prev?.menuConfiguration?.filter((_, i) => i !== index),
     }))
   }
 
@@ -243,14 +254,14 @@ export function ModulePublisher() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setShowPreview(true)}>
+          <Button type="button" variant="outline" onClick={() => setShowPreview(true)}>
             <Eye className="mr-2 h-4 w-4" />
             Prévisualiser
           </Button>
-          <Button variant="outline" onClick={handleSaveDraft}>
+          <Button type="button" variant="outline" onClick={handleSaveDraft}>
             Sauvegarder brouillon
           </Button>
-          <Button onClick={handlePublish} disabled={isPublishing}>
+          <Button type="button" onClick={handlePublish} disabled={isPublishing}>
             {isPublishing ? 'Publication...' : 'Publier'}
           </Button>
         </div>
@@ -274,12 +285,12 @@ export function ModulePublisher() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="moduleKey">Clé du module *</Label>
+                  <Label htmlFor={fieldIds.moduleKey}>Clé du module *</Label>
                   <Input
-                    id="moduleKey"
+                    id={fieldIds.moduleKey}
                     placeholder="ex: hr-recruitment-tool"
                     value={form.moduleKey}
-                    onChange={(e) => handleInputChange('moduleKey', e.target.value)}
+                    onChange={(e) => handleInputChange('moduleKey', e?.target?.value)}
                   />
                   <p className="text-xs text-muted-foreground">
                     Identifiant unique (lettres, chiffres, tirets)
@@ -287,33 +298,33 @@ export function ModulePublisher() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="displayName">Nom d'affichage *</Label>
+                  <Label htmlFor={fieldIds.displayName}>Nom d'affichage *</Label>
                   <Input
-                    id="displayName"
+                    id={fieldIds.displayName}
                     placeholder="ex: Outil de Recrutement RH"
                     value={form.displayName}
-                    onChange={(e) => handleInputChange('displayName', e.target.value)}
+                    onChange={(e) => handleInputChange('displayName', e?.target?.value)}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="shortDescription">Description courte</Label>
+                <Label htmlFor={fieldIds.shortDescription}>Description courte</Label>
                 <Input
-                  id="shortDescription"
+                  id={fieldIds.shortDescription}
                   placeholder="Description en une ligne"
                   value={form.shortDescription}
-                  onChange={(e) => handleInputChange('shortDescription', e.target.value)}
+                  onChange={(e) => handleInputChange('shortDescription', e?.target?.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description complète *</Label>
+                <Label htmlFor={fieldIds.description}>Description complète *</Label>
                 <Textarea
-                  id="description"
+                  id={fieldIds.description}
                   placeholder="Décrivez en détail les fonctionnalités et avantages de votre module..."
                   value={form.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={(e) => handleInputChange('description', e?.target?.value)}
                   rows={4}
                 />
               </div>
@@ -329,7 +340,7 @@ export function ModulePublisher() {
                       <SelectValue placeholder="Sélectionnez une catégorie" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((category) => (
+                      {CATEGORIES?.map((category) => (
                         <SelectItem key={category.value} value={category.value}>
                           {category.label}
                         </SelectItem>
@@ -339,21 +350,21 @@ export function ModulePublisher() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="version">Version</Label>
+                  <Label htmlFor={fieldIds.version}>Version</Label>
                   <Input
-                    id="version"
+                    id={fieldIds.version}
                     value={form.version}
-                    onChange={(e) => handleInputChange('version', e.target.value)}
+                    onChange={(e) => handleInputChange('version', e?.target?.value)}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="icon">Icône</Label>
+                  <Label htmlFor={fieldIds.icon}>Icône</Label>
                   <Input
-                    id="icon"
+                    id={fieldIds.icon}
                     placeholder="ex: Users"
                     value={form.icon}
-                    onChange={(e) => handleInputChange('icon', e.target.value)}
+                    onChange={(e) => handleInputChange('icon', e?.target?.value)}
                   />
                   <p className="text-xs text-muted-foreground">Nom d'icône Lucide React</p>
                 </div>
@@ -372,14 +383,14 @@ export function ModulePublisher() {
               <div className="space-y-2">
                 <Label>Type de tarification</Label>
                 <Select
-                  value={form.pricing.type}
+                  value={form?.pricing?.type}
                   onValueChange={(value) => handlePricingChange('type', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {PRICING_TYPES.map((type) => (
+                    {PRICING_TYPES?.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
@@ -388,21 +399,21 @@ export function ModulePublisher() {
                 </Select>
               </div>
 
-              {form.pricing.type !== 'FREE' && (
+              {form?.pricing?.type !== 'FREE' && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Montant</Label>
                     <Input
                       type="number"
-                      value={form.pricing.amount}
-                      onChange={(e) => handlePricingChange('amount', Number(e.target.value))}
+                      value={form?.pricing?.amount}
+                      onChange={(e) => handlePricingChange('amount', Number(e?.target?.value))}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>Devise</Label>
                     <Select
-                      value={form.pricing.currency}
+                      value={form?.pricing?.currency}
                       onValueChange={(value) => handlePricingChange('currency', value)}
                     >
                       <SelectTrigger>
@@ -417,11 +428,11 @@ export function ModulePublisher() {
                 </div>
               )}
 
-              {form.pricing.type === 'SUBSCRIPTION' && (
+              {form?.pricing.type === 'SUBSCRIPTION' && (
                 <div className="space-y-2">
                   <Label>Période</Label>
                   <Select
-                    value={form.pricing.period}
+                    value={form?.pricing?.period}
                     onValueChange={(value) => handlePricingChange('period', value)}
                   >
                     <SelectTrigger>
@@ -439,8 +450,8 @@ export function ModulePublisher() {
                 <Label>Description tarifaire</Label>
                 <Textarea
                   placeholder="Détails sur la tarification, conditions particulières..."
-                  value={form.pricing.description}
-                  onChange={(e) => handlePricingChange('description', e.target.value)}
+                  value={form?.pricing?.description}
+                  onChange={(e) => handlePricingChange('description', e?.target?.value)}
                   rows={3}
                 />
               </div>
@@ -459,25 +470,25 @@ export function ModulePublisher() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
                 <p className="text-sm text-muted-foreground">
-                  Permissions requises ({form.permissions.length})
+                  Permissions requises ({form?.permissions?.length})
                 </p>
-                <Button size="sm" onClick={addPermission}>
+                <Button type="button" size="sm" onClick={addPermission}>
                   <Plus className="mr-2 h-4 w-4" />
                   Ajouter permission
                 </Button>
               </div>
 
               <div className="space-y-3">
-                {form.permissions.map((permission, index) => (
-                  <Card key={`permission-${permission.action}-${index}`}>
+                {form?.permissions?.map((permission, index) => (
+                  <Card key={`permission-${permission?.action}-${index}`}>
                     <CardContent className="pt-4">
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label>Action</Label>
                           <Input
                             placeholder="ex: VIEW, CREATE, DELETE"
-                            value={permission.action}
-                            onChange={(e) => updatePermission(index, 'action', e.target.value)}
+                            value={permission?.action}
+                            onChange={(e) => updatePermission(index, 'action', e?.target?.value)}
                           />
                         </div>
 
@@ -485,8 +496,8 @@ export function ModulePublisher() {
                           <Label>Nom</Label>
                           <Input
                             placeholder="ex: Voir les candidatures"
-                            value={permission.name}
-                            onChange={(e) => updatePermission(index, 'name', e.target.value)}
+                            value={permission?.name}
+                            onChange={(e) => updatePermission(index, 'name', e?.target?.value)}
                           />
                         </div>
                       </div>
@@ -496,11 +507,14 @@ export function ModulePublisher() {
                         <div className="flex gap-2">
                           <Textarea
                             placeholder="Description de la permission..."
-                            value={permission.description}
-                            onChange={(e) => updatePermission(index, 'description', e.target.value)}
+                            value={permission?.description}
+                            onChange={(e) =>
+                              updatePermission(index, 'description', e?.target?.value)
+                            }
                             rows={2}
                           />
                           <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => removePermission(index)}
@@ -514,7 +528,7 @@ export function ModulePublisher() {
                 ))}
               </div>
 
-              {form.permissions.length === 0 && (
+              {form?.permissions?.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   Aucune permission définie
                 </div>
@@ -532,16 +546,16 @@ export function ModulePublisher() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
                 <p className="text-sm text-muted-foreground">
-                  Éléments de menu ({form.menuConfiguration.length})
+                  Éléments de menu ({form?.menuConfiguration?.length})
                 </p>
-                <Button size="sm" onClick={addMenuItem}>
+                <Button type="button" size="sm" onClick={addMenuItem}>
                   <Plus className="mr-2 h-4 w-4" />
                   Ajouter élément
                 </Button>
               </div>
 
               <div className="space-y-3">
-                {form.menuConfiguration.map((item, index) => (
+                {form?.menuConfiguration?.map((item, index) => (
                   <Card key={`menu-item-${item.title}-${index}`}>
                     <CardContent className="pt-4">
                       <div className="grid gap-4 md:grid-cols-3">
@@ -550,7 +564,7 @@ export function ModulePublisher() {
                           <Input
                             placeholder="ex: Gestion RH"
                             value={item.title}
-                            onChange={(e) => updateMenuItem(index, 'title', e.target.value)}
+                            onChange={(e) => updateMenuItem(index, 'title', e?.target?.value)}
                           />
                         </div>
 
@@ -564,7 +578,7 @@ export function ModulePublisher() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {MENU_TYPES.map((type) => (
+                              {MENU_TYPES?.map((type) => (
                                 <SelectItem key={type.value} value={type.value}>
                                   {type.label}
                                 </SelectItem>
@@ -578,7 +592,7 @@ export function ModulePublisher() {
                           <Input
                             placeholder="ex: Users"
                             value={item.icon}
-                            onChange={(e) => updateMenuItem(index, 'icon', e.target.value)}
+                            onChange={(e) => updateMenuItem(index, 'icon', e?.target?.value)}
                           />
                         </div>
                       </div>
@@ -589,10 +603,11 @@ export function ModulePublisher() {
                           <Input
                             placeholder="ex: /hr/recruitment"
                             value={item.programId}
-                            onChange={(e) => updateMenuItem(index, 'programId', e.target.value)}
+                            onChange={(e) => updateMenuItem(index, 'programId', e?.target?.value)}
                           />
                         </div>
                         <Button
+                          type="button"
                           variant="outline"
                           size="sm"
                           onClick={() => removeMenuItem(index)}
@@ -606,7 +621,7 @@ export function ModulePublisher() {
                 ))}
               </div>
 
-              {form.menuConfiguration.length === 0 && (
+              {form?.menuConfiguration?.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   Aucun élément de menu défini
                 </div>
@@ -625,14 +640,14 @@ export function ModulePublisher() {
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <Label>Dépendances</Label>
-                  <Button size="sm" variant="outline" onClick={addDependency}>
+                  <Button type="button" size="sm" variant="outline" onClick={addDependency}>
                     <Plus className="mr-2 h-4 w-4" />
                     Ajouter dépendance
                   </Button>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {form.dependencies.map((dep, index) => (
+                  {form?.dependencies?.map((dep, index) => (
                     <Badge
                       key={`dep-${dep}`}
                       variant="secondary"
@@ -647,7 +662,7 @@ export function ModulePublisher() {
                   ))}
                 </div>
 
-                {form.dependencies.length === 0 && (
+                {form?.dependencies?.length === 0 && (
                   <p className="text-sm text-muted-foreground">Aucune dépendance définie</p>
                 )}
               </div>
@@ -656,7 +671,7 @@ export function ModulePublisher() {
                 <Label>Éditeur</Label>
                 <Input
                   value={form.publisher}
-                  onChange={(e) => handleInputChange('publisher', e.target.value)}
+                  onChange={(e) => handleInputChange('publisher', e?.target?.value)}
                 />
               </div>
             </CardContent>
@@ -689,10 +704,10 @@ export function ModulePublisher() {
             <div className="flex items-center gap-4">
               {form.category && <Badge variant="outline">{form.category}</Badge>}
               <span className="text-sm font-medium">
-                {form.pricing.type === 'FREE'
+                {form?.pricing.type === 'FREE'
                   ? 'Gratuit'
-                  : form.pricing.type === 'SUBSCRIPTION'
-                    ? `${form.pricing.amount}€/${form.pricing.period === 'MONTH' ? 'mois' : 'an'}`
+                  : form?.pricing.type === 'SUBSCRIPTION'
+                    ? `${form?.pricing?.amount}€/${form?.pricing?.period === 'MONTH' ? 'mois' : 'an'}`
                     : 'Prix sur demande'}
               </span>
             </div>

@@ -6,6 +6,7 @@ import { Cron, CronExpression } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
 import { firstValueFrom } from 'rxjs'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import { WebhookDelivery as WebhookDeliveryEntity } from '../entities/webhook-delivery.entity'
 import { WebhookEvent as WebhookEventEntity } from '../entities/webhook-event.entity'
 import { WebhookSubscription as WebhookSubscriptionEntity } from '../entities/webhook-subscription.entity'
@@ -27,7 +28,7 @@ export class PricingWebhooksService {
 
   async updateSubscription(
     id: string,
-    updates: any,
+    updates: unknown,
     societeId: string
   ): Promise<WebhookSubscription> {
     const subscription = await this.subscriptionRepo.findOne({
@@ -46,7 +47,7 @@ export class PricingWebhooksService {
     await this.subscriptionRepo.delete({ id, societeId })
   }
 
-  async testWebhook(url: string, event: any): Promise<any> {
+  async testWebhook(url: string, event: any): Promise<unknown> {
     const startTime = Date.now()
 
     try {
@@ -63,12 +64,12 @@ export class PricingWebhooksService {
         responseTime: Date.now() - startTime,
         error: null,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         statusCode: error.response?.status || 0,
         responseTime: Date.now() - startTime,
-        error: error.message,
+        error: getErrorMessage(error),
       }
     }
   }
@@ -322,10 +323,10 @@ export class PricingWebhooksService {
       await this.updateSubscriptionStats(subscription.id, true)
 
       this.logger.log(`Webhook délivré avec succès: ${delivery.id}`)
-    } catch (error: any) {
+    } catch (error: unknown) {
       delivery.response = {
         statusCode: error.response?.status || 0,
-        error: error.message,
+        error: getErrorMessage(error),
       }
 
       // Vérifier si on doit réessayer
@@ -363,7 +364,7 @@ export class PricingWebhooksService {
   /**
    * Génère une signature HMAC pour sécuriser les webhooks
    */
-  private generateSignature(payload: any, secret: string): string {
+  private generateSignature(payload: unknown, secret: string): string {
     const hmac = crypto.createHmac('sha256', secret)
     hmac.update(JSON.stringify(payload))
     return `sha256=${hmac.digest('hex')}`
@@ -385,8 +386,8 @@ export class PricingWebhooksService {
       if (response.status >= 400) {
         throw new Error(`URL returned ${response.status}`)
       }
-    } catch (error: any) {
-      throw new Error(`URL validation failed: ${error.message}`)
+    } catch (error: unknown) {
+      throw new Error(`URL validation failed: ${getErrorMessage(error)}`)
     }
   }
 
@@ -422,7 +423,7 @@ export class PricingWebhooksService {
    * Gestionnaires d'événements internes
    */
   @OnEvent('price.calculated')
-  async handlePriceCalculated(event: any): Promise<void> {
+  async handlePriceCalculated(event: unknown): Promise<void> {
     if (event.previousPrice && event.newPrice) {
       const changePercent = ((event.newPrice - event.previousPrice) / event.previousPrice) * 100
 
@@ -443,7 +444,7 @@ export class PricingWebhooksService {
   }
 
   @OnEvent('rule.applied')
-  async handleRuleApplied(event: any): Promise<void> {
+  async handleRuleApplied(event: unknown): Promise<void> {
     await this.emit({
       type: WebhookEventType.RULE_APPLIED,
       societeId: event.societeId,
@@ -489,7 +490,10 @@ export class PricingWebhooksService {
         )
 
         // Désactiver automatiquement si trop de failures
-        if (subscription.metadata.successRate < 10 && subscription.metadata.totalCalls > 100) {
+        if (
+          subscription.metadata.successRate < 10 &&
+          (subscription.metadata.totalCalls ?? 0) > 100
+        ) {
           subscription.isActive = false
           await this.subscriptionRepo.save(subscription)
           this.logger.error(`Webhook ${subscription.id} désactivé automatiquement`)

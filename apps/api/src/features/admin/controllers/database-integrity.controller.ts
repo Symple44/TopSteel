@@ -79,7 +79,7 @@ export class DatabaseIntegrityController {
 
     return {
       success: true,
-      data: stats as any,
+      data: stats as unknown,
     }
   }
 
@@ -100,7 +100,7 @@ export class DatabaseIntegrityController {
 
     return {
       success: true,
-      data: backups as any,
+      data: backups as unknown,
     }
   }
 

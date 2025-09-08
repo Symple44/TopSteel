@@ -1,11 +1,17 @@
 'use client'
-import { useState, useCallback } from 'react'
-import { ArrowUpDown, ArrowUp, ArrowDown, X } from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
+import { ArrowDown, ArrowUp, ArrowUpDown, X } from 'lucide-react'
+import { useCallback, useState } from 'react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export type SortDirection = 'asc' | 'desc'
 export interface SortField {
   key: string
@@ -43,99 +49,120 @@ export function BusinessSortControls({
   showClearAll = true,
   className,
 }: BusinessSortControlsProps) {
-  const [sortConfig, setSortConfig] = useState<SortConfig>(value || {
-    criteria: [],
-    maxSorts
-  })
-  const updateSortConfig = useCallback((newConfig: SortConfig) => {
-    setSortConfig(newConfig)
-    onChange?.(newConfig)
-  }, [onChange])
-  const addSort = useCallback((fieldKey: string) => {
-    const field = fields.find(f => f.key === fieldKey)
-    if (!field) return
-    const existingIndex = sortConfig.criteria.findIndex(c => c.field === fieldKey)
-    if (existingIndex >= 0) {
-      // Toggle direction if already exists
-      const newCriteria = [...sortConfig.criteria]
-      newCriteria[existingIndex] = {
-        ...newCriteria[existingIndex],
-        direction: newCriteria[existingIndex].direction === 'asc' ? 'desc' : 'asc'
-      }
-      updateSortConfig({
-        ...sortConfig,
-        criteria: newCriteria
-      })
-    } else {
-      // Add new sort criteria
-      if (!allowMultiple) {
-        // Replace existing sort
+  const [sortConfig, setSortConfig] = useState<SortConfig>(
+    value || {
+      criteria: [],
+      maxSorts,
+    }
+  )
+  const updateSortConfig = useCallback(
+    (newConfig: SortConfig) => {
+      setSortConfig(newConfig)
+      onChange?.(newConfig)
+    },
+    [onChange]
+  )
+  const addSort = useCallback(
+    (fieldKey: string) => {
+      const field = fields.find((f) => f.key === fieldKey)
+      if (!field) return
+      const existingIndex = sortConfig.criteria.findIndex((c) => c.field === fieldKey)
+      if (existingIndex >= 0) {
+        // Toggle direction if already exists
+        const newCriteria = [...sortConfig.criteria]
+        newCriteria[existingIndex] = {
+          ...newCriteria[existingIndex],
+          direction: newCriteria[existingIndex].direction === 'asc' ? 'desc' : 'asc',
+        }
         updateSortConfig({
           ...sortConfig,
-          criteria: [{
-            field: fieldKey,
-            direction: field.defaultDirection || 'asc',
-            priority: 1
-          }]
+          criteria: newCriteria,
         })
       } else {
-        // Add to existing sorts (respect maxSorts limit)
-        if (sortConfig.criteria.length >= maxSorts) return
-        const newPriority = Math.max(...sortConfig.criteria.map(c => c.priority), 0) + 1
-        updateSortConfig({
-          ...sortConfig,
-          criteria: [...sortConfig.criteria, {
-            field: fieldKey,
-            direction: field.defaultDirection || 'asc',
-            priority: newPriority
-          }]
-        })
+        // Add new sort criteria
+        if (allowMultiple) {
+          // Add to existing sorts (respect maxSorts limit)
+          if (sortConfig.criteria.length >= maxSorts) return
+          const newPriority = Math.max(...sortConfig.criteria.map((c) => c.priority), 0) + 1
+          updateSortConfig({
+            ...sortConfig,
+            criteria: [
+              ...sortConfig.criteria,
+              {
+                field: fieldKey,
+                direction: field.defaultDirection || 'asc',
+                priority: newPriority,
+              },
+            ],
+          })
+        } else {
+          // Replace existing sort
+          updateSortConfig({
+            ...sortConfig,
+            criteria: [
+              {
+                field: fieldKey,
+                direction: field.defaultDirection || 'asc',
+                priority: 1,
+              },
+            ],
+          })
+        }
       }
-    }
-  }, [sortConfig, fields, allowMultiple, maxSorts, updateSortConfig])
-  const removeSort = useCallback((fieldKey: string) => {
-    updateSortConfig({
-      ...sortConfig,
-      criteria: sortConfig.criteria.filter(c => c.field !== fieldKey)
-    })
-  }, [sortConfig, updateSortConfig])
-  const updateSortDirection = useCallback((fieldKey: string, direction: SortDirection) => {
-    updateSortConfig({
-      ...sortConfig,
-      criteria: sortConfig.criteria.map(c => 
-        c.field === fieldKey ? { ...c, direction } : c
-      )
-    })
-  }, [sortConfig, updateSortConfig])
+    },
+    [sortConfig, fields, allowMultiple, maxSorts, updateSortConfig]
+  )
+  const removeSort = useCallback(
+    (fieldKey: string) => {
+      updateSortConfig({
+        ...sortConfig,
+        criteria: sortConfig.criteria.filter((c) => c.field !== fieldKey),
+      })
+    },
+    [sortConfig, updateSortConfig]
+  )
+  const updateSortDirection = useCallback(
+    (fieldKey: string, direction: SortDirection) => {
+      updateSortConfig({
+        ...sortConfig,
+        criteria: sortConfig.criteria.map((c) => (c.field === fieldKey ? { ...c, direction } : c)),
+      })
+    },
+    [sortConfig, updateSortConfig]
+  )
   const clearAllSorts = useCallback(() => {
     updateSortConfig({
       ...sortConfig,
-      criteria: []
+      criteria: [],
     })
   }, [sortConfig, updateSortConfig])
-  const reorderSort = useCallback((fieldKey: string, newPriority: number) => {
-    const criteriaWithoutCurrent = sortConfig.criteria.filter(c => c.field !== fieldKey)
-    const currentCriteria = sortConfig.criteria.find(c => c.field === fieldKey)
-    if (!currentCriteria) return
-    // Adjust priorities of other criteria
-    const adjustedCriteria = criteriaWithoutCurrent.map(c => ({
-      ...c,
-      priority: c.priority >= newPriority ? c.priority + 1 : c.priority
-    }))
-    updateSortConfig({
-      ...sortConfig,
-      criteria: [...adjustedCriteria, { ...currentCriteria, priority: newPriority }]
-        .sort((a, b) => a.priority - b.priority)
-    })
-  }, [sortConfig, updateSortConfig])
+  const _reorderSort = useCallback(
+    (fieldKey: string, newPriority: number) => {
+      const criteriaWithoutCurrent = sortConfig.criteria.filter((c) => c.field !== fieldKey)
+      const currentCriteria = sortConfig.criteria.find((c) => c.field === fieldKey)
+      if (!currentCriteria) return
+      // Adjust priorities of other criteria
+      const adjustedCriteria = criteriaWithoutCurrent.map((c) => ({
+        ...c,
+        priority: c.priority >= newPriority ? c.priority + 1 : c.priority,
+      }))
+      updateSortConfig({
+        ...sortConfig,
+        criteria: [...adjustedCriteria, { ...currentCriteria, priority: newPriority }].sort(
+          (a, b) => a.priority - b.priority
+        ),
+      })
+    },
+    [sortConfig, updateSortConfig]
+  )
   const getFieldLabel = (fieldKey: string): string => {
-    return fields.find(f => f.key === fieldKey)?.label || fieldKey
+    return fields.find((f) => f.key === fieldKey)?.label || fieldKey
   }
   const getDirectionIcon = (direction: SortDirection) => {
     return direction === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
   }
-  const availableFields = fields.filter(f => 
-    !sortConfig.criteria.some(c => c.field === f.key) || !allowMultiple
+  const availableFields = fields.filter(
+    (f) => !sortConfig.criteria.some((c) => c.field === f.key) || !allowMultiple
   )
   const sortedCriteria = [...sortConfig.criteria].sort((a, b) => a.priority - b.priority)
   return (
@@ -146,13 +173,13 @@ export function BusinessSortControls({
         {/* Quick Sort Buttons */}
         <div className="flex items-center gap-1">
           {fields.slice(0, 3).map((field) => {
-            const currentSort = sortConfig.criteria.find(c => c.field === field.key)
+            const currentSort = sortConfig.criteria.find((c) => c.field === field.key)
             const isActive = !!currentSort
             return (
               <Button
                 key={field.key}
                 type="button"
-                variant={isActive ? "default" : "outline"}
+                variant={isActive ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => addSort(field.key)}
                 disabled={disabled}
@@ -220,10 +247,12 @@ export function BusinessSortControls({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => updateSortDirection(
-                    criteria.field, 
-                    criteria.direction === 'asc' ? 'desc' : 'asc'
-                  )}
+                  onClick={() =>
+                    updateSortDirection(
+                      criteria.field,
+                      criteria.direction === 'asc' ? 'desc' : 'asc'
+                    )
+                  }
                   disabled={disabled}
                   className="h-4 w-4 p-0"
                 >
@@ -258,7 +287,8 @@ export function BusinessSortControls({
           {sortedCriteria.map((criteria, index) => (
             <span key={criteria.field}>
               {index > 0 && ' puis '}
-              {getFieldLabel(criteria.field)} ({criteria.direction === 'asc' ? 'croissant' : 'décroissant'})
+              {getFieldLabel(criteria.field)} (
+              {criteria.direction === 'asc' ? 'croissant' : 'décroissant'})
             </span>
           ))}
         </div>

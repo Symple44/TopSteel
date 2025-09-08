@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
-
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
@@ -64,7 +63,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium">Filtres avancés</h3>
-        <Button variant="ghost" size="sm" onClick={handleReset}>
+        <Button type="button" variant="ghost" size="sm" onClick={handleReset}>
           <RotateCcw className="h-4 w-4 mr-2" />
           Réinitialiser
         </Button>
@@ -137,7 +136,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
             type="number"
             value={filters.stockMin}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleFilterChange('stockMin', e.target.value)
+              handleFilterChange('stockMin', e?.target?.value)
             }
             placeholder="0"
           />
@@ -149,7 +148,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
             type="number"
             value={filters.stockMax}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleFilterChange('stockMax', e.target.value)
+              handleFilterChange('stockMax', e?.target?.value)
             }
             placeholder="1000"
           />

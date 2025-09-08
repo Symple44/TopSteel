@@ -141,7 +141,7 @@ export class PageDiscoveryService {
     }
 
     if (criteria.method) {
-      pages = pages.filter((p) => p.method === criteria.method.toUpperCase())
+      pages = pages.filter((p) => p.method === criteria.method?.toUpperCase())
     }
 
     if (criteria.module) {
@@ -153,7 +153,7 @@ export class PageDiscoveryService {
     }
 
     if (criteria.permission) {
-      pages = pages.filter((p) => p.metadata.permissions?.includes(criteria.permission))
+      pages = pages.filter((p) => p.metadata.permissions?.includes(criteria.permission!))
     }
 
     if (criteria.isPublic !== undefined) {
@@ -201,7 +201,7 @@ export class PageDiscoveryService {
    * Check if instance is a controller
    */
   private isController(wrapper: InstanceWrapper): boolean {
-    return wrapper.metatype && Reflect.hasMetadata('__controller__', wrapper.metatype)
+    return Boolean(wrapper.metatype && Reflect.hasMetadata('__controller__', wrapper.metatype))
   }
 
   /**
@@ -278,7 +278,9 @@ export class PageDiscoveryService {
       }
 
       if (metadata.permissions) {
-        metadata.permissions.forEach((p) => moduleInfo.permissions.add(p))
+        metadata.permissions.forEach((p) => {
+          moduleInfo.permissions.add(p)
+        })
       }
     }
   }
@@ -286,7 +288,7 @@ export class PageDiscoveryService {
   /**
    * Check if method is a route handler
    */
-  private isRouteHandler(method: Function): boolean {
+  private isRouteHandler(method: (...args: unknown[]) => unknown): boolean {
     return !!(
       Reflect.getMetadata('method', method) ||
       Reflect.getMetadata('path', method) ||
@@ -297,7 +299,7 @@ export class PageDiscoveryService {
   /**
    * Get HTTP method from route handler
    */
-  private getHttpMethod(method: Function): string | null {
+  private getHttpMethod(method: (...args: unknown[]) => unknown): string | null {
     const httpMethod = Reflect.getMetadata('method', method)
 
     if (httpMethod) {
@@ -330,11 +332,17 @@ export class PageDiscoveryService {
   /**
    * Extract metadata from controller and method
    */
-  private extractMetadata(controller: any, method: Function): DiscoveredPage['metadata'] {
+  private extractMetadata(
+    controller: object,
+    method: (...args: unknown[]) => unknown
+  ): DiscoveredPage['metadata'] {
     const metadata: DiscoveredPage['metadata'] = {}
 
     // Get roles
-    const roles = this.reflector.getAllAndOverride<string[]>('roles', [method, controller])
+    const roles = this.reflector.getAllAndOverride<string[]>('roles', [
+      method,
+      controller.constructor,
+    ])
     if (roles) {
       metadata.roles = roles
     }
@@ -342,32 +350,44 @@ export class PageDiscoveryService {
     // Get permissions
     const permissions = this.reflector.getAllAndOverride<string[]>('permissions', [
       method,
-      controller,
+      controller.constructor,
     ])
     if (permissions) {
       metadata.permissions = permissions
     }
 
     // Check if public
-    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [method, controller])
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+      method,
+      controller.constructor,
+    ])
     if (isPublic) {
       metadata.isPublic = true
     }
 
     // Check if auth should be skipped
-    const skipAuth = this.reflector.getAllAndOverride<boolean>('skipAuth', [method, controller])
+    const skipAuth = this.reflector.getAllAndOverride<boolean>('skipAuth', [
+      method,
+      controller.constructor,
+    ])
     if (skipAuth) {
       metadata.skipAuth = true
     }
 
     // Get resource
-    const resource = this.reflector.getAllAndOverride<string>('resource', [method, controller])
+    const resource = this.reflector.getAllAndOverride<string>('resource', [
+      method,
+      controller.constructor,
+    ])
     if (resource) {
       metadata.resource = resource
     }
 
     // Get action
-    const action = this.reflector.getAllAndOverride<string>('action', [method, controller])
+    const action = this.reflector.getAllAndOverride<string>('action', [
+      method,
+      controller.constructor,
+    ])
     if (action) {
       metadata.action = action
     }
@@ -375,14 +395,17 @@ export class PageDiscoveryService {
     // Get description
     const description = this.reflector.getAllAndOverride<string>('description', [
       method,
-      controller,
+      controller.constructor,
     ])
     if (description) {
       metadata.description = description
     }
 
     // Check if deprecated
-    const deprecated = this.reflector.getAllAndOverride<boolean>('deprecated', [method, controller])
+    const deprecated = this.reflector.getAllAndOverride<boolean>('deprecated', [
+      method,
+      controller.constructor,
+    ])
     if (deprecated) {
       metadata.deprecated = true
     }
@@ -393,7 +416,7 @@ export class PageDiscoveryService {
   /**
    * Extract parameters from method
    */
-  private extractParameters(method: Function): DiscoveredPage['parameters'] {
+  private extractParameters(method: (...args: unknown[]) => unknown): DiscoveredPage['parameters'] {
     const parameters: DiscoveredPage['parameters'] = []
 
     // Get parameter types
@@ -404,7 +427,7 @@ export class PageDiscoveryService {
 
     Object.keys(paramMetadata).forEach((key) => {
       const param = paramMetadata[key]
-      const index = parseInt(key)
+      const index = parseInt(key, 10)
       const type = paramTypes[index]
 
       if (param) {
@@ -453,9 +476,9 @@ export class PageDiscoveryService {
     const data = {
       discoveryDate: new Date().toISOString(),
       totalPages: this.discoveredPages.size,
-      modules: Array.from(this.moduleInfo.entries()).map(([name, info]) => ({
-        name,
+      modules: Array.from(this.moduleInfo.entries()).map(([moduleName, info]) => ({
         ...info,
+        name: moduleName,
         permissions: Array.from(info.permissions),
       })),
       pages: Array.from(this.discoveredPages.values()),

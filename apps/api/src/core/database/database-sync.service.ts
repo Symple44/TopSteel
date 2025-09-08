@@ -165,10 +165,10 @@ export class DatabaseSyncService {
     `)
 
     return {
-      tableCount: parseInt(tables[0]?.count || '0'),
-      indexCount: parseInt(indexes[0]?.count || '0'),
+      tableCount: parseInt(tables[0]?.count || '0', 10),
+      indexCount: parseInt(indexes[0]?.count || '0', 10),
       hasOrphanedIndexes: orphanedIndexes.length > 0,
-      hasConflicts: parseInt(conflicts[0]?.count || '0') > 20, // Plus de 20 index auto-générés = vraiment suspect
+      hasConflicts: parseInt(conflicts[0]?.count || '0', 10) > 20, // Plus de 20 index auto-générés = vraiment suspect
     }
   }
 

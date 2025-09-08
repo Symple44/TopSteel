@@ -57,7 +57,14 @@ export function OptimizedImage({
         className={cn('flex items-center justify-center bg-gray-100 text-gray-400', className)}
         style={{ width, height, ...style }}
       >
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <title>Image non disponible</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"

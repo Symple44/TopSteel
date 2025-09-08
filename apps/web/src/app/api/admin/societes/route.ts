@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
 
     // Construire l'endpoint avec les query params
-    const queryString = searchParams.toString()
+    const queryString = searchParams?.toString()
     const endpoint = `admin/societes${queryString ? `?${queryString}` : ''}`
 
     // Appel vers le backend
@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
       method: 'GET',
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
-      return NextResponse.json(responseData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      return NextResponse?.json(responseData)
     } else {
       // Fallback avec des données mock en cas d'erreur backend
       const mockSocietes = [
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         },
       ]
 
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: mockSocietes,
         meta: {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       })
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )

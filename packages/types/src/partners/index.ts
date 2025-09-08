@@ -112,6 +112,7 @@ export interface Partner {
   // Commercial
   conditionsPaiement?: string
   modePaiement?: string
+  delaiPaiement?: number // Added for compatibility
   plafondCredit?: number
   tauxRemise?: number
   representantCommercial?: string
@@ -133,8 +134,8 @@ export interface Partner {
   addresses?: PartnerAddress[]
 
   // Metadata
-  notes?: Record<string, any>
-  donneesTechniques?: Record<string, any>
+  notes?: Record<string, unknown>
+  donneesTechniques?: Record<string, unknown>
 
   // Timestamps
   createdAt: Date
@@ -174,7 +175,7 @@ export interface PartnerGroup {
     color?: string
     icon?: string
     tags?: string[]
-    customFields?: Record<string, any>
+    customFields?: Record<string, unknown>
   }
 
   // Relations
@@ -214,7 +215,7 @@ export interface Contact {
   accepteMarketing?: boolean
 
   // Disponibilité
-  horairesDisponibilite?: Record<string, any>
+  horairesDisponibilite?: Record<string, unknown>
   joursAbsence?: string[]
   dateNaissance?: Date
 
@@ -224,7 +225,7 @@ export interface Contact {
 
   // Notes
   notes?: string
-  preferences?: Record<string, any>
+  preferences?: Record<string, unknown>
   historiqueInteractions?: Array<{
     date: Date
     type: string
@@ -286,13 +287,13 @@ export interface PartnerSite {
   hasGrue?: boolean
 
   // Horaires et instructions
-  horaires?: Record<string, any>
+  horaires?: Record<string, unknown>
   instructionsLivraison?: string
   consignesSecurite?: string
-  documentsRequis?: Record<string, any>
+  documentsRequis?: Record<string, unknown>
 
   // Préférences
-  preferences?: Record<string, any>
+  preferences?: Record<string, unknown>
 
   // Dates
   dateOuverture?: Date
@@ -303,7 +304,7 @@ export interface PartnerSite {
   addresses?: PartnerAddress[]
 
   // Metadata
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   // Timestamps
   createdAt: Date
@@ -382,6 +383,7 @@ export interface CreatePartnerDto {
   pays?: string
   conditionsPaiement?: string
   modePaiement?: string
+  delaiPaiement?: number
   plafondCredit?: number
   tauxRemise?: number
   representantCommercial?: string
@@ -391,8 +393,8 @@ export interface CreatePartnerDto {
   compteComptableClient?: string
   compteComptableFournisseur?: string
   groupId?: string
-  notes?: Record<string, any>
-  donneesTechniques?: Record<string, any>
+  notes?: Record<string, unknown>
+  donneesTechniques?: Record<string, unknown>
 }
 
 export interface UpdatePartnerDto extends Partial<CreatePartnerDto> {}
@@ -413,12 +415,12 @@ export interface CreateContactDto {
   prefereEmail?: boolean
   prefereSMS?: boolean
   accepteMarketing?: boolean
-  horairesDisponibilite?: Record<string, any>
+  horairesDisponibilite?: Record<string, unknown>
   joursAbsence?: string[]
   dateNaissance?: string
   partnerSiteId?: string
   notes?: string
-  preferences?: Record<string, any>
+  preferences?: Record<string, unknown>
 }
 
 export interface UpdateContactDto extends Partial<CreateContactDto> {}
@@ -452,14 +454,14 @@ export interface CreatePartnerSiteDto {
   hasChariot?: boolean
   hasPontRoulant?: boolean
   hasGrue?: boolean
-  horaires?: Record<string, any>
+  horaires?: Record<string, unknown>
   instructionsLivraison?: string
   consignesSecurite?: string
-  documentsRequis?: Record<string, any>
-  preferences?: Record<string, any>
+  documentsRequis?: Record<string, unknown>
+  preferences?: Record<string, unknown>
   dateOuverture?: string
   dateFermeture?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface UpdatePartnerSiteDto extends Partial<CreatePartnerSiteDto> {
@@ -517,7 +519,7 @@ export interface CreatePartnerGroupDto {
     color?: string
     icon?: string
     tags?: string[]
-    customFields?: Record<string, any>
+    customFields?: Record<string, unknown>
   }
 }
 

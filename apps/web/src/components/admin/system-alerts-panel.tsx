@@ -32,7 +32,7 @@ interface SystemAlertsPanelProps {
   autoRefresh?: boolean
 }
 
-export default function SystemAlertsPanel({
+export function SystemAlertsPanel({
   alerts = [],
   maxAlerts: _maxAlerts = 10,
   autoRefresh: _autoRefresh = true,
@@ -97,27 +97,27 @@ export default function SystemAlertsPanel({
 
   const markAsRead = (alertId: string) => {
     setCurrentAlerts((prev) =>
-      prev.map((alert) => (alert.id === alertId ? { ...alert, isRead: true } : alert))
+      prev?.map((alert) => (alert.id === alertId ? { ...alert, isRead: true } : alert))
     )
   }
 
   const dismissAlert = (alertId: string) => {
-    setCurrentAlerts((prev) => prev.filter((alert) => alert.id !== alertId))
+    setCurrentAlerts((prev) => prev?.filter((alert) => alert.id !== alertId))
   }
 
   const markAllAsRead = () => {
-    setCurrentAlerts((prev) => prev.map((alert) => ({ ...alert, isRead: true })))
+    setCurrentAlerts((prev) => prev?.map((alert) => ({ ...alert, isRead: true })))
   }
 
   const clearAllAlerts = () => {
     setCurrentAlerts([])
   }
 
-  const filteredAlerts = currentAlerts.filter(
+  const filteredAlerts = currentAlerts?.filter(
     (alert) => selectedFilter === 'all' || alert.type === selectedFilter
   )
 
-  const unreadCount = currentAlerts.filter((alert) => !alert.isRead).length
+  const unreadCount = currentAlerts?.filter((alert) => !alert.isRead).length
 
   return (
     <Card className="w-full">
@@ -137,6 +137,7 @@ export default function SystemAlertsPanel({
           </div>
           <div className="flex items-center space-x-2">
             <Button
+              type="button"
               size="sm"
               variant="outline"
               onClick={() => setIsNotificationsEnabled(!isNotificationsEnabled)}
@@ -147,10 +148,10 @@ export default function SystemAlertsPanel({
                 <BellOff className="w-4 h-4" />
               )}
             </Button>
-            <Button size="sm" variant="outline" onClick={markAllAsRead}>
+            <Button type="button" size="sm" variant="outline" onClick={markAllAsRead}>
               Marquer tout lu
             </Button>
-            <Button size="sm" variant="outline" onClick={clearAllAlerts}>
+            <Button type="button" size="sm" variant="outline" onClick={clearAllAlerts}>
               Effacer tout
             </Button>
           </div>
@@ -162,6 +163,7 @@ export default function SystemAlertsPanel({
         <div className="flex space-x-2">
           {(['all', 'error', 'warning', 'info'] as const).map((filter) => (
             <Button
+              type="button"
               key={filter}
               size="sm"
               variant={selectedFilter === filter ? 'default' : 'outline'}
@@ -174,7 +176,7 @@ export default function SystemAlertsPanel({
               {filter === 'info' && 'Informations'}
               {filter !== 'all' && (
                 <span className="ml-1">
-                  ({currentAlerts.filter((a) => a.type === filter).length})
+                  ({currentAlerts?.filter((a) => a.type === filter).length})
                 </span>
               )}
             </Button>
@@ -183,14 +185,14 @@ export default function SystemAlertsPanel({
 
         {/* Liste des alertes */}
         <div className="space-y-2 max-h-96 overflow-y-auto">
-          {filteredAlerts.length === 0 ? (
+          {filteredAlerts?.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <CheckCircle2 className="w-12 h-12 mx-auto mb-2 text-green-600" />
               <p>Aucune alerte système</p>
               <p className="text-sm">Tout fonctionne correctement</p>
             </div>
           ) : (
-            filteredAlerts.map((alert) => (
+            filteredAlerts?.map((alert) => (
               <div
                 key={alert.id}
                 className={`flex items-start space-x-3 p-3 border-l-4 rounded-lg ${getSeverityColor(alert.severity)} ${
@@ -222,7 +224,7 @@ export default function SystemAlertsPanel({
                         </Badge>
                         <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                           {getSourceIcon(alert.source)}
-                          <span>{alert.source.toUpperCase()}</span>
+                          <span>{alert?.source?.toUpperCase()}</span>
                         </div>
                       </div>
                       <p
@@ -242,6 +244,7 @@ export default function SystemAlertsPanel({
                     <div className="flex space-x-1">
                       {!alert.isRead && (
                         <Button
+                          type="button"
                           size="sm"
                           variant="ghost"
                           onClick={() => markAsRead(alert.id)}
@@ -251,6 +254,7 @@ export default function SystemAlertsPanel({
                         </Button>
                       )}
                       <Button
+                        type="button"
                         size="sm"
                         variant="ghost"
                         onClick={() => dismissAlert(alert.id)}

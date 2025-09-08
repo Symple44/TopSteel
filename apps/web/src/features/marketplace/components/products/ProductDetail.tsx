@@ -26,7 +26,7 @@ import type { Product } from './ProductCard'
 interface ProductDetailProps {
   product: Product & {
     longDescription?: string
-    specifications?: Record<string, any>
+    specifications?: Record<string, unknown>
     features?: string[]
     weight?: number
     dimensions?: {
@@ -86,7 +86,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   }
 
   const handleImageNavigation = (direction: 'prev' | 'next') => {
-    const totalImages = product.images.length
+    const totalImages = product?.images?.length
     if (direction === 'prev') {
       setSelectedImageIndex((prev) => (prev - 1 + totalImages) % totalImages)
     } else {
@@ -95,9 +95,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
+    const rect = e?.currentTarget?.getBoundingClientRect()
+    const x = ((e.clientX - rect?.left) / rect?.width) * 100
+    const y = ((e.clientY - rect?.top) / rect?.height) * 100
     setZoomPosition({ x, y })
   }
 
@@ -136,6 +136,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
             onMouseEnter={() => setIsZoomed(true)}
             onMouseLeave={() => setIsZoomed(false)}
             onMouseMove={handleMouseMove}
+            role="img"
+            aria-label="Product image with zoom functionality"
           >
             <Image
               src={product.images[selectedImageIndex] || '/placeholder-product.jpg'}
@@ -155,7 +157,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
             />
 
             {/* Image Navigation */}
-            {product.images.length > 1 && (
+            {product?.images?.length > 1 && (
               <>
                 <button
                   onClick={() => handleImageNavigation('prev')}
@@ -195,9 +197,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           </div>
 
           {/* Thumbnail Images */}
-          {product.images.length > 1 && (
+          {product?.images?.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-2">
-              {product.images.map((image, index) => (
+              {product?.images?.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
@@ -238,7 +240,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                       key={i}
                       className={cn(
                         'w-5 h-5',
-                        i < Math.floor(product.rating || 0)
+                        i < Math.floor(product.rating ?? 0)
                           ? 'text-yellow-400 fill-current'
                           : 'text-gray-300'
                       )}
@@ -248,7 +250,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 <span className="ml-2 text-lg font-medium">{product.rating}</span>
               </div>
               <button className="text-blue-600 hover:underline">
-                {product.reviewCount || 0} reviews
+                {product.reviewCount ?? 0} reviews
               </button>
             </div>
           )}
@@ -303,7 +305,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   type="number"
                   value={quantity}
                   onChange={(e) => {
-                    const val = parseInt(e.target.value)
+                    const val = parseInt(e?.target?.value, 10)
                     if (!Number.isNaN(val) && val >= 1 && val <= product.stockQuantity) {
                       setQuantity(val)
                     }
@@ -376,9 +378,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           </div>
 
           {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
+          {product.tags && product?.tags?.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag, index) => (
+              {product?.tags?.map((tag, index) => (
                 <span
                   key={index}
                   className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full"
@@ -420,11 +422,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 {product.longDescription || product.description}
               </p>
 
-              {product.features && product.features.length > 0 && (
+              {product.features && product?.features?.length > 0 && (
                 <>
                   <h4 className="text-lg font-semibold mt-6 mb-3">Key Features</h4>
                   <ul className="space-y-2">
-                    {product.features.map((feature, index) => (
+                    {product?.features?.map((feature, index) => (
                       <li key={index} className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                         <span className="text-gray-600">{feature}</span>
@@ -445,7 +447,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     {Object.entries(product.specifications).map(([key, value], index) => (
                       <tr key={key} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
                         <td className="px-4 py-3 text-gray-700 font-medium capitalize">
-                          {key.replace(/_/g, ' ')}
+                          {key?.replace(/_/g, ' ')}
                         </td>
                         <td className="px-4 py-3 text-gray-600">
                           {typeof value === 'object' ? JSON.stringify(value) : value}

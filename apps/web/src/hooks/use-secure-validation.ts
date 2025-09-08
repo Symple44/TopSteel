@@ -30,7 +30,7 @@ function validateEmailSecure(email: string): boolean {
   // Pattern email basique mais robuste
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
-  if (!emailPattern.test(email)) {
+  if (!emailPattern?.test(email)) {
     return false
   }
 
@@ -41,9 +41,9 @@ function validateEmailSecure(email: string): boolean {
 
   // Vérifier les domaines suspects
   const suspiciousDomains = ['tempmail.org', '10minutemail.com', 'guerrillamail.com']
-  const domain = email.split('@')[1]?.toLowerCase()
+  const domain = email?.split('@')[1]?.toLowerCase()
 
-  if (domain && suspiciousDomains.includes(domain)) {
+  if (domain && suspiciousDomains?.includes(domain)) {
     return false
   }
 
@@ -93,37 +93,37 @@ export function useSecureValidation(rules: ValidationRules) {
         const fieldErrors: string[] = []
 
         // Required
-        if (rule.required && !value.trim()) {
-          fieldErrors.push('Ce champ est requis')
+        if (rule.required && !value?.trim()) {
+          fieldErrors?.push('Ce champ est requis')
         }
 
         if (value) {
           // Email
           if (rule.email) {
-            if (!SimpleSecurityUtils.validateEmailSecure(value)) {
-              fieldErrors.push('Email invalide ou non autorisé')
+            if (!SimpleSecurityUtils?.validateEmailSecure(value)) {
+              fieldErrors?.push('Email invalide ou non autorisé')
             }
           }
 
           // Length
-          if (rule.minLength && value.length < rule.minLength) {
-            fieldErrors.push(`Minimum ${rule.minLength} caractères`)
+          if (rule.minLength && value?.length < rule.minLength) {
+            fieldErrors?.push(`Minimum ${rule.minLength} caractères`)
           }
-          if (rule.maxLength && value.length > rule.maxLength) {
-            fieldErrors.push(`Maximum ${rule.maxLength} caractères`)
+          if (rule.maxLength && value?.length > rule.maxLength) {
+            fieldErrors?.push(`Maximum ${rule.maxLength} caractères`)
           }
 
           // Pattern
-          if (rule.pattern && !rule.pattern.test(value)) {
-            fieldErrors.push('Format invalide')
+          if (rule.pattern && !rule?.pattern?.test(value)) {
+            fieldErrors?.push('Format invalide')
           }
 
           // Custom validation
           if (rule.custom) {
-            const customError = rule.custom(value)
+            const customError = rule?.custom(value)
 
             if (customError) {
-              fieldErrors.push(customError)
+              fieldErrors?.push(customError)
             }
           }
         }
@@ -141,11 +141,11 @@ export function useSecureValidation(rules: ValidationRules) {
   )
 
   const sanitizeInput = useCallback((value: string): string => {
-    return SimpleSecurityUtils.sanitizeString(value)
+    return SimpleSecurityUtils?.sanitizeString(value)
   }, [])
 
   const sanitizeHtml = useCallback((value: string): string => {
-    return SimpleSecurityUtils.sanitizeHtml(value)
+    return SimpleSecurityUtils?.sanitizeHtml(value)
   }, [])
 
   return {
@@ -204,7 +204,7 @@ export function useFormSecureValidation() {
     phone: {
       pattern: /^(\+33|0)[1-9](\d{8})$/,
       custom: (value: string) => {
-        if (value && !value.match(/^(\+33|0)[1-9](\d{8})$/)) {
+        if (value && !value?.match(/^(\+33|0)[1-9](\d{8})$/)) {
           return 'Format de téléphone français invalide'
         }
 

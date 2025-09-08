@@ -1,28 +1,20 @@
 'use client'
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { 
-  Search, 
-  Package, 
-  AlertCircle, 
-  Check, 
-  ChevronsUpDown, 
-  Filter,
-  Star,
-  Zap,
-  Shield,
-  Weight,
-  Ruler,
-  Info,
-  Plus,
-  RefreshCw
-} from 'lucide-react'
+import { AlertCircle, Check, ChevronsUpDown, Package, Plus, Search, Star } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Label } from '../../../forms/label/Label'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Input } from '../../../primitives/input/Input'
 import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export interface MaterialSpecification {
   id: string
   name: string
@@ -102,11 +94,11 @@ export interface MaterialSelectorProps {
   maxHeight?: string
 }
 const MOCK_CATEGORIES: MaterialCategory[] = [
-  { id: '1', name: 'Aciers', level: 0, description: 'Tous types d\'aciers' },
+  { id: '1', name: 'Aciers', level: 0, description: "Tous types d'aciers" },
   { id: '1.1', name: 'Aciers au carbone', parentId: '1', level: 1 },
   { id: '1.2', name: 'Aciers inoxydables', parentId: '1', level: 1 },
   { id: '1.3', name: 'Aciers alliés', parentId: '1', level: 1 },
-  { id: '2', name: 'Aluminium', level: 0, description: 'Alliages d\'aluminium' },
+  { id: '2', name: 'Aluminium', level: 0, description: "Alliages d'aluminium" },
   { id: '2.1', name: 'Série 1000', parentId: '2', level: 1 },
   { id: '2.2', name: 'Série 6000', parentId: '2', level: 1 },
   { id: '3', name: 'Cuivre', level: 0, description: 'Cuivre et alliages' },
@@ -121,33 +113,46 @@ const MOCK_MATERIALS: Material[] = [
     categoryId: '1.1',
     categoryPath: ['Aciers', 'Aciers au carbone'],
     specifications: [
-      { id: '1', name: 'Limite élastique', value: 235, unit: 'MPa', category: 'mechanical', required: true },
-      { id: '2', name: 'Résistance à la traction', value: 340, unit: 'MPa', category: 'mechanical' },
+      {
+        id: '1',
+        name: 'Limite élastique',
+        value: 235,
+        unit: 'MPa',
+        category: 'mechanical',
+        required: true,
+      },
+      {
+        id: '2',
+        name: 'Résistance à la traction',
+        value: 340,
+        unit: 'MPa',
+        category: 'mechanical',
+      },
       { id: '3', name: 'Carbone', value: 0.17, unit: '%', category: 'chemical' },
     ],
     properties: {
       density: 7850,
       strength: 340,
       certifications: ['EN 10025-2', 'CE'],
-      temperature: { min: -20, max: 350 }
+      temperature: { min: -20, max: 350 },
     },
     availability: {
       inStock: true,
       quantity: 2500,
       unit: 'kg',
       leadTime: 2,
-      minimumOrder: 100
+      minimumOrder: 100,
     },
     pricing: {
       basePrice: 0.85,
       currency: 'EUR',
-      pricePerUnit: '€/kg'
+      pricePerUnit: '€/kg',
     },
     qualityGrade: 'Standard',
     isHazardous: false,
     isFavorite: true,
     tags: ['construction', 'soudable'],
-    supplier: 'ArcelorMittal'
+    supplier: 'ArcelorMittal',
   },
   {
     id: '2',
@@ -166,26 +171,26 @@ const MOCK_MATERIALS: Material[] = [
       strength: 515,
       corrosionResistance: 95,
       certifications: ['EN 10088-2', 'AISI 316L'],
-      temperature: { min: -196, max: 800 }
+      temperature: { min: -196, max: 800 },
     },
     availability: {
       inStock: true,
       quantity: 750,
       unit: 'kg',
       leadTime: 5,
-      minimumOrder: 50
+      minimumOrder: 50,
     },
     pricing: {
-      basePrice: 8.50,
+      basePrice: 8.5,
       currency: 'EUR',
-      pricePerUnit: '€/kg'
+      pricePerUnit: '€/kg',
     },
     qualityGrade: 'Premium',
     isHazardous: false,
     isFavorite: false,
     tags: ['alimentaire', 'résistant corrosion'],
-    supplier: 'Outokumpu'
-  }
+    supplier: 'Outokumpu',
+  },
 ]
 export function MaterialSelector({
   value,
@@ -220,10 +225,9 @@ export function MaterialSelector({
   const [selectedCategory, setSelectedCategory] = useState(filterByCategory || '')
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(filterByAvailability)
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false)
+  const ids = useFormFieldIds(['availableOnly', 'favoritesOnly'])
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>(
-    multiple && Array.isArray(value) ? value : 
-    !multiple && typeof value === 'string' ? [value] :
-    []
+    multiple && Array.isArray(value) ? value : !multiple && typeof value === 'string' ? [value] : []
   )
   useEffect(() => {
     if (multiple && Array.isArray(value)) {
@@ -233,15 +237,15 @@ export function MaterialSelector({
     }
   }, [value, multiple])
   const filteredMaterials = useMemo(() => {
-    let filtered = materials.filter(material => {
+    const filtered = materials.filter((material) => {
       // Search filter
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase()
-        const matchesSearch = 
+        const matchesSearch =
           material.name.toLowerCase().includes(searchLower) ||
           material.code.toLowerCase().includes(searchLower) ||
           material.description?.toLowerCase().includes(searchLower) ||
-          material.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+          material.tags?.some((tag) => tag.toLowerCase().includes(searchLower))
         if (!matchesSearch) return false
       }
       // Category filter
@@ -281,7 +285,7 @@ export function MaterialSelector({
   const groupedMaterials = useMemo(() => {
     if (!groupBy) return { '': filteredMaterials }
     const grouped: Record<string, Material[]> = {}
-    filteredMaterials.forEach(material => {
+    filteredMaterials.forEach((material) => {
       let groupKey = ''
       switch (groupBy) {
         case 'category':
@@ -302,11 +306,11 @@ export function MaterialSelector({
     return grouped
   }, [filteredMaterials, groupBy])
   const handleMaterialToggle = (materialId: string) => {
-    const material = materials.find(m => m.id === materialId)
+    const material = materials.find((m) => m.id === materialId)
     if (!material) return
     if (multiple) {
       const newSelection = selectedMaterials.includes(materialId)
-        ? selectedMaterials.filter(id => id !== materialId)
+        ? selectedMaterials.filter((id) => id !== materialId)
         : [...selectedMaterials, materialId]
       setSelectedMaterials(newSelection)
       onChange?.(newSelection)
@@ -322,17 +326,17 @@ export function MaterialSelector({
     if (selectedMaterials.length === 0) return placeholder
     if (multiple) {
       if (selectedMaterials.length === 1) {
-        const material = materials.find(m => m.id === selectedMaterials[0])
+        const material = materials.find((m) => m.id === selectedMaterials[0])
         return material?.name || 'Matériau sélectionné'
       }
       return `${selectedMaterials.length} matériaux sélectionnés`
     } else {
-      const material = materials.find(m => m.id === selectedMaterials[0])
+      const material = materials.find((m) => m.id === selectedMaterials[0])
       return material?.name || placeholder
     }
   }
   const getCategoryName = (categoryId: string): string => {
-    const category = categories.find(c => c.id === categoryId)
+    const category = categories.find((c) => c.id === categoryId)
     return category?.name || categoryId
   }
   return (
@@ -345,6 +349,7 @@ export function MaterialSelector({
       )}
       <div className="relative">
         <Button
+          type="button"
           variant="outline"
           role="combobox"
           aria-expanded={isOpen}
@@ -363,7 +368,7 @@ export function MaterialSelector({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
         {isOpen && (
-          <div 
+          <div
             className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg"
             style={{ maxHeight }}
           >
@@ -400,20 +405,32 @@ export function MaterialSelector({
                   </Select>
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="available-only"
+                      id={ids.availableOnly}
                       checked={showOnlyAvailable}
-                      onCheckedChange={setShowOnlyAvailable}
+                      onCheckedChange={(checked) => {
+                        if (typeof checked === 'boolean') {
+                          setShowOnlyAvailable(checked)
+                        }
+                      }}
                     />
-                    <Label htmlFor="available-only" className="text-sm">En stock</Label>
+                    <Label htmlFor={ids.availableOnly} className="text-sm">
+                      En stock
+                    </Label>
                   </div>
                   {showFavorites && (
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="favorites-only"
+                        id={ids.favoritesOnly}
                         checked={showOnlyFavorites}
-                        onCheckedChange={setShowOnlyFavorites}
+                        onCheckedChange={(checked) => {
+                          if (typeof checked === 'boolean') {
+                            setShowOnlyFavorites(checked)
+                          }
+                        }}
                       />
-                      <Label htmlFor="favorites-only" className="text-sm">Favoris</Label>
+                      <Label htmlFor={ids.favoritesOnly} className="text-sm">
+                        Favoris
+                      </Label>
                     </div>
                   )}
                 </div>
@@ -429,19 +446,27 @@ export function MaterialSelector({
                     </div>
                   )}
                   {groupMaterials.map((material) => (
-                    <div
+                    <button
                       key={material.id}
+                      type="button"
                       className={cn(
-                        'flex items-start gap-3 px-3 py-2 hover:bg-muted/50 cursor-pointer border-b last:border-b-0',
+                        'flex items-start gap-3 px-3 py-2 hover:bg-muted/50 cursor-pointer border-b last:border-b-0 w-full text-left',
                         selectedMaterials.includes(material.id) && 'bg-blue-50'
                       )}
                       onClick={() => handleMaterialToggle(material.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleMaterialToggle(material.id)
+                        }
+                      }}
                     >
                       <div className="flex items-center mt-0.5">
                         {multiple ? (
                           <Checkbox
                             checked={selectedMaterials.includes(material.id)}
-                            readOnly
+                            disabled
+                            aria-readonly="true"
                           />
                         ) : (
                           <div className="w-4 h-4 rounded-full border flex items-center justify-center">
@@ -459,7 +484,9 @@ export function MaterialSelector({
                             <Star className="w-4 h-4 text-yellow-500 fill-current" />
                           )}
                           {material.qualityGrade === 'Premium' && (
-                            <Badge variant="secondary" className="text-xs">Premium</Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              Premium
+                            </Badge>
                           )}
                           {material.isHazardous && (
                             <Badge variant="destructive" className="text-xs">
@@ -469,14 +496,16 @@ export function MaterialSelector({
                           )}
                         </div>
                         {material.description && (
-                          <p className="text-sm text-muted-foreground mb-2">{material.description}</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {material.description}
+                          </p>
                         )}
                         <div className="flex flex-wrap gap-2 text-xs">
                           <Badge variant="outline">{getCategoryName(material.categoryId)}</Badge>
                           {material.supplier && (
                             <Badge variant="outline">{material.supplier}</Badge>
                           )}
-                          {material.tags?.map(tag => (
+                          {material.tags?.map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-xs">
                               {tag}
                             </Badge>
@@ -485,14 +514,18 @@ export function MaterialSelector({
                         {/* Availability Info */}
                         {showAvailability && (
                           <div className="mt-2 flex items-center gap-4 text-xs">
-                            <div className={cn(
-                              'flex items-center gap-1',
-                              material.availability.inStock ? 'text-green-600' : 'text-red-600'
-                            )}>
-                              <div className={cn(
-                                'w-2 h-2 rounded-full',
-                                material.availability.inStock ? 'bg-green-500' : 'bg-red-500'
-                              )} />
+                            <div
+                              className={cn(
+                                'flex items-center gap-1',
+                                material.availability.inStock ? 'text-green-600' : 'text-red-600'
+                              )}
+                            >
+                              <div
+                                className={cn(
+                                  'w-2 h-2 rounded-full',
+                                  material.availability.inStock ? 'bg-green-500' : 'bg-red-500'
+                                )}
+                              />
                               {material.availability.inStock ? 'En stock' : 'Non disponible'}
                               {material.availability.quantity && (
                                 <span className="text-muted-foreground">
@@ -520,13 +553,14 @@ export function MaterialSelector({
                             {material.specifications.slice(0, 2).map((spec, idx) => (
                               <span key={spec.id} className="text-muted-foreground">
                                 {idx > 0 && ', '}
-                                {spec.name}: {spec.value}{spec.unit}
+                                {spec.name}: {spec.value}
+                                {spec.unit}
                               </span>
                             ))}
                           </div>
                         )}
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               ))}
@@ -541,13 +575,11 @@ export function MaterialSelector({
             {allowCustomEntry && onCustomAdd && (
               <div className="p-3 border-t">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() => {
-                    // This would open a dialog to add custom material
-                    console.log('Add custom material')
-                  }}
+                  onClick={() => {}}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Ajouter un nouveau matériau
@@ -557,9 +589,7 @@ export function MaterialSelector({
           </div>
         )}
       </div>
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />
@@ -571,8 +601,8 @@ export function MaterialSelector({
         <div className="mt-2 space-y-1">
           <Label className="text-sm">Matériaux sélectionnés:</Label>
           <div className="flex flex-wrap gap-1">
-            {selectedMaterials.map(materialId => {
-              const material = materials.find(m => m.id === materialId)
+            {selectedMaterials.map((materialId) => {
+              const material = materials.find((m) => m.id === materialId)
               if (!material) return null
               return (
                 <Badge key={materialId} variant="secondary" className="text-xs">

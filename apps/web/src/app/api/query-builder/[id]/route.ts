@@ -7,21 +7,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const response = await callBackendFromApi(request, `query-builder/${id}`, {
       method: 'GET',
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal?.timeout(10000),
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
     } else {
-      return NextResponse.json(
-        { error: `Backend responded with ${response.status}: ${response.statusText}` },
+      return NextResponse?.json(
+        { error: `Backend responded with ${response?.status}: ${response?.statusText}` },
         { status: response.status }
       )
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )
@@ -30,27 +30,27 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const body = await request.json()
+    const body = await request?.json()
     const { id } = await params
 
     const response = await callBackendFromApi(request, `query-builder/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal?.timeout(10000),
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
     } else {
-      return NextResponse.json(
-        { error: `Backend responded with ${response.status}: ${response.statusText}` },
+      return NextResponse?.json(
+        { error: `Backend responded with ${response?.status}: ${response?.statusText}` },
         { status: response.status }
       )
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )
@@ -66,19 +66,19 @@ export async function DELETE(
 
     const response = await callBackendFromApi(request, `query-builder/${id}`, {
       method: 'DELETE',
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal?.timeout(10000),
     })
 
-    if (response.ok) {
-      return NextResponse.json({ success: true })
+    if (response?.ok) {
+      return NextResponse?.json({ success: true })
     } else {
-      return NextResponse.json(
-        { error: `Backend responded with ${response.status}: ${response.statusText}` },
+      return NextResponse?.json(
+        { error: `Backend responded with ${response?.status}: ${response?.statusText}` },
         { status: response.status }
       )
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )

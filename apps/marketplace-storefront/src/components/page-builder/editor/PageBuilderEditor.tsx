@@ -111,7 +111,7 @@ export function PageBuilderEditor({ initialSections = [], onSave }: PageBuilderE
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault()
-    const dragIndex = parseInt(e.dataTransfer.getData('sectionIndex'))
+    const dragIndex = parseInt(e.dataTransfer.getData('sectionIndex'), 10)
     if (dragIndex !== dropIndex) {
       moveSection(dragIndex, dropIndex)
     }

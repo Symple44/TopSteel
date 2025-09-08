@@ -1,6 +1,7 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import { MarketplaceModule as MarketplaceModuleEntity } from '../entities/marketplace-module.entity'
 // Import des modules réels - Supprimés pour optimiser le debug
 import type { MarketplaceService } from './marketplace.service'
@@ -153,7 +154,7 @@ export class ModuleRegistryService implements OnModuleInit {
     ]
 
     for (const field of requiredFields) {
-      if (!moduleInfo[field]) {
+      if (!(field in moduleInfo) || !moduleInfo[field as keyof ModuleInfo]) {
         throw new Error(`Champ requis manquant: ${field}`)
       }
     }
@@ -194,13 +195,13 @@ export class ModuleRegistryService implements OnModuleInit {
         displayName: moduleInfo.displayName,
         description: moduleInfo.description,
         shortDescription: moduleInfo.shortDescription,
-        pricing: moduleInfo.pricing as any,
+        pricing: moduleInfo.pricing as unknown,
         dependencies: moduleInfo.dependencies,
-        menuConfiguration: moduleInfo.menuConfiguration as any,
-        permissions: moduleInfo.permissions as any,
-        apiRoutes: moduleInfo.apiRoutes as any,
+        menuConfiguration: moduleInfo.menuConfiguration as unknown,
+        permissions: moduleInfo.permissions as unknown,
+        apiRoutes: moduleInfo.apiRoutes as unknown,
         icon: moduleInfo.icon,
-        metadata: moduleInfo.metadata as any,
+        metadata: moduleInfo.metadata as unknown,
       },
       '00000000-0000-0000-0000-000000000000'
     )
@@ -216,15 +217,15 @@ export class ModuleRegistryService implements OnModuleInit {
         displayName: moduleInfo.displayName,
         description: moduleInfo.description,
         shortDescription: moduleInfo.shortDescription,
-        category: moduleInfo.category as any,
+        category: moduleInfo.category as unknown,
         publisher: moduleInfo.publisher,
-        pricing: moduleInfo.pricing as any,
+        pricing: moduleInfo.pricing as unknown,
         dependencies: moduleInfo.dependencies,
-        menuConfiguration: moduleInfo.menuConfiguration as any,
-        permissions: moduleInfo.permissions as any,
-        apiRoutes: moduleInfo.apiRoutes as any,
+        menuConfiguration: moduleInfo.menuConfiguration as unknown,
+        permissions: moduleInfo.permissions as unknown,
+        apiRoutes: moduleInfo.apiRoutes as unknown,
         icon: moduleInfo.icon,
-        metadata: moduleInfo.metadata as any,
+        metadata: moduleInfo.metadata as unknown,
       },
       '00000000-0000-0000-0000-000000000000'
     )
@@ -286,7 +287,7 @@ export class ModuleRegistryService implements OnModuleInit {
       } catch (error) {
         this.logger.error(
           `Erreur lors de la vérification du module ${moduleKey}:`,
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
         )
       }
     }

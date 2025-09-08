@@ -1,16 +1,14 @@
 'use client'
 
-import type { Material } from '@erp/types'
-
+import type { Material, MaterialFilters as MaterialFiltersType, MaterialType } from '@erp/types'
 import {
-  // @ts-ignore - TypeScript bug with re-exports
-  AdvancedDataTable,
   Badge,
   Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  DataTable,
   Input,
   Select,
   SelectContent,
@@ -18,14 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
+import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
 import { AlertCircle, Download, Package2, Plus, TrendingUp, Upload } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
-import { useDeleteMaterial, useMaterialStatistics, useMaterials } from '@/hooks/use-materials'
+import { useMaterialStatistics, useMaterials } from '@/hooks/use-materials'
 import { sanitizeSearchQuery } from '@/lib/security-utils'
 import { formatCurrency } from '@/lib/utils'
 
-interface MaterialFilters {
+interface MaterialFiltersLocal {
   type?: string
   category?: string
   search?: string
@@ -33,30 +32,36 @@ interface MaterialFilters {
 }
 
 export default function MaterialsPage() {
-  const [filters, setFilters] = useState<MaterialFilters>({})
+  const [filters, setFilters] = useState<MaterialFiltersLocal>({})
   const [searchInput, setSearchInput] = useState('')
+  const [formMode, _setFormMode] = useState<'create' | 'edit'>('create')
   const debouncedSearch = useDebounce(searchInput, 500)
 
-  const finalFilters = useMemo(
-    () => ({
-      ...filters,
+  const finalFilters = useMemo((): MaterialFiltersType => {
+    const convertedFilters: MaterialFiltersType = {
       search: debouncedSearch ? sanitizeSearchQuery(debouncedSearch) : undefined,
-    }),
-    [filters, debouncedSearch]
-  )
+    }
 
-  const { data: materials = [], isLoading, error } = useMaterials(finalFilters)
-  const { data: statistics } = useMaterialStatistics()
-  const deleteMaterial = useDeleteMaterial()
+    // Convert string type to MaterialType array if needed
+    if (filters.type) {
+      const materialType = filters.type as MaterialType
+      convertedFilters.type = [materialType]
+    }
 
-  const handleDelete = useCallback(
-    async (material: Material) => {
-      if (confirm(`Êtes-vous sûr de vouloir supprimer ${material.designation} ?`)) {
-        await deleteMaterial.mutateAsync(material.id)
-      }
-    },
-    [deleteMaterial]
-  )
+    // Add other filters that match the type
+    if (filters.stockAlert !== undefined) {
+      // Map stockAlert to the expected stockPhysique filter
+      convertedFilters.stockPhysique = filters.stockAlert ? 'low' : undefined
+    }
+
+    return convertedFilters
+  }, [filters, debouncedSearch])
+
+  const materialsQuery = useMaterials(finalFilters)
+  const { data: materials = [], isLoading, error } = materialsQuery
+  const statisticsQuery = useMaterialStatistics()
+  const { data: statistics } = statisticsQuery
+  // const deleteMaterial = useDeleteMaterial() // TODO: Implement delete functionality
 
   const columns = useMemo(
     () => [
@@ -74,7 +79,6 @@ export default function MaterialsPage() {
         title: 'Désignation',
         type: 'text' as const,
         sortable: true,
-        searchable: true,
       },
       {
         id: 'type',
@@ -82,7 +86,9 @@ export default function MaterialsPage() {
         title: 'Type',
         type: 'text' as const,
         width: 120,
-        render: (value: string) => <Badge variant="outline">{value}</Badge>,
+        render: (value: unknown, _row: Material, _column: ColumnConfig<Material>) => (
+          <Badge variant="outline">{String(value)}</Badge>
+        ),
       },
       {
         id: 'category',
@@ -111,11 +117,12 @@ export default function MaterialsPage() {
         title: 'Stock',
         type: 'number' as const,
         width: 100,
-        render: (value: number, material: Material) => {
-          const isLow = material.stockMin && value <= material.stockMin
+        render: (_value: unknown, material: Material, _column: ColumnConfig<Material>) => {
+          const stockValue = material.stockPhysique ?? 0
+          const isLow = material?.stockMini && stockValue <= material.stockMini
           return (
             <div className={isLow ? 'text-destructive font-medium' : ''}>
-              {value} {material.unit}
+              {stockValue} {material.unite}
               {isLow && <AlertCircle className="inline-block ml-1 h-3 w-3" />}
             </div>
           )
@@ -127,7 +134,8 @@ export default function MaterialsPage() {
         title: 'Prix unitaire',
         type: 'number' as const,
         width: 120,
-        render: (value: number) => formatCurrency(value),
+        render: (_value: unknown, material: Material, _column: ColumnConfig<Material>) =>
+          formatCurrency(material.prixUnitaire ?? 0),
       },
       {
         id: 'stockValue',
@@ -135,43 +143,20 @@ export default function MaterialsPage() {
         title: 'Valeur stock',
         type: 'number' as const,
         width: 120,
-        render: (_: unknown, material: Material) =>
-          formatCurrency((material.stock || 0) * (material.price || 0)),
+        render: (_value: unknown, material: Material, _column: ColumnConfig<Material>) =>
+          formatCurrency((material.stockPhysique ?? 0) * (material.prixUnitaire ?? 0)),
       },
     ],
     []
   )
 
   const [showMaterialForm, setShowMaterialForm] = useState(false)
-  const [_selectedMaterial, setSelectedMaterial] = useState<Material | null>(null)
-  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
-
-  const handleEdit = useCallback((material: Material) => {
-    setSelectedMaterial(material)
-    setFormMode('edit')
-    setShowMaterialForm(true)
-  }, [])
 
   const handleCreate = useCallback(() => {
-    setSelectedMaterial(null)
-    setFormMode('create')
     setShowMaterialForm(true)
   }, [])
 
-  const _actions = useMemo(
-    () => [
-      {
-        header: 'Modifier',
-        onClick: handleEdit,
-      },
-      {
-        header: 'Supprimer',
-        onClick: handleDelete,
-        variant: 'destructive' as const,
-      },
-    ],
-    [handleDelete, handleEdit]
-  )
+  // const _actions = useMemo(...) removed - unused actions array
 
   // Gestion d'erreur
   if (error) {
@@ -195,15 +180,15 @@ export default function MaterialsPage() {
           <p className="text-muted-foreground">Gérez votre inventaire de matériaux industriels</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" aria-label="Importer des matériaux">
+          <Button type="button" variant="outline" size="sm" aria-label="Importer des matériaux">
             <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
             Importer
           </Button>
-          <Button variant="outline" size="sm" aria-label="Exporter les matériaux">
+          <Button type="button" variant="outline" size="sm" aria-label="Exporter les matériaux">
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Exporter
           </Button>
-          <Button aria-label="Créer un nouveau matériau" onClick={handleCreate}>
+          <Button type="button" aria-label="Créer un nouveau matériau" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
             Nouveau matériau
           </Button>
@@ -219,7 +204,7 @@ export default function MaterialsPage() {
               <Package2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{statistics.totalMaterials || 0}</div>
+              <div className="text-2xl font-bold">{statistics.totalMaterials ?? 0}</div>
               <p className="text-xs text-muted-foreground">Références actives</p>
             </CardContent>
           </Card>
@@ -230,7 +215,7 @@ export default function MaterialsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatCurrency(statistics.totalStockValue || 0)}
+                {formatCurrency(statistics.totalStockValue ?? 0)}
               </div>
               <p className="text-xs text-muted-foreground">Valorisation totale</p>
             </CardContent>
@@ -241,7 +226,7 @@ export default function MaterialsPage() {
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{statistics.lowStockCount || 0}</div>
+              <div className="text-2xl font-bold">{statistics.lowStockCount ?? 0}</div>
               <p className="text-xs text-muted-foreground">Matériaux en rupture</p>
             </CardContent>
           </Card>
@@ -251,7 +236,11 @@ export default function MaterialsPage() {
               <Package2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{statistics.categoryCount || 0}</div>
+              <div className="text-2xl font-bold">
+                {statistics.categoryCount
+                  ? Object.values(statistics.categoryCount).reduce((sum, count) => sum + count, 0)
+                  : 0}
+              </div>
               <p className="text-xs text-muted-foreground">Types de matériaux</p>
             </CardContent>
           </Card>
@@ -268,13 +257,15 @@ export default function MaterialsPage() {
             <Input
               placeholder="Rechercher..."
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchInput(e?.target?.value)
+              }
               className="max-w-sm"
               aria-label="Rechercher dans les matériaux"
             />
             <Select
               value={filters.type || 'all'}
-              onValueChange={(value) =>
+              onValueChange={(value: string) =>
                 setFilters({ ...filters, type: value === 'all' ? undefined : value })
               }
             >
@@ -290,8 +281,8 @@ export default function MaterialsPage() {
               </SelectContent>
             </Select>
             <Select
-              value={filters.stockAlert !== undefined ? filters.stockAlert.toString() : 'all'}
-              onValueChange={(value) =>
+              value={filters.stockAlert !== undefined ? filters?.stockAlert?.toString() : 'all'}
+              onValueChange={(value: string) =>
                 setFilters({
                   ...filters,
                   stockAlert: value === 'all' ? undefined : value === 'true',
@@ -314,14 +305,14 @@ export default function MaterialsPage() {
       {/* Data Table */}
       <Card>
         <CardContent className="p-0">
-          <AdvancedDataTable
+          <DataTable
             columns={columns}
             data={materials}
             keyField="id"
             tableId="materials-table"
             userId={
               typeof window !== 'undefined'
-                ? localStorage.getItem('userId') || 'default-user'
+                ? localStorage?.getItem('userId') || 'default-user'
                 : 'default-user'
             }
             searchable
@@ -353,7 +344,9 @@ export default function MaterialsPage() {
               {/* Formulaire temporaire - à remplacer par MaterialFormDialog */}
               <div className="space-y-4">
                 <p>Formulaire matériau en cours de développement</p>
-                <Button onClick={() => setShowMaterialForm(false)}>Fermer</Button>
+                <Button type="button" onClick={() => setShowMaterialForm(false)}>
+                  Fermer
+                </Button>
               </div>
             </CardContent>
           </Card>

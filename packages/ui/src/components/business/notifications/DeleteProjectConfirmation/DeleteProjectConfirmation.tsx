@@ -1,7 +1,15 @@
 'use client'
+import { AlertTriangle, Database, Factory, FileText, Package, Users } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from '../../../primitives'
-import { AlertTriangle, Package, Users, Calendar, Database, FileText, Factory } from 'lucide-react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Textarea,
+} from '../../../primitives'
 export interface ProjectDependency {
   id: string
   name: string
@@ -28,44 +36,44 @@ export interface DeleteProjectConfirmationProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   project: ProjectDetails
-  onConfirm: (data: { 
-    projectId: string; 
-    reason: string; 
-    handleDependencies: 'delete' | 'reassign' | 'archive';
-    reassignmentOptions?: Record<string, string>;
+  onConfirm: (data: {
+    projectId: string
+    reason: string
+    handleDependencies: 'delete' | 'reassign' | 'archive'
+    reassignmentOptions?: Record<string, string>
   }) => Promise<void>
 }
 const dependencyTypeConfig = {
   order: {
     icon: Package,
     label: 'Commandes',
-    color: 'text-blue-600'
+    color: 'text-blue-600',
   },
   supplier_contract: {
     icon: Users,
     label: 'Contrats fournisseurs',
-    color: 'text-green-600'
+    color: 'text-green-600',
   },
   production_line: {
     icon: Factory,
     label: 'Lignes de production',
-    color: 'text-orange-600'
+    color: 'text-orange-600',
   },
   document: {
     icon: FileText,
     label: 'Documents',
-    color: 'text-purple-600'
+    color: 'text-purple-600',
   },
   user_assignment: {
     icon: Users,
     label: 'Assignations utilisateurs',
-    color: 'text-indigo-600'
-  }
+    color: 'text-indigo-600',
+  },
 }
 const impactColors = {
   low: 'bg-green-100 text-green-800',
   medium: 'bg-yellow-100 text-yellow-800',
-  high: 'bg-red-100 text-red-800'
+  high: 'bg-red-100 text-red-800',
 }
 export function DeleteProjectConfirmation({
   open,
@@ -73,23 +81,25 @@ export function DeleteProjectConfirmation({
   project,
   onConfirm,
 }: DeleteProjectConfirmationProps) {
+  const ids = useFormFieldIds(['reason'])
   const [loading, setLoading] = useState(false)
   const [reason, setReason] = useState('')
-  const [handleDependencies, setHandleDependencies] = useState<'delete' | 'reassign' | 'archive'>('archive')
-  const [reassignmentOptions, setReassignmentOptions] = useState<Record<string, string>>({})
+  const [handleDependencies, setHandleDependencies] = useState<'delete' | 'reassign' | 'archive'>(
+    'archive'
+  )
+  const [reassignmentOptions, _setReassignmentOptions] = useState<Record<string, string>>({})
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
-      await onConfirm({ 
-        projectId: project.id, 
-        reason, 
+      await onConfirm({
+        projectId: project.id,
+        reason,
         handleDependencies,
-        reassignmentOptions: handleDependencies === 'reassign' ? reassignmentOptions : undefined
+        reassignmentOptions: handleDependencies === 'reassign' ? reassignmentOptions : undefined,
       })
       onOpenChange(false)
-    } catch (error) {
-      console.error('Project deletion failed:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -97,18 +107,21 @@ export function DeleteProjectConfirmation({
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'EUR',
     }).format(amount)
   }
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR')
   }
-  const groupedDependencies = project.dependencies.reduce((acc, dep) => {
-    if (!acc[dep.type]) acc[dep.type] = []
-    acc[dep.type].push(dep)
-    return acc
-  }, {} as Record<string, ProjectDependency[]>)
-  const highImpactDependencies = project.dependencies.filter(dep => dep.impact === 'high')
+  const groupedDependencies = project.dependencies.reduce(
+    (acc, dep) => {
+      if (!acc[dep.type]) acc[dep.type] = []
+      acc[dep.type].push(dep)
+      return acc
+    },
+    {} as Record<string, ProjectDependency[]>
+  )
+  const highImpactDependencies = project.dependencies.filter((dep) => dep.impact === 'high')
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -155,12 +168,11 @@ export function DeleteProjectConfirmation({
               <div className="flex items-start gap-2">
                 <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-red-800 mb-2">
-                    Attention: Impact élevé détecté
-                  </h4>
+                  <h4 className="font-medium text-red-800 mb-2">Attention: Impact élevé détecté</h4>
                   <p className="text-sm text-red-700 mb-3">
-                    Ce projet a {highImpactDependencies.length} dépendance{highImpactDependencies.length > 1 ? 's' : ''} à fort impact. 
-                    La suppression pourrait affecter significativement d'autres parties du système.
+                    Ce projet a {highImpactDependencies.length} dépendance
+                    {highImpactDependencies.length > 1 ? 's' : ''} à fort impact. La suppression
+                    pourrait affecter significativement d'autres parties du système.
                   </p>
                   <ul className="text-sm text-red-700 space-y-1">
                     {highImpactDependencies.map((dep) => (
@@ -201,8 +213,14 @@ export function DeleteProjectConfirmation({
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[dep.impact]}`}>
-                                {dep.impact === 'low' ? 'Faible' : dep.impact === 'medium' ? 'Moyen' : 'Élevé'}
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[dep.impact]}`}
+                              >
+                                {dep.impact === 'low'
+                                  ? 'Faible'
+                                  : dep.impact === 'medium'
+                                    ? 'Moyen'
+                                    : 'Élevé'}
                               </span>
                               {dep.canBeReassigned && (
                                 <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
@@ -229,7 +247,7 @@ export function DeleteProjectConfirmation({
                   name="handleDependencies"
                   value="archive"
                   checked={handleDependencies === 'archive'}
-                  onChange={(e) => setHandleDependencies(e.target.value as any)}
+                  onChange={(e) => setHandleDependencies(e.target.value as unknown)}
                   className="mt-1"
                 />
                 <div>
@@ -245,7 +263,7 @@ export function DeleteProjectConfirmation({
                   name="handleDependencies"
                   value="reassign"
                   checked={handleDependencies === 'reassign'}
-                  onChange={(e) => setHandleDependencies(e.target.value as any)}
+                  onChange={(e) => setHandleDependencies(e.target.value as unknown)}
                   className="mt-1"
                 />
                 <div>
@@ -261,7 +279,7 @@ export function DeleteProjectConfirmation({
                   name="handleDependencies"
                   value="delete"
                   checked={handleDependencies === 'delete'}
-                  onChange={(e) => setHandleDependencies(e.target.value as any)}
+                  onChange={(e) => setHandleDependencies(e.target.value as unknown)}
                   className="mt-1"
                 />
                 <div>
@@ -275,11 +293,11 @@ export function DeleteProjectConfirmation({
           </div>
           {/* Deletion Reason */}
           <div className="space-y-2">
-            <label htmlFor="reason" className="text-sm font-medium">
+            <label htmlFor={ids.reason} className="text-sm font-medium">
               Motif de suppression <span className="text-red-500">*</span>
             </label>
             <Textarea
-              id="reason"
+              id={ids.reason}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Décrivez la raison de la suppression du projet..."
@@ -296,11 +314,7 @@ export function DeleteProjectConfirmation({
             >
               Annuler
             </Button>
-            <Button 
-              type="submit" 
-              disabled={loading || !reason.trim()}
-              variant="destructive"
-            >
+            <Button type="submit" disabled={loading || !reason.trim()} variant="destructive">
               {loading ? 'Suppression en cours...' : 'Confirmer la suppression'}
             </Button>
           </div>

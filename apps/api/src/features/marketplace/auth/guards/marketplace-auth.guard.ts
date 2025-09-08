@@ -57,7 +57,7 @@ export class MarketplaceAuthGuard extends AuthGuard('marketplace-jwt') {
     }
   }
 
-  private extractTokenFromHeader(request: any): string | undefined {
+  private extractTokenFromHeader(request: unknown): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? []
     return type === 'Bearer' ? token : undefined
   }

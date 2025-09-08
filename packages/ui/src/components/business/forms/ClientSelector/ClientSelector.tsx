@@ -1,24 +1,20 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { Check, ChevronsUpDown, Search, Plus, Building2, User, AlertCircle } from 'lucide-react'
+import { AlertCircle, Building2, Check, ChevronsUpDown, Plus, Search, User } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
-import { Button } from '../../../primitives/button/Button'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
 } from '../../../navigation'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../../../primitives'
-import { Badge } from '../../../data-display/badge'
-import { Label } from '../../../forms/label/Label'
+import { Popover, PopoverContent, PopoverTrigger } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Client {
   id: string
   code: string
@@ -70,7 +66,7 @@ export function ClientSelector({
   multiple = false,
   required = false,
   disabled = false,
-  placeholder = "Sélectionner un client...",
+  placeholder = 'Sélectionner un client...',
   label,
   helperText,
   showStatus = true,
@@ -86,6 +82,7 @@ export function ClientSelector({
   const [selectedClients, setSelectedClients] = useState<string[]>(
     Array.isArray(value) ? value : value ? [value] : []
   )
+  const ids = useFormFieldIds(['clientSelector'])
   useEffect(() => {
     if (multiple && Array.isArray(value)) {
       setSelectedClients(value)
@@ -93,7 +90,7 @@ export function ClientSelector({
       setSelectedClients(value ? [value] : [])
     }
   }, [value, multiple])
-  const filteredClients = clients.filter(client => {
+  const filteredClients = clients.filter((client) => {
     if (filterByStatus && !filterByStatus.includes(client.status)) return false
     if (filterByType && !filterByType.includes(client.type)) return false
     if (!searchQuery) return true
@@ -105,32 +102,35 @@ export function ClientSelector({
       client.vatNumber?.toLowerCase().includes(query)
     )
   })
-  const handleSelect = useCallback((clientId: string) => {
-    if (multiple) {
-      const newSelection = selectedClients.includes(clientId)
-        ? selectedClients.filter(id => id !== clientId)
-        : [...selectedClients, clientId]
-      if (maxSelections && newSelection.length > maxSelections) {
-        return
+  const handleSelect = useCallback(
+    (clientId: string) => {
+      if (multiple) {
+        const newSelection = selectedClients.includes(clientId)
+          ? selectedClients.filter((id) => id !== clientId)
+          : [...selectedClients, clientId]
+        if (maxSelections && newSelection.length > maxSelections) {
+          return
+        }
+        setSelectedClients(newSelection)
+        onChange?.(newSelection)
+      } else {
+        setSelectedClients([clientId])
+        onChange?.(clientId)
+        setOpen(false)
       }
-      setSelectedClients(newSelection)
-      onChange?.(newSelection)
-    } else {
-      setSelectedClients([clientId])
-      onChange?.(clientId)
-      setOpen(false)
-    }
-  }, [selectedClients, multiple, maxSelections, onChange])
+    },
+    [selectedClients, multiple, maxSelections, onChange]
+  )
   const getSelectedClientsDisplay = () => {
     if (selectedClients.length === 0) return placeholder
     if (multiple) {
       if (selectedClients.length === 1) {
-        const client = clients.find(c => c.id === selectedClients[0])
+        const client = clients.find((c) => c.id === selectedClients[0])
         return client?.name || 'Client sélectionné'
       }
       return `${selectedClients.length} clients sélectionnés`
     } else {
-      const client = clients.find(c => c.id === selectedClients[0])
+      const client = clients.find((c) => c.id === selectedClients[0])
       return client?.name || 'Client sélectionné'
     }
   }
@@ -153,7 +153,7 @@ export function ClientSelector({
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <Label htmlFor="client-selector">
+        <Label htmlFor={ids.clientSelector}>
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
@@ -161,7 +161,8 @@ export function ClientSelector({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            id="client-selector"
+            type="button"
+            id={ids.clientSelector}
             variant="outline"
             role="combobox"
             aria-expanded={open}
@@ -193,6 +194,7 @@ export function ClientSelector({
                 Aucun client trouvé.
                 {showCreateButton && onClientCreate && (
                   <Button
+                    type="button"
                     variant="link"
                     size="sm"
                     onClick={() => {
@@ -215,7 +217,7 @@ export function ClientSelector({
                 <>
                   <CommandGroup heading="Entreprises">
                     {filteredClients
-                      .filter(client => client.type === 'company')
+                      .filter((client) => client.type === 'company')
                       .map((client) => (
                         <CommandItem
                           key={client.id}
@@ -238,15 +240,15 @@ export function ClientSelector({
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              {showBalance && client.outstandingBalance !== undefined && client.outstandingBalance > 0 && (
-                                <Badge variant="destructive" className="text-xs">
-                                  {formatCurrency(client.outstandingBalance)}
-                                </Badge>
-                              )}
+                              {showBalance &&
+                                client.outstandingBalance !== undefined &&
+                                client.outstandingBalance > 0 && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    {formatCurrency(client.outstandingBalance)}
+                                  </Badge>
+                                )}
                               {showStatus && getStatusBadge(client.status)}
-                              {selectedClients.includes(client.id) && (
-                                <Check className="h-4 w-4" />
-                              )}
+                              {selectedClients.includes(client.id) && <Check className="h-4 w-4" />}
                             </div>
                           </div>
                         </CommandItem>
@@ -255,7 +257,7 @@ export function ClientSelector({
                   <CommandSeparator />
                   <CommandGroup heading="Particuliers">
                     {filteredClients
-                      .filter(client => client.type === 'individual')
+                      .filter((client) => client.type === 'individual')
                       .map((client) => (
                         <CommandItem
                           key={client.id}
@@ -273,15 +275,15 @@ export function ClientSelector({
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              {showBalance && client.outstandingBalance !== undefined && client.outstandingBalance > 0 && (
-                                <Badge variant="destructive" className="text-xs">
-                                  {formatCurrency(client.outstandingBalance)}
-                                </Badge>
-                              )}
+                              {showBalance &&
+                                client.outstandingBalance !== undefined &&
+                                client.outstandingBalance > 0 && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    {formatCurrency(client.outstandingBalance)}
+                                  </Badge>
+                                )}
                               {showStatus && getStatusBadge(client.status)}
-                              {selectedClients.includes(client.id) && (
-                                <Check className="h-4 w-4" />
-                              )}
+                              {selectedClients.includes(client.id) && <Check className="h-4 w-4" />}
                             </div>
                           </div>
                         </CommandItem>
@@ -293,6 +295,7 @@ export function ClientSelector({
             {showCreateButton && onClientCreate && (
               <div className="border-t p-2">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="w-full"
@@ -309,9 +312,7 @@ export function ClientSelector({
           </Command>
         </PopoverContent>
       </Popover>
-      {helperText && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

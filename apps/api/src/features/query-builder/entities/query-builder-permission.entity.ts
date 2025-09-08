@@ -1,7 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { User } from '../../../domains/users/entities/user.entity'
-import { QueryBuilder } from './query-builder.entity'
+// Removed import to avoid circular dependencies
+// import { QueryBuilder } from './query-builder.entity'
 
 export type PermissionType = 'view' | 'edit' | 'delete' | 'execute' | 'share' | 'export'
 
@@ -13,15 +14,12 @@ export class QueryBuilderPermission {
   @Column()
   queryBuilderId: string
 
-  @ManyToOne(
-    () => QueryBuilder,
-    (queryBuilder) => queryBuilder.permissions,
-    {
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('QueryBuilder', 'permissions', {
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'queryBuilderId' })
-  queryBuilder: QueryBuilder
+  queryBuilder: any
 
   @Column()
   permissionType: PermissionType

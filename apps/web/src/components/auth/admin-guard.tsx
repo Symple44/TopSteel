@@ -3,13 +3,13 @@
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
-import { type Role, usePermissions } from '@/hooks/use-permissions'
+import { type Permission, type Role, usePermissions } from '@/hooks/use-permissions'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 interface AdminGuardProps {
   children: ReactNode
   requiredRoles?: Role[]
-  requiredPermissions?: string[]
+  requiredPermissions?: Permission[]
   fallbackPath?: string
   showUnauthorized?: boolean
 }
@@ -39,18 +39,18 @@ export function AdminGuard({
 
     // Vérifier les rôles requis
     if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles)) {
-      router.push(fallbackPath)
+      router?.push(fallbackPath)
       return
     }
 
     // Vérifier les permissions requises
     if (requiredPermissions.length > 0) {
-      const hasRequiredPermissions = requiredPermissions.every((permission) =>
-        hasPermission(permission as string)
+      const hasRequiredPermissions = requiredPermissions?.every((permission) =>
+        hasPermission(permission)
       )
 
       if (!hasRequiredPermissions) {
-        router.push(fallbackPath)
+        router?.push(fallbackPath)
         return
       }
     }
@@ -91,7 +91,7 @@ export function AdminGuard({
           </h1>
           <p className="text-muted-foreground">{t('insufficientRoles')}</p>
           <p className="text-sm text-muted-foreground mt-2">
-            {t('requiredRoles')} {requiredRoles.join(', ')}
+            {t('requiredRoles')} {requiredRoles?.join(', ')}
           </p>
         </div>
       </div>
@@ -100,8 +100,8 @@ export function AdminGuard({
 
   // Vérification des permissions
   if (requiredPermissions.length > 0) {
-    const hasRequiredPermissions = requiredPermissions.every((permission) =>
-      hasPermission(permission as string)
+    const hasRequiredPermissions = requiredPermissions?.every((permission) =>
+      hasPermission(permission)
     )
 
     if (!hasRequiredPermissions) {
@@ -113,7 +113,7 @@ export function AdminGuard({
             </h1>
             <p className="text-muted-foreground">{t('insufficientPermissionsText')}</p>
             <p className="text-sm text-muted-foreground mt-2">
-              {t('requiredPermissions')} {requiredPermissions.join(', ')}
+              {t('requiredPermissions')} {requiredPermissions?.join(', ')}
             </p>
           </div>
         </div>

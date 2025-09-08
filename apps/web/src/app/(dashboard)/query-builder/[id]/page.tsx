@@ -16,8 +16,8 @@ export default function QueryBuilderDetailPage() {
   const fetchQueryBuilder = useCallback(async (id: string) => {
     try {
       const response = await callClientApi(`query-builder/${id}`)
-      if (response.ok) {
-        const data = await response.json()
+      if (response?.ok) {
+        const data = await response?.json()
         setQueryBuilder(data)
       }
     } catch (_error) {
@@ -27,12 +27,12 @@ export default function QueryBuilderDetailPage() {
   }, [])
 
   useEffect(() => {
-    if (params.id && params.id !== 'new') {
-      fetchQueryBuilder(params.id as string)
+    if (params?.id && params?.id !== 'new') {
+      fetchQueryBuilder(params?.id as string)
     } else {
       setLoading(false)
     }
-  }, [params.id, fetchQueryBuilder])
+  }, [params?.id, fetchQueryBuilder])
 
   if (loading) {
     return (
@@ -42,5 +42,5 @@ export default function QueryBuilderDetailPage() {
     )
   }
 
-  return <QueryBuilderInterface queryBuilderId={params.id as string} initialData={queryBuilder} />
+  return <QueryBuilderInterface queryBuilderId={params?.id as string} initialData={queryBuilder} />
 }

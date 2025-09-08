@@ -1,7 +1,14 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 import { CommonEntity } from '../../../../core/database/entities/base/multi-tenant.entity'
 import { Societe } from '../../../../features/societes/entities/societe.entity'
-import { RolePermission } from './role-permission.entity'
+
+// Type definition to avoid circular dependency
+type RolePermission = {
+  id: string
+  roleId: string
+  permissionId: string
+  // Other RolePermission properties would be here
+}
 
 export enum AccessLevel {
   BLOCKED = 'BLOCKED',
@@ -47,10 +54,7 @@ export class Permission extends CommonEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata?: Record<string, unknown>
 
-  @OneToMany(
-    () => RolePermission,
-    (rp) => rp.permission
-  )
+  @OneToMany('RolePermission', (rp: RolePermission) => rp.permissionId)
   rolePermissions!: RolePermission[]
 
   @Column({ type: 'varchar', length: 50, default: 'application' })

@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { TrackingStatus } from '../shipping/marketplace-shipping.service'
+import { TrackingStatus } from '../types/shipping.types'
 import { MarketplaceOrder } from './marketplace-order.entity'
 
 @Entity('marketplace_shipments')

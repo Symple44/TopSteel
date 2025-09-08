@@ -40,13 +40,13 @@ export default function MarketplacePage() {
     const fetchQuickStats = async () => {
       try {
         const response = await callClientApi('admin/marketplace/stats')
-        if (response.ok) {
-          const data = await response.json()
+        if (response?.ok) {
+          const data = await response?.json()
           setQuickStats({
-            totalModules: data.overview?.totalModules || 0,
-            publishedModules: data.overview?.publishedModules || 0,
-            totalDownloads: data.overview?.totalDownloads || 0,
-            averageRating: data.overview?.averageRating || 0,
+            totalModules: data.overview?.totalModules ?? 0,
+            publishedModules: data.overview?.publishedModules ?? 0,
+            totalDownloads: data.overview?.totalDownloads ?? 0,
+            averageRating: data.overview?.averageRating ?? 0,
           })
         }
       } catch (_error) {
@@ -67,7 +67,7 @@ export default function MarketplacePage() {
           <p className="text-muted-foreground">{t('marketplace.description')}</p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
+          <Button type="button" variant="outline">
             <Settings className="mr-2 h-4 w-4" />
             {t('marketplace.settings')}
           </Button>
@@ -88,9 +88,9 @@ export default function MarketplacePage() {
               <Loader2 className="h-6 w-6 animate-spin" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{quickStats?.totalModules || 0}</div>
+                <div className="text-2xl font-bold">{quickStats?.totalModules ?? 0}</div>
                 <p className="text-xs text-muted-foreground">
-                  {quickStats?.publishedModules || 0} {tMp('marketplace.published')}
+                  {quickStats?.publishedModules ?? 0} {tMp('marketplace.published')}
                 </p>
               </>
             )}
@@ -129,7 +129,7 @@ export default function MarketplacePage() {
             ) : (
               <>
                 <div className="text-2xl font-bold">
-                  {quickStats?.averageRating ? quickStats.averageRating.toFixed(1) : '0'}/5
+                  {quickStats?.averageRating ? quickStats.averageRating?.toFixed(1) : '0'}/5
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {tMp('marketplace.userSatisfaction')}

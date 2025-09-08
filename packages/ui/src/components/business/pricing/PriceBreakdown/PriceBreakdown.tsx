@@ -302,14 +302,14 @@ export function PriceBreakdown({
           <div className="flex items-center gap-2">
             {onCopy && (
               <SimpleTooltip content="Copier">
-                <Button variant="outline" size="sm" onClick={onCopy}>
+                <Button type="button" variant="outline" size="sm" onClick={onCopy}>
                   <Copy className="w-4 h-4" />
                 </Button>
               </SimpleTooltip>
             )}
             {onExport && (
               <SimpleTooltip content="Exporter">
-                <Button variant="outline" size="sm" onClick={onExport}>
+                <Button type="button" variant="outline" size="sm" onClick={onExport}>
                   <Download className="w-4 h-4" />
                 </Button>
               </SimpleTooltip>

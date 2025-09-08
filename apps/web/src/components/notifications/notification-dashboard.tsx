@@ -1,6 +1,5 @@
 'use client'
 
-import type { Notification } from '@erp/domains/notifications'
 import {
   Badge,
   Button,
@@ -34,8 +33,9 @@ import {
 import { useMemo, useState } from 'react'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
+import type { ClientNotification as Notification } from '@/types/notifications'
 
-const categoryIcons = {
+const categoryIcons: Record<string, React.ComponentType> = {
   system: Database,
   stock: Package,
   projet: FileText,
@@ -86,7 +86,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
   const formatTimeAgo = (date: Date) => {
     const now = new Date()
-    const diff = now.getTime() - new Date(date).getTime()
+    const diff = now?.getTime() - new Date(date).getTime()
     const minutes = Math.floor(diff / 60000)
     const hours = Math.floor(minutes / 60)
     const days = Math.floor(hours / 24)
@@ -99,11 +99,11 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
   // Grouper les notifications par catégorie
   const notificationsByCategory = useMemo(() => {
-    const grouped = state.notifications.reduce(
+    const grouped = state?.notifications?.reduce(
       (acc, notification) => {
         const category = notification.metadata?.category || 'system'
         if (!acc[category]) acc[category] = []
-        acc[category].push(notification)
+        acc?.[category]?.push(notification)
         return acc
       },
       {} as Record<string, Notification[]>
@@ -118,22 +118,22 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
     // Filtre par catégorie
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter((n) => (n.metadata?.category || 'system') === selectedCategory)
+      filtered = filtered?.filter((n) => (n.metadata?.category || 'system') === selectedCategory)
     }
 
     // Filtre par priorité
     if (selectedPriority !== 'all') {
-      filtered = filtered.filter(
+      filtered = filtered?.filter(
         (n) => (n.priority?.toLowerCase() || 'normal') === selectedPriority
       )
     }
 
     // Filtre par recherche
     if (searchTerm) {
-      filtered = filtered.filter(
+      filtered = filtered?.filter(
         (n) =>
-          n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          n.message.toLowerCase().includes(searchTerm.toLowerCase())
+          n?.title?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+          n?.message?.toLowerCase().includes(searchTerm?.toLowerCase())
       )
     }
 
@@ -186,7 +186,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                     <span className="text-sm font-medium">Toutes</span>
                   </div>
                   <Badge variant="secondary" className="text-xs">
-                    {state.notifications.length}
+                    {state?.notifications?.length}
                   </Badge>
                 </button>
 
@@ -195,9 +195,9 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                 {/* Catégories */}
                 {Object.entries(categoryLabels).map(([key, label]) => {
                   const Icon = categoryIcons[key as keyof typeof categoryIcons]
-                  const count = notificationsByCategory[key]?.length || 0
+                  const count = notificationsByCategory[key]?.length ?? 0
                   const unreadCount =
-                    notificationsByCategory[key]?.filter((n) => !n.isRead).length || 0
+                    notificationsByCategory[key]?.filter((n) => !n.readAt).length ?? 0
 
                   return (
                     <button
@@ -245,23 +245,33 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                       : categoryLabels[selectedCategory as keyof typeof categoryLabels]}
                   </h3>
                   <Badge variant="outline">
-                    {filteredNotifications.length} notification
-                    {filteredNotifications.length !== 1 ? 's' : ''}
+                    {filteredNotifications?.length} notification
+                    {filteredNotifications?.length !== 1 ? 's' : ''}
                   </Badge>
                 </div>
 
                 <div className="flex items-center gap-2">
                   {state.unreadCount > 0 && (
-                    <Button variant="ghost" size="sm" onClick={() => actions.markAllAsRead()}>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => actions?.markAllAsRead()}
+                    >
                       <CheckCheck className="h-4 w-4 mr-2" />
                       Marquer tout comme lu
                     </Button>
                   )}
-                  <Button variant="ghost" size="sm" onClick={() => setShowSettings(true)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowSettings(true)}
+                  >
                     <Settings className="h-4 w-4 mr-2" />
                     Paramètres
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={onClose}>
+                  <Button type="button" variant="ghost" size="sm" onClick={onClose}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -275,7 +285,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                     placeholder="Rechercher dans les notifications..."
                     value={searchTerm}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSearchTerm(e.target.value)
+                      setSearchTerm(e?.target?.value)
                     }
                     className="pl-9"
                   />
@@ -283,7 +293,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
                 <select
                   value={selectedPriority}
-                  onChange={(e) => setSelectedPriority(e.target.value)}
+                  onChange={(e) => setSelectedPriority(e?.target?.value)}
                   className="px-3 py-2 border rounded-md text-sm"
                 >
                   <option value="all">Toutes priorités</option>
@@ -297,22 +307,22 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
             {/* Liste des notifications */}
             <ScrollArea className="flex-1">
-              {filteredNotifications.length === 0 ? (
+              {filteredNotifications?.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
                   <Bell className="h-8 w-8 mx-auto mb-4 text-gray-300" />
                   <p>Aucune notification trouvée</p>
                 </div>
               ) : (
                 <div className="p-4 space-y-2">
-                  {filteredNotifications.map((notification) => (
+                  {filteredNotifications?.map((notification) => (
                     <button
                       key={notification.id}
                       type="button"
                       className={cn(
                         'group p-4 rounded-lg border hover:shadow-sm transition-all cursor-pointer w-full text-left',
-                        !notification.isRead && 'bg-blue-50 border-blue-200'
+                        !notification.readAt && 'bg-blue-50 border-blue-200'
                       )}
-                      onClick={() => actions.markAsRead(notification.id)}
+                      onClick={() => actions?.markAsRead(notification.id)}
                     >
                       <div className="flex gap-4">
                         <div className="flex-shrink-0 mt-1">
@@ -333,11 +343,12 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                                 {formatTimeAgo(new Date(notification.createdAt || Date.now()))}
                               </span>
                               <Button
+                                type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={(e: React.MouseEvent) => {
-                                  e.stopPropagation()
-                                  actions.deleteNotification(notification.id)
+                                  e?.stopPropagation()
+                                  actions?.deleteNotification(notification.id)
                                 }}
                                 className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity"
                               >
@@ -353,18 +364,19 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                               ] || 'Système'}
                             </Badge>
 
-                            {notification.priority && notification.priority !== 'NORMAL' && (
-                              <Badge
-                                className={cn(
-                                  'text-xs',
-                                  priorityColors[
-                                    notification.priority.toLowerCase() as keyof typeof priorityColors
-                                  ]
-                                )}
-                              >
-                                {notification.priority.toLowerCase()}
-                              </Badge>
-                            )}
+                            {notification.priority &&
+                              String(notification.priority) !== 'NORMAL' && (
+                                <Badge
+                                  className={cn(
+                                    'text-xs',
+                                    priorityColors[
+                                      notification?.priority?.toLowerCase() as keyof typeof priorityColors
+                                    ]
+                                  )}
+                                >
+                                  {notification?.priority?.toLowerCase()}
+                                </Badge>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -378,15 +390,21 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
             <div className="p-4 border-t bg-gray-50">
               <div className="flex justify-between items-center">
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => actions.deleteAll()}
+                  onClick={() => actions?.deleteAll()}
                   className="text-red-600 hover:text-red-700"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Effacer tout
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => actions.refreshNotifications()}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => actions?.refreshNotifications()}
+                >
                   Actualiser
                 </Button>
               </div>

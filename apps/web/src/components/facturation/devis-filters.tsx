@@ -11,14 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
-
 import { Filter, Search, X } from 'lucide-react'
 
 interface DevisFiltersProps {
   onFiltersChange?: (filters: unknown) => void
 }
 
-export function DevisFilters({ _onFiltersChange }: DevisFiltersProps) {
+export function DevisFilters({ onFiltersChange: _onFiltersChange }: DevisFiltersProps) {
   return (
     <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex-1">
@@ -53,12 +52,12 @@ export function DevisFilters({ _onFiltersChange }: DevisFiltersProps) {
         </SelectContent>
       </Select>
 
-      <Button variant="outline" size="sm">
+      <Button type="button" variant="outline" size="sm">
         <Filter className="h-4 w-4 mr-2" />
         Filtres
       </Button>
 
-      <Button variant="outline" size="sm">
+      <Button type="button" variant="outline" size="sm">
         <X className="h-4 w-4 mr-2" />
         Effacer
       </Button>

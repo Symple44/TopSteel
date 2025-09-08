@@ -9,8 +9,8 @@ export class OptimizedCacheService {
   constructor() {
     this.redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
-      port: Number.parseInt(process.env.REDIS_PORT || '6379'),
-      db: Number.parseInt(process.env.REDIS_DB || '0'),
+      port: Number.parseInt(process.env.REDIS_PORT || '6379', 10),
+      db: Number.parseInt(process.env.REDIS_DB || '0', 10),
       lazyConnect: false, // Connexion immédiate
       connectTimeout: 10000,
       commandTimeout: 5000,
@@ -67,14 +67,16 @@ export class OptimizedCacheService {
 
       do {
         const result = await this.redis.scan(cursor, 'MATCH', pattern, 'COUNT', 100)
-        cursor = parseInt(result[0])
+        cursor = parseInt(result[0], 10)
         keys.push(...result[1])
       } while (cursor !== 0)
 
       if (keys.length > 0) {
         // Use pipeline for bulk operations
         const pipeline = this.redis.pipeline()
-        keys.forEach((key) => pipeline.del(key))
+        keys.forEach((key) => {
+          pipeline.del(key)
+        })
         await pipeline.exec()
         this.logger.debug(`Invalidated ${keys.length} keys matching pattern: ${pattern}`)
       }
@@ -138,7 +140,9 @@ export class OptimizedCacheService {
       if (!keys || keys.size === 0) return
 
       const pipeline = this.redis.pipeline()
-      keys.forEach((key) => pipeline.del(key))
+      keys.forEach((key) => {
+        pipeline.del(key)
+      })
       await pipeline.exec()
 
       // Clean up the group

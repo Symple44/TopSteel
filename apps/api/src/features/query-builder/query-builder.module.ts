@@ -10,6 +10,10 @@ import {
   QueryBuilderJoin,
   QueryBuilderPermission,
 } from './entities'
+import { QueryBuilderSecurityGuard } from './security/query-builder-security.guard'
+// Security services
+import { QueryBuilderSecurityService } from './security/query-builder-security.service'
+import { SqlSanitizationService } from './security/sql-sanitization.service'
 import { QueryBuilderService } from './services/query-builder.service'
 import { QueryBuilderExecutorService } from './services/query-builder-executor.service'
 import { QueryBuilderPermissionService } from './services/query-builder-permission.service'
@@ -35,7 +39,16 @@ import { SchemaIntrospectionService } from './services/schema-introspection.serv
     QueryBuilderExecutorService,
     QueryBuilderPermissionService,
     SchemaIntrospectionService,
+    // Security services
+    QueryBuilderSecurityService,
+    SqlSanitizationService,
+    QueryBuilderSecurityGuard,
   ],
-  exports: [QueryBuilderService, QueryBuilderExecutorService],
+  exports: [
+    QueryBuilderService,
+    QueryBuilderExecutorService,
+    QueryBuilderSecurityService,
+    SqlSanitizationService,
+  ],
 })
 export class QueryBuilderModule {}

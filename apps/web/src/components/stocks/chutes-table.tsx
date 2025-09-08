@@ -1,5 +1,4 @@
 import { Button, Input } from '@erp/ui'
-
 import { Edit, Eye, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -38,8 +37,8 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
   const [searchTerm, setSearchTerm] = useState('')
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value)
-    onSearch(e.target.value)
+    setSearchTerm(e?.target?.value)
+    onSearch(e?.target?.value)
   }
 
   const getQualityBadge = (qualite: string) => {
@@ -113,18 +112,18 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {chutes.map((chute) => (
+            {chutes?.map((chute) => (
               <tr key={chute.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <div className="font-medium text-gray-900">{chute.reference}</div>
                   <div className="text-sm text-gray-500">
-                    {chute.dateCreation.toLocaleDateString()}
+                    {chute?.dateCreation?.toLocaleDateString()}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">{chute.materiau}</td>
                 <td className="px-4 py-3 text-sm text-gray-900">
-                  {chute.dimensions.longueur} × {chute.dimensions.largeur} ×{' '}
-                  {chute.dimensions.epaisseur} mm
+                  {chute?.dimensions?.longueur} × {chute?.dimensions?.largeur} ×{' '}
+                  {chute?.dimensions?.epaisseur} mm
                 </td>
                 <td className="px-4 py-3">{getQualityBadge(chute.qualite)}</td>
                 <td className="px-4 py-3">{getStatusBadge(chute.statut)}</td>
@@ -133,13 +132,26 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => onView(chute)} className="p-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onView(chute)}
+                      className="p-1"
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => onEdit(chute)} className="p-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(chute)}
+                      className="p-1"
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => onDelete(chute)}

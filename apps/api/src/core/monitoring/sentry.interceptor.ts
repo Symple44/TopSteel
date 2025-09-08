@@ -1,29 +1,34 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
-import { Observable } from 'rxjs'
-import { tap, catchError } from 'rxjs/operators'
-import * as Sentry from '@sentry/node'
-import { SentryService } from './sentry.service'
+import {
+  type CallHandler,
+  type ExecutionContext,
+  Injectable,
+  type NestInterceptor,
+} from '@nestjs/common'
+import type { Transaction } from '@sentry/types'
+import type { Observable } from 'rxjs'
+import { catchError, tap } from 'rxjs/operators'
+import type { SentryService } from './sentry.service'
 
 @Injectable()
 export class SentryInterceptor implements NestInterceptor {
   constructor(private readonly sentryService: SentryService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest()
     const response = context.switchToHttp().getResponse()
-    
+
     // Start a transaction for this request
     const transaction = this.sentryService.startTransaction(
       `${request.method} ${request.route?.path || request.url}`,
       'http.server'
-    )
-    
+    ) as Transaction | null
+
     // Add request metadata
-    if (transaction) {
+    if (transaction && 'setHttpStatus' in transaction) {
       transaction.setHttpStatus(response.statusCode)
       transaction.setTag('http.method', request.method)
       transaction.setTag('http.url', request.url)
-      
+
       // Add user context if available
       if (request.user) {
         this.sentryService.setUser({
@@ -32,7 +37,7 @@ export class SentryInterceptor implements NestInterceptor {
         })
       }
     }
-    
+
     // Add breadcrumb for this request
     this.sentryService.addBreadcrumb({
       message: `${request.method} ${request.url}`,
@@ -45,18 +50,18 @@ export class SentryInterceptor implements NestInterceptor {
         userAgent: request.headers['user-agent'],
       },
     })
-    
+
     const startTime = Date.now()
-    
+
     return next.handle().pipe(
       tap(() => {
         const responseTime = Date.now() - startTime
-        
+
         // Add response metadata
-        if (transaction) {
+        if (transaction && 'setHttpStatus' in transaction) {
           transaction.setHttpStatus(response.statusCode)
           transaction.setData('response_time', responseTime)
-          
+
           // Add performance breadcrumb for slow requests
           if (responseTime > 1000) {
             this.sentryService.addBreadcrumb({
@@ -70,7 +75,7 @@ export class SentryInterceptor implements NestInterceptor {
               },
             })
           }
-          
+
           // Finish the transaction
           this.sentryService.finishTransaction(transaction)
         }
@@ -78,12 +83,12 @@ export class SentryInterceptor implements NestInterceptor {
       catchError((error) => {
         // The error will be caught by the exception filter
         // Just finish the transaction here
-        if (transaction) {
+        if (transaction && 'setHttpStatus' in transaction) {
           transaction.setHttpStatus(error.status || 500)
           this.sentryService.finishTransaction(transaction)
         }
         throw error
-      }),
+      })
     )
   }
 }

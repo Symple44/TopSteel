@@ -1,23 +1,8 @@
 'use client'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { 
-  Button, 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  Input,
-  Textarea,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Checkbox
-} from '../../../primitives'
 import {
   Form,
   FormControl,
@@ -25,24 +10,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../../../forms'
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Validation schema for project timeline
 const timelineFormSchema = z.object({
   projectId: z.string().min(1, 'Le projet est requis'),
-  milestones: z.array(z.object({
-    id: z.string().optional(),
-    name: z.string().min(1, 'Le nom du jalon est requis'),
-    description: z.string().optional(),
-    startDate: z.string().min(1, 'La date de début est requise'),
-    endDate: z.string().min(1, 'La date de fin est requise'),
-    status: z.enum(['not_started', 'in_progress', 'completed', 'delayed']),
-    priority: z.enum(['low', 'medium', 'high', 'critical']),
-    dependencies: z.array(z.string()).optional(),
-    assignedTo: z.array(z.string()).optional(),
-    estimatedHours: z.number().min(0).optional(),
-    actualHours: z.number().min(0).optional(),
-    completionPercentage: z.number().min(0).max(100).optional(),
-  })).min(1, 'Au moins un jalon est requis'),
+  milestones: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        name: z.string().min(1, 'Le nom du jalon est requis'),
+        description: z.string().optional(),
+        startDate: z.string().min(1, 'La date de début est requise'),
+        endDate: z.string().min(1, 'La date de fin est requise'),
+        status: z.enum(['not_started', 'in_progress', 'completed', 'delayed']),
+        priority: z.enum(['low', 'medium', 'high', 'critical']),
+        dependencies: z.array(z.string()).optional(),
+        assignedTo: z.array(z.string()).optional(),
+        estimatedHours: z.number().min(0).optional(),
+        actualHours: z.number().min(0).optional(),
+        completionPercentage: z.number().min(0).max(100).optional(),
+      })
+    )
+    .min(1, 'Au moins un jalon est requis'),
   autoSchedule: z.boolean().default(false),
   baselineDate: z.string().optional(),
   criticalPath: z.boolean().default(false),
@@ -69,38 +71,43 @@ export function ProjectTimelineDialog({
 }: ProjectTimelineDialogProps) {
   const [loading, setLoading] = useState(false)
   const [selectedMilestone, setSelectedMilestone] = useState<number>(0)
-  const form = useForm<TimelineFormData>({
+  const form = useForm({
     resolver: zodResolver(timelineFormSchema),
     defaultValues: {
       projectId: projectId || initialData?.projectId || '',
-      milestones: initialData?.milestones || [{
-        name: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        status: 'not_started',
-        priority: 'medium',
-        dependencies: [],
-        assignedTo: [],
-        estimatedHours: 0,
-        actualHours: 0,
-        completionPercentage: 0,
-      }],
+      milestones: initialData?.milestones || [
+        {
+          name: '',
+          description: '',
+          startDate: '',
+          endDate: '',
+          status: 'not_started',
+          priority: 'medium',
+          dependencies: [],
+          assignedTo: [],
+          estimatedHours: 0,
+          actualHours: 0,
+          completionPercentage: 0,
+        },
+      ],
       autoSchedule: initialData?.autoSchedule || false,
       baselineDate: initialData?.baselineDate || '',
       criticalPath: initialData?.criticalPath || false,
       resourceAllocation: initialData?.resourceAllocation || false,
     },
   })
-  const { fields: milestones, append: addMilestone, remove: removeMilestone } = 
-    form.useFieldArray({ name: 'milestones' })
+  const {
+    fields: milestones,
+    append: addMilestone,
+    remove: removeMilestone,
+  } = useFieldArray({ control: form.control, name: 'milestones' })
   const handleSubmit = async (data: TimelineFormData) => {
     setLoading(true)
     try {
       // Calculate critical path and resource allocation if enabled
       if (data.criticalPath) {
         // Add critical path calculation logic
-        data.milestones = data.milestones.map(milestone => ({
+        data.milestones = data.milestones.map((milestone) => ({
           ...milestone,
           // Add critical path indicators
         }))
@@ -108,8 +115,7 @@ export function ProjectTimelineDialog({
       await onSubmit?.(data)
       onOpenChange(false)
       form.reset()
-    } catch (error) {
-      console.error('Error updating project timeline:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -197,10 +203,7 @@ export function ProjectTimelineDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Planification automatique</FormLabel>
                     </FormItem>
@@ -212,10 +215,7 @@ export function ProjectTimelineDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Afficher le chemin critique</FormLabel>
                     </FormItem>
@@ -227,10 +227,7 @@ export function ProjectTimelineDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Allocation des ressources</FormLabel>
                     </FormItem>
@@ -248,7 +245,7 @@ export function ProjectTimelineDialog({
               </div>
               {/* Milestone Tabs */}
               <div className="flex flex-wrap gap-2 border-b">
-                {milestones.map((_, index) => (
+                {milestones.map((_milestone: unknown, index: number) => (
                   <button
                     key={index}
                     type="button"
@@ -290,10 +287,7 @@ export function ProjectTimelineDialog({
                         <FormItem>
                           <FormLabel>Nom du jalon *</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="ex: Fabrication des poutres"
-                              {...field} 
-                            />
+                            <Input placeholder="ex: Fabrication des poutres" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -331,10 +325,7 @@ export function ProjectTimelineDialog({
                       <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Description détaillée du jalon..."
-                            {...field} 
-                          />
+                          <Textarea placeholder="Description détaillée du jalon..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -400,8 +391,8 @@ export function ProjectTimelineDialog({
                         <FormItem>
                           <FormLabel>Heures estimées</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="number" 
+                            <Input
+                              type="number"
                               min="0"
                               step="0.5"
                               {...field}
@@ -419,8 +410,8 @@ export function ProjectTimelineDialog({
                         <FormItem>
                           <FormLabel>Heures réelles</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="number" 
+                            <Input
+                              type="number"
                               min="0"
                               step="0.5"
                               {...field}
@@ -438,8 +429,8 @@ export function ProjectTimelineDialog({
                         <FormItem>
                           <FormLabel>Pourcentage accompli</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="number" 
+                            <Input
+                              type="number"
                               min="0"
                               max="100"
                               {...field}
@@ -457,24 +448,10 @@ export function ProjectTimelineDialog({
             {/* Action Buttons */}
             <div className="flex justify-between">
               <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    // Export timeline to different formats
-                    console.log('Exporting timeline...')
-                  }}
-                >
+                <Button type="button" variant="outline" onClick={() => {}}>
                   Exporter
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    // Print timeline
-                    console.log('Printing timeline...')
-                  }}
-                >
+                <Button type="button" variant="outline" onClick={() => {}}>
                   Imprimer
                 </Button>
               </div>

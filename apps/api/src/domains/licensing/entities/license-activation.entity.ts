@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { License } from './license.entity'
+// import { License } from './license.entity';
 
 /**
  * Activation status
@@ -118,7 +118,7 @@ export class LicenseActivation {
   }
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
@@ -127,13 +127,9 @@ export class LicenseActivation {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => License,
-    (license) => license.activations,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('License', 'activations', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'license_id' })
-  license!: License
+  license!: any
 
   // Utility methods
 
@@ -173,8 +169,8 @@ export class LicenseActivation {
   activate(): void {
     this.status = ActivationStatus.ACTIVE
     this.activatedAt = new Date()
-    this.deactivatedAt = null
-    this.deactivationReason = null
+    this.deactivatedAt = undefined
+    this.deactivationReason = undefined
   }
 
   /**
@@ -250,7 +246,7 @@ export class LicenseActivation {
   /**
    * Get activation summary
    */
-  getSummary(): Record<string, any> {
+  getSummary(): Record<string, unknown> {
     return {
       id: this.id,
       activationKey: this.activationKey,
@@ -279,7 +275,7 @@ export class LicenseActivation {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       ...this.getSummary(),
       hardwareInfo: this.hardwareInfo,

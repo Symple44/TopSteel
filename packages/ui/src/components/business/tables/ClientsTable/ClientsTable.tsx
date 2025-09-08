@@ -1,4 +1,5 @@
 'use client'
+import { Edit, Eye, Mail, MoreHorizontal, Phone, Trash2 } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -7,9 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { MoreHorizontal, Edit, Trash2, Eye, Phone, Mail } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
+import { Badge } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Client {
   id: string
   code: string
@@ -48,13 +48,13 @@ interface ClientsTableProps {
   onDelete?: (client: Client) => void
   onContact?: (client: Client, type: 'email' | 'phone') => void
 }
-export function ClientsTable({ 
-  data = [], 
-  loading = false, 
+export function ClientsTable({
+  data = [],
+  loading = false,
   onView,
-  onEdit, 
+  onEdit,
   onDelete,
-  onContact 
+  onContact,
 }: ClientsTableProps) {
   if (loading) {
     return (
@@ -151,11 +151,15 @@ export function ClientsTable({
                   </Badge>
                 </TableCell>
                 <TableCell>{getStatusBadge(client.status)}</TableCell>
+                <TableCell className="text-right">{formatCurrency(client.creditLimit)}</TableCell>
                 <TableCell className="text-right">
-                  {formatCurrency(client.creditLimit)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <span className={client.outstandingBalance && client.outstandingBalance > 0 ? 'text-red-600 font-medium' : ''}>
+                  <span
+                    className={
+                      client.outstandingBalance && client.outstandingBalance > 0
+                        ? 'text-red-600 font-medium'
+                        : ''
+                    }
+                  >
                     {formatCurrency(client.outstandingBalance)}
                   </span>
                 </TableCell>
@@ -172,7 +176,7 @@ export function ClientsTable({
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -188,10 +192,7 @@ export function ClientsTable({
                         Modifier
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        onClick={() => onDelete?.(client)}
-                        className="text-red-600"
-                      >
+                      <DropdownMenuItem onClick={() => onDelete?.(client)} className="text-red-600">
                         <Trash2 className="mr-2 h-4 w-4" />
                         Supprimer
                       </DropdownMenuItem>

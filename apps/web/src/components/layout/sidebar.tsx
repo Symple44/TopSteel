@@ -1,8 +1,7 @@
 // apps/web/src/components/layout/sidebar.tsx - VERSION AMÉLIORÉE
 'use client'
 
-import { Badge, Button, Separator } from '@erp/ui'
-import { SimpleTooltip as TooltipFixed } from '@erp/ui/primitives'
+import { Badge, Button, Separator, SimpleTooltip as TooltipFixed } from '@erp/ui'
 import {
   Activity,
   BarChart3,
@@ -286,7 +285,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
         return []
       }
 
-      const converted = items.map((item) => {
+      const converted = items?.map((item: unknown) => {
         // Appliquer les préférences utilisateur si disponibles
         const displayTitle =
           item.userPreferences?.customTitle ||
@@ -354,7 +353,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
-      prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]
+      prev?.includes(title) ? prev?.filter((item) => item !== title) : [...prev, title]
     )
   }
 
@@ -375,8 +374,8 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   }
 
   const renderNavItem = (item: NavItem, level = 0) => {
-    const hasChildren = item.children && item.children.length > 0
-    const isExpanded = expandedItems.includes(item.title)
+    const hasChildren = item.children && item?.children?.length > 0
+    const isExpanded = expandedItems?.includes(item.title)
     const itemIsActive = isActive(item.href)
     const _parentIsActive = isParentActive(item)
     const hasActiveChild =
@@ -384,14 +383,14 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
       item.children?.some((child) => {
         if (!child.href) return false
         // Un enfant est actif si l'URL courante correspond exactement ou est une sous-page
-        return pathname === child.href || pathname.startsWith(`${child.href}/`)
+        return pathname === child.href || pathname?.startsWith(`${child.href}/`)
       })
 
     const handleClick = () => {
       if (hasChildren) {
         toggleExpanded(item.title)
       } else if (item.href) {
-        router.push(item.href)
+        router?.push(item.href)
       }
     }
 
@@ -663,7 +662,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               >
                 <button
                   type="button"
-                  onClick={() => router.push('/settings/menu')}
+                  onClick={() => router?.push('/settings/menu')}
                   className="inline-flex items-center justify-center w-10 h-8 p-0 ml-0.5 bg-gradient-to-br from-accent/10 to-accent/20 hover:from-accent/20 hover:to-accent/30 border border-accent/20 hover:border-accent/30 transition-all duration-300 flex-shrink-0 rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Settings2 className="h-3 w-3" />
@@ -676,7 +675,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 p-1.5 space-y-0.5 overflow-y-auto">
-        {navigation.length === 0 && mode === 'custom' && !loading ? (
+        {navigation?.length === 0 && mode === 'custom' && !loading ? (
           // Message quand le menu personnalisé est vierge
           <div className="p-4 text-center">
             <div className="text-muted-foreground text-sm">
@@ -684,9 +683,10 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               <p className="font-medium mb-1">{t('emptyCustomMenu')}</p>
               <p className="text-xs opacity-75 mb-3">{t('customizeMenuDescription')}</p>
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => router.push('/settings/menu')}
+                onClick={() => router?.push('/settings/menu')}
                 className="text-xs"
               >
                 <Settings2 className="h-3 w-3 mr-1" />
@@ -695,9 +695,9 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
             </div>
           </div>
         ) : (
-          navigation.map((item, index) => (
+          navigation?.map((item, index) => (
             <React.Fragment
-              key={`${item.href || item.title || 'unnamed'}-nav-${index}-${navigation.length}-refresh-${refreshKey}`}
+              key={`${item.href || item.title || 'unnamed'}-nav-${index}-${navigation?.length}-refresh-${refreshKey}`}
             >
               {renderNavItem(item)}
             </React.Fragment>

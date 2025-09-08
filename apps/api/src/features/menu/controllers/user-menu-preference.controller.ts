@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { Request as ExpressRequest } from 'express'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
@@ -19,7 +20,9 @@ export class UserMenuPreferenceController {
   @Get()
   @ApiOperation({ summary: "Récupérer les préférences de menu de l'utilisateur" })
   @ApiResponse({ status: 200, description: 'Préférences récupérées avec succès' })
-  async getPreferences(@Request() req): Promise<{ success: boolean; data: UserMenuPreference[] }> {
+  async getPreferences(
+    @Request() req: ExpressRequest & { user: { id: string } }
+  ): Promise<{ success: boolean; data: UserMenuPreference[] }> {
     const userId = req.user.id
     const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
 
@@ -31,7 +34,9 @@ export class UserMenuPreferenceController {
 
   @Get('selected-pages')
   @ApiOperation({ summary: 'Récupérer les pages sélectionnées' })
-  async getSelectedPages(@Request() req): Promise<{ success: boolean; data: string[] }> {
+  async getSelectedPages(
+    @Request() req: ExpressRequest & { user: { id: string } }
+  ): Promise<{ success: boolean; data: string[] }> {
     const userId = req.user.id
     const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
 
@@ -44,7 +49,7 @@ export class UserMenuPreferenceController {
   @Put('menu-visibility')
   @ApiOperation({ summary: "Mettre à jour la visibilité d'un menu" })
   async updateMenuVisibility(
-    @Request() req,
+    @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { menuId: string; isVisible: boolean }
   ): Promise<{ success: boolean; data: UserMenuPreference }> {
     const userId = req.user.id
@@ -63,7 +68,7 @@ export class UserMenuPreferenceController {
   @Post('toggle-page')
   @ApiOperation({ summary: 'Activer/désactiver une page' })
   async togglePage(
-    @Request() req,
+    @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { pageId: string }
   ): Promise<{ success: boolean; data: UserMenuPreference }> {
     const userId = req.user.id
@@ -78,7 +83,7 @@ export class UserMenuPreferenceController {
   @Put('menu-order')
   @ApiOperation({ summary: "Changer l'ordre d'un menu" })
   async updateMenuOrder(
-    @Request() req,
+    @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { menuId: string; order: number }
   ): Promise<{ success: boolean; data: UserMenuPreference }> {
     const userId = req.user.id
@@ -97,7 +102,7 @@ export class UserMenuPreferenceController {
   @Put()
   @ApiOperation({ summary: 'Mettre à jour les préférences de menu' })
   async updatePreferences(
-    @Request() req,
+    @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { menuId: string; isVisible?: boolean; order?: number; customLabel?: string }
   ): Promise<{ success: boolean; data: UserMenuPreference }> {
     const userId = req.user.id
@@ -135,7 +140,9 @@ export class UserMenuPreferenceController {
 
   @Get('menu')
   @ApiOperation({ summary: 'Récupérer le menu personnalisé (legacy)' })
-  async getCustomMenuLegacy(@Request() req): Promise<{ success: boolean; data: MenuItemDto[] }> {
+  async getCustomMenuLegacy(
+    @Request() req: ExpressRequest & { user: { id: string } }
+  ): Promise<{ success: boolean; data: MenuItemDto[] }> {
     const userId = req.user.id
     const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
 
@@ -307,7 +314,9 @@ export class UserMenuPreferenceController {
 
     // Construire une map des préférences pour un accès rapide
     const preferenceMap = new Map()
-    preferences.forEach((p) => preferenceMap.set(p.menuId, p))
+    preferences.forEach((p) => {
+      preferenceMap.set(p.menuId, p)
+    })
 
     // Construire tous les items de menu (visibles et leurs parents nécessaires)
     const allMenuItems = new Map()
@@ -316,7 +325,11 @@ export class UserMenuPreferenceController {
     preferences
       .filter((p) => p.isVisible)
       .forEach((preference) => {
-        const defaultMenu = defaultMenuMapping[preference.menuId] || {
+        const menuMapping = defaultMenuMapping as Record<
+          string,
+          (typeof defaultMenuMapping)[keyof typeof defaultMenuMapping]
+        >
+        const defaultMenu = menuMapping[preference.menuId] || {
           title:
             preference.menuId.charAt(0).toUpperCase() +
             preference.menuId.slice(1).replace('-', ' '),
@@ -343,7 +356,7 @@ export class UserMenuPreferenceController {
 
         // Ajouter le parent si nécessaire
         if (defaultMenu.parentId && !allMenuItems.has(defaultMenu.parentId)) {
-          const parentMenu = defaultMenuMapping[defaultMenu.parentId]
+          const parentMenu = menuMapping[defaultMenu.parentId]
           if (parentMenu) {
             allMenuItems.set(defaultMenu.parentId, {
               id: defaultMenu.parentId,
@@ -376,7 +389,7 @@ export class UserMenuPreferenceController {
         const parent = allMenuItems.get(item.parentId)
         if (parent) {
           parent.children.push(item)
-          parent.children.sort((a, b) => a.orderIndex - b.orderIndex)
+          parent.children.sort((a: MenuItemDto, b: MenuItemDto) => a.orderIndex - b.orderIndex)
         }
       } else {
         // Item racine
@@ -395,7 +408,7 @@ export class UserMenuPreferenceController {
   @Post('reset')
   @ApiOperation({ summary: 'Réinitialiser les préférences' })
   async resetPreferences(
-    @Request() req
+    @Request() req: ExpressRequest & { user: { id: string } }
   ): Promise<{ success: boolean; data: UserMenuPreference[] }> {
     const userId = req.user.id
     const reset = await this.userMenuPreferenceService.resetPreferences(userId)
@@ -409,7 +422,7 @@ export class UserMenuPreferenceController {
   @Post('custom-menu')
   @ApiOperation({ summary: 'Sauvegarder le menu personnalisé complet' })
   async saveCustomMenu(
-    @Request() req,
+    @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { menuItems: MenuItemDto[] }
   ): Promise<{
     success: boolean
@@ -443,7 +456,7 @@ export class UserMenuPreferenceController {
   @Get('custom-menu')
   @ApiOperation({ summary: 'Récupérer le menu personnalisé complet' })
   async getCustomMenu(
-    @Request() req
+    @Request() req: ExpressRequest & { user: { id: string } }
   ): Promise<{ success: boolean; data: MenuItemDto[]; error?: string }> {
     const userId = req.user.id
     const cacheKey = `user:custom-menu:${userId}`
@@ -480,7 +493,7 @@ export class UserMenuPreferenceController {
   @Post('selected-pages')
   @ApiOperation({ summary: 'Sauvegarder les pages sélectionnées' })
   async saveSelectedPages(
-    @Request() req,
+    @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { selectedPages: string[] }
   ): Promise<{ success: boolean; data: string[] }> {
     const userId = req.user.id

@@ -1,11 +1,11 @@
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns'
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, Between } from 'typeorm'
-import * as Twilio from 'twilio'
-import { Vonage } from '@vonage/server-sdk'
 import { Auth } from '@vonage/auth'
-import { SNSClient, PublishCommand } from '@aws-sdk/client-sns'
+import { Vonage } from '@vonage/server-sdk'
+import * as Twilio from 'twilio'
+import { Between, type Repository } from 'typeorm'
 import { SMSLog } from '../entities/sms-log.entity'
 
 /**
@@ -58,10 +58,10 @@ export class SMSService {
   constructor(
     private readonly configService: ConfigService,
     @InjectRepository(SMSLog)
-    private readonly smsLogRepository: Repository<SMSLog>,
+    private readonly smsLogRepository: Repository<SMSLog>
   ) {
     this.config = {
-      provider: this.configService.get<string>('SMS_PROVIDER', 'mock') as any,
+      provider: this.configService.get<string>('SMS_PROVIDER', 'mock') as unknown,
       apiKey: this.configService.get<string>('SMS_API_KEY', ''),
       apiSecret: this.configService.get<string>('SMS_API_SECRET', ''),
       senderId: this.configService.get<string>('SMS_SENDER_ID', 'TopSteel'),
@@ -82,10 +82,7 @@ export class SMSService {
       switch (this.config.provider) {
         case 'twilio':
           if (this.config.twilioAccountSid && this.config.apiKey) {
-            this.twilioClient = Twilio.default(
-              this.config.twilioAccountSid,
-              this.config.apiKey
-            )
+            this.twilioClient = Twilio.default(this.config.twilioAccountSid, this.config.apiKey)
             this.logger.log('Twilio client initialized successfully')
           }
           break
@@ -165,7 +162,7 @@ export class SMSService {
   async sendSMS(request: SendSMSRequest): Promise<SendSMSResponse> {
     const startTime = Date.now()
     let response: SendSMSResponse
-    
+
     try {
       this.logger.log(
         `Sending SMS to ${this.maskPhoneNumber(request.phoneNumber)} via ${this.config.provider}`
@@ -198,7 +195,7 @@ export class SMSService {
 
       // Enregistrer le log
       await this.logSMS(request, response, Date.now() - startTime)
-      
+
       return response
     } catch (error) {
       this.logger.error('Error sending SMS:', error)
@@ -206,7 +203,7 @@ export class SMSService {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
       }
-      
+
       await this.logSMS(request, response, Date.now() - startTime)
       return response
     }
@@ -305,7 +302,7 @@ export class SMSService {
         messageId: message.sid,
         status: message.status,
         cost: message.price ? parseFloat(message.price) : undefined,
-        segmentCount: message.numSegments ? parseInt(message.numSegments) : 1,
+        segmentCount: message.numSegments ? parseInt(message.numSegments, 10) : 1,
       }
     } catch (error) {
       this.logger.error('Twilio SMS sending failed:', error)
@@ -336,10 +333,10 @@ export class SMSService {
       })
 
       const messageData = response.messages?.[0]
-      
+
       if (messageData?.status === '0') {
         this.logger.log(`Vonage SMS sent successfully: ${messageData.messageId}`)
-        
+
         return {
           success: true,
           messageId: messageData.messageId,
@@ -388,7 +385,7 @@ export class SMSService {
       })
 
       const response = await this.snsClient.send(command)
-      
+
       this.logger.log(`AWS SNS SMS sent successfully: ${response.MessageId}`)
 
       return {
@@ -468,19 +465,19 @@ export class SMSService {
 
       // Calculer les statistiques
       const totalSent = logs.length
-      const successCount = logs.filter(log => log.status === 'sent').length
+      const successCount = logs.filter((log) => log.status === 'sent').length
       const successRate = (successCount / totalSent) * 100
       const totalCost = logs.reduce((sum, log) => sum + (log.cost || 0), 0)
 
       // Grouper par fournisseur
       const byProvider: Record<string, number> = {}
-      logs.forEach(log => {
+      logs.forEach((log) => {
         byProvider[log.provider] = (byProvider[log.provider] || 0) + 1
       })
 
       // Grouper par type
       const byType: Record<string, number> = {}
-      logs.forEach(log => {
+      logs.forEach((log) => {
         byType[log.messageType] = (byType[log.messageType] || 0) + 1
       })
 

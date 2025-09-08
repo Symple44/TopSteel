@@ -1,6 +1,7 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm'
 import { BaseAuditEntity } from '../../../core/common/base/base.entity'
-import { NotificationRuleExecution } from './notification-rule-execution.entity'
+// Removed import to avoid circular dependencies
+// import { NotificationRuleExecution } from './notification-rule-execution.entity'
 
 export enum TriggerType {
   USER = 'user',
@@ -73,6 +74,11 @@ export interface NotificationConfig {
 }
 
 @Entity('notification_rules')
+@Index(['isActive', 'trigger']) // For active rules by trigger type
+@Index(['createdBy', 'isActive']) // For user-created active rules
+@Index(['modifiedBy', 'lastModified']) // For recent modifications
+@Index(['triggerCount']) // For most triggered rules
+@Index(['lastTriggered']) // For recently triggered rules
 export class NotificationRule extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
@@ -86,21 +92,27 @@ export class NotificationRule extends BaseAuditEntity {
   isActive!: boolean
 
   @Column({ type: 'jsonb' })
+  @Index() // GIN index for trigger queries
   trigger!: EventTrigger
 
   @Column({ type: 'jsonb', default: '[]' })
+  @Index() // GIN index for condition queries
   conditions!: RuleCondition[]
 
   @Column({ type: 'jsonb' })
+  @Index() // GIN index for notification config queries
   notification!: NotificationConfig
 
   @Column({ type: 'integer', default: 0 })
+  @Index() // Index for sorting by trigger frequency
   triggerCount!: number
 
   @Column({ type: 'timestamp', nullable: true })
+  @Index() // Index for recently triggered rules
   lastTriggered?: Date
 
   @Column({ type: 'timestamp', nullable: true })
+  @Index() // Index for recently modified rules
   lastModified?: Date
 
   @Column({ type: 'uuid', nullable: true })
@@ -111,11 +123,8 @@ export class NotificationRule extends BaseAuditEntity {
   @Index()
   modifiedBy?: string
 
-  @OneToMany(
-    () => NotificationRuleExecution,
-    (execution) => execution.rule
-  )
-  executions!: NotificationRuleExecution[]
+  @OneToMany('NotificationRuleExecution', 'rule')
+  executions!: unknown[]
 
   // Méthodes utilitaires
   incrementTriggerCount(): void {

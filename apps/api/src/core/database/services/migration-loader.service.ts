@@ -1,21 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
 import type { DataSource } from 'typeorm'
 import { CreateInitialTables1737178800000 } from '../migrations/1737178800000-CreateInitialTables'
-// Migration désactivée car elle crée des tables métiers non utilisées
-// import { CreateAllTables1737179000000 } from '../migrations/1737179000000-CreateAllTables'
 
 @Injectable()
 export class MigrationLoaderService {
   private readonly logger = new Logger(MigrationLoaderService.name)
-  private readonly isDevelopment: boolean
 
-  constructor(
-    private readonly dataSource: DataSource,
-    private readonly configService: ConfigService
-  ) {
-    this.isDevelopment = this.configService.get('NODE_ENV') === 'development'
-  }
+  constructor(private readonly dataSource: DataSource) {}
 
   /**
    * Force l'exécution des migrations avec les classes directement importées
@@ -61,7 +52,6 @@ export class MigrationLoaderService {
 
       // Exécuter les migrations directement
       const initialMigration = new CreateInitialTables1737178800000()
-      // Migration CreateAllTables désactivée
 
       await this.dataSource.transaction(async (manager) => {
         this.logger.log('🔄 Exécution de CreateInitialTables...')
@@ -79,8 +69,6 @@ export class MigrationLoaderService {
         `,
           [1737178800000, 'CreateInitialTables1737178800000']
         )
-
-        // Migration CreateAllTables désactivée car elle crée des tables métiers non utilisées
       })
 
       this.logger.log('✅ Toutes les migrations exécutées avec succès')
@@ -102,7 +90,7 @@ export class MigrationLoaderService {
         AND table_name IN ('users', 'system_parameters', 'roles', 'permissions')
       `)
 
-      return parseInt(result[0].count) >= 4
+      return parseInt(result[0].count, 10) >= 4
     } catch (error) {
       this.logger.error('Erreur lors de la vérification des tables:', error)
       return false

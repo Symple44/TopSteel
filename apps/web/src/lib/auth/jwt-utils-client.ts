@@ -47,9 +47,9 @@ export function extractTokenFromCookies(): string | null {
   }
 
   try {
-    const cookies = document.cookie.split(';')
+    const cookies = document?.cookie?.split(';') || []
     for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split('=')
+      const [name, value] = (cookie || '').trim().split('=')
       if (name === 'token' || name === 'access_token' || name === 'topsteel-access-token') {
         return value
       }
@@ -67,18 +67,18 @@ export function extractTokenFromRequest(request: NextRequest): string | null {
   try {
     // 1. Vérifier les cookies
     const tokenFromCookie =
-      request.cookies.get('token')?.value ||
-      request.cookies.get('access_token')?.value ||
-      request.cookies.get('topsteel-access-token')?.value
+      request.cookies?.get('token')?.value ||
+      request.cookies?.get('access_token')?.value ||
+      request.cookies?.get('topsteel-access-token')?.value
 
     if (tokenFromCookie) {
       return tokenFromCookie
     }
 
     // 2. Vérifier l'header Authorization
-    const authHeader = request.headers.get('authorization')
+    const authHeader = request?.headers?.get('authorization')
     if (authHeader?.startsWith('Bearer ')) {
-      return authHeader.substring(7)
+      return authHeader?.substring(7)
     }
 
     return null
@@ -92,27 +92,27 @@ export function extractTokenFromRequest(request: NextRequest): string | null {
  */
 export function decodeJWTPayload(token: string): JWTPayload | null {
   try {
-    const parts = token.split('.')
-    if (parts.length !== 3) {
+    const parts = token?.split('.')
+    if (parts?.length !== 3) {
       return null
     }
 
     // Décoder le payload
-    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    while (base64.length % 4) {
+    let base64 = parts?.[1]?.replace(/-/g, '+').replace(/_/g, '/')
+    while (base64?.length % 4) {
       base64 += '='
     }
 
     const payload = JSON.parse(atob(base64)) as JWTPayload
 
     // Vérification basique de structure
-    if (!payload.sub || !payload.exp || !payload.email) {
+    if (!payload?.sub || !payload?.exp || !payload?.email) {
       return null
     }
 
     // Vérifier l'expiration
     const now = Math.floor(Date.now() / 1000)
-    if (payload.exp <= now) {
+    if (payload?.exp <= now) {
       return null
     }
 
@@ -179,7 +179,7 @@ export function hasPermission(user: AuthenticatedUser, permission: string): bool
  * Vérifie si l'utilisateur est un administrateur
  */
 export function isAdmin(user: AuthenticatedUser): boolean {
-  return ADMIN_ROLES.includes(user.role as (typeof ADMIN_ROLES)[number])
+  return ADMIN_ROLES?.includes(user.role as (typeof ADMIN_ROLES)[number])
 }
 
 /**

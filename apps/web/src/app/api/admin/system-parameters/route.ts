@@ -483,26 +483,26 @@ const parameters = [...mockParameters]
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
+    const category = searchParams?.get('category')
 
     if (category) {
-      const filteredParams = parameters.filter((p) => p.category === category)
-      return NextResponse.json(filteredParams)
+      const filteredParams = parameters?.filter((p) => p.category === category)
+      return NextResponse?.json(filteredParams)
     }
 
-    return NextResponse.json(parameters)
+    return NextResponse?.json(parameters)
   } catch (_error) {
-    return NextResponse.json({ error: 'Failed to fetch system parameters' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to fetch system parameters' }, { status: 500 })
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
-    const updates: Array<{ key: string; value: string }> = await request.json()
+    const updates: Array<{ key: string; value: string }> = await request?.json()
 
     // Mettre à jour les paramètres
-    updates.forEach((update) => {
-      const paramIndex = parameters.findIndex((p) => p.key === update.key)
+    updates?.forEach((update) => {
+      const paramIndex = parameters?.findIndex((p) => p.key === update.key)
       if (paramIndex !== -1) {
         // Paramètre existant : mettre à jour
         parameters[paramIndex] = {
@@ -517,7 +517,7 @@ export async function PATCH(request: NextRequest) {
           key: update.key,
           value: update.value,
           type: 'STRING',
-          category: update.key.startsWith('elasticsearch.') ? 'ELASTICSEARCH' : 'GENERAL',
+          category: update?.key?.startsWith('elasticsearch.') ? 'ELASTICSEARCH' : 'GENERAL',
           description: `Paramètre ${update.key}`,
           defaultValue: update.value,
           isEditable: true,
@@ -527,25 +527,25 @@ export async function PATCH(request: NextRequest) {
         }
 
         // Ajuster le type selon la clé
-        if (update.key.includes('enable') || update.key.includes('Auth')) {
+        if (update?.key?.includes('enable') || update?.key?.includes('Auth')) {
           newParam.type = 'BOOLEAN'
         } else if (
-          update.key.includes('timeout') ||
-          update.key.includes('retries') ||
-          update.key.includes('batchSize')
+          update?.key?.includes('timeout') ||
+          update?.key?.includes('retries') ||
+          update?.key?.includes('batchSize')
         ) {
           newParam.type = 'NUMBER'
         }
 
-        parameters.push(newParam)
+        parameters?.push(newParam)
       }
     })
 
     // Retourner les paramètres mis à jour
-    const updatedParams = parameters.filter((p) => updates.some((update) => update.key === p.key))
+    const updatedParams = parameters?.filter((p) => updates?.some((update) => update.key === p.key))
 
-    return NextResponse.json(updatedParams)
+    return NextResponse?.json(updatedParams)
   } catch (_error) {
-    return NextResponse.json({ error: 'Failed to update system parameters' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to update system parameters' }, { status: 500 })
   }
 }

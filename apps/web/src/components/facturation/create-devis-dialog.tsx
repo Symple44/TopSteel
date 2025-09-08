@@ -1,7 +1,16 @@
 'use client'
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from '@erp/ui'
-
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Textarea,
+  useFormFieldIds,
+} from '@erp/ui'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -19,10 +28,19 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
     dateValidite: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 jours
   })
 
+  // Generate unique IDs for form fields
+  const fieldIds = useFormFieldIds([
+    'reference',
+    'dateValidite',
+    'clientNom',
+    'clientEmail',
+    'description',
+  ])
+
   if (!open) return null
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
     onOpenChange(false)
     setFormData({
       reference: '',
@@ -46,29 +64,29 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="reference">Référence *</Label>
+                <Label htmlFor={fieldIds.reference}>Référence *</Label>
                 <Input
-                  id="reference"
+                  id={fieldIds.reference}
                   value={formData.reference}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFormData({
                       ...formData,
-                      reference: e.target.value,
+                      reference: e?.target?.value,
                     })
                   }
                   placeholder="DEV-2025-001"
                 />
               </div>
               <div>
-                <Label htmlFor="dateValidite">Date de validité</Label>
+                <Label htmlFor={fieldIds.dateValidite}>Date de validité</Label>
                 <Input
-                  id="dateValidite"
+                  id={fieldIds.dateValidite}
                   type="date"
                   value={formData.dateValidite}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFormData({
                       ...formData,
-                      dateValidite: e.target.value,
+                      dateValidite: e?.target?.value,
                     })
                   }
                 />
@@ -76,14 +94,14 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
             </div>
 
             <div>
-              <Label htmlFor="clientNom">Client *</Label>
+              <Label htmlFor={fieldIds.clientNom}>Client *</Label>
               <Input
-                id="clientNom"
+                id={fieldIds.clientNom}
                 value={formData.clientNom}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({
                     ...formData,
-                    clientNom: e.target.value,
+                    clientNom: e?.target?.value,
                   })
                 }
                 placeholder="Nom du client ou entreprise"
@@ -91,15 +109,15 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
             </div>
 
             <div>
-              <Label htmlFor="clientEmail">Email client</Label>
+              <Label htmlFor={fieldIds.clientEmail}>Email client</Label>
               <Input
-                id="clientEmail"
+                id={fieldIds.clientEmail}
                 type="email"
                 value={formData.clientEmail}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({
                     ...formData,
-                    clientEmail: e.target.value,
+                    clientEmail: e?.target?.value,
                   })
                 }
                 placeholder="client@exemple.fr"
@@ -107,14 +125,14 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
             </div>
 
             <div>
-              <Label htmlFor="description">Description du projet</Label>
+              <Label htmlFor={fieldIds.description}>Description du projet</Label>
               <Textarea
-                id="description"
+                id={fieldIds.description}
                 value={formData.description}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setFormData({
                     ...formData,
-                    description: e.target.value,
+                    description: e?.target?.value,
                   })
                 }
                 placeholder="Description des travaux de métallerie..."

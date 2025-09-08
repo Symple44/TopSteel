@@ -58,6 +58,13 @@ export const DEFAULT_SHORTCUTS_CONFIG: KeyboardShortcutsConfig = {
   export: true,
 }
 
+export interface TableContext {
+  selectedRows?: number[]
+  selectedColumns?: string[]
+  columns?: Array<{ id: string; editable?: boolean }>
+  currentCell?: { row: number; column: string }
+}
+
 export interface KeyboardShortcutsActions {
   // Navigation
   onArrowKey?: (direction: 'up' | 'down' | 'left' | 'right', shiftKey: boolean) => void
@@ -96,7 +103,8 @@ export function useKeyboardShortcuts(
   config: Partial<KeyboardShortcutsConfig> = {},
   actions: KeyboardShortcutsActions = {},
   enabled: boolean = true,
-  targetRef?: React.RefObject<HTMLElement>
+  targetRef?: React.RefObject<HTMLElement>,
+  context?: TableContext
 ) {
   const finalConfig = { ...DEFAULT_SHORTCUTS_CONFIG, ...config }
 
@@ -286,10 +294,22 @@ export function useKeyboardShortcuts(
             if (finalConfig.editCell && actions.onEditCell) {
               event.preventDefault()
               // Éditer la première cellule éditable de la ligne sélectionnée
-              const selectedRow = context.selectedRows?.[0]
-              const firstEditableColumn = context.columns?.find(col => col.editable)
-              if (selectedRow && firstEditableColumn) {
-                actions.onEditCell(selectedRow, firstEditableColumn.id)
+              if (context) {
+                const selectedRow = context.selectedRows?.[0]
+                const currentColumn = context.currentCell?.column
+                const firstEditableColumn = context.columns?.find((col) => col.editable)
+
+                if (selectedRow !== undefined) {
+                  // Priorité : cellule courante si éditable, sinon première colonne éditable
+                  if (
+                    currentColumn &&
+                    context.columns?.find((col) => col.id === currentColumn && col.editable)
+                  ) {
+                    actions.onEditCell(selectedRow, currentColumn)
+                  } else if (firstEditableColumn) {
+                    actions.onEditCell(selectedRow, firstEditableColumn.id)
+                  }
+                }
               }
               handled = true
             }
@@ -323,7 +343,7 @@ export function useKeyboardShortcuts(
 
       return handled
     },
-    [finalConfig, actions, enabled]
+    [finalConfig, actions, enabled, context]
   )
 
   useEffect(() => {

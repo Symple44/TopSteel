@@ -8,7 +8,15 @@ export interface ImageUploadProps {
   entityType?: 'user' | 'company' | 'project'
   entityId?: string
   currentImageUrl?: string
-  onUploadSuccess?: (result: any) => void
+  onUploadSuccess?: (result: {
+    data?: {
+      urls?: {
+        medium?: string
+        original?: string
+      }
+    }
+    url?: string
+  }) => void
   onUploadError?: (error: string) => void
   maxSize?: number
   allowedTypes?: string[]
@@ -168,7 +176,7 @@ export function ImageUpload({
       onClick={handleClick}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && !disabled && handleClick()}
       tabIndex={disabled ? -1 : 0}
-      aria-label="Upload image"
+      aria-label={`Télécharger une image ${category} - Cliquez ou glissez-déposez un fichier`}
       disabled={disabled}
     >
       <input
@@ -178,11 +186,16 @@ export function ImageUpload({
         accept={allowedTypes?.join(',') || 'image/*'}
         onChange={handleFileInputChange}
         disabled={disabled}
+        aria-label={`Sélectionner un fichier image pour ${category} par glisser-déposer ou en cliquant`}
       />
       <div className="flex flex-col items-center justify-center space-y-4">
         {previewUrl && showPreview ? (
           <div className="relative">
-            <img src={previewUrl} alt="Preview" className="h-32 w-32 rounded-lg object-cover" />
+            <img
+              src={previewUrl}
+              alt={`Prévisualisation ${category === 'avatar' ? "de l'avatar" : category === 'logo' ? 'du logo' : 'du document'}`}
+              className="h-32 w-32 rounded-lg object-cover"
+            />
             {!disabled && (
               <Button
                 type="button"
@@ -193,17 +206,21 @@ export function ImageUpload({
                   e.stopPropagation()
                   handleRemove()
                 }}
+                aria-label={`Supprimer l'image ${category === 'avatar' ? 'avatar' : category === 'logo' ? 'logo' : 'document'}`}
               >
-                <X className="h-3 w-3" />
+                <X className="h-3 w-3" aria-hidden="true" />
               </Button>
             )}
           </div>
         ) : (
           <div className="flex flex-col items-center space-y-2">
             {isUploading ? (
-              <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+              <Loader2
+                className="h-12 w-12 animate-spin text-muted-foreground"
+                aria-hidden="true"
+              />
             ) : (
-              <Upload className="h-12 w-12 text-muted-foreground" />
+              <Upload className="h-12 w-12 text-muted-foreground" aria-hidden="true" />
             )}
             <div className="text-center">
               <p className="text-sm font-medium">
@@ -222,15 +239,24 @@ export function ImageUpload({
     <div className="flex items-center space-x-4">
       <div className="relative">
         {previewUrl ? (
-          <img src={previewUrl} alt="Avatar" className="h-16 w-16 rounded-full object-cover" />
+          <img
+            src={previewUrl}
+            alt={`Avatar actuel ${entityType ? `pour ${entityType}` : ''}`}
+            className="h-16 w-16 rounded-full object-cover"
+          />
         ) : (
-          <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+          <div
+            className="h-16 w-16 rounded-full bg-muted flex items-center justify-center"
+            role="img"
+            aria-label="Aucun avatar défini"
+          >
+            <ImageIcon className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           </div>
         )}
         {isUploading && (
           <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
-            <Loader2 className="h-4 w-4 animate-spin text-white" />
+            <Loader2 className="h-4 w-4 animate-spin text-white" aria-hidden="true" />
+            <span className="sr-only">Téléchargement de l'image en cours</span>
           </div>
         )}
       </div>
@@ -241,6 +267,7 @@ export function ImageUpload({
           size="sm"
           onClick={handleClick}
           disabled={disabled || isUploading}
+          aria-label={`${isUploading ? t('uploading') : t('changePhoto')} - ${category}`}
         >
           {isUploading ? t('uploading') : t('changePhoto')}
         </Button>
@@ -252,6 +279,7 @@ export function ImageUpload({
             onClick={handleRemove}
             disabled={disabled}
             className="text-destructive hover:text-destructive"
+            aria-label={`${t('remove')} ${category}`}
           >
             {t('remove')}
           </Button>
@@ -264,6 +292,7 @@ export function ImageUpload({
         accept="image/*"
         onChange={handleFileInputChange}
         disabled={disabled}
+        aria-label={`Sélectionner un fichier image pour ${category}`}
       />
     </div>
   )
@@ -274,11 +303,12 @@ export function ImageUpload({
       onClick={handleClick}
       disabled={disabled || isUploading}
       className={cn('relative', className)}
+      aria-label={`${isUploading ? t('uploading') : t('upload')} - ${category}`}
     >
       {isUploading ? (
-        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
       ) : (
-        <Upload className="h-4 w-4 mr-2" />
+        <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
       )}
       {isUploading ? t('uploading') : t('upload')}
       <input
@@ -288,6 +318,7 @@ export function ImageUpload({
         accept={allowedTypes?.join(',') || 'image/*'}
         onChange={handleFileInputChange}
         disabled={disabled}
+        aria-label={`Sélectionner un fichier image pour ${category}`}
       />
     </Button>
   )

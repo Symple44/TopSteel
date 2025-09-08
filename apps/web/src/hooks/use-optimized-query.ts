@@ -42,7 +42,7 @@ export function useOptimizedMutation<TData, TVariables>(
     onSuccess: () => {
       if (invalidationKeys) {
         for (const key of invalidationKeys) {
-          queryClient.invalidateQueries({ queryKey: key })
+          queryClient?.invalidateQueries({ queryKey: key })
         }
       }
     },
@@ -75,7 +75,7 @@ export function useSmartQuery<T>(
     retry: (failureCount, error: unknown) => {
       // Ne pas retry sur les erreurs 4xx
       const errorResponse = (error as { response?: { status: number } })?.response
-      if (errorResponse?.status && errorResponse.status >= 400 && errorResponse.status < 500) {
+      if (errorResponse?.status && errorResponse?.status >= 400 && errorResponse?.status < 500) {
         return false
       }
 
@@ -103,7 +103,7 @@ export function useSmartMutation<TData, TVariables>(
       // Invalider les clés spécifiées
       if (options?.invalidateKeys) {
         for (const key of options.invalidateKeys) {
-          queryClient.invalidateQueries({ queryKey: key })
+          queryClient?.invalidateQueries({ queryKey: key })
         }
       }
 
@@ -116,7 +116,7 @@ export function useSmartMutation<TData, TVariables>(
     retry: (failureCount, error: unknown) => {
       // Ne pas retry sur les erreurs client (4xx)
       const errorResponse = (error as { response?: { status: number } })?.response
-      if (errorResponse?.status && errorResponse.status >= 400 && errorResponse.status < 500) {
+      if (errorResponse?.status && errorResponse?.status >= 400 && errorResponse?.status < 500) {
         return false
       }
 

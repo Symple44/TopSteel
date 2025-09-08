@@ -160,11 +160,7 @@ const OPERATORS = {
   ],
 }
 
-export default function ConditionBuilder({
-  triggerType,
-  conditions,
-  onChange,
-}: ConditionBuilderProps) {
+export function ConditionBuilder({ triggerType, conditions, onChange }: ConditionBuilderProps) {
   const [showPreview, setShowPreview] = useState(false)
 
   const addCondition = () => {
@@ -180,14 +176,14 @@ export default function ConditionBuilder({
   }
 
   const updateCondition = (id: string, updates: Partial<Condition>) => {
-    const updated = conditions.map((condition) =>
+    const updated = conditions?.map((condition) =>
       condition.id === id ? { ...condition, ...updates } : condition
     )
     onChange(updated)
   }
 
   const removeCondition = (id: string) => {
-    onChange(conditions.filter((condition) => condition.id !== id))
+    onChange(conditions?.filter((condition) => condition.id !== id))
   }
 
   const getFieldType = (fieldValue: string): 'string' | 'number' | 'boolean' | 'date' => {
@@ -207,7 +203,7 @@ export default function ConditionBuilder({
     if (fieldType === 'boolean') {
       return (
         <Select
-          value={condition.value.toString()}
+          value={condition?.value?.toString()}
           onValueChange={(value: string) =>
             updateCondition(condition.id, { value: value === 'true' })
           }
@@ -226,9 +222,13 @@ export default function ConditionBuilder({
     if (isListOperator) {
       return (
         <Textarea
-          value={Array.isArray(condition.value) ? condition.value.join('\n') : condition.value}
+          value={
+            Array.isArray(condition.value)
+              ? condition?.value?.join('\n')
+              : String(condition.value || '')
+          }
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            updateCondition(condition.id, { value: e.target.value.split('\n').filter(Boolean) })
+            updateCondition(condition.id, { value: e?.target?.value?.split('\n').filter(Boolean) })
           }
           placeholder="Une valeur par ligne"
           className="w-48"
@@ -241,9 +241,9 @@ export default function ConditionBuilder({
       return (
         <Input
           type="number"
-          value={condition.value}
+          value={String(condition.value)}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            updateCondition(condition.id, { value: parseFloat(e.target.value) || 0 })
+            updateCondition(condition.id, { value: parseFloat(e?.target?.value) || 0 })
           }
           className="w-32"
           placeholder="0"
@@ -255,9 +255,9 @@ export default function ConditionBuilder({
       return (
         <Input
           type="datetime-local"
-          value={condition.value}
+          value={String(condition.value)}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            updateCondition(condition.id, { value: e.target.value })
+            updateCondition(condition.id, { value: e?.target?.value })
           }
           className="w-48"
         />
@@ -266,9 +266,9 @@ export default function ConditionBuilder({
 
     return (
       <Input
-        value={condition.value}
+        value={String(condition.value)}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          updateCondition(condition.id, { value: e.target.value })
+          updateCondition(condition.id, { value: e?.target?.value })
         }
         className="w-48"
         placeholder="Valeur"
@@ -287,13 +287,13 @@ export default function ConditionBuilder({
     let valueText = ''
     if (!['is_null', 'is_not_null'].includes(condition.operator)) {
       if (Array.isArray(condition.value)) {
-        valueText = `[${condition.value.join(', ')}]`
+        valueText = `[${condition?.value?.join(', ')}]`
       } else {
-        valueText = condition.value.toString()
+        valueText = condition?.value?.toString()
       }
     }
 
-    return `${field.label} ${operator.label} ${valueText}`.trim()
+    return `${field?.label} ${operator?.label} ${valueText}`.trim()
   }
 
   const generatePreviewText = (): string => {
@@ -317,11 +317,16 @@ export default function ConditionBuilder({
             <span>Conditions de déclenchement</span>
           </CardTitle>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={() => setShowPreview(!showPreview)}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPreview(!showPreview)}
+            >
               <Eye className="h-4 w-4 mr-2" />
               Aperçu
             </Button>
-            <Button onClick={addCondition} size="sm">
+            <Button type="button" onClick={addCondition} size="sm">
               <Plus className="h-4 w-4 mr-2" />
               Ajouter
             </Button>
@@ -347,7 +352,7 @@ export default function ConditionBuilder({
           </div>
         ) : (
           <div className="space-y-3">
-            {conditions.map((condition, index) => (
+            {conditions?.map((condition, index) => (
               <div key={condition.id} className="flex items-center space-x-3 p-3 border rounded-lg">
                 {index > 0 && (
                   <Select
@@ -382,8 +387,8 @@ export default function ConditionBuilder({
                   </SelectTrigger>
                   <SelectContent>
                     {AVAILABLE_FIELDS[triggerType]?.map((field) => (
-                      <SelectItem key={field.value} value={field.value}>
-                        {field.label}
+                      <SelectItem key={field?.value} value={field?.value}>
+                        {field?.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -403,8 +408,8 @@ export default function ConditionBuilder({
                   </SelectTrigger>
                   <SelectContent>
                     {OPERATORS[getFieldType(condition.field)]?.map((operator) => (
-                      <SelectItem key={operator.value} value={operator.value}>
-                        {operator.label}
+                      <SelectItem key={operator?.value} value={operator?.value}>
+                        {operator?.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -412,7 +417,12 @@ export default function ConditionBuilder({
 
                 {renderValueInput(condition)}
 
-                <Button variant="outline" size="sm" onClick={() => removeCondition(condition.id)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeCondition(condition.id)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
@@ -424,7 +434,7 @@ export default function ConditionBuilder({
           <div className="border-t pt-4">
             <h4 className="font-medium mb-2">Logique appliquée :</h4>
             <div className="flex flex-wrap gap-2">
-              {conditions.map((condition, index) => (
+              {conditions?.map((condition, index) => (
                 <div key={condition.id} className="flex items-center space-x-1">
                   {index > 0 && (
                     <Badge variant="outline" className="text-xs">

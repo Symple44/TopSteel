@@ -95,7 +95,8 @@ export class TenantInitializationService {
         }
 
         // Hasher le mot de passe
-        const hashedPassword = await bcrypt.hash(userData.password, 10)
+        const saltRounds = process.env.NODE_ENV === 'production' ? 12 : 10
+        const hashedPassword = await bcrypt.hash(userData.password, saltRounds)
 
         // Créer l'utilisateur
         const user = this._userRepository.create({
@@ -284,7 +285,7 @@ export class TenantInitializationService {
         WHERE table_name = 'system_parameters'
       `)
 
-      if (parseInt(existingParams[0]?.count || '0') === 0) {
+      if (parseInt(existingParams[0]?.count || '0', 10) === 0) {
         this.logger.log("Table system_parameters n'existe pas dans la base tenant")
         return
       }
@@ -369,7 +370,7 @@ export class TenantInitializationService {
         WHERE table_name = 'material_categories'
       `)
 
-      if (parseInt(tableExists[0]?.count || '0') > 0) {
+      if (parseInt(tableExists[0]?.count || '0', 10) > 0) {
         for (const category of defaultCategories) {
           await tenantDataSource.query(
             `

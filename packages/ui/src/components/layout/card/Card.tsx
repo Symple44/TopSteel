@@ -32,16 +32,12 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
       : ''
 
-    const finalClassName = cn(
-      cardVariants({ variant, padding }),
-      interactiveClasses,
-      className
-    )
+    const finalClassName = cn(cardVariants({ variant, padding }), interactiveClasses, className)
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown)
       }
     }
 
@@ -69,7 +65,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 )
 Card.displayName = 'Card'
 
-const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   (
     {
       className,
@@ -95,7 +91,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown)
       }
     }
 
@@ -122,7 +118,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 )
 CardHeader.displayName = 'CardHeader'
 
-const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
+const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
   (
     { className, children, onClick, onMouseEnter, onMouseLeave, onFocus, onBlur, id, role },
     ref
@@ -137,7 +133,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTML
         onClick={onClick}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            onClick?.(e as any)
+            onClick?.(e as unknown)
           }
         }}
         onMouseEnter={onMouseEnter}
@@ -154,10 +150,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTML
 )
 CardTitle.displayName = 'CardTitle'
 
-const CardDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(
+const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   (
     { className, children, onClick, onMouseEnter, onMouseLeave, onFocus, onBlur, id, role },
     ref
@@ -172,7 +165,7 @@ const CardDescription = React.forwardRef<
         onClick={onClick}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            onClick?.(e as any)
+            onClick?.(e as unknown)
           }
         }}
         onMouseEnter={onMouseEnter}
@@ -189,7 +182,7 @@ const CardDescription = React.forwardRef<
 )
 CardDescription.displayName = 'CardDescription'
 
-const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   (
     {
       className,
@@ -215,7 +208,7 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown)
       }
     }
 
@@ -242,7 +235,7 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 )
 CardContent.displayName = 'CardContent'
 
-const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
   (
     {
       className,
@@ -268,7 +261,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown)
       }
     }
 
@@ -294,6 +287,13 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
   }
 )
 CardFooter.displayName = 'CardFooter'
+
+// Define individual component prop types
+export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export type { CardVariants }

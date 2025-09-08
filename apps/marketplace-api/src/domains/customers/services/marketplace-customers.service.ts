@@ -7,8 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import { MoreThan, type Repository } from 'typeorm'
+import type { EmailService } from '../../email/email.service'
 import { type CustomerAddress, MarketplaceCustomer } from '../entities/marketplace-customer.entity'
-import { EmailService } from '../../email/email.service'
 
 export interface CreateCustomerDto {
   email: string
@@ -98,7 +98,7 @@ export class MarketplaceCustomersService {
     if (createDto.hasAccount) {
       const verificationToken = this.emailService.generateSecureToken()
       const hashedToken = this.emailService.hashToken(verificationToken)
-      
+
       // Stocker le token de vérification
       savedCustomer.emailVerificationToken = hashedToken
       savedCustomer.emailVerificationExpires = new Date(Date.now() + 24 * 3600000) // 24 heures
@@ -114,7 +114,7 @@ export class MarketplaceCustomersService {
         metadata: {
           societeId,
           customerName: `${savedCustomer.firstName || ''} ${savedCustomer.lastName || ''}`.trim(),
-        }
+        },
       })
     }
 
@@ -377,7 +377,7 @@ export class MarketplaceCustomersService {
     // Générer un token sécurisé
     const resetToken = this.emailService.generateSecureToken()
     const hashedToken = this.emailService.hashToken(resetToken)
-    
+
     // Stocker le hash du token dans la base de données
     customer.resetPasswordToken = hashedToken
     customer.resetPasswordExpires = new Date(Date.now() + 3600000) // 1 heure
@@ -394,14 +394,14 @@ export class MarketplaceCustomersService {
       metadata: {
         societeId,
         customerName: `${customer.firstName || ''} ${customer.lastName || ''}`.trim(),
-      }
+      },
     })
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
     // Hasher le token fourni pour le comparer avec celui en base
     const hashedToken = this.emailService.hashToken(token)
-    
+
     const customer = await this.customerRepo.findOne({
       where: {
         resetPasswordToken: hashedToken,
@@ -441,9 +441,5 @@ export class MarketplaceCustomersService {
 
   private generateAddressId(): string {
     return `addr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  }
-
-  private generateResetToken(): string {
-    return Math.random().toString(36).substr(2, 32)
   }
 }

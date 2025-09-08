@@ -47,7 +47,7 @@ export class GracefulShutdownService implements OnApplicationShutdown {
           reject(new Error('Timeout lors de la fermeture du serveur HTTP'))
         }, 10000)
 
-        server.close((error) => {
+        server.close((error: Error | null) => {
           clearTimeout(timeout)
           if (error) {
             reject(error)
@@ -143,8 +143,7 @@ export class GracefulShutdownService implements OnApplicationShutdown {
 
     return new Promise((resolve) => {
       const checkInterval = setInterval(() => {
-        // @ts-ignore - Accès aux connexions internes
-        const connections = server._connections || 0
+        const connections = (server as unknown as { _connections?: number })._connections || 0
         if (connections === 0) {
           clearInterval(checkInterval)
           resolve()

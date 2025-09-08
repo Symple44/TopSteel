@@ -6,7 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { PageSection } from './page-section.entity'
+// Removed direct import to avoid circular dependency
+// import { PageSection } from './page-section.entity'
 
 export enum PageType {
   HOME = 'home',
@@ -76,15 +77,11 @@ export class PageTemplate {
     backgroundImage?: string
   }
 
-  @OneToMany(
-    () => PageSection,
-    (section) => section.pageTemplate,
-    {
-      cascade: true,
-      eager: true,
-    }
-  )
-  sections!: PageSection[]
+  @OneToMany('PageSection', 'pageTemplate', {
+    cascade: true,
+    lazy: true,
+  })
+  sections!: any[]
 
   @Column({ type: 'timestamp', nullable: true })
   publishedAt?: Date

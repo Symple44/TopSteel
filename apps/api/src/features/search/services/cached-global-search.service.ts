@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import type {
   ISearchStrategy,
   SearchOptions,
@@ -79,7 +80,10 @@ export class CachedGlobalSearchService implements ISearchStrategy {
         },
       }
     } catch (error) {
-      this.logger.error(`Search with cache failed: ${error.message}`, error.stack)
+      this.logger.error(
+        `Search with cache failed: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
 
       // Fallback to direct search if cache fails
       this.logger.debug('Falling back to direct search due to cache error')
@@ -98,7 +102,10 @@ export class CachedGlobalSearchService implements ISearchStrategy {
     try {
       await this.cacheService.cacheSearchResults(tenantId, options, results)
     } catch (error) {
-      this.logger.error(`Failed to cache search results: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to cache search results: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       // Don't throw - caching is non-critical
     }
   }
@@ -150,9 +157,9 @@ export class CachedGlobalSearchService implements ISearchStrategy {
   /**
    * Get search engine status including cache status
    */
-  getSearchEngineStatus(): { engine: string; available: boolean; info?: string } {
+  async getSearchEngineStatus(): Promise<{ engine: string; available: boolean; info?: string }> {
     const baseStatus = this.globalSearchService.getSearchEngineStatus()
-    const cacheHealthy = this.cacheService.isHealthy()
+    const cacheHealthy = await this.cacheService.isHealthy()
 
     return {
       ...baseStatus,
@@ -196,7 +203,7 @@ export class CachedGlobalSearchService implements ISearchStrategy {
 
         this.logger.debug(`Cache warmed for query: "${query}"`)
       } catch (error) {
-        this.logger.warn(`Failed to warm cache for query "${query}": ${error.message}`)
+        this.logger.warn(`Failed to warm cache for query "${query}": ${getErrorMessage(error)}`)
       }
     }
   }
@@ -209,7 +216,10 @@ export class CachedGlobalSearchService implements ISearchStrategy {
       await this.cacheService.invalidateEntityCache(tenantId, entityType)
       this.logger.debug(`Cache invalidated for tenant ${tenantId}, entity type: ${entityType}`)
     } catch (error) {
-      this.logger.error(`Failed to invalidate cache: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to invalidate cache: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -221,7 +231,10 @@ export class CachedGlobalSearchService implements ISearchStrategy {
       await this.cacheService.invalidateTenantCache(tenantId)
       this.logger.debug(`All cache invalidated for tenant ${tenantId}`)
     } catch (error) {
-      this.logger.error(`Failed to invalidate tenant cache: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to invalidate tenant cache: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -255,8 +268,8 @@ export class CachedGlobalSearchService implements ISearchStrategy {
    */
   private extractTenantId(options: SearchOptions): string | null {
     // Check if tenant ID is in the options context
-    if ((options as any).tenantId) {
-      return (options as any).tenantId
+    if ((options as unknown).tenantId) {
+      return (options as unknown).tenantId
     }
 
     // Check if tenant ID is in filters
@@ -277,12 +290,12 @@ export class CachedGlobalSearchService implements ISearchStrategy {
    */
   private extractTenantIdFromDocument(document: SearchDocument): string | null {
     // Check common tenant ID fields
-    if ((document as any).tenantId) {
-      return (document as any).tenantId
+    if ((document as unknown).tenantId) {
+      return (document as unknown).tenantId
     }
 
-    if ((document as any).tenant_id) {
-      return (document as any).tenant_id
+    if ((document as unknown).tenant_id) {
+      return (document as unknown).tenant_id
     }
 
     return null

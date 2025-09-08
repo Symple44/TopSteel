@@ -56,7 +56,7 @@ export function MenuItemEditor({
 }: MenuItemEditorProps) {
   const [expanded, setExpanded] = useState(true)
 
-  const currentType = menuTypes.find((t) => t.value === item.type)
+  const currentType = menuTypes?.find((t) => t.value === item.type)
 
   const handleFieldChange = (field: string, value: string | boolean | number | null) => {
     onUpdate({
@@ -81,10 +81,11 @@ export function MenuItemEditor({
     if (!currentType?.canHaveChildren) return
 
     const newChild: MenuItem = {
+      id: `new-child-${Date.now()}`,
       title: 'Nouvel élément enfant',
       type: 'P',
       icon: 'Play',
-      orderIndex: item.children.length,
+      orderIndex: item?.children?.length,
       isVisible: true,
       children: [],
     }
@@ -105,7 +106,7 @@ export function MenuItemEditor({
   }
 
   const deleteChildItem = (childIndex: number) => {
-    const updatedChildren = item.children.filter((_, i) => i !== childIndex)
+    const updatedChildren = item?.children?.filter((_, i) => i !== childIndex)
     onUpdate({
       ...item,
       children: updatedChildren,
@@ -114,7 +115,7 @@ export function MenuItemEditor({
 
   const moveChildItem = (childIndex: number, direction: 'up' | 'down') => {
     const newIndex = direction === 'up' ? childIndex - 1 : childIndex + 1
-    if (newIndex < 0 || newIndex >= item.children.length) return
+    if (newIndex < 0 || newIndex >= item?.children?.length) return
 
     const updatedChildren = [...item.children]
     const temp = updatedChildren[childIndex]
@@ -122,7 +123,7 @@ export function MenuItemEditor({
     updatedChildren[newIndex] = temp
 
     // Mettre à jour les orderIndex
-    updatedChildren.forEach((child, i) => {
+    updatedChildren?.forEach((child, i) => {
       child.orderIndex = i
     })
 
@@ -154,6 +155,7 @@ export function MenuItemEditor({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 className="h-6 w-6 p-0"
@@ -175,16 +177,16 @@ export function MenuItemEditor({
 
             <div className="flex items-center gap-1">
               {onMoveUp && (
-                <Button variant="ghost" size="sm" onClick={onMoveUp}>
+                <Button type="button" variant="ghost" size="sm" onClick={onMoveUp}>
                   <ChevronUp className="h-4 w-4" />
                 </Button>
               )}
               {onMoveDown && (
-                <Button variant="ghost" size="sm" onClick={onMoveDown}>
+                <Button type="button" variant="ghost" size="sm" onClick={onMoveDown}>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               )}
-              <Button variant="ghost" size="sm" onClick={onDelete}>
+              <Button type="button" variant="ghost" size="sm" onClick={onDelete}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -198,7 +200,7 @@ export function MenuItemEditor({
                 <Label>Titre</Label>
                 <Input
                   value={item.title}
-                  onChange={(e) => handleFieldChange('title', e.target.value)}
+                  onChange={(e) => handleFieldChange('title', e?.target?.value)}
                   placeholder="Titre de l'élément"
                 />
               </div>
@@ -210,7 +212,7 @@ export function MenuItemEditor({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {menuTypes.map((type) => (
+                    {menuTypes?.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         <div className="flex items-center gap-2">
                           {getTypeIcon(type.value)}
@@ -231,7 +233,7 @@ export function MenuItemEditor({
                 <Label>Icône</Label>
                 <Input
                   value={item.icon || ''}
-                  onChange={(e) => handleFieldChange('icon', e.target.value)}
+                  onChange={(e) => handleFieldChange('icon', e?.target?.value)}
                   placeholder="Nom de l'icône Lucide"
                 />
               </div>
@@ -241,7 +243,9 @@ export function MenuItemEditor({
                 <Input
                   type="number"
                   value={item.orderIndex}
-                  onChange={(e) => handleFieldChange('orderIndex', parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    handleFieldChange('orderIndex', parseInt(e?.target?.value, 10) || 0)
+                  }
                 />
               </div>
 
@@ -263,7 +267,7 @@ export function MenuItemEditor({
                 <Label>ID du Programme</Label>
                 <Input
                   value={item.programId || ''}
-                  onChange={(e) => handleFieldChange('programId', e.target.value)}
+                  onChange={(e) => handleFieldChange('programId', e?.target?.value)}
                   placeholder="/dashboard, /admin/users, etc."
                 />
               </div>
@@ -274,7 +278,7 @@ export function MenuItemEditor({
                 <Label>URL Externe</Label>
                 <Input
                   value={item.externalUrl || ''}
-                  onChange={(e) => handleFieldChange('externalUrl', e.target.value)}
+                  onChange={(e) => handleFieldChange('externalUrl', e?.target?.value)}
                   placeholder="https://example.com"
                 />
               </div>
@@ -285,7 +289,7 @@ export function MenuItemEditor({
                 <Label>ID Query Builder</Label>
                 <Input
                   value={item.queryBuilderId || ''}
-                  onChange={(e) => handleFieldChange('queryBuilderId', e.target.value)}
+                  onChange={(e) => handleFieldChange('queryBuilderId', e?.target?.value)}
                   placeholder="UUID de la vue Query Builder"
                 />
               </div>
@@ -306,20 +310,19 @@ export function MenuItemEditor({
             {currentType?.canHaveChildren && (
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <Label>Éléments enfants ({item.children.length})</Label>
-                  <Button size="sm" onClick={addChildItem}>
+                  <Label>Éléments enfants ({item?.children?.length})</Label>
+                  <Button type="button" size="sm" onClick={addChildItem}>
                     <Plus className="h-4 w-4 mr-2" />
                     Ajouter un enfant
                   </Button>
                 </div>
 
-                {item.children.length > 0 && (
+                {item?.children?.length > 0 && (
                   <div className="space-y-2">
-                    {item.children.map((child, childIndex) => (
+                    {item?.children?.map((child, childIndex) => (
                       <MenuItemEditor
                         key={child.id || `child-${childIndex}`}
                         item={child}
-                        index={childIndex}
                         menuTypes={menuTypes}
                         level={level + 1}
                         onUpdate={(updatedChild) => updateChildItem(childIndex, updatedChild)}
@@ -328,7 +331,7 @@ export function MenuItemEditor({
                           childIndex > 0 ? () => moveChildItem(childIndex, 'up') : undefined
                         }
                         onMoveDown={
-                          childIndex < item.children.length - 1
+                          childIndex < item?.children?.length - 1
                             ? () => moveChildItem(childIndex, 'down')
                             : undefined
                         }

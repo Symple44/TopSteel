@@ -247,7 +247,7 @@ class DetailedConsistencyReporter {
       let rowCount: number | undefined
       try {
         const countResult = await queryRunner.query(`SELECT COUNT(*) as count FROM "${tableName}"`)
-        rowCount = parseInt(countResult[0].count)
+        rowCount = parseInt(countResult[0].count, 10)
         if (rowCount > 10000) rowCount = undefined // Ne pas afficher pour les grandes tables
       } catch {
         // Ignorer les erreurs de comptage
@@ -410,7 +410,10 @@ class DetailedConsistencyReporter {
         })
       }
 
-      indexMap.get(rowTyped.index_name)?.columns.push(rowTyped.column_name)
+      const indexInfo = indexMap.get(rowTyped.index_name)
+      if (indexInfo) {
+        indexInfo.columns.push(rowTyped.column_name)
+      }
     })
 
     return Array.from(indexMap.values())
@@ -440,7 +443,7 @@ class DetailedConsistencyReporter {
 
       return migrations.map((m: unknown) => ({
         name: (m as { name: string }).name,
-        timestamp: parseInt((m as { timestamp: string }).timestamp),
+        timestamp: parseInt((m as { timestamp: string }).timestamp, 10),
         executed: true,
       }))
     } catch (_error: unknown) {

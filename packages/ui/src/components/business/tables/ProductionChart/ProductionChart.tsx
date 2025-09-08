@@ -1,8 +1,7 @@
 'use client'
+import { AlertCircle, CheckCircle, Clock, Factory, Package, TrendingUp } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Badge } from '../../../primitives'
-import { Progress } from '../../../primitives'
-import { Factory, TrendingUp, TrendingDown, Clock, CheckCircle, AlertCircle, Wrench, Package } from 'lucide-react'
+import { Badge, Progress } from '../../../primitives'
 export interface ProductionData {
   period: string
   totalProduced: number
@@ -61,9 +60,9 @@ interface ProductionChartProps {
   onMachineClick?: (machineId: string) => void
   onViewDetails?: () => void
 }
-export function ProductionChart({ 
+export function ProductionChart({
   data = [],
-  title = "Graphique de production",
+  title = 'Graphique de production',
   period = 'daily',
   showMachines = true,
   showProducts = true,
@@ -73,7 +72,7 @@ export function ProductionChart({
   loading = false,
   onPeriodChange,
   onMachineClick,
-  onViewDetails
+  onViewDetails,
 }: ProductionChartProps) {
   if (loading) {
     return (
@@ -85,7 +84,9 @@ export function ProductionChart({
           <div className="flex items-center justify-center" style={{ height }}>
             <div className="text-center">
               <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-              <p className="mt-2 text-sm text-muted-foreground">Chargement des données de production...</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Chargement des données de production...
+              </p>
             </div>
           </div>
         </CardContent>
@@ -122,18 +123,32 @@ export function ProductionChart({
   }
   // Simulated production bars
   const renderProductionBars = () => {
-    const maxProduction = Math.max(...data.map(d => d.totalProduced))
+    const maxProduction = Math.max(...data.map((d) => d.totalProduced))
     return (
       <div className="flex items-end justify-between gap-2 h-32 mt-4">
         {data.slice(0, 24).map((item, index) => {
           const height = (item.totalProduced / maxProduction) * 100
-          const efficiencyColor = item.efficiency >= 90 ? 'bg-green-500' : item.efficiency >= 70 ? 'bg-yellow-500' : 'bg-red-500'
+          const efficiencyColor =
+            item.efficiency >= 90
+              ? 'bg-green-500'
+              : item.efficiency >= 70
+                ? 'bg-yellow-500'
+                : 'bg-red-500'
           return (
-            <div 
+            // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+            <div
               key={index}
               className={`flex-1 ${efficiencyColor} hover:opacity-80 rounded-t transition-all cursor-pointer relative group`}
               style={{ height: `${height}%` }}
+              role={onPeriodChange ? 'button' : undefined}
+              tabIndex={onPeriodChange ? 0 : undefined}
               onClick={() => onPeriodChange?.(item.period)}
+              onKeyDown={(e) => {
+                if (onPeriodChange && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  onPeriodChange(item.period)
+                }
+              }}
             >
               <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 {item.period}: {formatNumber(item.totalProduced)} unités
@@ -149,16 +164,32 @@ export function ProductionChart({
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
         <div className="flex gap-2">
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('hourly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('hourly')}
+          >
             Heure
           </Badge>
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('shift')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('shift')}
+          >
             Équipe
           </Badge>
-          <Badge variant={period === 'daily' ? 'default' : 'outline'} className="cursor-pointer" onClick={() => onPeriodChange?.('daily')}>
+          <Badge
+            variant={period === 'daily' ? 'default' : 'outline'}
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('daily')}
+          >
             Jour
           </Badge>
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('weekly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('weekly')}
+          >
             Semaine
           </Badge>
         </div>
@@ -177,13 +208,14 @@ export function ProductionChart({
                   <Package className="h-4 w-4" />
                   <span>Production</span>
                 </div>
-                <div className="text-2xl font-bold">
-                  {formatNumber(currentData.totalProduced)}
-                </div>
+                <div className="text-2xl font-bold">{formatNumber(currentData.totalProduced)}</div>
                 <div className="text-xs text-muted-foreground">
                   / {formatNumber(currentData.totalPlanned)} planifié
                 </div>
-                <Progress value={(currentData.totalProduced / currentData.totalPlanned) * 100} className="h-1" />
+                <Progress
+                  value={(currentData.totalProduced / currentData.totalPlanned) * 100}
+                  className="h-1"
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -221,9 +253,7 @@ export function ProductionChart({
                     <Clock className="h-4 w-4" />
                     <span>Temps cycle</span>
                   </div>
-                  <div className="text-2xl font-bold">
-                    {currentData.metrics.cycleTime}min
-                  </div>
+                  <div className="text-2xl font-bold">{currentData.metrics.cycleTime}min</div>
                   <div className="text-xs text-muted-foreground">
                     Setup: {currentData.metrics.setupTime}min
                   </div>
@@ -241,10 +271,19 @@ export function ProductionChart({
                 <div className="text-sm font-medium mb-3">État des machines</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {currentData.machines.map((machine) => (
-                    <div 
+                    // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+                    <div
                       key={machine.id}
                       className="border rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow"
+                      role={onMachineClick ? 'button' : undefined}
+                      tabIndex={onMachineClick ? 0 : undefined}
                       onClick={() => onMachineClick?.(machine.id)}
+                      onKeyDown={(e) => {
+                        if (onMachineClick && (e.key === 'Enter' || e.key === ' ')) {
+                          e.preventDefault()
+                          onMachineClick(machine.id)
+                        }
+                      }}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -261,9 +300,7 @@ export function ProductionChart({
                           Efficacité: {machine.efficiency}%
                         </span>
                         {machine.downtime > 0 && (
-                          <span className="text-red-600">
-                            Arrêt: {machine.downtime}min
-                          </span>
+                          <span className="text-red-600">Arrêt: {machine.downtime}min</span>
                         )}
                       </div>
                     </div>
@@ -277,7 +314,10 @@ export function ProductionChart({
                 <div className="text-sm font-medium mb-3">Performance par produit</div>
                 <div className="space-y-2">
                   {currentData.products.slice(0, 5).map((product, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 border rounded"
+                    >
                       <div className="flex-1">
                         <div className="font-medium text-sm">{product.reference}</div>
                         <div className="text-xs text-muted-foreground">{product.name}</div>
@@ -311,9 +351,14 @@ export function ProductionChart({
                 </div>
                 <div className="space-y-2">
                   {currentData.issues.slice(0, 3).map((issue, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm p-2 bg-orange-50 rounded">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between text-sm p-2 bg-orange-50 rounded"
+                    >
                       <div>
-                        <Badge variant="outline" className="mr-2">{issue.type}</Badge>
+                        <Badge variant="outline" className="mr-2">
+                          {issue.type}
+                        </Badge>
                         <span className="text-muted-foreground">{issue.description}</span>
                       </div>
                       {getImpactBadge(issue.impact)}
@@ -324,10 +369,7 @@ export function ProductionChart({
             )}
             {onViewDetails && (
               <div className="mt-4 flex justify-center">
-                <button
-                  onClick={onViewDetails}
-                  className="text-sm text-blue-600 hover:underline"
-                >
+                <button onClick={onViewDetails} className="text-sm text-blue-600 hover:underline">
                   Voir le rapport complet →
                 </button>
               </div>

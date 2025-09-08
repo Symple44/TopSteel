@@ -13,6 +13,7 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
+  useFormFieldIds,
 } from '@erp/ui'
 import { AlertTriangle, ArrowLeft, Key, Shield, Smartphone, Timer } from 'lucide-react'
 import type React from 'react'
@@ -46,6 +47,7 @@ export default function MFAVerification({
   onBack,
 }: MFAVerificationProps) {
   const { t } = useTranslation('auth')
+  const ids = useFormFieldIds(['code', 'sms-code'])
   const [selectedMethod, setSelectedMethod] = useState<string>(availableMethods[0]?.type || 'totp')
   const [mfaSession, setMFASession] = useState<MFASession | null>(null)
   const [verificationCode, setVerificationCode] = useState('')
@@ -60,7 +62,7 @@ export default function MFAVerification({
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
-          toast.error(t('mfaSessionExpired'))
+          toast?.error(t('mfaSessionExpired'))
           onBack()
           return 0
         }
@@ -82,16 +84,16 @@ export default function MFAVerification({
         }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        setMFASession(data.data)
+      if (response?.ok) {
+        const data = await response?.json()
+        setMFASession(data?.data)
 
         // WebAuthn challenge sera géré par l'interface utilisateur
       } else {
-        toast.error(t('mfaSessionError'))
+        toast?.error(t('mfaSessionError'))
       }
     } catch {
-      toast.error(t('mfaSessionError'))
+      toast?.error(t('mfaSessionError'))
     } finally {
       setLoading(false)
     }
@@ -108,18 +110,23 @@ export default function MFAVerification({
   const startWebAuthnAuthentication = async (options: unknown) => {
     try {
       // Check WebAuthn support
-      if (!window.navigator.credentials || !window.PublicKeyCredential) {
-        toast.error(t('webauthnNotSupported'))
+      if (!window?.navigator?.credentials || !window.PublicKeyCredential) {
+        toast?.error(t('webauthnNotSupported'))
         return
       }
 
       // Get credentials
-      const credential = (await navigator.credentials.get({
-        publicKey: options,
+      if (typeof options !== 'object' || !options) {
+        toast?.error(t('webauthnError'))
+        return
+      }
+
+      const credential = (await navigator?.credentials?.get({
+        publicKey: options as PublicKeyCredentialRequestOptions,
       })) as PublicKeyCredential
 
       if (!credential) {
-        toast.error(t('webauthnError'))
+        toast?.error(t('webauthnError'))
         return
       }
 
@@ -132,27 +139,27 @@ export default function MFAVerification({
           clientDataJSON: btoa(
             String.fromCharCode(
               ...new Uint8Array(
-                (credential.response as AuthenticatorAssertionResponse).clientDataJSON
+                (credential?.response as AuthenticatorAssertionResponse).clientDataJSON
               )
             )
           ),
           authenticatorData: btoa(
             String.fromCharCode(
               ...new Uint8Array(
-                (credential.response as AuthenticatorAssertionResponse).authenticatorData
+                (credential?.response as AuthenticatorAssertionResponse).authenticatorData
               )
             )
           ),
           signature: btoa(
             String.fromCharCode(
-              ...new Uint8Array((credential.response as AuthenticatorAssertionResponse).signature)
+              ...new Uint8Array((credential?.response as AuthenticatorAssertionResponse).signature)
             )
           ),
-          userHandle: (credential.response as AuthenticatorAssertionResponse).userHandle
+          userHandle: (credential?.response as AuthenticatorAssertionResponse).userHandle
             ? btoa(
                 String.fromCharCode(
                   ...new Uint8Array(
-                    (credential.response as AuthenticatorAssertionResponse).userHandle ??
+                    (credential?.response as AuthenticatorAssertionResponse).userHandle ??
                       new Uint8Array()
                   )
                 )
@@ -164,7 +171,7 @@ export default function MFAVerification({
       // Verify authentication
       await verifyMFA(undefined, response)
     } catch {
-      toast.error(t('webauthnError'))
+      toast?.error(t('webauthnError'))
       setAttempts((prev) => prev + 1)
     }
   }
@@ -173,7 +180,7 @@ export default function MFAVerification({
     if (!mfaSession) return
 
     if (attempts >= maxAttempts) {
-      toast.error(t('tooManyAttempts'))
+      toast?.error(t('tooManyAttempts'))
       onBack()
       return
     }
@@ -190,23 +197,23 @@ export default function MFAVerification({
         }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        toast.success(t('mfaVerificationSuccessful'))
+      if (response?.ok) {
+        const data = await response?.json()
+        toast?.success(t('mfaVerificationSuccessful'))
 
-        if (data.data.backupCodesUsed && data.data.backupCodesUsed > 0) {
-          toast.info(t('backupCodesUsed', { count: data.data.backupCodesUsed }))
+        if (data?.data?.backupCodesUsed && data?.data?.backupCodesUsed > 0) {
+          toast?.info(t('backupCodesUsed', { count: data?.data?.backupCodesUsed }))
         }
 
-        onSuccess(data.data.sessionToken)
+        onSuccess(data?.data?.sessionToken)
       } else {
-        const errorData = await response.json()
-        toast.error(errorData.error || t('invalidMfaCode'))
+        const errorData = await response?.json()
+        toast?.error(errorData?.error || t('invalidMfaCode'))
         setAttempts((prev) => prev + 1)
         setVerificationCode('')
       }
     } catch {
-      toast.error(t('mfaVerificationFailed'))
+      toast?.error(t('mfaVerificationFailed'))
       setAttempts((prev) => prev + 1)
     } finally {
       setLoading(false)
@@ -214,8 +221,8 @@ export default function MFAVerification({
   }
 
   const handleSubmitTOTP = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (verificationCode.length === 6 || verificationCode.includes('-')) {
+    e?.preventDefault()
+    if (verificationCode.length === 6 || verificationCode?.includes('-')) {
       verifyMFA(verificationCode)
     }
   }
@@ -223,7 +230,7 @@ export default function MFAVerification({
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+    return `${minutes}:${remainingSeconds?.toString().padStart(2, '0')}`
   }
 
   const getMethodIcon = (method: string) => {
@@ -248,7 +255,7 @@ export default function MFAVerification({
       case 'sms':
         return t('smsMethod')
       default:
-        return method.toUpperCase()
+        return method?.toUpperCase()
     }
   }
 
@@ -279,7 +286,7 @@ export default function MFAVerification({
             <Label>{t('authenticationMethod')}</Label>
             <Tabs value={selectedMethod} onValueChange={setSelectedMethod}>
               <TabsList className="grid w-full grid-cols-2">
-                {availableMethods.map((method) => (
+                {availableMethods?.map((method) => (
                   <TabsTrigger
                     key={method.type}
                     value={method.type}
@@ -308,14 +315,14 @@ export default function MFAVerification({
         {selectedMethod === 'totp' && (
           <form onSubmit={handleSubmitTOTP} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="code">{t('verificationCode')}</Label>
+              <Label htmlFor={ids.code}>{t('verificationCode')}</Label>
               <Input
-                id="code"
+                id={ids.code}
                 type="text"
                 placeholder={t('verificationCodePlaceholder')}
                 value={verificationCode}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setVerificationCode(e.target.value.replace(/\s/g, ''))
+                  setVerificationCode(e?.target?.value?.replace(/\s/g, ''))
                 }
                 maxLength={12}
                 className="text-center text-lg tracking-widest"
@@ -333,7 +340,7 @@ export default function MFAVerification({
               disabled={
                 loading ||
                 !verificationCode ||
-                (verificationCode.length !== 6 && !verificationCode.includes('-'))
+                (verificationCode.length !== 6 && !verificationCode?.includes('-'))
               }
             >
               {loading ? t('verifying') : t('verify')}
@@ -356,6 +363,7 @@ export default function MFAVerification({
               </div>
             ) : (
               <Button
+                type="button"
                 onClick={() => startWebAuthnAuthentication(mfaSession?.challenge)}
                 className="w-full"
               >
@@ -376,14 +384,14 @@ export default function MFAVerification({
 
             <form onSubmit={handleSubmitTOTP} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="sms-code">{t('smsCode')}</Label>
+                <Label htmlFor={ids['sms-code']}>{t('smsCode')}</Label>
                 <Input
-                  id="sms-code"
+                  id={ids['sms-code']}
                   type="text"
                   placeholder={t('smsCodePlaceholder')}
                   value={verificationCode}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setVerificationCode(e.target.value.replace(/\s/g, ''))
+                    setVerificationCode(e?.target?.value?.replace(/\s/g, ''))
                   }
                   maxLength={6}
                   className="text-center text-lg tracking-widest"
@@ -405,7 +413,7 @@ export default function MFAVerification({
 
         {/* Back button */}
         <div className="pt-4 border-t">
-          <Button variant="ghost" onClick={onBack} className="w-full">
+          <Button type="button" variant="ghost" onClick={onBack} className="w-full">
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('backToLogin')}
           </Button>

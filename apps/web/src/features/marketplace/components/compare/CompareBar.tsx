@@ -25,7 +25,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
   const maxProducts = useSelector(selectMaxCompareProducts)
   const [isMinimized, setIsMinimized] = React.useState(false)
 
-  if (products.length === 0) return null
+  if (products?.length === 0) return null
 
   const handleRemoveProduct = (productId: string) => {
     dispatch(removeFromCompare(productId))
@@ -40,7 +40,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
   }
 
   const handleViewComparison = () => {
-    if (products.length >= 2) {
+    if (products?.length >= 2) {
       dispatch(setCompareOpen(true))
       onViewComparison?.()
     }
@@ -61,12 +61,12 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
             <div className="flex items-center gap-3">
               <Layers className="w-5 h-5" />
               <span className="font-medium">
-                Compare Products ({products.length}/{maxProducts})
+                Compare Products ({products?.length}/{maxProducts})
               </span>
             </div>
 
             <div className="flex items-center gap-2">
-              {products.length >= 2 && (
+              {products?.length >= 2 && (
                 <button
                   onClick={handleViewComparison}
                   className="px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
@@ -102,7 +102,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
         {!isMinimized && (
           <div className="p-4">
             <div className="flex gap-4 overflow-x-auto">
-              {products.map((product) => (
+              {products?.map((product) => (
                 <div
                   key={product.id}
                   className="flex-shrink-0 w-48 bg-gray-50 rounded-lg p-3 relative group"
@@ -115,9 +115,9 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
                   </button>
 
                   <div className="flex gap-3">
-                    {product.image ? (
+                    {product.images?.[0] ? (
                       <img
-                        src={product.image}
+                        src={product.images?.[0]}
                         alt={product.name}
                         className="w-12 h-12 object-cover rounded"
                       />
@@ -131,7 +131,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
                       <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
                       <p className="text-xs text-gray-600">{product.brand}</p>
                       <p className="text-sm font-semibold text-gray-900 mt-1">
-                        €{product.price.toFixed(2)}
+                        €{product?.price?.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -139,12 +139,12 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
               ))}
 
               {/* Add more products slot */}
-              {products.length < maxProducts && (
+              {products?.length < maxProducts && (
                 <div className="flex-shrink-0 w-48 border-2 border-dashed border-gray-300 rounded-lg p-3 flex items-center justify-center">
                   <div className="text-center">
                     <Package className="w-8 h-8 text-gray-400 mx-auto mb-1" />
                     <p className="text-xs text-gray-500">
-                      Add {maxProducts - products.length} more
+                      Add {maxProducts - products?.length} more
                     </p>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export const CompareBar: React.FC<CompareBarProps> = ({ onViewComparison, classN
             </div>
 
             {/* Hint */}
-            {products.length === 1 && (
+            {products?.length === 1 && (
               <p className="text-sm text-gray-600 mt-3 text-center">
                 Add at least one more product to compare
               </p>

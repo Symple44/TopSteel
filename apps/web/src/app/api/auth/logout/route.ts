@@ -8,9 +8,9 @@ export async function POST(req: NextRequest) {
     const tokens = await getTokensFromCookies(req)
 
     // Essayer aussi depuis l'en-tête Authorization pour la compatibilité
-    const authHeader = req.headers.get('authorization')
+    const authHeader = req?.headers?.get('authorization')
     const token =
-      tokens?.accessToken || (authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null)
+      tokens?.accessToken || (authHeader?.startsWith('Bearer ') ? authHeader?.substring(7) : null)
 
     if (token) {
       // Rediriger vers l'API backend pour invalider le token
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Créer la réponse
-    const response = NextResponse.json({ success: true })
+    const response = NextResponse?.json({ success: true })
 
     // Effacer tous les cookies d'authentification
     clearAuthCookies(response)
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     return response
   } catch (_error) {
     // Même en cas d'erreur, on considère le logout comme réussi
-    const response = NextResponse.json({ success: true })
+    const response = NextResponse?.json({ success: true })
     clearAuthCookies(response)
     return response
   }

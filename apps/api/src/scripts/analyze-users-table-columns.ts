@@ -73,7 +73,7 @@ class UsersTableAnalyzer {
       AND table_schema = 'public'
     `)
 
-    return parseInt(result[0].count) > 0
+    return parseInt(result[0].count, 10) > 0
   }
 
   private async analyzeColumns(): Promise<ColumnInfo[]> {
@@ -178,7 +178,7 @@ class UsersTableAnalyzer {
     try {
       // Compter le nombre total d'utilisateurs
       const countResult = await this.dataSource.query('SELECT COUNT(*) as count FROM users')
-      const totalUsers = parseInt(countResult[0].count)
+      const totalUsers = parseInt(countResult[0].count, 10)
 
       if (totalUsers === 0) {
         return

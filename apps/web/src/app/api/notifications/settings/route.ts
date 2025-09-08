@@ -77,15 +77,15 @@ let userSettings = { ...defaultSettings }
 
 export async function GET(_request: NextRequest) {
   try {
-    return NextResponse.json(userSettings)
+    return NextResponse?.json(userSettings)
   } catch (_error) {
-    return NextResponse.json({ error: 'Failed to fetch notification settings' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to fetch notification settings' }, { status: 500 })
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
-    const updates = await request.json()
+    const updates = await request?.json()
 
     // Fusionner les paramètres mis à jour
     userSettings = {
@@ -93,30 +93,30 @@ export async function PATCH(request: NextRequest) {
       ...updates,
       // Fusionner les objets imbriqués
       categories: {
-        ...userSettings.categories,
-        ...(updates.categories || {}),
+        ...userSettings?.categories,
+        ...(updates?.categories || {}),
       },
       priority: {
-        ...userSettings.priority,
-        ...(updates.priority || {}),
+        ...userSettings?.priority,
+        ...(updates?.priority || {}),
       },
       schedules: {
-        ...userSettings.schedules,
-        ...(updates.schedules || {}),
+        ...userSettings?.schedules,
+        ...(updates?.schedules || {}),
         workingHours: {
-          ...userSettings.schedules.workingHours,
-          ...(updates.schedules?.workingHours || {}),
+          ...userSettings?.schedules?.workingHours,
+          ...(updates?.schedules?.workingHours || {}),
         },
         weekdays: {
-          ...userSettings.schedules.weekdays,
-          ...(updates.schedules?.weekdays || {}),
+          ...userSettings?.schedules?.weekdays,
+          ...(updates?.schedules?.weekdays || {}),
         },
       },
     }
 
-    return NextResponse.json(userSettings)
+    return NextResponse?.json(userSettings)
   } catch (_error) {
-    return NextResponse.json({ error: 'Failed to update notification settings' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to update notification settings' }, { status: 500 })
   }
 }
 
@@ -125,8 +125,8 @@ export async function POST(_request: NextRequest) {
     // Réinitialiser aux paramètres par défaut
     userSettings = { ...defaultSettings }
 
-    return NextResponse.json(userSettings)
+    return NextResponse?.json(userSettings)
   } catch (_error) {
-    return NextResponse.json({ error: 'Failed to reset notification settings' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to reset notification settings' }, { status: 500 })
   }
 }

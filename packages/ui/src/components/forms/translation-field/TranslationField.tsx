@@ -2,7 +2,7 @@
 
 import { Globe, Languages } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Label } from '../../forms'
+import { Label } from '../../forms/label/Label'
 import {
   Button,
   Dialog,
@@ -141,6 +141,7 @@ export function TranslationField({
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button
+              type="button"
               variant="outline"
               size="sm"
               className="shrink-0 px-2"
@@ -196,10 +197,12 @@ export function TranslationField({
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={handleCancel}>
+              <Button type="button" variant="outline" onClick={handleCancel}>
                 {t('cancel')}
               </Button>
-              <Button onClick={handleSave}>{t('save')}</Button>
+              <Button type="button" onClick={handleSave}>
+                {t('save')}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

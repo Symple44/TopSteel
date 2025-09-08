@@ -16,18 +16,18 @@ export function useSelectedPages() {
 
       const response = await callClientApi('user/menu-preferences/selected-pages')
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erreur lors du chargement (${response.status}): ${errorText}`)
+      if (!response?.ok) {
+        const errorText = await response?.text()
+        throw new Error(`Erreur lors du chargement (${response?.status}): ${errorText}`)
       }
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
+      if (data?.success) {
         const pages = Array.isArray(data.data) ? data.data : []
         setSelectedPages(new Set(pages))
       } else {
-        const errorMsg = data.message || 'Erreur inconnue'
+        const errorMsg = data?.message || 'Erreur inconnue'
         setError(errorMsg)
       }
     } catch (err) {
@@ -37,7 +37,10 @@ export function useSelectedPages() {
       setSelectedPages(new Set(defaultPages))
 
       // Seulement définir une erreur si c'est critique (ex: problème d'authentification)
-      if (err instanceof Error && (err.message.includes('401') || err.message.includes('403'))) {
+      if (
+        err instanceof Error &&
+        (err?.message?.includes('401') || err?.message?.includes('403'))
+      ) {
         setError('Vous devez être connecté pour accéder aux préférences de menu')
       }
       // Sinon, laisser l'erreur à null et utiliser les valeurs par défaut
@@ -56,15 +59,15 @@ export function useSelectedPages() {
         body: JSON.stringify({ selectedPages: pagesArray }),
       })
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erreur lors de la sauvegarde (${response.status}): ${errorText}`)
+      if (!response?.ok) {
+        const errorText = await response?.text()
+        throw new Error(`Erreur lors de la sauvegarde (${response?.status}): ${errorText}`)
       }
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (!data.success) {
-        throw new Error(data.message || 'Erreur de sauvegarde')
+      if (!data?.success) {
+        throw new Error(data?.message || 'Erreur de sauvegarde')
       }
 
       // Déclencher un événement pour notifier les autres composants de recharger le menu
@@ -84,10 +87,10 @@ export function useSelectedPages() {
   const togglePage = useCallback(
     async (pageId: string) => {
       const newSelected = new Set(selectedPages)
-      if (newSelected.has(pageId)) {
-        newSelected.delete(pageId)
+      if (newSelected?.has(pageId)) {
+        newSelected?.delete(pageId)
       } else {
-        newSelected.add(pageId)
+        newSelected?.add(pageId)
       }
 
       // Mettre à jour l'état local immédiatement
@@ -134,7 +137,7 @@ export function useSelectedPages() {
     selectAllPages,
     deselectAllPages,
     resetSelection,
-    isSelected: (pageId: string) => selectedPages.has(pageId),
+    isSelected: (pageId: string) => selectedPages?.has(pageId),
     selectedCount: selectedPages.size,
     refreshSelectedPages: loadSelectedPages,
   }

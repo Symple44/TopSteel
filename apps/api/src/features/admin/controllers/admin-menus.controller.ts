@@ -64,7 +64,8 @@ export class AdminMenusController {
   ): Promise<MenuConfiguration> {
     const userId =
       (req.user as { id?: string; sub?: string; email?: string })?.sub ||
-      (req.user as { id?: string; sub?: string; email?: string })?.id
+      (req.user as { id?: string; sub?: string; email?: string })?.id ||
+      'system'
     return await this.menuConfigService.createConfiguration(createDto, userId)
   }
 
@@ -76,7 +77,8 @@ export class AdminMenusController {
   ): Promise<MenuConfiguration> {
     const userId =
       (req.user as { id?: string; sub?: string; email?: string })?.sub ||
-      (req.user as { id?: string; sub?: string; email?: string })?.id
+      (req.user as { id?: string; sub?: string; email?: string })?.id ||
+      'system'
     return await this.menuConfigService.updateConfiguration(id, updateDto, userId)
   }
 
@@ -139,7 +141,8 @@ export class AdminMenusController {
   ): Promise<MenuConfiguration> {
     const userId =
       (req.user as { id?: string; sub?: string; email?: string })?.sub ||
-      (req.user as { id?: string; sub?: string; email?: string })?.id
+      (req.user as { id?: string; sub?: string; email?: string })?.id ||
+      'system'
     return await this.menuConfigService.importConfiguration(data, userId)
   }
 
@@ -269,7 +272,8 @@ export class AdminMenusController {
   ) {
     const userId =
       (req.user as { id?: string; sub?: string; email?: string })?.sub ||
-      (req.user as { id?: string; sub?: string; email?: string })?.id
+      (req.user as { id?: string; sub?: string; email?: string })?.id ||
+      'system'
     return await this.menuConfigService.addUserDataViewToMenu(
       userId,
       body.queryBuilderId,

@@ -1,10 +1,10 @@
 'use client'
-import React from 'react'
+import { Activity, Gauge, Target, TrendingUp } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Card } from '../../../layout/card'
 import { Progress } from '../../../primitives/progress'
-import { Badge } from '../../../data-display/badge'
-import { Gauge, TrendingUp, Activity, Target } from 'lucide-react'
+
 interface MechanicalProperty {
   name: string
   value: number
@@ -35,13 +35,13 @@ interface MechanicalPropertiesProps {
   comparisonData?: { [key: string]: number }
   onPropertyClick?: (property: MechanicalProperty) => void
 }
-export function MechanicalProperties({ 
-  className, 
+export function MechanicalProperties({
+  className,
   materialName,
   properties,
   showComparison = false,
   comparisonData,
-  onPropertyClick
+  onPropertyClick,
 }: MechanicalPropertiesProps) {
   const getPropertyIcon = (name: string) => {
     if (name.toLowerCase().includes('strength')) return <Target className="w-4 h-4" />
@@ -53,13 +53,29 @@ export function MechanicalProperties({
   const getGradeBadge = (grade?: string) => {
     switch (grade) {
       case 'excellent':
-        return <Badge variant="success" className="text-xs">Excellent</Badge>
+        return (
+          <Badge variant="default" className="text-xs">
+            Excellent
+          </Badge>
+        )
       case 'good':
-        return <Badge variant="outline" className="text-xs border-green-200 text-green-600">Good</Badge>
+        return (
+          <Badge variant="outline" className="text-xs border-green-200 text-green-600">
+            Good
+          </Badge>
+        )
       case 'acceptable':
-        return <Badge variant="secondary" className="text-xs">Acceptable</Badge>
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Acceptable
+          </Badge>
+        )
       case 'poor':
-        return <Badge variant="destructive" className="text-xs">Poor</Badge>
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Poor
+          </Badge>
+        )
       default:
         return null
     }
@@ -76,23 +92,39 @@ export function MechanicalProperties({
   }
   const getDirectionIcon = (direction?: string) => {
     switch (direction) {
-      case 'longitudinal': return '↔️'
-      case 'transverse': return '↕️'
-      case 'through-thickness': return '⬆️'
-      default: return '🔄'
+      case 'longitudinal':
+        return '↔️'
+      case 'transverse':
+        return '↕️'
+      case 'through-thickness':
+        return '⬆️'
+      default:
+        return '🔄'
     }
   }
   const mainProperties = [
-    { key: 'tensileStrength', label: 'Tensile Strength', color: 'bg-red-50 border-red-200 text-red-700' },
-    { key: 'yieldStrength', label: 'Yield Strength', color: 'bg-orange-50 border-orange-200 text-orange-700' },
-    { key: 'elongation', label: 'Elongation', color: 'bg-green-50 border-green-200 text-green-700' },
+    {
+      key: 'tensileStrength',
+      label: 'Tensile Strength',
+      color: 'bg-red-50 border-red-200 text-red-700',
+    },
+    {
+      key: 'yieldStrength',
+      label: 'Yield Strength',
+      color: 'bg-orange-50 border-orange-200 text-orange-700',
+    },
+    {
+      key: 'elongation',
+      label: 'Elongation',
+      color: 'bg-green-50 border-green-200 text-green-700',
+    },
     { key: 'hardness', label: 'Hardness', color: 'bg-blue-50 border-blue-200 text-blue-700' },
   ]
   const additionalProperties = Object.entries(properties).filter(
-    ([key]) => !mainProperties.some(p => p.key === key) && properties[key]
+    ([key]) => !mainProperties.some((p) => p.key === key) && properties[key]
   )
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -109,14 +141,23 @@ export function MechanicalProperties({
             if (!property) return null
             const comparisonPercent = getComparisonPercentage(key, property.value)
             return (
-              <div 
+              // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+              <div
                 key={key}
                 className={cn(
-                  "p-4 rounded-lg border transition-colors",
+                  'p-4 rounded-lg border transition-colors',
                   color,
-                  onPropertyClick && "cursor-pointer hover:bg-opacity-70"
+                  onPropertyClick && 'cursor-pointer hover:bg-opacity-70'
                 )}
+                role={onPropertyClick ? 'button' : undefined}
+                tabIndex={onPropertyClick ? 0 : undefined}
                 onClick={() => onPropertyClick?.(property)}
+                onKeyDown={(e) => {
+                  if (onPropertyClick && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault()
+                    onPropertyClick(property)
+                  }
+                }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -139,25 +180,17 @@ export function MechanicalProperties({
                       <span>vs. Reference</span>
                       <span>{comparisonPercent}%</span>
                     </div>
-                    <Progress 
-                      value={Math.min(parseFloat(comparisonPercent), 200)} 
+                    <Progress
+                      value={Math.min(parseFloat(comparisonPercent), 200)}
                       className="h-2"
                     />
                   </div>
                 )}
                 <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-                  {property.temperature && (
-                    <div>Temperature: {property.temperature}°C</div>
-                  )}
-                  {property.standard && (
-                    <div>Standard: {property.standard}</div>
-                  )}
-                  {property.testMethod && (
-                    <div>Test: {property.testMethod}</div>
-                  )}
-                  {property.sampleSize && (
-                    <div>Sample size: {property.sampleSize}</div>
-                  )}
+                  {property.temperature && <div>Temperature: {property.temperature}°C</div>}
+                  {property.standard && <div>Standard: {property.standard}</div>}
+                  {property.testMethod && <div>Test: {property.testMethod}</div>}
+                  {property.sampleSize && <div>Sample size: {property.sampleSize}</div>}
                 </div>
               </div>
             )
@@ -172,13 +205,22 @@ export function MechanicalProperties({
                 if (!property) return null
                 const comparisonPercent = getComparisonPercentage(key, property.value)
                 return (
-                  <div 
+                  // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+                  <div
                     key={key}
                     className={cn(
-                      "p-3 rounded-lg border bg-gray-50 border-gray-200 transition-colors",
-                      onPropertyClick && "cursor-pointer hover:bg-gray-100"
+                      'p-3 rounded-lg border bg-gray-50 border-gray-200 transition-colors',
+                      onPropertyClick && 'cursor-pointer hover:bg-gray-100'
                     )}
+                    role={onPropertyClick ? 'button' : undefined}
+                    tabIndex={onPropertyClick ? 0 : undefined}
                     onClick={() => onPropertyClick?.(property)}
+                    onKeyDown={(e) => {
+                      if (onPropertyClick && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault()
+                        onPropertyClick(property)
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-medium text-sm capitalize">
@@ -199,8 +241,8 @@ export function MechanicalProperties({
                           <span>vs. Ref</span>
                           <span>{comparisonPercent}%</span>
                         </div>
-                        <Progress 
-                          value={Math.min(parseFloat(comparisonPercent), 200)} 
+                        <Progress
+                          value={Math.min(parseFloat(comparisonPercent), 200)}
                           className="h-1"
                         />
                       </div>
@@ -248,11 +290,16 @@ export function MechanicalProperties({
         {/* Test Conditions */}
         <div className="pt-3 border-t text-xs text-muted-foreground">
           <div className="flex flex-wrap gap-4">
-            {Object.values(properties).some(p => p?.temperature) && (
-              <div>Test Temperature: {Object.values(properties).find(p => p?.temperature)?.temperature}°C</div>
+            {Object.values(properties).some((p) => p?.temperature) && (
+              <div>
+                Test Temperature:{' '}
+                {Object.values(properties).find((p) => p?.temperature)?.temperature}°C
+              </div>
             )}
-            {Object.values(properties).some(p => p?.confidence) && (
-              <div>Confidence: {Object.values(properties).find(p => p?.confidence)?.confidence}%</div>
+            {Object.values(properties).some((p) => p?.confidence) && (
+              <div>
+                Confidence: {Object.values(properties).find((p) => p?.confidence)?.confidence}%
+              </div>
             )}
             <div>Properties based on standard test methods</div>
           </div>

@@ -1,5 +1,6 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { type EventEmitter2, OnEvent } from '@nestjs/event-emitter'
+import { hasStack } from '../../../core/common/utils'
 import type { SearchCacheService } from './search-cache.service'
 
 // Events that trigger cache invalidation
@@ -9,7 +10,7 @@ export interface CacheInvalidationEvent {
   entityId: string
   operation: 'create' | 'update' | 'delete'
   timestamp: Date
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface BulkCacheInvalidationEvent {
@@ -63,7 +64,10 @@ export class SearchCacheInvalidationService implements OnModuleInit {
         timestamp: new Date(),
       } as CacheInvalidationEvent)
     } catch (error) {
-      this.logger.error(`Failed to invalidate cache for ${entityType}:${entityId}`, error.stack)
+      this.logger.error(
+        `Failed to invalidate cache for ${entityType}:${entityId}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -82,7 +86,10 @@ export class SearchCacheInvalidationService implements OnModuleInit {
         timestamp: new Date(),
       })
     } catch (error) {
-      this.logger.error(`Failed to invalidate tenant cache for ${tenantId}`, error.stack)
+      this.logger.error(
+        `Failed to invalidate tenant cache for ${tenantId}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -223,7 +230,10 @@ export class SearchCacheInvalidationService implements OnModuleInit {
         `Cache stats - Hits: ${stats.hits}, Misses: ${stats.misses}, Hit Rate: ${stats.hitRate.toFixed(2)}%`
       )
     } catch (error) {
-      this.logger.error('Failed to perform scheduled cache cleanup', error.stack)
+      this.logger.error(
+        'Failed to perform scheduled cache cleanup',
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -267,7 +277,7 @@ export function emitCacheInvalidationEvent(
   entityType: string,
   entityId: string,
   operation: 'create' | 'update' | 'delete',
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): void {
   const event: CacheInvalidationEvent = {
     tenantId,
@@ -286,10 +296,10 @@ export function emitCacheInvalidationEvent(
  * Usage: @InvalidateCache('product', 'update')
  */
 export function InvalidateCache(entityType: string, operation: 'create' | 'update' | 'delete') {
-  return (_target: any, _propertyName: string, descriptor: PropertyDescriptor) => {
+  return (_target: unknown, _propertyName: string, descriptor: PropertyDescriptor) => {
     const method = descriptor.value
 
-    descriptor.value = async function (this: any, ...args: any[]) {
+    descriptor.value = async function (this: unknown, ...args: unknown[]) {
       const result = await method.apply(this, args)
 
       // Try to extract tenant and entity information from result or arguments

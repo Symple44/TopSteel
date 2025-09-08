@@ -31,8 +31,8 @@ export function QueryBuilderSidebar() {
   const fetchQueryBuilders = useCallback(async () => {
     try {
       const response = await callClientApi('query-builder')
-      if (response.ok) {
-        const result = await response.json()
+      if (response?.ok) {
+        const result = await response?.json()
         // Assurer que nous avons bien un tableau
         const data = Array.isArray(result) ? result : result.data || result.queryBuilders || []
         setQueryBuilders(data)
@@ -49,27 +49,27 @@ export function QueryBuilderSidebar() {
   }, [fetchQueryBuilders])
 
   const filteredQueryBuilders = Array.isArray(queryBuilders)
-    ? queryBuilders.filter(
+    ? queryBuilders?.filter(
         (qb) =>
-          qb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          qb.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          qb?.name?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+          qb.description?.toLowerCase().includes(searchTerm?.toLowerCase())
       )
     : []
 
   const handleSelect = (id: string) => {
     setSelectedId(id)
-    router.push(`/query-builder/${id}`)
+    router?.push(`/query-builder/${id}`)
   }
 
   const handleCreate = () => {
-    router.push('/query-builder/new')
+    router?.push('/query-builder/new')
   }
 
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold mb-4">Query Builders</h2>
-        <Button onClick={handleCreate} className="w-full mb-4" size="sm">
+        <Button type="button" onClick={handleCreate} className="w-full mb-4" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Nouveau Query Builder
         </Button>
@@ -78,7 +78,7 @@ export function QueryBuilderSidebar() {
           <Input
             placeholder="Rechercher..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e?.target?.value)}
             className="pl-8"
           />
         </div>
@@ -94,7 +94,7 @@ export function QueryBuilderSidebar() {
             </div>
           ) : (
             <div className="space-y-2">
-              {filteredQueryBuilders.map((qb) => (
+              {filteredQueryBuilders?.map((qb) => (
                 <button
                   key={qb.id}
                   type="button"

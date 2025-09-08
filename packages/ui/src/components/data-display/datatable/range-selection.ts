@@ -245,7 +245,9 @@ export class RangeSelectionManager {
    * Notifier les listeners
    */
   private notifyListeners() {
-    this.listeners.forEach((listener) => listener(this.selection))
+    this.listeners.forEach((listener) => {
+      listener(this.selection)
+    })
   }
 
   /**
@@ -270,7 +272,7 @@ export class RangeSelectionManager {
     )
 
     const rows = Object.keys(cellsByRow)
-      .map((k) => parseInt(k))
+      .map((k) => parseInt(k, 10))
       .sort((a, b) => a - b)
     const allColumns = [...new Set(selectedCells.map((c) => c.column))]
     allColumns.sort((a, b) => columnOrder.indexOf(a) - columnOrder.indexOf(b))
@@ -285,7 +287,7 @@ export class RangeSelectionManager {
 
             const value = column.getValue
               ? column.getValue(data[rowIndex])
-              : (data[rowIndex] as any)[column.key]
+              : (data[rowIndex] as unknown)[column.key]
 
             return String(value ?? '')
           })
@@ -329,7 +331,7 @@ export class RangeSelectionManager {
         const column = columns.find((c) => c.id === columnId)
         if (!column || !data[sourceRow]) return
 
-        const sourceValue = (data[sourceRow] as any)[column.key]
+        const sourceValue = (data[sourceRow] as unknown)[column.key]
 
         // Remplir toutes les autres cellules avec cette valeur
         for (let i = 1; i < rows.length; i++) {
@@ -364,7 +366,7 @@ export class RangeSelectionManager {
     )
 
     Object.entries(cellsByRow).forEach(([rowStr, columnIds]) => {
-      const row = parseInt(rowStr)
+      const row = parseInt(rowStr, 10)
       if (!data[row]) return
 
       // Trier les colonnes selon leur ordre dans le tableau
@@ -377,7 +379,7 @@ export class RangeSelectionManager {
         const sourceColumn = columns.find((c) => c.id === sourceColumnId)
         if (!sourceColumn) return
 
-        const sourceValue = (data[row] as any)[sourceColumn.key]
+        const sourceValue = (data[row] as unknown)[sourceColumn.key]
 
         // Remplir toutes les autres colonnes avec cette valeur
         for (let i = 1; i < columnIds.length; i++) {

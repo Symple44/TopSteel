@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import {
   EventStatus,
   ExecutionResult,
@@ -69,7 +70,7 @@ export class NotificationRuleEngineService {
       )
     } catch (error) {
       this.logger.error(`Error processing event ${event.id}:`, error)
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
       const errorStack = error instanceof Error ? error.stack : undefined
       event.markAsFailed(errorMessage, { stack: errorStack })
       await this.ruleService._eventRepository.save(event)
@@ -147,7 +148,7 @@ export class NotificationRuleEngineService {
     } catch (error) {
       this.logger.error(`Error executing rule ${rule.id}:`, error)
 
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
       const errorStack = error instanceof Error ? error.stack : undefined
       const execution = NotificationRuleExecution.createFailed(
         rule.id,
@@ -253,7 +254,9 @@ export class NotificationRuleEngineService {
       return await this._notificationRepository.save(notification)
     } catch (error) {
       this.logger.error(`Error creating notification from rule ${rule.id}:`, error)
-      throw new Error(`Template error: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Template error: ${error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)}`
+      )
     }
   }
 
@@ -280,7 +283,7 @@ export class NotificationRuleEngineService {
     const failedEvents = await this.ruleService._eventRepository.find({
       where: {
         status: EventStatus.FAILED,
-        occurredAt: maxAgeDate as any,
+        occurredAt: maxAgeDate as unknown,
       },
       order: { occurredAt: 'ASC' },
       take: 50,
@@ -402,7 +405,7 @@ export class NotificationRuleEngineService {
       return {
         success: false,
         conditionResult: { result: false, details: {} },
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? getErrorMessage(error) : getErrorMessage(error),
       }
     }
   }

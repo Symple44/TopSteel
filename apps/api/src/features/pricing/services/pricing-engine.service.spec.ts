@@ -87,7 +87,7 @@ describe('PricingEngineService', () => {
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
       getOne: jest.fn().mockResolvedValue(mockArticle),
-    } as any)
+    } as unknown)
 
     jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
       where: jest.fn().mockReturnThis(),
@@ -95,9 +95,9 @@ describe('PricingEngineService', () => {
       orderBy: jest.fn().mockReturnThis(),
       addOrderBy: jest.fn().mockReturnThis(),
       getMany: jest.fn().mockResolvedValue([mockPriceRule]),
-    } as any)
+    } as unknown)
 
-    jest.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as any)
+    jest.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as unknown)
   })
 
   afterEach(() => {
@@ -117,7 +117,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -156,7 +156,7 @@ describe('PricingEngineService', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         getOne: jest.fn().mockResolvedValue(articleWithCoeff),
-      } as any)
+      } as unknown)
 
       // No rules to focus on coefficient
       jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -165,7 +165,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -186,7 +186,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([fixedAmountRule]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -207,7 +207,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([fixedPriceRule]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -236,7 +236,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([lowPriorityRule, highPriorityRule]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -263,7 +263,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([nonCombinableRule, secondRule]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -276,7 +276,7 @@ describe('PricingEngineService', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         getOne: jest.fn().mockResolvedValue(null),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -323,7 +323,7 @@ describe('PricingEngineService', () => {
 
   describe('previewRule', () => {
     it('should preview a specific rule', async () => {
-      jest.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as any)
+      jest.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as unknown)
 
       const result = await service.previewRule('rule-123', 'article-123', {
         societeId: 'societe-123',
@@ -369,7 +369,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([problematicRule]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -381,8 +381,8 @@ describe('PricingEngineService', () => {
 
   describe('Edge cases', () => {
     it('should handle zero base price', async () => {
-      const _zeroPrice
-      Article = {
+      const _zeroPrice = 0
+      const zeroPriceArticle = {
         ...mockArticle,
         prixVenteHT: 0,
       }
@@ -391,7 +391,7 @@ describe('PricingEngineService', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         getOne: jest.fn().mockResolvedValue(zeroPriceArticle),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -412,7 +412,7 @@ describe('PricingEngineService', () => {
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([largeDiscountRule]),
-      } as any)
+      } as unknown)
 
       const result = await service.calculatePrice(mockContext)
 

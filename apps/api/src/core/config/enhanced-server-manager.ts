@@ -89,7 +89,7 @@ export async function killProcessOnPort(port: number): Promise<string[]> {
       for (const line of lines) {
         const parts = line.trim().split(/\s+/)
         const pid = parts[parts.length - 1]
-        if (pid && !Number.isNaN(parseInt(pid)) && pid !== '0') {
+        if (pid && !Number.isNaN(parseInt(pid, 10)) && pid !== '0') {
           pids.add(pid)
         }
       }

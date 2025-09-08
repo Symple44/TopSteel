@@ -1,9 +1,9 @@
-import { Construction } from 'lucide-react'
+import { Construction, type LucideIcon } from 'lucide-react'
 
 interface UnderConstructionProps {
   title: string
   description?: string
-  icon?: React.ComponentType<{ className?: string }>
+  icon?: LucideIcon
 }
 
 export function UnderConstruction({

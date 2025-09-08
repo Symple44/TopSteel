@@ -181,7 +181,7 @@ export class HealthController {
       const { DataSource } = await import('typeorm')
       const configObj = config as Record<string, unknown>
       const testConnection = new DataSource({
-        type: (configObj.type as string) as DataSourceOptions['type'],
+        type: configObj.type as string as DataSourceOptions['type'],
         host: configObj.host as string,
         port: configObj.port as number,
         username: configObj.username as string,

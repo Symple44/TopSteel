@@ -44,7 +44,7 @@ export function ColumnFilterDropdown<T = any>({
   const uniqueValues = React.useMemo(() => {
     const values = new Set<string>()
     data.forEach((item) => {
-      const value = (item as any)[column.id]
+      const value = (item as unknown)[column.id]
       if (value !== null && value !== undefined) {
         values.add(String(value))
       }
@@ -94,6 +94,9 @@ export function ColumnFilterDropdown<T = any>({
         window.removeEventListener('resize', handleResize)
       }
     }
+
+    // Return undefined cleanup function when isOpen is false
+    return undefined
   }, [isOpen])
 
   useEffect(() => {
@@ -165,6 +168,7 @@ export function ColumnFilterDropdown<T = any>({
   return (
     <div ref={containerRef} className="relative inline-block">
       <Button
+        type="button"
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
@@ -188,6 +192,7 @@ export function ColumnFilterDropdown<T = any>({
 
               <div className="flex gap-1 mb-2">
                 <Button
+                  type="button"
                   variant={currentSort === 'asc' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleSort(currentSort === 'asc' ? null : 'asc')}
@@ -197,6 +202,7 @@ export function ColumnFilterDropdown<T = any>({
                   Ascending
                 </Button>
                 <Button
+                  type="button"
                   variant={currentSort === 'desc' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleSort(currentSort === 'desc' ? null : 'desc')}
@@ -207,7 +213,13 @@ export function ColumnFilterDropdown<T = any>({
                 </Button>
               </div>
 
-              <Button variant="outline" size="sm" onClick={onAdvancedFilter} className="w-full">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onAdvancedFilter}
+                className="w-full"
+              >
                 <Search className="h-3 w-3 mr-1" />
                 Advanced Filter
               </Button>
@@ -228,7 +240,13 @@ export function ColumnFilterDropdown<T = any>({
 
             <div className="p-2 border-b border-border bg-muted/20">
               <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={handleSelectAll} className="text-xs">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSelectAll}
+                  className="text-xs"
+                >
                   {selectedValues.length === filteredValues.length
                     ? translations?.clear || 'Clear'
                     : translations?.selectAll || 'Select All'}
@@ -266,11 +284,23 @@ export function ColumnFilterDropdown<T = any>({
             </div>
 
             <div className="p-3 border-t border-border bg-muted/20 flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleClearFilter} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleClearFilter}
+                className="flex-1"
+              >
                 <X className="h-3 w-3 mr-1" />
                 {translations?.clear || 'Clear'}
               </Button>
-              <Button variant="default" size="sm" onClick={handleApplyFilter} className="flex-1">
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                onClick={handleApplyFilter}
+                className="flex-1"
+              >
                 <Check className="h-3 w-3 mr-1" />
                 Apply
               </Button>

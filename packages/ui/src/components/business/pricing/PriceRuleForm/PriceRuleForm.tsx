@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Alert, AlertDescription, AlertTitle } from '../../../feedback/alert'
@@ -206,6 +207,22 @@ export function PriceRuleForm({
   onCancel,
   className,
 }: PriceRuleFormProps) {
+  const ids = useFormFieldIds([
+    'ruleName',
+    'description',
+    'articleFamily',
+    'articleId',
+    'customerGroups',
+    'formula',
+    'adjustmentValue',
+    'validFrom',
+    'validUntil',
+    'usageLimit',
+    'usageLimitPerCustomer',
+    'priority',
+    'combinable',
+    'isActive',
+  ])
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<Partial<PriceRule>>({
     ruleName: '',
@@ -353,9 +370,9 @@ export function PriceRuleForm({
   const renderBasicStep = () => (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="ruleName">Nom de la règle *</Label>
+        <Label htmlFor={ids.ruleName}>Nom de la règle *</Label>
         <Input
-          id="ruleName"
+          id={ids.ruleName}
           value={formData.ruleName}
           onChange={(e) => updateFormData('ruleName', e.target.value)}
           placeholder="Ex: Remise volume acier"
@@ -364,9 +381,9 @@ export function PriceRuleForm({
         {errors.ruleName && <p className="text-sm text-red-500 mt-1">{errors.ruleName}</p>}
       </div>
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor={ids.description}>Description</Label>
         <Textarea
-          id="description"
+          id={ids.description}
           value={formData.description || ''}
           onChange={(e) => updateFormData('description', e.target.value)}
           placeholder="Description détaillée de la règle..."
@@ -396,9 +413,9 @@ export function PriceRuleForm({
   const renderTargetStep = () => (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="articleFamily">Famille d'articles</Label>
+        <Label htmlFor={ids.articleFamily}>Famille d'articles</Label>
         <Input
-          id="articleFamily"
+          id={ids.articleFamily}
           value={formData.articleFamily || ''}
           onChange={(e) => updateFormData('articleFamily', e.target.value)}
           placeholder="Ex: ACIER, INOX..."
@@ -408,18 +425,18 @@ export function PriceRuleForm({
         </p>
       </div>
       <div>
-        <Label htmlFor="articleId">Article spécifique (ID)</Label>
+        <Label htmlFor={ids.articleId}>Article spécifique (ID)</Label>
         <Input
-          id="articleId"
+          id={ids.articleId}
           value={formData.articleId || ''}
           onChange={(e) => updateFormData('articleId', e.target.value)}
           placeholder="UUID de l'article"
         />
       </div>
       <div>
-        <Label htmlFor="customerGroups">Groupes clients</Label>
+        <Label htmlFor={ids.customerGroups}>Groupes clients</Label>
         <Input
-          id="customerGroups"
+          id={ids.customerGroups}
           value={formData.customerGroups?.join(', ') || ''}
           onChange={(e) =>
             updateFormData(
@@ -520,7 +537,7 @@ export function PriceRuleForm({
               <Badge variant="outline">volume</Badge>
             </div>
             <Textarea
-              id="formula"
+              id={ids.formula}
               value={formData.formula || ''}
               onChange={(e) => updateFormData('formula', e.target.value)}
               placeholder="Ex: price * 0.9 * (quantity > 100 ? 0.95 : 1)"
@@ -531,7 +548,7 @@ export function PriceRuleForm({
           </div>
         ) : (
           <Input
-            id="adjustmentValue"
+            id={ids.adjustmentValue}
             type="number"
             step="0.01"
             value={formData.adjustmentValue}
@@ -693,9 +710,9 @@ export function PriceRuleForm({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="validFrom">Date de début</Label>
+          <Label htmlFor={ids.validFrom}>Date de début</Label>
           <Input
-            id="validFrom"
+            id={ids.validFrom}
             type="datetime-local"
             value={
               formData.validFrom ? new Date(formData.validFrom).toISOString().slice(0, 16) : ''
@@ -704,9 +721,9 @@ export function PriceRuleForm({
           />
         </div>
         <div>
-          <Label htmlFor="validUntil">Date de fin</Label>
+          <Label htmlFor={ids.validUntil}>Date de fin</Label>
           <Input
-            id="validUntil"
+            id={ids.validUntil}
             type="datetime-local"
             value={
               formData.validUntil ? new Date(formData.validUntil).toISOString().slice(0, 16) : ''
@@ -717,29 +734,32 @@ export function PriceRuleForm({
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="usageLimit">Limite d'utilisation totale</Label>
+          <Label htmlFor={ids.usageLimit}>Limite d'utilisation totale</Label>
           <Input
-            id="usageLimit"
+            id={ids.usageLimit}
             type="number"
             min="1"
             value={formData.usageLimit || ''}
             onChange={(e) =>
-              updateFormData('usageLimit', e.target.value ? parseInt(e.target.value) : undefined)
+              updateFormData(
+                'usageLimit',
+                e.target.value ? parseInt(e.target.value, 10) : undefined
+              )
             }
             placeholder="Illimité"
           />
         </div>
         <div>
-          <Label htmlFor="usageLimitPerCustomer">Limite par client</Label>
+          <Label htmlFor={ids.usageLimitPerCustomer}>Limite par client</Label>
           <Input
-            id="usageLimitPerCustomer"
+            id={ids.usageLimitPerCustomer}
             type="number"
             min="1"
             value={formData.usageLimitPerCustomer || ''}
             onChange={(e) =>
               updateFormData(
                 'usageLimitPerCustomer',
-                e.target.value ? parseInt(e.target.value) : undefined
+                e.target.value ? parseInt(e.target.value, 10) : undefined
               )
             }
             placeholder="Illimité"
@@ -751,14 +771,14 @@ export function PriceRuleForm({
   const renderAdvancedStep = () => (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="priority">Priorité</Label>
+        <Label htmlFor={ids.priority}>Priorité</Label>
         <Input
-          id="priority"
+          id={ids.priority}
           type="number"
           min="0"
           max="1000"
           value={formData.priority}
-          onChange={(e) => updateFormData('priority', parseInt(e.target.value))}
+          onChange={(e) => updateFormData('priority', parseInt(e.target.value, 10))}
         />
         <p className="text-sm text-muted-foreground mt-1">
           Les règles avec une priorité plus élevée sont appliquées en premier
@@ -766,26 +786,26 @@ export function PriceRuleForm({
       </div>
       <div className="flex items-center justify-between">
         <div>
-          <Label htmlFor="combinable">Combinable avec d'autres règles</Label>
+          <Label htmlFor={ids.combinable}>Combinable avec d'autres règles</Label>
           <p className="text-sm text-muted-foreground">
             Si désactivé, aucune autre règle ne sera appliquée après celle-ci
           </p>
         </div>
         <Switch
-          id="combinable"
+          id={ids.combinable}
           checked={formData.combinable}
           onCheckedChange={(checked) => updateFormData('combinable', checked)}
         />
       </div>
       <div className="flex items-center justify-between">
         <div>
-          <Label htmlFor="isActive">Règle active</Label>
+          <Label htmlFor={ids.isActive}>Règle active</Label>
           <p className="text-sm text-muted-foreground">
             La règle sera immédiatement active après création
           </p>
         </div>
         <Switch
-          id="isActive"
+          id={ids.isActive}
           checked={formData.isActive}
           onCheckedChange={(checked) => updateFormData('isActive', checked)}
         />

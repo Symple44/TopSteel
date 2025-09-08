@@ -210,28 +210,28 @@ const notificationRules: NotificationRule[] = [
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const isActive = searchParams.get('isActive')
-    const triggerType = searchParams.get('triggerType')
-    const limit = parseInt(searchParams.get('limit') || '50')
-    const offset = parseInt(searchParams.get('offset') || '0')
+    const isActive = searchParams?.get('isActive')
+    const triggerType = searchParams?.get('triggerType')
+    const limit = parseInt(searchParams?.get('limit') || '50', 10)
+    const offset = parseInt(searchParams?.get('offset') || '0', 10)
 
     let filteredRules = notificationRules
 
     // Filtrer par statut actif
     if (isActive !== null) {
-      filteredRules = filteredRules.filter((rule) => rule.isActive === (isActive === 'true'))
+      filteredRules = filteredRules?.filter((rule) => rule.isActive === (isActive === 'true'))
     }
 
     // Filtrer par type de déclencheur
     if (triggerType) {
-      filteredRules = filteredRules.filter((rule) => rule.trigger.type === triggerType)
+      filteredRules = filteredRules?.filter((rule) => rule?.trigger.type === triggerType)
     }
 
     // Pagination
-    const total = filteredRules.length
-    const rules = filteredRules.slice(offset, offset + limit)
+    const total = filteredRules?.length
+    const rules = filteredRules?.slice(offset, offset + limit)
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: {
         rules,
@@ -242,7 +242,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { success: false, error: 'Erreur lors de la récupération des règles' },
       { status: 500 }
     )
@@ -251,20 +251,20 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request?.json()
 
     // Validation des données requises
-    if (!body.name || !body.trigger || !body.notification) {
-      return NextResponse.json(
+    if (!body?.name || !body?.trigger || !body?.notification) {
+      return NextResponse?.json(
         { success: false, error: 'Nom, déclencheur et configuration de notification sont requis' },
         { status: 400 }
       )
     }
 
     // Vérifier l'unicité du nom
-    const existingRule = notificationRules.find((rule) => rule.name === body.name)
+    const existingRule = notificationRules?.find((rule) => rule.name === body?.name)
     if (existingRule) {
-      return NextResponse.json(
+      return NextResponse?.json(
         { success: false, error: 'Une règle avec ce nom existe déjà' },
         { status: 400 }
       )
@@ -283,14 +283,14 @@ export async function POST(request: NextRequest) {
       triggerCount: 0,
     }
 
-    notificationRules.push(newRule)
+    notificationRules?.push(newRule)
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: newRule,
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { success: false, error: 'Erreur lors de la création de la règle' },
       { status: 500 }
     )
@@ -299,23 +299,23 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { id, ...updates } = body
+    const body = await request?.json()
+    const { id, ...updates } = body || {}
 
     if (!id) {
-      return NextResponse.json({ success: false, error: 'ID de la règle requis' }, { status: 400 })
+      return NextResponse?.json({ success: false, error: 'ID de la règle requis' }, { status: 400 })
     }
 
-    const ruleIndex = notificationRules.findIndex((rule) => rule.id === id)
+    const ruleIndex = notificationRules?.findIndex((rule) => rule.id === id)
     if (ruleIndex === -1) {
-      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
+      return NextResponse?.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Vérifier l'unicité du nom si modifié
-    if (updates.name && updates.name !== notificationRules[ruleIndex].name) {
-      const existingRule = notificationRules.find((rule) => rule.name === updates.name)
+    if (updates.name && updates.name !== notificationRules?.[ruleIndex]?.name) {
+      const existingRule = notificationRules?.find((rule) => rule.name === updates.name)
       if (existingRule) {
-        return NextResponse.json(
+        return NextResponse?.json(
           { success: false, error: 'Une règle avec ce nom existe déjà' },
           { status: 400 }
         )
@@ -328,12 +328,12 @@ export async function PUT(request: NextRequest) {
       ...updates,
     }
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: notificationRules[ruleIndex],
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { success: false, error: 'Erreur lors de la mise à jour de la règle' },
       { status: 500 }
     )
@@ -343,26 +343,26 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
+    const id = searchParams?.get('id')
 
     if (!id) {
-      return NextResponse.json({ success: false, error: 'ID de la règle requis' }, { status: 400 })
+      return NextResponse?.json({ success: false, error: 'ID de la règle requis' }, { status: 400 })
     }
 
-    const ruleIndex = notificationRules.findIndex((rule) => rule.id === id)
+    const ruleIndex = notificationRules?.findIndex((rule) => rule.id === id)
     if (ruleIndex === -1) {
-      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
+      return NextResponse?.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Supprimer la règle
-    notificationRules.splice(ruleIndex, 1)
+    notificationRules?.splice(ruleIndex, 1)
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       message: 'Règle supprimée avec succès',
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { success: false, error: 'Erreur lors de la suppression de la règle' },
       { status: 500 }
     )

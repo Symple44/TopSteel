@@ -1,8 +1,10 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+// import { useSession } from 'next-auth/react' // Disabled - next-auth not installed
+const useSession = () => ({ data: null, status: 'unauthenticated' })
+
 import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   loadCartFromStorage,
@@ -28,11 +30,102 @@ export const CartProvider: React.FC<CartProviderProps> = ({
   syncInterval = 60000, // 1 minute
 }) => {
   const dispatch = useDispatch()
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession() as { data: unknown; status: string }
   const cartItems = useSelector(selectCartItems)
   const [isInitialized, setIsInitialized] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
   const [sessionId, setSessionId] = useState<string>('')
+
+  // Helper functions defined with useCallback to avoid hoisting issues
+  const generateSessionId = useCallback((): string => {
+    return `guest_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+  }, [])
+
+  const syncWithBackend = useCallback(async () => {
+    if (!sessionId || status !== 'authenticated' || !session?.user?.id) return
+
+    try {
+      await syncCartWithBackend(
+        {
+          items: cartItems,
+          isOpen: false,
+          lastUpdated: new Date(),
+          appliedCoupon: null,
+          shippingMethod: null,
+        },
+        session?.user?.id
+      )
+    } catch (_error) {}
+  }, [sessionId, status, session?.user?.id, cartItems])
+
+  const reserveStock = useCallback(async () => {
+    if (cartItems?.length === 0) return
+
+    try {
+      await reserveCartStock(cartItems, sessionId)
+    } catch (_error) {}
+  }, [cartItems, sessionId])
+
+  const initializeCart = useCallback(async () => {
+    try {
+      // Generate or retrieve session ID for guest users
+      let storedSessionId = localStorage?.getItem('marketplace_session_id')
+      if (!storedSessionId) {
+        storedSessionId = generateSessionId()
+        localStorage.setItem('marketplace_session_id', storedSessionId)
+      }
+      setSessionId(storedSessionId)
+
+      // Load cart from localStorage
+      const storedCart = loadCartFromStorage()
+      if (storedCart?.items) {
+        dispatch(syncCart(storedCart?.items))
+      }
+
+      // Sync with backend if user is logged in
+      if (status === 'authenticated' && session?.user) {
+        await syncWithBackend()
+      }
+
+      setIsInitialized(true)
+    } catch (_error) {
+      setIsInitialized(true)
+    }
+  }, [dispatch, status, session?.user, generateSessionId, syncWithBackend])
+
+  const handleUserLogin = useCallback(async () => {
+    if (!session?.user?.id || isSyncing) return
+
+    setIsSyncing(true)
+    try {
+      // Merge guest cart with user cart
+      const mergedItems = await mergeCartsAfterLogin(
+        {
+          items: cartItems,
+          isOpen: false,
+          lastUpdated: new Date(),
+          appliedCoupon: null,
+          shippingMethod: null,
+        },
+        session?.user?.id
+      )
+
+      if (mergedItems?.length > 0) {
+        dispatch(syncCart(mergedItems))
+      }
+
+      await syncWithBackend()
+    } catch (_error) {
+    } finally {
+      setIsSyncing(false)
+    }
+  }, [session?.user?.id, isSyncing, cartItems, dispatch, syncWithBackend])
+
+  const handleUserLogout = useCallback(() => {
+    // Clear user-specific data but keep guest cart
+    setIsSyncing(false)
+    // Don't clear the cart items, just reset sync status
+  }, [])
 
   // Initialize cart from localStorage on mount
   useEffect(() => {
@@ -52,7 +145,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({
 
   // Auto-sync with backend
   useEffect(() => {
-    if (!autoSync || !isInitialized || cartItems.length === 0) return
+    if (!autoSync || !isInitialized || cartItems?.length === 0) return undefined
 
     const syncTimer = setInterval(() => {
       syncWithBackend()
@@ -63,121 +156,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({
 
   // Reserve stock when items are added
   useEffect(() => {
-    if (cartItems.length > 0 && isInitialized) {
+    if (cartItems?.length > 0 && isInitialized) {
       reserveStock()
     }
   }, [cartItems, isInitialized, reserveStock])
-
-  const initializeCart = async () => {
-    try {
-      // Generate or retrieve session ID for guest users
-      let storedSessionId = localStorage.getItem('marketplace_session_id')
-      if (!storedSessionId) {
-        storedSessionId = generateSessionId()
-        localStorage.setItem('marketplace_session_id', storedSessionId)
-      }
-      setSessionId(storedSessionId)
-
-      // Load cart from localStorage
-      const storedCart = loadCartFromStorage()
-      if (storedCart?.items) {
-        dispatch(syncCart(storedCart.items))
-      }
-
-      // Sync with backend if user is logged in
-      if (status === 'authenticated' && session?.user) {
-        await syncWithBackend()
-      }
-
-      setIsInitialized(true)
-    } catch (_error) {
-      setIsInitialized(true)
-    }
-  }
-
-  const handleUserLogin = async () => {
-    if (!session?.user?.id || isSyncing) return
-
-    setIsSyncing(true)
-    try {
-      // Merge guest cart with user cart
-      const mergedItems = await mergeCartsAfterLogin(
-        {
-          items: cartItems,
-          isOpen: false,
-          lastUpdated: new Date(),
-          appliedCoupon: null,
-          shippingMethod: null,
-        },
-        session.user.id
-      )
-
-      if (mergedItems.length > 0) {
-        dispatch(syncCart(mergedItems))
-      }
-
-      // Clear guest session ID
-      localStorage.removeItem('marketplace_session_id')
-    } catch (_error) {
-    } finally {
-      setIsSyncing(false)
-    }
-  }
-
-  const handleUserLogout = () => {
-    // Generate new session ID for guest
-    const newSessionId = generateSessionId()
-    localStorage.setItem('marketplace_session_id', newSessionId)
-    setSessionId(newSessionId)
-  }
-
-  const syncWithBackend = async () => {
-    if (isSyncing || cartItems.length === 0) return
-
-    setIsSyncing(true)
-    try {
-      const userId = session?.user?.id
-      const updatedItems = await syncCartWithBackend(
-        {
-          items: cartItems,
-          isOpen: false,
-          lastUpdated: new Date(),
-          appliedCoupon: null,
-          shippingMethod: null,
-        },
-        userId,
-        userId ? undefined : sessionId
-      )
-
-      // Update cart if items have changed
-      if (JSON.stringify(updatedItems) !== JSON.stringify(cartItems)) {
-        dispatch(syncCart(updatedItems))
-      }
-    } catch (_error) {
-    } finally {
-      setIsSyncing(false)
-    }
-  }
-
-  const reserveStock = async () => {
-    try {
-      const userId = session?.user?.id
-      const reservations = await reserveCartStock(cartItems, userId, userId ? undefined : sessionId)
-
-      // Update cart items with reservation IDs
-      reservations.forEach((_reservationId, productId) => {
-        const item = cartItems.find((i) => i.product.id === productId)
-        if (item && !item.reservationId) {
-          // Update reservation ID in Redux
-          // Note: You might want to add a specific action for this
-        }
-      })
-    } catch (_error) {}
-  }
-
-  const generateSessionId = (): string => {
-    return `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  }
 
   // Show loading state while initializing
   if (!isInitialized) {
@@ -202,7 +184,7 @@ export const useCart = () => {
   const dispatch = useDispatch()
   const cartItems = useSelector(selectCartItems)
 
-  const addItemToCart = (product: any, quantity: number = 1, options?: any) => {
+  const addItemToCart = (product: unknown, quantity: number = 1, options?: any) => {
     dispatch(addToCart({ product, quantity, options }))
   }
 

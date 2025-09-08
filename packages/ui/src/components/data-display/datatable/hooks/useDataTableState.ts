@@ -1,57 +1,57 @@
 'use client'
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
-import type { 
-  ColumnConfig, 
-  SortConfig, 
-  FilterConfig, 
-  SelectionState,
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type {
+  AdvancedFilterGroup,
+  ColumnConfig,
+  FilterConfig,
   PaginationConfig,
+  SelectionState,
+  SortConfig,
   TableSettings,
-  AdvancedFilterGroup
 } from '../types'
-import { useDataFiltering } from './useDataFiltering'
-import { useDataSorting } from './useDataSorting'
-import { useDataSelection } from './useDataSelection'
-import { useDataPagination } from './useDataPagination'
 import { useDataExport } from './useDataExport'
+import { useDataFiltering } from './useDataFiltering'
+import { useDataPagination } from './useDataPagination'
+import { useDataSelection } from './useDataSelection'
+import { useDataSorting } from './useDataSorting'
 
 export interface DataTableState<T> {
   // Colonnes
   columns: ColumnConfig<T>[]
   visibleColumns: ColumnConfig<T>[]
-  
+
   // Données
   data: T[]
   processedData: T[]
   displayData: T[]
-  
+
   // Filtrage
   filters: FilterConfig[]
   searchTerm: string
   advancedFilters: AdvancedFilterGroup | null
   isFiltered: boolean
-  
+
   // Tri
   sortConfig: SortConfig[]
-  
+
   // Sélection
   selection: SelectionState
   selectedData: T[]
-  
+
   // Pagination
   currentPage: number
   pageSize: number
   totalPages: number
   paginationInfo: any
-  
+
   // Export
   isExporting: boolean
-  
+
   // État UI
   loading: boolean
   error: string | null
-  
+
   // Paramètres
   settings: TableSettings
 }
@@ -61,7 +61,7 @@ export interface UseDataTableStateProps<T> {
   data: T[]
   columns: ColumnConfig<T>[]
   keyField: string | number
-  
+
   // Options de fonctionnalités
   sortable?: boolean
   filterable?: boolean
@@ -69,16 +69,16 @@ export interface UseDataTableStateProps<T> {
   selectable?: boolean
   exportable?: boolean
   pagination?: boolean | PaginationConfig
-  
+
   // Paramètres sauvegardés
   settings?: TableSettings
-  
+
   // Callbacks
   onSettingsChange?: (settings: TableSettings) => void
   onSelectionChange?: (selection: SelectionState) => void
   onPaginationChange?: (config: PaginationConfig) => void
   onExport?: (format: string, options: any) => void
-  
+
   // État initial
   initialFilters?: FilterConfig[]
   initialSorts?: SortConfig[]
@@ -89,7 +89,7 @@ export interface UseDataTableStateProps<T> {
 export interface UseDataTableStateReturn<T> {
   // État
   state: DataTableState<T>
-  
+
   // Actions de filtrage
   setFilters: (filters: FilterConfig[]) => void
   addFilter: (filter: FilterConfig) => void
@@ -97,31 +97,31 @@ export interface UseDataTableStateReturn<T> {
   clearFilters: () => void
   setSearchTerm: (term: string) => void
   setAdvancedFilters: (filters: AdvancedFilterGroup | null) => void
-  
+
   // Actions de tri
   handleSort: (columnId: string, direction?: 'asc' | 'desc' | null) => void
   clearSorts: () => void
-  
+
   // Actions de sélection
   toggleRow: (rowId: string | number) => void
   toggleAll: () => void
   selectRange: (startId: string | number, endId: string | number) => void
   clearSelection: () => void
-  
+
   // Actions de pagination
   goToPage: (page: number) => void
   nextPage: () => void
   prevPage: () => void
   setPageSize: (size: number) => void
-  
+
   // Actions d'export
   exportData: (format: 'csv' | 'excel' | 'json' | 'pdf', options?: any) => Promise<void>
-  
+
   // Actions de colonnes
   toggleColumnVisibility: (columnId: string) => void
   reorderColumns: (startIndex: number, endIndex: number) => void
   resizeColumn: (columnId: string, width: number) => void
-  
+
   // Actions de paramètres
   updateSettings: (settings: Partial<TableSettings>) => void
   resetSettings: () => void
@@ -130,7 +130,7 @@ export interface UseDataTableStateReturn<T> {
 /**
  * Hook principal pour gérer l'état complet d'une DataTable
  */
-export function useDataTableState<T extends Record<string, any>>({
+export function useDataTableState<T extends Record<string, unknown>>({
   data,
   columns: initialColumns,
   keyField,
@@ -153,11 +153,11 @@ export function useDataTableState<T extends Record<string, any>>({
   // État des colonnes
   const [columns, setColumns] = useState<ColumnConfig<T>[]>(initialColumns)
   const [settings, setSettings] = useState<TableSettings>(initialSettings)
-  
+
   // Colonnes visibles et ordonnées
   const visibleColumns = useMemo(() => {
     return columns
-      .filter(col => {
+      .filter((col) => {
         const settingVisible = settings.columns[col.id]?.visible
         return settingVisible !== undefined ? settingVisible : col.visible !== false
       })
@@ -167,7 +167,7 @@ export function useDataTableState<T extends Record<string, any>>({
         return orderA - orderB
       })
   }, [columns, settings])
-  
+
   // Hook de filtrage
   const {
     filteredData,
@@ -180,7 +180,6 @@ export function useDataTableState<T extends Record<string, any>>({
     addFilter,
     removeFilter,
     clearFilters,
-    updateFilter,
     isFiltered,
   } = useDataFiltering({
     data,
@@ -188,25 +187,18 @@ export function useDataTableState<T extends Record<string, any>>({
     initialFilters,
     searchable,
   })
-  
+
   // Hook de tri
-  const {
-    sortedData,
-    sortConfig,
-    setSortConfig,
-    handleSort,
-    clearSorts,
-  } = useDataSorting({
+  const { sortedData, sortConfig, setSortConfig, handleSort, clearSorts } = useDataSorting({
     data: filteredData,
     columns: visibleColumns,
     initialSorts,
     sortable,
   })
-  
+
   // Hook de sélection
   const {
     selection,
-    setSelection,
     selectedData,
     toggleRow,
     toggleAll,
@@ -218,7 +210,7 @@ export function useDataTableState<T extends Record<string, any>>({
     selectable,
     onSelectionChange,
   })
-  
+
   // Hook de pagination
   const {
     paginatedData,
@@ -235,12 +227,9 @@ export function useDataTableState<T extends Record<string, any>>({
     pagination,
     onPaginationChange,
   })
-  
+
   // Hook d'export
-  const {
-    exportData,
-    isExporting,
-  } = useDataExport({
+  const { exportData, isExporting } = useDataExport({
     data: sortedData,
     columns: visibleColumns,
     selectedRows: selection.selectedRows,
@@ -248,15 +237,15 @@ export function useDataTableState<T extends Record<string, any>>({
     exportable,
     onExport,
   })
-  
+
   // Données affichées (après tous les traitements)
   const displayData = useMemo(() => {
     return pagination ? paginatedData : sortedData
   }, [pagination, paginatedData, sortedData])
-  
+
   // Actions sur les colonnes
   const toggleColumnVisibility = useCallback((columnId: string) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       columns: {
         ...prev.columns,
@@ -267,27 +256,30 @@ export function useDataTableState<T extends Record<string, any>>({
       },
     }))
   }, [])
-  
-  const reorderColumns = useCallback((startIndex: number, endIndex: number) => {
-    const newColumns = [...columns]
-    const [removed] = newColumns.splice(startIndex, 1)
-    newColumns.splice(endIndex, 0, removed)
-    
-    // Mettre à jour l'ordre dans les settings
-    const newSettings = { ...settings }
-    newColumns.forEach((col, index) => {
-      if (!newSettings.columns[col.id]) {
-        newSettings.columns[col.id] = {}
-      }
-      newSettings.columns[col.id].order = index
-    })
-    
-    setColumns(newColumns)
-    setSettings(newSettings)
-  }, [columns, settings])
-  
+
+  const reorderColumns = useCallback(
+    (startIndex: number, endIndex: number) => {
+      const newColumns = [...columns]
+      const [removed] = newColumns.splice(startIndex, 1)
+      newColumns.splice(endIndex, 0, removed)
+
+      // Mettre à jour l'ordre dans les settings
+      const newSettings = { ...settings }
+      newColumns.forEach((col, index) => {
+        if (!newSettings.columns[col.id]) {
+          newSettings.columns[col.id] = {}
+        }
+        newSettings.columns[col.id].order = index
+      })
+
+      setColumns(newColumns)
+      setSettings(newSettings)
+    },
+    [columns, settings]
+  )
+
   const resizeColumn = useCallback((columnId: string, width: number) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       columns: {
         ...prev.columns,
@@ -298,77 +290,80 @@ export function useDataTableState<T extends Record<string, any>>({
       },
     }))
   }, [])
-  
+
   // Gestion des paramètres
   const updateSettings = useCallback((newSettings: Partial<TableSettings>) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       ...newSettings,
     }))
   }, [])
-  
+
   const resetSettings = useCallback(() => {
     setSettings({ columns: {} })
     setSortConfig([])
     clearFilters()
     clearSelection()
   }, [clearFilters, clearSelection, setSortConfig])
-  
+
   // Synchroniser les paramètres
   useEffect(() => {
     onSettingsChange?.(settings)
   }, [settings, onSettingsChange])
-  
+
   // Synchroniser les colonnes quand elles changent depuis l'extérieur
   useEffect(() => {
     setColumns(initialColumns)
   }, [initialColumns])
-  
+
   // État consolidé
-  const state: DataTableState<T> = useMemo(() => ({
-    columns,
-    visibleColumns,
-    data,
-    processedData: sortedData,
-    displayData,
-    filters,
-    searchTerm,
-    advancedFilters,
-    isFiltered,
-    sortConfig,
-    selection,
-    selectedData,
-    currentPage,
-    pageSize,
-    totalPages,
-    paginationInfo,
-    isExporting,
-    loading,
-    error,
-    settings,
-  }), [
-    columns,
-    visibleColumns,
-    data,
-    sortedData,
-    displayData,
-    filters,
-    searchTerm,
-    advancedFilters,
-    isFiltered,
-    sortConfig,
-    selection,
-    selectedData,
-    currentPage,
-    pageSize,
-    totalPages,
-    paginationInfo,
-    isExporting,
-    loading,
-    error,
-    settings,
-  ])
-  
+  const state: DataTableState<T> = useMemo(
+    () => ({
+      columns,
+      visibleColumns,
+      data,
+      processedData: sortedData,
+      displayData,
+      filters,
+      searchTerm,
+      advancedFilters,
+      isFiltered,
+      sortConfig,
+      selection,
+      selectedData,
+      currentPage,
+      pageSize,
+      totalPages,
+      paginationInfo,
+      isExporting,
+      loading,
+      error,
+      settings,
+    }),
+    [
+      columns,
+      visibleColumns,
+      data,
+      sortedData,
+      displayData,
+      filters,
+      searchTerm,
+      advancedFilters,
+      isFiltered,
+      sortConfig,
+      selection,
+      selectedData,
+      currentPage,
+      pageSize,
+      totalPages,
+      paginationInfo,
+      isExporting,
+      loading,
+      error,
+      settings,
+    ]
+  )
+
   return {
     state,
     // Filtrage

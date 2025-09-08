@@ -1,15 +1,21 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { Clock, Sun, Sunset, Moon, AlertCircle, RotateCcw } from 'lucide-react'
+import { AlertCircle, Clock, Moon, RotateCcw, Sun, Sunset } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
 import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
 export type ShiftType = 'morning' | 'afternoon' | 'night' | 'custom'
-export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
+export type DayOfWeek =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday'
 export interface WorkingHours {
   startTime: string
   endTime: string
@@ -96,33 +102,42 @@ export function WorkingHoursPicker({
   className,
 }: WorkingHoursPickerProps) {
   const [workingHours, setWorkingHours] = useState<Partial<WorkingHoursValue>>(
-    value.weeklyHours ? value : {
-      weeklyHours: daysOfWeek.reduce((acc, day) => {
-        acc[day.key] = { ...defaultWorkingHours }
-        return acc
-      }, {} as WeeklyWorkingHours),
-      shiftType: 'custom',
-      allowOvertime: false,
-      totalHoursPerWeek: 0,
-      ...value,
-    }
+    value.weeklyHours
+      ? value
+      : {
+          weeklyHours: daysOfWeek.reduce((acc, day) => {
+            acc[day.key] = { ...defaultWorkingHours }
+            return acc
+          }, {} as WeeklyWorkingHours),
+          shiftType: 'custom',
+          allowOvertime: false,
+          totalHoursPerWeek: 0,
+          ...value,
+        }
   )
   useEffect(() => {
-    setWorkingHours(value.weeklyHours ? value : {
-      weeklyHours: daysOfWeek.reduce((acc, day) => {
-        acc[day.key] = { ...defaultWorkingHours }
-        return acc
-      }, {} as WeeklyWorkingHours),
-      shiftType: 'custom',
-      allowOvertime: false,
-      totalHoursPerWeek: 0,
-      ...value,
-    })
+    setWorkingHours(
+      value.weeklyHours
+        ? value
+        : {
+            weeklyHours: daysOfWeek.reduce((acc, day) => {
+              acc[day.key] = { ...defaultWorkingHours }
+              return acc
+            }, {} as WeeklyWorkingHours),
+            shiftType: 'custom',
+            allowOvertime: false,
+            totalHoursPerWeek: 0,
+            ...value,
+          }
+    )
   }, [value])
-  useEffect(() => {
-    calculateTotalHours()
-  }, [workingHours.weeklyHours])
-  const calculateTotalHours = () => {
+
+  const parseTime = useCallback((time: string): number => {
+    const [hours, minutes] = time.split(':').map(Number)
+    return hours * 60 + (minutes || 0)
+  }, [])
+
+  const calculateTotalHours = useCallback(() => {
     if (!workingHours.weeklyHours) return
     let total = 0
     Object.values(workingHours.weeklyHours).forEach((hours) => {
@@ -153,11 +168,11 @@ export function WorkingHoursPicker({
     }
     setWorkingHours(updatedWorkingHours)
     onChange?.(updatedWorkingHours)
-  }
-  const parseTime = (time: string): number => {
-    const [hours, minutes] = time.split(':').map(Number)
-    return hours * 60 + (minutes || 0)
-  }
+  }, [workingHours, showBreaks, onChange, parseTime])
+
+  useEffect(() => {
+    calculateTotalHours()
+  }, [calculateTotalHours])
   const handleShiftChange = (shiftType: ShiftType) => {
     if (shiftType === 'custom' || !workingHours.weeklyHours) {
       const updatedWorkingHours = { ...workingHours, shiftType }
@@ -167,7 +182,7 @@ export function WorkingHoursPicker({
     }
     const preset = shiftPresets[shiftType]
     const updatedWeeklyHours = { ...workingHours.weeklyHours }
-    daysOfWeek.forEach(day => {
+    daysOfWeek.forEach((day) => {
       if (day.key !== 'saturday' && day.key !== 'sunday') {
         updatedWeeklyHours[day.key] = {
           ...updatedWeeklyHours[day.key],
@@ -203,7 +218,7 @@ export function WorkingHoursPicker({
     if (!workingHours.weeklyHours) return
     const sourceHours = workingHours.weeklyHours[sourceDay]
     const updatedWeeklyHours = { ...workingHours.weeklyHours }
-    daysOfWeek.forEach(day => {
+    daysOfWeek.forEach((day) => {
       updatedWeeklyHours[day.key] = { ...sourceHours }
     })
     const updatedWorkingHours = {
@@ -230,16 +245,21 @@ export function WorkingHoursPicker({
   }
   const getShiftIcon = (shiftType: ShiftType) => {
     switch (shiftType) {
-      case 'morning': return Sun
-      case 'afternoon': return Sunset
-      case 'night': return Moon
-      default: return Clock
+      case 'morning':
+        return Sun
+      case 'afternoon':
+        return Sunset
+      case 'night':
+        return Moon
+      default:
+        return Clock
     }
   }
   const isValidTimeRange = (start: string, end: string): boolean => {
     const startMinutes = parseTime(start)
     const endMinutes = parseTime(end)
-    const duration = endMinutes > startMinutes ? endMinutes - startMinutes : (24 * 60) - startMinutes + endMinutes
+    const duration =
+      endMinutes > startMinutes ? endMinutes - startMinutes : 24 * 60 - startMinutes + endMinutes
     const hours = duration / 60
     return hours >= minHoursPerDay && hours <= maxHoursPerDay
   }
@@ -272,6 +292,7 @@ export function WorkingHoursPicker({
             const isSelected = workingHours.shiftType === shift
             return (
               <Button
+                type="button"
                 key={shift}
                 type="button"
                 variant={isSelected ? 'default' : 'outline'}
@@ -281,9 +302,13 @@ export function WorkingHoursPicker({
                 className="justify-start gap-2"
               >
                 <ShiftIcon className="h-4 w-4" />
-                {shift === 'morning' ? 'Matin' :
-                 shift === 'afternoon' ? 'Après-midi' :
-                 shift === 'night' ? 'Nuit' : 'Personnalisé'}
+                {shift === 'morning'
+                  ? 'Matin'
+                  : shift === 'afternoon'
+                    ? 'Après-midi'
+                    : shift === 'night'
+                      ? 'Nuit'
+                      : 'Personnalisé'}
               </Button>
             )
           })}
@@ -302,7 +327,7 @@ export function WorkingHoursPicker({
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={dayHours.isActive}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handleDayHoursChange(day.key, 'isActive', checked === true)
                       }
                       disabled={disabled}
@@ -351,7 +376,9 @@ export function WorkingHoursPicker({
                           <Input
                             type="time"
                             value={dayHours.breakStart || ''}
-                            onChange={(e) => handleDayHoursChange(day.key, 'breakStart', e.target.value)}
+                            onChange={(e) =>
+                              handleDayHoursChange(day.key, 'breakStart', e.target.value)
+                            }
                             disabled={disabled}
                           />
                         </div>
@@ -360,7 +387,9 @@ export function WorkingHoursPicker({
                           <Input
                             type="time"
                             value={dayHours.breakEnd || ''}
-                            onChange={(e) => handleDayHoursChange(day.key, 'breakEnd', e.target.value)}
+                            onChange={(e) =>
+                              handleDayHoursChange(day.key, 'breakEnd', e.target.value)
+                            }
                             disabled={disabled}
                           />
                         </div>
@@ -404,7 +433,10 @@ export function WorkingHoursPicker({
                 step="5"
                 value={workingHours.overtimeRate || 25}
                 onChange={(e) => {
-                  const updatedWorkingHours = { ...workingHours, overtimeRate: parseInt(e.target.value) || 25 }
+                  const updatedWorkingHours = {
+                    ...workingHours,
+                    overtimeRate: parseInt(e.target.value, 10) || 25,
+                  }
                   setWorkingHours(updatedWorkingHours)
                   onChange?.(updatedWorkingHours)
                 }}
@@ -432,25 +464,28 @@ export function WorkingHoursPicker({
             <div>
               <span className="text-xs text-muted-foreground">Jours actifs:</span>
               <div className="font-mono font-medium">
-                {workingHours.weeklyHours ? 
-                  Object.values(workingHours.weeklyHours).filter(h => h.isActive).length : 0
-                }/7
+                {workingHours.weeklyHours
+                  ? Object.values(workingHours.weeklyHours).filter((h) => h.isActive).length
+                  : 0}
+                /7
               </div>
             </div>
             <div>
               <span className="text-xs text-muted-foreground">Équipe:</span>
               <Badge variant="outline" className="text-xs ml-1">
-                {workingHours.shiftType === 'morning' ? 'Matin' :
-                 workingHours.shiftType === 'afternoon' ? 'Après-midi' :
-                 workingHours.shiftType === 'night' ? 'Nuit' : 'Personnalisé'}
+                {workingHours.shiftType === 'morning'
+                  ? 'Matin'
+                  : workingHours.shiftType === 'afternoon'
+                    ? 'Après-midi'
+                    : workingHours.shiftType === 'night'
+                      ? 'Nuit'
+                      : 'Personnalisé'}
               </Badge>
             </div>
           </div>
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

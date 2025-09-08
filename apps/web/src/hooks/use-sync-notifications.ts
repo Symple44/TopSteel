@@ -9,7 +9,7 @@ export function useSyncNotifications() {
 
   useEffect(() => {
     // Configurer le callback pour les notifications de sync
-    syncChecker.setToastCallback((issue) => {
+    syncChecker?.setToastCallback((issue) => {
       // Ignorer les notifications de faible priorité
       if (issue.severity === 'low') {
         return
@@ -30,7 +30,7 @@ export function useSyncNotifications() {
 
     // Cleanup function pour éviter les fuites mémoire
     return () => {
-      syncChecker.setToastCallback(undefined as unknown)
+      syncChecker?.setToastCallback(undefined as unknown)
     }
   }, [toast])
 }

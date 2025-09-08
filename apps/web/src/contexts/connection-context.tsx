@@ -37,7 +37,7 @@ export function ConnectionProvider({ children, checkInterval = 60000 }: Connecti
     setIsChecking(true)
     try {
       // Endpoint léger pour vérifier la connexion
-      const healthData = await apiClientEnhanced.get('/health', {
+      const healthData = await apiClientEnhanced?.get('/health', {
         timeout: 8000, // Timeout de 8 secondes (plus long)
         retry: false, // Pas de retry pour le health check
         cache: false, // Pas de cache pour le health check

@@ -51,7 +51,7 @@ export function createRobustStore<
     devtools: enableDevtools = true,
     immer: enableImmer = true,
     subscriptions = false,
-  } = config
+  } = config || {}
 
   // Store creator compatible avec Zustand
   const storeCreator = (set: unknown, get: unknown) => {
@@ -86,7 +86,7 @@ export function createRobustStore<
       storage: {
         getItem: (key: string) => {
           try {
-            const item = localStorage.getItem(key)
+            const item = localStorage?.getItem(key)
 
             return item ? JSON.parse(item) : null
           } catch (_error) {
@@ -100,18 +100,19 @@ export function createRobustStore<
         },
         removeItem: (key: string) => {
           try {
-            localStorage.removeItem(key)
+            localStorage?.removeItem(key)
           } catch (_error) {}
         },
       },
       partialize: (state: unknown) => {
         // Ne persister que les données importantes
+
         const {
           loading: _loading,
           error: _error,
           lastUpdate: _lastUpdate,
           ...persistedState
-        } = state as Record<string, unknown>
+        } = (state as Record<string, unknown>) || {}
 
         return persistedState
       },
@@ -129,14 +130,14 @@ export function createRobustStore<
   }
 
   // Middleware DevTools
-  if (enableDevtools && process.env.NODE_ENV === 'development') {
+  if (enableDevtools && process?.env?.NODE_ENV === 'development') {
     store = devtools(store, { name }) as typeof store
   }
 
   const zustandStore = create<TState & TActions>()(store)
 
   // Monitoring des changements d'état
-  if (process.env.NODE_ENV === 'development') {
+  if (process?.env?.NODE_ENV === 'development') {
     addMonitoring(zustandStore, name)
   }
 
@@ -151,18 +152,26 @@ export function createBaseActions<TState extends BaseStoreState>(
 ): BaseStoreActions {
   return {
     setLoading: (loading: boolean) => (state: TState) => {
-      state.loading = loading
+      if (state && 'loading' in state) {
+        ;(state as BaseStoreState & { loading?: boolean }).loading = loading
+      }
       state.lastUpdate = Date.now()
     },
 
     setError: (error: string | null) => (state: TState) => {
-      state.error = error
-      state.loading = false
+      if (state && 'error' in state) {
+        ;(state as unknown).error = error
+      }
+      if (state && 'loading' in state) {
+        ;(state as unknown).loading = false
+      }
       state.lastUpdate = Date.now()
     },
 
     clearError: () => (state: TState) => {
-      state.error = null
+      if (state && 'error' in state) {
+        ;(state as unknown).error = null
+      }
       state.lastUpdate = Date.now()
     },
 
@@ -215,33 +224,33 @@ export function createCache<K, V>(ttlMs = 300000) {
 
   return {
     get: (key: K): V | null => {
-      const item = cache.get(key)
+      const item = cache?.get(key)
 
       if (!item) return null
 
       if (Date.now() - item.timestamp > ttlMs) {
-        cache.delete(key)
+        cache?.delete(key)
 
         return null
       }
 
-      return item.data
+      return item?.data
     },
 
     set: (key: K, value: V): void => {
-      cache.set(key, {
+      cache?.set(key, {
         data: value,
         timestamp: Date.now(),
       })
     },
 
     has: (key: K): boolean => {
-      const item = cache.get(key)
+      const item = cache?.get(key)
 
       if (!item) return false
 
       if (Date.now() - item.timestamp > ttlMs) {
-        cache.delete(key)
+        cache?.delete(key)
 
         return false
       }
@@ -251,21 +260,21 @@ export function createCache<K, V>(ttlMs = 300000) {
 
     delete: (key?: K): void => {
       if (key) {
-        cache.delete(key)
+        cache?.delete(key)
       } else {
-        cache.clear()
+        cache?.clear()
       }
     },
 
-    size: () => cache.size,
+    size: () => cache?.size,
 
     cleanup: (): number => {
       const now = Date.now()
       let deletedCount = 0
 
       for (const [key, item] of cache.entries()) {
-        if (now - item.timestamp > ttlMs) {
-          cache.delete(key)
+        if (now - item?.timestamp > ttlMs) {
+          cache?.delete(key)
           deletedCount++
         }
       }
@@ -288,7 +297,7 @@ export function validateState<TState extends BaseStoreState>(
     const value = state[key as keyof TState]
 
     if (value !== undefined && !validator(value)) {
-      errors.push(`Validation échouée pour ${String(key)}`)
+      errors?.push(`Validation échouée pour ${String(key)}`)
     }
   }
 
@@ -348,7 +357,7 @@ function addMonitoring(store: unknown, name: string) {
   storeTyped.getState = () => {
     const state = originalGetState()
 
-    StoreMonitor.logAccess(name, state)
+    StoreMonitor?.logAccess(name, state)
 
     return state
   }
@@ -358,7 +367,7 @@ function addMonitoring(store: unknown, name: string) {
     const result = originalSetState(updater)
     const newState = originalGetState()
 
-    StoreMonitor.logStateChange(name, 'setState', newState, prevState)
+    StoreMonitor?.logStateChange(name, 'setState', newState, prevState)
 
     return result
   }
@@ -371,7 +380,7 @@ export function safeSerialize(data: unknown): string | null {
   try {
     return JSON.stringify(data, (_key, value) => {
       if (typeof value === 'function') return undefined
-      if (value instanceof Date) return value.toISOString()
+      if (value instanceof Date) return value?.toISOString()
       if (value instanceof Error) return { name: value.name, message: value.message }
 
       return value
@@ -403,7 +412,7 @@ export function safeDeserialize<T>(data: string): T | null {
 
 // Store monitor as module-level functions
 const storeMonitorSubscribers = new Set<(event: StoreEvent) => void>()
-let storeMonitorEnabled = process.env.NODE_ENV === 'development'
+let storeMonitorEnabled = process?.env?.NODE_ENV === 'development'
 const storeAccessLog = new Map<string, number>()
 
 function enableStoreMonitor(enabled = true) {
@@ -411,9 +420,9 @@ function enableStoreMonitor(enabled = true) {
 }
 
 function subscribeToStoreMonitor(callback: (event: StoreEvent) => void) {
-  storeMonitorSubscribers.add(callback)
+  storeMonitorSubscribers?.add(callback)
 
-  return () => storeMonitorSubscribers.delete(callback)
+  return () => storeMonitorSubscribers?.delete(callback)
 }
 
 function cloneStoreState(state: unknown) {
@@ -443,7 +452,7 @@ function logStoreStateChange(
   }
 
   // Log console en développement
-  if (process.env.NODE_ENV === 'development') {
+  if (process?.env?.NODE_ENV === 'development') {
     if (prevState) {
     }
     if (event.duration) {
@@ -462,9 +471,9 @@ function logStoreAccess(storeName: string, _state: unknown) {
   if (!storeMonitorEnabled) return
 
   const key = `${storeName}-access`
-  const count = (storeAccessLog.get(key) || 0) + 1
+  const count = (storeAccessLog?.get(key) || 0) + 1
 
-  storeAccessLog.set(key, count)
+  storeAccessLog?.set(key, count)
 
   // Log périodique des accès
   if (count % 100 === 0) {
@@ -474,15 +483,15 @@ function logStoreAccess(storeName: string, _state: unknown) {
 function getStoreMonitorStats() {
   return {
     subscribers: storeMonitorSubscribers.size,
-    accessCount: Array.from(storeAccessLog.entries()),
+    accessCount: Array.from(storeAccessLog?.entries()),
     isEnabled: storeMonitorEnabled,
     timestamp: Date.now(),
   }
 }
 
 function resetStoreMonitor() {
-  storeAccessLog.clear()
-  storeMonitorSubscribers.clear()
+  storeAccessLog?.clear()
+  storeMonitorSubscribers?.clear()
 }
 
 // Legacy export for backward compatibility

@@ -9,7 +9,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm'
-import { License } from './license.entity'
+// import { License } from './license.entity';
 
 /**
  * Feature categories
@@ -77,10 +77,10 @@ export class LicenseFeature {
   expiresAt?: Date
 
   @Column({ type: 'jsonb', default: {} })
-  configuration!: Record<string, any>
+  configuration!: Record<string, unknown>
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
@@ -89,13 +89,9 @@ export class LicenseFeature {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => License,
-    (license) => license.features,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('License', 'features', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'license_id' })
-  license!: License
+  license!: any
 
   // Utility methods
 
@@ -111,7 +107,7 @@ export class LicenseFeature {
       return false
     }
 
-    if (this.limit !== null && this.used >= this.limit) {
+    if (this.limit !== undefined && this.used >= this.limit) {
       return false
     }
 
@@ -122,15 +118,15 @@ export class LicenseFeature {
    * Check if feature has reached its limit
    */
   hasReachedLimit(): boolean {
-    return this.limit !== null && this.used >= this.limit
+    return this.limit !== undefined && this.used >= this.limit
   }
 
   /**
    * Get remaining usage
    */
-  getRemainingUsage(): number | null {
-    if (this.limit === null) {
-      return null
+  getRemainingUsage(): number | undefined {
+    if (this.limit === undefined) {
+      return undefined
     }
 
     return Math.max(0, this.limit - this.used)
@@ -139,9 +135,9 @@ export class LicenseFeature {
   /**
    * Get usage percentage
    */
-  getUsagePercentage(): number | null {
-    if (this.limit === null || this.limit === 0) {
-      return null
+  getUsagePercentage(): number | undefined {
+    if (this.limit === undefined || this.limit === 0) {
+      return undefined
     }
 
     return Math.min(100, (this.used / this.limit) * 100)
@@ -151,7 +147,7 @@ export class LicenseFeature {
    * Increment usage
    */
   incrementUsage(amount: number = 1): boolean {
-    if (this.limit !== null && this.used + amount > this.limit) {
+    if (this.limit !== undefined && this.used + amount > this.limit) {
       return false
     }
 
@@ -184,7 +180,7 @@ export class LicenseFeature {
   enable(): void {
     this.isEnabled = true
     this.enabledAt = new Date()
-    this.disabledAt = null
+    this.disabledAt = undefined
   }
 
   /**
@@ -215,7 +211,7 @@ export class LicenseFeature {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       code: this.featureCode,

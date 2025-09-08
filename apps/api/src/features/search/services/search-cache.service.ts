@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
 import type { RedisService } from '../../../core/common/services/redis.service'
+import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import type { SearchOptions, SearchResponse } from '../interfaces/search.interfaces'
 
 export interface CacheConfig {
@@ -125,7 +126,7 @@ export class SearchCacheService implements OnModuleInit {
             .reduce((acc, key) => {
               acc[key] = options.filters?.[key]
               return acc
-            }, {} as any)
+            }, {} as unknown)
         : undefined,
       limit: options.limit,
       offset: options.offset,
@@ -215,7 +216,10 @@ export class SearchCacheService implements OnModuleInit {
         `Cached search results for tenant ${tenantId}, key: ${cacheKey}, TTL: ${ttl}s`
       )
     } catch (error) {
-      this.logger.error(`Failed to cache search results: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to cache search results: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -252,7 +256,10 @@ export class SearchCacheService implements OnModuleInit {
 
       return parsed.results
     } catch (error) {
-      this.logger.error(`Failed to retrieve cached search results: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to retrieve cached search results: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       this.statistics.misses++
       return null
     }
@@ -277,7 +284,10 @@ export class SearchCacheService implements OnModuleInit {
       this.logger.debug(`Invalidating cache for tenant ${tenantId}, entity type: ${entityType}`)
       this.statistics.deletes++
     } catch (error) {
-      this.logger.error(`Failed to invalidate entity cache: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to invalidate entity cache: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -297,7 +307,10 @@ export class SearchCacheService implements OnModuleInit {
       this.logger.debug(`Invalidating all cache for tenant ${tenantId}`)
       this.statistics.deletes++
     } catch (error) {
-      this.logger.error(`Failed to invalidate tenant cache: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to invalidate tenant cache: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -338,7 +351,10 @@ export class SearchCacheService implements OnModuleInit {
 
       return { ...this.statistics }
     } catch (error) {
-      this.logger.error(`Failed to get cache statistics: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to get cache statistics: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       return this.statistics
     }
   }
@@ -358,7 +374,10 @@ export class SearchCacheService implements OnModuleInit {
       this.statistics.deletes++
       this.initializeStatistics()
     } catch (error) {
-      this.logger.error(`Failed to clear cache: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to clear cache: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
@@ -424,7 +443,7 @@ export class SearchCacheService implements OnModuleInit {
       const metadataKey = `${cacheKey}:meta`
       await this.redisService.set(metadataKey, JSON.stringify(metadata), metadata.ttl)
     } catch (error) {
-      this.logger.debug(`Failed to update access metadata: ${error.message}`)
+      this.logger.debug(`Failed to update access metadata: ${getErrorMessage(error)}`)
     }
   }
 
@@ -440,7 +459,7 @@ export class SearchCacheService implements OnModuleInit {
       // This could include memory usage, key counts, etc.
       this.logger.debug('Collecting cache statistics')
     } catch (error) {
-      this.logger.debug(`Failed to collect statistics: ${error.message}`)
+      this.logger.debug(`Failed to collect statistics: ${getErrorMessage(error)}`)
     }
   }
 }

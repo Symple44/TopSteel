@@ -26,8 +26,12 @@
   "files": [
     "src/index.ts",
     "src/core/index.ts",
+    "src/core/articles.ts",
     "src/core/base.ts",
     "src/core/common.ts",
+    "src/core/materials.ts",
+    "src/core/projects.ts",
+    "src/core/users.ts",
     "src/core/utilities.ts",
     "src/cross-cutting/index.ts",
     "src/cross-cutting/audit.ts",
@@ -50,11 +54,5 @@
     "src/ui/navigation.ts",
     "src/ui/tables.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/__tests__/**"
-  ]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"]
 }

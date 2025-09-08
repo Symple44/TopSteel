@@ -65,21 +65,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   }
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
     if (onAddToCart && !isOutOfStock) {
       onAddToCart(product)
     }
   }
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
     if (onAddToWishlist) {
       onAddToWishlist(product)
     }
   }
 
   const handleQuickView = (e: React.MouseEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
     if (onQuickView) {
       onQuickView(product)
     }
@@ -97,7 +97,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <Link href={`/marketplace/products/${product.slug}`} className="relative flex-shrink-0">
           <div className="relative w-48 h-48 overflow-hidden rounded-lg">
             <Image
-              src={product.images[0] || '/placeholder-product.jpg'}
+              src={product.images?.[0] || '/placeholder-product.jpg'}
               alt={product.name}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -139,14 +139,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                       key={i}
                       className={cn(
                         'w-4 h-4',
-                        i < Math.floor(product.rating || 0)
+                        i < Math.floor(product.rating ?? 0)
                           ? 'text-yellow-400 fill-current'
                           : 'text-gray-300'
                       )}
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-500">({product.reviewCount || 0})</span>
+                <span className="text-sm text-gray-500">({product.reviewCount ?? 0})</span>
               </div>
             )}
 
@@ -232,7 +232,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <Link href={`/marketplace/products/${product.slug}`} className="block">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           <Image
-            src={product.images[0] || '/placeholder-product.jpg'}
+            src={product.images?.[0] || '/placeholder-product.jpg'}
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -315,14 +315,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   key={i}
                   className={cn(
                     'w-3 h-3',
-                    i < Math.floor(product.rating || 0)
+                    i < Math.floor(product.rating ?? 0)
                       ? 'text-yellow-400 fill-current'
                       : 'text-gray-300'
                   )}
                 />
               ))}
             </div>
-            <span className="text-xs text-gray-500">({product.reviewCount || 0})</span>
+            <span className="text-xs text-gray-500">({product.reviewCount ?? 0})</span>
           </div>
         )}
 

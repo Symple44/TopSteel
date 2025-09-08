@@ -11,6 +11,7 @@ import {
 import type { Request } from 'express'
 import { type Observable, throwError } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
+import { getErrorMessage } from '../../../core/common/utils'
 
 @Injectable()
 export class SentryInterceptor implements NestInterceptor {
@@ -23,14 +24,13 @@ export class SentryInterceptor implements NestInterceptor {
 
   private async loadSentry(): Promise<void> {
     try {
-      // @ts-ignore - Module optionnel
-      this.sentry = await import('@sentry/node').catch(() => null)
+      this.sentry = await import('@sentry/node' as unknown).catch(() => null)
     } catch (_error) {
       this.logger.debug('Sentry not available for interceptor')
     }
   }
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<Request>()
     const { method, url, body, headers, query, params } = request
 
@@ -52,7 +52,7 @@ export class SentryInterceptor implements NestInterceptor {
     })
 
     // Set transaction on scope
-    this.sentry.getCurrentHub().configureScope((scope) => {
+    this.sentry.getCurrentHub().configureScope((scope: unknown) => {
       scope.setSpan(transaction)
 
       // Add request context
@@ -66,8 +66,8 @@ export class SentryInterceptor implements NestInterceptor {
       })
 
       // Set user if available
-      if ((request as any).user) {
-        const user = (request as any).user
+      if ((request as unknown).user) {
+        const user = (request as unknown).user
         scope.setUser({
           id: user.id,
           email: user.email,
@@ -131,14 +131,14 @@ export class SentryInterceptor implements NestInterceptor {
 
         // Determine status code
         let statusCode = HttpStatus.INTERNAL_SERVER_ERROR
-        let errorMessage = error.message || 'Internal server error'
+        let errorMessage = getErrorMessage(error) || 'Internal server error'
         let errorData: any = {}
 
         if (error instanceof HttpException) {
           statusCode = error.getStatus()
           const response = error.getResponse()
           if (typeof response === 'object') {
-            errorMessage = (response as any).message || errorMessage
+            errorMessage = (response as unknown).message || errorMessage
             errorData = response
           } else {
             errorMessage = response
@@ -152,7 +152,7 @@ export class SentryInterceptor implements NestInterceptor {
 
         // Capture to Sentry if it's a server error
         if (statusCode >= 500 && this.sentry) {
-          this.sentry.withScope((scope) => {
+          this.sentry.withScope((scope: unknown) => {
             scope.setLevel('error')
             scope.setContext('error', {
               statusCode,
@@ -198,7 +198,7 @@ export class SentryInterceptor implements NestInterceptor {
     )
   }
 
-  private sanitizeHeaders(headers: Record<string, any>): Record<string, any> {
+  private sanitizeHeaders(headers: Record<string, unknown>): Record<string, unknown> {
     const sanitized = { ...headers }
     const sensitiveHeaders = [
       'authorization',
@@ -217,7 +217,7 @@ export class SentryInterceptor implements NestInterceptor {
     return sanitized
   }
 
-  private sanitizeBody(body: any): any {
+  private sanitizeBody(body: unknown): any {
     if (!body || typeof body !== 'object') {
       return body
     }
@@ -238,7 +238,7 @@ export class SentryInterceptor implements NestInterceptor {
       'ssn',
     ]
 
-    const sanitizeObject = (obj: any): any => {
+    const sanitizeObject = (obj: unknown): any => {
       if (!obj || typeof obj !== 'object') {
         return obj
       }

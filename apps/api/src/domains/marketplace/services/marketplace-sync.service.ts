@@ -7,6 +7,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Queue } from 'bull'
 import type { Redis } from 'ioredis'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils/error.utils'
 import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
 import { Article, ArticleStatus } from '../../inventory/entities/article.entity'
 import { Partner, PartnerType } from '../../partners/entities/partner.entity'
@@ -21,6 +22,67 @@ interface OrderSyncPayload {
   marketplaceOrderId: string
   tenantId: string
   action: 'CREATE_ERP_DOCUMENTS' | 'UPDATE_STATUS' | 'SYNC_PAYMENT'
+}
+
+interface ArticleEventPayload {
+  id: string
+  tenantId: string
+}
+
+interface StockEventPayload {
+  articleId: string
+  tenantId: string
+  quantity: number
+}
+
+interface MarketplaceOrderEventPayload {
+  orderId: string
+  tenantId: string
+}
+
+interface MarketplaceCustomer {
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+  defaultAddress?: {
+    street: string
+    postalCode: string
+    city: string
+    country?: string
+  }
+}
+
+interface MarketplaceOrderItem {
+  id: string
+  productId: string
+  quantity: number
+  price: number
+}
+
+interface MarketplaceOrderData {
+  id: string
+  orderNumber: string
+  items: MarketplaceOrderItem[]
+  customer: MarketplaceCustomer
+  paymentStatus: string
+  total: number
+}
+
+interface DeliveryNoteData {
+  id: string
+  orderNumber: string
+  partnerId: string
+  status: 'pending' | 'confirmed' | 'shipped'
+}
+
+interface InvoiceData {
+  id: string
+  orderNumber: string
+  partnerId: string
+  deliveryNoteId: string
+  status: 'draft' | 'confirmed' | 'paid'
+  total: number
 }
 
 @Injectable()
@@ -91,7 +153,7 @@ export class MarketplaceSyncService {
           result.failed++
           result.errors.push({
             articleId: article.id,
-            error: error.message,
+            error: getErrorMessage(error),
           })
           this.logger.error(`Failed to sync article ${article.id}:`, error)
         }
@@ -180,7 +242,7 @@ export class MarketplaceSyncService {
   /**
    * Gestion des événements
    */
-  private async handleArticleCreated(payload: any) {
+  private async handleArticleCreated(payload: ArticleEventPayload) {
     await this.syncQueue.add('sync-article', {
       articleId: payload.id,
       tenantId: payload.tenantId,
@@ -188,7 +250,7 @@ export class MarketplaceSyncService {
     })
   }
 
-  private async handleArticleUpdated(payload: any) {
+  private async handleArticleUpdated(payload: ArticleEventPayload) {
     await this.syncQueue.add('sync-article', {
       articleId: payload.id,
       tenantId: payload.tenantId,
@@ -196,7 +258,7 @@ export class MarketplaceSyncService {
     })
   }
 
-  private async handleArticleDeleted(payload: any) {
+  private async handleArticleDeleted(payload: ArticleEventPayload) {
     await this.syncQueue.add('sync-article', {
       articleId: payload.id,
       tenantId: payload.tenantId,
@@ -204,7 +266,7 @@ export class MarketplaceSyncService {
     })
   }
 
-  private async handleStockUpdated(payload: any) {
+  private async handleStockUpdated(payload: StockEventPayload) {
     await this.syncQueue.add('sync-stock', {
       articleId: payload.articleId,
       tenantId: payload.tenantId,
@@ -212,7 +274,7 @@ export class MarketplaceSyncService {
     })
   }
 
-  private async handleMarketplaceOrderCreated(payload: any) {
+  private async handleMarketplaceOrderCreated(payload: MarketplaceOrderEventPayload) {
     await this.syncQueue.add('sync-order', {
       marketplaceOrderId: payload.orderId,
       tenantId: payload.tenantId,
@@ -220,7 +282,7 @@ export class MarketplaceSyncService {
     } as OrderSyncPayload)
   }
 
-  private async handleMarketplaceOrderPaid(payload: any) {
+  private async handleMarketplaceOrderPaid(payload: MarketplaceOrderEventPayload) {
     await this.syncQueue.add('sync-order', {
       marketplaceOrderId: payload.orderId,
       tenantId: payload.tenantId,
@@ -311,7 +373,7 @@ export class MarketplaceSyncService {
   }
 
   private async createPartnerFromMarketplaceCustomer(
-    customer: any,
+    customer: MarketplaceCustomer,
     _tenantId: string
   ): Promise<Partner> {
     const partner = this.partnerRepository.create({
@@ -323,12 +385,16 @@ export class MarketplaceSyncService {
       codePostal: customer.defaultAddress?.postalCode,
       ville: customer.defaultAddress?.city,
       pays: customer.defaultAddress?.country || 'FR',
-    } as any)
+    })
 
     return (await this.partnerRepository.save(partner)) as unknown as Partner
   }
 
-  private async createDeliveryNote(order: any, partner: Partner, _tenantId: string): Promise<any> {
+  private async createDeliveryNote(
+    order: MarketplaceOrderData,
+    partner: Partner,
+    _tenantId: string
+  ): Promise<DeliveryNoteData> {
     // Création du bon de livraison - sera implémenté avec le module Documents
     // Pour le moment, retourne un placeholder pour maintenir la compatibilité
     this.logger.log(`Bon de livraison à créer pour la commande ${order.orderNumber}`)
@@ -341,11 +407,11 @@ export class MarketplaceSyncService {
   }
 
   private async createInvoice(
-    order: any,
+    order: MarketplaceOrderData,
     partner: Partner,
-    deliveryNote: any,
+    deliveryNote: DeliveryNoteData,
     _tenantId: string
-  ): Promise<any> {
+  ): Promise<InvoiceData> {
     // Création de la facture - sera implémenté avec le module Documents
     // Pour le moment, retourne un placeholder pour maintenir la compatibilité
     this.logger.log(`Facture à créer pour la commande ${order.orderNumber}`)
@@ -364,7 +430,7 @@ export class MarketplaceSyncService {
     return []
   }
 
-  private async checkStockConsistency(_tenantId: string): Promise<any[]> {
+  private async checkStockConsistency(_tenantId: string): Promise<unknown[]> {
     // À implémenter : vérifier la cohérence des stocks
     return []
   }

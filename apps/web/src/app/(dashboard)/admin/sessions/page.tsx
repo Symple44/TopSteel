@@ -52,7 +52,7 @@ import { callClientApi } from '@/utils/backend-api'
 // Fonction utilitaire pour formater les dates
 const formatDateTime = (date: string | Date) => {
   const d = new Date(date)
-  return d.toLocaleDateString('fr-FR', {
+  return d?.toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -64,7 +64,7 @@ const formatDateTime = (date: string | Date) => {
 const formatDuration = (start: string | Date) => {
   const now = new Date()
   const startTime = new Date(start)
-  const diffMs = now.getTime() - startTime.getTime()
+  const diffMs = now?.getTime() - startTime?.getTime()
 
   const hours = Math.floor(diffMs / (1000 * 60 * 60))
   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
@@ -154,12 +154,14 @@ function SessionsManagementContent() {
         callClientApi('admin/sessions/history?limit=100'),
       ])
 
-      if ((onlineData as { success?: boolean; data?: OnlineUser[] }).success) {
-        setOnlineUsers((onlineData as { data: OnlineUser[] }).data)
+      const onlineResponse = onlineData as { success?: boolean; data?: OnlineUser[] }
+      if (onlineResponse.success && onlineResponse.data) {
+        setOnlineUsers(onlineResponse.data)
       }
 
-      if ((historyData as { success?: boolean; data?: ConnectionHistoryEntry[] }).success) {
-        setConnectionHistory((historyData as { data: ConnectionHistoryEntry[] }).data)
+      const historyResponse = historyData as { success?: boolean; data?: ConnectionHistory[] }
+      if (historyResponse.success && historyResponse.data) {
+        setConnectionHistory(historyResponse.data)
       }
     } catch (_error) {
     } finally {
@@ -182,11 +184,11 @@ function SessionsManagementContent() {
   }, [autoRefresh, loadData])
 
   // Filtrer les utilisateurs en ligne
-  const filteredOnlineUsers = onlineUsers.filter((user) => {
+  const filteredOnlineUsers = onlineUsers?.filter((user) => {
     const matchesSearch =
       searchTerm === '' ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
+      user?.email?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm?.toLowerCase())
 
     const matchesRole = filterRole === 'all' || user.role === filterRole
 
@@ -210,7 +212,8 @@ function SessionsManagementContent() {
         body: JSON.stringify({ sessionId, userId }),
       })
 
-      if ((response as { success?: boolean }).success) {
+      const responseData = response as { success?: boolean }
+      if (responseData.success) {
         loadData() // Recharger les données
       }
     } catch (_error) {}
@@ -249,6 +252,7 @@ function SessionsManagementContent() {
         </div>
         <div className="flex space-x-2">
           <Button
+            type="button"
             variant={autoRefresh ? 'default' : 'outline'}
             onClick={() => setAutoRefresh(!autoRefresh)}
             size="sm"
@@ -256,7 +260,7 @@ function SessionsManagementContent() {
             <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
             {autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
           </Button>
-          <Button onClick={loadData} size="sm">
+          <Button type="button" onClick={loadData} size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualiser
           </Button>
@@ -280,7 +284,9 @@ function SessionsManagementContent() {
               <Users className="h-5 w-5 text-blue-600" />
               <h3 className="text-sm font-medium text-muted-foreground">Actifs</h3>
             </div>
-            <p className="text-2xl font-bold mt-2">{onlineUsers.filter((u) => !u.isIdle).length}</p>
+            <p className="text-2xl font-bold mt-2">
+              {onlineUsers?.filter((u) => !u.isIdle).length}
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -289,7 +295,7 @@ function SessionsManagementContent() {
               <Clock className="h-5 w-5 text-orange-600" />
               <h3 className="text-sm font-medium text-muted-foreground">Inactifs</h3>
             </div>
-            <p className="text-2xl font-bold mt-2">{onlineUsers.filter((u) => u.isIdle).length}</p>
+            <p className="text-2xl font-bold mt-2">{onlineUsers?.filter((u) => u.isIdle).length}</p>
           </CardContent>
         </Card>
         <Card>
@@ -299,7 +305,7 @@ function SessionsManagementContent() {
               <h3 className="text-sm font-medium text-muted-foreground">Alertes</h3>
             </div>
             <p className="text-2xl font-bold mt-2">
-              {onlineUsers.filter((u) => u.warningCount > 0).length}
+              {onlineUsers?.filter((u) => u.warningCount > 0).length}
             </p>
           </CardContent>
         </Card>
@@ -308,6 +314,7 @@ function SessionsManagementContent() {
       {/* Onglets */}
       <div className="flex space-x-1 bg-muted p-1 rounded-lg w-fit">
         <Button
+          type="button"
           variant={activeTab === 'online' ? 'default' : 'ghost'}
           onClick={() => setActiveTab('online')}
           size="sm"
@@ -316,6 +323,7 @@ function SessionsManagementContent() {
           Utilisateurs en ligne ({onlineUsers.length})
         </Button>
         <Button
+          type="button"
           variant={activeTab === 'history' ? 'default' : 'ghost'}
           onClick={() => setActiveTab('history')}
           size="sm"
@@ -338,7 +346,7 @@ function SessionsManagementContent() {
                       placeholder="Rechercher par nom ou email..."
                       value={searchTerm}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setSearchTerm(e.target.value)
+                        setSearchTerm(e?.target?.value)
                       }
                       className="pl-10"
                     />
@@ -389,14 +397,14 @@ function SessionsManagementContent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOnlineUsers.map((user) => (
+                  {filteredOnlineUsers?.map((user) => (
                     <TableRow key={user.sessionId}>
                       <TableCell>
                         <div className="flex items-center space-x-3">
                           <Avatar>
                             <AvatarFallback>
-                              {user.firstName[0]}
-                              {user.lastName[0]}
+                              {user.firstName?.[0]}
+                              {user.lastName?.[0]}
                             </AvatarFallback>
                           </Avatar>
                           <div>
@@ -429,7 +437,7 @@ function SessionsManagementContent() {
                           <MapPin className="h-3 w-3 mr-1" />
                           {user.location ? (
                             <span>
-                              {user.location.city}, {user.location.country}
+                              {user?.location?.city}, {user?.location?.country}
                             </span>
                           ) : (
                             <span className="text-muted-foreground">Non déterminée</span>
@@ -438,8 +446,8 @@ function SessionsManagementContent() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          <p>{user.deviceInfo.browser}</p>
-                          <p className="text-muted-foreground">{user.deviceInfo.os}</p>
+                          <p>{user?.deviceInfo?.browser}</p>
+                          <p className="text-muted-foreground">{user?.deviceInfo?.os}</p>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -464,28 +472,31 @@ function SessionsManagementContent() {
                       <TableCell className="text-right">
                         <div className="flex items-center space-x-1">
                           <Button
+                            type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleViewProfile(user)}
-                            title="Voir le profil"
+                            aria-label="Voir le profil"
                           >
                             <User className="h-4 w-4" />
                           </Button>
                           <Button
+                            type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleViewHistory(user)}
-                            title="Historique"
+                            aria-label="Historique"
                           >
                             <History className="h-4 w-4" />
                           </Button>
                           <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
                             <Button
+                              type="button"
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDisconnectUser(user.sessionId, user.userId)}
                               className="text-red-600 hover:text-red-700"
-                              title="Déconnecter"
+                              aria-label="Déconnecter"
                             >
                               <LogOut className="h-4 w-4" />
                             </Button>
@@ -496,7 +507,7 @@ function SessionsManagementContent() {
                   ))}
                 </TableBody>
               </Table>
-              {filteredOnlineUsers.length === 0 && (
+              {filteredOnlineUsers?.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   Aucun utilisateur en ligne trouvé
                 </div>
@@ -525,14 +536,14 @@ function SessionsManagementContent() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {connectionHistory.map((session) => (
+                {connectionHistory?.map((session) => (
                   <TableRow key={session.id}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar>
                           <AvatarFallback>
-                            {session.firstName[0]}
-                            {session.lastName[0]}
+                            {session.firstName?.[0]}
+                            {session.lastName?.[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
@@ -567,7 +578,7 @@ function SessionsManagementContent() {
                         <MapPin className="h-3 w-3 mr-1" />
                         {session.location ? (
                           <span>
-                            {session.location.city}, {session.location.country}
+                            {session?.location?.city}, {session?.location?.country}
                           </span>
                         ) : (
                           <span className="text-muted-foreground">Non déterminée</span>
@@ -576,8 +587,8 @@ function SessionsManagementContent() {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <p>{session.deviceInfo.browser}</p>
-                        <p className="text-muted-foreground">{session.deviceInfo.os}</p>
+                        <p>{session?.deviceInfo?.browser}</p>
+                        <p className="text-muted-foreground">{session?.deviceInfo?.os}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -631,10 +642,10 @@ function UserConnectionHistory({ userId }: { userId: string }) {
 
   const loadUserHistory = useCallback(async () => {
     try {
-      const response = await callClientApi(`admin/sessions/user/${userId}/history`)
-      const data = await response.json()
-      if (data.success) {
-        setHistory(data.data)
+      const data = await callClientApi(`admin/sessions/user/${userId}/history`)
+      const historyResponse = data as { success?: boolean; data?: ConnectionHistory[] }
+      if (historyResponse.success && historyResponse.data) {
+        setHistory(historyResponse.data)
       }
     } catch (_error) {
     } finally {
@@ -665,9 +676,9 @@ function UserConnectionHistory({ userId }: { userId: string }) {
             <div className="text-sm text-muted-foreground">Cette semaine</div>
             <div className="text-2xl font-bold">
               {
-                history.filter((h) => {
+                history?.filter((h) => {
                   const weekAgo = new Date()
-                  weekAgo.setDate(weekAgo.getDate() - 7)
+                  weekAgo?.setDate(weekAgo?.getDate() - 7)
                   return new Date(h.loginTime) > weekAgo
                 }).length
               }
@@ -678,14 +689,14 @@ function UserConnectionHistory({ userId }: { userId: string }) {
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">Déconnexions forcées</div>
             <div className="text-2xl font-bold text-red-600">
-              {history.filter((h) => h.status === 'forced_logout').length}
+              {history?.filter((h) => h.status === 'forced_logout').length}
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Alerte si déconnexions suspectes */}
-      {history.filter((h) => h.status === 'forced_logout').length > 3 && (
+      {history?.filter((h) => h.status === 'forced_logout').length > 3 && (
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
@@ -697,7 +708,7 @@ function UserConnectionHistory({ userId }: { userId: string }) {
 
       {/* Liste des connexions */}
       <div className="space-y-2 max-h-96 overflow-y-auto">
-        {history.map((session) => (
+        {history?.map((session) => (
           <div key={session.id} className="flex items-center justify-between p-3 border rounded-lg">
             <div className="flex-1">
               <div className="flex items-center space-x-2">
@@ -721,8 +732,9 @@ function UserConnectionHistory({ userId }: { userId: string }) {
               </div>
               <div className="text-xs text-muted-foreground mt-1">
                 IP: {session.ipAddress} •
-                {session.location && ` ${session.location.city}, ${session.location.country} • `}
-                {session.deviceInfo.browser} ({session.deviceInfo.os})
+                {session.location &&
+                  ` ${session?.location?.city}, ${session?.location?.country} • `}
+                {session?.deviceInfo?.browser} ({session?.deviceInfo?.os})
                 {session.duration && ` • Durée: ${session.duration}`}
               </div>
             </div>

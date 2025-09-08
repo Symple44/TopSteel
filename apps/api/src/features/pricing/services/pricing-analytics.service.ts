@@ -81,7 +81,8 @@ export class PricingAnalyticsService {
       })
 
       // Flush si le buffer est plein
-      if (this.metricsBuffer.get(key)?.length >= 100) {
+      const buffer = this.metricsBuffer.get(key)
+      if (buffer && buffer.length >= 100) {
         await this.flushMetrics(key)
       }
     } catch (error) {
@@ -202,15 +203,18 @@ export class PricingAnalyticsService {
 
         // Top groupes clients
         const topCustomerGroups = Array.from(stats.customerGroups.entries())
-          .sort((a, b) => b[1] - a[1])
+          .sort((a, b) => (b as [string, number])[1] - (a as [string, number])[1])
           .slice(0, 5)
-          .map(([group, count]) => ({ group, count }))
+          .map((entry) => {
+            const [group, count] = entry as [string, number]
+            return { group, count }
+          })
 
         // Heures de pointe
         const peakUsageHours = stats.hourlyUsage
           .map((count: number, hour: number) => ({ hour, count }))
-          .filter((h: any) => h.count > 0)
-          .sort((a: any, b: any) => b.count - a.count)
+          .filter((h: unknown) => h.count > 0)
+          .sort((a: unknown, b: any) => b.count - a.count)
           .slice(0, 5)
 
         return {
@@ -378,7 +382,9 @@ export class PricingAnalyticsService {
     csv.push('')
 
     csv.push('Recommendations')
-    dashboard.recommendations.forEach((r) => csv.push(r))
+    dashboard.recommendations.forEach((r) => {
+      csv.push(r)
+    })
 
     return csv.join('\n')
   }

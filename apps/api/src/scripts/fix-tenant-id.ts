@@ -9,21 +9,21 @@ async function fixTenantId() {
   console.log('🔧 Correction du tenantId dans ElasticSearch...')
 
   const client = new Client({
-    node: 'http://127.0.0.1:9200',
+    node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200',
     auth: {
-      username: 'elastic',
-      password: 'ogAceYjRKTIMmACWwhRA',
+      username: process.env.ELASTICSEARCH_USERNAME || 'elastic',
+      password: process.env.ELASTICSEARCH_PASSWORD || '',
     },
   })
 
   // Connexion à la base auth pour vérifier les sociétés
   const authDataSource = new DataSource({
     type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'postgres',
-    database: 'erp_topsteel_auth',
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+    username: process.env.DATABASE_USERNAME || 'postgres',
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME || 'erp_topsteel_auth',
     synchronize: false,
   })
 
@@ -40,7 +40,7 @@ async function fixTenantId() {
     `)
 
     console.log(`\n📊 Sociétés trouvées: ${societes.length}`)
-    societes.forEach((s: any) => {
+    societes.forEach((s: unknown) => {
       console.log(`  - ${s.nom} (ID: ${s.id}, Code: ${s.code})`)
     })
 
@@ -48,8 +48,8 @@ async function fixTenantId() {
     const targetTenantId = '73416fa9-f693-42f6-99d3-7c919cefe4d5'
     const currentTenantId = 'a4a21147-ef1b-489c-8769-067bc45da723'
 
-    const targetSociete = societes.find((s: any) => s.id === targetTenantId)
-    const currentSociete = societes.find((s: any) => s.id === currentTenantId)
+    const targetSociete = societes.find((s: unknown) => s.id === targetTenantId)
+    const currentSociete = societes.find((s: unknown) => s.id === currentTenantId)
 
     console.log(
       `\n🎯 Tenant cible: ${targetSociete ? targetSociete.nom : 'Non trouvé'} (${targetTenantId})`
@@ -129,7 +129,7 @@ async function fixTenantId() {
 
       if (testSearch.hits.hits.length > 0) {
         console.log('  Premiers résultats:')
-        testSearch.hits.hits.forEach((hit: any) => {
+        testSearch.hits.hits.forEach((hit: unknown) => {
           console.log(`    - ${hit._source.title || hit._source.designation}`)
         })
       }

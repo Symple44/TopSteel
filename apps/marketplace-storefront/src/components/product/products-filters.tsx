@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, Filter, Search, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { getCategories } from '@/lib/api/storefront'
 import { cn } from '@/lib/utils'
 
@@ -14,6 +14,9 @@ interface ProductsFiltersProps {
 export function ProductsFilters({ tenant }: ProductsFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const searchInputId = useId()
+  const minPriceId = useId()
+  const maxPriceId = useId()
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
@@ -92,7 +95,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <input
-              id="search-input"
+              id={searchInputId}
               type="text"
               placeholder="Rechercher des produits..."
               value={searchQuery}
@@ -164,11 +167,11 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
           <span className="text-sm font-medium">Fourchette de prix</span>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label htmlFor="min-price" className="sr-only">
+              <label htmlFor={minPriceId} className="sr-only">
                 Prix minimum
               </label>
               <input
-                id="min-price"
+                id={minPriceId}
                 type="number"
                 placeholder="Prix min"
                 value={minPrice}
@@ -178,11 +181,11 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               />
             </div>
             <div>
-              <label htmlFor="max-price" className="sr-only">
+              <label htmlFor={maxPriceId} className="sr-only">
                 Prix maximum
               </label>
               <input
-                id="max-price"
+                id={maxPriceId}
                 type="number"
                 placeholder="Prix max"
                 value={maxPrice}

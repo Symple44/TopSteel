@@ -13,6 +13,30 @@ export interface User {
   societeId?: string
   societeCode?: string
   societeName?: string
+  // Additional properties for consistency across the app
+  firstName?: string // Alias for prenom
+  lastName?: string // Alias for nom
+  phone?: string
+  department?: string
+  isActive: boolean
+  lastLogin?: string | Date
+  createdAt?: string
+  updatedAt?: string
+  // Role and group associations
+  roles?: Array<{
+    id: string
+    name: string
+    description?: string
+    assignedAt?: string
+    expiresAt?: string
+  }>
+  groups?: Array<{
+    id: string
+    name: string
+    type?: string
+    description?: string
+    assignedAt?: string
+  }>
 }
 
 export interface Company {

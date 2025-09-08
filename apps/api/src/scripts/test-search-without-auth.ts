@@ -68,7 +68,7 @@ async function testSearchDirectly() {
     // Test 3: Vérifier les facettes
     if (result.facets?.types) {
       logger.log('\n📊 Distribution par type:')
-      result.facets.types.forEach((facet: any) => {
+      result.facets.types.forEach((facet: { value: string; count: number }) => {
         logger.log(`  - ${facet.value}: ${facet.count} documents`)
       })
     }

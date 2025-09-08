@@ -1,22 +1,21 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { StockLevelIndicator } from '../StockLevelIndicator'
-import { PriceDisplay } from '../PriceDisplay'
-import { 
-  Package, 
-  Ruler, 
-  Weight, 
-  Shield, 
-  Zap, 
-  Thermometer,
-  AlertTriangle,
+import {
   CheckCircle,
+  FileText,
   Image,
-  FileText
+  Package,
+  Ruler,
+  Shield,
+  Thermometer,
+  Weight,
+  Zap,
 } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
+import { Button } from '../../../primitives/button/Button'
+import { PriceDisplay } from '../PriceDisplay'
+import { StockLevelIndicator } from '../StockLevelIndicator'
 export interface Material {
   id: string
   name: string
@@ -261,9 +260,7 @@ export function MaterialCard({
           <div className="flex items-center gap-2">
             {material.image && <Image className="h-3 w-3" />}
             {material.description && <FileText className="h-3 w-3" />}
-            {material.stock.location && (
-              <span>📍 {material.stock.location}</span>
-            )}
+            {material.stock.location && <span>📍 {material.stock.location}</span>}
           </div>
           <div>
             Prix maj: {new Intl.DateTimeFormat('fr-FR').format(material.pricing.lastUpdated)}
@@ -273,17 +270,23 @@ export function MaterialCard({
         {showActions && (
           <div className="flex gap-2 pt-3 border-t">
             {onViewDetails && (
-              <Button variant="outline" size="sm" onClick={onViewDetails} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewDetails}
+                className="flex-1"
+              >
                 Voir détails
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit}>
+              <Button type="button" variant="outline" size="sm" onClick={onEdit}>
                 Modifier
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" size="sm" onClick={onDelete}>
+              <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
                 Supprimer
               </Button>
             )}

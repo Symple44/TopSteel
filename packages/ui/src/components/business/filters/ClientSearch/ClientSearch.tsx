@@ -1,10 +1,10 @@
 'use client'
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { Search, Users, Building, Phone, Mail, MapPin, X, Loader2 } from 'lucide-react'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
+import { Building, Loader2, Mail, MapPin, Phone, Search, Users, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 export interface ClientSearchResult {
   id: string
   name: string
@@ -36,7 +36,7 @@ export function ClientSearch({
   value,
   onSelect,
   onSearch,
-  placeholder = "Rechercher un client...",
+  placeholder = 'Rechercher un client...',
   disabled = false,
   multiple = false,
   maxResults = 10,
@@ -55,7 +55,7 @@ export function ClientSearch({
   )
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const searchTimeoutRef = useRef<NodeJS.Timeout>()
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   useEffect(() => {
     if (autoFocus && inputRef.current) {
       inputRef.current.focus()
@@ -71,91 +71,103 @@ export function ClientSearch({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-  const performSearch = useCallback(async (searchQuery: string) => {
-    if (!onSearch || searchQuery.trim().length < 2) {
-      setResults([])
-      setIsOpen(false)
-      return
-    }
-    setIsLoading(true)
-    try {
-      const searchResults = await onSearch(searchQuery.trim())
-      setResults(searchResults.slice(0, maxResults))
-      setIsOpen(true)
-      setHighlightedIndex(-1)
-    } catch (error) {
-      console.error('Client search error:', error)
-      setResults([])
-    } finally {
-      setIsLoading(false)
-    }
-  }, [onSearch, maxResults])
-  const handleQueryChange = useCallback((value: string) => {
-    setQuery(value)
-    // Clear existing timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current)
-    }
-    // Debounce search
-    searchTimeoutRef.current = setTimeout(() => {
-      performSearch(value)
-    }, 300)
-  }, [performSearch])
-  const handleClientSelect = useCallback((client: ClientSearchResult) => {
-    if (multiple) {
-      const isAlreadySelected = selectedClients.some(c => c.id === client.id)
-      let newSelection: ClientSearchResult[]
-      if (isAlreadySelected) {
-        newSelection = selectedClients.filter(c => c.id !== client.id)
-      } else {
-        newSelection = [...selectedClients, client]
+  const performSearch = useCallback(
+    async (searchQuery: string) => {
+      if (!onSearch || searchQuery.trim().length < 2) {
+        setResults([])
+        setIsOpen(false)
+        return
       }
+      setIsLoading(true)
+      try {
+        const searchResults = await onSearch(searchQuery.trim())
+        setResults(searchResults.slice(0, maxResults))
+        setIsOpen(true)
+        setHighlightedIndex(-1)
+      } catch (_error) {
+        setResults([])
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [onSearch, maxResults]
+  )
+  const handleQueryChange = useCallback(
+    (value: string) => {
+      setQuery(value)
+      // Clear existing timeout
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+      // Debounce search
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch(value)
+      }, 300)
+    },
+    [performSearch]
+  )
+  const handleClientSelect = useCallback(
+    (client: ClientSearchResult) => {
+      if (multiple) {
+        const isAlreadySelected = selectedClients.some((c) => c.id === client.id)
+        let newSelection: ClientSearchResult[]
+        if (isAlreadySelected) {
+          newSelection = selectedClients.filter((c) => c.id !== client.id)
+        } else {
+          newSelection = [...selectedClients, client]
+        }
+        setSelectedClients(newSelection)
+        onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+      } else {
+        setSelectedClients([client])
+        onSelect?.(client)
+        setQuery('')
+        setIsOpen(false)
+      }
+      setHighlightedIndex(-1)
+    },
+    [multiple, selectedClients, onSelect]
+  )
+  const handleRemoveClient = useCallback(
+    (clientId: string) => {
+      const newSelection = selectedClients.filter((c) => c.id !== clientId)
       setSelectedClients(newSelection)
-      onSelect?.(newSelection.length > 0 ? newSelection as any : null)
-    } else {
-      setSelectedClients([client])
-      onSelect?.(client)
-      setQuery('')
-      setIsOpen(false)
-    }
-    setHighlightedIndex(-1)
-  }, [multiple, selectedClients, onSelect])
-  const handleRemoveClient = useCallback((clientId: string) => {
-    const newSelection = selectedClients.filter(c => c.id !== clientId)
-    setSelectedClients(newSelection)
-    onSelect?.(newSelection.length > 0 ? newSelection as any : null)
-  }, [selectedClients, onSelect])
+      onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+    },
+    [selectedClients, onSelect]
+  )
   const clearSelection = useCallback(() => {
     setSelectedClients([])
     setQuery('')
     onSelect?.(null)
     setIsOpen(false)
   }, [onSelect])
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!isOpen) return
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault()
-        setHighlightedIndex(prev => 
-          prev < results.length - 1 ? prev + 1 : prev
-        )
-        break
-      case 'ArrowUp':
-        e.preventDefault()
-        setHighlightedIndex(prev => prev > 0 ? prev - 1 : prev)
-        break
-      case 'Enter':
-        e.preventDefault()
-        if (highlightedIndex >= 0 && results[highlightedIndex]) {
-          handleClientSelect(results[highlightedIndex])
-        }
-        break
-      case 'Escape':
-        setIsOpen(false)
-        setHighlightedIndex(-1)
-        break
-    }
-  }, [isOpen, results, highlightedIndex, handleClientSelect])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!isOpen) return
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault()
+          setHighlightedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev))
+          break
+        case 'ArrowUp':
+          e.preventDefault()
+          setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev))
+          break
+        case 'Enter':
+          e.preventDefault()
+          if (highlightedIndex >= 0 && results[highlightedIndex]) {
+            handleClientSelect(results[highlightedIndex])
+          }
+          break
+        case 'Escape':
+          setIsOpen(false)
+          setHighlightedIndex(-1)
+          break
+      }
+    },
+    [isOpen, results, highlightedIndex, handleClientSelect]
+  )
   const getStatusColor = (status: string) => {
     const colors = {
       active: 'bg-green-100 text-green-800',
@@ -191,10 +203,14 @@ export function ClientSearch({
                 <Users className="h-3 w-3" />
               )}
               <span className="text-sm">{client.name}</span>
-              <X
-                className="h-3 w-3 cursor-pointer hover:text-destructive"
+              <button
+                type="button"
                 onClick={() => handleRemoveClient(client.id)}
-              />
+                className="h-3 w-3 p-0 border-0 bg-transparent hover:text-destructive focus:outline-none focus:text-destructive"
+                aria-label={`Supprimer ${client.name}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
             </Badge>
           ))}
         </div>
@@ -236,10 +252,13 @@ export function ClientSearch({
         <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg max-h-80 overflow-auto">
           {results.map((client, index) => {
             const isHighlighted = index === highlightedIndex
-            const isSelected = selectedClients.some(c => c.id === client.id)
+            const isSelected = selectedClients.some((c) => c.id === client.id)
             return (
+              // biome-ignore lint/a11y/useSemanticElements: This div uses role="button" with complex nested content including badges, icons, and text. Using a button element would interfere with layout and styling.
               <div
                 key={client.id}
+                role="button"
+                tabIndex={0}
                 className={cn(
                   'flex items-center gap-3 p-3 cursor-pointer transition-colors',
                   isHighlighted && 'bg-muted',
@@ -247,6 +266,12 @@ export function ClientSearch({
                   'hover:bg-muted'
                 )}
                 onClick={() => handleClientSelect(client)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleClientSelect(client)
+                  }
+                }}
               >
                 {/* Client Icon */}
                 <div className="flex-shrink-0">
@@ -260,8 +285,8 @@ export function ClientSearch({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm truncate">{client.name}</span>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={cn('text-xs', getStatusColor(client.status))}
                     >
                       {getStatusLabel(client.status)}
@@ -284,9 +309,7 @@ export function ClientSearch({
                       {(client.city || client.country) && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="h-3 w-3" />
-                          <span>
-                            {[client.city, client.country].filter(Boolean).join(', ')}
-                          </span>
+                          <span>{[client.city, client.country].filter(Boolean).join(', ')}</span>
                         </div>
                       )}
                     </div>

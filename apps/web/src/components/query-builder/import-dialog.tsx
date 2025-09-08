@@ -1,6 +1,6 @@
 'use client'
 
-import { Label } from '@erp/ui'
+import { Label, useFormFieldIds } from '@erp/ui'
 import {
   Button,
   Dialog,
@@ -23,6 +23,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
   const [jsonContent, setJsonContent] = useState('')
   const [error, setError] = useState('')
   const { toast } = useToast()
+  const ids = useFormFieldIds(['fileUpload', 'jsonContent'])
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -34,7 +35,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
       setJsonContent(content)
       setError('')
     }
-    reader.readAsText(file)
+    reader?.readAsText(file)
   }
 
   const handleImport = () => {
@@ -42,7 +43,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
       const data = JSON.parse(jsonContent)
 
       // Validation basique
-      if (!data.name || !data.mainTable) {
+      if (!data?.name || !data?.mainTable) {
         setError('Le JSON doit contenir au minimum "name" et "mainTable"')
         return
       }
@@ -85,7 +86,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button type="button" variant="outline" size="sm">
           <Upload className="h-4 w-4 mr-2" />
           Importer JSON
         </Button>
@@ -96,18 +97,19 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="file-upload">Fichier JSON</Label>
+            <Label htmlFor={ids.fileUpload}>Fichier JSON</Label>
             <div className="flex items-center gap-2 mt-2">
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => document.getElementById('file-upload')?.click()}
+                onClick={() => document.getElementById(ids.fileUpload)?.click()}
               >
                 <FileJson className="h-4 w-4 mr-2" />
                 Choisir un fichier
               </Button>
               <input
-                id="file-upload"
+                id={ids.fileUpload}
                 type="file"
                 accept=".json"
                 onChange={handleFileUpload}
@@ -118,12 +120,12 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
           </div>
 
           <div>
-            <Label htmlFor="json-content">Contenu JSON</Label>
+            <Label htmlFor={ids.jsonContent}>Contenu JSON</Label>
             <Textarea
-              id="json-content"
+              id={ids.jsonContent}
               value={jsonContent}
               onChange={(e) => {
-                setJsonContent(e.target.value)
+                setJsonContent(e?.target?.value)
                 setError('')
               }}
               placeholder={`{
@@ -145,10 +147,10 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
           )}
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Annuler
             </Button>
-            <Button onClick={handleImport} disabled={!jsonContent.trim()}>
+            <Button type="button" onClick={handleImport} disabled={!jsonContent?.trim()}>
               Importer
             </Button>
           </div>

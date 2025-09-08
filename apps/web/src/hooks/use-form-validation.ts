@@ -28,34 +28,34 @@ export function useFormValidation<T extends Record<string, unknown>>(
     if (!rule) return ''
 
     // Required
-    if (rule.required && (!value || (typeof value === 'string' && !value.trim()))) {
-      return rule.message?.required || `${String(field)} est requis`
+    if (rule?.required && (!value || (typeof value === 'string' && !value?.trim()))) {
+      return rule?.message?.required || `${String(field)} est requis`
     }
 
     // String validations
     if (typeof value === 'string') {
-      if (rule.minLength && value.length < rule.minLength) {
+      if (rule?.minLength && value?.length < rule?.minLength) {
         return (
-          rule.message?.minLength ||
-          `${String(field)} doit contenir au moins ${rule.minLength} caractères`
+          rule?.message?.minLength ||
+          `${String(field)} doit contenir au moins ${rule?.minLength} caractères`
         )
       }
 
-      if (rule.maxLength && value.length > rule.maxLength) {
+      if (rule?.maxLength && value?.length > rule?.maxLength) {
         return (
-          rule.message?.maxLength ||
-          `${String(field)} ne peut pas dépasser ${rule.maxLength} caractères`
+          rule?.message?.maxLength ||
+          `${String(field)} ne peut pas dépasser ${rule?.maxLength} caractères`
         )
       }
 
-      if (rule.pattern && !rule.pattern.test(value)) {
-        return rule.message?.pattern || `${String(field)} n'est pas au bon format`
+      if (rule?.pattern && !rule?.pattern?.test(value)) {
+        return rule?.message?.pattern || `${String(field)} n'est pas au bon format`
       }
     }
 
     // Custom validation
-    if (rule.custom) {
-      const customError = rule.custom(value)
+    if (rule?.custom) {
+      const customError = rule?.custom(value)
       if (customError) return customError
     }
 
@@ -64,7 +64,7 @@ export function useFormValidation<T extends Record<string, unknown>>(
 
   const handleChange =
     (field: keyof T) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const value = e.target.value
+      const value = e?.target?.value
       setValues((prev) => ({ ...prev, [field]: value }))
 
       // Validation en temps réel si touché

@@ -10,8 +10,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  type ColumnConfig,
-  AdvancedDataTable as DataTable,
+  DataTable,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -21,7 +20,9 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  useUniqueId,
 } from '@erp/ui'
+import type { ColumnConfig, SelectionState } from '@erp/ui/components/data-display/datatable/types'
 import { Activity, Calculator, Download, Plus, TrendingDown, Upload } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -35,6 +36,7 @@ const useApiClient = () => ({
 })
 
 import { toast } from 'sonner'
+import { deleteTyped, fetchTyped, postTyped } from '@/lib/api-typed'
 
 // Comment out the problematic imports for now to fix build
 // import type { PriceRule, PriceRuleChannel, AdjustmentType } from '@erp/entities'
@@ -82,8 +84,9 @@ enum AdjustmentType {
   FORMULA = 'FORMULA',
 }
 
-type SimulationContext = Record<string, unknown>
-type SimulationResult = Record<string, unknown>
+// Note: These types are reserved for future simulation feature implementation
+// type SimulationContext = Record<string, unknown>
+// type SimulationResult = Record<string, unknown>
 
 interface PricingStats {
   totalRules: number
@@ -111,41 +114,53 @@ export default function PricingManagementPage() {
   const [selectedRule, setSelectedRule] = useState<PriceRule | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [showSimulator, setShowSimulator] = useState(false)
-  const [selectedRules, setSelectedRules] = useState<Set<string>>(new Set())
+  const [selectionState, setSelectionState] = useState<SelectionState>({
+    selectedRows: new Set<string>(),
+    selectAll: false,
+  })
   const [stats, setStats] = useState<PricingStats | null>(null)
   const [searchTerm, _setSearchTerm] = useState('')
   const [filterChannel, _setFilterChannel] = useState<PriceRuleChannel | 'ALL'>('ALL')
   const [filterActive, _setFilterActive] = useState<boolean | null>(null)
+
+  // Unique IDs for form elements
+  const importFileId = useUniqueId('import-file')
 
   const apiClient = useApiClient()
 
   // Colonnes pour la DataTable
   const columns: ColumnConfig<PriceRule>[] = [
     {
+      id: 'ruleName',
       key: 'ruleName',
-      header: 'Nom de la règle',
+      title: 'Nom de la règle',
       sortable: true,
-      searchable: true,
-      render: (rule) => (
+      type: 'text',
+      render: (_value: unknown, row: PriceRule, _column: ColumnConfig<PriceRule>) => (
         <div className="flex items-center gap-2">
-          <span className="font-medium">{rule.ruleName}</span>
-          {!rule.isActive && <Badge variant="secondary">Inactive</Badge>}
+          <span className="font-medium">{row?.ruleName}</span>
+          {!row?.isActive && <Badge variant="secondary">Inactive</Badge>}
         </div>
       ),
     },
     {
+      id: 'channel',
       key: 'channel',
-      header: 'Canal',
+      title: 'Canal',
       sortable: true,
-      filterable: true,
-      render: (rule) => <Badge variant="outline">{rule.channel}</Badge>,
+      type: 'text',
+      render: (_value: unknown, row: PriceRule, _column: ColumnConfig<PriceRule>) => (
+        <Badge variant="outline">{row?.channel}</Badge>
+      ),
     },
     {
+      id: 'adjustmentType',
       key: 'adjustmentType',
-      header: 'Type',
+      title: 'Type',
       sortable: true,
-      render: (rule) => {
-        const typeLabels = {
+      type: 'text',
+      render: (_value: unknown, row: PriceRule, _column: ColumnConfig<PriceRule>) => {
+        const typeLabels: Record<string, string> = {
           [AdjustmentType.PERCENTAGE]: 'Pourcentage',
           [AdjustmentType.FIXED_AMOUNT]: 'Montant fixe',
           [AdjustmentType.FIXED_PRICE]: 'Prix fixe',
@@ -155,49 +170,57 @@ export default function PricingManagementPage() {
           [AdjustmentType.PRICE_PER_VOLUME]: 'Prix au volume',
           [AdjustmentType.FORMULA]: 'Formule',
         }
-        return typeLabels[rule.adjustmentType] || rule.adjustmentType
+        return typeLabels[row?.adjustmentType] || row?.adjustmentType
       },
     },
     {
+      id: 'adjustmentValue',
       key: 'adjustmentValue',
-      header: 'Valeur',
+      title: 'Valeur',
       sortable: true,
-      render: (rule) => {
-        if (rule.adjustmentType === AdjustmentType.PERCENTAGE) {
+      type: 'text',
+      render: (_value: unknown, row: PriceRule, _column: ColumnConfig<PriceRule>) => {
+        if (row?.adjustmentType === AdjustmentType.PERCENTAGE) {
           return (
-            <span className={rule.adjustmentValue < 0 ? 'text-green-600' : 'text-gray-900'}>
-              {rule.adjustmentValue > 0 ? '+' : ''}
-              {rule.adjustmentValue}%
+            <span className={row?.adjustmentValue < 0 ? 'text-green-600' : 'text-gray-900'}>
+              {row?.adjustmentValue > 0 ? '+' : ''}
+              {row?.adjustmentValue}%
             </span>
           )
         }
-        if (rule.adjustmentType === AdjustmentType.FORMULA) {
-          return <code className="text-xs">{rule.formula?.substring(0, 30)}...</code>
+        if (row?.adjustmentType === AdjustmentType.FORMULA) {
+          return <code className="text-xs">{row?.formula?.substring(0, 30)}...</code>
         }
-        if (rule.adjustmentUnit) {
-          return `${rule.adjustmentValue}€/${rule.adjustmentUnit}`
+        if (row?.adjustmentUnit) {
+          return `${row?.adjustmentValue}€/${row?.adjustmentUnit}`
         }
-        return `${rule.adjustmentValue}€`
+        return `${row?.adjustmentValue}€`
       },
     },
     {
+      id: 'priority',
       key: 'priority',
-      header: 'Priorité',
+      title: 'Priorité',
       sortable: true,
-      render: (rule) => <Badge variant="secondary">{rule.priority}</Badge>,
+      type: 'text',
+      render: (_value: unknown, row: PriceRule, _column: ColumnConfig<PriceRule>) => (
+        <Badge variant="secondary">{row?.priority}</Badge>
+      ),
     },
     {
+      id: 'usageCount',
       key: 'usageCount',
-      header: 'Utilisations',
+      title: 'Utilisations',
       sortable: true,
-      render: (rule) => {
-        const percentage = rule.usageLimit ? (rule.usageCount / rule.usageLimit) * 100 : 0
+      type: 'text',
+      render: (_value: unknown, row: PriceRule, _column: ColumnConfig<PriceRule>) => {
+        const percentage = row.usageLimit ? (row.usageCount / row.usageLimit) * 100 : 0
         return (
           <div className="flex items-center gap-2">
-            <span>{rule.usageCount}</span>
-            {rule.usageLimit && (
+            <span>{row?.usageCount}</span>
+            {row?.usageLimit && (
               <>
-                <span className="text-muted-foreground">/ {rule.usageLimit}</span>
+                <span className="text-muted-foreground">/ {row?.usageLimit}</span>
                 {percentage >= 90 && (
                   <Badge variant="destructive" className="text-xs">
                     {Math.round(percentage)}%
@@ -210,11 +233,13 @@ export default function PricingManagementPage() {
       },
     },
     {
+      id: 'combinable',
       key: 'combinable',
-      header: 'Combinable',
-      render: (rule) => (
-        <Badge variant={rule.combinable ? 'outline' : 'destructive'}>
-          {rule.combinable ? 'Oui' : 'Non'}
+      title: 'Combinable',
+      type: 'text',
+      render: (_value: unknown, row: PriceRule, _column: ColumnConfig<PriceRule>) => (
+        <Badge variant={row?.combinable ? 'outline' : 'destructive'}>
+          {row?.combinable ? 'Oui' : 'Non'}
         </Badge>
       ),
     },
@@ -227,17 +252,19 @@ export default function PricingManagementPage() {
 
     try {
       const params = new URLSearchParams()
-      if (searchTerm) params.append('search', searchTerm)
-      if (filterChannel !== 'ALL') params.append('channel', filterChannel)
-      if (filterActive !== null) params.append('active', String(filterActive))
+      if (searchTerm) params?.append('search', searchTerm)
+      if (filterChannel !== 'ALL') params?.append('channel', filterChannel)
+      if (filterActive !== null) params?.append('active', String(filterActive))
 
-      const response = await apiClient.get(`/pricing/rules?${params.toString()}`)
-      setRules(response.data.rules || [])
+      const response = await fetchTyped<{ rules: PriceRule[]; total: number }>(
+        `/pricing/rules?${params?.toString()}`
+      )
+      setRules(response?.rules || [])
 
       // Calculer les statistiques
       const stats: PricingStats = {
-        totalRules: response.data.total || 0,
-        activeRules: response.data.rules?.filter((r: PriceRule) => r.isActive).length || 0,
+        totalRules: response?.total ?? 0,
+        activeRules: response?.rules?.filter((r: PriceRule) => r.isActive).length ?? 0,
         averageDiscount: 0,
         totalUsage: 0,
       }
@@ -245,12 +272,12 @@ export default function PricingManagementPage() {
       // Calculer la remise moyenne et l'usage total
       let totalDiscount = 0
       let discountCount = 0
-      response.data.rules?.forEach((rule: PriceRule) => {
-        if (rule.adjustmentType === AdjustmentType.PERCENTAGE && rule.adjustmentValue < 0) {
+      response?.rules?.forEach((rule: PriceRule) => {
+        if (rule?.adjustmentType === AdjustmentType.PERCENTAGE && rule?.adjustmentValue < 0) {
           totalDiscount += Math.abs(rule.adjustmentValue)
           discountCount++
         }
-        stats.totalUsage += rule.usageCount
+        stats.totalUsage += rule?.usageCount
       })
 
       if (discountCount > 0) {
@@ -258,8 +285,8 @@ export default function PricingManagementPage() {
       }
 
       // Trouver la règle la plus utilisée
-      const mostUsed = response.data.rules?.reduce((max: PriceRule | null, rule: PriceRule) => {
-        if (!max || rule.usageCount > max.usageCount) return rule
+      const mostUsed = response?.rules?.reduce((max: PriceRule | null, rule: PriceRule) => {
+        if (!max || rule?.usageCount > max.usageCount) return rule
         return max
       }, null)
 
@@ -272,75 +299,56 @@ export default function PricingManagementPage() {
       }
 
       setStats(stats)
-    } catch (err) {
-      const _errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
+    } catch (_err) {
+      // const _errorMessage = err instanceof Error ? err.message : 'Erreur inconnue' // Unused - removed
       setError('Impossible de charger les règles de prix')
-      toast.error('Erreur lors du chargement des règles')
+      toast?.error('Erreur lors du chargement des règles')
     } finally {
       setLoading(false)
     }
-  }, [apiClient, searchTerm, filterChannel, filterActive])
+  }, [searchTerm, filterChannel, filterActive])
 
   useEffect(() => {
     loadRules()
   }, [loadRules])
 
-  // Créer/Modifier une règle
-  const _handleSaveRule = async (ruleData: Partial<PriceRule>) => {
-    try {
-      if (selectedRule) {
-        // Modification
-        await apiClient.put(`/pricing/rules/${selectedRule.id}`, ruleData)
-        toast.success('Règle modifiée avec succès')
-      } else {
-        // Création
-        await apiClient.post('/pricing/rules', ruleData)
-        toast.success('Règle créée avec succès')
-      }
-
-      setShowForm(false)
-      setSelectedRule(null)
-      loadRules()
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-      toast.error(`Erreur lors de la sauvegarde de la règle: ${errorMessage}`)
-    }
-  }
+  // Créer/Modifier une règle - function removed (unused)
+  // const _handleSaveRule = async (ruleData: Partial<PriceRule>) => { ... }
 
   // Supprimer une règle
   const handleDeleteRule = async (rule: PriceRule) => {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer la règle "${rule.ruleName}" ?`)) {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer la règle "${rule?.ruleName}" ?`)) {
       return
     }
 
     try {
-      await apiClient.delete(`/pricing/rules/${rule.id}`)
-      toast.success('Règle supprimée avec succès')
+      await deleteTyped(`/pricing/rules/${rule?.id}`)
+      toast?.success('Règle supprimée avec succès')
       loadRules()
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-      toast.error(`Erreur lors de la suppression de la règle: ${errorMessage}`)
+      toast?.error(`Erreur lors de la suppression de la règle: ${errorMessage}`)
     }
   }
 
   // Activer/Désactiver une règle
   const handleToggleRule = async (rule: PriceRule) => {
     try {
-      await apiClient.post(`/pricing/rules/${rule.id}/toggle`)
-      toast.success(`Règle ${rule.isActive ? 'désactivée' : 'activée'} avec succès`)
+      await postTyped(`/pricing/rules/${rule?.id}/toggle`)
+      toast?.success(`Règle ${rule?.isActive ? 'désactivée' : 'activée'} avec succès`)
       loadRules()
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-      toast.error(`Erreur lors du changement de statut de la règle: ${errorMessage}`)
+      toast?.error(`Erreur lors du changement de statut de la règle: ${errorMessage}`)
     }
   }
 
   // Dupliquer une règle
   const handleDuplicateRule = async (rule: PriceRule) => {
+    const { id: _id, ...ruleWithoutId } = rule || {}
     const newRule = {
-      ...rule,
-      id: undefined,
-      ruleName: `${rule.ruleName} (copie)`,
+      ...ruleWithoutId,
+      ruleName: `${rule?.ruleName} (copie)`,
       isActive: false,
       usageCount: 0,
     }
@@ -354,63 +362,59 @@ export default function PricingManagementPage() {
     }, 100)
   }
 
-  // Simuler un calcul de prix
-  const _handleSimulate = async (context: SimulationContext): Promise<SimulationResult> => {
-    try {
-      const response = await apiClient.post('/pricing/calculate', context)
-      return response.data
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-      throw new Error(`Erreur lors de la simulation: ${errorMessage}`)
-    }
-  }
+  // Simuler un calcul de prix - function removed (unused)
+  // const _handleSimulate = async (context: SimulationContext): Promise<SimulationResult> => { ... }
 
   // Actions en masse
   const handleBulkDelete = async () => {
-    if (selectedRules.size === 0) {
-      toast.error('Aucune règle sélectionnée')
+    if (selectionState.selectedRows.size === 0) {
+      toast?.error('Aucune règle sélectionnée')
       return
     }
 
-    if (!confirm(`Supprimer ${selectedRules.size} règle(s) ?`)) {
+    if (!confirm(`Supprimer ${selectionState.selectedRows.size} règle(s) ?`)) {
       return
     }
 
     try {
       await Promise.all(
-        Array.from(selectedRules).map((id) => apiClient.delete(`/pricing/rules/${id}`))
+        Array.from(selectionState.selectedRows).map((id) =>
+          apiClient?.delete(`/pricing/rules/${id}`)
+        )
       )
-      toast.success(`${selectedRules.size} règle(s) supprimée(s)`)
-      setSelectedRules(new Set())
+      toast?.success(`${selectionState.selectedRows.size} règle(s) supprimée(s)`)
+      setSelectionState({ selectedRows: new Set(), selectAll: false })
       loadRules()
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-      toast.error(`Erreur lors de la suppression des règles: ${errorMessage}`)
+      toast?.error(`Erreur lors de la suppression des règles: ${errorMessage}`)
     }
   }
 
   const handleBulkToggle = async (activate: boolean) => {
-    if (selectedRules.size === 0) {
-      toast.error('Aucune règle sélectionnée')
+    if (selectionState.selectedRows.size === 0) {
+      toast?.error('Aucune règle sélectionnée')
       return
     }
 
     try {
       await Promise.all(
-        Array.from(selectedRules).map((id) => {
-          const rule = rules.find((r) => r.id === id)
-          if (rule && rule.isActive !== activate) {
-            return apiClient.post(`/pricing/rules/${id}/toggle`)
+        Array.from(selectionState.selectedRows).map((id) => {
+          const rule = rules?.find((r) => r.id === id)
+          if (rule && rule?.isActive !== activate) {
+            return apiClient?.post(`/pricing/rules/${id}/toggle`)
           }
           return Promise.resolve()
         })
       )
-      toast.success(`${selectedRules.size} règle(s) ${activate ? 'activée(s)' : 'désactivée(s)'}`)
-      setSelectedRules(new Set())
+      toast?.success(
+        `${selectionState.selectedRows.size} règle(s) ${activate ? 'activée(s)' : 'désactivée(s)'}`
+      )
+      setSelectionState({ selectedRows: new Set(), selectAll: false })
       loadRules()
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-      toast.error(`Erreur lors du changement de statut des règles: ${errorMessage}`)
+      toast?.error(`Erreur lors du changement de statut des règles: ${errorMessage}`)
     }
   }
 
@@ -422,11 +426,11 @@ export default function PricingManagementPage() {
     const exportFileDefaultName = `price-rules-${new Date().toISOString().split('T')[0]}.json`
 
     const linkElement = document.createElement('a')
-    linkElement.setAttribute('href', dataUri)
-    linkElement.setAttribute('download', exportFileDefaultName)
-    linkElement.click()
+    linkElement?.setAttribute('href', dataUri)
+    linkElement?.setAttribute('download', exportFileDefaultName)
+    linkElement?.click()
 
-    toast.success('Règles exportées avec succès')
+    toast?.success('Règles exportées avec succès')
   }
 
   // Import des règles
@@ -442,22 +446,24 @@ export default function PricingManagementPage() {
 
         // Valider et importer les règles
         for (const rule of importedRules) {
-          delete rule.id
-          delete rule.usageCount
-          rule.isActive = false
+          delete rule?.id
+          delete rule?.usageCount
+          if (rule) {
+            rule.isActive = false
+          }
 
-          await apiClient.post('/pricing/rules', rule)
+          await postTyped('/pricing/rules', rule)
         }
 
-        toast.success(`${importedRules.length} règle(s) importée(s)`)
+        toast?.success(`${importedRules?.length} règle(s) importée(s)`)
         loadRules()
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-        toast.error(`Erreur lors de l'import des règles: ${errorMessage}`)
+        toast?.error(`Erreur lors de l'import des règles: ${errorMessage}`)
       }
     }
 
-    reader.readAsText(file)
+    reader?.readAsText(file)
   }
 
   return (
@@ -467,27 +473,36 @@ export default function PricingManagementPage() {
         description="Configurez les règles de calcul de prix et les remises"
         actions={
           <div className="flex gap-3">
-            <Button variant="outline" onClick={handleExport}>
+            <Button type="button" variant="outline" onClick={handleExport}>
               <Download className="w-4 h-4 mr-2" />
               Exporter
             </Button>
 
-            <label>
-              <Button variant="outline" asChild>
-                <span>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Importer
-                </span>
+            <div className="relative">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => document.getElementById(importFileId)?.click()}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Importer
               </Button>
-              <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-            </label>
+              <input
+                id={importFileId}
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                className="hidden"
+              />
+            </div>
 
-            <Button onClick={() => setShowSimulator(true)} variant="outline">
+            <Button type="button" onClick={() => setShowSimulator(true)} variant="outline">
               <Calculator className="w-4 h-4 mr-2" />
               Simulateur
             </Button>
 
             <Button
+              type="button"
               onClick={() => {
                 setSelectedRule(null)
                 setShowForm(true)
@@ -522,7 +537,7 @@ export default function PricingManagementPage() {
             <CardContent>
               <div className="text-2xl font-bold flex items-center">
                 <TrendingDown className="w-4 h-4 mr-2 text-green-600" />
-                {stats.averageDiscount.toFixed(1)}%
+                {stats?.averageDiscount?.toFixed(1)}%
               </div>
             </CardContent>
           </Card>
@@ -534,7 +549,7 @@ export default function PricingManagementPage() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalUsage}</div>
               {stats.mostUsedRule && (
-                <p className="text-xs text-muted-foreground">Top: {stats.mostUsedRule.name}</p>
+                <p className="text-xs text-muted-foreground">Top: {stats?.mostUsedRule?.name}</p>
               )}
             </CardContent>
           </Card>
@@ -571,25 +586,40 @@ export default function PricingManagementPage() {
 
         <TabsContent value="table" className="space-y-4">
           {/* Actions en masse */}
-          {selectedRules.size > 0 && (
+          {selectionState.selectedRows.size > 0 && (
             <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
               <span className="text-sm font-medium">
-                {selectedRules.size} règle(s) sélectionnée(s)
+                {selectionState.selectedRows.size} règle(s) sélectionnée(s)
               </span>
 
-              <Button size="sm" variant="outline" onClick={() => handleBulkToggle(true)}>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkToggle(true)}
+              >
                 Activer
               </Button>
 
-              <Button size="sm" variant="outline" onClick={() => handleBulkToggle(false)}>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkToggle(false)}
+              >
                 Désactiver
               </Button>
 
-              <Button size="sm" variant="destructive" onClick={handleBulkDelete}>
+              <Button type="button" size="sm" variant="destructive" onClick={handleBulkDelete}>
                 Supprimer
               </Button>
 
-              <Button size="sm" variant="ghost" onClick={() => setSelectedRules(new Set())}>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => setSelectionState({ selectedRows: new Set(), selectAll: false })}
+              >
                 Annuler
               </Button>
             </div>
@@ -603,27 +633,26 @@ export default function PricingManagementPage() {
             keyField="id"
             searchable
             selectable
-            selectedIds={selectedRules}
-            onSelectionChange={setSelectedRules}
-            actions={(rule) => [
+            onSelectionChange={setSelectionState}
+            actions={[
               {
                 label: 'Modifier',
-                onClick: () => {
+                onClick: (rule) => {
                   setSelectedRule(rule)
                   setShowForm(true)
                 },
               },
               {
                 label: 'Dupliquer',
-                onClick: () => handleDuplicateRule(rule),
+                onClick: (rule) => handleDuplicateRule(rule),
               },
               {
-                label: rule.isActive ? 'Désactiver' : 'Activer',
-                onClick: () => handleToggleRule(rule),
+                label: 'Basculer',
+                onClick: (rule) => handleToggleRule(rule),
               },
               {
                 label: 'Supprimer',
-                onClick: () => handleDeleteRule(rule),
+                onClick: (rule) => handleDeleteRule(rule),
                 variant: 'destructive',
               },
             ]}
@@ -633,12 +662,12 @@ export default function PricingManagementPage() {
         <TabsContent value="cards" className="space-y-4">
           {/* Vue cartes - Component commented out */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {rules.map((rule) => (
-              <div key={rule.id} className="p-4 border rounded">
-                <h3>{rule.ruleName}</h3>
-                <p>Type: {rule.adjustmentType}</p>
-                <p>Value: {rule.adjustmentValue}</p>
-                <p>Active: {rule.isActive ? 'Yes' : 'No'}</p>
+            {rules?.map((rule) => (
+              <div key={rule?.id} className="p-4 border rounded">
+                <h3>{rule?.ruleName}</h3>
+                <p>Type: {rule?.adjustmentType}</p>
+                <p>Value: {rule?.adjustmentValue}</p>
+                <p>Active: {rule?.isActive ? 'Yes' : 'No'}</p>
               </div>
             ))}
           </div>

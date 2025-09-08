@@ -6,8 +6,8 @@
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import * as React from 'react'
-import type { TooltipVariants } from "../../../lib/design-system"
-import { tooltipVariants } from "../../../lib/design-system"
+import type { TooltipVariants } from '../../../lib/design-system'
+import { tooltipVariants } from '../../../lib/design-system'
 import { cn } from '../../../lib/utils'
 
 // ===== TYPES UNIFIÉS =====
@@ -261,7 +261,10 @@ export interface SimpleTooltipProps {
   className?: string
 }
 
-const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
+const SimpleTooltip = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Content>,
+  SimpleTooltipProps
+>(
   (
     {
       // Props du tooltip root
@@ -312,9 +315,7 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
       return shouldUseAsChild ? (
         triggerContent
       ) : (
-        <div ref={ref} className={triggerClassName}>
-          {triggerContent}
-        </div>
+        <div className={triggerClassName}>{triggerContent}</div>
       )
     }
 

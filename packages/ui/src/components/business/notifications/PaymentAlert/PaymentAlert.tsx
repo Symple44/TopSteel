@@ -1,5 +1,5 @@
 'use client'
-import { CreditCard, AlertTriangle, Calendar, Euro, User, Building } from 'lucide-react'
+import { AlertTriangle, Building, Calendar, CreditCard, Euro } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
 export type PaymentUrgency = 'upcoming' | 'due_today' | 'overdue' | 'critical'
 export type PaymentType = 'invoice' | 'supplier_payment' | 'subscription' | 'loan' | 'tax_payment'
@@ -35,56 +35,56 @@ const urgencyConfig = {
     borderColor: 'border-blue-200',
     textColor: 'text-blue-800',
     iconColor: 'text-blue-600',
-    title: 'Paiements à venir'
+    title: 'Paiements à venir',
   },
   due_today: {
     bgColor: 'bg-yellow-50',
     borderColor: 'border-yellow-200',
     textColor: 'text-yellow-800',
     iconColor: 'text-yellow-600',
-    title: 'Paiements dus aujourd\'hui'
+    title: "Paiements dus aujourd'hui",
   },
   overdue: {
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200',
     textColor: 'text-orange-800',
     iconColor: 'text-orange-600',
-    title: 'Paiements en retard'
+    title: 'Paiements en retard',
   },
   critical: {
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
     textColor: 'text-red-800',
     iconColor: 'text-red-600',
-    title: 'Paiements critiques'
-  }
+    title: 'Paiements critiques',
+  },
 }
 const typeConfig = {
   invoice: {
     icon: CreditCard,
     label: 'Facture client',
-    color: 'text-blue-600'
+    color: 'text-blue-600',
   },
   supplier_payment: {
     icon: Building,
     label: 'Paiement fournisseur',
-    color: 'text-green-600'
+    color: 'text-green-600',
   },
   subscription: {
     icon: Calendar,
     label: 'Abonnement',
-    color: 'text-purple-600'
+    color: 'text-purple-600',
   },
   loan: {
     icon: Euro,
     label: 'Prêt',
-    color: 'text-orange-600'
+    color: 'text-orange-600',
   },
   tax_payment: {
     icon: AlertTriangle,
     label: 'Impôt',
-    color: 'text-red-600'
-  }
+    color: 'text-red-600',
+  },
 }
 export function PaymentAlert({
   className,
@@ -96,20 +96,20 @@ export function PaymentAlert({
   onSchedulePayment,
   onRequestExtension,
   onViewDetails,
-  showActions = true
+  showActions = true,
 }: PaymentAlertProps) {
   const config = urgencyConfig[urgency]
   const formatCurrency = (amount: number, curr = currency) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: curr
+      currency: curr,
     }).format(amount)
   }
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const today = new Date()
     const diffDays = Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-    if (diffDays === 0) return 'Aujourd\'hui'
+    if (diffDays === 0) return "Aujourd'hui"
     if (diffDays === 1) return 'Demain'
     if (diffDays === -1) return 'Hier'
     if (diffDays < 0) return `Il y a ${Math.abs(diffDays)} jours`
@@ -126,21 +126,15 @@ export function PaymentAlert({
     return 'text-blue-600'
   }
   return (
-    <div className={cn(
-      'rounded-lg border p-4',
-      config.bgColor,
-      config.borderColor,
-      className
-    )}>
+    <div className={cn('rounded-lg border p-4', config.bgColor, config.borderColor, className)}>
       <div className="flex items-start gap-3">
         <CreditCard className={cn('h-5 w-5 mt-0.5', config.iconColor)} />
         <div className="flex-1 space-y-3">
           <div>
-            <h3 className={cn('font-medium', config.textColor)}>
-              {config.title}
-            </h3>
+            <h3 className={cn('font-medium', config.textColor)}>{config.title}</h3>
             <p className={cn('text-sm mt-1', config.textColor)}>
-              {payments.length} paiement{payments.length > 1 ? 's' : ''} • Montant total: {formatCurrency(totalAmount)}
+              {payments.length} paiement{payments.length > 1 ? 's' : ''} • Montant total:{' '}
+              {formatCurrency(totalAmount)}
             </p>
           </div>
           <div className="space-y-3">
@@ -156,7 +150,12 @@ export function PaymentAlert({
                           <h4 className="text-sm font-medium text-gray-900">
                             {payment.description}
                           </h4>
-                          <span className={cn('text-xs px-2 py-0.5 rounded-full bg-gray-100', typeConfig[payment.type].color)}>
+                          <span
+                            className={cn(
+                              'text-xs px-2 py-0.5 rounded-full bg-gray-100',
+                              typeConfig[payment.type].color
+                            )}
+                          >
                             {typeConfig[payment.type].label}
                           </span>
                         </div>
@@ -180,7 +179,9 @@ export function PaymentAlert({
                           {payment.invoiceNumber && (
                             <div>
                               <span className="text-gray-500">N° Facture:</span>
-                              <span className="ml-2 font-mono text-xs">{payment.invoiceNumber}</span>
+                              <span className="ml-2 font-mono text-xs">
+                                {payment.invoiceNumber}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -189,12 +190,14 @@ export function PaymentAlert({
                             <div className="flex items-center gap-1">
                               <AlertTriangle className="h-3 w-3 text-red-600" />
                               <span className="text-red-800 font-medium">
-                                En retard de {payment.overdueDays} jour{payment.overdueDays > 1 ? 's' : ''}
+                                En retard de {payment.overdueDays} jour
+                                {payment.overdueDays > 1 ? 's' : ''}
                               </span>
                             </div>
                             {payment.lateFee && payment.lateFee > 0 && (
                               <div className="text-red-700 mt-1">
-                                Pénalités de retard: {formatCurrency(payment.lateFee, payment.currency)}
+                                Pénalités de retard:{' '}
+                                {formatCurrency(payment.lateFee, payment.currency)}
                               </div>
                             )}
                           </div>
@@ -251,19 +254,16 @@ export function PaymentAlert({
           {/* Summary */}
           <div className="bg-white/70 rounded-lg p-3 border border-white/30">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-900">
-                Total à payer:
-              </span>
-              <span className="text-lg font-bold text-gray-900">
-                {formatCurrency(totalAmount)}
-              </span>
+              <span className="text-sm font-medium text-gray-900">Total à payer:</span>
+              <span className="text-lg font-bold text-gray-900">{formatCurrency(totalAmount)}</span>
             </div>
-            {urgency === 'overdue' || urgency === 'critical' && (
-              <div className="mt-2 text-xs text-red-700">
-                <AlertTriangle className="h-3 w-3 inline mr-1" />
-                Des pénalités de retard peuvent s'appliquer
-              </div>
-            )}
+            {urgency === 'overdue' ||
+              (urgency === 'critical' && (
+                <div className="mt-2 text-xs text-red-700">
+                  <AlertTriangle className="h-3 w-3 inline mr-1" />
+                  Des pénalités de retard peuvent s'appliquer
+                </div>
+              ))}
           </div>
         </div>
       </div>

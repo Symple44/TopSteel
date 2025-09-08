@@ -3,16 +3,16 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { DataSource, QueryRunner, Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils/error.utils'
+import { StockMovement } from '../entities/stock-movement.entity'
 import {
   type IStockMovement,
   type IStockMovementFilters,
+  type StockMovementPriority,
   StockMovementStatus,
   StockMovementType,
-  StockMovementMotif,
-  StockMovementPriority,
 } from '../interfaces/stock-movement.interface'
-import { StockMovement } from '../entities/stock-movement.entity'
-import { StockMovementRepository } from '../repositories/stock-movement.repository'
+import type { StockMovementRepository } from '../repositories/stock-movement.repository'
 
 /**
  * Service de gestion des mouvements de stock
@@ -55,10 +55,12 @@ export class StockMovementService {
 
     // Validation du stock pour les sorties
     if (validateStock && data.type === StockMovementType.SORTIE) {
-      const stockDisponible = article.stockPhysique - (article.stockReserve || 0)
-      if (stockDisponible < data.quantite) {
+      const stockPhysique = article.stockPhysique ?? 0
+      const quantite = data.quantite ?? 0
+      const stockDisponible = stockPhysique - (article.stockReserve ?? 0)
+      if (stockDisponible < quantite) {
         throw new BadRequestException(
-          `Stock insuffisant. Disponible: ${stockDisponible}, Demandé: ${data.quantite}`
+          `Stock insuffisant. Disponible: ${stockDisponible}, Demandé: ${quantite}`
         )
       }
     }
@@ -70,20 +72,20 @@ export class StockMovementService {
 
     try {
       // Créer le mouvement
-      const reference = await this.stockMovementRepository.generateReference(data.type)
-      const stockAvant = article.stockPhysique
-      const stockApres = this.calculateNewStock(article.stockPhysique, data.quantite, data.type)
-      
+      const reference = await this.stockMovementRepository.generateReference(data.type!)
+      const stockAvant = article.stockPhysique ?? 0
+      const stockApres = this.calculateNewStock(stockAvant, data.quantite ?? 0, data.type!)
+
       const movement = await this.stockMovementRepository.create({
         ...data,
         reference,
         statut: data.status || StockMovementStatus.EN_ATTENTE,
         stockAvant,
         stockApres,
-        tenantId: (data as any).tenantId || article.societeId,
+        tenantId: (data as unknown).tenantId || article.societeId,
         creeParId: data.utilisateurId || 'SYSTEM',
         creeParNom: data.utilisateurNom || 'System',
-        motif: data.motif as any, // Convert StockMovementReason to StockMovementMotif
+        motif: data.motif as unknown, // Convert StockMovementReason to StockMovementMotif
       } as Partial<StockMovement>)
 
       // Mettre à jour l'article si demandé
@@ -147,7 +149,7 @@ export class StockMovementService {
 
     // Validation du stock
     if (!options?.skipValidation && movement.type === StockMovementType.SORTIE) {
-      const stockDisponible = article.stockPhysique - (article.stockReserve || 0)
+      const stockDisponible = (article.stockPhysique ?? 0) - (article.stockReserve ?? 0)
       if (stockDisponible < movement.quantite) {
         movement.statut = StockMovementStatus.ANNULE
         movement.notes = 'Stock insuffisant'
@@ -169,7 +171,7 @@ export class StockMovementService {
       // Mettre à jour le mouvement
       movement.statut = StockMovementStatus.COMPLETE
       movement.stockApres = this.calculateNewStock(
-        article.stockPhysique,
+        article.stockPhysique ?? 0,
         movement.quantite,
         movement.type
       )
@@ -203,7 +205,7 @@ export class StockMovementService {
   async cancelMovement(
     movementId: string,
     motif: string,
-    options?: { 
+    options?: {
       reverseStock?: boolean
       userId?: string
       userName?: string
@@ -305,8 +307,8 @@ export class StockMovementService {
       includeAnnule?: boolean
     }
   ): Promise<StockMovement[]> {
-    const status = options?.includeAnnule 
-      ? undefined 
+    const status = options?.includeAnnule
+      ? undefined
       : [StockMovementStatus.EN_ATTENTE, StockMovementStatus.COMPLETE]
 
     return await this.stockMovementRepository.findByArticle(articleId, {
@@ -353,17 +355,14 @@ export class StockMovementService {
   /**
    * Obtenir les statistiques de stock pour un article
    */
-  async getStockStatistics(
-    articleId: string,
-    period?: { start: Date; end: Date }
-  ): Promise<any> {
+  async getStockStatistics(articleId: string, period?: { start: Date; end: Date }): Promise<unknown> {
     return await this.stockMovementRepository.getStatsByArticle(articleId, period)
   }
 
   /**
    * Obtenir l'analyse de stock pour un article
    */
-  async getStockAnalysis(articleId: string): Promise<any> {
+  async getStockAnalysis(articleId: string): Promise<unknown> {
     return await this.stockMovementRepository.getStockAnalysis(articleId)
   }
 
@@ -374,21 +373,19 @@ export class StockMovementService {
     articleId: string,
     groupBy: 'day' | 'week' | 'month',
     period: { start: Date; end: Date }
-  ): Promise<any> {
+  ): Promise<unknown> {
     return await this.stockMovementRepository.getMovementTrends(articleId, groupBy, period)
   }
 
   /**
    * Obtenir les mouvements en attente
    */
-  async getPendingMovements(
-    options?: {
-      articleId?: string
-      type?: StockMovementType[]
-      priorite?: StockMovementPriority[]
-      limit?: number
-    }
-  ): Promise<StockMovement[]> {
+  async getPendingMovements(options?: {
+    articleId?: string
+    type?: StockMovementType[]
+    priorite?: StockMovementPriority[]
+    limit?: number
+  }): Promise<StockMovement[]> {
     return await this.stockMovementRepository.findPendingMovements(options)
   }
 
@@ -415,7 +412,7 @@ export class StockMovementService {
         result.success.push(movementId)
       } catch (error) {
         result.failed.push(movementId)
-        result.errors[movementId] = error.message
+        result.errors[movementId] = getErrorMessage(error)
       }
     }
 
@@ -431,7 +428,7 @@ export class StockMovementService {
     quantite: number,
     type: StockMovementType
   ): Promise<void> {
-    const newStock = this.calculateNewStock(article.stockPhysique, quantite, type)
+    const newStock = this.calculateNewStock(article.stockPhysique ?? 0, quantite, type)
 
     await queryRunner.manager.update(
       Article,
@@ -443,11 +440,11 @@ export class StockMovementService {
     )
 
     // Vérifier les alertes de stock
-    if (newStock <= (article.stockMini || 0)) {
+    if (newStock <= (article.stockMini ?? 0)) {
       this.eventEmitter.emit('stock.alert.minimum', {
         articleId: article.id,
         stockActuel: newStock,
-        stockMinimum: article.stockMini,
+        stockMinimum: article.stockMini ?? 0,
       })
     }
 
@@ -481,14 +478,13 @@ export class StockMovementService {
     }
   }
 
-
   /**
    * Récupérer un mouvement par ID
    */
   async getById(id: string): Promise<IStockMovement> {
     const movement = await this.movementRepository.findOne({
       where: { id },
-      relations: ['article']
+      relations: ['article'],
     })
 
     if (!movement) {
@@ -508,10 +504,10 @@ export class StockMovementService {
     limit: number
   }> {
     const result = await this.stockMovementRepository.findWithFilters(filters)
-    
+
     return {
       ...result,
-      items: result.items.map(item => this.mapToInterface(item))
+      items: result.items.map((item) => this.mapToInterface(item)),
     }
   }
 
@@ -522,10 +518,10 @@ export class StockMovementService {
     const movements = await this.movementRepository.find({
       where: { articleId },
       relations: ['article'],
-      order: { dateCreation: 'DESC' }
+      order: { dateCreation: 'DESC' },
     })
 
-    return movements.map(movement => this.mapToInterface(movement))
+    return movements.map((movement) => this.mapToInterface(movement))
   }
 
   /**
@@ -539,7 +535,7 @@ export class StockMovementService {
       articleCode: entity.article?.reference,
       articleLibelle: entity.article?.designation,
       type: entity.type,
-      motif: entity.motif as any, // Convert StockMovementMotif to StockMovementReason
+      motif: entity.motif as unknown, // Convert StockMovementMotif to StockMovementReason
       quantite: entity.quantite,
       unite: entity.unite || '',
       stockAvant: entity.stockAvant,
@@ -567,5 +563,4 @@ export class StockMovementService {
       validateurNom: entity.traiteParNom,
     }
   }
-
 }

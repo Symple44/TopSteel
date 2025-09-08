@@ -134,7 +134,9 @@ export class EnhancedTenantGuard implements CanActivate {
       request.authMeta = {
         tokenType: payload.societeId ? 'multi-tenant' : 'global',
         hasFullSuperAdminAccess: userContext.globalRole === GlobalUserRole.SUPER_ADMIN,
-        effectiveRole: (tenantContext.userSocieteInfo as any)?.effectiveRole || userContext.role,
+        effectiveRole:
+          (tenantContext.userSocieteInfo as { effectiveRole?: string })?.effectiveRole ||
+          userContext.role,
         validatedAt: new Date().toISOString(),
       }
 

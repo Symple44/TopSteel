@@ -11,6 +11,7 @@
  */
 
 import { callBackendApi, callClientApi } from '@/utils/backend-api'
+import { csrfManager } from './csrf'
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -55,15 +56,15 @@ function createRateLimiter(maxRequests: number, windowMs: number) {
     const now = Date.now()
 
     // Nettoyer les requêtes anciennes
-    while (requests.length > 0 && requests[0] < now - windowMs) {
-      requests.shift()
+    while (requests.length > 0 && requests?.[0] < now - windowMs) {
+      requests?.shift()
     }
 
     if (requests.length >= maxRequests) {
       throw new Error('Rate limit exceeded')
     }
 
-    requests.push(now)
+    requests?.push(now)
 
     return operation()
   }
@@ -91,7 +92,7 @@ export class APIError extends Error {
    * Vérification si l'erreur est une erreur réseau
    */
   isNetworkError(): boolean {
-    return this.code.startsWith('HTTP_') || this.code === 'NETWORK_ERROR'
+    return this?.code?.startsWith('HTTP_') || this.code === 'NETWORK_ERROR'
   }
 
   /**
@@ -107,7 +108,7 @@ export class APIError extends Error {
   isRetryable(): boolean {
     const retryableCodes = ['HTTP_500', 'HTTP_502', 'HTTP_503', 'HTTP_504', 'NETWORK_ERROR']
 
-    return retryableCodes.includes(this.code)
+    return retryableCodes?.includes(this.code)
   }
 }
 
@@ -126,8 +127,8 @@ export class APIClient {
   }
 
   constructor(baseURL: string) {
-    this.baseURL = baseURL.replace(/\/$/, '')
-    this.startCacheCleanup()
+    this.baseURL = baseURL?.replace(/\/$/, '')
+    this?.startCacheCleanup()
   }
 
   /**
@@ -138,9 +139,11 @@ export class APIClient {
       () => {
         const now = Date.now()
 
-        for (const [key, entry] of this.cache.entries()) {
-          if (now - entry.timestamp > entry.ttl) {
-            this.cache.delete(key)
+        if (this.cache) {
+          for (const [key, entry] of this.cache.entries()) {
+            if (now - entry?.timestamp > entry?.ttl) {
+              this.cache.delete(key)
+            }
           }
         }
       },
@@ -152,28 +155,30 @@ export class APIClient {
    * Vérification du cache
    */
   private getCachedData<T>(key: string): T | null {
-    const entry = this.cache.get(key)
+    const entry = this?.cache?.get(key)
 
     if (!entry) return null
 
     const now = Date.now()
 
-    if (now - entry.timestamp > entry.ttl) {
-      this.cache.delete(key)
+    if (now - entry?.timestamp > entry?.ttl) {
+      this?.cache?.delete(key)
 
       return null
     }
 
-    this.metrics.cacheHits++
+    if (this?.metrics) {
+      this.metrics.cacheHits++
+    }
 
-    return entry.data as T
+    return entry?.data as T
   }
 
   /**
    * Stockage en cache
    */
   private setCachedData(key: string, data: unknown, ttl: number): void {
-    this.cache.set(key, {
+    this?.cache?.set(key, {
       data,
       timestamp: Date.now(),
       ttl,
@@ -191,9 +196,12 @@ export class APIClient {
   }
 
   /**
-   * Construction des headers
+   * Construction des headers avec protection CSRF
    */
-  private buildHeaders(config: RequestConfig): Record<string, string> {
+  private async buildHeaders(
+    config: RequestConfig,
+    endpoint: string
+  ): Promise<Record<string, string>> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
@@ -202,14 +210,21 @@ export class APIClient {
 
     // Authentification automatique
     if (config.requireAuth !== false) {
-      const token = this.getAuthToken()
+      const token = this?.getAuthToken()
 
-      if (token) {
+      if (token && headers) {
         headers.Authorization = `Bearer ${token}`
       }
     }
 
-    return headers
+    // Protection CSRF automatique
+    try {
+      const method = config.method || 'GET'
+      const enhancedHeaders = await csrfManager?.addCsrfToHeaders(headers, method, endpoint)
+      return enhancedHeaders
+    } catch (_error) {
+      return headers
+    }
   }
 
   /**
@@ -220,17 +235,17 @@ export class APIClient {
 
     try {
       // Chercher d'abord dans localStorage (remember me)
-      let authData = localStorage.getItem('topsteel_auth_tokens')
+      let authData = localStorage?.getItem('topsteel_auth_tokens')
 
       // Si pas dans localStorage, chercher dans sessionStorage
       if (!authData) {
-        authData = sessionStorage.getItem('topsteel_auth_tokens')
+        authData = sessionStorage?.getItem('topsteel_auth_tokens')
       }
 
       if (!authData) return null
 
       const sessionData = JSON.parse(authData)
-      const accessToken = sessionData.tokens?.accessToken
+      const accessToken = sessionData?.tokens?.accessToken
 
       return accessToken || null
     } catch {
@@ -242,7 +257,9 @@ export class APIClient {
    * Gestion des erreurs
    */
   private handleError(error: unknown, _endpoint: string): never {
-    this.metrics.errors++
+    if (this?.metrics) {
+      this.metrics.errors++
+    }
 
     const errorDetails: APIErrorDetails = {
       code: (error as { code?: string }).code || 'UNKNOWN_ERROR',
@@ -292,26 +309,27 @@ export class APIClient {
   async request<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
     const startTime = Date.now()
 
-    this.metrics.requests++
+    if (this?.metrics) {
+      this.metrics.requests++
+    }
 
     try {
       // Vérification du rate limiting
-      this.rateLimiter(() => {})()
+      this?.rateLimiter(() => {})()
 
       // Vérification du cache pour les requêtes GET
       if ((config.method || 'GET') === 'GET' && config.cache !== false) {
-        const cacheKey = this.getCacheKey(endpoint, config)
+        const cacheKey = this?.getCacheKey(endpoint, config)
         const cachedData = this.getCachedData<T>(cacheKey)
 
         if (cachedData) return cachedData
       }
 
       // Préparation de la requête pour l'API unifiée
+      const headers = await this?.buildHeaders(config, endpoint)
       const fetchConfig: RequestInit = {
         method: config.method || 'GET',
-        headers: {
-          ...this.buildHeaders(config),
-        },
+        headers,
         ...(config.body ? { body: JSON.stringify(config.body) } : {}),
       }
 
@@ -320,46 +338,48 @@ export class APIClient {
         // Déterminer si on utilise le backend direct ou les routes API Next.js
         const useDirectBackend =
           typeof window === 'undefined' ||
-          this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
+          this.baseURL !== (process?.env?.NEXT_PUBLIC_API_URL || '/api')
 
         const response = useDirectBackend
           ? await callBackendApi(endpoint, fetchConfig)
           : await callClientApi(endpoint, fetchConfig)
 
-        if (!response.ok) {
+        if (!response?.ok) {
           throw {
-            code: `HTTP_${response.status}`,
+            code: `HTTP_${response?.status}`,
             message: response.statusText,
             details: { status: response.status, statusText: response.statusText },
           }
         }
 
-        return response.json()
+        return response?.json()
       }
 
-      const result = await this.executeWithTimeout(
+      const result = await this?.executeWithTimeout(
         config.retry !== false
-          ? () => this.executeWithRetry(operation, config.retryAttempts)
+          ? () => this?.executeWithRetry(operation, config.retryAttempts)
           : operation,
         config.timeout
       )
 
       // Mise en cache pour les requêtes GET
       if ((config.method || 'GET') === 'GET' && config.cache !== false) {
-        const cacheKey = this.getCacheKey(endpoint, config)
+        const cacheKey = this?.getCacheKey(endpoint, config)
         const cacheTTL = config.cacheTTL || 5 * 60 * 1000 // 5 minutes par défaut
 
-        this.setCachedData(cacheKey, result, cacheTTL)
+        this?.setCachedData(cacheKey, result, cacheTTL)
       }
 
       // Métriques
       const responseTime = Date.now() - startTime
 
-      this.metrics.avgResponseTime = (this.metrics.avgResponseTime + responseTime) / 2
+      if (this.metrics) {
+        this.metrics.avgResponseTime = (this.metrics.avgResponseTime + responseTime) / 2
+      }
 
       return result
     } catch (error) {
-      this.handleError(error, endpoint)
+      this?.handleError(error, endpoint)
     }
   }
 
@@ -431,12 +451,17 @@ export class APIClient {
     }
 
     // Supprimer Content-Type pour les uploads
-    if (uploadConfig.headers && 'Content-Type' in uploadConfig.headers) {
-      const { 'Content-Type': _removed, ...restHeaders } = uploadConfig.headers
-      uploadConfig.headers = restHeaders
+    if (uploadConfig?.headers && 'Content-Type' in uploadConfig.headers) {
+      const { 'Content-Type': _removed, ...restHeaders } = uploadConfig.headers as Record<
+        string,
+        string
+      >
+      if (uploadConfig) {
+        uploadConfig.headers = restHeaders
+      }
     }
 
-    const headers = this.buildHeaders(uploadConfig)
+    const headers = await this?.buildHeaders(uploadConfig, endpoint)
     const fetchConfig: RequestInit = {
       method: 'POST',
       headers: Object.fromEntries(
@@ -447,21 +472,22 @@ export class APIClient {
 
     // Déterminer si on utilise le backend direct ou les routes API Next.js
     const useDirectBackend =
-      typeof window === 'undefined' || this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
+      typeof window === 'undefined' ||
+      this.baseURL !== (process?.env?.NEXT_PUBLIC_API_URL || '/api')
 
     const response = useDirectBackend
       ? await callBackendApi(endpoint, fetchConfig)
       : await callClientApi(endpoint, fetchConfig)
 
-    if (!response.ok) {
+    if (!response?.ok) {
       throw {
-        code: `HTTP_${response.status}`,
+        code: `HTTP_${response?.status}`,
         message: response.statusText,
         details: { status: response.status, statusText: response.statusText },
       }
     }
 
-    return response.json()
+    return response?.json()
   }
 
   /**
@@ -469,14 +495,16 @@ export class APIClient {
    */
   invalidateCache(pattern?: string): void {
     if (!pattern) {
-      this.cache.clear()
+      this?.cache?.clear()
 
       return
     }
 
-    for (const key of this.cache.keys()) {
-      if (key.includes(pattern)) {
-        this.cache.delete(key)
+    if (this.cache) {
+      for (const key of this.cache.keys()) {
+        if (key?.includes(pattern)) {
+          this.cache.delete(key)
+        }
       }
     }
   }
@@ -507,18 +535,18 @@ export class APIClient {
     const parts = [domain]
 
     if (resource) {
-      parts.push(resource)
+      parts?.push(resource)
     }
 
     if (id !== undefined) {
-      parts.push(String(id))
+      parts?.push(String(id))
     }
 
     return parts
   }
 }
 
-// ✅ INSTANCE GLOBALE EXPORTÉE
+// ✅ INSTANCE GLOBALE EXPORTÉE - Utilisez apiClient depuis ./api-client-instance pour les types complets
 export const apiClient = new APIClient(process.env.NEXT_PUBLIC_API_URL || '/api')
 
 // ✅ TYPES EXPORTÉS

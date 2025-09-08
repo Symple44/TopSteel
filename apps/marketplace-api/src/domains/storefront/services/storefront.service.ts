@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { Societe } from '../../../shared/entities/erp/societe.entity'
-import { EmailService } from '../../email/email.service'
+import type { EmailService } from '../../email/email.service'
 import { MarketplaceTheme } from '../../themes/entities/marketplace-theme.entity'
-import { NewsletterSubscription, SubscriptionStatus } from '../entities/newsletter-subscription.entity'
+import {
+  NewsletterSubscription,
+  SubscriptionStatus,
+} from '../entities/newsletter-subscription.entity'
 
 export interface StorefrontConfig {
   storeName: string
@@ -414,7 +417,7 @@ export class StorefrontService {
             message: 'Cette adresse email est déjà inscrite à notre newsletter',
           }
         }
-        
+
         // Reactivate if previously unsubscribed
         subscription.status = SubscriptionStatus.PENDING
         subscription.unsubscribedAt = null
@@ -461,11 +464,10 @@ export class StorefrontService {
         success: true,
         message: 'Un email de confirmation a été envoyé à votre adresse',
       }
-    } catch (error) {
-      console.error('Error subscribing to newsletter:', error)
+    } catch (_error) {
       return {
         success: false,
-        message: 'Une erreur est survenue lors de l\'inscription',
+        message: "Une erreur est survenue lors de l'inscription",
       }
     }
   }
@@ -495,7 +497,8 @@ export class StorefrontService {
       }
 
       // Send email to company
-      const companyEmail = societe.email || (societe.configuration?.marketplace as any)?.contactEmail
+      const companyEmail =
+        societe.email || (societe.configuration?.marketplace as any)?.contactEmail
       if (companyEmail) {
         await this.sendContactEmailToCompany({
           companyEmail,
@@ -514,13 +517,13 @@ export class StorefrontService {
 
       return {
         success: true,
-        message: 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
+        message:
+          'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
       }
-    } catch (error) {
-      console.error('Error sending contact message:', error)
+    } catch (_error) {
       return {
         success: false,
-        message: 'Une erreur est survenue lors de l\'envoi du message',
+        message: "Une erreur est survenue lors de l'envoi du message",
       }
     }
   }

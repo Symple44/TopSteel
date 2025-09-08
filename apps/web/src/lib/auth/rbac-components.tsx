@@ -130,8 +130,8 @@ interface ModuleGuardProps extends BaseProtectionProps {
 export function ModuleGuard({ module, actions = [], children, fallback = null }: ModuleGuardProps) {
   const permissions =
     actions.length > 0
-      ? actions.map((action) => `${module.toUpperCase()}_${action.toUpperCase()}`)
-      : [`${module.toUpperCase()}_READ`] // Permission minimale par défaut
+      ? actions?.map((action) => `${module?.toUpperCase()}_${action?.toUpperCase()}`)
+      : [`${module?.toUpperCase()}_READ`] // Permission minimale par défaut
 
   return (
     <PermissionsGuard permissions={permissions} mode="ANY" fallback={fallback}>
@@ -183,7 +183,7 @@ export function AccessGuard({
   }
 
   // Vérification par permissions multiples
-  if (permissions && permissions.length > 0) {
+  if (permissions && permissions?.length > 0) {
     return (
       <PermissionsGuard permissions={permissions} mode={permissionsMode} fallback={fallback}>
         {children}
@@ -265,7 +265,7 @@ export function AccessDenied({
     if (onReturn) {
       onReturn()
     } else if (typeof window !== 'undefined') {
-      window.history.back()
+      window?.history?.back()
     }
   }
 

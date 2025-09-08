@@ -33,14 +33,36 @@ export const SUPPORTED_LANGUAGES: Language[] = [
 export const DEFAULT_LANGUAGE = 'fr'
 
 export type TranslationKey = string
-export type TranslationValue = string | Record<string, any>
+export type TranslationValue = string | Record<string, unknown>
 export type TranslationNamespace = Record<string, TranslationValue>
 export type Translations = Record<string, TranslationNamespace>
+
+// Define the translation function type
+export type TranslationFunction = (key: string, params?: Record<string, string | number>) => string
+
+// Define the plural translation function type
+export type PluralTranslationFunction = (
+  key: string,
+  count: number,
+  params?: Record<string, string | number>
+) => string
+
+// Define the return type of useTranslation hook
+export interface UseTranslationReturn {
+  t: TranslationFunction
+  plural: PluralTranslationFunction
+  currentLanguage: Language
+  language: string // Alias for backward compatibility
+  changeLanguage: (langCode: string) => void
+  setLanguage: (langCode: string) => void
+  supportedLanguages: Language[]
+  isLoading: boolean
+}
 
 export interface I18nContext {
   currentLanguage: Language
   setLanguage: (langCode: string) => void
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: TranslationFunction
   isLoading: boolean
 }
 

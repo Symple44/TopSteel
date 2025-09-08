@@ -17,7 +17,7 @@ async function testMarketplaceApiFixes() {
   const tenantDbConfig = {
     type: 'postgres' as const,
     host: process.env.ERP_DB_HOST || 'localhost',
-    port: parseInt(process.env.ERP_DB_PORT || '5432'),
+    port: parseInt(process.env.ERP_DB_PORT || '5432', 10),
     username: process.env.ERP_DB_USERNAME || 'postgres',
     password: process.env.ERP_DB_PASSWORD || 'postgres',
     database: 'erp_topsteel_topsteel',
@@ -29,7 +29,7 @@ async function testMarketplaceApiFixes() {
   const authDbConfig = {
     type: 'postgres' as const,
     host: process.env.ERP_DB_HOST || 'localhost',
-    port: parseInt(process.env.ERP_DB_PORT || '5432'),
+    port: parseInt(process.env.ERP_DB_PORT || '5432', 10),
     username: process.env.ERP_DB_USERNAME || 'postgres',
     password: process.env.ERP_DB_PASSWORD || 'postgres',
     database: 'erp_topsteel_topsteel', // Note: même base pour le test

@@ -9,16 +9,16 @@ export async function GET(
     const { tenantCode } = await params
 
     // Récupérer les headers d'authentification
-    const authHeader = request.headers.get('authorization')
-    const cookieHeader = request.headers.get('cookie')
+    const authHeader = request?.headers?.get('authorization')
+    const cookieHeader = request?.headers?.get('cookie')
 
     // Extraire le token d'accès du cookie si pas d'Authorization header
-    let accessToken = null
+    let accessToken: string | null = null
     if (cookieHeader) {
-      const cookies = cookieHeader.split(';').map((c) => c.trim())
-      const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
+      const cookies = cookieHeader?.split(';').map((c) => c?.trim())
+      const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
       if (accessTokenCookie) {
-        accessToken = accessTokenCookie.split('=')[1]
+        accessToken = accessTokenCookie?.split('=')[1]
       }
     }
 
@@ -43,21 +43,21 @@ export async function GET(
       `admin/database/health/tenant/${tenantCode}`,
       {
         method: 'GET',
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal?.timeout(10000),
       }
     )
 
-    if (response.ok) {
-      const responseData = await response.json()
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
     } else {
-      return NextResponse.json(
+      return NextResponse?.json(
         { error: 'API backend error', status: response.status },
         { status: response.status }
       )
     }
   } catch (_error) {
-    return NextResponse.json({ error: 'API backend non disponible' }, { status: 503 })
+    return NextResponse?.json({ error: 'API backend non disponible' }, { status: 503 })
   }
 }

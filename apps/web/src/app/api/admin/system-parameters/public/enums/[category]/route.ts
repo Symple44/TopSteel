@@ -19,17 +19,17 @@ export async function GET(
     const { category } = await params
 
     if (!category) {
-      return NextResponse.json({ error: 'Category parameter is required' }, { status: 400 })
+      return NextResponse?.json({ error: 'Category parameter is required' }, { status: 400 })
     }
 
-    const enumValues = enumDefinitions[category.toLowerCase()]
+    const enumValues = enumDefinitions[category?.toLowerCase()]
 
     if (!enumValues) {
-      return NextResponse.json({ error: `Enum category '${category}' not found` }, { status: 404 })
+      return NextResponse?.json({ error: `Enum category '${category}' not found` }, { status: 404 })
     }
 
-    return NextResponse.json(enumValues)
+    return NextResponse?.json(enumValues)
   } catch (_error) {
-    return NextResponse.json({ error: 'Failed to fetch enum values' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to fetch enum values' }, { status: 500 })
   }
 }

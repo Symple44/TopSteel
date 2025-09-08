@@ -1,9 +1,5 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
-import { Contact } from './contact.entity'
-import { PartnerAddress } from './partner-address.entity'
-import { PartnerGroup } from './partner-group.entity'
-import { PartnerSite } from './partner-site.entity'
 
 export enum PartnerType {
   CLIENT = 'CLIENT',
@@ -30,6 +26,12 @@ export enum PartnerCategory {
  * Représente un client ou fournisseur de l'entreprise
  */
 @Entity('partners')
+@Index(['type', 'status']) // Partner type and status filtering
+@Index(['category', 'status']) // Category-based active partner queries
+@Index(['groupId']) // Partner group queries
+@Index(['societeId', 'type', 'status']) // Multi-tenant partner queries
+@Index(['fournisseurPrefere']) // Preferred supplier queries
+@Index(['createdAt']) // Partner creation timeline
 export class Partner extends BusinessEntity {
   @Column({ type: 'varchar', length: 20, unique: true })
   @Index()
@@ -39,15 +41,11 @@ export class Partner extends BusinessEntity {
   @Index()
   groupId?: string
 
-  @ManyToOne(
-    () => PartnerGroup,
-    (group) => group.partners,
-    {
-      nullable: true,
-    }
-  )
+  @ManyToOne('PartnerGroup', (group: unknown) => group.partners, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'groupId' })
-  group?: PartnerGroup
+  group?: any
 
   @Column({ type: 'enum', enum: PartnerType })
   @Index()
@@ -67,6 +65,7 @@ export class Partner extends BusinessEntity {
   denomination!: string // Nom ou raison sociale
 
   @Column({ type: 'varchar', length: 100, nullable: true })
+  @Index() // Index for commercial name searches
   denominationCommerciale?: string
 
   @Column({ type: 'varchar', length: 20, nullable: true })
@@ -84,6 +83,7 @@ export class Partner extends BusinessEntity {
   contactPrincipal?: string
 
   @Column({ type: 'varchar', length: 20, nullable: true })
+  @Index() // Index for phone number lookups
   telephone?: string
 
   @Column({ type: 'varchar', length: 20, nullable: true })
@@ -129,6 +129,7 @@ export class Partner extends BusinessEntity {
   tauxRemise?: number // Remise habituelle en %
 
   @Column({ type: 'varchar', length: 100, nullable: true })
+  @Index() // Index for sales representative queries
   representantCommercial?: string
 
   // Informations spécifiques fournisseurs
@@ -151,6 +152,7 @@ export class Partner extends BusinessEntity {
 
   // Métadonnées
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for notes and tags queries
   notes?: {
     commentaires?: string
     historiqueNotes?: Array<{
@@ -162,6 +164,7 @@ export class Partner extends BusinessEntity {
   }
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for technical data queries
   donneesTechniques?: {
     secteurActivite?: string
     effectif?: string
@@ -171,23 +174,14 @@ export class Partner extends BusinessEntity {
   }
 
   // Relations
-  @OneToMany(
-    () => Contact,
-    (contact) => contact.partner
-  )
-  contacts!: Contact[]
+  @OneToMany('Contact', (contact: unknown) => contact.partner)
+  contacts!: unknown[]
 
-  @OneToMany(
-    () => PartnerSite,
-    (site) => site.partner
-  )
-  sites!: PartnerSite[]
+  @OneToMany('PartnerSite', (site: unknown) => site.partner)
+  sites!: unknown[]
 
-  @OneToMany(
-    () => PartnerAddress,
-    (address) => address.partner
-  )
-  addresses!: PartnerAddress[]
+  @OneToMany('PartnerAddress', (address: unknown) => address.partner)
+  addresses!: unknown[]
 
   // Relations futures
   // @OneToMany('Commande', 'client')

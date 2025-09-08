@@ -260,70 +260,7 @@ export const tooltipVariants = cva(
 export type TooltipVariants = VariantProps<typeof tooltipVariants>
 
 // === THEME CONFIGURATION ===
-export interface ThemeConfig {
-  name: string
-  colors: Record<string, string>
-}
+// Import unified theme types and configurations
+export type { ResolvedTheme, ThemeConfig } from '../design-system/themes'
 
-export interface ResolvedTheme {
-  name: string
-  colors: Record<string, string>
-  isDark: boolean
-}
-
-export const lightTheme: ThemeConfig = {
-  name: 'light',
-  colors: {
-    background: 'hsl(0 0% 100%)',
-    foreground: 'hsl(240 10% 3.9%)',
-    primary: 'hsl(240 5.9% 10%)',
-    'primary-foreground': 'hsl(0 0% 98%)',
-    secondary: 'hsl(240 4.8% 95.9%)',
-    'secondary-foreground': 'hsl(240 5.9% 10%)',
-    muted: 'hsl(240 4.8% 95.9%)',
-    'muted-foreground': 'hsl(240 3.8% 46.1%)',
-    accent: 'hsl(240 4.8% 95.9%)',
-    'accent-foreground': 'hsl(240 5.9% 10%)',
-    border: 'hsl(240 5.9% 90%)',
-    input: 'hsl(240 5.9% 90%)',
-    ring: 'hsl(240 5.9% 10%)',
-  }
-}
-
-export const darkTheme: ThemeConfig = {
-  name: 'dark',
-  colors: {
-    background: 'hsl(240 10% 3.9%)',
-    foreground: 'hsl(0 0% 98%)',
-    primary: 'hsl(0 0% 98%)',
-    'primary-foreground': 'hsl(240 5.9% 10%)',
-    secondary: 'hsl(240 3.7% 15.9%)',
-    'secondary-foreground': 'hsl(0 0% 98%)',
-    muted: 'hsl(240 3.7% 15.9%)',
-    'muted-foreground': 'hsl(240 5% 64.9%)',
-    accent: 'hsl(240 3.7% 15.9%)',
-    'accent-foreground': 'hsl(0 0% 98%)',
-    border: 'hsl(240 3.7% 15.9%)',
-    input: 'hsl(240 3.7% 15.9%)',
-    ring: 'hsl(240 4.9% 83.9%)',
-  }
-}
-
-export const vibrantTheme: ThemeConfig = {
-  name: 'vibrant',
-  colors: {
-    background: 'hsl(210 100% 98%)',
-    foreground: 'hsl(220 15% 20%)',
-    primary: 'hsl(220 100% 50%)',
-    'primary-foreground': 'hsl(0 0% 100%)',
-    secondary: 'hsl(210 100% 95%)',
-    'secondary-foreground': 'hsl(220 15% 20%)',
-    muted: 'hsl(210 100% 95%)',
-    'muted-foreground': 'hsl(220 10% 50%)',
-    accent: 'hsl(210 100% 95%)',
-    'accent-foreground': 'hsl(220 15% 20%)',
-    border: 'hsl(210 40% 85%)',
-    input: 'hsl(210 40% 85%)',
-    ring: 'hsl(220 100% 50%)',
-  }
-}
+export { darkTheme, lightTheme, vibrantTheme } from '../design-system/themes'

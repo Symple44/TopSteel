@@ -1,7 +1,7 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { AlertTriangle, Clock, CheckCircle, XCircle, Calendar } from 'lucide-react'
+import { AlertTriangle, Calendar, CheckCircle, Clock, XCircle } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 export type DeadlineStatus = 'overdue' | 'critical' | 'warning' | 'normal' | 'completed'
 interface DeadlineIndicatorProps {
   deadline: Date
@@ -115,7 +115,11 @@ export function DeadlineIndicator({
   if (variant === 'inline') {
     return (
       <span className={cn('inline-flex items-center gap-1 text-sm', className)}>
-        {showIcon && <Icon className={cn(getIconSize(), getStatusConfig(currentStatus).className.split(' ')[1])} />}
+        {showIcon && (
+          <Icon
+            className={cn(getIconSize(), getStatusConfig(currentStatus).className.split(' ')[1])}
+          />
+        )}
         {showTimeRemaining ? formatTimeRemaining(daysRemaining) : formatDeadline(deadline)}
       </span>
     )
@@ -132,12 +136,17 @@ export function DeadlineIndicator({
         <div className="text-sm text-muted-foreground">
           <div>Échéance: {formatDeadline(deadline)}</div>
           {showTimeRemaining && (
-            <div className={cn(
-              currentStatus === 'overdue' ? 'text-red-600' :
-              currentStatus === 'critical' ? 'text-red-600' :
-              currentStatus === 'warning' ? 'text-yellow-600' :
-              'text-muted-foreground'
-            )}>
+            <div
+              className={cn(
+                currentStatus === 'overdue'
+                  ? 'text-red-600'
+                  : currentStatus === 'critical'
+                    ? 'text-red-600'
+                    : currentStatus === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-muted-foreground'
+              )}
+            >
               {formatTimeRemaining(daysRemaining)}
             </div>
           )}
@@ -146,7 +155,7 @@ export function DeadlineIndicator({
     )
   }
   return (
-    <Badge 
+    <Badge
       className={cn(
         'inline-flex items-center gap-1.5 font-medium',
         config.className,

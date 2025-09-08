@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { getErrorMessage } from '../../../core/common/utils'
 import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
@@ -269,7 +270,7 @@ export class SearchCacheController {
     } catch (error) {
       return {
         message: 'Cache maintenance completed with some errors',
-        actions: [...actions, `Error: ${error.message}`],
+        actions: [...actions, `Error: ${getErrorMessage(error)}`],
       }
     }
   }

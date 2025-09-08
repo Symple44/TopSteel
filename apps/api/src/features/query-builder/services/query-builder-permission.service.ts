@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import { type PermissionType, QueryBuilderPermission } from '../entities'
 import { User } from '../../../domains/users/entities/user.entity'
+import { type PermissionType, QueryBuilderPermission } from '../entities'
 
 @Injectable()
 export class QueryBuilderPermissionService {
@@ -40,12 +40,12 @@ export class QueryBuilderPermissionService {
       .where('user.id = :userId', { userId })
       .getRawMany()
 
-    const roleIds = userRoles.map(ur => ur.ur_roleId).filter(Boolean)
+    const roleIds = userRoles.map((ur) => ur.ur_roleId).filter(Boolean)
 
     if (roleIds.length > 0) {
       // Check permissions for these roles
       const rolePermissions = await this._permissionRepository.find({
-        where: roleIds.map(roleId => ({
+        where: roleIds.map((roleId) => ({
           queryBuilderId,
           roleId,
           permissionType,
@@ -53,13 +53,13 @@ export class QueryBuilderPermissionService {
       })
 
       // If any role grants permission, allow it
-      const roleGrantsPermission = rolePermissions.some(p => p.isAllowed)
+      const roleGrantsPermission = rolePermissions.some((p) => p.isAllowed)
       if (roleGrantsPermission) {
         return true
       }
 
       // If any role explicitly denies permission, deny it
-      const roleDeniesPermission = rolePermissions.some(p => !p.isAllowed)
+      const roleDeniesPermission = rolePermissions.some((p) => !p.isAllowed)
       if (roleDeniesPermission) {
         return false
       }
@@ -136,10 +136,10 @@ export class QueryBuilderPermissionService {
       .getRawMany()
 
     const result = []
-    
+
     for (const userRole of userRoles) {
       if (!userRole.ur_roleId) continue
-      
+
       const permissions = await this._permissionRepository.find({
         where: {
           queryBuilderId,
@@ -151,7 +151,7 @@ export class QueryBuilderPermissionService {
       result.push({
         roleId: userRole.ur_roleId,
         roleName: userRole.role_name || 'Unknown Role',
-        permissions: permissions.map(p => p.permissionType),
+        permissions: permissions.map((p) => p.permissionType),
       })
     }
 
@@ -163,13 +163,13 @@ export class QueryBuilderPermissionService {
    */
   async hasAnyPermission(queryBuilderId: string, userId: string): Promise<boolean> {
     const permissionTypes: PermissionType[] = ['view', 'edit', 'delete', 'share', 'export']
-    
+
     for (const permissionType of permissionTypes) {
       if (await this.checkPermission(queryBuilderId, userId, permissionType)) {
         return true
       }
     }
-    
+
     return false
   }
 
@@ -181,12 +181,16 @@ export class QueryBuilderPermissionService {
     userId: string
   ): Promise<Record<PermissionType, boolean>> {
     const permissionTypes: PermissionType[] = ['view', 'edit', 'delete', 'share', 'export']
-    const permissions: Record<PermissionType, boolean> = {} as any
-    
+    const permissions: Record<PermissionType, boolean> = {} as unknown
+
     for (const permissionType of permissionTypes) {
-      permissions[permissionType] = await this.checkPermission(queryBuilderId, userId, permissionType)
+      permissions[permissionType] = await this.checkPermission(
+        queryBuilderId,
+        userId,
+        permissionType
+      )
     }
-    
+
     return permissions
   }
 
@@ -205,7 +209,7 @@ export class QueryBuilderPermissionService {
       isAllowed: true,
       ...(targetType === 'user' ? { userId: targetId } : { roleId: targetId }),
     }
-    
+
     return this.addPermission(data)
   }
 
@@ -223,7 +227,7 @@ export class QueryBuilderPermissionService {
       permissionType,
       ...(targetType === 'user' ? { userId: targetId } : { roleId: targetId }),
     }
-    
+
     const permission = await this._permissionRepository.findOne({ where: whereCondition })
     if (permission) {
       await this._permissionRepository.delete(permission.id)

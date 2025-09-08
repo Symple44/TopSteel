@@ -1,13 +1,7 @@
 'use client'
 
-import {
-  AdvancedDataTable,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  type ColumnConfig,
-} from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle, DataTable } from '@erp/ui'
+import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
 import {
   Button,
   DropdownMenu,
@@ -18,33 +12,86 @@ import {
 import { Download, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+// Define proper interfaces for query builder columns
+interface QueryBuilderColumn {
+  name: string
+  type: string
+  label?: string
+  columnName?: string
+  tableName?: string
+  alias?: string
+  dataType?: string
+  description?: string
+  isVisible?: boolean
+  displayOrder?: number
+  isSortable?: boolean
+  isFilterable?: boolean
+  format?: {
+    type?: 'currency' | 'percentage' | 'number' | 'date'
+    decimals?: number
+  }
+}
+
+interface QueryBuilderCalculatedField {
+  name: string
+  expression: string
+  type: string
+  isVisible?: boolean
+  displayOrder?: number
+}
+
+interface QueryBuilderSettings {
+  settings?: {
+    enableExport?: boolean
+    exportFormats?: string[]
+  }
+}
+
+// Data row interface for the preview table
+interface PreviewDataRow extends Record<string, unknown> {
+  id?: string | number
+}
+
+// Column data type for DataTable
+interface PreviewColumn {
+  id: string
+  key: string
+  title: string
+  description: string
+  type: 'text' | 'number' | 'boolean' | 'date' | 'datetime'
+  width: number
+  sortable: boolean
+  searchable: boolean
+  render?: (value: unknown, row: PreviewDataRow, column: PreviewColumn) => string
+}
+
 interface DataTablePreviewProps {
-  data: Record<string, unknown>[]
-  columns?: Array<{ name: string; type: string; label?: string }>
-  calculatedFields?: Array<{ name: string; expression: string; type: string }>
+  data: PreviewDataRow[]
+  columns?: QueryBuilderColumn[]
+  calculatedFields?: QueryBuilderCalculatedField[]
   layout?: Record<string, unknown>
-  settings?: Record<string, unknown>
+  settings?: QueryBuilderSettings
 }
 
 // Convert query builder data types to DataTable types
-const getDataTableType = (dataType: string): ColumnConfig<any>['type'] => {
+const getDataTableType = (dataType: string): PreviewColumn['type'] => {
   const type = dataType?.toLowerCase() || ''
 
   if (
-    type.includes('int') ||
-    type.includes('numeric') ||
-    type.includes('decimal') ||
-    type.includes('float')
+    type?.includes('int') ||
+    type?.includes('numeric') ||
+    type?.includes('decimal') ||
+    type?.includes('float')
   ) {
     return 'number'
   }
-  if (type.includes('bool')) {
+  if (type?.includes('bool')) {
     return 'boolean'
   }
-  if (type.includes('date') && type.includes('time')) {
+  if (type?.includes('date') && type?.includes('time')) {
     return 'datetime'
   }
-  if (type.includes('date')) {
+  if (type?.includes('date')) {
     return 'date'
   }
   return 'text'
@@ -59,46 +106,63 @@ export function DataTablePreview({
 }: DataTablePreviewProps) {
   const [loading, setLoading] = useState(false)
 
-  const dataTableColumns = useMemo((): ColumnConfig<any>[] => {
+  const dataTableColumns = useMemo((): PreviewColumn[] => {
     // Si pas de colonnes définies, pas d'affichage
     if (!columns || columns.length === 0) {
       return []
     }
 
     // Traitement des colonnes définies par le query builder
-    const visibleColumns = columns.filter((col) => col.isVisible ?? true)
-    const visibleCalculatedFields = calculatedFields.filter((field) => field.isVisible ?? true)
+    const visibleColumns = columns?.filter((col) => col.isVisible ?? true)
+    const visibleCalculatedFields = calculatedFields?.filter((field) => field.isVisible ?? true)
 
     // Trier par displayOrder
     const allColumns = [...visibleColumns, ...visibleCalculatedFields].sort(
-      (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
     )
 
-    const result = allColumns.map((col, index): ColumnConfig<any> => {
-      const columnId = col.alias || col.columnName || col.name || `col_${index}`
+    const result = allColumns?.map((col, index): PreviewColumn => {
+      // Handle different column types properly
+      const isCalculatedField = 'expression' in col
+      const queryCol = col as QueryBuilderColumn
+      const calcCol = col as QueryBuilderCalculatedField
 
-      const columnConfig: ColumnConfig<any> = {
+      const columnId = isCalculatedField
+        ? calcCol.name || `calc_${index}`
+        : queryCol.alias || queryCol.columnName || queryCol.name || `col_${index}`
+
+      const title = isCalculatedField
+        ? calcCol.name || 'Calculated Field'
+        : queryCol.label || queryCol.columnName || queryCol.name || 'Unknown'
+
+      const description = isCalculatedField
+        ? `Champ calculé: ${calcCol.expression || ''}`
+        : queryCol.description || `Colonne ${queryCol.tableName || ''}.${queryCol.columnName || ''}`
+
+      const dataType = isCalculatedField ? calcCol.type : queryCol.dataType || queryCol.type
+
+      const columnConfig: PreviewColumn = {
         id: columnId,
-        key: columnId as keyof any,
-        title: col.label || col.columnName || col.name || 'Unknown',
-        description: col.description || `Colonne ${col.tableName || ''}.${col.columnName || ''}`,
-        type: getDataTableType(col.dataType),
+        key: columnId,
+        title: title,
+        description: description,
+        type: getDataTableType(dataType),
         width: 150,
-        sortable: col.isSortable ?? true,
-        searchable: col.isFilterable ?? true,
-        render: (value: any) => {
+        sortable: isCalculatedField ? false : (queryCol.isSortable ?? true),
+        searchable: isCalculatedField ? false : (queryCol.isFilterable ?? true),
+        render: (value: unknown, _row: PreviewDataRow, _column: PreviewColumn) => {
           // Format based on data type and format settings
-          if (col.format) {
-            switch (col.format.type) {
+          if (!isCalculatedField && queryCol.format) {
+            switch (queryCol.format.type) {
               case 'currency':
                 return new Intl.NumberFormat('fr-FR', {
                   style: 'currency',
                   currency: 'EUR',
                 }).format(value as number)
               case 'percentage':
-                return `${((value as number) * 100).toFixed(col.format.decimals || 2)}%`
+                return `${((value as number) * 100).toFixed(queryCol.format.decimals || 2)}%`
               case 'number':
-                return (value as number).toFixed(col.format.decimals || 0)
+                return (value as number).toFixed(queryCol.format.decimals ?? 0)
               case 'date':
                 return new Date(value as string).toLocaleDateString('fr-FR')
               default:
@@ -135,14 +199,20 @@ export function DataTablePreview({
         <div className="flex items-center justify-between">
           <CardTitle>Data Preview</CardTitle>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={loading}
+            >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            {settings.settings?.enableExport && (
+            {settings?.settings?.enableExport && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <Download className="h-4 w-4 mr-2" />
                     Export
                   </Button>
@@ -150,7 +220,7 @@ export function DataTablePreview({
                 <DropdownMenuContent>
                   {settings.settings?.exportFormats?.map((format: string) => (
                     <DropdownMenuItem key={format} onClick={() => handleExport(format)}>
-                      Export as {format.toUpperCase()}
+                      Export as {format?.toUpperCase()}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -170,16 +240,18 @@ export function DataTablePreview({
         ) : (
           <div className="h-full flex flex-col">
             {/* Afficher les en-têtes même sans données */}
-            <AdvancedDataTable
+            <DataTable
               data={
                 data && data.length > 0
                   ? data
                   : [
                       // Ligne vide pour afficher les en-têtes
-                      Object.fromEntries(dataTableColumns.map((col) => [col.id, ''])),
+                      Object.fromEntries(
+                        dataTableColumns?.map((col) => [col.id, ''])
+                      ) as PreviewDataRow,
                     ]
               }
-              columns={dataTableColumns}
+              columns={dataTableColumns as ColumnConfig<PreviewDataRow>[]}
               keyField="id"
               tableId="query-preview"
               // Configuration pour l'aperçu
@@ -195,7 +267,7 @@ export function DataTablePreview({
               pagination={{
                 page: 1,
                 pageSize: 10,
-                total: data?.length || 0,
+                total: data?.length ?? 0,
                 showSizeChanger: true,
                 pageSizeOptions: [10, 25, 50, 100],
               }}

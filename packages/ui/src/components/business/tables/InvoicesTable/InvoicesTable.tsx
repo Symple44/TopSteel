@@ -1,5 +1,17 @@
 'use client'
 import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Download,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Send,
+  Trash2,
+  XCircle,
+} from 'lucide-react'
+import {
   Table,
   TableBody,
   TableCell,
@@ -7,20 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Download, 
-  Send,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  XCircle
-} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +27,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
+import { Badge } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Invoice {
   id: string
   number: string
@@ -89,30 +89,30 @@ export function InvoicesTable({
   }
   const getStatusBadge = (status: Invoice['status']) => {
     const variants = {
-      draft: { 
-        label: 'Brouillon', 
+      draft: {
+        label: 'Brouillon',
         className: 'bg-gray-100 text-gray-800',
-        icon: <Edit className="h-3 w-3" />
+        icon: <Edit className="h-3 w-3" />,
       },
-      sent: { 
-        label: 'Envoyée', 
+      sent: {
+        label: 'Envoyée',
         className: 'bg-blue-100 text-blue-800',
-        icon: <Send className="h-3 w-3" />
+        icon: <Send className="h-3 w-3" />,
       },
-      paid: { 
-        label: 'Payée', 
+      paid: {
+        label: 'Payée',
         className: 'bg-green-100 text-green-800',
-        icon: <CheckCircle className="h-3 w-3" />
+        icon: <CheckCircle className="h-3 w-3" />,
       },
-      overdue: { 
-        label: 'En retard', 
+      overdue: {
+        label: 'En retard',
         className: 'bg-red-100 text-red-800',
-        icon: <AlertCircle className="h-3 w-3" />
+        icon: <AlertCircle className="h-3 w-3" />,
       },
-      cancelled: { 
-        label: 'Annulée', 
+      cancelled: {
+        label: 'Annulée',
         className: 'bg-gray-100 text-gray-600',
-        icon: <XCircle className="h-3 w-3" />
+        icon: <XCircle className="h-3 w-3" />,
       },
     }
     const variant = variants[status] || variants.draft
@@ -198,7 +198,8 @@ export function InvoicesTable({
                             <span className="text-orange-600">Aujourd'hui</span>
                           ) : (
                             <span className="text-red-600">
-                              {Math.abs(daysUntilDue)} jour{Math.abs(daysUntilDue) > 1 ? 's' : ''} de retard
+                              {Math.abs(daysUntilDue)} jour{Math.abs(daysUntilDue) > 1 ? 's' : ''}{' '}
+                              de retard
                             </span>
                           )}
                         </div>
@@ -212,9 +213,7 @@ export function InvoicesTable({
                   </TableCell>
                   <TableCell className="text-right">
                     {formatCurrency(invoice.tax, invoice.currency)}
-                    <div className="text-xs text-muted-foreground">
-                      {invoice.taxRate}%
-                    </div>
+                    <div className="text-xs text-muted-foreground">{invoice.taxRate}%</div>
                   </TableCell>
                   <TableCell className="text-right font-medium">
                     {formatCurrency(invoice.total, invoice.currency)}
@@ -227,7 +226,7 @@ export function InvoicesTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -261,7 +260,7 @@ export function InvoicesTable({
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => onDelete?.(invoice)}
                           className="text-red-600"
                           disabled={invoice.status === 'paid'}

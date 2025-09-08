@@ -51,50 +51,52 @@ const maxCacheSize = 100
 const defaultTTL = 5000
 
 function getSelectorMemo<R>(key: string, ttl: number = defaultTTL): R | undefined {
-  const entry = selectorCache.get(key)
+  const entry = selectorCache?.get(key)
 
   if (!entry) return undefined
 
   const now = Date.now()
 
-  if (now - entry.timestamp > ttl) {
-    selectorCache.delete(key)
+  if (now - entry?.timestamp > ttl) {
+    selectorCache?.delete(key)
 
     return undefined
   }
 
-  entry.hitCount++
+  if (entry) {
+    entry.hitCount++
+  }
 
-  return entry.value as R
+  return entry?.value as R
 }
 
 function setSelectorMemo<R>(key: string, value: R): void {
   const now = Date.now()
 
-  selectorCache.set(key, {
+  selectorCache?.set(key, {
     value: value as unknown,
     timestamp: now,
     hitCount: 1,
   })
 
   // Nettoyage du cache si trop grand
-  if (selectorCache.size > maxCacheSize) {
-    const entries = Array.from(selectorCache.entries())
-    const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
-    const toDelete = sortedByUsage.slice(0, Math.floor(maxCacheSize * 0.3))
+  if (selectorCache?.size > maxCacheSize) {
+    const entries = Array.from(selectorCache?.entries())
+    const sortedByUsage = entries?.sort((a, b) => a?.[1]?.hitCount - b?.[1]?.hitCount)
+    const toDelete = sortedByUsage?.slice(0, Math.floor(maxCacheSize * 0.3))
 
     for (const [key] of toDelete) {
-      selectorCache.delete(key)
+      selectorCache?.delete(key)
     }
   }
 }
 
 function clearSelectorMemo(): void {
-  selectorCache.clear()
+  selectorCache?.clear()
 }
 
 function getSelectorMemoEntries(): Array<[string, MemoCache<unknown>]> {
-  return Array.from(selectorCache.entries())
+  return Array.from(selectorCache?.entries())
 }
 
 // ===== CRÉATEUR DE SÉLECTEURS OPTIMISÉS TYPÉ =====
@@ -106,7 +108,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
     useShallow: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
       const result = useStore(selector, shallow as EqualityFn<R>)
 
-      if (process.env.NODE_ENV === 'development' && debugLabel) {
+      if (process?.env?.NODE_ENV === 'development' && debugLabel) {
       }
 
       return result
@@ -122,7 +124,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
     ) => {
       const result = useStore(selector, equalityFn)
 
-      if (process.env.NODE_ENV === 'development' && debugLabel) {
+      if (process?.env?.NODE_ENV === 'development' && debugLabel) {
       }
 
       return result
@@ -134,7 +136,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
     useSimple: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
       const result = useStore(selector)
 
-      if (process.env.NODE_ENV === 'development' && debugLabel) {
+      if (process?.env?.NODE_ENV === 'development' && debugLabel) {
       }
 
       return result
@@ -151,7 +153,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
 
             return result ?? defaultValue
           } catch (_error) {
-            if (process.env.NODE_ENV === 'development') {
+            if (process?.env?.NODE_ENV === 'development') {
             }
 
             return defaultValue
@@ -174,14 +176,14 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
         debugLabel?: string
       } = {}
     ) => {
-      const { equalityFn = shallow as EqualityFn<U>, debugLabel: _debugLabel } = options
+      const { equalityFn = shallow as EqualityFn<U>, debugLabel: _debugLabel } = options || {}
 
       const transformedSelector = useMemo(
         () => (state: T) => {
           try {
             return transform(selector(state))
           } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
+            if (process?.env?.NODE_ENV === 'development') {
             }
             throw error
           }
@@ -206,14 +208,14 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
 
           if (!items || !Array.isArray(items)) return [] as unknown as R
 
-          return items.filter(filterFn) as unknown as R
+          return items?.filter(filterFn) as unknown as R
         },
         [selector, filterFn]
       )
 
       const result = useStore(filteredSelector, shallow as EqualityFn<R>)
 
-      if (process.env.NODE_ENV === 'development' && debugLabel) {
+      if (process?.env?.NODE_ENV === 'development' && debugLabel) {
       }
 
       return result
@@ -230,7 +232,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
         debugLabel?: string
       } = {}
     ) => {
-      const { ttl = 5000, cacheKey, debugLabel } = options
+      const { ttl = 5000, cacheKey, debugLabel } = options || {}
 
       const memoizedSelector = useMemo(() => {
         return (state: T): R => {
@@ -261,7 +263,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
      */
     clearMemoCache: () => {
       clearSelectorMemo()
-      if (process.env.NODE_ENV === 'development') {
+      if (process?.env?.NODE_ENV === 'development') {
       }
     },
 
@@ -273,7 +275,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
 
       return {
         size: entries.length,
-        entries: entries.map(([key, value]) => ({
+        entries: entries?.map(([key, value]) => ({
           key,
           hitCount: value.hitCount,
           age: Date.now() - value.timestamp,
@@ -291,7 +293,12 @@ export function useOptimizedSelector<T, R>(
   selector: StoreSelector<T, R>,
   options: SelectorOptions<R> = {}
 ): R {
-  const { strategy = SelectorStrategy.SHALLOW, equalityFn, defaultValue, debugLabel } = options
+  const {
+    strategy = SelectorStrategy.SHALLOW,
+    equalityFn,
+    defaultValue,
+    debugLabel,
+  } = options || {}
 
   // Créer la fonction d'égalité appropriée
   const finalEqualityFn = useMemo(() => {
@@ -317,7 +324,7 @@ export function useOptimizedSelector<T, R>(
 
         return result ?? defaultValue
       } catch (_error) {
-        if (process.env.NODE_ENV === 'development' && debugLabel) {
+        if (process?.env?.NODE_ENV === 'development' && debugLabel) {
         }
 
         return defaultValue
@@ -328,7 +335,7 @@ export function useOptimizedSelector<T, R>(
   // Toujours appeler useStore de la même façon
   const result = useStore(safeSelector, finalEqualityFn)
 
-  if (process.env.NODE_ENV === 'development' && debugLabel) {
+  if (process?.env?.NODE_ENV === 'development' && debugLabel) {
   }
 
   return result
@@ -345,7 +352,7 @@ export function createMemoizedSelector<T, R>(
     keySelector?: (state: T) => string
   } = {}
 ): StoreSelector<T, R> {
-  const { maxCacheSize = 10, ttl = 5000, keySelector } = options
+  const { maxCacheSize = 10, ttl = 5000, keySelector } = options || {}
 
   const cache = new Map<string, MemoCache<R>>()
   let lastState: T | undefined
@@ -361,35 +368,37 @@ export function createMemoizedSelector<T, R>(
     const cacheKey = keySelector ? keySelector(state) : JSON.stringify(state)
 
     const now = Date.now()
-    const cached = cache.get(cacheKey)
+    const cached = cache?.get(cacheKey)
 
     // Vérifier le cache
-    if (cached && now - cached.timestamp < ttl) {
-      cached.hitCount++
+    if (cached && now - cached?.timestamp < ttl) {
+      if (cached) {
+        cached.hitCount++
+      }
       lastState = state
-      lastResult = cached.value
+      lastResult = cached?.value
 
-      return cached.value
+      return cached?.value
     }
 
     // Calculer la nouvelle valeur
     const value = selector(state)
 
     // Mettre en cache
-    cache.set(cacheKey, {
+    cache?.set(cacheKey, {
       value,
       timestamp: now,
       hitCount: 1,
     })
 
     // Nettoyage du cache
-    if (cache.size > maxCacheSize) {
-      const entries = Array.from(cache.entries())
-      const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
-      const toDelete = sortedByUsage.slice(0, Math.floor(maxCacheSize * 0.3))
+    if (cache?.size > maxCacheSize) {
+      const entries = Array.from(cache?.entries())
+      const sortedByUsage = entries?.sort((a, b) => a?.[1]?.hitCount - b?.[1]?.hitCount)
+      const toDelete = sortedByUsage?.slice(0, Math.floor(maxCacheSize * 0.3))
 
       for (const [key] of toDelete) {
-        cache.delete(key)
+        cache?.delete(key)
       }
     }
 
@@ -408,14 +417,14 @@ export const selectorDebugUtils = {
    * Wrapper pour tracer les appels de sélecteur
    */
   trace: <T, R>(selector: StoreSelector<T, R>, _label: string): StoreSelector<T, R> => {
-    if (process.env.NODE_ENV !== 'development') {
+    if (process?.env?.NODE_ENV !== 'development') {
       return selector
     }
 
     return (state: T): R => {
-      const start = performance.now()
+      const start = performance?.now()
       const result = selector(state)
-      const _duration = performance.now() - start
+      const _duration = performance?.now() - start
 
       return result
     }
@@ -435,13 +444,13 @@ export const selectorDebugUtils = {
       const times: number[] = []
 
       for (let i = 0; i < iterations; i++) {
-        const start = performance.now()
+        const start = performance?.now()
 
         selector(state)
-        times.push(performance.now() - start)
+        times?.push(performance?.now() - start)
       }
 
-      const totalTime = times.reduce((sum, time) => sum + time, 0)
+      const totalTime = times?.reduce((sum, time) => sum + time, 0)
 
       results[name] = {
         averageTime: totalTime / iterations,

@@ -60,14 +60,14 @@ export function DataTableEmpty({
 
       <div className="flex flex-col sm:flex-row gap-3">
         {isSearchResult && onClearSearch && (
-          <Button onClick={onClearSearch} variant="outline" size="sm">
+          <Button type="button" onClick={onClearSearch} variant="outline" size="sm">
             <X className="h-4 w-4 mr-2" />
             {translations?.clearSearch || 'Clear search'}
           </Button>
         )}
 
         {action && (
-          <Button onClick={action.onClick} variant="default" size="sm">
+          <Button type="button" onClick={action.onClick} variant="default" size="sm">
             {action.icon || <Plus className="h-4 w-4 mr-2" />}
             {action.label}
           </Button>

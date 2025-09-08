@@ -22,7 +22,7 @@ async function testRealAPILogin() {
 
     const loginData = {
       login: 'admin@topsteel.com', // Utilisateur de test
-      password: 'Admin123!@#', // Mot de passe par défaut
+      password: process.env.TEST_LOGIN_PASSWORD || 'TestLogin123!', // Mot de passe par défaut
     }
 
     console.log(`📧 Email: ${loginData.login}`)
@@ -53,14 +53,14 @@ async function testRealAPILogin() {
         console.log(`Nombre de sociétés: ${societes.length}`)
         console.log()
 
-        societes.forEach((societe: any, index: number) => {
+        societes.forEach((societe: unknown, index: number) => {
           console.log(`${index + 1}. ${societe.nom} (${societe.code})`)
           console.log(`   ID: ${societe.id}`)
           console.log(`   Rôle: ${societe.role}`)
           console.log(`   Par défaut: ${societe.isDefault ? 'Oui' : 'Non'}`)
           console.log(`   Permissions: ${societe.permissions?.join(', ') || 'Aucune'}`)
           if (societe.sites && societe.sites.length > 0) {
-            console.log(`   Sites: ${societe.sites.map((s: any) => s.nom).join(', ')}`)
+            console.log(`   Sites: ${societe.sites.map((s: unknown) => s.nom).join(', ')}`)
           }
           console.log()
         })
@@ -72,7 +72,7 @@ async function testRealAPILogin() {
 
       // Si une seule société ou société par défaut, tester la connexion à cette société
       if (societes && societes.length > 0) {
-        const defaultSociete = societes.find((s: any) => s.isDefault) || societes[0]
+        const defaultSociete = societes.find((s: unknown) => s.isDefault) || societes[0]
 
         console.log('\n📋 ÉTAPE 2: Sélection de Société')
         console.log('-'.repeat(40))
@@ -101,14 +101,14 @@ async function testRealAPILogin() {
           console.log(`   Société: ${userInfo.societe.nom} (${userInfo.societe.code})`)
           console.log(`   Database: ${userInfo.societe.databaseName}`)
           console.log(`   Permissions: ${userInfo.permissions?.slice(0, 3).join(', ')}...`)
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.log(
             '❌ Erreur lors de la sélection de société:',
             error.response?.data?.message || error.message
           )
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error.response) {
         console.log('❌ Erreur de connexion:')
         console.log(`   Status: ${error.response.status}`)
@@ -120,7 +120,7 @@ async function testRealAPILogin() {
         console.log('❌ Erreur:', error.message)
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Erreur fatale:', error.message)
   }
 

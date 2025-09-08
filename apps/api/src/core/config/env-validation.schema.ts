@@ -8,17 +8,24 @@ import { z } from 'zod'
 // Helper schemas for common patterns
 const stringNonEmpty = z.string().min(1, 'Cannot be empty')
 const portSchema = z.coerce.number().int().min(1).max(65535)
-const booleanSchema = z.string().transform(val => val === 'true').pipe(z.boolean())
+const booleanSchema = z
+  .string()
+  .transform((val) => val === 'true')
+  .pipe(z.boolean())
 const urlSchema = z.string().url()
 
 // JWT Secret validation - must be at least 32 characters for security
-const jwtSecretSchema = z.string().min(32, 'JWT secret must be at least 32 characters for security')
+const _jwtSecretSchema = z
+  .string()
+  .min(32, 'JWT secret must be at least 32 characters for security')
 
 // Database URL validation
-const databaseUrlSchema = z.string().regex(
-  /^postgresql:\/\/[\w\-\.]+:[\w\-\.]*@[\w\-\.]+:\d+\/[\w\-\.]+(\?.*)?$/,
-  'Invalid PostgreSQL connection string format'
-)
+const databaseUrlSchema = z
+  .string()
+  .regex(
+    /^postgresql:\/\/[\w\-.]+:[\w\-.]*@[\w\-.]+:\d+\/[\w\-.]+(\?.*)?$/,
+    'Invalid PostgreSQL connection string format'
+  )
 
 // Email validation for SMTP
 const emailSchema = z.string().email()
@@ -53,7 +60,7 @@ export const envValidationSchema = z.object({
       return true // Allow any value in development
     },
     {
-      message: 'JWT_SECRET must be set and at least 32 characters in production'
+      message: 'JWT_SECRET must be set and at least 32 characters in production',
     }
   ),
   JWT_REFRESH_SECRET: z.string().refine(
@@ -64,7 +71,7 @@ export const envValidationSchema = z.object({
       return true
     },
     {
-      message: 'JWT_REFRESH_SECRET must be set and at least 32 characters in production'
+      message: 'JWT_REFRESH_SECRET must be set and at least 32 characters in production',
     }
   ),
   JWT_EXPIRES_IN: stringNonEmpty.default('7d'),
@@ -82,7 +89,7 @@ export const envValidationSchema = z.object({
       return true
     },
     {
-      message: 'SESSION_SECRET must be set and at least 32 characters in production'
+      message: 'SESSION_SECRET must be set and at least 32 characters in production',
     }
   ),
   SESSION_MAX_AGE: z.coerce.number().int().default(86400000),
@@ -199,10 +206,10 @@ export const envValidationSchema = z.object({
 })
 
 // Custom validation for SMS provider dependencies
-export const validateSmsProviderDependencies = (env: Record<string, any>) => {
+export const validateSmsProviderDependencies = (env: Record<string, unknown>) => {
   if (env.SMS_PROVIDER === 'twilio') {
     const requiredTwilioFields = ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER']
-    const missingFields = requiredTwilioFields.filter(field => !env[field])
+    const missingFields = requiredTwilioFields.filter((field) => !env[field])
     if (missingFields.length > 0) {
       throw new Error(`Twilio SMS provider requires: ${missingFields.join(', ')}`)
     }
@@ -210,7 +217,7 @@ export const validateSmsProviderDependencies = (env: Record<string, any>) => {
 
   if (env.SMS_PROVIDER === 'vonage') {
     const requiredVonageFields = ['VONAGE_API_KEY', 'VONAGE_API_SECRET']
-    const missingFields = requiredVonageFields.filter(field => !env[field])
+    const missingFields = requiredVonageFields.filter((field) => !env[field])
     if (missingFields.length > 0) {
       throw new Error(`Vonage SMS provider requires: ${missingFields.join(', ')}`)
     }
@@ -218,7 +225,7 @@ export const validateSmsProviderDependencies = (env: Record<string, any>) => {
 
   if (env.SMS_PROVIDER === 'aws') {
     const requiredAwsFields = ['AWS_REGION', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
-    const missingFields = requiredAwsFields.filter(field => !env[field])
+    const missingFields = requiredAwsFields.filter((field) => !env[field])
     if (missingFields.length > 0) {
       throw new Error(`AWS SNS SMS provider requires: ${missingFields.join(', ')}`)
     }

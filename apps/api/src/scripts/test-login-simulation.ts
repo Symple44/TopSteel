@@ -158,7 +158,7 @@ async function simulateLoginProcess() {
   // Décoder et afficher le contenu du token JWT
   console.log('🔍 CONTENU DU TOKEN JWT FINAL:')
   console.log('-'.repeat(40))
-  const decodedToken = jwt.decode(finalToken) as any
+  const decodedToken = jwt.decode(finalToken) as unknown
   console.log(
     JSON.stringify(
       {

@@ -1,11 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils/error.utils'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
+import type { IPermission, IRolePermission } from '../types/entities.types'
 
 /**
  * Structure représentant une permission calculée
@@ -136,8 +138,7 @@ export class PermissionCalculatorService {
       return result
     } catch (error) {
       this.logger.error(
-        `Error calculating permissions for user ${userId} in societe ${societeId}:`,
-        error
+        `Error calculating permissions for user ${userId} in societe ${societeId}: ${getErrorMessage(error)}`
       )
       return this.createEmptyPermissionSet(userId, societeId, siteId)
     }
@@ -211,12 +212,15 @@ export class PermissionCalculatorService {
 
     if (role?.rolePermissions) {
       for (const rolePerm of role.rolePermissions) {
-        if (rolePerm.isActive && rolePerm.isGranted && rolePerm.permission.isActive) {
-          const key = `${rolePerm.permission.resource}:${rolePerm.permission.action}`
+        const rp = rolePerm as IRolePermission
+        const permission = rp.permission as IPermission
+
+        if (rp.isActive && rp.isGranted && permission.isActive) {
+          const key = `${permission.resource}:${permission.action}`
           permissions.set(key, {
-            resource: rolePerm.permission.resource,
-            action: rolePerm.permission.action,
-            level: rolePerm.accessLevel as CalculatedPermission['level'],
+            resource: permission.resource,
+            action: permission.action,
+            level: rp.accessLevel,
             source: 'role',
             scope: 'societe',
             isRestricted: false,

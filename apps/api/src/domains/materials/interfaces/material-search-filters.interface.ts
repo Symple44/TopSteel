@@ -644,7 +644,7 @@ export interface IMaterialAggregationOptions {
  */
 export interface IMaterialSearchResult {
   /** Matériaux trouvés */
-  materiaux: any[] // Remplacez par votre interface Material
+  materiaux: unknown[] // Remplacez par votre interface Material
 
   /** Informations de pagination */
   pagination: {

@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import {
   AlertCircle,
@@ -52,6 +53,7 @@ const URGENCY_LEVELS = [
 ]
 
 export default function SupportPage() {
+  const ids = useFormFieldIds(['name', 'email', 'company', 'subject', 'description'])
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -69,11 +71,11 @@ export default function SupportPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     // Validation basique
     if (!formData.name || !formData.email || !formData.subject || !formData.description) {
-      toast.error('Veuillez remplir tous les champs obligatoires')
+      toast?.error('Veuillez remplir tous les champs obligatoires')
       return
     }
 
@@ -84,9 +86,9 @@ export default function SupportPage() {
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       setIsSubmitted(true)
-      toast.success('Ticket créé - Votre demande a été envoyée avec succès')
+      toast?.success('Ticket créé - Votre demande a été envoyée avec succès')
     } catch (_error) {
-      toast.error('Une erreur est survenue. Veuillez réessayer.')
+      toast?.error('Une erreur est survenue. Veuillez réessayer.')
     } finally {
       setIsLoading(false)
     }
@@ -113,9 +115,9 @@ export default function SupportPage() {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
                 <h3 className="font-medium text-blue-900 mb-2">Prochaines étapes :</h3>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Vous recevrez un email de confirmation</li>
-                  <li>• Notre équipe vous contactera sous 24h</li>
-                  <li>• Suivez votre ticket via l'interface admin</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
               </div>
 
@@ -207,12 +209,12 @@ export default function SupportPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nom complet *</Label>
+                    <Label htmlFor={ids.name}>Nom complet *</Label>
                     <Input
-                      id="name"
+                      id={ids.name}
                       value={formData.name}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        handleInputChange('name', e.target.value)
+                        handleInputChange('name', e?.target?.value)
                       }
                       placeholder="Jean Dupont"
                       required
@@ -220,13 +222,13 @@ export default function SupportPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor={ids.email}>Email *</Label>
                     <Input
-                      id="email"
+                      id={ids.email}
                       type="email"
                       value={formData.email}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        handleInputChange('email', e.target.value)
+                        handleInputChange('email', e?.target?.value)
                       }
                       placeholder="jean.dupont@entreprise.com"
                       required
@@ -235,12 +237,12 @@ export default function SupportPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="company">Entreprise</Label>
+                  <Label htmlFor={ids.company}>Entreprise</Label>
                   <Input
-                    id="company"
+                    id={ids.company}
                     value={formData.company}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange('company', e.target.value)
+                      handleInputChange('company', e?.target?.value)
                     }
                     placeholder="TopSteel Métallerie"
                   />
@@ -257,7 +259,7 @@ export default function SupportPage() {
                         <SelectValue placeholder="Sélectionnez une catégorie" />
                       </SelectTrigger>
                       <SelectContent>
-                        {SUPPORT_CATEGORIES.map((cat) => (
+                        {SUPPORT_CATEGORIES?.map((cat) => (
                           <SelectItem key={cat.value} value={cat.value}>
                             {cat.label}
                           </SelectItem>
@@ -276,7 +278,7 @@ export default function SupportPage() {
                         <SelectValue placeholder="Niveau d'urgence" />
                       </SelectTrigger>
                       <SelectContent>
-                        {URGENCY_LEVELS.map((level) => (
+                        {URGENCY_LEVELS?.map((level) => (
                           <SelectItem key={level.value} value={level.value}>
                             <span className={level.color}>{level.label}</span>
                           </SelectItem>
@@ -287,12 +289,12 @@ export default function SupportPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Sujet *</Label>
+                  <Label htmlFor={ids.subject}>Sujet *</Label>
                   <Input
-                    id="subject"
+                    id={ids.subject}
                     value={formData.subject}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange('subject', e.target.value)
+                      handleInputChange('subject', e?.target?.value)
                     }
                     placeholder="Résumé du problème"
                     required
@@ -300,12 +302,12 @@ export default function SupportPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description détaillée *</Label>
+                  <Label htmlFor={ids.description}>Description détaillée *</Label>
                   <Textarea
-                    id="description"
+                    id={ids.description}
                     value={formData.description}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      handleInputChange('description', e.target.value)
+                      handleInputChange('description', e?.target?.value)
                     }
                     placeholder="Décrivez votre problème en détail : étapes pour reproduire, messages d'erreur, capture d'écran..."
                     rows={6}

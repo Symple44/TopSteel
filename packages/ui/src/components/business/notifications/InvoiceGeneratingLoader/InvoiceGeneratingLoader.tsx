@@ -1,8 +1,8 @@
 'use client'
+import { Calculator, CheckCircle, Euro, FileText, Loader, Package } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { FileText, Loader, CheckCircle, Package, Calculator, Euro, Calendar } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
-export type InvoiceGenerationStep = 
+export type InvoiceGenerationStep =
   | 'calculating_totals'
   | 'generating_line_items'
   | 'applying_taxes'
@@ -36,50 +36,50 @@ const steps = [
     label: 'Calcul des montants',
     description: 'Calcul des totaux et sous-totaux',
     icon: Calculator,
-    duration: 1000
+    duration: 1000,
   },
   {
     key: 'generating_line_items' as const,
     label: 'Génération des lignes',
     description: 'Création des lignes de facturation',
     icon: Package,
-    duration: 2000
+    duration: 2000,
   },
   {
     key: 'applying_taxes' as const,
     label: 'Application des taxes',
     description: 'Calcul et application de la TVA',
     icon: Euro,
-    duration: 500
+    duration: 500,
   },
   {
     key: 'formatting_document' as const,
     label: 'Formatage du document',
     description: 'Mise en forme de la facture',
     icon: FileText,
-    duration: 1500
+    duration: 1500,
   },
   {
     key: 'generating_pdf' as const,
     label: 'Génération PDF',
     description: 'Création du fichier PDF',
     icon: FileText,
-    duration: 2000
+    duration: 2000,
   },
   {
     key: 'saving_to_database' as const,
     label: 'Sauvegarde',
     description: 'Enregistrement en base de données',
     icon: CheckCircle,
-    duration: 800
+    duration: 800,
   },
   {
     key: 'completed' as const,
     label: 'Terminé',
     description: 'Facture générée avec succès',
     icon: CheckCircle,
-    duration: 0
-  }
+    duration: 0,
+  },
 ]
 export function InvoiceGeneratingLoader({
   className,
@@ -90,17 +90,17 @@ export function InvoiceGeneratingLoader({
   estimatedTime,
   timeElapsed,
   onComplete,
-  onError
+  onError,
 }: InvoiceGeneratingLoaderProps) {
   const [animatedProgress, setAnimatedProgress] = useState(0)
   const [dots, setDots] = useState('')
-  const currentStepIndex = steps.findIndex(step => step.key === currentStep)
+  const currentStepIndex = steps.findIndex((step) => step.key === currentStep)
   const currentStepConfig = steps[currentStepIndex] || steps[0]
-  const IconComponent = currentStepConfig.icon
+  const _IconComponent = currentStepConfig.icon
   // Animate progress
   useEffect(() => {
     const interval = setInterval(() => {
-      setAnimatedProgress(prev => {
+      setAnimatedProgress((prev) => {
         const diff = progress - prev
         if (Math.abs(diff) < 0.1) return progress
         return prev + diff * 0.1
@@ -112,9 +112,9 @@ export function InvoiceGeneratingLoader({
   useEffect(() => {
     if (!isGenerating) return
     const interval = setInterval(() => {
-      setDots(prev => {
+      setDots((prev) => {
         if (prev.length >= 3) return ''
-        return prev + '.'
+        return `${prev}.`
       })
     }, 500)
     return () => clearInterval(interval)
@@ -122,7 +122,7 @@ export function InvoiceGeneratingLoader({
   const formatCurrency = (amount: number, currency = 'EUR') => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency
+      currency,
     }).format(amount)
   }
   const formatTime = (seconds: number) => {
@@ -132,14 +132,12 @@ export function InvoiceGeneratingLoader({
   const getStepStatus = (stepIndex: number) => {
     if (stepIndex < currentStepIndex) return 'completed'
     if (stepIndex === currentStepIndex && isGenerating) return 'current'
-    if (stepIndex === currentStepIndex && !isGenerating && currentStep === 'completed') return 'completed'
+    if (stepIndex === currentStepIndex && !isGenerating && currentStep === 'completed')
+      return 'completed'
     return 'pending'
   }
   return (
-    <div className={cn(
-      'bg-blue-50 border border-blue-200 rounded-lg p-6',
-      className
-    )}>
+    <div className={cn('bg-blue-50 border border-blue-200 rounded-lg p-6', className)}>
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center">
@@ -155,9 +153,7 @@ export function InvoiceGeneratingLoader({
               {currentStep === 'completed' ? 'Facture générée' : `Génération de facture${dots}`}
             </h3>
           </div>
-          <p className="text-sm text-gray-600">
-            {currentStepConfig.description}
-          </p>
+          <p className="text-sm text-gray-600">{currentStepConfig.description}</p>
         </div>
         {/* Invoice Info */}
         <div className="bg-white/50 rounded-lg p-4 border border-white/20">
@@ -223,9 +219,7 @@ export function InvoiceGeneratingLoader({
         {/* Time Info */}
         {(timeElapsed || estimatedTime) && (
           <div className="flex justify-between text-sm text-gray-600">
-            {timeElapsed && (
-              <span>Temps écoulé: {formatTime(timeElapsed)}</span>
-            )}
+            {timeElapsed && <span>Temps écoulé: {formatTime(timeElapsed)}</span>}
             {estimatedTime && isGenerating && (
               <span>Temps estimé: {formatTime(estimatedTime)}</span>
             )}
@@ -240,11 +234,16 @@ export function InvoiceGeneratingLoader({
               const StepIcon = step.icon
               return (
                 <div key={step.key} className="flex items-center gap-3">
-                  <div className={cn(
-                    'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center',
-                    status === 'completed' ? 'bg-green-100' :
-                    status === 'current' ? 'bg-blue-100' : 'bg-gray-100'
-                  )}>
+                  <div
+                    className={cn(
+                      'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center',
+                      status === 'completed'
+                        ? 'bg-green-100'
+                        : status === 'current'
+                          ? 'bg-blue-100'
+                          : 'bg-gray-100'
+                    )}
+                  >
                     {status === 'completed' ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : status === 'current' ? (
@@ -254,19 +253,22 @@ export function InvoiceGeneratingLoader({
                     )}
                   </div>
                   <div className="flex-1">
-                    <div className={cn(
-                      'text-sm font-medium',
-                      status === 'completed' ? 'text-green-700' :
-                      status === 'current' ? 'text-blue-700' : 'text-gray-500'
-                    )}>
+                    <div
+                      className={cn(
+                        'text-sm font-medium',
+                        status === 'completed'
+                          ? 'text-green-700'
+                          : status === 'current'
+                            ? 'text-blue-700'
+                            : 'text-gray-500'
+                      )}
+                    >
                       {step.label}
                       {status === 'current' && isGenerating && (
                         <span className="ml-2 text-blue-500">{dots}</span>
                       )}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {step.description}
-                    </div>
+                    <div className="text-xs text-gray-500">{step.description}</div>
                   </div>
                 </div>
               )

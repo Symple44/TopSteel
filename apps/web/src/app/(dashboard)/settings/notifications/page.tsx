@@ -7,7 +7,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle, useUniqueId } from '@erp/ui'
 import { ArrowLeft, Bell, Check, Clock, Mail, Smartphone } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
@@ -31,10 +31,14 @@ export default function NotificationsSettingsPage() {
     hasUnsavedChanges,
   } = useNotificationSettings()
 
+  // Generate unique IDs for form fields
+  const quietHoursStartId = useUniqueId('quiet-hours-start')
+  const quietHoursEndId = useUniqueId('quiet-hours-end')
+
   // Vérifier l'authentification
-  React.useEffect(() => {
+  React?.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/settings/notifications')
+      router?.push('/login?redirect=/settings/notifications')
     }
   }, [isAuthenticated, authLoading, router])
 
@@ -71,8 +75,9 @@ export default function NotificationsSettingsPage() {
         {/* Header */}
         <div className="mb-8">
           <Button
+            type="button"
             variant="ghost"
-            onClick={() => router.back()}
+            onClick={() => router?.back()}
             className="mb-4 text-slate-600 hover:text-slate-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -96,18 +101,18 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Mail className="h-6 w-6 mr-3 text-blue-600" />
-                {t('settingsEnhanced.notifications.sections.email')}
+                {t('settingsEnhanced?.notifications?.sections.email')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries({
-                newMessages: t('settingsEnhanced.notifications.emailTypes.newMessages'),
-                systemAlerts: t('settingsEnhanced.notifications.emailTypes.systemAlerts'),
-                taskReminders: t('settingsEnhanced.notifications.emailTypes.taskReminders'),
+                newMessages: t('settingsEnhanced?.notifications?.emailTypes.newMessages'),
+                systemAlerts: t('settingsEnhanced?.notifications?.emailTypes.systemAlerts'),
+                taskReminders: t('settingsEnhanced?.notifications?.emailTypes.taskReminders'),
                 weeklyReports: 'Rapports hebdomadaires',
                 securityAlerts: 'Alertes de sécurité',
                 maintenanceNotice: t(
-                  'settingsEnhanced.notifications.emailTypes.maintenanceNotifications'
+                  'settingsEnhanced?.notifications?.emailTypes.maintenanceNotifications'
                 ),
               }).map(([key, label]) => (
                 <div key={key} className="flex items-center justify-between py-2">
@@ -116,7 +121,7 @@ export default function NotificationsSettingsPage() {
                     <input
                       type="checkbox"
                       checked={settings.emailTypes[key as keyof typeof settings.emailTypes]}
-                      onChange={(e) => updateNestedSetting('emailTypes', key, e.target.checked)}
+                      onChange={(e) => updateNestedSetting('emailTypes', key, e?.target?.checked)}
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -131,37 +136,39 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Smartphone className="h-6 w-6 mr-3 text-green-600" />
-                {t('settingsEnhanced.notifications.sections.push')}
+                {t('settingsEnhanced?.notifications?.sections.push')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between py-2">
                 <span className="text-slate-700">
-                  {t('settingsEnhanced.notifications.descriptions.pushNotifications')}
+                  {t('settingsEnhanced?.notifications?.descriptions.pushNotifications')}
                 </span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={settings.pushTypes.enabled}
-                    onChange={(e) => updateNestedSetting('pushTypes', 'enabled', e.target.checked)}
+                    checked={settings?.pushTypes?.enabled}
+                    onChange={(e) =>
+                      updateNestedSetting('pushTypes', 'enabled', e?.target?.checked)
+                    }
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                 </label>
               </div>
 
-              {settings.pushTypes.enabled && (
+              {settings?.pushTypes?.enabled && (
                 <>
                   <div className="flex items-center justify-between py-2">
                     <span className="text-slate-700">
-                      {t('settingsEnhanced.notifications.descriptions.soundNotifications')}
+                      {t('settingsEnhanced?.notifications?.descriptions.soundNotifications')}
                     </span>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={settings.pushTypes.sound}
+                        checked={settings?.pushTypes?.sound}
                         onChange={(e) =>
-                          updateNestedSetting('pushTypes', 'sound', e.target.checked)
+                          updateNestedSetting('pushTypes', 'sound', e?.target?.checked)
                         }
                         className="sr-only peer"
                       />
@@ -171,7 +178,7 @@ export default function NotificationsSettingsPage() {
 
                   <div className="space-y-3">
                     <h4 className="font-medium text-slate-700">
-                      {t('settingsEnhanced.notifications.sections.categories')} :
+                      {t('settingsEnhanced?.notifications?.sections.categories')} :
                     </h4>
                     {Object.entries({
                       urgent: 'Notifications urgentes',
@@ -187,7 +194,7 @@ export default function NotificationsSettingsPage() {
                               settings.pushTypes[key as keyof typeof settings.pushTypes] as boolean
                             }
                             onChange={(e) =>
-                              updateNestedSetting('pushTypes', key, e.target.checked)
+                              updateNestedSetting('pushTypes', key, e?.target?.checked)
                             }
                             className="sr-only peer"
                           />
@@ -206,7 +213,7 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Clock className="h-6 w-6 mr-3 text-purple-600" />
-                {t('settingsEnhanced.notifications.sections.silent')}
+                {t('settingsEnhanced?.notifications?.sections.silent')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -215,40 +222,42 @@ export default function NotificationsSettingsPage() {
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={settings.quietHours.enabled}
-                    onChange={(e) => updateNestedSetting('quietHours', 'enabled', e.target.checked)}
+                    checked={settings?.quietHours?.enabled}
+                    onChange={(e) =>
+                      updateNestedSetting('quietHours', 'enabled', e?.target?.checked)
+                    }
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                 </label>
               </div>
 
-              {settings.quietHours.enabled && (
+              {settings?.quietHours?.enabled && (
                 <div className="grid grid-cols-2 gap-4 pl-4">
                   <div>
                     <label
-                      htmlFor="quiet-hours-start"
+                      htmlFor={quietHoursStartId}
                       className="block text-sm text-slate-600 mb-1"
                     >
                       {tc('common.start')}
                     </label>
                     <input
-                      id="quiet-hours-start"
+                      id={quietHoursStartId}
                       type="time"
-                      value={settings.quietHours.start}
-                      onChange={(e) => updateNestedSetting('quietHours', 'start', e.target.value)}
+                      value={settings?.quietHours?.start}
+                      onChange={(e) => updateNestedSetting('quietHours', 'start', e?.target?.value)}
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                   <div>
-                    <label htmlFor="quiet-hours-end" className="block text-sm text-slate-600 mb-1">
+                    <label htmlFor={quietHoursEndId} className="block text-sm text-slate-600 mb-1">
                       {tc('common.end')}
                     </label>
                     <input
-                      id="quiet-hours-end"
+                      id={quietHoursEndId}
                       type="time"
-                      value={settings.quietHours.end}
-                      onChange={(e) => updateNestedSetting('quietHours', 'end', e.target.value)}
+                      value={settings?.quietHours?.end}
+                      onChange={(e) => updateNestedSetting('quietHours', 'end', e?.target?.value)}
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
@@ -260,6 +269,7 @@ export default function NotificationsSettingsPage() {
           {/* Boutons d'action */}
           <div className="flex justify-between pt-8">
             <Button
+              type="button"
               variant="outline"
               onClick={handleReset}
               className="px-6 text-red-600 border-red-200 hover:bg-red-50"
@@ -268,10 +278,16 @@ export default function NotificationsSettingsPage() {
             </Button>
 
             <div className="flex space-x-4">
-              <Button variant="outline" onClick={() => router.back()} className="px-8">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router?.back()}
+                className="px-8"
+              >
                 {t('notifications.back')}
               </Button>
               <Button
+                type="button"
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges}
                 className={`px-8 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 ${

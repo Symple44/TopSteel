@@ -1,14 +1,14 @@
 'use client'
 
-import React from 'react'
 import { MoreHorizontal } from 'lucide-react'
+import React from 'react'
 import { Button } from '../../../../primitives/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '../../../../primitives/dropdown/DropdownMenu'
 
 interface InlineActionsProps<T> {
@@ -28,7 +28,7 @@ interface InlineActionsProps<T> {
  */
 export function InlineActions<T>({ row, actions }: InlineActionsProps<T>) {
   // Filtrer les actions visibles
-  const visibleActions = actions.filter(action => {
+  const visibleActions = actions.filter((action) => {
     if (action.disabled) {
       return !action.disabled(row)
     }
@@ -44,6 +44,7 @@ export function InlineActions<T>({ row, actions }: InlineActionsProps<T>) {
     const action = visibleActions[0]
     return (
       <Button
+        type="button"
         variant={action.variant || 'outline'}
         size="sm"
         onClick={(e) => {
@@ -63,6 +64,7 @@ export function InlineActions<T>({ row, actions }: InlineActionsProps<T>) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           className="h-8 w-8 p-0"
@@ -82,14 +84,10 @@ export function InlineActions<T>({ row, actions }: InlineActionsProps<T>) {
               }}
               disabled={action.disabled?.(row)}
               className={
-                action.variant === 'destructive' 
-                  ? 'text-destructive focus:text-destructive' 
-                  : ''
+                action.variant === 'destructive' ? 'text-destructive focus:text-destructive' : ''
               }
             >
-              {action.icon && (
-                <span className="mr-2">{action.icon}</span>
-              )}
+              {action.icon && <span className="mr-2">{action.icon}</span>}
               {action.label}
             </DropdownMenuItem>
           </React.Fragment>

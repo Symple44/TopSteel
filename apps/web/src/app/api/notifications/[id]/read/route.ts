@@ -11,10 +11,10 @@ export async function PATCH(
     const { id } = await params
 
     // Trouver la notification
-    const notificationIndex = notifications.findIndex((n) => n.id === id)
+    const notificationIndex = notifications?.findIndex((n) => n.id === id)
 
     if (notificationIndex === -1) {
-      return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
+      return NextResponse?.json({ error: 'Notification not found' }, { status: 404 })
     }
 
     // Marquer comme lue
@@ -24,8 +24,8 @@ export async function PATCH(
       readAt: new Date().toISOString(),
     }
 
-    return NextResponse.json(notifications[notificationIndex])
+    return NextResponse?.json(notifications[notificationIndex])
   } catch (_error) {
-    return NextResponse.json({ error: 'Failed to mark notification as read' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to mark notification as read' }, { status: 500 })
   }
 }

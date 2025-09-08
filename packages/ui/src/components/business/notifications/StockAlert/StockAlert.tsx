@@ -1,8 +1,14 @@
 'use client'
-import { Package, AlertTriangle, TrendingDown, ShoppingCart, Truck, Clock } from 'lucide-react'
+import { AlertTriangle, Clock, Package, ShoppingCart, TrendingDown } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
 export type StockLevel = 'out_of_stock' | 'critical' | 'low' | 'warning'
-export type MaterialCategory = 'steel_sheets' | 'steel_bars' | 'steel_pipes' | 'fasteners' | 'consumables' | 'raw_materials'
+export type MaterialCategory =
+  | 'steel_sheets'
+  | 'steel_bars'
+  | 'steel_pipes'
+  | 'fasteners'
+  | 'consumables'
+  | 'raw_materials'
 export interface StockItem {
   id: string
   name: string
@@ -37,61 +43,61 @@ const levelConfig = {
     borderColor: 'border-red-300',
     textColor: 'text-red-900',
     iconColor: 'text-red-700',
-    title: 'Rupture de stock'
+    title: 'Rupture de stock',
   },
   critical: {
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
     textColor: 'text-red-800',
     iconColor: 'text-red-600',
-    title: 'Stock critique'
+    title: 'Stock critique',
   },
   low: {
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200',
     textColor: 'text-orange-800',
     iconColor: 'text-orange-600',
-    title: 'Stock faible'
+    title: 'Stock faible',
   },
   warning: {
     bgColor: 'bg-yellow-50',
     borderColor: 'border-yellow-200',
     textColor: 'text-yellow-800',
     iconColor: 'text-yellow-600',
-    title: 'Alerte stock'
-  }
+    title: 'Alerte stock',
+  },
 }
 const categoryConfig = {
   steel_sheets: {
     icon: Package,
     label: 'Tôles acier',
-    color: 'text-blue-600'
+    color: 'text-blue-600',
   },
   steel_bars: {
     icon: Package,
     label: 'Barres acier',
-    color: 'text-green-600'
+    color: 'text-green-600',
   },
   steel_pipes: {
     icon: Package,
     label: 'Tubes acier',
-    color: 'text-purple-600'
+    color: 'text-purple-600',
   },
   fasteners: {
     icon: Package,
     label: 'Fixations',
-    color: 'text-orange-600'
+    color: 'text-orange-600',
   },
   consumables: {
     icon: Package,
     label: 'Consommables',
-    color: 'text-pink-600'
+    color: 'text-pink-600',
   },
   raw_materials: {
     icon: Package,
     label: 'Matières premières',
-    color: 'text-indigo-600'
-  }
+    color: 'text-indigo-600',
+  },
 }
 export function StockAlert({
   className,
@@ -101,15 +107,15 @@ export function StockAlert({
   onViewDetails,
   onAdjustThreshold,
   onContactSupplier,
-  showActions = true
+  showActions = true,
 }: StockAlertProps) {
   const config = levelConfig[level]
   const totalValue = items.reduce((sum, item) => sum + item.totalValue, 0)
-  const outOfStockCount = items.filter(item => item.currentQuantity === 0).length
+  const outOfStockCount = items.filter((item) => item.currentQuantity === 0).length
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'EUR',
     }).format(amount)
   }
   const formatDate = (dateString: string) => {
@@ -141,22 +147,16 @@ export function StockAlert({
     return null
   }
   return (
-    <div className={cn(
-      'rounded-lg border p-4',
-      config.bgColor,
-      config.borderColor,
-      className
-    )}>
+    <div className={cn('rounded-lg border p-4', config.bgColor, config.borderColor, className)}>
       <div className="flex items-start gap-3">
         <Package className={cn('h-5 w-5 mt-0.5', config.iconColor)} />
         <div className="flex-1 space-y-4">
           <div>
-            <h3 className={cn('font-medium', config.textColor)}>
-              {config.title}
-            </h3>
+            <h3 className={cn('font-medium', config.textColor)}>{config.title}</h3>
             <p className={cn('text-sm mt-1', config.textColor)}>
-              {items.length} article{items.length > 1 ? 's' : ''} nécessite{items.length === 1 ? '' : 'nt'} une attention • 
-              Valeur totale: {formatCurrency(totalValue)}
+              {items.length} article{items.length > 1 ? 's' : ''} nécessite
+              {items.length === 1 ? '' : 'nt'} une attention • Valeur totale:{' '}
+              {formatCurrency(totalValue)}
               {outOfStockCount > 0 && (
                 <span className="ml-2 font-medium">• {outOfStockCount} en rupture</span>
               )}
@@ -171,45 +171,66 @@ export function StockAlert({
                 <div key={item.id} className="bg-white/50 rounded-lg p-4 border border-white/20">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1">
-                      <CategoryIcon className={cn('h-5 w-5 mt-0.5', categoryConfig[item.category].color)} />
+                      <CategoryIcon
+                        className={cn('h-5 w-5 mt-0.5', categoryConfig[item.category].color)}
+                      />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h4 className="text-sm font-medium text-gray-900">{item.name}</h4>
                           <span className="text-xs font-mono text-gray-500">({item.sku})</span>
-                          <span className={cn('w-3 h-3 rounded-full', stockIndicator.color)} title={stockIndicator.label} />
+                          <span
+                            className={cn('w-3 h-3 rounded-full', stockIndicator.color)}
+                            title={stockIndicator.label}
+                          />
                           {urgencyIcon}
                         </div>
                         <div className="grid grid-cols-3 gap-4 text-sm mb-3">
                           <div>
                             <span className="text-gray-500">Stock actuel:</span>
-                            <span className={cn('ml-2 font-medium', 
-                              item.currentQuantity === 0 ? 'text-red-600' : 
-                              item.currentQuantity <= item.minimumThreshold ? 'text-orange-600' : 'text-gray-900'
-                            )}>
+                            <span
+                              className={cn(
+                                'ml-2 font-medium',
+                                item.currentQuantity === 0
+                                  ? 'text-red-600'
+                                  : item.currentQuantity <= item.minimumThreshold
+                                    ? 'text-orange-600'
+                                    : 'text-gray-900'
+                              )}
+                            >
                               {item.currentQuantity} {item.unit}
                             </span>
                           </div>
                           <div>
                             <span className="text-gray-500">Seuil minimum:</span>
-                            <span className="ml-2">{item.minimumThreshold} {item.unit}</span>
+                            <span className="ml-2">
+                              {item.minimumThreshold} {item.unit}
+                            </span>
                           </div>
                           <div>
                             <span className="text-gray-500">Point de commande:</span>
-                            <span className="ml-2">{item.reorderPoint} {item.unit}</span>
+                            <span className="ml-2">
+                              {item.reorderPoint} {item.unit}
+                            </span>
                           </div>
                           <div>
                             <span className="text-gray-500">Jours restants:</span>
                             <span className={cn('ml-2', getDaysLeftColor(item.daysOfStockLeft))}>
-                              {item.daysOfStockLeft <= 0 ? 'Épuisé' : `${Math.round(item.daysOfStockLeft)} jours`}
+                              {item.daysOfStockLeft <= 0
+                                ? 'Épuisé'
+                                : `${Math.round(item.daysOfStockLeft)} jours`}
                             </span>
                           </div>
                           <div>
                             <span className="text-gray-500">Utilisation/jour:</span>
-                            <span className="ml-2">{item.averageDailyUsage} {item.unit}</span>
+                            <span className="ml-2">
+                              {item.averageDailyUsage} {item.unit}
+                            </span>
                           </div>
                           <div>
                             <span className="text-gray-500">Valeur stock:</span>
-                            <span className="ml-2 font-medium">{formatCurrency(item.totalValue)}</span>
+                            <span className="ml-2 font-medium">
+                              {formatCurrency(item.totalValue)}
+                            </span>
                           </div>
                         </div>
                         <div className="bg-gray-50 rounded p-3 text-sm">
@@ -257,12 +278,27 @@ export function StockAlert({
                           <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
                             <div className="flex items-center gap-2 mb-2">
                               <ShoppingCart className="h-4 w-4 text-blue-600" />
-                              <span className="text-sm font-medium text-blue-800">Recommandation de commande</span>
+                              <span className="text-sm font-medium text-blue-800">
+                                Recommandation de commande
+                              </span>
                             </div>
                             <p className="text-sm text-blue-700">
-                              Quantité recommandée: {Math.ceil((item.reorderPoint + item.averageDailyUsage * 30) - item.currentQuantity)} {item.unit}
+                              Quantité recommandée:{' '}
+                              {Math.ceil(
+                                item.reorderPoint +
+                                  item.averageDailyUsage * 30 -
+                                  item.currentQuantity
+                              )}{' '}
+                              {item.unit}
                               <br />
-                              Coût estimé: {formatCurrency(Math.ceil((item.reorderPoint + item.averageDailyUsage * 30) - item.currentQuantity) * item.unitCost)}
+                              Coût estimé:{' '}
+                              {formatCurrency(
+                                Math.ceil(
+                                  item.reorderPoint +
+                                    item.averageDailyUsage * 30 -
+                                    item.currentQuantity
+                                ) * item.unitCost
+                              )}
                             </p>
                           </div>
                         )}
@@ -313,9 +349,7 @@ export function StockAlert({
           {showActions && items.length > 1 && (
             <div className="bg-white/70 rounded-lg p-3 border border-white/30">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-900">
-                  Actions rapides:
-                </span>
+                <span className="text-sm font-medium text-gray-900">Actions rapides:</span>
                 <div className="flex gap-2">
                   <button className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
                     Commander tout

@@ -18,19 +18,23 @@ export function BackendStatusIndicatorWrapper({
   const { t } = useTranslation('common')
 
   const translations = {
-    online: t('backend.status.online'),
-    offline: t('backend.status.offline'),
-    error: t('backend.status.error'),
-    checking: t('backend.status.checking'),
-    retry: t('backend.status.retry'),
-    available: t('backend.status.available'),
+    online: t('backend?.status?.online'),
+    offline: t('backend?.status?.offline'),
+    error: t('backend?.status?.error'),
+    checking: t('backend?.status?.checking'),
+    retry: t('backend?.status?.retry'),
+    available: t('backend?.status?.available'),
   }
 
   return (
     <BackendStatusIndicator
       showDetails={showDetails}
       className={className}
-      health={health}
+      health={{
+        ...health,
+        responseTime: health.responseTime ?? undefined,
+        lastCheck: health.lastCheck ?? undefined,
+      }}
       onRetry={checkHealth}
       translations={translations}
     />
@@ -54,8 +58,12 @@ export function BackendConnectionGuardWrapper({ children }: { children: React.Re
 
   return (
     <BackendConnectionGuard
-      health={health}
-      apiUrl={process.env.NEXT_PUBLIC_API_URL}
+      health={{
+        ...health,
+        responseTime: health.responseTime ?? undefined,
+        lastCheck: health.lastCheck ?? undefined,
+      }}
+      apiUrl={process?.env?.NEXT_PUBLIC_API_URL}
       translations={translations}
     >
       {children}

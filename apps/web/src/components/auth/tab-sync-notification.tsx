@@ -25,33 +25,35 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
   const tabId = useRef<string>(getTabId())
 
   useEffect(() => {
-    if (!enabled || typeof window === 'undefined') return
+    if (!enabled || typeof window === 'undefined') return undefined
 
     const channel = new BroadcastChannel('topsteel-auth')
 
     const handleMessage = (event: MessageEvent) => {
-      const { type, data, tabId: senderTabId } = event.data
+      const eventData = event?.data || {}
+      const { type, data, tabId: senderTabId } = eventData
 
       // Ignorer les messages de notre propre onglet
-      if (senderTabId === tabId.current) {
+      if (senderTabId === tabId?.current) {
         return
       }
 
       switch (type) {
         case 'COMPANY_CHANGED':
           // Notifier seulement si on est sur une société différente
-          if (data.company && company && data.company.id !== company.id) {
-            toast.info(
+          if (data.company && company && data?.company?.id !== company.id) {
+            toast?.info(
               <div className="flex items-center space-x-3">
                 <Building className="h-5 w-5 text-blue-500" />
                 <div className="flex-1">
                   <p className="font-medium">{t('tabSync.societyChanged')}</p>
                   <p className="text-sm text-muted-foreground">
-                    {t('tabSync.nowConnectedTo')} <strong>{data.company.nom}</strong>
+                    {t('tabSync.nowConnectedTo')} <strong>{data?.company?.nom}</strong>
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">{t('tabSync.refreshToSync')}</p>
                 </div>
                 <Button
+                  type="button"
                   size="sm"
                   variant="outline"
                   onClick={() => window.location.reload()}
@@ -71,7 +73,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
 
         case 'USER_LOGOUT':
           if (isAuthenticated) {
-            toast.error(
+            toast?.error(
               <div className="flex items-center space-x-3">
                 <LogOut className="h-5 w-5 text-red-500" />
                 <div className="flex-1">
@@ -79,9 +81,10 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                   <p className="text-sm text-muted-foreground">{t('tabSync.logoutInOtherTab')}</p>
                 </div>
                 <Button
+                  type="button"
                   size="sm"
                   variant="outline"
-                  onClick={() => router.push('/login')}
+                  onClick={() => router?.push('/login')}
                   className="ml-2"
                 >
                   {t('tabSync.reconnection')}
@@ -97,7 +100,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
 
         case 'USER_LOGIN':
           if (!isAuthenticated) {
-            toast.success(
+            toast?.success(
               <div className="flex items-center space-x-3">
                 <AlertCircle className="h-5 w-5 text-green-500" />
                 <div className="flex-1">
@@ -105,6 +108,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                   <p className="text-sm text-muted-foreground">{t('tabSync.loginInOtherTab')}</p>
                 </div>
                 <Button
+                  type="button"
                   size="sm"
                   variant="outline"
                   onClick={() => window.location.reload()}
@@ -124,11 +128,11 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
       }
     }
 
-    channel.addEventListener('message', handleMessage)
+    channel?.addEventListener('message', handleMessage)
 
     return () => {
-      channel.removeEventListener('message', handleMessage)
-      channel.close()
+      channel?.removeEventListener('message', handleMessage)
+      channel?.close()
     }
   }, [enabled, company, isAuthenticated, router, t])
 

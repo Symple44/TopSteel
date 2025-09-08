@@ -1,12 +1,13 @@
 'use client'
 
-import React, { memo } from 'react'
-import { Checkbox } from '../../../../primitives/checkbox'
+import type React from 'react'
+import { memo } from 'react'
 import { cn } from '../../../../../lib/utils'
+import { Checkbox } from '../../../../primitives/checkbox'
 import { useDataTableContext } from '../../contexts/DataTableContext'
-import { TableCell } from './TableCell'
-import { InlineActions } from './InlineActions'
 import type { ColumnConfig } from '../../types'
+import { InlineActions } from './InlineActions'
+import { TableCell } from './TableCell'
 
 export interface DataTableBodyProps<T = any> {
   onRowClick?: (row: T, index: number) => void
@@ -29,7 +30,7 @@ export interface DataTableBodyProps<T = any> {
 /**
  * Corps du DataTable avec rendu des lignes et cellules
  */
-export function DataTableBody<T extends Record<string, any>>({
+export function DataTableBody<T extends Record<string, unknown>>({
   onRowClick,
   onRowDoubleClick,
   onCellEdit,
@@ -40,11 +41,7 @@ export function DataTableBody<T extends Record<string, any>>({
   loading = false,
   emptyMessage = 'Aucune donnée',
 }: DataTableBodyProps<T>) {
-  const {
-    state,
-    toggleRow,
-    toggleAll,
-  } = useDataTableContext<T>()
+  const { state, toggleRow } = useDataTableContext<T>()
 
   const { displayData, visibleColumns, selection } = state
 
@@ -52,7 +49,7 @@ export function DataTableBody<T extends Record<string, any>>({
   const renderRow = (row: T, index: number) => {
     const rowId = row[keyField] as string | number
     const isSelected = selection.selectedRows.has(rowId)
-    
+
     return (
       <tr
         key={rowId}
@@ -102,7 +99,7 @@ export function DataTableBody<T extends Record<string, any>>({
     return (
       <tbody>
         <tr>
-          <td 
+          <td
             colSpan={visibleColumns.length + (state.selection ? 1 : 0) + (actions ? 1 : 0)}
             className="text-center py-8"
           >
@@ -120,7 +117,7 @@ export function DataTableBody<T extends Record<string, any>>({
     return (
       <tbody>
         <tr>
-          <td 
+          <td
             colSpan={visibleColumns.length + (state.selection ? 1 : 0) + (actions ? 1 : 0)}
             className="text-center py-8 text-muted-foreground"
           >
@@ -131,11 +128,7 @@ export function DataTableBody<T extends Record<string, any>>({
     )
   }
 
-  return (
-    <tbody>
-      {displayData.map((row, index) => renderRow(row, index))}
-    </tbody>
-  )
+  return <tbody>{displayData.map((row, index) => renderRow(row, index))}</tbody>
 }
 
 // Export avec memo pour optimiser les re-renders

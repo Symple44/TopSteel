@@ -34,7 +34,7 @@ async function runSearchIndexesMigration() {
     const dataSource = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
+      port: parseInt(process.env.DB_PORT || '5432', 10),
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: db.database,
@@ -175,7 +175,7 @@ async function runSearchIndexesMigration() {
 }
 
 // Fonctions pour créer les index par table
-async function createPartnersIndexes(queryRunner: any) {
+async function createPartnersIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_partners_search 
     ON partners USING gin(
@@ -193,7 +193,7 @@ async function createPartnersIndexes(queryRunner: any) {
   `)
 }
 
-async function createArticlesIndexes(queryRunner: any) {
+async function createArticlesIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_articles_search
     ON articles USING gin(
@@ -209,7 +209,7 @@ async function createArticlesIndexes(queryRunner: any) {
   `)
 }
 
-async function createMaterialsIndexes(queryRunner: any) {
+async function createMaterialsIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_materials_search
     ON materials USING gin(
@@ -225,7 +225,7 @@ async function createMaterialsIndexes(queryRunner: any) {
   `)
 }
 
-async function createProjetsIndexes(queryRunner: any) {
+async function createProjetsIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_projets_search
     ON projets USING gin(
@@ -241,7 +241,7 @@ async function createProjetsIndexes(queryRunner: any) {
   `)
 }
 
-async function createDevisIndexes(queryRunner: any) {
+async function createDevisIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_devis_search
     ON devis USING gin(
@@ -257,7 +257,7 @@ async function createDevisIndexes(queryRunner: any) {
   `)
 }
 
-async function createFacturesIndexes(queryRunner: any) {
+async function createFacturesIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_factures_search
     ON factures USING gin(
@@ -273,7 +273,7 @@ async function createFacturesIndexes(queryRunner: any) {
   `)
 }
 
-async function createMenuItemsIndexes(queryRunner: any) {
+async function createMenuItemsIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_menu_items_search
     ON menu_items USING gin(
@@ -289,7 +289,7 @@ async function createMenuItemsIndexes(queryRunner: any) {
   `)
 }
 
-async function createUsersIndexes(queryRunner: any) {
+async function createUsersIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_users_search
     ON users USING gin(
@@ -306,7 +306,7 @@ async function createUsersIndexes(queryRunner: any) {
   `)
 }
 
-async function createSocietesIndexes(queryRunner: any) {
+async function createSocietesIndexes(queryRunner: unknown) {
   await queryRunner.query(`
     CREATE INDEX IF NOT EXISTS idx_societes_search
     ON societes USING gin(

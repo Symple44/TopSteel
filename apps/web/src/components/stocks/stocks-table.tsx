@@ -1,7 +1,6 @@
 'use client'
 
 import { Badge, Button } from '@erp/ui'
-
 import { Edit, Eye, MoreHorizontal, Package } from 'lucide-react'
 
 export function StocksTable() {
@@ -90,7 +89,7 @@ export function StocksTable() {
             </tr>
           </thead>
           <tbody>
-            {stocks.map((stock, index) => (
+            {stocks?.map((stock, index) => (
               <tr key={stock.id} className={index % 2 === 0 ? 'bg-background' : 'bg-muted/20'}>
                 <td className="p-4">
                   <div className="flex items-center gap-2">
@@ -120,19 +119,19 @@ export function StocksTable() {
                   <code className="text-xs bg-muted px-2 py-1 rounded">{stock.emplacement}</code>
                 </td>
                 <td className="p-4 text-right font-mono text-sm">
-                  €{stock.prixUnitaire.toFixed(2)}
+                  €{stock?.prixUnitaire?.toFixed(2)}
                 </td>
-                <td className="p-4 text-right font-medium">€{stock.valeur.toFixed(2)}</td>
+                <td className="p-4 text-right font-medium">€{stock?.valeur?.toFixed(2)}</td>
                 <td className="p-4">{getStatutBadge(stock.statut)}</td>
                 <td className="p-4">
                   <div className="flex items-center justify-end gap-1">
-                    <Button variant="ghost" size="icon">
+                    <Button type="button" variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button type="button" variant="ghost" size="icon">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button type="button" variant="ghost" size="icon">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </div>
@@ -143,7 +142,7 @@ export function StocksTable() {
         </table>
       </div>
 
-      {stocks.length === 0 && (
+      {stocks?.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>Aucun stock trouvé</p>

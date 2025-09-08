@@ -2,6 +2,7 @@ import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Not, type Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import { Partner } from '../../../domains/partners/entities/partner.entity'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
@@ -240,7 +241,7 @@ export class MarketplaceOrderAdapter {
         processed++
       } catch (error) {
         this.logger.error(`Failed to sync order ${order.orderNumber}:`, error)
-        errors.push(`Order ${order.orderNumber}: ${error.message}`)
+        errors.push(`Order ${order.orderNumber}: ${getErrorMessage(error)}`)
       }
     }
 
@@ -252,7 +253,7 @@ export class MarketplaceOrderAdapter {
    * Créer une commande ERP à partir d'une commande marketplace
    * (Fonction de préparation pour future intégration)
    */
-  async prepareERPOrderData(marketplaceOrder: MarketplaceOrder): Promise<any> {
+  async prepareERPOrderData(marketplaceOrder: MarketplaceOrder): Promise<unknown> {
     // Cette fonction prépare les données pour créer une commande ERP
     // Elle sera utilisée quand le module commandes ERP sera implémenté
 

@@ -30,7 +30,7 @@ export function NotificationSettings() {
     'general'
   )
 
-  const categoryIcons = {
+  const categoryIcons: Record<string, React.ComponentType> = {
     system: Settings2,
     stock: Package,
     projet: FileText,
@@ -54,32 +54,32 @@ export function NotificationSettings() {
     utilisateur: 'Messages utilisateurs',
   }
 
-  const priorityIcons = {
-    low: Info,
-    normal: Bell,
-    high: AlertTriangle,
-    urgent: X,
+  const priorityIcons: Record<string, React.ComponentType> = {
+    LOW: Info,
+    NORMAL: Bell,
+    HIGH: AlertTriangle,
+    URGENT: X,
   }
 
   const priorityLabels = {
-    low: 'Faible',
-    normal: 'Normale',
-    high: 'Élevée',
-    urgent: 'Urgente',
+    LOW: 'Faible',
+    NORMAL: 'Normale',
+    HIGH: 'Élevée',
+    URGENT: 'Urgente',
   }
 
   const priorityColors = {
-    low: 'text-blue-500',
-    normal: 'text-green-500',
-    high: 'text-orange-500',
-    urgent: 'text-red-500',
+    LOW: 'text-blue-500',
+    NORMAL: 'text-green-500',
+    HIGH: 'text-orange-500',
+    URGENT: 'text-red-500',
   }
 
   const tabs = [
-    { id: 'general', label: 'Général', icon: Settings2 },
-    { id: 'categories', label: 'Catégories', icon: FileText },
-    { id: 'priority', label: 'Priorités', icon: AlertTriangle },
-    { id: 'schedule', label: 'Horaires', icon: Clock },
+    { id: 'general' as const, label: 'Général', icon: Settings2 },
+    { id: 'categories' as const, label: 'Catégories', icon: FileText },
+    { id: 'priority' as const, label: 'Priorités', icon: AlertTriangle },
+    { id: 'schedule' as const, label: 'Horaires', icon: Clock },
   ]
 
   const renderTabContent = () => {
@@ -179,7 +179,8 @@ export function NotificationSettings() {
                   </div>
                   <Switch
                     checked={
-                      state.settings.categories[key as keyof typeof state.settings.categories]
+                      state.settings.categories[key as keyof typeof state.settings.categories] ||
+                      false
                     }
                     onCheckedChange={(checked: boolean) =>
                       actions.updateSettings({
@@ -214,7 +215,9 @@ export function NotificationSettings() {
                     </div>
                   </div>
                   <Switch
-                    checked={state.settings.priority[key as keyof typeof state.settings.priority]}
+                    checked={
+                      state.settings.priority[key as keyof typeof state.settings.priority] || false
+                    }
                     onCheckedChange={(checked: boolean) =>
                       actions.updateSettings({
                         priority: {
@@ -257,13 +260,13 @@ export function NotificationSettings() {
       {/* Onglets */}
       <div className="border-b border-border">
         <nav className="flex space-x-8">
-          {tabs.map((tab) => {
+          {tabs?.map((tab) => {
             const Icon = tab.icon
             return (
               <button
                 type="button"
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as string)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
                     ? 'border-primary text-primary'

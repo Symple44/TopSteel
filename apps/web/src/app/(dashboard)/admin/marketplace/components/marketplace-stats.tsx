@@ -57,15 +57,15 @@ export function MarketplaceStats() {
         setLoading(true)
         const response = await callClientApi('admin/marketplace/stats')
 
-        if (!response.ok) {
+        if (!response?.ok) {
           throw new Error('Erreur lors du chargement des statistiques')
         }
 
-        const data = await response.json()
+        const data = await response?.json()
         setStats(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erreur inconnue')
-        toast.error('Impossible de charger les statistiques')
+        toast?.error('Impossible de charger les statistiques')
       } finally {
         setLoading(false)
       }
@@ -91,14 +91,14 @@ export function MarketplaceStats() {
         <p className="text-sm text-muted-foreground">
           Les statistiques s'afficheront automatiquement quand des modules seront utilisés
         </p>
-        <Button onClick={() => window.location.reload()} className="mt-4">
+        <Button onClick={() => window.location.reload()} className="mt-4" type="button">
           Réessayer
         </Button>
       </div>
     )
   }
 
-  const { overview, categoryBreakdown } = stats
+  const { overview, categoryBreakdown } = stats || {}
   const totalCategoryModules = Object.values(categoryBreakdown).reduce(
     (sum, count) => sum + count,
     0
@@ -129,7 +129,7 @@ export function MarketplaceStats() {
             <Download className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overview.totalDownloads.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{overview?.totalDownloads?.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">+12% ce mois</p>
           </CardContent>
         </Card>
@@ -200,11 +200,11 @@ export function MarketplaceStats() {
             <p className="text-muted-foreground mb-2">
               Les statistiques détaillées apparaîtront ici :
             </p>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Modules les plus téléchargés</li>
-              <li>• Analyses d'usage et performance</li>
-              <li>• Revenus générés par module</li>
-              <li>• Feedback utilisateurs</li>
+            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+              <li key="downloads">Modules les plus téléchargés</li>
+              <li key="analytics">Analyses d'usage et performance</li>
+              <li key="revenue">Revenus générés par module</li>
+              <li key="feedback">Feedback utilisateurs</li>
             </ul>
           </div>
         </CardContent>

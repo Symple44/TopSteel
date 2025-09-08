@@ -9,8 +9,8 @@
 import { ThemeProvider as NextThemeProvider, useTheme as useNextTheme } from 'next-themes'
 import * as React from 'react'
 import { createContext, useContext } from 'react'
-import type { ResolvedTheme, ThemeConfig } from "../../../lib/design-system"
-import { darkTheme, lightTheme, vibrantTheme } from "../../../lib/design-system"
+import type { ResolvedTheme, ThemeConfig } from '../../../lib/design-system'
+import { darkTheme, lightTheme, vibrantTheme } from '../../../lib/design-system'
 
 // ===== TYPES UNIFIÉS =====
 

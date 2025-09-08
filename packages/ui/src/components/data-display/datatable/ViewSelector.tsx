@@ -60,7 +60,7 @@ export function ViewSelector<T = any>({
             content={`Mode d'affichage: ${availableViews.find((v) => v.type === currentView)?.name || 'Tableau'}`}
             triggerAsChild={true}
           >
-            <Button variant="outline" size="sm" className="h-7 w-7 p-0">
+            <Button type="button" variant="outline" size="sm" className="h-7 w-7 p-0">
               {(() => {
                 const currentViewConfig = availableViews.find((v) => v.type === currentView)
                 const IconComponent = currentViewConfig ? VIEW_ICONS[currentViewConfig.type] : Table
@@ -150,7 +150,7 @@ function ViewSettingsForm<T = any>({
 
   const updateSettings = (key: string, value: any) => {
     if (viewType === 'kanban') {
-      setSettings((prev: any) => ({
+      setSettings((prev: unknown) => ({
         ...prev,
         kanban: {
           ...prev.kanban,
@@ -158,7 +158,7 @@ function ViewSettingsForm<T = any>({
         },
       }))
     } else if (viewType === 'cards') {
-      setSettings((prev: any) => ({
+      setSettings((prev: unknown) => ({
         ...prev,
         cards: {
           ...prev.cards,
@@ -166,7 +166,7 @@ function ViewSettingsForm<T = any>({
         },
       }))
     } else if (viewType === 'timeline') {
-      setSettings((prev: any) => ({
+      setSettings((prev: unknown) => ({
         ...prev,
         timeline: {
           ...prev.timeline,
@@ -174,7 +174,7 @@ function ViewSettingsForm<T = any>({
         },
       }))
     } else if (viewType === 'calendar') {
-      setSettings((prev: any) => ({
+      setSettings((prev: unknown) => ({
         ...prev,
         calendar: {
           ...prev.calendar,
@@ -183,7 +183,7 @@ function ViewSettingsForm<T = any>({
       }))
     } else {
       // Fallback for other view types
-      setSettings((prev: any) => ({
+      setSettings((prev: unknown) => ({
         ...prev,
         [viewType]: {
           ...prev[viewType as keyof ViewSettings],
@@ -365,10 +365,12 @@ function ViewSettingsForm<T = any>({
         </div>
 
         <div className="p-6 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button onClick={() => onSave(settings)}>Enregistrer</Button>
+          <Button type="button" onClick={() => onSave(settings)}>
+            Enregistrer
+          </Button>
         </div>
       </>
     )
@@ -487,7 +489,7 @@ function ViewSettingsForm<T = any>({
               <Label>Nombre de cartes par ligne</Label>
               <CustomSelect
                 value={String(cardsSettings.cardsPerRow)}
-                onValueChange={(value) => updateSettings('cardsPerRow', parseInt(value))}
+                onValueChange={(value) => updateSettings('cardsPerRow', parseInt(value, 10))}
                 placeholder="Nombre de cartes"
                 options={[
                   { value: '1', label: '1' },
@@ -503,10 +505,12 @@ function ViewSettingsForm<T = any>({
         </div>
 
         <div className="p-6 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button onClick={() => onSave(settings)}>Enregistrer</Button>
+          <Button type="button" onClick={() => onSave(settings)}>
+            Enregistrer
+          </Button>
         </div>
       </>
     )
@@ -560,10 +564,12 @@ function ViewSettingsForm<T = any>({
         </div>
 
         <div className="p-6 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button onClick={() => onSave(settings)}>Enregistrer</Button>
+          <Button type="button" onClick={() => onSave(settings)}>
+            Enregistrer
+          </Button>
         </div>
       </>
     )
@@ -632,10 +638,12 @@ function ViewSettingsForm<T = any>({
         </div>
 
         <div className="p-6 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button onClick={() => onSave(settings)}>Enregistrer</Button>
+          <Button type="button" onClick={() => onSave(settings)}>
+            Enregistrer
+          </Button>
         </div>
       </>
     )
@@ -648,7 +656,9 @@ function ViewSettingsForm<T = any>({
       </div>
 
       <div className="p-6 border-t border-border">
-        <Button onClick={onCancel}>Fermer</Button>
+        <Button type="button" onClick={onCancel}>
+          Fermer
+        </Button>
       </div>
     </>
   )

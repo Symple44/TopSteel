@@ -71,7 +71,7 @@ export class AdminSocietesController {
       if (query.search) {
         const searchTerm = query.search.toLowerCase()
         societes = societes.filter(
-          (societe: any) =>
+          (societe: unknown) =>
             societe.nom.toLowerCase().includes(searchTerm) ||
             societe.code.toLowerCase().includes(searchTerm)
         )
@@ -86,7 +86,7 @@ export class AdminSocietesController {
 
       // Formatter les données avec les utilisateurs si demandé
       const formattedSocietes = await Promise.all(
-        paginatedSocietes.map(async (societe: any) => {
+        paginatedSocietes.map(async (societe: unknown) => {
           let users: Record<string, unknown>[] = []
           let userCount = 0
 
@@ -98,12 +98,12 @@ export class AdminSocietesController {
             for (const user of allUsers) {
               const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccessToSociete = userSocieteRoles.some(
-                (role: any) => role.societeId === societe.id && role.isActive
+                (role: unknown) => role.societeId === societe.id && role.isActive
               )
 
               if (hasAccessToSociete) {
                 const userRoleInSociete = userSocieteRoles.find(
-                  (role: any) => role.societeId === societe.id
+                  (role: unknown) => role.societeId === societe.id
                 )
 
                 usersWithAccess.push({
@@ -129,7 +129,7 @@ export class AdminSocietesController {
             for (const user of allUsers) {
               const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccess = userSocieteRoles.some(
-                (role: any) => role.societeId === societe.id && role.isActive
+                (role: unknown) => role.societeId === societe.id && role.isActive
               )
               if (hasAccess) {
                 userCount++
@@ -148,7 +148,7 @@ export class AdminSocietesController {
             userCount,
             users: query.includeUsers ? users : undefined,
             sites:
-              societe.sites?.map((site: any) => ({
+              societe.sites?.map((site: unknown) => ({
                 id: site.id,
                 nom: site.nom,
                 code: site.code,
@@ -289,7 +289,7 @@ export class AdminSocietesController {
         userId,
         societeId,
         body.roleType,
-        (currentUser as any).id,
+        (currentUser as unknown).id,
         {
           isDefault: body.isDefault || false,
           additionalPermissions: body.additionalPermissions || [],
@@ -308,7 +308,7 @@ export class AdminSocietesController {
           isDefault: userSocieteRole.isDefaultSociete,
           isActive: userSocieteRole.isActive,
           grantedAt: userSocieteRole.grantedAt,
-          grantedBy: (currentUser as any).id,
+          grantedBy: (currentUser as unknown).id,
         },
         message: 'Utilisateur ajouté à la société avec succès',
         statusCode: 201,
@@ -385,7 +385,7 @@ export class AdminSocietesController {
         userId,
         societeId,
         body.roleType,
-        (currentUser as any).id,
+        (currentUser as unknown).id,
         {
           isDefault: body.isDefault !== undefined ? body.isDefault : existingRole.isDefaultSociete,
           additionalPermissions: body.additionalPermissions || existingRole.additionalPermissions,

@@ -18,20 +18,20 @@ export function useLazyLoad<T extends HTMLElement = HTMLDivElement>(
     triggerOnce = true,
     disabled = false,
     onIntersect,
-  } = options
+  } = options || {}
 
   const ref = useRef<T>(null)
   const [isIntersecting, setIsIntersecting] = useState(false)
   const [hasIntersected, setHasIntersected] = useState(false)
 
   useEffect(() => {
-    if (disabled || !ref.current || (triggerOnce && hasIntersected)) {
-      return
+    if (disabled || !ref?.current || (triggerOnce && hasIntersected)) {
+      return undefined
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
+        entries?.forEach((entry) => {
           const isCurrentlyIntersecting = entry.isIntersecting
 
           setIsIntersecting(isCurrentlyIntersecting)
@@ -41,7 +41,7 @@ export function useLazyLoad<T extends HTMLElement = HTMLDivElement>(
             onIntersect?.(entry)
 
             if (triggerOnce) {
-              observer.unobserve(entry.target)
+              observer?.unobserve(entry.target)
             }
           }
         })
@@ -52,12 +52,12 @@ export function useLazyLoad<T extends HTMLElement = HTMLDivElement>(
       }
     )
 
-    if (ref.current) {
-      observer.observe(ref.current)
+    if (ref?.current) {
+      observer?.observe(ref?.current)
     }
 
     return () => {
-      observer.disconnect()
+      observer?.disconnect()
     }
   }, [rootMargin, threshold, triggerOnce, disabled, hasIntersected, onIntersect])
 
@@ -105,24 +105,26 @@ export function useInfiniteScroll(
     isLoading?: boolean
   } = {}
 ): React.RefObject<HTMLDivElement> {
-  const { threshold = 0.1, rootMargin = '100px', hasMore = true, isLoading = false } = options
+  const { threshold = 0.1, rootMargin = '100px', hasMore = true, isLoading = false } = options || {}
 
   const observerRef = useRef<HTMLDivElement>(null)
   const callbackRef = useRef(callback)
 
   useEffect(() => {
-    callbackRef.current = callback
+    if (callbackRef.current !== undefined) {
+      callbackRef.current = callback
+    }
   }, [callback])
 
   useEffect(() => {
-    if (!hasMore || isLoading || !observerRef.current) {
-      return
+    if (!hasMore || isLoading || !observerRef?.current) {
+      return undefined
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          callbackRef.current()
+        if (entries?.[0]?.isIntersecting) {
+          callbackRef?.current()
         }
       },
       {
@@ -131,10 +133,10 @@ export function useInfiniteScroll(
       }
     )
 
-    observer.observe(observerRef.current)
+    observer?.observe(observerRef?.current)
 
     return () => {
-      observer.disconnect()
+      observer?.disconnect()
     }
   }, [threshold, rootMargin, hasMore, isLoading])
 
@@ -210,7 +212,7 @@ export function useVirtualScroll<T>({
     [itemHeight, getItemHeight]
   )
 
-  const totalHeight = items.reduce((acc, _, index) => acc + getHeight(index), 0)
+  const totalHeight = items?.reduce((acc, _, index) => acc + getHeight(index), 0)
 
   const virtualItems = (() => {
     const result: Array<{
@@ -253,7 +255,7 @@ export function useVirtualScroll<T>({
     let currentOffset = startOffset
     for (let i = startIndex; i <= endIndex; i++) {
       const height = getHeight(i)
-      result.push({
+      result?.push({
         index: i,
         item: items[i],
         style: {
@@ -272,28 +274,30 @@ export function useVirtualScroll<T>({
 
   const scrollToIndex = useCallback(
     (index: number) => {
-      if (!containerRef.current) return
+      if (!containerRef?.current) return
 
       let offset = 0
       for (let i = 0; i < index; i++) {
         offset += getHeight(i)
       }
 
-      containerRef.current.scrollTop = offset
+      if (containerRef.current) {
+        containerRef.current.scrollTop = offset
+      }
     },
     [getHeight]
   )
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const container = containerRef?.current
+    if (!container) return undefined
 
     const handleScroll = () => {
-      setScrollTop(container.scrollTop)
+      setScrollTop(container?.scrollTop)
     }
 
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
+    container?.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container?.removeEventListener('scroll', handleScroll)
   }, [])
 
   return {
@@ -313,27 +317,31 @@ export function useIntersectionObserver(
   const elements = useRef<Set<Element>>(new Set())
 
   useEffect(() => {
-    observer.current = new IntersectionObserver((newEntries) => {
-      setEntries((prev) => {
-        const next = new Map(prev)
-        newEntries.forEach((entry) => {
-          next.set(entry.target, entry)
+    if (observer.current !== undefined) {
+      observer.current = new IntersectionObserver((newEntries) => {
+        setEntries((prev) => {
+          const next = new Map(prev)
+          newEntries?.forEach((entry) => {
+            next?.set(entry.target, entry)
+          })
+          return next
         })
-        return next
-      })
-    }, options)
+      }, options)
+    }
 
-    const { current: currentObserver } = observer
-    elements.current.forEach((element) => currentObserver.observe(element))
+    const { current: currentObserver } = observer || {}
+    elements?.current?.forEach((element) => {
+      currentObserver?.observe(element)
+    })
 
-    return () => currentObserver.disconnect()
+    return () => currentObserver?.disconnect()
   }, [options.root, options.rootMargin, options.threshold, options])
 
   const observe = useCallback((element: Element | null) => {
     if (!element) return
 
-    elements.current.add(element)
-    observer.current?.observe(element)
+    elements?.current?.add(element)
+    observer?.current?.observe(element)
   }, [])
 
   return [observe, entries]

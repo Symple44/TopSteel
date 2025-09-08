@@ -115,8 +115,17 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
 
     // Placeholder pendant hydration
     if (!mounted) {
+      const { 'aria-pressed': _, 'aria-expanded': __, ...cleanProps } = props
       return (
-        <Button ref={ref} variant={variant} size={size} className={className} disabled {...props}>
+        <Button
+          type="button"
+          ref={ref}
+          variant={variant}
+          size={size}
+          className={className}
+          disabled
+          {...cleanProps}
+        >
           {showIcons && <MoonIcon className="h-4 w-4" />}
           {shouldShowLabels && <span className="ml-2">Thème</span>}
         </Button>
@@ -125,15 +134,17 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
 
     // Mode toggle simple
     if (mode === 'toggle') {
+      const { 'aria-pressed': _, 'aria-expanded': __, ...cleanProps } = props
       return (
         <Button
+          type="button"
           ref={ref}
           variant={variant}
           size={size}
           className={className}
           onClick={toggleTheme}
           title={`Thème actuel: ${currentThemeData.label}. Cliquer pour changer.`}
-          {...props}
+          {...cleanProps}
         >
           {showIcons && <CurrentIcon className="h-4 w-4" />}
           {shouldShowLabels && <span className="ml-2">{currentThemeData.label}</span>}
@@ -146,11 +157,15 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            type="button"
             ref={ref}
             variant={variant}
             size={size}
             className={cn('gap-2', className)}
-            {...props}
+            {...(() => {
+              const { 'aria-pressed': _, 'aria-expanded': __, ...cleanProps } = props
+              return cleanProps
+            })()}
           >
             {showIcons && <CurrentIcon className="h-4 w-4" />}
             {shouldShowLabels && <span>{currentThemeData.label}</span>}

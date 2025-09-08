@@ -69,7 +69,9 @@ export class MarketplaceMigrationController {
   @ApiResponse({ status: 200, description: 'Migration status retrieved successfully' })
   async getMigrationStatus(): Promise<{ inProgress: boolean; progress?: MigrationProgress }> {
     const inProgress = this.migrationService.isMigrationInProgress()
-    const progress = inProgress ? this.migrationService.getMigrationProgress() : undefined
+    const progress = inProgress
+      ? (this.migrationService.getMigrationProgress() ?? undefined)
+      : undefined
 
     return {
       inProgress,

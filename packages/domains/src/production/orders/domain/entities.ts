@@ -221,6 +221,24 @@ export interface ControleQualite extends BaseEntity {
   readonly updatedAt: Date
 }
 
+// ===== FILTERS =====
+
+export interface ProductionFilters {
+  statut?: StatutProduction | StatutProduction[]
+  priorite?: PrioriteProduction | PrioriteProduction[]
+  dateDebutMin?: Date
+  dateDebutMax?: Date
+  dateFinMin?: Date
+  dateFinMax?: Date
+  clientId?: string
+  projetId?: string
+  operateur?: string
+  page?: number
+  limit?: number
+  sortBy?: 'dateDebut' | 'dateFin' | 'priorite' | 'statut' | 'reference'
+  sortOrder?: 'asc' | 'desc'
+}
+
 export interface MaterialOrder extends BaseEntity {
   readonly materialId: string
   readonly designation: string

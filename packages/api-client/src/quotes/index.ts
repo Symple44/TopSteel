@@ -73,43 +73,59 @@ export class QuotesApiClient extends BaseApiClient {
 
   // Mettre à jour un devis
   async updateQuote(id: string, updates: Partial<CreateQuoteDTO>): Promise<Quote> {
-    const response = await this.http.patch<Quote>(`${this.endpoint}/${this.normalizeId(id)}`, updates)
+    const response = await this.http.patch<Quote>(
+      `${this.endpoint}/${this.normalizeId(id)}`,
+      updates
+    )
     return response.data
   }
 
   // Dupliquer un devis
   async duplicateQuote(id: string): Promise<Quote> {
-    const response = await this.http.post<Quote>(`${this.endpoint}/${this.normalizeId(id)}/duplicate`)
+    const response = await this.http.post<Quote>(
+      `${this.endpoint}/${this.normalizeId(id)}/duplicate`
+    )
     return response.data
   }
 
   // Envoyer un devis par email
-  async sendQuote(id: string, emailData: {
-    to: string[]
-    cc?: string[]
-    subject?: string
-    message?: string
-  }): Promise<{ success: boolean; messageId: string }> {
-    const response = await this.http.post<{ success: boolean; messageId: string }>(`${this.endpoint}/${this.normalizeId(id)}/send`, emailData)
+  async sendQuote(
+    id: string,
+    emailData: {
+      to: string[]
+      cc?: string[]
+      subject?: string
+      message?: string
+    }
+  ): Promise<{ success: boolean; messageId: string }> {
+    const response = await this.http.post<{ success: boolean; messageId: string }>(
+      `${this.endpoint}/${this.normalizeId(id)}/send`,
+      emailData
+    )
     return response.data
   }
 
   // Convertir un devis en commande
   async convertToOrder(id: string): Promise<{ orderId: string }> {
-    const response = await this.http.post<{ orderId: string }>(`${this.endpoint}/${this.normalizeId(id)}/convert-to-order`)
+    const response = await this.http.post<{ orderId: string }>(
+      `${this.endpoint}/${this.normalizeId(id)}/convert-to-order`
+    )
     return response.data
   }
 
   // Changer le statut d'un devis
   async updateStatus(id: string, status: Quote['status']): Promise<Quote> {
-    const response = await this.http.patch<Quote>(`${this.endpoint}/${this.normalizeId(id)}/status`, { status })
+    const response = await this.http.patch<Quote>(
+      `${this.endpoint}/${this.normalizeId(id)}/status`,
+      { status }
+    )
     return response.data
   }
 
   // Générer le PDF d'un devis
   async generatePDF(id: string): Promise<Blob> {
     const response = await this.http.get<Blob>(`${this.endpoint}/${this.normalizeId(id)}/pdf`, {
-      responseType: 'blob'
+      responseType: 'blob',
     } as RequestOptions)
     return response.data
   }

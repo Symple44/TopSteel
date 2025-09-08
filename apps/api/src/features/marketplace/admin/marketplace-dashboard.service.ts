@@ -265,7 +265,7 @@ export class MarketplaceDashboardService {
           products.map((product) => ({
             id: product.id,
             name: product.designation,
-            stockQuantity: product.stockPhysique,
+            stockQuantity: product.stockPhysique ?? 0,
             minStockLevel: product.stockMini || 0,
           }))
         ),
@@ -312,7 +312,7 @@ export class MarketplaceDashboardService {
           results.map((row) => ({
             date: row.date,
             revenue: parseFloat(row.revenue || '0'),
-            orders: parseInt(row.orders || '0'),
+            orders: parseInt(row.orders || '0', 10),
           }))
         ),
 
@@ -341,7 +341,7 @@ export class MarketplaceDashboardService {
           results.map((row) => ({
             productId: row.productId,
             productName: row.productName,
-            totalSold: parseInt(row.totalSold || '0'),
+            totalSold: parseInt(row.totalSold || '0', 10),
             revenue: parseFloat(row.revenue || '0'),
           }))
         ),
@@ -358,11 +358,11 @@ export class MarketplaceDashboardService {
         .groupBy('order.status')
         .getRawMany()
         .then((results) => {
-          const total = results.reduce((sum, row) => sum + parseInt(row.count), 0)
+          const total = results.reduce((sum, row) => sum + parseInt(row.count, 10), 0)
           return results.map((row) => ({
             status: row.status,
-            count: parseInt(row.count),
-            percentage: total > 0 ? Math.round((parseInt(row.count) / total) * 100) : 0,
+            count: parseInt(row.count, 10),
+            percentage: total > 0 ? Math.round((parseInt(row.count, 10) / total) * 100) : 0,
           }))
         }),
 
@@ -381,7 +381,7 @@ export class MarketplaceDashboardService {
           })
 
           return results.map((row) => {
-            const newCustomers = parseInt(row.newCustomers)
+            const newCustomers = parseInt(row.newCustomers, 10)
             totalCustomers += newCustomers
             return {
               date: row.date,
@@ -434,7 +434,7 @@ export class MarketplaceDashboardService {
 
     const successfulDeliveries = await this.shipmentRepository.count({
       where: {
-        status: 'DELIVERED' as any,
+        status: 'DELIVERED' as unknown,
         createdAt: Between(startDate, endDate),
       },
     })

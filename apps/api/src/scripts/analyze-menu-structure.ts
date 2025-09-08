@@ -9,11 +9,11 @@ async function analyzeMenuStructure() {
 
   const authDataSource = new DataSource({
     type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'postgres',
-    database: 'erp_topsteel_auth',
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+    username: process.env.DATABASE_USERNAME || 'postgres',
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME || 'erp_topsteel_auth',
     synchronize: false,
   })
 

@@ -4,6 +4,22 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import * as mathjs from 'mathjs'
 import type { DataSource, Repository } from 'typeorm'
+import type {
+  AppliedRuleInfo,
+  BreakdownStep,
+  BuildDetailedBreakdownParams,
+  BuildFinalResultParams,
+  CalculationState,
+  DetailedBreakdown,
+  EnrichedPricingContext,
+  FormulaPriceResult,
+  LengthPriceResult,
+  PriceRuleApplication,
+  SkippedRule,
+  SurfacePriceResult,
+  VolumePriceResult,
+  WeightPriceResult,
+} from '../types/pricing-engine.types'
 
 export interface PricingContext {
   // Identifiants
@@ -144,6 +160,7 @@ export class PricingEngineService {
 
   /**
    * Calcule le prix d'un article en appliquant les règles de prix
+   * Cognitive Complexity: Reduced from ~45 to ~8
    */
   async calculatePrice(
     context: PricingContext,
@@ -154,150 +171,323 @@ export class PricingEngineService {
     }
   ): Promise<PriceCalculationResult> {
     const startTime = Date.now()
-    const warnings: string[] = []
-    const breakdownSteps: any[] = []
-    const skippedRules: any[] = []
-    let stepNumber = 0
+    const calculationState = this.initializeCalculationState()
 
-    // 1. Récupérer l'article si non fourni
-    let article = context.article
-    if (!article && (context.articleId || context.articleReference)) {
-      article = await this.fetchArticle(
-        context.articleId || '',
-        context.articleReference,
-        context.societeId
-      )
-      if (!article) {
-        warnings.push('Article introuvable')
-        return this.createEmptyResult(warnings)
-      }
-    }
-
+    // Early returns for validation
+    const article = await this.resolveArticle(context)
     if (!article) {
-      warnings.push('Aucun article spécifié')
-      return this.createEmptyResult(warnings)
+      return this.createEmptyResult(['Article non trouvé ou non spécifié'])
     }
 
-    // Appliquer le coefficient de vente si présent
+    // Apply coefficient and get base price
+    const basePrice = this.applySellingCoefficient(article, calculationState, options)
+
+    // Process rules
+    const { applicableRules, skippedRules } = await this.processRules(article, context, options)
+    const { finalPrice, appliedRules } = await this.applyRules(
+      applicableRules,
+      basePrice,
+      article,
+      context,
+      calculationState,
+      options
+    )
+
+    // Build and return result
+    return this.buildFinalResult({
+      article,
+      context,
+      options,
+      basePrice,
+      finalPrice,
+      appliedRules,
+      skippedRules,
+      calculationTime: Date.now() - startTime,
+      calculationState,
+    })
+  }
+
+  /**
+   * Initialize calculation state to track progress
+   */
+  private initializeCalculationState(): CalculationState {
+    return {
+      warnings: [] as string[],
+      breakdownSteps: [] as BreakdownStep[],
+      stepNumber: 0,
+    }
+  }
+
+  /**
+   * Resolve article from context with early return pattern
+   */
+  private async resolveArticle(context: PricingContext): Promise<PricingContext['article'] | null> {
+    if (context.article) {
+      return context.article
+    }
+
+    if (!context.articleId && !context.articleReference) {
+      return null
+    }
+
+    return await this.fetchArticle(
+      context.articleId || '',
+      context.articleReference,
+      context.societeId
+    )
+  }
+
+  /**
+   * Apply selling coefficient with single responsibility
+   */
+  private applySellingCoefficient(
+    article: NonNullable<PricingContext['article']>,
+    state: CalculationState,
+    options?: { detailed?: boolean }
+  ): number {
     let basePrice = article.prixVenteHT || 0
-    const _originalPrice = basePrice
 
-    if (article.coefficientVente && article.coefficientVente !== 1) {
-      const previousPrice = basePrice
-      basePrice = basePrice * article.coefficientVente
-      this.logger.log(
-        `Coefficient de vente appliqué: ${article.coefficientVente} -> Prix ajusté: ${basePrice}€`
-      )
-
-      if (options?.detailed) {
-        breakdownSteps.push({
-          stepNumber: ++stepNumber,
-          ruleName: 'Coefficient de vente',
-          ruleId: 'coefficient',
-          priceBefore: previousPrice,
-          priceAfter: basePrice,
-          adjustment: basePrice - previousPrice,
-          adjustmentType: 'COEFFICIENT',
-          description: `Application du coefficient de vente ${article.coefficientVente}`,
-        })
-      }
+    if (!this.shouldApplyCoefficient(article.coefficientVente)) {
+      return basePrice
     }
 
-    // 2. Récupérer toutes les règles potentielles
+    const previousPrice = basePrice
+    basePrice = basePrice * article.coefficientVente!
+
+    this.logger.log(
+      `Coefficient de vente appliqué: ${article.coefficientVente} -> Prix ajusté: ${basePrice}€`
+    )
+
+    if (options?.detailed) {
+      this.addCoefficientBreakdownStep(state, previousPrice, basePrice, article.coefficientVente!)
+    }
+
+    return basePrice
+  }
+
+  /**
+   * Guard clause for coefficient application
+   */
+  private shouldApplyCoefficient(coefficient?: number): boolean {
+    return coefficient !== undefined && coefficient !== 1
+  }
+
+  /**
+   * Add coefficient breakdown step
+   */
+  private addCoefficientBreakdownStep(
+    state: CalculationState,
+    previousPrice: number,
+    newPrice: number,
+    coefficient: number
+  ): void {
+    state.breakdownSteps.push({
+      stepNumber: ++state.stepNumber,
+      ruleName: 'Coefficient de vente',
+      ruleId: 'coefficient',
+      priceBefore: previousPrice,
+      priceAfter: newPrice,
+      adjustment: newPrice - previousPrice,
+      adjustmentType: 'COEFFICIENT',
+      description: `Application du coefficient de vente ${coefficient}`,
+    })
+  }
+
+  /**
+   * Process all rules and separate applicable from skipped
+   */
+  private async processRules(
+    article: NonNullable<PricingContext['article']>,
+    context: PricingContext,
+    options?: { includeSkippedRules?: boolean }
+  ): Promise<{ applicableRules: PriceRule[]; skippedRules: SkippedRule[] }> {
     const allRules = await this.getAllRulesForEvaluation(article, context)
+    const enrichedContext = this.createEnrichedContext(context, article)
 
-    // 3. Filtrer les règles applicables et capturer les règles non applicables
-    const applicableRules: PriceRule[] = []
+    return allRules.reduce(
+      (acc, rule) => {
+        if (rule.canBeApplied(enrichedContext)) {
+          acc.applicableRules.push(rule)
+        } else if (options?.includeSkippedRules) {
+          acc.skippedRules.push(this.createSkippedRuleInfo(rule))
+        }
+        return acc
+      },
+      { applicableRules: [] as PriceRule[], skippedRules: [] as SkippedRule[] }
+    )
+  }
 
-    for (const rule of allRules) {
-      const enrichedContext = {
-        ...context,
-        article_reference: article.reference,
-        article_family: article.famille,
-        quantity: context.quantity || 1,
+  /**
+   * Create enriched context for rule evaluation
+   */
+  private createEnrichedContext(
+    context: PricingContext,
+    article: NonNullable<PricingContext['article']>
+  ): EnrichedPricingContext {
+    return {
+      ...context,
+      article_reference: article.reference,
+      article_family: article.famille,
+      quantity: context.quantity || 1,
+    }
+  }
+
+  /**
+   * Create skipped rule information
+   */
+  private createSkippedRuleInfo(rule: PriceRule): SkippedRule {
+    return {
+      ruleId: rule.id,
+      ruleName: rule.ruleName,
+      reason: this.determineSkipReason(rule),
+      priority: rule.priority,
+    }
+  }
+
+  /**
+   * Determine why a rule was skipped
+   */
+  private determineSkipReason(rule: PriceRule): string {
+    const now = new Date()
+
+    if (rule.validFrom && new Date(rule.validFrom) > now) {
+      return 'Règle pas encore valide'
+    }
+    if (rule.validUntil && new Date(rule.validUntil) < now) {
+      return 'Règle expirée'
+    }
+    if (rule.usageLimit && rule.usageCount >= rule.usageLimit) {
+      return "Limite d'utilisation atteinte"
+    }
+    if (!rule.isActive) {
+      return 'Règle inactive'
+    }
+    return 'Conditions non remplies'
+  }
+
+  /**
+   * Apply rules sequentially with proper error handling
+   */
+  private async applyRules(
+    rules: PriceRule[],
+    startPrice: number,
+    article: NonNullable<PricingContext['article']>,
+    context: PricingContext,
+    state: CalculationState,
+    options?: { detailed?: boolean }
+  ): Promise<{ finalPrice: number; appliedRules: AppliedRuleInfo[] }> {
+    let currentPrice = startPrice
+    const appliedRules: AppliedRuleInfo[] = []
+
+    for (const rule of rules) {
+      const ruleApplication = await this.safeApplyRule(rule, currentPrice, article, context)
+
+      if (!ruleApplication.success) {
+        state.warnings.push(`Erreur règle ${rule.ruleName}`)
+        continue
       }
 
-      if (rule.canBeApplied(enrichedContext)) {
-        applicableRules.push(rule)
-      } else if (options?.includeSkippedRules) {
-        // Déterminer la raison du skip
-        let reason = 'Conditions non remplies'
+      if (ruleApplication.priceChanged) {
+        const appliedRule = this.createAppliedRuleInfo(rule, currentPrice, ruleApplication.newPrice)
+        appliedRules.push(appliedRule)
 
-        if (rule.validFrom && new Date(rule.validFrom) > new Date()) {
-          reason = 'Règle pas encore valide'
-        } else if (rule.validUntil && new Date(rule.validUntil) < new Date()) {
-          reason = 'Règle expirée'
-        } else if (rule.usageLimit && rule.usageCount >= rule.usageLimit) {
-          reason = "Limite d'utilisation atteinte"
-        } else if (!rule.isActive) {
-          reason = 'Règle inactive'
+        if (options?.detailed) {
+          this.addRuleBreakdownStep(state, rule, currentPrice, ruleApplication.newPrice)
         }
 
-        skippedRules.push({
-          ruleId: rule.id,
-          ruleName: rule.ruleName,
-          reason,
-          priority: rule.priority,
-        })
+        currentPrice = ruleApplication.newPrice
+        await this.updateRuleUsage(rule, context.customerId)
+
+        // Early exit for non-combinable rules
+        if (!rule.combinable) {
+          break
+        }
       }
     }
 
-    // 4. Appliquer les règles par ordre de priorité
-    let currentPrice = basePrice
-    const appliedRules: PriceCalculationResult['appliedRules'] = []
+    return { finalPrice: Math.max(0, currentPrice), appliedRules }
+  }
 
-    for (const rule of applicableRules) {
-      try {
-        const ruleResult = await this.applyRule(rule, currentPrice, article, context)
-
-        if (ruleResult.newPrice !== currentPrice) {
-          const previousPrice = currentPrice
-
-          appliedRules.push({
-            ruleId: rule.id,
-            ruleName: rule.ruleName,
-            ruleType: rule.adjustmentType,
-            adjustment: rule.adjustmentValue,
-            adjustmentUnit: rule.adjustmentUnit,
-            discountAmount: currentPrice - ruleResult.newPrice,
-            discountPercentage: ((currentPrice - ruleResult.newPrice) / currentPrice) * 100,
-          })
-
-          // Capturer l'étape détaillée si demandé
-          if (options?.detailed) {
-            breakdownSteps.push({
-              stepNumber: ++stepNumber,
-              ruleName: rule.ruleName,
-              ruleId: rule.id,
-              priceBefore: previousPrice,
-              priceAfter: ruleResult.newPrice,
-              adjustment: ruleResult.newPrice - previousPrice,
-              adjustmentType: rule.adjustmentType,
-              description: this.getStepDescription(rule, previousPrice, ruleResult.newPrice),
-            })
-          }
-
-          currentPrice = ruleResult.newPrice
-
-          // Incrémenter l'usage de la règle
-          rule.incrementUsage(context.customerId)
-          await this.priceRuleRepository.save(rule)
-
-          // Si la règle n'est pas combinable, arrêter
-          if (!rule.combinable) {
-            break
-          }
-        }
-      } catch (error) {
-        this.logger.error(`Erreur application règle ${rule.id}:`, error)
-        warnings.push(`Erreur règle ${rule.ruleName}`)
+  /**
+   * Safely apply a rule with error handling
+   */
+  private async safeApplyRule(
+    rule: PriceRule,
+    currentPrice: number,
+    article: NonNullable<PricingContext['article']>,
+    context: PricingContext
+  ): Promise<PriceRuleApplication> {
+    try {
+      const result = await this.applyRule(rule, currentPrice, article, context)
+      return {
+        success: true,
+        newPrice: result.newPrice,
+        priceChanged: result.newPrice !== currentPrice,
+      }
+    } catch (error) {
+      this.logger.error(`Erreur application règle ${rule.id}:`, error)
+      return {
+        success: false,
+        newPrice: currentPrice,
+        priceChanged: false,
       }
     }
+  }
 
-    // 4. Construire le résultat
-    const finalPrice = Math.max(0, currentPrice)
+  /**
+   * Create applied rule information
+   */
+  private createAppliedRuleInfo(
+    rule: PriceRule,
+    currentPrice: number,
+    newPrice: number
+  ): AppliedRuleInfo {
+    return {
+      ruleId: rule.id,
+      ruleName: rule.ruleName,
+      ruleType: rule.adjustmentType,
+      adjustment: rule.adjustmentValue,
+      adjustmentUnit: rule.adjustmentUnit,
+      discountAmount: currentPrice - newPrice,
+      discountPercentage: ((currentPrice - newPrice) / currentPrice) * 100,
+    }
+  }
+
+  /**
+   * Add rule breakdown step
+   */
+  private addRuleBreakdownStep(
+    state: CalculationState,
+    rule: PriceRule,
+    previousPrice: number,
+    newPrice: number
+  ): void {
+    state.breakdownSteps.push({
+      stepNumber: ++state.stepNumber,
+      ruleName: rule.ruleName,
+      ruleId: rule.id,
+      priceBefore: previousPrice,
+      priceAfter: newPrice,
+      adjustment: newPrice - previousPrice,
+      adjustmentType: rule.adjustmentType,
+      description: this.getStepDescription(rule, previousPrice, newPrice),
+    })
+  }
+
+  /**
+   * Update rule usage
+   */
+  private async updateRuleUsage(rule: PriceRule, customerId?: string): Promise<void> {
+    rule.incrementUsage(customerId)
+    await this.priceRuleRepository.save(rule)
+  }
+
+  /**
+   * Build the final result with all details
+   */
+  private buildFinalResult(params: BuildFinalResultParams): PriceCalculationResult {
+    const { article, options, basePrice, finalPrice, appliedRules, calculationState } = params
     const totalDiscount = basePrice - finalPrice
-    const calculationTime = Date.now() - startTime
 
     const result: PriceCalculationResult = {
       basePrice,
@@ -306,74 +496,104 @@ export class PricingEngineService {
       appliedRules,
       totalDiscount,
       totalDiscountPercentage: basePrice > 0 ? (totalDiscount / basePrice) * 100 : 0,
-      unitPrice: article.uniteVente
-        ? {
-            value: finalPrice,
-            unit: article.uniteVente,
-          }
-        : undefined,
-      warnings: warnings.length > 0 ? warnings : undefined,
+      unitPrice: article.uniteVente ? { value: finalPrice, unit: article.uniteVente } : undefined,
+      warnings: calculationState.warnings.length > 0 ? calculationState.warnings : undefined,
     }
 
-    // Ajouter les détails si demandés
     if (options?.detailed) {
-      result.breakdown = {
-        steps: breakdownSteps,
-        skippedRules: options.includeSkippedRules ? skippedRules : undefined,
-        context: {
-          article: {
-            id: article.id,
-            reference: article.reference,
-            designation: article.designation,
-            famille: article.famille,
-            dimensions: {
-              poids: article.poids,
-              longueur: article.longueur,
-              largeur: article.largeur,
-              hauteur: article.hauteur,
-              surface: article.surface,
-              volume: article.volume,
-            },
-            units: {
-              stock: article.uniteStock,
-              vente: article.uniteVente,
-              achat: article.uniteAchat,
-            },
-          },
-          customer: {
-            id: context.customerId,
-            group: context.customerGroup,
-            email: context.customerEmail,
-          },
-          quantity: context.quantity || 1,
-          channel: context.channel || PriceRuleChannel.ERP,
-        },
-        metadata: {
-          calculationTime,
-          rulesEvaluated: allRules.length,
-          rulesApplied: appliedRules.length,
-          cacheHit: false,
-        },
-      }
-
-      // Ajouter les marges si demandées
-      if (options.includeMargins && article.prixAchatHT) {
-        const costPrice = article.prixAchatHT * (article.coefficientAchat || 1)
-        const margin = finalPrice - costPrice
-        const marginPercentage = costPrice > 0 ? (margin / costPrice) * 100 : 0
-        const markupPercentage = finalPrice > 0 ? (margin / finalPrice) * 100 : 0
-
-        result.breakdown.margins = {
-          costPrice,
-          sellingPrice: finalPrice,
-          margin,
-          marginPercentage,
-          markupPercentage,
-        }
-      }
+      result.breakdown = this.buildDetailedBreakdown(params)
     }
 
     return result
+  }
+
+  /**
+   * Build detailed breakdown
+   */
+  private buildDetailedBreakdown(params: BuildDetailedBreakdownParams): DetailedBreakdown {
+    const {
+      article,
+      context,
+      options,
+      finalPrice,
+      skippedRules,
+      appliedRules,
+      calculationTime,
+      calculationState,
+    } = params
+
+    const breakdown: DetailedBreakdown = {
+      steps: calculationState.breakdownSteps,
+      skippedRules: options?.includeSkippedRules ? skippedRules : undefined,
+      context: this.buildBreakdownContext(article, context),
+      metadata: {
+        calculationTime,
+        rulesEvaluated: skippedRules.length + appliedRules.length,
+        rulesApplied: appliedRules.length,
+        cacheHit: false,
+      },
+    }
+
+    if (options?.includeMargins && article.prixAchatHT) {
+      breakdown.margins = this.calculateMargins(article, finalPrice)
+    }
+
+    return breakdown
+  }
+
+  /**
+   * Build breakdown context
+   */
+  private buildBreakdownContext(
+    article: NonNullable<PricingContext['article']>,
+    context: PricingContext
+  ) {
+    return {
+      article: {
+        id: article.id,
+        reference: article.reference,
+        designation: article.designation,
+        famille: article.famille,
+        dimensions: {
+          poids: article.poids,
+          longueur: article.longueur,
+          largeur: article.largeur,
+          hauteur: article.hauteur,
+          surface: article.surface,
+          volume: article.volume,
+        },
+        units: {
+          stock: article.uniteStock,
+          vente: article.uniteVente,
+          achat: article.uniteAchat,
+        },
+      },
+      customer: {
+        id: context.customerId,
+        group: context.customerGroup,
+        email: context.customerEmail,
+      },
+      quantity: context.quantity || 1,
+      channel: context.channel || PriceRuleChannel.ERP,
+    }
+  }
+
+  /**
+   * Calculate margins
+   */
+  private calculateMargins(article: NonNullable<PricingContext['article']>, finalPrice: number) {
+    const costPrice = article.prixAchatHT! * (article.coefficientAchat || 1)
+    const margin = finalPrice - costPrice
+    const marginPercentage = costPrice > 0 ? (margin / costPrice) * 100 : 0
+    const markupPercentage = finalPrice > 0 ? (margin / finalPrice) * 100 : 0
+
+    return {
+      costPrice,
+      sellingPrice: finalPrice,
+      margin,
+      marginPercentage,
+      markupPercentage,
+    }
   }
 
   /**
@@ -425,7 +645,7 @@ export class PricingEngineService {
   private calculateWeightBasedPrice(
     rule: PriceRule,
     article: PricingContext['article']
-  ): { newPrice: number } {
+  ): WeightPriceResult {
     if (!article?.poids || !rule.adjustmentUnit) {
       return { newPrice: 0 }
     }
@@ -447,7 +667,7 @@ export class PricingEngineService {
   private calculateLengthBasedPrice(
     rule: PriceRule,
     article: PricingContext['article']
-  ): { newPrice: number } {
+  ): LengthPriceResult {
     if (!article?.longueur || !rule.adjustmentUnit) {
       return { newPrice: 0 }
     }
@@ -469,7 +689,7 @@ export class PricingEngineService {
   private calculateSurfaceBasedPrice(
     rule: PriceRule,
     article: PricingContext['article']
-  ): { newPrice: number } {
+  ): SurfacePriceResult {
     if (!rule.adjustmentUnit) {
       return { newPrice: 0 }
     }
@@ -500,7 +720,7 @@ export class PricingEngineService {
   private calculateVolumeBasedPrice(
     rule: PriceRule,
     article: PricingContext['article']
-  ): { newPrice: number } {
+  ): VolumePriceResult {
     if (!rule.adjustmentUnit) {
       return { newPrice: 0 }
     }
@@ -538,7 +758,7 @@ export class PricingEngineService {
     currentPrice: number,
     article: PricingContext['article'],
     context: PricingContext
-  ): { newPrice: number } {
+  ): FormulaPriceResult {
     if (!rule.formula) {
       return { newPrice: currentPrice }
     }
@@ -688,10 +908,10 @@ export class PricingEngineService {
       .getMany()
 
     // Filtrer les règles selon leurs conditions
-    const enrichedContext = {
+    const enrichedContext: EnrichedPricingContext = {
       ...context,
       article_reference: article.reference,
-      article_family: article.famille,
+      article_family: article.famille as string | undefined,
       quantity: context.quantity || 1,
     }
 
@@ -800,10 +1020,13 @@ export class PricingEngineService {
     }
 
     // Désactiver temporairement toutes les autres règles pour le preview
-    const _originalRules = await this.getApplicableRules({ id: articleId } as any, {
-      ...context,
-      articleId,
-    })
+    const _originalRules = await this.getApplicableRules(
+      { id: articleId } as PricingContext['article'],
+      {
+        ...context,
+        articleId,
+      }
+    )
 
     // Calculer avec seulement cette règle
     const article = await this.fetchArticle(articleId, undefined, context.societeId)

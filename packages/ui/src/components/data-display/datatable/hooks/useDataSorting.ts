@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
-import type { SortConfig, ColumnConfig } from '../types'
-import { 
-  sortData, 
-  updateSortConfig, 
-  getColumnSortState,
+import { useCallback, useMemo, useState } from 'react'
+import type { ColumnConfig, SortConfig } from '../types'
+import {
   clearAllSorts,
+  getColumnSortState,
+  isColumnSortable,
   multiColumnSort,
-  isColumnSortable
+  sortData,
+  updateSortConfig,
 } from '../utils/sortUtils'
 
 export interface UseDataSortingProps<T> {
@@ -37,7 +37,7 @@ export interface UseDataSortingReturn<T> {
 /**
  * Hook pour gérer le tri des données d'une DataTable
  */
-export function useDataSorting<T extends Record<string, any>>({
+export function useDataSorting<T extends Record<string, unknown>>({
   data,
   columns,
   initialSorts = [],
@@ -48,24 +48,27 @@ export function useDataSorting<T extends Record<string, any>>({
   const [sortConfig, setSortConfig] = useState<SortConfig[]>(initialSorts)
 
   // Gestionnaire de tri principal
-  const handleSort = useCallback((
-    columnId: string,
-    forceDirection?: 'asc' | 'desc' | null
-  ) => {
-    if (!sortable) return
-    
-    setSortConfig(prev => {
-      // Si pas de multi-tri, effacer les autres tris
-      const currentConfig = multiSort ? prev : []
-      
-      return updateSortConfig(currentConfig, columnId, forceDirection)
-    })
-  }, [sortable, multiSort])
+  const handleSort = useCallback(
+    (columnId: string, forceDirection?: 'asc' | 'desc' | null) => {
+      if (!sortable) return
+
+      setSortConfig((prev) => {
+        // Si pas de multi-tri, effacer les autres tris
+        const currentConfig = multiSort ? prev : []
+
+        return updateSortConfig(currentConfig, columnId, forceDirection)
+      })
+    },
+    [sortable, multiSort]
+  )
 
   // Obtenir la direction de tri pour une colonne
-  const getSortDirection = useCallback((columnId: string): 'asc' | 'desc' | null => {
-    return getColumnSortState(columnId, sortConfig)
-  }, [sortConfig])
+  const getSortDirection = useCallback(
+    (columnId: string): 'asc' | 'desc' | null => {
+      return getColumnSortState(columnId, sortConfig)
+    },
+    [sortConfig]
+  )
 
   // Effacer tous les tris
   const clearSorts = useCallback(() => {
@@ -73,70 +76,81 @@ export function useDataSorting<T extends Record<string, any>>({
   }, [])
 
   // Ajouter un tri (pour multi-tri)
-  const addSort = useCallback((columnId: string, direction: 'asc' | 'desc') => {
-    if (!sortable) return
-    
-    setSortConfig(prev => {
-      // Vérifier si la colonne est déjà triée
-      const existing = prev.find(s => s.column === columnId)
-      
-      if (existing) {
-        // Mettre à jour la direction
-        return prev.map(s => 
-          s.column === columnId 
-            ? { ...s, direction } 
-            : s
-        )
-      }
-      
-      // Ajouter le nouveau tri
-      if (multiSort) {
-        return [...prev, { column: columnId, direction }]
-      } else {
-        // Si pas de multi-tri, remplacer
-        return [{ column: columnId, direction }]
-      }
-    })
-  }, [sortable, multiSort])
+  const addSort = useCallback(
+    (columnId: string, direction: 'asc' | 'desc') => {
+      if (!sortable) return
+
+      setSortConfig((prev) => {
+        // Vérifier si la colonne est déjà triée
+        const existing = prev.find((s) => s.column === columnId)
+
+        if (existing) {
+          // Mettre à jour la direction
+          return prev.map((s) => (s.column === columnId ? { ...s, direction } : s))
+        }
+
+        // Ajouter le nouveau tri
+        if (multiSort) {
+          return [...prev, { column: columnId, direction }]
+        } else {
+          // Si pas de multi-tri, remplacer
+          return [{ column: columnId, direction }]
+        }
+      })
+    },
+    [sortable, multiSort]
+  )
 
   // Supprimer un tri
   const removeSort = useCallback((columnId: string) => {
-    setSortConfig(prev => prev.filter(s => s.column !== columnId))
+    setSortConfig((prev) => prev.filter((s) => s.column !== columnId))
   }, [])
 
   // Basculer le tri d'une colonne
-  const toggleSort = useCallback((columnId: string) => {
-    handleSort(columnId)
-  }, [handleSort])
+  const toggleSort = useCallback(
+    (columnId: string) => {
+      handleSort(columnId)
+    },
+    [handleSort]
+  )
 
   // Vérifier si une colonne est triée
-  const isSorted = useCallback((columnId: string): boolean => {
-    return sortConfig.some(s => s.column === columnId)
-  }, [sortConfig])
+  const isSorted = useCallback(
+    (columnId: string): boolean => {
+      return sortConfig.some((s) => s.column === columnId)
+    },
+    [sortConfig]
+  )
 
   // Vérifier si une colonne peut être triée
-  const canSort = useCallback((columnId: string): boolean => {
-    const column = columns.find(col => col.id === columnId)
-    return column ? isColumnSortable(column, sortable) : false
-  }, [columns, sortable])
+  const canSort = useCallback(
+    (columnId: string): boolean => {
+      const column = columns.find((col) => col.id === columnId)
+      return column ? isColumnSortable(column, sortable) : false
+    },
+    [columns, sortable]
+  )
 
   // Obtenir l'index de tri (pour multi-tri)
-  const sortIndex = useCallback((columnId: string): number => {
-    const index = sortConfig.findIndex(s => s.column === columnId)
-    return index
-  }, [sortConfig])
+  const sortIndex = useCallback(
+    (columnId: string): number => {
+      const index = sortConfig.findIndex((s) => s.column === columnId)
+      return index
+    },
+    [sortConfig]
+  )
 
   // Calculer les données triées
   const sortedData = useMemo(() => {
     if (sortConfig.length === 0) {
       return data
     }
-    
+
     // Utiliser le tri multi-colonnes si activé
     if (multiSort && sortConfig.length > 1) {
       return multiColumnSort(data, sortConfig, columns)
     }
-    
+
     // Sinon utiliser le tri simple
     return sortData(data, sortConfig, columns)
   }, [data, sortConfig, columns, multiSort])

@@ -3,7 +3,7 @@ import type { AuthConfig, AuthTokens, Company, StoredSession, User } from './aut
 
 // Configuration par défaut
 const DEFAULT_CONFIG: AuthConfig = {
-  apiBaseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002',
+  apiBaseUrl: process?.env?.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002',
   tokenStorageKey: 'topsteel_auth_tokens',
   rememberMeStorageKey: 'topsteel_remember_me',
   broadcastChannelName: 'topsteel-auth',
@@ -37,7 +37,7 @@ export class AuthStorage {
 
     try {
       // Sauvegarder la session
-      storage.setItem(this.config.tokenStorageKey, JSON.stringify(sessionData))
+      storage?.setItem(this?.config?.tokenStorageKey, JSON.stringify(sessionData))
 
       // Sauvegarder aussi dans localStorage pour l'apiClient (compatibilité)
       localStorage.setItem(
@@ -58,9 +58,9 @@ export class AuthStorage {
 
       // Sauvegarder le flag remember me
       if (rememberMe) {
-        localStorage.setItem(this.config.rememberMeStorageKey, 'true')
+        localStorage.setItem(this?.config?.rememberMeStorageKey, 'true')
       } else {
-        localStorage.removeItem(this.config.rememberMeStorageKey)
+        localStorage?.removeItem(this?.config?.rememberMeStorageKey)
       }
     } catch (_error) {}
   }
@@ -75,10 +75,10 @@ export class AuthStorage {
 
     try {
       // Vérifier d'abord si remember me était activé
-      const rememberMe = localStorage.getItem(this.config.rememberMeStorageKey) === 'true'
+      const rememberMe = localStorage?.getItem(this?.config?.rememberMeStorageKey) === 'true'
       const storage = rememberMe ? localStorage : sessionStorage
 
-      const storedData = storage.getItem(this.config.tokenStorageKey)
+      const storedData = storage?.getItem(this?.config?.tokenStorageKey)
 
       if (!storedData) {
         return { user: null, tokens: null, company: null }
@@ -87,14 +87,14 @@ export class AuthStorage {
       const sessionData: StoredSession = JSON.parse(storedData)
 
       // Valider la structure des données
-      if (!this.isValidSession(sessionData)) {
-        this.clearSession()
+      if (!this?.isValidSession(sessionData)) {
+        this?.clearSession()
         return { user: null, tokens: null, company: null }
       }
 
       return sessionData
     } catch (_error) {
-      this.clearSession()
+      this?.clearSession()
       return { user: null, tokens: null, company: null }
     }
   }
@@ -107,10 +107,10 @@ export class AuthStorage {
 
     try {
       // Effacer des deux types de stockage
-      localStorage.removeItem(this.config.tokenStorageKey)
-      sessionStorage.removeItem(this.config.tokenStorageKey)
-      localStorage.removeItem(this.config.rememberMeStorageKey)
-      localStorage.removeItem('topsteel-tokens') // Nettoyer aussi la clé de compatibilité
+      localStorage?.removeItem(this?.config?.tokenStorageKey)
+      sessionStorage?.removeItem(this?.config?.tokenStorageKey)
+      localStorage?.removeItem(this?.config?.rememberMeStorageKey)
+      localStorage?.removeItem('topsteel-tokens') // Nettoyer aussi la clé de compatibilité
 
       // Effacer également le cookie
       // biome-ignore lint: Cookie cleanup required for secure logout
@@ -124,10 +124,10 @@ export class AuthStorage {
   updateTokens(tokens: AuthTokens): void {
     if (typeof window === 'undefined') return
 
-    const currentSession = this.getStoredSession()
-    if (currentSession.user) {
-      const rememberMe = localStorage.getItem(this.config.rememberMeStorageKey) === 'true'
-      this.saveSession(currentSession.user, tokens, currentSession.company, rememberMe)
+    const currentSession = this?.getStoredSession()
+    if (currentSession?.user) {
+      const rememberMe = localStorage?.getItem(this?.config?.rememberMeStorageKey) === 'true'
+      this?.saveSession(currentSession?.user, tokens, currentSession?.company, rememberMe)
     }
   }
 
@@ -137,10 +137,10 @@ export class AuthStorage {
   updateCompany(company: Company): void {
     if (typeof window === 'undefined') return
 
-    const currentSession = this.getStoredSession()
-    if (currentSession.user && currentSession.tokens) {
-      const rememberMe = localStorage.getItem(this.config.rememberMeStorageKey) === 'true'
-      this.saveSession(currentSession.user, currentSession.tokens, company, rememberMe)
+    const currentSession = this?.getStoredSession()
+    if (currentSession?.user && currentSession?.tokens) {
+      const rememberMe = localStorage?.getItem(this?.config?.rememberMeStorageKey) === 'true'
+      this?.saveSession(currentSession?.user, currentSession?.tokens, company, rememberMe)
     }
   }
 

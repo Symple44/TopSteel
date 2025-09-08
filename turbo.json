@@ -11,7 +11,18 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts", "vite.config.ts", "next.config.mjs", "!**/*.test.ts", "!**/*.test.tsx", "!**/__tests__/**", "!**/*.stories.tsx"],
+      "inputs": [
+        "src/**",
+        "package.json",
+        "tsconfig.json",
+        "tsup.config.ts",
+        "vite.config.ts",
+        "next.config.mjs",
+        "!**/*.test.ts",
+        "!**/*.test.tsx",
+        "!**/__tests__/**",
+        "!**/*.stories.tsx"
+      ],
       "outputs": ["dist/**", ".next/**", "build/**", "!dist/cache/**", "!.next/cache/**"],
       "cache": true,
       "outputLogs": "errors-only",
@@ -19,7 +30,14 @@
     },
     "build:packages": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts", "!**/*.test.ts", "!**/__tests__/**"],
+      "inputs": [
+        "src/**",
+        "package.json",
+        "tsconfig.json",
+        "tsup.config.ts",
+        "!**/*.test.ts",
+        "!**/__tests__/**"
+      ],
       "outputs": ["dist/**"],
       "cache": true,
       "outputLogs": "errors-only"
@@ -37,8 +55,50 @@
       "persistent": true
     },
     "test": {
+      "dependsOn": ["^build:packages"],
+      "inputs": [
+        "src/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/__tests__/**",
+        "jest.config.js",
+        "jest.setup.js"
+      ],
       "outputs": ["coverage/**"],
-      "cache": true
+      "cache": true,
+      "outputLogs": "errors-only"
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:coverage": {
+      "dependsOn": ["^build:packages"],
+      "inputs": [
+        "src/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/__tests__/**",
+        "jest.config.js",
+        "jest.setup.js"
+      ],
+      "outputs": ["coverage/**"],
+      "cache": true,
+      "outputLogs": "full"
+    },
+    "test:ci": {
+      "dependsOn": ["^build:packages"],
+      "inputs": [
+        "src/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/__tests__/**",
+        "jest.config.js",
+        "jest.setup.js"
+      ],
+      "outputs": ["coverage/**"],
+      "cache": true,
+      "outputLogs": "full"
     },
     "test:e2e": {
       "outputs": ["coverage/**"],

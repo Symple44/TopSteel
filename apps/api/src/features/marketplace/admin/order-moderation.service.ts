@@ -202,25 +202,35 @@ export class OrderModerationService {
 
       switch (action.action) {
         case 'APPROVE':
-          result = await this.approveOrder(order, action.reason, moderatorId)
+          result = await this.approveOrder(order, action.reason ?? '', moderatorId)
           break
         case 'REJECT':
-          result = await this.rejectOrder(order, action.reason, moderatorId)
+          result = await this.rejectOrder(order, action.reason ?? '', moderatorId)
           break
         case 'HOLD':
-          result = await this.holdOrder(order, action.reason, moderatorId)
+          result = await this.holdOrder(order, action.reason ?? '', moderatorId)
           break
         case 'FLAG':
-          result = await this.flagOrder(order, action.flagType, action.reason, moderatorId)
+          result = await this.flagOrder(
+            order,
+            action.flagType ?? 'GENERAL',
+            action.reason ?? '',
+            moderatorId
+          )
           break
         case 'ASSIGN':
-          result = await this.assignOrder(order, action.assignTo, moderatorId)
+          result = await this.assignOrder(order, action.assignTo ?? '', moderatorId)
           break
         case 'ADD_NOTE':
-          result = await this.addNote(order, action.noteMessage, moderatorId, action.isInternalNote)
+          result = await this.addNote(
+            order,
+            action.noteMessage ?? '',
+            moderatorId,
+            action.isInternalNote
+          )
           break
         case 'RESOLVE_FLAG':
-          result = await this.resolveFlag(order, action.flagType, moderatorId)
+          result = await this.resolveFlag(order, action.flagType ?? 'GENERAL', moderatorId)
           break
         default:
           throw new BadRequestException(`Unknown moderation action: ${action.action}`)
@@ -334,7 +344,7 @@ export class OrderModerationService {
   /**
    * Apply moderation filters to query
    */
-  private applyModerationFilters(queryBuilder: any, filters: OrderModerationFilters): void {
+  private applyModerationFilters(queryBuilder: unknown, filters: OrderModerationFilters): void {
     if (filters.status) {
       queryBuilder.andWhere('order.status = :status', { status: filters.status })
     }
@@ -403,7 +413,7 @@ export class OrderModerationService {
   /**
    * Parse order flags from JSON
    */
-  private parseOrderFlags(flagsJson: any): OrderFlag[] {
+  private parseOrderFlags(flagsJson: unknown): OrderFlag[] {
     if (!flagsJson) return []
 
     try {
@@ -416,7 +426,7 @@ export class OrderModerationService {
   /**
    * Parse order notes from JSON
    */
-  private parseOrderNotes(notesJson: any): ModerationNote[] {
+  private parseOrderNotes(notesJson: unknown): ModerationNote[] {
     if (!notesJson) return []
 
     try {
@@ -540,7 +550,7 @@ export class OrderModerationService {
     const flags = this.parseOrderFlags(order.flags)
 
     flags.push({
-      type: flagType as any,
+      type: flagType as unknown,
       severity: 'MEDIUM',
       message: reason,
       createdAt: new Date(),

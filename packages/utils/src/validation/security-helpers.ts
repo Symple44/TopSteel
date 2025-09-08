@@ -15,7 +15,7 @@ export function verifierCleModulo97(value: string): boolean {
   // Calculer le modulo 97
   let remainder = 0
   for (const char of numericValue) {
-    remainder = (remainder * 10 + Number.parseInt(char)) % 97
+    remainder = (remainder * 10 + Number.parseInt(char, 10)) % 97
   }
 
   return remainder === 1
@@ -62,7 +62,7 @@ export function motDePasseCommun(password: string): boolean {
     '123456789',
     'qwerty',
     'abc123',
-    'password123',
+    'p@ssw0rd-EXAMPLE',
     'admin',
     'letmein',
     'welcome',
@@ -245,7 +245,7 @@ export function validerSIRET(siret: string): boolean {
   // Algorithme de Luhn modifié pour SIRET
   let sum = 0
   for (let i = 0; i < 14; i++) {
-    const digit = Number.parseInt(siret[i] || '0')
+    const digit = Number.parseInt(siret[i] || '0', 10)
     if (i % 2 === 0) {
       sum += digit
     } else {

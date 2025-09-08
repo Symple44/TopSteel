@@ -18,6 +18,7 @@ interface AuthenticatedRequest extends Request {
     role: string
   }
 }
+
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import {
   MarketplacePermission,

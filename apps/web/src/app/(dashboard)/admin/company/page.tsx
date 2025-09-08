@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@erp/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, useFormFieldIds } from '@erp/ui'
 import { Building2, Save } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -12,6 +12,20 @@ import { useTranslation } from '@/lib/i18n'
 export default function CompanySettingsPage() {
   const { t } = useTranslation('admin')
   const [isLoading, setIsLoading] = useState(false)
+
+  // Generate unique IDs for form fields
+  const fieldIds = useFormFieldIds([
+    'name',
+    'siret',
+    'vat',
+    'phone',
+    'email',
+    'website',
+    'address',
+    'city',
+    'postalCode',
+    'country',
+  ])
 
   const [companyData, setCompanyData] = useState({
     name: 'TopSteel',
@@ -31,20 +45,20 @@ export default function CompanySettingsPage() {
     try {
       // Simulation d'un appel API
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast.success(t('saveSuccess'))
+      toast?.success(t('saveSuccess'))
     } catch (_error) {
-      toast.error(t('saveError'))
+      toast?.error(t('saveError'))
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleLogoUpload = (_imageUrl: string) => {
-    toast.success(t('company.logoUpdated'))
+    toast?.success(t('company.logoUpdated'))
   }
 
-  const handleLogoError = (error: Error) => {
-    toast.error(`${t('company.logoError')}: ${error.message}`)
+  const handleLogoError = (error: string) => {
+    toast?.error(`${t('company.logoError')}: ${error}`)
   }
 
   return (
@@ -95,18 +109,18 @@ export default function CompanySettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label
-                    htmlFor="company-name"
+                    htmlFor={fieldIds.name}
                     className="block text-sm font-medium text-foreground mb-2"
                   >
                     {t('company.name')}
                   </label>
                   <Input
-                    id="company-name"
+                    id={fieldIds.name}
                     value={companyData.name}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCompanyData((prev) => ({
                         ...prev,
-                        name: e.target.value,
+                        name: e?.target?.value,
                       }))
                     }
                     placeholder={t('company.companyName')}
@@ -115,18 +129,18 @@ export default function CompanySettingsPage() {
 
                 <div>
                   <label
-                    htmlFor="company-siret"
+                    htmlFor={fieldIds.siret}
                     className="block text-sm font-medium text-foreground mb-2"
                   >
                     {t('company.siret')}
                   </label>
                   <Input
-                    id="company-siret"
+                    id={fieldIds.siret}
                     value={companyData.siret}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCompanyData((prev) => ({
                         ...prev,
-                        siret: e.target.value,
+                        siret: e?.target?.value,
                       }))
                     }
                     placeholder="12345678901234"
@@ -135,18 +149,18 @@ export default function CompanySettingsPage() {
 
                 <div>
                   <label
-                    htmlFor="company-vat"
+                    htmlFor={fieldIds.vat}
                     className="block text-sm font-medium text-foreground mb-2"
                   >
                     {t('company.vat')}
                   </label>
                   <Input
-                    id="company-vat"
+                    id={fieldIds.vat}
                     value={companyData.vat}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCompanyData((prev) => ({
                         ...prev,
-                        vat: e.target.value,
+                        vat: e?.target?.value,
                       }))
                     }
                     placeholder="FR12345678901"
@@ -155,18 +169,18 @@ export default function CompanySettingsPage() {
 
                 <div>
                   <label
-                    htmlFor="company-phone"
+                    htmlFor={fieldIds.phone}
                     className="block text-sm font-medium text-foreground mb-2"
                   >
                     {t('company.phone')}
                   </label>
                   <Input
-                    id="company-phone"
+                    id={fieldIds.phone}
                     value={companyData.phone}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCompanyData((prev) => ({
                         ...prev,
-                        phone: e.target.value,
+                        phone: e?.target?.value,
                       }))
                     }
                     placeholder="+33 1 23 45 67 89"
@@ -175,19 +189,19 @@ export default function CompanySettingsPage() {
 
                 <div>
                   <label
-                    htmlFor="company-email"
+                    htmlFor={fieldIds.email}
                     className="block text-sm font-medium text-foreground mb-2"
                   >
                     {t('company.email')}
                   </label>
                   <Input
-                    id="company-email"
+                    id={fieldIds.email}
                     type="email"
                     value={companyData.email}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCompanyData((prev) => ({
                         ...prev,
-                        email: e.target.value,
+                        email: e?.target?.value,
                       }))
                     }
                     placeholder="contact@entreprise.com"
@@ -196,19 +210,19 @@ export default function CompanySettingsPage() {
 
                 <div>
                   <label
-                    htmlFor="company-website"
+                    htmlFor={fieldIds.website}
                     className="block text-sm font-medium text-foreground mb-2"
                   >
                     {t('company.website')}
                   </label>
                   <Input
-                    id="company-website"
+                    id={fieldIds.website}
                     type="url"
                     value={companyData.website}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCompanyData((prev) => ({
                         ...prev,
-                        website: e.target.value,
+                        website: e?.target?.value,
                       }))
                     }
                     placeholder="https://entreprise.com"
@@ -222,18 +236,18 @@ export default function CompanySettingsPage() {
 
                 <div>
                   <label
-                    htmlFor="company-address"
+                    htmlFor={fieldIds.address}
                     className="block text-sm font-medium text-foreground mb-2"
                   >
                     {t('company.address')}
                   </label>
                   <Input
-                    id="company-address"
+                    id={fieldIds.address}
                     value={companyData.address}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCompanyData((prev) => ({
                         ...prev,
-                        address: e.target.value,
+                        address: e?.target?.value,
                       }))
                     }
                     placeholder="123 Rue de l'Industrie"
@@ -243,18 +257,18 @@ export default function CompanySettingsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
                     <label
-                      htmlFor="company-city"
+                      htmlFor={fieldIds.city}
                       className="block text-sm font-medium text-foreground mb-2"
                     >
                       {t('company.city')}
                     </label>
                     <Input
-                      id="company-city"
+                      id={fieldIds.city}
                       value={companyData.city}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setCompanyData((prev) => ({
                           ...prev,
-                          city: e.target.value,
+                          city: e?.target?.value,
                         }))
                       }
                       placeholder="Paris"
@@ -263,18 +277,18 @@ export default function CompanySettingsPage() {
 
                   <div>
                     <label
-                      htmlFor="company-postalCode"
+                      htmlFor={fieldIds.postalCode}
                       className="block text-sm font-medium text-foreground mb-2"
                     >
                       {t('company.postalCode')}
                     </label>
                     <Input
-                      id="company-postalCode"
+                      id={fieldIds.postalCode}
                       value={companyData.postalCode}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setCompanyData((prev) => ({
                           ...prev,
-                          postalCode: e.target.value,
+                          postalCode: e?.target?.value,
                         }))
                       }
                       placeholder="75001"
@@ -283,18 +297,18 @@ export default function CompanySettingsPage() {
 
                   <div>
                     <label
-                      htmlFor="company-country"
+                      htmlFor={fieldIds.country}
                       className="block text-sm font-medium text-foreground mb-2"
                     >
                       {t('company.country')}
                     </label>
                     <Input
-                      id="company-country"
+                      id={fieldIds.country}
                       value={companyData.country}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setCompanyData((prev) => ({
                           ...prev,
-                          country: e.target.value,
+                          country: e?.target?.value,
                         }))
                       }
                       placeholder="France"
@@ -305,7 +319,12 @@ export default function CompanySettingsPage() {
 
               {/* Bouton de sauvegarde */}
               <div className="flex justify-end pt-4">
-                <Button onClick={handleSave} disabled={isLoading} className="flex items-center">
+                <Button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={isLoading}
+                  className="flex items-center"
+                >
                   <Save className="h-4 w-4 mr-2" />
                   {isLoading ? t('company.saving') : t('company.save')}
                 </Button>

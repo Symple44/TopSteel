@@ -96,7 +96,7 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
     }
   }
 
-  if (sortedItems.length === 0) {
+  if (sortedItems?.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <p>{t('menus.noMenuItemsConfigured')}</p>
@@ -106,7 +106,7 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
 
   return (
     <div className="space-y-2">
-      {sortedItems.map((item) => (
+      {sortedItems?.map((item) => (
         <Card
           key={item.id}
           className={cn('transition-all', !item.isVisible && 'opacity-50 border-dashed')}
@@ -165,14 +165,14 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{t('menu.container')}</span>
                     <span>
-                      ({item.children.length} {t('menu.items')})
+                      ({item?.children?.length} {t('menu.items')})
                     </span>
                   </div>
                 )}
               </div>
 
               {/* Enfants */}
-              {item.children && item.children.length > 0 && (
+              {item.children && item?.children?.length > 0 && (
                 <div className="border-l-2 border-muted pl-4 ml-6">
                   <MenuPreview menuItems={item.children} level={level + 1} />
                 </div>

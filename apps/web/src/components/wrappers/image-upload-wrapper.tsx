@@ -29,6 +29,14 @@ export function ImageUploadWrapper(props: ImageUploadWrapperProps) {
     })
   }
 
+  const handleUploadSuccess = (result: {
+    data?: { urls?: { medium?: string; original?: string } }
+    url?: string
+  }) => {
+    const imageUrl = result.data?.urls?.original || result.url || ''
+    props.onUploadSuccess(imageUrl)
+  }
+
   const translations = {
     uploading: t('uploading'),
     changePhoto: t('changePhoto'),
@@ -42,7 +50,7 @@ export function ImageUploadWrapper(props: ImageUploadWrapperProps) {
       entityType={props.entityType}
       entityId={props.entityId}
       currentImageUrl={props.currentImageUrl}
-      onUploadSuccess={props.onUploadSuccess}
+      onUploadSuccess={handleUploadSuccess}
       onUploadError={props.onUploadError}
       maxSize={props.maxSize}
       allowedTypes={props.allowedTypes}

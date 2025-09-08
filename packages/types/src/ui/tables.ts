@@ -5,7 +5,7 @@ export interface TableColumn<T = any> {
   sortable?: boolean
   filterable?: boolean
   width?: string
-  render?: (value: any, row: T) => ReactNode
+  render?: (value: unknown, row: T) => ReactNode
 }
 
 export interface TableProps<T = any> {

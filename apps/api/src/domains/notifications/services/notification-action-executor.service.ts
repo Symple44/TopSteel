@@ -1,9 +1,22 @@
 import type { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
+import type { AxiosResponse } from 'axios'
 import { firstValueFrom } from 'rxjs'
 import { ActionType, type NotificationAction } from '../entities/notification-action.entity'
 import type { NotificationExecution } from '../entities/notification-execution.entity'
-import type { RuleExecutionContext } from './notification-rules-engine.service'
+import type {
+  ActionExecutionResult,
+  ApiCallResult,
+  CustomActionResult,
+  FieldUpdateResult,
+  FunctionExecutionResult,
+  LogEventResult,
+  NotificationActionResult,
+  ReportSendResult,
+  RuleExecutionContext,
+  TaskCreationResult,
+  WorkflowTriggerResult,
+} from '../types/notification-execution.types'
 
 /**
  * Notification action executor service
@@ -21,7 +34,7 @@ export class NotificationActionExecutor {
     action: NotificationAction,
     context: RuleExecutionContext,
     execution: NotificationExecution
-  ): Promise<any> {
+  ): Promise<ActionExecutionResult> {
     this.logger.debug(`Executing action ${action.name} (${action.type})`)
 
     try {
@@ -69,7 +82,7 @@ export class NotificationActionExecutor {
     action: NotificationAction,
     context: RuleExecutionContext,
     execution: NotificationExecution
-  ): Promise<any> {
+  ): Promise<NotificationActionResult> {
     const config = action.notificationConfig
     if (!config) {
       throw new Error('Notification config is missing')
@@ -90,8 +103,14 @@ export class NotificationActionExecutor {
     }
 
     return {
+      success: true,
       recipientsNotified: recipients.length,
       channels: config.channels || ['email'],
+      data: {
+        template: config.template,
+        subject: config.subject,
+        priority: config.priority,
+      },
     }
   }
 
@@ -101,7 +120,7 @@ export class NotificationActionExecutor {
   private async executeFieldUpdate(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<FieldUpdateResult> {
     const config = action.updateFieldConfig
     if (!config) {
       throw new Error('Update field config is missing')
@@ -112,10 +131,15 @@ export class NotificationActionExecutor {
     this.logger.log(`Would update ${config.entity}.${config.fieldPath} to ${config.value}`)
 
     return {
+      success: true,
       entity: config.entity,
       field: config.fieldPath,
       value: config.value,
       updated: true,
+      data: {
+        previousValue: null, // Would come from database
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 
@@ -125,7 +149,7 @@ export class NotificationActionExecutor {
   private async executeFunction(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<FunctionExecutionResult> {
     const config = action.functionConfig
     if (!config) {
       throw new Error('Function config is missing')
@@ -136,8 +160,15 @@ export class NotificationActionExecutor {
     this.logger.log(`Would execute function ${config.name} with params:`, config.parameters)
 
     return {
+      success: true,
       function: config.name,
       executed: true,
+      returnValue: null, // Would come from function execution
+      data: {
+        parameters: config.parameters,
+        timeout: config.timeout,
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 
@@ -147,14 +178,14 @@ export class NotificationActionExecutor {
   private async executeApiCall(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<ApiCallResult> {
     const config = action.apiConfig
     if (!config) {
       throw new Error('API config is missing')
     }
 
     const headers: Record<string, string> = {
-      ...config.headers,
+      ...(config.headers as Record<string, string>),
       'Content-Type': 'application/json',
     }
 
@@ -168,7 +199,7 @@ export class NotificationActionExecutor {
       timeout: (config.timeoutSeconds || 30) * 1000,
     }
 
-    let response
+    let response: AxiosResponse<unknown>
     switch (config.method) {
       case 'GET':
         response = await firstValueFrom(this.httpService.get(config.url, requestConfig))
@@ -186,13 +217,25 @@ export class NotificationActionExecutor {
       case 'DELETE':
         response = await firstValueFrom(this.httpService.delete(config.url, requestConfig))
         break
+      case 'PATCH':
+        response = await firstValueFrom(
+          this.httpService.patch(config.url, config.body, requestConfig)
+        )
+        break
       default:
         throw new Error(`Unsupported HTTP method: ${config.method}`)
     }
 
     return {
+      success: true,
       status: response.status,
       data: response.data,
+      responseHeaders: response.headers as Record<string, string>,
+      metadata: {
+        method: config.method,
+        url: config.url,
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 
@@ -202,7 +245,7 @@ export class NotificationActionExecutor {
   private async executeCreateTask(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<TaskCreationResult> {
     const config = action.taskConfig
     if (!config) {
       throw new Error('Task config is missing')
@@ -213,9 +256,18 @@ export class NotificationActionExecutor {
     this.logger.log(`Would create task: ${config.title}`)
 
     return {
+      success: true,
       taskId: `task-${Date.now()}`,
       title: config.title,
       created: true,
+      data: {
+        description: config.description,
+        assignee: config.assignee,
+        priority: config.priority,
+        dueDate: config.dueDate,
+        labels: config.labels,
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 
@@ -225,7 +277,7 @@ export class NotificationActionExecutor {
   private async executeTriggerWorkflow(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<WorkflowTriggerResult> {
     const config = action.workflowConfig
     if (!config) {
       throw new Error('Workflow config is missing')
@@ -236,8 +288,15 @@ export class NotificationActionExecutor {
     this.logger.log(`Would trigger workflow ${config.workflowId}`)
 
     return {
+      success: true,
       workflowId: config.workflowId,
       triggered: true,
+      executionId: `execution-${Date.now()}`,
+      data: {
+        version: config.version,
+        input: config.input,
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 
@@ -247,7 +306,7 @@ export class NotificationActionExecutor {
   private async executeLogEvent(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<LogEventResult> {
     const config = action.logConfig
     if (!config) {
       throw new Error('Log config is missing')
@@ -255,6 +314,7 @@ export class NotificationActionExecutor {
 
     // Log the event
     const logMessage = `[${config.category || 'NOTIFICATION'}] ${config.message}`
+    const timestamp = new Date().toISOString()
 
     switch (config.level) {
       case 'debug':
@@ -272,8 +332,15 @@ export class NotificationActionExecutor {
     }
 
     return {
+      success: true,
       logged: true,
       level: config.level,
+      timestamp,
+      data: {
+        message: config.message,
+        category: config.category,
+        metadata: config.metadata,
+      },
     }
   }
 
@@ -283,7 +350,7 @@ export class NotificationActionExecutor {
   private async executeSendReport(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<ReportSendResult> {
     const config = action.reportConfig
     if (!config) {
       throw new Error('Report config is missing')
@@ -294,9 +361,15 @@ export class NotificationActionExecutor {
     this.logger.log(`Would send report ${config.reportId} in ${config.format} format`)
 
     return {
+      success: true,
       reportId: config.reportId,
       format: config.format,
       sent: true,
+      recipients: config.recipients,
+      data: {
+        parameters: config.parameters,
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 
@@ -306,7 +379,7 @@ export class NotificationActionExecutor {
   private async executeCustom(
     action: NotificationAction,
     _context: RuleExecutionContext
-  ): Promise<any> {
+  ): Promise<CustomActionResult> {
     const config = action.customConfig
     if (!config) {
       throw new Error('Custom config is missing')
@@ -317,8 +390,14 @@ export class NotificationActionExecutor {
     this.logger.log('Executing custom action', config)
 
     return {
+      success: true,
       custom: true,
       config,
+      data: {
+        handlerName: config.handlerName,
+        parameters: config.parameters,
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 

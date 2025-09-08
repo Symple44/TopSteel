@@ -1,6 +1,7 @@
 import { Client, type ClientOptions } from '@elastic/elasticsearch'
 import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
+import { getErrorMessage, toError } from '../../../core/common/utils'
 import { getElasticsearchMapping } from '../config/searchable-entities.config'
 import type {
   IElasticsearchSearchService,
@@ -52,7 +53,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
       return true
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        this.logger.debug('ElasticSearch not available:', error.message)
+        this.logger.debug('ElasticSearch not available:', getErrorMessage(error))
       }
       return false
     }
@@ -72,7 +73,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
       const response = (await this.client.search({
         index: this.indexName,
         ...searchBody,
-      })) as ElasticsearchSearchResponse
+      } as unknown)) as ElasticsearchSearchResponse
 
       if (process.env.NODE_ENV === 'development') {
         this.logger.debug(
@@ -203,9 +204,9 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
       index: this.indexName,
       id: `${type}_${id}`,
       document: {
+        ...document,
         type,
         id,
-        ...document,
         indexedAt: new Date().toISOString(),
       },
     })
@@ -221,7 +222,8 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
       })
     } catch (error) {
       // Don't throw error if document doesn't exist
-      if (error.meta?.statusCode !== 404) {
+      const err = toError(error) as unknown
+      if (err.meta?.statusCode !== 404) {
         throw error
       }
     }
@@ -257,7 +259,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        this.logger.debug('ElasticSearch index creation skipped:', error.message)
+        this.logger.debug('ElasticSearch index creation skipped:', getErrorMessage(error))
       }
     }
   }

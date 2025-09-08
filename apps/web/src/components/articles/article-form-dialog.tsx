@@ -15,6 +15,7 @@ import {
   SelectValue,
   Switch,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -103,13 +104,42 @@ const defaultFormData: FormData = {
 }
 
 export function ArticleFormDialog({ open, onOpenChange, article, mode }: ArticleFormDialogProps) {
+  const ids = useFormFieldIds([
+    'reference',
+    'designation',
+    'description',
+    'famille',
+    'marque',
+    'modele',
+    'uniteStock',
+    'uniteAchat',
+    'uniteVente',
+    'coefficientAchat',
+    'coefficientVente',
+    'gereEnStock',
+    'stockPhysique',
+    'stockMini',
+    'stockMaxi',
+    'stockSecurite',
+    'prixAchatStandard',
+    'prixVenteHT',
+    'tauxTVA',
+    'tauxMarge',
+    'delaiApprovisionnement',
+    'quantiteMiniCommande',
+    'poids',
+    'longueur',
+    'largeur',
+    'hauteur',
+    'couleur',
+  ])
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const createArticle = useCreateArticle()
   const updateArticle = useUpdateArticle()
 
-  const isSubmitting = createArticle.isPending || updateArticle.isPending
+  const isSubmitting = createArticle?.isPending || updateArticle?.isPending
 
   useEffect(() => {
     if (article && mode === 'edit') {
@@ -128,11 +158,11 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
         uniteVente: article.uniteVente || '',
         coefficientAchat: String(article.coefficientAchat || 1),
         coefficientVente: String(article.coefficientVente || 1),
-        gereEnStock: article.gereEnStock || false,
-        stockPhysique: String(article.stockPhysique || 0),
-        stockMini: String(article.stockMini || 0),
-        stockMaxi: String(article.stockMaxi || 0),
-        stockSecurite: String(article.stockSecurite || 0),
+        gereEnStock: article.gereEnStock ?? false,
+        stockPhysique: String(article.stockPhysique ?? 0),
+        stockMini: String(article.stockMini ?? 0),
+        stockMaxi: String(article.stockMaxi ?? 0),
+        stockSecurite: String(article.stockSecurite ?? 0),
         methodeValorisation: article.methodeValorisation || 'FIFO',
         prixAchatStandard: String(article.prixAchatStandard || ''),
         prixVenteHT: String(article.prixVenteHT || ''),
@@ -155,15 +185,15 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.reference.trim()) {
+    if (!formData?.reference?.trim()) {
       newErrors.reference = 'La référence est obligatoire'
     }
 
-    if (!formData.designation.trim()) {
+    if (!formData?.designation?.trim()) {
       newErrors.designation = 'La désignation est obligatoire'
     }
 
-    if (!formData.uniteStock.trim()) {
+    if (!formData?.uniteStock?.trim()) {
       newErrors.uniteStock = "L'unité de stock est obligatoire"
     }
 
@@ -194,7 +224,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!validateForm()) {
       return
@@ -232,7 +262,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
       tauxTVA: formData.tauxTVA ? parseFloat(formData.tauxTVA) : undefined,
       tauxMarge: formData.tauxMarge ? parseFloat(formData.tauxMarge) : undefined,
       delaiApprovisionnement: formData.delaiApprovisionnement
-        ? parseInt(formData.delaiApprovisionnement)
+        ? parseInt(formData.delaiApprovisionnement, 10)
         : undefined,
       quantiteMiniCommande: formData.quantiteMiniCommande
         ? parseFloat(formData.quantiteMiniCommande)
@@ -246,9 +276,9 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
     try {
       if (mode === 'create') {
-        await createArticle.mutateAsync(sanitizedData)
+        await createArticle?.mutateAsync(sanitizedData)
       } else if (article) {
-        await updateArticle.mutateAsync({ id: article.id, data: sanitizedData })
+        await updateArticle?.mutateAsync({ id: article.id, data: sanitizedData })
       }
       onOpenChange(false)
     } catch (_error) {}
@@ -301,11 +331,11 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="reference">Référence *</Label>
+                <Label htmlFor={ids.reference}>Référence *</Label>
                 <Input
-                  id="reference"
+                  id={ids.reference}
                   value={formData.reference}
-                  onChange={(e) => handleInputChange('reference', e.target.value)}
+                  onChange={(e) => handleInputChange('reference', e?.target?.value)}
                   className={cn(errors.reference && 'border-red-500')}
                 />
                 {errors.reference && (
@@ -314,11 +344,11 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
               </div>
 
               <div>
-                <Label htmlFor="designation">Désignation *</Label>
+                <Label htmlFor={ids.designation}>Désignation *</Label>
                 <Input
-                  id="designation"
+                  id={ids.designation}
                   value={formData.designation}
-                  onChange={(e) => handleInputChange('designation', e.target.value)}
+                  onChange={(e) => handleInputChange('designation', e?.target?.value)}
                   className={cn(errors.designation && 'border-red-500')}
                 />
                 {errors.designation && (
@@ -328,11 +358,11 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor={ids.description}>Description</Label>
               <Textarea
-                id="description"
+                id={ids.description}
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(e) => handleInputChange('description', e?.target?.value)}
                 rows={3}
               />
             </div>
@@ -379,29 +409,29 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="famille">Famille</Label>
+                <Label htmlFor={ids.famille}>Famille</Label>
                 <Input
-                  id="famille"
+                  id={ids.famille}
                   value={formData.famille}
-                  onChange={(e) => handleInputChange('famille', e.target.value)}
+                  onChange={(e) => handleInputChange('famille', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="marque">Marque</Label>
+                <Label htmlFor={ids.marque}>Marque</Label>
                 <Input
-                  id="marque"
+                  id={ids.marque}
                   value={formData.marque}
-                  onChange={(e) => handleInputChange('marque', e.target.value)}
+                  onChange={(e) => handleInputChange('marque', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="modele">Modèle</Label>
+                <Label htmlFor={ids.modele}>Modèle</Label>
                 <Input
-                  id="modele"
+                  id={ids.modele}
                   value={formData.modele}
-                  onChange={(e) => handleInputChange('modele', e.target.value)}
+                  onChange={(e) => handleInputChange('modele', e?.target?.value)}
                 />
               </div>
             </div>
@@ -413,11 +443,11 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="uniteStock">Unité de stock *</Label>
+                <Label htmlFor={ids.uniteStock}>Unité de stock *</Label>
                 <Input
-                  id="uniteStock"
+                  id={ids.uniteStock}
                   value={formData.uniteStock}
-                  onChange={(e) => handleInputChange('uniteStock', e.target.value)}
+                  onChange={(e) => handleInputChange('uniteStock', e?.target?.value)}
                   className={cn(errors.uniteStock && 'border-red-500')}
                 />
                 {errors.uniteStock && (
@@ -426,34 +456,34 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
               </div>
 
               <div>
-                <Label htmlFor="uniteAchat">Unité d'achat</Label>
+                <Label htmlFor={ids.uniteAchat}>Unité d'achat</Label>
                 <Input
-                  id="uniteAchat"
+                  id={ids.uniteAchat}
                   value={formData.uniteAchat}
-                  onChange={(e) => handleInputChange('uniteAchat', e.target.value)}
+                  onChange={(e) => handleInputChange('uniteAchat', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="uniteVente">Unité de vente</Label>
+                <Label htmlFor={ids.uniteVente}>Unité de vente</Label>
                 <Input
-                  id="uniteVente"
+                  id={ids.uniteVente}
                   value={formData.uniteVente}
-                  onChange={(e) => handleInputChange('uniteVente', e.target.value)}
+                  onChange={(e) => handleInputChange('uniteVente', e?.target?.value)}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="coefficientAchat">Coefficient d'achat *</Label>
+                <Label htmlFor={ids.coefficientAchat}>Coefficient d'achat *</Label>
                 <Input
-                  id="coefficientAchat"
+                  id={ids.coefficientAchat}
                   type="number"
                   step="0.01"
                   min="0.01"
                   value={formData.coefficientAchat}
-                  onChange={(e) => handleInputChange('coefficientAchat', e.target.value)}
+                  onChange={(e) => handleInputChange('coefficientAchat', e?.target?.value)}
                   className={cn(errors.coefficientAchat && 'border-red-500')}
                 />
                 {errors.coefficientAchat && (
@@ -462,14 +492,14 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
               </div>
 
               <div>
-                <Label htmlFor="coefficientVente">Coefficient de vente *</Label>
+                <Label htmlFor={ids.coefficientVente}>Coefficient de vente *</Label>
                 <Input
-                  id="coefficientVente"
+                  id={ids.coefficientVente}
                   type="number"
                   step="0.01"
                   min="0.01"
                   value={formData.coefficientVente}
-                  onChange={(e) => handleInputChange('coefficientVente', e.target.value)}
+                  onChange={(e) => handleInputChange('coefficientVente', e?.target?.value)}
                   className={cn(errors.coefficientVente && 'border-red-500')}
                 />
                 {errors.coefficientVente && (
@@ -485,25 +515,25 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
               <h3 className="text-lg font-medium">Gestion du stock</h3>
               <div className="flex items-center space-x-2">
                 <Switch
-                  id="gereEnStock"
+                  id={ids.gereEnStock}
                   checked={formData.gereEnStock}
                   onCheckedChange={(checked) => handleInputChange('gereEnStock', checked)}
                 />
-                <Label htmlFor="gereEnStock">Géré en stock</Label>
+                <Label htmlFor={ids.gereEnStock}>Géré en stock</Label>
               </div>
             </div>
 
             {formData.gereEnStock && (
               <div className="grid grid-cols-4 gap-4">
                 <div>
-                  <Label htmlFor="stockPhysique">Stock physique *</Label>
+                  <Label htmlFor={ids.stockPhysique}>Stock physique *</Label>
                   <Input
-                    id="stockPhysique"
+                    id={ids.stockPhysique}
                     type="number"
                     min="0"
                     step="0.01"
                     value={formData.stockPhysique}
-                    onChange={(e) => handleInputChange('stockPhysique', e.target.value)}
+                    onChange={(e) => handleInputChange('stockPhysique', e?.target?.value)}
                     className={cn(errors.stockPhysique && 'border-red-500')}
                   />
                   {errors.stockPhysique && (
@@ -512,14 +542,14 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
                 </div>
 
                 <div>
-                  <Label htmlFor="stockMini">Stock minimum *</Label>
+                  <Label htmlFor={ids.stockMini}>Stock minimum *</Label>
                   <Input
-                    id="stockMini"
+                    id={ids.stockMini}
                     type="number"
                     min="0"
                     step="0.01"
                     value={formData.stockMini}
-                    onChange={(e) => handleInputChange('stockMini', e.target.value)}
+                    onChange={(e) => handleInputChange('stockMini', e?.target?.value)}
                     className={cn(errors.stockMini && 'border-red-500')}
                   />
                   {errors.stockMini && (
@@ -528,26 +558,26 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
                 </div>
 
                 <div>
-                  <Label htmlFor="stockMaxi">Stock maximum</Label>
+                  <Label htmlFor={ids.stockMaxi}>Stock maximum</Label>
                   <Input
-                    id="stockMaxi"
+                    id={ids.stockMaxi}
                     type="number"
                     min="0"
                     step="0.01"
                     value={formData.stockMaxi}
-                    onChange={(e) => handleInputChange('stockMaxi', e.target.value)}
+                    onChange={(e) => handleInputChange('stockMaxi', e?.target?.value)}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="stockSecurite">Stock de sécurité</Label>
+                  <Label htmlFor={ids.stockSecurite}>Stock de sécurité</Label>
                   <Input
-                    id="stockSecurite"
+                    id={ids.stockSecurite}
                     type="number"
                     min="0"
                     step="0.01"
                     value={formData.stockSecurite}
-                    onChange={(e) => handleInputChange('stockSecurite', e.target.value)}
+                    onChange={(e) => handleInputChange('stockSecurite', e?.target?.value)}
                   />
                 </div>
               </div>
@@ -578,51 +608,51 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
             <div className="grid grid-cols-4 gap-4">
               <div>
-                <Label htmlFor="prixAchatStandard">Prix d'achat standard</Label>
+                <Label htmlFor={ids.prixAchatStandard}>Prix d'achat standard</Label>
                 <Input
-                  id="prixAchatStandard"
+                  id={ids.prixAchatStandard}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.prixAchatStandard}
-                  onChange={(e) => handleInputChange('prixAchatStandard', e.target.value)}
+                  onChange={(e) => handleInputChange('prixAchatStandard', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="prixVenteHT">Prix de vente HT</Label>
+                <Label htmlFor={ids.prixVenteHT}>Prix de vente HT</Label>
                 <Input
-                  id="prixVenteHT"
+                  id={ids.prixVenteHT}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.prixVenteHT}
-                  onChange={(e) => handleInputChange('prixVenteHT', e.target.value)}
+                  onChange={(e) => handleInputChange('prixVenteHT', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="tauxTVA">Taux TVA (%)</Label>
+                <Label htmlFor={ids.tauxTVA}>Taux TVA (%)</Label>
                 <Input
-                  id="tauxTVA"
+                  id={ids.tauxTVA}
                   type="number"
                   min="0"
                   max="100"
                   step="0.01"
                   value={formData.tauxTVA}
-                  onChange={(e) => handleInputChange('tauxTVA', e.target.value)}
+                  onChange={(e) => handleInputChange('tauxTVA', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="tauxMarge">Taux de marge (%)</Label>
+                <Label htmlFor={ids.tauxMarge}>Taux de marge (%)</Label>
                 <Input
-                  id="tauxMarge"
+                  id={ids.tauxMarge}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.tauxMarge}
-                  onChange={(e) => handleInputChange('tauxMarge', e.target.value)}
+                  onChange={(e) => handleInputChange('tauxMarge', e?.target?.value)}
                 />
               </div>
             </div>
@@ -634,25 +664,27 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="delaiApprovisionnement">Délai d'approvisionnement (jours)</Label>
+                <Label htmlFor={ids.delaiApprovisionnement}>
+                  Délai d'approvisionnement (jours)
+                </Label>
                 <Input
-                  id="delaiApprovisionnement"
+                  id={ids.delaiApprovisionnement}
                   type="number"
                   min="0"
                   value={formData.delaiApprovisionnement}
-                  onChange={(e) => handleInputChange('delaiApprovisionnement', e.target.value)}
+                  onChange={(e) => handleInputChange('delaiApprovisionnement', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="quantiteMiniCommande">Quantité minimum de commande</Label>
+                <Label htmlFor={ids.quantiteMiniCommande}>Quantité minimum de commande</Label>
                 <Input
-                  id="quantiteMiniCommande"
+                  id={ids.quantiteMiniCommande}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.quantiteMiniCommande}
-                  onChange={(e) => handleInputChange('quantiteMiniCommande', e.target.value)}
+                  onChange={(e) => handleInputChange('quantiteMiniCommande', e?.target?.value)}
                 />
               </div>
             </div>
@@ -664,60 +696,60 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
 
             <div className="grid grid-cols-4 gap-4">
               <div>
-                <Label htmlFor="poids">Poids (kg)</Label>
+                <Label htmlFor={ids.poids}>Poids (kg)</Label>
                 <Input
-                  id="poids"
+                  id={ids.poids}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.poids}
-                  onChange={(e) => handleInputChange('poids', e.target.value)}
+                  onChange={(e) => handleInputChange('poids', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="longueur">Longueur (mm)</Label>
+                <Label htmlFor={ids.longueur}>Longueur (mm)</Label>
                 <Input
-                  id="longueur"
+                  id={ids.longueur}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.longueur}
-                  onChange={(e) => handleInputChange('longueur', e.target.value)}
+                  onChange={(e) => handleInputChange('longueur', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="largeur">Largeur (mm)</Label>
+                <Label htmlFor={ids.largeur}>Largeur (mm)</Label>
                 <Input
-                  id="largeur"
+                  id={ids.largeur}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.largeur}
-                  onChange={(e) => handleInputChange('largeur', e.target.value)}
+                  onChange={(e) => handleInputChange('largeur', e?.target?.value)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="hauteur">Hauteur (mm)</Label>
+                <Label htmlFor={ids.hauteur}>Hauteur (mm)</Label>
                 <Input
-                  id="hauteur"
+                  id={ids.hauteur}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.hauteur}
-                  onChange={(e) => handleInputChange('hauteur', e.target.value)}
+                  onChange={(e) => handleInputChange('hauteur', e?.target?.value)}
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="couleur">Couleur</Label>
+              <Label htmlFor={ids.couleur}>Couleur</Label>
               <Input
-                id="couleur"
+                id={ids.couleur}
                 value={formData.couleur}
-                onChange={(e) => handleInputChange('couleur', e.target.value)}
+                onChange={(e) => handleInputChange('couleur', e?.target?.value)}
               />
             </div>
           </div>

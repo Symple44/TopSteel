@@ -37,7 +37,7 @@ interface MigrationStatusCardProps {
   isLoading?: boolean
 }
 
-export default function MigrationStatusCard({
+export function MigrationStatusCard({
   database,
   status,
   executed,
@@ -105,14 +105,14 @@ export default function MigrationStatusCard({
       .replace(/^\d{3}-/, '') // Enlever le préfixe numérique
       .replace(/\.ts$/, '') // Enlever l'extension
       .replace(/([A-Z])/g, ' $1') // Ajouter des espaces avant les majuscules
-      .replace(/^./, (str) => str.toUpperCase()) // Capitaliser la première lettre
+      .replace(/^./, (str) => str?.toUpperCase()) // Capitaliser la première lettre
 
     return cleanName
   }
 
   const getFileIcon = (fileName: string) => {
-    if (fileName.includes('Create')) return <Layers className="w-3 h-3" />
-    if (fileName.includes('Update') || fileName.includes('Alter'))
+    if (fileName?.includes('Create')) return <Layers className="w-3 h-3" />
+    if (fileName?.includes('Update') || fileName?.includes('Alter'))
       return <FileText className="w-3 h-3" />
     return <FileText className="w-3 h-3" />
   }
@@ -151,6 +151,7 @@ export default function MigrationStatusCard({
                 {status === 'error' && 'Erreur'}
               </Badge>
               <Button
+                type="button"
                 size="sm"
                 variant="ghost"
                 onClick={() => setIsExpanded(!isExpanded)}
@@ -195,6 +196,7 @@ export default function MigrationStatusCard({
           {/* Actions */}
           <div className="flex items-center justify-between">
             <Button
+              type="button"
               size="sm"
               variant="outline"
               onClick={() => setShowDetails(!showDetails)}
@@ -206,6 +208,7 @@ export default function MigrationStatusCard({
 
             {pending.length > 0 && (
               <Button
+                type="button"
                 size="sm"
                 onClick={onRunMigrations}
                 disabled={isLoading}
@@ -242,7 +245,7 @@ export default function MigrationStatusCard({
                     Migrations en attente ({pending.length})
                   </h4>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {pending.map((migration) => (
+                    {pending?.map((migration) => (
                       <div
                         key={migration}
                         className="flex items-center justify-between text-xs p-3 bg-yellow-50/80 dark:bg-yellow-950/50 rounded-lg hover:bg-yellow-100/80 dark:hover:bg-yellow-950/70 transition-colors border border-yellow-200/60 dark:border-yellow-800/60"
@@ -255,6 +258,7 @@ export default function MigrationStatusCard({
                           </span>
                         </div>
                         <Button
+                          type="button"
                           size="sm"
                           variant="ghost"
                           onClick={() => handleViewMigration(migration)}
@@ -275,7 +279,7 @@ export default function MigrationStatusCard({
                     Dernières migrations ({Math.min(executed.length, 5)}/{executed.length})
                   </h4>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {executed.slice(-5).map((migration) => (
+                    {executed?.slice(-5).map((migration) => (
                       <div
                         key={migration}
                         className="flex items-center justify-between text-xs p-3 bg-green-50/80 dark:bg-green-950/50 rounded-lg hover:bg-green-100/80 dark:hover:bg-green-950/70 transition-colors border border-green-200/60 dark:border-green-800/60"
@@ -290,6 +294,7 @@ export default function MigrationStatusCard({
                         <div className="flex items-center space-x-1 flex-shrink-0">
                           <Clock className="w-3 h-3 text-green-600 dark:text-green-400" />
                           <Button
+                            type="button"
                             size="sm"
                             variant="ghost"
                             onClick={() => handleViewMigration(migration)}
@@ -326,14 +331,14 @@ export default function MigrationStatusCard({
         title="Détails de la migration"
         subtitle={selectedMigration || ''}
         onLoadDetails={async () => {
-          const { callClientApi } = await import('@/utils/backend-api')
+          const { callClientApi } = (await import('@/utils/backend-api')) || {}
           const response = await callClientApi(
             `admin/database/migrations/${database}/${selectedMigration}/details`
           )
-          if (!response.ok) {
+          if (!response?.ok) {
             throw new Error('Impossible de charger les détails')
           }
-          const data = await response.json()
+          const data = await response?.json()
           return {
             name: selectedMigration || '',
             content: data.content,

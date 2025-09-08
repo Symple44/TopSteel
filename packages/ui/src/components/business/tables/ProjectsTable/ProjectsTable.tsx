@@ -1,5 +1,20 @@
 'use client'
 import {
+  AlertCircle,
+  Archive,
+  BarChart3,
+  CheckCircle,
+  Clock,
+  Edit,
+  Eye,
+  FileText,
+  MoreHorizontal,
+  PauseCircle,
+  PlayCircle,
+  Trash2,
+  Users,
+} from 'lucide-react'
+import {
   Table,
   TableBody,
   TableCell,
@@ -7,25 +22,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Users,
-  Calendar,
-  DollarSign,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  PlayCircle,
-  PauseCircle,
-  Archive,
-  FileText,
-  BarChart3
-} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +30,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
-import { Progress } from '../../../primitives'
+import { Badge, Progress } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Project {
   id: string
   code: string
@@ -116,35 +113,35 @@ export function ProjectsTable({
   }
   const getStatusBadge = (status: Project['status']) => {
     const variants = {
-      planning: { 
-        label: 'Planification', 
+      planning: {
+        label: 'Planification',
         className: 'bg-gray-100 text-gray-800',
-        icon: <Clock className="h-3 w-3" />
+        icon: <Clock className="h-3 w-3" />,
       },
-      active: { 
-        label: 'Actif', 
+      active: {
+        label: 'Actif',
         className: 'bg-blue-100 text-blue-800',
-        icon: <PlayCircle className="h-3 w-3" />
+        icon: <PlayCircle className="h-3 w-3" />,
       },
-      on_hold: { 
-        label: 'En pause', 
+      on_hold: {
+        label: 'En pause',
         className: 'bg-yellow-100 text-yellow-800',
-        icon: <PauseCircle className="h-3 w-3" />
+        icon: <PauseCircle className="h-3 w-3" />,
       },
-      completed: { 
-        label: 'Terminé', 
+      completed: {
+        label: 'Terminé',
         className: 'bg-green-100 text-green-800',
-        icon: <CheckCircle className="h-3 w-3" />
+        icon: <CheckCircle className="h-3 w-3" />,
       },
-      cancelled: { 
-        label: 'Annulé', 
+      cancelled: {
+        label: 'Annulé',
         className: 'bg-red-100 text-red-800',
-        icon: <AlertCircle className="h-3 w-3" />
+        icon: <AlertCircle className="h-3 w-3" />,
       },
-      archived: { 
-        label: 'Archivé', 
+      archived: {
+        label: 'Archivé',
         className: 'bg-gray-100 text-gray-600',
-        icon: <Archive className="h-3 w-3" />
+        icon: <Archive className="h-3 w-3" />,
       },
     }
     const variant = variants[status] || variants.planning
@@ -167,23 +164,23 @@ export function ProjectsTable({
   }
   const getHealthIndicator = (health: Project['health']) => {
     const variants = {
-      good: { 
-        label: 'Bon', 
+      good: {
+        label: 'Bon',
         color: 'text-green-600',
         bgColor: 'bg-green-50',
-        icon: <CheckCircle className="h-4 w-4" />
+        icon: <CheckCircle className="h-4 w-4" />,
       },
-      at_risk: { 
-        label: 'À risque', 
+      at_risk: {
+        label: 'À risque',
         color: 'text-orange-600',
         bgColor: 'bg-orange-50',
-        icon: <AlertCircle className="h-4 w-4" />
+        icon: <AlertCircle className="h-4 w-4" />,
       },
-      critical: { 
-        label: 'Critique', 
+      critical: {
+        label: 'Critique',
         color: 'text-red-600',
         bgColor: 'bg-red-50',
-        icon: <AlertCircle className="h-4 w-4" />
+        icon: <AlertCircle className="h-4 w-4" />,
       },
     }
     const variant = variants[health] || variants.good
@@ -218,7 +215,7 @@ export function ProjectsTable({
   }
   const getMilestoneProgress = (milestones: Project['milestones']) => {
     if (!milestones || milestones.length === 0) return null
-    const completed = milestones.filter(m => m.completed).length
+    const completed = milestones.filter((m) => m.completed).length
     return `${completed}/${milestones.length}`
   }
   return (
@@ -253,9 +250,13 @@ export function ProjectsTable({
               const milestoneProgress = getMilestoneProgress(project.milestones)
               const budgetStatus = getBudgetStatus(project.budget, project.spent)
               return (
-                <TableRow 
+                <TableRow
                   key={project.id}
-                  className={project.status === 'cancelled' || project.status === 'archived' ? 'opacity-60' : ''}
+                  className={
+                    project.status === 'cancelled' || project.status === 'archived'
+                      ? 'opacity-60'
+                      : ''
+                  }
                 >
                   <TableCell>
                     <div>
@@ -283,9 +284,7 @@ export function ProjectsTable({
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">{project.progress}%</span>
                         {milestoneProgress && (
-                          <span className="text-muted-foreground">
-                            Jalons: {milestoneProgress}
-                          </span>
+                          <span className="text-muted-foreground">Jalons: {milestoneProgress}</span>
                         )}
                       </div>
                     </div>
@@ -298,10 +297,7 @@ export function ProjectsTable({
                       <div className="text-xs text-muted-foreground">
                         / {formatCurrency(project.budget, project.currency)}
                       </div>
-                      <Progress 
-                        value={(project.spent / project.budget) * 100} 
-                        className="h-1"
-                      />
+                      <Progress value={(project.spent / project.budget) * 100} className="h-1" />
                     </div>
                   </TableCell>
                   <TableCell>
@@ -346,15 +342,13 @@ export function ProjectsTable({
                           title={`${member.name} - ${member.role}`}
                         >
                           {member.avatar ? (
-                            <img 
-                              src={member.avatar} 
+                            <img
+                              src={member.avatar}
                               alt={member.name}
                               className="h-full w-full rounded-full"
                             />
                           ) : (
-                            <span className="text-xs font-medium">
-                              {member.name.charAt(0)}
-                            </span>
+                            <span className="text-xs font-medium">{member.name.charAt(0)}</span>
                           )}
                         </div>
                       ))}
@@ -368,7 +362,7 @@ export function ProjectsTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -402,7 +396,7 @@ export function ProjectsTable({
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {project.status !== 'archived' && (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onArchive?.(project)}
                             className="text-orange-600"
                           >
@@ -410,7 +404,7 @@ export function ProjectsTable({
                             Archiver
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => onDelete?.(project)}
                           className="text-red-600"
                           disabled={project.status === 'active'}

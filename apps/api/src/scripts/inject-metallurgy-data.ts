@@ -38,7 +38,7 @@ class MetallurgyDataInjector {
     this.dataSource = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
+      port: parseInt(process.env.DB_PORT || '5432', 10),
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: dbName,
@@ -104,7 +104,7 @@ class MetallurgyDataInjector {
   private async getArticleCount(): Promise<number> {
     try {
       const result = await this.dataSource.query('SELECT COUNT(*) as count FROM articles')
-      return parseInt(result[0].count)
+      return parseInt(result[0].count, 10)
     } catch {
       return 0
     }

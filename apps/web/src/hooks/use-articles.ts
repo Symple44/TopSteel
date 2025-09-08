@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/api-client-instance'
+import { deleteTyped, fetchTyped, postTyped } from '@/lib/api-typed'
 
 // Types pour les articles (similaires aux matériaux)
 export interface Article {
@@ -72,6 +73,7 @@ export enum ArticleStatus {
   INACTIF = 'INACTIF',
   OBSOLETE = 'OBSOLETE',
   EN_COURS_CREATION = 'EN_COURS_CREATION',
+  EN_ATTENTE = 'EN_ATTENTE',
 }
 
 export interface ArticleFilters {
@@ -121,8 +123,8 @@ export function useArticles(filters: ArticleFilters = {}) {
         }
       })
 
-      const response = await apiClient.get(`/api/business/articles?${params.toString()}`)
-      return response.data
+      const response = await fetchTyped<Article[]>(`/api/business/articles?${params.toString()}`)
+      return response
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
@@ -133,8 +135,8 @@ export function useArticle(id: string) {
   return useQuery({
     queryKey: ['articles', id],
     queryFn: async (): Promise<Article> => {
-      const response = await apiClient.get(`/api/business/articles/${id}`)
-      return response.data
+      const response = await fetchTyped<Article>(`/api/business/articles/${id}`)
+      return response
     },
     enabled: !!id,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -146,8 +148,8 @@ export function useArticleStatistics() {
   return useQuery({
     queryKey: ['articles', 'statistics'],
     queryFn: async (): Promise<ArticleStatistics> => {
-      const response = await apiClient.get('/api/business/articles/statistics')
-      return response.data
+      const response = await fetchTyped<ArticleStatistics>('/api/business/articles/statistics')
+      return response
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
   })
@@ -159,8 +161,10 @@ export function useStockValorisation(famille?: string) {
     queryKey: ['articles', 'valorisation', famille],
     queryFn: async (): Promise<StockValorisation> => {
       const params = famille ? `?famille=${encodeURIComponent(famille)}` : ''
-      const response = await apiClient.get(`/api/business/articles/valorisation${params}`)
-      return response.data
+      const response = await fetchTyped<StockValorisation>(
+        `/api/business/articles/valorisation${params}`
+      )
+      return response
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
   })
@@ -171,8 +175,8 @@ export function useArticlesEnRupture() {
   return useQuery({
     queryKey: ['articles', 'rupture'],
     queryFn: async (): Promise<Article[]> => {
-      const response = await apiClient.get('/api/business/articles/rupture')
-      return response.data
+      const response = await fetchTyped<Article[]>('/api/business/articles/rupture')
+      return response
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
@@ -183,8 +187,8 @@ export function useArticlesSousStockMini() {
   return useQuery({
     queryKey: ['articles', 'sous-stock-mini'],
     queryFn: async (): Promise<Article[]> => {
-      const response = await apiClient.get('/api/business/articles/sous-stock-mini')
-      return response.data
+      const response = await fetchTyped<Article[]>('/api/business/articles/sous-stock-mini')
+      return response
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
@@ -195,8 +199,10 @@ export function useArticlesAReapprovisionner() {
   return useQuery({
     queryKey: ['articles', 'a-reapprovisionner'],
     queryFn: async (): Promise<Array<Article & { quantiteACommander: number }>> => {
-      const response = await apiClient.get('/api/business/articles/a-reapprovisionner')
-      return response.data
+      const response = await fetchTyped<Array<Article & { quantiteACommander: number }>>(
+        '/api/business/articles/a-reapprovisionner'
+      )
+      return response
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
@@ -208,14 +214,14 @@ export function useCreateArticle() {
 
   return useMutation({
     mutationFn: async (data: Partial<Article>): Promise<Article> => {
-      const response = await apiClient.post('/api/business/articles', data)
-      return response.data
+      const response = await postTyped<Article, Partial<Article>>('/api/business/articles', data)
+      return response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       toast.success('Article créé avec succès')
     },
-    onError: (_error: any) => {
+    onError: () => {
       toast.error("Erreur lors de la création de l'article")
     },
   })
@@ -227,15 +233,15 @@ export function useUpdateArticle() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Article> }): Promise<Article> => {
-      const response = await apiClient.patch(`/api/business/articles/${id}`, data)
-      return response.data
+      const response = await apiClient.patch<Article>(`/api/business/articles/${id}`, data)
+      return response
     },
     onSuccess: (updatedArticle) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       queryClient.setQueryData(['articles', updatedArticle.id], updatedArticle)
       toast.success('Article modifié avec succès')
     },
-    onError: (_error: any) => {
+    onError: () => {
       toast.error("Erreur lors de la modification de l'article")
     },
   })
@@ -247,13 +253,13 @@ export function useDeleteArticle() {
 
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
-      await apiClient.delete(`/api/business/articles/${id}`)
+      await deleteTyped<void>(`/api/business/articles/${id}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       toast.success('Article supprimé avec succès')
     },
-    onError: (_error: any) => {
+    onError: () => {
       toast.error("Erreur lors de la suppression de l'article")
     },
   })
@@ -273,18 +279,21 @@ export function useEffectuerInventaire() {
       stockPhysiqueReel: number
       commentaire?: string
     }): Promise<Article> => {
-      const response = await apiClient.post(`/api/business/articles/${id}/inventaire`, {
+      const response = await postTyped<
+        Article,
+        { stockPhysiqueReel: number; commentaire?: string }
+      >(`/api/business/articles/${id}/inventaire`, {
         stockPhysiqueReel,
         commentaire,
       })
-      return response.data
+      return response
     },
     onSuccess: (article) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       queryClient.setQueryData(['articles', article.id], article)
       toast.success('Inventaire effectué avec succès')
     },
-    onError: (_error: any) => {
+    onError: () => {
       toast.error("Erreur lors de l'inventaire")
     },
   })
@@ -304,17 +313,20 @@ export function useDupliquerArticle() {
       nouvelleReference: string
       modifications?: Partial<Article>
     }): Promise<Article> => {
-      const response = await apiClient.post(`/api/business/articles/${id}/dupliquer`, {
+      const response = await postTyped<
+        Article,
+        { nouvelleReference: string; modifications?: Partial<Article> }
+      >(`/api/business/articles/${id}/dupliquer`, {
         nouvelleReference,
         modifications,
       })
-      return response.data
+      return response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       toast.success('Article dupliqué avec succès')
     },
-    onError: (_error: any) => {
+    onError: () => {
       toast.error('Erreur lors de la duplication')
     },
   })
@@ -326,17 +338,18 @@ export function useCreerCommandeReapprovisionnement() {
     mutationFn: async (
       fournisseurId: string
     ): Promise<{ articles: Article[]; quantitesTotales: number }> => {
-      const response = await apiClient.post(
-        `/api/business/articles/reapprovisionner/${fournisseurId}`
-      )
-      return response.data
+      const response = await postTyped<
+        { articles: Article[]; quantitesTotales: number },
+        undefined
+      >(`/api/business/articles/reapprovisionner/${fournisseurId}`)
+      return response
     },
     onSuccess: (result) => {
       toast.success(
         `Commande créée: ${result.articles.length} articles (${result.quantitesTotales} unités)`
       )
     },
-    onError: (_error: any) => {
+    onError: () => {
       toast.error('Erreur lors de la création de la commande')
     },
   })

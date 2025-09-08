@@ -181,7 +181,7 @@
 
 /* Corrections pour les dropdowns dans les tables */
 [data-radix-popper-content-wrapper] {
-  z-index: 9999 !important;
+  z-index: 9999;
 }
 
 /* Améliorer les dropdowns de la datatable */
@@ -230,33 +230,33 @@
 
 /* Style pour les sélecteurs dans l'InlineEditor */
 .inline-editor-select-content {
-  z-index: 10000 !important;
-  position: fixed !important;
+  z-index: 10000;
+  position: fixed;
 }
 
 /* Styles pour les select portals */
 [data-select-portal] {
-  background-color: white !important;
-  border: 1px solid #e5e7eb !important;
-  color: #1f2937 !important;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
   box-shadow:
     0 10px 38px -10px rgba(22, 23, 24, 0.35),
-    0 10px 20px -15px rgba(22, 23, 24, 0.2) !important;
+    0 10px 20px -15px rgba(22, 23, 24, 0.2);
 }
 
 /* Styles pour les dropdowns avec portal */
 [data-radix-select-content],
 [data-radix-dropdown-menu-content] {
-  z-index: 99999 !important;
+  z-index: 99999;
 }
 
 /* Amélioration du rendu des portails */
 .dropdown-portal-content {
-  background-color: white !important;
-  border: 1px solid #e5e7eb !important;
+  background-color: white;
+  border: 1px solid #e5e7eb;
   box-shadow:
     0 10px 38px -10px rgba(22, 23, 24, 0.35),
-    0 10px 20px -15px rgba(22, 23, 24, 0.2) !important;
+    0 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation-duration: 200ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
@@ -264,13 +264,13 @@
 
 /* Force les styles pour tous les dropdowns portals */
 [data-dropdown-portal] {
-  background-color: white !important;
-  border: 1px solid #e5e7eb !important;
-  color: #1f2937 !important;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
 }
 
 [data-dropdown-portal] [data-dropdown-item]:hover {
-  background-color: #f3f4f6 !important;
+  background-color: #f3f4f6;
 }
 
 /* Animation d'entrée pour les portails */

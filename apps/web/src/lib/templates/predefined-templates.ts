@@ -228,19 +228,19 @@ export const templateCategories = {
  */
 export function searchTemplates(query: string, category?: string): Template[] {
   const filteredByCategory = category
-    ? predefinedTemplates.filter((template) => template.category === category)
+    ? predefinedTemplates?.filter((template) => template.category === category)
     : predefinedTemplates
 
-  if (!query.trim()) {
+  if (!query?.trim()) {
     return filteredByCategory
   }
 
-  const searchTerm = query.toLowerCase()
-  return filteredByCategory.filter(
+  const searchTerm = query?.toLowerCase()
+  return filteredByCategory?.filter(
     (template) =>
-      template.name.toLowerCase().includes(searchTerm) ||
-      template.description.toLowerCase().includes(searchTerm) ||
-      template.tags.some((tag) => tag.toLowerCase().includes(searchTerm))
+      template?.name?.toLowerCase().includes(searchTerm) ||
+      template?.description?.toLowerCase().includes(searchTerm) ||
+      template?.tags?.some((tag) => tag?.toLowerCase().includes(searchTerm))
   )
 }
 
@@ -248,7 +248,7 @@ export function searchTemplates(query: string, category?: string): Template[] {
  * Obtient un template par son ID
  */
 export function getTemplateById(id: string): Template | undefined {
-  return predefinedTemplates.find((template) => template.id === id)
+  return predefinedTemplates?.find((template) => template.id === id)
 }
 
 /**
@@ -259,9 +259,9 @@ export function getRecommendedTemplates(): Template[] {
   // Pour l'instant, retourne les templates les plus populaires
   // Peut être étendu avec de l'analyse d'usage
   return [
-    predefinedTemplates.find((t) => t.id === 'sales-dashboard'),
-    predefinedTemplates.find((t) => t.id === 'admin-control'),
-    predefinedTemplates.find((t) => t.id === 'focus-mode'),
-    predefinedTemplates.find((t) => t.id === 'production-focus'),
+    predefinedTemplates?.find((t) => t.id === 'sales-dashboard'),
+    predefinedTemplates?.find((t) => t.id === 'admin-control'),
+    predefinedTemplates?.find((t) => t.id === 'focus-mode'),
+    predefinedTemplates?.find((t) => t.id === 'production-focus'),
   ].filter(Boolean) as Template[]
 }

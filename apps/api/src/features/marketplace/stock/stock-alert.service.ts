@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import type { EmailService } from '../../../core/email/email.service'
 
 interface StockAlertEvent {
@@ -254,7 +255,7 @@ export class StockAlertService {
       const exists = await this.redisService.exists(key)
       return exists === 1
     } catch (error) {
-      this.logger.error(`Failed to check duplicate alert: ${error.message}`)
+      this.logger.error(`Failed to check duplicate alert: ${getErrorMessage(error)}`)
       return false // If Redis fails, don't suppress alerts
     }
   }
@@ -268,7 +269,7 @@ export class StockAlertService {
       const ttl = this.defaultConfig.alertCooldownMinutes * 60 // Convert to seconds
       await this.redisService.setex(key, ttl, '1')
     } catch (error) {
-      this.logger.error(`Failed to mark alert as sent: ${error.message}`)
+      this.logger.error(`Failed to mark alert as sent: ${getErrorMessage(error)}`)
     }
   }
 
@@ -283,7 +284,7 @@ export class StockAlertService {
         await this.redisService.del(key)
       }
     } catch (error) {
-      this.logger.error(`Failed to clear alert markers: ${error.message}`)
+      this.logger.error(`Failed to clear alert markers: ${getErrorMessage(error)}`)
     }
   }
 
@@ -346,7 +347,7 @@ export class StockAlertService {
 
       this.logger.debug(`Stock alert logged: ${alertType} for product ${productId}`)
     } catch (error) {
-      this.logger.error(`Failed to log stock alert: ${error.message}`)
+      this.logger.error(`Failed to log stock alert: ${getErrorMessage(error)}`)
     }
   }
 

@@ -157,8 +157,19 @@ export class PricingAnalyticsController {
           topChannel:
             Object.entries(dashboard.rulesByChannel).sort(([, a], [, b]) => b - a)[0]?.[0] || 'ERP',
         },
-        opportunities: [],
-        alerts: [],
+        opportunities: [] as Array<{
+          type: string
+          priority: string
+          message: string
+          action: string
+          data?: { ruleIds: string[] }
+        }>,
+        alerts: [] as Array<{
+          type: string
+          severity: string
+          message: string
+          action: string
+        }>,
       }
 
       // Opportunités d'amélioration

@@ -12,22 +12,22 @@ export async function testOpenTelemetry() {
     // Simuler une latence
     await new Promise((resolve) => setTimeout(resolve, 100))
 
-    apiSpan.setAttributes({
+    apiSpan?.setAttributes({
       'test.result': 'success',
       'test.duration_ms': 100,
     })
-    apiSpan.end()
+    apiSpan?.end()
 
     // Test 2: Trace d'action utilisateur
     const userSpan = traceUserAction('login-attempt', 'test-user-123')
 
     await new Promise((resolve) => setTimeout(resolve, 50))
 
-    userSpan.setAttributes({
+    userSpan?.setAttributes({
       'test.action': 'login',
       'test.success': true,
     })
-    userSpan.end()
+    userSpan?.end()
 
     // Test 3: Vérifier que pas d'erreur CLIENT
     try {
@@ -35,7 +35,7 @@ export async function testOpenTelemetry() {
       const promises = Array.from({ length: 3 }, async (_, i) => {
         const span = traceAPICall(`test-${i}`, `/api/test-${i}`)
         await new Promise((resolve) => setTimeout(resolve, 10))
-        span.end()
+        span?.end()
         return `test-${i}-ok`
       })
 
@@ -55,6 +55,6 @@ export async function testOpenTelemetry() {
 }
 
 // Test automatique différé si activé
-if (typeof window !== 'undefined' && process.env.OTEL_ENABLED === 'true') {
+if (typeof window !== 'undefined' && process?.env?.OTEL_ENABLED === 'true') {
   setTimeout(testOpenTelemetry, 4000)
 }

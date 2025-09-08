@@ -1,7 +1,7 @@
 'use client'
 
-import { Avatar, AvatarFallback, Badge, Button } from '@erp/ui'
-import { AdvancedDataTable, type ColumnConfig } from '@erp/ui/data-display'
+import type { ColumnConfig } from '@erp/ui'
+import { Avatar, AvatarFallback, Badge, Button, DataTable } from '@erp/ui'
 import {
   Building,
   Calendar,
@@ -14,53 +14,23 @@ import {
   Users,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import BulkProfileManagement from '@/components/admin/bulk-profile-management'
+import { BulkProfileManagement } from '@/components/admin/bulk-profile-management'
 import { useTranslation } from '@/lib/i18n/hooks'
+import type { User } from '@/types/auth'
 import { callClientApi } from '@/utils/backend-api'
-
-interface User {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  phone?: string
-  department?: string
-  isActive: boolean
-  createdAt: string
-  lastLogin?: string
-  roles: {
-    id: string
-    name: string
-    description: string
-    assignedAt: string
-    expiresAt?: string
-  }[]
-  groups: {
-    id: string
-    name: string
-    type: string
-    assignedAt: string
-  }[]
-  permissions: {
-    moduleId: string
-    moduleName: string
-    level: string
-    source: 'role' | 'group'
-  }[]
-}
 
 // We'll need to move this function inside the component to access translations
 const formatDate = (date: string | Date | null | undefined, t: (key: string) => string) => {
   if (!date) return t('users.never')
   const d = new Date(date)
-  if (Number.isNaN(d.getTime())) return t('users.invalidDate')
+  if (Number.isNaN(d?.getTime())) return t('users.invalidDate')
 
   const now = new Date()
-  const diff = now.getTime() - d.getTime()
+  const diff = now?.getTime() - d?.getTime()
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
 
   if (days === 0) {
-    return `${d.toLocaleTimeString('fr-FR', {
+    return `${d?.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit',
     })} (${t('users.today')})`
@@ -68,18 +38,18 @@ const formatDate = (date: string | Date | null | undefined, t: (key: string) => 
     return (
       t('users.yesterday') +
       ' ' +
-      d.toLocaleTimeString('fr-FR', {
+      d?.toLocaleTimeString('fr-FR', {
         hour: '2-digit',
         minute: '2-digit',
       })
     )
   } else if (days < 7) {
-    return t('users.daysAgo', { days })
+    return `${days} ${t('users.daysAgo')}`
   } else {
-    return d.toLocaleDateString('fr-FR', {
+    return d?.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'short',
-      year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+      year: d?.getFullYear() !== now?.getFullYear() ? 'numeric' : undefined,
     })
   }
 }
@@ -92,7 +62,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     description: t('users.userInfo'),
     type: 'text',
     sortable: true,
-    searchable: true,
+
     locked: true,
     width: 280,
     // Fonction pour extraire la valeur pour le filtrage/tri
@@ -103,7 +73,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
           : t('users.user')
       return `${fullName} ${row.email}`
     },
-    render: (_, row) => (
+    render: (_value: unknown, row: User, _column: ColumnConfig<User>) => (
       <div className="flex items-center space-x-3">
         <Avatar className="h-9 w-9">
           <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
@@ -132,7 +102,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     description: t('users.rolesAssigned'),
     type: 'select',
     sortable: true,
-    searchable: true,
+
     width: 200,
     // Options pour le filtrage
     options: [
@@ -145,13 +115,13 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     // Fonction pour extraire la valeur string pour le filtrage
     getValue: (row) => {
       const roles = Array.isArray(row.roles) ? row.roles : []
-      return roles.map((role) => role.name).join(', ')
+      return roles?.map((role) => role.name).join(', ')
     },
-    render: (_, row) => {
+    render: (_value: unknown, row: User, _column: ColumnConfig<User>) => {
       const roles = Array.isArray(row.roles) ? row.roles : []
       return (
         <div className="flex flex-wrap gap-1.5">
-          {roles.map((role) => (
+          {roles?.map((role) => (
             <Badge
               key={role.id}
               variant="outline"
@@ -161,7 +131,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
               {role.name}
             </Badge>
           ))}
-          {roles.length === 0 && (
+          {roles?.length === 0 && (
             <span className="text-sm text-muted-foreground">{t('users.noRoles')}</span>
           )}
         </div>
@@ -175,18 +145,18 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     description: t('users.groupsAssigned'),
     type: 'text',
     sortable: true,
-    searchable: true,
+
     width: 200,
     // Fonction pour extraire la valeur string pour le filtrage
     getValue: (row) => {
       const groups = Array.isArray(row.groups) ? row.groups : []
-      return groups.map((group) => group.name).join(', ')
+      return groups?.map((group) => group.name).join(', ')
     },
-    render: (_, row) => {
+    render: (_value: unknown, row: User, _column: ColumnConfig<User>) => {
       const groups = Array.isArray(row.groups) ? row.groups : []
       return (
         <div className="flex flex-wrap gap-1.5">
-          {groups.map((group) => (
+          {groups?.map((group) => (
             <Badge
               key={group.id}
               variant="secondary"
@@ -196,7 +166,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
               {group.name}
             </Badge>
           ))}
-          {groups.length === 0 && (
+          {groups?.length === 0 && (
             <span className="text-sm text-muted-foreground">{t('users.noGroups')}</span>
           )}
         </div>
@@ -209,12 +179,12 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     title: t('users.department'),
     type: 'text',
     sortable: true,
-    searchable: true,
+
     editable: true,
     width: 150,
-    render: (value) => (
+    render: (value: unknown, _row: User, _column: ColumnConfig<User>) => (
       <span className="text-foreground font-medium">
-        {value || <span className="text-muted-foreground">-</span>}
+        {(value as React.ReactNode) || <span className="text-muted-foreground">-</span>}
       </span>
     ),
   },
@@ -224,17 +194,17 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     title: t('users.lastLogin'),
     type: 'datetime',
     sortable: true,
-    searchable: false,
+
     width: 180,
     format: {
       dateFormat: 'dd/MM/yyyy HH:mm',
     },
-    render: (value) => (
+    render: (value: unknown, _row: User, _column: ColumnConfig<User>) => (
       <div className="flex items-center text-sm">
         <div className="flex items-center space-x-1.5">
           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
           <span className={value ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-            {formatDate(value, t)}
+            {formatDate(value as string | Date | null | undefined, t)}
           </span>
         </div>
       </div>
@@ -252,7 +222,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
       { value: true, label: t('users.active'), color: '#10b981' },
       { value: false, label: t('users.inactive'), color: '#6b7280' },
     ],
-    render: (value) => (
+    render: (value: unknown, _row: User, _column: ColumnConfig<User>) => (
       <Badge variant={value ? 'default' : 'secondary'}>
         {value ? t('users.active') : t('users.inactive')}
       </Badge>
@@ -264,13 +234,15 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     title: t('users.createdAt'),
     type: 'datetime',
     sortable: true,
-    searchable: false,
+
     width: 150,
     format: {
       dateFormat: 'dd/MM/yyyy',
     },
-    render: (value) => (
-      <span className="text-muted-foreground font-medium">{formatDate(value, t)}</span>
+    render: (value: unknown, _row: User, _column: ColumnConfig<User>) => (
+      <span className="text-muted-foreground font-medium">
+        {formatDate(value as string | Date | null | undefined, t)}
+      </span>
     ),
   },
 ]
@@ -297,10 +269,10 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
       const response = await callClientApi('admin/users?includePermissions=true', {
         method: 'GET',
       })
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (response.ok && data.success && data.data) {
-        setUsers(data.data)
+      if (response?.ok && data?.success && data?.data) {
+        setUsers(data?.data)
       } else {
         setError(t('users.loadingError'))
       }
@@ -316,9 +288,9 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
     loadUsers()
   }, [loadUsers])
 
-  const handleCellEdit = (newValue: string | boolean, row: User, column: ColumnConfig<User>) => {
+  const handleCellEdit = (row: User, column: ColumnConfig<User>, value: unknown) => {
     setUsers((prevData) =>
-      prevData.map((user) => (user.id === row.id ? { ...user, [column.key]: newValue } : user))
+      prevData?.map((user) => (user.id === row.id ? { ...user, [column.key]: value } : user))
     )
     // Here we could send the update to the server
   }
@@ -336,8 +308,8 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
   }
 
   const handleDelete = (rows: User[]) => {
-    const idsToDelete = rows.map((row) => row.id)
-    setUsers(users.filter((user) => !idsToDelete.includes(user.id)))
+    const idsToDelete = rows?.map((row) => row.id)
+    setUsers(users?.filter((user) => !idsToDelete?.includes(user.id)))
     // Ici on pourrait envoyer la suppression au serveur
   }
 
@@ -352,21 +324,23 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
       t('users.exportHeaders.groups'),
       t('users.exportHeaders.lastLogin'),
     ]
-    const rows = users.map((user) => [
+    const rows = users?.map((user) => [
       user.email,
       user.lastName || '',
       user.firstName || '',
       user.department || '',
       user.isActive ? t('users.active') : t('users.inactive'),
-      user.roles.map((r) => r.name).join(', '),
-      user.groups.map((g) => g.name).join(', '),
+      user?.roles?.map((r) => r.name).join(', '),
+      user?.groups?.map((g) => g.name).join(', '),
       formatDate(user.lastLogin, t),
     ])
 
-    const csv = [headers, ...rows].map((row) => row.map((cell) => `"${cell}"`).join(',')).join('\n')
+    const csv = [headers, ...rows]
+      .map((row) => row?.map((cell) => `"${cell}"`).join(','))
+      .join('\n')
 
     const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
+    const url = URL?.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = `users-${new Date().toISOString().split('T')[0]}.csv`
@@ -384,15 +358,15 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
           <p className="text-muted-foreground/80 text-lg">{t('users.userManagementDescription')}</p>
         </div>
         <div className="flex space-x-3">
-          <Button variant="outline" onClick={exportUsers}>
+          <Button type="button" variant="outline" onClick={exportUsers}>
             <Download className="h-4 w-4 mr-2" />
             {t('users.export')}
           </Button>
-          <Button variant="outline" onClick={() => setIsBulkManagementOpen(true)}>
+          <Button type="button" variant="outline" onClick={() => setIsBulkManagementOpen(true)}>
             <Settings className="h-4 w-4 mr-2" />
             {t('users.bulkManagement')}
           </Button>
-          <Button onClick={handleCreate}>
+          <Button type="button" onClick={handleCreate}>
             <UserPlus className="h-4 w-4 mr-2" />
             {t('users.newUser')}
           </Button>
@@ -422,7 +396,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
                 {t('users.activeUsers')}
               </h3>
               <p className="text-3xl font-bold text-foreground">
-                {users.filter((u) => u.isActive).length}
+                {users?.filter((u) => u.isActive).length}
               </p>
             </div>
             <div className="p-3 bg-primary rounded-lg">
@@ -438,7 +412,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
                 {t('users.withRoles')}
               </h3>
               <p className="text-3xl font-bold text-foreground">
-                {users.filter((u) => u.roles.length > 0).length}
+                {users?.filter((u) => u?.roles?.length && u.roles.length > 0).length}
               </p>
             </div>
             <div className="p-3 bg-secondary rounded-lg">
@@ -454,7 +428,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
                 {t('users.withGroups')}
               </h3>
               <p className="text-3xl font-bold text-foreground">
-                {users.filter((u) => u.groups.length > 0).length}
+                {users?.filter((u) => u?.groups?.length && u.groups.length > 0).length}
               </p>
             </div>
             <div className="p-3 bg-secondary rounded-lg">
@@ -465,7 +439,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
       </div>
 
       {/* DataTable */}
-      <AdvancedDataTable
+      <DataTable
         data={users}
         columns={columns}
         keyField="id"
@@ -476,11 +450,17 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         searchable
         filterable
         height={600}
-        actions={{
-          create: handleCreate,
-          edit: handleEdit,
-          delete: handleDelete,
-        }}
+        actions={[
+          {
+            label: t('users.actions.edit'),
+            onClick: (row: User) => handleEdit(row),
+          },
+          {
+            label: t('users.actions.delete'),
+            onClick: (row: User) => handleDelete([row]),
+            variant: 'destructive' as const,
+          },
+        ]}
         onCellEdit={handleCellEdit}
         onRowDoubleClick={handleEdit}
         loading={loading}

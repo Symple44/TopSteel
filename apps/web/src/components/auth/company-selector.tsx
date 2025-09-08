@@ -1,5 +1,6 @@
 'use client'
 
+import { useFormFieldIds } from '@erp/ui'
 import {
   Button,
   Checkbox,
@@ -10,7 +11,6 @@ import {
   DialogTitle,
 } from '@erp/ui/primitives'
 import { AlertTriangle, Building2, Check, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from '@/hooks/use-auth'
@@ -43,10 +43,10 @@ const loadCacheFromStorage = (): RoleData[] | null => {
   if (typeof window === 'undefined') return null
 
   try {
-    const cached = sessionStorage.getItem(ROLES_CACHE_KEY)
-    const expiry = sessionStorage.getItem(ROLES_CACHE_EXPIRY_KEY)
+    const cached = sessionStorage?.getItem(ROLES_CACHE_KEY)
+    const expiry = sessionStorage?.getItem(ROLES_CACHE_EXPIRY_KEY)
 
-    if (cached && expiry && Date.now() < parseInt(expiry)) {
+    if (cached && expiry && Date.now() < parseInt(expiry, 10)) {
       return JSON.parse(cached)
     }
   } catch {}
@@ -83,62 +83,80 @@ const loadRolesFromParameters = async (
 
   try {
     const response = await callClientApi(`parameters/system/user_roles?language=${language}`)
-    if (response.ok) {
-      const data = await response.json()
+    if (response?.ok) {
+      const data = await response?.json()
 
       // Vérifier la structure de la réponse
-      let rolesList = []
+      let rolesList: RoleData[] = []
 
       if (Array.isArray(data)) {
         // Réponse directe en tableau
-        rolesList = data
+        rolesList = data as RoleData[]
       } else if (data.data && Array.isArray(data.data)) {
         // Réponse avec data wrapper (cas de l'API backend)
-        rolesList = data.data
+        rolesList = data?.data as RoleData[]
       } else if (data.success && Array.isArray(data.roles)) {
         // Autre format possible
-        rolesList = data.roles
+        rolesList = data?.roles as RoleData[]
       } else if (typeof data === 'object' && data !== null) {
         // Si c'est un objet, vérifier s'il contient des rôles
         const possibleArrays = Object.values(data).filter(Array.isArray)
-        if (possibleArrays.length > 0) {
-          rolesList = possibleArrays[0] as { id: string; name: string }[]
+        if (possibleArrays?.length > 0) {
+          rolesList = possibleArrays?.[0] as RoleData[]
         }
       }
 
       if (!Array.isArray(rolesList) || rolesList.length === 0) {
         // Si la réponse semble être des rôles par défaut de la route Next.js (array direct)
-        if (Array.isArray(data) && data.some((item) => item.id && item.name)) {
-          rolesList = data.map((role: { id: string; name: string }) => ({
+        if (Array.isArray(data) && data?.some((item) => item.id && item.name)) {
+          rolesList = data?.map((role: { id: string; name: string; description?: string }) => ({
             key: role.id,
             value: role.name,
             icon: '👤',
             color: 'blue',
             order: 999,
-            description: role.description,
+            permissions: [],
+            category: 'standard',
+            translationKey: undefined,
           }))
         } else {
           // Utiliser des rôles hardcodés en dernier recours
           rolesList = [
-            { key: 'ADMIN', value: 'Administrateur', icon: '🔧', color: 'orange', order: 1 },
-            { key: 'USER', value: 'Utilisateur', icon: '👤', color: 'blue', order: 2 },
+            {
+              key: 'ADMIN',
+              value: 'Administrateur',
+              icon: '🔧',
+              color: 'orange',
+              order: 1,
+              permissions: [],
+              category: 'standard',
+              translationKey: undefined,
+            },
+            {
+              key: 'USER',
+              value: 'Utilisateur',
+              icon: '👤',
+              color: 'blue',
+              order: 2,
+              permissions: [],
+              category: 'standard',
+              translationKey: undefined,
+            },
           ]
         }
       }
 
       // Mapper les données du backend vers le format attendu
-      rolesCache = rolesList.map(
-        (role: { key?: string; id?: string; value?: string; name?: string; label?: string }) => ({
-          key: role.key || role.id || 'UNKNOWN',
-          value: role.value || role.name || role.label || 'Rôle',
-          icon: role.icon || '👤',
-          color: role.color || 'blue',
-          order: role.order || 999,
-          permissions: role.permissions || [],
-          category: role.category || 'standard',
-          translationKey: role.translationKey || null,
-        })
-      )
+      rolesCache = rolesList?.map((role) => ({
+        key: role.key || 'UNKNOWN',
+        value: role.value || 'Rôle',
+        icon: role.icon || '👤',
+        color: role.color || 'blue',
+        order: role.order || 999,
+        permissions: role.permissions || [],
+        category: role.category || 'standard',
+        translationKey: role.translationKey || undefined,
+      }))
 
       // Sauvegarder en cache
       saveCacheToStorage(rolesCache)
@@ -173,25 +191,25 @@ const getFallbackRoles = (language: string = 'fr'): RoleData[] => {
   // Créer un translator simple pour le fallback
   const fallbackTranslator = (key: string) => {
     const translations: Record<string, Record<string, string>> = {
-      'roles.owner': {
+      'roles?.owner': {
         fr: 'Propriétaire',
         en: 'Owner',
         es: 'Propietario',
       },
-      'roles.super_admin': {
+      'roles?.super_admin': {
         fr: 'Super Administrateur',
         en: 'Super Administrator',
         es: 'Super Administrador',
       },
-      'roles.admin': { fr: 'Administrateur', en: 'Administrator', es: 'Administrador' },
-      'roles.manager': { fr: 'Manager', en: 'Manager', es: 'Gerente' },
-      'roles.commercial': { fr: 'Commercial', en: 'Sales Representative', es: 'Comercial' },
-      'roles.technician': { fr: 'Technicien', en: 'Technician', es: 'Técnico' },
-      'roles.accountant': { fr: 'Comptable', en: 'Accountant', es: 'Contador' },
-      'roles.operator': { fr: 'Opérateur', en: 'Operator', es: 'Operador' },
-      'roles.user': { fr: 'Utilisateur', en: 'User', es: 'Usuario' },
-      'roles.viewer': { fr: 'Observateur', en: 'Viewer', es: 'Observador' },
-      'roles.guest': { fr: 'Invité', en: 'Guest', es: 'Invitado' },
+      'roles?.admin': { fr: 'Administrateur', en: 'Administrator', es: 'Administrador' },
+      'roles?.manager': { fr: 'Manager', en: 'Manager', es: 'Gerente' },
+      'roles?.commercial': { fr: 'Commercial', en: 'Sales Representative', es: 'Comercial' },
+      'roles?.technician': { fr: 'Technicien', en: 'Technician', es: 'Técnico' },
+      'roles?.accountant': { fr: 'Comptable', en: 'Accountant', es: 'Contador' },
+      'roles?.operator': { fr: 'Opérateur', en: 'Operator', es: 'Operador' },
+      'roles?.user': { fr: 'Utilisateur', en: 'User', es: 'Usuario' },
+      'roles?.viewer': { fr: 'Observateur', en: 'Viewer', es: 'Observador' },
+      'roles?.guest': { fr: 'Invité', en: 'Guest', es: 'Invitado' },
     }
     return translations[key]?.[language] || key
   }
@@ -272,94 +290,40 @@ const getFallbackRoles = (language: string = 'fr'): RoleData[] => {
 }
 
 // Fonction pour récupérer les données d'un rôle
-const getRoleData = async (roleKey: string, language: string = 'fr'): Promise<RoleData | null> => {
+const _getRoleData = async (roleKey: string, language: string = 'fr'): Promise<RoleData | null> => {
   const roles = await loadRolesFromParameters(language)
-  return roles.find((role) => role.key === roleKey) || null
-}
-
-// Utilitaires pour l'affichage des rôles (maintenant basés sur les paramètres)
-const _getRoleDisplay = async (role: string, language: string = 'fr') => {
-  const roleData = await getRoleData(role, language)
-  if (roleData) {
-    return `${roleData.icon || '👤'} ${roleData.value}`
-  }
-  return `👤 ${role}`
-}
-
-const _getRoleStyle = async (role: string, isSelected: boolean, language: string = 'fr') => {
-  const roleData = await getRoleData(role, language)
-  const color = roleData?.color || 'blue'
-
-  // Mappage des couleurs vers les classes Tailwind
-  const colorMap: Record<string, { selected: string; hover: string }> = {
-    destructive: {
-      selected: 'bg-destructive/20 text-destructive border-destructive/30',
-      hover:
-        'bg-destructive/10 text-destructive/80 group-hover:bg-destructive/20 group-hover:text-destructive',
-    },
-    orange: {
-      selected: 'bg-orange-100 text-orange-700 border-orange-200',
-      hover: 'bg-orange-50 text-orange-600 group-hover:bg-orange-100 group-hover:text-orange-700',
-    },
-    purple: {
-      selected: 'bg-purple-100 text-purple-700 border-purple-200',
-      hover: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100 group-hover:text-purple-700',
-    },
-    green: {
-      selected: 'bg-green-100 text-green-700 border-green-200',
-      hover: 'bg-green-50 text-green-600 group-hover:bg-green-100 group-hover:text-green-700',
-    },
-    yellow: {
-      selected: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      hover: 'bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100 group-hover:text-yellow-700',
-    },
-    cyan: {
-      selected: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-      hover: 'bg-cyan-50 text-cyan-600 group-hover:bg-cyan-100 group-hover:text-cyan-700',
-    },
-    blue: {
-      selected: 'bg-blue-100 text-blue-700 border-blue-200',
-      hover: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100 group-hover:text-blue-700',
-    },
-    gray: {
-      selected: 'bg-gray-100 text-gray-700 border-gray-200',
-      hover: 'bg-gray-50 text-gray-600 group-hover:bg-gray-100 group-hover:text-gray-700',
-    },
-  }
-
-  const colorClasses = colorMap[color] || colorMap.blue
-  return isSelected ? colorClasses.selected : colorClasses.hover
+  return roles?.find((role) => role.key === roleKey) || null
 }
 
 // Versions synchrones pour l'affichage immédiat (utilise le cache ou fallback)
 const getRoleDisplaySync = (role: string, translator: (key: string) => string): string => {
   if (rolesCache) {
-    const roleData = rolesCache.find((r) => r.key === role)
+    const roleData = rolesCache?.find((r) => r.key === role)
     if (roleData) {
       // Si on a une clé de traduction, utiliser le système i18n, sinon utiliser la valeur
-      const displayName = roleData.translationKey
-        ? translator(roleData.translationKey)
+      const displayName = roleData?.translationKey
+        ? translator(roleData?.translationKey)
         : roleData.value
-      return `${roleData.icon || '👤'} ${displayName}`
+      return `${roleData?.icon || '👤'} ${displayName}`
     }
   }
 
   // Fallback immédiat avec traduction
   const fallbackRoles = getFallbackRoles()
-  const roleData = fallbackRoles.find((r) => r.key === role)
-  return roleData ? `${roleData.icon} ${getRoleTranslation(role, translator)}` : `👤 ${role}`
+  const roleData = fallbackRoles?.find((r) => r.key === role)
+  return roleData ? `${roleData?.icon} ${getRoleTranslation(role, translator)}` : `👤 ${role}`
 }
 
 const getRoleStyleSync = (role: string, isSelected: boolean): string => {
   let color = 'blue'
 
   if (rolesCache) {
-    const roleData = rolesCache.find((r) => r.key === role)
+    const roleData = rolesCache?.find((r) => r.key === role)
     color = roleData?.color || 'blue'
   } else {
     // Fallback immédiat
     const fallbackRoles = getFallbackRoles()
-    const roleData = fallbackRoles.find((r) => r.key === role)
+    const roleData = fallbackRoles?.find((r) => r.key === role)
     color = roleData?.color || 'blue'
   }
 
@@ -410,7 +374,7 @@ interface Company {
   role?: string
   isDefault?: boolean
   permissions?: string[]
-  sites?: { id: string; name: string }[]
+  sites?: unknown[]
 }
 
 interface CompanySelectorProps {
@@ -423,10 +387,11 @@ interface CompanySelectorProps {
 export default function CompanySelector({
   open = true,
   onOpenChange,
-  _onCompanySelected,
+  onCompanySelected,
   showInDialog = true,
 }: CompanySelectorProps) {
-  const _router = useRouter()
+  // Suppress unused parameter warnings
+  void onCompanySelected
   const { user, logout, selectCompany } = useAuth()
   const { t } = useTranslation()
   const [companies, setCompanies] = useState<Company[]>([])
@@ -435,11 +400,12 @@ export default function CompanySelector({
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [tabCount, setTabCount] = useState(1)
+  const ids = useFormFieldIds(['saveAsDefault'])
 
   const loadCompanies = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await authService.getUserCompanies()
+      const data = await authService?.getUserCompanies()
 
       // S'assurer que data est un tableau
       let companiesArray: Company[] = []
@@ -448,23 +414,24 @@ export default function CompanySelector({
       } else if (data && typeof data === 'object') {
         // Si les données sont dans une propriété (ex: data.data, data.companies, etc.)
         const dataObj = data as Record<string, unknown>
-        companiesArray = dataObj.data || dataObj.companies || dataObj.societes || []
+        const potentialArray = dataObj?.data || dataObj?.companies || dataObj?.societes || []
+        companiesArray = Array.isArray(potentialArray) ? (potentialArray as Company[]) : []
       }
 
       setCompanies(companiesArray)
 
       // Sélectionner automatiquement la société par défaut s'il y en a une
-      const defaultCompany = companiesArray.find((c) => c.isDefault === true)
+      const defaultCompany = companiesArray?.find((c) => c.isDefault === true)
 
       if (defaultCompany) {
-        setSelectedCompanyId(defaultCompany.id)
+        setSelectedCompanyId(defaultCompany?.id)
         setSaveAsDefault(true)
       } else if (companiesArray.length === 1) {
-        setSelectedCompanyId(companiesArray[0].id)
+        setSelectedCompanyId(companiesArray?.[0]?.id)
       } else {
       }
     } catch {
-      toast.error(t('companies.loadingError'))
+      toast?.error(t('companies.loadingError'))
     } finally {
       setLoading(false)
     }
@@ -489,7 +456,7 @@ export default function CompanySelector({
 
   const handleSelectCompany = async () => {
     if (!selectedCompanyId) {
-      toast.error(t('companies.select'))
+      toast?.error(t('companies.select'))
       return
     }
 
@@ -497,7 +464,7 @@ export default function CompanySelector({
       setSubmitting(true)
 
       // Trouver la société sélectionnée
-      const selectedCompany = companies.find((c) => c.id === selectedCompanyId)
+      const selectedCompany = companies?.find((c) => c.id === selectedCompanyId)
       if (!selectedCompany) {
         throw new Error(t('companies.notFound'))
       }
@@ -519,19 +486,19 @@ export default function CompanySelector({
       // Sauvegarder la préférence si demandé
       if (saveAsDefault) {
         try {
-          await authService.setDefaultCompany(selectedCompanyId)
+          await authService?.setDefaultCompany(selectedCompanyId)
         } catch {}
       }
 
-      toast.success(t('companies.connectedTo', { name: selectedCompany.nom }))
+      toast?.success(t('companies.connectedTo', { name: selectedCompany.nom }))
 
       // Attendre un peu pour s'assurer que les tokens sont stockés avant de rediriger
       let attempts = 0
       const maxAttempts = 15 // Augmenter le nombre de tentatives
       const checkTokensAndRedirect = () => {
         const storedTokens =
-          localStorage.getItem('topsteel_auth_tokens') ||
-          sessionStorage.getItem('topsteel_auth_tokens')
+          localStorage?.getItem('topsteel_auth_tokens') ||
+          sessionStorage?.getItem('topsteel_auth_tokens')
 
         if (storedTokens) {
           try {
@@ -553,14 +520,14 @@ export default function CompanySelector({
           if (user?.id) {
             window.location.href = '/dashboard'
           } else {
-            toast.error(t('companies.syncError'))
+            toast?.error(t('companies.syncError'))
           }
         }
       }
 
       setTimeout(checkTokensAndRedirect, 300)
     } catch {
-      toast.error(t('companies.cannotConnect'))
+      toast?.error(t('companies.cannotConnect'))
     } finally {
       setSubmitting(false)
     }
@@ -585,6 +552,7 @@ export default function CompanySelector({
             <p className="text-muted-foreground text-xs">{t('companies.contactAdmin')}</p>
           </div>
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => logout()}
@@ -596,7 +564,7 @@ export default function CompanySelector({
       ) : (
         <>
           <div className="grid gap-3">
-            {companies.map((company) => (
+            {companies?.map((company) => (
               <button
                 key={company.id}
                 type="button"
@@ -610,7 +578,7 @@ export default function CompanySelector({
                   (e.key === 'Enter' || e.key === ' ') && setSelectedCompanyId(company.id)
                 }
                 tabIndex={0}
-                aria-label={`Select company ${company.name}`}
+                aria-label={`Select company ${company.nom}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3 flex-1">
@@ -709,13 +677,13 @@ export default function CompanySelector({
           {/* Checkbox optimisé */}
           <div className="flex items-center space-x-2 py-2 px-3 bg-muted/30 rounded-lg border">
             <Checkbox
-              id="save-as-default"
+              id={ids.saveAsDefault}
               checked={saveAsDefault}
               onCheckedChange={(checked) => setSaveAsDefault(checked as boolean)}
               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <label
-              htmlFor="save-as-default"
+              htmlFor={ids.saveAsDefault}
               className="text-xs font-medium text-foreground cursor-pointer select-none"
             >
               {t('companies.setAsDefault')}
@@ -726,6 +694,7 @@ export default function CompanySelector({
           <div className="flex justify-between items-center pt-3 border-t">
             <div className="flex space-x-1">
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={loadCompanies}
@@ -735,6 +704,7 @@ export default function CompanySelector({
                 {t('actions.refresh')}
               </Button>
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => logout()}
@@ -747,6 +717,7 @@ export default function CompanySelector({
             <div className="flex space-x-2">
               {onOpenChange && (
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => onOpenChange(false)}
@@ -757,6 +728,7 @@ export default function CompanySelector({
                 </Button>
               )}
               <Button
+                type="button"
                 onClick={handleSelectCompany}
                 disabled={!selectedCompanyId || submitting}
                 size="sm"

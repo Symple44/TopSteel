@@ -576,7 +576,7 @@ export class ShopConfigurationService {
   /**
    * Deep merge objects
    */
-  private deepMerge(target: any, source: any): any {
+  private deepMerge(target: unknown, source: any): any {
     const result = { ...target }
 
     for (const key in source) {

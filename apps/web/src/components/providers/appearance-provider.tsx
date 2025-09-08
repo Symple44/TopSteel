@@ -22,21 +22,21 @@ export function AppearanceProvider({ children }: AppearanceProviderProps) {
     const root = document.documentElement
 
     // Appliquer la taille de police
-    root.style.setProperty(
+    root?.style?.setProperty(
       '--font-size-multiplier',
       settings.fontSize === 'small' ? '0.875' : settings.fontSize === 'large' ? '1.125' : '1'
     )
 
     // Appliquer la densité
-    root.style.setProperty(
+    root?.style?.setProperty(
       '--density-multiplier',
       settings.density === 'compact' ? '0.75' : settings.density === 'spacious' ? '1.25' : '1'
     )
 
     // Appliquer la largeur de sidebar
-    root.style.setProperty(
+    root?.style?.setProperty(
       '--sidebar-width',
-      settings.sidebarWidth === 'compact'
+      settings?.sidebarWidth === 'compact'
         ? '200px'
         : settings.sidebarWidth === 'wide'
           ? '320px'
@@ -59,16 +59,16 @@ export function AppearanceProvider({ children }: AppearanceProviderProps) {
       rose: 'hsl(330 81% 60%)',
     }
 
-    if (accentColors[settings.accentColor]) {
-      root.style.setProperty('--accent-color', accentColors[settings.accentColor])
+    if (accentColors[settings?.accentColor]) {
+      root?.style?.setProperty('--accent-color', accentColors[settings?.accentColor])
     }
 
     // Appliquer les classes CSS
-    document.body.classList.remove('density-compact', 'density-comfortable', 'density-spacious')
-    document.body.classList.add(`density-${settings.density}`)
+    document?.body?.classList?.remove('density-compact', 'density-comfortable', 'density-spacious')
+    document?.body?.classList?.add(`density-${settings?.density}`)
 
-    document.body.classList.remove('font-small', 'font-medium', 'font-large')
-    document.body.classList.add(`font-${settings.fontSize}`)
+    document?.body?.classList?.remove('font-small', 'font-medium', 'font-large')
+    document?.body?.classList?.add(`font-${settings?.fontSize}`)
   }, [settings])
 
   return <>{children}</>

@@ -1,6 +1,5 @@
 'use client'
 
-import type { Notification } from '@erp/domains/notifications'
 import { Badge, Button, Input, ScrollArea } from '@erp/ui'
 import {
   AlertTriangle,
@@ -18,6 +17,7 @@ import { createPortal } from 'react-dom'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { cn } from '@/lib/utils'
+import type { ClientNotification as Notification } from '@/types/notifications'
 import { NotificationDashboardV2 } from './notification-dashboard-v2'
 
 export function NotificationCenter() {
@@ -43,7 +43,7 @@ export function NotificationCenter() {
 
   const formatTimeAgo = (date: Date) => {
     const now = new Date()
-    const diff = now.getTime() - new Date(date).getTime()
+    const diff = now?.getTime() - new Date(date).getTime()
     const minutes = Math.floor(diff / 60000)
     const hours = Math.floor(minutes / 60)
     const days = Math.floor(hours / 24)
@@ -61,10 +61,10 @@ export function NotificationCenter() {
       return state.notifications
     }
 
-    return state.notifications.filter((notification) => {
+    return state?.notifications?.filter((notification) => {
       return (
-        notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        notification.message.toLowerCase().includes(searchTerm.toLowerCase())
+        notification?.title?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+        notification?.message?.toLowerCase().includes(searchTerm?.toLowerCase())
       )
     })
   }, [state.notifications, searchTerm])
@@ -72,7 +72,13 @@ export function NotificationCenter() {
   return (
     <>
       <div className="relative">
-        <Button variant="ghost" size="sm" className="relative" onClick={() => setIsOpen(!isOpen)}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="relative"
+          onClick={() => setIsOpen(!isOpen)}
+        >
           <Bell className="h-4 w-4" />
           {state.unreadCount > 0 && (
             <Badge
@@ -108,11 +114,12 @@ export function NotificationCenter() {
                   <h3 className="font-semibold">{t('notifications')}</h3>
                   <div className="flex gap-1">
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       className="hover:text-blue-600 hover:bg-blue-50"
                       onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation()
+                        e?.stopPropagation()
                         setShowDashboard(true)
                         setIsOpen(false)
                       }}
@@ -122,11 +129,12 @@ export function NotificationCenter() {
                     </Button>
                     {state.unreadCount > 0 && (
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={(e: React.MouseEvent) => {
-                          e.stopPropagation()
-                          actions.markAllAsRead()
+                          e?.stopPropagation()
+                          actions?.markAllAsRead()
                         }}
                         title={tn('actions.markAsRead')}
                       >
@@ -134,10 +142,11 @@ export function NotificationCenter() {
                       </Button>
                     )}
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation()
+                        e?.stopPropagation()
                         setShowSettings(true)
                         setIsOpen(false) // Fermer le dropdown
                       }}
@@ -146,10 +155,11 @@ export function NotificationCenter() {
                       <Settings className="h-4 w-4" />
                     </Button>
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation()
+                        e?.stopPropagation()
                         setIsOpen(false)
                       }}
                       title={t('close')}
@@ -169,7 +179,7 @@ export function NotificationCenter() {
                   />
                   {state.connected ? tn('states.realTime') : tn('states.disconnected')}
                   <span className="ml-2">
-                    {filteredNotifications.length} / {state.notifications.length}
+                    {filteredNotifications?.length} / {state?.notifications?.length}
                   </span>
                 </div>
               </div>
@@ -182,7 +192,7 @@ export function NotificationCenter() {
                     placeholder={tn('states.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSearchTerm(e.target.value)
+                      setSearchTerm(e?.target?.value)
                     }
                     className="pl-9 h-8"
                   />
@@ -191,22 +201,22 @@ export function NotificationCenter() {
 
               {/* Liste des notifications */}
               <ScrollArea className="max-h-64">
-                {filteredNotifications.length === 0 ? (
+                {filteredNotifications?.length === 0 ? (
                   <div className="p-4 text-center text-sm text-gray-500">
                     {searchTerm ? tn('states.noResults') : tn('states.empty')}
                   </div>
                 ) : (
                   <div className="p-2 space-y-1">
-                    {filteredNotifications.map((notification: Notification) => (
+                    {filteredNotifications?.map((notification: Notification) => (
                       <button
                         key={notification.id}
                         type="button"
                         className={cn(
                           'group flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors w-full text-left',
-                          !notification.isRead && 'bg-blue-50 border-l-2 border-l-blue-500'
+                          !notification.readAt && 'bg-blue-50 border-l-2 border-l-blue-500'
                         )}
                         onClick={() => {
-                          actions.markAsRead(notification.id)
+                          actions?.markAsRead(notification.id)
                         }}
                       >
                         <div className="flex-shrink-0 mt-0.5">
@@ -228,8 +238,8 @@ export function NotificationCenter() {
 
                           {notification.message && (
                             <p className="text-sm text-gray-600 mt-1 leading-tight truncate">
-                              {notification.message.length > 100
-                                ? `${notification.message.substring(0, 100)}...`
+                              {notification?.message?.length > 100
+                                ? `${notification?.message?.substring(0, 100)}...`
                                 : notification.message}
                             </p>
                           )}
@@ -240,42 +250,47 @@ export function NotificationCenter() {
                                 {notification.metadata?.category || notification.type}
                               </Badge>
 
-                              {notification.priority && notification.priority !== 'NORMAL' && (
-                                <Badge
-                                  variant={
-                                    notification.priority === 'URGENT' ? 'destructive' : 'secondary'
-                                  }
-                                  className="text-xs"
-                                >
-                                  {notification.priority.toLowerCase()}
-                                </Badge>
-                              )}
+                              {notification.priority &&
+                                String(notification.priority) !== 'NORMAL' && (
+                                  <Badge
+                                    variant={
+                                      String(notification.priority) === 'URGENT'
+                                        ? 'destructive'
+                                        : 'secondary'
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {notification?.priority?.toLowerCase()}
+                                  </Badge>
+                                )}
                             </div>
 
-                            {notification.actions && notification.actions.length > 0 && (
+                            {notification.actions && notification?.actions?.length > 0 && (
                               <Button
+                                type="button"
                                 variant="outline"
                                 size="sm"
                                 className="text-xs h-6 px-2"
                                 onClick={(e: React.MouseEvent) => {
-                                  e.stopPropagation()
+                                  e?.stopPropagation()
                                   if (notification.actions?.[0]?.url) {
-                                    window.open(notification.actions[0].url, '_blank')
+                                    window.open(notification.actions?.[0]?.url, '_blank')
                                   }
                                 }}
                               >
-                                {notification.actions[0].label}
+                                {notification.actions?.[0]?.label}
                               </Button>
                             )}
                           </div>
                         </div>
 
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           onClick={(e: React.MouseEvent) => {
-                            e.stopPropagation()
-                            actions.deleteNotification(notification.id)
+                            e?.stopPropagation()
+                            actions?.deleteNotification(notification.id)
                           }}
                           className="flex-shrink-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-gray-400 hover:text-gray-600 transition-opacity"
                           title={tn('actions.delete')}
@@ -289,27 +304,29 @@ export function NotificationCenter() {
               </ScrollArea>
 
               {/* Actions du bas */}
-              {state.notifications.length > 0 && (
+              {state?.notifications?.length > 0 && (
                 <div className="p-2 border-t">
                   <div className="flex gap-2">
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       className="flex-1 text-gray-500 hover:text-red-600"
                       onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation()
-                        actions.deleteAll()
+                        e?.stopPropagation()
+                        actions?.deleteAll()
                       }}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       {t('clearAll')}
                     </Button>
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation()
-                        actions.refreshNotifications()
+                        e?.stopPropagation()
+                        actions?.refreshNotifications()
                       }}
                       className="flex-1"
                     >
@@ -358,8 +375,10 @@ export function NotificationCenter() {
                       </div>
                       <input
                         type="checkbox"
-                        checked={state.settings.enableSound}
-                        onChange={(e) => actions.updateSettings({ enableSound: e.target.checked })}
+                        checked={state?.settings?.enableSound}
+                        onChange={(e) =>
+                          actions?.updateSettings({ enableSound: e?.target?.checked })
+                        }
                         className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />
                     </label>
@@ -373,8 +392,10 @@ export function NotificationCenter() {
                       </div>
                       <input
                         type="checkbox"
-                        checked={state.settings.enableToast}
-                        onChange={(e) => actions.updateSettings({ enableToast: e.target.checked })}
+                        checked={state?.settings?.enableToast}
+                        onChange={(e) =>
+                          actions?.updateSettings({ enableToast: e?.target?.checked })
+                        }
                         className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />
                     </label>
@@ -390,9 +411,9 @@ export function NotificationCenter() {
                       </div>
                       <input
                         type="checkbox"
-                        checked={state.settings.enableBrowser}
+                        checked={state?.settings?.enableBrowser}
                         onChange={(e) =>
-                          actions.updateSettings({ enableBrowser: e.target.checked })
+                          actions?.updateSettings({ enableBrowser: e?.target?.checked })
                         }
                         className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />
@@ -407,9 +428,9 @@ export function NotificationCenter() {
                       </div>
                       <input
                         type="checkbox"
-                        checked={state.settings.enableEmail}
+                        checked={state?.settings?.enableEmail}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          actions.updateSettings({ enableEmail: e.target.checked })
+                          actions?.updateSettings({ enableEmail: e?.target?.checked })
                         }
                         className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />
@@ -439,13 +460,15 @@ export function NotificationCenter() {
                         <input
                           type="checkbox"
                           checked={
-                            state.settings.categories[key as keyof typeof state.settings.categories]
+                            state?.settings?.categories?.[
+                              key as keyof typeof state.settings.categories
+                            ] || false
                           }
                           onChange={(e) =>
-                            actions.updateSettings({
+                            actions?.updateSettings({
                               categories: {
-                                ...state.settings.categories,
-                                [key]: e.target.checked,
+                                ...state?.settings?.categories,
+                                [key]: e?.target?.checked,
                               },
                             })
                           }
@@ -474,13 +497,15 @@ export function NotificationCenter() {
                         <input
                           type="checkbox"
                           checked={
-                            state.settings.priority[key as keyof typeof state.settings.priority]
+                            state?.settings?.priority?.[
+                              key as keyof typeof state.settings.priority
+                            ] || false
                           }
                           onChange={(e) =>
-                            actions.updateSettings({
+                            actions?.updateSettings({
                               priority: {
-                                ...state.settings.priority,
-                                [key]: e.target.checked,
+                                ...state?.settings?.priority,
+                                [key]: e?.target?.checked,
                               },
                             })
                           }
@@ -498,7 +523,7 @@ export function NotificationCenter() {
                   type="button"
                   onClick={() => {
                     if ('Notification' in window && Notification.permission === 'default') {
-                      Notification.requestPermission()
+                      Notification?.requestPermission()
                     }
                   }}
                   className="text-sm text-blue-600 hover:text-blue-700"

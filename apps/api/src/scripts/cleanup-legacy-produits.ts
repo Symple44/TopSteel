@@ -36,7 +36,7 @@ async function cleanupLegacyProduits() {
   const dataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432'),
+    port: parseInt(process.env.DB_PORT || '5432', 10),
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     database: dbName,
@@ -60,7 +60,7 @@ async function cleanupLegacyProduits() {
 
     // Vérifier le contenu de la table
     const countResult = await dataSource.query('SELECT COUNT(*) FROM produits')
-    const count = parseInt(countResult[0].count)
+    const count = parseInt(countResult[0].count, 10)
 
     // Vérifier les contraintes de clé étrangère
     const fkConstraints = await dataSource.query(`

@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { NotificationRule } from './notification-rule.entity'
+// import { NotificationRule } from './notification-rule.entity';
 
 /**
  * Execution status
@@ -139,7 +139,7 @@ export class NotificationExecution {
   }>
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @Column({ type: 'boolean', default: false })
   acknowledged!: boolean
@@ -157,13 +157,9 @@ export class NotificationExecution {
   createdAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => NotificationRule,
-    (rule) => rule.executions,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('NotificationRule', 'executions', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'rule_id' })
-  rule!: NotificationRule
+  rule!: any
 
   // Utility methods
 
@@ -191,9 +187,9 @@ export class NotificationExecution {
   /**
    * Calculate execution duration
    */
-  calculateDuration(): number | null {
+  calculateDuration(): number | undefined {
     if (!this.completedAt) {
-      return null
+      return undefined
     }
     return this.completedAt.getTime() - this.executedAt.getTime()
   }
@@ -357,7 +353,7 @@ export class NotificationExecution {
   /**
    * Get execution summary
    */
-  getSummary(): Record<string, any> {
+  getSummary(): Record<string, unknown> {
     return {
       id: this.id,
       ruleId: this.ruleId,
@@ -396,7 +392,7 @@ export class NotificationExecution {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       ...this.getSummary(),
       triggerData: this.triggerData,

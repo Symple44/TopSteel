@@ -9,17 +9,17 @@ export async function GET(request: NextRequest) {
       method: 'GET',
     })
 
-    if (!response.ok) {
-      return NextResponse.json(
+    if (!response?.ok) {
+      return NextResponse?.json(
         { success: false, error: "Erreur lors de l'appel à l'API" },
         { status: response.status }
       )
     }
 
-    const responseData = await response.json()
+    const responseData = await response?.json()
     // L'API NestJS retourne { data: { success, data }, statusCode, message, timestamp }
     // On extrait juste la partie data.data
-    return NextResponse.json(responseData.data || responseData)
+    return NextResponse?.json(responseData?.data || responseData)
   } catch (_error) {
     // Retourner des données mock si l'API n'est pas disponible
     const mockStatus = {
@@ -31,6 +31,6 @@ export async function GET(request: NextRequest) {
       },
     }
 
-    return NextResponse.json(mockStatus)
+    return NextResponse?.json(mockStatus)
   }
 }

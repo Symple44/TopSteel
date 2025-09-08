@@ -9,8 +9,24 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { Role } from './role.entity'
-import { UserGroup } from './user-group.entity'
+
+// Removed direct imports to avoid circular dependencies
+// import { Role } from './role.entity'
+// import type { UserGroup } from './user-group.entity'
+
+// Type definitions to avoid circular dependencies
+type Role = {
+  id: string
+  name: string
+  // Other Role properties would be here
+}
+
+type UserGroup = {
+  id: string
+  userId: string
+  groupId: string
+  // Other UserGroup properties would be here
+}
 
 @Entity('groups')
 @Index(['name'], { unique: true })
@@ -47,13 +63,10 @@ export class Group {
   updatedBy?: string
 
   // Relations
-  @OneToMany(
-    () => UserGroup,
-    (userGroup) => userGroup.group
-  )
+  @OneToMany('UserGroup', 'group', { lazy: true })
   userGroups!: UserGroup[]
 
-  @ManyToMany(() => Role)
+  @ManyToMany('Role', 'groups', { lazy: true })
   @JoinTable({
     name: 'group_roles',
     joinColumn: {

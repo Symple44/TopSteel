@@ -18,7 +18,7 @@ export function useMenuMode() {
   // Charger l'état depuis localStorage au montage
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY)
+      const stored = localStorage?.getItem(STORAGE_KEY)
       if (stored) {
         const state: MenuModeState = JSON.parse(stored)
         setMode(state.mode)

@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, Between, In, MoreThan, LessThan } from 'typeorm'
-import { 
-  PartnerInteraction, 
-  InteractionType, 
+import { Between, In, LessThan, MoreThan, type Repository } from 'typeorm'
+import { toTypeORMUpdate } from '../../../core/database/typeorm-helpers'
+import {
+  type InteractionDirection,
+  type InteractionPriority,
   InteractionStatus,
-  InteractionPriority,
-  InteractionDirection 
+  type InteractionType,
+  PartnerInteraction,
 } from '../entities/partner-interaction.entity'
 
 export interface InteractionSearchCriteria {
@@ -53,14 +54,14 @@ export class PartnerInteractionRepository {
   }
 
   async findById(id: string): Promise<PartnerInteraction | null> {
-    return await this.repository.findOne({ 
+    return await this.repository.findOne({
       where: { id },
-      relations: ['partner']
+      relations: ['partner'],
     })
   }
 
   async findByPartner(
-    partnerId: string, 
+    partnerId: string,
     options?: { limit?: number; offset?: number }
   ): Promise<PartnerInteraction[]> {
     return await this.repository.find({
@@ -68,7 +69,7 @@ export class PartnerInteractionRepository {
       order: { dateInteraction: 'DESC' },
       take: options?.limit || 100,
       skip: options?.offset || 0,
-      relations: ['partner']
+      relations: ['partner'],
     })
   }
 
@@ -81,7 +82,7 @@ export class PartnerInteractionRepository {
       order: { dateInteraction: 'DESC' },
       take: options?.limit || 100,
       skip: options?.offset || 0,
-      relations: ['partner']
+      relations: ['partner'],
     })
   }
 
@@ -90,7 +91,8 @@ export class PartnerInteractionRepository {
     total: number
     hasMore: boolean
   }> {
-    const query = this.repository.createQueryBuilder('interaction')
+    const query = this.repository
+      .createQueryBuilder('interaction')
       .leftJoinAndSelect('interaction.partner', 'partner')
 
     // Filtres de base
@@ -115,14 +117,16 @@ export class PartnerInteractionRepository {
     }
 
     if (criteria.direction?.length) {
-      query.andWhere('interaction.direction IN (:...directions)', { directions: criteria.direction })
+      query.andWhere('interaction.direction IN (:...directions)', {
+        directions: criteria.direction,
+      })
     }
 
     // Filtres de date
     if (criteria.dateMin && criteria.dateMax) {
       query.andWhere('interaction.dateInteraction BETWEEN :dateMin AND :dateMax', {
         dateMin: criteria.dateMin,
-        dateMax: criteria.dateMax
+        dateMax: criteria.dateMax,
       })
     } else if (criteria.dateMin) {
       query.andWhere('interaction.dateInteraction >= :dateMin', { dateMin: criteria.dateMin })
@@ -144,9 +148,11 @@ export class PartnerInteractionRepository {
     }
 
     if (criteria.hasActions === true) {
-      query.andWhere("jsonb_array_length(interaction.actionsRequises) > 0")
+      query.andWhere('jsonb_array_length(interaction.actionsRequises) > 0')
     } else if (criteria.hasActions === false) {
-      query.andWhere("(interaction.actionsRequises IS NULL OR jsonb_array_length(interaction.actionsRequises) = 0)")
+      query.andWhere(
+        '(interaction.actionsRequises IS NULL OR jsonb_array_length(interaction.actionsRequises) = 0)'
+      )
     }
 
     // Tri
@@ -176,7 +182,7 @@ export class PartnerInteractionRepository {
   }
 
   async update(id: string, data: Partial<PartnerInteraction>): Promise<PartnerInteraction> {
-    await this.repository.update(id, data)
+    await this.repository.update(id, toTypeORMUpdate(data))
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Interaction ${id} not found`)
@@ -191,25 +197,31 @@ export class PartnerInteractionRepository {
   /**
    * Méthodes de statistiques
    */
-  async getStatsByPartner(partnerId: string, period?: { start: Date; end: Date }): Promise<InteractionStats> {
+  async getStatsByPartner(
+    partnerId: string,
+    period?: { start: Date; end: Date }
+  ): Promise<InteractionStats> {
     const whereClause: any = { partnerId }
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
 
     const interactions = await this.repository.find({ where: whereClause })
-    
+
     return this.calculateStats(interactions)
   }
 
-  async getStatsByUser(userId: string, period?: { start: Date; end: Date }): Promise<InteractionStats> {
+  async getStatsByUser(
+    userId: string,
+    period?: { start: Date; end: Date }
+  ): Promise<InteractionStats> {
     const whereClause: any = { userId }
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
 
     const interactions = await this.repository.find({ where: whereClause })
-    
+
     return this.calculateStats(interactions)
   }
 
@@ -220,7 +232,7 @@ export class PartnerInteractionRepository {
     }
 
     const interactions = await this.repository.find({ where: whereClause })
-    
+
     return this.calculateStats(interactions)
   }
 
@@ -239,22 +251,23 @@ export class PartnerInteractionRepository {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
 
-    const interactions = await this.repository.find({ 
+    const interactions = await this.repository.find({
       where: whereClause,
-      relations: ['partner']
+      relations: ['partner'],
     })
 
     // Calculer les statistiques
     const count = interactions.length
     const averageDuration = interactions.reduce((sum, i) => sum + (i.duree || 0), 0) / count || 0
-    const averageSatisfaction = interactions
-      .filter(i => i.satisfactionScore)
-      .reduce((sum, i) => sum + (i.satisfactionScore || 0), 0) / 
-      interactions.filter(i => i.satisfactionScore).length || 0
+    const averageSatisfaction =
+      interactions
+        .filter((i) => i.satisfactionScore)
+        .reduce((sum, i) => sum + (i.satisfactionScore || 0), 0) /
+        interactions.filter((i) => i.satisfactionScore).length || 0
 
     // Top users
     const userCounts = new Map<string, { name: string; count: number }>()
-    interactions.forEach(i => {
+    interactions.forEach((i) => {
       const current = userCounts.get(i.userId) || { name: i.utilisateurNom, count: 0 }
       current.count++
       userCounts.set(i.userId, current)
@@ -266,7 +279,7 @@ export class PartnerInteractionRepository {
 
     // Top partners
     const partnerCounts = new Map<string, { name: string; count: number }>()
-    interactions.forEach(i => {
+    interactions.forEach((i) => {
       const partnerName = i.partner?.denomination || 'Unknown'
       const current = partnerCounts.get(i.partnerId) || { name: partnerName, count: 0 }
       current.count++
@@ -282,28 +295,30 @@ export class PartnerInteractionRepository {
       averageDuration,
       averageSatisfaction,
       topUsers,
-      topPartners
+      topPartners,
     }
   }
 
   async getTrendsByPeriod(
     groupBy: 'day' | 'week' | 'month',
     period: { start: Date; end: Date }
-  ): Promise<Array<{
-    periode: string
-    count: number
-    types: Record<string, number>
-  }>> {
+  ): Promise<
+    Array<{
+      periode: string
+      count: number
+      types: Record<string, number>
+    }>
+  > {
     const interactions = await this.repository.find({
       where: {
-        dateInteraction: Between(period.start, period.end)
+        dateInteraction: Between(period.start, period.end),
       },
-      order: { dateInteraction: 'ASC' }
+      order: { dateInteraction: 'ASC' },
     })
 
     const grouped = new Map<string, PartnerInteraction[]>()
-    
-    interactions.forEach(interaction => {
+
+    interactions.forEach((interaction) => {
       const date = interaction.dateInteraction
       let key: string
 
@@ -311,11 +326,12 @@ export class PartnerInteractionRepository {
         case 'day':
           key = date.toISOString().split('T')[0]
           break
-        case 'week':
+        case 'week': {
           const weekStart = new Date(date)
           weekStart.setDate(date.getDate() - date.getDay())
           key = weekStart.toISOString().split('T')[0]
           break
+        }
         case 'month':
           key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
           break
@@ -324,30 +340,27 @@ export class PartnerInteractionRepository {
       if (!grouped.has(key)) {
         grouped.set(key, [])
       }
-      grouped.get(key)!.push(interaction)
+      grouped.get(key)?.push(interaction)
     })
 
     return Array.from(grouped.entries()).map(([periode, items]) => {
       const types: Record<string, number> = {}
-      items.forEach(item => {
+      items.forEach((item) => {
         types[item.type] = (types[item.type] || 0) + 1
       })
 
       return {
         periode,
         count: items.length,
-        types
+        types,
       }
     })
   }
 
-  async getUpcomingInteractions(
-    limit = 10,
-    userId?: string
-  ): Promise<PartnerInteraction[]> {
+  async getUpcomingInteractions(limit = 10, userId?: string): Promise<PartnerInteraction[]> {
     const whereClause: any = {
       status: InteractionStatus.PLANIFIE,
-      dateInteraction: MoreThan(new Date())
+      dateInteraction: MoreThan(new Date()),
     }
 
     if (userId) {
@@ -358,14 +371,14 @@ export class PartnerInteractionRepository {
       where: whereClause,
       order: { dateInteraction: 'ASC' },
       take: limit,
-      relations: ['partner']
+      relations: ['partner'],
     })
   }
 
   async getOverdueInteractions(userId?: string): Promise<PartnerInteraction[]> {
     const whereClause: any = {
       status: In([InteractionStatus.PLANIFIE, InteractionStatus.EN_COURS]),
-      dateInteraction: LessThan(new Date())
+      dateInteraction: LessThan(new Date()),
     }
 
     if (userId) {
@@ -375,7 +388,7 @@ export class PartnerInteractionRepository {
     return await this.repository.find({
       where: whereClause,
       order: { dateInteraction: 'DESC' },
-      relations: ['partner']
+      relations: ['partner'],
     })
   }
 
@@ -390,7 +403,7 @@ export class PartnerInteractionRepository {
       averageSatisfaction: 0,
       totalDuration: 0,
       interactionsWithActions: 0,
-      completionRate: 0
+      completionRate: 0,
     }
 
     if (interactions.length === 0) {
@@ -402,35 +415,35 @@ export class PartnerInteractionRepository {
     let satisfactionCount = 0
     let completedCount = 0
 
-    interactions.forEach(interaction => {
+    interactions.forEach((interaction) => {
       // Par type
       stats.byType[interaction.type] = (stats.byType[interaction.type] || 0) + 1
-      
+
       // Par status
       stats.byStatus[interaction.status] = (stats.byStatus[interaction.status] || 0) + 1
-      
+
       // Par priorité
       stats.byPriority[interaction.priority] = (stats.byPriority[interaction.priority] || 0) + 1
-      
+
       // Par direction
       stats.byDirection[interaction.direction] = (stats.byDirection[interaction.direction] || 0) + 1
-      
+
       // Durée
       if (interaction.duree) {
         totalDuration += interaction.duree
       }
-      
+
       // Satisfaction
       if (interaction.satisfactionScore) {
         totalSatisfaction += interaction.satisfactionScore
         satisfactionCount++
       }
-      
+
       // Actions
       if (interaction.hasActions()) {
         stats.interactionsWithActions++
       }
-      
+
       // Complétées
       if (interaction.isCompleted()) {
         completedCount++

@@ -5,15 +5,15 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetchBackend('/marketplace/modules', request)
 
-    if (!response.ok) {
-      throw new Error(`Erreur API: ${response.status}`)
+    if (!response?.ok) {
+      throw new Error(`Erreur API: ${response?.status}`)
     }
 
-    const modules = await response.json()
+    const modules = await response?.json()
 
-    return NextResponse.json(modules)
+    return NextResponse?.json(modules)
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: 'Erreur lors de la récupération des modules' },
       { status: 500 }
     )

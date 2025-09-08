@@ -76,13 +76,13 @@ export function MarketplaceCatalog() {
 
   const getCategoryLabel = (category: string) => {
     const categoryLabels = {
-      HR: t('marketplace.categories.hr'),
-      PROCUREMENT: t('marketplace.categories.procurement'),
-      ANALYTICS: t('marketplace.categories.analytics'),
-      INTEGRATION: t('marketplace.categories.integration'),
-      QUALITY: t('marketplace.categories.quality'),
-      MAINTENANCE: t('marketplace.categories.maintenance'),
-      FINANCE: t('marketplace.categories.finance'),
+      HR: t('marketplace?.categories?.hr'),
+      PROCUREMENT: t('marketplace?.categories?.procurement'),
+      ANALYTICS: t('marketplace?.categories?.analytics'),
+      INTEGRATION: t('marketplace?.categories?.integration'),
+      QUALITY: t('marketplace?.categories?.quality'),
+      MAINTENANCE: t('marketplace?.categories?.maintenance'),
+      FINANCE: t('marketplace?.categories?.finance'),
     }
     return categoryLabels[category as keyof typeof categoryLabels] || category
   }
@@ -102,15 +102,15 @@ export function MarketplaceCatalog() {
         setLoading(true)
         const response = await callClientApi('admin/marketplace/modules')
 
-        if (!response.ok) {
+        if (!response?.ok) {
           throw new Error(t('marketplace.loadingError'))
         }
 
-        const data = await response.json()
+        const data = await response?.json()
         setModules(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : t('common.unknownError'))
-        toast.error(t('marketplace.loadingErrorMessage'))
+        toast?.error(t('marketplace.loadingErrorMessage'))
       } finally {
         setLoading(false)
       }
@@ -119,11 +119,11 @@ export function MarketplaceCatalog() {
     fetchModules()
   }, [t])
 
-  const filteredModules = modules.filter((module) => {
+  const filteredModules = modules?.filter((module) => {
     const matchesSearch =
       searchQuery === '' ||
-      module.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      module.description.toLowerCase().includes(searchQuery.toLowerCase())
+      module?.displayName?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
+      module?.description?.toLowerCase().includes(searchQuery?.toLowerCase())
 
     const matchesCategory = selectedCategory === 'all' || module.category === selectedCategory
 
@@ -138,22 +138,22 @@ export function MarketplaceCatalog() {
   const formatPrice = (pricing: MarketplaceModule['pricing']) => {
     switch (pricing.type) {
       case 'FREE':
-        return t('marketplace.installedModules.pricing.free')
+        return t('marketplace?.installedModules?.pricing.free')
       case 'ONE_TIME':
-        return `${pricing.amount}${pricing.currency} (${t('marketplace.installedModules.pricing.oneTime')})`
+        return `${pricing.amount}${pricing.currency} (${t('marketplace?.installedModules?.pricing.oneTime')})`
       case 'SUBSCRIPTION': {
         const period =
           pricing.period === 'YEAR'
-            ? t('marketplace.installedModules.pricing.year')
-            : t('marketplace.installedModules.pricing.month')
+            ? t('marketplace?.installedModules?.pricing.year')
+            : t('marketplace?.installedModules?.pricing.month')
         return `${pricing.amount}${pricing.currency}/${period}`
       }
       case 'COMMISSION':
-        return t('marketplace.installedModules.pricing.commission')
+        return t('marketplace?.installedModules?.pricing.commission')
       case 'USAGE_BASED':
-        return t('marketplace.installedModules.pricing.usageBased')
+        return t('marketplace?.installedModules?.pricing.usageBased')
       default:
-        return t('marketplace.installedModules.pricing.onRequest')
+        return t('marketplace?.installedModules?.pricing.onRequest')
     }
   }
 
@@ -175,7 +175,9 @@ export function MarketplaceCatalog() {
     return (
       <div className="text-center py-12">
         <p className="text-destructive mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()}>{t('marketplace.retry')}</Button>
+        <Button type="button" onClick={() => window.location.reload()}>
+          {t('marketplace.retry')}
+        </Button>
       </div>
     )
   }
@@ -189,7 +191,7 @@ export function MarketplaceCatalog() {
           <Input
             placeholder={t('marketplace.searchPlaceholder')}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e?.target?.value)}
             className="pl-10"
           />
         </div>
@@ -214,7 +216,7 @@ export function MarketplaceCatalog() {
 
       {/* Grille des modules */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredModules.map((module) => (
+        {filteredModules?.map((module) => (
           <Card
             key={module.id}
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02]"
@@ -253,7 +255,7 @@ export function MarketplaceCatalog() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Download className="h-3 w-3" />
-                    <span>{module.downloadCount.toLocaleString()}</span>
+                    <span>{module?.downloadCount?.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -266,11 +268,13 @@ export function MarketplaceCatalog() {
                 <div className="font-medium text-sm">{formatPrice(module.pricing)}</div>
 
                 {module.isInstalled ? (
-                  <Button size="sm" variant="outline" disabled>
+                  <Button type="button" size="sm" variant="outline" disabled>
                     {t('marketplace.installed')}
                   </Button>
                 ) : (
-                  <Button size="sm">{t('marketplace.viewDetails')}</Button>
+                  <Button type="button" size="sm">
+                    {t('marketplace.viewDetails')}
+                  </Button>
                 )}
               </div>
             </CardContent>
@@ -278,7 +282,7 @@ export function MarketplaceCatalog() {
         ))}
       </div>
 
-      {filteredModules.length === 0 && (
+      {filteredModules?.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">{t('marketplace.noModulesFound')}</p>
         </div>

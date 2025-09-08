@@ -48,28 +48,28 @@ export default function PrivacyPolicyPage() {
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Informations d'identification</h3>
-                <ul className="text-gray-700 text-sm space-y-1">
-                  <li>• Nom, prénom, adresse email</li>
-                  <li>• Informations de l'entreprise (nom, SIRET, adresse)</li>
-                  <li>• Identifiants de connexion et mots de passe (chiffrés)</li>
+                <ul className="text-gray-700 text-sm space-y-1 list-disc list-inside">
+                  <li key="identity">Nom, prénom, adresse email</li>
+                  <li key="company">Informations de l'entreprise (nom, SIRET, adresse)</li>
+                  <li key="credentials">Identifiants de connexion et mots de passe (chiffrés)</li>
                 </ul>
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Données d'utilisation</h3>
                 <ul className="text-gray-700 text-sm space-y-1">
-                  <li>• Logs de connexion et d'activité</li>
-                  <li>• Données de performance et d'utilisation</li>
-                  <li>• Préférences utilisateur et paramètres</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Données métier</h3>
                 <ul className="text-gray-700 text-sm space-y-1">
-                  <li>• Informations clients et fournisseurs</li>
-                  <li>• Données de production et de stock</li>
-                  <li>• Documents et fichiers téléchargés</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
               </div>
             </div>
@@ -84,11 +84,11 @@ export default function PrivacyPolicyPage() {
             <div className="text-gray-700 space-y-3">
               <p>Nous utilisons vos données uniquement pour :</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Fournir et maintenir le service TopSteel ERP</li>
-                <li>Gérer votre compte et authentification</li>
-                <li>Améliorer nos services et développer de nouvelles fonctionnalités</li>
-                <li>Fournir un support technique et client</li>
-                <li>Respecter nos obligations légales et réglementaires</li>
+                <li>{}</li>
+                <li>{}</li>
+                <li>{}</li>
+                <li>{}</li>
+                <li>{}</li>
               </ul>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                 <p className="text-blue-800 text-sm">
@@ -186,10 +186,10 @@ export default function PrivacyPolicyPage() {
             <div className="text-gray-700 space-y-3">
               <p>Nous conservons vos données selon les durées légales :</p>
               <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>Données de compte : pendant la durée d'utilisation + 3 ans</li>
-                <li>Données comptables : 10 ans (obligation légale)</li>
-                <li>Logs de sécurité : 1 an</li>
-                <li>Données de support : 3 ans après résolution</li>
+                <li>{}</li>
+                <li>{}</li>
+                <li>{}</li>
+                <li>{}</li>
               </ul>
             </div>
           </section>

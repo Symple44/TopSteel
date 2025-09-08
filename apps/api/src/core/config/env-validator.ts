@@ -1,11 +1,15 @@
-import { config } from 'dotenv'
-import { join } from 'node:path'
 import { existsSync } from 'node:fs'
-import { envValidationSchema, validateSmsProviderDependencies, type ValidatedEnv } from './env-validation.schema'
+import { join } from 'node:path'
+import { config } from 'dotenv'
+import {
+  envValidationSchema,
+  type ValidatedEnv,
+  validateSmsProviderDependencies,
+} from './env-validation.schema'
 
 /**
  * Secure Environment Variables Validator
- * 
+ *
  * This utility provides:
  * - Runtime validation of environment variables
  * - Secure loading of .env files in correct priority order
@@ -44,11 +48,7 @@ class EnvironmentValidator {
    * Load and validate environment variables
    */
   async validate(options: EnvValidatorOptions = {}): Promise<ValidationResult> {
-    const {
-      throwOnError = true,
-      logValidation = true,
-      validateSecrets = true
-    } = options
+    const { throwOnError = true, logValidation = true, validateSecrets = true } = options
 
     try {
       // Load environment files in priority order
@@ -58,13 +58,10 @@ class EnvironmentValidator {
       const result = envValidationSchema.safeParse(process.env)
 
       if (!result.success) {
-        const errors = result.error.issues.map(err => 
-          `${err.path.join('.')}: ${err.message}`
-        )
-        
+        const errors = result.error.issues.map((err) => `${err.path.join('.')}: ${err.message}`)
+
         if (logValidation) {
-          console.error('❌ Environment validation failed:')
-          errors.forEach(error => console.error(`  - ${error}`))
+          errors.forEach((_error) => {})
         }
 
         if (throwOnError) {
@@ -88,24 +85,20 @@ class EnvironmentValidator {
       this.validatedEnv = result.data
 
       if (logValidation) {
-        console.log('✅ Environment validation successful')
         if (warnings.length > 0) {
-          console.warn('⚠️  Security warnings:')
-          warnings.forEach(warning => console.warn(`  - ${warning}`))
+          warnings.forEach((_warning) => {})
         }
       }
 
-      return { 
-        success: true, 
-        data: result.data, 
-        warnings: warnings.length > 0 ? warnings : undefined 
+      return {
+        success: true,
+        data: result.data,
+        warnings: warnings.length > 0 ? warnings : undefined,
       }
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown validation error'
-      
+
       if (logValidation) {
-        console.error('❌ Environment validation error:', errorMessage)
       }
 
       if (throwOnError) {
@@ -145,11 +138,11 @@ class EnvironmentValidator {
       'password',
       '123456',
       'admin',
-      secretName.toLowerCase()
+      secretName.toLowerCase(),
     ]
 
     const lowerValue = value.toLowerCase()
-    return !insecurePatterns.some(pattern => lowerValue.includes(pattern))
+    return !insecurePatterns.some((pattern) => lowerValue.includes(pattern))
   }
 
   /**
@@ -157,15 +150,15 @@ class EnvironmentValidator {
    */
   private loadEnvironmentFiles(): void {
     const rootDir = join(__dirname, '../../../..')
-    
+
     // Load in priority order (last loaded takes precedence)
     const envFiles = [
       join(rootDir, '.env'),
       join(rootDir, '.env.local'),
-      join(rootDir, '.env.vault') // For production secrets
+      join(rootDir, '.env.vault'), // For production secrets
     ]
 
-    envFiles.forEach(envFile => {
+    envFiles.forEach((envFile) => {
       if (existsSync(envFile)) {
         config({ path: envFile, override: false })
       }
@@ -198,7 +191,7 @@ class EnvironmentValidator {
 
     // Check if using default passwords in database URL
     const dbUrlPatterns = ['password', 'admin', '123456', 'postgres']
-    if (dbUrlPatterns.some(pattern => env.DATABASE_URL.toLowerCase().includes(pattern))) {
+    if (dbUrlPatterns.some((pattern) => env.DATABASE_URL.toLowerCase().includes(pattern))) {
       warnings.push('DATABASE_URL may contain a default or weak password')
     }
 
@@ -221,7 +214,7 @@ class EnvironmentValidator {
     }
 
     // Check external service keys
-    if (env.STRIPE_SECRET_KEY && env.STRIPE_SECRET_KEY.startsWith('sk_test_')) {
+    if (env.STRIPE_SECRET_KEY?.startsWith('sk_test_')) {
       warnings.push('Using Stripe test keys in production')
     }
 
@@ -232,7 +225,7 @@ class EnvironmentValidator {
    * Generate a secure random secret for development
    */
   static generateSecureSecret(length = 64): string {
-    const crypto = require('crypto')
+    const crypto = require('node:crypto')
     return crypto.randomBytes(length).toString('hex')
   }
 

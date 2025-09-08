@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Download, Edit, Plus, Save, Trash2 } from 'lucide-react'
 import { Button } from '../../components/primitives/button'
 
-const meta: Meta<typeof Button> = {
+const meta: Meta<Button type="button"Props> = {
   title: '02-Primitives/Button',
   component: Button,
   parameters: {
@@ -30,7 +30,7 @@ const meta: Meta<typeof Button> = {
 }
 
 export default meta
-type Story = StoryObj<typeof Button>
+type Story = StoryObj<Button type="button"Props>
 
 // Variants de base
 export const Default: Story = {
@@ -85,19 +85,19 @@ export const Large: Story = {
 // Avec icônes (contexte ERP)
 export const WithIcons = () => (
   <div className="flex space-x-4">
-    <Button>
+    <Button type="button">
       <Plus className="mr-2 h-4 w-4" />
       Nouveau Projet
     </Button>
-    <Button variant="outline">
+    <Button type="button" variant="outline">
       <Edit className="mr-2 h-4 w-4" />
       Modifier
     </Button>
-    <Button variant="secondary">
+    <Button type="button" variant="secondary">
       <Download className="mr-2 h-4 w-4" />
       Exporter
     </Button>
-    <Button variant="destructive">
+    <Button type="button" variant="destructive">
       <Trash2 className="mr-2 h-4 w-4" />
       Supprimer
     </Button>
@@ -108,8 +108,10 @@ export const WithIcons = () => (
 export const States = () => (
   <div className="space-y-4">
     <div className="flex space-x-4">
-      <Button>Normal</Button>
-      <Button disabled>Désactivé</Button>
+      <Button type="button">Normal</Button>
+      <Button type="button" disabled>
+        Désactivé
+      </Button>
     </div>
   </div>
 )
@@ -120,15 +122,15 @@ export const ERPActions = () => (
     <div>
       <h4 className="mb-2 font-medium">Actions Projet</h4>
       <div className="flex space-x-2">
-        <Button>
+        <Button type="button">
           <Plus className="mr-2 h-4 w-4" />
           Nouveau Projet
         </Button>
-        <Button variant="outline">
+        <Button type="button" variant="outline">
           <Edit className="mr-2 h-4 w-4" />
           Modifier
         </Button>
-        <Button variant="secondary">
+        <Button type="button" variant="secondary">
           <Save className="mr-2 h-4 w-4" />
           Sauvegarder
         </Button>
@@ -137,11 +139,13 @@ export const ERPActions = () => (
     <div>
       <h4 className="mb-2 font-medium">Actions Destructives</h4>
       <div className="flex space-x-2">
-        <Button variant="destructive">
+        <Button type="button" variant="destructive">
           <Trash2 className="mr-2 h-4 w-4" />
           Supprimer Projet
         </Button>
-        <Button variant="destructive">Annuler Commande</Button>
+        <Button type="button" variant="destructive">
+          Annuler Commande
+        </Button>
       </div>
     </div>
   </div>

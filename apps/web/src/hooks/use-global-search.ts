@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { useDebounce } from '@/hooks/use-debounce'
-import { apiClient } from '@/lib/api-client-instance'
+import { fetchTyped, postTyped } from '@/lib/api-typed'
 
 export interface SearchResult {
   type: string
@@ -12,7 +12,7 @@ export interface SearchResult {
   description?: string
   url?: string
   icon?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   score?: number
   highlight?: {
     title?: string[]
@@ -47,7 +47,7 @@ const SEARCH_HISTORY_KEY = 'topsteel_search_history'
 const MAX_HISTORY_ITEMS = 10
 
 export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
-  const { limit = 20, types, autoFocus = false, minChars = 2, debounceMs = 300 } = options
+  const { limit = 20, types, autoFocus = false, minChars = 2, debounceMs = 300 } = options || {}
 
   const { user } = useAuth()
   const [query, setQuery] = useState('')
@@ -70,12 +70,12 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
   // Charger l'historique de recherche
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(SEARCH_HISTORY_KEY)
+      const stored = localStorage?.getItem(SEARCH_HISTORY_KEY)
       if (stored) {
         const parsedHistory = JSON.parse(stored)
         // Valider et nettoyer l'historique
-        const validHistory = parsedHistory.filter(
-          (item: any) =>
+        const validHistory = parsedHistory?.filter(
+          (item: unknown) =>
             item &&
             typeof item.query === 'string' &&
             typeof item.timestamp === 'number' &&
@@ -84,9 +84,9 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         setHistory(validHistory)
 
         // Si aucun élément valide trouvé, nettoyer le localStorage
-        if (validHistory.length !== parsedHistory.length) {
-          if (validHistory.length === 0) {
-            localStorage.removeItem(SEARCH_HISTORY_KEY)
+        if (validHistory?.length !== parsedHistory?.length) {
+          if (validHistory?.length === 0) {
+            localStorage?.removeItem(SEARCH_HISTORY_KEY)
           } else {
             localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(validHistory))
           }
@@ -94,7 +94,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
       }
     } catch (_error) {
       // Nettoyer le localStorage en cas d'erreur
-      localStorage.removeItem(SEARCH_HISTORY_KEY)
+      localStorage?.removeItem(SEARCH_HISTORY_KEY)
     }
   }, [])
 
@@ -111,7 +111,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
 
       setHistory((prev) => {
         // Éviter les doublons
-        const filtered = prev.filter((item) => item.query !== searchQuery)
+        const filtered = prev?.filter((item) => item.query !== searchQuery)
         const updated = [newItem, ...filtered].slice(0, MAX_HISTORY_ITEMS)
 
         try {
@@ -136,12 +136,14 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
       }
 
       // Annuler la recherche précédente
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
+      if (abortControllerRef?.current) {
+        abortControllerRef?.current?.abort()
       }
 
       // Créer un nouveau controller
-      abortControllerRef.current = new AbortController()
+      if (abortControllerRef.current !== undefined) {
+        abortControllerRef.current = new AbortController()
+      }
 
       setLoading(true)
       setError(null)
@@ -149,35 +151,39 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
       try {
         const params = new URLSearchParams({
           q: searchQuery,
-          limit: limit.toString(),
+          limit: limit?.toString(),
         })
 
         if (types && types.length > 0) {
-          params.append('types', types.join(','))
+          params?.append('types', types?.join(','))
         }
 
-        const response = await apiClient.get(`/search/global?${params}`, {
-          signal: abortControllerRef.current.signal,
+        const response = await fetchTyped(`/search/global?${params}`, {
+          signal: abortControllerRef?.current?.signal,
         })
 
-        if (response.data?.success && response.data.data) {
-          const data: SearchResponse = response.data.data
+        const apiResponse = response as { data: { success: boolean; data: SearchResponse } }
+        if (apiResponse.data?.success && apiResponse.data?.data) {
+          const data: SearchResponse = apiResponse.data.data
           setResults(data.results)
           setSuggestions(data.suggestions || [])
           setFacets(data.facets || {})
           setSearchEngine(data.searchEngine)
           setSearchTime(data.took)
-          setTotal(typeof data.total === 'object' ? data.total.value : data.total)
+          setTotal(typeof data.total === 'object' ? data?.total?.value : data.total)
 
           // Sauvegarder dans l'historique
-          saveToHistory(searchQuery, typeof data.total === 'object' ? data.total.value : data.total)
+          saveToHistory(
+            searchQuery,
+            typeof data.total === 'object' ? data?.total?.value : data.total
+          )
         } else {
           setResults([])
           setSuggestions([])
           setFacets({})
           setTotal(0)
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (err.name !== 'AbortError') {
           setError(err.message || 'Erreur lors de la recherche')
           setResults([])
@@ -206,51 +212,10 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
 
   // Auto-focus si demandé
   useEffect(() => {
-    if (autoFocus && searchInputRef.current) {
-      searchInputRef.current.focus()
+    if (autoFocus && searchInputRef?.current) {
+      searchInputRef?.current?.focus()
     }
   }, [autoFocus])
-
-  // Navigation clavier dans les résultats
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!results.length) return
-
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault()
-          setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0))
-          break
-        case 'ArrowUp':
-          e.preventDefault()
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1))
-          break
-        case 'Enter':
-          e.preventDefault()
-          if (selectedIndex >= 0 && results[selectedIndex]) {
-            handleResultClick(results[selectedIndex])
-          }
-          break
-        case 'Escape':
-          e.preventDefault()
-          clearSearch()
-          break
-      }
-    },
-    [results, selectedIndex, clearSearch, handleResultClick]
-  )
-
-  // Gestion du clic sur un résultat
-  const handleResultClick = useCallback((result: SearchResult) => {
-    if (result.url) {
-      // Navigation vers l'URL du résultat
-      if (result.url.startsWith('http')) {
-        window.open(result.url, '_blank')
-      } else {
-        window.location.href = result.url
-      }
-    }
-  }, [])
 
   // Effacer la recherche
   const clearSearch = useCallback(() => {
@@ -263,6 +228,49 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
     setError(null)
   }, [])
 
+  // Gestion du clic sur un résultat
+  const handleResultClick = useCallback((result: SearchResult) => {
+    if (result.url) {
+      // Navigation vers l'URL du résultat
+      if (result?.url?.startsWith('http')) {
+        window.open(result.url, '_blank')
+      } else {
+        window.location.href = result.url
+      }
+    }
+  }, [])
+
+  // Navigation clavier dans les résultats
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!results.length) return
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e?.preventDefault()
+          setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0))
+          break
+        case 'ArrowUp':
+          e?.preventDefault()
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1))
+          break
+        case 'Enter':
+          e?.preventDefault()
+          if (selectedIndex >= 0 && results[selectedIndex]) {
+            handleResultClick(results[selectedIndex])
+          }
+          break
+        case 'Escape':
+          e?.preventDefault()
+          clearSearch()
+          break
+      }
+    },
+    [results, selectedIndex, clearSearch, handleResultClick]
+  )
+
+  // Ces fonctions ont été déplacées plus haut pour éviter l'utilisation avant déclaration
+
   // Rechercher depuis l'historique
   const searchFromHistory = useCallback((historyItem: SearchHistoryItem) => {
     setQuery(historyItem.query)
@@ -273,9 +281,9 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
     (input: string): string[] => {
       if (!input || input.length < 2) return []
 
-      const lowerInput = input.toLowerCase()
+      const lowerInput = input?.toLowerCase()
       return history
-        .filter((item) => item.query.toLowerCase().includes(lowerInput))
+        .filter((item) => item?.query?.toLowerCase().includes(lowerInput))
         .map((item) => item.query)
         .slice(0, 5)
     },
@@ -285,8 +293,8 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
   // Obtenir le statut du moteur de recherche
   const getEngineStatus = useCallback(async () => {
     try {
-      const response = await apiClient.get('/search/status')
-      return response.data?.data
+      const response = await fetchTyped('/search/status')
+      return response
     } catch (_error) {
       return null
     }
@@ -294,10 +302,10 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
 
   // Réindexer (admin seulement)
   const reindex = useCallback(async () => {
-    if (!user?.roles?.includes('admin') && !user?.roles?.includes('super_admin')) {
+    if (!user?.role?.includes('admin') && !user?.role?.includes('super_admin')) {
       throw new Error('Permission denied')
     }
-    const response = await apiClient.post('/search/reindex')
+    const response = await postTyped<{ data: any }>('/search/reindex')
     return response.data
   }, [user])
 
@@ -313,11 +321,11 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
   const getGroupedResults = useCallback(() => {
     const grouped: Record<string, SearchResult[]> = {}
 
-    results.forEach((result) => {
+    results?.forEach((result) => {
       if (!grouped[result.type]) {
         grouped[result.type] = []
       }
-      grouped[result.type].push(result)
+      grouped?.[result.type]?.push(result)
     })
 
     return grouped
@@ -326,7 +334,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
   // Obtenir le nombre de résultats par type
   const getResultCountByType = useCallback(
     (type: string): number => {
-      return results.filter((r) => r.type === type).length
+      return results?.filter((r) => r.type === type).length
     },
     [results]
   )
@@ -370,7 +378,7 @@ export function useSearch(query: string, options?: UseGlobalSearchOptions) {
   const search = useGlobalSearch(options)
 
   useEffect(() => {
-    search.setQuery(query)
+    search?.setQuery(query)
   }, [query, search.setQuery])
 
   return {

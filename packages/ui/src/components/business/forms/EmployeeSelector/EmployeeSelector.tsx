@@ -1,8 +1,20 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { Check, ChevronsUpDown, Search, Plus, User, UserCheck, Clock, AlertCircle, Crown } from 'lucide-react'
+import {
+  AlertCircle,
+  Check,
+  ChevronsUpDown,
+  Clock,
+  Crown,
+  Plus,
+  Search,
+  User,
+  UserCheck,
+} from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
-import { Button } from '../../../primitives/button/Button'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation/dropdown-menu'
-import { Badge } from '../../../data-display/badge'
-import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
 import { Input } from '../../../primitives/input/Input'
 export interface Employee {
   id: string
@@ -22,7 +33,14 @@ export interface Employee {
   email: string
   phone?: string
   role: 'admin' | 'manager' | 'supervisor' | 'operator' | 'technician' | 'engineer' | 'apprentice'
-  department: 'production' | 'quality' | 'logistics' | 'sales' | 'admin' | 'maintenance' | 'engineering'
+  department:
+    | 'production'
+    | 'quality'
+    | 'logistics'
+    | 'sales'
+    | 'admin'
+    | 'maintenance'
+    | 'engineering'
   status: 'active' | 'inactive' | 'vacation' | 'sick' | 'busy'
   availability: 'available' | 'busy' | 'offline'
   skills?: string[]
@@ -76,7 +94,7 @@ export function EmployeeSelector({
   multiple = false,
   required = false,
   disabled = false,
-  placeholder = "Sélectionner un employé...",
+  placeholder = 'Sélectionner un employé...',
   label,
   helperText,
   showRole = true,
@@ -99,6 +117,7 @@ export function EmployeeSelector({
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>(
     Array.isArray(value) ? value : value ? [value] : []
   )
+  const ids = useFormFieldIds(['employeeSelector'])
   useEffect(() => {
     if (multiple && Array.isArray(value)) {
       setSelectedEmployees(value)
@@ -107,12 +126,13 @@ export function EmployeeSelector({
     }
   }, [value, multiple])
   const filteredEmployees = employees
-    .filter(employee => !excludeIds.includes(employee.id))
-    .filter(employee => {
+    .filter((employee) => !excludeIds.includes(employee.id))
+    .filter((employee) => {
       if (filterByRole && !filterByRole.includes(employee.role)) return false
       if (filterByDepartment && !filterByDepartment.includes(employee.department)) return false
       if (filterByStatus && !filterByStatus.includes(employee.status)) return false
-      if (filterByAvailability && !filterByAvailability.includes(employee.availability)) return false
+      if (filterByAvailability && !filterByAvailability.includes(employee.availability))
+        return false
       if (filterByShift && !filterByShift.includes(employee.shift)) return false
       if (!searchQuery) return true
       const query = searchQuery.toLowerCase()
@@ -121,36 +141,39 @@ export function EmployeeSelector({
         employee.lastName.toLowerCase().includes(query) ||
         employee.employeeNumber.toLowerCase().includes(query) ||
         employee.email.toLowerCase().includes(query) ||
-        employee.skills?.some(skill => skill.toLowerCase().includes(query)) ||
+        employee.skills?.some((skill) => skill.toLowerCase().includes(query)) ||
         employee.workStation?.toLowerCase().includes(query)
       )
     })
-  const handleSelect = useCallback((employeeId: string) => {
-    if (multiple) {
-      const newSelection = selectedEmployees.includes(employeeId)
-        ? selectedEmployees.filter(id => id !== employeeId)
-        : [...selectedEmployees, employeeId]
-      if (maxSelections && newSelection.length > maxSelections) {
-        return
+  const handleSelect = useCallback(
+    (employeeId: string) => {
+      if (multiple) {
+        const newSelection = selectedEmployees.includes(employeeId)
+          ? selectedEmployees.filter((id) => id !== employeeId)
+          : [...selectedEmployees, employeeId]
+        if (maxSelections && newSelection.length > maxSelections) {
+          return
+        }
+        setSelectedEmployees(newSelection)
+        onChange?.(newSelection)
+      } else {
+        setSelectedEmployees([employeeId])
+        onChange?.(employeeId)
+        setOpen(false)
       }
-      setSelectedEmployees(newSelection)
-      onChange?.(newSelection)
-    } else {
-      setSelectedEmployees([employeeId])
-      onChange?.(employeeId)
-      setOpen(false)
-    }
-  }, [selectedEmployees, multiple, maxSelections, onChange])
+    },
+    [selectedEmployees, multiple, maxSelections, onChange]
+  )
   const getSelectedEmployeesDisplay = () => {
     if (selectedEmployees.length === 0) return placeholder
     if (multiple) {
       if (selectedEmployees.length === 1) {
-        const employee = employees.find(e => e.id === selectedEmployees[0])
+        const employee = employees.find((e) => e.id === selectedEmployees[0])
         return employee ? `${employee.firstName} ${employee.lastName}` : 'Employé sélectionné'
       }
       return `${selectedEmployees.length} employés sélectionnés`
     } else {
-      const employee = employees.find(e => e.id === selectedEmployees[0])
+      const employee = employees.find((e) => e.id === selectedEmployees[0])
       return employee ? `${employee.firstName} ${employee.lastName}` : 'Employé sélectionné'
     }
   }
@@ -158,7 +181,11 @@ export function EmployeeSelector({
     const variants = {
       admin: { label: 'Admin', className: 'bg-purple-100 text-purple-800', icon: Crown },
       manager: { label: 'Manager', className: 'bg-blue-100 text-blue-800', icon: UserCheck },
-      supervisor: { label: 'Superviseur', className: 'bg-green-100 text-green-800', icon: UserCheck },
+      supervisor: {
+        label: 'Superviseur',
+        className: 'bg-green-100 text-green-800',
+        icon: UserCheck,
+      },
       operator: { label: 'Opérateur', className: 'bg-gray-100 text-gray-800', icon: User },
       technician: { label: 'Technicien', className: 'bg-yellow-100 text-yellow-800', icon: User },
       engineer: { label: 'Ingénieur', className: 'bg-indigo-100 text-indigo-800', icon: User },
@@ -206,23 +233,28 @@ export function EmployeeSelector({
     const variant = variants[availability]
     return (
       <Badge className={`${variant.className} text-xs flex items-center gap-1`}>
-        <div className={`h-2 w-2 rounded-full ${availability === 'available' ? 'bg-green-500' : availability === 'busy' ? 'bg-yellow-500' : 'bg-gray-500'}`} />
+        <div
+          className={`h-2 w-2 rounded-full ${availability === 'available' ? 'bg-green-500' : availability === 'busy' ? 'bg-yellow-500' : 'bg-gray-500'}`}
+        />
         {variant.label}
       </Badge>
     )
   }
   // Group employees by department
-  const employeesByDepartment = filteredEmployees.reduce((acc, employee) => {
-    if (!acc[employee.department]) {
-      acc[employee.department] = []
-    }
-    acc[employee.department].push(employee)
-    return acc
-  }, {} as Record<Employee['department'], Employee[]>)
+  const employeesByDepartment = filteredEmployees.reduce(
+    (acc, employee) => {
+      if (!acc[employee.department]) {
+        acc[employee.department] = []
+      }
+      acc[employee.department].push(employee)
+      return acc
+    },
+    {} as Record<Employee['department'], Employee[]>
+  )
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <Label htmlFor="employee-selector">
+        <Label htmlFor={ids.employeeSelector}>
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
@@ -230,7 +262,8 @@ export function EmployeeSelector({
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            id="employee-selector"
+            type="button"
+            id={ids.employeeSelector}
             variant="outline"
             role="combobox"
             aria-expanded={open}
@@ -267,6 +300,7 @@ export function EmployeeSelector({
                 Aucun employé trouvé.
                 {showCreateButton && onEmployeeCreate && (
                   <Button
+                    type="button"
                     variant="link"
                     size="sm"
                     onClick={() => {
@@ -326,7 +360,7 @@ export function EmployeeSelector({
                               )}
                               {showSkills && employee.skills && employee.skills.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mt-1">
-                                  {employee.skills.slice(0, 3).map(skill => (
+                                  {employee.skills.slice(0, 3).map((skill) => (
                                     <Badge key={skill} variant="outline" className="text-xs">
                                       {skill}
                                     </Badge>
@@ -368,6 +402,7 @@ export function EmployeeSelector({
               <DropdownMenuSeparator />
               <div className="p-2">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="w-full"
@@ -384,9 +419,7 @@ export function EmployeeSelector({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      {helperText && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />
@@ -401,8 +434,8 @@ export function EmployeeSelector({
       {/* Selected employees summary for multiple selection */}
       {multiple && selectedEmployees.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2">
-          {selectedEmployees.map(id => {
-            const employee = employees.find(e => e.id === id)
+          {selectedEmployees.map((id) => {
+            const employee = employees.find((e) => e.id === id)
             return employee ? (
               <Badge key={id} variant="secondary" className="text-xs">
                 {employee.firstName} {employee.lastName}

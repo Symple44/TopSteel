@@ -1,7 +1,18 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
 import { CommonEntity } from '../../../../core/database/entities/base/multi-tenant.entity'
-import { Permission } from './permission.entity'
-import { Role } from './role.entity'
+
+// Type definitions to avoid circular dependencies
+type Role = {
+  id: string
+  name: string
+  // Other Role properties would be here
+}
+
+type Permission = {
+  id: string
+  name: string
+  // Other Permission properties would be here
+}
 
 /**
  * Table role_permissions
@@ -14,7 +25,7 @@ export class RolePermission extends CommonEntity {
   @Index()
   roleId!: string
 
-  @ManyToOne(() => Role)
+  @ManyToOne('Role')
   @JoinColumn({ name: 'roleId' })
   role!: Role
 
@@ -22,7 +33,7 @@ export class RolePermission extends CommonEntity {
   @Index()
   permissionId!: string
 
-  @ManyToOne(() => Permission)
+  @ManyToOne('Permission')
   @JoinColumn({ name: 'permissionId' })
   permission!: Permission
 

@@ -1,31 +1,33 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
-import { Check, X, Edit2 } from 'lucide-react'
-import { Input } from '../../../../primitives/input'
-import { Checkbox } from '../../../../primitives/checkbox'
-import { Badge } from '../../..//badge'
+import { Check, Edit2, X } from 'lucide-react'
+import type React from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '../../../../../lib/utils'
+import type { JsonValue, SafeObject } from '../../../../../types/common'
+import { Checkbox } from '../../../../primitives/checkbox'
+import { Input } from '../../../../primitives/input'
+import { Badge } from '../../..//badge'
 import type { ColumnConfig } from '../../types'
 
 interface TableCellProps<T> {
   row: T
   column: ColumnConfig<T>
-  onEdit?: (value: any) => void
+  onEdit?: (value: JsonValue) => void
   className?: string
 }
 
 /**
  * Cellule de tableau avec support d'édition inline
  */
-export function TableCell<T extends Record<string, any>>({
+export function TableCell<T extends SafeObject>({
   row,
   column,
   onEdit,
   className,
 }: TableCellProps<T>) {
   const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState<any>(null)
+  const [editValue, setEditValue] = useState<JsonValue>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Obtenir la valeur de la cellule
@@ -47,7 +49,7 @@ export function TableCell<T extends Record<string, any>>({
   // Activer l'édition
   const startEdit = () => {
     if (!column.editable || !onEdit) return
-    setEditValue(value)
+    setEditValue(value as JsonValue)
     setIsEditing(true)
   }
 
@@ -74,7 +76,7 @@ export function TableCell<T extends Record<string, any>>({
   }, [isEditing])
 
   // Formater la valeur pour l'affichage
-  const formatValue = (val: any): React.ReactNode => {
+  const formatValue = (val: JsonValue): React.ReactNode => {
     // Rendu personnalisé
     if (column.render) {
       return column.render(val, row, column)
@@ -84,64 +86,79 @@ export function TableCell<T extends Record<string, any>>({
     switch (column.type) {
       case 'boolean':
         return (
-          <Checkbox 
-            checked={!!val} 
+          <Checkbox
+            checked={!!val}
             disabled={!column.editable}
             onCheckedChange={column.editable ? onEdit : undefined}
           />
         )
 
-      case 'date':
+      case 'date': {
         if (!val) return '-'
-        const date = new Date(val)
-        return date.toLocaleDateString('fr-FR')
+        try {
+          const date = new Date(String(val))
+          return date.toLocaleDateString('fr-FR')
+        } catch {
+          return String(val)
+        }
+      }
 
-      case 'datetime':
+      case 'datetime': {
         if (!val) return '-'
-        const datetime = new Date(val)
-        return datetime.toLocaleString('fr-FR')
+        try {
+          const datetime = new Date(String(val))
+          return datetime.toLocaleString('fr-FR')
+        } catch {
+          return String(val)
+        }
+      }
 
       case 'number':
         if (val == null) return '-'
         if (column.format) {
-          let formatted = val
+          const numVal = Number(val)
+          let formatted: string | number = numVal
           if (column.format.decimals !== undefined) {
-            formatted = Number(val).toFixed(column.format.decimals)
+            formatted = numVal.toFixed(column.format.decimals)
           }
           if (column.format.prefix) {
-            formatted = column.format.prefix + formatted
+            formatted = column.format.prefix + String(formatted)
           }
           if (column.format.suffix) {
-            formatted = formatted + column.format.suffix
+            formatted = String(formatted) + column.format.suffix
           }
-          return formatted
+          return String(formatted)
         }
-        return val
+        return String(val)
 
       case 'select':
-      case 'multiselect':
-        if (!column.options) return val
-        const option = column.options.find(opt => opt.value === val)
+      case 'multiselect': {
+        if (!column.options) return String(val || '')
+        const option = column.options.find((opt) => opt.value === val)
         if (option) {
           return option.color ? (
-            <Badge style={{ backgroundColor: option.color }}>
-              {option.label}
-            </Badge>
+            <Badge style={{ backgroundColor: option.color }}>{option.label}</Badge>
           ) : (
             option.label
           )
         }
-        return val
+        return String(val || '')
+      }
 
-      case 'richtext':
+      case 'richtext': {
         if (!val) return '-'
         // Nettoyer le HTML pour l'affichage
         const div = document.createElement('div')
-        div.innerHTML = val
+        div.innerHTML = String(val)
         return div.textContent || '-'
+      }
 
       default:
         if (val == null || val === '') return '-'
+        // Handle arrays and objects by converting to string
+        if (typeof val === 'object') {
+          return JSON.stringify(val)
+        }
         return String(val)
     }
   }
@@ -154,7 +171,11 @@ export function TableCell<T extends Record<string, any>>({
           <Input
             ref={inputRef}
             type={column.type === 'number' ? 'number' : 'text'}
-            value={editValue}
+            value={
+              typeof editValue === 'string' || typeof editValue === 'number'
+                ? String(editValue)
+                : ''
+            }
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') saveEdit()
@@ -162,18 +183,10 @@ export function TableCell<T extends Record<string, any>>({
             }}
             className="h-8"
           />
-          <button
-            onClick={saveEdit}
-            className="p-1 hover:bg-green-100 rounded"
-            title="Sauvegarder"
-          >
+          <button onClick={saveEdit} className="p-1 hover:bg-green-100 rounded" title="Sauvegarder">
             <Check className="h-4 w-4 text-green-600" />
           </button>
-          <button
-            onClick={cancelEdit}
-            className="p-1 hover:bg-red-100 rounded"
-            title="Annuler"
-          >
+          <button onClick={cancelEdit} className="p-1 hover:bg-red-100 rounded" title="Annuler">
             <X className="h-4 w-4 text-red-600" />
           </button>
         </div>
@@ -183,7 +196,7 @@ export function TableCell<T extends Record<string, any>>({
 
   // Mode affichage
   return (
-    <td 
+    <td
       className={cn(
         'px-4 py-2',
         column.editable && onEdit && 'group cursor-pointer hover:bg-muted/50',
@@ -192,9 +205,9 @@ export function TableCell<T extends Record<string, any>>({
       onDoubleClick={startEdit}
     >
       <div className="flex items-center justify-between">
-        <span>{formatValue(value)}</span>
+        <span>{formatValue(value as JsonValue)}</span>
         {column.editable && onEdit && (
-          <Edit2 
+          <Edit2
             className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
             onClick={(e) => {
               e.stopPropagation()

@@ -513,7 +513,7 @@ export class MenuConfigurationService {
       {
         name: data.name as string,
         description: typeof data.description === 'string' ? data.description : undefined,
-        items: data.items as any,
+        items: data.items as unknown,
       },
       createdBy
     )

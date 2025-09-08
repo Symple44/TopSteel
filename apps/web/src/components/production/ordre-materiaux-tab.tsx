@@ -1,7 +1,11 @@
 'use client'
 
-import type { MaterialOrder, OrdrePriorite, OrdreStatut } from '@erp/domains/production'
-import { MaterialStatus } from '@erp/domains/production'
+import {
+  type MaterialOrder,
+  MaterialStatus,
+  type OrdrePriorite,
+  type OrdreStatut,
+} from '@erp/domains'
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 import { AlertTriangle, Package, Plus } from 'lucide-react'
 
@@ -19,8 +23,8 @@ interface Materiau {
 interface OrdreSimple {
   id: string
   numero: string
-  statut: OrdreStatut
-  priorite: OrdrePriorite
+  statut: (typeof OrdreStatut)[keyof typeof OrdreStatut]
+  priorite: (typeof OrdrePriorite)[keyof typeof OrdrePriorite]
   avancement: number
   description?: string
   projetId: string
@@ -107,14 +111,14 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
             Liste des matériaux nécessaires pour cet ordre de fabrication
           </p>
         </div>
-        <Button size="sm">
+        <Button type="button" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Ajouter matériau
         </Button>
       </div>
 
       <div className="space-y-4">
-        {materiaux.map((materiau: Materiau) => (
+        {materiaux?.map((materiau: Materiau) => (
           <Card key={materiau.id} className="transition-shadow hover:shadow-md">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -161,7 +165,7 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
         ))}
       </div>
 
-      {materiaux.some((m) => m.statut === 'INSUFFISANT') && (
+      {materiaux?.some((m) => m.statut === 'INSUFFISANT') && (
         <Card className="border-orange-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-orange-600">
@@ -174,10 +178,10 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
               </div>
             </div>
             <div className="mt-4 flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 Générer commande
               </Button>
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 Vérifier alternatives
               </Button>
             </div>

@@ -7,12 +7,12 @@ export async function DELETE(
   try {
     const { key } = await params
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       message: `Raccourci ${key} supprimé avec succès`,
     })
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors de la suppression du raccourci',

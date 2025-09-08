@@ -1,6 +1,6 @@
 'use client'
 
-import { Label } from '@erp/ui'
+import { Label, useFormFieldIds } from '@erp/ui'
 import {
   Button,
   Dialog,
@@ -20,7 +20,7 @@ import {
 import { Menu, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'
-import { apiClient } from '@/lib/api-client'
+import { postTyped } from '@/lib/api-typed'
 
 interface AddToMenuButtonProps {
   queryBuilderId: string
@@ -50,9 +50,10 @@ export function AddToMenuButton({
     title: queryBuilderName,
     icon: 'BarChart3',
   })
+  const ids = useFormFieldIds(['title'])
 
   const handleAddToMenu = async () => {
-    if (!formData.title.trim()) {
+    if (!formData?.title?.trim()) {
       toast({
         title: 'Erreur',
         description: 'Le titre est requis',
@@ -64,7 +65,7 @@ export function AddToMenuButton({
     setLoading(true)
     try {
       // D'abord, préparer les données pour le menu
-      const menuData = await apiClient.post(`/query-builder/${queryBuilderId}/add-to-menu`, {
+      const menuData = await postTyped(`/query-builder/${queryBuilderId}/add-to-menu`, {
         title: formData.title,
         icon: formData.icon,
       })
@@ -73,10 +74,10 @@ export function AddToMenuButton({
       const menuResult = menuData as {
         data: { queryBuilderId: string; title: string; icon: string }
       }
-      await apiClient.post('/admin/menus/user-data-view', {
-        queryBuilderId: menuResult.data.queryBuilderId,
-        title: menuResult.data.title,
-        icon: menuResult.data.icon,
+      await postTyped('/admin/menus/user-data-view', {
+        queryBuilderId: menuResult?.data?.queryBuilderId,
+        title: menuResult?.data?.title,
+        icon: menuResult?.data?.icon,
       })
 
       toast({
@@ -92,7 +93,9 @@ export function AddToMenuButton({
     } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.response?.data?.message || "Impossible d'ajouter la vue au menu",
+        description:
+          (error as unknown)?.response?.data?.message ||
+          (error instanceof Error ? error.message : "Impossible d'ajouter la vue au menu"),
         variant: 'destructive',
       })
     } finally {
@@ -103,7 +106,7 @@ export function AddToMenuButton({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button type="button" variant="outline" size="sm">
           <Menu className="h-4 w-4 mr-2" />
           Ajouter au Menu
         </Button>
@@ -117,13 +120,13 @@ export function AddToMenuButton({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="title" className="text-right">
+            <Label htmlFor={ids.title} className="text-right">
               Titre
             </Label>
             <Input
-              id="title"
+              id={ids.title}
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, title: e?.target?.value })}
               className="col-span-3"
               placeholder="Nom dans le menu"
             />
@@ -140,7 +143,7 @@ export function AddToMenuButton({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {iconOptions.map((option) => (
+                {iconOptions?.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -150,10 +153,10 @@ export function AddToMenuButton({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>
             Annuler
           </Button>
-          <Button onClick={handleAddToMenu} disabled={loading}>
+          <Button type="button" onClick={handleAddToMenu} disabled={loading}>
             {loading ? (
               <>
                 <Plus className="h-4 w-4 mr-2 animate-spin" />

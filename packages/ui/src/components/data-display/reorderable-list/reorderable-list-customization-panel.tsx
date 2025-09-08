@@ -2,6 +2,7 @@
 
 import { Eye, Layout, Palette, RotateCcw, Save, Settings, Zap } from 'lucide-react'
 import { useState } from 'react'
+import { useFormFieldIds } from '../../../hooks/useFormFieldIds'
 import { cn } from '../../../lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '../../layout/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../navigation/tabs'
@@ -30,6 +31,15 @@ export function ReorderableListCustomizationPanel({
   className,
   position = 'right',
 }: CustomizationPanelProps) {
+  const ids = useFormFieldIds([
+    'maxDepth',
+    'allowNesting',
+    'levelIndicators',
+    'connectionLines',
+    'animations',
+    'compactMode',
+    'defaultExpanded',
+  ])
   const [activeTab, setActiveTab] = useState('theme')
 
   // Gestionnaires pour les changements
@@ -136,16 +146,16 @@ export function ReorderableListCustomizationPanel({
             <div className="space-y-3">
               <div>
                 <label
-                  htmlFor="maxDepth"
+                  htmlFor={ids.maxDepth}
                   className="text-xs font-medium text-muted-foreground mb-2 block"
                 >
                   Profondeur maximale: {config.layout.maxDepth}
                 </label>
                 <input
                   type="range"
-                  id="maxDepth"
+                  id={ids.maxDepth}
                   value={config.layout.maxDepth}
-                  onChange={(e) => handleLayoutChange('maxDepth', parseInt(e.target.value))}
+                  onChange={(e) => handleLayoutChange('maxDepth', parseInt(e.target.value, 10))}
                   min={1}
                   max={20}
                   step={1}
@@ -154,11 +164,14 @@ export function ReorderableListCustomizationPanel({
               </div>
 
               <div className="flex items-center justify-between">
-                <label htmlFor="allowNesting" className="text-xs font-medium text-muted-foreground">
+                <label
+                  htmlFor={ids.allowNesting}
+                  className="text-xs font-medium text-muted-foreground"
+                >
                   Imbrication autorisée
                 </label>
                 <Switch
-                  id="allowNesting"
+                  id={ids.allowNesting}
                   checked={config.layout.allowNesting}
                   onCheckedChange={(checked: boolean) =>
                     handleLayoutChange('allowNesting', checked)
@@ -172,6 +185,7 @@ export function ReorderableListCustomizationPanel({
                 </div>
                 <div className="flex gap-2">
                   <Button
+                    type="button"
                     variant={config.layout.dragHandlePosition === 'left' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handleLayoutChange('dragHandlePosition', 'left')}
@@ -180,6 +194,7 @@ export function ReorderableListCustomizationPanel({
                     Gauche
                   </Button>
                   <Button
+                    type="button"
                     variant={config.layout.dragHandlePosition === 'right' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handleLayoutChange('dragHandlePosition', 'right')}
@@ -198,12 +213,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="h-3 w-3" />
-                  <label htmlFor="level-indicators" className="text-xs font-medium">
+                  <label htmlFor={ids.levelIndicators} className="text-xs font-medium">
                     Indicateurs de niveau
                   </label>
                 </div>
                 <Switch
-                  id="level-indicators"
+                  id={ids.levelIndicators}
                   checked={config.preferences.showLevelIndicators}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('showLevelIndicators', checked)
@@ -214,12 +229,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="h-3 w-3" />
-                  <label htmlFor="connection-lines" className="text-xs font-medium">
+                  <label htmlFor={ids.connectionLines} className="text-xs font-medium">
                     Lignes de connexion
                   </label>
                 </div>
                 <Switch
-                  id="connection-lines"
+                  id={ids.connectionLines}
                   checked={config.preferences.showConnectionLines}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('showConnectionLines', checked)
@@ -230,12 +245,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Zap className="h-3 w-3" />
-                  <label htmlFor="animations" className="text-xs font-medium">
+                  <label htmlFor={ids.animations} className="text-xs font-medium">
                     Animations
                   </label>
                 </div>
                 <Switch
-                  id="animations"
+                  id={ids.animations}
                   checked={config.preferences.enableAnimations}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('enableAnimations', checked)
@@ -246,12 +261,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Layout className="h-3 w-3" />
-                  <label htmlFor="compact-mode" className="text-xs font-medium">
+                  <label htmlFor={ids.compactMode} className="text-xs font-medium">
                     Mode compact
                   </label>
                 </div>
                 <Switch
-                  id="compact-mode"
+                  id={ids.compactMode}
                   checked={config.preferences.compactMode}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('compactMode', checked)
@@ -262,12 +277,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="h-3 w-3" />
-                  <label htmlFor="default-expanded" className="text-xs font-medium">
+                  <label htmlFor={ids.defaultExpanded} className="text-xs font-medium">
                     Expansion par défaut
                   </label>
                 </div>
                 <Switch
-                  id="default-expanded"
+                  id={ids.defaultExpanded}
                   checked={config.preferences.defaultExpanded}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('defaultExpanded', checked)
@@ -280,11 +295,11 @@ export function ReorderableListCustomizationPanel({
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 border-t border-border/50">
-          <Button onClick={onSave} disabled={saving} size="sm" className="flex-1">
+          <Button type="button" onClick={onSave} disabled={saving} size="sm" className="flex-1">
             <Save className="h-3 w-3 mr-1" />
             {saving ? 'Sauvegarde...' : 'Sauvegarder'}
           </Button>
-          <Button onClick={onReset} variant="outline" size="sm">
+          <Button type="button" onClick={onReset} variant="outline" size="sm">
             <RotateCcw className="h-3 w-3" />
           </Button>
         </div>

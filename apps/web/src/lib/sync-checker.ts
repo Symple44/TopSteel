@@ -5,7 +5,7 @@ export interface SyncIssue {
   severity: 'low' | 'medium' | 'high'
   message: string
   timestamp: string
-  details?: any
+  details?: Record<string, unknown>
 }
 
 class SyncChecker {
@@ -22,16 +22,16 @@ class SyncChecker {
       timestamp: new Date().toISOString(),
     }
 
-    this.issues.push(newIssue)
+    this?.issues?.push(newIssue)
 
     // Envoyer le toast si un callback est configuré
     if (this.toastCallback) {
-      this.toastCallback(newIssue)
+      this?.toastCallback(newIssue)
     }
 
     // Auto-nettoyer les anciens problèmes (garder seulement les 10 derniers)
-    if (this.issues.length > 10) {
-      this.issues = this.issues.slice(-10)
+    if (this?.issues?.length > 10) {
+      this.issues = this?.issues?.slice(-10)
     }
   }
 
@@ -46,7 +46,7 @@ class SyncChecker {
   // Vérifications spécifiques
   checkMenuSync(expectedCount: number, actualCount: number, context: string) {
     if (expectedCount !== actualCount) {
-      this.addIssue({
+      this?.addIssue({
         type: 'menu',
         severity: 'medium',
         message: `Désynchronisation du menu détectée dans ${context}`,
@@ -57,9 +57,9 @@ class SyncChecker {
 
   checkDatabaseConnection() {}
 
-  checkStorageConsistency(storageType: string, expectedData: any, actualData: any) {
+  checkStorageConsistency(storageType: string, expectedData: unknown, actualData: unknown) {
     if (JSON.stringify(expectedData) !== JSON.stringify(actualData)) {
-      this.addIssue({
+      this?.addIssue({
         type: 'storage',
         severity: 'medium',
         message: `Incohérence détectée dans ${storageType}`,

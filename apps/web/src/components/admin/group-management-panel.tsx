@@ -34,6 +34,7 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import {
   Building,
@@ -51,12 +52,12 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { PermissionHide } from '@/components/auth/permission-guard'
 import { callClientApi } from '@/utils/backend-api'
-import BulkUserAssignment from './bulk-user-assignment'
+import { BulkUserAssignment } from './bulk-user-assignment'
 
 // Fonction utilitaire pour formater les dates
 const formatDate = (date: string | Date) => {
   const d = new Date(date)
-  return d.toLocaleDateString('fr-FR', {
+  return d?.toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -113,7 +114,7 @@ const GROUP_TYPE_COLORS = {
   CUSTOM: 'bg-gray-100 text-gray-800',
 }
 
-export default function GroupManagementPanel() {
+export function GroupManagementPanel() {
   const [groups, setGroups] = useState<Group[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
@@ -130,9 +131,9 @@ export default function GroupManagementPanel() {
   const loadGroups = useCallback(async () => {
     try {
       const response = await callClientApi('admin/groups')
-      const data = await response.json()
-      if (data.success) {
-        setGroups(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setGroups(data?.data)
       }
     } catch (_error) {
     } finally {
@@ -143,9 +144,9 @@ export default function GroupManagementPanel() {
   const loadRoles = useCallback(async () => {
     try {
       const response = await callClientApi('admin/roles')
-      const data = await response.json()
-      if (data.success) {
-        setRoles(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setRoles(data?.data)
       }
     } catch (_error) {}
   }, [])
@@ -159,16 +160,16 @@ export default function GroupManagementPanel() {
     try {
       // Charger les utilisateurs du groupe
       const usersResponse = await callClientApi(`admin/groups/${groupId}/users`)
-      const usersData = await usersResponse.json()
-      if (usersData.success) {
-        setGroupUsers(usersData.data)
+      const usersData = await usersResponse?.json()
+      if (usersData?.success) {
+        setGroupUsers(usersData?.data)
       }
 
       // Charger les rôles du groupe
       const rolesResponse = await callClientApi(`admin/groups/${groupId}/roles`)
-      const rolesData = await rolesResponse.json()
-      if (rolesData.success) {
-        setGroupRoles(rolesData.data)
+      const rolesData = await rolesResponse?.json()
+      if (rolesData?.success) {
+        setGroupRoles(rolesData?.data)
       }
     } catch (_error) {}
   }
@@ -183,7 +184,7 @@ export default function GroupManagementPanel() {
         method: 'DELETE',
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         loadGroups()
       }
     } catch (_error) {}
@@ -201,10 +202,10 @@ export default function GroupManagementPanel() {
   }
 
   // Regrouper les groupes par type
-  const groupsByType = groups.reduce(
+  const groupsByType = groups?.reduce(
     (acc, group) => {
       if (!acc[group.type]) acc[group.type] = []
-      acc[group.type].push(group)
+      acc?.[group.type]?.push(group)
       return acc
     },
     {} as Record<string, Group[]>
@@ -267,7 +268,7 @@ export default function GroupManagementPanel() {
       <div className="grid gap-4 md:grid-cols-4">
         {Object.entries(GROUP_TYPE_LABELS).map(([type, label]) => {
           const Icon = GROUP_TYPE_ICONS[type as keyof typeof GROUP_TYPE_ICONS]
-          const count = groupsByType[type]?.length || 0
+          const count = groupsByType[type]?.length ?? 0
           return (
             <Card key={type}>
               <CardContent className="p-6">
@@ -290,7 +291,7 @@ export default function GroupManagementPanel() {
 
         <TabsContent value="groups" className="space-y-4">
           <div className="grid gap-4">
-            {groups.map((group) => (
+            {groups?.map((group) => (
               <GroupCard
                 key={group.id}
                 group={group}
@@ -319,7 +320,7 @@ export default function GroupManagementPanel() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
-                  {typeGroups.map((group) => (
+                  {typeGroups?.map((group) => (
                     <GroupCard
                       key={group.id}
                       group={group}
@@ -410,10 +411,10 @@ function GroupCard({
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
             <div
-              className={`p-2 rounded-lg ${GROUP_TYPE_COLORS[group.type].replace('text-', 'bg-').replace('-800', '-100')}`}
+              className={`p-2 rounded-lg ${GROUP_TYPE_COLORS?.[group.type]?.replace('text-', 'bg-').replace('-800', '-100')}`}
             >
               <Icon
-                className={`h-6 w-6 ${GROUP_TYPE_COLORS[group.type].replace('bg-', 'text-').replace('-100', '-600')}`}
+                className={`h-6 w-6 ${GROUP_TYPE_COLORS?.[group.type]?.replace('bg-', 'text-').replace('-100', '-600')}`}
               />
             </div>
             <div className="flex-1">
@@ -491,8 +492,11 @@ function GroupForm({
     roleIds: [] as string[],
   })
 
+  // Generate unique IDs for form fields
+  const fieldIds = useFormFieldIds(['name', 'description', 'type', 'isActive'])
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     try {
       const url = group ? `admin/groups/${group.id}` : 'admin/groups'
@@ -502,7 +506,7 @@ function GroupForm({
         body: JSON.stringify(formData),
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         onSave()
       }
     } catch (_error) {}
@@ -511,12 +515,12 @@ function GroupForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">Nom du groupe</Label>
+        <Label htmlFor={fieldIds.name}>Nom du groupe</Label>
         <Input
-          id="name"
+          id={fieldIds.name}
           value={formData.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setFormData((prev) => ({ ...prev, name: e.target.value }))
+            setFormData((prev) => ({ ...prev, name: e?.target?.value }))
           }
           placeholder="Ex: Équipe commerciale..."
           required
@@ -524,12 +528,12 @@ function GroupForm({
       </div>
 
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor={fieldIds.description}>Description</Label>
         <Textarea
-          id="description"
+          id={fieldIds.description}
           value={formData.description}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setFormData((prev) => ({ ...prev, description: e.target.value }))
+            setFormData((prev) => ({ ...prev, description: e?.target?.value }))
           }
           placeholder="Décrivez le rôle et les responsabilités de ce groupe..."
           required
@@ -537,14 +541,14 @@ function GroupForm({
       </div>
 
       <div>
-        <Label htmlFor="type">Type de groupe</Label>
+        <Label htmlFor={fieldIds.type}>Type de groupe</Label>
         <Select
           value={formData.type}
           onValueChange={(value: string) =>
             setFormData((prev) => ({ ...prev, type: value as typeof formData.type }))
           }
         >
-          <SelectTrigger>
+          <SelectTrigger id={fieldIds.type}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -564,18 +568,18 @@ function GroupForm({
             Sélectionnez les rôles qui seront automatiquement attribués aux membres du groupe
           </p>
           <div className="space-y-2 border rounded-lg p-3 max-h-48 overflow-y-auto">
-            {roles.map((role) => (
+            {roles?.map((role) => (
               <div key={role.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={`role-${role.id}`}
-                  checked={formData.roleIds.includes(role.id)}
+                  checked={formData?.roleIds?.includes(role.id)}
                   onCheckedChange={(checked: boolean) => {
                     if (checked) {
                       setFormData((prev) => ({ ...prev, roleIds: [...prev.roleIds, role.id] }))
                     } else {
                       setFormData((prev) => ({
                         ...prev,
-                        roleIds: prev.roleIds.filter((id) => id !== role.id),
+                        roleIds: prev?.roleIds?.filter((id) => id !== role.id),
                       }))
                     }
                   }}
@@ -592,13 +596,13 @@ function GroupForm({
 
       <div className="flex items-center space-x-2">
         <Switch
-          id="isActive"
+          id={fieldIds.isActive}
           checked={formData.isActive}
           onCheckedChange={(checked: boolean) =>
             setFormData((prev) => ({ ...prev, isActive: checked }))
           }
         />
-        <Label htmlFor="isActive">Groupe actif</Label>
+        <Label htmlFor={fieldIds.isActive}>Groupe actif</Label>
       </div>
 
       <div className="flex justify-end space-x-2">
@@ -625,7 +629,7 @@ function GroupDetails({
   allRoles: Role[]
   onRefresh: () => void
 }) {
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(roles.map((r) => r.id))
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(roles?.map((r) => r.id))
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
 
   if (!group) return null
@@ -637,7 +641,7 @@ function GroupDetails({
         body: JSON.stringify({ roleIds: selectedRoles }),
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         onRefresh()
       }
     } catch (_error) {}
@@ -649,7 +653,7 @@ function GroupDetails({
         method: 'DELETE',
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         onRefresh()
       }
     } catch (_error) {}
@@ -724,14 +728,14 @@ function GroupDetails({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
+                {users?.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar>
                           <AvatarFallback>
-                            {user.firstName[0]}
-                            {user.lastName[0]}
+                            {user.firstName?.[0]}
+                            {user.lastName?.[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
@@ -779,18 +783,18 @@ function GroupDetails({
           <Card>
             <CardContent className="p-4">
               <div className="space-y-2">
-                {allRoles.map((role) => (
+                {allRoles?.map((role) => (
                   <div
                     key={role.id}
                     className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded"
                   >
                     <Checkbox
-                      checked={selectedRoles.includes(role.id)}
+                      checked={selectedRoles?.includes(role.id)}
                       onCheckedChange={(checked: boolean) => {
                         if (checked) {
                           setSelectedRoles([...selectedRoles, role.id])
                         } else {
-                          setSelectedRoles(selectedRoles.filter((id) => id !== role.id))
+                          setSelectedRoles(selectedRoles?.filter((id) => id !== role.id))
                         }
                       }}
                     />

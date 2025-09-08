@@ -60,6 +60,7 @@ const Toaster = forwardRef<HTMLDivElement, ToasterProps>(
                 )}
               </div>
               <Button
+                type="button"
                 onClick={() => removeToast(toast.id)}
                 className="ml-3 text-sm opacity-70 hover:opacity-100"
               >

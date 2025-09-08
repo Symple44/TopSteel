@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, Not, type Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import { Partner } from '../../../domains/partners/entities/partner.entity'
 import type {
   MarketplaceCustomerAdapter,
@@ -224,7 +225,7 @@ export class ERPMarketplaceIntegrationService {
           if (!article.marketplaceSettings) {
             article.marketplaceSettings = {
               basePrice: article.prixVenteHT,
-              categories: [article.famille].filter(Boolean),
+              categories: [article.famille].filter((c): c is string => Boolean(c)),
               description: article.description,
               images: [],
               tags: [],
@@ -233,7 +234,7 @@ export class ERPMarketplaceIntegrationService {
           }
           processed++
         } catch (error) {
-          errors.push(`Failed to sync product ${article.reference}: ${error.message}`)
+          errors.push(`Failed to sync product ${article.reference}: ${getErrorMessage(error)}`)
         }
       }
 
@@ -253,7 +254,7 @@ export class ERPMarketplaceIntegrationService {
           })
           processed++
         } catch (error) {
-          errors.push(`Failed to sync customer ${customer.email}: ${error.message}`)
+          errors.push(`Failed to sync customer ${customer.email}: ${getErrorMessage(error)}`)
         }
       }
 
@@ -290,7 +291,7 @@ export class ERPMarketplaceIntegrationService {
       return {
         success: false,
         processed,
-        errors: [...errors, `Critical error: ${error.message}`],
+        errors: [...errors, `Critical error: ${getErrorMessage(error)}`],
         duration: Date.now() - startTime,
         timestamp,
       }

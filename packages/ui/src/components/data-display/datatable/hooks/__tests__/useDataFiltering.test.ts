@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
-import { useDataFiltering } from '../useDataFiltering.simple'
+import { describe, expect, it } from 'vitest'
 import type { FilterConfig } from '../../types'
+import { useDataFiltering } from '../useDataFiltering.simple'
 
 describe('useDataFiltering', () => {
   const sampleData = [
@@ -12,18 +12,14 @@ describe('useDataFiltering', () => {
   ]
 
   it('should filter by search term', () => {
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, [], 'Alice')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, [], 'Alice'))
 
     expect(result.current).toHaveLength(1)
     expect(result.current[0].name).toBe('Alice Smith')
   })
 
   it('should search case-insensitively', () => {
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, [], 'JOHN')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, [], 'JOHN'))
 
     expect(result.current).toHaveLength(2)
     expect(result.current[0].name).toBe('John Doe')
@@ -31,39 +27,27 @@ describe('useDataFiltering', () => {
   })
 
   it('should filter by exact match', () => {
-    const filters: FilterConfig[] = [
-      { column: 'city', operator: 'equals', value: 'Paris' }
-    ]
+    const filters: FilterConfig[] = [{ column: 'city', operator: 'equals', value: 'Paris' }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(1)
     expect(result.current[0].city).toBe('Paris')
   })
 
   it('should filter by contains', () => {
-    const filters: FilterConfig[] = [
-      { column: 'name', operator: 'contains', value: 'Smith' }
-    ]
+    const filters: FilterConfig[] = [{ column: 'name', operator: 'contains', value: 'Smith' }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(1)
     expect(result.current[0].name).toBe('Alice Smith')
   })
 
   it('should filter by greater than', () => {
-    const filters: FilterConfig[] = [
-      { column: 'age', operator: 'greaterThan', value: 28 }
-    ]
+    const filters: FilterConfig[] = [{ column: 'age', operator: 'gt', value: 28 }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(2)
     expect(result.current[0].age).toBe(30)
@@ -71,13 +55,9 @@ describe('useDataFiltering', () => {
   })
 
   it('should filter by less than', () => {
-    const filters: FilterConfig[] = [
-      { column: 'age', operator: 'lessThan', value: 30 }
-    ]
+    const filters: FilterConfig[] = [{ column: 'age', operator: 'lt', value: 30 }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(2)
     expect(result.current[0].age).toBe(25)
@@ -85,13 +65,9 @@ describe('useDataFiltering', () => {
   })
 
   it('should filter by between', () => {
-    const filters: FilterConfig[] = [
-      { column: 'age', operator: 'between', value: [26, 30] }
-    ]
+    const filters: FilterConfig[] = [{ column: 'age', operator: 'between', value: [26, 30] }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(2)
     expect(result.current[0].age).toBe(30)
@@ -99,27 +75,21 @@ describe('useDataFiltering', () => {
   })
 
   it('should filter by boolean values', () => {
-    const filters: FilterConfig[] = [
-      { column: 'active', operator: 'equals', value: true }
-    ]
+    const filters: FilterConfig[] = [{ column: 'active', operator: 'equals', value: true }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(3)
-    expect(result.current.every(item => item.active)).toBe(true)
+    expect(result.current.every((item) => item.active)).toBe(true)
   })
 
   it('should combine multiple filters with AND logic', () => {
     const filters: FilterConfig[] = [
       { column: 'active', operator: 'equals', value: true },
-      { column: 'age', operator: 'greaterThan', value: 28 }
+      { column: 'age', operator: 'gt', value: 28 },
     ]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(2)
     expect(result.current[0].name).toBe('John Doe')
@@ -127,13 +97,9 @@ describe('useDataFiltering', () => {
   })
 
   it('should combine search with filters', () => {
-    const filters: FilterConfig[] = [
-      { column: 'active', operator: 'equals', value: true }
-    ]
+    const filters: FilterConfig[] = [{ column: 'active', operator: 'equals', value: true }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, 'John')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, 'John'))
 
     expect(result.current).toHaveLength(2)
     expect(result.current[0].name).toBe('John Doe')
@@ -141,21 +107,15 @@ describe('useDataFiltering', () => {
   })
 
   it('should return empty array when no matches', () => {
-    const filters: FilterConfig[] = [
-      { column: 'age', operator: 'greaterThan', value: 100 }
-    ]
+    const filters: FilterConfig[] = [{ column: 'age', operator: 'gt', value: 100 }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(sampleData, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(sampleData, filters, ''))
 
     expect(result.current).toHaveLength(0)
   })
 
   it('should handle empty data', () => {
-    const { result } = renderHook(() => 
-      useDataFiltering([], [], 'search')
-    )
+    const { result } = renderHook(() => useDataFiltering([], [], 'search'))
 
     expect(result.current).toEqual([])
   })
@@ -167,13 +127,9 @@ describe('useDataFiltering', () => {
       { id: 3, name: 'Bob', value: 'test' },
     ]
 
-    const filters: FilterConfig[] = [
-      { column: 'value', operator: 'contains', value: 'test' }
-    ]
+    const filters: FilterConfig[] = [{ column: 'value', operator: 'contains', value: 'test' }]
 
-    const { result } = renderHook(() => 
-      useDataFiltering(dataWithNulls, filters, '')
-    )
+    const { result } = renderHook(() => useDataFiltering(dataWithNulls, filters, ''))
 
     expect(result.current).toHaveLength(1)
     expect(result.current[0].name).toBe('Bob')

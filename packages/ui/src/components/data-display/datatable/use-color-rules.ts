@@ -25,7 +25,7 @@ export function useColorRules<T = any>(data: T[], columns: ColumnConfig<T>[], ru
 
       columns.forEach((column) => {
         // Obtenir la valeur de la cellule
-        const cellValue = column.getValue ? column.getValue(row) : (row as any)[column.key]
+        const cellValue = column.getValue ? column.getValue(row) : (row as unknown)[column.key]
         const appliedCellRules: ColorRule[] = []
 
         // Évaluer chaque règle pour cette cellule
@@ -111,7 +111,7 @@ export function useColorRules<T = any>(data: T[], columns: ColumnConfig<T>[], ru
 }
 
 // Fonction pour évaluer une règle sur une valeur
-function evaluateRule(value: any, rule: ColorRule): boolean {
+function evaluateRule(value: unknown, rule: ColorRule): boolean {
   // Normaliser la valeur
   const normalizedValue = normalizeValue(value)
   const ruleValue = normalizeValue(rule.value)
@@ -173,7 +173,7 @@ function evaluateRule(value: any, rule: ColorRule): boolean {
 }
 
 // Fonction pour normaliser les valeurs avant comparaison
-function normalizeValue(value: any): string | number | boolean | null {
+function normalizeValue(value: unknown): string | number | boolean | null {
   if (value === null || value === undefined) {
     return null
   }

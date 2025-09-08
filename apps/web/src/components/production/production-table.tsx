@@ -2,7 +2,6 @@
 'use client'
 
 import { Badge, Button, Card, CardContent } from '@erp/ui'
-
 import { AlertTriangle, CheckCircle, Clock, Edit, Eye, Pause, Play } from 'lucide-react'
 
 interface ProductionTableProps {
@@ -58,10 +57,10 @@ const PrioriteBadge = ({ priorite }: { priorite: string }) => {
   return <span className={`px-2 py-1 rounded text-xs font-medium ${className}`}>{label}</span>
 }
 
-export function ProductionTable({ ordres, onView, onEdit, _onStatusChange }: ProductionTableProps) {
+export function ProductionTable({ ordres, onView, onEdit, onStatusChange }: ProductionTableProps) {
   return (
     <div className="space-y-4">
-      {ordres.map((ordre) => (
+      {ordres?.map((ordre) => (
         <Card key={ordre.id} className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -75,11 +74,11 @@ export function ProductionTable({ ordres, onView, onEdit, _onStatusChange }: Pro
               </div>
 
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => onView(ordre.id)}>
+                <Button type="button" variant="outline" size="sm" onClick={() => onView(ordre.id)}>
                   <Eye className="h-4 w-4 mr-2" />
                   Voir
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => onEdit(ordre.id)}>
+                <Button type="button" variant="outline" size="sm" onClick={() => onEdit(ordre.id)}>
                   <Edit className="h-4 w-4 mr-2" />
                   Modifier
                 </Button>

@@ -48,7 +48,9 @@ export class Emitter {
   emit(event, ...args) {
     const callbacks = this.callbacks[event]
     if (callbacks) {
-      callbacks.forEach((fn) => fn.apply(this, args))
+      callbacks.forEach((fn) => {
+        fn.apply(this, args)
+      })
     }
     return this
   }

@@ -53,7 +53,7 @@ export class ModuleController {
         .getRawMany()
 
       const categoryStats = totalByCategory.reduce((acc, item) => {
-        acc[item.module_category] = parseInt(item.count)
+        acc[item.module_category] = parseInt(item.count, 10)
         return acc
       }, {})
 

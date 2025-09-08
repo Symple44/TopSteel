@@ -1,32 +1,46 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+
 // Client validation schema (same as AddClientDialog)
 const clientSchema = z.object({
   id: z.string().optional(), // For editing existing client
-  companyName: z.string().min(1, 'Le nom de l\'entreprise est requis'),
+  companyName: z.string().min(1, "Le nom de l'entreprise est requis"),
   siret: z.string().optional(),
   tvaNumber: z.string().optional(),
   companyType: z.enum(['SARL', 'SAS', 'SA', 'EI', 'EURL', 'SCI', 'Autre']),
   // Contact Information
   contactFirstName: z.string().min(1, 'Le prénom du contact est requis'),
   contactLastName: z.string().min(1, 'Le nom du contact est requis'),
-  contactEmail: z.string().email('Email invalide').min(1, 'L\'email est requis'),
+  contactEmail: z.string().email('Email invalide').min(1, "L'email est requis"),
   contactPhone: z.string().min(1, 'Le téléphone est requis'),
   contactPosition: z.string().optional(),
   // Address Information
-  address: z.string().min(1, 'L\'adresse est requise'),
+  address: z.string().min(1, "L'adresse est requise"),
   postalCode: z.string().min(1, 'Le code postal est requis'),
   city: z.string().min(1, 'La ville est requise'),
   country: z.string().default('France'),
@@ -60,10 +74,15 @@ interface EditClientDialogProps {
   onSubmit?: (data: ClientFormData) => void | Promise<void>
   clientData?: ClientData | null // Data of client to edit
 }
-export function EditClientDialog({ open, onOpenChange, onSubmit, clientData }: EditClientDialogProps) {
+export function EditClientDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+  clientData,
+}: EditClientDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<ClientFormData>({
+  const form = useForm({
     resolver: zodResolver(clientSchema),
     defaultValues: {
       companyType: 'SARL',
@@ -84,12 +103,12 @@ export function EditClientDialog({ open, onOpenChange, onSubmit, clientData }: E
       form.reset({
         ...clientData,
         // Determine if using same address
-        useSameAddress: 
-          !clientData.billingAddress || 
+        useSameAddress:
+          !clientData.billingAddress ||
           (clientData.billingAddress === clientData.address &&
-           clientData.billingPostalCode === clientData.postalCode &&
-           clientData.billingCity === clientData.city &&
-           clientData.billingCountry === clientData.country),
+            clientData.billingPostalCode === clientData.postalCode &&
+            clientData.billingCity === clientData.city &&
+            clientData.billingCountry === clientData.country),
       })
     }
   }, [open, clientData, form])
@@ -129,9 +148,7 @@ export function EditClientDialog({ open, onOpenChange, onSubmit, clientData }: E
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>
-            Modifier le client: {clientData.companyName}
-          </DialogTitle>
+          <DialogTitle>Modifier le client: {clientData.companyName}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[70vh] pr-4">
           <Form {...form}>
@@ -395,10 +412,7 @@ export function EditClientDialog({ open, onOpenChange, onSubmit, clientData }: E
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="text-sm font-normal">
                           Utiliser la même adresse que l'entreprise
@@ -607,14 +621,9 @@ export function EditClientDialog({ open, onOpenChange, onSubmit, clientData }: E
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
-                        <FormLabel className="text-sm font-normal">
-                          Client actif
-                        </FormLabel>
+                        <FormLabel className="text-sm font-normal">Client actif</FormLabel>
                       </FormItem>
                     )}
                   />

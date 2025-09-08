@@ -1,19 +1,18 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { Progress } from '../../../primitives'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  ArrowUp, 
-  ArrowDown, 
+import {
+  ArrowDown,
+  ArrowUp,
+  Download,
+  Maximize2,
   MoreVertical,
   RefreshCw,
-  Maximize2,
-  Download,
-  Settings
+  Settings,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react'
+import type { WidgetStatus } from '../../../../types/variants'
+import { mapWidgetStatusToBadge } from '../../../../types/variants'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +21,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
+import { Badge, Progress } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface WidgetData {
   type: 'metric' | 'chart' | 'list' | 'progress' | 'status' | 'custom'
   title: string
@@ -48,7 +49,7 @@ export interface WidgetData {
   }>
   status?: {
     label: string
-    variant: 'default' | 'secondary' | 'success' | 'warning' | 'destructive'
+    variant: WidgetStatus
   }
   actions?: Array<{
     label: string
@@ -107,10 +108,11 @@ export function DashboardWidget({
           <div className="text-center">
             <p className="text-sm text-red-600">{error}</p>
             {onRefresh && (
-              <Button 
+              <Button
+                type="button"
                 onClick={onRefresh}
-                variant="outline" 
-                size="sm" 
+                variant="outline"
+                size="sm"
                 className="mt-2"
               >
                 <RefreshCw className="h-3 w-3 mr-1" />
@@ -167,7 +169,7 @@ export function DashboardWidget({
   // Render simple bar chart
   const renderMiniChart = () => {
     if (!data.chartData || data.chartData.length === 0) return null
-    const maxValue = Math.max(...data.chartData.map(d => d.value))
+    const maxValue = Math.max(...data.chartData.map((d) => d.value))
     return (
       <div className="flex items-end justify-between gap-1 h-16 mt-4">
         {data.chartData.slice(-10).map((item, index) => {
@@ -204,17 +206,13 @@ export function DashboardWidget({
     <Card className={`${className} ${colorClasses[data.color || 'default']} ${sizeClasses[size]}`}>
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div className="flex-1">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {data.title}
-          </CardTitle>
-          {data.subtitle && (
-            <p className="text-xs text-muted-foreground mt-1">{data.subtitle}</p>
-          )}
+          <CardTitle className="text-sm font-medium text-muted-foreground">{data.title}</CardTitle>
+          {data.subtitle && <p className="text-xs text-muted-foreground mt-1">{data.subtitle}</p>}
         </div>
         {showActions && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -246,11 +244,7 @@ export function DashboardWidget({
                 </DropdownMenuItem>
               )}
               {(onEdit || onDelete) && <DropdownMenuSeparator />}
-              {onEdit && (
-                <DropdownMenuItem onClick={onEdit}>
-                  Modifier
-                </DropdownMenuItem>
-              )}
+              {onEdit && <DropdownMenuItem onClick={onEdit}>Modifier</DropdownMenuItem>}
               {onDelete && (
                 <DropdownMenuItem onClick={onDelete} className="text-red-600">
                   Supprimer
@@ -276,7 +270,11 @@ export function DashboardWidget({
               </span>
               {data.change !== undefined && (
                 <div className={`flex items-center gap-1 text-sm ${getChangeColor()}`}>
-                  {data.change >= 0 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                  {data.change >= 0 ? (
+                    <ArrowUp className="h-3 w-3" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3" />
+                  )}
                   <span className="font-medium">{Math.abs(data.change)}%</span>
                 </div>
               )}
@@ -304,7 +302,8 @@ export function DashboardWidget({
               <span>{data.progress || 0}%</span>
               {data.change !== undefined && (
                 <span className={getChangeColor()}>
-                  {data.change >= 0 ? '+' : ''}{data.change}% {data.changeLabel}
+                  {data.change >= 0 ? '+' : ''}
+                  {data.change}% {data.changeLabel}
                 </span>
               )}
             </div>
@@ -315,11 +314,9 @@ export function DashboardWidget({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold">{formatValue(data.value)}</p>
-              {data.subtitle && (
-                <p className="text-sm text-muted-foreground">{data.subtitle}</p>
-              )}
+              {data.subtitle && <p className="text-sm text-muted-foreground">{data.subtitle}</p>}
             </div>
-            <Badge variant={data.status.variant}>{data.status.label}</Badge>
+            <Badge variant={mapWidgetStatusToBadge(data.status.variant)}>{data.status.label}</Badge>
           </div>
         )}
         {/* List Widget */}
@@ -334,8 +331,11 @@ export function DashboardWidget({
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{formatValue(item.value)}</span>
                   {item.change !== undefined && (
-                    <span className={`text-xs ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {item.change >= 0 ? '+' : ''}{item.change}%
+                    <span
+                      className={`text-xs ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {item.change >= 0 ? '+' : ''}
+                      {item.change}%
                     </span>
                   )}
                 </div>
@@ -361,6 +361,7 @@ export function DashboardWidget({
               <div className="flex gap-2 mt-4">
                 {data.actions.map((action, index) => (
                   <Button
+                    type="button"
                     key={index}
                     onClick={action.onClick}
                     variant="outline"

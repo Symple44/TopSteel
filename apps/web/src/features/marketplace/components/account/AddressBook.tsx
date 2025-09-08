@@ -2,7 +2,7 @@
 
 import { Building, Check, Edit2, Heart, Home, MapPin, Plus, Trash2 } from 'lucide-react'
 import type React from 'react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 interface Address {
@@ -84,6 +84,19 @@ const countries = [
 ]
 
 export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
+  const addressLabelId = useId()
+  const addressTypeId = useId()
+  const firstNameId = useId()
+  const lastNameId = useId()
+  const companyId = useId()
+  const streetAddressId = useId()
+  const address2Id = useId()
+  const cityId = useId()
+  const stateId = useId()
+  const postalCodeId = useId()
+  const countryId = useId()
+  const phoneId = useId()
+
   const [addresses, setAddresses] = useState<Address[]>(mockAddresses)
   const [isEditing, setIsEditing] = useState(false)
   const [editingAddress, setEditingAddress] = useState<Address | null>(null)
@@ -127,13 +140,13 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
   const handleDelete = (addressId: string) => {
     if (window.confirm('Are you sure you want to delete this address?')) {
-      setAddresses((prev) => prev.filter((addr) => addr.id !== addressId))
+      setAddresses((prev) => prev?.filter((addr) => addr.id !== addressId))
     }
   }
 
   const handleSetDefault = (addressId: string) => {
     setAddresses((prev) =>
-      prev.map((addr) => ({
+      prev?.map((addr) => ({
         ...addr,
         isDefault: addr.id === addressId,
       }))
@@ -154,13 +167,27 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.label?.trim()) newErrors.label = 'Label is required'
-    if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required'
-    if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required'
-    if (!formData.address?.trim()) newErrors.address = 'Address is required'
-    if (!formData.city?.trim()) newErrors.city = 'City is required'
-    if (!formData.postalCode?.trim()) newErrors.postalCode = 'Postal code is required'
-    if (!formData.country) newErrors.country = 'Country is required'
+    if (!formData.label?.trim()) {
+      newErrors.label = 'Label is required'
+    }
+    if (!formData.firstName?.trim()) {
+      newErrors.firstName = 'First name is required'
+    }
+    if (!formData.lastName?.trim()) {
+      newErrors.lastName = 'Last name is required'
+    }
+    if (!formData.address?.trim()) {
+      newErrors.address = 'Address is required'
+    }
+    if (!formData.city?.trim()) {
+      newErrors.city = 'City is required'
+    }
+    if (!formData.postalCode?.trim()) {
+      newErrors.postalCode = 'Postal code is required'
+    }
+    if (!formData.country) {
+      newErrors.country = 'Country is required'
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -176,7 +203,7 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
     if (editingAddress) {
       setAddresses((prev) =>
-        prev.map((addr) => (addr.id === editingAddress.id ? addressData : addr))
+        prev?.map((addr) => (addr.id === editingAddress.id ? addressData : addr))
       )
     } else {
       setAddresses((prev) => [...prev, addressData])
@@ -213,13 +240,17 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
             {/* Address Label and Type */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor={addressLabelId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Address Label *
                 </label>
                 <input
+                  id={addressLabelId}
                   type="text"
                   value={formData.label || ''}
-                  onChange={(e) => handleInputChange('label', e.target.value)}
+                  onChange={(e) => handleInputChange('label', e?.target?.value)}
                   placeholder="e.g., Home, Office, Parents"
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
@@ -230,10 +261,16 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address Type</label>
+                <label
+                  htmlFor={addressTypeId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Address Type
+                </label>
                 <select
+                  id={addressTypeId}
                   value={formData.type || 'home'}
-                  onChange={(e) => handleInputChange('type', e.target.value)}
+                  onChange={(e) => handleInputChange('type', e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="home">Home</option>
@@ -246,11 +283,17 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
             {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                <label
+                  htmlFor={firstNameId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  First Name *
+                </label>
                 <input
+                  id={firstNameId}
                   type="text"
                   value={formData.firstName || ''}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  onChange={(e) => handleInputChange('firstName', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.firstName ? 'border-red-500' : 'border-gray-300'
@@ -262,11 +305,17 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                <label
+                  htmlFor={lastNameId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Last Name *
+                </label>
                 <input
+                  id={lastNameId}
                   type="text"
                   value={formData.lastName || ''}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  onChange={(e) => handleInputChange('lastName', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.lastName ? 'border-red-500' : 'border-gray-300'
@@ -278,26 +327,31 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
             {/* Company */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={companyId} className="block text-sm font-medium text-gray-700 mb-1">
                 Company (Optional)
               </label>
               <input
+                id={companyId}
                 type="text"
                 value={formData.company || ''}
-                onChange={(e) => handleInputChange('company', e.target.value)}
+                onChange={(e) => handleInputChange('company', e?.target?.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             {/* Address Fields */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor={streetAddressId}
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Street Address *
               </label>
               <input
+                id={streetAddressId}
                 type="text"
                 value={formData.address || ''}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                onChange={(e) => handleInputChange('address', e?.target?.value)}
                 placeholder="Street address"
                 className={cn(
                   'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
@@ -306,23 +360,32 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
               />
               {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
 
-              <input
-                type="text"
-                value={formData.address2 || ''}
-                onChange={(e) => handleInputChange('address2', e.target.value)}
-                placeholder="Apartment, suite, etc. (optional)"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
-              />
+              <div className="mt-2">
+                <label htmlFor={address2Id} className="sr-only">
+                  Address Line 2 (Optional)
+                </label>
+                <input
+                  id={address2Id}
+                  type="text"
+                  value={formData.address2 || ''}
+                  onChange={(e) => handleInputChange('address2', e?.target?.value)}
+                  placeholder="Apartment, suite, etc. (optional)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
 
             {/* City, State, Postal */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                <label htmlFor={cityId} className="block text-sm font-medium text-gray-700 mb-1">
+                  City *
+                </label>
                 <input
+                  id={cityId}
                   type="text"
                   value={formData.city || ''}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  onChange={(e) => handleInputChange('city', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.city ? 'border-red-500' : 'border-gray-300'
@@ -332,23 +395,30 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State/Region</label>
+                <label htmlFor={stateId} className="block text-sm font-medium text-gray-700 mb-1">
+                  State/Region
+                </label>
                 <input
+                  id={stateId}
                   type="text"
                   value={formData.state || ''}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
+                  onChange={(e) => handleInputChange('state', e?.target?.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor={postalCodeId}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Postal Code *
                 </label>
                 <input
+                  id={postalCodeId}
                   type="text"
                   value={formData.postalCode || ''}
-                  onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                  onChange={(e) => handleInputChange('postalCode', e?.target?.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                     errors.postalCode ? 'border-red-500' : 'border-gray-300'
@@ -362,17 +432,20 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
             {/* Country */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+              <label htmlFor={countryId} className="block text-sm font-medium text-gray-700 mb-1">
+                Country *
+              </label>
               <select
+                id={countryId}
                 value={formData.country || ''}
-                onChange={(e) => handleInputChange('country', e.target.value)}
+                onChange={(e) => handleInputChange('country', e?.target?.value)}
                 className={cn(
                   'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
                   errors.country ? 'border-red-500' : 'border-gray-300'
                 )}
               >
                 <option value="">Select a country</option>
-                {countries.map((country) => (
+                {countries?.map((country) => (
                   <option key={country.code} value={country.code}>
                     {country.name}
                   </option>
@@ -383,13 +456,14 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor={phoneId} className="block text-sm font-medium text-gray-700 mb-1">
                 Phone Number (Optional)
               </label>
               <input
+                id={phoneId}
                 type="tel"
                 value={formData.phone || ''}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
+                onChange={(e) => handleInputChange('phone', e?.target?.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -399,8 +473,8 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={formData.isDefault || false}
-                  onChange={(e) => handleInputChange('isDefault', e.target.checked.toString())}
+                  checked={formData.isDefault ?? false}
+                  onChange={(e) => handleInputChange('isDefault', e?.target?.checked?.toString())}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">Set as default address</span>
@@ -447,7 +521,7 @@ export const AddressBook: React.FC<AddressBookProps> = ({ className }) => {
 
       {/* Address Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {addresses.map((address) => {
+        {addresses?.map((address) => {
           const TypeIcon = getTypeIcon(address.type)
 
           return (

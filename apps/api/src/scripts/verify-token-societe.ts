@@ -46,22 +46,22 @@ function verifyTokenSociete() {
     permissions: ['*'],
   })
 
-  const topsteelDecoded = jwt.decode(topsteelToken) as any
+  const topsteelDecoded = jwt.decode(topsteelToken) as Record<string, unknown> | null
 
   console.log('📝 Token décodé:')
-  console.log(`  User ID: ${topsteelDecoded.sub}`)
-  console.log(`  Email: ${topsteelDecoded.email}`)
-  console.log(`  ${colors.yellow}Société ID: ${topsteelDecoded.societeId}${colors.reset}`)
-  console.log(`  Société Code: ${topsteelDecoded.societeCode}`)
-  console.log(`  Société Name: ${topsteelDecoded.societeName}`)
+  console.log(`  User ID: ${topsteelDecoded?.sub}`)
+  console.log(`  Email: ${topsteelDecoded?.email}`)
+  console.log(`  ${colors.yellow}Société ID: ${topsteelDecoded?.societeId}${colors.reset}`)
+  console.log(`  Société Code: ${topsteelDecoded?.societeCode}`)
+  console.log(`  Société Name: ${topsteelDecoded?.societeName}`)
 
   // Vérifier que le societeId correspond bien
-  const topsteelMatch = topsteelDecoded.societeId === env.societes.topsteel.id
+  const topsteelMatch = topsteelDecoded?.societeId === env.societes.topsteel.id
   console.log(
     `\n✅ Vérification: societeId correspond à TopSteel: ${topsteelMatch ? `${colors.green}OUI` : `${colors.red}NON`}${colors.reset}`
   )
   console.log(`  Expected: ${env.societes.topsteel.id}`)
-  console.log(`  Got: ${topsteelDecoded.societeId}`)
+  console.log(`  Got: ${topsteelDecoded?.societeId}`)
 
   // Test 2: Token pour Metalux
   console.log(`\n${colors.blue}📌 TEST 2: Token pour Metalux Industries${colors.reset}`)
@@ -75,21 +75,21 @@ function verifyTokenSociete() {
     permissions: ['*'],
   })
 
-  const metaluxDecoded = jwt.decode(metaluxToken) as any
+  const metaluxDecoded = jwt.decode(metaluxToken) as Record<string, unknown> | null
 
   console.log('📝 Token décodé:')
-  console.log(`  User ID: ${metaluxDecoded.sub}`)
-  console.log(`  Email: ${metaluxDecoded.email}`)
-  console.log(`  ${colors.yellow}Société ID: ${metaluxDecoded.societeId}${colors.reset}`)
-  console.log(`  Société Code: ${metaluxDecoded.societeCode}`)
-  console.log(`  Société Name: ${metaluxDecoded.societeName}`)
+  console.log(`  User ID: ${metaluxDecoded?.sub}`)
+  console.log(`  Email: ${metaluxDecoded?.email}`)
+  console.log(`  ${colors.yellow}Société ID: ${metaluxDecoded?.societeId}${colors.reset}`)
+  console.log(`  Société Code: ${metaluxDecoded?.societeCode}`)
+  console.log(`  Société Name: ${metaluxDecoded?.societeName}`)
 
-  const metaluxMatch = metaluxDecoded.societeId === env.societes.metalux.id
+  const metaluxMatch = metaluxDecoded?.societeId === env.societes.metalux.id
   console.log(
     `\n✅ Vérification: societeId correspond à Metalux: ${metaluxMatch ? `${colors.green}OUI` : `${colors.red}NON`}${colors.reset}`
   )
   console.log(`  Expected: ${env.societes.metalux.id}`)
-  console.log(`  Got: ${metaluxDecoded.societeId}`)
+  console.log(`  Got: ${metaluxDecoded?.societeId}`)
 
   // Test 3: Même utilisateur, sociétés différentes
   console.log(`\n${colors.blue}📌 TEST 3: Même utilisateur, sociétés différentes${colors.reset}`)
@@ -116,22 +116,22 @@ function verifyTokenSociete() {
     permissions: ['*'],
   })
 
-  const userTopsteelDecoded = jwt.decode(userTopsteelToken) as any
-  const userMetaluxDecoded = jwt.decode(userMetaluxToken) as any
+  const userTopsteelDecoded = jwt.decode(userTopsteelToken) as Record<string, unknown> | null
+  const userMetaluxDecoded = jwt.decode(userMetaluxToken) as Record<string, unknown> | null
 
   console.log('🔄 Comparaison des tokens pour le même utilisateur:')
   console.log('\nToken 1 (TopSteel):')
-  console.log(`  User ID: ${userTopsteelDecoded.sub}`)
-  console.log(`  ${colors.yellow}Société ID: ${userTopsteelDecoded.societeId}${colors.reset}`)
-  console.log(`  Rôle: ${userTopsteelDecoded.role}`)
+  console.log(`  User ID: ${userTopsteelDecoded?.sub}`)
+  console.log(`  ${colors.yellow}Société ID: ${userTopsteelDecoded?.societeId}${colors.reset}`)
+  console.log(`  Rôle: ${userTopsteelDecoded?.role}`)
 
   console.log('\nToken 2 (Metalux):')
-  console.log(`  User ID: ${userMetaluxDecoded.sub}`)
-  console.log(`  ${colors.yellow}Société ID: ${userMetaluxDecoded.societeId}${colors.reset}`)
-  console.log(`  Rôle: ${userMetaluxDecoded.role}`)
+  console.log(`  User ID: ${userMetaluxDecoded?.sub}`)
+  console.log(`  ${colors.yellow}Société ID: ${userMetaluxDecoded?.societeId}${colors.reset}`)
+  console.log(`  Rôle: ${userMetaluxDecoded?.role}`)
 
-  const sameUser = userTopsteelDecoded.sub === userMetaluxDecoded.sub
-  const differentSociete = userTopsteelDecoded.societeId !== userMetaluxDecoded.societeId
+  const sameUser = userTopsteelDecoded?.sub === userMetaluxDecoded?.sub
+  const differentSociete = userTopsteelDecoded?.societeId !== userMetaluxDecoded?.societeId
 
   console.log(`\n✅ Vérifications:`)
   console.log(
@@ -141,7 +141,7 @@ function verifyTokenSociete() {
     `  Sociétés différentes: ${differentSociete ? `${colors.green}OUI` : `${colors.red}NON`}${colors.reset}`
   )
   console.log(
-    `  Rôles différents: ${userTopsteelDecoded.role !== userMetaluxDecoded.role ? `${colors.green}OUI` : `${colors.red}NON`}${colors.reset}`
+    `  Rôles différents: ${userTopsteelDecoded?.role !== userMetaluxDecoded?.role ? `${colors.green}OUI` : `${colors.red}NON`}${colors.reset}`
   )
 
   // Test 4: Vérification de l'isolation
@@ -151,8 +151,8 @@ function verifyTokenSociete() {
   console.log("🛡️ Simulation d'accès aux données:")
 
   function simulateDataAccess(token: string, requestedSocieteId: string): boolean {
-    const decoded = jwt.decode(token) as any
-    return decoded.societeId === requestedSocieteId
+    const decoded = jwt.decode(token) as Record<string, unknown> | null
+    return decoded?.societeId === requestedSocieteId
   }
 
   // TopSteel essaie d'accéder aux données TopSteel

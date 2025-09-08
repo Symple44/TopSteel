@@ -47,7 +47,7 @@ export async function extractToken(request?: NextRequest): Promise<string | null
     // 1. Vérifier les cookies (prioritaire)
     const cookieStore = await cookies()
     const tokenFromCookie =
-      cookieStore.get('token')?.value || cookieStore.get('access_token')?.value
+      cookieStore?.get('token')?.value || cookieStore?.get('access_token')?.value
 
     if (tokenFromCookie) {
       return tokenFromCookie
@@ -55,17 +55,17 @@ export async function extractToken(request?: NextRequest): Promise<string | null
 
     // 2. Vérifier les headers Authorization (Bearer token)
     const headerStore = await headers()
-    const authHeader = headerStore.get('authorization')
+    const authHeader = headerStore?.get('authorization')
 
     if (authHeader?.startsWith('Bearer ')) {
-      return authHeader.substring(7)
+      return authHeader?.substring(7)
     }
 
     // 3. Si une requête est fournie, vérifier ses headers
     if (request) {
-      const requestAuth = request.headers.get('authorization')
+      const requestAuth = request?.headers?.get('authorization')
       if (requestAuth?.startsWith('Bearer ')) {
-        return requestAuth.substring(7)
+        return requestAuth?.substring(7)
       }
     }
 
@@ -80,27 +80,27 @@ export async function extractToken(request?: NextRequest): Promise<string | null
  */
 export function decodeJWTPayload(token: string): JWTPayload | null {
   try {
-    const parts = token.split('.')
-    if (parts.length !== 3) {
+    const parts = token?.split('.')
+    if (parts?.length !== 3) {
       return null
     }
 
     // Décoder le payload
-    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    while (base64.length % 4) {
+    let base64 = parts?.[1]?.replace(/-/g, '+').replace(/_/g, '/')
+    while (base64?.length % 4) {
       base64 += '='
     }
 
     const payload = JSON.parse(atob(base64)) as JWTPayload
 
     // Vérification basique de structure
-    if (!payload.sub || !payload.exp || !payload.email) {
+    if (!payload?.sub || !payload?.exp || !payload?.email) {
       return null
     }
 
     // Vérifier l'expiration
     const now = Math.floor(Date.now() / 1000)
-    if (payload.exp <= now) {
+    if (payload?.exp <= now) {
       return null
     }
 
@@ -169,7 +169,7 @@ export function hasPermission(user: AuthenticatedUser, permission: string): bool
  * Vérifie si l'utilisateur est un administrateur
  */
 export function isAdmin(user: AuthenticatedUser): boolean {
-  return ADMIN_ROLES.includes(user.role as (typeof ADMIN_ROLES)[number])
+  return ADMIN_ROLES?.includes(user.role as (typeof ADMIN_ROLES)[number])
 }
 
 /**

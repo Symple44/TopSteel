@@ -11,17 +11,7 @@ import {
 import { Download, Edit, MoreVertical, Play, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface MenuConfiguration {
-  id: string
-  name: string
-  description?: string
-  isActive: boolean
-  isSystem: boolean
-  createdAt: string
-  updatedAt: string
-  createdBy?: string
-  items?: { id: string; name: string; path?: string }[] // Make items optional to match parent interface
-}
+import type { MenuConfiguration } from '@/types/menu'
 
 interface MenuConfigurationListProps {
   configurations: MenuConfiguration[]
@@ -45,7 +35,7 @@ export function MenuConfigurationList({
   return (
     <div className="space-y-2">
       {configurations && configurations.length > 0 ? (
-        configurations.map((config) => (
+        configurations?.map((config) => (
           <button
             key={config.id}
             type="button"
@@ -58,7 +48,7 @@ export function MenuConfigurationList({
             onClick={() => onSelect(config)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
+                e?.preventDefault()
                 onSelect(config)
               }
             }}
@@ -82,17 +72,19 @@ export function MenuConfigurationList({
                   <p className="text-xs text-muted-foreground truncate">{config.description}</p>
                 )}
                 <p className="text-xs text-muted-foreground mt-1">
-                  Modifié le {new Date(config.updatedAt).toLocaleDateString()}
+                  Modifié le{' '}
+                  {config.updatedAt ? new Date(config.updatedAt).toLocaleDateString() : 'N/A'}
                 </p>
               </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    type="button"
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => e?.stopPropagation()}
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>

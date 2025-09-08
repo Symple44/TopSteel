@@ -1,16 +1,16 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { 
-  FileText, 
-  Clock, 
-  AlertTriangle,
-  CheckCircle,
-  ArrowRight,
-  X,
-  Send
-} from 'lucide-react'
+import { AlertTriangle, ArrowRight, CheckCircle, Clock, FileText, Send, X } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
-export type InvoiceStatus = 'draft' | 'sent' | 'pending' | 'paid' | 'overdue' | 'cancelled' | 'refunded' | 'partial'
+import { Badge } from '../../../data-display/badge'
+export type InvoiceStatus =
+  | 'draft'
+  | 'sent'
+  | 'pending'
+  | 'paid'
+  | 'overdue'
+  | 'cancelled'
+  | 'refunded'
+  | 'partial'
 interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
   showIcon?: boolean
@@ -21,15 +21,15 @@ interface InvoiceStatusBadgeProps {
   currency?: string
   daysOverdue?: number
 }
-export function InvoiceStatusBadge({ 
-  status, 
-  showIcon = true, 
+export function InvoiceStatusBadge({
+  status,
+  showIcon = true,
   size = 'md',
   className,
   amount,
   totalAmount,
   currency = 'EUR',
-  daysOverdue = 0
+  daysOverdue = 0,
 }: InvoiceStatusBadgeProps) {
   const getStatusConfig = (status: InvoiceStatus) => {
     switch (status) {
@@ -127,7 +127,7 @@ export function InvoiceStatusBadge({
   const partialPercentage = getPartialPercentage()
   return (
     <div className="flex flex-col gap-1">
-      <Badge 
+      <Badge
         variant="outline"
         className={cn(
           'inline-flex items-center gap-1.5 font-medium transition-colors',
@@ -143,16 +143,12 @@ export function InvoiceStatusBadge({
       {status === 'partial' && amount && totalAmount && (
         <div className="text-xs text-muted-foreground">
           {formatCurrency(amount, currency)} / {formatCurrency(totalAmount, currency)}
-          {partialPercentage && (
-            <span className="ml-1">({partialPercentage}%)</span>
-          )}
+          {partialPercentage && <span className="ml-1">({partialPercentage}%)</span>}
         </div>
       )}
       {/* Show overdue warning */}
       {status === 'overdue' && daysOverdue > 30 && (
-        <div className="text-xs text-red-600 font-medium">
-          Attention: Retard critique
-        </div>
+        <div className="text-xs text-red-600 font-medium">Attention: Retard critique</div>
       )}
       {/* Show upcoming due date warning */}
       {status === 'pending' && daysOverdue < 0 && Math.abs(daysOverdue) <= 3 && (

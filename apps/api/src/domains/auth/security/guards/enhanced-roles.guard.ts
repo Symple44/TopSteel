@@ -65,8 +65,9 @@ export class EnhancedRolesGuard implements CanActivate {
       // Vérification SUPER_ADMIN bypass
       if (
         roleRequirement.allowSuperAdminBypass !== false &&
-        userRoles.some((role: any) => {
-          const roleValue = typeof role === 'object' ? role.name || role.role : role
+        userRoles.some((role: unknown) => {
+          const roleObj = role as { name?: string; role?: string } | string
+          const roleValue = typeof roleObj === 'object' ? roleObj.name || roleObj.role : roleObj
           return roleValue === GlobalUserRole.SUPER_ADMIN
         })
       ) {
@@ -76,10 +77,11 @@ export class EnhancedRolesGuard implements CanActivate {
       // Vérifier les rôles globaux
       if (roleRequirement.globalRoles && roleRequirement.globalRoles.length > 0) {
         const hasGlobalRole = roleRequirement.globalRoles.some((requiredRole) =>
-          userRoles.some((userRole: any) => {
+          userRoles.some((userRole: unknown) => {
+            const roleObj = userRole as { name?: string; role?: string } | string
             const roleValue =
-              typeof userRole === 'object' ? userRole.name || userRole.role : userRole
-            return isGlobalRoleHigherOrEqual(roleValue, requiredRole)
+              typeof roleObj === 'object' ? roleObj.name || roleObj.role : roleObj
+            return roleValue ? isGlobalRoleHigherOrEqual(roleValue as GlobalUserRole, requiredRole) : false
           })
         )
 
@@ -183,7 +185,7 @@ export class EnhancedRolesGuard implements CanActivate {
 
     // Vérifier les query parameters
     if ((request as { query?: Record<string, unknown> }).query?.userId) {
-      return (request as { query?: Record<string, any> }).query?.userId as string
+      return (request as { query?: Record<string, string> }).query?.userId as string
     }
 
     return null

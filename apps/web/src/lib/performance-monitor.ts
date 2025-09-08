@@ -46,7 +46,7 @@ export class PerformanceMonitor {
   private constructor() {
     this.isClient = typeof window !== 'undefined'
     if (this.isClient) {
-      this.initializeObservers()
+      this?.initializeObservers()
     }
   }
 
@@ -63,7 +63,7 @@ export class PerformanceMonitor {
    */
   private ensureClient(): boolean {
     if (!this.isClient) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process?.env?.NODE_ENV === 'development') {
       }
 
       return false
@@ -81,19 +81,19 @@ export class PerformanceMonitor {
 
       descriptor.value = function (...args: unknown[]) {
         if (typeof window === 'undefined') {
-          return method.apply(this, args)
+          return method?.apply(this, args)
         }
 
-        const start = performance.now()
-        const result = method.apply(this, args)
-        const end = performance.now()
+        const start = performance?.now()
+        const result = method?.apply(this, args)
+        const end = performance?.now()
         const duration = end - start
 
         if (duration > 16) {
         }
 
         // Enregistrer la métrique
-        PerformanceMonitor.getInstance().recordMetric('component_render', {
+        PerformanceMonitor?.getInstance().recordMetric('component_render', {
           component: componentName,
           method: propertyName,
           duration,
@@ -123,22 +123,26 @@ export class PerformanceMonitor {
       }
 
       // Performance Paint Timing
-      const paintEntries = performance.getEntriesByType('paint')
+      const paintEntries = performance?.getEntriesByType('paint')
 
       for (const entry of paintEntries) {
         if (entry.name === 'first-paint') {
-          metrics.firstPaint = entry.startTime
+          if (metrics) {
+            metrics.firstPaint = entry.startTime
+          }
         } else if (entry.name === 'first-contentful-paint') {
-          metrics.firstContentfulPaint = entry.startTime
+          if (metrics) {
+            metrics.firstContentfulPaint = entry.startTime
+          }
         }
       }
 
       // Log des performances lentes
-      if (metrics.loadComplete > 3000) {
+      if (metrics?.loadComplete > 3000) {
       }
 
       // Envoyer aux analytics si disponible
-      PerformanceMonitor.sendToAnalytics('page_load_performance', {
+      PerformanceMonitor?.sendToAnalytics('page_load_performance', {
         page_name: pageName,
         load_time: metrics.loadComplete,
         dom_content_loaded: metrics.domContentLoaded,
@@ -147,7 +151,7 @@ export class PerformanceMonitor {
       })
 
       // Enregistrer dans les métriques internes
-      PerformanceMonitor.getInstance().recordMetric('page_load', {
+      PerformanceMonitor?.getInstance().recordMetric('page_load', {
         pageName,
         ...metrics,
       })
@@ -164,32 +168,32 @@ export class PerformanceMonitor {
 
     try {
       const observer = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries()
-        const lastEntry = entries[entries.length - 1]
+        const entries = entryList?.getEntries()
+        const lastEntry = entries[entries?.length - 1]
 
         if (lastEntry?.startTime) {
-          const lcpTime = lastEntry.startTime
+          const lcpTime = lastEntry?.startTime
 
           if (lcpTime > 2500) {
           }
 
           // Envoyer aux analytics
-          PerformanceMonitor.sendToAnalytics('web_vitals', {
+          PerformanceMonitor?.sendToAnalytics('web_vitals', {
             metric_name: 'LCP',
             value: Math.round(lcpTime),
             rating: lcpTime <= 2500 ? 'good' : lcpTime <= 4000 ? 'needs_improvement' : 'poor',
           })
 
           // Enregistrer
-          PerformanceMonitor.getInstance().recordMetric('lcp', {
+          PerformanceMonitor?.getInstance().recordMetric('lcp', {
             value: lcpTime,
             rating: lcpTime <= 2500 ? 'good' : 'poor',
           })
         }
       })
 
-      observer.observe({ type: 'largest-contentful-paint', buffered: true })
-      PerformanceMonitor.getInstance().observers.push(observer)
+      observer?.observe({ type: 'largest-contentful-paint', buffered: true })
+      PerformanceMonitor?.getInstance().observers?.push(observer)
     } catch (_error) {}
   }
 
@@ -203,7 +207,7 @@ export class PerformanceMonitor {
 
     try {
       const observer = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries()
+        const entries = entryList?.getEntries()
 
         for (const entry of entries) {
           const fid =
@@ -214,22 +218,22 @@ export class PerformanceMonitor {
           }
 
           // Envoyer aux analytics
-          PerformanceMonitor.sendToAnalytics('web_vitals', {
+          PerformanceMonitor?.sendToAnalytics('web_vitals', {
             metric_name: 'FID',
             value: Math.round(fid),
             rating: fid <= 100 ? 'good' : fid <= 300 ? 'needs_improvement' : 'poor',
           })
 
           // Enregistrer
-          PerformanceMonitor.getInstance().recordMetric('fid', {
+          PerformanceMonitor?.getInstance().recordMetric('fid', {
             value: fid,
             rating: fid <= 100 ? 'good' : 'poor',
           })
         }
       })
 
-      observer.observe({ type: 'first-input', buffered: true })
-      PerformanceMonitor.getInstance().observers.push(observer)
+      observer?.observe({ type: 'first-input', buffered: true })
+      PerformanceMonitor?.getInstance().observers?.push(observer)
     } catch (_error) {}
   }
 
@@ -245,7 +249,7 @@ export class PerformanceMonitor {
       let clsValue = 0
 
       const observer = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries()
+        const entries = entryList?.getEntries()
 
         for (const entry of entries) {
           if (!(entry as PerformanceEntry & { hadRecentInput?: boolean }).hadRecentInput) {
@@ -257,15 +261,15 @@ export class PerformanceMonitor {
         }
 
         // Envoyer aux analytics
-        PerformanceMonitor.sendToAnalytics('web_vitals', {
+        PerformanceMonitor?.sendToAnalytics('web_vitals', {
           metric_name: 'CLS',
-          value: Number.parseFloat(clsValue.toFixed(3)),
+          value: Number?.parseFloat(clsValue?.toFixed(3)),
           rating: clsValue <= 0.1 ? 'good' : clsValue <= 0.25 ? 'needs_improvement' : 'poor',
         })
       })
 
-      observer.observe({ type: 'layout-shift', buffered: true })
-      PerformanceMonitor.getInstance().observers.push(observer)
+      observer?.observe({ type: 'layout-shift', buffered: true })
+      PerformanceMonitor?.getInstance().observers?.push(observer)
     } catch (_error) {}
   }
 
@@ -282,7 +286,7 @@ export class PerformanceMonitor {
       }
 
       // Console pour développement
-      if (process.env.NODE_ENV === 'development') {
+      if (process?.env?.NODE_ENV === 'development') {
       }
     } catch (_error) {}
   }
@@ -291,15 +295,15 @@ export class PerformanceMonitor {
    * Initialiser les observers de performance - SSR-Safe
    */
   private initializeObservers(): void {
-    if (!this.ensureClient()) return
+    if (!this?.ensureClient()) return
 
     // Attendre que le DOM soit prêt
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        this.setupObservers()
+        this?.setupObservers()
       })
     } else {
-      this.setupObservers()
+      this?.setupObservers()
     }
   }
 
@@ -308,9 +312,9 @@ export class PerformanceMonitor {
    */
   private setupObservers(): void {
     // Initialiser tous les trackers Core Web Vitals
-    PerformanceMonitor.trackLCP()
-    PerformanceMonitor.trackFID()
-    PerformanceMonitor.trackCLS()
+    PerformanceMonitor?.trackLCP()
+    PerformanceMonitor?.trackFID()
+    PerformanceMonitor?.trackCLS()
   }
 
   /**
@@ -326,24 +330,24 @@ export class PerformanceMonitor {
             ? data.duration
             : 0,
       timestamp: Date.now(),
-      url: this.isClient ? window.location.href : undefined,
-      userAgent: this.isClient ? window.navigator.userAgent : undefined,
+      url: this.isClient ? window?.location?.href : undefined,
+      userAgent: this.isClient ? window?.navigator?.userAgent : undefined,
     }
 
-    if (!this.metrics.has(name)) {
-      this.metrics.set(name, [])
+    if (!this?.metrics?.has(name)) {
+      this?.metrics?.set(name, [])
     }
 
-    const metrics = this.metrics.get(name)
+    const metrics = this?.metrics?.get(name)
     if (!metrics) {
       return
     }
 
-    metrics.push(metric)
+    metrics?.push(metric)
 
     // Limiter à 1000 métriques par type
-    if (metrics.length > 1000) {
-      metrics.shift()
+    if (metrics?.length > 1000) {
+      metrics?.shift()
     }
   }
 
@@ -352,7 +356,7 @@ export class PerformanceMonitor {
    */
   getMetrics(name?: string): PerformanceMetric[] | Map<string, PerformanceMetric[]> {
     if (name) {
-      return this.metrics.get(name) || []
+      return this?.metrics?.get(name) || []
     }
 
     return this.metrics
@@ -362,12 +366,12 @@ export class PerformanceMonitor {
    * Nettoyer les métriques et observers - SSR-Safe
    */
   cleanup(): void {
-    this.metrics.clear()
+    this?.metrics?.clear()
 
     if (this.isClient) {
       for (const observer of this.observers) {
         try {
-          observer.disconnect()
+          observer?.disconnect()
         } catch (_error) {}
       }
     }
@@ -382,19 +386,19 @@ export class PerformanceMonitor {
     const report: Record<string, unknown> = {}
 
     for (const [name, metrics] of this.metrics.entries()) {
-      if (metrics.length === 0) continue
+      if (metrics?.length === 0) continue
 
-      const values = metrics.map((m) => m.value).filter((v) => v > 0)
+      const values = metrics?.map((m) => m.value).filter((v) => v > 0)
 
-      if (values.length === 0) continue
+      if (values?.length === 0) continue
 
       report[name] = {
         count: values.length,
-        average: values.reduce((sum, val) => sum + val, 0) / values.length,
+        average: values?.reduce((sum, val) => sum + val, 0) / values.length,
         min: Math.min(...values),
         max: Math.max(...values),
         latest: values[values.length - 1],
-        timestamp: metrics[metrics.length - 1].timestamp,
+        timestamp: metrics?.[metrics.length - 1]?.timestamp,
       }
     }
 
@@ -406,20 +410,20 @@ export class PerformanceMonitor {
    */
   static initializeClient(): void {
     if (typeof window !== 'undefined') {
-      PerformanceMonitor.getInstance()
+      PerformanceMonitor?.getInstance()
     }
   }
 }
 
 // ===== HOOK POUR UTILISATION DANS REACT =====
 export function usePerformanceMonitor() {
-  const monitor = PerformanceMonitor.getInstance()
+  const monitor = PerformanceMonitor?.getInstance()
 
   return {
-    recordMetric: monitor.recordMetric.bind(monitor),
-    getMetrics: monitor.getMetrics.bind(monitor),
-    getReport: monitor.getPerformanceReport.bind(monitor),
-    cleanup: monitor.cleanup.bind(monitor),
+    recordMetric: monitor?.recordMetric?.bind(monitor),
+    getMetrics: monitor?.getMetrics?.bind(monitor),
+    getReport: monitor?.getPerformanceReport?.bind(monitor),
+    cleanup: monitor?.cleanup?.bind(monitor),
   }
 }
 

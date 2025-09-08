@@ -1,6 +1,7 @@
 'use client'
 
 import type React from 'react'
+import type { Permission } from '@/hooks/use-permissions'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -26,12 +27,16 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
 // Composant pour valider les permissions d'accès
 export function RouteGuard({
   children,
-  _requiredPermissions = [],
-  _fallbackUrl = '/dashboard',
+  requiredPermissions = [],
+  fallbackUrl = '/dashboard',
 }: {
   children: React.ReactNode
-  requiredPermissions?: string[]
+  requiredPermissions?: Permission[]
   fallbackUrl?: string
 }) {
+  // Suppress unused parameter warnings
+  void requiredPermissions
+  void fallbackUrl
+
   return <>{children}</>
 }

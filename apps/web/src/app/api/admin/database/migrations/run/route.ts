@@ -9,9 +9,9 @@ export async function POST(request: NextRequest) {
       method: 'POST',
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       // Simuler une réponse d'erreur
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: "API backend non disponible - impossible d'exécuter les migrations",
@@ -20,11 +20,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const responseData = await response.json()
-    return NextResponse.json(responseData.data || responseData)
+    const responseData = await response?.json()
+    return NextResponse?.json(responseData?.data || responseData)
   } catch (_error) {
     // Simuler une réponse d'erreur
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: "Erreur interne - impossible d'exécuter les migrations",

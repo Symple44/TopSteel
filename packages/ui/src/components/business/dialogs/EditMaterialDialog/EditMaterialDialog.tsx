@@ -1,24 +1,8 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-  Switch,
-  Label
-} from '../../../primitives'
 import {
   Form,
   FormControl,
@@ -26,8 +10,21 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '../../../forms'
+  FormMessage,
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Switch } from '../../../primitives/switch/switch'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Validation schema for material editing
 const materialSchema = z.object({
   reference: z.string().min(1, 'La référence est obligatoire'),
@@ -41,10 +38,10 @@ const materialSchema = z.object({
     width: z.number().positive().optional(),
     height: z.number().positive().optional(),
     diameter: z.number().positive().optional(),
-    thickness: z.number().positive().optional()
+    thickness: z.number().positive().optional(),
   }),
   weight: z.number().positive('Le poids doit être positif').optional(),
-  unit: z.string().min(1, 'L\'unité est obligatoire'),
+  unit: z.string().min(1, "L'unité est obligatoire"),
   unitPrice: z.number().positive('Le prix unitaire doit être positif'),
   minStock: z.number().min(0, 'Le stock minimum doit être positif ou nul'),
   maxStock: z.number().positive('Le stock maximum doit être positif').optional(),
@@ -56,12 +53,12 @@ const materialSchema = z.object({
     yieldStrength: z.number().positive().optional(),
     elongation: z.number().positive().optional(),
     hardness: z.number().positive().optional(),
-    corrosionResistance: z.string().optional()
+    corrosionResistance: z.string().optional(),
   }),
   isActive: z.boolean().default(true),
   requiresInspection: z.boolean().default(false),
   hazardous: z.boolean().default(false),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 })
 type MaterialFormData = z.infer<typeof materialSchema>
 interface Material {
@@ -105,10 +102,15 @@ interface EditMaterialDialogProps {
   onSubmit?: (data: MaterialFormData) => void | Promise<void>
   material?: Material
 }
-export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: EditMaterialDialogProps) {
+export function EditMaterialDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+  material,
+}: EditMaterialDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<MaterialFormData>({
+  const form = useForm({
     resolver: zodResolver(materialSchema),
     defaultValues: {
       reference: '',
@@ -122,7 +124,7 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
         width: undefined,
         height: undefined,
         diameter: undefined,
-        thickness: undefined
+        thickness: undefined,
       },
       weight: undefined,
       unit: 'kg',
@@ -137,13 +139,13 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
         yieldStrength: undefined,
         elongation: undefined,
         hardness: undefined,
-        corrosionResistance: ''
+        corrosionResistance: '',
       },
       isActive: true,
       requiresInspection: false,
       hazardous: false,
-      notes: ''
-    }
+      notes: '',
+    },
   })
   // Update form when material changes
   useEffect(() => {
@@ -168,7 +170,7 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
         isActive: material.isActive,
         requiresInspection: material.requiresInspection,
         hazardous: material.hazardous,
-        notes: material.notes || ''
+        notes: material.notes || '',
       })
     }
   }, [material, open, form])
@@ -331,7 +333,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.01"
                           placeholder="1000"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -350,7 +354,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.01"
                           placeholder="100"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -369,7 +375,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.01"
                           placeholder="50"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -388,7 +396,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.01"
                           placeholder="25"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -407,7 +417,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.01"
                           placeholder="2.5"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -432,7 +444,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.001"
                           placeholder="7.85"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -475,7 +489,7 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.01"
                           placeholder="0.00"
                           {...field}
-                          onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -508,7 +522,7 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           type="number"
                           placeholder="10"
                           {...field}
-                          onChange={e => field.onChange(parseInt(e.target.value) || 0)}
+                          onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -526,7 +540,11 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           type="number"
                           placeholder="1000"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value ? parseInt(e.target.value, 10) : undefined
+                            )
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -576,7 +594,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           type="number"
                           placeholder="400"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -594,7 +614,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           type="number"
                           placeholder="235"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -613,7 +635,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           step="0.1"
                           placeholder="26"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -631,7 +655,9 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                           type="number"
                           placeholder="120"
                           {...field}
-                          onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -679,10 +705,7 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                         </FormDescription>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -694,15 +717,10 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
                         <FormLabel className="text-base">Contrôle qualité requis</FormLabel>
-                        <FormDescription>
-                          Le matériau nécessite un contrôle qualité
-                        </FormDescription>
+                        <FormDescription>Le matériau nécessite un contrôle qualité</FormDescription>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -719,10 +737,7 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
                         </FormDescription>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -748,12 +763,7 @@ export function EditMaterialDialog({ open, onOpenChange, onSubmit, material }: E
               )}
             />
             <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                 Annuler
               </Button>
               <Button type="submit" disabled={loading}>

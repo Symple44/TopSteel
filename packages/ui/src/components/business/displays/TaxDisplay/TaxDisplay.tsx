@@ -1,8 +1,8 @@
 'use client'
-import { CurrencyDisplay } from '../CurrencyDisplay'
-import { Badge } from '../../../data-display/badge'
-import { Receipt, Percent } from 'lucide-react'
+import { Percent, Receipt } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { CurrencyDisplay } from '../CurrencyDisplay'
 export interface TaxItem {
   id: string
   name: string

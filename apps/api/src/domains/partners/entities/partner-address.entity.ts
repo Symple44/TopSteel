@@ -1,7 +1,8 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
-import { Partner } from './partner.entity'
-import { PartnerSite } from './partner-site.entity'
+// Removed direct imports to avoid circular dependencies
+// import { Partner } from './partner.entity'
+// import { PartnerSite } from './partner-site.entity';
 
 export enum AddressType {
   FACTURATION = 'FACTURATION', // Adresse de facturation
@@ -27,30 +28,24 @@ export class PartnerAddress extends BusinessEntity {
   @Index()
   partnerId!: string
 
-  @ManyToOne(
-    () => Partner,
-    (partner) => partner.addresses,
-    {
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('Partner', 'addresses', {
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'partnerId' })
-  partner!: Partner
+  partner!: any
 
   @Column({ type: 'uuid', nullable: true })
   @Index()
   partnerSiteId?: string
 
-  @ManyToOne(
-    () => PartnerSite,
-    (site) => site.addresses,
-    {
-      nullable: true,
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('PartnerSite', 'addresses', {
+    nullable: true,
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'partnerSiteId' })
-  site?: PartnerSite
+  site?: any
 
   @Column({ type: 'varchar', length: 100 })
   @Index()

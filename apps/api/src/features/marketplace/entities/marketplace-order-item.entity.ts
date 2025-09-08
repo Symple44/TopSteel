@@ -8,7 +8,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MarketplaceOrder } from './marketplace-order.entity'
+// Removed import to avoid circular dependencies
+// import { MarketplaceOrder } from './marketplace-order.entity'
+import type { SafeObject } from '../../../../../../packages/ui/src/types/common'
 
 @Entity('marketplace_order_items')
 export class MarketplaceOrderItem {
@@ -18,13 +20,9 @@ export class MarketplaceOrderItem {
   @Column({ name: 'order_id' })
   orderId: string
 
-  @ManyToOne(
-    () => MarketplaceOrder,
-    (order) => order.items,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('MarketplaceOrder', 'items', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'order_id' })
-  order: MarketplaceOrder
+  order: any
 
   @Column({ name: 'product_id' })
   productId: string // Référence vers Article.id ERP
@@ -46,7 +44,7 @@ export class MarketplaceOrderItem {
   discount: number
 
   @Column('jsonb', { nullable: true })
-  customizations: Record<string, any>
+  customizations: SafeObject
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date

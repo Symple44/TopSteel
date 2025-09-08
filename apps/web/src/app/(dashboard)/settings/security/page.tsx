@@ -21,6 +21,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  useUniqueId,
 } from '@erp/ui'
 import {
   AlertTriangle,
@@ -97,6 +98,10 @@ export default function SecuritySettingsPage() {
   const [showBackupCodes, setShowBackupCodes] = useState(false)
   const [backupCodes, setBackupCodes] = useState<string[]>([])
 
+  // Generate unique IDs for form fields
+  const verificationCodeId = useUniqueId('verification-code')
+  const deviceNameId = useUniqueId('device-name')
+
   const loadMFAData = useCallback(async () => {
     try {
       setLoading(true)
@@ -105,15 +110,15 @@ export default function SecuritySettingsPage() {
         callClientApi('auth/mfa/methods'),
       ])
 
-      const statsData = await statsResponse.json()
-      const methodsData = await methodsResponse.json()
+      const statsData = await statsResponse?.json()
+      const methodsData = await methodsResponse?.json()
 
-      if (statsData.success && methodsData.success) {
-        setMFAStats(statsData.data)
-        setMFAMethods(methodsData.data)
+      if (statsData?.success && methodsData?.success) {
+        setMFAStats(statsData?.data)
+        setMFAMethods(methodsData?.data)
       }
     } catch {
-      toast.error(t('security.mfa.loadError'))
+      toast?.error(t('security?.mfa?.loadError'))
     } finally {
       setLoading(false)
     }
@@ -130,15 +135,15 @@ export default function SecuritySettingsPage() {
         body: JSON.stringify({}),
       })
 
-      const data = await response.json()
-      if (data.success) {
-        setTotpSetup(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setTotpSetup(data?.data)
         setSetupDialog({ open: true, type: 'totp' })
       } else {
-        toast.error(t('security.mfa.totp.configError'))
+        toast?.error(t('security?.mfa?.totp.configError'))
       }
     } catch {
-      toast.error(t('security.mfa.configError'))
+      toast?.error(t('security?.mfa?.configError'))
     }
   }
 
@@ -154,18 +159,18 @@ export default function SecuritySettingsPage() {
         }),
       })
 
-      const data = await response.json()
-      if (data.success) {
-        toast.success(t('security.mfa.totp.success'))
+      const data = await response?.json()
+      if (data?.success) {
+        toast?.success(t('security?.mfa?.totp.success'))
         setSetupDialog({ open: false, type: null })
         setTotpSetup(null)
         setVerificationCode('')
         loadMFAData()
       } else {
-        toast.error(t('security.mfa.totp.invalidCode'))
+        toast?.error(t('security?.mfa?.totp.invalidCode'))
       }
     } catch {
-      toast.error(t('security.mfa.verificationError'))
+      toast?.error(t('security?.mfa?.verificationError'))
     }
   }
 
@@ -178,36 +183,36 @@ export default function SecuritySettingsPage() {
         }),
       })
 
-      const data = await response.json()
-      if (data.success) {
-        setWebauthnSetup(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setWebauthnSetup(data?.data)
         setSetupDialog({ open: true, type: 'webauthn' })
 
         // Trigger WebAuthn registration
-        await startWebAuthnRegistration(data.data.options)
+        await startWebAuthnRegistration(data?.data?.options)
       } else {
-        toast.error(t('security.mfa.webauthn.configError'))
+        toast?.error(t('security?.mfa?.webauthn.configError'))
       }
     } catch {
-      toast.error(t('security.mfa.webauthn.notSupportedError'))
+      toast?.error(t('security?.mfa?.webauthn.notSupportedError'))
     }
   }
 
   const startWebAuthnRegistration = async (options: unknown) => {
     try {
       // Check WebAuthn support
-      if (!window.navigator.credentials || !window.PublicKeyCredential) {
-        toast.error(t('security.mfa.webauthn.notSupported'))
+      if (!window?.navigator?.credentials || !window.PublicKeyCredential) {
+        toast?.error(t('security?.mfa?.webauthn.notSupported'))
         return
       }
 
       // Create credentials
-      const credential = (await navigator.credentials.create({
-        publicKey: options,
+      const credential = (await navigator?.credentials?.create({
+        publicKey: options as PublicKeyCredentialCreationOptions,
       })) as PublicKeyCredential
 
       if (!credential) {
-        toast.error(t('security.mfa.webauthn.registrationFailed'))
+        toast?.error(t('security?.mfa?.webauthn.registrationFailed'))
         return
       }
 
@@ -220,14 +225,14 @@ export default function SecuritySettingsPage() {
           clientDataJSON: btoa(
             String.fromCharCode(
               ...new Uint8Array(
-                (credential.response as AuthenticatorAttestationResponse).clientDataJSON
+                (credential?.response as AuthenticatorAttestationResponse).clientDataJSON
               )
             )
           ),
           attestationObject: btoa(
             String.fromCharCode(
               ...new Uint8Array(
-                (credential.response as AuthenticatorAttestationResponse).attestationObject
+                (credential?.response as AuthenticatorAttestationResponse).attestationObject
               )
             )
           ),
@@ -237,7 +242,7 @@ export default function SecuritySettingsPage() {
       // Verify registration
       await verifyWebAuthnRegistration(response)
     } catch {
-      toast.error(t('security.mfa.webauthn.registrationError'))
+      toast?.error(t('security?.mfa?.webauthn.registrationError'))
     }
   }
 
@@ -254,18 +259,18 @@ export default function SecuritySettingsPage() {
         }),
       })
 
-      const verifyData = await verifyResponse.json()
-      if (verifyData.success) {
-        toast.success(t('security.mfa.webauthn.success'))
+      const verifyData = await verifyResponse?.json()
+      if (verifyData?.success) {
+        toast?.success(t('security?.mfa?.webauthn.success'))
         setSetupDialog({ open: false, type: null })
         setWebauthnSetup(null)
         setDeviceName('')
         loadMFAData()
       } else {
-        toast.error(t('security.mfa.webauthn.verificationError'))
+        toast?.error(t('security?.mfa?.webauthn.verificationError'))
       }
     } catch {
-      toast.error(t('security.mfa.verificationError'))
+      toast?.error(t('security?.mfa?.verificationError'))
     }
   }
 
@@ -276,15 +281,15 @@ export default function SecuritySettingsPage() {
         body: JSON.stringify({ mfaType: type }),
       })
 
-      const data = await response.json()
-      if (data.success) {
-        toast.success(`${type.toUpperCase()} ${ts('security.disabled')}`)
+      const data = await response?.json()
+      if (data?.success) {
+        toast?.success(`${type?.toUpperCase()} ${ts('security.disabled')}`)
         loadMFAData()
       } else {
-        toast.error(t('security.mfa.disableError'))
+        toast?.error(t('security?.mfa?.disableError'))
       }
     } catch {
-      toast.error(t('security.mfa.configError'))
+      toast?.error(t('security?.mfa?.configError'))
     }
   }
 
@@ -292,15 +297,15 @@ export default function SecuritySettingsPage() {
     try {
       const response = await callClientApi('auth/mfa/totp/backup-codes')
 
-      const data = await response.json()
-      if (data.success) {
-        setBackupCodes(data.data.codes)
+      const data = await response?.json()
+      if (data?.success) {
+        setBackupCodes(data?.data?.codes)
         setShowBackupCodes(true)
       } else {
-        toast.error(t('security.mfa.codesNotAvailable'))
+        toast?.error(t('security?.mfa?.codesNotAvailable'))
       }
     } catch {
-      toast.error(t('security.mfa.codesError'))
+      toast?.error(t('security?.mfa?.codesError'))
     }
   }
 
@@ -378,7 +383,7 @@ export default function SecuritySettingsPage() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {mfaStats.methods.webauthn.credentialsCount}
+                  {mfaStats?.methods?.webauthn.credentialsCount}
                 </div>
                 <div className="text-sm text-muted-foreground">{ts('security.securityKeys')}</div>
               </div>
@@ -397,11 +402,11 @@ export default function SecuritySettingsPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="totp" className="flex items-center gap-2">
             <Smartphone className="w-4 h-4" />
-            {ts('settingsEnhanced.security.mfaTypes.totp')}
+            {ts('settingsEnhanced?.security?.mfaTypes.totp')}
           </TabsTrigger>
           <TabsTrigger value="webauthn" className="flex items-center gap-2">
             <Key className="w-4 h-4" />
-            {ts('settingsEnhanced.security.mfaTypes.webauthn')}
+            {ts('settingsEnhanced?.security?.mfaTypes.webauthn')}
           </TabsTrigger>
         </TabsList>
 
@@ -411,7 +416,7 @@ export default function SecuritySettingsPage() {
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Smartphone className="w-5 h-5" />
-                  {ts('settingsEnhanced.security.mfaTypes.totp')}
+                  {ts('settingsEnhanced?.security?.mfaTypes.totp')}
                 </span>
                 {mfaStats?.methods.totp.enabled && (
                   <Badge variant="outline" className="text-green-600">
@@ -431,17 +436,23 @@ export default function SecuritySettingsPage() {
                       <p className="font-medium">{ts('security.configured')}</p>
                       <p className="text-sm text-muted-foreground">
                         {ts('security.lastUsed')}{' '}
-                        {mfaStats.methods.totp.lastUsed
-                          ? new Date(mfaStats.methods.totp.lastUsed).toLocaleString()
+                        {mfaStats?.methods?.totp.lastUsed
+                          ? new Date(mfaStats?.methods?.totp.lastUsed).toLocaleString()
                           : ts('security.neverUsed')}
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={handleGetBackupCodes}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGetBackupCodes}
+                      >
                         <Eye className="w-4 h-4 mr-2" />
                         {ts('security.backupCodes')}
                       </Button>
                       <Button
+                        type="button"
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDisableMFA('totp')}
@@ -458,7 +469,7 @@ export default function SecuritySettingsPage() {
                     <Shield className="w-4 h-4" />
                     <AlertDescription>{ts('security.notConfigured')}</AlertDescription>
                   </Alert>
-                  <Button onClick={handleSetupTOTP} className="w-full">
+                  <Button type="button" onClick={handleSetupTOTP} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
                     {ts('security.configure')}
                   </Button>
@@ -479,7 +490,7 @@ export default function SecuritySettingsPage() {
                 {mfaStats?.methods.webauthn.enabled && (
                   <Badge variant="outline" className="text-green-600">
                     <CheckCircle className="w-3 h-3 mr-1" />
-                    {mfaStats.methods.webauthn.credentialsCount} {ts('security.keyCredentials')}
+                    {mfaStats?.methods?.webauthn.credentialsCount} {ts('security.keyCredentials')}
                   </Badge>
                 )}
               </CardTitle>
@@ -492,19 +503,19 @@ export default function SecuritySettingsPage() {
                   {mfaMethods
                     .filter((method) => method.type === 'webauthn')
                     .map((method) =>
-                      method.deviceInfo?.credentials.map((credential) => (
+                      method.deviceInfo?.credentials?.map((credential) => (
                         <div
-                          key={credential.id}
+                          key={credential?.id}
                           className="flex items-center justify-between p-4 border rounded-lg"
                         >
                           <div>
-                            <p className="font-medium">{credential.deviceName}</p>
+                            <p className="font-medium">{credential?.deviceName}</p>
                             <p className="text-sm text-muted-foreground">
                               {ts('security.deviceAdded')}{' '}
-                              {new Date(credential.createdAt).toLocaleDateString()}
+                              {new Date(credential?.createdAt).toLocaleDateString()}
                             </p>
                           </div>
-                          <Button variant="destructive" size="sm">
+                          <Button type="button" variant="destructive" size="sm">
                             <Trash2 className="w-4 h-4 mr-2" />
                             {ts('security.removeDevice')}
                           </Button>
@@ -512,7 +523,12 @@ export default function SecuritySettingsPage() {
                       ))
                     )}
 
-                  <Button variant="outline" onClick={handleSetupWebAuthn} className="w-full">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleSetupWebAuthn}
+                    className="w-full"
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     {ts('security.addNewKey')}
                   </Button>
@@ -523,7 +539,7 @@ export default function SecuritySettingsPage() {
                     <Key className="w-4 h-4" />
                     <AlertDescription>{ts('security.webauthnNotConfigured')}</AlertDescription>
                   </Alert>
-                  <Button onClick={handleSetupWebAuthn} className="w-full">
+                  <Button type="button" onClick={handleSetupWebAuthn} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
                     {ts('security.configureWebauthn')}
                   </Button>
@@ -565,15 +581,15 @@ export default function SecuritySettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="verification-code">
+                <label className="text-sm font-medium" htmlFor={verificationCodeId}>
                   {ts('security.verificationCodeLabel')}
                 </label>
                 <input
-                  id="verification-code"
+                  id={verificationCodeId}
                   type="text"
                   placeholder={ts('security.verificationCodePlaceholder')}
                   value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
+                  onChange={(e) => setVerificationCode(e?.target?.value)}
                   className="w-full p-2 border rounded"
                   maxLength={6}
                 />
@@ -582,7 +598,7 @@ export default function SecuritySettingsPage() {
               <div className="space-y-2">
                 <p className="text-sm font-medium">{ts('security.backupCodesLabel')}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  {totpSetup.backupCodes.map((code) => (
+                  {totpSetup?.backupCodes?.map((code) => (
                     <code
                       key={`backup-code-${code}`}
                       className="block p-1 bg-muted rounded text-center"
@@ -597,10 +613,15 @@ export default function SecuritySettingsPage() {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSetupDialog({ open: false, type: null })}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setSetupDialog({ open: false, type: null })}
+            >
               {ts('security.cancel')}
             </Button>
             <Button
+              type="button"
               onClick={handleVerifyTOTP}
               disabled={!verificationCode || verificationCode.length !== 6}
             >
@@ -623,15 +644,15 @@ export default function SecuritySettingsPage() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="device-name" className="text-sm font-medium">
+              <label htmlFor={deviceNameId} className="text-sm font-medium">
                 {ts('security.deviceNameLabel')}
               </label>
               <input
-                id="device-name"
+                id={deviceNameId}
                 type="text"
                 placeholder={ts('security.deviceNamePlaceholder')}
                 value={deviceName}
-                onChange={(e) => setDeviceName(e.target.value)}
+                onChange={(e) => setDeviceName(e?.target?.value)}
                 className="w-full p-2 border rounded"
               />
             </div>
@@ -643,7 +664,11 @@ export default function SecuritySettingsPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSetupDialog({ open: false, type: null })}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setSetupDialog({ open: false, type: null })}
+            >
               {ts('security.cancel')}
             </Button>
           </DialogFooter>
@@ -660,7 +685,7 @@ export default function SecuritySettingsPage() {
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
-              {backupCodes.map((code) => (
+              {backupCodes?.map((code) => (
                 <code
                   key={`backup-code-${code}`}
                   className="block p-2 bg-muted rounded text-center font-mono"
@@ -677,14 +702,15 @@ export default function SecuritySettingsPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBackupCodes(false)}>
+            <Button type="button" variant="outline" onClick={() => setShowBackupCodes(false)}>
               {ts('security.close')}
             </Button>
             <Button
+              type="button"
               onClick={() => {
-                const codesText = backupCodes.join('\n')
-                navigator.clipboard.writeText(codesText)
-                toast.success(t('security.mfa.codesCopied'))
+                const codesText = backupCodes?.join('\n')
+                navigator?.clipboard?.writeText(codesText)
+                toast?.success(t('security?.mfa?.codesCopied'))
               }}
             >
               <Download className="w-4 h-4 mr-2" />

@@ -1,3 +1,4 @@
+import type React from 'react'
 import type { ReactNode } from 'react'
 
 // Types de données supportés
@@ -73,7 +74,7 @@ export interface ColumnConfig<T = Record<string, unknown>> {
 
   // Fonction pour obtenir la valeur personnalisée (utile pour des propriétés imbriquées)
   getValue?: (row: T) => unknown
-  
+
   // Alias pour getValue (compatibilité)
   accessor?: ((row: T) => unknown) | string
 
@@ -90,13 +91,17 @@ export interface SortConfig {
 
 // Configuration des filtres
 export interface FilterConfig {
-  field: string  // Identifiant de la colonne à filtrer
-  value: DataValue | Record<string, unknown>  // Valeur du filtre (peut être complexe)
-  operator?:  // Opérateur de comparaison (optionnel pour les filtres complexes)
+  field: string // Identifiant de la colonne à filtrer
+  value: DataValue | Record<string, unknown> // Valeur du filtre (peut être complexe)
+  operator?: // Opérateur de comparaison (optionnel pour les filtres complexes)
     | 'equals'
+    | 'not_equals'
     | 'contains'
+    | 'not_contains'
     | 'startsWith'
+    | 'starts_with'
     | 'endsWith'
+    | 'ends_with'
     | 'gt'
     | 'lt'
     | 'gte'
@@ -104,7 +109,10 @@ export interface FilterConfig {
     | 'between'
     | 'in'
     | 'notIn'
-  column?: string  // Alias pour field (compatibilité)
+    | 'not_in'
+    | 'is_empty'
+    | 'is_not_empty'
+  column?: string // Alias pour field (compatibilité)
 }
 
 // Opérateurs de filtrage avancé
@@ -128,20 +136,20 @@ export type FilterOperator =
 // Règle de filtrage avancé
 export interface AdvancedFilterRule {
   id: string
-  field: string  // Identifiant de la colonne
-  column?: string  // Alias pour field (compatibilité)
+  field: string // Identifiant de la colonne
+  column?: string // Alias pour field (compatibilité)
   operator: FilterOperator
-  value: any
-  value2?: any  // Pour l'opérateur "between"
+  value: unknown
+  value2?: unknown // Pour l'opérateur "between"
   enabled: boolean
 }
 
 // Groupe de filtres avancés
 export interface AdvancedFilterGroup {
   id: string
-  logic: 'AND' | 'OR'  // Pour filtres combinés
-  condition?: 'AND' | 'OR'  // Alias pour logic
-  rules: (AdvancedFilterRule | AdvancedFilterGroup)[]  // Support des groupes imbriqués
+  logic: 'AND' | 'OR' // Pour filtres combinés
+  condition?: 'AND' | 'OR' // Alias pour logic
+  rules: (AdvancedFilterRule | AdvancedFilterGroup)[] // Support des groupes imbriqués
 }
 
 // État de sélection
@@ -193,34 +201,39 @@ export interface DataTableConfig<T = Record<string, unknown>> {
   filterable?: boolean
   editable?: boolean
   selectable?: boolean
+  exportable?: boolean
   pagination?: boolean | PaginationConfig
 
-  // Actions
-  actions?: {
-    create?: () => void
-    edit?: (row: T) => void
-    delete?: (rows: T[]) => void
-    export?: (data: T[], format: 'xlsx' | 'csv' | 'pdf') => void
-    import?: (data: unknown[]) => void
-  }
-
-  // Paramètres
-  settings?: TableSettings
-  onSettingsChange?: (settings: TableSettings) => void
-
-  // Événements
-  onRowClick?: (row: T) => void
-  onRowDoubleClick?: (row: T) => void
-  onCellEdit?: (value: unknown, row: T, column: ColumnConfig<T>) => void
-  onSelectionChange?: (selection: SelectionState) => void
-  onPaginationChange?: (pagination: { page: number; pageSize: number; total: number }) => void
-
-  // Style
+  // Apparence
+  title?: string
   className?: string
   height?: number | string
   striped?: boolean
   bordered?: boolean
+  hoverable?: boolean
   compact?: boolean
+  loading?: boolean
+  error?: string | null
+  emptyMessage?: string
+
+  // Actions et callbacks
+  actions?: Array<{
+    label: string
+    icon?: React.ReactNode
+    onClick: (row: T) => void
+    variant?: 'default' | 'destructive' | 'outline'
+    disabled?: (row: T) => boolean
+  }>
+  onRowClick?: (row: T, index: number) => void
+  onRowDoubleClick?: (row: T, index: number) => void
+  onCellEdit?: (row: T, column: ColumnConfig<T>, value: unknown) => void
+  onSelectionChange?: (selection: SelectionState) => void
+  onPaginationChange?: (config: PaginationConfig) => void
+  onAddNew?: () => void
+
+  // Paramètres persistants
+  settings?: TableSettings
+  onSettingsChange?: (settings: TableSettings) => void
 }
 
 // Props du composant DataTable (alias de DataTableConfig)

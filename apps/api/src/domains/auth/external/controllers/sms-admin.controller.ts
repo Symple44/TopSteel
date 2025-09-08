@@ -1,18 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-  UseGuards,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
-import { Roles } from '../../decorators/roles.decorator'
-import { SMSService } from '../../services/sms.service'
+import type { SMSService } from '../../services/sms.service'
 
 /**
  * DTO pour tester l'envoi SMS
@@ -55,10 +46,8 @@ export class SMSAdminController {
     const startDate = query.startDate
       ? new Date(query.startDate)
       : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 derniers jours par défaut
-    
-    const endDate = query.endDate
-      ? new Date(query.endDate)
-      : new Date()
+
+    const endDate = query.endDate ? new Date(query.endDate) : new Date()
 
     return await this.smsService.getSMSStatistics(startDate, endDate)
   }

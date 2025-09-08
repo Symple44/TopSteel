@@ -1,6 +1,6 @@
 // SSR-compatible Univer imports with client-side detection
-let Univer: any = null
-let UniverSheetsPlugin: any = null
+let Univer: typeof import('@univerjs/core').Univer | null = null
+let UniverSheetsPlugin: typeof import('@univerjs/sheets').UniverSheetsPlugin | null = null
 
 // Flag to track if we're running on the client side
 const isClient = typeof window !== 'undefined'
@@ -42,12 +42,12 @@ import { fr } from './translations/fr'
 import type { TranslationEntry, TranslationImportResult, TranslationStats } from './types'
 
 // Fonction helper pour vérifier si une traduction est valide
-const isValidTranslation = (value: any): boolean => {
-  return typeof value === 'string' && value.trim() !== ''
+const isValidTranslation = (value: unknown): boolean => {
+  return typeof value === 'string' && value?.trim() !== ''
 }
 
 // Obtenir toutes les traductions disponibles
-export const getAllTranslations = (): Record<string, any> => ({
+export const getAllTranslations = (): Record<string, Record<string, unknown>> => ({
   fr,
   en,
   es,
@@ -55,7 +55,7 @@ export const getAllTranslations = (): Record<string, any> => ({
 
 // Convertir les traductions imbriquées en entrées plates
 export const flattenTranslations = (
-  translations: Record<string, any>,
+  translations: Record<string, Record<string, unknown>>,
   _namespace = '',
   _category = 'general'
 ): TranslationEntry[] => {
@@ -64,15 +64,15 @@ export const flattenTranslations = (
 
   // Récupérer toutes les clés uniques de toutes les langues
   const allKeys = new Set<string>()
-  languages.forEach((lang) => {
+  languages?.forEach((lang) => {
     extractKeys(translations[lang], '', allKeys)
   })
 
   // Créer une entrée pour chaque clé
-  allKeys.forEach((fullKey) => {
-    const parts = fullKey.split('.')
-    const ns = parts[0]
-    const key = parts.slice(1).join('.')
+  allKeys?.forEach((fullKey) => {
+    const parts = fullKey?.split('.')
+    const ns = parts?.[0]
+    const key = parts?.slice(1).join('.')
 
     const entry: TranslationEntry = {
       id: fullKey,
@@ -86,34 +86,40 @@ export const flattenTranslations = (
     }
 
     // Récupérer la traduction pour chaque langue
-    languages.forEach((lang) => {
+    languages?.forEach((lang) => {
       const value = getNestedValue(translations[lang], fullKey)
       if (value !== undefined && typeof value === 'string') {
         entry.translations[lang] = value
       }
     })
 
-    entries.push(entry)
+    entries?.push(entry)
   })
 
-  return entries.sort((a, b) => a.fullKey.localeCompare(b.fullKey))
+  return entries?.sort((a, b) => a?.fullKey?.localeCompare(b.fullKey))
 }
 
 // Extraire toutes les clés d'un objet imbriqué
-const extractKeys = (obj: any, prefix: string, keys: Set<string>): void => {
+const extractKeys = (obj: Record<string, unknown>, prefix: string, keys: Set<string>): void => {
   Object.keys(obj).forEach((key) => {
     const fullKey = prefix ? `${prefix}.${key}` : key
     if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-      extractKeys(obj[key], fullKey, keys)
+      extractKeys(obj[key] as Record<string, unknown>, fullKey, keys)
     } else {
-      keys.add(fullKey)
+      keys?.add(fullKey)
     }
   })
 }
 
 // Obtenir une valeur imbriquée par sa clé complète
-const getNestedValue = (obj: any, path: string): any => {
-  return path.split('.').reduce((current, key) => current?.[key], obj)
+const getNestedValue = (obj: Record<string, unknown>, path: string): unknown => {
+  return path
+    .split('.')
+    .reduce(
+      (current: Record<string, unknown> | unknown, key) =>
+        (current as Record<string, unknown>)?.[key],
+      obj
+    )
 }
 
 // Déterminer la catégorie basée sur le namespace et la clé
@@ -126,8 +132,8 @@ export const determineCategory = (namespace: string, key: string): string => {
   if (namespace === 'admin') return 'Administration'
   if (namespace === 'profile') return 'Profil'
   if (namespace === 'common') {
-    if (key.includes('security')) return 'Sécurité'
-    if (key.includes('notification')) return 'Notifications'
+    if (key?.includes('security')) return 'Sécurité'
+    if (key?.includes('notification')) return 'Notifications'
     return 'Général'
   }
   return 'Autre'
@@ -143,8 +149,8 @@ export const calculateTranslationStats = (entries: TranslationEntry[]): Translat
     percentageComplete: {},
   }
 
-  languages.forEach((lang) => {
-    const translated = entries.filter((e) => isValidTranslation(e.translations[lang])).length
+  languages?.forEach((lang) => {
+    const translated = entries?.filter((e) => isValidTranslation(e.translations[lang])).length
     const untranslated = entries.length - translated
 
     stats.translated[lang] = translated
@@ -168,13 +174,13 @@ export const filterTranslations = (
     modified?: boolean
   }
 ): TranslationEntry[] => {
-  return entries.filter((entry) => {
+  return entries?.filter((entry) => {
     // Filtre de recherche
     if (filter.search) {
-      const searchLower = filter.search.toLowerCase()
-      const matchKey = entry.fullKey.toLowerCase().includes(searchLower)
+      const searchLower = filter?.search?.toLowerCase()
+      const matchKey = entry?.fullKey?.toLowerCase().includes(searchLower)
       const matchTranslations = Object.values(entry.translations).some((t) =>
-        t.toLowerCase().includes(searchLower)
+        t?.toLowerCase().includes(searchLower)
       )
       if (!matchKey && !matchTranslations) return false
     }
@@ -200,7 +206,7 @@ export const filterTranslations = (
 
 // Interface pour les données de cellule Univer
 interface UniverCellData {
-  v?: any // value
+  v?: unknown // value
   t?: number // type (1=string, 2=number, 3=boolean, 4=date)
 }
 
@@ -223,7 +229,7 @@ interface UniverWorkbookData {
 
 // Instance Univer singleton pour les traductions
 class TranslationUniverUtils {
-  private static univerInstance: any = null
+  private static univerInstance: InstanceType<typeof import('@univerjs/core').Univer> | null = null
   private static univerAvailable = false
 
   /**
@@ -245,26 +251,28 @@ class TranslationUniverUtils {
   /**
    * Obtient l'instance Univer singleton avec gestion d'erreur (client-side seulement)
    */
-  private static async getUniverInstance(): Promise<any> {
+  private static async getUniverInstance(): Promise<InstanceType<
+    typeof import('@univerjs/core').Univer
+  > | null> {
     if (!isClient) {
       return null // Server-side: always return null
     }
 
-    const univerAvailable = await TranslationUniverUtils.isUniverAvailable()
+    const univerAvailable = await TranslationUniverUtils?.isUniverAvailable()
     if (!univerAvailable) {
       return null
     }
 
-    if (!TranslationUniverUtils.univerInstance) {
+    if (!TranslationUniverUtils.univerInstance && Univer) {
       try {
         TranslationUniverUtils.univerInstance = new Univer({
-          theme: 'default',
-          locale: 'fr-FR',
+          theme: 'default' as unknown,
+          locale: 'fr-FR' as unknown,
         })
 
         // Registrer seulement les plugins nécessaires pour les traductions
         if (UniverSheetsPlugin) {
-          TranslationUniverUtils.univerInstance.registerPlugin(UniverSheetsPlugin)
+          TranslationUniverUtils?.univerInstance?.registerPlugin(UniverSheetsPlugin)
         }
 
         TranslationUniverUtils.univerAvailable = true
@@ -290,13 +298,13 @@ class TranslationUniverUtils {
 
     // En-têtes (ligne 0)
     const headers = ['ID', 'Namespace', 'Key', 'Category', 'Description']
-    languages.forEach((lang) => {
-      headers.push(`Translation_${lang}`)
+    languages?.forEach((lang) => {
+      headers?.push(`Translation_${lang}`)
     })
 
     const headerRow: Record<string, UniverCellData> = {}
-    headers.forEach((header, colIndex) => {
-      headerRow[colIndex.toString()] = {
+    headers?.forEach((header, colIndex) => {
+      headerRow[colIndex?.toString()] = {
         v: header,
         t: 1, // string type
       }
@@ -304,7 +312,7 @@ class TranslationUniverUtils {
     cellData['0'] = headerRow
 
     // Données (lignes 1+)
-    entries.forEach((entry, rowIndex) => {
+    entries?.forEach((entry, rowIndex) => {
       const dataRow: Record<string, UniverCellData> = {}
 
       // Colonnes fixes
@@ -317,12 +325,12 @@ class TranslationUniverUtils {
       ]
 
       // Ajouter les traductions pour chaque langue
-      languages.forEach((lang) => {
-        rowData.push(entry.translations[lang] || '')
+      languages?.forEach((lang) => {
+        rowData?.push(entry.translations[lang] || '')
       })
 
-      rowData.forEach((value, colIndex) => {
-        dataRow[colIndex.toString()] = {
+      rowData?.forEach((value, colIndex) => {
+        dataRow[colIndex?.toString()] = {
           v: value,
           t: 1, // string type
         }
@@ -353,23 +361,26 @@ class TranslationUniverUtils {
   static async exportWorkbookToBlob(workbookData: UniverWorkbookData): Promise<Blob> {
     // Server-side: always use fallback
     if (!isClient) {
-      return TranslationUniverUtils.createFallbackExcelBlob(workbookData)
+      return TranslationUniverUtils?.createFallbackExcelBlob(workbookData)
     }
 
     // Essayer Univer d'abord si disponible (client-side seulement)
-    const univer = await TranslationUniverUtils.getUniverInstance()
+    const univer = await TranslationUniverUtils?.getUniverInstance()
+
     if (univer && TranslationUniverUtils.univerAvailable) {
       try {
-        const univerSheet = univer.createUniverSheet(workbookData)
+        const univerSheet = univer?.createUniverSheet(workbookData as unknown)
 
         // Utiliser l'API d'export d'Univer pour générer le blob Excel
-        if (univerSheet && typeof univerSheet.exportAsExcel === 'function') {
-          const blob = await univerSheet.exportAsExcel()
+
+        if (univerSheet && typeof (univerSheet as unknown)?.exportAsExcel === 'function') {
+          const blob = await (univerSheet as unknown)?.exportAsExcel()
           return blob
-        } else if (univerSheet && typeof univerSheet.save === 'function') {
+        } else if (univerSheet && typeof (univerSheet as unknown)?.save === 'function') {
           // Alternative: méthode save
-          const blob = await univerSheet.save()
-          return blob
+
+          const blob = await (univerSheet as unknown)?.save()
+          return blob as Blob
         }
       } catch (_error) {
         TranslationUniverUtils.univerAvailable = false
@@ -377,7 +388,7 @@ class TranslationUniverUtils {
     }
 
     // Fallback: créer un blob Excel compatible
-    return TranslationUniverUtils.createFallbackExcelBlob(workbookData)
+    return TranslationUniverUtils?.createFallbackExcelBlob(workbookData)
   }
 
   /**
@@ -386,7 +397,7 @@ class TranslationUniverUtils {
   static createFallbackExcelBlob(workbookData: UniverWorkbookData): Blob {
     try {
       // Créer un contenu Excel compatible (format CSV avec BOM UTF-8)
-      const sheet = workbookData.sheets[workbookData.sheetOrder[0]]
+      const sheet = workbookData?.sheets[workbookData?.sheetOrder?.[0]]
       if (!sheet) {
         throw new Error('No sheet data available')
       }
@@ -394,24 +405,24 @@ class TranslationUniverUtils {
       const lines: string[] = []
 
       for (let row = 0; row < sheet.rowCount; row++) {
-        const rowKey = row.toString()
+        const rowKey = row?.toString()
         const cells: string[] = []
 
         for (let col = 0; col < sheet.columnCount; col++) {
-          const colKey = col.toString()
+          const colKey = col?.toString()
           const cellData = sheet.cellData[rowKey]?.[colKey]
           const value = cellData?.v || ''
           // Échapper les guillemets et virgules pour CSV
           const escapedValue = String(value).replace(/"/g, '""')
-          cells.push(`"${escapedValue}"`)
+          cells?.push(`"${escapedValue}"`)
         }
 
-        lines.push(cells.join(','))
+        lines?.push(cells?.join(','))
       }
 
       // Ajouter BOM UTF-8 pour la compatibilité Excel
       const BOM = '\uFEFF'
-      const csvContent = BOM + lines.join('\r\n')
+      const csvContent = BOM + lines?.join('\r\n')
 
       return new Blob([csvContent], {
         type: 'application/vnd.ms-excel;charset=utf-8;',
@@ -430,26 +441,29 @@ class TranslationUniverUtils {
   static async importExcelToWorkbook(buffer: ArrayBuffer): Promise<UniverWorkbookData | null> {
     // Server-side: always use fallback
     if (!isClient) {
-      return TranslationUniverUtils.parseFallbackExcel(buffer)
+      return TranslationUniverUtils?.parseFallbackExcel(buffer)
     }
 
     // Essayer Univer d'abord si disponible (client-side seulement)
-    const univer = await TranslationUniverUtils.getUniverInstance()
+    const univer = await TranslationUniverUtils?.getUniverInstance()
+
     if (univer && TranslationUniverUtils.univerAvailable) {
       try {
         // Utiliser l'API d'import d'Univer pour lire le fichier Excel
-        if (typeof univer.importExcel === 'function') {
-          const workbook = await univer.importExcel(buffer)
+
+        if (typeof (univer as unknown)?.importExcel === 'function') {
+          const workbook = await (univer as unknown)?.importExcel(buffer)
           if (workbook) {
             // Convertir en format de données standard
-            const firstSheet = workbook.getActiveSheet ? workbook.getActiveSheet() : null
+            const firstSheet = workbook.getActiveSheet ? workbook?.getActiveSheet() : null
             if (firstSheet) {
-              return TranslationUniverUtils.extractWorkbookData(firstSheet)
+              return TranslationUniverUtils?.extractWorkbookData(firstSheet)
             }
           }
-        } else if (typeof univer.importFromBuffer === 'function') {
+        } else if (typeof (univer as unknown)?.importFromBuffer === 'function') {
           // Alternative: méthode importFromBuffer
-          const workbookData = await univer.importFromBuffer(buffer)
+
+          const workbookData = await (univer as unknown)?.importFromBuffer(buffer)
           if (workbookData) {
             return workbookData
           }
@@ -460,17 +474,20 @@ class TranslationUniverUtils {
     }
 
     // Fallback: essayer de parser comme CSV/Excel basique
-    return TranslationUniverUtils.parseFallbackExcel(buffer)
+    return TranslationUniverUtils?.parseFallbackExcel(buffer)
   }
 
   /**
    * Extrait les données d'une feuille Univer
    */
-  private static extractWorkbookData(sheet: any): UniverWorkbookData {
+  private static extractWorkbookData(sheet: {
+    getUsedRange(): { endRow?: number; endColumn?: number } | null
+    getCell(row: number, col: number): { getValue(): unknown } | null
+  }): UniverWorkbookData {
     const cellData: Record<string, Record<string, UniverCellData>> = {}
 
     // Obtenir les dimensions de la feuille
-    const range = sheet.getUsedRange()
+    const range = sheet?.getUsedRange()
     const rowCount = range?.endRow ? range.endRow + 1 : 0
     const columnCount = range?.endColumn ? range.endColumn + 1 : 0
 
@@ -479,17 +496,17 @@ class TranslationUniverUtils {
       const rowData: Record<string, UniverCellData> = {}
 
       for (let col = 0; col < columnCount; col++) {
-        const cell = sheet.getCell(row, col)
+        const cell = sheet?.getCell(row, col)
         if (cell) {
-          rowData[col.toString()] = {
-            v: cell.getValue() || '',
+          rowData[col?.toString()] = {
+            v: cell?.getValue() || '',
             t: 1, // string type par défaut
           }
         }
       }
 
       if (Object.keys(rowData).length > 0) {
-        cellData[row.toString()] = rowData
+        cellData[row?.toString()] = rowData
       }
     }
 
@@ -515,16 +532,16 @@ class TranslationUniverUtils {
   private static parseFallbackExcel(buffer: ArrayBuffer): UniverWorkbookData | null {
     try {
       // Vérifier s'il s'agit d'un fichier Excel réel (signature XLSX)
-      if (buffer.byteLength < 4) return null
+      if (buffer?.byteLength < 4) return null
 
-      const signature = new Uint8Array(buffer.slice(0, 4))
+      const signature = new Uint8Array(buffer?.slice(0, 4))
 
       // Signature ZIP (XLSX est un format ZIP)
       const isZip =
-        signature[0] === 0x50 &&
-        signature[1] === 0x4b &&
-        (signature[2] === 0x03 || signature[2] === 0x05 || signature[2] === 0x07) &&
-        (signature[3] === 0x04 || signature[3] === 0x06 || signature[3] === 0x08)
+        signature?.[0] === 0x50 &&
+        signature?.[1] === 0x4b &&
+        (signature?.[2] === 0x03 || signature?.[2] === 0x05 || signature?.[2] === 0x07) &&
+        (signature?.[3] === 0x04 || signature?.[3] === 0x06 || signature?.[3] === 0x08)
 
       if (isZip) {
         return null
@@ -546,22 +563,22 @@ class TranslationUniverUtils {
       }
 
       // Supprimer le BOM s'il existe
-      if (text.charCodeAt(0) === 0xfeff) {
-        text = text.substring(1)
+      if (text?.charCodeAt(0) === 0xfeff) {
+        text = text?.substring(1)
       }
 
-      const lines = text.split(/\r?\n/).filter((line) => line.trim())
+      const lines = text?.split(/\r?\n/).filter((line) => line?.trim())
 
-      if (lines.length === 0) return null
+      if (lines?.length === 0) return null
 
       // Détecter le séparateur
-      const firstLine = lines[0]
+      const firstLine = lines?.[0]
       let separator = ','
-      if (firstLine.includes('\t')) {
+      if (firstLine?.includes('\t')) {
         separator = '\t'
       } else if (
-        firstLine.includes(';') &&
-        firstLine.split(';').length > firstLine.split(',').length
+        firstLine?.includes(';') &&
+        firstLine?.split(';').length > firstLine?.split(',').length
       ) {
         separator = ';'
       }
@@ -569,24 +586,24 @@ class TranslationUniverUtils {
       const cellData: Record<string, Record<string, UniverCellData>> = {}
       let maxColumns = 0
 
-      lines.forEach((line, rowIndex) => {
+      lines?.forEach((line, rowIndex) => {
         // Parser la ligne CSV/TSV
         const cells =
           separator === '\t'
-            ? line.split('\t')
-            : TranslationUniverUtils.parseCSVLine(line, separator)
+            ? line?.split('\t')
+            : TranslationUniverUtils?.parseCSVLine(line, separator)
 
         maxColumns = Math.max(maxColumns, cells.length)
 
         const rowData: Record<string, UniverCellData> = {}
-        cells.forEach((cell, colIndex) => {
-          rowData[colIndex.toString()] = {
-            v: cell.trim(),
+        cells?.forEach((cell, colIndex) => {
+          rowData[colIndex?.toString()] = {
+            v: cell?.trim(),
             t: 1, // string type
           }
         })
 
-        cellData[rowIndex.toString()] = rowData
+        cellData[rowIndex?.toString()] = rowData
       })
 
       return {
@@ -633,7 +650,7 @@ class TranslationUniverUtils {
         }
       } else if (char === separator && !inQuotes) {
         // Séparateur de cellule
-        result.push(current.trim())
+        result?.push(current?.trim())
         current = ''
         i++
       } else {
@@ -642,32 +659,32 @@ class TranslationUniverUtils {
       }
     }
 
-    result.push(current.trim())
+    result?.push(current?.trim())
     return result
   }
 
   /**
    * Convertit les données de workbook Univer en tableau 2D
    */
-  static extractDataFromWorkbook(workbook: UniverWorkbookData): any[][] {
-    const firstSheetId = workbook.sheetOrder[0]
-    const sheet = workbook.sheets[firstSheetId]
+  static extractDataFromWorkbook(workbook: UniverWorkbookData): unknown[][] {
+    const firstSheetId = workbook?.sheetOrder?.[0]
+    const sheet = workbook?.sheets[firstSheetId]
 
     if (!sheet) return []
 
-    const result: any[][] = []
+    const result: unknown[][] = []
 
     for (let row = 0; row < sheet.rowCount; row++) {
-      const rowKey = row.toString()
-      const rowData: any[] = []
+      const rowKey = row?.toString()
+      const rowData: unknown[] = []
 
       for (let col = 0; col < sheet.columnCount; col++) {
-        const colKey = col.toString()
+        const colKey = col?.toString()
         const cellData = sheet.cellData[rowKey]?.[colKey]
-        rowData.push(cellData?.v || '')
+        rowData?.push(cellData?.v || '')
       }
 
-      result.push(rowData)
+      result?.push(rowData)
     }
 
     return result
@@ -678,19 +695,21 @@ class TranslationUniverUtils {
 export const exportToExcel = (entries: TranslationEntry[], languages: string[]): Blob => {
   try {
     // Créer les données de workbook Univer
-    const workbookData = TranslationUniverUtils.createWorkbookFromTranslations(entries, languages)
+    const workbookData = TranslationUniverUtils?.createWorkbookFromTranslations(entries, languages)
 
     // Note: Cette fonction doit rester synchrone pour maintenir la compatibilité API
     // On utilise toujours le fallback synchrone qui génère un format CSV compatible Excel
     // car l'export async Univer nécessiterait un changement d'API
-    return TranslationUniverUtils.createFallbackExcelBlob(workbookData)
+    return TranslationUniverUtils?.createFallbackExcelBlob(workbookData)
   } catch (_error) {
     // Fallback d'urgence: créer un CSV minimal mais valide
     const headers = ['ID', 'Namespace', 'Key', 'Category', 'Description']
-    languages.forEach((lang) => headers.push(`Translation_${lang}`))
+    languages?.forEach((lang) => {
+      headers?.push(`Translation_${lang}`)
+    })
 
-    const csvRows = [headers.join(',')]
-    entries.forEach((entry) => {
+    const csvRows = [headers?.join(',')]
+    entries?.forEach((entry) => {
       const row = [
         `"${entry.id}"`,
         `"${entry.namespace}"`,
@@ -698,14 +717,14 @@ export const exportToExcel = (entries: TranslationEntry[], languages: string[]):
         `"${entry.category || ''}"`,
         `"${entry.description || ''}"`,
       ]
-      languages.forEach((lang) => {
-        row.push(`"${(entry.translations[lang] || '').replace(/"/g, '""')}"`)
+      languages?.forEach((lang) => {
+        row?.push(`"${(entry.translations[lang] || '').replace(/"/g, '""')}"`)
       })
-      csvRows.push(row.join(','))
+      csvRows?.push(row?.join(','))
     })
 
     const BOM = '\uFEFF'
-    const csvContent = BOM + csvRows.join('\r\n')
+    const csvContent = BOM + csvRows?.join('\r\n')
 
     return new Blob([csvContent], {
       type: 'application/vnd.ms-excel;charset=utf-8;',
@@ -728,66 +747,70 @@ export const importFromExcel = async (
   }
 
   try {
-    const buffer = await file.arrayBuffer()
+    const buffer = await file?.arrayBuffer()
 
     // Utiliser Univer pour lire le fichier Excel
-    const workbook = await TranslationUniverUtils.importExcelToWorkbook(buffer)
+    const workbook = await TranslationUniverUtils?.importExcelToWorkbook(buffer)
     if (!workbook) {
-      result.errors.push(
+      result?.errors?.push(
         'Impossible de lire le fichier. Formats supportés: Excel (.xlsx), CSV (.csv), TSV (.tsv)'
       )
       return result
     }
 
     // Extraire les données sous forme de tableau 2D
-    const rawData = TranslationUniverUtils.extractDataFromWorkbook(workbook)
-    if (rawData.length === 0) {
-      result.errors.push('Fichier vide')
+    const rawData = TranslationUniverUtils?.extractDataFromWorkbook(workbook)
+    if (rawData?.length === 0) {
+      result?.errors?.push('Fichier vide')
       return result
     }
 
     // Vérifier qu'il y a au moins une ligne d'en-têtes
-    if (rawData.length < 1) {
-      result.errors.push("Le fichier doit contenir au moins une ligne d'en-têtes")
+    if (rawData?.length < 1) {
+      result?.errors?.push("Le fichier doit contenir au moins une ligne d'en-têtes")
       return result
     }
 
     // Première ligne = en-têtes, reste = données
-    const headers = rawData[0] as string[]
-    const dataRows = rawData.slice(1)
+    const headers = rawData?.[0] as string[]
+    const dataRows = rawData?.slice(1)
 
     // Vérifier que les colonnes requises sont présentes
     const requiredColumns = ['ID']
-    const missingColumns = requiredColumns.filter((col) => !headers.includes(col))
-    if (missingColumns.length > 0) {
-      result.errors.push(`Colonnes manquantes: ${missingColumns.join(', ')}`)
+    const missingColumns = requiredColumns?.filter((col) => !headers?.includes(col))
+    if (missingColumns?.length > 0) {
+      result?.errors?.push(`Colonnes manquantes: ${missingColumns?.join(', ')}`)
       return result
     }
 
     // Convertir en format objet comme le faisait XLSX.utils.sheet_to_json
-    const data = dataRows.map((row) => {
-      const rowObj: any = {}
-      headers.forEach((header, index) => {
+    const data = dataRows?.map((row) => {
+      const rowObj: Record<string, unknown> = {}
+      headers?.forEach((header, index) => {
         rowObj[header] = row[index] || ''
       })
       return rowObj
     })
 
-    const entriesMap = new Map(existingEntries.map((e) => [e.id, e]))
+    const entriesMap = new Map(existingEntries?.map((e) => [e.id, e]))
 
-    data.forEach((row: any, index) => {
+    data?.forEach((row: Record<string, unknown>, index) => {
       try {
         const id = row.ID?.toString().trim()
         if (!id) {
-          result.warnings.push(`Ligne ${index + 2}: ID manquant`)
-          result.skipped++
+          if (result?.warnings) {
+            result.warnings.push(`Ligne ${index + 2}: ID manquant`)
+          }
+          if (result) {
+            result.skipped++
+          }
           return
         }
 
         const translations: Record<string, string> = {}
         Object.keys(row).forEach((key) => {
-          if (key.startsWith('Translation_')) {
-            const lang = key.replace('Translation_', '')
+          if (key?.startsWith('Translation_')) {
+            const lang = key?.replace('Translation_', '')
             const translation = row[key]?.toString().trim() || ''
             if (translation) {
               translations[lang] = translation
@@ -795,24 +818,30 @@ export const importFromExcel = async (
           }
         })
 
-        if (entriesMap.has(id)) {
+        if (entriesMap?.has(id)) {
           // Mise à jour
-          const existing = entriesMap.get(id)!
+          const existing = entriesMap?.get(id)!
           let hasChanges = false
 
           // Vérifier s'il y a de vrais changements
           Object.keys(translations).forEach((lang) => {
-            if (existing.translations[lang] !== translations[lang]) {
+            if (existing?.translations[lang] !== translations[lang]) {
               hasChanges = true
             }
           })
 
           if (hasChanges) {
-            existing.translations = { ...existing.translations, ...translations }
-            existing.updatedAt = new Date()
-            result.updated++
+            if (existing) {
+              existing.translations = { ...existing.translations, ...translations }
+              existing.updatedAt = new Date()
+            }
+            if (result) {
+              result.updated++
+            }
           } else {
-            result.skipped++
+            if (result) {
+              result.skipped++
+            }
           }
         } else {
           // Nouvelle entrée
@@ -830,17 +859,25 @@ export const importFromExcel = async (
             createdAt: new Date(),
             updatedAt: new Date(),
           }
-          entriesMap.set(id, newEntry)
-          result.imported++
+          entriesMap?.set(id, newEntry)
+          if (result) {
+            result.imported++
+          }
         }
       } catch (error) {
-        result.errors.push(`Ligne ${index + 2}: ${error}`)
+        if (result?.errors) {
+          result.errors.push(`Ligne ${index + 2}: ${error}`)
+        }
       }
     })
 
-    result.success = result.errors.length === 0
+    if (result?.errors) {
+      result.success = result.errors.length === 0
+    }
   } catch (error) {
-    result.errors.push(`Erreur d'import: ${error}`)
+    if (result?.errors) {
+      result.errors.push(`Erreur d'import: ${error}`)
+    }
   }
 
   return result
@@ -854,12 +891,12 @@ export const saveTranslation = async (entry: TranslationEntry): Promise<boolean>
       body: JSON.stringify({ translationEntry: entry }),
     })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response?.ok) {
+      throw new Error(`HTTP error! status: ${response?.status}`)
     }
 
-    const result = await response.json()
-    return result.success
+    const result = await response?.json()
+    return result?.success
   } catch (_error) {
     return false
   }
@@ -875,30 +912,30 @@ export const loadTranslationsWithOverrides = async (): Promise<TranslationEntry[
       method: 'GET',
     })
 
-    if (!response.ok) {
+    if (!response?.ok) {
       // Retourner les traductions de base si l'API échoue
       return baseTranslations
     }
 
-    const result = await response.json()
+    const result = await response?.json()
 
-    if (result.success && result.data.overrides) {
-      const overrides = result.data.overrides
+    if (result?.success && result?.data?.overrides) {
+      const overrides = result?.data?.overrides
 
       // Appliquer les overrides aux traductions de base
-      return baseTranslations.map((entry) => {
+      return baseTranslations?.map((entry) => {
         if (overrides[entry.id]) {
           return {
             ...entry,
             // Fusionner les traductions : base + overrides
             translations: {
               ...entry.translations,
-              ...overrides[entry.id].translations,
+              ...overrides?.[entry.id]?.translations,
             },
             // Marquer comme modifié si des overrides existent
             isModified: true,
-            updatedAt: new Date(overrides[entry.id].updatedAt),
-            updatedBy: overrides[entry.id].updatedBy,
+            updatedAt: new Date(overrides?.[entry.id]?.updatedAt),
+            updatedBy: overrides?.[entry.id]?.updatedBy,
           }
         }
         return {
@@ -910,7 +947,7 @@ export const loadTranslationsWithOverrides = async (): Promise<TranslationEntry[
   } catch (_error) {}
 
   // Retourner les traductions de base avec un flag non-modifié
-  return baseTranslations.map((entry) => ({
+  return baseTranslations?.map((entry) => ({
     ...entry,
     isModified: false,
   }))
@@ -930,11 +967,11 @@ export const bulkImportTranslations = async (
       body: JSON.stringify({ translations }),
     })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response?.ok) {
+      throw new Error(`HTTP error! status: ${response?.status}`)
     }
 
-    const result = await response.json()
+    const result = await response?.json()
     return result
   } catch (error) {
     return {

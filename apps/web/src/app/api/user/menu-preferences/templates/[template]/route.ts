@@ -43,7 +43,7 @@ export async function POST(
     const { template } = await params
 
     if (!templates[template as keyof typeof templates]) {
-      return NextResponse.json({ success: false, message: 'Template inconnu' }, { status: 400 })
+      return NextResponse?.json({ success: false, message: 'Template inconnu' }, { status: 400 })
     }
 
     const templateConfig = templates[template as keyof typeof templates]
@@ -59,13 +59,13 @@ export async function POST(
       shortcuts: [],
     }
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: updatedPreferences,
       message: `Template ${template} appliqué`,
     })
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: "Erreur lors de l'application du template",

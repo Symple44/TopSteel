@@ -33,7 +33,7 @@ export function GenericCardEditor({
   title,
   viewType,
 }: GenericCardEditorProps) {
-  const [formData, setFormData] = useState<any>({})
+  const [formData, setFormData] = useState<Record<string, unknown>>({})
 
   useEffect(() => {
     if (item && isOpen) {
@@ -41,8 +41,8 @@ export function GenericCardEditor({
     }
   }, [item, isOpen])
 
-  const handleFieldChange = (fieldId: string, value: any) => {
-    setFormData((prev: any) => ({
+  const handleFieldChange = (fieldId: string, value: unknown) => {
+    setFormData((prev: Record<string, unknown>) => ({
       ...prev,
       [fieldId]: value,
     }))
@@ -56,7 +56,7 @@ export function GenericCardEditor({
   }
 
   // Fonction pour obtenir le composant input approprié selon le type de colonne
-  const renderInputForColumn = (column: ColumnConfig, currentValue: any) => {
+  const renderInputForColumn = (column: ColumnConfig, currentValue: unknown) => {
     const isEditable = isColumnEditable(column)
     const commonProps = {
       disabled: !isEditable,
@@ -70,8 +70,10 @@ export function GenericCardEditor({
         return (
           <div className="flex items-center">
             <Input
-              value={currentValue || ''}
-              onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleFieldChange(column.id, e.target.value)
+              }
               placeholder={`Saisir ${column.title.toLowerCase()}`}
               {...commonProps}
             />
@@ -84,13 +86,13 @@ export function GenericCardEditor({
           <div className="flex items-center">
             <Input
               type="number"
-              value={currentValue || ''}
-              onChange={(e: any) => {
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const val = e.target.value === '' ? null : Number(e.target.value)
                 handleFieldChange(column.id, val)
               }}
               placeholder={`Saisir ${column.title.toLowerCase()}`}
-              step={column.format?.decimals ? 10 ** -column.format.decimals : 'any'}
+              step={column.format?.decimals ? 10 ** -column.format.decimals : undefined}
               min={column.validation?.min}
               max={column.validation?.max}
               {...commonProps}
@@ -104,13 +106,13 @@ export function GenericCardEditor({
         const dateValue =
           currentValue instanceof Date
             ? currentValue.toISOString().split('T')[0]
-            : currentValue || ''
+            : String(currentValue || '')
         return (
           <div className="flex items-center">
             <Input
               type={column.type === 'datetime' ? 'datetime-local' : 'date'}
               value={dateValue}
-              onChange={(e: any) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const val = e.target.value ? new Date(e.target.value) : null
                 handleFieldChange(column.id, val)
               }}
@@ -129,7 +131,9 @@ export function GenericCardEditor({
             </span>
             <Checkbox
               checked={Boolean(currentValue)}
-              onCheckedChange={(checked: any) => handleFieldChange(column.id, checked)}
+              onCheckedChange={(checked: boolean | 'indeterminate') =>
+                handleFieldChange(column.id, checked)
+              }
               disabled={!isEditable}
             />
             {lockIcon}
@@ -141,8 +145,10 @@ export function GenericCardEditor({
           return (
             <div className="flex items-center">
               <Input
-                value={currentValue || ''}
-                onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+                value={String(currentValue || '')}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleFieldChange(column.id, e.target.value)
+                }
                 placeholder={`Saisir ${column.title.toLowerCase()}`}
                 {...commonProps}
               />
@@ -153,7 +159,7 @@ export function GenericCardEditor({
         return (
           <div className="flex items-center">
             <CustomSelect
-              value={currentValue || ''}
+              value={String(currentValue || '')}
               onValueChange={(value) => handleFieldChange(column.id, value)}
               placeholder={`Sélectionner ${column.title.toLowerCase()}`}
               options={column.options.map((opt) => ({
@@ -169,15 +175,15 @@ export function GenericCardEditor({
       case 'multiselect': {
         const displayValue = Array.isArray(currentValue)
           ? currentValue.join(', ')
-          : currentValue || ''
+          : String(currentValue || '')
         return (
           <div className="flex items-center">
             <Input
               value={displayValue}
-              onChange={(e: any) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const values = e.target.value
                   .split(',')
-                  .map((v: any) => v.trim())
+                  .map((v: string) => v.trim())
                   .filter(Boolean)
                 handleFieldChange(column.id, values)
               }}
@@ -193,8 +199,10 @@ export function GenericCardEditor({
         return (
           <div className="flex items-start">
             <Textarea
-              value={currentValue || ''}
-              onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                handleFieldChange(column.id, e.target.value)
+              }
               placeholder={`Saisir ${column.title.toLowerCase()}`}
               rows={4}
               className={`resize-none ${commonProps.className}`}
@@ -208,8 +216,10 @@ export function GenericCardEditor({
         return (
           <div className="flex items-center">
             <Input
-              value={currentValue || ''}
-              onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleFieldChange(column.id, e.target.value)
+              }
               placeholder={`Saisir ${column.title.toLowerCase()}`}
               {...commonProps}
             />
@@ -263,7 +273,7 @@ export function GenericCardEditor({
             </h3>
 
             {tableColumns.map((column) => {
-              const currentValue = formData[column.id] || ''
+              const currentValue = formData[column.id] ?? ''
               const isEditable = isColumnEditable(column)
               const isUniqueKey = column.id === keyField || column.key === keyField
 
@@ -294,11 +304,11 @@ export function GenericCardEditor({
 
       {/* Actions */}
       <div className="p-6 border-t border-border flex justify-end gap-3">
-        <Button variant="outline" onClick={onClose}>
+        <Button type="button" variant="outline" onClick={onClose}>
           <X className="h-4 w-4 mr-2" />
           Annuler
         </Button>
-        <Button onClick={handleSave}>
+        <Button type="button" onClick={handleSave}>
           <Save className="h-4 w-4 mr-2" />
           Enregistrer
         </Button>

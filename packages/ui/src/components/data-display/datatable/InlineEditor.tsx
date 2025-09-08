@@ -130,7 +130,7 @@ export function InlineEditor<T = Record<string, unknown>>({
         return (
           <Input
             ref={inputRef}
-            value={(value as any) || ''}
+            value={(value as unknown) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -148,7 +148,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="number"
-            value={(value as any) || ''}
+            value={(value as unknown) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -168,7 +168,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="date"
-            value={value instanceof Date ? value.toISOString().split('T')[0] : (value as any) || ''}
+            value={value instanceof Date ? value.toISOString().split('T')[0] : (value as unknown) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -185,7 +185,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="datetime-local"
-            value={value instanceof Date ? value.toISOString().slice(0, 16) : (value as any) || ''}
+            value={value instanceof Date ? value.toISOString().slice(0, 16) : (value as unknown) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -202,7 +202,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <div className="flex items-center gap-2">
             <Checkbox
               checked={Boolean(value)}
-              onCheckedChange={(checked: any) => {
+              onCheckedChange={(checked: unknown) => {
                 setValue(checked)
                 // Auto-save pour les checkboxes
                 setTimeout(() => handleSave(), 0)
@@ -216,7 +216,7 @@ export function InlineEditor<T = Record<string, unknown>>({
       case 'select':
         return (
           <SelectPortal
-            value={value as any}
+            value={value as unknown}
             onValueChange={(newValue) => {
               setValue(newValue)
               // Auto-save pour les selects
@@ -261,7 +261,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <div className="flex items-center gap-1">
             <Input
               ref={inputRef}
-              value={(value as any) || ''}
+              value={(value as unknown) || ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
@@ -296,11 +296,30 @@ export function InlineEditor<T = Record<string, unknown>>({
             // Using dangerouslySetInnerHTML is necessary for inline rich text editing
             // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize((value as any) || '', {
-                ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'div', 'span'],
+              __html: DOMPurify.sanitize((value as unknown) || '', {
+                ALLOWED_TAGS: [
+                  'p',
+                  'br',
+                  'strong',
+                  'b',
+                  'em',
+                  'i',
+                  'u',
+                  'h1',
+                  'h2',
+                  'h3',
+                  'h4',
+                  'h5',
+                  'h6',
+                  'ul',
+                  'ol',
+                  'li',
+                  'div',
+                  'span',
+                ],
                 ALLOWED_ATTR: ['class', 'style'],
                 ALLOW_DATA_ATTR: false,
-                FORBID_TAGS: ['script', 'iframe']
+                FORBID_TAGS: ['script', 'iframe'],
               }) as unknown as string,
             }}
             onInput={(e) => {
@@ -329,7 +348,7 @@ export function InlineEditor<T = Record<string, unknown>>({
         return (
           <Input
             ref={inputRef}
-            value={(value as any) || ''}
+            value={(value as unknown) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -373,7 +392,7 @@ export function InlineEditor<T = Record<string, unknown>>({
         <FormulaEditor
           open={showFormulaEditor}
           onOpenChange={setShowFormulaEditor}
-          currentFormula={value as any}
+          currentFormula={value as unknown}
           columns={allColumns}
           sampleData={sampleData}
           onSave={(formula) => {

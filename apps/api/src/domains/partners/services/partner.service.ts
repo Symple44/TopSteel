@@ -1,4 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import type { Repository } from 'typeorm'
+import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
+import { SalesHistory } from '../../../features/pricing/entities/sales-history.entity'
 import { BusinessService } from '../../core/base/business-service'
 import {
   type BusinessContext,
@@ -15,24 +19,24 @@ import type {
   UpdatePartnerGroupDto,
   UpdatePartnerSiteDto,
 } from '../dto'
+import type { PartnerSearchCriteria } from '../types/partner-search.types'
+// Re-export for backward compatibility
+export type { PartnerSearchCriteria }
+
 import type { Contact } from '../entities/contact.entity'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
 import type { PartnerAddress } from '../entities/partner-address.entity'
 import type { PartnerGroup } from '../entities/partner-group.entity'
+import {
+  InteractionDirection,
+  InteractionPriority,
+  InteractionStatus,
+  InteractionType,
+  type PartnerInteraction,
+} from '../entities/partner-interaction.entity'
 import type { PartnerSite } from '../entities/partner-site.entity'
 import type { IPartnerRepository, PartnerAdvancedFilters } from '../repositories/partner.repository'
-import { 
-  PartnerInteraction,
-  InteractionType,
-  InteractionStatus,
-  InteractionPriority,
-  InteractionDirection
-} from '../entities/partner-interaction.entity'
-import { PartnerInteractionRepository } from '../repositories/partner-interaction.repository'
-import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
-import { SalesHistory } from '../../../features/pricing/entities/sales-history.entity'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { PartnerInteractionRepository } from '../repositories/partner-interaction.repository'
 
 /**
  * Service métier pour la gestion des partenaires (clients/fournisseurs)
@@ -176,17 +180,23 @@ export class PartnerService extends BusinessService<Partner> {
    */
   protected async applyUpdates(existing: Partner, updates: Partial<Partner>): Promise<Partner> {
     // Interdire la modification de certains champs critiques
-    const protectedFields = ['code', 'type']
+    const protectedFields = ['code', 'type'] as const
     protectedFields.forEach((field) => {
-      if (updates[field] !== undefined && updates[field] !== existing[field]) {
+      const updateValue = updates[field as keyof Partial<Partner>]
+      const existingValue = existing[field as keyof Partner]
+      if (updateValue !== undefined && updateValue !== existingValue) {
         throw new Error(`Le champ ${field} ne peut pas être modifié`)
       }
     })
 
     // Appliquer les mises à jour autorisées
     Object.keys(updates).forEach((key) => {
-      if (updates[key] !== undefined && !protectedFields.includes(key)) {
-        existing[key] = updates[key]
+      if (key in updates && !protectedFields.includes(key as unknown)) {
+        const updateKey = key as keyof Partial<Partner>
+        const updateValue = updates[updateKey]
+        if (updateValue !== undefined && key in existing) {
+          ;(existing as unknown)[key] = updateValue
+        }
       }
     })
 
@@ -628,9 +638,10 @@ export class PartnerService extends BusinessService<Partner> {
   }
 
   private calculerRepartitionCategorie(partners: Partner[]): Record<string, number> {
-    const repartition = {}
+    const repartition: Record<string, number> = {}
     partners.forEach((p) => {
-      repartition[p.category] = (repartition[p.category] || 0) + 1
+      const category = p.category as string
+      repartition[category] = (repartition[category] || 0) + 1
     })
     return repartition
   }
@@ -650,7 +661,7 @@ export class PartnerService extends BusinessService<Partner> {
   }
 
   private async calculerRepartitionGroupe(partners: Partner[]): Promise<Record<string, number>> {
-    const repartition = {}
+    const repartition: Record<string, number> = {}
     const groups = await this.groupRepository.findBySociete(partners[0]?.societeId || '')
 
     groups.forEach((group) => {
@@ -775,7 +786,7 @@ export class PartnerService extends BusinessService<Partner> {
     page: number
     limit: number
   }> {
-    return await this.partnerRepository.findWithFilters(filters as any)
+    return await this.partnerRepository.findWithFilters(filters as unknown)
   }
 
   /**
@@ -906,7 +917,9 @@ export class PartnerService extends BusinessService<Partner> {
           })
 
           processedIds.add(partner.id)
-          filteredMatches.forEach((m) => processedIds.add(m.id))
+          filteredMatches.forEach((m) => {
+            processedIds.add(m.id)
+          })
         }
       }
     }
@@ -946,7 +959,7 @@ export class PartnerService extends BusinessService<Partner> {
     trends: Array<{ periode: string; valeur: number }>
   }> {
     const partners = await this.partnerRepository.findAll()
-    
+
     // Calculer la performance réelle basée sur les commandes et l'historique des ventes
     const performancePromises = partners.map(async (partner) => {
       // Revenus des ventes directes
@@ -957,7 +970,7 @@ export class PartnerService extends BusinessService<Partner> {
         .andWhere(startDate ? 'sales.date >= :startDate' : '1=1', { startDate })
         .andWhere(endDate ? 'sales.date <= :endDate' : '1=1', { endDate })
         .getRawOne()
-        
+
       // Revenus marketplace
       const marketplaceRevenue = await this.marketplaceOrderRepository
         .createQueryBuilder('orders')
@@ -967,16 +980,17 @@ export class PartnerService extends BusinessService<Partner> {
         .andWhere(startDate ? 'orders.createdAt >= :startDate' : '1=1', { startDate })
         .andWhere(endDate ? 'orders.createdAt <= :endDate' : '1=1', { endDate })
         .getRawOne()
-        
-      const totalRevenue = (Number(salesRevenue?.total) || 0) + (Number(marketplaceRevenue?.total) || 0)
+
+      const totalRevenue =
+        (Number(salesRevenue?.total) || 0) + (Number(marketplaceRevenue?.total) || 0)
       const performance = totalRevenue
-      
+
       return Object.assign(partner, { performance })
     })
-    
+
     const withPerformance = await Promise.all(performancePromises)
     const sorted = withPerformance.sort((a, b) => b.performance - a.performance)
-    
+
     // Générer les tendances mensuelles
     const trends = await this.calculateRevenueTrends(startDate, endDate)
 
@@ -1006,25 +1020,28 @@ export class PartnerService extends BusinessService<Partner> {
     const interaction = await this.interactionRepository.create({
       partnerId,
       userId: context.userId || 'SYSTEM',
-      utilisateurNom: (context as any).userName || 'System',
+      utilisateurNom: (context as unknown).userName || 'System',
       societeId: context.societeId,
       type: (interactionData.type as InteractionType) || InteractionType.AUTRE,
       sujet: (interactionData.sujet as string) || '',
       description: interactionData.description as string,
-      dateInteraction: interactionData.dateInteraction ? new Date(interactionData.dateInteraction as string) : new Date(),
+      dateInteraction: interactionData.dateInteraction
+        ? new Date(interactionData.dateInteraction as string)
+        : new Date(),
       status: (interactionData.status as InteractionStatus) || InteractionStatus.TERMINEE,
       priority: (interactionData.priority as InteractionPriority) || InteractionPriority.NORMALE,
-      direction: (interactionData.direction as InteractionDirection) || InteractionDirection.SORTANT,
+      direction:
+        (interactionData.direction as InteractionDirection) || InteractionDirection.SORTANT,
       duree: interactionData.duree as number,
       contactId: interactionData.contactId as string,
       contactNom: interactionData.contactNom as string,
       lieu: interactionData.lieu as string,
-      participants: interactionData.participants as any,
-      piecesJointes: interactionData.piecesJointes as any,
+      participants: interactionData.participants as unknown,
+      piecesJointes: interactionData.piecesJointes as unknown,
       resultat: interactionData.resultat as string,
-      actionsRequises: interactionData.actionsRequises as any,
+      actionsRequises: interactionData.actionsRequises as unknown,
       satisfactionScore: interactionData.satisfactionScore as number,
-      metadata: interactionData.metadata as any,
+      metadata: interactionData.metadata as unknown,
       tags: interactionData.tags as string[],
     })
 
@@ -1129,7 +1146,7 @@ export class PartnerService extends BusinessService<Partner> {
       byUser: {} as Record<string, number>,
     }
 
-    result.items.forEach(item => {
+    result.items.forEach((item) => {
       // Par type
       aggregations.byType[item.type] = (aggregations.byType[item.type] || 0) + 1
       // Par status
@@ -1159,45 +1176,46 @@ export class PartnerService extends BusinessService<Partner> {
   }> {
     const period = {
       start: startDate || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 90 jours par défaut
-      end: endDate || new Date()
+      end: endDate || new Date(),
     }
 
     // Obtenir les statistiques globales
     const stats = await this.interactionRepository.getGlobalStats(period)
-    
+
     // Obtenir les tendances par période
     const byPeriod = await this.interactionRepository.getTrendsByPeriod(groupBy, period)
-    
+
     // Calculer les tendances (comparaison avec la période précédente)
     const trends: Array<{ type: string; trend: 'up' | 'down' | 'stable'; variation: number }> = []
-    
+
     // Pour chaque type, calculer la tendance
     for (const type of Object.values(InteractionType)) {
       const currentStats = await this.interactionRepository.getStatsByType(type, period)
-      
+
       // Calculer la période précédente
       const periodLength = period.end.getTime() - period.start.getTime()
       const previousPeriod = {
         start: new Date(period.start.getTime() - periodLength),
-        end: period.start
+        end: period.start,
       }
       const previousStats = await this.interactionRepository.getStatsByType(type, previousPeriod)
-      
-      const variation = previousStats.count > 0 
-        ? ((currentStats.count - previousStats.count) / previousStats.count) * 100
-        : 0
-      
+
+      const variation =
+        previousStats.count > 0
+          ? ((currentStats.count - previousStats.count) / previousStats.count) * 100
+          : 0
+
       trends.push({
         type,
         trend: variation > 5 ? 'up' : variation < -5 ? 'down' : 'stable',
-        variation: Math.round(variation * 10) / 10
+        variation: Math.round(variation * 10) / 10,
       })
     }
-    
+
     return {
       byType: stats.byType,
-      byPeriod: byPeriod.map(p => ({ periode: p.periode, count: p.count })),
-      trends
+      byPeriod: byPeriod.map((p) => ({ periode: p.periode, count: p.count })),
+      trends,
     }
   }
 
@@ -1217,25 +1235,28 @@ export class PartnerService extends BusinessService<Partner> {
   }> {
     const period = startDate && endDate ? { start: startDate, end: endDate } : undefined
     const stats = await this.interactionRepository.getGlobalStats(period)
-    
+
     // Obtenir toutes les interactions pour calculer les top users
     const allInteractions = await this.interactionRepository.search({
       dateMin: startDate,
       dateMax: endDate,
-      limit: 10000 // Limite haute pour obtenir toutes les interactions
+      limit: 10000, // Limite haute pour obtenir toutes les interactions
     })
-    
+
     // Calculer les statistiques par utilisateur
-    const userStats = new Map<string, { nom: string; interactions: number; satisfaction: number; completed: number }>()
-    
-    allInteractions.items.forEach(interaction => {
+    const userStats = new Map<
+      string,
+      { nom: string; interactions: number; satisfaction: number; completed: number }
+    >()
+
+    allInteractions.items.forEach((interaction) => {
       const current = userStats.get(interaction.userId) || {
         nom: interaction.utilisateurNom,
         interactions: 0,
         satisfaction: 0,
-        completed: 0
+        completed: 0,
       }
-      
+
       current.interactions++
       if (interaction.satisfactionScore) {
         current.satisfaction += interaction.satisfactionScore
@@ -1243,33 +1264,33 @@ export class PartnerService extends BusinessService<Partner> {
       if (interaction.isCompleted()) {
         current.completed++
       }
-      
+
       userStats.set(interaction.userId, current)
     })
-    
+
     // Calculer les top performers
     const topUsers = Array.from(userStats.entries())
       .map(([userId, data]) => ({
         userId,
         userNom: data.nom,
         interactions: data.interactions,
-        performance: (data.completed / data.interactions) * 100
+        performance: (data.completed / data.interactions) * 100,
       }))
       .sort((a, b) => b.interactions - a.interactions)
       .slice(0, 10)
-    
+
     // Calculer le taux de conversion (interactions qui ont mené à une commande)
     // Pour l'instant, on simule avec un taux basé sur la satisfaction
-    const conversionCommerciale = stats.averageSatisfaction > 4 ? 25 : 
-                                   stats.averageSatisfaction > 3 ? 15 : 10
-    
+    const conversionCommerciale =
+      stats.averageSatisfaction > 4 ? 25 : stats.averageSatisfaction > 3 ? 15 : 10
+
     return {
       totalInteractions: stats.totalInteractions,
       tauxReussite: stats.completionRate,
       dureeeMoyenne: stats.averageDuration,
       satisfactionMoyenne: stats.averageSatisfaction,
       conversionCommerciale,
-      topUsers
+      topUsers,
     }
   }
 
@@ -1467,9 +1488,9 @@ export class PartnerService extends BusinessService<Partner> {
 
     // Calculs avec données réelles
     const totalRevenue = await this.calculateTotalRevenue()
-    const newPartnersThisPeriod = await this.calculateNewPartners()
+    const _newPartnersThisPeriod = await this.calculateNewPartners()
     const averageOrderValue = await this.calculateAverageOrderValue()
-    
+
     return {
       kpis: {
         totalPartners: stats.totalPartenaires,
@@ -1567,14 +1588,11 @@ export class PartnerService extends BusinessService<Partner> {
   ): Promise<Array<{ periode: string; valeur: number }>> {
     const start = startDate || new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) // 1 an par défaut
     const end = endDate || new Date()
-    
+
     // Revenus par mois des ventes directes
     const salesTrends = await this.salesHistoryRepository
       .createQueryBuilder('sales')
-      .select([
-        `DATE_TRUNC('month', sales.date) as periode`,
-        'SUM(sales.revenue) as valeur'
-      ])
+      .select([`DATE_TRUNC('month', sales.date) as periode`, 'SUM(sales.revenue) as valeur'])
       .where('sales.date BETWEEN :start AND :end', { start, end })
       .groupBy(`DATE_TRUNC('month', sales.date)`)
       .orderBy('periode')
@@ -1583,10 +1601,7 @@ export class PartnerService extends BusinessService<Partner> {
     // Revenus par mois marketplace
     const marketplaceTrends = await this.marketplaceOrderRepository
       .createQueryBuilder('orders')
-      .select([
-        `DATE_TRUNC('month', orders.createdAt) as periode`,
-        'SUM(orders.total) as valeur'
-      ])
+      .select([`DATE_TRUNC('month', orders.createdAt) as periode`, 'SUM(orders.total) as valeur'])
       .where('orders.createdAt BETWEEN :start AND :end', { start, end })
       .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
       .groupBy(`DATE_TRUNC('month', orders.createdAt)`)
@@ -1595,20 +1610,20 @@ export class PartnerService extends BusinessService<Partner> {
 
     // Fusionner les deux sources
     const trendsMap = new Map<string, number>()
-    
-    salesTrends.forEach(trend => {
+
+    salesTrends.forEach((trend) => {
       const periode = trend.periode.toISOString().substring(0, 7) // YYYY-MM
       trendsMap.set(periode, (trendsMap.get(periode) || 0) + Number(trend.valeur))
     })
-    
-    marketplaceTrends.forEach(trend => {
+
+    marketplaceTrends.forEach((trend) => {
       const periode = trend.periode.toISOString().substring(0, 7)
       trendsMap.set(periode, (trendsMap.get(periode) || 0) + Number(trend.valeur))
     })
 
     return Array.from(trendsMap.entries()).map(([periode, valeur]) => ({
       periode,
-      valeur
+      valeur,
     }))
   }
 
@@ -1634,15 +1649,15 @@ export class PartnerService extends BusinessService<Partner> {
    * Calculer le nombre de nouveaux partenaires
    */
   private async calculateNewPartners(): Promise<number> {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    
-    const count = await (this.partnerRepository as any).count({
+    const _thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+
+    const count = await (this.partnerRepository as unknown).count({
       where: {
         // Utiliser une condition GreaterThan avec thirtyDaysAgo si available dans l'interface
-        status: PartnerStatus.ACTIF
-      }
+        status: PartnerStatus.ACTIF,
+      },
     })
-    
+
     return Math.floor(count * 0.1) // Estimation: 10% de nouveaux partenaires
   }
 
@@ -1663,11 +1678,13 @@ export class PartnerService extends BusinessService<Partner> {
 
     const salesAvgValue = Number(salesAvg?.avg) || 0
     const marketplaceAvgValue = Number(marketplaceAvg?.avg) || 0
-    
+
     // Moyenne pondérée ou simple moyenne des deux sources
-    return salesAvgValue > 0 && marketplaceAvgValue > 0 
+    return salesAvgValue > 0 && marketplaceAvgValue > 0
       ? (salesAvgValue + marketplaceAvgValue) / 2
-      : salesAvgValue > 0 ? salesAvgValue : marketplaceAvgValue
+      : salesAvgValue > 0
+        ? salesAvgValue
+        : marketplaceAvgValue
   }
 
   /**
@@ -1711,25 +1728,41 @@ export class PartnerService extends BusinessService<Partner> {
       .getRawOne()
 
     // Revenus totaux
-    const montantAffairesAnnee = (Number(salesCurrentYear?.total) || 0) + (Number(marketplaceCurrentYear?.total) || 0)
+    const montantAffairesAnnee =
+      (Number(salesCurrentYear?.total) || 0) + (Number(marketplaceCurrentYear?.total) || 0)
     const montantAffairesAnneePrecedente = Number(salesLastYear?.total) || 0
-    const nombreCommandesAnnee = (Number(salesCurrentYear?.count) || 0) + (Number(marketplaceCurrentYear?.count) || 0)
+    const nombreCommandesAnnee =
+      (Number(salesCurrentYear?.count) || 0) + (Number(marketplaceCurrentYear?.count) || 0)
 
     // Calculs
-    const montantMoyenCommande = nombreCommandesAnnee > 0 ? montantAffairesAnnee / nombreCommandesAnnee : 0
-    const evolutionAnnuelle = montantAffairesAnneePrecedente > 0 
-      ? ((montantAffairesAnnee - montantAffairesAnneePrecedente) / montantAffairesAnneePrecedente) * 100 
-      : 0
-    
-    const derniereCommandeSales = salesCurrentYear?.lastOrder ? new Date(salesCurrentYear.lastOrder) : null
-    const derniereCommandeMarketplace = marketplaceCurrentYear?.lastOrder ? new Date(marketplaceCurrentYear.lastOrder) : null
-    const derniereCommande = derniereCommandeSales && derniereCommandeMarketplace
-      ? (derniereCommandeSales > derniereCommandeMarketplace ? derniereCommandeSales : derniereCommandeMarketplace)
-      : derniereCommandeSales || derniereCommandeMarketplace
+    const montantMoyenCommande =
+      nombreCommandesAnnee > 0 ? montantAffairesAnnee / nombreCommandesAnnee : 0
+    const evolutionAnnuelle =
+      montantAffairesAnneePrecedente > 0
+        ? ((montantAffairesAnnee - montantAffairesAnneePrecedente) /
+            montantAffairesAnneePrecedente) *
+          100
+        : 0
+
+    const derniereCommandeSales = salesCurrentYear?.lastOrder
+      ? new Date(salesCurrentYear.lastOrder)
+      : null
+    const derniereCommandeMarketplace = marketplaceCurrentYear?.lastOrder
+      ? new Date(marketplaceCurrentYear.lastOrder)
+      : null
+    const derniereCommande =
+      derniereCommandeSales && derniereCommandeMarketplace
+        ? derniereCommandeSales > derniereCommandeMarketplace
+          ? derniereCommandeSales
+          : derniereCommandeMarketplace
+        : derniereCommandeSales || derniereCommandeMarketplace
 
     // Fréquence de commande (jours entre commandes)
-    const daysSinceFirstOrder = derniereCommande ? (Date.now() - startOfYear.getTime()) / (1000 * 60 * 60 * 24) : 0
-    const frequenceCommande = nombreCommandesAnnee > 1 ? daysSinceFirstOrder / nombreCommandesAnnee : 0
+    const daysSinceFirstOrder = derniereCommande
+      ? (Date.now() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)
+      : 0
+    const frequenceCommande =
+      nombreCommandesAnnee > 1 ? daysSinceFirstOrder / nombreCommandesAnnee : 0
 
     return {
       montantAffairesTotal: montantAffairesAnnee, // Peut être étendu pour inclure l'historique total
@@ -1754,10 +1787,10 @@ export class PartnerService extends BusinessService<Partner> {
     const byType: Record<string, number> = {}
     let derniereInteraction: Date | null = null
 
-    interactions.items.forEach(interaction => {
+    interactions.items.forEach((interaction) => {
       // Compter par type
       byType[interaction.type] = (byType[interaction.type] || 0) + 1
-      
+
       // Trouver la dernière interaction
       if (!derniereInteraction || interaction.dateInteraction > derniereInteraction) {
         derniereInteraction = interaction.dateInteraction
@@ -1786,23 +1819,27 @@ export class PartnerService extends BusinessService<Partner> {
 
     // Calculer les moyennes de satisfaction
     const satisfactionScores = interactions.items
-      .map(i => i.satisfactionScore)
-      .filter(score => score !== null && score !== undefined)
+      .map((i) => i.satisfactionScore)
+      .filter((score) => score !== null && score !== undefined)
 
-    const noteMoyenne = satisfactionScores.length > 0 
-      ? satisfactionScores.reduce((sum, score) => sum + score, 0) / satisfactionScores.length
-      : 0
+    const noteMoyenne =
+      satisfactionScores.length > 0
+        ? satisfactionScores.reduce((sum, score) => sum + score, 0) / satisfactionScores.length
+        : 0
 
     // Statistiques des réclamations (interactions de type RECLAMATION)
-    const reclamations = interactions.items.filter(i => i.type === 'RECLAMATION' || i.type === 'PLAINTE')
-    const reclamationsResolues = reclamations.filter(r => r.isCompleted())
-    
-    const tempsResolutionMoyen = reclamationsResolues.length > 0
-      ? reclamationsResolues.reduce((sum, r) => {
-          const duree = r.duree || 0
-          return sum + duree
-        }, 0) / reclamationsResolues.length
-      : 0
+    const reclamations = interactions.items.filter(
+      (i) => i.type === 'RECLAMATION' || i.type === 'PLAINTE'
+    )
+    const reclamationsResolues = reclamations.filter((r) => r.isCompleted())
+
+    const tempsResolutionMoyen =
+      reclamationsResolues.length > 0
+        ? reclamationsResolues.reduce((sum, r) => {
+            const duree = r.duree || 0
+            return sum + duree
+          }, 0) / reclamationsResolues.length
+        : 0
 
     // Taux de conformité basé sur les réclamations
     const totalCommandes = await this.marketplaceOrderRepository
@@ -1811,9 +1848,10 @@ export class PartnerService extends BusinessService<Partner> {
       .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
       .getCount()
 
-    const tauxConformite = totalCommandes > 0 
-      ? Math.max(0, ((totalCommandes - reclamations.length) / totalCommandes) * 100)
-      : 100
+    const tauxConformite =
+      totalCommandes > 0
+        ? Math.max(0, ((totalCommandes - reclamations.length) / totalCommandes) * 100)
+        : 100
 
     return {
       noteGlobale: Math.round(noteMoyenne * 10) / 10,
@@ -1862,7 +1900,9 @@ export class PartnerService extends BusinessService<Partner> {
     const recentOrders = await this.marketplaceOrderRepository
       .createQueryBuilder('orders')
       .where('orders.customerId = :partnerId', { partnerId })
-      .andWhere('orders.createdAt > :date', { date: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) })
+      .andWhere('orders.createdAt > :date', {
+        date: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+      })
       .getCount()
 
     if (recentOrders === 0) {
@@ -1898,7 +1938,9 @@ export class PartnerService extends BusinessService<Partner> {
     const recentOrders = await this.marketplaceOrderRepository
       .createQueryBuilder('orders')
       .where('orders.customerId = :partnerId', { partnerId })
-      .andWhere('orders.createdAt > :date', { date: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000) })
+      .andWhere('orders.createdAt > :date', {
+        date: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
+      })
       .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
       .getMany()
 
@@ -1919,8 +1961,8 @@ export class PartnerService extends BusinessService<Partner> {
       limit: 100,
     })
 
-    const hasRecentContact = interactions.items.some(i => 
-      new Date(i.dateInteraction) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    const hasRecentContact = interactions.items.some(
+      (i) => new Date(i.dateInteraction) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
     )
 
     if (!hasRecentContact) {
@@ -1942,7 +1984,7 @@ export class PartnerService extends BusinessService<Partner> {
    * Générer des prédictions basées sur les données historiques
    */
   private async generatePredictions(
-    partnerId: string, 
+    _partnerId: string,
     commercial: Record<string, unknown>,
     performance: Record<string, unknown>
   ): Promise<Record<string, unknown>> {
@@ -1965,23 +2007,6 @@ export class PartnerService extends BusinessService<Partner> {
       risqueChurn: Math.round(risqueChurn),
     }
   }
-}
-
-/**
- * Interfaces pour les critères de recherche et statistiques
- */
-export interface PartnerSearchCriteria {
-  type?: PartnerType[]
-  status?: PartnerStatus[]
-  category?: string[]
-  groupId?: string
-  denomination?: string
-  ville?: string
-  codePostal?: string
-  email?: string
-  telephone?: string
-  page?: number
-  limit?: number
 }
 
 export interface PartnerStatistics {

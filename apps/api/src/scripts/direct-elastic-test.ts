@@ -39,7 +39,7 @@ async function testElastic() {
     )
 
     if (sample.hits.hits.length > 0) {
-      sample.hits.hits.forEach((hit: any, i) => {
+      sample.hits.hits.forEach((hit: unknown, i) => {
         console.log(`\nDocument ${i + 1}:`)
         console.log(`  ID: ${hit._id}`)
         console.log(`  Type: ${hit._source.type}`)
@@ -73,7 +73,7 @@ async function testElastic() {
 
     if (ipeSearch.hits.hits.length > 0) {
       console.log('  Premiers résultats:')
-      ipeSearch.hits.hits.forEach((hit: any) => {
+      ipeSearch.hits.hits.forEach((hit: unknown) => {
         console.log(
           `    - ${hit._source.title || hit._source.designation} (type: ${hit._source.type})`
         )
@@ -103,7 +103,7 @@ async function testElastic() {
 
     if (multiSearch.hits.hits.length > 0) {
       console.log('  Premiers résultats:')
-      multiSearch.hits.hits.forEach((hit: any) => {
+      multiSearch.hits.hits.forEach((hit: unknown) => {
         console.log(`    - ${hit._source.title || hit._source.designation} (score: ${hit._score})`)
       })
     }
@@ -159,15 +159,15 @@ async function testElastic() {
       },
     })
 
-    const buckets = (agg.aggregations?.tenants as any)?.buckets || []
+    const buckets = (agg.aggregations?.tenants as unknown)?.buckets || []
     if (buckets.length > 0) {
-      buckets.forEach((bucket: any) => {
+      buckets.forEach((bucket: unknown) => {
         console.log(`  ${bucket.key}: ${bucket.doc_count} documents`)
       })
     } else {
       console.log('  Aucun tenantId trouvé')
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Erreur:', error.message)
     if (error.meta?.body) {
       console.error('Détails:', JSON.stringify(error.meta.body, null, 2))

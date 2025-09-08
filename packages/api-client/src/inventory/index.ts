@@ -42,7 +42,9 @@ export class InventoryApiClient extends BaseApiClient {
 
   // Récupérer un article par ID
   async getItem(id: string): Promise<InventoryItem> {
-    const response = await this.http.get<InventoryItem>(`${this.endpoint}/items/${this.normalizeId(id)}`)
+    const response = await this.http.get<InventoryItem>(
+      `${this.endpoint}/items/${this.normalizeId(id)}`
+    )
     return response.data
   }
 
@@ -61,24 +63,31 @@ export class InventoryApiClient extends BaseApiClient {
 
   // Ajuster le stock d'un article
   async adjustStock(itemId: string, quantity: number, reason?: string): Promise<InventoryItem> {
-    const response = await this.http.post<InventoryItem>(`${this.endpoint}/items/${this.normalizeId(itemId)}/adjust`, {
-      quantity,
-      reason
-    })
+    const response = await this.http.post<InventoryItem>(
+      `${this.endpoint}/items/${this.normalizeId(itemId)}/adjust`,
+      {
+        quantity,
+        reason,
+      }
+    )
     return response.data
   }
 
   // Obtenir les alertes de stock
-  async getStockAlerts(): Promise<Array<{
-    item: InventoryItem
-    alertType: 'LOW_STOCK' | 'OUT_OF_STOCK' | 'OVERSTOCK'
-    threshold: number
-  }>> {
-    const response = await this.http.get<Array<{
+  async getStockAlerts(): Promise<
+    Array<{
       item: InventoryItem
       alertType: 'LOW_STOCK' | 'OUT_OF_STOCK' | 'OVERSTOCK'
       threshold: number
-    }>>(`${this.endpoint}/alerts`)
+    }>
+  > {
+    const response = await this.http.get<
+      Array<{
+        item: InventoryItem
+        alertType: 'LOW_STOCK' | 'OUT_OF_STOCK' | 'OVERSTOCK'
+        threshold: number
+      }>
+    >(`${this.endpoint}/alerts`)
     return response.data
   }
 }

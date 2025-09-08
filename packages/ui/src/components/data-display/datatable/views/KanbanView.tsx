@@ -36,7 +36,7 @@ export function KanbanView({
             </div>
 
             {onAddCard && (
-              <Button variant="ghost" size="sm" onClick={() => onAddCard(column.id)}>
+              <Button type="button" variant="ghost" size="sm" onClick={() => onAddCard(column.id)}>
                 <Plus className="h-4 w-4" />
               </Button>
             )}
@@ -141,6 +141,7 @@ export function KanbanView({
                     align="end"
                     trigger={
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={(e: React.MouseEvent) => {
@@ -170,6 +171,7 @@ export function KanbanView({
                 <p className="text-sm">Aucune carte dans cette colonne</p>
                 {onAddCard && (
                   <Button
+                    type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => onAddCard(column.id)}
@@ -188,7 +190,7 @@ export function KanbanView({
       {/* Colonne pour ajouter une nouvelle colonne */}
       <div className="flex-shrink-0 w-80">
         <div className="bg-muted/10 border-2 border-dashed border-muted rounded-lg p-4 h-full flex items-center justify-center">
-          <Button variant="ghost" className="text-muted-foreground">
+          <Button type="button" variant="ghost" className="text-muted-foreground">
             <Plus className="h-4 w-4 mr-2" />
             Ajouter une colonne
           </Button>

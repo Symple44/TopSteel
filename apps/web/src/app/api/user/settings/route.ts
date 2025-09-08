@@ -64,15 +64,15 @@ export async function GET() {
     // Simuler une récupération depuis la base de données
     await new Promise((resolve) => setTimeout(resolve, 100))
 
-    return NextResponse.json(userSettings)
+    return NextResponse?.json(userSettings)
   } catch {
-    return NextResponse.json({ error: 'Failed to fetch user settings' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to fetch user settings' }, { status: 500 })
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
-    const updates = await request.json()
+    const updates = await request?.json()
 
     // Mettre à jour les paramètres utilisateur
     userSettings = {
@@ -83,8 +83,8 @@ export async function PATCH(request: NextRequest) {
     // Simuler une sauvegarde en base de données
     await new Promise((resolve) => setTimeout(resolve, 200))
 
-    return NextResponse.json(userSettings)
+    return NextResponse?.json(userSettings)
   } catch {
-    return NextResponse.json({ error: 'Failed to update user settings' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to update user settings' }, { status: 500 })
   }
 }

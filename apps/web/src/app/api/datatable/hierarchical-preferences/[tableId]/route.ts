@@ -88,8 +88,8 @@ export async function GET(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId } = await params
@@ -105,9 +105,9 @@ export async function GET(
       updated_at: new Date().toISOString(),
     }
 
-    return NextResponse.json(mockPreferences)
+    return NextResponse?.json(mockPreferences)
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -118,16 +118,16 @@ export async function PUT(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId } = await params
-    const updates = (await request.json()) as Partial<HierarchicalDatatableConfig>
+    const updates = (await request?.json()) as Partial<HierarchicalDatatableConfig>
 
     // Valider les données
     if (!updates || typeof updates !== 'object') {
-      return NextResponse.json({ error: 'Données invalides' }, { status: 400 })
+      return NextResponse?.json({ error: 'Données invalides' }, { status: 400 })
     }
 
     // Simuler la mise à jour en base de données
@@ -141,9 +141,9 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     }
 
-    return NextResponse.json(updatedPreferences)
+    return NextResponse?.json(updatedPreferences)
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -154,12 +154,12 @@ export async function POST(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId } = await params
-    const config = (await request.json()) as HierarchicalDatatableConfig
+    const config = (await request?.json()) as HierarchicalDatatableConfig
 
     // Simuler la création en base de données
     // En production, remplacer par une vraie requête DB
@@ -172,9 +172,9 @@ export async function POST(
       updated_at: new Date().toISOString(),
     }
 
-    return NextResponse.json(newPreferences, { status: 201 })
+    return NextResponse?.json(newPreferences, { status: 201 })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -185,14 +185,14 @@ export async function DELETE(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId: _tableId } = await params
 
-    return NextResponse.json({ success: true })
+    return NextResponse?.json({ success: true })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

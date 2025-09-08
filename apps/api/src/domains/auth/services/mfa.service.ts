@@ -292,20 +292,20 @@ export class MFAService {
         existingSMS.metadata = {
           ...existingSMS.metadata,
           lastUsed: new Date().toISOString(),
-        } as any
+        } as { qrCode?: string; deviceInfo?: { deviceName: string; userAgent: string; ipAddress: string }; lastUsed?: string; usageCount?: number; failedAttempts?: number; lastFailedAttempt?: string }
         // Store SMS verification code temporarily
-        ;(existingSMS.metadata as any).pendingVerificationCode = verificationCode
-        ;(existingSMS.metadata as any).pendingCodeExpiry = new Date(
+        ;(existingSMS.metadata as { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }).pendingVerificationCode = verificationCode
+        ;(existingSMS.metadata as { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }).pendingCodeExpiry = new Date(
           Date.now() + 10 * 60 * 1000
         ).toISOString()
-        ;(existingSMS.metadata as any).smsMessageId = smsResult.messageId
+        ;(existingSMS.metadata as { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }).smsMessageId = smsResult.messageId
         mfaRecord = await this.userMFARepository.save(existingSMS)
       } else {
         mfaRecord = UserMFA.createSMS(userId, phoneNumber)
         mfaRecord.metadata = {
           // Store SMS verification temporarily
           lastUsed: new Date().toISOString(),
-        } as any // Temporary fields for SMS verification
+        } as { qrCode?: string; deviceInfo?: { deviceName: string; userAgent: string; ipAddress: string }; lastUsed?: string; usageCount?: number; failedAttempts?: number; lastFailedAttempt?: string } // Temporary fields for SMS verification
         mfaRecord = await this.userMFARepository.save(mfaRecord)
       }
 
@@ -438,9 +438,9 @@ export class MFAService {
       mfaRecord.metadata = {
         ...mfaRecord.metadata,
         lastUsed: new Date().toISOString(),
-      } as any
+      } as { qrCode?: string; deviceInfo?: { deviceName: string; userAgent: string; ipAddress: string }; lastUsed?: string; usageCount?: number; failedAttempts?: number; lastFailedAttempt?: string }
       // Store message ID temporarily
-      ;(mfaRecord.metadata as any).lastSMSMessageId = smsResult.messageId
+      ;(mfaRecord.metadata as { lastSMSMessageId?: string }).lastSMSMessageId = smsResult.messageId
       await this.userMFARepository.save(mfaRecord)
 
       this.logger.log(`SMS code sent to user ${userId}`)
@@ -745,8 +745,8 @@ export class MFAService {
       let userAgent: string | undefined
 
       if (request) {
-        ipAddress = this.geolocationService.extractRealIP(request as any)
-        userAgent = (request as any).headers['user-agent']
+        ipAddress = this.geolocationService.extractRealIP(request as unknown)
+        userAgent = (request as unknown).headers['user-agent']
       }
 
       let mfaSession: MFASession

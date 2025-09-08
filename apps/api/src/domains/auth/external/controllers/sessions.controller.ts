@@ -132,7 +132,11 @@ export class SessionsController {
         throw new HttpException('userId requis', HttpStatus.BAD_REQUEST)
       }
 
-      const removedSessions = await this.authService.forceLogoutUser(userId, adminUserId, reason)
+      const removedSessions = await this.authService.forceLogoutUser(
+        userId,
+        adminUserId || '',
+        reason
+      )
 
       return {
         success: true,
@@ -174,7 +178,11 @@ export class SessionsController {
         throw new HttpException('sessionId requis', HttpStatus.BAD_REQUEST)
       }
 
-      const success = await this.authService.forceLogoutSession(sessionId, adminUserId, reason)
+      const success = await this.authService.forceLogoutSession(
+        sessionId,
+        adminUserId || '',
+        reason
+      )
 
       if (!success) {
         throw new HttpException('Session non trouvée ou déjà déconnectée', HttpStatus.NOT_FOUND)

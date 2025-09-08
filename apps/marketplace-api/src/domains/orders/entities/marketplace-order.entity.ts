@@ -9,8 +9,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
-import { MarketplaceOrderItem } from './marketplace-order-item.entity'
+// Removed direct imports to avoid circular dependencies
+// import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
+// import { MarketplaceOrderItem } from './marketplace-order-item.entity'
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -152,20 +153,18 @@ export class MarketplaceOrder {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => MarketplaceCustomer,
-    (customer) => customer.orders,
-    { nullable: true }
-  )
+  @ManyToOne('MarketplaceCustomer', 'orders', {
+    nullable: true,
+    lazy: true,
+  })
   @JoinColumn({ name: 'customerId' })
-  customer?: MarketplaceCustomer
+  customer?: any
 
-  @OneToMany(
-    () => MarketplaceOrderItem,
-    (item) => item.order,
-    { cascade: true }
-  )
-  items!: MarketplaceOrderItem[]
+  @OneToMany('MarketplaceOrderItem', 'order', {
+    cascade: true,
+    lazy: true,
+  })
+  items!: any[]
 
   // Méthodes utilitaires
   isGuest(): boolean {

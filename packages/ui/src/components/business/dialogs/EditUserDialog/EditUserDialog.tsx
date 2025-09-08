@@ -1,24 +1,36 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertTriangle, Building, Clock, Eye, EyeOff, Key, Shield, User } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
-import { User, Mail, Phone, Shield, Building, Users, Eye, EyeOff, AlertTriangle, Clock, Key } from 'lucide-react'
+import { Badge } from '../../../data-display/badge'
+import { Alert } from '../../../feedback/alert'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+import { Separator } from '../../../layout/separator'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { Badge } from '../../../data-display/badge'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
-import {
-  FormDescription,
-  Alert,
-  Separator,
-} from '../../../'
+
 // User roles for steel manufacturing ERP
 const USER_ROLES = [
   'admin',
@@ -33,7 +45,7 @@ const USER_ROLES = [
   'operator',
   'supervisor',
   'analyst',
-  'employee'
+  'employee',
 ] as const
 // Departments specific to steel manufacturing
 const DEPARTMENTS = [
@@ -49,7 +61,7 @@ const DEPARTMENTS = [
   'maintenance',
   'research_development',
   'safety_environment',
-  'human_resources'
+  'human_resources',
 ] as const
 // Permissions categories for steel manufacturing ERP
 const PERMISSION_CATEGORIES = {
@@ -62,67 +74,84 @@ const PERMISSION_CATEGORIES = {
   finance: ['view', 'create', 'edit', 'approve_payments', 'manage_budgets'],
   projects: ['view', 'create', 'edit', 'assign_resources', 'manage_timeline'],
   reports: ['view', 'create', 'export', 'advanced_analytics'],
-  administration: ['system_settings', 'backup_restore', 'audit_logs']
+  administration: ['system_settings', 'backup_restore', 'audit_logs'],
 } as const
 // User validation schema for editing
-const editUserSchema = z.object({
-  id: z.string(),
-  // Personal Information
-  firstName: z.string().min(1, 'Le prénom est requis'),
-  lastName: z.string().min(1, 'Le nom est requis'),
-  email: z.string().email('Email invalide').min(1, 'L\'email est requis'),
-  phone: z.string().optional(),
-  position: z.string().optional(),
-  // Account Information
-  username: z.string().min(3, 'Le nom d\'utilisateur doit contenir au moins 3 caractères'),
-  resetPassword: z.boolean().default(false),
-  newPassword: z.string().optional(),
-  mustChangePassword: z.boolean().default(false),
-  // Role and Department
-  role: z.enum(USER_ROLES),
-  department: z.enum(DEPARTMENTS),
-  manager: z.string().optional(),
-  team: z.string().optional(),
-  // Permissions
-  permissions: z.object({
-    users: z.array(z.string()).default([]),
-    clients: z.array(z.string()).default([]),
-    materials: z.array(z.string()).default([]),
-    inventory: z.array(z.string()).default([]),
-    production: z.array(z.string()).default([]),
-    sales: z.array(z.string()).default([]),
-    finance: z.array(z.string()).default([]),
-    projects: z.array(z.string()).default([]),
-    reports: z.array(z.string()).default([]),
-    administration: z.array(z.string()).default([])
-  }).default({}),
-  // Work Information
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  contractType: z.enum(['full_time', 'part_time', 'contractor', 'intern']),
-  hourlyRate: z.number().min(0).optional(),
-  // Status Information
-  isActive: z.boolean(),
-  canAccessMobileApp: z.boolean(),
-  maxSessionDuration: z.number().min(1).max(24),
-  lastLoginAt: z.string().optional(),
-  // Additional Information
-  notes: z.string().optional(),
-})
-.refine((data) => {
-  // If reset password is enabled, new password is required
-  if (data.resetPassword && (!data.newPassword || data.newPassword.length < 6)) {
-    return false
-  }
-  // End date must be after start date if both are provided
-  if (data.startDate && data.endDate && data.endDate <= data.startDate) {
-    return false
-  }
-  return true
-}, {
-  message: 'Validation des données échouée',
-  path: ['newPassword']
-})
+const editUserSchema = z
+  .object({
+    id: z.string(),
+    // Personal Information
+    firstName: z.string().min(1, 'Le prénom est requis'),
+    lastName: z.string().min(1, 'Le nom est requis'),
+    email: z.string().email('Email invalide').min(1, "L'email est requis"),
+    phone: z.string().optional(),
+    position: z.string().optional(),
+    // Account Information
+    username: z.string().min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères"),
+    resetPassword: z.boolean().default(false),
+    newPassword: z.string().optional(),
+    mustChangePassword: z.boolean().default(false),
+    // Role and Department
+    role: z.enum(USER_ROLES),
+    department: z.enum(DEPARTMENTS),
+    manager: z.string().optional(),
+    team: z.string().optional(),
+    // Permissions
+    permissions: z
+      .object({
+        users: z.array(z.string()).default([]),
+        clients: z.array(z.string()).default([]),
+        materials: z.array(z.string()).default([]),
+        inventory: z.array(z.string()).default([]),
+        production: z.array(z.string()).default([]),
+        sales: z.array(z.string()).default([]),
+        finance: z.array(z.string()).default([]),
+        projects: z.array(z.string()).default([]),
+        reports: z.array(z.string()).default([]),
+        administration: z.array(z.string()).default([]),
+      })
+      .default({
+        users: [],
+        clients: [],
+        materials: [],
+        inventory: [],
+        production: [],
+        sales: [],
+        finance: [],
+        projects: [],
+        reports: [],
+        administration: [],
+      }),
+    // Work Information
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    contractType: z.enum(['full_time', 'part_time', 'contractor', 'intern']),
+    hourlyRate: z.number().min(0).optional(),
+    // Status Information
+    isActive: z.boolean(),
+    canAccessMobileApp: z.boolean(),
+    maxSessionDuration: z.number().min(1).max(24),
+    lastLoginAt: z.string().optional(),
+    // Additional Information
+    notes: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      // If reset password is enabled, new password is required
+      if (data.resetPassword && (!data.newPassword || data.newPassword.length < 6)) {
+        return false
+      }
+      // End date must be after start date if both are provided
+      if (data.startDate && data.endDate && data.endDate <= data.startDate) {
+        return false
+      }
+      return true
+    },
+    {
+      message: 'Validation des données échouée',
+      path: ['newPassword'],
+    }
+  )
 type EditUserFormData = z.infer<typeof editUserSchema>
 interface UserData {
   id: string
@@ -166,18 +195,18 @@ interface EditUserDialogProps {
   availableManagers?: Array<{ id: string; name: string }>
   availableTeams?: Array<{ id: string; name: string }>
 }
-export function EditUserDialog({ 
-  open, 
-  onOpenChange, 
+export function EditUserDialog({
+  open,
+  onOpenChange,
   onSubmit,
   userData,
   availableManagers = [],
-  availableTeams = []
+  availableTeams = [],
 }: EditUserDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
-  const form = useForm<EditUserFormData>({
+  const form = useForm({
     resolver: zodResolver(editUserSchema),
     defaultValues: {
       id: '',
@@ -209,13 +238,13 @@ export function EditUserDialog({
         finance: [],
         projects: [],
         reports: [],
-        administration: []
+        administration: [],
       },
       notes: '',
     },
   })
   const watchResetPassword = form.watch('resetPassword')
-  const watchRole = form.watch('role')
+  const _watchRole = form.watch('role')
   // Load user data when dialog opens
   useEffect(() => {
     if (userData && open) {
@@ -230,11 +259,11 @@ export function EditUserDialog({
         resetPassword: false,
         newPassword: '',
         mustChangePassword: false,
-        role: userData.role as any,
-        department: userData.department as any,
+        role: userData.role || 'USER',
+        department: userData.department || '',
         manager: userData.manager || '',
         team: userData.team || '',
-        contractType: userData.contractType as any,
+        contractType: userData.contractType || 'CDI',
         hourlyRate: userData.hourlyRate,
         isActive: userData.isActive,
         canAccessMobileApp: userData.canAccessMobileApp,
@@ -252,7 +281,7 @@ export function EditUserDialog({
           finance: userData.permissions.finance || [],
           projects: userData.permissions.projects || [],
           reports: userData.permissions.reports || [],
-          administration: userData.permissions.administration || []
+          administration: userData.permissions.administration || [],
         },
         notes: userData.notes || '',
       })
@@ -271,7 +300,7 @@ export function EditUserDialog({
         finance: ['view', 'create', 'edit', 'approve_payments', 'manage_budgets'],
         projects: ['view', 'create', 'edit', 'assign_resources', 'manage_timeline'],
         reports: ['view', 'create', 'export', 'advanced_analytics'],
-        administration: ['system_settings', 'backup_restore', 'audit_logs']
+        administration: ['system_settings', 'backup_restore', 'audit_logs'],
       },
       manager: {
         users: ['view', 'create', 'edit'],
@@ -282,7 +311,7 @@ export function EditUserDialog({
         sales: ['view', 'create', 'edit'],
         finance: ['view'],
         projects: ['view', 'create', 'edit', 'assign_resources'],
-        reports: ['view', 'create', 'export']
+        reports: ['view', 'create', 'export'],
       },
       employee: {
         clients: ['view'],
@@ -291,8 +320,8 @@ export function EditUserDialog({
         production: ['view'],
         sales: ['view'],
         projects: ['view'],
-        reports: ['view']
-      }
+        reports: ['view'],
+      },
     }
     const permissions = defaultPermissions[role] || defaultPermissions.employee
     form.setValue('permissions', permissions as EditUserFormData['permissions'])
@@ -332,7 +361,7 @@ export function EditUserDialog({
       operator: 'Opérateur',
       supervisor: 'Superviseur',
       analyst: 'Analyste',
-      employee: 'Employé'
+      employee: 'Employé',
     }
     return labels[role] || role
   }
@@ -350,7 +379,7 @@ export function EditUserDialog({
       maintenance: 'Maintenance',
       research_development: 'R&D',
       safety_environment: 'Sécurité & Environnement',
-      human_resources: 'Ressources humaines'
+      human_resources: 'Ressources humaines',
     }
     return labels[department] || department
   }
@@ -376,7 +405,7 @@ export function EditUserDialog({
       advanced_analytics: 'Analytics avancés',
       system_settings: 'Paramètres système',
       backup_restore: 'Sauvegarde/Restauration',
-      audit_logs: 'Logs d\'audit'
+      audit_logs: "Logs d'audit",
     }
     return labels[permission] || permission
   }
@@ -419,7 +448,9 @@ export function EditUserDialog({
                     <div>
                       <p className="text-sm font-medium">Dernière connexion</p>
                       <p className="text-sm text-muted-foreground">
-                        {userData.lastLoginAt ? formatDate(userData.lastLoginAt) : 'Jamais connecté'}
+                        {userData.lastLoginAt
+                          ? formatDate(userData.lastLoginAt)
+                          : 'Jamais connecté'}
                       </p>
                     </div>
                     <div>
@@ -473,11 +504,7 @@ export function EditUserDialog({
                       <FormItem>
                         <FormLabel>Email *</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="email" 
-                            placeholder="utilisateur@entreprise.com" 
-                            {...field} 
-                          />
+                          <Input type="email" placeholder="utilisateur@entreprise.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -529,9 +556,7 @@ export function EditUserDialog({
                         <FormControl>
                           <Input placeholder="nom.utilisateur" {...field} />
                         </FormControl>
-                        <FormDescription>
-                          Utilisé pour se connecter au système
-                        </FormDescription>
+                        <FormDescription>Utilisé pour se connecter au système</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -544,10 +569,7 @@ export function EditUserDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <div>
                             <FormLabel className="text-sm font-normal">
@@ -571,7 +593,7 @@ export function EditUserDialog({
                               <FormControl>
                                 <div className="relative">
                                   <Input
-                                    type={showPassword ? "text" : "password"}
+                                    type={showPassword ? 'text' : 'password'}
                                     placeholder="••••••••"
                                     {...field}
                                   />
@@ -600,10 +622,7 @@ export function EditUserDialog({
                           render={({ field }) => (
                             <FormItem className="flex items-center space-x-2 space-y-0">
                               <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
                               </FormControl>
                               <FormLabel className="text-sm font-normal">
                                 Obliger le changement à la prochaine connexion
@@ -626,7 +645,7 @@ export function EditUserDialog({
                             min="1"
                             max="24"
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 8)}
+                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 8)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -650,11 +669,11 @@ export function EditUserDialog({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Rôle *</FormLabel>
-                        <Select 
+                        <Select
                           onValueChange={(value) => {
                             field.onChange(value)
                             assignDefaultPermissions(value)
-                          }} 
+                          }}
                           value={field.value}
                         >
                           <FormControl>
@@ -663,7 +682,7 @@ export function EditUserDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {USER_ROLES.map(role => (
+                            {USER_ROLES.map((role) => (
                               <SelectItem key={role} value={role}>
                                 {getRoleLabel(role)}
                               </SelectItem>
@@ -690,7 +709,7 @@ export function EditUserDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {DEPARTMENTS.map(dept => (
+                            {DEPARTMENTS.map((dept) => (
                               <SelectItem key={dept} value={dept}>
                                 {getDepartmentLabel(dept)}
                               </SelectItem>
@@ -716,7 +735,7 @@ export function EditUserDialog({
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="">Aucun manager</SelectItem>
-                              {availableManagers.map(manager => (
+                              {availableManagers.map((manager) => (
                                 <SelectItem key={manager.id} value={manager.id}>
                                   {manager.name}
                                 </SelectItem>
@@ -743,7 +762,7 @@ export function EditUserDialog({
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="">Aucune équipe</SelectItem>
-                              {availableTeams.map(team => (
+                              {availableTeams.map((team) => (
                                 <SelectItem key={team.id} value={team.id}>
                                   {team.name}
                                 </SelectItem>
@@ -772,7 +791,7 @@ export function EditUserDialog({
                         {category.replace('_', ' ')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
-                        {permissions.map(permission => (
+                        {permissions.map((permission) => (
                           <FormField
                             key={`${category}-${permission}`}
                             control={form.control}
@@ -787,7 +806,7 @@ export function EditUserDialog({
                                       if (checked) {
                                         field.onChange([...currentPerms, permission])
                                       } else {
-                                        field.onChange(currentPerms.filter(p => p !== permission))
+                                        field.onChange(currentPerms.filter((p) => p !== permission))
                                       }
                                     }}
                                   />
@@ -874,7 +893,9 @@ export function EditUserDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormDescription>
@@ -899,14 +920,9 @@ export function EditUserDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Compte actif
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Compte actif</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -916,10 +932,7 @@ export function EditUserDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Accès application mobile
@@ -958,7 +971,7 @@ export function EditUserDialog({
                   Annuler
                 </Button>
                 <Button type="submit" disabled={loading} className="flex-1">
-                  {loading ? 'Modification en cours...' : 'Modifier l\'utilisateur'}
+                  {loading ? 'Modification en cours...' : "Modifier l'utilisateur"}
                 </Button>
               </div>
             </form>

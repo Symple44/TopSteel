@@ -9,16 +9,16 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": false, // À activer progressivement
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false, // TODO: À activer progressivement
-    "strictPropertyInitialization": false, // Temporaire pour NestJS decorators
-    "noFallthroughCasesInSwitch": true, // Activé : évite les erreurs de switch
-    "strictNullChecks": false, // À activer plus tard
-    "strictFunctionTypes": false, // À activer plus tard
-    "strictBindCallApply": true, // Activé : meilleur typage des fonctions
-    "noImplicitThis": true, // Activé : évite les erreurs de contexte
-    "alwaysStrict": true, // Activé : mode strict JS
+    "noImplicitAny": true,
+    "strictPropertyInitialization": false, // Gardé pour TypeORM decorators
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": false,

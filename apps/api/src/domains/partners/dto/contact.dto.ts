@@ -136,7 +136,7 @@ export class CreateContactDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export class UpdateContactDto {
@@ -244,7 +244,7 @@ export class UpdateContactDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export class ContactFilterDto {

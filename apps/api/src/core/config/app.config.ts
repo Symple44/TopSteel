@@ -23,7 +23,23 @@ export const appConfig = registerAs('app', () => ({
   },
   security: {
     bcryptRounds: Number.parseInt(process.env.BCRYPT_ROUNDS || '12', 10),
-    sessionSecret: process.env.SESSION_SECRET || 'fallback-session-secret',
+    sessionSecret: (() => {
+      const secret = process.env.SESSION_SECRET
+      const isProduction = process.env.NODE_ENV === 'production'
+
+      if (isProduction && !secret) {
+        throw new Error('SESSION_SECRET environment variable is required in production')
+      }
+
+      if (secret && secret.length < 32) {
+        throw new Error('SESSION_SECRET must be at least 32 characters long')
+      }
+
+      // Use a development default only in non-production environments
+      return (
+        secret || (isProduction ? undefined : 'development-secret-min-32-chars-for-testing-only')
+      )
+    })(),
     cookieName: process.env.COOKIE_NAME || 'topsteel-session',
   },
 }))

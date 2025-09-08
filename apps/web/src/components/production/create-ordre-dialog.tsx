@@ -13,8 +13,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  useFormFieldIds,
 } from '@erp/ui'
-
 import { useState } from 'react'
 
 interface CreateOrdreDialogProps {
@@ -24,6 +24,7 @@ interface CreateOrdreDialogProps {
 }
 
 export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
+  const ids = useFormFieldIds(['numero', 'description', 'dateDebut', 'dateFin', 'projet'])
   const [formData, setFormData] = useState({
     numero: '',
     description: '',
@@ -34,7 +35,7 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
   })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     const newOrdre = {
       ...formData,
@@ -60,7 +61,7 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
   // ✅ Handler simplifié pour les inputs
   const handleInputChange =
     (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormData((prev) => ({ ...prev, [field]: e.target.value }))
+      setFormData((prev) => ({ ...prev, [field]: e?.target?.value }))
     }
 
   return (
@@ -73,11 +74,11 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             {/* ✅ COHÉRENCE : Utilise toujours <Label> component */}
-            <Label htmlFor="numero" className="text-sm font-medium">
+            <Label htmlFor={ids.numero} className="text-sm font-medium">
               Numéro d'ordre
             </Label>
             <Input
-              id="numero"
+              id={ids.numero}
               type="text"
               value={formData.numero}
               onChange={handleInputChange('numero')}
@@ -86,11 +87,11 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
           </div>
 
           <div>
-            <Label htmlFor="description" className="text-sm font-medium">
+            <Label htmlFor={ids.description} className="text-sm font-medium">
               Description
             </Label>
             <Input
-              id="description"
+              id={ids.description}
               type="text"
               value={formData.description}
               onChange={handleInputChange('description')}
@@ -121,22 +122,22 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="dateDebut" className="text-sm font-medium">
+              <Label htmlFor={ids.dateDebut} className="text-sm font-medium">
                 Date début
               </Label>
               <Input
-                id="dateDebut"
+                id={ids.dateDebut}
                 type="date"
                 value={formData.dateDebutPrevue}
                 onChange={handleInputChange('dateDebutPrevue')}
               />
             </div>
             <div>
-              <Label htmlFor="dateFin" className="text-sm font-medium">
+              <Label htmlFor={ids.dateFin} className="text-sm font-medium">
                 Date fin
               </Label>
               <Input
-                id="dateFin"
+                id={ids.dateFin}
                 type="date"
                 value={formData.dateFinPrevue}
                 onChange={handleInputChange('dateFinPrevue')}
@@ -145,11 +146,11 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
           </div>
 
           <div>
-            <Label htmlFor="projet" className="text-sm font-medium">
+            <Label htmlFor={ids.projet} className="text-sm font-medium">
               Projet associé
             </Label>
             <Input
-              id="projet"
+              id={ids.projet}
               type="text"
               value={formData.projet}
               onChange={handleInputChange('projet')}
@@ -175,6 +176,7 @@ export function CreateOrdreDialogAdvanced({
   onOpenChange,
   onSubmit,
 }: CreateOrdreDialogProps) {
+  const ids = useFormFieldIds(['numero', 'description', 'dateDebut', 'dateFin', 'projet'])
   const [formData, setFormData] = useState({
     numero: '',
     description: '',
@@ -190,11 +192,11 @@ export function CreateOrdreDialogAdvanced({
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.numero.trim()) {
+    if (!formData?.numero?.trim()) {
       newErrors.numero = "Le numéro d'ordre est requis"
     }
 
-    if (!formData.description.trim()) {
+    if (!formData?.description?.trim()) {
       newErrors.description = 'La description est requise'
     }
 
@@ -209,7 +211,7 @@ export function CreateOrdreDialogAdvanced({
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!validateForm()) {
       return
@@ -240,7 +242,7 @@ export function CreateOrdreDialogAdvanced({
 
   const handleInputChange =
     (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormData((prev) => ({ ...prev, [field]: e.target.value }))
+      setFormData((prev) => ({ ...prev, [field]: e?.target?.value }))
       // Clear error when user starts typing
       if (errors[field]) {
         setErrors((prev) => ({ ...prev, [field]: '' }))
@@ -256,11 +258,11 @@ export function CreateOrdreDialogAdvanced({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="numero" className="text-sm font-medium">
+            <Label htmlFor={ids.numero} className="text-sm font-medium">
               Numéro d'ordre *
             </Label>
             <Input
-              id="numero"
+              id={ids.numero}
               type="text"
               value={formData.numero}
               onChange={handleInputChange('numero')}
@@ -271,11 +273,11 @@ export function CreateOrdreDialogAdvanced({
           </div>
 
           <div>
-            <Label htmlFor="description" className="text-sm font-medium">
+            <Label htmlFor={ids.description} className="text-sm font-medium">
               Description *
             </Label>
             <Input
-              id="description"
+              id={ids.description}
               type="text"
               value={formData.description}
               onChange={handleInputChange('description')}
@@ -309,22 +311,22 @@ export function CreateOrdreDialogAdvanced({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="dateDebut" className="text-sm font-medium">
+              <Label htmlFor={ids.dateDebut} className="text-sm font-medium">
                 Date début
               </Label>
               <Input
-                id="dateDebut"
+                id={ids.dateDebut}
                 type="date"
                 value={formData.dateDebutPrevue}
                 onChange={handleInputChange('dateDebutPrevue')}
               />
             </div>
             <div>
-              <Label htmlFor="dateFin" className="text-sm font-medium">
+              <Label htmlFor={ids.dateFin} className="text-sm font-medium">
                 Date fin
               </Label>
               <Input
-                id="dateFin"
+                id={ids.dateFin}
                 type="date"
                 value={formData.dateFinPrevue}
                 onChange={handleInputChange('dateFinPrevue')}
@@ -337,11 +339,11 @@ export function CreateOrdreDialogAdvanced({
           </div>
 
           <div>
-            <Label htmlFor="projet" className="text-sm font-medium">
+            <Label htmlFor={ids.projet} className="text-sm font-medium">
               Projet associé
             </Label>
             <Input
-              id="projet"
+              id={ids.projet}
               type="text"
               value={formData.projet}
               onChange={handleInputChange('projet')}

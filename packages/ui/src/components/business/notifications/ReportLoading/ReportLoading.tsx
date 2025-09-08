@@ -1,8 +1,23 @@
 'use client'
+import {
+  BarChart3,
+  Calendar,
+  CheckCircle,
+  Database,
+  Download,
+  FileText,
+  Loader,
+  TrendingUp,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { FileText, Loader, BarChart3, Download, CheckCircle, Calendar, Database, TrendingUp } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
-export type ReportType = 'financial' | 'production' | 'inventory' | 'quality' | 'sales' | 'compliance'
+export type ReportType =
+  | 'financial'
+  | 'production'
+  | 'inventory'
+  | 'quality'
+  | 'sales'
+  | 'compliance'
 export type ReportFormat = 'pdf' | 'excel' | 'csv' | 'html'
 export interface ReportProgress {
   currentStep: string
@@ -30,49 +45,49 @@ const reportTypeConfig = {
     label: 'Rapport financier',
     color: 'text-green-600',
     bgColor: 'bg-green-50',
-    borderColor: 'border-green-200'
+    borderColor: 'border-green-200',
   },
   production: {
     icon: BarChart3,
     label: 'Rapport de production',
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200'
+    borderColor: 'border-blue-200',
   },
   inventory: {
     icon: Database,
-    label: 'Rapport d\'inventaire',
+    label: "Rapport d'inventaire",
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200'
+    borderColor: 'border-purple-200',
   },
   quality: {
     icon: CheckCircle,
     label: 'Rapport qualité',
     color: 'text-orange-600',
     bgColor: 'bg-orange-50',
-    borderColor: 'border-orange-200'
+    borderColor: 'border-orange-200',
   },
   sales: {
     icon: TrendingUp,
     label: 'Rapport des ventes',
     color: 'text-indigo-600',
     bgColor: 'bg-indigo-50',
-    borderColor: 'border-indigo-200'
+    borderColor: 'border-indigo-200',
   },
   compliance: {
     icon: FileText,
     label: 'Rapport de conformité',
     color: 'text-red-600',
     bgColor: 'bg-red-50',
-    borderColor: 'border-red-200'
-  }
+    borderColor: 'border-red-200',
+  },
 }
 const formatConfig = {
   pdf: { label: 'PDF', icon: FileText },
   excel: { label: 'Excel', icon: FileText },
   csv: { label: 'CSV', icon: FileText },
-  html: { label: 'HTML', icon: FileText }
+  html: { label: 'HTML', icon: FileText },
 }
 export function ReportLoading({
   className,
@@ -85,7 +100,7 @@ export function ReportLoading({
   onDownload,
   reportId,
   timeElapsed,
-  showProgress = true
+  showProgress = true,
 }: ReportLoadingProps) {
   const [dots, setDots] = useState('')
   const config = reportTypeConfig[reportType]
@@ -95,9 +110,9 @@ export function ReportLoading({
   useEffect(() => {
     if (!isGenerating) return
     const interval = setInterval(() => {
-      setDots(prev => {
+      setDots((prev) => {
         if (prev.length >= 3) return ''
-        return prev + '.'
+        return `${prev}.`
       })
     }, 500)
     return () => clearInterval(interval)
@@ -117,12 +132,14 @@ export function ReportLoading({
     return 'bg-green-500'
   }
   return (
-    <div className={cn(
-      'rounded-lg border p-6',
-      isGenerating ? config.bgColor : 'bg-green-50',
-      isGenerating ? config.borderColor : 'border-green-200',
-      className
-    )}>
+    <div
+      className={cn(
+        'rounded-lg border p-6',
+        isGenerating ? config.bgColor : 'bg-green-50',
+        isGenerating ? config.borderColor : 'border-green-200',
+        className
+      )}
+    >
       <div className="space-y-4">
         {/* Header */}
         <div className="text-center">
@@ -135,7 +152,11 @@ export function ReportLoading({
               <IconComponent className={cn('h-6 w-6', config.color)} />
             )}
             <h3 className="text-lg font-medium text-gray-900">
-              {isGenerating ? `Génération en cours${dots}` : reportId ? 'Rapport généré' : 'Préparation du rapport'}
+              {isGenerating
+                ? `Génération en cours${dots}`
+                : reportId
+                  ? 'Rapport généré'
+                  : 'Préparation du rapport'}
             </h3>
           </div>
           <p className="text-sm text-gray-600">
@@ -155,13 +176,15 @@ export function ReportLoading({
             </div>
             <div>
               <span className="text-gray-500">Demande:</span>
-              <span className="ml-2">{new Date().toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}</span>
+              <span className="ml-2">
+                {new Date().toLocaleDateString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
             </div>
             {timeElapsed && (
               <div>
@@ -191,7 +214,8 @@ export function ReportLoading({
               <p className="text-sm font-medium text-gray-700">{progress.currentStep}</p>
               {progress.totalRecords > 0 && (
                 <p className="text-xs text-gray-600 mt-1">
-                  {formatNumber(progress.recordsProcessed)} / {formatNumber(progress.totalRecords)} enregistrements traités
+                  {formatNumber(progress.recordsProcessed)} / {formatNumber(progress.totalRecords)}{' '}
+                  enregistrements traités
                 </p>
               )}
             </div>

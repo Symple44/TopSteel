@@ -16,11 +16,14 @@ import type React from 'react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
+// Generic filter value type for different filter types
+type FilterValue = string | number | string[] | { min: number; max: number } | boolean
+
 export interface FilterOption {
   id: string
   label: string
   count?: number
-  value?: any
+  value?: FilterValue
 }
 
 export interface FilterGroup {
@@ -38,7 +41,7 @@ export interface FilterGroup {
 export interface ActiveFilter {
   groupId: string
   optionId?: string
-  value?: any
+  value?: FilterValue
   label: string
 }
 
@@ -137,7 +140,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   isMobile = false,
 }) => {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
-    new Set(filters.map((f) => f.id))
+    new Set(filters?.map((f) => f.id))
   )
   const [_priceRange, setPriceRange] = useState<[number, number]>([0, 10000])
   const [tempPriceRange, setTempPriceRange] = useState<[number, number]>([0, 10000])
@@ -145,21 +148,21 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   const toggleGroup = (groupId: string) => {
     setExpandedGroups((prev) => {
       const newSet = new Set(prev)
-      if (newSet.has(groupId)) {
-        newSet.delete(groupId)
+      if (newSet?.has(groupId)) {
+        newSet?.delete(groupId)
       } else {
-        newSet.add(groupId)
+        newSet?.add(groupId)
       }
       return newSet
     })
   }
 
   const handleCheckboxChange = (groupId: string, optionId: string, label: string) => {
-    const existing = activeFilters.find((f) => f.groupId === groupId && f.optionId === optionId)
+    const existing = activeFilters?.find((f) => f.groupId === groupId && f.optionId === optionId)
 
     let newFilters: ActiveFilter[]
     if (existing) {
-      newFilters = activeFilters.filter((f) => !(f.groupId === groupId && f.optionId === optionId))
+      newFilters = activeFilters?.filter((f) => !(f.groupId === groupId && f.optionId === optionId))
     } else {
       newFilters = [...activeFilters, { groupId, optionId, label }]
     }
@@ -168,8 +171,8 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   }
 
   const handleRadioChange = (groupId: string, optionId: string, label: string) => {
-    const newFilters = activeFilters.filter((f) => f.groupId !== groupId)
-    newFilters.push({ groupId, optionId, label })
+    const newFilters = activeFilters?.filter((f) => f.groupId !== groupId)
+    newFilters?.push({ groupId, optionId, label })
     onFilterChange(newFilters)
   }
 
@@ -179,19 +182,19 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
   const applyPriceFilter = () => {
     setPriceRange(tempPriceRange)
-    const newFilters = activeFilters.filter((f) => f.groupId !== 'price')
-    if (tempPriceRange[0] > 0 || tempPriceRange[1] < 10000) {
-      newFilters.push({
+    const newFilters = activeFilters?.filter((f) => f.groupId !== 'price')
+    if (tempPriceRange?.[0] > 0 || tempPriceRange?.[1] < 10000) {
+      newFilters?.push({
         groupId: 'price',
-        value: tempPriceRange,
-        label: `€${tempPriceRange[0]} - €${tempPriceRange[1]}`,
+        value: { min: tempPriceRange?.[0], max: tempPriceRange?.[1] },
+        label: `€${tempPriceRange?.[0]} - €${tempPriceRange?.[1]}`,
       })
     }
     onFilterChange(newFilters)
   }
 
   const removeFilter = (filter: ActiveFilter) => {
-    const newFilters = activeFilters.filter(
+    const newFilters = activeFilters?.filter(
       (f) => !(f.groupId === filter.groupId && f.optionId === filter.optionId)
     )
     onFilterChange(newFilters)
@@ -205,7 +208,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   }
 
   const isFilterActive = (groupId: string, optionId?: string): boolean => {
-    return activeFilters.some(
+    return activeFilters?.some(
       (f) => f.groupId === groupId && (!optionId || f.optionId === optionId)
     )
   }
@@ -234,7 +237,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
       {activeFilters.length > 0 && (
         <div className="p-4 border-b border-gray-200">
           <div className="flex flex-wrap gap-2">
-            {activeFilters.map((filter, index) => (
+            {activeFilters?.map((filter, index) => (
               <span
                 key={`${filter.groupId}-${filter.optionId}-${index}`}
                 className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full"
@@ -254,9 +257,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
       {/* Filter Groups */}
       <div className="divide-y divide-gray-200">
-        {filters.map((group) => {
+        {filters?.map((group) => {
           const Icon = group.icon
-          const isExpanded = expandedGroups.has(group.id)
+          const isExpanded = expandedGroups?.has(group.id)
 
           return (
             <div key={group.id} className="p-4">
@@ -324,11 +327,11 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">
                           {group.unit}
-                          {tempPriceRange[0]}
+                          {tempPriceRange?.[0]}
                         </span>
                         <span className="text-sm text-gray-600">
                           {group.unit}
-                          {tempPriceRange[1]}
+                          {tempPriceRange?.[1]}
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -337,9 +340,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                           min={group.min}
                           max={group.max}
                           step={group.step}
-                          value={tempPriceRange[0]}
+                          value={tempPriceRange?.[0]}
                           onChange={(e) =>
-                            handlePriceChange([parseInt(e.target.value), tempPriceRange[1]])
+                            handlePriceChange([parseInt(e?.target?.value, 10), tempPriceRange?.[1]])
                           }
                           className="w-full"
                         />
@@ -348,9 +351,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                           min={group.min}
                           max={group.max}
                           step={group.step}
-                          value={tempPriceRange[1]}
+                          value={tempPriceRange?.[1]}
                           onChange={(e) =>
-                            handlePriceChange([tempPriceRange[0], parseInt(e.target.value)])
+                            handlePriceChange([tempPriceRange?.[0], parseInt(e?.target?.value, 10)])
                           }
                           className="w-full"
                         />

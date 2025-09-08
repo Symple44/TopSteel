@@ -1,27 +1,20 @@
 'use client'
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { 
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  DollarSign,
-  ShoppingCart,
-  Users,
-  Target,
-  Calendar,
+import {
+  AlertTriangle,
   BarChart3,
   Download,
   Eye,
-  Filter,
-  Package,
-  Truck,
+  Minus,
   Star,
-  AlertTriangle
+  TrendingDown,
+  TrendingUp,
+  Users,
 } from 'lucide-react'
+import React from 'react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
+import { Button } from '../../../primitives/button/Button'
 export interface SalesStats {
   id: string
   period: {
@@ -178,13 +171,24 @@ export function SalesStatsCard({
   }
   const getQuotaStatus = () => {
     const percentage = stats.performance.quotaPercentage
-    if (percentage >= 100) return { status: 'achieved', color: 'text-green-600', bgColor: 'bg-green-100 border-green-200' }
-    if (percentage >= 80) return { status: 'on-track', color: 'text-blue-600', bgColor: 'bg-blue-100 border-blue-200' }
-    if (percentage >= 60) return { status: 'behind', color: 'text-yellow-600', bgColor: 'bg-yellow-100 border-yellow-200' }
+    if (percentage >= 100)
+      return {
+        status: 'achieved',
+        color: 'text-green-600',
+        bgColor: 'bg-green-100 border-green-200',
+      }
+    if (percentage >= 80)
+      return { status: 'on-track', color: 'text-blue-600', bgColor: 'bg-blue-100 border-blue-200' }
+    if (percentage >= 60)
+      return {
+        status: 'behind',
+        color: 'text-yellow-600',
+        bgColor: 'bg-yellow-100 border-yellow-200',
+      }
     return { status: 'critical', color: 'text-red-600', bgColor: 'bg-red-100 border-red-200' }
   }
   const quotaStatus = getQuotaStatus()
-  const highAlerts = stats.alerts?.filter(a => a.severity === 'high') || []
+  const highAlerts = stats.alerts?.filter((a) => a.severity === 'high') || []
   return (
     <Card className={cn('hover:shadow-md transition-shadow', className)}>
       <CardHeader className="pb-3">
@@ -194,14 +198,11 @@ export function SalesStatsCard({
               <BarChart3 className="h-4 w-4 text-green-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">
-                Ventes {stats.region?.name || 'Générales'}
-              </CardTitle>
+              <CardTitle className="text-lg">Ventes {stats.region?.name || 'Générales'}</CardTitle>
               <p className="text-sm text-muted-foreground">
-                {stats.period.label} • {formatDate(stats.period.start)} - {formatDate(stats.period.end)}
-                {stats.salesRep && (
-                  <span className="ml-2">• {stats.salesRep.name}</span>
-                )}
+                {stats.period.label} • {formatDate(stats.period.start)} -{' '}
+                {formatDate(stats.period.end)}
+                {stats.salesRep && <span className="ml-2">• {stats.salesRep.name}</span>}
               </p>
             </div>
           </div>
@@ -230,19 +231,36 @@ export function SalesStatsCard({
               {stats.metrics.totalRevenue.previousPeriod && (
                 <div className="flex items-center gap-1">
                   {React.createElement(
-                    getTrendIcon(stats.metrics.totalRevenue.value, stats.metrics.totalRevenue.previousPeriod),
-                    { 
+                    getTrendIcon(
+                      stats.metrics.totalRevenue.value,
+                      stats.metrics.totalRevenue.previousPeriod
+                    ),
+                    {
                       className: cn(
                         'h-3 w-3',
-                        getTrendColor(stats.metrics.totalRevenue.value, stats.metrics.totalRevenue.previousPeriod)
-                      )
+                        getTrendColor(
+                          stats.metrics.totalRevenue.value,
+                          stats.metrics.totalRevenue.previousPeriod
+                        )
+                      ),
                     }
                   )}
-                  <span className={cn(
-                    'text-xs font-medium',
-                    getTrendColor(stats.metrics.totalRevenue.value, stats.metrics.totalRevenue.previousPeriod)
-                  )}>
-                    {Math.abs(getTrendPercentage(stats.metrics.totalRevenue.value, stats.metrics.totalRevenue.previousPeriod)).toFixed(1)}%
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      getTrendColor(
+                        stats.metrics.totalRevenue.value,
+                        stats.metrics.totalRevenue.previousPeriod
+                      )
+                    )}
+                  >
+                    {Math.abs(
+                      getTrendPercentage(
+                        stats.metrics.totalRevenue.value,
+                        stats.metrics.totalRevenue.previousPeriod
+                      )
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
               )}
@@ -250,11 +268,20 @@ export function SalesStatsCard({
             {stats.metrics.totalRevenue.target && (
               <div className="text-xs text-muted-foreground">
                 Objectif: {formatCurrency(stats.metrics.totalRevenue.target, stats.currency)}
-                <span className={cn(
-                  'ml-1 font-medium',
-                  stats.metrics.totalRevenue.value >= stats.metrics.totalRevenue.target ? 'text-green-600' : 'text-red-600'
-                )}>
-                  ({((stats.metrics.totalRevenue.value / stats.metrics.totalRevenue.target) * 100).toFixed(0)}%)
+                <span
+                  className={cn(
+                    'ml-1 font-medium',
+                    stats.metrics.totalRevenue.value >= stats.metrics.totalRevenue.target
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                  )}
+                >
+                  (
+                  {(
+                    (stats.metrics.totalRevenue.value / stats.metrics.totalRevenue.target) *
+                    100
+                  ).toFixed(0)}
+                  %)
                 </span>
               </div>
             )}
@@ -262,25 +289,40 @@ export function SalesStatsCard({
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Commandes</p>
             <div className="flex items-center gap-2">
-              <p className="font-bold text-lg">
-                {formatNumber(stats.metrics.orderCount.value)}
-              </p>
+              <p className="font-bold text-lg">{formatNumber(stats.metrics.orderCount.value)}</p>
               {stats.metrics.orderCount.previousPeriod && (
                 <div className="flex items-center gap-1">
                   {React.createElement(
-                    getTrendIcon(stats.metrics.orderCount.value, stats.metrics.orderCount.previousPeriod),
-                    { 
+                    getTrendIcon(
+                      stats.metrics.orderCount.value,
+                      stats.metrics.orderCount.previousPeriod
+                    ),
+                    {
                       className: cn(
                         'h-3 w-3',
-                        getTrendColor(stats.metrics.orderCount.value, stats.metrics.orderCount.previousPeriod)
-                      )
+                        getTrendColor(
+                          stats.metrics.orderCount.value,
+                          stats.metrics.orderCount.previousPeriod
+                        )
+                      ),
                     }
                   )}
-                  <span className={cn(
-                    'text-xs font-medium',
-                    getTrendColor(stats.metrics.orderCount.value, stats.metrics.orderCount.previousPeriod)
-                  )}>
-                    {Math.abs(getTrendPercentage(stats.metrics.orderCount.value, stats.metrics.orderCount.previousPeriod)).toFixed(1)}%
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      getTrendColor(
+                        stats.metrics.orderCount.value,
+                        stats.metrics.orderCount.previousPeriod
+                      )
+                    )}
+                  >
+                    {Math.abs(
+                      getTrendPercentage(
+                        stats.metrics.orderCount.value,
+                        stats.metrics.orderCount.previousPeriod
+                      )
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
               )}
@@ -304,26 +346,45 @@ export function SalesStatsCard({
                 {stats.metrics.averageOrderValue.previousPeriod && (
                   <div className="flex items-center justify-center gap-1 mt-1">
                     {React.createElement(
-                      getTrendIcon(stats.metrics.averageOrderValue.value, stats.metrics.averageOrderValue.previousPeriod),
-                      { 
+                      getTrendIcon(
+                        stats.metrics.averageOrderValue.value,
+                        stats.metrics.averageOrderValue.previousPeriod
+                      ),
+                      {
                         className: cn(
                           'h-3 w-3',
-                          getTrendColor(stats.metrics.averageOrderValue.value, stats.metrics.averageOrderValue.previousPeriod)
-                        )
+                          getTrendColor(
+                            stats.metrics.averageOrderValue.value,
+                            stats.metrics.averageOrderValue.previousPeriod
+                          )
+                        ),
                       }
                     )}
-                    <span className={cn(
-                      'text-xs',
-                      getTrendColor(stats.metrics.averageOrderValue.value, stats.metrics.averageOrderValue.previousPeriod)
-                    )}>
-                      {Math.abs(getTrendPercentage(stats.metrics.averageOrderValue.value, stats.metrics.averageOrderValue.previousPeriod)).toFixed(1)}%
+                    <span
+                      className={cn(
+                        'text-xs',
+                        getTrendColor(
+                          stats.metrics.averageOrderValue.value,
+                          stats.metrics.averageOrderValue.previousPeriod
+                        )
+                      )}
+                    >
+                      {Math.abs(
+                        getTrendPercentage(
+                          stats.metrics.averageOrderValue.value,
+                          stats.metrics.averageOrderValue.previousPeriod
+                        )
+                      ).toFixed(1)}
+                      %
                     </span>
                   </div>
                 )}
               </div>
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">Conversion</p>
-                <p className="font-semibold text-sm">{stats.metrics.conversionRate.value.toFixed(1)}%</p>
+                <p className="font-semibold text-sm">
+                  {stats.metrics.conversionRate.value.toFixed(1)}%
+                </p>
                 {stats.metrics.conversionRate.target && (
                   <p className="text-xs text-muted-foreground">
                     Obj: {stats.metrics.conversionRate.target.toFixed(1)}%
@@ -353,12 +414,16 @@ export function SalesStatsCard({
                 </div>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
+                <div
                   className={cn(
                     'h-2 rounded-full transition-all duration-300',
-                    quotaStatus.status === 'achieved' ? 'bg-green-500' :
-                    quotaStatus.status === 'on-track' ? 'bg-blue-500' :
-                    quotaStatus.status === 'behind' ? 'bg-yellow-500' : 'bg-red-500'
+                    quotaStatus.status === 'achieved'
+                      ? 'bg-green-500'
+                      : quotaStatus.status === 'on-track'
+                        ? 'bg-blue-500'
+                        : quotaStatus.status === 'behind'
+                          ? 'bg-yellow-500'
+                          : 'bg-red-500'
                   )}
                   style={{ width: `${Math.min(stats.performance.quotaPercentage, 100)}%` }}
                 />
@@ -371,12 +436,17 @@ export function SalesStatsCard({
             {/* Top Products */}
             {stats.topProducts.length > 0 && (
               <div className="space-y-2 pt-2 border-t">
-                <p className="text-xs text-muted-foreground font-medium">Produits les plus vendus</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Produits les plus vendus
+                </p>
                 <div className="space-y-1">
                   {stats.topProducts.slice(0, 3).map((product, index) => (
                     <div key={product.id} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs w-5 h-5 rounded-full p-0 flex items-center justify-center">
+                        <Badge
+                          variant="outline"
+                          className="text-xs w-5 h-5 rounded-full p-0 flex items-center justify-center"
+                        >
                           {index + 1}
                         </Badge>
                         <div className="min-w-0 flex-1">
@@ -389,7 +459,9 @@ export function SalesStatsCard({
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{formatCurrency(product.revenue, stats.currency)}</p>
+                        <p className="font-medium">
+                          {formatCurrency(product.revenue, stats.currency)}
+                        </p>
                         <p className="text-xs text-muted-foreground">{product.quantity} unités</p>
                       </div>
                     </div>
@@ -430,13 +502,17 @@ export function SalesStatsCard({
                 </p>
                 <div className="space-y-1">
                   {highAlerts.slice(0, 2).map((alert) => (
-                    <div key={alert.id} className="text-xs bg-red-50 p-2 rounded border border-red-200">
+                    <div
+                      key={alert.id}
+                      className="text-xs bg-red-50 p-2 rounded border border-red-200"
+                    >
                       <p className="font-medium text-red-800">{alert.message}</p>
                     </div>
                   ))}
                   {highAlerts.length > 2 && (
                     <p className="text-xs text-red-600">
-                      +{highAlerts.length - 2} autre{highAlerts.length - 2 > 1 ? 's' : ''} alerte{highAlerts.length - 2 > 1 ? 's' : ''}
+                      +{highAlerts.length - 2} autre{highAlerts.length - 2 > 1 ? 's' : ''} alerte
+                      {highAlerts.length - 2 > 1 ? 's' : ''}
                     </p>
                   )}
                 </div>
@@ -448,30 +524,48 @@ export function SalesStatsCard({
         {showActions && (
           <div className="flex flex-wrap gap-2 pt-3 border-t">
             {onViewDetails && (
-              <Button variant="outline" size="sm" onClick={onViewDetails} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewDetails}
+                className="flex items-center gap-1"
+              >
                 <Eye className="h-3 w-3" />
                 Détails
               </Button>
             )}
             {onViewCustomers && (
-              <Button variant="outline" size="sm" onClick={onViewCustomers} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewCustomers}
+                className="flex items-center gap-1"
+              >
                 <Users className="h-3 w-3" />
                 Clients
               </Button>
             )}
             {onExport && (
-              <Button variant="outline" size="sm" onClick={onExport} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onExport}
+                className="flex items-center gap-1"
+              >
                 <Download className="h-3 w-3" />
                 Exporter
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit}>
+              <Button type="button" variant="outline" size="sm" onClick={onEdit}>
                 Modifier
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" size="sm" onClick={onDelete}>
+              <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
                 Supprimer
               </Button>
             )}

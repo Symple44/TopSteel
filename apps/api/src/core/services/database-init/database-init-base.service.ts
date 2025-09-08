@@ -80,7 +80,7 @@ export class DatabaseInitBaseService {
         SELECT COUNT(*) as count FROM modules
       `)
 
-      if (parseInt(moduleCount[0]?.count || '0') === 0) {
+      if (parseInt(moduleCount[0]?.count || '0', 10) === 0) {
         this.logger.log('Création des modules système...')
 
         for (const module of INIT_DATA.modules) {
@@ -110,7 +110,7 @@ export class DatabaseInitBaseService {
         SELECT COUNT(*) as count FROM permissions
       `)
 
-      if (parseInt(permissionCount[0]?.count || '0') === 0) {
+      if (parseInt(permissionCount[0]?.count || '0', 10) === 0) {
         this.logger.log('Création des permissions système...')
 
         // Permissions de base pour tous les modules
@@ -158,7 +158,7 @@ export class DatabaseInitBaseService {
         SELECT COUNT(*) as count FROM roles
       `)
 
-      if (parseInt(roleCount[0]?.count || '0') === 0) {
+      if (parseInt(roleCount[0]?.count || '0', 10) === 0) {
         this.logger.log('Création des rôles système...')
 
         for (const role of INIT_DATA.roles) {
@@ -188,7 +188,7 @@ export class DatabaseInitBaseService {
         SELECT COUNT(*) as count FROM groups
       `)
 
-      if (parseInt(groupCount[0]?.count || '0') === 0) {
+      if (parseInt(groupCount[0]?.count || '0', 10) === 0) {
         this.logger.log('Création des groupes par défaut...')
 
         for (const group of INIT_DATA.groups) {
@@ -236,7 +236,7 @@ export class DatabaseInitBaseService {
         SELECT COUNT(*) as count FROM system_parameters
       `)
 
-      if (parseInt(paramCount[0]?.count || '0') === 0) {
+      if (parseInt(paramCount[0]?.count || '0', 10) === 0) {
         this.logger.log('Création des paramètres système...')
 
         for (const param of INIT_DATA.systemParameters) {
@@ -276,7 +276,7 @@ export class DatabaseInitBaseService {
         [tableName]
       )
 
-      return result[0]?.table_exists && parseInt(result[0]?.row_count || '0') > 0
+      return result[0]?.table_exists && parseInt(result[0]?.row_count || '0', 10) > 0
     } catch (_error) {
       return false
     }

@@ -11,7 +11,7 @@ export enum SubscriptionStatus {
   ACTIVE = 'active',
   UNSUBSCRIBED = 'unsubscribed',
   PENDING = 'pending',
-  BOUNCED = 'bounced'
+  BOUNCED = 'bounced',
 }
 
 @Entity('newsletter_subscriptions')
@@ -37,7 +37,7 @@ export class NewsletterSubscription {
   @Column({
     type: 'enum',
     enum: SubscriptionStatus,
-    default: SubscriptionStatus.ACTIVE
+    default: SubscriptionStatus.ACTIVE,
   })
   @Index()
   status!: SubscriptionStatus
@@ -78,7 +78,7 @@ export class NewsletterSubscription {
   metadata?: {
     customerType?: string
     tags?: string[]
-    customFields?: Record<string, any>
+    customFields?: Record<string, unknown>
     lastEmailSentAt?: string
     emailsSentCount?: number
     lastOpenedAt?: string
@@ -117,13 +117,13 @@ export class NewsletterSubscription {
   }
 
   generateUnsubscribeToken(): string {
-    const crypto = require('crypto')
+    const crypto = require('node:crypto')
     this.unsubscribeToken = crypto.randomBytes(32).toString('hex')
     return this.unsubscribeToken
   }
 
   generateConfirmationToken(): string {
-    const crypto = require('crypto')
+    const crypto = require('node:crypto')
     this.confirmationToken = crypto.randomBytes(32).toString('hex')
     return this.confirmationToken
   }
@@ -146,7 +146,7 @@ export class NewsletterSubscription {
     }
 
     const now = new Date().toISOString()
-    
+
     if (type === 'open') {
       this.metadata.lastOpenedAt = now
       this.metadata.openCount = (this.metadata.openCount || 0) + 1

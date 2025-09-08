@@ -31,7 +31,7 @@ export interface CreatePromotionDto {
   stackable?: boolean
   requiresCoupon?: boolean
   couponCode?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface UpdatePromotionDto extends Partial<CreatePromotionDto> {
@@ -73,7 +73,7 @@ export interface CreateCouponDto {
   excludedCategories?: string[]
   customerGroups?: string[]
   customerEmails?: string[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface UpdateCouponDto extends Partial<CreateCouponDto> {
@@ -209,10 +209,10 @@ export class MarketplacePromotionsService {
       if (updateData.type || updateData.value !== undefined || updateData.conditions) {
         const validationData = { ...promotion, ...updateData }
         if (updateData.type) {
-          validationData.type = updateData.type as any
+          validationData.type = updateData.type as unknown
         }
         // Type check workaround for validation
-        this.validatePromotionData(validationData as any)
+        this.validatePromotionData(validationData as unknown)
       }
 
       Object.assign(promotion, updateData)
@@ -407,8 +407,8 @@ export class MarketplacePromotionsService {
         throw new NotFoundException(`Order ${orderId} not found`)
       }
 
-      order.appliedCouponId = null
-      order.appliedCouponCode = null
+      order.appliedCouponId = ''
+      order.appliedCouponCode = ''
       order.discountAmount = 0
       order.total = order.subtotal + order.tax + order.shippingCost
 
@@ -780,7 +780,7 @@ export class MarketplacePromotionsService {
   private calculatePromotionDiscount(
     promotion: MarketplacePromotion,
     order: MarketplaceOrder,
-    applicableItems: any[]
+    applicableItems: unknown[]
   ): number {
     const applicableTotal = applicableItems.reduce((sum, item) => sum + item.totalPrice, 0)
 
@@ -808,7 +808,7 @@ export class MarketplacePromotionsService {
   /**
    * Get applicable order items for promotion
    */
-  private getApplicableOrderItems(order: MarketplaceOrder, promotion: MarketplacePromotion): any[] {
+  private getApplicableOrderItems(order: MarketplaceOrder, promotion: MarketplacePromotion): unknown[] {
     return order.items.filter((item) => {
       // Check excluded products
       if (promotion.excludedProducts?.includes(item.productId)) {
@@ -906,7 +906,7 @@ export class MarketplacePromotionsService {
       // Track customer-specific usage in Redis
       const key = `coupon-usage:${couponId}:${customerId}`
       const current = await this.redisService.get(key)
-      const count = current ? parseInt(current) + 1 : 1
+      const count = current ? parseInt(current, 10) + 1 : 1
       await this.redisService.set(key, count.toString())
     }
   }
@@ -917,7 +917,7 @@ export class MarketplacePromotionsService {
   private async getCustomerCouponUsage(couponId: string, customerId: string): Promise<number> {
     const key = `coupon-usage:${couponId}:${customerId}`
     const usage = await this.redisService.get(key)
-    return usage ? parseInt(usage) : 0
+    return usage ? parseInt(usage, 10) : 0
   }
 
   /**
@@ -929,7 +929,7 @@ export class MarketplacePromotionsService {
   ): Promise<number> {
     const key = `promotion-usage:${promotionId}:${customerId}`
     const usage = await this.redisService.get(key)
-    return usage ? parseInt(usage) : 0
+    return usage ? parseInt(usage, 10) : 0
   }
 
   /**

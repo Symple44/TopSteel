@@ -1,38 +1,36 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
 import {
-  Search,
-  FolderOpen,
   AlertCircle,
-  Check,
-  ChevronsUpDown,
-  Calendar,
-  User,
-  DollarSign,
-  Progress as ProgressIcon,
-  Clock,
-  MapPin,
-  Building,
   AlertTriangle,
+  Building,
+  Calendar,
+  Check,
   CheckCircle2,
+  ChevronsUpDown,
+  DollarSign,
+  FolderOpen,
+  MapPin,
   Pause,
   Play,
-  Plus
+  Plus,
+  Search,
+  User,
 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Label } from '../../../forms/label/Label'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
 import { Input } from '../../../primitives/input/Input'
-import { Progress } from '../../../data-display/progress/progress'
-export type ProjectStatus = 
-  | 'draft' 
-  | 'planning' 
-  | 'active' 
-  | 'on_hold' 
-  | 'completed' 
-  | 'cancelled'
+import { Progress } from '../../../primitives/progress'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+export type ProjectStatus = 'draft' | 'planning' | 'active' | 'on_hold' | 'completed' | 'cancelled'
 export type ProjectPriority = 'low' | 'medium' | 'high' | 'critical'
 export interface ProjectMember {
   id: string
@@ -109,11 +107,31 @@ export interface ProjectSelectorProps {
 }
 const STATUS_CONFIG = {
   draft: { label: 'Brouillon', color: 'bg-gray-100 text-gray-800', icon: <Progress /> },
-  planning: { label: 'Planification', color: 'bg-blue-100 text-blue-800', icon: <Calendar className="w-3 h-3" /> },
-  active: { label: 'En cours', color: 'bg-green-100 text-green-800', icon: <Play className="w-3 h-3" /> },
-  on_hold: { label: 'En pause', color: 'bg-yellow-100 text-yellow-800', icon: <Pause className="w-3 h-3" /> },
-  completed: { label: 'Terminé', color: 'bg-emerald-100 text-emerald-800', icon: <CheckCircle2 className="w-3 h-3" /> },
-  cancelled: { label: 'Annulé', color: 'bg-red-100 text-red-800', icon: <AlertTriangle className="w-3 h-3" /> },
+  planning: {
+    label: 'Planification',
+    color: 'bg-blue-100 text-blue-800',
+    icon: <Calendar className="w-3 h-3" />,
+  },
+  active: {
+    label: 'En cours',
+    color: 'bg-green-100 text-green-800',
+    icon: <Play className="w-3 h-3" />,
+  },
+  on_hold: {
+    label: 'En pause',
+    color: 'bg-yellow-100 text-yellow-800',
+    icon: <Pause className="w-3 h-3" />,
+  },
+  completed: {
+    label: 'Terminé',
+    color: 'bg-emerald-100 text-emerald-800',
+    icon: <CheckCircle2 className="w-3 h-3" />,
+  },
+  cancelled: {
+    label: 'Annulé',
+    color: 'bg-red-100 text-red-800',
+    icon: <AlertTriangle className="w-3 h-3" />,
+  },
 }
 const PRIORITY_CONFIG = {
   low: { label: 'Basse', color: 'bg-gray-100 text-gray-700' },
@@ -133,32 +151,32 @@ const MOCK_PROJECTS: Project[] = [
     budget: {
       allocated: 450000,
       spent: 285000,
-      currency: 'EUR'
+      currency: 'EUR',
     },
     dates: {
       startDate: new Date('2024-01-15'),
       endDate: new Date('2024-06-30'),
       createdAt: new Date('2023-12-01'),
-      lastActivity: new Date('2024-01-20')
+      lastActivity: new Date('2024-01-20'),
     },
     client: {
       id: 'client1',
       name: 'Jean Dupont',
-      company: 'Industries Nord'
+      company: 'Industries Nord',
     },
     manager: {
       id: 'mgr1',
       name: 'Marie Martin',
-      role: 'Chef de projet'
+      role: 'Chef de projet',
     },
     team: [
       { id: 'tm1', name: 'Pierre Durand', role: 'Ingénieur' },
-      { id: 'tm2', name: 'Sophie Bernard', role: 'Technicienne' }
+      { id: 'tm2', name: 'Sophie Bernard', role: 'Technicienne' },
     ],
     location: 'Lille, France',
     tags: ['rénovation', 'production', 'urgent'],
     category: 'Industrie',
-    isFavorite: true
+    isFavorite: true,
   },
   {
     id: '2',
@@ -171,7 +189,7 @@ const MOCK_PROJECTS: Project[] = [
     budget: {
       allocated: 750000,
       spent: 35000,
-      currency: 'EUR'
+      currency: 'EUR',
     },
     dates: {
       startDate: new Date('2024-03-01'),
@@ -181,18 +199,18 @@ const MOCK_PROJECTS: Project[] = [
     client: {
       id: 'client2',
       name: 'Logistics SA',
-      company: 'Logistics SA'
+      company: 'Logistics SA',
     },
     manager: {
       id: 'mgr2',
       name: 'Laurent Petit',
-      role: 'Chef de projet'
+      role: 'Chef de projet',
     },
     location: 'Lyon, France',
     tags: ['construction', 'entrepôt', 'logistique'],
     category: 'Construction',
-    isFavorite: false
-  }
+    isFavorite: false,
+  },
 ]
 export function ProjectSelector({
   value,
@@ -227,9 +245,7 @@ export function ProjectSelector({
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [priorityFilter, setPriorityFilter] = useState<string>('')
   const [selectedProjects, setSelectedProjects] = useState<string[]>(
-    multiple && Array.isArray(value) ? value : 
-    !multiple && typeof value === 'string' ? [value] :
-    []
+    multiple && Array.isArray(value) ? value : !multiple && typeof value === 'string' ? [value] : []
   )
   useEffect(() => {
     if (multiple && Array.isArray(value)) {
@@ -239,18 +255,18 @@ export function ProjectSelector({
     }
   }, [value, multiple])
   const filteredProjects = useMemo(() => {
-    let filtered = projects.filter(project => {
+    const filtered = projects.filter((project) => {
       // Archived projects filter
       if (project.isArchived) return false
       // Search filter
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase()
-        const matchesSearch = 
+        const matchesSearch =
           project.name.toLowerCase().includes(searchLower) ||
           project.code.toLowerCase().includes(searchLower) ||
           project.description?.toLowerCase().includes(searchLower) ||
           project.client?.name.toLowerCase().includes(searchLower) ||
-          project.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+          project.tags?.some((tag) => tag.toLowerCase().includes(searchLower))
         if (!matchesSearch) return false
       }
       // Status filter
@@ -288,19 +304,29 @@ export function ProjectSelector({
           return new Date(bDate).getTime() - new Date(aDate).getTime()
         })
         break
-      case 'priority':
+      case 'priority': {
         const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
         filtered.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority])
         break
+      }
       default:
         filtered.sort((a, b) => a.name.localeCompare(b.name))
     }
     return filtered
-  }, [projects, searchTerm, statusFilter, priorityFilter, filterByStatus, filterByManager, filterByClient, sortBy])
+  }, [
+    projects,
+    searchTerm,
+    statusFilter,
+    priorityFilter,
+    filterByStatus,
+    filterByManager,
+    filterByClient,
+    sortBy,
+  ])
   const groupedProjects = useMemo(() => {
     if (!groupBy) return { '': filteredProjects }
     const grouped: Record<string, Project[]> = {}
-    filteredProjects.forEach(project => {
+    filteredProjects.forEach((project) => {
       let groupKey = ''
       switch (groupBy) {
         case 'status':
@@ -324,11 +350,11 @@ export function ProjectSelector({
     return grouped
   }, [filteredProjects, groupBy])
   const handleProjectToggle = (projectId: string) => {
-    const project = projects.find(p => p.id === projectId)
+    const project = projects.find((p) => p.id === projectId)
     if (!project) return
     if (multiple) {
       const newSelection = selectedProjects.includes(projectId)
-        ? selectedProjects.filter(id => id !== projectId)
+        ? selectedProjects.filter((id) => id !== projectId)
         : [...selectedProjects, projectId]
       setSelectedProjects(newSelection)
       onChange?.(newSelection)
@@ -344,12 +370,12 @@ export function ProjectSelector({
     if (selectedProjects.length === 0) return placeholder
     if (multiple) {
       if (selectedProjects.length === 1) {
-        const project = projects.find(p => p.id === selectedProjects[0])
+        const project = projects.find((p) => p.id === selectedProjects[0])
         return project?.name || 'Projet sélectionné'
       }
       return `${selectedProjects.length} projets sélectionnés`
     } else {
-      const project = projects.find(p => p.id === selectedProjects[0])
+      const project = projects.find((p) => p.id === selectedProjects[0])
       return project?.name || placeholder
     }
   }
@@ -378,6 +404,7 @@ export function ProjectSelector({
       )}
       <div className="relative">
         <Button
+          type="button"
           variant="outline"
           role="combobox"
           aria-expanded={isOpen}
@@ -396,7 +423,7 @@ export function ProjectSelector({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
         {isOpen && (
-          <div 
+          <div
             className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg"
             style={{ maxHeight }}
           >
@@ -458,13 +485,20 @@ export function ProjectSelector({
                     </div>
                   )}
                   {groupProjects.map((project) => (
-                    <div
+                    <button
                       key={project.id}
+                      type="button"
                       className={cn(
-                        'flex items-start gap-3 px-3 py-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0',
+                        'flex items-start gap-3 px-3 py-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0 w-full text-left',
                         selectedProjects.includes(project.id) && 'bg-blue-50'
                       )}
                       onClick={() => handleProjectToggle(project.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleProjectToggle(project.id)
+                        }
+                      }}
                     >
                       <div className="flex items-center mt-0.5">
                         <div className="w-4 h-4 rounded-full border flex items-center justify-center">
@@ -479,21 +513,23 @@ export function ProjectSelector({
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium">{project.name}</span>
-                              <span className="text-xs text-muted-foreground">({project.code})</span>
+                              <span className="text-xs text-muted-foreground">
+                                ({project.code})
+                              </span>
                             </div>
                             {project.description && (
                               <p className="text-sm text-muted-foreground">{project.description}</p>
                             )}
                           </div>
                           <div className="flex items-center gap-1">
-                            <Badge 
+                            <Badge
                               className={cn('text-xs', STATUS_CONFIG[project.status].color)}
                               variant="secondary"
                             >
                               {STATUS_CONFIG[project.status].icon}
                               <span className="ml-1">{STATUS_CONFIG[project.status].label}</span>
                             </Badge>
-                            <Badge 
+                            <Badge
                               className={cn('text-xs', PRIORITY_CONFIG[project.priority].color)}
                               variant="outline"
                             >
@@ -506,7 +542,9 @@ export function ProjectSelector({
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
                               <span className="text-muted-foreground">Progression</span>
-                              <span className={cn('font-medium', getProgressColor(project.progress))}>
+                              <span
+                                className={cn('font-medium', getProgressColor(project.progress))}
+                              >
                                 {project.progress}%
                               </span>
                             </div>
@@ -549,7 +587,10 @@ export function ProjectSelector({
                               <div className="flex items-center gap-1">
                                 <DollarSign className="w-3 h-3 text-muted-foreground" />
                                 <span className="text-muted-foreground">
-                                  {formatCurrency(project.budget.allocated, project.budget.currency)}
+                                  {formatCurrency(
+                                    project.budget.allocated,
+                                    project.budget.currency
+                                  )}
                                 </span>
                               </div>
                             )}
@@ -565,7 +606,7 @@ export function ProjectSelector({
                         {/* Tags */}
                         {project.tags && project.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1">
-                            {project.tags.slice(0, 3).map(tag => (
+                            {project.tags.slice(0, 3).map((tag) => (
                               <Badge key={tag} variant="secondary" className="text-xs px-1 py-0">
                                 {tag}
                               </Badge>
@@ -578,7 +619,7 @@ export function ProjectSelector({
                           </div>
                         )}
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               ))}
@@ -593,6 +634,7 @@ export function ProjectSelector({
             {allowCreateNew && onCreateNew && (
               <div className="p-3 border-t">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="w-full"
@@ -609,9 +651,7 @@ export function ProjectSelector({
           </div>
         )}
       </div>
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

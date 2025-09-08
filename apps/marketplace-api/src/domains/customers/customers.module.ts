@@ -11,8 +11,22 @@ import { MarketplaceCustomersService } from './services/marketplace-customers.se
   imports: [
     TypeOrmModule.forFeature([MarketplaceCustomer], 'marketplace'),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'marketplace-secret-key',
-      signOptions: { expiresIn: '15m' }
+      secret: (() => {
+        const secret = process.env.JWT_SECRET
+        const isProduction = process.env.NODE_ENV === 'production'
+
+        if (isProduction && !secret) {
+          throw new Error('JWT_SECRET environment variable is required in production')
+        }
+
+        if (secret && secret.length < 32) {
+          throw new Error('JWT_SECRET must be at least 32 characters long')
+        }
+
+        // Use a development default only in non-production environments
+        return secret || (isProduction ? undefined : 'customers-dev-jwt-secret-min-32-characters')
+      })(),
+      signOptions: { expiresIn: '15m' },
     }),
     TenantModule,
     EmailModule,

@@ -1,7 +1,15 @@
 'use client'
-import { Upload, FileText, CheckCircle, XCircle, AlertCircle, Clock, Package } from 'lucide-react'
+import { AlertCircle, CheckCircle, Clock, FileText, Package, Upload, XCircle } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
-export type ImportStatus = 'pending' | 'uploading' | 'processing' | 'validating' | 'importing' | 'completed' | 'failed' | 'cancelled'
+export type ImportStatus =
+  | 'pending'
+  | 'uploading'
+  | 'processing'
+  | 'validating'
+  | 'importing'
+  | 'completed'
+  | 'failed'
+  | 'cancelled'
 export interface ImportError {
   row: number
   column?: string
@@ -43,57 +51,57 @@ const statusConfig = {
     color: 'text-gray-500',
     bgColor: 'bg-gray-50',
     borderColor: 'border-gray-200',
-    title: 'En attente'
+    title: 'En attente',
   },
   uploading: {
     icon: Upload,
     color: 'text-blue-500',
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200',
-    title: 'Téléchargement'
+    title: 'Téléchargement',
   },
   processing: {
     icon: Package,
     color: 'text-orange-500',
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200',
-    title: 'Traitement'
+    title: 'Traitement',
   },
   validating: {
     icon: AlertCircle,
     color: 'text-yellow-500',
     bgColor: 'bg-yellow-50',
     borderColor: 'border-yellow-200',
-    title: 'Validation'
+    title: 'Validation',
   },
   importing: {
     icon: FileText,
     color: 'text-purple-500',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200',
-    title: 'Import'
+    title: 'Import',
   },
   completed: {
     icon: CheckCircle,
     color: 'text-green-500',
     bgColor: 'bg-green-50',
     borderColor: 'border-green-200',
-    title: 'Terminé'
+    title: 'Terminé',
   },
   failed: {
     icon: XCircle,
     color: 'text-red-500',
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
-    title: 'Échec'
+    title: 'Échec',
   },
   cancelled: {
     icon: XCircle,
     color: 'text-gray-500',
     bgColor: 'bg-gray-50',
     borderColor: 'border-gray-200',
-    title: 'Annulé'
-  }
+    title: 'Annulé',
+  },
 }
 export function ImportProgress({
   className,
@@ -108,7 +116,7 @@ export function ImportProgress({
   onCancel,
   onRetry,
   onDownloadErrorReport,
-  showDetailedStats = true
+  showDetailedStats = true,
 }: ImportProgressProps) {
   const config = statusConfig[status]
   const IconComponent = config.icon
@@ -117,7 +125,7 @@ export function ImportProgress({
     const k = 1024
     const sizes = ['B', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`
   }
   const formatTime = (seconds: number) => {
     if (seconds < 60) return `${Math.round(seconds)}s`
@@ -135,12 +143,7 @@ export function ImportProgress({
   const hasFailed = status === 'failed'
   const isCancelled = status === 'cancelled'
   return (
-    <div className={cn(
-      'rounded-lg border p-6',
-      config.bgColor,
-      config.borderColor,
-      className
-    )}>
+    <div className={cn('rounded-lg border p-6', config.bgColor, config.borderColor, className)}>
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -148,9 +151,7 @@ export function ImportProgress({
             <IconComponent className={cn('h-6 w-6', config.color)} />
             <div>
               <h3 className="font-medium text-gray-900">{config.title}</h3>
-              {currentStep && (
-                <p className="text-sm text-gray-600">{currentStep}</p>
-              )}
+              {currentStep && <p className="text-sm text-gray-600">{currentStep}</p>}
             </div>
           </div>
           {isInProgress && onCancel && (
@@ -188,7 +189,9 @@ export function ImportProgress({
               </div>
               <div>
                 <span className="font-medium">Modifié:</span>
-                <span className="ml-1">{new Date(file.lastModified).toLocaleDateString('fr-FR')}</span>
+                <span className="ml-1">
+                  {new Date(file.lastModified).toLocaleDateString('fr-FR')}
+                </span>
               </div>
             </div>
           </div>
@@ -202,7 +205,10 @@ export function ImportProgress({
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className={cn('h-2 rounded-full transition-all duration-300', getProgressBarColor())}
+                className={cn(
+                  'h-2 rounded-full transition-all duration-300',
+                  getProgressBarColor()
+                )}
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -211,9 +217,7 @@ export function ImportProgress({
         {/* Time Info */}
         {(timeElapsed || timeRemaining) && (
           <div className="flex justify-between text-sm text-gray-600">
-            {timeElapsed && (
-              <span>Temps écoulé: {formatTime(timeElapsed)}</span>
-            )}
+            {timeElapsed && <span>Temps écoulé: {formatTime(timeElapsed)}</span>}
             {timeRemaining && isInProgress && (
               <span>Temps restant: {formatTime(timeRemaining)}</span>
             )}
@@ -255,9 +259,7 @@ export function ImportProgress({
         {errors.length > 0 && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-red-800">
-                Erreurs ({errors.length})
-              </h4>
+              <h4 className="text-sm font-medium text-red-800">Erreurs ({errors.length})</h4>
               {onDownloadErrorReport && (
                 <button
                   onClick={onDownloadErrorReport}
@@ -272,9 +274,7 @@ export function ImportProgress({
                 <div key={index} className="text-sm">
                   <span className="font-medium text-red-700">Ligne {error.row}:</span>
                   <span className="text-red-600 ml-2">{error.message}</span>
-                  {error.column && (
-                    <span className="text-red-500 ml-2">({error.column})</span>
-                  )}
+                  {error.column && <span className="text-red-500 ml-2">({error.column})</span>}
                 </div>
               ))}
               {errors.length > 5 && (
@@ -302,9 +302,7 @@ export function ImportProgress({
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center gap-2">
               <XCircle className="h-4 w-4 text-red-600" />
-              <span className="text-sm font-medium text-red-800">
-                L'import a échoué
-              </span>
+              <span className="text-sm font-medium text-red-800">L'import a échoué</span>
             </div>
             <p className="text-sm text-red-700 mt-1">
               Veuillez vérifier les erreurs ci-dessus et réessayer
@@ -316,9 +314,7 @@ export function ImportProgress({
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="flex items-center gap-2">
               <XCircle className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-800">
-                Import annulé
-              </span>
+              <span className="text-sm font-medium text-gray-800">Import annulé</span>
             </div>
             <p className="text-sm text-gray-700 mt-1">
               L'opération d'import a été annulée par l'utilisateur

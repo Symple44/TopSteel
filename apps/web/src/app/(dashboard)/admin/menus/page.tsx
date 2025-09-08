@@ -18,24 +18,27 @@ import { Button } from '@erp/ui/primitives'
 import { Download, Play, Plus, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api-client'
+import { deleteTyped, ensureDataProperty, postTyped } from '@/lib/api-typed'
+import type { MenuConfiguration, MenuItem } from '@/types/menu'
 import { MenuConfigurationEditor } from './components/menu-configuration-editor'
 import { MenuConfigurationList } from './components/menu-configuration-list'
 import { MenuPreview } from './components/menu-preview'
 
-interface MenuConfiguration {
+// API version with optional fields that we need to convert
+interface ApiMenuConfiguration {
   id: string
   name: string
   description?: string
   isActive: boolean
   isSystem: boolean
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
   createdBy?: string
-  items?: MenuItem[] // Make items optional since it's not always present
+  items?: MenuItem[]
 }
 
-interface MenuItem {
-  id: string
+interface ApiMenuItem {
+  id?: string
   title: string
   type: 'M' | 'P' | 'L' | 'D'
   icon?: string
@@ -44,8 +47,41 @@ interface MenuItem {
   programId?: string
   externalUrl?: string
   queryBuilderId?: string
-  children: MenuItem[]
+  children: ApiMenuItem[]
+  allowedGroups?: string[]
+  requiredRoles?: string[]
+  requiredPermissions?: string[]
+  inheritFromParent?: boolean
+  isPublic?: boolean
+  badge?: string | number
+  href?: string
+  customIcon?: string
+  customIconColor?: string
 }
+
+// Helper function to convert API response to our expected types
+const convertApiMenuConfiguration = (apiConfig: ApiMenuConfiguration): MenuConfiguration => ({
+  ...apiConfig,
+  createdAt: apiConfig.createdAt || new Date().toISOString(),
+})
+
+const convertApiMenuItem = (apiItem: ApiMenuItem): MenuItem => ({
+  ...apiItem,
+  id: apiItem.id || `menu-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  children: apiItem.children.map(convertApiMenuItem),
+})
+
+// API Response types
+interface ApiResponse<T = any> {
+  data: T
+  success?: boolean
+  message?: string
+}
+
+// Note: This interface is reserved for future API response typing
+// interface ActiveConfigResponse {
+//   configuration: MenuConfiguration
+// }
 
 interface MenuType {
   value: string
@@ -58,7 +94,7 @@ interface MenuType {
 
 export default function MenuAdminPage() {
   const [configurations, setConfigurations] = useState<MenuConfiguration[]>([])
-  const [activeConfig, setActiveConfig] = useState<MenuConfiguration | null>(null)
+  const [_activeConfig, setActiveConfig] = useState<MenuConfiguration | null>(null)
   const [selectedConfig, setSelectedConfig] = useState<MenuConfiguration | null>(null)
   const [selectedConfigItems, setSelectedConfigItems] = useState<MenuItem[]>([])
   const [menuTypes, setMenuTypes] = useState<MenuType[]>([])
@@ -68,18 +104,25 @@ export default function MenuAdminPage() {
   const loadConfigurations = useCallback(async () => {
     try {
       const [configsResponse, activeResponse] = await Promise.all([
-        apiClient.get('/admin/menu-raw/configurations'),
-        apiClient.get('/admin/menu-raw/configurations/active'),
+        apiClient.get<ApiResponse<ApiMenuConfiguration[]>>('/admin/menu-raw/configurations'),
+        apiClient.get<{ data: { configuration: ApiMenuConfiguration } }>(
+          '/admin/menu-raw/configurations/active'
+        ),
       ])
 
       // L'API menu-raw retourne une structure imbriquée: { data: { success: true, data: [...] } }
-      const responseData = configsResponse?.data?.data || configsResponse?.data
-      const configs = Array.isArray(responseData) ? responseData : []
+      const configsData = ensureDataProperty<ApiMenuConfiguration[]>(configsResponse)
+      const responseData = configsData?.data || []
+      const apiConfigs = Array.isArray(responseData) ? responseData : []
+      const configs = apiConfigs.map(convertApiMenuConfiguration)
       setConfigurations(configs)
-      if (activeResponse?.data) {
-        setActiveConfig(activeResponse.data.configuration)
+
+      const activeData = ensureDataProperty<{ configuration: ApiMenuConfiguration }>(activeResponse)
+      if (activeData?.data?.configuration) {
+        const activeConfig = convertApiMenuConfiguration(activeData.data.configuration)
+        setActiveConfig(activeConfig)
         if (!selectedConfig) {
-          setSelectedConfig(activeResponse.data.configuration)
+          setSelectedConfig(activeConfig)
         }
       }
     } catch (_error) {
@@ -90,16 +133,22 @@ export default function MenuAdminPage() {
 
   const loadMenuTypes = useCallback(async () => {
     try {
-      const response = await apiClient.get('/admin/menus/menu-types')
-      setMenuTypes(response?.data?.types || [])
+      const response = await apiClient.get<{ data: { types: MenuType[] } }>(
+        '/admin/menus/menu-types'
+      )
+      const data = ensureDataProperty<{ types: MenuType[] }>(response)
+      setMenuTypes(data?.data?.types || [])
     } catch (_error) {}
   }, [])
 
   const loadMenuItems = useCallback(async (configId: string) => {
     try {
-      const response = await apiClient.get(`/admin/menu-raw/tree?configId=${configId}`)
-      const responseData = response?.data?.data || response?.data
-      const items = Array.isArray(responseData) ? responseData : []
+      const response = await apiClient.get<{ data: ApiMenuItem[] }>(
+        `/admin/menu-raw/tree?configId=${configId}`
+      )
+      const data = ensureDataProperty<ApiMenuItem[]>(response)
+      const apiItems = Array.isArray(data?.data) ? data.data : []
+      const items = apiItems.map(convertApiMenuItem)
       setSelectedConfigItems(items)
     } catch (_error) {
       setSelectedConfigItems([])
@@ -122,7 +171,7 @@ export default function MenuAdminPage() {
 
   const handleActivateConfiguration = async (configId: string) => {
     try {
-      await apiClient.post(`/admin/menus/configurations/${configId}/activate`)
+      await postTyped(`/admin/menus/configurations/${configId}/activate`)
       await loadConfigurations()
     } catch (_error) {}
   }
@@ -133,7 +182,7 @@ export default function MenuAdminPage() {
     }
 
     try {
-      await apiClient.delete(`/admin/menus/configurations/${configId}`)
+      await deleteTyped(`/admin/menus/configurations/${configId}`)
       await loadConfigurations()
       if (selectedConfig?.id === configId) {
         setSelectedConfig(null)
@@ -143,23 +192,24 @@ export default function MenuAdminPage() {
 
   const handleCreateDefault = async () => {
     try {
-      await apiClient.post('/admin/menus/configurations/default')
+      await postTyped('/admin/menus/configurations/default')
       await loadConfigurations()
     } catch (_error) {}
   }
 
   const handleExportConfig = async (configId: string) => {
     try {
-      const response = await apiClient.get(`/admin/menus/configurations/${configId}/export`)
-      const blob = new Blob([JSON.stringify(response?.data, null, 2)], {
+      const response = await apiClient.get<unknown>(`/admin/menus/configurations/${configId}/export`)
+      const data = ensureDataProperty<unknown>(response)
+      const blob = new Blob([JSON.stringify(data?.data, null, 2)], {
         type: 'application/json',
       })
-      const url = URL.createObjectURL(blob)
+      const url = URL?.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       a.download = `menu-config-${configId}.json`
       a.click()
-      URL.revokeObjectURL(url)
+      URL?.revokeObjectURL(url)
     } catch (_error) {}
   }
 
@@ -180,11 +230,11 @@ export default function MenuAdminPage() {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleCreateDefault}>
+          <Button type="button" variant="outline" onClick={handleCreateDefault}>
             <Settings className="h-4 w-4 mr-2" />
             Créer Config. par Défaut
           </Button>
-          <Button onClick={() => setEditMode('create')}>
+          <Button type="button" onClick={() => setEditMode('create')}>
             <Plus className="h-4 w-4 mr-2" />
             Nouvelle Configuration
           </Button>
@@ -204,7 +254,6 @@ export default function MenuAdminPage() {
             <CardContent>
               <MenuConfigurationList
                 configurations={configurations}
-                activeConfig={activeConfig}
                 selectedConfig={selectedConfig}
                 onSelect={(config: MenuConfiguration) => setSelectedConfig(config)}
                 onActivate={handleActivateConfiguration}
@@ -248,8 +297,9 @@ export default function MenuAdminPage() {
                           <CardDescription>{selectedConfig.description}</CardDescription>
                         </div>
                         <div className="flex gap-2">
-                          {!selectedConfig.isActive && (
+                          {!selectedConfig.isActive && selectedConfig.id && (
                             <Button
+                              type="button"
                               size="sm"
                               onClick={() => handleActivateConfiguration(selectedConfig.id)}
                             >
@@ -257,13 +307,16 @@ export default function MenuAdminPage() {
                               Activer
                             </Button>
                           )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleExportConfig(selectedConfig.id)}
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
+                          {selectedConfig.id && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleExportConfig(selectedConfig.id)}
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </CardHeader>

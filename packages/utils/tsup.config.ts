@@ -2,13 +2,13 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: {
-    'index': 'src/index.ts',
+    index: 'src/index.ts',
     'format/index': 'src/format/index.ts',
     'validation/index': 'src/validation/index.ts',
     'calculation/index': 'src/calculation/index.ts',
     'helpers/index': 'src/helpers/index.ts',
     'constants/index': 'src/constants/index.ts',
-    'lib/index': 'src/lib/index.ts'
+    'lib/index': 'src/lib/index.ts',
   },
   format: ['esm', 'cjs'],
   dts: false, // Disabled - will use tsc instead

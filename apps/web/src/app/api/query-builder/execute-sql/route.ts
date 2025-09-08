@@ -3,15 +3,15 @@ import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { sql, limit = 100 } = body
+    const body = await request?.json()
+    const { sql, limit = 100 } = body || {}
 
     if (!sql) {
-      return NextResponse.json({ error: 'SQL query is required' }, { status: 400 })
+      return NextResponse?.json({ error: 'SQL query is required' }, { status: 400 })
     }
 
     // 🔒 Validation SQL basique pour éviter les accès inter-tenant
-    const _sqlLower = sql.toLowerCase().trim()
+    const _sqlLower = sql?.toLowerCase().trim()
 
     const forbiddenPatterns = [
       /\btopsteel_auth\./i,
@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
     ]
 
     for (const pattern of forbiddenPatterns) {
-      if (pattern.test(sql)) {
-        return NextResponse.json(
+      if (pattern?.test(sql)) {
+        return NextResponse?.json(
           { error: 'Query contains forbidden operations or system tables' },
           { status: 400 }
         )
@@ -44,19 +44,19 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({ sql, limit }),
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
-      const actualData = responseData.data || responseData.rows || responseData
-      return NextResponse.json(actualData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      const actualData = responseData?.data || responseData?.rows || responseData
+      return NextResponse?.json(actualData)
     } else {
-      const errorText = await response.text()
-      return NextResponse.json(
-        { error: `Backend responded with ${response.status}: ${errorText}` },
+      const errorText = await response?.text()
+      return NextResponse?.json(
+        { error: `Backend responded with ${response?.status}: ${errorText}` },
         { status: response.status }
       )
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )

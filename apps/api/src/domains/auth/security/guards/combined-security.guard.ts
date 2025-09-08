@@ -145,13 +145,16 @@ export class CombinedSecurityGuard implements CanActivate {
           resource,
           action,
           success: false,
-          errorCode: error.code,
-          errorMessage: error.message,
+          errorCode:
+            error instanceof Error && 'code' in error
+              ? (error as Error & { code: string }).code
+              : 'UNKNOWN',
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
           metadata: {
             route,
             method,
             duration: Date.now() - startTime,
-            stack: error.stack,
+            stack: error instanceof Error ? error.stack : undefined,
           },
         })
       }
@@ -255,11 +258,20 @@ export class CombinedSecurityGuard implements CanActivate {
   /**
    * Obtient l'adresse IP du client
    */
-  private getClientIp(request: any): string {
+  private getClientIp(
+    request: Request & { ip?: string; connection?: { remoteAddress?: string } }
+  ): string {
+    const headers = request.headers as unknown as Record<string, string | string[] | undefined>
+    const forwardedFor = headers['x-forwarded-for']
+    const realIp = headers['x-real-ip']
+    
+    const forwardedForValue = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor
+    const realIpValue = Array.isArray(realIp) ? realIp[0] : realIp
+    
     return (
       request.ip ||
-      request.headers['x-forwarded-for']?.split(',')[0] ||
-      request.headers['x-real-ip'] ||
+      forwardedForValue?.split(',')[0] ||
+      realIpValue ||
       request.connection?.remoteAddress ||
       'unknown'
     )

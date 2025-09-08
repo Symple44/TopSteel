@@ -11,6 +11,11 @@ import {
 import { User } from '../../../users/entities/user.entity'
 
 @Entity('user_sessions')
+@Index(['userId', 'status', 'lastActivity']) // Composite index for user activity queries
+@Index(['userId', 'isActive']) // For active sessions by user
+@Index(['status', 'lastActivity']) // For session cleanup and monitoring
+@Index(['logoutTime']) // For session history queries
+@Index(['ipAddress', 'createdAt']) // For security analysis
 export class UserSession {
   @PrimaryGeneratedColumn('uuid')
   id!: string
@@ -20,13 +25,14 @@ export class UserSession {
   userId!: string
 
   @Column({ type: 'varchar', length: 255, unique: true })
-  @Index()
+  @Index({ unique: true }) // Unique index for session lookup
   sessionId!: string
 
   @Column({ type: 'varchar', length: 255 })
   accessToken!: string
 
   @Column({ type: 'varchar', length: 255, nullable: true })
+  @Index({ where: 'refreshToken IS NOT NULL' }) // Partial index for active refresh tokens
   refreshToken?: string
 
   @Column({ type: 'timestamp' })
@@ -41,20 +47,24 @@ export class UserSession {
   lastActivity!: Date
 
   @Column({ type: 'varchar', nullable: true })
+  @Index() // Index for IP-based security queries
   ipAddress?: string
 
   @Column({ type: 'text', nullable: true })
   userAgent?: string
 
   @Column({ type: 'jsonb', nullable: true })
+  @Index() // GIN index for device info queries
   deviceInfo?: {
     browser: string
     os: string
     device: string
     isMobile: boolean
+    [key: string]: unknown
   }
 
   @Column({ type: 'jsonb', nullable: true })
+  @Index() // GIN index for location-based queries
   location?: {
     city: string
     country: string
@@ -62,6 +72,7 @@ export class UserSession {
     latitude?: number
     longitude?: number
     timezone?: string
+    [key: string]: unknown
   }
 
   @Column({ type: 'boolean', default: true })
@@ -79,12 +90,14 @@ export class UserSession {
   warningCount!: number
 
   @Column({ type: 'uuid', nullable: true })
+  @Index() // Index for forced logout tracking
   forcedLogoutBy?: string
 
   @Column({ type: 'text', nullable: true })
   forcedLogoutReason?: string
 
   @Column({ type: 'jsonb', nullable: true })
+  @Index() // GIN index for metadata queries
   metadata?: Record<string, unknown>
 
   @CreateDateColumn()

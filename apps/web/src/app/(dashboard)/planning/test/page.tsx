@@ -134,7 +134,7 @@ const taskStatusConfig: Record<string, { label: string; color: string }> = {
 }
 
 export default function TestPlanningPage() {
-  const [selectedProject, setSelectedProject] = useState<(typeof projets)[0] | null>(null)
+  const [selectedProject, setSelectedProject] = useState<(typeof planningData)[0] | null>(null)
   const [viewMode, setViewMode] = useState('list') // 'list', 'gantt', 'calendar'
 
   const getProgressBarColor = (progress: number) => {
@@ -155,18 +155,21 @@ export default function TestPlanningPage() {
         </div>
         <div className="flex gap-2">
           <Button
+            type="button"
             variant={viewMode === 'list' ? 'default' : 'outline'}
             onClick={() => setViewMode('list')}
           >
             Liste
           </Button>
           <Button
+            type="button"
             variant={viewMode === 'gantt' ? 'default' : 'outline'}
             onClick={() => setViewMode('gantt')}
           >
             Gantt
           </Button>
           <Button
+            type="button"
             variant={viewMode === 'calendar' ? 'default' : 'outline'}
             onClick={() => setViewMode('calendar')}
           >
@@ -220,7 +223,7 @@ export default function TestPlanningPage() {
       {/* Vue Liste */}
       {viewMode === 'list' && (
         <div className="space-y-4">
-          {planningData.map((projet) => (
+          {planningData?.map((projet) => (
             <Card key={projet.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -230,8 +233,8 @@ export default function TestPlanningPage() {
                       Client: {projet.client} | {projet.dateDebut} - {projet.dateFin}
                     </CardDescription>
                   </div>
-                  <Badge className={`${statusConfig[projet.statut].color} text-white`}>
-                    {statusConfig[projet.statut].label}
+                  <Badge className={`${statusConfig?.[projet.statut]?.color} text-white`}>
+                    {statusConfig?.[projet.statut]?.label}
                   </Badge>
                 </div>
               </CardHeader>
@@ -254,7 +257,7 @@ export default function TestPlanningPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">👥 Équipe:</span>
                   <div className="flex gap-1">
-                    {projet.equipe.map((membre) => (
+                    {projet?.equipe?.map((membre) => (
                       <Badge key={membre} variant="secondary" className="text-xs">
                         {membre}
                       </Badge>
@@ -268,12 +271,12 @@ export default function TestPlanningPage() {
                     <span className="text-sm font-medium">🔧 Tâches</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {projet.taches.map((tache) => (
+                    {projet?.taches?.map((tache) => (
                       <div
                         key={tache.id}
                         className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded"
                       >
-                        <span className={taskStatusConfig[tache.statut].color}>{tache.nom}</span>
+                        <span className={taskStatusConfig?.[tache.statut]?.color}>{tache.nom}</span>
                         <Badge variant="outline" className="text-xs">
                           {tache.progression}%
                         </Badge>
@@ -299,7 +302,7 @@ export default function TestPlanningPage() {
                           ⚠️ {materiau.nom} - {materiau.quantite} {materiau.unite}
                         </Badge>
                       ))}
-                    {projet.materiaux.filter((m) => !m.disponible).length === 0 && (
+                    {projet?.materiaux?.filter((m) => !m.disponible).length === 0 && (
                       <Badge variant="secondary" className="text-xs text-green-700 bg-green-100">
                         ✅ Tous les matériaux disponibles
                       </Badge>
@@ -308,7 +311,12 @@ export default function TestPlanningPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button variant="outline" size="sm" onClick={() => setSelectedProject(projet)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedProject(projet)}
+                  >
                     Voir détails
                   </Button>
                 </div>
@@ -327,12 +335,12 @@ export default function TestPlanningPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {planningData.map((projet) => (
+              {planningData?.map((projet) => (
                 <div key={projet.id} className="flex items-center gap-4">
                   <div className="w-48 text-sm font-medium truncate">{projet.projet}</div>
                   <div className="flex-1 relative h-10 bg-gray-100 rounded">
                     <div
-                      className={`absolute h-full rounded ${statusConfig[projet.statut].color}`}
+                      className={`absolute h-full rounded ${statusConfig?.[projet.statut]?.color}`}
                       style={{
                         left: '10%',
                         width: '40%',
@@ -413,7 +421,9 @@ export default function TestPlanningPage() {
             </CardHeader>
             <CardContent>
               {/* Contenu détaillé ici */}
-              <Button onClick={() => setSelectedProject(null)}>Fermer</Button>
+              <Button type="button" onClick={() => setSelectedProject(null)}>
+                Fermer
+              </Button>
             </CardContent>
           </Card>
         </div>

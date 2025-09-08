@@ -49,11 +49,11 @@ export interface ConditionTemplate {
   icon?: React.ReactNode
   conditions: PricingCondition[]
 }
-interface ConditionGroup {
-  id: string
-  operator: 'AND' | 'OR'
-  conditions: (PricingCondition & { id: string })[]
-}
+// interface ConditionGroup {
+//   id: string
+//   operator: 'AND' | 'OR'
+//   conditions: (PricingCondition & { id: string })[]
+// }
 const CONDITION_TYPES = [
   {
     value: 'quantity',
@@ -195,7 +195,7 @@ export function ConditionBuilder({
   templates = DEFAULT_TEMPLATES,
 }: ConditionBuilderProps) {
   const [expandedConditions, setExpandedConditions] = useState<Set<number>>(new Set())
-  const [testContext, setTestContext] = useState<Record<string, any>>({
+  const [testContext, setTestContext] = useState<Record<string, unknown>>({
     quantity: 10,
     customer_group: 'PARTICULIER',
     customer_email: 'test@example.com',
@@ -282,7 +282,7 @@ export function ConditionBuilder({
     })
   }, [])
   const evaluateCondition = useCallback(
-    (condition: PricingCondition, context: Record<string, any>): boolean => {
+    (condition: PricingCondition, context: Record<string, unknown>): boolean => {
       const contextValue = context[condition.type] || context[condition.field || '']
       switch (condition.operator) {
         case 'equals':
@@ -549,6 +549,7 @@ export function ConditionBuilder({
                   <div className="flex items-center gap-2">
                     <SimpleTooltip content="Dupliquer">
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => duplicateCondition(index)}
@@ -558,7 +559,12 @@ export function ConditionBuilder({
                       </Button>
                     </SimpleTooltip>
                     <SimpleTooltip content={isExpanded ? 'Réduire' : 'Développer'}>
-                      <Button variant="ghost" size="sm" onClick={() => toggleExpanded(index)}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleExpanded(index)}
+                      >
                         {isExpanded ? (
                           <ChevronUp className="w-4 h-4" />
                         ) : (
@@ -567,7 +573,12 @@ export function ConditionBuilder({
                       </Button>
                     </SimpleTooltip>
                     <SimpleTooltip content="Supprimer">
-                      <Button variant="ghost" size="sm" onClick={() => removeCondition(index)}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeCondition(index)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </SimpleTooltip>
@@ -663,7 +674,7 @@ export function ConditionBuilder({
       </div>
       {/* Bouton d'ajout */}
       {conditions.length < maxConditions && (
-        <Button onClick={() => addCondition()} variant="outline" className="w-full">
+        <Button type="button" onClick={() => addCondition()} variant="outline" className="w-full">
           <Plus className="w-4 h-4 mr-2" />
           Ajouter une condition ({conditions.length}/{maxConditions})
         </Button>

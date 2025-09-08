@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode } from 'react'
+import { createContext, type ReactNode, useContext } from 'react'
 import type { DataTableState, UseDataTableStateReturn } from '../hooks/useDataTableState'
 
 /**
@@ -23,10 +23,7 @@ export interface DataTableProviderProps<T = any> {
   value: DataTableContextValue<T>
 }
 
-export function DataTableProvider<T = any>({ 
-  children, 
-  value 
-}: DataTableProviderProps<T>) {
+export function DataTableProvider<T = any>({ children, value }: DataTableProviderProps<T>) {
   return (
     <DataTableContext.Provider value={value as DataTableContextValue}>
       {children}
@@ -40,13 +37,11 @@ export function DataTableProvider<T = any>({
  */
 export function useDataTableContext<T = any>(): DataTableContextValue<T> {
   const context = useContext(DataTableContext)
-  
+
   if (!context) {
-    throw new Error(
-      'useDataTableContext doit être utilisé à l\'intérieur d\'un DataTableProvider'
-    )
+    throw new Error("useDataTableContext doit être utilisé à l'intérieur d'un DataTableProvider")
   }
-  
+
   return context as DataTableContextValue<T>
 }
 
@@ -63,7 +58,7 @@ export function useDataTableState<T = any>(): DataTableState<T> {
  */
 export function useDataTableFilters<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     filters: context.state.filters,
     searchTerm: context.state.searchTerm,
@@ -83,7 +78,7 @@ export function useDataTableFilters<T = any>() {
  */
 export function useDataTableSort<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     sortConfig: context.state.sortConfig,
     handleSort: context.handleSort,
@@ -96,7 +91,7 @@ export function useDataTableSort<T = any>() {
  */
 export function useDataTableSelection<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     selection: context.state.selection,
     selectedData: context.state.selectedData,
@@ -112,7 +107,7 @@ export function useDataTableSelection<T = any>() {
  */
 export function useDataTablePagination<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     currentPage: context.state.currentPage,
     pageSize: context.state.pageSize,
@@ -130,7 +125,7 @@ export function useDataTablePagination<T = any>() {
  */
 export function useDataTableExport<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     isExporting: context.state.isExporting,
     exportData: context.exportData,
@@ -142,7 +137,7 @@ export function useDataTableExport<T = any>() {
  */
 export function useDataTableColumns<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     columns: context.state.columns,
     visibleColumns: context.state.visibleColumns,
@@ -157,7 +152,7 @@ export function useDataTableColumns<T = any>() {
  */
 export function useDataTableData<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     data: context.state.data,
     processedData: context.state.processedData,
@@ -170,7 +165,7 @@ export function useDataTableData<T = any>() {
  */
 export function useDataTableSettings<T = any>() {
   const context = useDataTableContext<T>()
-  
+
   return {
     settings: context.state.settings,
     updateSettings: context.updateSettings,

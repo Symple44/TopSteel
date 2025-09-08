@@ -1,17 +1,16 @@
 'use client'
-import { useState, useCallback } from 'react'
-import { Calendar, Clock, X, ChevronDown } from 'lucide-react'
+import { Calendar, ChevronDown, Clock, X } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
 import { Button } from '../../../primitives/button/Button'
 import { Input } from '../../../primitives/input/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
-import { cn } from '../../../../lib/utils'
 export interface DateRange {
   from?: string
   to?: string
 }
-export type DatePreset = 
+export type DatePreset =
   | 'today'
   | 'yesterday'
   | 'last_7_days'
@@ -59,8 +58,8 @@ const datePresets: Array<{ value: DatePreset; label: string }> = [
 export function DateRangeFilter({
   value,
   onChange,
-  label = "Période",
-  placeholder = "Sélectionner une période...",
+  label = 'Période',
+  placeholder = 'Sélectionner une période...',
   disabled = false,
   showPresets = true,
   showTime = false,
@@ -72,140 +71,168 @@ export function DateRangeFilter({
   const [dateRange, setDateRange] = useState<DateRange>(value || {})
   const [selectedPreset, setSelectedPreset] = useState<DatePreset | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    if (showTime) {
-      const hours = String(date.getHours()).padStart(2, '0')
-      const minutes = String(date.getMinutes()).padStart(2, '0')
-      return `${year}-${month}-${day}T${hours}:${minutes}`
-    }
-    return `${year}-${month}-${day}`
-  }
-  const getDateFromPreset = useCallback((preset: DatePreset): DateRange => {
-    const now = new Date()
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    switch (preset) {
-      case 'today':
-        return {
-          from: formatDate(today),
-          to: formatDate(today)
+  const formatDate = useCallback(
+    (date: Date): string => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      if (showTime) {
+        const hours = String(date.getHours()).padStart(2, '0')
+        const minutes = String(date.getMinutes()).padStart(2, '0')
+        return `${year}-${month}-${day}T${hours}:${minutes}`
+      }
+      return `${year}-${month}-${day}`
+    },
+    [showTime]
+  )
+  const getDateFromPreset = useCallback(
+    (preset: DatePreset): DateRange => {
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      switch (preset) {
+        case 'today':
+          return {
+            from: formatDate(today),
+            to: formatDate(today),
+          }
+        case 'yesterday': {
+          const yesterday = new Date(today)
+          yesterday.setDate(yesterday.getDate() - 1)
+          return {
+            from: formatDate(yesterday),
+            to: formatDate(yesterday),
+          }
         }
-      case 'yesterday':
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        return {
-          from: formatDate(yesterday),
-          to: formatDate(yesterday)
+        case 'last_7_days': {
+          const last7Days = new Date(today)
+          last7Days.setDate(last7Days.getDate() - 6)
+          return {
+            from: formatDate(last7Days),
+            to: formatDate(today),
+          }
         }
-      case 'last_7_days':
-        const last7Days = new Date(today)
-        last7Days.setDate(last7Days.getDate() - 6)
-        return {
-          from: formatDate(last7Days),
-          to: formatDate(today)
+        case 'last_30_days': {
+          const last30Days = new Date(today)
+          last30Days.setDate(last30Days.getDate() - 29)
+          return {
+            from: formatDate(last30Days),
+            to: formatDate(today),
+          }
         }
-      case 'last_30_days':
-        const last30Days = new Date(today)
-        last30Days.setDate(last30Days.getDate() - 29)
-        return {
-          from: formatDate(last30Days),
-          to: formatDate(today)
+        case 'last_90_days': {
+          const last90Days = new Date(today)
+          last90Days.setDate(last90Days.getDate() - 89)
+          return {
+            from: formatDate(last90Days),
+            to: formatDate(today),
+          }
         }
-      case 'last_90_days':
-        const last90Days = new Date(today)
-        last90Days.setDate(last90Days.getDate() - 89)
-        return {
-          from: formatDate(last90Days),
-          to: formatDate(today)
+        case 'this_week': {
+          const thisWeekStart = new Date(today)
+          const dayOfWeek = thisWeekStart.getDay()
+          const diff = thisWeekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) // Monday as first day
+          thisWeekStart.setDate(diff)
+          return {
+            from: formatDate(thisWeekStart),
+            to: formatDate(today),
+          }
         }
-      case 'this_week':
-        const thisWeekStart = new Date(today)
-        const dayOfWeek = thisWeekStart.getDay()
-        const diff = thisWeekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) // Monday as first day
-        thisWeekStart.setDate(diff)
-        return {
-          from: formatDate(thisWeekStart),
-          to: formatDate(today)
+        case 'this_month': {
+          const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+          return {
+            from: formatDate(thisMonthStart),
+            to: formatDate(today),
+          }
         }
-      case 'this_month':
-        const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
-        return {
-          from: formatDate(thisMonthStart),
-          to: formatDate(today)
+        case 'this_quarter': {
+          const currentQuarter = Math.floor(today.getMonth() / 3)
+          const thisQuarterStart = new Date(today.getFullYear(), currentQuarter * 3, 1)
+          return {
+            from: formatDate(thisQuarterStart),
+            to: formatDate(today),
+          }
         }
-      case 'this_quarter':
-        const currentQuarter = Math.floor(today.getMonth() / 3)
-        const thisQuarterStart = new Date(today.getFullYear(), currentQuarter * 3, 1)
-        return {
-          from: formatDate(thisQuarterStart),
-          to: formatDate(today)
+        case 'this_year': {
+          const thisYearStart = new Date(today.getFullYear(), 0, 1)
+          return {
+            from: formatDate(thisYearStart),
+            to: formatDate(today),
+          }
         }
-      case 'this_year':
-        const thisYearStart = new Date(today.getFullYear(), 0, 1)
-        return {
-          from: formatDate(thisYearStart),
-          to: formatDate(today)
+        case 'previous_week': {
+          const prevWeekEnd = new Date(today)
+          const prevWeekDayOfWeek = prevWeekEnd.getDay()
+          const prevWeekDiff =
+            prevWeekEnd.getDate() - prevWeekDayOfWeek + (prevWeekDayOfWeek === 0 ? -6 : 1) - 7
+          prevWeekEnd.setDate(prevWeekDiff + 6)
+          const prevWeekStart = new Date(prevWeekEnd)
+          prevWeekStart.setDate(prevWeekStart.getDate() - 6)
+          return {
+            from: formatDate(prevWeekStart),
+            to: formatDate(prevWeekEnd),
+          }
         }
-      case 'previous_week':
-        const prevWeekEnd = new Date(today)
-        const prevWeekDayOfWeek = prevWeekEnd.getDay()
-        const prevWeekDiff = prevWeekEnd.getDate() - prevWeekDayOfWeek + (prevWeekDayOfWeek === 0 ? -6 : 1) - 7
-        prevWeekEnd.setDate(prevWeekDiff + 6)
-        const prevWeekStart = new Date(prevWeekEnd)
-        prevWeekStart.setDate(prevWeekStart.getDate() - 6)
-        return {
-          from: formatDate(prevWeekStart),
-          to: formatDate(prevWeekEnd)
+        case 'previous_month': {
+          const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+          const prevMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0)
+          return {
+            from: formatDate(prevMonth),
+            to: formatDate(prevMonthEnd),
+          }
         }
-      case 'previous_month':
-        const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-        const prevMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0)
-        return {
-          from: formatDate(prevMonth),
-          to: formatDate(prevMonthEnd)
+        case 'previous_quarter': {
+          const prevQuarter = Math.floor(today.getMonth() / 3) - 1
+          const prevQuarterYear = prevQuarter < 0 ? today.getFullYear() - 1 : today.getFullYear()
+          const prevQuarterMonth = prevQuarter < 0 ? 9 : prevQuarter * 3
+          const prevQuarterStart = new Date(prevQuarterYear, prevQuarterMonth, 1)
+          const prevQuarterEnd = new Date(prevQuarterYear, prevQuarterMonth + 3, 0)
+          return {
+            from: formatDate(prevQuarterStart),
+            to: formatDate(prevQuarterEnd),
+          }
         }
-      case 'previous_quarter':
-        const prevQuarter = Math.floor(today.getMonth() / 3) - 1
-        const prevQuarterYear = prevQuarter < 0 ? today.getFullYear() - 1 : today.getFullYear()
-        const prevQuarterMonth = prevQuarter < 0 ? 9 : prevQuarter * 3
-        const prevQuarterStart = new Date(prevQuarterYear, prevQuarterMonth, 1)
-        const prevQuarterEnd = new Date(prevQuarterYear, prevQuarterMonth + 3, 0)
-        return {
-          from: formatDate(prevQuarterStart),
-          to: formatDate(prevQuarterEnd)
+        case 'previous_year': {
+          const prevYear = today.getFullYear() - 1
+          const prevYearStart = new Date(prevYear, 0, 1)
+          const prevYearEnd = new Date(prevYear, 11, 31)
+          return {
+            from: formatDate(prevYearStart),
+            to: formatDate(prevYearEnd),
+          }
         }
-      case 'previous_year':
-        const prevYear = today.getFullYear() - 1
-        const prevYearStart = new Date(prevYear, 0, 1)
-        const prevYearEnd = new Date(prevYear, 11, 31)
-        return {
-          from: formatDate(prevYearStart),
-          to: formatDate(prevYearEnd)
-        }
-      default:
-        return {}
-    }
-  }, [showTime])
-  const updateDateRange = useCallback((newRange: DateRange) => {
-    setDateRange(newRange)
-    onChange?.(newRange.from || newRange.to ? newRange : null)
-  }, [onChange])
-  const handlePresetSelect = useCallback((preset: DatePreset) => {
-    setSelectedPreset(preset)
-    if (preset === 'custom') {
-      setIsExpanded(true)
-      return
-    }
-    const range = getDateFromPreset(preset)
-    updateDateRange(range)
-    setIsExpanded(false)
-  }, [getDateFromPreset, updateDateRange])
-  const handleCustomDateChange = useCallback((field: 'from' | 'to', value: string) => {
-    const newRange = { ...dateRange, [field]: value }
-    updateDateRange(newRange)
-  }, [dateRange, updateDateRange])
+        default:
+          return {}
+      }
+    },
+    [formatDate]
+  )
+  const updateDateRange = useCallback(
+    (newRange: DateRange) => {
+      setDateRange(newRange)
+      onChange?.(newRange.from || newRange.to ? newRange : null)
+    },
+    [onChange]
+  )
+  const handlePresetSelect = useCallback(
+    (preset: DatePreset) => {
+      setSelectedPreset(preset)
+      if (preset === 'custom') {
+        setIsExpanded(true)
+        return
+      }
+      const range = getDateFromPreset(preset)
+      updateDateRange(range)
+      setIsExpanded(false)
+    },
+    [getDateFromPreset, updateDateRange]
+  )
+  const handleCustomDateChange = useCallback(
+    (field: 'from' | 'to', value: string) => {
+      const newRange = { ...dateRange, [field]: value }
+      updateDateRange(newRange)
+    },
+    [dateRange, updateDateRange]
+  )
   const clearDateRange = useCallback(() => {
     setDateRange({})
     setSelectedPreset(null)
@@ -214,15 +241,13 @@ export function DateRangeFilter({
   }, [onChange])
   const getDisplayText = useCallback(() => {
     if (selectedPreset && selectedPreset !== 'custom') {
-      return datePresets.find(p => p.value === selectedPreset)?.label || placeholder
+      return datePresets.find((p) => p.value === selectedPreset)?.label || placeholder
     }
     if (dateRange.from || dateRange.to) {
-      const fromDisplay = dateRange.from 
+      const fromDisplay = dateRange.from
         ? new Date(dateRange.from).toLocaleDateString('fr-FR')
         : '...'
-      const toDisplay = dateRange.to 
-        ? new Date(dateRange.to).toLocaleDateString('fr-FR')
-        : '...'
+      const toDisplay = dateRange.to ? new Date(dateRange.to).toLocaleDateString('fr-FR') : '...'
       if (dateRange.from && dateRange.to) {
         return `${fromDisplay} - ${toDisplay}`
       } else if (dateRange.from) {
@@ -251,10 +276,7 @@ export function DateRangeFilter({
           disabled={disabled}
           className="w-full justify-between"
         >
-          <span className={cn(
-            "truncate",
-            !hasValue && "text-muted-foreground"
-          )}>
+          <span className={cn('truncate', !hasValue && 'text-muted-foreground')}>
             {getDisplayText()}
           </span>
           <div className="flex items-center gap-1">
@@ -267,16 +289,15 @@ export function DateRangeFilter({
                 }}
               />
             )}
-            <ChevronDown className={cn(
-              'h-4 w-4 transition-transform',
-              isExpanded && 'rotate-180'
-            )} />
+            <ChevronDown
+              className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')}
+            />
           </div>
         </Button>
         {/* Active Filter Badge */}
         {hasValue && (
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
           >
             1
@@ -293,9 +314,10 @@ export function DateRangeFilter({
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {datePresets.slice(0, -1).map((preset) => (
                   <Button
+                    type="button"
                     key={preset.value}
                     type="button"
-                    variant={selectedPreset === preset.value ? "default" : "outline"}
+                    variant={selectedPreset === preset.value ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handlePresetSelect(preset.value)}
                     disabled={disabled}
@@ -322,7 +344,7 @@ export function DateRangeFilter({
               <div className="space-y-2">
                 <Label className="text-xs">Date de début</Label>
                 <Input
-                  type={showTime ? "datetime-local" : "date"}
+                  type={showTime ? 'datetime-local' : 'date'}
                   value={dateRange.from || ''}
                   onChange={(e) => handleCustomDateChange('from', e.target.value)}
                   disabled={disabled}
@@ -333,7 +355,7 @@ export function DateRangeFilter({
               <div className="space-y-2">
                 <Label className="text-xs">Date de fin</Label>
                 <Input
-                  type={showTime ? "datetime-local" : "date"}
+                  type={showTime ? 'datetime-local' : 'date'}
                   value={dateRange.to || ''}
                   onChange={(e) => handleCustomDateChange('to', e.target.value)}
                   disabled={disabled}

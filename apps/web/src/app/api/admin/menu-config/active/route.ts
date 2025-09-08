@@ -177,9 +177,9 @@ export async function GET(_request: NextRequest) {
       message: 'Configuration de menu standard récupérée avec succès',
     }
 
-    return NextResponse.json(response, { status: 200 })
+    return NextResponse?.json(response, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors du chargement de la configuration de menu',

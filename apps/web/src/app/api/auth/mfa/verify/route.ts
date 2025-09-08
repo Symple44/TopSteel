@@ -3,12 +3,12 @@ import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { userId, mfaType, code, webauthnResponse } = body
+    const body = await request?.json()
+    const { userId, mfaType, code, webauthnResponse } = body || {}
 
     // Validation des données
     if (!userId || !mfaType) {
-      return NextResponse.json(
+      return NextResponse?.json(
         { error: 'Données manquantes: userId et mfaType requis' },
         { status: 400 }
       )
@@ -25,21 +25,21 @@ export async function POST(request: NextRequest) {
       }),
     })
 
-    if (!apiResponse.ok) {
-      const errorData = await apiResponse.json().catch(() => ({ error: 'Erreur API backend' }))
-      return NextResponse.json(
+    if (!apiResponse?.ok) {
+      const errorData = await apiResponse?.json().catch(() => ({ error: 'Erreur API backend' }))
+      return NextResponse?.json(
         { error: errorData.error || 'Erreur lors de la vérification MFA' },
         { status: apiResponse.status }
       )
     }
 
-    const verificationData = await apiResponse.json()
+    const verificationData = await apiResponse?.json()
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
-      data: verificationData.data,
+      data: verificationData?.data,
     })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

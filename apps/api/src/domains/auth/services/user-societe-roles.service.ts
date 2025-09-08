@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
+import type { Permission, PermissionService } from './permission.service'
 import type { PermissionCalculatorService } from './permission-calculator.service'
-import { PermissionService, Permission } from './permission.service'
 
 export interface UserSocieteRoleWithPermissions {
   userId: string
@@ -88,7 +88,7 @@ export class UserSocieteRolesService {
           societeId: row.societeId,
           societe: {
             id: row.societe_id || row.societeId,
-            nom: row.societe_nom || `Société ${(row as any).societeId.substring(0, 8)}...`,
+            nom: row.societe_nom || `Société ${(row as unknown).societeId.substring(0, 8)}...`,
             code: row.societe_code || 'N/A',
           },
           roleType: row.roleType || 'USER',
@@ -129,7 +129,7 @@ export class UserSocieteRolesService {
         action: string
         accessLevel: 'BLOCKED' | 'READ' | 'WRITE' | 'DELETE' | 'ADMIN'
         isGranted: boolean
-      }> = userPermissions.map(perm => {
+      }> = userPermissions.map((perm) => {
         const [resource, action] = perm.split('.')
         return {
           id: perm,
@@ -137,7 +137,7 @@ export class UserSocieteRolesService {
           resource,
           action,
           accessLevel: this.getAccessLevelForPermission(perm),
-          isGranted: true
+          isGranted: true,
         }
       })
 
@@ -201,7 +201,7 @@ export class UserSocieteRolesService {
   ): Promise<boolean> {
     // Construire le nom de la permission
     const permissionName = `${resource}.${action}` as Permission
-    
+
     // Vérifier si l'utilisateur a la permission
     const hasPermission = await this.permissionService.hasPermission(
       userId,
@@ -218,16 +218,18 @@ export class UserSocieteRolesService {
     const levels = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
     const userLevel = levels.indexOf(accessLevel)
     const requiredLevelIndex = levels.indexOf(requiredLevel)
-    
+
     return userLevel >= requiredLevelIndex && userLevel > 0 // BLOCKED = 0
   }
 
   /**
    * Détermine le niveau d'accès pour une permission
    */
-  private getAccessLevelForPermission(permission: string): 'BLOCKED' | 'READ' | 'WRITE' | 'DELETE' | 'ADMIN' {
+  private getAccessLevelForPermission(
+    permission: string
+  ): 'BLOCKED' | 'READ' | 'WRITE' | 'DELETE' | 'ADMIN' {
     const [, action] = permission.split('.')
-    
+
     switch (action) {
       case 'view':
         return 'READ'

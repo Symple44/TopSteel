@@ -156,10 +156,10 @@ export async function GET(_request: NextRequest) {
       message: 'Menu standard récupéré avec succès',
     }
 
-    return NextResponse.json(response, { status: 200 })
+    return NextResponse?.json(response, { status: 200 })
   } catch (error) {
     // Error loading menu tree (silenced)
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Error loading menu tree',

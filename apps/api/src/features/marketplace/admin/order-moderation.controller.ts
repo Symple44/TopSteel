@@ -328,7 +328,7 @@ export class OrderModerationController {
     const pendingOrders = result.orders
       .filter((order) => order.status === 'PENDING')
       .sort((a, b) => {
-        const priorityOrder = { URGENT: 4, HIGH: 3, MEDIUM: 2, LOW: 1 }
+        const priorityOrder: Record<string, number> = { URGENT: 4, HIGH: 3, MEDIUM: 2, LOW: 1 }
         return priorityOrder[b.priority] - priorityOrder[a.priority]
       })
 

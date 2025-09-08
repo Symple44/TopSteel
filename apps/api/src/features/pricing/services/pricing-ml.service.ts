@@ -276,7 +276,7 @@ export class PricingMLService {
     }
 
     const input = tf.tensor2d([features])
-    const prediction = this.model.predict(input) as any
+    const prediction = this.model.predict(input) as unknown
     const result = await prediction.data()
 
     input.dispose()
@@ -430,7 +430,10 @@ export class PricingMLService {
       batchSize: 32,
       validationSplit: 0.2,
       callbacks: {
-        onEpochEnd: (epoch, logs) => {
+        onEpochEnd: (
+          epoch: number,
+          logs?: { loss?: number; [key: string]: number | undefined }
+        ) => {
           this.logger.debug(`Epoch ${epoch}: loss = ${logs?.loss}`)
         },
       },

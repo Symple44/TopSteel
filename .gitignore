@@ -18,19 +18,52 @@ build/
 out/
 *.tsbuildinfo
 
-# Environment files
+# Environment files - CRITICAL SECURITY
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+.env.staging
 .env.vault
 .env.vault.local
 .env.encrypted
+.env.security
 *.env
+*.env.*
 *.env.backup.*
+!.env.example
+!.env.security.example
+
+# Security & Secrets - NEVER COMMIT
 **/secrets/**
 **/certificates/**
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+private.key
+public.key
+jwt.key
+ssl/
+
+# Sensitive configuration
+config/production.json
+config/staging.json
+config/secrets.json
+ormconfig.json
+ormconfig.js
+
+# Backup files that might contain secrets
+*.backup
+*.bak
+*.old
+*.orig
+*~
 
 # Logs
 logs/
@@ -40,6 +73,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+turbo-*.log
+typescript-errors.log
 
 # OS files
 .DS_Store
@@ -69,6 +104,10 @@ Desktop.ini
 *.swo
 *~
 .cache/
+*.bak
+*.old
+nul
+temp_output.txt
 
 # Turbo
 .turbo/
@@ -156,3 +195,20 @@ uploads/
 
 # Backup Database
 sql/backups/
+
+# Security-related files (TopSteel)
+.secrets
+.secrets.*
+*.secrets
+secrets/
+.vault
+.vault.*
+*.generated
+security-report-*.md
+.env.*.generated
+.env.staging
+*.p12
+*.jks
+*.keystore
+auth_keys/
+private_keys/

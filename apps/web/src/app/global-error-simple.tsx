@@ -18,7 +18,7 @@ export default function GlobalError({
             onClick={reset}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
+                e?.preventDefault()
                 reset()
               }
             }}

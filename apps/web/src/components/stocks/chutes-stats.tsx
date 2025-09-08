@@ -20,7 +20,7 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
   const statCards = [
     {
       title: 'Total Chutes',
-      value: stats.totalChutes.toLocaleString(),
+      value: stats?.totalChutes?.toLocaleString(),
       icon: Package,
       description: 'Références en stock',
       color: 'text-blue-600',
@@ -28,7 +28,7 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
     },
     {
       title: 'Valeur Totale',
-      value: `${stats.valeurTotale.toLocaleString()} €`,
+      value: `${stats?.valeurTotale?.toLocaleString()} €`,
       icon: DollarSign,
       description: 'Valeur estimée',
       color: 'text-green-600',
@@ -44,7 +44,7 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
     },
     {
       title: 'Économies',
-      value: `${stats.economiesRealisees.toLocaleString()} €`,
+      value: `${stats?.economiesRealisees?.toLocaleString()} €`,
       icon: TrendingUp,
       description: `+${stats.evolutionMois}% ce mois`,
       color: 'text-orange-600',
@@ -56,7 +56,7 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
     <div className="space-y-6">
       {/* Statistiques principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat) => {
+        {statCards?.map((stat) => {
           const Icon = stat.icon
 
           return (
@@ -175,7 +175,7 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
 
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
-                {stats.economiesRealisees.toLocaleString()} €
+                {stats?.economiesRealisees?.toLocaleString()} €
               </div>
               <p className="text-sm text-muted-foreground mt-1">Économies réalisées</p>
               <div className="mt-2">

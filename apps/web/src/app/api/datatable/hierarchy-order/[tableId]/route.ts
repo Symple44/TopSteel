@@ -20,8 +20,8 @@ export async function GET(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId } = await params
@@ -59,13 +59,13 @@ export async function GET(
       },
     ]
 
-    return NextResponse.json({
+    return NextResponse?.json({
       table_id: tableId,
       user_id: 'mock-user',
       items: mockHierarchyOrder,
     })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -76,16 +76,21 @@ export async function PUT(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId } = await params
+
+    if (!request) {
+      return NextResponse?.json({ error: 'Requête invalide' }, { status: 400 })
+    }
+
     const { items }: HierarchyUpdateRequest = await request.json()
 
     // Valider les données
     if (!Array.isArray(items)) {
-      return NextResponse.json({ error: 'Format de données invalide' }, { status: 400 })
+      return NextResponse?.json({ error: 'Format de données invalide' }, { status: 400 })
     }
 
     // Valider chaque élément
@@ -95,17 +100,17 @@ export async function PUT(
         typeof item.display_order !== 'number' ||
         typeof item.level !== 'number'
       ) {
-        return NextResponse.json({ error: "Données d'élément invalides" }, { status: 400 })
+        return NextResponse?.json({ error: "Données d'élément invalides" }, { status: 400 })
       }
     }
 
     // Générer les chemins hiérarchiques
-    const processedItems = items.map((item) => ({
+    const processedItems = items?.map((item) => ({
       ...item,
       path: generatePath(item, items),
     }))
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       table_id: tableId,
       user_id: 'mock-user',
@@ -113,7 +118,7 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -124,12 +129,12 @@ export async function POST(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId: _tableId } = await params
-    const newItem: Omit<HierarchyOrderItem, 'path'> = await request.json()
+    const newItem: Omit<HierarchyOrderItem, 'path'> = await request?.json()
 
     // Valider les données
     if (
@@ -137,7 +142,7 @@ export async function POST(
       typeof newItem.display_order !== 'number' ||
       typeof newItem.level !== 'number'
     ) {
-      return NextResponse.json({ error: 'Données invalides' }, { status: 400 })
+      return NextResponse?.json({ error: 'Données invalides' }, { status: 400 })
     }
 
     // Simuler l'ajout en base de données
@@ -148,7 +153,7 @@ export async function POST(
         : `${newItem.display_order}`,
     }
 
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: true,
         item: processedItem,
@@ -157,7 +162,7 @@ export async function POST(
       { status: 201 }
     )
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -168,36 +173,36 @@ export async function DELETE(
 ) {
   try {
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { tableId: _tableId } = await params
     const { searchParams } = new URL(request.url)
-    const itemId = searchParams.get('itemId')
+    const itemId = searchParams?.get('itemId')
 
     if (!itemId) {
-      return NextResponse.json({ error: "ID d'élément requis" }, { status: 400 })
+      return NextResponse?.json({ error: "ID d'élément requis" }, { status: 400 })
     }
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       deleted_item_id: itemId,
     })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
 // Fonction utilitaire pour générer les chemins hiérarchiques
 function generatePath(item: HierarchyOrderItem, allItems: HierarchyOrderItem[]): string {
   if (!item.parent_id) {
-    return item.display_order.toString()
+    return item?.display_order?.toString()
   }
 
-  const parent = allItems.find((i) => i.item_id === item.parent_id)
+  const parent = allItems?.find((i) => i.item_id === item.parent_id)
   if (!parent) {
-    return item.display_order.toString()
+    return item?.display_order?.toString()
   }
 
   const parentPath = generatePath(parent, allItems)

@@ -61,9 +61,9 @@ const getStatusBadge = (statut: string) => {
     refuse: { label: 'Refusé', variant: 'destructive' as const },
   }
 
-  const config = statusConfig[statut as keyof typeof statusConfig] || statusConfig.brouillon
+  const config = statusConfig[statut as keyof typeof statusConfig] || statusConfig?.brouillon
 
-  return <Badge variant={config.variant}>{config.label}</Badge>
+  return <Badge variant={config?.variant}>{config?.label}</Badge>
 }
 
 interface DevisTableProps {
@@ -87,7 +87,7 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((devis) => (
+          {data?.map((devis) => (
             <TableRow key={devis.id}>
               <TableCell className="font-medium">{devis.reference}</TableCell>
               <TableCell>{devis.clientNom}</TableCell>
@@ -98,15 +98,15 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
               <TableCell>{formatDate(devis.dateValidite)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-2">
-                  <Button variant="ghost" size="sm">
+                  <Button type="button" variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button type="button" variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button type="button" variant="ghost" size="sm">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

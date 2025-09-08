@@ -2,6 +2,8 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+// Entités API (entitites)
+import { UiPreferencesReorderableList } from '../../api/entities/ui-preferences-reorderable-list.entity'
 import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
 import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
 import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
@@ -36,7 +38,19 @@ import { DatabaseSyncService } from './database-sync.service'
         const host = configService.get<string>('DB_HOST') || 'localhost'
         const port = configService.get<number>('DB_PORT') || 5432
         const username = configService.get<string>('DB_USERNAME') || 'postgres'
-        const password = configService.get<string>('DB_PASSWORD') || 'postgres'
+        const password = (() => {
+          const pwd = configService.get<string>('DB_PASSWORD')
+          const nodeEnv = configService.get<string>('NODE_ENV')
+
+          if (!pwd) {
+            if (nodeEnv === 'production') {
+              throw new Error('DB_PASSWORD environment variable is required in production')
+            }
+            // Use development default password for non-production environments
+            return 'dev_password'
+          }
+          return pwd
+        })()
         const database = configService.get<string>('DB_NAME') || 'erp_topsteel'
         const _synchronize = true // Activé pour créer les tables automatiquement
         const logging = configService.get<boolean>('DB_LOGGING') || false
@@ -53,6 +67,9 @@ import { DatabaseSyncService } from './database-sync.service'
           MenuItemRole,
           UserMenuPreferences,
           UserMenuItemPreference,
+
+          // Entités API
+          UiPreferencesReorderableList,
 
           // Entités auth
           UserSession,

@@ -11,9 +11,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       method: 'GET',
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
-      return NextResponse.json(responseData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      return NextResponse?.json(responseData)
     } else {
       // Fallback avec des données mock
       const mockSociete = {
@@ -52,13 +52,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ],
       }
 
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: mockSociete,
       })
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )

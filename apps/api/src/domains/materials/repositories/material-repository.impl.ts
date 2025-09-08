@@ -68,7 +68,8 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   }
 
   async update(id: string, entity: Partial<Material>): Promise<Material> {
-    await this.repository.update(id, entity as unknown)
+    // TypeORM type issue - entity is compatible but type system doesn't recognize it
+    await this.repository.update(id, entity as Parameters<typeof this.repository.update>[1])
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Material with id ${id} not found after update`)
@@ -565,36 +566,44 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     ])
 
     // Construire les objets de répartition
-    const repartitionParType: Record<MaterialType, number> = {} as any
+    const repartitionParType: Record<MaterialType, number> = {} as unknown
     Object.values(MaterialType).forEach((type) => {
       repartitionParType[type] = 0
     })
-    typeStats.forEach((stat) => {
-      repartitionParType[stat.type] = parseInt(stat.count)
+    typeStats.forEach((stat: { type: string; count: string }) => {
+      if (stat.type in MaterialType) {
+        repartitionParType[stat.type as MaterialType] = parseInt(stat.count, 10)
+      }
     })
 
-    const repartitionParForme: Record<MaterialShape, number> = {} as any
+    const repartitionParForme: Record<MaterialShape, number> = {} as unknown
     Object.values(MaterialShape).forEach((forme) => {
       repartitionParForme[forme] = 0
     })
-    formeStats.forEach((stat) => {
-      repartitionParForme[stat.forme] = parseInt(stat.count)
+    formeStats.forEach((stat: { forme: string; count: string }) => {
+      if (stat.forme in MaterialShape) {
+        repartitionParForme[stat.forme as MaterialShape] = parseInt(stat.count, 10)
+      }
     })
 
-    const repartitionParStatus: Record<MaterialStatus, number> = {} as any
+    const repartitionParStatus: Record<MaterialStatus, number> = {} as unknown
     Object.values(MaterialStatus).forEach((status) => {
       repartitionParStatus[status] = 0
     })
-    statusStats.forEach((stat) => {
-      repartitionParStatus[stat.status] = parseInt(stat.count)
+    statusStats.forEach((stat: { status: string; count: string }) => {
+      if (stat.status in MaterialStatus) {
+        repartitionParStatus[stat.status as MaterialStatus] = parseInt(stat.count, 10)
+      }
     })
 
-    const repartitionParStockage: Record<StorageMethod, number> = {} as any
+    const repartitionParStockage: Record<StorageMethod, number> = {} as unknown
     Object.values(StorageMethod).forEach((method) => {
       repartitionParStockage[method] = 0
     })
-    stockageStats.forEach((stat) => {
-      repartitionParStockage[stat.methodeStockage] = parseInt(stat.count)
+    stockageStats.forEach((stat: { methodeStockage: string; count: string }) => {
+      if (stat.methodeStockage in StorageMethod) {
+        repartitionParStockage[stat.methodeStockage as StorageMethod] = parseInt(stat.count, 10)
+      }
     })
 
     return {
@@ -769,7 +778,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       .groupBy('material.type')
       .getRawMany()
 
-    const valuation: Record<MaterialType, { quantite: number; valeur: number }> = {} as any
+    const valuation: Record<MaterialType, { quantite: number; valeur: number }> = {} as unknown
 
     // Initialiser avec 0 pour tous les types
     Object.values(MaterialType).forEach((type) => {
@@ -777,10 +786,12 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     })
 
     // Remplir avec les données réelles
-    result.forEach((row) => {
-      valuation[row.type] = {
-        quantite: parseFloat(row.quantite || '0'),
-        valeur: parseFloat(row.valeur || '0'),
+    result.forEach((row: { type: string; quantite: string; valeur: string }) => {
+      if (row.type in MaterialType) {
+        valuation[row.type as MaterialType] = {
+          quantite: parseFloat(row.quantite || '0'),
+          valeur: parseFloat(row.valeur || '0'),
+        }
       }
     })
 
@@ -800,7 +811,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
       .groupBy('material.forme')
       .getRawMany()
 
-    const valuation: Record<MaterialShape, { quantite: number; valeur: number }> = {} as any
+    const valuation: Record<MaterialShape, { quantite: number; valeur: number }> = {} as unknown
 
     // Initialiser avec 0 pour toutes les formes
     Object.values(MaterialShape).forEach((shape) => {
@@ -808,10 +819,12 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     })
 
     // Remplir avec les données réelles
-    result.forEach((row) => {
-      valuation[row.forme] = {
-        quantite: parseFloat(row.quantite || '0'),
-        valeur: parseFloat(row.valeur || '0'),
+    result.forEach((row: { forme: string; quantite: string; valeur: string }) => {
+      if (row.forme in MaterialShape) {
+        valuation[row.forme as MaterialShape] = {
+          quantite: parseFloat(row.quantite || '0'),
+          valeur: parseFloat(row.valeur || '0'),
+        }
       }
     })
 
@@ -1049,7 +1062,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: any): Promise<Material[]> {
+  async findBySpecification(_spec: unknown): Promise<Material[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

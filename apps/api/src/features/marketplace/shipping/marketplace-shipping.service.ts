@@ -5,9 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
 import type { Repository } from 'typeorm'
+import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import type { EmailService } from '../../../core/email/email.service'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 import { MarketplaceShipment } from '../entities/marketplace-shipment.entity'
+import { ShippingMethod, TrackingStatus } from '../types/shipping.types'
 
 export interface CreateShipmentDto {
   orderId: string
@@ -33,22 +35,8 @@ export interface TrackingUpdate {
   nextAction?: string
 }
 
-export enum TrackingStatus {
-  LABEL_CREATED = 'LABEL_CREATED',
-  IN_TRANSIT = 'IN_TRANSIT',
-  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
-  DELIVERED = 'DELIVERED',
-  DELIVERY_FAILED = 'DELIVERY_FAILED',
-  RETURNED = 'RETURNED',
-  EXCEPTION = 'EXCEPTION',
-}
-
-export enum ShippingMethod {
-  STANDARD = 'STANDARD',
-  EXPRESS = 'EXPRESS',
-  OVERNIGHT = 'OVERNIGHT',
-  PICKUP = 'PICKUP',
-}
+// Re-export types for backward compatibility
+export { ShippingMethod, TrackingStatus } from '../types/shipping.types'
 
 @Injectable()
 export class MarketplaceShippingService {
@@ -144,7 +132,10 @@ export class MarketplaceShippingService {
 
       return savedShipment
     } catch (error) {
-      this.logger.error(`Failed to create shipment: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to create shipment: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       throw error
     }
   }
@@ -196,7 +187,10 @@ export class MarketplaceShippingService {
 
       return updatedShipment
     } catch (error) {
-      this.logger.error(`Failed to update tracking info: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to update tracking info: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       throw error
     }
   }
@@ -266,7 +260,7 @@ export class MarketplaceShippingService {
 
       return shipments
     } catch (error) {
-      this.logger.error(`Failed to get customer shipments: ${error.message}`, error)
+      this.logger.error(`Failed to get customer shipments: ${getErrorMessage(error)}`, error)
       return []
     }
   }
@@ -274,7 +268,7 @@ export class MarketplaceShippingService {
   /**
    * Calculate shipping cost based on order and destination
    */
-  async calculateShippingCost(order: any, shippingMethod: ShippingMethod): Promise<number> {
+  async calculateShippingCost(order: unknown, shippingMethod: ShippingMethod): Promise<number> {
     try {
       // This is a simplified calculation
       // In production, this would integrate with carrier APIs
@@ -307,7 +301,7 @@ export class MarketplaceShippingService {
       return Math.round(cost * 100) / 100 // Round to 2 decimals
     } catch (error) {
       this.logger.error('Failed to calculate shipping cost:', error)
-      const baseRates = {
+      const baseRates: Record<string, number> = {
         STANDARD: 5.99,
         EXPRESS: 12.99,
         PREMIUM: 19.99,
@@ -428,7 +422,7 @@ export class MarketplaceShippingService {
         timestamp: update.timestamp,
       })
     } catch (error) {
-      this.logger.error(`Failed to handle tracking status update: ${error.message}`, error)
+      this.logger.error(`Failed to handle tracking status update: ${getErrorMessage(error)}`, error)
     }
   }
 
@@ -530,7 +524,7 @@ export class MarketplaceShippingService {
       const cacheKey = `tracking:${trackingNumber}`
       await this.redisService.del(cacheKey)
     } catch (error) {
-      this.logger.error(`Failed to clear tracking cache: ${error.message}`)
+      this.logger.error(`Failed to clear tracking cache: ${getErrorMessage(error)}`)
     }
   }
 

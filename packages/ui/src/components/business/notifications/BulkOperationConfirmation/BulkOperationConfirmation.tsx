@@ -1,8 +1,8 @@
 'use client'
+import { AlertTriangle, Calendar, Factory, Hash, Package, Users } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives'
-import { AlertTriangle, Package, Factory, Users, Calendar, Hash } from 'lucide-react'
-export type BulkOperationType = 
+export type BulkOperationType =
   | 'delete_orders'
   | 'update_prices'
   | 'change_status'
@@ -24,7 +24,11 @@ export interface BulkOperationConfirmationProps {
   items: BulkOperationItem[]
   targetValue?: string
   estimatedDuration?: number
-  onConfirm: (data: { operation: BulkOperationType; items: BulkOperationItem[]; targetValue?: string }) => Promise<void>
+  onConfirm: (data: {
+    operation: BulkOperationType
+    items: BulkOperationItem[]
+    targetValue?: string
+  }) => Promise<void>
 }
 const operationConfig = {
   delete_orders: {
@@ -33,7 +37,7 @@ const operationConfig = {
     icon: AlertTriangle,
     variant: 'destructive' as const,
     actionText: 'Supprimer',
-    warningText: 'Cette action est irréversible'
+    warningText: 'Cette action est irréversible',
   },
   update_prices: {
     title: 'Mettre à jour les prix',
@@ -41,7 +45,7 @@ const operationConfig = {
     icon: Package,
     variant: 'default' as const,
     actionText: 'Mettre à jour',
-    warningText: 'Les prix seront modifiés immédiatement'
+    warningText: 'Les prix seront modifiés immédiatement',
   },
   change_status: {
     title: 'Changer le statut',
@@ -49,7 +53,7 @@ const operationConfig = {
     icon: Factory,
     variant: 'default' as const,
     actionText: 'Changer',
-    warningText: 'Le statut sera mis à jour pour tous les éléments'
+    warningText: 'Le statut sera mis à jour pour tous les éléments',
   },
   assign_supplier: {
     title: 'Assigner un fournisseur',
@@ -57,7 +61,7 @@ const operationConfig = {
     icon: Users,
     variant: 'default' as const,
     actionText: 'Assigner',
-    warningText: 'Le fournisseur sera changé pour tous les articles'
+    warningText: 'Le fournisseur sera changé pour tous les articles',
   },
   update_delivery_dates: {
     title: 'Mettre à jour les dates de livraison',
@@ -65,7 +69,7 @@ const operationConfig = {
     icon: Calendar,
     variant: 'default' as const,
     actionText: 'Mettre à jour',
-    warningText: 'Les dates seront mises à jour automatiquement'
+    warningText: 'Les dates seront mises à jour automatiquement',
   },
   archive_projects: {
     title: 'Archiver les projets',
@@ -73,7 +77,7 @@ const operationConfig = {
     icon: Package,
     variant: 'default' as const,
     actionText: 'Archiver',
-    warningText: 'Les projets ne seront plus visibles dans la liste active'
+    warningText: 'Les projets ne seront plus visibles dans la liste active',
   },
   export_data: {
     title: 'Exporter les données',
@@ -81,8 +85,8 @@ const operationConfig = {
     icon: Hash,
     variant: 'default' as const,
     actionText: 'Exporter',
-    warningText: 'L\'export peut prendre quelques minutes'
-  }
+    warningText: "L'export peut prendre quelques minutes",
+  },
 }
 export function BulkOperationConfirmation({
   open,
@@ -102,8 +106,7 @@ export function BulkOperationConfirmation({
     try {
       await onConfirm({ operation, items, targetValue })
       onOpenChange(false)
-    } catch (error) {
-      console.error('Bulk operation failed:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -124,9 +127,7 @@ export function BulkOperationConfirmation({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {config.description}
-            </p>
+            <p className="text-sm text-muted-foreground">{config.description}</p>
             {targetValue && (
               <div className="bg-muted p-3 rounded-lg">
                 <p className="text-sm font-medium">Nouvelle valeur:</p>
@@ -134,16 +135,12 @@ export function BulkOperationConfirmation({
               </div>
             )}
             <div className="border rounded-lg p-4 max-h-64 overflow-y-auto">
-              <h4 className="text-sm font-medium mb-3">
-                Éléments sélectionnés ({items.length})
-              </h4>
+              <h4 className="text-sm font-medium mb-3">Éléments sélectionnés ({items.length})</h4>
               <div className="space-y-2">
                 {items.slice(0, 10).map((item) => (
                   <div key={item.id} className="flex justify-between items-center text-sm">
                     <span className="font-medium">{item.name}</span>
-                    {item.type && (
-                      <span className="text-muted-foreground">{item.type}</span>
-                    )}
+                    {item.type && <span className="text-muted-foreground">{item.type}</span>}
                   </div>
                 ))}
                 {items.length > 10 && (
@@ -175,11 +172,7 @@ export function BulkOperationConfirmation({
             >
               Annuler
             </Button>
-            <Button 
-              type="submit" 
-              disabled={loading}
-              variant={config.variant}
-            >
+            <Button type="submit" disabled={loading} variant={config.variant}>
               {loading ? 'En cours...' : config.actionText}
             </Button>
           </div>

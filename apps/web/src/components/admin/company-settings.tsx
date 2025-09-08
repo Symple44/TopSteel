@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, Button, Input, Label } from '@erp/ui'
+import { Avatar, Button, Input, Label, useFormFieldIds } from '@erp/ui'
 import { RotateCcw, Save, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { toast } from 'sonner'
@@ -8,6 +8,14 @@ import { useSystemParameters } from '@/hooks/use-system-parameters'
 import { useTranslation } from '@/lib/i18n'
 
 export function CompanySettings() {
+  const ids = useFormFieldIds([
+    'company-name',
+    'company-siret',
+    'company-vat',
+    'company-email',
+    'company-phone',
+    'company-address',
+  ])
   const { t } = useTranslation('admin')
   const { parameters, updateParameter, resetToDefaults, saveParameters } = useSystemParameters()
 
@@ -18,9 +26,9 @@ export function CompanySettings() {
   const handleSave = async () => {
     try {
       await saveParameters()
-      toast.success(t('saveSuccess'))
+      toast?.success(t('saveSuccess'))
     } catch (_error) {
-      toast.error(t('saveError'))
+      toast?.error(t('saveError'))
     }
   }
 
@@ -28,9 +36,9 @@ export function CompanySettings() {
     if (confirm(t('resetConfirm'))) {
       try {
         await resetToDefaults()
-        toast.success(t('resetSuccess'))
+        toast?.success(t('resetSuccess'))
       } catch (_error) {
-        toast.error(t('resetError'))
+        toast?.error(t('resetError'))
       }
     }
   }
@@ -40,11 +48,11 @@ export function CompanySettings() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">{t('company.title')}</h2>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={handleReset}>
+          <Button type="button" variant="outline" onClick={handleReset}>
             <RotateCcw className="mr-2 h-4 w-4" />
             {t('common.reset')}
           </Button>
-          <Button onClick={handleSave}>
+          <Button type="button" onClick={handleSave}>
             <Save className="mr-2 h-4 w-4" />
             {t('common.save')}
           </Button>
@@ -53,74 +61,74 @@ export function CompanySettings() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="company-name">{t('company.name')}</Label>
+          <Label htmlFor={ids['company-name']}>{t('company.name')}</Label>
           <Input
-            id="company-name"
+            id={ids['company-name']}
             value={parameters?.COMPANY_NAME || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleInputChange('COMPANY_NAME', e.target.value)
+              handleInputChange('COMPANY_NAME', e?.target?.value)
             }
             placeholder="TopSteel Métallerie"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="company-siret">{t('company.siret')}</Label>
+          <Label htmlFor={ids['company-siret']}>{t('company.siret')}</Label>
           <Input
-            id="company-siret"
+            id={ids['company-siret']}
             value={parameters?.COMPANY_SIRET || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleInputChange('COMPANY_SIRET', e.target.value)
+              handleInputChange('COMPANY_SIRET', e?.target?.value)
             }
             placeholder="12345678901234"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="company-vat">{t('company.vat')}</Label>
+          <Label htmlFor={ids['company-vat']}>{t('company.vat')}</Label>
           <Input
-            id="company-vat"
+            id={ids['company-vat']}
             value={parameters?.COMPANY_TVA || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleInputChange('COMPANY_TVA', e.target.value)
+              handleInputChange('COMPANY_TVA', e?.target?.value)
             }
             placeholder="FR12345678901"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="company-email">{t('company.email')}</Label>
+          <Label htmlFor={ids['company-email']}>{t('company.email')}</Label>
           <Input
-            id="company-email"
+            id={ids['company-email']}
             type="email"
             value={parameters?.COMPANY_EMAIL || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleInputChange('COMPANY_EMAIL', e.target.value)
+              handleInputChange('COMPANY_EMAIL', e?.target?.value)
             }
             placeholder="contact@topsteel.tech"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="company-phone">{t('company.phone')}</Label>
+          <Label htmlFor={ids['company-phone']}>{t('company.phone')}</Label>
           <Input
-            id="company-phone"
+            id={ids['company-phone']}
             type="tel"
             value={parameters?.COMPANY_PHONE || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleInputChange('COMPANY_PHONE', e.target.value)
+              handleInputChange('COMPANY_PHONE', e?.target?.value)
             }
             placeholder="+33 1 23 45 67 89"
           />
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="company-address">{t('company.address')}</Label>
+          <Label htmlFor={ids['company-address']}>{t('company.address')}</Label>
           <Input
-            id="company-address"
+            id={ids['company-address']}
             value={parameters?.COMPANY_ADDRESS || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleInputChange('COMPANY_ADDRESS', e.target.value)
+              handleInputChange('COMPANY_ADDRESS', e?.target?.value)
             }
             placeholder="123 Rue de l'Industrie, 69001 Lyon, France"
           />
@@ -133,7 +141,7 @@ export function CompanySettings() {
           <Avatar className="h-24 w-24">
             <Image src="/logo.png" alt="Company Logo" width={96} height={96} />
           </Avatar>
-          <Button variant="outline">
+          <Button type="button" variant="outline">
             <Upload className="mr-2 h-4 w-4" />
             {t('company.uploadLogo')}
           </Button>

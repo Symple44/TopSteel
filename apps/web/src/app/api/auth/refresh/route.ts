@@ -8,11 +8,11 @@ export async function POST(req: NextRequest) {
     const tokens = await getTokensFromCookies(req)
 
     // Essayer aussi depuis le body pour la compatibilité
-    const body = await req.json().catch(() => ({}))
-    const refreshToken = tokens?.refreshToken || body.refreshToken
+    const body = await req?.json().catch(() => ({}))
+    const refreshToken = tokens?.refreshToken || body?.refreshToken
 
     if (!refreshToken) {
-      return NextResponse.json({ error: 'No refresh token found' }, { status: 401 })
+      return NextResponse?.json({ error: 'No refresh token found' }, { status: 401 })
     }
 
     // Rediriger vers l'API backend
@@ -21,14 +21,14 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ refreshToken }),
     })
 
-    const data = await response.json()
+    const data = await response?.json()
 
-    if (!response.ok) {
-      return NextResponse.json(data, { status: response.status })
+    if (!response?.ok) {
+      return NextResponse?.json(data, { status: response.status })
     }
 
     // Créer la réponse avec les nouvelles données
-    const nextResponse = NextResponse.json({
+    const nextResponse = NextResponse?.json({
       success: true,
       accessToken: data.accessToken,
       expiresIn: data.expiresIn,
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     return nextResponse
   } catch (_error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse?.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     const tokens = await getTokensFromCookies(request)
 
     if (!tokens) {
-      return NextResponse.json({
+      return NextResponse?.json({
         needsRefresh: false,
         isAuthenticated: false,
       })
@@ -68,13 +68,13 @@ export async function GET(request: NextRequest) {
 
     const needsRefresh = areTokensExpired(tokens)
 
-    return NextResponse.json({
+    return NextResponse?.json({
       needsRefresh,
       isAuthenticated: true,
       expiresAt: tokens.expiresAt,
     })
   } catch {
-    return NextResponse.json({
+    return NextResponse?.json({
       needsRefresh: false,
       isAuthenticated: false,
     })

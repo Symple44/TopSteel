@@ -6,7 +6,7 @@ import { Client } from '@elastic/elasticsearch'
 
 async function checkElasticsearch() {
   const client = new Client({
-    node: 'http://localhost:9200',
+    node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200',
     auth: {
       username: 'elastic',
       password: 'elastic123',
@@ -32,7 +32,7 @@ async function checkElasticsearch() {
     })
 
     console.log('📄 Exemples de documents:')
-    sample.hits.hits.forEach((hit: any, index) => {
+    sample.hits.hits.forEach((hit: unknown, index) => {
       console.log(`\nDocument ${index + 1}:`)
       console.log('  Type:', hit._source.type)
       console.log('  Title:', hit._source.title)
@@ -56,7 +56,7 @@ async function checkElasticsearch() {
     console.log(`Résultats trouvés: ${ipeSearch.hits.total.value}`)
     if (ipeSearch.hits.hits.length > 0) {
       console.log('Premiers résultats:')
-      ipeSearch.hits.hits.forEach((hit: any) => {
+      ipeSearch.hits.hits.forEach((hit: unknown) => {
         console.log(`  - ${hit._source.title} (tenantId: ${hit._source.tenantId})`)
       })
     }
@@ -78,7 +78,7 @@ async function checkElasticsearch() {
 
     const tenantBuckets = tenantAgg.aggregations?.tenants?.buckets || []
     if (tenantBuckets.length > 0) {
-      tenantBuckets.forEach((bucket: any) => {
+      tenantBuckets.forEach((bucket: unknown) => {
         console.log(`  - ${bucket.key}: ${bucket.doc_count} documents`)
       })
     } else {

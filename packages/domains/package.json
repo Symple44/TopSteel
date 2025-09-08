@@ -58,12 +58,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "set NODE_OPTIONS=--max-old-space-size=8192 && tsup",
     "dev": "tsup --watch",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --watchAll=false",
     "lint": "eslint .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^9.1.1",
@@ -93,12 +96,18 @@
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
+    "@jest/globals": "^30.0.5",
+    "@swc/jest": "^0.2.39",
     "@types/jest": "^30.0.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^30.0.5",
+    "jsdom": "^26.1.0",
+    "ts-jest": "^29.4.1",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
   },
   "publishConfig": {
     "access": "restricted"
-  }
+  },
+  "sideEffects": false
 }

@@ -11,7 +11,7 @@ export default function QueryBuilderPage() {
   const { t } = useTranslation('queryBuilder')
 
   useEffect(() => {
-    router.push('/query-builder/new')
+    router?.push('/query-builder/new')
   }, [router])
 
   return (

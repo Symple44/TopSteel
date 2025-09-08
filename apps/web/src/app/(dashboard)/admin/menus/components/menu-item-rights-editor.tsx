@@ -114,16 +114,16 @@ export function MenuItemRightsEditor({
 
   // Simuler l'accès pour un groupe donné
   const simulateAccess = (groupId: string) => {
-    const group = availableGroups.find((g) => g.id === groupId)
+    const group = availableGroups?.find((g) => g.id === groupId)
     if (!group) return { hasAccess: false, reason: 'Groupe non trouvé' }
 
     if (isPublic) return { hasAccess: true, reason: 'Élément public' }
 
-    if (effectiveRights.groups.length === 0 && effectiveRights.roles.length === 0) {
+    if (effectiveRights?.groups?.length === 0 && effectiveRights?.roles?.length === 0) {
       return { hasAccess: true, reason: 'Aucune restriction' }
     }
 
-    if (effectiveRights.groups.includes(groupId)) {
+    if (effectiveRights?.groups?.includes(groupId)) {
       return { hasAccess: true, reason: 'Groupe autorisé' }
     }
 
@@ -142,7 +142,7 @@ export function MenuItemRightsEditor({
     if (checked) {
       setRequiredPermissions([...requiredPermissions, permissionId])
     } else {
-      setRequiredPermissions(requiredPermissions.filter((p) => p !== permissionId))
+      setRequiredPermissions(requiredPermissions?.filter((p) => p !== permissionId))
     }
   }
 
@@ -155,7 +155,7 @@ export function MenuItemRightsEditor({
       )
     }
 
-    if (effectiveRights.inheritedFrom) {
+    if (effectiveRights?.inheritedFrom) {
       return (
         <Badge variant="outline" className="text-blue-700 bg-blue-50">
           ⬆️ Hérité
@@ -163,7 +163,7 @@ export function MenuItemRightsEditor({
       )
     }
 
-    if (!effectiveRights.isRestricted) {
+    if (!effectiveRights?.isRestricted) {
       return (
         <Badge variant="outline" className="text-gray-600">
           🔓 Libre accès
@@ -189,6 +189,7 @@ export function MenuItemRightsEditor({
           </CardTitle>
           <div className="flex items-center gap-2">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => setShowAdvanced(!showAdvanced)}
@@ -273,21 +274,21 @@ export function MenuItemRightsEditor({
                 )}
               </Label>
               <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
-                {availableGroups.map((group) => (
-                  <div key={group.id} className="flex items-center space-x-2 p-2 rounded border">
+                {availableGroups?.map((group) => (
+                  <div key={group?.id} className="flex items-center space-x-2 p-2 rounded border">
                     <Checkbox
-                      checked={allowedGroups.includes(group.id)}
+                      checked={allowedGroups?.includes(group?.id)}
                       onCheckedChange={(checked) => {
                         if (checked) {
-                          setAllowedGroups([...allowedGroups, group.id])
+                          setAllowedGroups([...allowedGroups, group?.id])
                         } else {
-                          setAllowedGroups(allowedGroups.filter((g) => g !== group.id))
+                          setAllowedGroups(allowedGroups?.filter((g) => g !== group?.id))
                         }
                       }}
                     />
-                    <Label htmlFor={`group-${group.id}`} className="text-sm cursor-pointer flex-1">
-                      <div className="font-medium">{group.name}</div>
-                      <div className="text-xs text-muted-foreground">{group.description}</div>
+                    <Label htmlFor={`group-${group?.id}`} className="text-sm cursor-pointer flex-1">
+                      <div className="font-medium">{group?.name}</div>
+                      <div className="text-xs text-muted-foreground">{group?.description}</div>
                     </Label>
                   </div>
                 ))}
@@ -309,24 +310,27 @@ export function MenuItemRightsEditor({
                     )}
                   </Label>
                   <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                    {availableRoles.map((role) => (
-                      <div key={role.id} className="flex items-center space-x-2 p-2 rounded border">
+                    {availableRoles?.map((role) => (
+                      <div
+                        key={role?.id}
+                        className="flex items-center space-x-2 p-2 rounded border"
+                      >
                         <Checkbox
-                          checked={requiredRoles.includes(role.id)}
+                          checked={requiredRoles?.includes(role?.id)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setRequiredRoles([...requiredRoles, role.id])
+                              setRequiredRoles([...requiredRoles, role?.id])
                             } else {
-                              setRequiredRoles(requiredRoles.filter((r) => r !== role.id))
+                              setRequiredRoles(requiredRoles?.filter((r) => r !== role?.id))
                             }
                           }}
                         />
                         <Label
-                          htmlFor={`role-${role.id}`}
+                          htmlFor={`role-${role?.id}`}
                           className="text-sm cursor-pointer flex-1"
                         >
-                          {role.name}
-                          {role.isSystemRole && (
+                          {role?.name}
+                          {role?.isSystemRole && (
                             <Badge variant="secondary" className="ml-1 text-xs">
                               Système
                             </Badge>
@@ -350,13 +354,13 @@ export function MenuItemRightsEditor({
                   </Label>
                   <div className="max-h-40 overflow-y-auto border rounded-md">
                     {Object.entries(
-                      availablePermissions.reduce(
+                      availablePermissions?.reduce(
                         (acc, permission) => {
                           const module = permission.module
                           if (!acc[module]) {
                             acc[module] = []
                           }
-                          acc[module].push(permission)
+                          acc?.[module]?.push(permission)
                           return acc
                         },
                         {} as Record<string, Permission[]>
@@ -365,10 +369,10 @@ export function MenuItemRightsEditor({
                       <div key={module} className="p-3 border-b last:border-b-0">
                         <h4 className="font-medium text-sm mb-2 text-blue-600">{module}</h4>
                         <div className="space-y-2">
-                          {permissions.map((permission) => (
+                          {permissions?.map((permission) => (
                             <div key={permission.id} className="flex items-center space-x-2">
                               <Checkbox
-                                checked={requiredPermissions.includes(permission.id)}
+                                checked={requiredPermissions?.includes(permission.id)}
                                 onCheckedChange={(checked) =>
                                   handlePermissionsChange(permission.id, checked as boolean)
                                 }
@@ -408,9 +412,9 @@ export function MenuItemRightsEditor({
                 <SelectValue placeholder="Tester avec un groupe..." />
               </SelectTrigger>
               <SelectContent>
-                {availableGroups.map((group) => (
-                  <SelectItem key={group.id} value={group.id}>
-                    {group.name}
+                {availableGroups?.map((group) => (
+                  <SelectItem key={group?.id} value={group?.id}>
+                    {group?.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -431,19 +435,19 @@ export function MenuItemRightsEditor({
               </div>
             )}
 
-            {effectiveRights.inheritedFrom && (
+            {effectiveRights?.inheritedFrom && (
               <div className="flex items-center gap-2 text-sm text-blue-700">
                 <Info className="h-4 w-4" />
-                Droits hérités de "{effectiveRights.inheritedFrom}"
+                Droits hérités de "{effectiveRights?.inheritedFrom}"
               </div>
             )}
 
-            {effectiveRights.groups.length > 0 && (
+            {effectiveRights?.groups?.length > 0 && (
               <div className="text-sm">
                 <span className="font-medium">Groupes: </span>
-                {effectiveRights.groups
+                {effectiveRights?.groups
                   .map((groupId) => {
-                    const group = availableGroups.find((g) => g.id === groupId)
+                    const group = availableGroups?.find((g) => g.id === groupId)
                     return group?.name
                   })
                   .filter(Boolean)
@@ -451,12 +455,12 @@ export function MenuItemRightsEditor({
               </div>
             )}
 
-            {effectiveRights.roles.length > 0 && (
+            {effectiveRights?.roles?.length > 0 && (
               <div className="text-sm">
                 <span className="font-medium">Rôles requis: </span>
-                {effectiveRights.roles
+                {effectiveRights?.roles
                   .map((roleId) => {
-                    const role = availableRoles.find((r) => r.id === roleId)
+                    const role = availableRoles?.find((r) => r.id === roleId)
                     return role?.name
                   })
                   .filter(Boolean)
@@ -464,7 +468,7 @@ export function MenuItemRightsEditor({
               </div>
             )}
 
-            {!isPublic && !effectiveRights.isRestricted && (
+            {!isPublic && !effectiveRights?.isRestricted && (
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <AlertTriangle className="h-4 w-4" />
                 Aucune restriction - accessible à tous les utilisateurs connectés
@@ -477,18 +481,18 @@ export function MenuItemRightsEditor({
             <div className="p-3 rounded-lg border">
               {(() => {
                 const access = simulateAccess(selectedPreviewGroup)
-                const group = availableGroups.find((g) => g.id === selectedPreviewGroup)
+                const group = availableGroups?.find((g) => g.id === selectedPreviewGroup)
                 return (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {access.hasAccess ? (
+                      {access?.hasAccess ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <XCircle className="h-4 w-4 text-red-500" />
                       )}
                       <span className="font-medium">{group?.name}</span>
                     </div>
-                    <div className="text-sm text-muted-foreground">{access.reason}</div>
+                    <div className="text-sm text-muted-foreground">{access?.reason}</div>
                   </div>
                 )
               })()}

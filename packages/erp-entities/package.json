@@ -10,15 +10,22 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "typeorm": "^0.3.25"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@vitest/ui": "^3.2.4",
+    "happy-dom": "^18.0.1",
     "tsup": "^8.5.0",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4"
   },
   "publishConfig": {
     "access": "restricted"

@@ -1,3 +1,9 @@
+import type {
+  AggregationsAggregationContainer,
+  SearchSuggester,
+  SortCombinations,
+} from '@elastic/elasticsearch/lib/api/types'
+
 // Common types for search system
 export interface SearchMetadata {
   [key: string]: string | number | boolean | Date | null | undefined
@@ -266,11 +272,11 @@ export interface ElasticsearchQuery {
     post_tags: string[]
     fields: Record<string, Record<string, unknown>>
   }
-  suggest?: Record<string, unknown>
-  aggs?: Record<string, unknown>
+  suggest?: SearchSuggester
+  aggs?: Record<string, AggregationsAggregationContainer>
   from?: number
   size?: number
-  sort?: Array<Record<string, unknown>>
+  sort?: SortCombinations[]
 }
 
 // Request types from Express

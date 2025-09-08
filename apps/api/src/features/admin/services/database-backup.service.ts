@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 
 const execAsync = promisify(exec)
 
@@ -78,7 +79,7 @@ export class DatabaseBackupService {
         throw new Error('Ce service ne supporte que PostgreSQL')
       }
 
-      const pgOptions = connectionOptions as any
+      const pgOptions = connectionOptions as unknown
       const pgDumpCommand = [
         'pg_dump',
         `-h ${pgOptions.host}`,
@@ -128,7 +129,7 @@ export class DatabaseBackupService {
     } catch (error) {
       return {
         success: false,
-        message: `Erreur lors de la création de la sauvegarde: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+        message: `Erreur lors de la création de la sauvegarde: ${error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'}`,
       }
     }
   }
@@ -145,7 +146,7 @@ export class DatabaseBackupService {
         }
       }
 
-      const connectionOptions = this._dataSource.options as any
+      const connectionOptions = this._dataSource.options as unknown
       const isCompressed = backup.filename.endsWith('.gz')
 
       let command: string
@@ -169,7 +170,7 @@ export class DatabaseBackupService {
     } catch (error) {
       return {
         success: false,
-        message: `Erreur lors de la restauration: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+        message: `Erreur lors de la restauration: ${error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'}`,
       }
     }
   }
@@ -195,7 +196,7 @@ export class DatabaseBackupService {
     } catch (error) {
       return {
         success: false,
-        message: `Erreur lors de la suppression: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+        message: `Erreur lors de la suppression: ${error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'}`,
       }
     }
   }

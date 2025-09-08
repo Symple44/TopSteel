@@ -1,14 +1,33 @@
 'use client'
-import { useState, useCallback } from 'react'
-import { Plus, Trash2, ChevronDown, Search } from 'lucide-react'
+import { ChevronDown, Plus, Search, Trash2 } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { cn } from '../../../../lib/utils'
+import { Label } from '../../../forms/label/Label'
 import { Button } from '../../../primitives/button/Button'
 import { Input } from '../../../primitives/input/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Label } from '../../../forms/label/Label'
-import { cn } from '../../../../lib/utils'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export type SearchFieldType = 'text' | 'number' | 'date' | 'select' | 'boolean'
-export type SearchOperator = 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'starts_with' | 'ends_with' | 
-  'greater_than' | 'less_than' | 'greater_than_or_equal' | 'less_than_or_equal' | 'in' | 'not_in' | 'is_null' | 'is_not_null'
+export type SearchOperator =
+  | 'equals'
+  | 'not_equals'
+  | 'contains'
+  | 'not_contains'
+  | 'starts_with'
+  | 'ends_with'
+  | 'greater_than'
+  | 'less_than'
+  | 'greater_than_or_equal'
+  | 'less_than_or_equal'
+  | 'in'
+  | 'not_in'
+  | 'is_null'
+  | 'is_not_null'
 export type LogicalOperator = 'AND' | 'OR'
 export interface SearchField {
   key: string
@@ -38,9 +57,36 @@ interface AdvancedSearchBuilderProps {
   className?: string
 }
 const operatorsByType: Record<SearchFieldType, SearchOperator[]> = {
-  text: ['equals', 'not_equals', 'contains', 'not_contains', 'starts_with', 'ends_with', 'is_null', 'is_not_null'],
-  number: ['equals', 'not_equals', 'greater_than', 'less_than', 'greater_than_or_equal', 'less_than_or_equal', 'is_null', 'is_not_null'],
-  date: ['equals', 'not_equals', 'greater_than', 'less_than', 'greater_than_or_equal', 'less_than_or_equal', 'is_null', 'is_not_null'],
+  text: [
+    'equals',
+    'not_equals',
+    'contains',
+    'not_contains',
+    'starts_with',
+    'ends_with',
+    'is_null',
+    'is_not_null',
+  ],
+  number: [
+    'equals',
+    'not_equals',
+    'greater_than',
+    'less_than',
+    'greater_than_or_equal',
+    'less_than_or_equal',
+    'is_null',
+    'is_not_null',
+  ],
+  date: [
+    'equals',
+    'not_equals',
+    'greater_than',
+    'less_than',
+    'greater_than_or_equal',
+    'less_than_or_equal',
+    'is_null',
+    'is_not_null',
+  ],
   select: ['equals', 'not_equals', 'in', 'not_in', 'is_null', 'is_not_null'],
   boolean: ['equals', 'not_equals'],
 }
@@ -58,27 +104,32 @@ const operatorLabels: Record<SearchOperator, string> = {
   in: 'parmi',
   not_in: 'pas parmi',
   is_null: 'est vide',
-  is_not_null: 'n\'est pas vide',
+  is_not_null: "n'est pas vide",
 }
 export function AdvancedSearchBuilder({
   fields,
   value,
   onChange,
   onSearch,
-  placeholder = "Construire une requête de recherche avancée...",
+  placeholder = 'Construire une requête de recherche avancée...',
   disabled = false,
   maxConditions = 10,
   className,
 }: AdvancedSearchBuilderProps) {
-  const [query, setQuery] = useState<SearchQuery>(value || {
-    conditions: [],
-    globalOperator: 'AND'
-  })
+  const [query, setQuery] = useState<SearchQuery>(
+    value || {
+      conditions: [],
+      globalOperator: 'AND',
+    }
+  )
   const [isExpanded, setIsExpanded] = useState(false)
-  const updateQuery = useCallback((newQuery: SearchQuery) => {
-    setQuery(newQuery)
-    onChange?.(newQuery)
-  }, [onChange])
+  const updateQuery = useCallback(
+    (newQuery: SearchQuery) => {
+      setQuery(newQuery)
+      onChange?.(newQuery)
+    },
+    [onChange]
+  )
   const addCondition = useCallback(() => {
     if (query.conditions.length >= maxConditions) return
     const newCondition: SearchCondition = {
@@ -86,50 +137,57 @@ export function AdvancedSearchBuilder({
       field: fields[0]?.key || '',
       operator: 'equals',
       value: '',
-      logicalOperator: query.conditions.length > 0 ? query.globalOperator : undefined
+      logicalOperator: query.conditions.length > 0 ? query.globalOperator : undefined,
     }
     updateQuery({
       ...query,
-      conditions: [...query.conditions, newCondition]
+      conditions: [...query.conditions, newCondition],
     })
   }, [query, fields, maxConditions, updateQuery])
-  const removeCondition = useCallback((conditionId: string) => {
-    updateQuery({
-      ...query,
-      conditions: query.conditions.filter(c => c.id !== conditionId)
-    })
-  }, [query, updateQuery])
-  const updateCondition = useCallback((conditionId: string, updates: Partial<SearchCondition>) => {
-    updateQuery({
-      ...query,
-      conditions: query.conditions.map(c => 
-        c.id === conditionId ? { ...c, ...updates } : c
-      )
-    })
-  }, [query, updateQuery])
-  const updateGlobalOperator = useCallback((operator: LogicalOperator) => {
-    updateQuery({
-      ...query,
-      globalOperator: operator,
-      conditions: query.conditions.map((c, index) => 
-        index > 0 ? { ...c, logicalOperator: operator } : c
-      )
-    })
-  }, [query, updateQuery])
+  const removeCondition = useCallback(
+    (conditionId: string) => {
+      updateQuery({
+        ...query,
+        conditions: query.conditions.filter((c) => c.id !== conditionId),
+      })
+    },
+    [query, updateQuery]
+  )
+  const updateCondition = useCallback(
+    (conditionId: string, updates: Partial<SearchCondition>) => {
+      updateQuery({
+        ...query,
+        conditions: query.conditions.map((c) => (c.id === conditionId ? { ...c, ...updates } : c)),
+      })
+    },
+    [query, updateQuery]
+  )
+  const updateGlobalOperator = useCallback(
+    (operator: LogicalOperator) => {
+      updateQuery({
+        ...query,
+        globalOperator: operator,
+        conditions: query.conditions.map((c, index) =>
+          index > 0 ? { ...c, logicalOperator: operator } : c
+        ),
+      })
+    },
+    [query, updateQuery]
+  )
   const handleSearch = useCallback(() => {
     onSearch?.(query)
   }, [query, onSearch])
   const clearAll = useCallback(() => {
     updateQuery({
       conditions: [],
-      globalOperator: 'AND'
+      globalOperator: 'AND',
     })
   }, [updateQuery])
   const getFieldType = (fieldKey: string): SearchFieldType => {
-    return fields.find(f => f.key === fieldKey)?.type || 'text'
+    return fields.find((f) => f.key === fieldKey)?.type || 'text'
   }
   const renderValueInput = (condition: SearchCondition) => {
-    const field = fields.find(f => f.key === condition.field)
+    const field = fields.find((f) => f.key === condition.field)
     const needsValue = !['is_null', 'is_not_null'].includes(condition.operator)
     if (!needsValue) return null
     switch (field?.type) {
@@ -142,12 +200,14 @@ export function AdvancedSearchBuilder({
                 <label key={option.value} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={Array.isArray(condition.value) && condition.value.includes(option.value)}
+                    checked={
+                      Array.isArray(condition.value) && condition.value.includes(option.value)
+                    }
                     onChange={(e) => {
                       const currentValues = Array.isArray(condition.value) ? condition.value : []
                       const newValues = e.target.checked
                         ? [...currentValues, option.value]
-                        : currentValues.filter(v => v !== option.value)
+                        : currentValues.filter((v) => v !== option.value)
                       updateCondition(condition.id, { value: newValues })
                     }}
                     disabled={disabled}
@@ -288,13 +348,13 @@ export function AdvancedSearchBuilder({
                     onValueChange={(field) => {
                       const fieldType = getFieldType(field)
                       const availableOperators = operatorsByType[fieldType]
-                      const newOperator = availableOperators.includes(condition.operator) 
-                        ? condition.operator 
+                      const newOperator = availableOperators.includes(condition.operator)
+                        ? condition.operator
                         : availableOperators[0]
-                      updateCondition(condition.id, { 
-                        field, 
+                      updateCondition(condition.id, {
+                        field,
                         operator: newOperator,
-                        value: ''
+                        value: '',
                       })
                     }}
                     disabled={disabled}
@@ -315,10 +375,12 @@ export function AdvancedSearchBuilder({
                 <div className="flex-1 min-w-0">
                   <Select
                     value={condition.operator}
-                    onValueChange={(operator) => updateCondition(condition.id, { 
-                      operator: operator as SearchOperator,
-                      value: ['is_null', 'is_not_null'].includes(operator) ? null : ''
-                    })}
+                    onValueChange={(operator) =>
+                      updateCondition(condition.id, {
+                        operator: operator as SearchOperator,
+                        value: ['is_null', 'is_not_null'].includes(operator) ? null : '',
+                      })
+                    }
                     disabled={disabled}
                   >
                     <SelectTrigger>
@@ -334,9 +396,7 @@ export function AdvancedSearchBuilder({
                   </Select>
                 </div>
                 {/* Value */}
-                <div className="flex-1 min-w-0">
-                  {renderValueInput(condition)}
-                </div>
+                <div className="flex-1 min-w-0">{renderValueInput(condition)}</div>
                 {/* Remove Button */}
                 <Button
                   type="button"

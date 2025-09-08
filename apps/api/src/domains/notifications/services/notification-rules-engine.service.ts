@@ -5,42 +5,16 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { CronExpressionParser } from 'cron-parser'
 import * as mathjs from 'mathjs'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { ActionType, NotificationAction } from '../entities/notification-action.entity'
 import { NotificationCondition } from '../entities/notification-condition.entity'
 import { ExecutionStatus, NotificationExecution } from '../entities/notification-execution.entity'
 import { NotificationRule, RuleStatus, RuleType } from '../entities/notification-rule.entity'
+import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
 import type { NotificationActionExecutor } from './notification-action-executor.service'
 import type { NotificationConditionEvaluator } from './notification-condition-evaluator.service'
 import type { NotificationDeliveryService } from './notification-delivery.service'
-
-/**
- * Rule execution context
- */
-export interface RuleExecutionContext {
-  rule: NotificationRule
-  triggerType: string
-  triggerSource: string
-  triggerData?: any
-  societeId?: string
-  siteId?: string
-  userId?: string
-  metadata?: Record<string, any>
-}
-
-/**
- * Rule execution result
- */
-export interface RuleExecutionResult {
-  executionId: string
-  ruleId: string
-  status: ExecutionStatus
-  conditionsPassed: boolean
-  actionsExecuted: number
-  recipientsNotified: number
-  errors: string[]
-  duration: number
-}
 
 /**
  * Notification rules engine service
@@ -131,7 +105,8 @@ export class NotificationRulesEngineService {
         await this.queueRuleExecution(context)
 
         // Update next execution time
-        rule.nextExecutionAt = this.calculateNextExecutionTime(rule)
+        const nextTime = this.calculateNextExecutionTime(rule)
+        rule.nextExecutionAt = nextTime ?? undefined
         await this.ruleRepository.save(rule)
       }
     }
@@ -316,10 +291,11 @@ export class NotificationRulesEngineService {
     } catch (error) {
       this.logger.error(`Error executing rule ${rule.code}:`, error)
       execution.status = ExecutionStatus.FAILED
-      execution.errorMessage = error.message
+      const errorMessage = getErrorMessage(error)
+      execution.errorMessage = errorMessage
       execution.errorDetails = error
       result.status = ExecutionStatus.FAILED
-      result.errors.push(error.message)
+      result.errors.push(errorMessage)
     } finally {
       // Finalize execution
       execution.markCompleted(execution.status)
@@ -359,7 +335,7 @@ export class NotificationRulesEngineService {
     }
 
     let overallResult = true
-    const results: any[] = []
+    const results: unknown[] = []
 
     for (const condition of rule.conditions) {
       const startTime = Date.now()
@@ -371,7 +347,7 @@ export class NotificationRulesEngineService {
         condition.updateStatistics(result)
         await this.conditionRepository.save(condition)
       } catch (err) {
-        error = err.message
+        error = getErrorMessage(err)
         this.logger.error(`Error evaluating condition ${condition.name}:`, err)
       }
 
@@ -449,7 +425,7 @@ export class NotificationRulesEngineService {
 
         action.updateStatistics(true)
       } catch (err) {
-        error = err.message
+        error = getErrorMessage(err)
         errors.push(`Action ${action.name}: ${error}`)
         this.logger.error(`Error executing action ${action.name}:`, err)
         action.updateStatistics(false, error)
@@ -527,7 +503,7 @@ export class NotificationRulesEngineService {
       await this.deliveryService.sendNotification({
         title: `Escalation: ${rule.name}`,
         body: `Rule execution requires attention. Execution ID: ${execution.id}`,
-        channels: level.channels as any,
+        channels: level.channels as unknown,
         recipients,
         priority: 'high',
         metadata: {

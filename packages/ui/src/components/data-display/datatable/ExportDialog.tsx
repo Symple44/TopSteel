@@ -2,6 +2,7 @@
 
 import { Download, File, FileSpreadsheet, FileText } from 'lucide-react'
 import { useState } from 'react'
+import { useFormFieldIds } from '../../../hooks/useFormFieldIds'
 import {
   Button,
   Checkbox,
@@ -55,6 +56,17 @@ export function ExportDialog<T>({
   columns,
   filename = 'export',
 }: ExportDialogProps<T>) {
+  const ids = useFormFieldIds([
+    'includeHeaders',
+    'selectedOnly',
+    'visibleColumnsOnly',
+    'includeStyles',
+    'freezeHeader',
+    'autoFilter',
+    'conditionalFormatting',
+    'includeStatistics',
+  ])
+
   const [settings, setSettings] = useState<ExportSettings>({
     format: 'xlsx',
     filename: filename,
@@ -206,7 +218,7 @@ export function ExportDialog<T>({
                 <Label>Nom du fichier</Label>
                 <Input
                   value={settings.filename}
-                  onChange={(e: any) =>
+                  onChange={(e: unknown) =>
                     setSettings((prev) => ({
                       ...prev,
                       filename: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '_'),
@@ -226,35 +238,35 @@ export function ExportDialog<T>({
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="includeHeaders"
+                  id={ids.includeHeaders}
                   checked={settings.includeHeaders}
-                  onCheckedChange={(checked: any) =>
+                  onCheckedChange={(checked: unknown) =>
                     setSettings((prev) => ({ ...prev, includeHeaders: !!checked }))
                   }
                 />
-                <Label htmlFor="includeHeaders">Inclure les en-têtes</Label>
+                <Label htmlFor={ids.includeHeaders}>Inclure les en-têtes</Label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="selectedOnly"
+                  id={ids.selectedOnly}
                   checked={settings.selectedOnly}
-                  onCheckedChange={(checked: any) =>
+                  onCheckedChange={(checked: unknown) =>
                     setSettings((prev) => ({ ...prev, selectedOnly: !!checked }))
                   }
                 />
-                <Label htmlFor="selectedOnly">Lignes sélectionnées uniquement</Label>
+                <Label htmlFor={ids.selectedOnly}>Lignes sélectionnées uniquement</Label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="visibleColumnsOnly"
+                  id={ids.visibleColumnsOnly}
                   checked={settings.visibleColumnsOnly}
-                  onCheckedChange={(checked: any) =>
+                  onCheckedChange={(checked: unknown) =>
                     setSettings((prev) => ({ ...prev, visibleColumnsOnly: !!checked }))
                   }
                 />
-                <Label htmlFor="visibleColumnsOnly">Colonnes visibles uniquement</Label>
+                <Label htmlFor={ids.visibleColumnsOnly}>Colonnes visibles uniquement</Label>
               </div>
             </div>
           </div>
@@ -269,57 +281,57 @@ export function ExportDialog<T>({
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="includeStyles"
+                      id={ids.includeStyles}
                       checked={settings.includeStyles}
-                      onCheckedChange={(checked: any) =>
+                      onCheckedChange={(checked: unknown) =>
                         setSettings((prev) => ({ ...prev, includeStyles: !!checked }))
                       }
                     />
-                    <Label htmlFor="includeStyles">Inclure les styles et couleurs</Label>
+                    <Label htmlFor={ids.includeStyles}>Inclure les styles et couleurs</Label>
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="freezeHeader"
+                      id={ids.freezeHeader}
                       checked={settings.freezeHeader}
-                      onCheckedChange={(checked: any) =>
+                      onCheckedChange={(checked: unknown) =>
                         setSettings((prev) => ({ ...prev, freezeHeader: !!checked }))
                       }
                     />
-                    <Label htmlFor="freezeHeader">Figer la ligne d'en-tête</Label>
+                    <Label htmlFor={ids.freezeHeader}>Figer la ligne d'en-tête</Label>
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="autoFilter"
+                      id={ids.autoFilter}
                       checked={settings.autoFilter}
-                      onCheckedChange={(checked: any) =>
+                      onCheckedChange={(checked: unknown) =>
                         setSettings((prev) => ({ ...prev, autoFilter: !!checked }))
                       }
                     />
-                    <Label htmlFor="autoFilter">Activer l'autofilter</Label>
+                    <Label htmlFor={ids.autoFilter}>Activer l'autofilter</Label>
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="conditionalFormatting"
+                      id={ids.conditionalFormatting}
                       checked={settings.conditionalFormatting}
-                      onCheckedChange={(checked: any) =>
+                      onCheckedChange={(checked: unknown) =>
                         setSettings((prev) => ({ ...prev, conditionalFormatting: !!checked }))
                       }
                     />
-                    <Label htmlFor="conditionalFormatting">Formatage conditionnel</Label>
+                    <Label htmlFor={ids.conditionalFormatting}>Formatage conditionnel</Label>
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="includeStatistics"
+                      id={ids.includeStatistics}
                       checked={settings.includeStatistics}
-                      onCheckedChange={(checked: any) =>
+                      onCheckedChange={(checked: unknown) =>
                         setSettings((prev) => ({ ...prev, includeStatistics: !!checked }))
                       }
                     />
-                    <Label htmlFor="includeStatistics">Feuille de statistiques</Label>
+                    <Label htmlFor={ids.includeStatistics}>Feuille de statistiques</Label>
                   </div>
                 </div>
               </div>
@@ -333,10 +345,10 @@ export function ExportDialog<T>({
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium">Colonnes à exporter</h3>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={selectAllColumns}>
+                <Button type="button" variant="outline" size="sm" onClick={selectAllColumns}>
                   Tout sélectionner
                 </Button>
-                <Button variant="outline" size="sm" onClick={deselectAllColumns}>
+                <Button type="button" variant="outline" size="sm" onClick={deselectAllColumns}>
                   Tout désélectionner
                 </Button>
               </div>
@@ -381,10 +393,16 @@ export function ExportDialog<T>({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isExporting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isExporting}
+          >
             Annuler
           </Button>
           <Button
+            type="button"
             onClick={handleExport}
             disabled={isExporting || settings.selectedColumns.length === 0}
           >

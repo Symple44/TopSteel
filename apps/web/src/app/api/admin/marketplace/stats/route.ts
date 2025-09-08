@@ -6,15 +6,15 @@ export async function GET(request: NextRequest) {
     // Récupérer les statistiques depuis l'API backend
     const response = await fetchBackend('/marketplace/stats/overview', request)
 
-    if (!response.ok) {
-      throw new Error(`Erreur API: ${response.status}`)
+    if (!response?.ok) {
+      throw new Error(`Erreur API: ${response?.status}`)
     }
 
-    const stats = await response.json()
+    const stats = await response?.json()
 
-    return NextResponse.json(stats)
+    return NextResponse?.json(stats)
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: 'Erreur lors de la récupération des statistiques' },
       { status: 500 }
     )

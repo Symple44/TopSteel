@@ -52,12 +52,12 @@ export type Indexable<T = any> = Record<string, T>
 /**
  * Type pour les fonctions génériques
  */
-export type AnyFunction = (...args: any[]) => any
+export type AnyFunction = (...args: unknown[]) => any
 
 /**
  * Type pour les constructeurs
  */
-export type Constructor<T = {}> = new (...args: any[]) => T
+export type Constructor<T = {}> = new (...args: unknown[]) => T
 
 /**
  * Type pour les valeurs d'enum

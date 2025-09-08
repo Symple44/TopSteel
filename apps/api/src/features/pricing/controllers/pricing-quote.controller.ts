@@ -28,7 +28,7 @@ export interface QuoteRequest {
   includeMargins?: boolean
   currency?: string
   promotionCode?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface QuoteLineResult {
@@ -65,7 +65,7 @@ export interface QuoteResponse {
   totalBeforeTax: number
   taxAmount?: number
   totalIncludingTax?: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   breakdown?: {
     rulesApplied: number
     totalItems: number

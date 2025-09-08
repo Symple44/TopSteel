@@ -1,4 +1,4 @@
-// apps/web/src/hooks/use-web-vitals.ts
+// apps/web/src/hooks/use-web-vitals?.ts
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -26,11 +26,11 @@ interface MetricOptions {
 
 export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
   const {
-    enableConsoleLog = process.env.NODE_ENV === 'development',
-    enableAnalytics = process.env.NODE_ENV === 'production',
+    enableConsoleLog = process?.env?.NODE_ENV === 'development',
+    enableAnalytics = process?.env?.NODE_ENV === 'production',
     sampleRate = 1.0,
     reportAllChanges = false,
-  } = options
+  } = options || {}
 
   const [vitals, setVitals] = useState<WebVitalsMetrics>({})
   const [isLoading, setIsLoading] = useState(true)
@@ -44,7 +44,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
       try {
         // Use sendBeacon for reliable delivery
         if (navigator.sendBeacon) {
-          navigator.sendBeacon('/api/analytics/vitals', JSON.stringify(metric))
+          navigator?.sendBeacon('/api/analytics/vitals', JSON.stringify(metric))
         } else {
           callClientApi('analytics/vitals', {
             method: 'POST',
@@ -58,10 +58,10 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
   )
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') return undefined
 
     let mounted = true
-    const startTime = performance.now()
+    const startTime = performance?.now()
 
     async function initWebVitals() {
       try {
@@ -71,7 +71,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
         if (!mounted) return
 
         // API v5.x avec nouvelles fonctions onXXX
-        const { onCLS, onINP, onFCP, onLCP, onTTFB } = webVitals
+        const { onCLS, onINP, onFCP, onLCP, onTTFB } = webVitals || {}
 
         // CLS - Cumulative Layout Shift
         onCLS(
@@ -118,12 +118,12 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
         })
 
         // Métriques personnalisées TopSteel
-        const loadTime = performance.now() - startTime
+        const loadTime = performance?.now() - startTime
 
         setVitals((prev) => ({
           ...prev,
           loadTime,
-          renderTime: performance.now() - performance.timeOrigin,
+          renderTime: performance?.now() - performance.timeOrigin,
         }))
 
         setIsLoading(false)
@@ -181,29 +181,29 @@ export function useTopSteelMetrics() {
 
   // Analyse de performance spécifique métallurgie
   const performanceGrade = useMemo(() => {
-    if (!vitals.LCP || !vitals.CLS || !vitals.INP) return null
+    if (!vitals?.LCP || !vitals?.CLS || !vitals?.INP) return null
 
     let score = 100
 
     // Seuils optimisés pour applications industrielles
-    if (vitals.LCP > 4000)
+    if (vitals?.LCP > 4000)
       score -= 30 // LCP > 4s
-    else if (vitals.LCP > 2500) score -= 15 // LCP > 2.5s
+    else if (vitals?.LCP > 2500) score -= 15 // LCP > 2.5s
 
-    if (vitals.CLS > 0.25)
+    if (vitals?.CLS > 0.25)
       score -= 25 // CLS > 0.25
-    else if (vitals.CLS > 0.1) score -= 10 // CLS > 0.1
+    else if (vitals?.CLS > 0.1) score -= 10 // CLS > 0.1
 
-    if (vitals.INP > 500)
+    if (vitals?.INP > 500)
       score -= 20 // INP > 500ms
-    else if (vitals.INP > 200) score -= 10 // INP > 200ms
+    else if (vitals?.INP > 200) score -= 10 // INP > 200ms
 
     if (score >= 90) return 'EXCELLENT'
     if (score >= 75) return 'BON'
     if (score >= 50) return 'MOYEN'
 
     return 'CRITIQUE'
-  }, [vitals.LCP, vitals.CLS, vitals.INP])
+  }, [vitals?.LCP, vitals?.CLS, vitals?.INP])
 
   return {
     ...vitals,

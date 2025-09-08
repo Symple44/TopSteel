@@ -40,7 +40,7 @@ export const envConfig = {
           throw new Error('JWT_SECRET must be set and at least 32 characters in production')
         }
         // Generate a random secret for development only
-        const crypto = require('crypto')
+        const crypto = require('node:crypto')
         return crypto.randomBytes(32).toString('hex')
       }
       return secret
@@ -53,7 +53,7 @@ export const envConfig = {
           throw new Error('JWT_REFRESH_SECRET must be set and at least 32 characters in production')
         }
         // Generate a random secret for development only
-        const crypto = require('crypto')
+        const crypto = require('node:crypto')
         return crypto.randomBytes(32).toString('hex')
       }
       return secret

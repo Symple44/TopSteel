@@ -7,14 +7,18 @@ import {
   Put,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards,
-  UnauthorizedException
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Request } from 'express'
-import { DataSource } from 'typeorm'
-import { OrdersService, CreateOrderDto, UpdateOrderStatusDto } from '../services/orders.service'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { Request } from 'express'
+import type { DataSource } from 'typeorm'
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
+import type {
+  CreateOrderDto,
+  OrdersService,
+  UpdateOrderStatusDto,
+} from '../services/orders.service'
 
 interface TenantRequest extends Request {
   tenant: {
@@ -37,10 +41,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Create a new order' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
   @ApiBearerAuth()
-  async createOrder(
-    @Req() req: TenantRequest,
-    @Body() createOrderDto: CreateOrderDto
-  ) {
+  async createOrder(@Req() req: TenantRequest, @Body() createOrderDto: CreateOrderDto) {
     if (!req.user?.customerId) {
       throw new UnauthorizedException('Customer authentication required')
     }
@@ -71,15 +72,11 @@ export class OrdersController {
       throw new UnauthorizedException('Customer authentication required')
     }
 
-    return await this.ordersService.getCustomerOrders(
-      req.user.customerId,
-      req.tenant.societeId,
-      {
-        status: query.status,
-        limit: query.limit ? parseInt(query.limit) : 20,
-        offset: query.offset ? parseInt(query.offset) : 0
-      }
-    )
+    return await this.ordersService.getCustomerOrders(req.user.customerId, req.tenant.societeId, {
+      status: query.status,
+      limit: query.limit ? parseInt(query.limit, 10) : 20,
+      offset: query.offset ? parseInt(query.offset, 10) : 0,
+    })
   }
 
   @Get(':orderId')
@@ -87,10 +84,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Order details' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiBearerAuth()
-  async getOrder(
-    @Req() req: TenantRequest,
-    @Param('orderId') orderId: string
-  ) {
+  async getOrder(@Req() req: TenantRequest, @Param('orderId') orderId: string) {
     // If customer, only allow viewing their own orders
     const customerId = req.user?.role === 'admin' ? undefined : req.user?.customerId
 
@@ -98,11 +92,7 @@ export class OrdersController {
       throw new UnauthorizedException('Authentication required')
     }
 
-    return await this.ordersService.getOrderById(
-      orderId,
-      req.tenant.societeId,
-      customerId
-    )
+    return await this.ordersService.getOrderById(orderId, req.tenant.societeId, customerId)
   }
 
   @Put(':orderId/cancel')
@@ -142,11 +132,7 @@ export class OrdersController {
       throw new UnauthorizedException('Admin access required')
     }
 
-    return await this.ordersService.updateOrderStatus(
-      orderId,
-      req.tenant.societeId,
-      updateDto
-    )
+    return await this.ordersService.updateOrderStatus(orderId, req.tenant.societeId, updateDto)
   }
 
   @Put('admin/:orderId/payment-status')
@@ -193,15 +179,11 @@ export class OrdersController {
     }
 
     if (query.customerId) {
-      return await this.ordersService.getCustomerOrders(
-        query.customerId,
-        req.tenant.societeId,
-        {
-          status: query.status,
-          limit: query.limit ? parseInt(query.limit) : 20,
-          offset: query.offset ? parseInt(query.offset) : 0
-        }
-      )
+      return await this.ordersService.getCustomerOrders(query.customerId, req.tenant.societeId, {
+        status: query.status,
+        limit: query.limit ? parseInt(query.limit, 10) : 20,
+        offset: query.offset ? parseInt(query.offset, 10) : 0,
+      })
     }
 
     // Return all orders for the tenant
@@ -209,7 +191,7 @@ export class OrdersController {
     return {
       orders: [],
       total: 0,
-      message: 'Full order listing not yet implemented'
+      message: 'Full order listing not yet implemented',
     }
   }
 }

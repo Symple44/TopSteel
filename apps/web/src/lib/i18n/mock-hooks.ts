@@ -22,12 +22,12 @@ export function useLanguage() {
 
 export function useFormatting() {
   return {
-    formatDate: (date: Date) => date.toLocaleDateString(),
-    formatNumber: (number: number) => number.toString(),
+    formatDate: (date: Date) => date?.toLocaleDateString(),
+    formatNumber: (number: number) => number?.toString(),
     formatCurrency: (amount: number) => `€${amount}`,
     formatPercentage: (value: number) => `${value}%`,
     formatFileSize: (bytes: number) => `${bytes} B`,
-    formatRelativeTime: (date: Date) => date.toLocaleDateString(),
+    formatRelativeTime: (date: Date) => date?.toLocaleDateString(),
     locale: 'fr',
   }
 }

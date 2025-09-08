@@ -3,24 +3,30 @@ import { fetchBackend } from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { assignments } = body
+    const body = await request?.json()
+    const { assignments } = body || {}
 
     if (!assignments || !Array.isArray(assignments)) {
-      return NextResponse.json(
+      return NextResponse?.json(
         { success: false, error: 'Assignments array is required' },
         { status: 400 }
       )
     }
 
     // Traiter les assignations par batch pour éviter la surcharge
-    const results = []
+    const results: {
+      success: boolean
+      groupId: string
+      userId: string
+      data?: unknown
+      error?: string
+    }[] = []
     const batchSize = 10 // Traiter 10 assignations à la fois
 
     for (let i = 0; i < assignments.length; i += batchSize) {
-      const batch = assignments.slice(i, i + batchSize)
+      const batch = assignments?.slice(i, i + batchSize)
 
-      const batchPromises = batch.map(async (assignment) => {
+      const batchPromises = batch?.map(async (assignment) => {
         try {
           const response = await fetchBackend(
             `/admin/groups/${assignment.groupId}/users`,
@@ -34,8 +40,8 @@ export async function POST(request: NextRequest) {
             }
           )
 
-          if (response.ok) {
-            const data = await response.json()
+          if (response?.ok) {
+            const data = await response?.json()
             return {
               success: true,
               groupId: assignment.groupId,
@@ -43,7 +49,7 @@ export async function POST(request: NextRequest) {
               data: data?.data,
             }
           } else {
-            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+            const errorData = await response?.json().catch(() => ({ error: 'Unknown error' }))
             return {
               success: false,
               groupId: assignment.groupId,
@@ -62,13 +68,13 @@ export async function POST(request: NextRequest) {
       })
 
       const batchResults = await Promise.all(batchPromises)
-      results.push(...batchResults)
+      results?.push(...batchResults)
     }
 
-    const successCount = results.filter((r) => r.success).length
-    const errorCount = results.filter((r) => !r.success).length
+    const successCount = results?.filter((r) => r.success).length
+    const errorCount = results?.filter((r) => !r.success).length
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: {
         total: assignments.length,
@@ -79,7 +85,7 @@ export async function POST(request: NextRequest) {
       message: `${successCount} assignations réussies, ${errorCount} échecs`,
     })
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         error: "Erreur lors de l'assignation en masse",

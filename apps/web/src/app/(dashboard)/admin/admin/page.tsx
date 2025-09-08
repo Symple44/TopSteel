@@ -118,7 +118,7 @@ export default function AdminConfigurationPage() {
               Configuration
             </h2>
             <nav className="space-y-1">
-              {navigationItems.map((item) => {
+              {navigationItems?.map((item) => {
                 const Icon = item.icon
                 const isActive = activeSection === item.id
 

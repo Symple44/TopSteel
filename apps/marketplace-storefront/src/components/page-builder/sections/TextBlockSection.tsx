@@ -53,11 +53,28 @@ export function TextBlockSection({ section, isEditing }: SectionProps<TextBlockC
           // Content is properly sanitized with DOMPurify to prevent XSS vulnerabilities
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(content.content || '', {
-              ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'blockquote'],
+              ALLOWED_TAGS: [
+                'p',
+                'br',
+                'strong',
+                'em',
+                'u',
+                'h1',
+                'h2',
+                'h3',
+                'h4',
+                'h5',
+                'h6',
+                'ul',
+                'ol',
+                'li',
+                'a',
+                'img',
+                'blockquote',
+              ],
               ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel', 'class'],
               ALLOW_DATA_ATTR: false,
-              FORBID_SCRIPT: true
-            })
+            }),
           }}
         />
       </div>

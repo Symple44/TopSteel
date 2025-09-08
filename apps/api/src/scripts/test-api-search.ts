@@ -90,7 +90,7 @@ async function testAPISearch() {
     logger.log(`  Moteur: ${stats.engine.engine}`)
     logger.log(`  Entités configurées: ${stats.entities.length}`)
     logger.log('  Types disponibles:')
-    stats.entities.forEach((e: any) => {
+    stats.entities.forEach((e: unknown) => {
       logger.log(`    - ${e.name} (${e.type})`)
     })
 

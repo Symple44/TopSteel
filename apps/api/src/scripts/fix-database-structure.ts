@@ -16,7 +16,7 @@ async function fixDatabaseStructure() {
   const tenantDbConfig = {
     type: 'postgres' as const,
     host: process.env.ERP_DB_HOST || 'localhost',
-    port: parseInt(process.env.ERP_DB_PORT || '5432'),
+    port: parseInt(process.env.ERP_DB_PORT || '5432', 10),
     username: process.env.ERP_DB_USERNAME || 'postgres',
     password: process.env.ERP_DB_PASSWORD || 'postgres',
     database: 'erp_topsteel_topsteel', // Base spécifique à TopSteel

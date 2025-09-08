@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { QueryBuilder } from './query-builder.entity'
+// Removed import to avoid circular dependencies
+// import { QueryBuilder } from './query-builder.entity'
 
 @Entity('query_builder_columns')
 export class QueryBuilderColumn {
@@ -9,15 +10,12 @@ export class QueryBuilderColumn {
   @Column()
   queryBuilderId: string
 
-  @ManyToOne(
-    () => QueryBuilder,
-    (queryBuilder) => queryBuilder.columns,
-    {
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('QueryBuilder', 'columns', {
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'queryBuilderId' })
-  queryBuilder: QueryBuilder
+  queryBuilder: any
 
   @Column()
   tableName: string

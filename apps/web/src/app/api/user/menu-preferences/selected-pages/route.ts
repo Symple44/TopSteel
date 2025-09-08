@@ -8,21 +8,21 @@ export async function GET(request: NextRequest) {
     // Utiliser l'endpoint standard et filtrer les pages visibles
     const response = await callBackendFromApi(request, 'user/menu-preferences')
 
-    if (response.ok) {
-      const data = await response.json()
+    if (response?.ok) {
+      const data = await response?.json()
 
       // Vérifier la structure des données et extraire les pages visibles
-      let menuPreferences = []
+      let menuPreferences: unknown[] = []
 
       // Gérer la structure imbriquée du backend : { data: { success: true, data: [...] } }
-      if (data.data?.success && Array.isArray(data.data.data)) {
-        menuPreferences = data.data.data
+      if (data.data?.success && Array.isArray(data?.data?.data)) {
+        menuPreferences = data?.data?.data
       } else if (Array.isArray(data.data)) {
-        menuPreferences = data.data
+        menuPreferences = data?.data
       } else if (Array.isArray(data)) {
         menuPreferences = data
       } else if (data.preferences && Array.isArray(data.preferences)) {
-        menuPreferences = data.preferences
+        menuPreferences = data?.preferences
       } else {
         menuPreferences = []
       }
@@ -31,19 +31,19 @@ export async function GET(request: NextRequest) {
         .filter((p: { isVisible?: boolean }) => p.isVisible)
         .map((p: { menuId: string }) => p.menuId)
 
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: selectedPages,
         message: 'Pages sélectionnées depuis la base de données',
       })
     } else {
-      throw new Error(`Backend API error: ${response.status}`)
+      throw new Error(`Backend API error: ${response?.status}`)
     }
   } catch (error) {
     // Gérer les différents types d'erreurs
     if (error instanceof Error) {
       if (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN') {
-        return NextResponse.json(
+        return NextResponse?.json(
           { success: false, message: 'Authentification requise' },
           { status: 401 }
         )
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Pour toute autre erreur
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors de la récupération des pages',
@@ -64,8 +64,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { selectedPages = [] } = body
+    const body = await request?.json()
+    const { selectedPages = [] } = body || {}
 
     // Utiliser directement l'endpoint backend qui gère tout
     const response = await callBackendFromApi(request, 'user/menu-preferences/selected-pages', {
@@ -73,14 +73,14 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({ selectedPages }),
     })
 
-    if (response.ok) {
-      const data = await response.json()
+    if (response?.ok) {
+      const data = await response?.json()
 
       // Vérifier la structure de la réponse du backend
-      const isSuccess = data.success || data.data?.success
+      const isSuccess = data?.success || data?.data?.success
 
       if (isSuccess) {
-        return NextResponse.json({
+        return NextResponse?.json({
           success: true,
           data: selectedPages,
           message: 'Pages sélectionnées sauvegardées avec succès',
@@ -89,21 +89,21 @@ export async function POST(request: NextRequest) {
         throw new Error('Backend returned success: false')
       }
     } else {
-      const errorText = await response.text()
-      throw new Error(`Backend API error: ${response.status} - ${errorText}`)
+      const errorText = await response?.text()
+      throw new Error(`Backend API error: ${response?.status} - ${errorText}`)
     }
   } catch (error) {
     // Gérer les différents types d'erreurs
     if (error instanceof Error) {
       if (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN') {
-        return NextResponse.json(
+        return NextResponse?.json(
           { success: false, message: 'Authentification requise pour sauvegarder les préférences' },
           { status: 401 }
         )
       }
     }
 
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors de la sauvegarde des pages sélectionnées',

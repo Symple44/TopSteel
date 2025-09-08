@@ -66,16 +66,16 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
       {showDetails && (
         <div className="p-6 border-b max-h-96 overflow-y-auto">
           <div className="space-y-4">
-            {items.map((item) => (
+            {items?.map((item) => (
               <div
-                key={`${item.product.id}-${JSON.stringify(item.selectedOptions)}`}
+                key={`${item?.product?.id}-${JSON.stringify(item.selectedOptions)}`}
                 className="flex gap-3"
               >
                 {/* Product Image */}
                 <div className="relative w-16 h-16 flex-shrink-0">
                   <Image
-                    src={item.product.images[0] || '/placeholder-product.jpg'}
-                    alt={item.product.name}
+                    src={item?.product?.images?.[0] || '/placeholder-product.jpg'}
+                    alt={item?.product?.name}
                     fill
                     className="object-cover rounded-lg"
                   />
@@ -88,7 +88,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
                 {/* Product Details */}
                 <div className="flex-1">
                   <h4 className="text-sm font-medium text-gray-900 line-clamp-1">
-                    {item.product.name}
+                    {item?.product?.name}
                   </h4>
                   {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -100,14 +100,14 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
                     </p>
                   )}
                   <p className="text-sm text-gray-600 mt-1">
-                    {formatPrice(item.product.price)} × {item.quantity}
+                    {formatPrice(item?.product?.price)} × {item.quantity}
                   </p>
                 </div>
 
                 {/* Item Total */}
                 <div className="text-right">
                   <p className="text-sm font-medium">
-                    {formatPrice(item.product.price * item.quantity)}
+                    {formatPrice(item?.product?.price * item.quantity)}
                   </p>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
         <div className="space-y-2">
           {/* Subtotal */}
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal ({items.length} items)</span>
+            <span className="text-gray-600">Subtotal ({items?.length} items)</span>
             <span className="font-medium">{formatPrice(subtotal)}</span>
           </div>
 
@@ -130,7 +130,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
             <div className="flex justify-between text-sm">
               <div className="flex items-center gap-1 text-green-600">
                 <Tag className="w-3 h-3" />
-                <span>Discount {appliedCoupon && `(${appliedCoupon.code})`}</span>
+                <span>Discount {appliedCoupon && `(${appliedCoupon?.code})`}</span>
               </div>
               <span className="text-green-600 font-medium">-{formatPrice(discount)}</span>
             </div>
@@ -146,7 +146,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
           <div className="flex justify-between text-sm">
             <div className="flex items-center gap-1 text-gray-600">
               <Truck className="w-3 h-3" />
-              <span>Shipping {shippingMethod && `(${shippingMethod.name})`}</span>
+              <span>Shipping {shippingMethod && `(${shippingMethod?.name})`}</span>
             </div>
             <span>{shipping > 0 ? formatPrice(shipping) : 'FREE'}</span>
           </div>

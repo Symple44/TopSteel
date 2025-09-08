@@ -1,115 +1,253 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertTriangle, Copy, Info, RotateCcw, Search, Shield, User } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
-import { Shield, User, Check, X, Search, Copy, RotateCcw, AlertTriangle, Info } from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
-import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
-import { Switch } from '../../../primitives/switch/switch'
 import { Badge } from '../../../data-display/badge'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+import { Alert } from '../../../feedback/alert'
 import {
+  Form,
+  FormControl,
   FormDescription,
-  Alert,
-  Separator,
-} from '../../../'
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+import { Separator } from '../../../layout/separator'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Switch } from '../../../primitives/switch/switch'
+
 // Extended permissions with resource-level controls
 const DETAILED_PERMISSIONS = {
   users: {
     label: 'Gestion des utilisateurs',
     permissions: {
-      view: { label: 'Voir les utilisateurs', description: 'Consulter la liste et les détails des utilisateurs' },
-      create: { label: 'Créer des utilisateurs', description: 'Ajouter de nouveaux utilisateurs au système' },
-      edit: { label: 'Modifier les utilisateurs', description: 'Éditer les informations des utilisateurs existants' },
-      delete: { label: 'Supprimer des utilisateurs', description: 'Supprimer définitivement des utilisateurs' },
-      manage_roles: { label: 'Gérer les rôles', description: 'Assigner et modifier les rôles des utilisateurs' },
-      view_activity: { label: 'Voir l\'activité', description: 'Consulter les logs d\'activité des utilisateurs' },
-      reset_passwords: { label: 'Réinitialiser mots de passe', description: 'Forcer la réinitialisation des mots de passe' },
-      manage_sessions: { label: 'Gérer les sessions', description: 'Terminer ou prolonger les sessions utilisateur' }
-    }
+      view: {
+        label: 'Voir les utilisateurs',
+        description: 'Consulter la liste et les détails des utilisateurs',
+      },
+      create: {
+        label: 'Créer des utilisateurs',
+        description: 'Ajouter de nouveaux utilisateurs au système',
+      },
+      edit: {
+        label: 'Modifier les utilisateurs',
+        description: 'Éditer les informations des utilisateurs existants',
+      },
+      delete: {
+        label: 'Supprimer des utilisateurs',
+        description: 'Supprimer définitivement des utilisateurs',
+      },
+      manage_roles: {
+        label: 'Gérer les rôles',
+        description: 'Assigner et modifier les rôles des utilisateurs',
+      },
+      view_activity: {
+        label: "Voir l'activité",
+        description: "Consulter les logs d'activité des utilisateurs",
+      },
+      reset_passwords: {
+        label: 'Réinitialiser mots de passe',
+        description: 'Forcer la réinitialisation des mots de passe',
+      },
+      manage_sessions: {
+        label: 'Gérer les sessions',
+        description: 'Terminer ou prolonger les sessions utilisateur',
+      },
+    },
   },
   clients: {
     label: 'Gestion des clients',
     permissions: {
-      view: { label: 'Voir les clients', description: 'Consulter la liste et les détails des clients' },
+      view: {
+        label: 'Voir les clients',
+        description: 'Consulter la liste et les détails des clients',
+      },
       create: { label: 'Créer des clients', description: 'Ajouter de nouveaux clients' },
       edit: { label: 'Modifier les clients', description: 'Éditer les informations clients' },
       delete: { label: 'Supprimer des clients', description: 'Supprimer des clients du système' },
-      manage_credit: { label: 'Gérer le crédit', description: 'Modifier les limites et conditions de crédit' },
-      view_finances: { label: 'Voir les finances', description: 'Consulter les données financières des clients' },
+      manage_credit: {
+        label: 'Gérer le crédit',
+        description: 'Modifier les limites et conditions de crédit',
+      },
+      view_finances: {
+        label: 'Voir les finances',
+        description: 'Consulter les données financières des clients',
+      },
       export_data: { label: 'Exporter données', description: 'Exporter les informations clients' },
-      merge_clients: { label: 'Fusionner clients', description: 'Fusionner des fiches clients dupliquées' }
-    }
+      merge_clients: {
+        label: 'Fusionner clients',
+        description: 'Fusionner des fiches clients dupliquées',
+      },
+    },
   },
   materials: {
     label: 'Gestion des matériaux',
     permissions: {
       view: { label: 'Voir les matériaux', description: 'Consulter le catalogue des matériaux' },
-      create: { label: 'Créer des matériaux', description: 'Ajouter de nouveaux matériaux au catalogue' },
-      edit: { label: 'Modifier les matériaux', description: 'Éditer les spécifications des matériaux' },
-      delete: { label: 'Supprimer des matériaux', description: 'Retirer des matériaux du catalogue' },
-      manage_pricing: { label: 'Gérer les prix', description: 'Modifier les prix et conditions tarifaires' },
-      view_costs: { label: 'Voir les coûts', description: 'Consulter les coûts d\'achat et marges' },
+      create: {
+        label: 'Créer des matériaux',
+        description: 'Ajouter de nouveaux matériaux au catalogue',
+      },
+      edit: {
+        label: 'Modifier les matériaux',
+        description: 'Éditer les spécifications des matériaux',
+      },
+      delete: {
+        label: 'Supprimer des matériaux',
+        description: 'Retirer des matériaux du catalogue',
+      },
+      manage_pricing: {
+        label: 'Gérer les prix',
+        description: 'Modifier les prix et conditions tarifaires',
+      },
+      view_costs: { label: 'Voir les coûts', description: "Consulter les coûts d'achat et marges" },
       bulk_import: { label: 'Import en lot', description: 'Importer des matériaux en masse' },
-      manage_suppliers: { label: 'Gérer fournisseurs', description: 'Associer et gérer les fournisseurs de matériaux' }
-    }
+      manage_suppliers: {
+        label: 'Gérer fournisseurs',
+        description: 'Associer et gérer les fournisseurs de matériaux',
+      },
+    },
   },
   inventory: {
     label: 'Gestion des stocks',
     permissions: {
-      view: { label: 'Voir les stocks', description: 'Consulter les niveaux de stock en temps réel' },
-      create: { label: 'Créer entrées stock', description: 'Enregistrer de nouvelles entrées de stock' },
+      view: {
+        label: 'Voir les stocks',
+        description: 'Consulter les niveaux de stock en temps réel',
+      },
+      create: {
+        label: 'Créer entrées stock',
+        description: 'Enregistrer de nouvelles entrées de stock',
+      },
       edit: { label: 'Modifier mouvements', description: 'Corriger les mouvements de stock' },
-      adjust: { label: 'Ajuster les stocks', description: 'Effectuer des ajustements d\'inventaire' },
-      transfer: { label: 'Transférer stock', description: 'Transférer des matériaux entre emplacements' },
-      view_movements: { label: 'Voir mouvements', description: 'Consulter l\'historique des mouvements' },
-      manage_locations: { label: 'Gérer emplacements', description: 'Créer et modifier les emplacements de stockage' },
-      set_alerts: { label: 'Configurer alertes', description: 'Définir les seuils d\'alerte de stock' }
-    }
+      adjust: {
+        label: 'Ajuster les stocks',
+        description: "Effectuer des ajustements d'inventaire",
+      },
+      transfer: {
+        label: 'Transférer stock',
+        description: 'Transférer des matériaux entre emplacements',
+      },
+      view_movements: {
+        label: 'Voir mouvements',
+        description: "Consulter l'historique des mouvements",
+      },
+      manage_locations: {
+        label: 'Gérer emplacements',
+        description: 'Créer et modifier les emplacements de stockage',
+      },
+      set_alerts: {
+        label: 'Configurer alertes',
+        description: "Définir les seuils d'alerte de stock",
+      },
+    },
   },
   production: {
     label: 'Gestion de production',
     permissions: {
-      view: { label: 'Voir production', description: 'Consulter les ordres et statuts de production' },
+      view: {
+        label: 'Voir production',
+        description: 'Consulter les ordres et statuts de production',
+      },
       create: { label: 'Créer ordres', description: 'Créer de nouveaux ordres de production' },
-      edit: { label: 'Modifier ordres', description: 'Modifier les ordres de production existants' },
-      manage_processes: { label: 'Gérer processus', description: 'Définir et modifier les processus de production' },
-      quality_control: { label: 'Contrôle qualité', description: 'Effectuer et valider les contrôles qualité' },
-      view_performance: { label: 'Voir performance', description: 'Consulter les métriques de performance' },
-      manage_resources: { label: 'Gérer ressources', description: 'Allouer machines et personnel aux productions' },
-      approve_changes: { label: 'Approuver modifications', description: 'Valider les changements de production' }
-    }
+      edit: {
+        label: 'Modifier ordres',
+        description: 'Modifier les ordres de production existants',
+      },
+      manage_processes: {
+        label: 'Gérer processus',
+        description: 'Définir et modifier les processus de production',
+      },
+      quality_control: {
+        label: 'Contrôle qualité',
+        description: 'Effectuer et valider les contrôles qualité',
+      },
+      view_performance: {
+        label: 'Voir performance',
+        description: 'Consulter les métriques de performance',
+      },
+      manage_resources: {
+        label: 'Gérer ressources',
+        description: 'Allouer machines et personnel aux productions',
+      },
+      approve_changes: {
+        label: 'Approuver modifications',
+        description: 'Valider les changements de production',
+      },
+    },
   },
   sales: {
     label: 'Gestion commerciale',
     permissions: {
       view: { label: 'Voir ventes', description: 'Consulter les devis, commandes et factures' },
-      create: { label: 'Créer devis/commandes', description: 'Créer de nouveaux devis et commandes' },
+      create: {
+        label: 'Créer devis/commandes',
+        description: 'Créer de nouveaux devis et commandes',
+      },
       edit: { label: 'Modifier documents', description: 'Modifier les documents commerciaux' },
-      approve_quotes: { label: 'Approuver devis', description: 'Valider et approuver les devis clients' },
-      manage_pricing: { label: 'Gérer tarification', description: 'Modifier les prix de vente et remises' },
+      approve_quotes: {
+        label: 'Approuver devis',
+        description: 'Valider et approuver les devis clients',
+      },
+      manage_pricing: {
+        label: 'Gérer tarification',
+        description: 'Modifier les prix de vente et remises',
+      },
       view_margins: { label: 'Voir marges', description: 'Consulter les marges bénéficiaires' },
-      manage_contracts: { label: 'Gérer contrats', description: 'Créer et modifier les contrats clients' },
-      export_documents: { label: 'Exporter documents', description: 'Exporter les documents commerciaux' }
-    }
+      manage_contracts: {
+        label: 'Gérer contrats',
+        description: 'Créer et modifier les contrats clients',
+      },
+      export_documents: {
+        label: 'Exporter documents',
+        description: 'Exporter les documents commerciaux',
+      },
+    },
   },
   finance: {
     label: 'Gestion financière',
     permissions: {
       view: { label: 'Voir finances', description: 'Consulter les données financières générales' },
-      create: { label: 'Créer écritures', description: 'Enregistrer de nouvelles écritures comptables' },
+      create: {
+        label: 'Créer écritures',
+        description: 'Enregistrer de nouvelles écritures comptables',
+      },
       edit: { label: 'Modifier écritures', description: 'Corriger les écritures comptables' },
-      approve_payments: { label: 'Approuver paiements', description: 'Valider les paiements et virements' },
-      manage_budgets: { label: 'Gérer budgets', description: 'Créer et modifier les budgets prévisionnels' },
-      view_reports: { label: 'Voir rapports', description: 'Consulter les rapports financiers détaillés' },
-      manage_accounts: { label: 'Gérer comptes', description: 'Administrer les comptes comptables' },
-      audit_access: { label: 'Accès audit', description: 'Consulter les pistes d\'audit financières' }
-    }
+      approve_payments: {
+        label: 'Approuver paiements',
+        description: 'Valider les paiements et virements',
+      },
+      manage_budgets: {
+        label: 'Gérer budgets',
+        description: 'Créer et modifier les budgets prévisionnels',
+      },
+      view_reports: {
+        label: 'Voir rapports',
+        description: 'Consulter les rapports financiers détaillés',
+      },
+      manage_accounts: {
+        label: 'Gérer comptes',
+        description: 'Administrer les comptes comptables',
+      },
+      audit_access: {
+        label: 'Accès audit',
+        description: "Consulter les pistes d'audit financières",
+      },
+    },
   },
   projects: {
     label: 'Gestion de projets',
@@ -117,49 +255,105 @@ const DETAILED_PERMISSIONS = {
       view: { label: 'Voir projets', description: 'Consulter la liste et détails des projets' },
       create: { label: 'Créer projets', description: 'Créer de nouveaux projets' },
       edit: { label: 'Modifier projets', description: 'Éditer les informations des projets' },
-      assign_resources: { label: 'Assigner ressources', description: 'Allouer personnel et matériel aux projets' },
+      assign_resources: {
+        label: 'Assigner ressources',
+        description: 'Allouer personnel et matériel aux projets',
+      },
       manage_timeline: { label: 'Gérer planning', description: 'Modifier les échéances et jalons' },
-      view_costs: { label: 'Voir coûts', description: 'Consulter les coûts et budgets des projets' },
+      view_costs: {
+        label: 'Voir coûts',
+        description: 'Consulter les coûts et budgets des projets',
+      },
       manage_tasks: { label: 'Gérer tâches', description: 'Créer et assigner des tâches' },
-      approve_milestones: { label: 'Approuver jalons', description: 'Valider l\'achèvement des jalons' }
-    }
+      approve_milestones: {
+        label: 'Approuver jalons',
+        description: "Valider l'achèvement des jalons",
+      },
+    },
   },
   reports: {
     label: 'Rapports et analyses',
     permissions: {
       view: { label: 'Voir rapports', description: 'Consulter les rapports standards' },
-      create: { label: 'Créer rapports', description: 'Générer de nouveaux rapports personnalisés' },
-      export: { label: 'Exporter données', description: 'Exporter les données vers différents formats' },
-      advanced_analytics: { label: 'Analytics avancés', description: 'Accéder aux outils d\'analyse avancée' },
-      schedule_reports: { label: 'Programmer rapports', description: 'Automatiser l\'envoi de rapports' },
-      share_reports: { label: 'Partager rapports', description: 'Partager les rapports avec des tiers' },
-      manage_dashboards: { label: 'Gérer tableaux de bord', description: 'Créer et modifier les tableaux de bord' },
-      real_time_data: { label: 'Données temps réel', description: 'Accéder aux données en temps réel' }
-    }
+      create: {
+        label: 'Créer rapports',
+        description: 'Générer de nouveaux rapports personnalisés',
+      },
+      export: {
+        label: 'Exporter données',
+        description: 'Exporter les données vers différents formats',
+      },
+      advanced_analytics: {
+        label: 'Analytics avancés',
+        description: "Accéder aux outils d'analyse avancée",
+      },
+      schedule_reports: {
+        label: 'Programmer rapports',
+        description: "Automatiser l'envoi de rapports",
+      },
+      share_reports: {
+        label: 'Partager rapports',
+        description: 'Partager les rapports avec des tiers',
+      },
+      manage_dashboards: {
+        label: 'Gérer tableaux de bord',
+        description: 'Créer et modifier les tableaux de bord',
+      },
+      real_time_data: {
+        label: 'Données temps réel',
+        description: 'Accéder aux données en temps réel',
+      },
+    },
   },
   administration: {
     label: 'Administration système',
     permissions: {
-      system_settings: { label: 'Paramètres système', description: 'Modifier la configuration générale du système' },
-      backup_restore: { label: 'Sauvegarde/Restauration', description: 'Gérer les sauvegardes et restaurations' },
-      audit_logs: { label: 'Logs d\'audit', description: 'Consulter les logs d\'audit système' },
-      manage_integrations: { label: 'Gérer intégrations', description: 'Configurer les intégrations externes' },
-      security_settings: { label: 'Paramètres sécurité', description: 'Modifier les paramètres de sécurité' },
-      license_management: { label: 'Gestion licences', description: 'Administrer les licences et abonnements' },
-      system_monitoring: { label: 'Monitoring système', description: 'Surveiller les performances système' },
-      maintenance_mode: { label: 'Mode maintenance', description: 'Activer/désactiver le mode maintenance' }
-    }
-  }
+      system_settings: {
+        label: 'Paramètres système',
+        description: 'Modifier la configuration générale du système',
+      },
+      backup_restore: {
+        label: 'Sauvegarde/Restauration',
+        description: 'Gérer les sauvegardes et restaurations',
+      },
+      audit_logs: { label: "Logs d'audit", description: "Consulter les logs d'audit système" },
+      manage_integrations: {
+        label: 'Gérer intégrations',
+        description: 'Configurer les intégrations externes',
+      },
+      security_settings: {
+        label: 'Paramètres sécurité',
+        description: 'Modifier les paramètres de sécurité',
+      },
+      license_management: {
+        label: 'Gestion licences',
+        description: 'Administrer les licences et abonnements',
+      },
+      system_monitoring: {
+        label: 'Monitoring système',
+        description: 'Surveiller les performances système',
+      },
+      maintenance_mode: {
+        label: 'Mode maintenance',
+        description: 'Activer/désactiver le mode maintenance',
+      },
+    },
+  },
 } as const
 // Role templates for quick assignment
 const ROLE_TEMPLATES = {
   admin: {
     label: 'Administrateur complet',
     description: 'Toutes les permissions sur tous les modules',
-    permissions: Object.keys(DETAILED_PERMISSIONS).reduce((acc, module) => {
-      acc[module] = Object.keys(DETAILED_PERMISSIONS[module as keyof typeof DETAILED_PERMISSIONS].permissions)
-      return acc
-    }, {} as Record<string, string[]>)
+    permissions: Object.keys(DETAILED_PERMISSIONS).reduce(
+      (acc, module) => {
+        acc[module] = Object.keys(
+          DETAILED_PERMISSIONS[module as keyof typeof DETAILED_PERMISSIONS].permissions
+        )
+        return acc
+      },
+      {} as Record<string, string[]>
+    ),
   },
   manager: {
     label: 'Manager général',
@@ -174,8 +368,8 @@ const ROLE_TEMPLATES = {
       finance: ['view', 'view_reports'],
       projects: ['view', 'create', 'edit', 'assign_resources', 'manage_timeline'],
       reports: ['view', 'create', 'export'],
-      administration: []
-    }
+      administration: [],
+    },
   },
   production_supervisor: {
     label: 'Superviseur production',
@@ -185,13 +379,20 @@ const ROLE_TEMPLATES = {
       clients: ['view'],
       materials: ['view'],
       inventory: ['view', 'create', 'transfer', 'view_movements'],
-      production: ['view', 'create', 'edit', 'manage_processes', 'quality_control', 'view_performance'],
+      production: [
+        'view',
+        'create',
+        'edit',
+        'manage_processes',
+        'quality_control',
+        'view_performance',
+      ],
       sales: ['view'],
       finance: [],
       projects: ['view', 'manage_tasks'],
       reports: ['view', 'create'],
-      administration: []
-    }
+      administration: [],
+    },
   },
   sales_representative: {
     label: 'Commercial',
@@ -206,8 +407,8 @@ const ROLE_TEMPLATES = {
       finance: ['view'],
       projects: ['view'],
       reports: ['view', 'create'],
-      administration: []
-    }
+      administration: [],
+    },
   },
   employee: {
     label: 'Employé standard',
@@ -222,13 +423,13 @@ const ROLE_TEMPLATES = {
       finance: [],
       projects: ['view'],
       reports: ['view'],
-      administration: []
-    }
-  }
+      administration: [],
+    },
+  },
 }
 // Permission validation schema
 const permissionsSchema = z.object({
-  userId: z.string().min(1, 'L\'ID utilisateur est requis'),
+  userId: z.string().min(1, "L'ID utilisateur est requis"),
   permissions: z.object({
     users: z.array(z.string()).default([]),
     clients: z.array(z.string()).default([]),
@@ -239,7 +440,7 @@ const permissionsSchema = z.object({
     finance: z.array(z.string()).default([]),
     projects: z.array(z.string()).default([]),
     reports: z.array(z.string()).default([]),
-    administration: z.array(z.string()).default([])
+    administration: z.array(z.string()).default([]),
   }),
   effectiveDate: z.string().optional(),
   expirationDate: z.string().optional(),
@@ -267,13 +468,13 @@ export function UserPermissionsDialog({
   onOpenChange,
   onSubmit,
   userData,
-  currentPermissions = {}
+  currentPermissions = {},
 }: UserPermissionsDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
-  const form = useForm<PermissionsFormData>({
+  const form = useForm({
     resolver: zodResolver(permissionsSchema),
     defaultValues: {
       userId: '',
@@ -287,7 +488,7 @@ export function UserPermissionsDialog({
         finance: [],
         projects: [],
         reports: [],
-        administration: []
+        administration: [],
       },
       temporaryAccess: false,
     },
@@ -308,7 +509,7 @@ export function UserPermissionsDialog({
           finance: currentPermissions.finance || [],
           projects: currentPermissions.projects || [],
           reports: currentPermissions.reports || [],
-          administration: currentPermissions.administration || []
+          administration: currentPermissions.administration || [],
         },
         temporaryAccess: false,
       })
@@ -317,16 +518,19 @@ export function UserPermissionsDialog({
   const applyTemplate = (templateKey: string) => {
     const template = ROLE_TEMPLATES[templateKey as keyof typeof ROLE_TEMPLATES]
     if (template) {
-      form.setValue('permissions', template.permissions as any)
+      form.setValue('permissions', template.permissions as unknown)
       setSelectedTemplate(templateKey)
     }
   }
   const clearAllPermissions = () => {
-    const emptyPermissions = Object.keys(DETAILED_PERMISSIONS).reduce((acc, module) => {
-      acc[module] = []
-      return acc
-    }, {} as Record<string, string[]>)
-    form.setValue('permissions', emptyPermissions as any)
+    const emptyPermissions = Object.keys(DETAILED_PERMISSIONS).reduce(
+      (acc, module) => {
+        acc[module] = []
+        return acc
+      },
+      {} as Record<string, string[]>
+    )
+    form.setValue('permissions', emptyPermissions as unknown)
     setSelectedTemplate('')
   }
   const copyFromCurrentRole = () => {
@@ -342,7 +546,7 @@ export function UserPermissionsDialog({
       // Validate temporal permissions
       if (data.temporaryAccess && data.effectiveDate && data.expirationDate) {
         if (new Date(data.expirationDate) <= new Date(data.effectiveDate)) {
-          setError('La date d\'expiration doit être postérieure à la date d\'effet')
+          setError("La date d'expiration doit être postérieure à la date d'effet")
           return
         }
       }
@@ -365,22 +569,30 @@ export function UserPermissionsDialog({
     const permissions = form.getValues('permissions')
     return Object.values(permissions).reduce((total, modulePerms) => total + modulePerms.length, 0)
   }
-  const filterPermissions = (permissions: Record<string, any>) => {
+  const filterPermissions = (permissions: Record<string, unknown>) => {
     if (!searchTerm) return permissions
-    return Object.entries(permissions).reduce((acc, [key, permData]) => {
-      const matchingPerms = Object.entries(permData.permissions).filter(
-        ([permKey, permValue]: [string, any]) =>
-          permValue.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          permValue.description.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      if (matchingPerms.length > 0 || permData.label.toLowerCase().includes(searchTerm.toLowerCase())) {
-        acc[key] = {
-          ...permData,
-          permissions: Object.fromEntries(matchingPerms.length > 0 ? matchingPerms : Object.entries(permData.permissions))
+    return Object.entries(permissions).reduce(
+      (acc, [key, permData]) => {
+        const matchingPerms = Object.entries(permData.permissions).filter(
+          ([_permKey, permValue]: [string, any]) =>
+            permValue.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            permValue.description.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        if (
+          matchingPerms.length > 0 ||
+          permData.label.toLowerCase().includes(searchTerm.toLowerCase())
+        ) {
+          acc[key] = {
+            ...permData,
+            permissions: Object.fromEntries(
+              matchingPerms.length > 0 ? matchingPerms : Object.entries(permData.permissions)
+            ),
+          }
         }
-      }
-      return acc
-    }, {} as Record<string, any>)
+        return acc
+      },
+      {} as Record<string, unknown>
+    )
   }
   if (!userData) {
     return (
@@ -426,7 +638,9 @@ export function UserPermissionsDialog({
                 <CardContent className="grid gap-4 md:grid-cols-4">
                   <div>
                     <p className="text-sm font-medium">Nom complet</p>
-                    <p className="text-sm text-muted-foreground">{userData.firstName} {userData.lastName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {userData.firstName} {userData.lastName}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium">Email</p>
@@ -447,7 +661,8 @@ export function UserPermissionsDialog({
                 <CardHeader>
                   <CardTitle className="text-lg">Actions rapides</CardTitle>
                   <FormDescription>
-                    Permissions actuelles: <Badge variant="secondary">{getPermissionCount()} permissions actives</Badge>
+                    Permissions actuelles:{' '}
+                    <Badge variant="secondary">{getPermissionCount()} permissions actives</Badge>
                   </FormDescription>
                 </CardHeader>
                 <CardContent>
@@ -496,8 +711,16 @@ export function UserPermissionsDialog({
                     <Alert className="mt-4">
                       <Info className="h-4 w-4" />
                       <div>
-                        <p className="font-medium">Modèle appliqué: {ROLE_TEMPLATES[selectedTemplate as keyof typeof ROLE_TEMPLATES].label}</p>
-                        <p className="text-sm text-muted-foreground">{ROLE_TEMPLATES[selectedTemplate as keyof typeof ROLE_TEMPLATES].description}</p>
+                        <p className="font-medium">
+                          Modèle appliqué:{' '}
+                          {ROLE_TEMPLATES[selectedTemplate as keyof typeof ROLE_TEMPLATES].label}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {
+                            ROLE_TEMPLATES[selectedTemplate as keyof typeof ROLE_TEMPLATES]
+                              .description
+                          }
+                        </p>
                       </div>
                     </Alert>
                   )}
@@ -512,53 +735,63 @@ export function UserPermissionsDialog({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {Object.entries(filterPermissions(DETAILED_PERMISSIONS)).map(([moduleKey, moduleData]) => (
-                    <div key={moduleKey} className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-base">{moduleData.label}</h4>
-                        <Badge variant="outline">
-                          {form.watch(`permissions.${moduleKey as keyof PermissionsFormData['permissions']}`).length} / {Object.keys(moduleData.permissions).length}
-                        </Badge>
+                  {Object.entries(filterPermissions(DETAILED_PERMISSIONS)).map(
+                    ([moduleKey, moduleData]) => (
+                      <div key={moduleKey} className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-base">{moduleData.label}</h4>
+                          <Badge variant="outline">
+                            {form.watch(
+                              `permissions.${moduleKey as keyof PermissionsFormData['permissions']}`
+                            )?.length || 0}{' '}
+                            / {Object.keys(moduleData.permissions).length}
+                          </Badge>
+                        </div>
+                        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                          {Object.entries(moduleData.permissions).map(
+                            ([permKey, permData]: [string, any]) => (
+                              <FormField
+                                key={`${moduleKey}-${permKey}`}
+                                control={form.control}
+                                name={`permissions.${moduleKey as keyof PermissionsFormData['permissions']}`}
+                                render={({ field }) => (
+                                  <FormItem className="flex items-start space-x-3 p-3 border rounded-lg">
+                                    <FormControl>
+                                      <Switch
+                                        checked={field.value?.includes(permKey) || false}
+                                        onCheckedChange={(checked) => {
+                                          const currentPerms = field.value || []
+                                          if (checked) {
+                                            field.onChange([...currentPerms, permKey])
+                                          } else {
+                                            field.onChange(
+                                              currentPerms.filter((p) => p !== permKey)
+                                            )
+                                          }
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <div className="flex-1 min-w-0">
+                                      <FormLabel className="text-sm font-medium leading-tight cursor-pointer">
+                                        {permData.label}
+                                      </FormLabel>
+                                      <FormDescription className="text-xs text-muted-foreground mt-1">
+                                        {permData.description}
+                                      </FormDescription>
+                                    </div>
+                                  </FormItem>
+                                )}
+                              />
+                            )
+                          )}
+                        </div>
+                        {moduleKey !==
+                          Object.keys(filterPermissions(DETAILED_PERMISSIONS))[
+                            Object.keys(filterPermissions(DETAILED_PERMISSIONS)).length - 1
+                          ] && <Separator className="mt-4" />}
                       </div>
-                      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                        {Object.entries(moduleData.permissions).map(([permKey, permData]: [string, any]) => (
-                          <FormField
-                            key={`${moduleKey}-${permKey}`}
-                            control={form.control}
-                            name={`permissions.${moduleKey as keyof PermissionsFormData['permissions']}`}
-                            render={({ field }) => (
-                              <FormItem className="flex items-start space-x-3 p-3 border rounded-lg">
-                                <FormControl>
-                                  <Switch
-                                    checked={field.value?.includes(permKey) || false}
-                                    onCheckedChange={(checked) => {
-                                      const currentPerms = field.value || []
-                                      if (checked) {
-                                        field.onChange([...currentPerms, permKey])
-                                      } else {
-                                        field.onChange(currentPerms.filter(p => p !== permKey))
-                                      }
-                                    }}
-                                  />
-                                </FormControl>
-                                <div className="flex-1 min-w-0">
-                                  <FormLabel className="text-sm font-medium leading-tight cursor-pointer">
-                                    {permData.label}
-                                  </FormLabel>
-                                  <FormDescription className="text-xs text-muted-foreground mt-1">
-                                    {permData.description}
-                                  </FormDescription>
-                                </div>
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                      </div>
-                      {moduleKey !== Object.keys(filterPermissions(DETAILED_PERMISSIONS))[Object.keys(filterPermissions(DETAILED_PERMISSIONS)).length - 1] && (
-                        <Separator className="mt-4" />
-                      )}
-                    </div>
-                  ))}
+                    )
+                  )}
                 </CardContent>
               </Card>
               {/* Temporal Access */}
@@ -573,10 +806,7 @@ export function UserPermissionsDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <div>
                           <FormLabel className="text-sm font-normal">
@@ -626,11 +856,12 @@ export function UserPermissionsDialog({
                       <FormItem>
                         <FormLabel>Raison de la modification</FormLabel>
                         <FormControl>
-                          <Input placeholder="Raison de cette modification des permissions..." {...field} />
+                          <Input
+                            placeholder="Raison de cette modification des permissions..."
+                            {...field}
+                          />
                         </FormControl>
-                        <FormDescription>
-                          Optionnel - pour traçabilité et audit
-                        </FormDescription>
+                        <FormDescription>Optionnel - pour traçabilité et audit</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -15,6 +15,25 @@ interface JwtPayload {
 @Injectable()
 export class JwtEnhancedStrategy extends PassportStrategy(Strategy, 'jwt-enhanced') {
   constructor(configService: ConfigService) {
+    const jwtSecret = configService.get('jwt.secret')
+    const isProduction = process.env.NODE_ENV === 'production'
+
+    if (isProduction && !jwtSecret) {
+      throw new Error('JWT secret is not configured. Please set JWT_SECRET environment variable.')
+    }
+
+    if (jwtSecret && jwtSecret.length < 32) {
+      throw new Error('JWT_SECRET must be at least 32 characters long')
+    }
+
+    // Use a development default only in non-production environments
+    const finalSecret =
+      jwtSecret || (isProduction ? '' : 'jwt-enhanced-dev-secret-min-32-characters')
+
+    if (!finalSecret) {
+      throw new Error('JWT secret cannot be empty')
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -23,7 +42,7 @@ export class JwtEnhancedStrategy extends PassportStrategy(Strategy, 'jwt-enhance
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get('jwt.secret') || 'fallback-secret',
+      secretOrKey: finalSecret,
       passReqToCallback: true,
     } as StrategyOptionsWithRequest)
   }

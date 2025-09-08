@@ -266,7 +266,7 @@ export class MarketplacePromotionsController {
   async getApplicablePromotions(
     @CurrentTenant() _tenantId: string,
     @Param('orderId') _orderId: string,
-    @CurrentUser() _user: any,
+    @CurrentUser() _user: unknown,
     @Query('customerId') _customerId?: string
   ) {
     // Would need to get order first
@@ -281,7 +281,7 @@ export class MarketplacePromotionsController {
   async calculateOrderDiscount(
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: unknown,
     @Query('couponCode') couponCode?: string,
     @Query('customerId') customerId?: string
   ) {

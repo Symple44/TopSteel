@@ -5,24 +5,24 @@
 
 // Utilitaires de filtrage
 export {
-  isEmptyValue,
-  valueToString,
-  applyFilter,
   applyAdvancedFilter,
+  applyFilter,
   filterDataByColumns,
   filterDataBySearch,
+  isEmptyValue,
+  valueToString,
 } from './filterUtils'
 
 // Utilitaires de tri
 export {
   cleanHtmlTags,
-  compareValues,
-  getColumnValue,
-  sortData,
-  cycleSortDirection,
-  updateSortConfig,
-  isColumnSortable,
-  getColumnSortState,
   clearAllSorts,
+  compareValues,
+  cycleSortDirection,
+  getColumnSortState,
+  getColumnValue,
+  isColumnSortable,
   multiColumnSort,
+  sortData,
+  updateSortConfig,
 } from './sortUtils'

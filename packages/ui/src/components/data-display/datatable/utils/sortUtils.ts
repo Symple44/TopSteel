@@ -1,4 +1,4 @@
-import type { SortConfig, ColumnConfig } from '../types'
+import type { ColumnConfig, SortConfig } from '../types'
 
 /**
  * Nettoie les balises HTML d'une chaîne
@@ -10,11 +10,7 @@ export function cleanHtmlTags(value: string): string {
 /**
  * Compare deux valeurs pour le tri
  */
-export function compareValues(
-  aVal: unknown,
-  bVal: unknown,
-  direction: 'asc' | 'desc'
-): number {
+export function compareValues(aVal: unknown, bVal: unknown, direction: 'asc' | 'desc'): number {
   // Gérer les valeurs null/undefined
   if (aVal == null && bVal == null) return 0
   if (aVal == null) return direction === 'desc' ? 1 : -1
@@ -32,9 +28,9 @@ export function compareValues(
   if (aVal === bVal) return 0
 
   // Comparaison simple et fiable
-  if ((aVal as any) < (bVal as any)) return direction === 'desc' ? 1 : -1
-  if ((aVal as any) > (bVal as any)) return direction === 'desc' ? -1 : 1
-  
+  if ((aVal as unknown) < (bVal as unknown)) return direction === 'desc' ? 1 : -1
+  if ((aVal as unknown) > (bVal as unknown)) return direction === 'desc' ? -1 : 1
+
   return 0
 }
 
@@ -49,13 +45,13 @@ export function getColumnValue<T>(
   if (column?.getValue) {
     return column.getValue(row)
   }
-  return (row as any)[column?.key || columnKey]
+  return (row as unknown)[column?.key || columnKey]
 }
 
 /**
  * Applique le tri sur un tableau de données
  */
-export function sortData<T extends Record<string, any>>(
+export function sortData<T extends Record<string, unknown>>(
   data: T[],
   sortConfigs: SortConfig[],
   columns: ColumnConfig<T>[]
@@ -63,15 +59,15 @@ export function sortData<T extends Record<string, any>>(
   if (!sortConfigs || sortConfigs.length === 0) return data
 
   const sorted = [...data]
-  
+
   // Appliquer chaque configuration de tri dans l'ordre
   sortConfigs.forEach((sortConfig) => {
     sorted.sort((a, b) => {
       const column = columns.find((col) => col.id === sortConfig.column)
-      
+
       const aVal = getColumnValue(a, column, sortConfig.column)
       const bVal = getColumnValue(b, column, sortConfig.column)
-      
+
       return compareValues(aVal, bVal, sortConfig.direction)
     })
   })
@@ -99,12 +95,12 @@ export function updateSortConfig(
   forceDirection?: 'asc' | 'desc' | null
 ): SortConfig[] {
   const existing = sortConfigs.find((s) => s.column === columnId)
-  
+
   // Si forceDirection est null, supprimer le tri
   if (forceDirection === null) {
     return sortConfigs.filter((s) => s.column !== columnId)
   }
-  
+
   // Si une direction est forcée, l'utiliser
   if (forceDirection === 'asc' || forceDirection === 'desc') {
     if (existing) {
@@ -115,7 +111,7 @@ export function updateSortConfig(
       return [...sortConfigs, { column: columnId, direction: forceDirection }]
     }
   }
-  
+
   // Si forceDirection est undefined, utiliser la logique de cycle
   if (forceDirection === undefined) {
     if (existing) {
@@ -123,14 +119,12 @@ export function updateSortConfig(
       if (newDirection === null) {
         return sortConfigs.filter((s) => s.column !== columnId)
       }
-      return sortConfigs.map((s) =>
-        s.column === columnId ? { ...s, direction: newDirection } : s
-      )
+      return sortConfigs.map((s) => (s.column === columnId ? { ...s, direction: newDirection } : s))
     } else {
       return [...sortConfigs, { column: columnId, direction: 'desc' }]
     }
   }
-  
+
   return sortConfigs
 }
 
@@ -171,7 +165,7 @@ export function clearAllSorts(): SortConfig[] {
  * Applique un tri multi-colonnes
  * (utile pour trier par plusieurs colonnes en même temps)
  */
-export function multiColumnSort<T extends Record<string, any>>(
+export function multiColumnSort<T extends Record<string, unknown>>(
   data: T[],
   sortConfigs: SortConfig[],
   columns: ColumnConfig<T>[]
@@ -179,24 +173,24 @@ export function multiColumnSort<T extends Record<string, any>>(
   if (!sortConfigs || sortConfigs.length === 0) return data
 
   const sorted = [...data]
-  
+
   sorted.sort((a, b) => {
     // Parcourir toutes les configurations de tri
     for (const sortConfig of sortConfigs) {
       const column = columns.find((col) => col.id === sortConfig.column)
-      
+
       const aVal = getColumnValue(a, column, sortConfig.column)
       const bVal = getColumnValue(b, column, sortConfig.column)
-      
+
       const comparison = compareValues(aVal, bVal, sortConfig.direction)
-      
+
       // Si les valeurs sont différentes, retourner le résultat
       if (comparison !== 0) {
         return comparison
       }
       // Si les valeurs sont égales, passer à la colonne suivante
     }
-    
+
     // Si toutes les colonnes sont égales
     return 0
   })

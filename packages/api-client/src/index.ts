@@ -1,23 +1,40 @@
 /**
- * 🌐 API CLIENT - PACKAGE @erp/api-client
- * Client API centralisé pour l'ERP TopSteel
+ * 🌐 @erp/api-client - MAIN EXPORT INDEX
+ * Tree-shaking optimized API client exports for TopSteel ERP
+ *
+ * ORGANIZATION:
+ * - Core utilities and base classes
+ * - Domain-specific API clients
+ * - Main ERPApiClient for convenience
+ *
+ * For better tree-shaking, prefer importing from specific subpaths:
+ * - @erp/api-client/core
+ * - @erp/api-client/clients
+ * - @erp/api-client/projects
+ * - etc.
  */
 
+// ===== COMPLETE DOMAIN EXPORTS =====
+// Re-export all API clients for backward compatibility
 export * from './admin'
 export * from './auth'
-// ===== DOMAIN CLIENTS =====
 export * from './clients'
-// ===== CORE =====
+// ===== ESSENTIAL DOMAIN EXPORTS =====
+// Most commonly used API clients
+export { ClientApiClient } from './clients'
+export type { ApiClientConfig } from './core'
+// ===== CORE EXPORTS =====
 export * from './core'
 export * from './inventory'
 export * from './partners'
 export * from './pricing'
 export * from './projects'
+export { ProjectApiClient } from './projects'
 export * from './quotes'
 export * from './users'
+export { UserSettingsApiClient } from './users'
 
 // ===== MAIN API CLIENT =====
-
 import { SystemParametersApiClient } from './admin'
 import { ClientApiClient } from './clients'
 import type { ApiClientConfig } from './core'
@@ -27,6 +44,15 @@ import { PricingApi } from './pricing'
 import { ProjectApiClient } from './projects'
 import { UserSettingsApiClient } from './users'
 
+/**
+ * Main ERP API Client - Orchestrates all domain-specific clients
+ *
+ * @example
+ * ```typescript
+ * const apiClient = new ERPApiClient({ baseURL: 'https://api.example.com' })
+ * const projects = await apiClient.projects.getAll()
+ * ```
+ */
 export class ERPApiClient {
   public readonly clients: ClientApiClient
   public readonly projects: ProjectApiClient

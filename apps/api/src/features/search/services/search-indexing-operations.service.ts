@@ -201,7 +201,7 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
       .filter((r) => r.status === 'fulfilled' && !r.value.success)
       .map((r) =>
         r.status === 'fulfilled'
-          ? { id: r.value.id, type: r.value.type, error: r.value.error }
+          ? { id: r.value.id, type: r.value.type, error: r.value.error || 'Unknown error' }
           : { id: '', type: '', error: 'Unknown error' }
       )
 

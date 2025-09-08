@@ -159,9 +159,9 @@ export default function QueryBuilderTestPage() {
         body: JSON.stringify(testQueryBuilder),
       })
 
-      if (response.ok) {
-        const created = await response.json()
-        router.push(`/query-builder/${created.id}`)
+      if (response?.ok) {
+        const created = await response?.json()
+        router?.push(`/query-builder/${created?.id}`)
       } else {
       }
     } catch (_error) {}
@@ -234,7 +234,7 @@ export default function QueryBuilderTestPage() {
         </div>
 
         <div className="text-center">
-          <Button size="lg" onClick={createTestQueryBuilder}>
+          <Button type="button" size="lg" onClick={createTestQueryBuilder}>
             Créer un Query Builder de Test
           </Button>
           <p className="text-sm text-muted-foreground mt-2">

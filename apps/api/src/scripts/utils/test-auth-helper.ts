@@ -22,26 +22,27 @@ export interface TestAuthConfig {
   expiresIn?: string
 }
 
-export class TestAuthHelper {
-  private static jwtService: JwtService
+export namespace TestAuthHelper {
+  let jwtService: JwtService
+  let _configService: ConfigService
 
   /**
    * Initialise le helper avec les services nécessaires
    */
-  static initialize(jwtService?: JwtService, configService?: ConfigService) {
-    TestAuthHelper.jwtService =
-      jwtService ||
+  export function initialize(jwtServiceParam?: JwtService, configServiceParam?: ConfigService) {
+    jwtService =
+      jwtServiceParam ||
       new JwtService({
-        secret: process.env.JWT_SECRET || TestAuthHelper.generateTestSecret(),
+        secret: process.env.JWT_SECRET || generateTestSecret(),
         signOptions: { expiresIn: '1h' },
       })
-    TestAuthHelper.configService = configService || new ConfigService()
+    _configService = configServiceParam || new ConfigService()
   }
 
   /**
    * Génère un secret de test sécurisé pour le développement
    */
-  private static generateTestSecret(): string {
+  function generateTestSecret(): string {
     const secret = crypto.randomBytes(32).toString('hex')
     console.warn('⚠️  Using generated test secret. For production, set JWT_SECRET in .env')
     return secret
@@ -50,9 +51,9 @@ export class TestAuthHelper {
   /**
    * Génère un token JWT pour les tests
    */
-  static generateTestToken(config: TestAuthConfig = {}): string {
-    if (!TestAuthHelper.jwtService) {
-      TestAuthHelper.initialize()
+  export function generateTestToken(config: TestAuthConfig = {}): string {
+    if (!jwtService) {
+      initialize()
     }
 
     // Générer un societeId réaliste (UUID v4 format)
@@ -76,7 +77,7 @@ export class TestAuthHelper {
       iat: Math.floor(Date.now() / 1000),
     }
 
-    return TestAuthHelper.jwtService.sign(payload, {
+    return jwtService.sign(payload, {
       expiresIn: config.expiresIn || '1h',
     })
   }
@@ -84,7 +85,7 @@ export class TestAuthHelper {
   /**
    * Génère un token depuis les variables d'environnement
    */
-  static async getTokenFromEnv(): Promise<string | null> {
+  export async function getTokenFromEnv(): Promise<string | null> {
     // Option 1: Token pré-généré dans .env.test
     if (process.env.TEST_AUTH_TOKEN) {
       console.log('✅ Using TEST_AUTH_TOKEN from environment')
@@ -94,7 +95,7 @@ export class TestAuthHelper {
     // Option 2: Générer avec les credentials de test depuis .env
     if (process.env.TEST_USER_EMAIL && process.env.TEST_USER_ID) {
       console.log('✅ Generating token from TEST_USER credentials')
-      return TestAuthHelper.generateTestToken({
+      return generateTestToken({
         email: process.env.TEST_USER_EMAIL,
         userId: process.env.TEST_USER_ID,
         societeId: process.env.TEST_SOCIETE_ID,
@@ -105,7 +106,7 @@ export class TestAuthHelper {
     // Option 3: Mode développement - générer un token de test
     if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
       console.log('⚠️  Generating development test token')
-      return TestAuthHelper.generateTestToken()
+      return generateTestToken()
     }
 
     console.error('❌ No test authentication method available')
@@ -115,7 +116,7 @@ export class TestAuthHelper {
   /**
    * Sauvegarde un token dans un fichier temporaire sécurisé
    */
-  static async saveTokenToFile(token: string): Promise<string> {
+  export async function saveTokenToFile(token: string): Promise<string> {
     const tempDir = path.join(process.cwd(), '.tmp')
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true })
@@ -133,7 +134,7 @@ export class TestAuthHelper {
   /**
    * Lit un token depuis un fichier
    */
-  static async readTokenFromFile(filePath: string): Promise<string | null> {
+  export async function readTokenFromFile(filePath: string): Promise<string | null> {
     try {
       if (!fs.existsSync(filePath)) {
         console.error(`❌ Token file not found: ${filePath}`)
@@ -158,8 +159,8 @@ export class TestAuthHelper {
   /**
    * Génère un header d'autorisation complet
    */
-  static async getAuthHeader(): Promise<{ Authorization: string } | null> {
-    const token = await TestAuthHelper.getTokenFromEnv()
+  export async function getAuthHeader(): Promise<{ Authorization: string } | null> {
+    const token = await getTokenFromEnv()
     if (!token) {
       return null
     }
@@ -169,7 +170,7 @@ export class TestAuthHelper {
   /**
    * Nettoie les fichiers de tokens temporaires
    */
-  static cleanupTokenFiles(): void {
+  export function cleanupTokenFiles(): void {
     const tempDir = path.join(process.cwd(), '.tmp')
     if (fs.existsSync(tempDir)) {
       const files = fs.readdirSync(tempDir)

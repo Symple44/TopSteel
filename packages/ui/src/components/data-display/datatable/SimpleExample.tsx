@@ -86,10 +86,10 @@ import { useState } from 'react'
 
 export function SimpleDataTableExample() {
   const [data, setData] = useState<SimpleEmployee[]>(sampleData)
-  const [selectedRows, setSelectedRows] = useState<string[]>([])
+  const [selectedRows, _setSelectedRows] = useState<string[]>([])
 
   // Configuration pour AdvancedDataTable
-  const simpleColumns: ColumnConfig<SimpleEmployee>[] = [
+  const _simpleColumns: ColumnConfig<SimpleEmployee>[] = [
     {
       id: 'nom',
       key: 'nom',
@@ -187,9 +187,7 @@ export function SimpleDataTableExample() {
       </div>
 
       {selectedRows.length > 0 && (
-        <div className="text-sm text-gray-600">
-          {selectedRows.length} ligne(s) sélectionnée(s)
-        </div>
+        <div className="text-sm text-gray-600">{selectedRows.length} ligne(s) sélectionnée(s)</div>
       )}
     </div>
   )

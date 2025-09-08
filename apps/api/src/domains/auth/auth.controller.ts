@@ -15,6 +15,7 @@ import { CurrentUser } from '../../core/common/decorators/current-user.decorator
 import { Public } from '../../core/common/decorators/public.decorator'
 import { ThrottleAuth } from '../../core/common/decorators/throttle-config.decorator'
 import type { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+import { SkipCsrf } from '../../infrastructure/security/csrf'
 import type { User } from '../users/entities/user.entity'
 import type { AuthService } from './auth.service'
 import { Roles } from './decorators/roles.decorator'
@@ -34,6 +35,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @SkipCsrf()
   @ThrottleAuth()
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -84,6 +86,7 @@ export class AuthController {
   }
 
   @Public()
+  @SkipCsrf()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -95,6 +98,7 @@ export class AuthController {
     return this.authService.refreshToken(refreshTokenDto.refreshToken)
   }
 
+  @SkipCsrf()
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

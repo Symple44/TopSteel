@@ -85,7 +85,7 @@ interface BulkOperationsHistoryProps {
   limit?: number
 }
 
-export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperationsHistoryProps) {
+export function BulkOperationsHistory({ userId, limit = 20 }: BulkOperationsHistoryProps) {
   const [operations, setOperations] = useState<BulkOperation[]>([])
   const [loading, setLoading] = useState(true)
   const [_selectedOperation, setSelectedOperation] = useState<BulkOperation | null>(null)
@@ -93,16 +93,16 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
   const loadHistory = useCallback(async () => {
     try {
       setLoading(true)
-      const { callClientApi } = await import('@/utils/backend-api')
+      const { callClientApi } = (await import('@/utils/backend-api')) || {}
       const endpoint = userId
         ? `admin/users/${userId}/bulk-operations-history?limit=${limit}`
         : `admin/users/bulk-operations?limit=${limit}`
 
       const response = await callClientApi(endpoint)
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setOperations(data.data)
+      if (data?.success) {
+        setOperations(data?.data)
       }
     } catch (_error) {
     } finally {
@@ -117,7 +117,7 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
+    const diffMs = now?.getTime() - date?.getTime()
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffHours / 24)
 
@@ -128,10 +128,10 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
     } else if (diffDays < 7) {
       return `Il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}`
     } else {
-      return date.toLocaleDateString('fr-FR', {
+      return date?.toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: 'short',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+        year: date?.getFullYear() !== now?.getFullYear() ? 'numeric' : undefined,
         hour: '2-digit',
         minute: '2-digit',
       })
@@ -174,7 +174,7 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
             Historique des opérations en masse
             {userId && ' (cet utilisateur)'}
           </CardTitle>
-          <Button variant="outline" size="sm" onClick={loadHistory}>
+          <Button type="button" variant="outline" size="sm" onClick={loadHistory}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualiser
           </Button>
@@ -199,7 +199,7 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
               </TableRow>
             </TableHeader>
             <TableBody>
-              {operations.map((operation) => (
+              {operations?.map((operation) => (
                 <TableRow key={operation.id}>
                   <TableCell>
                     <div className="flex items-center space-x-2">
@@ -262,6 +262,7 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => setSelectedOperation(operation)}

@@ -1,4 +1,5 @@
 import type { Meta } from '@storybook/react'
+import { useId } from 'react'
 import { Label } from '../../components/forms/label'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/layout/card'
 import { Button } from '../../components/primitives/button'
@@ -27,149 +28,169 @@ const meta: Meta = {
 
 export default meta
 
-export const ProjetForm = () => (
-  <Card className="w-[500px]">
-    <CardHeader>
-      <CardTitle>Créer un nouveau projet</CardTitle>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="nom">Nom du projet *</Label>
-          <Input id="nom" placeholder="Ex: Hangar agricole 2024" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="reference">Référence</Label>
-          <Input id="reference" placeholder="PRJ-2024-001" />
-        </div>
-      </div>
+export const ProjetForm = () => {
+  const nomId = useId()
+  const referenceId = useId()
+  const dateDebutId = useId()
+  const dateFinId = useId()
+  const budgetId = useId()
+  const descriptionId = useId()
+  const urgentId = useId()
 
-      <div className="space-y-2">
-        <Label htmlFor="client">Client *</Label>
-        <Select>
-          <SelectTrigger>
-            <SelectValue placeholder="Sélectionner un client" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ferme-martin">Ferme Martin</SelectItem>
-            <SelectItem value="transport-abc">SARL Transport ABC</SelectItem>
-            <SelectItem value="industrie-xyz">Industries XYZ</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+  return (
+    <Card className="w-[500px]">
+      <CardHeader>
+        <CardTitle>Créer un nouveau projet</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor={nomId}>Nom du projet *</Label>
+            <Input id={nomId} placeholder="Ex: Hangar agricole 2024" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={referenceId}>Référence</Label>
+            <Input id={referenceId} placeholder="PRJ-2024-001" />
+          </div>
+        </div>
 
-      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="type">Type de projet</Label>
+          <Label htmlFor="client">Client *</Label>
           <Select>
             <SelectTrigger>
-              <SelectValue placeholder="Choisir le type" />
+              <SelectValue placeholder="Sélectionner un client" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="hangar">Hangar</SelectItem>
-              <SelectItem value="structure">Structure métallique</SelectItem>
-              <SelectItem value="garde-corps">Garde-corps</SelectItem>
-              <SelectItem value="escalier">Escalier</SelectItem>
+              <SelectItem value="ferme-martin">Ferme Martin</SelectItem>
+              <SelectItem value="transport-abc">SARL Transport ABC</SelectItem>
+              <SelectItem value="industrie-xyz">Industries XYZ</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="priorite">Priorité</Label>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Priorité" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="basse">Basse</SelectItem>
-              <SelectItem value="normale">Normale</SelectItem>
-              <SelectItem value="haute">Haute</SelectItem>
-              <SelectItem value="urgente">Urgente</SelectItem>
-            </SelectContent>
-          </Select>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="type">Type de projet</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir le type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hangar">Hangar</SelectItem>
+                <SelectItem value="structure">Structure métallique</SelectItem>
+                <SelectItem value="garde-corps">Garde-corps</SelectItem>
+                <SelectItem value="escalier">Escalier</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="priorite">Priorité</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Priorité" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="basse">Basse</SelectItem>
+                <SelectItem value="normale">Normale</SelectItem>
+                <SelectItem value="haute">Haute</SelectItem>
+                <SelectItem value="urgente">Urgente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="date-debut">Date de début</Label>
-          <Input id="date-debut" type="date" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor={dateDebutId}>Date de début</Label>
+            <Input id={dateDebutId} type="date" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={dateFinId}>Date de fin prévue</Label>
+            <Input id={dateFinId} type="date" />
+          </div>
         </div>
+
         <div className="space-y-2">
-          <Label htmlFor="date-fin">Date de fin prévue</Label>
-          <Input id="date-fin" type="date" />
+          <Label htmlFor={budgetId}>Budget prévisionnel (€ HT)</Label>
+          <Input id={budgetId} type="number" placeholder="45000" />
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="budget">Budget prévisionnel (€ HT)</Label>
-        <Input id="budget" type="number" placeholder="45000" />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea id="description" placeholder="Description détaillée du projet..." rows={3} />
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Checkbox id="urgent" />
-        <Label htmlFor="urgent">Projet urgent nécessitant un suivi particulier</Label>
-      </div>
-
-      <div className="flex space-x-2">
-        <Button type="submit">Créer le projet</Button>
-        <Button variant="outline">Annuler</Button>
-      </div>
-    </CardContent>
-  </Card>
-)
-
-export const ClientForm = () => (
-  <Card className="w-[400px]">
-    <CardHeader>
-      <CardTitle>Nouveau client</CardTitle>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="raison-sociale">Raison sociale *</Label>
-        <Input id="raison-sociale" placeholder="Ex: SARL Martin" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="siret">SIRET</Label>
-          <Input id="siret" placeholder="12345678901234" />
+          <Label htmlFor={descriptionId}>Description</Label>
+          <Textarea id={descriptionId} placeholder="Description détaillée du projet..." rows={3} />
         </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox id={urgentId} />
+          <Label htmlFor={urgentId}>Projet urgent nécessitant un suivi particulier</Label>
+        </div>
+
+        <div className="flex space-x-2">
+          <Button type="submit">Créer le projet</Button>
+          <Button variant="outline">Annuler</Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export const ClientForm = () => {
+  const raisonSocialeId = useId()
+  const siretId = useId()
+  const tvaId = useId()
+  const adresseId = useId()
+  const contactId = useId()
+  const emailId = useId()
+  const telephoneId = useId()
+
+  return (
+    <Card className="w-[400px]">
+      <CardHeader>
+        <CardTitle>Nouveau client</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="tva">N° TVA</Label>
-          <Input id="tva" placeholder="FR12345678901" />
+          <Label htmlFor={raisonSocialeId}>Raison sociale *</Label>
+          <Input id={raisonSocialeId} placeholder="Ex: SARL Martin" />
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="adresse">Adresse</Label>
-        <Textarea id="adresse" placeholder="Adresse complète..." rows={2} />
-      </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor={siretId}>SIRET</Label>
+            <Input id={siretId} placeholder="12345678901234" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={tvaId}>N° TVA</Label>
+            <Input id={tvaId} placeholder="FR12345678901" />
+          </div>
+        </div>
 
-      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="contact">Contact principal</Label>
-          <Input id="contact" placeholder="Jean Martin" />
+          <Label htmlFor={adresseId}>Adresse</Label>
+          <Textarea id={adresseId} placeholder="Adresse complète..." rows={2} />
         </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor={contactId}>Contact principal</Label>
+            <Input id={contactId} placeholder="Jean Martin" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={emailId}>Email</Label>
+            <Input id={emailId} type="email" placeholder="contact@martin.fr" />
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="contact@martin.fr" />
+          <Label htmlFor={telephoneId}>Téléphone</Label>
+          <Input id={telephoneId} type="tel" placeholder="01 23 45 67 89" />
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="telephone">Téléphone</Label>
-        <Input id="telephone" type="tel" placeholder="01 23 45 67 89" />
-      </div>
-
-      <div className="flex space-x-2">
-        <Button type="submit">Ajouter le client</Button>
-        <Button variant="outline">Annuler</Button>
-      </div>
-    </CardContent>
-  </Card>
-)
+        <div className="flex space-x-2">
+          <Button type="submit">Ajouter le client</Button>
+          <Button variant="outline">Annuler</Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

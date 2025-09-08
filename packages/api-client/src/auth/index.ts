@@ -139,16 +139,16 @@ export class AuthApiClient {
    */
   async login(data: LoginRequest): Promise<LoginResponse> {
     const response = await this.api.post<LoginResponse>('/auth/login', data)
-    
+
     // Stocker le token si fourni
     if (response.data.access_token) {
       this.setAccessToken(response.data.access_token)
     }
-    
+
     if (response.data.refresh_token) {
       this.setRefreshToken(response.data.refresh_token)
     }
-    
+
     return response.data
   }
 
@@ -177,24 +177,24 @@ export class AuthApiClient {
    */
   async refreshToken(data?: RefreshTokenRequest): Promise<RefreshTokenResponse> {
     const refreshToken = data?.refresh_token || this.getRefreshToken()
-    
+
     if (!refreshToken) {
       throw new Error('No refresh token available')
     }
-    
+
     const response = await this.api.post<RefreshTokenResponse>('/auth/refresh', {
       refresh_token: refreshToken,
     })
-    
+
     // Mettre à jour les tokens
     if (response.data.access_token) {
       this.setAccessToken(response.data.access_token)
     }
-    
+
     if (response.data.refresh_token) {
       this.setRefreshToken(response.data.refresh_token)
     }
-    
+
     return response.data
   }
 
@@ -281,13 +281,15 @@ export class AuthApiClient {
   /**
    * Récupérer les sessions actives
    */
-  async getActiveSessions(): Promise<Array<{
-    id: string
-    userAgent: string
-    ip: string
-    lastActivity: Date
-    current: boolean
-  }>> {
+  async getActiveSessions(): Promise<
+    Array<{
+      id: string
+      userAgent: string
+      ip: string
+      lastActivity: Date
+      current: boolean
+    }>
+  > {
     const response = await this.api.get('/auth/sessions')
     return response.data
   }
@@ -317,12 +319,12 @@ export class AuthApiClient {
   /**
    * Méthodes utilitaires pour gérer les tokens localement
    */
-  private setAccessToken(token: string): void {
+  private setAccessToken(_token: string): void {
     // Les tokens sont maintenant gérés par cookies HttpOnly
     // Cette méthode est conservée pour la compatibilité
   }
 
-  private setRefreshToken(token: string): void {
+  private setRefreshToken(_token: string): void {
     // Les tokens sont maintenant gérés par cookies HttpOnly
     // Cette méthode est conservée pour la compatibilité
   }

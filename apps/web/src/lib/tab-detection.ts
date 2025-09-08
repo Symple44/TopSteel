@@ -19,16 +19,16 @@ export function detectMultipleTabs(): Promise<boolean> {
 
     // Écouter les réponses d'autres onglets
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'TAB_PING_RESPONSE') {
+      if (event?.data.type === 'TAB_PING_RESPONSE') {
         hasResponse = true
-        channel.close()
+        channel?.close()
         resolve(true)
       }
     }
 
     // Envoyer un ping pour détecter d'autres onglets
     const sendPing = () => {
-      channel.postMessage({
+      channel?.postMessage({
         type: 'TAB_PING',
         tabId,
         timestamp: Date.now(),
@@ -37,29 +37,29 @@ export function detectMultipleTabs(): Promise<boolean> {
 
     // Répondre aux pings d'autres onglets
     const handlePing = (event: MessageEvent) => {
-      if (event.data.type === 'TAB_PING' && event.data.tabId !== tabId) {
-        channel.postMessage({
+      if (event?.data.type === 'TAB_PING' && event?.data?.tabId !== tabId) {
+        channel?.postMessage({
           type: 'TAB_PING_RESPONSE',
-          originalTabId: event.data.tabId,
+          originalTabId: event?.data?.tabId,
           responderTabId: tabId,
           timestamp: Date.now(),
         })
       }
     }
 
-    channel.addEventListener('message', handleMessage)
-    channel.addEventListener('message', handlePing)
+    channel?.addEventListener('message', handleMessage)
+    channel?.addEventListener('message', handlePing)
 
     // Envoyer le ping
     sendPing()
 
     // Attendre 500ms pour les réponses
     setTimeout(() => {
-      channel.removeEventListener('message', handleMessage)
-      channel.removeEventListener('message', handlePing)
+      channel?.removeEventListener('message', handleMessage)
+      channel?.removeEventListener('message', handlePing)
 
       if (!hasResponse) {
-        channel.close()
+        channel?.close()
         resolve(false)
       }
     }, 500)
@@ -75,12 +75,12 @@ export function getApproximateTabCount(): number {
 
   try {
     // Générer un ID unique pour cet onglet s'il n'existe pas
-    if (!sessionStorage.getItem('tab-id')) {
+    if (!sessionStorage?.getItem('tab-id')) {
       sessionStorage.setItem('tab-id', `tab_${Date.now()}_${Math.random()}`)
     }
 
     // Récupérer la liste des onglets actifs depuis localStorage
-    const activeTabsData = localStorage.getItem('topsteel-active-tabs')
+    const activeTabsData = localStorage?.getItem('topsteel-active-tabs')
     const activeTabs = activeTabsData ? JSON.parse(activeTabsData) : {}
 
     // Nettoyer les onglets inactifs (plus de 30 secondes)
@@ -90,7 +90,7 @@ export function getApproximateTabCount(): number {
     )
 
     // Ajouter/mettre à jour cet onglet
-    const currentTabId = sessionStorage.getItem('tab-id')!
+    const currentTabId = sessionStorage?.getItem('tab-id')!
     cleanedTabs[currentTabId] = now
 
     // Sauvegarder la liste mise à jour
@@ -109,9 +109,9 @@ export function cleanupTabDetection(): void {
   if (typeof window === 'undefined') return
 
   try {
-    const currentTabId = sessionStorage.getItem('tab-id')
+    const currentTabId = sessionStorage?.getItem('tab-id')
     if (currentTabId) {
-      const activeTabsData = localStorage.getItem('topsteel-active-tabs')
+      const activeTabsData = localStorage?.getItem('topsteel-active-tabs')
       if (activeTabsData) {
         const activeTabs = JSON.parse(activeTabsData)
         delete activeTabs[currentTabId]

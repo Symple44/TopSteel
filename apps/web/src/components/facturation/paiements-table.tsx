@@ -69,9 +69,9 @@ const getStatusBadge = (statut: string) => {
     rejete: { label: 'Rejeté', variant: 'destructive' as const },
   }
 
-  const item = config[statut as keyof typeof config] || config.en_attente
+  const item = config[statut as keyof typeof config] || config?.en_attente
 
-  return <Badge variant={item.variant}>{item.label}</Badge>
+  return <Badge variant={item?.variant}>{item?.label}</Badge>
 }
 
 interface PaiementsTableProps {
@@ -108,7 +108,7 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paiements.map((paiement) => (
+          {paiements?.map((paiement) => (
             <TableRow key={paiement.id}>
               <TableCell className="font-medium">{paiement.reference}</TableCell>
               <TableCell>{paiement.clientNom}</TableCell>
@@ -121,20 +121,20 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
               <TableCell>{getStatusBadge(paiement.statut)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-1">
-                  <Button variant="ghost" size="sm">
+                  <Button type="button" variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button type="button" variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button type="button" variant="ghost" size="sm">
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
               </TableCell>
             </TableRow>
           ))}
-          {paiements.length === 0 && (
+          {paiements?.length === 0 && (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                 Aucun {type} trouvé

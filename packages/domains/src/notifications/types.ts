@@ -202,6 +202,7 @@ export interface NotificationFilters {
   entityId?: string
   fromDate?: string
   toDate?: string
+  limit?: number
 }
 
 export interface NotificationListResponse {

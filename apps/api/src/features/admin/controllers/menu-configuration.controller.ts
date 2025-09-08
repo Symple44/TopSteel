@@ -1,11 +1,23 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Request } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
+import { getErrorMessage } from '../../../core/common/utils'
+import {
+  GlobalUserRole,
+  SocieteRoleType,
+} from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import type { User } from '../../../domains/users/entities/user.entity'
 import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
-import { GlobalUserRole, SocieteRoleType } from '../../../domains/auth/core/constants/roles.constants'
+import type { User } from '../../../domains/users/entities/user.entity'
 import type {
   CreateMenuConfigDto,
   MenuConfigurationService,
@@ -47,7 +59,12 @@ export class MenuConfigurationController {
 
   @Get('tree')
   @ApiOperation({ summary: "Obtenir l'arbre de menu de la configuration active" })
-  @ApiQuery({ name: 'configId', required: false, type: String, description: 'ID de la configuration spécifique (optionnel)' })
+  @ApiQuery({
+    name: 'configId',
+    required: false,
+    type: String,
+    description: 'ID de la configuration spécifique (optionnel)',
+  })
   @ApiResponse({ status: 200, description: 'Arbre de menu récupéré avec succès' })
   async getMenuTree(@Query('configId') configId?: string) {
     const tree = await this.menuConfigService.getMenuTree(configId)
@@ -66,10 +83,10 @@ export class MenuConfigurationController {
     try {
       // Récupérer les rôles et permissions réels de l'utilisateur
       const userRoles = [user.role] // Rôle global
-      
+
       // Récupérer les rôles société et permissions
       const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
-      
+
       // Ajouter les rôles société (converted to global roles for permission checking)
       for (const roleInfo of userSocieteRoles) {
         if (roleInfo.effectiveRole) {
@@ -80,18 +97,24 @@ export class MenuConfigurationController {
           }
         }
       }
-      
+
       // Collecter toutes les permissions
       const userPermissions = new Set<string>()
       for (const roleInfo of userSocieteRoles) {
         if (roleInfo.permissions) {
-          roleInfo.permissions.forEach(permission => userPermissions.add(permission))
+          roleInfo.permissions.forEach((permission) => {
+            userPermissions.add(permission)
+          })
         }
         if (roleInfo.additionalPermissions) {
-          roleInfo.additionalPermissions.forEach(permission => userPermissions.add(permission))
+          roleInfo.additionalPermissions.forEach((permission) => {
+            userPermissions.add(permission)
+          })
         }
         if (roleInfo.restrictedPermissions) {
-          roleInfo.restrictedPermissions.forEach(permission => userPermissions.delete(permission))
+          roleInfo.restrictedPermissions.forEach((permission) => {
+            userPermissions.delete(permission)
+          })
         }
       }
 
@@ -107,14 +130,14 @@ export class MenuConfigurationController {
         meta: {
           userId: user.id,
           userRoles,
-          permissionCount: userPermissions.size
-        }
+          permissionCount: userPermissions.size,
+        },
       }
     } catch (error) {
       return {
         success: false,
         message: 'Erreur lors de la récupération du menu filtré',
-        error: error instanceof Error ? error.message : 'Erreur inconnue',
+        error: error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue',
       }
     }
   }
@@ -154,7 +177,11 @@ export class MenuConfigurationController {
   @ApiResponse({ status: 200, description: 'Configuration mise à jour avec succès' })
   @ApiResponse({ status: 404, description: 'Configuration non trouvée' })
   @ApiResponse({ status: 403, description: 'Opération interdite (configuration système)' })
-  async updateConfiguration(@Param('id') id: string, @Body() updateDto: UpdateMenuConfigDto, @CurrentUser() user: User) {
+  async updateConfiguration(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateMenuConfigDto,
+    @CurrentUser() user: User
+  ) {
     const config = await this.menuConfigService.updateConfiguration(id, updateDto, user.id)
     return {
       success: true,
@@ -168,7 +195,10 @@ export class MenuConfigurationController {
   @ApiParam({ name: 'id', type: String, description: 'ID de la configuration de menu' })
   @ApiResponse({ status: 200, description: 'Configuration supprimée avec succès' })
   @ApiResponse({ status: 404, description: 'Configuration non trouvée' })
-  @ApiResponse({ status: 403, description: 'Opération interdite (configuration système ou active)' })
+  @ApiResponse({
+    status: 403,
+    description: 'Opération interdite (configuration système ou active)',
+  })
   async deleteConfiguration(@Param('id') id: string) {
     await this.menuConfigService.deleteConfiguration(id)
     return {
@@ -207,8 +237,11 @@ export class MenuConfigurationController {
   @ApiOperation({ summary: 'Importer une configuration de menu' })
   @ApiBody({ description: 'Données de configuration exportée à importer' })
   @ApiResponse({ status: 201, description: 'Configuration importée avec succès' })
-  @ApiResponse({ status: 400, description: 'Données d\'importation invalides' })
-  async importConfiguration(@Body() importData: Record<string, unknown>, @CurrentUser() user: User) {
+  @ApiResponse({ status: 400, description: "Données d'importation invalides" })
+  async importConfiguration(
+    @Body() importData: Record<string, unknown>,
+    @CurrentUser() user: User
+  ) {
     const config = await this.menuConfigService.importConfiguration(importData, user.id)
     return {
       success: true,

@@ -4,7 +4,7 @@ export interface User {
   nom: string
   prenom: string
   email: string
-  role?: string
+  role: string
   permissions?: string[]
   isActive: boolean
   createdAt: string
@@ -72,7 +72,11 @@ export interface AuthContextType extends AuthState {
   logout: () => Promise<void>
 
   // Actions MFA
-  verifyMFA: (mfaType: string, code?: string, webauthnResponse?: any) => Promise<void>
+  verifyMFA: (
+    mfaType: string,
+    code?: string,
+    webauthnResponse?: PublicKeyCredential
+  ) => Promise<void>
   resetMFA: () => void
 
   // Actions utilisateur
@@ -125,5 +129,10 @@ export interface AuthConfig {
 export interface AuthBroadcastEvent {
   type: 'USER_LOGIN' | 'USER_LOGOUT' | 'COMPANY_CHANGED' | 'TOKEN_REFRESH'
   tabId: string
-  data: any
+  data: {
+    user?: User
+    tokens?: AuthTokens
+    company?: Company
+    [key: string]: unknown
+  }
 }

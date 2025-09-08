@@ -8,7 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { UserMenuPreferences } from './user-menu-preferences.entity'
+// Removed import to avoid circular dependencies
+// import { UserMenuPreferences } from './user-menu-preferences.entity'
 
 @Entity('user_menu_item_preferences')
 @Index(['userPreferencesId', 'menuItemId'], { unique: true })
@@ -58,12 +59,9 @@ export class UserMenuItemPreference {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => UserMenuPreferences,
-    (preferences) => preferences.itemPreferences
-  )
+  @ManyToOne('UserMenuPreferences', 'itemPreferences')
   @JoinColumn({ name: 'userPreferencesId' })
-  userPreferences!: UserMenuPreferences
+  userPreferences!: any
 
   // Méthodes utilitaires
   static create(

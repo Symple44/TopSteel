@@ -24,25 +24,26 @@ const PopoverContext = React.createContext<{
   setOpen: (open: boolean) => void
 }>({
   open: false,
-  setOpen: () => {}
+  setOpen: () => {},
 })
 
 const Popover: React.FC<PopoverProps> = ({ open, onOpenChange, children }) => {
   const [internalOpen, setInternalOpen] = React.useState(false)
-  
+
   const isOpen = open !== undefined ? open : internalOpen
-  const setOpen = React.useCallback((newOpen: boolean) => {
-    if (open === undefined) {
-      setInternalOpen(newOpen)
-    }
-    onOpenChange?.(newOpen)
-  }, [open, onOpenChange])
+  const setOpen = React.useCallback(
+    (newOpen: boolean) => {
+      if (open === undefined) {
+        setInternalOpen(newOpen)
+      }
+      onOpenChange?.(newOpen)
+    },
+    [open, onOpenChange]
+  )
 
   return (
     <PopoverContext.Provider value={{ open: isOpen, setOpen }}>
-      <div className="relative inline-block">
-        {children}
-      </div>
+      <div className="relative inline-block">{children}</div>
     </PopoverContext.Provider>
   )
 }
@@ -50,7 +51,7 @@ const Popover: React.FC<PopoverProps> = ({ open, onOpenChange, children }) => {
 const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
   ({ className, onClick, children, ...props }, ref) => {
     const { setOpen } = React.useContext(PopoverContext)
-    
+
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       setOpen(true)
       onClick?.(event)
@@ -71,7 +72,7 @@ const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
 )
 
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-  ({ className, children, align = 'center', side = 'bottom', sideOffset = 4, ...props }, ref) => {
+  ({ className, children, align = 'center', side = 'bottom', sideOffset = 4, ...props }, _ref) => {
     const { open, setOpen } = React.useContext(PopoverContext)
     const contentRef = React.useRef<HTMLDivElement>(null)
 
@@ -86,6 +87,9 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
         document.addEventListener('mousedown', handleClickOutside)
         return () => document.removeEventListener('mousedown', handleClickOutside)
       }
+
+      // Return undefined cleanup function when open is false
+      return undefined
     }, [open, setOpen])
 
     if (!open) return null
@@ -94,13 +98,16 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
       top: 'bottom-full mb-2',
       bottom: 'top-full mt-2',
       left: 'right-full mr-2',
-      right: 'left-full ml-2'
+      right: 'left-full ml-2',
     }
 
     const alignmentClasses = {
       start: side === 'top' || side === 'bottom' ? 'left-0' : 'top-0',
-      center: side === 'top' || side === 'bottom' ? 'left-1/2 -translate-x-1/2' : 'top-1/2 -translate-y-1/2',
-      end: side === 'top' || side === 'bottom' ? 'right-0' : 'bottom-0'
+      center:
+        side === 'top' || side === 'bottom'
+          ? 'left-1/2 -translate-x-1/2'
+          : 'top-1/2 -translate-y-1/2',
+      end: side === 'top' || side === 'bottom' ? 'right-0' : 'bottom-0',
     }
 
     return (

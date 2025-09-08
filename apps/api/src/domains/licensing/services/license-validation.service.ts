@@ -39,6 +39,38 @@ export interface LicenseValidationResult {
 /**
  * Machine information
  */
+interface HardwareInfo {
+  cpu?: {
+    model: string
+    cores: number
+    speed: number
+  }
+  memory?: {
+    total: number
+    available: number
+  }
+  disk?: {
+    total: number
+    free: number
+  }
+}
+
+interface SoftwareInfo {
+  nodeVersion: string
+  npmVersion?: string
+  platform: string
+  arch: string
+  environmentType?: 'development' | 'staging' | 'production'
+}
+
+interface UsageLimits {
+  users: { current: number; max: number; available: number }
+  sites: { current: number; max: number; available: number }
+  transactions: { current: number; max: number; available: number }
+  storage: { current: number; max: number; available: number }
+  apiCalls: { current: number; max: number; available: number }
+}
+
 export interface MachineInfo {
   machineId: string
   machineName: string
@@ -47,8 +79,8 @@ export interface MachineInfo {
   hostname: string
   ipAddress?: string
   macAddress?: string
-  hardwareInfo?: any
-  softwareInfo?: any
+  hardwareInfo?: HardwareInfo
+  softwareInfo?: SoftwareInfo
 }
 
 /**
@@ -303,11 +335,11 @@ export class LicenseValidationService {
     valid: boolean
     errors: string[]
     warnings: string[]
-    limits: any
+    limits: UsageLimits
   }> {
     const errors: string[] = []
     const warnings: string[] = []
-    const limits: any = {}
+    const limits: Partial<UsageLimits> = {}
 
     // Get current usage for today
     const today = new Date()
@@ -392,7 +424,7 @@ export class LicenseValidationService {
       valid: errors.length === 0,
       errors,
       warnings,
-      limits,
+      limits: limits as UsageLimits,
     }
   }
 
@@ -488,7 +520,7 @@ export class LicenseValidationService {
     licenseId: string,
     metricType: UsageMetricType,
     value: number,
-    breakdown?: any
+    breakdown?: Record<string, unknown>
   ): Promise<void> {
     const now = new Date()
 

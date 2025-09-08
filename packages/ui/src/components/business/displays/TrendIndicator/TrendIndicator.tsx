@@ -1,5 +1,5 @@
 'use client'
-import { TrendingUp, TrendingDown, Minus, ArrowUp, ArrowDown } from 'lucide-react'
+import { ArrowDown, ArrowUp, Minus, TrendingDown, TrendingUp } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
 export type TrendDirection = 'up' | 'down' | 'neutral'
 interface TrendIndicatorProps {
@@ -27,15 +27,11 @@ export function TrendIndicator({
   className,
 }: TrendIndicatorProps) {
   // Calculate trend if not provided
-  const calculatedPercentage = percentage || (
-    previousValue && previousValue !== 0 
-      ? ((value - previousValue) / previousValue) * 100 
-      : 0
-  )
-  const calculatedDirection = direction || (
-    calculatedPercentage > 0 ? 'up' :
-    calculatedPercentage < 0 ? 'down' : 'neutral'
-  )
+  const calculatedPercentage =
+    percentage ||
+    (previousValue && previousValue !== 0 ? ((value - previousValue) / previousValue) * 100 : 0)
+  const calculatedDirection =
+    direction || (calculatedPercentage > 0 ? 'up' : calculatedPercentage < 0 ? 'down' : 'neutral')
   const getTrendConfig = (direction: TrendDirection) => {
     switch (direction) {
       case 'up':
@@ -109,13 +105,15 @@ export function TrendIndicator({
   const Icon = config.icon
   if (variant === 'minimal') {
     return (
-      <div className={cn(
-        'inline-flex items-center',
-        sizeConfig.container,
-        config.color,
-        sizeConfig.text,
-        className
-      )}>
+      <div
+        className={cn(
+          'inline-flex items-center',
+          sizeConfig.container,
+          config.color,
+          sizeConfig.text,
+          className
+        )}
+      >
         {showIcon && <Icon className={sizeConfig.icon} />}
         {showPercentage && (
           <span className="font-medium">{formatPercentage(calculatedPercentage)}</span>
@@ -125,17 +123,17 @@ export function TrendIndicator({
   }
   if (variant === 'detailed') {
     return (
-      <div className={cn(
-        'inline-flex items-center rounded-md px-2 py-1',
-        config.bgColor,
-        sizeConfig.container,
-        className
-      )}>
+      <div
+        className={cn(
+          'inline-flex items-center rounded-md px-2 py-1',
+          config.bgColor,
+          sizeConfig.container,
+          className
+        )}
+      >
         {showIcon && <Icon className={cn(sizeConfig.icon, config.color)} />}
         <div className={cn('flex flex-col', sizeConfig.text)}>
-          {showValue && (
-            <span className="font-semibold">{formatValue(value)}</span>
-          )}
+          {showValue && <span className="font-semibold">{formatValue(value)}</span>}
           {showPercentage && (
             <span className={cn('font-medium', config.color)}>
               {formatPercentage(calculatedPercentage)}
@@ -152,23 +150,14 @@ export function TrendIndicator({
   }
   // Simple variant (default)
   return (
-    <div className={cn(
-      'inline-flex items-center',
-      sizeConfig.container,
-      className
-    )}>
+    <div className={cn('inline-flex items-center', sizeConfig.container, className)}>
       {showIcon && (
-        <div className={cn(
-          'rounded-full p-1',
-          config.bgColor
-        )}>
+        <div className={cn('rounded-full p-1', config.bgColor)}>
           <Icon className={cn(sizeConfig.icon, config.color)} />
         </div>
       )}
       <div className={cn('flex items-center gap-1', sizeConfig.text)}>
-        {showValue && (
-          <span className="font-semibold">{formatValue(value)}</span>
-        )}
+        {showValue && <span className="font-semibold">{formatValue(value)}</span>}
         {showPercentage && (
           <span className={cn('font-medium', config.color)}>
             {formatPercentage(calculatedPercentage)}

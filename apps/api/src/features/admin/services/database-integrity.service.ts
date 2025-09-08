@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 
 export interface TableInfo {
   name: string
@@ -229,7 +230,7 @@ export class DatabaseIntegrityService {
       this.logger.error('Erreur lors de la synchronisation:', error)
 
       // Si c'est une erreur d'index, essayer de la résoudre
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
       if (errorMessage.includes('existe déjà') || errorMessage.includes('already exists')) {
         this.logger.log("Tentative de résolution des conflits d'index...")
 
@@ -267,7 +268,7 @@ export class DatabaseIntegrityService {
    */
   private async cleanupProblematicIndexes(): Promise<void> {
     try {
-      const problematicIndexes = [
+      const problematicIndexes: string[] = [
         // Pas d'index problématique actuellement
       ]
 
@@ -433,7 +434,7 @@ export class DatabaseIntegrityService {
     } catch (error) {
       return {
         connected: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? getErrorMessage(error) : getErrorMessage(error),
       }
     }
   }

@@ -9,7 +9,7 @@ export interface FormField {
     min?: number
     max?: number
     pattern?: string
-    custom?: (value: any) => string | null
+    custom?: (value: unknown) => string | null
   }
 }
 

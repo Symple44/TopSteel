@@ -55,7 +55,7 @@ export type WithSoftDelete<T> = T & {
  * Type pour les entités avec métadonnées
  */
 export type WithMetadata<T> = T & {
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 /**

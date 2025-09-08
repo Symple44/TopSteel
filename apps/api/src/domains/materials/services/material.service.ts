@@ -12,11 +12,17 @@ import {
   MaterialType,
   StorageMethod,
 } from '../entities/material.entity'
+import type { IMaterialRepository } from '../repositories/material.repository'
 import type {
-  IMaterialRepository,
   MaterialCompatibilityAnalysis,
+  MaterialSearchCriteria,
+  MaterialStatistics,
   MaterialStockAlert,
-} from '../repositories/material.repository'
+  MaterialStockValorisation,
+} from '../types/material.types'
+
+// Re-export types for external use
+export type { MaterialSearchCriteria, MaterialStatistics, MaterialStockValorisation }
 
 /**
  * Service métier pour la gestion des matériaux industriels
@@ -161,13 +167,19 @@ export class MaterialService extends BusinessService<Material> {
 
     // Appliquer les mises à jour (sauf référence qui ne peut pas changer)
     Object.keys(updates).forEach((key) => {
-      if (key !== 'reference' && updates[key] !== undefined) {
-        const oldValue = existing[key]
-        existing[key] = updates[key]
+      if (key !== 'reference' && key in updates) {
+        const updateKey = key as keyof Partial<Material>
+        const updateValue = updates[updateKey]
 
-        // Ajouter à l'historique si la valeur a changé
-        if (oldValue !== updates[key]) {
-          existing.ajouterModificationHistorique(key, oldValue, updates[key], 'SYSTEM')
+        if (updateValue !== undefined && key in existing) {
+          const existingKey = key as keyof Material
+          const oldValue = existing[existingKey]
+          ;(existing as unknown)[existingKey] = updateValue
+
+          // Ajouter à l'historique si la valeur a changé
+          if (oldValue !== updateValue) {
+            existing.ajouterModificationHistorique(key, oldValue, updateValue, 'SYSTEM')
+          }
         }
       }
     })
@@ -321,7 +333,7 @@ export class MaterialService extends BusinessService<Material> {
   /**
    * Recherche avancée avec filtres multiples
    */
-  async searchAdvanced(filters: any): Promise<{
+  async searchAdvanced(filters: unknown): Promise<{
     items: Material[]
     total: number
     page: number
@@ -926,51 +938,4 @@ export class MaterialService extends BusinessService<Material> {
 
     return reasons
   }
-}
-
-/**
- * Interfaces pour les critères de recherche et statistiques
- */
-export interface MaterialSearchCriteria {
-  type?: MaterialType[]
-  forme?: MaterialShape[]
-  status?: MaterialStatus[]
-  nuance?: string[]
-  nom?: string
-  reference?: string
-  marque?: string
-  fournisseurId?: string
-  stockCondition?: 'rupture' | 'sous_mini' | 'normal' | 'surstock'
-  dangereux?: boolean
-  obsolete?: boolean
-  page?: number
-  limit?: number
-  sortBy?: string
-  sortOrder?: 'ASC' | 'DESC'
-}
-
-export interface MaterialStockValorisation {
-  nombreMateriaux: number
-  valeurTotale: number
-  valeurParType: Record<MaterialType, number>
-  valeurParForme: Record<MaterialShape, number>
-  materialsSansStock: number
-  materialsEnRupture: number
-  materialsSousStockMini: number
-  materialsStockageSpecial: number
-  materialsDangereux: number
-}
-
-export interface MaterialStatistics {
-  totalMateriaux: number
-  repartitionParType: Record<MaterialType, number>
-  repartitionParForme: Record<MaterialShape, number>
-  repartitionParStatus: Record<MaterialStatus, number>
-  repartitionParStockage: Record<StorageMethod, number>
-  valeurTotaleStock: number
-  materialsEnRupture: number
-  materialsSousStockMini: number
-  materialsObsoletes: number
-  materialsDangereux: number
-  materialsStockageSpecial: number
 }

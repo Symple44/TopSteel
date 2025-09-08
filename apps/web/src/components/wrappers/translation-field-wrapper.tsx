@@ -4,10 +4,19 @@ import { TranslationField } from '@erp/ui/forms'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { translator } from '@/lib/i18n/translator'
 
+// Translation value can be a string or an object with language keys
+type TranslationValue = string | Record<string, string>
+
+// Translations object mapping language codes to translated values
+interface Translations {
+  [languageCode: string]: string
+}
+
 interface TranslationFieldWrapperProps {
-  value: any
-  onChange: (value: any) => void
-  onTranslationsChange: (translations: any) => void
+  value: TranslationValue
+  onChange: (value: TranslationValue) => void
+  translations?: Translations
+  onTranslationsChange: (translations: Translations) => void
   placeholder?: string
   className?: string
   disabled?: boolean
@@ -17,7 +26,7 @@ interface TranslationFieldWrapperProps {
 export function TranslationFieldWrapper(props: TranslationFieldWrapperProps) {
   const { t } = useTranslation('translation')
 
-  const currentLanguage = translator.getCurrentLanguage()
+  const currentLanguage = translator?.getCurrentLanguage()
 
   const fieldTranslations = {
     translateField: t('translateField'),
@@ -31,8 +40,9 @@ export function TranslationFieldWrapper(props: TranslationFieldWrapperProps) {
 
   return (
     <TranslationField
-      value={props.value}
-      onChange={props.onChange}
+      value={typeof props.value === 'string' ? props.value : Object.values(props.value)[0] || ''}
+      onChange={(value: string) => props.onChange(value)}
+      translations={props.translations}
       onTranslationsChange={props.onTranslationsChange}
       placeholder={props.placeholder}
       className={props.className}

@@ -7,8 +7,24 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MenuItem } from './menu-item.entity'
-import { UserMenuPreference } from './user-menu-preference.entity'
+
+// Forward declaration - removed circular dependencies
+// import { MenuItem } from './menu-item.entity';
+// import { UserMenuPreference } from './user-menu-preference.entity';
+
+// Type definitions to avoid circular dependencies
+type MenuItem = {
+  id: string
+  menuId: string
+  // Other MenuItem properties would be here
+}
+
+type UserMenuPreference = {
+  id: string
+  menuId: string
+  userId: string
+  // Other UserMenuPreference properties would be here
+}
 
 /**
  * Menu configuration entity
@@ -76,16 +92,10 @@ export class MenuConfiguration {
   updatedBy?: string
 
   // Relations
-  @OneToMany(
-    () => MenuItem,
-    (menuItem) => menuItem.menu
-  )
+  @OneToMany('MenuItem', 'menu')
   items!: MenuItem[]
 
-  @OneToMany(
-    () => UserMenuPreference,
-    (preference) => preference.menu
-  )
+  @OneToMany('UserMenuPreference', 'menu')
   userPreferences!: UserMenuPreference[]
 
   // Utility methods
@@ -145,7 +155,7 @@ export class MenuConfiguration {
   /**
    * Set configuration value
    */
-  setConfig(key: string, value: any): void {
+  setConfig(key: string, value: unknown): void {
     if (!this.config) {
       this.config = {}
     }
@@ -155,7 +165,7 @@ export class MenuConfiguration {
   /**
    * Merge configuration
    */
-  mergeConfig(config: Record<string, any>): void {
+  mergeConfig(config: Record<string, unknown>): void {
     this.config = { ...this.config, ...config }
   }
 
@@ -169,7 +179,7 @@ export class MenuConfiguration {
   /**
    * Set metadata value
    */
-  setMetadata(key: string, value: any): void {
+  setMetadata(key: string, value: unknown): void {
     if (!this.metadata) {
       this.metadata = {}
     }
@@ -179,7 +189,7 @@ export class MenuConfiguration {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       code: this.code,

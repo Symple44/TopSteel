@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { useId } from 'react'
 import { Label } from '../../components/forms/label'
-import { Input } from '../../components/primitives/input'
+import { Input, type InputProps } from '../../components/primitives/input'
 
-const meta: Meta<typeof Input> = {
+const meta: Meta<InputProps> = {
   title: '02-Primitives/Input',
   component: Input,
   parameters: {
@@ -17,7 +18,7 @@ const meta: Meta<typeof Input> = {
 }
 
 export default meta
-type Story = StoryObj<typeof Input>
+type Story = StoryObj<InputProps>
 
 export const Default: Story = {
   args: {
@@ -25,21 +26,27 @@ export const Default: Story = {
   },
 }
 
-export const WithLabel = () => (
-  <div className="space-y-2">
-    <Label htmlFor="project-name">Nom du projet</Label>
-    <Input id="project-name" placeholder="Ex: Hangar agricole 2024" />
-  </div>
-)
+export const WithLabel = () => {
+  const id = useId()
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>Nom du projet</Label>
+      <Input id={id} placeholder="Ex: Hangar agricole 2024" />
+    </div>
+  )
+}
 
-export const Required = () => (
-  <div className="space-y-2">
-    <Label htmlFor="client-name">
-      Nom du client <span className="text-red-500">*</span>
-    </Label>
-    <Input id="client-name" placeholder="Nom obligatoire" required />
-  </div>
-)
+export const Required = () => {
+  const id = useId()
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>
+        Nom du client <span className="text-red-500">*</span>
+      </Label>
+      <Input id={id} placeholder="Nom obligatoire" required />
+    </div>
+  )
+}
 
 export const Disabled: Story = {
   args: {
@@ -48,18 +55,21 @@ export const Disabled: Story = {
   },
 }
 
-export const WithError = () => (
-  <div className="space-y-2">
-    <Label htmlFor="email">Email</Label>
-    <Input
-      id="email"
-      type="email"
-      placeholder="email@exemple.com"
-      className="border-red-500 focus:ring-red-500"
-    />
-    <p className="text-sm text-red-500">Format d'email invalide</p>
-  </div>
-)
+export const WithError = () => {
+  const id = useId()
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>Email</Label>
+      <Input
+        id={id}
+        type="email"
+        placeholder="email@exemple.com"
+        className="border-red-500 focus:ring-red-500"
+      />
+      <p className="text-sm text-red-500">Format d'email invalide</p>
+    </div>
+  )
+}
 
 // Types spécifiques ERP
 export const ERPInputTypes = () => (

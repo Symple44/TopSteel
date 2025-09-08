@@ -1,22 +1,19 @@
 'use client'
-import React from 'react'
-import { Badge } from '../../../data-display/badge'
-import { Button } from '../../../primitives/button/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
-import { Progress } from '../../../data-display/progress/progress'
-import { cn } from '../../../../lib/utils'
-import { 
-  CheckCircle2, 
-  Circle,
-  Clock, 
+import {
   AlertTriangle,
+  CheckCircle2,
   ChevronRight,
-  ChevronLeft,
+  Circle,
   Play,
-  Pause,
+  RotateCcw,
   SkipForward,
-  RotateCcw
 } from 'lucide-react'
+import React from 'react'
+import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
+import { Button } from '../../../primitives/button/Button'
+import { Progress } from '../../../primitives/progress'
 export type StepStatus = 'completed' | 'current' | 'pending' | 'skipped' | 'error'
 export interface ProcessStep {
   id: string
@@ -29,7 +26,7 @@ export interface ProcessStep {
   completedAt?: Date
   startedAt?: Date
   error?: string
-  icon?: React.ComponentType<any>
+  icon?: React.ComponentType<{ className?: string }>
   content?: React.ReactNode
   actions?: Array<{
     id: string
@@ -60,32 +57,32 @@ const statusConfig = {
     color: 'text-green-600 border-green-300 bg-green-50',
     icon: CheckCircle2,
     label: 'Terminé',
-    badgeColor: 'bg-green-100 text-green-800'
+    badgeColor: 'bg-green-100 text-green-800',
   },
   current: {
     color: 'text-blue-600 border-blue-300 bg-blue-50',
     icon: Play,
     label: 'En cours',
-    badgeColor: 'bg-blue-100 text-blue-800'
+    badgeColor: 'bg-blue-100 text-blue-800',
   },
   pending: {
     color: 'text-gray-400 border-gray-200 bg-gray-50',
     icon: Circle,
     label: 'En attente',
-    badgeColor: 'bg-gray-100 text-gray-600'
+    badgeColor: 'bg-gray-100 text-gray-600',
   },
   skipped: {
     color: 'text-orange-400 border-orange-200 bg-orange-50',
     icon: SkipForward,
     label: 'Ignoré',
-    badgeColor: 'bg-orange-100 text-orange-800'
+    badgeColor: 'bg-orange-100 text-orange-800',
   },
   error: {
     color: 'text-red-600 border-red-300 bg-red-50',
     icon: AlertTriangle,
     label: 'Erreur',
-    badgeColor: 'bg-red-100 text-red-800'
-  }
+    badgeColor: 'bg-red-100 text-red-800',
+  },
 }
 export function ProcessStepper({
   className,
@@ -101,13 +98,13 @@ export function ProcessStepper({
   onStepClick,
   onStepComplete,
   onStepSkip,
-  onStepRetry
+  onStepRetry,
 }: ProcessStepperProps) {
-  const completedSteps = steps.filter(step => step.status === 'completed').length
+  const completedSteps = steps.filter((step) => step.status === 'completed').length
   const totalSteps = steps.length
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
   const getCurrentStepIndex = () => {
-    const current = steps.findIndex(step => step.status === 'current')
+    const current = steps.findIndex((step) => step.status === 'current')
     return current !== -1 ? current : currentStep
   }
   const currentStepIndex = getCurrentStepIndex()
@@ -122,10 +119,12 @@ export function ProcessStepper({
     const StepIcon = step.icon || statusConfig[step.status].icon
     if (variant === 'minimal') {
       return (
-        <div className={cn(
-          "w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium",
-          statusConfig[step.status].color
-        )}>
+        <div
+          className={cn(
+            'w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium',
+            statusConfig[step.status].color
+          )}
+        >
           {step.status === 'completed' ? (
             <CheckCircle2 className="w-4 h-4" />
           ) : (
@@ -135,11 +134,15 @@ export function ProcessStepper({
       )
     }
     return (
-      <div className={cn(
-        "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
-        statusConfig[step.status].color,
-        allowNavigation && (step.status === 'completed' || step.status === 'current') && "cursor-pointer hover:scale-105"
-      )}>
+      <div
+        className={cn(
+          'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all',
+          statusConfig[step.status].color,
+          allowNavigation &&
+            (step.status === 'completed' || step.status === 'current') &&
+            'cursor-pointer hover:scale-105'
+        )}
+      >
         <StepIcon className="w-5 h-5" />
       </div>
     )
@@ -150,13 +153,15 @@ export function ProcessStepper({
     return (
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <h3 className={cn(
-            "font-semibold",
-            step.status === 'current' && "text-blue-900",
-            step.status === 'completed' && "text-green-900",
-            step.status === 'error' && "text-red-900",
-            step.status === 'pending' && "text-gray-600"
-          )}>
+          <h3
+            className={cn(
+              'font-semibold',
+              step.status === 'current' && 'text-blue-900',
+              step.status === 'completed' && 'text-green-900',
+              step.status === 'error' && 'text-red-900',
+              step.status === 'pending' && 'text-gray-600'
+            )}
+          >
             {step.title}
             {step.optional && (
               <span className="text-xs text-muted-foreground ml-1">(optionnel)</span>
@@ -168,18 +173,12 @@ export function ProcessStepper({
             </Badge>
           )}
         </div>
-        {step.description && (
-          <p className="text-sm text-gray-600 mb-2">{step.description}</p>
-        )}
+        {step.description && <p className="text-sm text-gray-600 mb-2">{step.description}</p>}
         {/* Timing information */}
         {(step.estimated || step.actual || step.startedAt || step.completedAt) && (
           <div className="flex gap-4 text-xs text-muted-foreground mb-2">
-            {step.estimated && (
-              <span>Estimé: {step.estimated}</span>
-            )}
-            {step.actual && step.status === 'completed' && (
-              <span>Réel: {step.actual}</span>
-            )}
+            {step.estimated && <span>Estimé: {step.estimated}</span>}
+            {step.actual && step.status === 'completed' && <span>Réel: {step.actual}</span>}
             {step.startedAt && step.status === 'current' && (
               <span>Démarré: {step.startedAt.toLocaleTimeString('fr-FR')}</span>
             )}
@@ -196,15 +195,14 @@ export function ProcessStepper({
         )}
         {/* Step content */}
         {isActive && step.content && (
-          <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
-            {step.content}
-          </div>
+          <div className="mt-3 p-3 bg-gray-50 rounded-lg border">{step.content}</div>
         )}
         {/* Actions */}
         {isActive && step.actions && step.actions.length > 0 && (
           <div className="flex gap-2 mt-3">
             {step.actions.map((action) => (
               <Button
+                type="button"
                 key={action.id}
                 size="sm"
                 variant={action.variant || 'default'}
@@ -221,6 +219,7 @@ export function ProcessStepper({
           <div className="flex gap-2 mt-3">
             {step.status === 'current' && onStepComplete && (
               <Button
+                type="button"
                 size="sm"
                 onClick={() => onStepComplete(index)}
                 className="bg-green-600 hover:bg-green-700"
@@ -230,21 +229,13 @@ export function ProcessStepper({
               </Button>
             )}
             {step.status === 'current' && allowSkipping && step.optional && onStepSkip && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onStepSkip(index)}
-              >
+              <Button type="button" size="sm" variant="outline" onClick={() => onStepSkip(index)}>
                 <SkipForward className="w-4 h-4 mr-1" />
                 Ignorer
               </Button>
             )}
             {step.status === 'error' && onStepRetry && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onStepRetry(index)}
-              >
+              <Button type="button" size="sm" variant="outline" onClick={() => onStepRetry(index)}>
                 <RotateCcw className="w-4 h-4 mr-1" />
                 Réessayer
               </Button>
@@ -262,13 +253,22 @@ export function ProcessStepper({
             <div className="flex items-center gap-2">
               {steps.map((step, index) => (
                 <React.Fragment key={step.id}>
+                  {/* biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive */}
                   <div
                     className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2",
+                      'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2',
                       statusConfig[step.status].color,
-                      allowNavigation && "cursor-pointer"
+                      allowNavigation && 'cursor-pointer'
                     )}
+                    role={allowNavigation ? 'button' : undefined}
+                    tabIndex={allowNavigation ? 0 : undefined}
                     onClick={() => handleStepClick(index)}
+                    onKeyDown={(e) => {
+                      if (allowNavigation && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault()
+                        handleStepClick(index)
+                      }
+                    }}
                   >
                     {step.status === 'completed' ? (
                       <CheckCircle2 className="w-4 h-4" />
@@ -276,9 +276,7 @@ export function ProcessStepper({
                       <span>{index + 1}</span>
                     )}
                   </div>
-                  {index < steps.length - 1 && (
-                    <div className="w-8 h-0.5 bg-gray-200" />
-                  )}
+                  {index < steps.length - 1 && <div className="w-8 h-0.5 bg-gray-200" />}
                 </React.Fragment>
               ))}
             </div>
@@ -309,7 +307,9 @@ export function ProcessStepper({
               <div className="mt-4">
                 <div className="flex justify-between text-sm mb-2">
                   <span>Progression</span>
-                  <span>{completedSteps}/{totalSteps} étapes ({Math.round(progressPercentage)}%)</span>
+                  <span>
+                    {completedSteps}/{totalSteps} étapes ({Math.round(progressPercentage)}%)
+                  </span>
                 </div>
                 <Progress value={progressPercentage} className="h-2" />
               </div>
@@ -320,23 +320,30 @@ export function ProcessStepper({
           <div className="flex items-start gap-4 overflow-x-auto pb-4">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center gap-4 min-w-0">
-                <div 
-                  className="flex flex-col items-center gap-2 min-w-max cursor-pointer"
+                <button
+                  type="button"
+                  className="flex flex-col items-center gap-2 min-w-max cursor-pointer bg-transparent border-none p-0"
                   onClick={() => handleStepClick(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      handleStepClick(index)
+                    }
+                  }}
                 >
                   {renderStepIcon(step, index)}
                   <div className="text-center">
                     <p className="text-xs font-medium truncate max-w-20">{step.title}</p>
                     {variant !== 'minimal' && (
-                      <Badge 
-                        variant="outline" 
-                        className={cn("text-xs mt-1", statusConfig[step.status].badgeColor)}
+                      <Badge
+                        variant="outline"
+                        className={cn('text-xs mt-1', statusConfig[step.status].badgeColor)}
                       >
                         {statusConfig[step.status].label}
                       </Badge>
                     )}
                   </div>
-                </div>
+                </button>
                 {index < steps.length - 1 && (
                   <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
                 )}
@@ -362,7 +369,9 @@ export function ProcessStepper({
             <div className="mt-4">
               <div className="flex justify-between text-sm mb-2">
                 <span>Progression</span>
-                <span>{completedSteps}/{totalSteps} étapes ({Math.round(progressPercentage)}%)</span>
+                <span>
+                  {completedSteps}/{totalSteps} étapes ({Math.round(progressPercentage)}%)
+                </span>
               </div>
               <Progress value={progressPercentage} className="h-3" />
             </div>
@@ -376,15 +385,38 @@ export function ProcessStepper({
             {index < steps.length - 1 && (
               <div className="absolute left-5 top-14 w-0.5 h-12 bg-gray-200" />
             )}
-            <div 
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive */}
+            <div
               className={cn(
-                "flex items-start gap-4 p-3 rounded-lg border transition-all",
-                step.status === 'current' && "border-blue-300 bg-blue-50/50",
-                step.status === 'completed' && "border-green-300 bg-green-50/30",
-                step.status === 'error' && "border-red-300 bg-red-50/30",
-                allowNavigation && (step.status === 'completed' || step.status === 'current') && "cursor-pointer hover:shadow-sm"
+                'flex items-start gap-4 p-3 rounded-lg border transition-all',
+                step.status === 'current' && 'border-blue-300 bg-blue-50/50',
+                step.status === 'completed' && 'border-green-300 bg-green-50/30',
+                step.status === 'error' && 'border-red-300 bg-red-50/30',
+                allowNavigation &&
+                  (step.status === 'completed' || step.status === 'current') &&
+                  'cursor-pointer hover:shadow-sm'
               )}
+              role={
+                allowNavigation && (step.status === 'completed' || step.status === 'current')
+                  ? 'button'
+                  : undefined
+              }
+              tabIndex={
+                allowNavigation && (step.status === 'completed' || step.status === 'current')
+                  ? 0
+                  : undefined
+              }
               onClick={() => handleStepClick(index)}
+              onKeyDown={(e) => {
+                if (
+                  allowNavigation &&
+                  (step.status === 'completed' || step.status === 'current') &&
+                  (e.key === 'Enter' || e.key === ' ')
+                ) {
+                  e.preventDefault()
+                  handleStepClick(index)
+                }
+              }}
             >
               {renderStepIcon(step, index)}
               {renderStepContent(step, index)}

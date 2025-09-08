@@ -6,7 +6,7 @@ dotenv.config({ path: '.env' })
 const authDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
+  port: parseInt(process.env.DB_PORT || '5432', 10),
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_DATABASE_AUTH || 'erp_topsteel_auth',
@@ -46,13 +46,13 @@ async function testMenuSearch() {
 
         if (results.length > 0) {
           console.log(`   ✅ ${results.length} résultat(s) trouvé(s):`)
-          results.forEach((row: any) => {
+          results.forEach((row: unknown) => {
             console.log(`      - ${row.title} (${row.programId})`)
           })
         } else {
           console.log(`   ❌ Aucun résultat`)
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.log(`   ❌ Erreur: ${error.message}`)
       }
       console.log('')
@@ -69,7 +69,7 @@ async function testMenuSearch() {
     const directResults = await authDataSource.query(directQuery)
     if (directResults.length > 0) {
       console.log('✅ Menu Articles trouvé directement:')
-      directResults.forEach((row: any) => {
+      directResults.forEach((row: unknown) => {
         console.log(`   - ${row.title}`)
         console.log(`     ID: ${row.id}`)
         console.log(`     Program: ${row.programId}`)
@@ -95,7 +95,7 @@ async function testMenuSearch() {
         WHERE title ILIKE $1
       `
       const results = await authDataSource.query(testQuery, [`%${testCase.search}%`])
-      const found = results.find((r: any) => r.title === testCase.expected)
+      const found = results.find((r: unknown) => r.title === testCase.expected)
       console.log(`   "${testCase.search}" → ${found ? '✅ Trouvé' : '❌ Non trouvé'}`)
     }
   } catch (error) {

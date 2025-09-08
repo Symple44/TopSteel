@@ -112,7 +112,7 @@ export const DashboardOverview = () => (
                   <Progress value={projet.avancement} className="h-2" />
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="ml-4">
+              <Button type="button" variant="outline" size="sm" className="ml-4">
                 Voir détails
               </Button>
             </div>
@@ -133,8 +133,10 @@ export const ProjetDetailPattern = () => (
         </div>
         <div className="flex space-x-2">
           <Badge className="bg-green-500">En cours</Badge>
-          <Button variant="outline">Modifier</Button>
-          <Button>Actions</Button>
+          <Button type="button" variant="outline">
+            Modifier
+          </Button>
+          <Button type="button">Actions</Button>
         </div>
       </div>
     </div>

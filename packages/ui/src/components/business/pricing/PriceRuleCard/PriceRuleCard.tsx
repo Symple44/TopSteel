@@ -277,7 +277,7 @@ export function PriceRuleCard({
           <div className={cn('w-2 h-2 rounded-full', statusColor.replace('text-', 'bg-'))} />
         </SimpleTooltip>
         {showActions && (
-          <Button variant="ghost" size="sm" onClick={() => onToggle?.(rule)}>
+          <Button type="button" variant="ghost" size="sm" onClick={() => onToggle?.(rule)}>
             <Power className="w-4 h-4" />
           </Button>
         )}
@@ -337,7 +337,7 @@ export function PriceRuleCard({
               open={dropdownOpen}
               onOpenChange={setDropdownOpen}
               trigger={
-                <Button variant="ghost" size="sm">
+                <Button type="button" variant="ghost" size="sm">
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
               }
@@ -385,7 +385,12 @@ export function PriceRuleCard({
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Conditions ({rule.conditions.length})</span>
                 {expandable && (
-                  <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpanded(!expanded)}
+                  >
                     {expanded ? (
                       <ChevronUp className="w-4 h-4" />
                     ) : (

@@ -13,7 +13,6 @@ export {
   AvatarFallback,
   AvatarImage,
   Badge,
-  DataTable,
   Table,
   TableBody,
   TableCaption,
@@ -28,10 +27,18 @@ export type { BadgeProps } from './components/data-display/badge/Badge'
 // Advanced DataTable avec types explicites
 export {
   type ColumnConfig,
+  DataTable,
   DataTable as AdvancedDataTable,
   type SelectionState,
   usePersistedTableSettings,
 } from './components/data-display/datatable'
+// Export ReorderableListConfig and related types
+export type {
+  ReorderableItem,
+  ReorderableListConfig,
+  ReorderableTheme,
+  ThemedReorderableListProps,
+} from './components/data-display/reorderable-list'
 // Feedback - Export all including ConnectionLostDialog
 export * from './components/feedback'
 // Forms
@@ -70,8 +77,33 @@ export type {
   CardTitleProps,
 } from './components/layout/card/Card'
 
-// Navigation - Export all including LanguageSelector
+// Navigation - Export all including LanguageSelector and Tabs
 export * from './components/navigation'
+// Export DropdownMenu components explicitly
+export {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from './components/navigation/dropdown-menu'
+// Export Tabs explicitly to ensure they're available
+export {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from './components/navigation/tabs'
 // === COMPONENTS - EXPORT CENTRALISÉ ===
 // Primitives
 export {
@@ -85,6 +117,7 @@ export {
   DialogTitle,
   DialogTrigger,
   Input,
+  Progress,
   RadioGroup,
   RadioGroupItem,
   Select,
@@ -97,6 +130,7 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
+  SimpleTooltip,
   Switch,
   Textarea,
   Tooltip,
@@ -104,14 +138,24 @@ export {
   TooltipProvider,
   TooltipTrigger,
 } from './components/primitives'
-// Export Button types explicitly
+// Export Button and other primitive types explicitly
 export type { ButtonProps } from './components/primitives/button/Button'
+export type { InputProps } from './components/primitives/input/Input'
+export type { TextareaProps } from './components/primitives/textarea/Textarea'
 
 // Theme
 export * from './components/theme'
 
 // === DESIGN SYSTEM UNIFIÉ ===
 export * from './design-system'
+export { useTheme } from './hooks'
+// === HOOKS ===
+export {
+  useCheckboxGroupIds,
+  useFormFieldIds,
+  useRadioGroupIds,
+  useUniqueId,
+} from './hooks/useFormFieldIds'
 // === LEGACY COMPATIBILITY ===
 export type {
   AlertVariants,
@@ -131,8 +175,14 @@ export {
   switchVariants,
   tableVariants,
 } from './lib/design-system'
+// === SECURITY ===
+export {
+  DOMSanitizer,
+  sanitizeBasic,
+  sanitizeHighlight,
+  sanitizeHtml,
+  sanitizeRichText,
+  validateHtmlSafety,
+} from './lib/security/dom-sanitizer'
 // === UTILS ===
 export { cn } from './lib/utils'
-
-// === SECURITY ===
-export { DOMSanitizer, sanitizeRichText, sanitizeHighlight, sanitizeBasic, sanitizeHtml, validateHtmlSafety } from './lib/security/dom-sanitizer'

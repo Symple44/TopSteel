@@ -14,7 +14,7 @@ export class CleanupObsoleteTables1737500000015 implements MigrationInterface {
 
     // Vérifier qu'il y a des données dans la nouvelle table
     const dataCount = await queryRunner.query('SELECT COUNT(*) as count FROM user_societe_roles')
-    const count = parseInt(dataCount[0].count)
+    const count = parseInt(dataCount[0].count, 10)
 
     if (count === 0) {
       // Ne pas supprimer les tables si aucune donnée n'a été migrée
@@ -39,7 +39,7 @@ export class CleanupObsoleteTables1737500000015 implements MigrationInterface {
     const groupsExists = await queryRunner.hasTable('groups')
     if (groupsExists) {
       const groupsCount = await queryRunner.query('SELECT COUNT(*) as count FROM groups')
-      const groupsUsed = parseInt(groupsCount[0].count)
+      const groupsUsed = parseInt(groupsCount[0].count, 10)
 
       if (groupsUsed === 0) {
         // Supprimer d'abord user_groups si elle existe

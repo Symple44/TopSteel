@@ -173,7 +173,7 @@ export class StockMovement {
 
   /** Métadonnées JSON */
   @Column('jsonb', { nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   /** Date de création */
   @CreateDateColumn()

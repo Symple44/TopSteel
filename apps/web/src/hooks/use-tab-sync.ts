@@ -19,10 +19,10 @@ export interface TabSyncOptions {
  * Hook pour écouter les événements de synchronisation entre onglets
  */
 export function useTabSync(options: TabSyncOptions = {}) {
-  const { channelName = 'topsteel-auth', onMessage } = options
+  const { channelName = 'topsteel-auth', onMessage } = options || {}
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') return undefined
 
     const channel = new BroadcastChannel(channelName)
 
@@ -32,11 +32,11 @@ export function useTabSync(options: TabSyncOptions = {}) {
       }
     }
 
-    channel.addEventListener('message', handleBroadcastMessage)
+    channel?.addEventListener('message', handleBroadcastMessage)
 
     return () => {
-      channel.removeEventListener('message', handleBroadcastMessage)
-      channel.close()
+      channel?.removeEventListener('message', handleBroadcastMessage)
+      channel?.close()
     }
   }, [channelName, onMessage])
 
@@ -47,11 +47,11 @@ export function useTabSync(options: TabSyncOptions = {}) {
     if (typeof window === 'undefined') return
 
     const channel = new BroadcastChannel(channelName)
-    channel.postMessage({
+    channel?.postMessage({
       ...event,
       timestamp: Date.now(),
     })
-    channel.close()
+    channel?.close()
   }
 
   return { broadcast }

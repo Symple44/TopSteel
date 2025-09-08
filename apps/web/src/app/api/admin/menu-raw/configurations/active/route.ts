@@ -5,10 +5,10 @@ import { callBackendFromApi } from '@/utils/backend-api'
 export async function GET(req: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const accessToken = cookieStore.get('accessToken')?.value
+    const accessToken = cookieStore?.get('accessToken')?.value
 
     if (!accessToken) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+      return NextResponse?.json({ error: 'Non authentifié' }, { status: 401 })
     }
 
     // Appeler l'API backend pour récupérer la configuration de menu active
@@ -18,25 +18,25 @@ export async function GET(req: NextRequest) {
 
     // Vérifier si la réponse est JSON
     let data: unknown
-    const contentType = response.headers.get('content-type')
+    const contentType = response?.headers?.get('content-type')
 
     if (contentType?.includes('application/json')) {
       try {
-        data = await response.json()
+        data = await response?.json()
       } catch (_e) {
         data = { error: 'Invalid JSON response from API' }
       }
     } else {
-      const textData = await response.text()
+      const textData = await response?.text()
       data = { error: `API returned non-JSON response: ${textData}` }
     }
 
-    if (!response.ok) {
-      return NextResponse.json(data, { status: response.status })
+    if (!response?.ok) {
+      return NextResponse?.json(data, { status: response.status })
     }
 
-    return NextResponse.json(data)
+    return NextResponse?.json(data)
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

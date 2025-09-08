@@ -8,7 +8,15 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { Group } from './group.entity'
+
+// import { Group } from './group.entity';
+
+// Type definition to avoid circular dependency
+type Group = {
+  id: string
+  name: string
+  // Other Group properties would be here
+}
 
 @Entity('user_groups')
 @Index(['userId', 'groupId'], { unique: true })
@@ -44,10 +52,7 @@ export class UserGroup {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => Group,
-    (group) => group.userGroups
-  )
+  @ManyToOne('Group', 'userGroups')
   @JoinColumn({ name: 'groupId' })
   group!: Group
 

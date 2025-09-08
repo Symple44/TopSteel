@@ -1,68 +1,101 @@
-// packages/utils/src/index.ts - Version corrigée
+/**
+ * 🛠️ @erp/utils - MAIN EXPORT INDEX
+ * Tree-shaking optimized utility exports for TopSteel ERP
+ *
+ * ORGANIZATION:
+ * - Essential utilities for quick access
+ * - Domain-organized exports for better tree-shaking
+ * - Browser/Server safe functions
+ *
+ * For better tree-shaking, prefer importing from specific subpaths:
+ * - @erp/utils/format
+ * - @erp/utils/validation
+ * - @erp/utils/helpers
+ * - etc.
+ */
 
-// Export des services de conversion
-export { UnitConversionService, UnitType } from './conversion/unit-conversion.service'
+// ===== COMPLETE CATEGORY EXPORTS =====
+// Re-export all utilities by category for backward compatibility
+export * from './calculation'
+export * from './constants'
+export * from './conversion'
+export * from './format'
+export * from './helpers'
+// ===== ESSENTIAL UTILITIES (Most commonly used) =====
 export { cn } from './lib/cn'
 export { formatCurrency, formatDate, formatNumber } from './lib/formatters'
 export { debounce, throttle } from './lib/functions'
-export { validateCNPJ, validateEmail, validatePhone } from './lib/validators'
-
-// Export du logger centralisé
-export { 
-  logger, 
-  apiLogger, 
-  dbLogger, 
-  authLogger, 
-  webLogger, 
-  createLogger, 
+// Note: specific lib exports to avoid conflicts
+export * from './lib/index'
+// ===== LOGGING =====
+export {
+  apiLogger,
+  authLogger,
+  createLogger,
+  dbLogger,
+  type LoggerConfig,
   LogLevel,
-  type LoggerConfig 
+  logger,
+  webLogger,
 } from './logger'
-
-// Export des types utilitaires
+// ===== TYPES =====
 export type { DeepPartial, DeepRequired } from './types'
+export * from './validation'
 
-// Fonction de debug sécurisée
+// ===== UTILITY FUNCTIONS =====
+
+/**
+ * Safe logging function that checks for console availability
+ */
 export function safeLog(..._args: unknown[]) {
   // biome-ignore lint/suspicious/noConsole: Debug function that safely checks for console availability
 }
 
-// Fonction pour générer un ID unique (browser/server safe)
+/**
+ * Generate a unique ID (browser/server safe)
+ */
 export function generateId(): string {
-  // Tentative crypto.randomUUID (browser moderne)
+  // Try crypto.randomUUID (modern browser)
   if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
     try {
       return window.crypto.randomUUID().slice(0, 12)
     } catch {
-      // Fallback si crypto.randomUUID échoue
+      // Fallback if crypto.randomUUID fails
     }
   }
 
-  // Tentative Node.js crypto
+  // Try Node.js crypto
   if (typeof globalThis !== 'undefined' && (globalThis as Record<string, unknown>).crypto) {
     try {
       return ((globalThis as Record<string, unknown>).crypto as { randomUUID: () => string })
         .randomUUID()
         .slice(0, 12)
     } catch {
-      // Fallback si Node crypto échoue
+      // Fallback if Node crypto fails
     }
   }
 
-  // Fallback universel
+  // Universal fallback
   return Math.random().toString(36).substring(2, 14)
 }
 
-// Utilitaires browser-safe
+/**
+ * Check if running in browser environment
+ */
 export function isBrowser(): boolean {
   return typeof window !== 'undefined'
 }
 
+/**
+ * Check if running in server environment
+ */
 export function isServer(): boolean {
   return typeof window === 'undefined'
 }
 
-// Fonction pour obtenir une valeur de window de manière sûre
+/**
+ * Safely get a window property
+ */
 export function getWindowProperty<T = unknown>(key: string): T | undefined {
   if (
     isBrowser() &&
@@ -74,7 +107,9 @@ export function getWindowProperty<T = unknown>(key: string): T | undefined {
   return undefined
 }
 
-// Fonction pour obtenir une valeur de globalThis de manière sûre
+/**
+ * Safely get a globalThis property
+ */
 export function getGlobalProperty<T = unknown>(key: string): T | undefined {
   if (
     typeof globalThis !== 'undefined' &&
@@ -86,7 +121,7 @@ export function getGlobalProperty<T = unknown>(key: string): T | undefined {
 }
 
 /**
- * Formate un pourcentage
+ * Format a percentage value
  */
 export function formatPercent(value: number, decimals = 2): string {
   return `${(value * 100).toFixed(decimals)}%`

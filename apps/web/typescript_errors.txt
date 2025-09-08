@@ -1,0 +1,845 @@
+src/app/(dashboard)/admin/menus/components/menu-configuration-editor.tsx(58,43): error TS2339: Property 'data' does not exist on type '{}'.
+src/app/(dashboard)/admin/menus/components/menu-configuration-editor.tsx(59,41): error TS2339: Property 'data' does not exist on type '{}'.
+src/app/(dashboard)/admin/menus/components/menu-configuration-editor.tsx(60,53): error TS2339: Property 'data' does not exist on type '{}'.
+src/app/(dashboard)/admin/menus/page.tsx(199,17): error TS2322: Type 'import("D:/GitHub/TopSteel/apps/web/src/types/menu").MenuConfiguration[]' is not assignable to type 'MenuConfiguration[]'.
+src/app/(dashboard)/admin/menus/page.tsx(200,17): error TS2322: Type 'import("D:/GitHub/TopSteel/apps/web/src/types/menu").MenuConfiguration | null' is not assignable to type 'MenuConfiguration | null'.
+src/app/(dashboard)/admin/menus/page.tsx(265,36): error TS2322: Type 'import("D:/GitHub/TopSteel/apps/web/src/types/menu").MenuItem[]' is not assignable to type 'MenuItem[]'.
+src/app/(dashboard)/admin/users/[userId]/user-companies-datatable.tsx(89,47): error TS2339: Property 'data' does not exist on type '{}'.
+src/app/(dashboard)/admin/users/[userId]/user-companies-datatable.tsx(93,46): error TS2339: Property 'data' does not exist on type '{}'.
+src/app/(dashboard)/admin/users/users-datatable.tsx(45,31): error TS2554: Expected 1 arguments, but got 2.
+src/app/(dashboard)/admin/users/users-datatable.tsx(181,9): error TS2322: Type '{}' is not assignable to type 'ReactNode'.
+src/app/(dashboard)/admin/users/users-datatable.tsx(398,39): error TS18048: 'u.roles.length' is possibly 'undefined'.
+src/app/(dashboard)/admin/users/users-datatable.tsx(414,39): error TS18048: 'u.groups.length' is possibly 'undefined'.
+src/app/(dashboard)/admin/users/users-datatable.tsx(437,11): error TS2353: Object literal may only specify known properties, and 'create' does not exist in type '{ label: string; icon?: ReactNode; onClick: (row: User) => void; variant?: "default" | "destructive" | "outline" | undefined; disabled?: ((row: User) => boolean) | undefined; }[]'.
+src/app/(dashboard)/admin/users/users-datatable.tsx(441,9): error TS2322: Type '(row: User, column: ColumnConfig<User>, newValue: string | boolean) => void' is not assignable to type '(row: User, column: ColumnConfig<User>, value: JsonValue) => void'.
+src/app/(dashboard)/profile/page.tsx(238,19): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+src/app/(dashboard)/settings/appearance/page.tsx(59,20): error TS7030: Not all code paths return a value.
+src/app/(dashboard)/settings/appearance/page.tsx(219,59): error TS2345: Argument of type 'string' is not assignable to parameter of type '"light" | "dark" | "vibrant" | "system"'.
+src/app/(dashboard)/settings/appearance/page.tsx(280,65): error TS2345: Argument of type 'string' is not assignable to parameter of type '"blue" | "cyan" | "green" | "indigo" | "orange" | "pink" | "purple" | "red" | "teal" | "yellow" | "emerald" | "rose"'.
+src/app/(dashboard)/settings/appearance/page.tsx(323,66): error TS2345: Argument of type 'string' is not assignable to parameter of type '"medium" | "small" | "large"'.
+src/app/(dashboard)/settings/appearance/page.tsx(371,65): error TS2345: Argument of type 'string' is not assignable to parameter of type '"compact" | "comfortable" | "spacious"'.
+src/app/(dashboard)/settings/appearance/page.tsx(415,70): error TS2345: Argument of type 'string' is not assignable to parameter of type '"full" | "compact"'.
+src/app/(dashboard)/settings/menu/page.tsx(195,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(203,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(204,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(205,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(213,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(214,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(215,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(222,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(238,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(239,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(240,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(241,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(242,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(243,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(244,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(245,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(246,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(247,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(248,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(249,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(250,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(251,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(252,6): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(377,12): error TS2604: JSX element type 'Icon' does not have any construct or call signatures.
+src/app/(dashboard)/settings/menu/page.tsx(377,12): error TS2786: 'Icon' cannot be used as a JSX component.
+src/app/(dashboard)/settings/menu/page.tsx(471,3): error TS2339: Property '_onDropInFolder' does not exist on type '{ item: UserMenuItem; onRemove: (id: string) => void; level?: number | undefined; onDropInFolder?: ((parentId: string, droppedItem: unknown) => void) | undefined; onEdit?: ((item: UserMenuItem) => void) | undefined; }'.
+src/app/(dashboard)/settings/menu/page.tsx(513,12): error TS2604: JSX element type 'Icon' does not have any construct or call signatures.
+src/app/(dashboard)/settings/menu/page.tsx(513,12): error TS2786: 'Icon' cannot be used as a JSX component.
+src/app/(dashboard)/settings/menu/page.tsx(563,3): error TS2339: Property '_expanded' does not exist on type '{ item: MenuItemConfig; level?: number | undefined; onDragStart: (item: MenuItemConfig) => void; expanded?: boolean | undefined; onToggleExpanded?: (() => void) | undefined; expandedItems?: string[] | undefined; onToggleExpandedItem?: ((id: string) => void) | undefined; t: unknown; }'.
+src/app/(dashboard)/settings/menu/page.tsx(564,3): error TS2339: Property '_onToggleExpanded' does not exist on type '{ item: MenuItemConfig; level?: number | undefined; onDragStart: (item: MenuItemConfig) => void; expanded?: boolean | undefined; onToggleExpanded?: (() => void) | undefined; expandedItems?: string[] | undefined; onToggleExpandedItem?: ((id: string) => void) | undefined; t: unknown; }'.
+src/app/(dashboard)/settings/menu/page.tsx(602,28): error TS2554: Expected 1 arguments, but got 0.
+src/app/(dashboard)/settings/menu/page.tsx(620,17): error TS2698: Spread types may only be created from object types.
+src/app/(dashboard)/settings/menu/page.tsx(678,20): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(686,20): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(727,14): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(729,14): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(731,14): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(733,14): error TS18046: 't' is of type 'unknown'.
+src/app/(dashboard)/settings/menu/page.tsx(826,25): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'SetStateAction<MenuItemConfig[]>'.
+src/app/(dashboard)/settings/menu/page.tsx(856,35): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'TranslatableMenuItem'.
+src/app/(dashboard)/settings/menu/page.tsx(1273,13): error TS7030: Not all code paths return a value.
+src/app/(dashboard)/settings/menu/page.tsx(1619,26): error TS2604: JSX element type 'IconComponent' does not have any construct or call signatures.
+src/app/(dashboard)/settings/menu/page.tsx(1619,26): error TS2786: 'IconComponent' cannot be used as a JSX component.
+src/app/(dashboard)/settings/menu/page.tsx(1635,23): error TS2322: Type '{ as: true; TranslationField: true; value: string; onChange: Dispatch<SetStateAction<string>>; translations: Record<string, string>; onTranslationsChange: Dispatch<...>; placeholder: string; className: string; disabled: boolean; label: string; }' is not assignable to type 'IntrinsicAttributes & TranslationFieldWrapperProps'.
+src/app/(dashboard)/settings/menu/page.tsx(1744,36): error TS2604: JSX element type 'IconComponent' does not have any construct or call signatures.
+src/app/(dashboard)/settings/menu/page.tsx(1744,36): error TS2786: 'IconComponent' cannot be used as a JSX component.
+src/app/(dashboard)/settings/menu/page.tsx(1777,24): error TS2604: JSX element type 'IconComponent' does not have any construct or call signatures.
+src/app/(dashboard)/settings/menu/page.tsx(1777,24): error TS2786: 'IconComponent' cannot be used as a JSX component.
+src/app/(dashboard)/settings/security/page.tsx(206,9): error TS2322: Type 'unknown' is not assignable to type 'PublicKeyCredentialCreationOptions | undefined'.
+src/app/(dashboard)/test-datatable/page.tsx(7,10): error TS2305: Module '"@erp/ui/feedback"' has no exported member 'Card'.
+src/app/(dashboard)/test-datatable/page.tsx(7,16): error TS2305: Module '"@erp/ui/feedback"' has no exported member 'CardContent'.
+src/app/(dashboard)/test-datatable/page.tsx(7,29): error TS2724: '"@erp/ui/feedback"' has no exported member named 'CardDescription'. Did you mean 'AlertDescription'?
+src/app/(dashboard)/test-datatable/page.tsx(7,46): error TS2305: Module '"@erp/ui/feedback"' has no exported member 'CardHeader'.
+src/app/(dashboard)/test-datatable/page.tsx(7,58): error TS2305: Module '"@erp/ui/feedback"' has no exported member 'CardTitle'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(84,11): error TS2322: Type 'any[]' is not assignable to type 'never[]'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(153,11): error TS2353: Object literal may only specify known properties, and 'count' does not exist in type '{ status: string; data?: Record<string, unknown>[] | undefined; error?: string | undefined; } | ((prevState: { status: string; data?: Record<string, unknown>[] | undefined; error?: string | undefined; } | null) => { ...; } | null)'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(159,11): error TS2353: Object literal may only specify known properties, and 'statusCode' does not exist in type '{ status: string; data?: Record<string, unknown>[] | undefined; error?: string | undefined; } | ((prevState: { status: string; data?: Record<string, unknown>[] | undefined; error?: string | undefined; } | null) => { ...; } | null)'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(228,46): error TS2339: Property 'count' does not exist on type '{ status: string; data?: Record<string, unknown>[] | undefined; error?: string | undefined; }'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(254,33): error TS2322: Type '{}' is not assignable to type 'Key | null | undefined'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(345,48): error TS2339: Property 'tableName' does not exist on type '{ name: string; columns?: { name: string; type: string; }[] | undefined; }'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(352,36): error TS2339: Property 'schema' does not exist on type '{ name: string; columns?: { name: string; type: string; }[] | undefined; }'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(364,72): error TS2339: Property 'description' does not exist on type '{ name: string; columns?: { name: string; type: string; }[] | undefined; }'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(378,28): error TS18048: 'table.columns.length' is possibly 'undefined'.
+src/app/(dashboard)/test-multi-tenant/page.tsx(455,42): error TS2339: Property 'nullable' does not exist on type '{ columnName?: string | undefined; name?: string | undefined; dataType?: string | undefined; type?: string | undefined; isPrimaryKey?: boolean | undefined; primary?: boolean | undefined; isForeignKey?: boolean | undefined; foreign?: boolean | undefined; }'.
+src/app/api/admin/database/connections/route.ts(16,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/admin/database/health/route.ts(16,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/admin/database/health/tenant/[tenantCode]/route.ts(21,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/admin/database/migrations/status/route.ts(16,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/admin/database/migrations/tenant/[tenantCode]/status/route.ts(21,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/admin/database/optimize/route.ts(8,7): error TS2322: Type '{ Authorization?: string | null | undefined; }' is not assignable to type 'HeadersInit | undefined'.
+src/app/api/admin/database/restore/[id]/route.ts(10,7): error TS2322: Type '{ Authorization?: string | null | undefined; }' is not assignable to type 'HeadersInit | undefined'.
+src/app/api/admin/database/synchronize/route.ts(8,7): error TS2322: Type '{ Authorization?: string | null | undefined; }' is not assignable to type 'HeadersInit | undefined'.
+src/app/api/admin/groups/bulk-assignment/route.ts(65,21): error TS2345: Argument of type '{ success: boolean; groupId: any; userId: any; data: any; error?: undefined; } | { success: boolean; groupId: any; userId: any; error: any; data?: undefined; }' is not assignable to parameter of type 'never'.
+src/app/api/admin/groups/bulk-assignment/route.ts(68,51): error TS2339: Property 'success' does not exist on type 'never'.
+src/app/api/admin/groups/bulk-assignment/route.ts(69,50): error TS2339: Property 'success' does not exist on type 'never'.
+src/app/api/admin/menus/configurations/active/route.ts(46,17): error TS18046: 'error' is of type 'unknown'.
+src/app/api/admin/translations/route.ts(65,21): error TS2339: Property 'includes' does not exist on type '{}'.
+src/app/api/admin/translations/route.ts(65,60): error TS2339: Property 'includes' does not exist on type '{}'.
+src/app/api/admin/translations/route.ts(110,21): error TS2339: Property 'includes' does not exist on type '{}'.
+src/app/api/admin/translations/route.ts(110,60): error TS2339: Property 'includes' does not exist on type '{}'.
+src/app/api/admin/translations/route.ts(169,21): error TS2339: Property 'includes' does not exist on type '{}'.
+src/app/api/admin/translations/route.ts(169,60): error TS2339: Property 'includes' does not exist on type '{}'.
+src/app/api/admin/users/bulk-operations/route.ts(119,21): error TS2345: Argument of type '{ success: boolean; userId: string; operation: any; data: any; error?: undefined; } | { success: boolean; userId: string; operation: any; error: any; data?: undefined; }' is not assignable to parameter of type 'never'.
+src/app/api/admin/users/bulk-operations/route.ts(122,51): error TS2339: Property 'success' does not exist on type 'never'.
+src/app/api/admin/users/bulk-operations/route.ts(123,50): error TS2339: Property 'success' does not exist on type 'never'.
+src/app/api/admin/users/bulk-operations/route.ts(131,47): error TS2339: Property 'success' does not exist on type 'never'.
+src/app/api/admin/users/bulk-operations/route.ts(131,69): error TS2339: Property 'userId' does not exist on type 'never'.
+src/app/api/health/route.ts(28,13): error TS2322: Type 'number' is not assignable to type 'null'.
+src/app/api/images/[category]/[variant]/[filename]/route.ts(61,29): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit | null | undefined'.
+src/app/api/images/upload/route.ts(38,40): error TS2339: Property 'uploadImage' does not exist on type '{}'.
+src/app/api/images/upload/route.ts(81,25): error TS2339: Property 'deleteImage' does not exist on type '{}'.
+src/app/api/notifications/route.ts(99,36): error TS2345: Argument of type '{ id: {}; type: {}; category: {}; title: {}; message: {}; priority: {}; source: unknown; entity_type: unknown; entity_id: unknown; data: unknown; recipient_type: {}; recipient_id: unknown; action_url: unknown; action_label: unknown; action_type: {}; expires_at: unknown; ... 4 more ...; read_at: null; }' is not assignable to parameter of type 'Notification'.
+src/app/api/notifications/route.ts(170,7): error TS2322: Type 'string[]' is not assignable to type 'string'.
+src/app/api/notifications/route.ts(171,7): error TS2322: Type 'string[]' is not assignable to type 'NotificationType[]'.
+src/app/api/notifications/route.ts(172,7): error TS2322: Type 'string[]' is not assignable to type 'NotificationPriority[]'.
+src/app/api/notifications/rules/[id]/test/route.ts(19,25): error TS2339: Property 'id' does not exist on type '{ field: string; operator: string; value: unknown; logic?: "AND" | "OR" | undefined; }'.
+src/app/api/notifications/rules/[id]/test/route.ts(20,9): error TS2353: Object literal may only specify known properties, and 'condition' does not exist in type '{ result: boolean; value: unknown; }'.
+src/app/api/notifications/rules/[id]/test/route.ts(55,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/notifications/rules/[id]/test/route.ts(58,72): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/notifications/rules/[id]/test/route.ts(61,73): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/notifications/rules/[id]/test/route.ts(64,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/notifications/rules/[id]/test/route.ts(92,36): error TS2769: No overload matches this call.
+src/app/api/notifications/rules/[id]/test/route.ts(109,9): error TS2322: Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+src/app/api/notifications/rules/[id]/test/route.ts(144,14): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/app/api/notifications/rules/[id]/test/route.ts(144,36): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/app/api/notifications/rules/[id]/test/route.ts(207,9): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type '{ field: string; operator: string; value: unknown; logic?: "AND" | "OR" | undefined; }'.
+src/app/api/notifications/rules/[id]/test/route.ts(209,9): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type '{ field: string; operator: string; value: unknown; logic?: "AND" | "OR" | undefined; }'.
+src/app/api/notifications/rules/[id]/test/route.ts(217,5): error TS2739: Type '{ type: "warning"; category: string; titleTemplate: string; messageTemplate: string; priority: string; actionUrl: string; actionLabel: string; }' is missing the following properties from type '{ [key: string]: unknown; type: "error" | "success" | "warning" | "info"; category: string; title: string; message: string; }': title, message
+src/app/api/notifications/rules/[id]/test/route.ts(249,16): error TS2339: Property 'isActive' does not exist on type 'NotificationRule'.
+src/app/api/notifications/rules/[id]/test/route.ts(276,89): error TS2339: Property 'trigger' does not exist on type 'NotificationRule'.
+src/app/api/notifications/rules/[id]/test/route.ts(280,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/notifications/rules/[id]/test/route.ts(281,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/notifications/rules/[id]/test/route.ts(283,46): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/app/api/notifications/rules/[id]/test/route.ts(324,31): error TS2339: Property 'trigger' does not exist on type 'NotificationRule'.
+src/app/api/query-builder/execute-sql-dev/route.ts(14,7): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/query-builder/route.ts(14,7): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(14,7): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(77,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(84,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(91,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(98,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(105,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(112,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(119,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(126,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(133,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(140,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(147,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(154,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(163,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(170,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(177,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(184,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(191,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(198,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(205,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(212,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(221,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(228,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(235,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(242,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(249,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(256,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(263,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(270,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(279,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(286,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(293,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(300,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(307,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(314,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(321,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(330,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(337,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(344,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(351,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(358,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/[tableName]/columns/route.ts(365,11): error TS2353: Object literal may only specify known properties, and 'columnName' does not exist in type '{ name: string; type: string; nullable?: boolean | undefined; default?: unknown; description?: string | undefined; }'.
+src/app/api/query-builder/schema/tables-dev/route.ts(14,7): error TS2322: Type 'string' is not assignable to type 'null'.
+src/app/api/search/images/route.ts(30,7): error TS2353: Object literal may only specify known properties, and 'entityType' does not exist in type '{ query?: string | undefined; category?: string | undefined; tags?: string[] | undefined; limit: number; offset: number; sortBy: string; sortOrder: string; }'.
+src/app/api/search/images/route.ts(44,19): error TS2339: Property 'sizeRange' does not exist on type '{ query?: string | undefined; category?: string | undefined; tags?: string[] | undefined; limit: number; offset: number; sortBy: string; sortOrder: string; }'.
+src/app/api/search/images/route.ts(54,19): error TS2339: Property 'dateRange' does not exist on type '{ query?: string | undefined; category?: string | undefined; tags?: string[] | undefined; limit: number; offset: number; sortBy: string; sortOrder: string; }'.
+src/app/api/search/images/route.ts(71,54): error TS2339: Property 'searchImages' does not exist on type 'ImageElasticsearchService'.
+src/app/api/ui-preferences/reorderable-list/[componentId]/route.ts(43,25): error TS2339: Property 'componentId' does not exist on type 'Partial<ReorderableListConfig>'.
+src/app/api/ui-preferences/reorderable-list/[componentId]/route.ts(43,46): error TS2339: Property 'componentId' does not exist on type 'Partial<ReorderableListConfig>'.
+src/app/api/ui-preferences/reorderable-list/[componentId]/route.ts(55,7): error TS2353: Object literal may only specify known properties, and 'theme' does not exist in type 'Partial<ReorderableListConfig>'.
+src/app/api/ui-preferences/reorderable-list/[componentId]/route.ts(55,19): error TS2339: Property 'theme' does not exist on type 'Partial<ReorderableListConfig>'.
+src/app/api/ui-preferences/reorderable-list/[componentId]/route.ts(56,25): error TS2339: Property 'preferences' does not exist on type 'Partial<ReorderableListConfig>'.
+src/app/api/ui-preferences/reorderable-list/[componentId]/route.ts(57,20): error TS2339: Property 'layout' does not exist on type 'Partial<ReorderableListConfig>'.
+src/app/api/user/menu-preferences/custom-menu/route.ts(18,13): error TS2552: Cannot find name 'UserMenuItem'. Did you mean '_UserMenuItem'?
+src/app/api/user/menu-preferences/selected-pages/route.ts(23,9): error TS2322: Type 'any[]' is not assignable to type 'never[]'.
+src/app/global-error.tsx(18,14): error TS2339: Property 'language' does not exist on type '{ t: (key: string, params?: Record<string, string | number> | undefined) => string; plural: (key: string, count: number, params?: Record<string, string | number> | undefined) => string; ... 4 more ...; isLoading: boolean; }'.
+src/app/layout-minimal.tsx(4,11): error TS2339: Property 'language' does not exist on type '{ t: (key: string, params?: Record<string, string | number> | undefined) => string; plural: (key: string, count: number, params?: Record<string, string | number> | undefined) => string; ... 4 more ...; isLoading: boolean; }'.
+src/components/admin/bulk-profile-management.tsx(382,52): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+src/components/admin/bulk-profile-management.tsx(558,27): error TS18047: 'selectedOperation' is possibly 'null'.
+src/components/admin/bulk-user-assignment.tsx(159,29): error TS2345: Argument of type '{ groupId: string; userId: string; assignedAt: string; }' is not assignable to parameter of type 'never'.
+src/components/admin/bulk-user-assignment.tsx(253,52): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+src/components/admin/bulk-user-assignment.tsx(269,52): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+src/components/admin/connection-management-panel.tsx(83,18): error TS2322: Type '"success"' is not assignable to type '"default" | "secondary" | "destructive" | "outline" | undefined'.
+src/components/admin/connection-management-panel.tsx(89,18): error TS2322: Type '"warning"' is not assignable to type '"default" | "secondary" | "destructive" | "outline" | undefined'.
+src/components/admin/elasticsearch-admin.tsx(375,52): error TS2339: Property 'documentCount' does not exist on type '{ exists: boolean; health?: string | undefined; status?: string | undefined; docsCount?: number | undefined; }'.
+src/components/admin/performance-metrics-chart.tsx(118,20): error TS2322: Type '"secondary" | "success"' is not assignable to type '"default" | "secondary" | "destructive" | "outline" | undefined'.
+src/components/admin/role-management-panel.tsx(489,27): error TS2339: Property 'permissionId' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(520,66): error TS2339: Property 'moduleId' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(545,48): error TS2339: Property 'permissionId' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(548,47): error TS2339: Property 'accessLevel' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(551,44): error TS2339: Property 'permissionId' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(553,44): error TS2339: Property 'isGranted' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(567,49): error TS2339: Property 'isGranted' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(570,44): error TS2339: Property 'permissionId' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/role-management-panel.tsx(571,44): error TS2339: Property 'accessLevel' does not exist on type '{ id: string; name: string; description: string; }'.
+src/components/admin/societes-management-panel.tsx(121,16): error TS18046: 'error' is of type 'unknown'.
+src/components/admin/societes-management-panel.tsx(144,16): error TS18046: 'error' is of type 'unknown'.
+src/components/admin/societes-management-panel.tsx(165,16): error TS18046: 'error' is of type 'unknown'.
+src/components/admin/translation-admin.tsx(109,13): error TS7030: Not all code paths return a value.
+src/components/admin/TranslationDataTable.tsx(96,115): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/components/admin/TranslationDataTable.tsx(119,114): error TS2322: Type 'unknown' is not assignable to type 'string | undefined'.
+src/components/admin/TranslationDataTable.tsx(131,117): error TS2322: Type 'unknown' is not assignable to type 'string | undefined'.
+src/components/admin/TranslationDataTable.tsx(142,112): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
+src/components/admin/TranslationDataTable.tsx(188,29): error TS2345: Argument of type '{ translations: { [x: string]: unknown; }; isModified: boolean; updatedAt: Date; id: string; namespace: string; key: string; fullKey: string; category?: string; description?: string; createdAt?: Date; updatedBy?: string; }' is not assignable to parameter of type 'TranslationEntry'.
+src/components/admin/TranslationDataTable.tsx(258,9): error TS2353: Object literal may only specify known properties, and 'create' does not exist in type '{ label: string; icon?: ReactNode; onClick: (row: TranslationEntry) => void; variant?: "default" | "destructive" | "outline" | undefined; disabled?: ((row: TranslationEntry) => boolean) | undefined; }[]'.
+src/components/articles/duplicate-article-dialog.tsx(162,20): error TS2339: Property 'EN_ATTENTE' does not exist on type 'typeof ArticleStatus'.
+src/components/auth/admin-guard.tsx(49,23): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Permission'.
+src/components/auth/admin-guard.tsx(104,21): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Permission'.
+src/components/auth/AuthProvider-simple.tsx(29,3): error TS2339: Property '_requiredPermissions' does not exist on type '{ children: ReactNode; requiredPermissions?: string[] | undefined; fallbackUrl?: string | undefined; }'.
+src/components/auth/AuthProvider-simple.tsx(30,3): error TS2339: Property '_fallbackUrl' does not exist on type '{ children: ReactNode; requiredPermissions?: string[] | undefined; fallbackUrl?: string | undefined; }'.
+src/components/auth/company-selector.tsx(94,9): error TS2322: Type 'any[]' is not assignable to type 'never[]'.
+src/components/auth/company-selector.tsx(105,11): error TS2322: Type '{ id: string; name: string; }[]' is not assignable to type 'never[]'.
+src/components/auth/company-selector.tsx(112,11): error TS2322: Type '{ key: string; value: string; icon: string; color: string; order: number; description: any; }[]' is not assignable to type 'never[]'.
+src/components/auth/company-selector.tsx(118,31): error TS2339: Property 'description' does not exist on type '{ id: string; name: string; }'.
+src/components/auth/company-selector.tsx(123,13): error TS2322: Type '{ key: string; value: string; icon: string; color: string; order: number; }' is not assignable to type 'never'.
+src/components/auth/company-selector.tsx(124,13): error TS2322: Type '{ key: string; value: string; icon: string; color: string; order: number; }' is not assignable to type 'never'.
+src/components/auth/company-selector.tsx(134,22): error TS2339: Property 'icon' does not exist on type '{ key?: string | undefined; id?: string | undefined; value?: string | undefined; name?: string | undefined; label?: string | undefined; }'.
+src/components/auth/company-selector.tsx(135,23): error TS2339: Property 'color' does not exist on type '{ key?: string | undefined; id?: string | undefined; value?: string | undefined; name?: string | undefined; label?: string | undefined; }'.
+src/components/auth/company-selector.tsx(136,23): error TS2339: Property 'order' does not exist on type '{ key?: string | undefined; id?: string | undefined; value?: string | undefined; name?: string | undefined; label?: string | undefined; }'.
+src/components/auth/company-selector.tsx(137,29): error TS2339: Property 'permissions' does not exist on type '{ key?: string | undefined; id?: string | undefined; value?: string | undefined; name?: string | undefined; label?: string | undefined; }'.
+src/components/auth/company-selector.tsx(138,26): error TS2339: Property 'category' does not exist on type '{ key?: string | undefined; id?: string | undefined; value?: string | undefined; name?: string | undefined; label?: string | undefined; }'.
+src/components/auth/company-selector.tsx(139,32): error TS2339: Property 'translationKey' does not exist on type '{ key?: string | undefined; id?: string | undefined; value?: string | undefined; name?: string | undefined; label?: string | undefined; }'.
+src/components/auth/company-selector.tsx(426,3): error TS2339: Property '_onCompanySelected' does not exist on type 'CompanySelectorProps'.
+src/components/auth/company-selector.tsx(447,9): error TS2322: Type 'import("D:/GitHub/TopSteel/apps/web/src/types/auth").Company[]' is not assignable to type 'Company[]'.
+src/components/auth/company-selector.tsx(451,9): error TS2740: Type '{}' is missing the following properties from type 'Company[]': length, pop, push, concat, and 28 more.
+src/components/auth/company-selector.tsx(613,55): error TS2339: Property 'name' does not exist on type 'Company'.
+src/components/auth/mfa-verification.tsx(118,9): error TS2322: Type 'unknown' is not assignable to type 'PublicKeyCredentialRequestOptions | undefined'.
+src/components/auth/permission-guard.tsx(59,23): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'Role[]'.
+src/components/auth/permission-guard.tsx(217,23): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'Role[]'.
+src/components/auth/tab-sync-notification.tsx(33,27): error TS2339: Property 'tabId' does not exist on type 'MessageEvent<any>'.
+src/components/auth/tab-sync-notification.tsx(33,62): error TS2339: Property 'data' does not exist on type '{}'.
+src/components/client-only.tsx(408,3): error TS2779: The left-hand side of an assignment expression may not be an optional property access.
+src/components/facturation/devis-filters.tsx(21,32): error TS2339: Property '_onFiltersChange' does not exist on type 'DevisFiltersProps'.
+src/components/facturation/factures-filters.tsx(20,35): error TS2339: Property '_onFiltersChange' does not exist on type 'FacturesFiltersProps'.
+src/components/index.ts(7,10): error TS2724: '"./devtools-wrapper"' has no exported member named 'DevtoolsWrapper'. Did you mean 'DevToolsWrapper'?
+src/components/index.ts(32,15): error TS2307: Cannot find module './admin' or its corresponding type declarations.
+src/components/index.ts(33,15): error TS2307: Cannot find module './articles' or its corresponding type declarations.
+src/components/index.ts(35,15): error TS2307: Cannot find module './stocks' or its corresponding type declarations.
+src/components/index.ts(36,15): error TS2307: Cannot find module './production' or its corresponding type declarations.
+src/components/index.ts(37,15): error TS2307: Cannot find module './projets' or its corresponding type declarations.
+src/components/index.ts(38,15): error TS2307: Cannot find module './facturation' or its corresponding type declarations.
+src/components/index.ts(39,15): error TS2307: Cannot find module './notifications' or its corresponding type declarations.
+src/components/index.ts(40,15): error TS2307: Cannot find module './settings' or its corresponding type declarations.
+src/components/layout/header.tsx(21,3): error TS2339: Property '_onToggleSidebar' does not exist on type 'HeaderProps'.
+src/components/layout/header.tsx(22,3): error TS2339: Property '_isSidebarCollapsed' does not exist on type 'HeaderProps'.
+src/components/layout/sidebar.tsx(291,11): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(292,12): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(292,30): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(292,66): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'TranslatableMenuItem'.
+src/components/layout/sidebar.tsx(293,29): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(293,65): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(294,30): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(294,67): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(299,17): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(301,20): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(304,20): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(307,20): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(307,60): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(310,20): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(319,21): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(320,28): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(321,21): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(321,61): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(322,18): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(324,23): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(325,21): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(327,13): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(328,13): error TS18046: 'item' is of type 'unknown'.
+src/components/layout/sidebar.tsx(329,13): error TS18046: 'item' is of type 'unknown'.
+src/components/lazy/lazy-imports.tsx(17,16): error TS2307: Cannot find module '../app/(dashboard)/settings/menu/page' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(25,16): error TS2307: Cannot find module '../app/(dashboard)/admin/database/page' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(33,16): error TS2307: Cannot find module '../app/(dashboard)/admin/sessions/page' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(41,16): error TS2307: Cannot find module '../app/(dashboard)/profile/page' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(50,12): error TS2307: Cannot find module '../app/(dashboard)/settings/security/page' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(58,16): error TS2307: Cannot find module '../app/(auth)/admin/pricing/page' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(68,77): error TS2339: Property 'default' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/partners/partner-form-dialog")'.
+src/components/lazy/lazy-imports.tsx(76,75): error TS2339: Property 'default' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/partners/sites-manager")'.
+src/components/lazy/lazy-imports.tsx(85,75): error TS2339: Property 'default' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/partners/addresses-manager")'.
+src/components/lazy/lazy-imports.tsx(95,12): error TS2307: Cannot find module '../components/query-builder/visual-query-builder' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(106,12): error TS2307: Cannot find module '../components/query-builder/table-selector' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(116,12): error TS2307: Cannot find module '../components/articles/article-form-dialog' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(126,12): error TS2307: Cannot find module '../components/admin/group-management-panel' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(135,12): error TS2307: Cannot find module '../components/admin/bulk-profile-management' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(143,16): error TS2307: Cannot find module '../components/admin/elasticsearch-admin' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(153,12): error TS2307: Cannot find module '../app/(dashboard)/admin/marketplace/components/module-publisher' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(165,12): error TS2307: Cannot find module '../components/notifications/notification-rules-panel' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(176,16): error TS2307: Cannot find module '../components/charts/index' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(184,16): error TS2307: Cannot find module '../components/3d-viewer/index' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(193,16): error TS2307: Cannot find module '../components/devtools-wrapper' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(202,16): error TS2307: Cannot find module '../components/facturation/devis-table' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(211,12): error TS2307: Cannot find module '../components/facturation/factures-table' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(220,12): error TS2307: Cannot find module '../components/facturation/paiements-chart' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(230,12): error TS2307: Cannot find module '../components/production/planning-calendar' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(239,16): error TS2307: Cannot find module '../components/stocks/chutes-optimizer' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(247,16): error TS2307: Cannot find module '../components/stocks/mouvements-chart' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(256,16): error TS2307: Cannot find module '../components/auth/company-selector' or its corresponding type declarations.
+src/components/lazy/lazy-imports.tsx(274,18): error TS2345: Argument of type '() => Promise<{ default: ComponentType<P>; }>' is not assignable to parameter of type 'DynamicOptions<P> | Loader<P>'.
+src/components/notifications/condition-builder.tsx(244,11): error TS2322: Type 'string | number | boolean | string[]' is not assignable to type 'string | number | readonly string[] | undefined'.
+src/components/notifications/condition-builder.tsx(258,11): error TS2322: Type 'string | number | boolean | string[]' is not assignable to type 'string | number | readonly string[] | undefined'.
+src/components/notifications/condition-builder.tsx(269,9): error TS2322: Type 'string | number | boolean | string[]' is not assignable to type 'string | number | readonly string[] | undefined'.
+src/components/notifications/notification-center.tsx(3,35): error TS2307: Cannot find module '@erp/domains/notifications' or its corresponding type declarations.
+src/components/notifications/notification-center.tsx(500,53): error TS1361: 'Notification' cannot be used as a value because it was imported using 'import type'.
+src/components/notifications/notification-center.tsx(501,23): error TS1361: 'Notification' cannot be used as a value because it was imported using 'import type'.
+src/components/notifications/notification-dashboard-v2.tsx(3,35): error TS2307: Cannot find module '@erp/domains/notifications' or its corresponding type declarations.
+src/components/notifications/notification-dashboard.tsx(3,35): error TS2307: Cannot find module '@erp/domains/notifications' or its corresponding type declarations.
+src/components/notifications/notification-dashboard.tsx(39,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(40,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(41,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(42,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(43,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(44,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(45,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(46,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-dashboard.tsx(47,3): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-rules-panel.tsx(569,52): error TS2339: Property 'triggerType' does not exist on type 'FormData'.
+src/components/notifications/notification-rules-panel.tsx(637,57): error TS2339: Property 'notificationType' does not exist on type 'FormData'.
+src/components/notifications/notification-rules-panel.tsx(657,81): error TS2339: Property 'priority' does not exist on type 'FormData'.
+src/components/notifications/notification-settings.tsx(34,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(35,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(36,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(37,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(38,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(39,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(40,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(41,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(42,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(58,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(59,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(60,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(61,5): error TS2322: Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ComponentType<any>'.
+src/components/notifications/notification-settings.tsx(266,45): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<"priority" | "categories" | "general" | "schedule">'.
+src/components/notifications/rule-test-dialog.tsx(219,40): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/notifications/rule-test-dialog.tsx(224,66): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/notifications/rule-test-dialog.tsx(228,55): error TS2339: Property 'map' does not exist on type '{}'.
+src/components/notifications/rule-test-dialog.tsx(290,46): error TS2339: Property 'condition' does not exist on type '{ result: boolean; value?: unknown; expected?: unknown; }'.
+src/components/notifications/rule-test-dialog.tsx(292,66): error TS2339: Property 'actualValue' does not exist on type '{ result: boolean; value?: unknown; expected?: unknown; }'.
+src/components/partners/addresses-manager.tsx(113,5): error TS2719: Type 'import("D:/GitHub/TopSteel/node_modules/react-hook-form/dist/types/resolvers").Resolver<{ libelle: string; type: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").AddressType; ligne1: string; codePostal: string; ville: string; status?: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").Add...' is not assignable to type 'import("D:/GitHub/TopSteel/node_modules/react-hook-form/dist/types/resolvers").Resolver<{ libelle: string; type: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").AddressType; ligne1: string; codePostal: string; ville: string; status?: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").Add...'. Two different types with this name exist, but they are unrelated.
+src/components/partners/addresses-manager.tsx(325,47): error TS2345: Argument of type '(data: AddressFormData) => Promise<void>' is not assignable to parameter of type 'SubmitHandler<TFieldValues>'.
+src/components/partners/partner-form-dialog.tsx(146,5): error TS2719: Type 'import("D:/GitHub/TopSteel/node_modules/react-hook-form/dist/types/resolvers").Resolver<{ type: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").PartnerType; denomination: string; category: string; code?: string | undefined; denominationCommerciale?: string | undefined; ... 24 more ...; compteComptabl...' is not assignable to type 'import("D:/GitHub/TopSteel/node_modules/react-hook-form/dist/types/resolvers").Resolver<{ type: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").PartnerType; denomination: string; category: string; code?: string | undefined; denominationCommerciale?: string | undefined; ... 24 more ...; compteComptabl...'. Two different types with this name exist, but they are unrelated.
+src/components/partners/partner-form-dialog.tsx(194,46): error TS2345: Argument of type '(data: PartnerFormData) => Promise<void>' is not assignable to parameter of type 'SubmitHandler<TFieldValues>'.
+src/components/partners/sites-manager.tsx(126,5): error TS2719: Type 'import("D:/GitHub/TopSteel/node_modules/react-hook-form/dist/types/resolvers").Resolver<{ code: string; nom: string; type: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").SiteType; description?: string | undefined; status?: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").SiteStatus | ...' is not assignable to type 'import("D:/GitHub/TopSteel/node_modules/react-hook-form/dist/types/resolvers").Resolver<{ code: string; nom: string; type: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").SiteType; description?: string | undefined; status?: import("D:/GitHub/TopSteel/packages/types/dist/partners/index").SiteStatus | ...'. Two different types with this name exist, but they are unrelated.
+src/components/partners/sites-manager.tsx(348,48): error TS2345: Argument of type '(data: SiteFormData) => Promise<void>' is not assignable to parameter of type 'SubmitHandler<TFieldValues>'.
+src/components/production/ordre-operations-tab.tsx(29,38): error TS2339: Property '_ordre' does not exist on type 'OrdreOperationsTabProps'.
+src/components/production/ordre-qualite-tab.tsx(25,35): error TS2339: Property '_ordre' does not exist on type 'OrdreQualiteTabProps'.
+src/components/production/planning-calendar.tsx(55,18): error TS2345: Argument of type '{ date: Date; isCurrentMonth: boolean; }' is not assignable to parameter of type 'never'.
+src/components/production/planning-calendar.tsx(60,18): error TS2345: Argument of type '{ date: Date; isCurrentMonth: boolean; }' is not assignable to parameter of type 'never'.
+src/components/production/planning-calendar.tsx(67,18): error TS2345: Argument of type '{ date: Date; isCurrentMonth: boolean; }' is not assignable to parameter of type 'never'.
+src/components/production/planning-calendar.tsx(133,52): error TS2339: Property 'date' does not exist on type 'never'.
+src/components/production/planning-calendar.tsx(134,34): error TS2339: Property 'date' does not exist on type 'never'.
+src/components/production/planning-calendar.tsx(139,27): error TS2339: Property 'date' does not exist on type 'never'.
+src/components/production/planning-calendar.tsx(142,25): error TS2339: Property 'isCurrentMonth' does not exist on type 'never'.
+src/components/production/planning-calendar.tsx(145,48): error TS2339: Property 'date' does not exist on type 'never'.
+src/components/production/planning-calendar.tsx(146,53): error TS2339: Property 'date' does not exist on type 'never'.
+src/components/production/planning-calendar.tsx(149,25): error TS2339: Property 'date' does not exist on type 'never'.
+src/components/production/production-table.tsx(38,11): error TS2339: Property 'label' does not exist on type '{ EN_ATTENTE: { label: string; variant: "secondary"; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; }; ... 4 more ...; ANNULE: { ...; }; }'.
+src/components/production/production-table.tsx(38,18): error TS2339: Property 'variant' does not exist on type '{ EN_ATTENTE: { label: string; variant: "secondary"; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; }; ... 4 more ...; ANNULE: { ...; }; }'.
+src/components/production/production-table.tsx(38,27): error TS2339: Property 'icon' does not exist on type '{ EN_ATTENTE: { label: string; variant: "secondary"; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; }; ... 4 more ...; ANNULE: { ...; }; }'.
+src/components/production/production-table.tsx(38,96): error TS2339: Property 'EN_ATTENTE' does not exist on type 'never'.
+src/components/production/production-table.tsx(56,11): error TS2339: Property 'label' does not exist on type '{ BASSE: { label: string; className: string; }; NORMALE: { label: string; className: string; }; HAUTE: { label: string; className: string; }; URGENTE: { label: string; className: string; }; }'.
+src/components/production/production-table.tsx(56,18): error TS2339: Property 'className' does not exist on type '{ BASSE: { label: string; className: string; }; NORMALE: { label: string; className: string; }; HAUTE: { label: string; className: string; }; URGENTE: { label: string; className: string; }; }'.
+src/components/production/production-table.tsx(56,88): error TS2339: Property 'NORMALE' does not exist on type 'never'.
+src/components/production/production-table.tsx(61,59): error TS2339: Property '_onStatusChange' does not exist on type 'ProductionTableProps'.
+src/components/providers/notifications-provider.tsx(3,35): error TS2307: Cannot find module '@erp/domains/notifications' or its corresponding type declarations.
+src/components/providers/notifications-provider.tsx(115,9): error TS2322: Type 'unknown' is not assignable to type 'Notification[]'.
+src/components/providers/notifications-provider.tsx(116,39): error TS2339: Property 'filter' does not exist on type '{}'.
+src/components/providers/notifications-provider.tsx(122,39): error TS2339: Property 'readAt' does not exist on type '{}'.
+src/components/providers/notifications-provider.tsx(158,40): error TS2698: Spread types may only be created from object types.
+src/components/providers/notifications-provider.tsx(163,9): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
+src/components/providers/notifications-provider.tsx(168,9): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
+src/components/providers/notifications-provider.tsx(173,9): error TS2322: Type 'unknown' is not assignable to type 'string | null'.
+src/components/providers/notifications-provider.tsx(329,27): error TS2352: Conversion of type '{ connected: boolean; readyState: 1; emit: (_event: string, _data?: unknown) => void; disconnect: () => void; }' to type 'Socket<DefaultEventsMap, DefaultEventsMap>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/components/providers/notifications-provider.tsx(500,7): error TS1361: 'Notification' cannot be used as a value because it was imported using 'import type'.
+src/components/providers/notifications-provider.tsx(502,7): error TS1361: 'Notification' cannot be used as a value because it was imported using 'import type'.
+src/components/query-builder/add-to-menu-button.tsx(96,22): error TS18046: 'error' is of type 'unknown'.
+src/components/query-builder/calculated-fields-editor.tsx(186,34): error TS2339: Property 'alias' does not exist on type '{ name: string; type: string; label?: string | undefined; }'.
+src/components/query-builder/calculated-fields-editor.tsx(189,63): error TS2339: Property 'alias' does not exist on type '{ name: string; type: string; label?: string | undefined; }'.
+src/components/query-builder/calculated-fields-editor.tsx(192,73): error TS2339: Property 'dataType' does not exist on type '{ name: string; type: string; label?: string | undefined; }'.
+src/components/query-builder/column-selector.tsx(150,28): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+src/components/query-builder/datatable-preview.tsx(63,57): error TS2339: Property 'isVisible' does not exist on type '{ name: string; type: string; label?: string | undefined; }'.
+src/components/query-builder/datatable-preview.tsx(64,79): error TS2339: Property 'isVisible' does not exist on type '{ name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(68,20): error TS2339: Property 'displayOrder' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(68,44): error TS2339: Property 'displayOrder' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(72,28): error TS2339: Property 'alias' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(72,41): error TS2339: Property 'columnName' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(76,9): error TS2322: Type 'string | number | symbol' is not assignable to type 'string'.
+src/components/query-builder/datatable-preview.tsx(77,20): error TS2339: Property 'label' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(77,33): error TS2339: Property 'columnName' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(78,26): error TS2339: Property 'description' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(78,56): error TS2339: Property 'tableName' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(78,79): error TS2339: Property 'columnName' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(79,36): error TS2339: Property 'dataType' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(81,23): error TS2339: Property 'isSortable' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(82,25): error TS2339: Property 'isFilterable' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(85,19): error TS2339: Property 'format' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(86,26): error TS2339: Property 'format' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(93,66): error TS2339: Property 'format' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(95,55): error TS2339: Property 'format' does not exist on type '{ name: string; type: string; label?: string | undefined; } | { name: string; expression: string; type: string; }'.
+src/components/query-builder/datatable-preview.tsx(136,33): error TS2339: Property 'enableExport' does not exist on type '{}'.
+src/components/query-builder/datatable-preview.tsx(145,39): error TS2339: Property 'exportFormats' does not exist on type '{}'.
+src/components/query-builder/query-builder-interface.tsx(241,17): error TS2322: Type '{ selectedTables: any[]; columns: any; onColumnsChange: (columns: Column[]) => void; layout: any; onLayoutChange: (layout: any) => void; }' is not assignable to type 'IntrinsicAttributes & ColumnSelectorProps'.
+src/components/query-builder/visual-query-builder.tsx(351,25): error TS18047: 'selectedTable' is possibly 'null'.
+src/components/query-builder/visual-query-builder.tsx(597,25): error TS2322: Type '{ alias: string; columnName: string; tableName: string; label: string; dataType: string; isVisible: boolean; isSortable: boolean; isFilterable: boolean; displayOrder: number; aggregation: "SUM" | ... 4 more ... | undefined; }[]' is not assignable to type '{ name: string; type: string; label?: string | undefined; }[]'.
+src/components/search/command-palette.tsx(131,13): error TS7030: Not all code paths return a value.
+src/components/search/command-palette.tsx(139,13): error TS7030: Not all code paths return a value.
+src/components/search/command-palette.tsx(290,44): error TS2339: Property 'value' does not exist on type 'never'.
+src/components/security/csp-style.tsx(22,12): error TS2322: Type '"div"' is not assignable to type '"SelectTrigger"'.
+src/components/security/csp-style.tsx(106,12): error TS2322: Type '"div"' is not assignable to type '"SelectTrigger"'.
+src/components/stocks/chutes-optimizer.tsx(180,21): error TS18047: 'selectedChute' is possibly 'null'.
+src/components/stocks/mouvements-table.tsx(139,7): error TS2339: Property 'label' does not exist on type '{ ENTREE: { label: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; className: string; }; SORTIE: { ...; }; TRANSFERT: { ...; }; AJUSTEMENT: { ...; }; }'.
+src/components/stocks/mouvements-table.tsx(140,7): error TS2339: Property 'icon' does not exist on type '{ ENTREE: { label: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; className: string; }; SORTIE: { ...; }; TRANSFERT: { ...; }; AJUSTEMENT: { ...; }; }'.
+src/components/stocks/mouvements-table.tsx(141,7): error TS2339: Property 'className' does not exist on type '{ ENTREE: { label: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; className: string; }; SORTIE: { ...; }; TRANSFERT: { ...; }; AJUSTEMENT: { ...; }; }'.
+src/components/stocks/mouvements-table.tsx(142,62): error TS2339: Property 'AJUSTEMENT' does not exist on type 'never'.
+src/features/marketplace/components/cart/CartProvider.tsx(3,28): error TS2307: Cannot find module 'next-auth/react' or its corresponding type declarations.
+src/features/marketplace/components/cart/CartProvider.tsx(43,22): error TS2448: Block-scoped variable 'initializeCart' used before its declaration.
+src/features/marketplace/components/cart/CartProvider.tsx(43,22): error TS2454: Variable 'initializeCart' is used before being assigned.
+src/features/marketplace/components/cart/CartProvider.tsx(52,39): error TS2448: Block-scoped variable 'handleUserLogin' used before its declaration.
+src/features/marketplace/components/cart/CartProvider.tsx(52,39): error TS2454: Variable 'handleUserLogin' is used before being assigned.
+src/features/marketplace/components/cart/CartProvider.tsx(52,56): error TS2448: Block-scoped variable 'handleUserLogout' used before its declaration.
+src/features/marketplace/components/cart/CartProvider.tsx(52,56): error TS2454: Variable 'handleUserLogout' is used before being assigned.
+src/features/marketplace/components/cart/CartProvider.tsx(63,57): error TS2448: Block-scoped variable 'syncWithBackend' used before its declaration.
+src/features/marketplace/components/cart/CartProvider.tsx(63,57): error TS2454: Variable 'syncWithBackend' is used before being assigned.
+src/features/marketplace/components/cart/CartProvider.tsx(70,33): error TS2448: Block-scoped variable 'reserveStock' used before its declaration.
+src/features/marketplace/components/cart/CartProvider.tsx(70,33): error TS2454: Variable 'reserveStock' is used before being assigned.
+src/features/marketplace/components/cart/ShoppingCart.tsx(53,22): error TS2448: Block-scoped variable 'validateCartItems' used before its declaration.
+src/features/marketplace/components/cart/ShoppingCart.tsx(53,22): error TS2454: Variable 'validateCartItems' is used before being assigned.
+src/features/marketplace/components/checkout/steps/ReviewStep.tsx(18,31): error TS2307: Cannot find module '../../store/cartSlice' or its corresponding type declarations.
+src/features/marketplace/components/checkout/steps/ReviewStep.tsx(104,34): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/features/marketplace/components/checkout/steps/ShippingStep.tsx(62,5): error TS2448: Block-scoped variable 'loadSavedAddresses' used before its declaration.
+src/features/marketplace/components/checkout/steps/ShippingStep.tsx(62,5): error TS2454: Variable 'loadSavedAddresses' is used before being assigned.
+src/features/marketplace/components/compare/CompareBar.tsx(118,30): error TS2551: Property 'image' does not exist on type 'Product'. Did you mean 'images'?
+src/features/marketplace/components/compare/CompareBar.tsx(120,38): error TS2551: Property 'image' does not exist on type 'Product'. Did you mean 'images'?
+src/features/marketplace/components/compare/ProductComparison.tsx(177,20): error TS2532: Object is possibly 'undefined'.
+src/features/marketplace/components/compare/ProductComparison.tsx(177,51): error TS2532: Object is possibly 'undefined'.
+src/features/marketplace/components/compare/ProductComparison.tsx(214,30): error TS2551: Property 'image' does not exist on type 'Product'. Did you mean 'images'?
+src/features/marketplace/components/compare/ProductComparison.tsx(216,38): error TS2551: Property 'image' does not exist on type 'Product'. Did you mean 'images'?
+src/features/marketplace/components/products/ProductGrid.tsx(93,25): error TS2345: Argument of type 'number' is not assignable to parameter of type 'never'.
+src/features/marketplace/components/search/SearchResults.tsx(27,5): error TS2561: Object literal may only specify known properties, but 'image' does not exist in type 'Product'. Did you mean to write 'images'?
+src/features/marketplace/components/search/SearchResults.tsx(45,5): error TS2561: Object literal may only specify known properties, but 'image' does not exist in type 'Product'. Did you mean to write 'images'?
+src/features/marketplace/components/search/SearchResults.tsx(63,5): error TS2561: Object literal may only specify known properties, but 'image' does not exist in type 'Product'. Did you mean to write 'images'?
+src/features/marketplace/components/search/SearchResults.tsx(105,7): error TS2448: Block-scoped variable 'loadProducts' used before its declaration.
+src/features/marketplace/components/search/SearchResults.tsx(105,7): error TS2454: Variable 'loadProducts' is used before being assigned.
+src/features/marketplace/optimization/lazy-loading.hook.tsx(64,11): error TS2322: Type 'RefObject<T | null>' is not assignable to type 'RefObject<T>'.
+src/features/marketplace/optimization/lazy-loading.hook.tsx(143,3): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
+src/features/marketplace/optimization/lazy-loading.hook.tsx(165,24): error TS2694: Namespace 'global.JSX' has no exported member 'Element'.
+src/features/marketplace/optimization/lazy-loading.hook.tsx(307,5): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
+src/features/marketplace/store/cartPersistence.ts(102,32): error TS18046: 'action' is of type 'unknown'.
+src/features/marketplace/store/cartPersistence.ts(110,7): error TS18046: 'action' is of type 'unknown'.
+src/features/marketplace/store/cartSlice.ts(66,15): error TS2339: Property 'product' does not exist on type '{ payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }'.
+src/features/marketplace/store/cartSlice.ts(66,24): error TS2339: Property 'quantity' does not exist on type '{ payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }'.
+src/features/marketplace/store/cartSlice.ts(66,34): error TS2339: Property 'options' does not exist on type '{ payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }'.
+src/features/marketplace/store/cartSlice.ts(66,59): error TS2339: Property 'payload' does not exist on type '{}'.
+src/features/marketplace/store/cartSlice.ts(99,15): error TS2339: Property 'productId' does not exist on type '{ payload: { productId: string; quantity: number; options?: Record<string, any> | undefined; }; type: string; }'.
+src/features/marketplace/store/cartSlice.ts(99,26): error TS2339: Property 'quantity' does not exist on type '{ payload: { productId: string; quantity: number; options?: Record<string, any> | undefined; }; type: string; }'.
+src/features/marketplace/store/cartSlice.ts(99,36): error TS2339: Property 'options' does not exist on type '{ payload: { productId: string; quantity: number; options?: Record<string, any> | undefined; }; type: string; }'.
+src/features/marketplace/store/cartSlice.ts(99,61): error TS2339: Property 'payload' does not exist on type '{}'.
+src/features/marketplace/store/cartSlice.ts(201,3): error TS2339: Property 'addToCart' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(202,3): error TS2339: Property 'updateQuantity' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(203,3): error TS2339: Property 'removeFromCart' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(204,3): error TS2339: Property 'clearCart' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(205,3): error TS2339: Property 'toggleCart' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(206,3): error TS2339: Property 'setCartOpen' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(207,3): error TS2339: Property 'applyCoupon' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(208,3): error TS2339: Property 'removeCoupon' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(209,3): error TS2339: Property 'setShippingMethod' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(210,3): error TS2339: Property 'syncCart' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(211,3): error TS2339: Property 'setReservationId' does not exist on type 'Slice<CartState, { addToCart: (state: WritableDraft<CartState>, action: { payload: { product: Product; quantity: number; options?: Record<string, any> | undefined; }; type: string; }) => void; ... 9 more ...; setReservationId: (state: WritableDraft<...>, action: { ...; }) => void; }, "cart", "cart", SliceSelectors<....'.
+src/features/marketplace/store/cartSlice.ts(212,22): error TS2339: Property 'actions' does not exist on type '{}'.
+src/features/marketplace/store/cartSlice.ts(226,11): error TS2339: Property 'type' does not exist on type '{ cart: CartState; }'.
+src/features/marketplace/store/cartSlice.ts(226,17): error TS2339: Property 'discount' does not exist on type '{ cart: CartState; }'.
+src/features/marketplace/store/cartSlice.ts(226,43): error TS2339: Property 'cart' does not exist on type '{}'.
+src/features/marketplace/store/cartSlice.ts(241,7): error TS18047: 'state.cart.appliedCoupon' is possibly 'null'.
+src/features/marketplace/store/compareSlice.ts(83,15): error TS2339: Property 'oldId' does not exist on type '{ payload: { oldId: string; newProduct: Product; }; type: string; }'.
+src/features/marketplace/store/compareSlice.ts(83,22): error TS2339: Property 'newProduct' does not exist on type '{ payload: { oldId: string; newProduct: Product; }; type: string; }'.
+src/features/marketplace/store/compareSlice.ts(83,50): error TS2339: Property 'payload' does not exist on type '{}'.
+src/features/marketplace/store/compareSlice.ts(108,3): error TS2339: Property 'addToCompare' does not exist on type 'Slice<CompareState, { addToCompare: (state: WritableDraft<CompareState>, action: { payload: Product; type: string; }) => void; removeFromCompare: (state: WritableDraft<...>, action: { ...; }) => void; ... 4 more ...; setMaxProducts: (state: WritableDraft<...>, action: { ...; }) => void; }, "compare", "compare", Slic...'.
+src/features/marketplace/store/compareSlice.ts(109,3): error TS2339: Property 'removeFromCompare' does not exist on type 'Slice<CompareState, { addToCompare: (state: WritableDraft<CompareState>, action: { payload: Product; type: string; }) => void; removeFromCompare: (state: WritableDraft<...>, action: { ...; }) => void; ... 4 more ...; setMaxProducts: (state: WritableDraft<...>, action: { ...; }) => void; }, "compare", "compare", Slic...'.
+src/features/marketplace/store/compareSlice.ts(110,3): error TS2339: Property 'toggleCompare' does not exist on type 'Slice<CompareState, { addToCompare: (state: WritableDraft<CompareState>, action: { payload: Product; type: string; }) => void; removeFromCompare: (state: WritableDraft<...>, action: { ...; }) => void; ... 4 more ...; setMaxProducts: (state: WritableDraft<...>, action: { ...; }) => void; }, "compare", "compare", Slic...'.
+src/features/marketplace/store/compareSlice.ts(111,3): error TS2339: Property 'clearCompare' does not exist on type 'Slice<CompareState, { addToCompare: (state: WritableDraft<CompareState>, action: { payload: Product; type: string; }) => void; removeFromCompare: (state: WritableDraft<...>, action: { ...; }) => void; ... 4 more ...; setMaxProducts: (state: WritableDraft<...>, action: { ...; }) => void; }, "compare", "compare", Slic...'.
+src/features/marketplace/store/compareSlice.ts(112,3): error TS2339: Property 'setCompareOpen' does not exist on type 'Slice<CompareState, { addToCompare: (state: WritableDraft<CompareState>, action: { payload: Product; type: string; }) => void; removeFromCompare: (state: WritableDraft<...>, action: { ...; }) => void; ... 4 more ...; setMaxProducts: (state: WritableDraft<...>, action: { ...; }) => void; }, "compare", "compare", Slic...'.
+src/features/marketplace/store/compareSlice.ts(113,3): error TS2339: Property 'replaceProduct' does not exist on type 'Slice<CompareState, { addToCompare: (state: WritableDraft<CompareState>, action: { payload: Product; type: string; }) => void; removeFromCompare: (state: WritableDraft<...>, action: { ...; }) => void; ... 4 more ...; setMaxProducts: (state: WritableDraft<...>, action: { ...; }) => void; }, "compare", "compare", Slic...'.
+src/features/marketplace/store/compareSlice.ts(114,3): error TS2339: Property 'setMaxProducts' does not exist on type 'Slice<CompareState, { addToCompare: (state: WritableDraft<CompareState>, action: { payload: Product; type: string; }) => void; removeFromCompare: (state: WritableDraft<...>, action: { ...; }) => void; ... 4 more ...; setMaxProducts: (state: WritableDraft<...>, action: { ...; }) => void; }, "compare", "compare", Slic...'.
+src/features/marketplace/store/compareSlice.ts(115,25): error TS2339: Property 'actions' does not exist on type '{}'.
+src/features/marketplace/store/wishlistPersistence.ts(94,32): error TS18046: 'action' is of type 'unknown'.
+src/features/marketplace/store/wishlistPersistence.ts(102,7): error TS18046: 'action' is of type 'unknown'.
+src/features/marketplace/store/wishlistSlice.ts(33,15): error TS2339: Property 'product' does not exist on type '{ payload: { product: Product; notes?: string | undefined; priority?: "low" | "medium" | "high" | undefined; }; type: string; }'.
+src/features/marketplace/store/wishlistSlice.ts(33,24): error TS2339: Property 'notes' does not exist on type '{ payload: { product: Product; notes?: string | undefined; priority?: "low" | "medium" | "high" | undefined; }; type: string; }'.
+src/features/marketplace/store/wishlistSlice.ts(33,31): error TS2339: Property 'priority' does not exist on type '{ payload: { product: Product; notes?: string | undefined; priority?: "low" | "medium" | "high" | undefined; }; type: string; }'.
+src/features/marketplace/store/wishlistSlice.ts(33,57): error TS2339: Property 'payload' does not exist on type '{}'.
+src/features/marketplace/store/wishlistSlice.ts(64,15): error TS2339: Property 'productId' does not exist on type '{ payload: { productId: string; notes?: string | undefined; priority?: "low" | "medium" | "high" | undefined; }; type: string; }'.
+src/features/marketplace/store/wishlistSlice.ts(64,26): error TS2339: Property 'notes' does not exist on type '{ payload: { productId: string; notes?: string | undefined; priority?: "low" | "medium" | "high" | undefined; }; type: string; }'.
+src/features/marketplace/store/wishlistSlice.ts(64,33): error TS2339: Property 'priority' does not exist on type '{ payload: { productId: string; notes?: string | undefined; priority?: "low" | "medium" | "high" | undefined; }; type: string; }'.
+src/features/marketplace/store/wishlistSlice.ts(64,59): error TS2339: Property 'payload' does not exist on type '{}'.
+src/features/marketplace/store/wishlistSlice.ts(124,3): error TS2339: Property 'addToWishlist' does not exist on type 'Slice<WishlistState, { addToWishlist: (state: WritableDraft<WishlistState>, action: { payload: { product: Product; notes?: string | undefined; priority?: "low" | ... 2 more ... | undefined; }; type: string; }) => void; ... 5 more ...; sortWishlist: (state: WritableDraft<...>, action: { ...; }) => void; }, "wishlist"...'.
+src/features/marketplace/store/wishlistSlice.ts(125,3): error TS2339: Property 'removeFromWishlist' does not exist on type 'Slice<WishlistState, { addToWishlist: (state: WritableDraft<WishlistState>, action: { payload: { product: Product; notes?: string | undefined; priority?: "low" | ... 2 more ... | undefined; }; type: string; }) => void; ... 5 more ...; sortWishlist: (state: WritableDraft<...>, action: { ...; }) => void; }, "wishlist"...'.
+src/features/marketplace/store/wishlistSlice.ts(126,3): error TS2339: Property 'updateWishlistItem' does not exist on type 'Slice<WishlistState, { addToWishlist: (state: WritableDraft<WishlistState>, action: { payload: { product: Product; notes?: string | undefined; priority?: "low" | ... 2 more ... | undefined; }; type: string; }) => void; ... 5 more ...; sortWishlist: (state: WritableDraft<...>, action: { ...; }) => void; }, "wishlist"...'.
+src/features/marketplace/store/wishlistSlice.ts(127,3): error TS2339: Property 'clearWishlist' does not exist on type 'Slice<WishlistState, { addToWishlist: (state: WritableDraft<WishlistState>, action: { payload: { product: Product; notes?: string | undefined; priority?: "low" | ... 2 more ... | undefined; }; type: string; }) => void; ... 5 more ...; sortWishlist: (state: WritableDraft<...>, action: { ...; }) => void; }, "wishlist"...'.
+src/features/marketplace/store/wishlistSlice.ts(128,3): error TS2339: Property 'moveToCart' does not exist on type 'Slice<WishlistState, { addToWishlist: (state: WritableDraft<WishlistState>, action: { payload: { product: Product; notes?: string | undefined; priority?: "low" | ... 2 more ... | undefined; }; type: string; }) => void; ... 5 more ...; sortWishlist: (state: WritableDraft<...>, action: { ...; }) => void; }, "wishlist"...'.
+src/features/marketplace/store/wishlistSlice.ts(129,3): error TS2339: Property 'syncWishlist' does not exist on type 'Slice<WishlistState, { addToWishlist: (state: WritableDraft<WishlistState>, action: { payload: { product: Product; notes?: string | undefined; priority?: "low" | ... 2 more ... | undefined; }; type: string; }) => void; ... 5 more ...; sortWishlist: (state: WritableDraft<...>, action: { ...; }) => void; }, "wishlist"...'.
+src/features/marketplace/store/wishlistSlice.ts(130,3): error TS2339: Property 'sortWishlist' does not exist on type 'Slice<WishlistState, { addToWishlist: (state: WritableDraft<WishlistState>, action: { payload: { product: Product; notes?: string | undefined; priority?: "low" | ... 2 more ... | undefined; }; type: string; }) => void; ... 5 more ...; sortWishlist: (state: WritableDraft<...>, action: { ...; }) => void; }, "wishlist"...'.
+src/features/marketplace/store/wishlistSlice.ts(131,26): error TS2339: Property 'actions' does not exist on type '{}'.
+src/hooks/index.ts(9,23): error TS2300: Duplicate identifier 'useMaterials'.
+src/hooks/index.ts(9,23): error TS2305: Module '"./use-articles"' has no exported member 'useMaterials'.
+src/hooks/index.ts(10,10): error TS2300: Duplicate identifier 'useMaterials'.
+src/hooks/index.ts(11,22): error TS2300: Duplicate identifier 'usePartners'.
+src/hooks/index.ts(11,22): error TS2305: Module '"./use-clients"' has no exported member 'usePartners'.
+src/hooks/index.ts(12,10): error TS2300: Duplicate identifier 'usePartners'.
+src/hooks/index.ts(12,23): error TS2305: Module '"./use-partners"' has no exported member 'usePartnerDetails'.
+src/hooks/index.ts(43,10): error TS2305: Module '"./use-optimized-component"' has no exported member 'useOptimizedComponent'.
+src/hooks/index.ts(54,10): error TS2724: '"./use-store-ssr"' has no exported member named 'useStoreSSR'. Did you mean 'useStoreSsr'?
+src/hooks/use-articles.ts(126,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(138,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(151,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(164,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(176,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(188,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(200,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(213,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(251,13): error TS2304: Cannot find name 'deleteTyped'.
+src/hooks/use-articles.ts(281,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(312,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-articles.ts(333,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-datatable.ts(44,63): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(52,11): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(52,43): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(67,54): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(68,71): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(82,11): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(82,43): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(94,33): error TS2571: Object is of type 'unknown'.
+src/hooks/use-datatable.ts(106,39): error TS2571: Object is of type 'unknown'.
+src/hooks/use-dynamic-menu.ts(99,55): error TS2339: Property 'success' does not exist on type '{}'.
+src/hooks/use-dynamic-menu.ts(100,25): error TS2571: Object is of type 'unknown'.
+src/hooks/use-dynamic-menu.ts(103,73): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-dynamic-menu.ts(132,53): error TS2339: Property 'success' does not exist on type '{}'.
+src/hooks/use-dynamic-menu.ts(133,9): error TS2571: Object is of type 'unknown'.
+src/hooks/use-dynamic-menu.ts(136,85): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-dynamic-menu.ts(137,57): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-dynamic-menu.ts(140,67): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-global-search.ts(166,23): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-global-search.ts(166,50): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-global-search.ts(167,50): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-global-search.ts(243,30): error TS2448: Block-scoped variable 'clearSearch' used before its declaration.
+src/hooks/use-global-search.ts(243,30): error TS2454: Variable 'clearSearch' is used before being assigned.
+src/hooks/use-global-search.ts(243,43): error TS2448: Block-scoped variable 'handleResultClick' used before its declaration.
+src/hooks/use-global-search.ts(243,43): error TS2454: Variable 'handleResultClick' is used before being assigned.
+src/hooks/use-global-search.ts(300,16): error TS2551: Property 'roles' does not exist on type 'User'. Did you mean 'role'?
+src/hooks/use-global-search.ts(300,51): error TS2551: Property 'roles' does not exist on type 'User'. Did you mean 'role'?
+src/hooks/use-global-search.ts(304,22): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-materials.ts(16,49): error TS2345: Argument of type 'MaterialType[]' is not assignable to parameter of type 'string'.
+src/hooks/use-materials.ts(17,20): error TS2339: Property 'category' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(17,65): error TS2339: Property 'category' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(18,20): error TS2339: Property 'dimensions' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(18,69): error TS2339: Property 'dimensions' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(19,20): error TS2551: Property 'quality' does not exist on type 'MaterialFilters'. Did you mean 'qualite'?
+src/hooks/use-materials.ts(19,63): error TS2551: Property 'quality' does not exist on type 'MaterialFilters'. Did you mean 'qualite'?
+src/hooks/use-materials.ts(21,20): error TS2339: Property 'minStock' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(21,79): error TS2339: Property 'minStock' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(22,20): error TS2339: Property 'maxStock' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(22,79): error TS2339: Property 'maxStock' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(23,20): error TS2339: Property 'stockAlert' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(24,47): error TS2339: Property 'stockAlert' does not exist on type 'MaterialFilters'.
+src/hooks/use-materials.ts(37,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-materials.ts(48,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-materials.ts(59,24): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-materials.ts(89,13): error TS2304: Cannot find name 'deleteTyped'.
+src/hooks/use-notification-settings.ts(135,11): error TS2698: Spread types may only be created from object types.
+src/hooks/use-partner-details.ts(45,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(55,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(72,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(75,54): error TS18046: 'contact' is of type 'unknown'.
+src/hooks/use-partner-details.ts(88,44): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(104,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(114,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(131,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(134,51): error TS18046: 'site' is of type 'unknown'.
+src/hooks/use-partner-details.ts(147,44): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(163,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(173,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(190,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(193,54): error TS18046: 'address' is of type 'unknown'.
+src/hooks/use-partner-details.ts(206,44): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(223,61): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(226,52): error TS18046: 'group' is of type 'unknown'.
+src/hooks/use-partner-details.ts(240,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partner-details.ts(243,52): error TS18046: 'group' is of type 'unknown'.
+src/hooks/use-partners.ts(25,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(32,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(40,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(48,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(55,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(62,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(69,31): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(78,56): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(81,54): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(95,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(98,54): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(99,73): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(112,44): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(129,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(132,58): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(144,44): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(147,54): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(161,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(164,54): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(178,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(181,54): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(195,18): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(198,54): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(199,73): error TS18046: 'partner' is of type 'unknown'.
+src/hooks/use-partners.ts(217,21): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(221,19): error TS18046: 'result' is of type 'unknown'.
+src/hooks/use-partners.ts(222,23): error TS18046: 'result' is of type 'unknown'.
+src/hooks/use-partners.ts(242,21): error TS2339: Property 'partners' does not exist on type 'APIClient'.
+src/hooks/use-partners.ts(245,40): error TS18046: 'result' is of type 'unknown'.
+src/hooks/use-partners.ts(246,11): error TS18046: 'result' is of type 'unknown'.
+src/hooks/use-partners.ts(247,27): error TS18046: 'result' is of type 'unknown'.
+src/hooks/use-performance.ts(10,5): error TS2779: The left-hand side of an assignment expression may not be an optional property access.
+src/hooks/use-price-calculation.ts(4,15): error TS2305: Module '"@/lib/ui-components-complete"' has no exported member 'SimulationContext'.
+src/hooks/use-price-calculation.ts(4,34): error TS2305: Module '"@/lib/ui-components-complete"' has no exported member 'SimulationResult'.
+src/hooks/use-price-calculation.ts(136,34): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-price-calculation.ts(178,34): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-price-calculation.ts(216,24): error TS18046: 'response' is of type 'unknown'.
+src/hooks/use-price-calculation.ts(252,26): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-price-rules.ts(3,15): error TS2305: Module '"@/lib/ui-components-complete"' has no exported member 'PriceRule'.
+src/hooks/use-price-rules.ts(58,26): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-price-rules.ts(59,26): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-price-rules.ts(75,26): error TS2339: Property 'data' does not exist on type '{}'.
+src/hooks/use-price-rules.ts(89,32): error TS2552: Cannot find name 'putTyped'. Did you mean 'postTyped'?
+src/hooks/use-price-rules.ts(106,15): error TS2304: Cannot find name 'deleteTyped'.
+src/hooks/use-projets.ts(96,11): error TS18047: 'selectedProjet' is possibly 'null'.
+src/hooks/use-sync-notifications.ts(33,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '(issue: SyncIssue) => void'.
+src/lib/__tests__/csrf.test.ts(169,7): error TS2454: Variable 'resolveFirst' is used before being assigned.
+src/lib/api-client-simple.test.ts(31,21): error TS2445: Property 'baseURL' is protected and only accessible within class 'APIClient' and its subclasses.
+src/lib/api-client-simple.test.ts(36,30): error TS2445: Property 'baseURL' is protected and only accessible within class 'APIClient' and its subclasses.
+src/lib/api-client-simple.test.ts(112,28): error TS2341: Property 'getAuthToken' is private and only accessible within class 'APIClient'.
+src/lib/api-client.ts(453,15): error TS2339: Property 'Content-Type' does not exist on type '{ method: "POST"; headers: { [x: string]: string; }; body?: unknown; cache?: boolean | undefined; cacheTTL?: number | undefined; retry?: boolean | undefined; retryAttempts?: number | undefined; timeout?: number | undefined; requireAuth?: boolean | undefined; }'.
+src/lib/api-client.ts(453,79): error TS2339: Property 'headers' does not exist on type '{}'.
+src/lib/api-client.ts(455,9): error TS2322: Type '{ method: "POST"; headers: { [x: string]: string; }; body?: unknown; cache?: boolean | undefined; cacheTTL?: number | undefined; retry?: boolean | undefined; retryAttempts?: number | undefined; timeout?: number | undefined; requireAuth?: boolean | undefined; }' is not assignable to type '{ [x: string]: string; }'.
+src/lib/api-typed.ts(16,63): error TS2345: Argument of type 'RequestInit | undefined' is not assignable to parameter of type 'RequestConfig | undefined'.
+src/lib/api-typed.ts(51,70): error TS2345: Argument of type 'RequestInit | undefined' is not assignable to parameter of type 'RequestConfig | undefined'.
+src/lib/api-typed.ts(82,69): error TS2345: Argument of type 'RequestInit | undefined' is not assignable to parameter of type 'RequestConfig | undefined'.
+src/lib/api-typed.ts(111,66): error TS2345: Argument of type 'RequestInit | undefined' is not assignable to parameter of type 'RequestConfig | undefined'.
+src/lib/auth-helper.ts(40,7): error TS2322: Type 'string' is not assignable to type 'null'.
+src/lib/auth-helper.ts(45,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/lib/auth-server.ts(21,45): error TS2698: Spread types may only be created from object types.
+src/lib/auth-server.ts(49,7): error TS2322: Type 'string' is not assignable to type 'null'.
+src/lib/auth-server.ts(54,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/lib/auth/auth-adapter.ts(30,11): error TS2322: Type '{ id: string; userId: string; societeId: string; roleId: string | undefined; role: { id: string; code: string; name: string; description: string; level: number; permissions: Permission[]; isSystemRole: true; isActive: true; createdAt: string; updatedAt: string; }; ... 7 more ...; updatedAt: any; }[]' is not assignable to type 'UserSocieteRole[]'.
+src/lib/auth/auth-adapter.ts(47,22): error TS2339: Property 'isDefaultSociete' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(48,21): error TS2339: Property 'isActive' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(49,34): error TS2339: Property 'additionalPermissions' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(50,30): error TS2339: Property 'restrictedPermissions' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(51,22): error TS2339: Property 'grantedAt' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(52,20): error TS2339: Property 'expiresAt' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(53,22): error TS2339: Property 'createdAt' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(54,22): error TS2339: Property 'updatedAt' does not exist on type 'UserSocieteRoleInput'.
+src/lib/auth/auth-adapter.ts(150,9): error TS2352: Conversion of type 'MFAState' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/auth/auth-adapter.ts(153,9): error TS2352: Conversion of type 'MFAState' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/auth/auth-adapter.ts(163,5): error TS2322: Type '{ id: string; code: string; module: string; action: string; description: string; resource: undefined; }[]' is not assignable to type 'Permission[]'.
+src/lib/auth/auth-adapter.ts(185,5): error TS2741: Property 'isActive' is missing in type '{ id: string; nom: string; prenom: string; email: string; role: string; permissions: string[]; societeId: string; societeCode: undefined; societeName: undefined; }' but required in type 'User'.
+src/lib/auth/auth-provider-fix.tsx(76,25): error TS2339: Property 'tabId' does not exist on type 'MessageEvent<AuthBroadcastEvent>'.
+src/lib/auth/auth-provider-fix.tsx(76,66): error TS2339: Property 'data' does not exist on type '{}'.
+src/lib/auth/auth-provider-fix.tsx(84,23): error TS2339: Property 'user' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider-fix.tsx(84,29): error TS2339: Property 'tokens' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider-fix.tsx(84,37): error TS2339: Property 'company' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider-fix.tsx(108,23): error TS2339: Property 'user' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider-fix.tsx(108,42): error TS2339: Property 'tokens' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider-fix.tsx(108,65): error TS2339: Property 'company' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider-fix.tsx(121,23): error TS2339: Property 'tokens' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider-fix.tsx(153,22): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider-fix.tsx(154,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider-fix.tsx(159,25): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider-fix.tsx(160,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Company'.
+src/lib/auth/auth-provider-fix.tsx(286,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider-fix.tsx(288,55): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider-fix.tsx(315,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider-fix.tsx(318,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider-fix.tsx(321,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Company'.
+src/lib/auth/auth-provider-fix.tsx(400,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider-fix.tsx(402,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider-fix.tsx(441,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider-fix.tsx(443,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider-fix.tsx(444,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Company'.
+src/lib/auth/auth-provider-fix.tsx(526,13): error TS2339: Property 'tokens' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider-fix.tsx(526,57): error TS2339: Property 'getStoredSession' does not exist on type '{}'.
+src/lib/auth/auth-provider-fix.tsx(549,13): error TS2339: Property 'user' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider-fix.tsx(549,19): error TS2339: Property 'tokens' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider-fix.tsx(549,27): error TS2339: Property 'company' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider-fix.tsx(549,58): error TS2339: Property 'getStoredSession' does not exist on type '{}'.
+src/lib/auth/auth-provider.tsx(76,25): error TS2339: Property 'tabId' does not exist on type 'MessageEvent<AuthBroadcastEvent>'.
+src/lib/auth/auth-provider.tsx(76,66): error TS2339: Property 'data' does not exist on type '{}'.
+src/lib/auth/auth-provider.tsx(84,23): error TS2339: Property 'user' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider.tsx(84,29): error TS2339: Property 'tokens' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider.tsx(84,37): error TS2339: Property 'company' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider.tsx(108,23): error TS2339: Property 'user' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider.tsx(108,42): error TS2339: Property 'tokens' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider.tsx(108,65): error TS2339: Property 'company' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider.tsx(121,23): error TS2339: Property 'tokens' does not exist on type 'AuthBroadcastEvent'.
+src/lib/auth/auth-provider.tsx(151,22): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider.tsx(154,13): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider.tsx(154,51): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider.tsx(160,25): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider.tsx(161,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Company'.
+src/lib/auth/auth-provider.tsx(287,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider.tsx(289,55): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider.tsx(314,21): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider.tsx(315,23): error TS2571: Object is of type 'unknown'.
+src/lib/auth/auth-provider.tsx(320,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider.tsx(323,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Company'.
+src/lib/auth/auth-provider.tsx(405,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider.tsx(407,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider.tsx(446,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'User'.
+src/lib/auth/auth-provider.tsx(448,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AuthTokens'.
+src/lib/auth/auth-provider.tsx(449,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Company'.
+src/lib/auth/auth-provider.tsx(531,13): error TS2339: Property 'tokens' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider.tsx(531,57): error TS2339: Property 'getStoredSession' does not exist on type '{}'.
+src/lib/auth/auth-provider.tsx(554,13): error TS2339: Property 'user' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider.tsx(554,19): error TS2339: Property 'tokens' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider.tsx(554,27): error TS2339: Property 'company' does not exist on type 'AuthStorage'.
+src/lib/auth/auth-provider.tsx(554,58): error TS2339: Property 'getStoredSession' does not exist on type '{}'.
+src/lib/auth/cookie-auth.ts(71,24): error TS2339: Property 'isSuperAdmin' does not exist on type 'User'.
+src/lib/auth/cookie-auth.ts(95,38): error TS2339: Property 'get' does not exist on type 'RequestCookies | Promise<ReadonlyRequestCookies>'.
+src/lib/auth/cookie-auth.ts(96,39): error TS2339: Property 'get' does not exist on type 'RequestCookies | Promise<ReadonlyRequestCookies>'.
+src/lib/auth/cookie-auth.ts(97,36): error TS2339: Property 'get' does not exist on type 'RequestCookies | Promise<ReadonlyRequestCookies>'.
+src/lib/auth/cookie-auth.ts(123,41): error TS2339: Property 'get' does not exist on type 'RequestCookies | Promise<ReadonlyRequestCookies>'.
+src/lib/auth/cookie-auth.ts(136,9): error TS2353: Object literal may only specify known properties, and 'isSuperAdmin' does not exist in type 'Partial<User>'.
+src/lib/auth/cookie-auth.ts(281,7): error TS2353: Object literal may only specify known properties, and 'isSuperAdmin' does not exist in type 'Partial<User>'.
+src/lib/auth/rbac-hooks.ts(23,48): error TS2304: Cannot find name 'User'.
+src/lib/auth/rbac-service.ts(123,50): error TS2345: Argument of type 'import("D:/GitHub/TopSteel/apps/web/src/lib/auth/rbac-types").AccessCondition[]' is not assignable to parameter of type 'AccessCondition[]'.
+src/lib/datatable-utils.ts(5,15): error TS2305: Module '"@/lib/ui-components-complete"' has no exported member 'DataTableColumn'.
+src/lib/i18n/translation-utils.ts(107,19): error TS2345: Argument of type 'object' is not assignable to parameter of type 'Record<string, unknown>'.
+src/lib/i18n/translation-utils.ts(268,53): error TS18047: 'Univer' is possibly 'null'.
+src/lib/i18n/translation-utils.ts(269,11): error TS2322: Type 'string' is not assignable to type '{ white: string; black: string; primary: { 50: string; 100: string; 200: string; 300: string; 400: string; 500: string; 600: string; 700: string; 800: string; 900: string; }; gray: { 50: string; 100: string; 200: string; ... 6 more ...; 900: string; }; ... 9 more ...; 'loop-color': { ...; }; }'.
+src/lib/i18n/translation-utils.ts(270,11): error TS2820: Type '"fr-FR"' is not assignable to type 'LocaleType | undefined'. Did you mean 'LocaleType.FR_FR'?
+src/lib/i18n/translation-utils.ts(371,55): error TS2345: Argument of type 'UniverWorkbookData' is not assignable to parameter of type 'Partial<IWorkbookData>'.
+src/lib/i18n/translation-utils.ts(374,48): error TS2339: Property 'exportAsExcel' does not exist on type 'Workbook'.
+src/lib/i18n/translation-utils.ts(375,43): error TS2339: Property 'exportAsExcel' does not exist on type 'Workbook'.
+src/lib/i18n/translation-utils.ts(380,11): error TS2740: Type 'IWorkbookData' is missing the following properties from type 'Blob': size, type, arrayBuffer, bytes, and 3 more.
+src/lib/i18n/translation-utils.ts(449,28): error TS2339: Property 'importExcel' does not exist on type 'Univer'.
+src/lib/i18n/translation-utils.ts(450,42): error TS2339: Property 'importExcel' does not exist on type 'Univer'.
+src/lib/i18n/translation-utils.ts(458,35): error TS2339: Property 'importFromBuffer' does not exist on type 'Univer'.
+src/lib/i18n/translation-utils.ts(460,46): error TS2339: Property 'importFromBuffer' does not exist on type 'Univer'.
+src/lib/index.ts(8,37): error TS2305: Module '"./api-response-handler"' has no exported member 'handleApiError'.
+src/lib/index.ts(14,23): error TS2305: Module '"./csrf"' has no exported member 'generateCSRFToken'.
+src/lib/index.ts(14,42): error TS2305: Module '"./csrf"' has no exported member 'validateCSRFToken'.
+src/lib/index.ts(15,25): error TS2305: Module '"./security-utils"' has no exported member 'validateUserInput'.
+src/lib/index.ts(15,44): error TS2305: Module '"./security-utils"' has no exported member 'encodeForHTML'.
+src/lib/index.ts(18,26): error TS2305: Module '"./utils"' has no exported member 'debounce'.
+src/lib/index.ts(18,36): error TS2305: Module '"./utils"' has no exported member 'throttle'.
+src/lib/index.ts(20,10): error TS2305: Module '"./error-handler"' has no exported member 'errorHandler'.
+src/lib/index.ts(30,23): error TS2305: Module '"./react-query"' has no exported member 'ReactQueryProvider'.
+src/lib/index.ts(37,10): error TS2614: Module '"./ssr-utils"' has no exported member 'ssrUtils'. Did you mean to use 'import ssrUtils from "./ssr-utils"' instead?
+src/lib/index.ts(43,10): error TS2305: Module '"./datatable-utils"' has no exported member 'datatableUtils'.
+src/lib/index.ts(46,10): error TS2724: '"./services/ui-preferences.service"' has no exported member named 'uiPreferencesService'. Did you mean 'UIPreferencesService'?
+src/lib/index.ts(47,10): error TS2724: '"./services/ui-preferences-client.service"' has no exported member named 'uiPreferencesClientService'. Did you mean 'UIPreferencesService'?
+src/lib/monitoring/sentry.ts(32,9): error TS2353: Object literal may only specify known properties, and 'tracingOrigins' does not exist in type 'Partial<BrowserTracingOptions>'.
+src/lib/react-19-ui-components.tsx(205,47): error TS2339: Property 'AdvancedDataTable' does not exist on type 'typeof import("@erp/ui")'.
+src/lib/security/csp-nonce.ts(9,25): error TS2339: Property 'get' does not exist on type 'Promise<ReadonlyHeaders>'.
+src/lib/security/csp-nonce.ts(9,60): error TS2339: Property 'get' does not exist on type 'Promise<ReadonlyHeaders>'.
+src/lib/services/ui-preferences-client.service.ts(61,7): error TS2322: Type '{ updatedAt: string; id?: string | undefined; title?: string; items?: ReorderableItem[] | undefined; }' is not assignable to type 'ReorderableListConfig'.
+src/lib/services/ui-preferences-client.service.ts(129,7): error TS2353: Object literal may only specify known properties, and 'componentId' does not exist in type 'Partial<ReorderableListConfig>'.
+src/lib/services/ui-preferences.service.ts(53,25): error TS2339: Property 'theme' does not exist on type 'Partial<ReorderableListConfig>'.
+src/lib/services/ui-preferences.service.ts(54,31): error TS2339: Property 'preferences' does not exist on type 'Partial<ReorderableListConfig>'.
+src/lib/services/ui-preferences.service.ts(55,26): error TS2339: Property 'layout' does not exist on type 'Partial<ReorderableListConfig>'.
+src/lib/store-utils.ts(110,11): error TS2339: Property 'loading' does not exist on type '{}'.
+src/lib/store-utils.ts(111,11): error TS2339: Property 'error' does not exist on type '{}'.
+src/lib/store-utils.ts(112,11): error TS2339: Property 'lastUpdate' does not exist on type '{}'.
+src/lib/ui-components-fix.tsx(51,8): error TS2305: Module '"@erp/ui"' has no exported member 'ColumnConfig'.
+src/lib/ui-components-fix.tsx(52,3): error TS2305: Module '"@erp/ui"' has no exported member 'AdvancedDataTable'.
+src/lib/ui-exports.ts(10,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Button'.
+src/lib/ui-exports.ts(11,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Card'.
+src/lib/ui-exports.ts(12,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'CardContent'.
+src/lib/ui-exports.ts(13,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'CardHeader'.
+src/lib/ui-exports.ts(14,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'CardTitle'.
+src/lib/ui-exports.ts(15,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Dialog'.
+src/lib/ui-exports.ts(16,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'DialogContent'.
+src/lib/ui-exports.ts(17,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'DialogDescription'.
+src/lib/ui-exports.ts(18,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'DialogFooter'.
+src/lib/ui-exports.ts(19,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'DialogHeader'.
+src/lib/ui-exports.ts(20,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'DialogTitle'.
+src/lib/ui-exports.ts(21,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Input'.
+src/lib/ui-exports.ts(22,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Label'.
+src/lib/ui-exports.ts(23,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'PageHeader'.
+src/lib/ui-exports.ts(24,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Select'.
+src/lib/ui-exports.ts(25,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'SelectContent'.
+src/lib/ui-exports.ts(26,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'SelectItem'.
+src/lib/ui-exports.ts(27,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'SelectTrigger'.
+src/lib/ui-exports.ts(28,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'SelectValue'.
+src/lib/ui-exports.ts(29,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Separator'.
+src/lib/ui-exports.ts(30,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Alert'.
+src/lib/ui-exports.ts(31,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'AlertDescription'.
+src/lib/ui-exports.ts(32,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'AlertTitle'.
+src/lib/ui-exports.ts(33,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Textarea'.
+src/lib/ui-exports.ts(34,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Progress'.
+src/lib/ui-exports.ts(35,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'Tabs'.
+src/lib/ui-exports.ts(36,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'TabsList'.
+src/lib/ui-exports.ts(37,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'TabsTrigger'.
+src/lib/ui-exports.ts(38,3): error TS2305: Module '"@erp/ui/data-display"' has no exported member 'TabsContent'.
+src/lib/ui-exports.ts(40,3): error TS2484: Export declaration conflicts with exported declaration of 'ColumnConfig'.
+src/lib/ui-exports.ts(45,3): error TS2300: Duplicate identifier 'BadgeProps'.
+src/lib/ui-exports.ts(46,3): error TS2300: Duplicate identifier 'ButtonProps'.
+src/lib/ui-exports.ts(47,3): error TS2300: Duplicate identifier 'CardProps'.
+src/lib/ui-exports.ts(51,3): error TS2484: Export declaration conflicts with exported declaration of 'DialogProps'.
+src/lib/ui-exports.ts(133,15): error TS2300: Duplicate identifier 'ButtonProps'.
+src/lib/ui-exports.ts(133,28): error TS2300: Duplicate identifier 'BadgeProps'.
+src/lib/ui-exports.ts(133,40): error TS2300: Duplicate identifier 'CardProps'.
+src/lib/ui-exports.ts(227,15): error TS2322: Type 'T' is not assignable to type 'object'.
+src/middleware.ts(356,11): error TS2339: Property 'pathname' does not exist on type 'NextRequest'.
+src/middleware.ts(356,38): error TS2339: Property 'nextUrl' does not exist on type '{}'.
+src/services/auth-service.ts(104,80): error TS2339: Property 'data' does not exist on type '{}'.
+src/services/auth-service.ts(157,79): error TS2339: Property 'data' does not exist on type '{}'.
+src/services/auth-service.ts(196,66): error TS2339: Property 'data' does not exist on type '{}'.
+src/services/auth-service.ts(226,91): error TS2339: Property 'data' does not exist on type '{}'.
+src/stores/app.store.ts(281,11): error TS18047: 'state.selectedProjet' is possibly 'null'.
+src/stores/index.ts(85,3): error TS2305: Module '"@erp/domains/core"' has no exported member 'FacturationFilters'.
+src/stores/index.ts(86,3): error TS2305: Module '"@erp/domains/core"' has no exported member 'OperationFilters'.
+src/stores/index.ts(87,3): error TS2305: Module '"@erp/domains/core"' has no exported member 'ProductionFilters'.
+src/stores/selectors/app.selectors.ts(370,9): error TS2779: The left-hand side of an assignment expression may not be an optional property access.
+src/stores/selectors/app.selectors.ts(373,9): error TS2779: The left-hand side of an assignment expression may not be an optional property access.
+src/types/index.ts(8,1): error TS2308: Module '@erp/types' has already exported a member named 'ApiResponse'. Consider explicitly re-exporting to resolve the ambiguity.
+src/types/index.ts(11,1): error TS2308: Module '@erp/types' has already exported a member named 'AuthState'. Consider explicitly re-exporting to resolve the ambiguity.
+src/types/index.ts(14,1): error TS2308: Module '@erp/types' has already exported a member named 'Permission'. Consider explicitly re-exporting to resolve the ambiguity.
+src/types/index.ts(14,1): error TS2308: Module '@erp/types' has already exported a member named 'Role'. Consider explicitly re-exporting to resolve the ambiguity.
+src/types/index.ts(17,1): error TS2308: Module '@erp/types' has already exported a member named 'Permission'. Consider explicitly re-exporting to resolve the ambiguity.
+src/types/index.ts(17,1): error TS2308: Module '@erp/types' has already exported a member named 'Role'. Consider explicitly re-exporting to resolve the ambiguity.
+src/utils/backend-api.ts(55,7): error TS2322: Type 'string' is not assignable to type 'null'.
+src/utils/fetch-safe.ts(23,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'RequestInit | undefined'.
+src/utils/fetch-test.ts(26,43): error TS2339: Property '_nextOriginalFetch' does not exist on type '{}'.

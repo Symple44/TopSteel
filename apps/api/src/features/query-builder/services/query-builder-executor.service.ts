@@ -1,8 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import * as mathjs from 'mathjs'
 import type { DataSource } from 'typeorm'
 import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
+import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
+import type { SqlSanitizationService } from '../security/sql-sanitization.service'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 export interface QueryExecutionParams {
@@ -23,10 +25,14 @@ export interface QueryExecutionResult {
 
 @Injectable()
 export class QueryBuilderExecutorService {
+  private readonly logger = new Logger(QueryBuilderExecutorService.name)
+
   constructor(
     @InjectDataSource('tenant')
     private _dataSource: DataSource,
-    private readonly permissionService: QueryBuilderPermissionService
+    private readonly permissionService: QueryBuilderPermissionService,
+    private readonly securityService: QueryBuilderSecurityService,
+    private readonly sanitizationService: SqlSanitizationService
   ) {}
 
   async executeQuery(
@@ -42,135 +48,247 @@ export class QueryBuilderExecutorService {
     )
 
     if (!canExecute && !queryBuilder.isPublic) {
+      this.logger.warn(
+        `User ${userId} attempted to execute query ${queryBuilder.id} without permission`
+      )
       throw new BadRequestException('You do not have permission to execute this query')
     }
 
-    const { page = 1, pageSize = 50, sortBy, sortOrder = 'ASC', filters = {} } = params
-
-    // Build SELECT clause
-    const selectColumns = this.buildSelectClause(queryBuilder)
-
-    // Build FROM clause with JOINs
-    const fromClause = this.buildFromClause(queryBuilder)
-
-    // Build WHERE clause
-    const { whereClause, whereParams } = this.buildWhereClause(filters, queryBuilder)
-
-    // Build ORDER BY clause
-    const orderByClause = sortBy ? `ORDER BY ${sortBy} ${sortOrder}` : ''
-
-    // Apply max rows limit if set
-    const effectivePageSize = queryBuilder.maxRows
-      ? Math.min(pageSize, queryBuilder.maxRows)
-      : pageSize
-
-    // Build final query
-    const offset = (page - 1) * effectivePageSize
-    const query = `
-      SELECT ${selectColumns}
-      FROM ${fromClause}
-      ${whereClause}
-      ${orderByClause}
-      LIMIT $${whereParams.length + 1} OFFSET $${whereParams.length + 2}
-    `
-
-    // Count query for pagination
-    const countQuery = `
-      SELECT COUNT(*) as total
-      FROM ${fromClause}
-      ${whereClause}
-    `
+    const { page = 1 } = params
 
     try {
+      // Convert legacy parameters to new structured format for security validation
+      const structuredParams = this.convertToStructuredParams(queryBuilder, params)
+
+      // Get tenant ID for isolation (this should come from user context)
+      const tenantId = await this.getUserTenantId(userId)
+
+      // Build secure query using sanitization service
+      const sanitizedQuery = this.sanitizationService.buildSafeSelectQuery({
+        selectColumns: structuredParams.selectColumns,
+        fromTable: queryBuilder.mainTable,
+        joins: structuredParams.joins,
+        filters: structuredParams.filters,
+        sorts: structuredParams.sorts,
+        limit: structuredParams.pageSize,
+        offset: structuredParams.offset,
+        tenantId,
+      })
+
+      // Build complete query strings
+      const mainQuery = this.sanitizationService.buildCompleteQuery(sanitizedQuery)
+
+      // Build count query (same as main query but with COUNT(*) and no LIMIT/OFFSET)
+      const countQuery = `SELECT COUNT(*) as total FROM ${sanitizedQuery.from} ${sanitizedQuery.where}`
+
+      this.logger.debug('Executing secure queries', {
+        userId,
+        queryBuilderId: queryBuilder.id,
+        mainQuery: mainQuery.substring(0, 200), // Log first 200 chars
+        parameterCount: sanitizedQuery.parameters.length,
+      })
+
       // Execute count query
-      const countResult = await this._dataSource.query(countQuery, whereParams)
+      const countResult = await this._dataSource.query(
+        countQuery,
+        sanitizedQuery.parameters.slice(0, -2)
+      ) // Remove LIMIT and OFFSET params
       const total = parseInt(countResult[0].total, 10)
 
       // Execute main query
-      const data = await this._dataSource.query(query, [...whereParams, effectivePageSize, offset])
+      const data = await this._dataSource.query(mainQuery, sanitizedQuery.parameters)
 
       // Apply calculated fields
       const processedData = this.processCalculatedFields(data, queryBuilder.calculatedFields)
+
+      this.logger.log('Query executed successfully', {
+        userId,
+        queryBuilderId: queryBuilder.id,
+        resultCount: data.length,
+        totalCount: total,
+      })
 
       return {
         data: processedData,
         total,
         page,
-        pageSize: effectivePageSize,
-        totalPages: Math.ceil(total / effectivePageSize),
+        pageSize: structuredParams.pageSize,
+        totalPages: Math.ceil(total / structuredParams.pageSize),
       }
     } catch (error) {
+      this.logger.error('Query execution failed', {
+        userId,
+        queryBuilderId: queryBuilder.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      })
+
       const message = error instanceof Error ? error.message : 'Unknown error'
       throw new BadRequestException(`Query execution failed: ${message}`)
     }
   }
 
-  private buildSelectClause(queryBuilder: QueryBuilder): string {
-    const columns = queryBuilder.columns
+  /**
+   * Convert legacy query parameters to structured format for security validation
+   */
+  private convertToStructuredParams(
+    queryBuilder: QueryBuilder,
+    params: QueryExecutionParams
+  ): {
+    selectColumns: Array<{
+      tableName: string
+      columnName: string
+      alias?: string
+      tableAlias?: string
+    }>
+    joins: Array<{
+      type: 'INNER' | 'LEFT' | 'RIGHT'
+      fromTable: string
+      fromColumn: string
+      toTable: string
+      toColumn: string
+      fromAlias?: string
+      toAlias?: string
+    }>
+    filters: Array<{
+      tableName: string
+      columnName: string
+      operator: string
+      value: any
+      tableAlias?: string
+    }>
+    sorts: Array<{
+      tableName: string
+      columnName: string
+      direction: 'ASC' | 'DESC'
+      tableAlias?: string
+    }>
+    pageSize: number
+    offset: number
+  } {
+    // Convert columns to structured format
+    const selectColumns = queryBuilder.columns
       .filter((col) => col.isVisible)
-      .map((col) => {
-        const tableAlias = this.getTableAlias(col.tableName, queryBuilder)
-        return `${tableAlias}.${col.columnName} AS "${col.alias}"`
-      })
+      .map((col) => ({
+        tableName: col.tableName,
+        columnName: col.columnName,
+        alias: col.alias,
+        tableAlias: this.getTableAlias(col.tableName, queryBuilder),
+      }))
 
-    return columns.join(', ')
-  }
+    // Convert joins to structured format
+    const joins = queryBuilder.joins.map((join, index) => ({
+      type: join.joinType.toUpperCase() as 'INNER' | 'LEFT' | 'RIGHT',
+      fromTable: join.fromTable,
+      fromColumn: join.fromColumn,
+      toTable: join.toTable,
+      toColumn: join.toColumn,
+      fromAlias: this.getTableAlias(join.fromTable, queryBuilder),
+      toAlias: join.alias || `t${index + 1}`,
+    }))
 
-  private buildFromClause(queryBuilder: QueryBuilder): string {
-    let fromClause = `${queryBuilder.mainTable} AS t0`
-
-    queryBuilder.joins.forEach((join, index) => {
-      const joinKeyword = join.joinType.toUpperCase()
-      const fromAlias = this.getTableAlias(join.fromTable, queryBuilder)
-      const toAlias = join.alias || `t${index + 1}`
-
-      fromClause += ` ${joinKeyword} JOIN ${join.toTable} AS ${toAlias}`
-      fromClause += ` ON ${fromAlias}.${join.fromColumn} = ${toAlias}.${join.toColumn}`
-    })
-
-    return fromClause
-  }
-
-  private buildWhereClause(
-    filters: Record<string, unknown>,
-    queryBuilder: QueryBuilder
-  ): { whereClause: string; whereParams: unknown[] } {
-    const conditions: string[] = []
-    const params: unknown[] = []
-    let paramIndex = 1
-
-    Object.entries(filters).forEach(([columnAlias, filterValue]) => {
+    // Convert legacy filters to structured format
+    const filters: Array<{
+      tableName: string
+      columnName: string
+      operator: string
+      value: any
+      tableAlias?: string
+    }> = []
+    Object.entries(params.filters || {}).forEach(([columnAlias, filterValue]) => {
       const column = queryBuilder.columns.find((col) => col.alias === columnAlias)
-
       if (column?.isFilterable) {
-        const tableAlias = this.getTableAlias(column.tableName, queryBuilder)
+        // Determine operator based on value type
+        let operator = '='
+        let value = filterValue
 
         if (Array.isArray(filterValue)) {
-          const placeholders = filterValue.map(() => `$${paramIndex++}`).join(', ')
-          conditions.push(`${tableAlias}.${column.columnName} IN (${placeholders})`)
-          params.push(...filterValue)
+          operator = 'IN'
         } else if (typeof filterValue === 'object' && filterValue !== null) {
           // Handle range filters
-          const rangeFilter = filterValue as Record<string, any>
-          if (rangeFilter.min !== undefined) {
-            conditions.push(`${tableAlias}.${column.columnName} >= $${paramIndex++}`)
-            params.push(rangeFilter.min)
+          const rangeFilter = filterValue as Record<string, unknown>
+          if (rangeFilter.min !== undefined && rangeFilter.max !== undefined) {
+            operator = 'BETWEEN'
+            value = [rangeFilter.min, rangeFilter.max]
+          } else if (rangeFilter.min !== undefined) {
+            operator = '>='
+            value = rangeFilter.min
+          } else if (rangeFilter.max !== undefined) {
+            operator = '<='
+            value = rangeFilter.max
           }
-          if (rangeFilter.max !== undefined) {
-            conditions.push(`${tableAlias}.${column.columnName} <= $${paramIndex++}`)
-            params.push(rangeFilter.max)
-          }
-        } else {
-          conditions.push(`${tableAlias}.${column.columnName} = $${paramIndex++}`)
-          params.push(filterValue)
         }
+
+        filters.push({
+          tableName: column.tableName,
+          columnName: column.columnName,
+          operator,
+          value,
+          tableAlias: this.getTableAlias(column.tableName, queryBuilder),
+        })
       }
     })
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    // Convert sorting to structured format
+    const sorts: Array<{
+      tableName: string
+      columnName: string
+      direction: 'ASC' | 'DESC'
+      tableAlias?: string
+    }> = []
+    if (params.sortBy) {
+      const column = queryBuilder.columns.find((col) => col.alias === params.sortBy)
+      if (column?.isSortable) {
+        sorts.push({
+          tableName: column.tableName,
+          columnName: column.columnName,
+          direction: params.sortOrder || 'ASC',
+          tableAlias: this.getTableAlias(column.tableName, queryBuilder),
+        })
+      }
+    }
 
-    return { whereClause, whereParams: params }
+    // Apply max rows limit if set
+    const effectivePageSize = queryBuilder.maxRows
+      ? Math.min(params.pageSize || 50, queryBuilder.maxRows)
+      : params.pageSize || 50
+
+    const offset = ((params.page || 1) - 1) * effectivePageSize
+
+    return {
+      selectColumns,
+      joins,
+      filters,
+      sorts,
+      pageSize: effectivePageSize,
+      offset,
+    }
   }
+
+  /**
+   * Get tenant ID for the current user (for tenant isolation)
+   */
+  private async getUserTenantId(userId: string): Promise<string | undefined> {
+    try {
+      // This should integrate with your user/tenant service
+      // For now, we'll implement a basic query to get the user's company
+      const result = await this._dataSource.query(
+        `SELECT su.societeId as company_id 
+         FROM users u 
+         JOIN societe_users su ON u.id = su.userId 
+         WHERE u.id = $1 AND su.isDefault = true AND su.actif = true
+         LIMIT 1`,
+        [userId]
+      )
+
+      return result?.[0]?.company_id || undefined
+    } catch (error) {
+      this.logger.warn(`Could not determine tenant ID for user ${userId}:`, error)
+      return undefined
+    }
+  }
+
+  // Removed - now handled by SqlSanitizationService
 
   private getTableAlias(tableName: string, queryBuilder: QueryBuilder): string {
     if (tableName === queryBuilder.mainTable) {
@@ -259,9 +377,103 @@ export class QueryBuilderExecutorService {
     }
   }
 
-  async getAvailableColumns(_queryBuilderId: string, _userId: string): Promise<unknown[]> {
-    // This method would return available columns based on the configured tables
-    // Implementation depends on specific requirements
-    return []
+  /**
+   * Get available columns that can be used in query builder
+   * Now uses the security service to return only whitelisted columns
+   */
+  async getAvailableColumns(
+    queryBuilderId: string,
+    userId: string
+  ): Promise<
+    Array<{
+      tableName: string
+      columnName: string
+      dataType: string
+      allowSelect: boolean
+      allowFilter: boolean
+      allowSort: boolean
+      isSensitive: boolean
+    }>
+  > {
+    // Check if user has permission to view this query builder
+    const canView = await this.permissionService.checkPermission(queryBuilderId, userId, 'view')
+    if (!canView) {
+      throw new BadRequestException('You do not have permission to view this query builder')
+    }
+
+    // Get all whitelisted tables and their columns
+    const allowedTables = this.securityService.getAllowedTables()
+    const availableColumns = []
+
+    for (const table of allowedTables) {
+      for (const column of table.columns) {
+        // Don't expose sensitive tenant columns
+        if (!column.isSensitive || column.name !== 'company_id') {
+          availableColumns.push({
+            tableName: table.name,
+            columnName: column.name,
+            dataType: column.dataType,
+            allowSelect: column.allowSelect,
+            allowFilter: column.allowFilter,
+            allowSort: column.allowSort,
+            isSensitive: column.isSensitive,
+          })
+        }
+      }
+    }
+
+    return availableColumns
+  }
+
+  /**
+   * Execute raw SQL with security validation (admin only)
+   */
+  async executeRawSql(
+    sql: string,
+    limit: number = 100,
+    userId: string,
+    companyId?: string
+  ): Promise<unknown[]> {
+    this.logger.log('Raw SQL execution requested', {
+      userId,
+      sqlPreview: sql.substring(0, 50),
+      limit,
+      companyId,
+    })
+
+    // Validate the SQL query for security
+    this.sanitizationService.validateRawSqlQuery(sql)
+
+    // Extract and validate table names
+    const tableNames = this.sanitizationService.extractTableNames(sql)
+    for (const tableName of tableNames) {
+      this.securityService.validateTable(tableName)
+    }
+
+    try {
+      // Execute with proper limits and parameterization
+      const limitedSql = `${sql} LIMIT ${Math.min(limit, 1000)}`
+
+      const result = await this._dataSource.query(limitedSql)
+
+      this.logger.log('Raw SQL execution successful', {
+        userId,
+        rowCount: result.length,
+        companyId,
+      })
+
+      return result
+    } catch (error) {
+      this.logger.error('Raw SQL execution failed', {
+        userId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        sqlPreview: sql.substring(0, 50),
+        companyId,
+      })
+
+      throw new BadRequestException(
+        `SQL execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
+    }
   }
 }

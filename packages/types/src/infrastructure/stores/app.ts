@@ -49,9 +49,9 @@ export interface SessionState {
  * Filtres par module
  */
 export interface FilterState {
-  projets?: Record<string, any>
-  stocks?: Record<string, any>
-  production?: Record<string, any>
+  projets?: Record<string, unknown>
+  stocks?: Record<string, unknown>
+  production?: Record<string, unknown>
 }
 
 /**
@@ -138,7 +138,7 @@ export interface AppNotificationActions {
  * Actions pour les filtres
  */
 export interface AppFilterActions {
-  setFilters: (module: keyof FilterState, filters: Record<string, any>) => void
+  setFilters: (module: keyof FilterState, filters: Record<string, unknown>) => void
   clearFilters: (module: keyof FilterState) => void
   resetAllFilters: () => void
 }

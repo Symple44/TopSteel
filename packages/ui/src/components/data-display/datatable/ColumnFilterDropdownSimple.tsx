@@ -120,6 +120,7 @@ export function ColumnFilterDropdownSimple<T = any>({
   return (
     <>
       <Button
+        type="button"
         ref={buttonRef}
         variant="ghost"
         size="sm"
@@ -147,6 +148,7 @@ export function ColumnFilterDropdownSimple<T = any>({
               {/* Boutons de tri */}
               <div className="flex gap-2">
                 <Button
+                  type="button"
                   variant={currentSort === 'asc' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => {
@@ -158,6 +160,7 @@ export function ColumnFilterDropdownSimple<T = any>({
                   <ArrowUp className="h-3 w-3" />
                 </Button>
                 <Button
+                  type="button"
                   variant={currentSort === 'desc' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => {
@@ -171,6 +174,7 @@ export function ColumnFilterDropdownSimple<T = any>({
               </div>
 
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => {

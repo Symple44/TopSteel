@@ -1,23 +1,8 @@
 'use client'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { 
-  Button, 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  Input,
-  Textarea,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Checkbox
-} from '../../../primitives'
 import {
   Form,
   FormControl,
@@ -25,16 +10,39 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../../../forms'
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Validation schema for payment method configuration
 const paymentMethodFormSchema = z.object({
   name: z.string().min(1, 'Le nom est requis'),
-  type: z.enum(['cash', 'check', 'bank_transfer', 'card', 'letter_of_credit', 'wire_transfer', 'crypto']),
+  type: z.enum([
+    'cash',
+    'check',
+    'bank_transfer',
+    'card',
+    'letter_of_credit',
+    'wire_transfer',
+    'crypto',
+  ]),
   description: z.string().optional(),
   isActive: z.boolean().default(true),
   isDefault: z.boolean().default(false),
   // Payment terms
-  defaultTerms: z.enum(['net_30', 'net_60', 'net_90', 'cod', 'prepaid', '2_10_net_30', 'custom']).optional(),
+  defaultTerms: z
+    .enum(['net_30', 'net_60', 'net_90', 'cod', 'prepaid', '2_10_net_30', 'custom'])
+    .optional(),
   customTermsDays: z.number().min(0).optional(),
   discountPercentage: z.number().min(0).max(100).optional(),
   discountDays: z.number().min(0).optional(),
@@ -44,40 +52,48 @@ const paymentMethodFormSchema = z.object({
   minimumAmount: z.number().min(0).optional(),
   maximumAmount: z.number().min(0).optional(),
   // Banking details (for bank transfers)
-  bankDetails: z.object({
-    bankName: z.string().optional(),
-    accountName: z.string().optional(),
-    accountNumber: z.string().optional(),
-    routingNumber: z.string().optional(),
-    swiftCode: z.string().optional(),
-    iban: z.string().optional(),
-    branchAddress: z.string().optional(),
-  }).optional(),
+  bankDetails: z
+    .object({
+      bankName: z.string().optional(),
+      accountName: z.string().optional(),
+      accountNumber: z.string().optional(),
+      routingNumber: z.string().optional(),
+      swiftCode: z.string().optional(),
+      iban: z.string().optional(),
+      branchAddress: z.string().optional(),
+    })
+    .optional(),
   // Card processing (for card payments)
-  cardProcessor: z.object({
-    provider: z.string().optional(),
-    merchantId: z.string().optional(),
-    apiKey: z.string().optional(),
-    publicKey: z.string().optional(),
-    testMode: z.boolean().default(false),
-  }).optional(),
+  cardProcessor: z
+    .object({
+      provider: z.string().optional(),
+      merchantId: z.string().optional(),
+      apiKey: z.string().optional(),
+      publicKey: z.string().optional(),
+      testMode: z.boolean().default(false),
+    })
+    .optional(),
   // Letter of credit specifics
-  letterOfCreditTerms: z.object({
-    issuingBank: z.string().optional(),
-    confirmingBank: z.string().optional(),
-    validityPeriod: z.number().min(0).optional(),
-    documentRequirement: z.string().optional(),
-  }).optional(),
+  letterOfCreditTerms: z
+    .object({
+      issuingBank: z.string().optional(),
+      confirmingBank: z.string().optional(),
+      validityPeriod: z.number().min(0).optional(),
+      documentRequirement: z.string().optional(),
+    })
+    .optional(),
   // Steel industry specific configurations
-  steelIndustryConfig: z.object({
-    allowProgressPayments: z.boolean().default(false),
-    requireDeliveryConfirmation: z.boolean().default(false),
-    allowRetention: z.boolean().default(false),
-    retentionPercentage: z.number().min(0).max(100).optional(),
-    retentionPeriod: z.number().min(0).optional(),
-    requireQualityInspection: z.boolean().default(false),
-    allowPartialPayments: z.boolean().default(false),
-  }).optional(),
+  steelIndustryConfig: z
+    .object({
+      allowProgressPayments: z.boolean().default(false),
+      requireDeliveryConfirmation: z.boolean().default(false),
+      allowRetention: z.boolean().default(false),
+      retentionPercentage: z.number().min(0).max(100).optional(),
+      retentionPeriod: z.number().min(0).optional(),
+      requireQualityInspection: z.boolean().default(false),
+      allowPartialPayments: z.boolean().default(false),
+    })
+    .optional(),
   // Approval workflow
   requiresApproval: z.boolean().default(false),
   approvalThreshold: z.number().min(0).optional(),
@@ -90,13 +106,15 @@ const paymentMethodFormSchema = z.object({
   notifyOnPayment: z.boolean().default(false),
   notificationRecipients: z.array(z.string()).optional(),
   // Integration settings
-  integrationConfig: z.object({
-    erp: z.boolean().default(false),
-    accounting: z.boolean().default(false),
-    bankingApi: z.boolean().default(false),
-    apiEndpoint: z.string().optional(),
-    webhookUrl: z.string().optional(),
-  }).optional(),
+  integrationConfig: z
+    .object({
+      erp: z.boolean().default(false),
+      accounting: z.boolean().default(false),
+      bankingApi: z.boolean().default(false),
+      apiEndpoint: z.string().optional(),
+      webhookUrl: z.string().optional(),
+    })
+    .optional(),
 })
 type PaymentMethodFormData = z.infer<typeof paymentMethodFormSchema>
 interface PaymentMethodDialogProps {
@@ -107,16 +125,16 @@ interface PaymentMethodDialogProps {
   editMode?: boolean
   availableUsers?: Array<{ id: string; name: string; role: string }>
 }
-export function PaymentMethodDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function PaymentMethodDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   initialData,
   editMode = false,
   availableUsers = [],
 }: PaymentMethodDialogProps) {
   const [loading, setLoading] = useState(false)
-  const form = useForm<PaymentMethodFormData>({
+  const form = useForm({
     resolver: zodResolver(paymentMethodFormSchema),
     defaultValues: {
       name: initialData?.name || '',
@@ -190,8 +208,7 @@ export function PaymentMethodDialog({
       await onSubmit?.(data)
       onOpenChange(false)
       form.reset()
-    } catch (error) {
-      console.error('Error configuring payment method:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -238,10 +255,7 @@ export function PaymentMethodDialog({
                   <FormItem>
                     <FormLabel>Nom de la méthode *</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="ex: Virement Standard"
-                        {...field} 
-                      />
+                      <Input placeholder="ex: Virement Standard" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -279,10 +293,7 @@ export function PaymentMethodDialog({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Description de la méthode de paiement..."
-                      {...field} 
-                    />
+                    <Textarea placeholder="Description de la méthode de paiement..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -295,10 +306,7 @@ export function PaymentMethodDialog({
                 render={({ field }) => (
                   <FormItem className="flex items-center space-x-2">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <FormLabel>Méthode active</FormLabel>
                   </FormItem>
@@ -310,10 +318,7 @@ export function PaymentMethodDialog({
                 render={({ field }) => (
                   <FormItem className="flex items-center space-x-2">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <FormLabel>Méthode par défaut</FormLabel>
                   </FormItem>
@@ -356,8 +361,8 @@ export function PaymentMethodDialog({
                       <FormItem>
                         <FormLabel>Jours personnalisés</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="0"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
@@ -377,8 +382,8 @@ export function PaymentMethodDialog({
                     <FormItem>
                       <FormLabel>% de remise anticipée</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           min="0"
                           max="100"
                           step="0.1"
@@ -397,8 +402,8 @@ export function PaymentMethodDialog({
                     <FormItem>
                       <FormLabel>Jours pour remise</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           min="0"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
@@ -421,8 +426,8 @@ export function PaymentMethodDialog({
                     <FormItem>
                       <FormLabel>Frais de traitement</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           min="0"
                           step="0.01"
                           {...field}
@@ -461,8 +466,8 @@ export function PaymentMethodDialog({
                     <FormItem>
                       <FormLabel>Montant minimum</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           min="0"
                           step="0.01"
                           {...field}
@@ -480,8 +485,8 @@ export function PaymentMethodDialog({
                     <FormItem>
                       <FormLabel>Montant maximum</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           min="0"
                           step="0.01"
                           {...field}
@@ -585,10 +590,7 @@ export function PaymentMethodDialog({
                     <FormItem>
                       <FormLabel>Adresse de l'agence</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Adresse complète de l'agence..."
-                          {...field} 
-                        />
+                        <Textarea placeholder="Adresse complète de l'agence..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -633,8 +635,8 @@ export function PaymentMethodDialog({
                       <FormItem>
                         <FormLabel>Période de validité (jours)</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="1"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
@@ -652,9 +654,9 @@ export function PaymentMethodDialog({
                     <FormItem>
                       <FormLabel>Exigences documentaires</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Textarea
                           placeholder="Documents requis pour la lettre de crédit..."
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -673,10 +675,7 @@ export function PaymentMethodDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Autoriser les paiements d'avancement</FormLabel>
                     </FormItem>
@@ -688,10 +687,7 @@ export function PaymentMethodDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Confirmation de livraison requise</FormLabel>
                     </FormItem>
@@ -703,10 +699,7 @@ export function PaymentMethodDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Autoriser la rétention de garantie</FormLabel>
                     </FormItem>
@@ -718,10 +711,7 @@ export function PaymentMethodDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Contrôle qualité requis</FormLabel>
                     </FormItem>
@@ -737,8 +727,8 @@ export function PaymentMethodDialog({
                       <FormItem>
                         <FormLabel>% de rétention</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="0"
                             max="100"
                             step="0.1"
@@ -757,8 +747,8 @@ export function PaymentMethodDialog({
                       <FormItem>
                         <FormLabel>Période de rétention (jours)</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="0"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
@@ -781,10 +771,7 @@ export function PaymentMethodDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Approbation requise</FormLabel>
                     </FormItem>
@@ -798,8 +785,8 @@ export function PaymentMethodDialog({
                       <FormItem>
                         <FormLabel>Seuil d'approbation (€)</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="0"
                             step="0.01"
                             {...field}
@@ -823,10 +810,7 @@ export function PaymentMethodDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Rapprochement automatique</FormLabel>
                     </FormItem>
@@ -864,10 +848,7 @@ export function PaymentMethodDialog({
                   <FormItem>
                     <FormLabel>Compte de rapprochement</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Numéro de compte comptable"
-                        {...field} 
-                      />
+                      <Input placeholder="Numéro de compte comptable" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

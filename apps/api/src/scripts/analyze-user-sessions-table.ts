@@ -251,7 +251,7 @@ class UserSessionsTableAnalyzer {
 
       // 5. Compter les enregistrements
       const countResult = await this.dataSource.query('SELECT COUNT(*) as count FROM user_sessions')
-      const recordCount = parseInt(countResult[0].count)
+      const recordCount = parseInt(countResult[0].count, 10)
 
       if (recordCount > 0) {
         // Analyser quelques exemples de données

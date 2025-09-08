@@ -1,7 +1,8 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
-import { Partner } from './partner.entity'
-import { PartnerSite } from './partner-site.entity'
+// Removed direct imports to avoid circular dependencies
+// import { Partner } from './partner.entity'
+// import { PartnerSite } from './partner-site.entity';
 
 export enum ContactRole {
   COMMERCIAL = 'COMMERCIAL', // Contact commercial principal
@@ -39,23 +40,20 @@ export class Contact extends BusinessEntity {
   @Index()
   partnerId!: string
 
-  @ManyToOne(
-    () => Partner,
-    (partner) => partner.contacts,
-    {
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('Partner', 'contacts', {
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'partnerId' })
-  partner!: Partner
+  partner!: any
 
   @Column({ type: 'uuid', nullable: true })
   @Index()
   partnerSiteId?: string
 
-  @ManyToOne(() => PartnerSite, { nullable: true })
+  @ManyToOne('PartnerSite', 'contacts', { nullable: true, lazy: true })
   @JoinColumn({ name: 'partnerSiteId' })
-  site?: PartnerSite // Site spécifique si le contact est lié à un site
+  site?: any // Site spécifique si le contact est lié à un site
 
   // Informations personnelles
   @Column({ type: 'varchar', length: 50 })

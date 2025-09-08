@@ -77,25 +77,27 @@ export class JwtUtilsService {
   getTokenExpirationTime(token: string): Date | null {
     try {
       const payload = this.extractPayload(token)
-      return (payload as any)?.exp ? new Date((payload as any).exp * 1000) : null
+      const typedPayload = payload as { exp?: number }
+      return typedPayload?.exp ? new Date(typedPayload.exp * 1000) : null
     } catch (error) {
       this.logger.warn('Failed to get token expiration time', error)
       return null
     }
   }
 
-  private handleTokenError(error: any): TokenInfo {
-    const payload = error.payload as ExtendedJwtPayload
+  private handleTokenError(error: unknown): TokenInfo {
+    const typedError = error as { payload?: ExtendedJwtPayload; name?: string }
+    const payload = typedError.payload as ExtendedJwtPayload
     const expiresAt = payload?.exp ? new Date(payload.exp * 1000) : undefined
     const issuedAt = payload?.iat ? new Date(payload.iat * 1000) : undefined
 
-    if (error.name === 'TokenExpiredError') {
+    if (typedError.name === 'TokenExpiredError') {
       return {
         isValid: false,
         isExpired: true,
         expiresAt,
         issuedAt,
-        payload: payload as any,
+        payload: payload as unknown as Record<string, unknown> | undefined,
         error: 'Token expired',
       }
     }
@@ -105,8 +107,8 @@ export class JwtUtilsService {
       isExpired: false,
       expiresAt,
       issuedAt,
-      payload: payload as any,
-      error: error.message || 'Invalid token',
+      payload: payload as unknown as Record<string, unknown> | undefined,
+      error: (typedError as { message?: string }).message || 'Invalid token',
     }
   }
 }

@@ -86,20 +86,20 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections)
-    if (newExpanded.has(section)) {
-      newExpanded.delete(section)
+    if (newExpanded?.has(section)) {
+      newExpanded?.delete(section)
     } else {
-      newExpanded.add(section)
+      newExpanded?.add(section)
     }
     setExpandedSections(newExpanded)
   }
 
   const handleCategoryChange = (category: string) => {
     const newCategories = new Set(selectedCategories)
-    if (newCategories.has(category)) {
-      newCategories.delete(category)
+    if (newCategories?.has(category)) {
+      newCategories?.delete(category)
     } else {
-      newCategories.add(category)
+      newCategories?.add(category)
     }
     setSelectedCategories(newCategories)
     applyFilters({ categories: newCategories })
@@ -107,10 +107,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const handleBrandChange = (brand: string) => {
     const newBrands = new Set(selectedBrands)
-    if (newBrands.has(brand)) {
-      newBrands.delete(brand)
+    if (newBrands?.has(brand)) {
+      newBrands?.delete(brand)
     } else {
-      newBrands.add(brand)
+      newBrands?.add(brand)
     }
     setSelectedBrands(newBrands)
     applyFilters({ brands: newBrands })
@@ -125,10 +125,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const handleTagToggle = (tag: string) => {
     const newTags = new Set(selectedTags)
-    if (newTags.has(tag)) {
-      newTags.delete(tag)
+    if (newTags?.has(tag)) {
+      newTags?.delete(tag)
     } else {
-      newTags.add(tag)
+      newTags?.add(tag)
     }
     setSelectedTags(newTags)
     applyFilters({ tags: newTags })
@@ -198,7 +198,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               key={cat}
               className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded-full"
             >
-              {sampleCategories.find((c) => c.value === cat)?.label}
+              {sampleCategories?.find((c) => c.value === cat)?.label}
               <button onClick={() => handleCategoryChange(cat)} className="hover:text-blue-900">
                 <X className="w-3 h-3" />
               </button>
@@ -209,7 +209,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               key={brand}
               className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded-full"
             >
-              {sampleBrands.find((b) => b.value === brand)?.label}
+              {sampleBrands?.find((b) => b.value === brand)?.label}
               <button onClick={() => handleBrandChange(brand)} className="hover:text-blue-900">
                 <X className="w-3 h-3" />
               </button>
@@ -225,19 +225,19 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           className="flex items-center justify-between w-full text-left"
         >
           <span className="font-medium">Categories</span>
-          {expandedSections.has('category') ? (
+          {expandedSections?.has('category') ? (
             <ChevronUp className="w-4 h-4 text-gray-500" />
           ) : (
             <ChevronDown className="w-4 h-4 text-gray-500" />
           )}
         </button>
-        {expandedSections.has('category') && (
+        {expandedSections?.has('category') && (
           <div className="mt-3 space-y-2">
-            {sampleCategories.map((category) => (
+            {sampleCategories?.map((category) => (
               <label key={category.value} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={selectedCategories.has(category.value)}
+                  checked={selectedCategories?.has(category.value)}
                   onChange={() => handleCategoryChange(category.value)}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
@@ -258,20 +258,20 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           className="flex items-center justify-between w-full text-left"
         >
           <span className="font-medium">Price Range</span>
-          {expandedSections.has('price') ? (
+          {expandedSections?.has('price') ? (
             <ChevronUp className="w-4 h-4 text-gray-500" />
           ) : (
             <ChevronDown className="w-4 h-4 text-gray-500" />
           )}
         </button>
-        {expandedSections.has('price') && (
+        {expandedSections?.has('price') && (
           <div className="mt-3 space-y-3">
             <div className="flex items-center gap-2">
               <input
                 type="number"
                 placeholder="Min"
                 value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
+                onChange={(e) => setMinPrice(e?.target?.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <span className="text-gray-500">-</span>
@@ -279,7 +279,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 type="number"
                 placeholder="Max"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                onChange={(e) => setMaxPrice(e?.target?.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -300,19 +300,19 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           className="flex items-center justify-between w-full text-left"
         >
           <span className="font-medium">Brands</span>
-          {expandedSections.has('brand') ? (
+          {expandedSections?.has('brand') ? (
             <ChevronUp className="w-4 h-4 text-gray-500" />
           ) : (
             <ChevronDown className="w-4 h-4 text-gray-500" />
           )}
         </button>
-        {expandedSections.has('brand') && (
+        {expandedSections?.has('brand') && (
           <div className="mt-3 space-y-2">
-            {sampleBrands.map((brand) => (
+            {sampleBrands?.map((brand) => (
               <label key={brand.value} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={selectedBrands.has(brand.value)}
+                  checked={selectedBrands?.has(brand.value)}
                   onChange={() => handleBrandChange(brand.value)}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
@@ -333,13 +333,13 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           className="flex items-center justify-between w-full text-left"
         >
           <span className="font-medium">Customer Rating</span>
-          {expandedSections.has('rating') ? (
+          {expandedSections?.has('rating') ? (
             <ChevronUp className="w-4 h-4 text-gray-500" />
           ) : (
             <ChevronDown className="w-4 h-4 text-gray-500" />
           )}
         </button>
-        {expandedSections.has('rating') && (
+        {expandedSections?.has('rating') && (
           <div className="mt-3 space-y-2">
             {[4, 3, 2, 1].map((rating) => (
               <label key={rating} className="flex items-center gap-2 cursor-pointer">
@@ -383,21 +383,21 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           className="flex items-center justify-between w-full text-left"
         >
           <span className="font-medium">Availability</span>
-          {expandedSections.has('availability') ? (
+          {expandedSections?.has('availability') ? (
             <ChevronUp className="w-4 h-4 text-gray-500" />
           ) : (
             <ChevronDown className="w-4 h-4 text-gray-500" />
           )}
         </button>
-        {expandedSections.has('availability') && (
+        {expandedSections?.has('availability') && (
           <div className="mt-3 space-y-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={inStock}
                 onChange={(e) => {
-                  setInStock(e.target.checked)
-                  applyFilters({ inStock: e.target.checked })
+                  setInStock(e?.target?.checked)
+                  applyFilters({ inStock: e?.target?.checked })
                 }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
@@ -408,8 +408,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 type="checkbox"
                 checked={onSale}
                 onChange={(e) => {
-                  setOnSale(e.target.checked)
-                  applyFilters({ onSale: e.target.checked })
+                  setOnSale(e?.target?.checked)
+                  applyFilters({ onSale: e?.target?.checked })
                 }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
@@ -426,21 +426,21 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           className="flex items-center justify-between w-full text-left"
         >
           <span className="font-medium">Tags</span>
-          {expandedSections.has('tags') ? (
+          {expandedSections?.has('tags') ? (
             <ChevronUp className="w-4 h-4 text-gray-500" />
           ) : (
             <ChevronDown className="w-4 h-4 text-gray-500" />
           )}
         </button>
-        {expandedSections.has('tags') && (
+        {expandedSections?.has('tags') && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {popularTags.map((tag) => (
+            {popularTags?.map((tag) => (
               <button
                 key={tag}
                 onClick={() => handleTagToggle(tag)}
                 className={cn(
                   'px-3 py-1 text-sm rounded-full border transition-colors',
-                  selectedTags.has(tag)
+                  selectedTags?.has(tag)
                     ? 'bg-blue-600 text-white border-blue-600'
                     : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
                 )}

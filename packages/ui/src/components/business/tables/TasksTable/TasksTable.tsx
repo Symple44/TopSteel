@@ -1,5 +1,21 @@
 'use client'
 import {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Edit,
+  Eye,
+  Flag,
+  MessageSquare,
+  MoreHorizontal,
+  Paperclip,
+  PauseCircle,
+  PlayCircle,
+  Trash2,
+  User,
+} from 'lucide-react'
+import {
   Table,
   TableBody,
   TableCell,
@@ -7,24 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  PlayCircle,
-  PauseCircle,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  Calendar,
-  User,
-  MessageSquare,
-  Paperclip,
-  Flag
-} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +31,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
-import { Progress } from '../../../primitives'
+import { Badge, Progress } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Task {
   id: string
   title: string
@@ -83,17 +82,17 @@ interface TasksTableProps {
   onAssign?: (task: Task) => void
   onComment?: (task: Task) => void
 }
-export function TasksTable({ 
-  data = [], 
-  loading = false, 
+export function TasksTable({
+  data = [],
+  loading = false,
   onView,
-  onEdit, 
+  onEdit,
   onDelete,
   onStart,
   onPause,
   onComplete,
   onAssign,
-  onComment
+  onComment,
 }: TasksTableProps) {
   if (loading) {
     return (
@@ -107,35 +106,35 @@ export function TasksTable({
   }
   const getStatusBadge = (status: Task['status']) => {
     const variants = {
-      todo: { 
-        label: 'À faire', 
+      todo: {
+        label: 'À faire',
         className: 'bg-gray-100 text-gray-800',
-        icon: <Clock className="h-3 w-3" />
+        icon: <Clock className="h-3 w-3" />,
       },
-      in_progress: { 
-        label: 'En cours', 
+      in_progress: {
+        label: 'En cours',
         className: 'bg-blue-100 text-blue-800',
-        icon: <PlayCircle className="h-3 w-3" />
+        icon: <PlayCircle className="h-3 w-3" />,
       },
-      blocked: { 
-        label: 'Bloqué', 
+      blocked: {
+        label: 'Bloqué',
         className: 'bg-red-100 text-red-800',
-        icon: <AlertCircle className="h-3 w-3" />
+        icon: <AlertCircle className="h-3 w-3" />,
       },
-      review: { 
-        label: 'En revue', 
+      review: {
+        label: 'En revue',
         className: 'bg-purple-100 text-purple-800',
-        icon: <Eye className="h-3 w-3" />
+        icon: <Eye className="h-3 w-3" />,
       },
-      done: { 
-        label: 'Terminé', 
+      done: {
+        label: 'Terminé',
         className: 'bg-green-100 text-green-800',
-        icon: <CheckCircle2 className="h-3 w-3" />
+        icon: <CheckCircle2 className="h-3 w-3" />,
       },
-      cancelled: { 
-        label: 'Annulé', 
+      cancelled: {
+        label: 'Annulé',
         className: 'bg-gray-100 text-gray-600',
-        icon: <PauseCircle className="h-3 w-3" />
+        icon: <PauseCircle className="h-3 w-3" />,
       },
     }
     const variant = variants[status] || variants.todo
@@ -148,25 +147,25 @@ export function TasksTable({
   }
   const getPriorityBadge = (priority: Task['priority']) => {
     const variants = {
-      low: { 
-        label: 'Faible', 
+      low: {
+        label: 'Faible',
         className: 'bg-gray-100 text-gray-800',
-        icon: null
+        icon: null,
       },
-      medium: { 
-        label: 'Moyen', 
+      medium: {
+        label: 'Moyen',
         className: 'bg-blue-100 text-blue-800',
-        icon: null
+        icon: null,
       },
-      high: { 
-        label: 'Élevé', 
+      high: {
+        label: 'Élevé',
         className: 'bg-orange-100 text-orange-800',
-        icon: <Flag className="h-3 w-3" />
+        icon: <Flag className="h-3 w-3" />,
       },
-      urgent: { 
-        label: 'Urgent', 
+      urgent: {
+        label: 'Urgent',
         className: 'bg-red-100 text-red-800',
-        icon: <Flag className="h-3 w-3" />
+        icon: <Flag className="h-3 w-3" />,
       },
     }
     const variant = variants[priority] || variants.medium
@@ -202,7 +201,7 @@ export function TasksTable({
   }
   const getSubtaskProgress = (subtasks?: Task['subtasks']) => {
     if (!subtasks || subtasks.length === 0) return null
-    const completed = subtasks.filter(st => st.completed).length
+    const completed = subtasks.filter((st) => st.completed).length
     return `${completed}/${subtasks.length}`
   }
   return (
@@ -233,13 +232,14 @@ export function TasksTable({
             data.map((task) => {
               const daysUntilDue = getDaysUntilDue(task.dueDate)
               const isOverdue = daysUntilDue !== null && daysUntilDue < 0 && task.status !== 'done'
-              const isDueSoon = daysUntilDue !== null && daysUntilDue <= 3 && daysUntilDue >= 0 && task.status !== 'done'
+              const isDueSoon =
+                daysUntilDue !== null &&
+                daysUntilDue <= 3 &&
+                daysUntilDue >= 0 &&
+                task.status !== 'done'
               const subtaskProgress = getSubtaskProgress(task.subtasks)
               return (
-                <TableRow 
-                  key={task.id}
-                  className={task.status === 'cancelled' ? 'opacity-60' : ''}
-                >
+                <TableRow key={task.id} className={task.status === 'cancelled' ? 'opacity-60' : ''}>
                   <TableCell>
                     <div>
                       <div className="font-medium">{task.title}</div>
@@ -275,15 +275,13 @@ export function TasksTable({
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    {task.projectName || '-'}
-                  </TableCell>
+                  <TableCell>{task.projectName || '-'}</TableCell>
                   <TableCell>
                     {task.assigneeName ? (
                       <div className="flex items-center gap-2">
                         {task.assigneeAvatar ? (
-                          <img 
-                            src={task.assigneeAvatar} 
+                          <img
+                            src={task.assigneeAvatar}
                             alt={task.assigneeName}
                             className="h-6 w-6 rounded-full"
                           />
@@ -295,8 +293,9 @@ export function TasksTable({
                         <span className="text-sm">{task.assigneeName}</span>
                       </div>
                     ) : (
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        type="button"
+                        variant="ghost"
                         size="sm"
                         onClick={() => onAssign?.(task)}
                         className="text-blue-600"
@@ -312,14 +311,14 @@ export function TasksTable({
                   <TableCell>
                     <div className="space-y-1">
                       <Progress value={task.progress} className="h-2" />
-                      <div className="text-xs text-muted-foreground">
-                        {task.progress}%
-                      </div>
+                      <div className="text-xs text-muted-foreground">{task.progress}%</div>
                     </div>
                   </TableCell>
                   <TableCell>
                     {task.dueDate ? (
-                      <div className={isOverdue ? 'text-red-600' : isDueSoon ? 'text-orange-600' : ''}>
+                      <div
+                        className={isOverdue ? 'text-red-600' : isDueSoon ? 'text-orange-600' : ''}
+                      >
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           <span className="text-sm">{formatDate(task.dueDate)}</span>
@@ -334,7 +333,8 @@ export function TasksTable({
                               <span className="font-medium">Aujourd'hui</span>
                             ) : (
                               <span className="font-medium">
-                                {Math.abs(daysUntilDue)} jour{Math.abs(daysUntilDue) > 1 ? 's' : ''} de retard
+                                {Math.abs(daysUntilDue)} jour{Math.abs(daysUntilDue) > 1 ? 's' : ''}{' '}
+                                de retard
                               </span>
                             )}
                           </div>
@@ -347,7 +347,9 @@ export function TasksTable({
                   <TableCell>
                     {task.estimatedHours ? (
                       <div className="text-sm">
-                        <div>{task.actualHours || 0}h / {task.estimatedHours}h</div>
+                        <div>
+                          {task.actualHours || 0}h / {task.estimatedHours}h
+                        </div>
                         {task.actualHours && task.actualHours > task.estimatedHours && (
                           <div className="text-xs text-red-600">
                             +{task.actualHours - task.estimatedHours}h
@@ -361,7 +363,7 @@ export function TasksTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -378,7 +380,7 @@ export function TasksTable({
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {task.status === 'todo' && (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onStart?.(task)}
                             className="text-blue-600"
                           >
@@ -387,7 +389,7 @@ export function TasksTable({
                           </DropdownMenuItem>
                         )}
                         {task.status === 'in_progress' && (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onPause?.(task)}
                             className="text-orange-600"
                           >
@@ -396,7 +398,7 @@ export function TasksTable({
                           </DropdownMenuItem>
                         )}
                         {(task.status === 'in_progress' || task.status === 'review') && (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onComplete?.(task)}
                             className="text-green-600"
                           >
@@ -415,7 +417,7 @@ export function TasksTable({
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => onDelete?.(task)}
                           className="text-red-600"
                           disabled={task.status === 'done'}

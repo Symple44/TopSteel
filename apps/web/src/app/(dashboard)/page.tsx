@@ -33,9 +33,9 @@ export default function HomePage() {
   const router = useRouter()
 
   // Vérifier l'authentification - mais ne pas rediriger vers dashboard
-  React.useEffect(() => {
+  React?.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/')
+      router?.push('/login?redirect=/')
     }
   }, [isAuthenticated, authLoading, router])
 
@@ -53,43 +53,43 @@ export default function HomePage() {
 
   const quickActions = [
     {
-      title: t('actions.dashboard.title'),
-      description: t('actions.dashboard.description'),
+      title: t('actions?.dashboard?.title'),
+      description: t('actions?.dashboard?.description'),
       icon: BarChart3,
       href: '/dashboard',
       color: 'from-blue-500 to-indigo-600',
     },
     {
-      title: t('actions.newProject.title'),
-      description: t('actions.newProject.description'),
+      title: t('actions?.newProject?.title'),
+      description: t('actions?.newProject?.description'),
       icon: FolderOpen,
       href: '/projects/new',
       color: 'from-emerald-500 to-teal-600',
     },
     {
-      title: t('actions.production.title'),
-      description: t('actions.production.description'),
+      title: t('actions?.production?.title'),
+      description: t('actions?.production?.description'),
       icon: Factory,
       href: '/production',
       color: 'from-orange-500 to-red-600',
     },
     {
-      title: t('actions.inventory.title'),
-      description: t('actions.inventory.description'),
+      title: t('actions?.inventory?.title'),
+      description: t('actions?.inventory?.description'),
       icon: Package,
       href: '/inventory',
       color: 'from-purple-500 to-pink-600',
     },
     {
-      title: t('actions.users.title'),
-      description: t('actions.users.description'),
+      title: t('actions?.users?.title'),
+      description: t('actions?.users?.description'),
       icon: Users,
       href: '/admin/users',
       color: 'from-cyan-500 to-blue-600',
     },
     {
-      title: t('actions.configuration.title'),
-      description: t('actions.configuration.description'),
+      title: t('actions?.configuration?.title'),
+      description: t('actions?.configuration?.description'),
       icon: Settings,
       href: '/admin',
       color: 'from-slate-500 to-gray-600',
@@ -102,7 +102,7 @@ export default function HomePage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
-            <CompanyLogo size="xl" showName={false} className="drop-shadow-xl" />
+            <CompanyLogo size="xl" showCompanyName={false} className="drop-shadow-xl" />
           </div>
 
           <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent mb-4">
@@ -115,7 +115,8 @@ export default function HomePage() {
 
           <div className="flex justify-center space-x-4">
             <Button
-              onClick={() => router.push('/dashboard')}
+              type="button"
+              onClick={() => router?.push('/dashboard')}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg px-8"
             >
               <BarChart3 className="mr-2 h-5 w-5" />
@@ -123,8 +124,9 @@ export default function HomePage() {
             </Button>
 
             <Button
+              type="button"
               variant="outline"
-              onClick={() => router.push('/admin/company')}
+              onClick={() => router?.push('/admin/company')}
               className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white px-8"
             >
               <Building2 className="mr-2 h-5 w-5" />
@@ -140,11 +142,11 @@ export default function HomePage() {
           </h2>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {quickActions.map((action) => (
+            {quickActions?.map((action) => (
               <button
                 key={action.href}
                 type="button"
-                onClick={() => router.push(action.href)}
+                onClick={() => router?.push(action.href)}
                 aria-label={`Navigate to ${action.title}`}
                 className="block w-full text-left"
               >

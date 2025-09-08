@@ -43,7 +43,10 @@ export function PartnerDetailDialog({
   onEdit,
 }: PartnerDetailDialogProps) {
   const [activeTab, setActiveTab] = useState('overview')
-  const { data: completeData } = usePartnerComplete(partner.id)
+  const completeDataQuery = usePartnerComplete(partner.id)
+  const { data: completeData } = completeDataQuery as {
+    data: Partner & { group?: unknown; contacts?: unknown[]; sites?: unknown[]; addresses?: unknown[] }
+  }
 
   const getStatusColor = (status: PartnerStatus) => {
     const colors = {
@@ -87,7 +90,7 @@ export function PartnerDetailDialog({
             </div>
             <div className="flex gap-2">
               {onEdit && (
-                <Button variant="outline" size="sm" onClick={onEdit}>
+                <Button type="button" variant="outline" size="sm" onClick={onEdit}>
                   <Edit className="mr-2 h-4 w-4" />
                   Modifier
                 </Button>
@@ -104,11 +107,11 @@ export function PartnerDetailDialog({
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="contacts">
-              Contacts ({completeData?.contacts?.length || 0})
+              Contacts ({completeData?.contacts?.length ?? 0})
             </TabsTrigger>
-            <TabsTrigger value="sites">Sites ({completeData?.sites?.length || 0})</TabsTrigger>
+            <TabsTrigger value="sites">Sites ({completeData?.sites?.length ?? 0})</TabsTrigger>
             <TabsTrigger value="addresses">
-              Adresses ({completeData?.addresses?.length || 0})
+              Adresses ({completeData?.addresses?.length ?? 0})
             </TabsTrigger>
             <TabsTrigger value="history">Historique</TabsTrigger>
           </TabsList>
@@ -236,7 +239,7 @@ export function PartnerDetailDialog({
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Conditions:</span>
                         <span className="text-sm font-medium">
-                          {partner.conditionsPaiement.replace(/_/g, ' ')}
+                          {partner?.conditionsPaiement?.replace(/_/g, ' ')}
                         </span>
                       </div>
                     )}
@@ -244,7 +247,7 @@ export function PartnerDetailDialog({
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Mode:</span>
                         <span className="text-sm font-medium">
-                          {partner.modePaiement.replace(/_/g, ' ')}
+                          {partner?.modePaiement?.replace(/_/g, ' ')}
                         </span>
                       </div>
                     )}
@@ -344,20 +347,22 @@ export function PartnerDetailDialog({
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">{completeData.group.name}</p>
-                        {completeData.group.description && (
+                        <p className="font-medium">{completeData?.group?.name}</p>
+                        {completeData?.group?.description && (
                           <p className="text-sm text-muted-foreground">
-                            {completeData.group.description}
+                            {completeData?.group?.description}
                           </p>
                         )}
                       </div>
                       <div className="text-right">
-                        {completeData.group.defaultDiscount && (
-                          <Badge variant="secondary">-{completeData.group.defaultDiscount}%</Badge>
+                        {completeData?.group?.defaultDiscount && (
+                          <Badge variant="secondary">
+                            -{completeData?.group?.defaultDiscount}%
+                          </Badge>
                         )}
-                        {completeData.group.creditLimit && (
+                        {completeData?.group?.creditLimit && (
                           <p className="text-sm text-muted-foreground mt-1">
-                            Plafond: {formatCurrency(completeData.group.creditLimit)}
+                            Plafond: {formatCurrency(completeData?.group?.creditLimit)}
                           </p>
                         )}
                       </div>
@@ -426,7 +431,7 @@ export function PartnerDetailDialog({
         </Tabs>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Fermer
           </Button>
         </DialogFooter>

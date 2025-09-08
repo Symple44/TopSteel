@@ -34,7 +34,7 @@ export function AppInitializer({ children }: AppInitializerProps) {
   // Rediriger vers la page d'erreur backend si nécessaire
   useEffect(() => {
     if (initState === 'backend-error') {
-      router.push('/backend-error')
+      router?.push('/backend-error')
     }
   }, [initState, router])
 

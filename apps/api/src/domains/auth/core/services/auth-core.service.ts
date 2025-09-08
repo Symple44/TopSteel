@@ -56,7 +56,7 @@ export class AuthCoreService {
       firstName: result.prenom || '',
       lastName: result.nom || '',
       isActive: result.actif,
-    } as any
+    }
   }
 
   /**

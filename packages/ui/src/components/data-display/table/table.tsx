@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { type TableVariants, tableVariants } from "../../../lib/design-system"
+import { type TableVariants, tableVariants } from '../../../lib/design-system'
 import { cn } from '../../../lib/utils'
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement>, TableVariants {}

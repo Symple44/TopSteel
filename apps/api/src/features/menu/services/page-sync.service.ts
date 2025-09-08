@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import type { DeepPartial, Repository } from 'typeorm'
 import {
   type DiscoveredPage as DiscoveredPageInterface,
   pageDiscoveryService,
@@ -82,7 +82,7 @@ export class PageSyncService {
       })
     } else {
       // Créer une nouvelle entrée avec les permissions les plus élevées
-      const newPage = this._discoveredPageRepository.create({
+      const pageData: DeepPartial<DiscoveredPage> = {
         id: page.id,
         title: page.title,
         href: page.href,
@@ -98,8 +98,9 @@ export class PageSyncService {
         defaultOrder: 0,
         // Accorder l'accès au niveau le plus élevé par défaut
         defaultAccessLevel: 'ADMIN',
-      } as unknown)
+      }
 
+      const newPage = this._discoveredPageRepository.create(pageData)
       await this._discoveredPageRepository.save(newPage)
     }
   }

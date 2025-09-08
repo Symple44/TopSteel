@@ -2,7 +2,6 @@
 'use client'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-
 import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useState } from 'react'
 
@@ -34,52 +33,52 @@ export function PlanningCalendar({
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate)
 
-    newDate.setMonth(currentDate.getMonth() + (direction === 'next' ? 1 : -1))
+    newDate?.setMonth(currentDate?.getMonth() + (direction === 'next' ? 1 : -1))
     setCurrentDate(newDate)
   }
 
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
+  const getDaysInMonth = (date: Date): { date: Date; isCurrentMonth: boolean }[] => {
+    const year = date?.getFullYear()
+    const month = date?.getMonth()
     const firstDay = new Date(year, month, 1)
     const lastDay = new Date(year, month + 1, 0)
-    const daysInMonth = lastDay.getDate()
-    const startDay = firstDay.getDay()
+    const daysInMonth = lastDay?.getDate()
+    const startDay = firstDay?.getDay()
 
-    const days = []
+    const days: { date: Date; isCurrentMonth: boolean }[] = []
 
     // Jours du mois précédent
     for (let i = startDay - 1; i >= 0; i--) {
       const prevDate = new Date(year, month, -i)
 
-      days.push({ date: prevDate, isCurrentMonth: false })
+      days?.push({ date: prevDate, isCurrentMonth: false })
     }
 
     // Jours du mois actuel
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push({ date: new Date(year, month, day), isCurrentMonth: true })
+      days?.push({ date: new Date(year, month, day), isCurrentMonth: true })
     }
 
     // Jours du mois suivant pour compléter la grille
     const remainingDays = 42 - days.length
 
     for (let day = 1; day <= remainingDays; day++) {
-      days.push({ date: new Date(year, month + 1, day), isCurrentMonth: false })
+      days?.push({ date: new Date(year, month + 1, day), isCurrentMonth: false })
     }
 
     return days
   }
 
   const getEventsForDate = (date: Date) => {
-    return events.filter((event) => {
+    return events?.filter((event) => {
       const eventDate = new Date(event.start)
 
-      return eventDate.toDateString() === date.toDateString()
+      return eventDate?.toDateString() === date?.toDateString()
     })
   }
 
   const days = getDaysInMonth(currentDate)
-  const monthName = currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+  const monthName = currentDate?.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
 
   return (
     <Card>
@@ -89,7 +88,7 @@ export function PlanningCalendar({
             <Calendar className="h-5 w-5" />
             Planning Production
           </CardTitle>
-          <Button onClick={onCreateEvent} className="flex items-center gap-2">
+          <Button type="button" onClick={onCreateEvent} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Nouveau
           </Button>
@@ -99,6 +98,7 @@ export function PlanningCalendar({
         {/* Navigation */}
         <div className="flex items-center justify-between mb-6">
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => navigateMonth('prev')}
@@ -109,6 +109,7 @@ export function PlanningCalendar({
           </Button>
           <h3 className="text-lg font-semibold capitalize">{monthName}</h3>
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => navigateMonth('next')}
@@ -129,29 +130,29 @@ export function PlanningCalendar({
           ))}
 
           {/* Jours du mois */}
-          {days.map((day, _index) => {
+          {days?.map((day, _index) => {
             const dayEvents = getEventsForDate(day.date)
-            const isToday = day.date.toDateString() === new Date().toDateString()
+            const isToday = day?.date?.toDateString() === new Date().toDateString()
 
             return (
               <button
                 type="button"
-                key={day.date.toISOString()}
+                key={day?.date?.toISOString()}
                 className={`
                   min-h-[100px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50 w-full text-left
                   ${day.isCurrentMonth ? '' : 'bg-gray-50 text-gray-400'}
                   ${isToday ? 'bg-blue-50 border-blue-200' : ''}
                 `}
                 onClick={() => onDateClick(day.date)}
-                aria-label={`Sélectionner le ${day.date.toLocaleDateString('fr-FR')}`}
+                aria-label={`Sélectionner le ${day?.date?.toLocaleDateString('fr-FR')}`}
               >
                 <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : ''}`}>
-                  {day.date.getDate()}
+                  {day?.date?.getDate()}
                 </div>
 
                 {/* Événements */}
                 <div className="space-y-1">
-                  {dayEvents.slice(0, 3).map((event) => (
+                  {dayEvents?.slice(0, 3).map((event) => (
                     <button
                       type="button"
                       key={event.id}
@@ -166,7 +167,7 @@ export function PlanningCalendar({
                         }
                       `}
                       onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                        e.stopPropagation()
+                        e?.stopPropagation()
                         onEventClick(event)
                       }}
                       aria-label={`Événement: ${event.title}`}
@@ -174,8 +175,8 @@ export function PlanningCalendar({
                       {event.title}
                     </button>
                   ))}
-                  {dayEvents.length > 3 && (
-                    <div className="text-xs text-gray-500">+{dayEvents.length - 3} autres</div>
+                  {dayEvents?.length > 3 && (
+                    <div className="text-xs text-gray-500">+{dayEvents?.length - 3} autres</div>
                   )}
                 </div>
               </button>

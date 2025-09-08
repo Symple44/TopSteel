@@ -1,17 +1,12 @@
 // apps/web/src/components/production/ordre-operations-tab.tsx
-import {
-  type Operation,
-  OperationStatut,
-  type OrdrePriorite,
-  type OrdreStatut,
-} from '@erp/domains/production'
+import { type Operation, OperationStatut, type OrdrePriorite, type OrdreStatut } from '@erp/domains'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 interface OrdreSimple {
   id: string
   numero: string
-  statut: OrdreStatut
-  priorite: OrdrePriorite
+  statut: (typeof OrdreStatut)[keyof typeof OrdreStatut]
+  priorite: (typeof OrdrePriorite)[keyof typeof OrdrePriorite]
   avancement: number
   description?: string
   projetId: string
@@ -26,7 +21,7 @@ interface OrdreOperationsTabProps {
   ordre: OrdreSimple
 }
 
-export function OrdreOperationsTab({ _ordre }: OrdreOperationsTabProps) {
+export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
   // Simulation d'opérations pour la démo (ordre.operationsIds contiendrait les IDs)
   const operations: Operation[] = []
 
@@ -41,7 +36,7 @@ export function OrdreOperationsTab({ _ordre }: OrdreOperationsTabProps) {
             <p className="text-sm text-muted-foreground">Aucune opération définie pour cet ordre</p>
           ) : (
             <div className="space-y-4">
-              {operations.map((operation: Operation, index: number) => (
+              {operations?.map((operation: Operation, index: number) => (
                 <div
                   key={operation.id || `operation-${operation.nom || 'unnamed'}-${index}`}
                   className="border rounded-lg p-4"
@@ -71,14 +66,14 @@ export function OrdreOperationsTab({ _ordre }: OrdreOperationsTabProps) {
                     <div>
                       <span className="text-sm font-medium">Durée estimée</span>
                       <p className="text-sm text-muted-foreground">
-                        {operation?.tempsEstime || 0}h
+                        {operation?.tempsEstime ?? 0}h
                       </p>
                     </div>
                     <div>
                       <span className="text-sm font-medium">Opérateurs</span>
                       <p className="text-sm text-muted-foreground">
                         {operation?.operateurIds?.length
-                          ? `${operation.operateurIds.length} opérateur(s)`
+                          ? `${operation?.operateurIds?.length} opérateur(s)`
                           : 'Non assigné'}
                       </p>
                     </div>

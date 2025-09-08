@@ -32,7 +32,40 @@ export function formatPercent(value: number, decimals = 2): string {
 export function getDaysUntil(date: Date | string): number {
   const targetDate = typeof date === 'string' ? new Date(date) : date
   const today = new Date()
-  const diffTime = targetDate.getTime() - today.getTime()
+  const diffTime = targetDate?.getTime() - today?.getTime()
 
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+}
+
+/**
+ * Debounce function
+ */
+export function debounce<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  waitFor: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: ReturnType<typeof setTimeout>
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => func(...args), waitFor)
+  }
+}
+
+/**
+ * Throttle function
+ */
+export function throttle<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args)
+      inThrottle = true
+      setTimeout(() => {
+        inThrottle = false
+      }, limit)
+    }
+  }
 }

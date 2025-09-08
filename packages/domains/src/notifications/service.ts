@@ -2,12 +2,16 @@ import type {
   CreateNotificationFromTemplateRequest,
   CreateNotificationRequest,
   Notification,
+  NotificationCategory,
   NotificationFilters,
   NotificationListResponse,
+  NotificationPriority,
   NotificationService,
   NotificationSettings,
   NotificationStats,
   NotificationTemplate,
+  NotificationType,
+  RecipientType,
   UpdateNotificationRequest,
 } from './types'
 
@@ -341,7 +345,16 @@ export class NotificationDatabaseService implements NotificationService {
       throw new Error(`Template ${request.templateName} not found`)
     }
 
-    const template = templateRows[0]
+    const template = templateRows[0] as {
+      type: string
+      category: string
+      title_template: string
+      message_template: string
+      priority: string
+      action_url_template?: string
+      action_label?: string
+      persistent: boolean
+    }
 
     // Remplacer les variables dans le template
     const title = this.replaceVariables(template.title_template, request.variables)
@@ -352,11 +365,11 @@ export class NotificationDatabaseService implements NotificationService {
 
     // Créer la notification
     const notificationRequest: CreateNotificationRequest = {
-      type: template.type,
-      category: template.category,
+      type: template.type as NotificationType,
+      category: template.category as NotificationCategory,
       title,
       message,
-      priority: template.priority,
+      priority: template.priority as NotificationPriority,
       recipientType: request.recipientType,
       recipientId: request.recipientId,
       actionUrl,
@@ -404,7 +417,8 @@ export class NotificationDatabaseService implements NotificationService {
   async cleanExpiredNotifications(): Promise<number> {
     const sql = `CALL CleanExpiredNotifications()`
     const result = await this.db.query(sql)
-    return result[0]?.deleted_count || 0
+    const typedResult = result[0] as { deleted_count?: number } | undefined
+    return typedResult?.deleted_count || 0
   }
 
   // Méthodes utilitaires privées
@@ -443,20 +457,20 @@ export class NotificationDatabaseService implements NotificationService {
 
     return {
       id: typedRow.id,
-      type: typedRow.type,
-      category: typedRow.category,
+      type: typedRow.type as NotificationType,
+      category: typedRow.category as NotificationCategory,
       title: typedRow.title,
       message: typedRow.message,
-      priority: typedRow.priority,
+      priority: typedRow.priority as NotificationPriority,
       source: typedRow.source,
       entityType: typedRow.entity_type,
       entityId: typedRow.entity_id,
       data: typedRow.data ? JSON.parse(typedRow.data) : undefined,
-      recipientType: typedRow.recipient_type,
+      recipientType: typedRow.recipient_type as RecipientType,
       recipientId: typedRow.recipient_id,
       actionUrl: typedRow.action_url,
       actionLabel: typedRow.action_label,
-      actionType: typedRow.action_type || 'primary',
+      actionType: (typedRow.action_type || 'primary') as 'primary' | 'secondary',
       createdAt: typedRow.created_at,
       expiresAt: typedRow.expires_at,
       persistent: typedRow.persistent,
@@ -464,7 +478,7 @@ export class NotificationDatabaseService implements NotificationService {
       isRead: typedRow.is_read,
       readAt: typedRow.read_at,
       metadata: {
-        category: typedRow.category,
+        category: typedRow.category as NotificationCategory,
         source: typedRow.source,
         entityType: typedRow.entity_type,
         entityId: typedRow.entity_id,
@@ -475,7 +489,7 @@ export class NotificationDatabaseService implements NotificationService {
             {
               url: typedRow.action_url,
               label: typedRow.action_label || 'Voir',
-              type: typedRow.action_type || 'primary',
+              type: (typedRow.action_type || 'primary') as 'primary' | 'secondary',
             },
           ]
         : undefined,
@@ -533,11 +547,11 @@ export class NotificationDatabaseService implements NotificationService {
     return {
       id: typedRow.id,
       name: typedRow.name,
-      type: typedRow.type,
-      category: typedRow.category,
+      type: typedRow.type as NotificationType,
+      category: typedRow.category as NotificationCategory,
       titleTemplate: typedRow.title_template,
       messageTemplate: typedRow.message_template,
-      priority: typedRow.priority,
+      priority: typedRow.priority as NotificationPriority,
       persistent: typedRow.persistent,
       actionUrlTemplate: typedRow.action_url_template,
       actionLabel: typedRow.action_label,

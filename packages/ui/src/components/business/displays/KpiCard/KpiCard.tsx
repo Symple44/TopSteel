@@ -1,18 +1,9 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { TrendIndicator } from '../TrendIndicator'
-import { CurrencyDisplay } from '../CurrencyDisplay'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Target, 
-  DollarSign, 
-  Users, 
-  Package, 
-  Clock,
-  BarChart3
-} from 'lucide-react'
+import { BarChart3, DollarSign, Package, Target, Users } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
+import { CurrencyDisplay } from '../CurrencyDisplay'
+import { TrendIndicator } from '../TrendIndicator'
 export interface KpiData {
   id: string
   title: string
@@ -95,9 +86,9 @@ export function KpiCard({
     switch (format) {
       case 'currency':
         return (
-          <CurrencyDisplay 
-            amount={value} 
-            currency={kpi.currency || 'EUR'} 
+          <CurrencyDisplay
+            amount={value}
+            currency={kpi.currency || 'EUR'}
             size="lg"
             compact={value >= 10000}
           />
@@ -108,7 +99,6 @@ export function KpiCard({
         if (value < 60) return `${value}min`
         if (value < 1440) return `${(value / 60).toFixed(1)}h`
         return `${(value / 1440).toFixed(1)}j`
-      case 'number':
       default:
         if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
         if (value >= 1000) return `${(value / 1000).toFixed(1)}k`
@@ -209,10 +199,9 @@ export function KpiCard({
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Réalisé: {targetPercentage?.toFixed(1)}%</span>
-                <span className={cn(
-                  'font-medium',
-                  isOnTarget() ? 'text-green-600' : 'text-blue-600'
-                )}>
+                <span
+                  className={cn('font-medium', isOnTarget() ? 'text-green-600' : 'text-blue-600')}
+                >
                   {isOnTarget() ? 'Objectif atteint' : 'En cours'}
                 </span>
               </div>

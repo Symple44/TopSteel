@@ -5,6 +5,53 @@ import {
   InvalidateCache,
 } from '../services/search-cache-invalidation.service'
 
+// Type definitions for the example service
+interface Product {
+  id: string
+  tenantId?: string
+  [key: string]: unknown
+}
+
+interface Customer {
+  id: string
+  tenantId?: string
+  [key: string]: unknown
+}
+
+interface Order {
+  id: string
+  tenantId?: string
+  [key: string]: unknown
+}
+
+interface User {
+  id: string
+  tenantId?: string
+  name?: string
+  email?: string
+  role?: string
+  permissions?: string[]
+  [key: string]: unknown
+}
+
+interface ProductUpdate {
+  productId: string
+  quantity: number
+}
+
+interface ComplexBusinessOperationData {
+  customerId: string
+  customerUpdates: Record<string, unknown>
+  orders: Record<string, unknown>[]
+  productUpdates: ProductUpdate[]
+}
+
+type EntityWithId = {
+  id: string
+  tenantId?: string
+  [key: string]: unknown
+}
+
 /**
  * Example service showing how to integrate cache invalidation with domain operations
  * This demonstrates best practices for cache invalidation in your domain services
@@ -16,7 +63,11 @@ export class CacheIntegrationExampleService {
   /**
    * Example 1: Manual cache invalidation using event emitter
    */
-  async updateProduct(tenantId: string, productId: string, updateData: any): Promise<any> {
+  async updateProduct(
+    tenantId: string,
+    productId: string,
+    updateData: Record<string, unknown>
+  ): Promise<Product> {
     // Perform the actual update operation
     const updatedProduct = await this.performProductUpdate(productId, updateData)
 
@@ -32,7 +83,7 @@ export class CacheIntegrationExampleService {
    * Example 2: Using the decorator for automatic cache invalidation
    */
   @InvalidateCache('customer', 'create')
-  async createCustomer(tenantId: string, customerData: any): Promise<any> {
+  async createCustomer(tenantId: string, customerData: Record<string, unknown>): Promise<Customer> {
     // The decorator will automatically emit cache invalidation events
     // after this method completes successfully
 
@@ -49,7 +100,11 @@ export class CacheIntegrationExampleService {
   /**
    * Example 3: Bulk operations with cache invalidation
    */
-  async bulkUpdateOrders(tenantId: string, orderIds: string[], updateData: any): Promise<void> {
+  async bulkUpdateOrders(
+    tenantId: string,
+    orderIds: string[],
+    updateData: Record<string, unknown>
+  ): Promise<void> {
     // Perform bulk update
     await this.performBulkOrderUpdate(orderIds, updateData)
 
@@ -66,7 +121,10 @@ export class CacheIntegrationExampleService {
   /**
    * Example 4: Complex operation affecting multiple entity types
    */
-  async processComplexBusinessOperation(tenantId: string, data: any): Promise<void> {
+  async processComplexBusinessOperation(
+    tenantId: string,
+    data: ComplexBusinessOperationData
+  ): Promise<void> {
     // This operation might affect multiple entity types
 
     // Update customer
@@ -95,7 +153,11 @@ export class CacheIntegrationExampleService {
   /**
    * Example 5: Conditional cache invalidation
    */
-  async updateUserProfile(tenantId: string, userId: string, profileData: any): Promise<any> {
+  async updateUserProfile(
+    tenantId: string,
+    userId: string,
+    profileData: Record<string, unknown>
+  ): Promise<User> {
     const result = await this.performUserProfileUpdate(userId, profileData)
 
     // Only invalidate cache if significant fields were changed
@@ -117,7 +179,7 @@ export class CacheIntegrationExampleService {
   /**
    * Example 6: Tenant-wide operation
    */
-  async updateTenantSettings(tenantId: string, settings: any): Promise<void> {
+  async updateTenantSettings(tenantId: string, settings: Record<string, unknown>): Promise<void> {
     await this.performTenantSettingsUpdate(tenantId, settings)
 
     // Emit tenant-wide invalidation event
@@ -139,7 +201,7 @@ export class CacheIntegrationExampleService {
   }
 
   // Helper methods for extracting tenant and entity IDs (used by decorator)
-  extractTenantId(args: any[], result: any): string | null {
+  extractTenantId(args: unknown[], result: EntityWithId): string | null {
     // Look for tenant ID in arguments first
     if (args[0] && typeof args[0] === 'string') {
       return args[0] // First argument is often tenantId
@@ -153,7 +215,7 @@ export class CacheIntegrationExampleService {
     return null
   }
 
-  extractEntityId(args: any[], result: any): string | null {
+  extractEntityId(args: unknown[], result: EntityWithId): string | null {
     // Look for entity ID in arguments
     if (args[1] && typeof args[1] === 'string') {
       return args[1] // Second argument is often entityId
@@ -169,25 +231,34 @@ export class CacheIntegrationExampleService {
 
   // Mock implementation methods (replace with your actual business logic)
 
-  private async performProductUpdate(productId: string, updateData: any): Promise<any> {
+  private async performProductUpdate(
+    productId: string,
+    updateData: Record<string, unknown>
+  ): Promise<Product> {
     // Your actual product update logic here
     return { id: productId, ...updateData }
   }
 
-  private async performCustomerCreation(customerData: any): Promise<any> {
+  private async performCustomerCreation(customerData: Record<string, unknown>): Promise<Customer> {
     // Your actual customer creation logic here
     return { id: 'customer-123', ...customerData }
   }
 
-  private async performBulkOrderUpdate(_orderIds: string[], _updateData: any): Promise<void> {
+  private async performBulkOrderUpdate(
+    _orderIds: string[],
+    _updateData: Record<string, unknown>
+  ): Promise<void> {
     // Your actual bulk order update logic here
   }
 
-  private async updateCustomerData(_customerId: string, _updateData: any): Promise<void> {
+  private async updateCustomerData(
+    _customerId: string,
+    _updateData: Record<string, unknown>
+  ): Promise<void> {
     // Your actual customer update logic here
   }
 
-  private async createOrder(orderData: any): Promise<any> {
+  private async createOrder(orderData: Record<string, unknown>): Promise<Order> {
     // Your actual order creation logic here
     return { id: 'order-123', ...orderData }
   }
@@ -196,12 +267,18 @@ export class CacheIntegrationExampleService {
     // Your actual inventory update logic here
   }
 
-  private async performUserProfileUpdate(userId: string, profileData: any): Promise<any> {
+  private async performUserProfileUpdate(
+    userId: string,
+    profileData: Record<string, unknown>
+  ): Promise<User> {
     // Your actual user profile update logic here
     return { id: userId, ...profileData }
   }
 
-  private async performTenantSettingsUpdate(_tenantId: string, _settings: any): Promise<void> {
+  private async performTenantSettingsUpdate(
+    _tenantId: string,
+    _settings: Record<string, unknown>
+  ): Promise<void> {
     // Your actual tenant settings update logic here
   }
 

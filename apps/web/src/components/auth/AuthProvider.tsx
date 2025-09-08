@@ -31,10 +31,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const pathname = usePathname()
 
   // Fonction de redirection sécurisée
-  const safeRedirect = React.useCallback(
+  const safeRedirect = React?.useCallback(
     (url: string) => {
       try {
-        router.replace(url)
+        router?.replace(url)
       } catch {
         // Fallback: utiliser window.location si router.replace échoue
         if (typeof window !== 'undefined') {
@@ -46,15 +46,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   )
 
   // Initialiser la session au démarrage
-  React.useEffect(() => {
-    if (typeof window !== 'undefined' && !sessionStorage.getItem('topsteel-session-initialized')) {
+  React?.useEffect(() => {
+    if (typeof window !== 'undefined' && !sessionStorage?.getItem('topsteel-session-initialized')) {
       sessionStorage.setItem('topsteel-session-initialized', 'true')
       // Session initialized
     }
 
     // Nettoyer le marqueur de session à la fermeture
     const handleBeforeUnload = () => {
-      sessionStorage.removeItem('topsteel-session-initialized')
+      sessionStorage?.removeItem('topsteel-session-initialized')
     }
 
     window.addEventListener('beforeunload', handleBeforeUnload)
@@ -62,13 +62,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   // Gestion des redirections basées sur l'état d'authentification
-  React.useEffect(() => {
+  React?.useEffect(() => {
     // Ne pas faire de redirections si on est encore en train de charger
     if (typeof window === 'undefined' || isLoading) return
 
-    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
-    const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
-    const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route))
+    const isPublicRoute = PUBLIC_ROUTES?.some((route) => pathname?.startsWith(route))
+    const isAuthRoute = AUTH_ROUTES?.some((route) => pathname?.startsWith(route))
+    const isProtectedRoute = PROTECTED_ROUTES?.some((route) => pathname?.startsWith(route))
 
     // Si l'utilisateur est connecté et sur une page d'auth, rediriger vers dashboard
     if (isAuthenticated && isAuthRoute) {
@@ -103,15 +103,15 @@ export function useRequireAuth() {
   const router = useRouter()
   const pathname = usePathname()
 
-  React.useEffect(() => {
+  React?.useEffect(() => {
     // Ne pas rediriger pendant le chargement
     if (isLoading) return
 
-    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
+    const isPublicRoute = PUBLIC_ROUTES?.some((route) => pathname?.startsWith(route))
 
     if (!isAuthenticated && !isPublicRoute) {
       try {
-        router.replace('/login')
+        router?.replace('/login')
       } catch {
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
@@ -128,7 +128,7 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
   const { user, tokens, isAuthenticated, isLoading } = useAuth()
   const pathname = usePathname()
 
-  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
+  const isPublicRoute = PUBLIC_ROUTES?.some((route) => pathname?.startsWith(route))
 
   // Si on est sur une route publique, afficher directement
   if (isPublicRoute) {
@@ -175,12 +175,12 @@ export function RouteGuard({
   const { user, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
-  React.useEffect(() => {
+  React?.useEffect(() => {
     if (isLoading) return
 
     if (!isAuthenticated) {
       try {
-        router.replace('/login')
+        router?.replace('/login')
       } catch {
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
@@ -191,16 +191,16 @@ export function RouteGuard({
 
     if (requiredPermissions.length > 0 && user) {
       // Get user roles array (new system) or single role (legacy)
-      const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+      const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
 
-      const hasPermission = requiredPermissions.some((permission) => {
+      const hasPermission = requiredPermissions?.some((permission) => {
         // Check if user has the permission directly
         if (user.permissions?.includes(permission)) {
           return true
         }
 
         // Check if any user role matches the permission
-        return userRoles.some((role: any) => {
+        return userRoles?.some((role: unknown) => {
           const roleValue = typeof role === 'object' ? role.name || role.role : role
           return roleValue === permission
         })
@@ -208,7 +208,7 @@ export function RouteGuard({
 
       if (!hasPermission) {
         try {
-          router.replace(fallbackUrl)
+          router?.replace(fallbackUrl)
         } catch {
           if (typeof window !== 'undefined') {
             window.location.href = fallbackUrl
@@ -238,16 +238,16 @@ export function RouteGuard({
   // Vérifier les permissions si spécifiées
   if (requiredPermissions.length > 0 && user) {
     // Get user roles array (new system) or single role (legacy)
-    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
 
-    const hasPermission = requiredPermissions.some((permission) => {
+    const hasPermission = requiredPermissions?.some((permission) => {
       // Check if user has the permission directly
       if (user.permissions?.includes(permission)) {
         return true
       }
 
       // Check if any user role matches the permission
-      return userRoles.some((role: any) => {
+      return userRoles?.some((role: unknown) => {
         const roleValue = typeof role === 'object' ? role.name || role.role : role
         return roleValue === permission
       })
@@ -264,7 +264,7 @@ export function RouteGuard({
             </p>
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={() => router?.back()}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               Retour

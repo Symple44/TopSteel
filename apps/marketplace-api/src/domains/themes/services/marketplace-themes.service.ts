@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { MarketplaceTheme } from '../entities/marketplace-theme.entity'
 
 export interface CreateThemeDto {
@@ -90,10 +86,7 @@ export class MarketplaceThemesService {
   /**
    * Create a new theme
    */
-  async create(
-    societeId: string,
-    createDto: CreateThemeDto
-  ): Promise<MarketplaceTheme> {
+  async create(societeId: string, createDto: CreateThemeDto): Promise<MarketplaceTheme> {
     // Check if theme name already exists for this company
     const existingTheme = await this.themeRepo.findOne({
       where: { societeId, name: createDto.name },
@@ -145,22 +138,25 @@ export class MarketplaceThemesService {
 
     // If activating this theme, deactivate others
     if (updateDto.isActive === true) {
-      await this.themeRepo.update(
-        { societeId, isActive: true },
-        { isActive: false }
-      )
+      await this.themeRepo.update({ societeId, isActive: true }, { isActive: false })
     }
 
     // Update theme properties
     Object.assign(theme, {
       ...updateDto,
       colors: updateDto.colors ? { ...theme.colors, ...updateDto.colors } : theme.colors,
-      typography: updateDto.typography ? { ...theme.typography, ...updateDto.typography } : theme.typography,
+      typography: updateDto.typography
+        ? { ...theme.typography, ...updateDto.typography }
+        : theme.typography,
       layout: updateDto.layout ? { ...theme.layout, ...updateDto.layout } : theme.layout,
-      components: updateDto.components ? { ...theme.components, ...updateDto.components } : theme.components,
+      components: updateDto.components
+        ? { ...theme.components, ...updateDto.components }
+        : theme.components,
       assets: updateDto.assets ? { ...theme.assets, ...updateDto.assets } : theme.assets,
       settings: updateDto.settings ? { ...theme.settings, ...updateDto.settings } : theme.settings,
-      responsive: updateDto.responsive ? { ...theme.responsive, ...updateDto.responsive } : theme.responsive,
+      responsive: updateDto.responsive
+        ? { ...theme.responsive, ...updateDto.responsive }
+        : theme.responsive,
       metadata: updateDto.metadata ? { ...theme.metadata, ...updateDto.metadata } : theme.metadata,
     })
 
@@ -196,10 +192,7 @@ export class MarketplaceThemesService {
     const theme = await this.findById(id, societeId)
 
     // Deactivate all other themes
-    await this.themeRepo.update(
-      { societeId, isActive: true },
-      { isActive: false }
-    )
+    await this.themeRepo.update({ societeId, isActive: true }, { isActive: false })
 
     // Activate this theme
     theme.isActive = true
@@ -211,11 +204,7 @@ export class MarketplaceThemesService {
   /**
    * Clone an existing theme
    */
-  async clone(
-    id: string,
-    societeId: string,
-    newName: string
-  ): Promise<MarketplaceTheme> {
+  async clone(id: string, societeId: string, newName: string): Promise<MarketplaceTheme> {
     const originalTheme = await this.findById(id, societeId)
 
     // Check if new name already exists
@@ -256,9 +245,13 @@ export class MarketplaceThemesService {
     const previewTheme = this.themeRepo.create({
       ...theme,
       colors: previewDto.colors ? { ...theme.colors, ...previewDto.colors } : theme.colors,
-      typography: previewDto.typography ? { ...theme.typography, ...previewDto.typography } : theme.typography,
+      typography: previewDto.typography
+        ? { ...theme.typography, ...previewDto.typography }
+        : theme.typography,
       layout: previewDto.layout ? { ...theme.layout, ...previewDto.layout } : theme.layout,
-      components: previewDto.components ? { ...theme.components, ...previewDto.components } : theme.components,
+      components: previewDto.components
+        ? { ...theme.components, ...previewDto.components }
+        : theme.components,
       customCSS: previewDto.customCSS ?? theme.customCSS,
     })
 
@@ -305,8 +298,8 @@ export class MarketplaceThemesService {
       where: { societeId },
     })
 
-    const activeTheme = themes.find(t => t.isActive)
-    const customThemes = themes.filter(t => !t.isDefault)
+    const activeTheme = themes.find((t) => t.isActive)
+    const customThemes = themes.filter((t) => !t.isDefault)
 
     return {
       total: themes.length,
@@ -486,10 +479,16 @@ export class MarketplaceThemesService {
    */
   private hasDesignChanges(updateDto: UpdateThemeDto): boolean {
     const designFields = [
-      'colors', 'typography', 'layout', 'components', 
-      'customCSS', 'customJS', 'assets', 'responsive'
+      'colors',
+      'typography',
+      'layout',
+      'components',
+      'customCSS',
+      'customJS',
+      'assets',
+      'responsive',
     ]
-    
-    return designFields.some(field => updateDto[field] !== undefined)
+
+    return designFields.some((field) => updateDto[field] !== undefined)
   }
 }

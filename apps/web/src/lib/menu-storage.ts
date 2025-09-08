@@ -18,15 +18,15 @@ function loadFromStorage<T>(key: string, defaultValue: T): T {
   }
 
   try {
-    const stored = localStorage.getItem(key)
+    const stored = localStorage?.getItem(key)
     if (stored) {
       const parsed = JSON.parse(stored)
       return parsed
     }
   } catch (error) {
     // Seulement signaler les erreurs persistantes, pas les échecs temporaires de parsing
-    if (error instanceof Error && !error.message.includes('JSON')) {
-      syncChecker.addIssue({
+    if (error instanceof Error && !error?.message?.includes('JSON')) {
+      syncChecker?.addIssue({
         type: 'storage',
         severity: 'low', // Réduire la sévérité
         message: `Lecture localStorage ${key} échouée`,
@@ -49,9 +49,9 @@ function saveToStorage<T>(key: string, value: T): void {
     // Seulement signaler les erreurs critiques de sauvegarde (quota dépassé, etc.)
     if (
       error instanceof Error &&
-      (error.name === 'QuotaExceededError' || error.message.includes('quota'))
+      (error.name === 'QuotaExceededError' || error?.message?.includes('quota'))
     ) {
-      syncChecker.addIssue({
+      syncChecker?.addIssue({
         type: 'storage',
         severity: 'high',
         message: `Espace localStorage insuffisant pour ${key}`,
@@ -88,7 +88,7 @@ export const menuStorage = {
           Object.keys(stored).length > 0 &&
           JSON.stringify(memorySelectedPages) !== JSON.stringify(stored)
         ) {
-          syncChecker.checkStorageConsistency('selected-pages', memorySelectedPages, stored)
+          syncChecker?.checkStorageConsistency('selected-pages', memorySelectedPages, stored)
         }
       } catch {
         // Ignorer les erreurs de comparaison temporaires
@@ -115,7 +115,7 @@ export const menuStorage = {
           Object.keys(stored).length > 0 &&
           JSON.stringify(memoryPreferences) !== JSON.stringify(stored)
         ) {
-          syncChecker.checkStorageConsistency('user-preferences', memoryPreferences, stored)
+          syncChecker?.checkStorageConsistency('user-preferences', memoryPreferences, stored)
         }
       } catch {
         // Ignorer les erreurs de comparaison temporaires

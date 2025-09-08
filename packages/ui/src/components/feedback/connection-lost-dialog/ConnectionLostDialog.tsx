@@ -105,7 +105,7 @@ export function ConnectionLostDialog({
         </DialogHeader>
 
         <div className="flex flex-col gap-3 pt-4">
-          <Button onClick={handleRetry} disabled={isRetrying} className="w-full">
+          <Button type="button" onClick={handleRetry} disabled={isRetrying} className="w-full">
             {isRetrying ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -121,6 +121,7 @@ export function ConnectionLostDialog({
 
           {onGoToLogin && (
             <Button
+              type="button"
               variant="outline"
               onClick={handleGoToLogin}
               disabled={isRetrying}

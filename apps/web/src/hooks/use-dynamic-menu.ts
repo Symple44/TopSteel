@@ -1,17 +1,48 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { apiClient } from '@/lib/api-client-instance'
+import { fetchTyped } from '@/lib/api-typed'
 import { translator } from '@/lib/i18n/translator'
 import { useMenuMode } from './use-menu-mode'
 import { usePermissions } from './use-permissions-v2'
 
+// Types pour les réponses API
+interface MenuApiResponse {
+  success: boolean
+  data: MenuItemConfig[]
+}
+
+interface MenuConfigResponse {
+  success: boolean
+  data: {
+    menuTree: MenuItemConfig[]
+    configuration: MenuConfiguration
+  }
+}
+
 // Fonction pour mapper les données du menu personnalisé vers la structure attendue
-function mapCustomMenuItemRecursively(item: any): MenuItemConfig {
+function mapCustomMenuItemRecursively(item: Record<string, unknown>): MenuItemConfig {
   return {
-    ...item,
-    // Inclure les traductions
+    id: item.id,
+    parentId: item.parentId,
+    title: item.title,
+    titleKey: item.titleKey,
     titleTranslations: item.titleTranslations || {},
+    href: item.href,
+    icon: item.icon,
+    gradient: item.gradient,
+    badge: item.badge,
+    orderIndex: item.orderIndex || 0,
+    isVisible: item.isVisible ?? true,
+    moduleId: item.moduleId,
+    target: item.target,
+    type: item.type,
+    programId: item.programId,
+    externalUrl: item.externalUrl,
+    queryBuilderId: item.queryBuilderId,
+    permissions: item.permissions,
+    roles: item.roles,
+    depth: item.depth || 0,
     // Mapper les propriétés personnalisées vers userPreferences
     userPreferences: {
       isVisible: item.isVisible ?? true,
@@ -25,7 +56,7 @@ function mapCustomMenuItemRecursively(item: any): MenuItemConfig {
     },
     // Traiter récursivement les enfants
     children: Array.isArray(item.children)
-      ? item.children.map((child: any) => mapCustomMenuItemRecursively(child))
+      ? item.children.map((child: Record<string, unknown>) => mapCustomMenuItemRecursively(child))
       : [],
   }
 }
@@ -92,14 +123,11 @@ export function useDynamicMenu() {
 
       // Charger le menu personnalisé depuis l'API
       try {
-        const response = await apiClient.get('/user/menu-preferences/custom-menu')
+        const response = await fetchTyped<MenuApiResponse>('/user/menu-preferences/custom-menu')
 
-        if (
-          (response as Record<string, unknown>).data?.success &&
-          Array.isArray((response as Record<string, unknown>).data.data)
-        ) {
+        if (response.success && Array.isArray(response.data)) {
           // Mapper les données pour inclure les préférences personnalisées dans la structure attendue
-          const menuItems = (response as Record<string, unknown>).data.data.map((item: any) =>
+          const menuItems = response.data.map((item: Record<string, unknown>) =>
             mapCustomMenuItemRecursively(item)
           )
           setCustomMenu(menuItems)
@@ -125,18 +153,13 @@ export function useDynamicMenu() {
 
       // Pour le menu standard, utiliser la configuration active de la base de données
       // MAIS sans les préférences utilisateur personnalisées
-      const response = await apiClient.get('/admin/menu-raw/configurations/active')
+      const response = await fetchTyped<MenuConfigResponse>('/admin/menu-raw/configurations/active')
 
-      if (
-        (response as Record<string, unknown>).data?.success &&
-        (response as Record<string, unknown>).data.data
-      ) {
+      if (response.success && response.data) {
         // Utiliser le menuTree de la configuration active
-        const menuItems = Array.isArray((response as Record<string, unknown>).data.data.menuTree)
-          ? (response as Record<string, unknown>).data.data.menuTree
-          : []
+        const menuItems = Array.isArray(response.data.menuTree) ? response.data.menuTree : []
         setStandardMenu(menuItems)
-        setMenuConfig((response as Record<string, unknown>).data.data.configuration)
+        setMenuConfig(response.data.configuration)
       } else {
         setStandardMenu([])
       }
@@ -162,23 +185,23 @@ export function useDynamicMenu() {
 
       // Si aucune restriction, autoriser l'accès
       if (
-        (!item.roles || item.roles.length === 0) &&
-        (!item.permissions || item.permissions.length === 0)
+        (!item.roles || item?.roles?.length === 0) &&
+        (!item.permissions || item?.permissions?.length === 0)
       ) {
         return true
       }
 
       // Vérifier les rôles
-      if (item.roles && item.roles.length > 0) {
-        const hasRequiredRole = item.roles.some((role) => hasRole(role))
+      if (item.roles && item?.roles?.length > 0) {
+        const hasRequiredRole = item?.roles?.some((role) => hasRole(role))
         if (!hasRequiredRole) {
           return false
         }
       }
 
       // Vérifier les permissions
-      if (item.permissions && item.permissions.length > 0) {
-        const hasRequiredPermission = item.permissions.some((permission) =>
+      if (item.permissions && item?.permissions?.length > 0) {
+        const hasRequiredPermission = item?.permissions?.some((permission) =>
           hasPermission(permission)
         )
         if (!hasRequiredPermission) {
@@ -219,7 +242,7 @@ export function useDynamicMenu() {
             item.programId ||
             item.externalUrl ||
             item.queryBuilderId ||
-            (item.children && item.children.length > 0)
+            (item.children && item?.children?.length > 0)
           return hasValidLink
         })
 
@@ -244,8 +267,8 @@ export function useDynamicMenu() {
     const handleMenuPreferencesChange = async (event: Event) => {
       const customEvent = event as CustomEvent
       // Si l'événement contient directement les données du menu, les utiliser
-      if (customEvent.detail?.menuItems && mode === 'custom') {
-        const mappedItems = customEvent.detail.menuItems.map((item: any) =>
+      if (customEvent?.detail?.menuItems && mode === 'custom') {
+        const mappedItems = customEvent?.detail?.menuItems?.map((item: unknown) =>
           mapCustomMenuItemRecursively(item)
         )
         setCustomMenu(mappedItems)
@@ -270,7 +293,7 @@ export function useDynamicMenu() {
 
   // Effet pour recharger les menus quand la langue change
   useEffect(() => {
-    const unsubscribe = translator.subscribe(() => {
+    const unsubscribe = translator?.subscribe(() => {
       // Forcer un re-render quand la langue change pour mettre à jour les traductions
       setRefreshKey((prev) => prev + 1)
     })
@@ -330,8 +353,8 @@ export function useMenu() {
 }
 
 // Utilitaires pour convertir les items de menu en format compatible avec la sidebar existante
-export function convertToNavItems(menuItems: MenuItemConfig[]): any[] {
-  return menuItems.map((item) => {
+export function convertToNavItems(menuItems: MenuItemConfig[]): unknown[] {
+  return menuItems?.map((item) => {
     // Générer l'URL basée sur le type de menu
     let href: string | undefined
 
@@ -357,7 +380,7 @@ export function convertToNavItems(menuItems: MenuItemConfig[]): any[] {
       badge: item.badge,
       gradient: item.gradient,
       target: item.type === 'L' || item.type === 'D' ? '_blank' : undefined,
-      children: item.children.length > 0 ? convertToNavItems(item.children) : undefined,
+      children: item?.children?.length > 0 ? convertToNavItems(item.children) : undefined,
       roles: item.roles,
       menuType: item.type,
       isFolder: item.type === 'M',

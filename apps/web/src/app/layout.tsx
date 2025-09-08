@@ -6,6 +6,7 @@ export const revalidate = 0
 
 import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
+import { getCSPNonce } from '@/lib/security/csp-nonce'
 import { Providers } from './providers'
 // import { logStartupInfo } from '@/lib/startup-logger'
 
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000'),
+  metadataBase: new URL(process?.env?.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000'),
   robots: {
     index: false,
     follow: false,
@@ -76,8 +77,15 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Get CSP nonce from headers for client-side access
+  const nonce = getCSPNonce()
+
   return (
-    <html lang="fr" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
+    <html lang="fr" className={`${inter?.variable} ${poppins?.variable}`} suppressHydrationWarning>
+      <head>
+        {/* CSP Nonce meta tag for client-side access */}
+        {nonce && <meta name="csp-nonce" content={nonce} />}
+      </head>
       <body
         className="font-inter antialiased bg-background text-foreground"
         suppressHydrationWarning

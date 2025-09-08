@@ -1,5 +1,5 @@
 import { BusinessEntity } from '@erp/entities'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 
 /**
  * Types de matériaux supportés
@@ -195,42 +195,61 @@ export interface ProductionInfo {
  * Entité Material - Gestion avancée des matériaux industriels
  */
 @Entity('materials')
+@Index(['reference'], { unique: true }) // Unique material reference
+@Index(['type', 'status']) // Material type and status filtering
+@Index(['forme', 'type']) // Shape and type combination queries
+@Index(['status', 'stockPhysique']) // Active materials with stock
+@Index(['societeId', 'status', 'type']) // Multi-tenant material queries
+@Index(['stockMini', 'stockPhysique']) // Stock level monitoring
+@Index(['prixUnitaire']) // Price-based queries
+@Index(['emplacement']) // Location-based queries
+@Index(['dateCreationFiche']) // Creation date tracking
+@Index(['dateDerniereEntree']) // Last stock entry tracking
+@Index(['dateDernierInventaire']) // Inventory tracking
 export class Material extends BusinessEntity {
   /**
    * Note: id est héritée de BaseEntity via CommonEntity
    */
 
   @Column({ type: 'varchar', length: 100, unique: true })
+  @Index({ unique: true }) // Unique index for material reference
   reference!: string
 
   @Column({ type: 'varchar', length: 255 })
+  @Index() // Index for material name searches
   nom!: string
 
   @Column({ type: 'text', nullable: true })
   description?: string
 
   @Column({ type: 'enum', enum: MaterialType })
+  @Index() // Index for material type filtering
   type!: MaterialType
 
   @Column({ type: 'enum', enum: MaterialShape })
+  @Index() // Index for material shape filtering
   forme!: MaterialShape
 
   @Column({ type: 'enum', enum: MaterialStatus, default: MaterialStatus.ACTIF })
+  @Index() // Index for material status filtering
   status!: MaterialStatus
 
   @Column({ type: 'varchar', length: 100, nullable: true })
+  @Index() // Index for material grade searches
   nuance?: string
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   qualite?: string
 
   @Column({ type: 'varchar', length: 100, nullable: true })
+  @Index() // Index for brand-based searches
   marque?: string
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   modele?: string
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for dimension queries
   dimensions!: MaterialDimensions
 
   @Column({ type: 'decimal', precision: 10, scale: 3, nullable: true })
@@ -240,9 +259,11 @@ export class Material extends BusinessEntity {
   densite?: number
 
   @Column({ type: 'enum', enum: MaterialUnit, default: MaterialUnit.KG })
+  @Index() // Index for unit-based queries
   unite!: MaterialUnit
 
   @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Index() // Index for price-based queries
   prixUnitaire?: number
 
   @Column({ type: 'varchar', length: 10, default: 'EUR' })
@@ -255,36 +276,46 @@ export class Material extends BusinessEntity {
   stockMaxi!: number
 
   @Column({ type: 'decimal', precision: 10, scale: 3, default: 0 })
+  @Index() // Index for stock level queries
   stockPhysique!: number
 
   @Column({ type: 'decimal', precision: 10, scale: 3, default: 0 })
   stockReserve!: number
 
   @Column({ type: 'varchar', length: 100, nullable: true })
+  @Index() // Index for location-based queries
   emplacement?: string
 
   @Column({ type: 'enum', enum: StorageMethod, default: StorageMethod.STANDARD })
+  @Index() // Index for storage method queries
   methodeStockage!: StorageMethod
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for mechanical properties queries
   proprietesMecaniques!: MechanicalProperties
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for physical properties queries
   proprietesPhysiques!: PhysicalProperties
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for chemical properties queries
   proprietesChimiques!: ChemicalProperties
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for certification queries
   certifications!: MaterialCertifications
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for supply info queries
   informationsApprovisionnement!: SupplyInfo
 
   @Column({ type: 'jsonb', default: {} })
+  @Index() // GIN index for production info queries
   informationsProduction!: ProductionInfo
 
   @Column({ type: 'boolean', default: false })
+  @Index() // Index for hazardous material filtering
   dangereux!: boolean
 
   @Column({ type: 'varchar', length: 50, nullable: true })
@@ -294,6 +325,7 @@ export class Material extends BusinessEntity {
   precautionsManipulation?: string
 
   @Column({ type: 'boolean', default: false })
+  @Index() // Index for obsolete material filtering
   obsolete!: boolean
 
   @Column({ type: 'varchar', length: 100, nullable: true })
@@ -303,21 +335,26 @@ export class Material extends BusinessEntity {
   notes?: string
 
   @Column({ type: 'uuid', nullable: true })
+  @Index() // Index for shared material linkage
   sharedMaterialId?: string
 
   @Column({ type: 'timestamp', nullable: true })
+  @Index() // Index for last stock entry tracking
   dateDerniereEntree?: Date
 
   @Column({ type: 'timestamp', nullable: true })
+  @Index() // Index for last stock exit tracking
   dateDerniereSortie?: Date
 
   @Column({ type: 'timestamp', nullable: true })
+  @Index() // Index for last inventory tracking
   dateDernierInventaire?: Date
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   dateCreationFiche!: Date
 
   @Column({ type: 'jsonb', nullable: true })
+  @Index() // GIN index for metadata queries
   metadonnees?: Record<string, unknown>
 
   /**
@@ -527,7 +564,7 @@ export class Material extends BusinessEntity {
     if (!this.metadonnees) this.metadonnees = {}
     if (!(this.metadonnees as Record<string, unknown>).historique)
       (this.metadonnees as Record<string, unknown>).historique = []
-    ;(this.metadonnees as any).historique.push({
+    ;(this.metadonnees as unknown).historique.push({
       date: new Date(),
       utilisateur,
       champ,
@@ -536,8 +573,8 @@ export class Material extends BusinessEntity {
     })
 
     // Garder seulement les 100 dernières modifications
-    if ((this.metadonnees as any).historique.length > 100) {
-      ;(this.metadonnees as any).historique = (this.metadonnees as any).historique.slice(-100)
+    if ((this.metadonnees as unknown).historique.length > 100) {
+      ;(this.metadonnees as unknown).historique = (this.metadonnees as unknown).historique.slice(-100)
     }
   }
 

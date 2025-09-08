@@ -14,11 +14,11 @@ export async function GET(request: NextRequest) {
     // Essayer de faire la requête avec authentification
     const response = await callBackendFromApi(request, 'user/menu-preferences')
 
-    if (response.ok) {
-      const data = await response.json()
-      return NextResponse.json(data)
+    if (response?.ok) {
+      const data = await response?.json()
+      return NextResponse?.json(data)
     } else {
-      throw new Error(`Backend error: ${response.status}`)
+      throw new Error(`Backend error: ${response?.status}`)
     }
   } catch (error) {
     // Si c'est un problème d'auth, retourner une erreur 401
@@ -26,14 +26,14 @@ export async function GET(request: NextRequest) {
       error instanceof Error &&
       (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN')
     ) {
-      return NextResponse.json(
+      return NextResponse?.json(
         { success: false, message: 'Authentification requise' },
         { status: 401 }
       )
     }
 
     // Pour toute autre erreur, retourner une erreur 500
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors du chargement des préférences',
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request?.json()
 
     // Essayer de faire la requête avec authentification
     const response = await callBackendFromApi(request, 'user/menu-preferences', {
@@ -54,11 +54,11 @@ export async function PUT(request: NextRequest) {
       body: JSON.stringify(body),
     })
 
-    if (response.ok) {
-      const data = await response.json()
-      return NextResponse.json(data)
+    if (response?.ok) {
+      const data = await response?.json()
+      return NextResponse?.json(data)
     } else {
-      throw new Error(`Backend error: ${response.status}`)
+      throw new Error(`Backend error: ${response?.status}`)
     }
   } catch (error) {
     // Si c'est un problème d'auth
@@ -66,14 +66,14 @@ export async function PUT(request: NextRequest) {
       error instanceof Error &&
       (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN')
     ) {
-      return NextResponse.json(
+      return NextResponse?.json(
         { success: false, message: 'Authentification requise pour modifier les préférences' },
         { status: 401 }
       )
     }
 
     // Pour les autres erreurs, retourner une erreur 500
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors de la mise à jour des préférences',

@@ -1,5 +1,18 @@
 'use client'
 import {
+  CheckCircle,
+  Clock,
+  Copy,
+  Download,
+  Edit,
+  Eye,
+  FileText,
+  MoreHorizontal,
+  Send,
+  Trash2,
+  XCircle,
+} from 'lucide-react'
+import {
   Table,
   TableBody,
   TableCell,
@@ -7,21 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Download, 
-  Send,
-  Copy,
-  FileText,
-  CheckCircle,
-  Clock,
-  XCircle
-} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +28,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
+import { Badge } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Quote {
   id: string
   number: string
@@ -71,16 +71,16 @@ interface QuotesTableProps {
   onDuplicate?: (quote: Quote) => void
   onConvertToInvoice?: (quote: Quote) => void
 }
-export function QuotesTable({ 
-  data = [], 
-  loading = false, 
+export function QuotesTable({
+  data = [],
+  loading = false,
   onView,
-  onEdit, 
+  onEdit,
   onDelete,
   onDownload,
   onSend,
   onDuplicate,
-  onConvertToInvoice
+  onConvertToInvoice,
 }: QuotesTableProps) {
   if (loading) {
     return (
@@ -94,35 +94,35 @@ export function QuotesTable({
   }
   const getStatusBadge = (status: Quote['status']) => {
     const variants = {
-      draft: { 
-        label: 'Brouillon', 
+      draft: {
+        label: 'Brouillon',
         className: 'bg-gray-100 text-gray-800',
-        icon: <Edit className="h-3 w-3" />
+        icon: <Edit className="h-3 w-3" />,
       },
-      sent: { 
-        label: 'Envoyé', 
+      sent: {
+        label: 'Envoyé',
         className: 'bg-blue-100 text-blue-800',
-        icon: <Send className="h-3 w-3" />
+        icon: <Send className="h-3 w-3" />,
       },
-      accepted: { 
-        label: 'Accepté', 
+      accepted: {
+        label: 'Accepté',
         className: 'bg-green-100 text-green-800',
-        icon: <CheckCircle className="h-3 w-3" />
+        icon: <CheckCircle className="h-3 w-3" />,
       },
-      rejected: { 
-        label: 'Refusé', 
+      rejected: {
+        label: 'Refusé',
         className: 'bg-red-100 text-red-800',
-        icon: <XCircle className="h-3 w-3" />
+        icon: <XCircle className="h-3 w-3" />,
       },
-      expired: { 
-        label: 'Expiré', 
+      expired: {
+        label: 'Expiré',
         className: 'bg-orange-100 text-orange-800',
-        icon: <Clock className="h-3 w-3" />
+        icon: <Clock className="h-3 w-3" />,
       },
-      converted: { 
-        label: 'Converti', 
+      converted: {
+        label: 'Converti',
         className: 'bg-purple-100 text-purple-800',
-        icon: <FileText className="h-3 w-3" />
+        icon: <FileText className="h-3 w-3" />,
       },
     }
     const variant = variants[status] || variants.draft
@@ -175,16 +175,15 @@ export function QuotesTable({
           ) : (
             data.map((quote) => {
               const daysUntilExpiry = getDaysUntilExpiry(quote.validUntil)
-              const isExpiring = quote.status === 'sent' && daysUntilExpiry <= 7 && daysUntilExpiry > 0
+              const isExpiring =
+                quote.status === 'sent' && daysUntilExpiry <= 7 && daysUntilExpiry > 0
               const isExpired = quote.status === 'sent' && daysUntilExpiry <= 0
               return (
                 <TableRow key={quote.id}>
                   <TableCell className="font-medium">
                     {quote.number}
                     {quote.reference && (
-                      <div className="text-xs text-muted-foreground">
-                        Réf: {quote.reference}
-                      </div>
+                      <div className="text-xs text-muted-foreground">Réf: {quote.reference}</div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -192,7 +191,9 @@ export function QuotesTable({
                   </TableCell>
                   <TableCell>{formatDate(quote.date)}</TableCell>
                   <TableCell>
-                    <div className={isExpired ? 'text-red-600' : isExpiring ? 'text-orange-600' : ''}>
+                    <div
+                      className={isExpired ? 'text-red-600' : isExpiring ? 'text-orange-600' : ''}
+                    >
                       {formatDate(quote.validUntil)}
                       {quote.status === 'sent' && (
                         <div className="text-xs">
@@ -213,9 +214,7 @@ export function QuotesTable({
                   </TableCell>
                   <TableCell className="text-right">
                     {formatCurrency(quote.tax, quote.currency)}
-                    <div className="text-xs text-muted-foreground">
-                      {quote.taxRate}%
-                    </div>
+                    <div className="text-xs text-muted-foreground">{quote.taxRate}%</div>
                   </TableCell>
                   <TableCell className="text-right font-medium">
                     {formatCurrency(quote.total, quote.currency)}
@@ -228,7 +227,7 @@ export function QuotesTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -260,7 +259,7 @@ export function QuotesTable({
                           Dupliquer
                         </DropdownMenuItem>
                         {quote.status === 'accepted' && !quote.convertedToInvoiceId && (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onConvertToInvoice?.(quote)}
                             className="text-green-600"
                           >
@@ -269,7 +268,7 @@ export function QuotesTable({
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => onDelete?.(quote)}
                           className="text-red-600"
                           disabled={quote.status === 'converted'}

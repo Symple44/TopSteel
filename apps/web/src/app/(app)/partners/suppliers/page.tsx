@@ -1,6 +1,6 @@
 'use client'
 
-import type { Partner, PartnerFilters, PartnerStatus } from '@erp/types'
+import type { Partner, PartnerFilters, PartnerStatistics, PartnerStatus } from '@erp/types'
 import { PartnerType } from '@erp/types'
 import {
   Badge,
@@ -9,14 +9,14 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  type ColumnConfig,
-  AdvancedDataTable as DataTable,
+  DataTable,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
+import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
 import { Building2, Download, Plus, Upload } from 'lucide-react'
 import { useState } from 'react'
 import { PartnerDetailDialog } from '@/components/partners/partner-detail-dialog'
@@ -30,8 +30,11 @@ export default function SuppliersPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null)
 
-  const { data: partners = [], isLoading } = usePartners(filters)
-  const { data: statistics } = usePartnerStatistics()
+  const partnersQuery = usePartners(filters)
+  const { data: partnersResponse, isLoading } = partnersQuery
+  const partners = partnersResponse?.items ?? []
+  const statisticsQuery = usePartnerStatistics()
+  const { data: statistics }: { data: PartnerStatistics | undefined } = statisticsQuery
   const deletePartner = useDeletePartner()
 
   const handleCreate = () => {
@@ -51,89 +54,87 @@ export default function SuppliersPage() {
 
   const handleDelete = async (partner: Partner) => {
     if (confirm(`Êtes-vous sûr de vouloir supprimer ${partner.denomination} ?`)) {
-      await deletePartner.mutateAsync(partner.id)
+      await deletePartner?.mutateAsync(partner.id)
     }
   }
 
   const columns: ColumnConfig<Partner>[] = [
     {
+      id: 'code',
       key: 'code',
-      header: 'Code',
+      title: 'Code',
       sortable: true,
       width: 120,
+      type: 'text',
     },
     {
+      id: 'denomination',
       key: 'denomination',
-      header: 'Dénomination',
+      title: 'Dénomination',
       sortable: true,
-      searchable: true,
+      type: 'text',
     },
     {
+      id: 'category',
       key: 'category',
-      header: 'Catégorie',
+      title: 'Catégorie',
       width: 150,
+      type: 'text',
     },
     {
+      id: 'ville',
       key: 'ville',
-      header: 'Ville',
+      title: 'Ville',
       sortable: true,
-      searchable: true,
+      type: 'text',
     },
     {
+      id: 'telephone',
       key: 'telephone',
-      header: 'Téléphone',
+      title: 'Téléphone',
       width: 150,
+      type: 'text',
     },
     {
+      id: 'email',
       key: 'email',
-      header: 'Email',
+      title: 'Email',
       width: 200,
+      type: 'text',
     },
     {
+      id: 'delaiPaiement',
       key: 'delaiPaiement',
-      header: 'Délai paiement',
+      title: 'Délai paiement',
       width: 150,
-      render: (partner) => (partner.delaiPaiement ? `${partner.delaiPaiement} jours` : '-'),
+      type: 'text',
+      render: (_value: unknown, partner: Partner, _column: ColumnConfig<Partner>) =>
+        partner.delaiPaiement ? `${partner.delaiPaiement} jours` : '-',
     },
     {
+      id: 'status',
       key: 'status',
-      header: 'Statut',
+      title: 'Statut',
       width: 120,
-      render: (partner) => {
-        const variants: Record<PartnerStatus, 'default' | 'secondary' | 'destructive' | 'outline'> =
-          {
-            ACTIF: 'default',
-            INACTIF: 'secondary',
-            PROSPECT: 'outline',
-            SUSPENDU: 'destructive',
-            ARCHIVE: 'secondary',
-          }
-        return <Badge variant={variants[partner.status]}>{partner.status}</Badge>
-      },
+      type: 'text',
+      render: (_value: unknown, partner: Partner, _column: ColumnConfig<Partner>) => (
+        <Badge variant={partner.status === 'ACTIF' ? 'default' : 'secondary'}>
+          {partner.status}
+        </Badge>
+      ),
     },
     {
+      id: 'group',
       key: 'group',
-      header: 'Groupe',
+      title: 'Groupe',
       width: 150,
-      render: (partner) => partner.group?.name || '-',
+      type: 'text',
+      render: (_value: unknown, partner: Partner, _column: ColumnConfig<Partner>) =>
+        partner.group?.name || '-',
     },
   ]
 
-  const _actions = [
-    {
-      header: 'Voir',
-      onClick: handleView,
-    },
-    {
-      header: 'Modifier',
-      onClick: handleEdit,
-    },
-    {
-      header: 'Supprimer',
-      onClick: handleDelete,
-      variant: 'destructive' as const,
-    },
-  ]
+  // const _actions = [...] removed - unused actions array
 
   return (
     <div className="space-y-6">
@@ -144,15 +145,15 @@ export default function SuppliersPage() {
           <p className="text-muted-foreground">Gérez vos fournisseurs et partenaires commerciaux</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button type="button" variant="outline" size="sm">
             <Upload className="mr-2 h-4 w-4" />
             Importer
           </Button>
-          <Button variant="outline" size="sm">
+          <Button type="button" variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4" />
             Exporter
           </Button>
-          <Button onClick={handleCreate}>
+          <Button type="button" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
             Nouveau fournisseur
           </Button>

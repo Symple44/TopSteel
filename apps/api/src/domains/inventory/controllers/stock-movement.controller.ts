@@ -307,8 +307,8 @@ export class StockMovementController {
   })
   async getArticleMovementHistory(
     @Param('articleId', ParseUUIDPipe) articleId: string,
-    @Query('limit') limit?: number,
-    @Query('includeAnnule') includeAnnule?: boolean
+    @Query('limit') _limit?: number,
+    @Query('includeAnnule') _includeAnnule?: boolean
   ): Promise<IStockMovement[]> {
     return await this.stockMovementService.getAllByArticle(articleId)
   }
@@ -377,7 +377,7 @@ import { BadRequestException, Injectable, type PipeTransform } from '@nestjs/com
 
 @Injectable()
 export class ParseDatePipe implements PipeTransform {
-  transform(value: any): Date {
+  transform(value: unknown): Date {
     const date = new Date(value)
     if (Number.isNaN(date.getTime())) {
       throw new BadRequestException('Date invalide')
@@ -386,6 +386,5 @@ export class ParseDatePipe implements PipeTransform {
   }
 }
 
-import { NotFoundException } from '@nestjs/common'
 // Imports manquants
 import { ApiProperty } from '@nestjs/swagger'

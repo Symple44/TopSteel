@@ -25,8 +25,10 @@ import {
 import { IsArray, IsBoolean, IsEnum, IsOptional, IsString, IsUrl } from 'class-validator'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { Roles } from '../../../core/common/decorators/roles.decorator'
+import { getErrorMessage } from '../../../core/common/utils'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
+import { SkipCsrf } from '../../../infrastructure/security/csrf'
 import type { PricingWebhooksService } from '../services/pricing-webhooks.service'
 import type { AuthenticatedUser } from '../types/auth.types'
 import { WebhookEventType } from '../types/webhook.types'
@@ -98,6 +100,7 @@ export class PricingWebhooksController {
 
   constructor(private readonly webhooksService: PricingWebhooksService) {}
 
+  @SkipCsrf()
   @Post('subscriptions')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -138,7 +141,7 @@ export class PricingWebhooksController {
       }
     } catch (error) {
       this.logger.error('Erreur création webhook:', error)
-      throw new BadRequestException(`Erreur création webhook: ${error.message}`)
+      throw new BadRequestException(`Erreur création webhook: ${getErrorMessage(error)}`)
     }
   }
 
@@ -237,6 +240,7 @@ export class PricingWebhooksController {
     }
   }
 
+  @SkipCsrf()
   @Post('test')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -287,7 +291,7 @@ export class PricingWebhooksController {
       this.logger.error('Erreur test webhook:', error)
       return {
         success: false,
-        error: error.message,
+        error: getErrorMessage(error),
         statusCode: 0,
         responseTime: 0,
       }

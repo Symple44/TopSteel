@@ -1,45 +1,41 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { FileText, Plus, Trash2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Plus, Trash2, Calculator, FileText, User, Calendar, Package } from 'lucide-react'
 import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea,
-  Label
-} from '../../../primitives'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '../../../forms'
+} from '../../../primitives/select/select'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Quote line item schema
 const quoteLineSchema = z.object({
   description: z.string().min(1, 'La description est obligatoire'),
   quantity: z.number().positive('La quantité doit être positive'),
   unitPrice: z.number().positive('Le prix unitaire doit être positif'),
-  discount: z.number().min(0).max(100).default(0)
+  discount: z.number().min(0).max(100).default(0),
 })
 // Main quote schema
 const quoteSchema = z.object({
   quoteNumber: z.string().min(1, 'Le numéro de devis est obligatoire'),
   clientId: z.string().min(1, 'Le client est obligatoire'),
-  issueDate: z.string().min(1, 'La date d\'émission est obligatoire'),
+  issueDate: z.string().min(1, "La date d'émission est obligatoire"),
   validUntil: z.string().min(1, 'La date de validité est obligatoire'),
   projectId: z.string().optional(),
   lines: z.array(quoteLineSchema).min(1, 'Au moins une ligne est requise'),
@@ -47,7 +43,7 @@ const quoteSchema = z.object({
   notes: z.string().optional(),
   currency: z.string().default('EUR'),
   validityPeriod: z.number().default(30),
-  globalDiscount: z.number().min(0).max(100).default(0)
+  globalDiscount: z.number().min(0).max(100).default(0),
 })
 type QuoteFormData = z.infer<typeof quoteSchema>
 interface Client {
@@ -62,21 +58,24 @@ interface CreateQuoteDialogProps {
   clients?: Client[]
   defaultClientId?: string
 }
-export function CreateQuoteDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function CreateQuoteDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   clients = [],
-  defaultClientId
+  defaultClientId,
 }: CreateQuoteDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const mockClients: Client[] = useMemo(() => [
-    { id: '1', name: 'Société ABC', email: 'contact@abc.fr' },
-    { id: '2', name: 'Construction XYZ', email: 'admin@xyz.fr' }
-  ], [])
+  const mockClients: Client[] = useMemo(
+    () => [
+      { id: '1', name: 'Société ABC', email: 'contact@abc.fr' },
+      { id: '2', name: 'Construction XYZ', email: 'admin@xyz.fr' },
+    ],
+    []
+  )
   const availableClients = clients.length > 0 ? clients : mockClients
-  const form = useForm<QuoteFormData>({
+  const form = useForm({
     resolver: zodResolver(quoteSchema),
     defaultValues: {
       quoteNumber: '',
@@ -84,22 +83,24 @@ export function CreateQuoteDialog({
       issueDate: new Date().toISOString().split('T')[0],
       validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       projectId: '',
-      lines: [{
-        description: '',
-        quantity: 1,
-        unitPrice: 0,
-        discount: 0
-      }],
+      lines: [
+        {
+          description: '',
+          quantity: 1,
+          unitPrice: 0,
+          discount: 0,
+        },
+      ],
       terms: 'Devis valable 30 jours. Prix indicatif, non contractuel.',
       notes: '',
       currency: 'EUR',
       validityPeriod: 30,
-      globalDiscount: 0
-    }
+      globalDiscount: 0,
+    },
   })
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'lines'
+    name: 'lines',
   })
   const watchedLines = form.watch('lines')
   const watchedGlobalDiscount = form.watch('globalDiscount')
@@ -109,7 +110,9 @@ export function CreateQuoteDialog({
       const date = new Date()
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
-      const quoteNumber = `DEVIS-${year}${month}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+      const quoteNumber = `DEVIS-${year}${month}-${Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, '0')}`
       form.setValue('quoteNumber', quoteNumber)
     }
   }, [open, form])
@@ -117,15 +120,15 @@ export function CreateQuoteDialog({
   const calculations = useMemo(() => {
     const subtotal = watchedLines.reduce((sum, line) => {
       const lineTotal = line.quantity * line.unitPrice
-      const lineDiscount = lineTotal * (line.discount || 0) / 100
+      const lineDiscount = (lineTotal * (line.discount || 0)) / 100
       return sum + (lineTotal - lineDiscount)
     }, 0)
-    const globalDiscountAmount = subtotal * (watchedGlobalDiscount || 0) / 100
+    const globalDiscountAmount = (subtotal * (watchedGlobalDiscount || 0)) / 100
     const totalAmount = subtotal - globalDiscountAmount
     return {
       subtotal,
       globalDiscountAmount,
-      totalAmount
+      totalAmount,
     }
   }, [watchedLines, watchedGlobalDiscount])
   const handleSubmit = async (data: QuoteFormData) => {
@@ -153,7 +156,7 @@ export function CreateQuoteDialog({
       description: '',
       quantity: 1,
       unitPrice: 0,
-      discount: 0
+      discount: 0,
     })
   }
   return (
@@ -233,7 +236,7 @@ export function CreateQuoteDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {availableClients.map(client => (
+                          {availableClients.map((client) => (
                             <SelectItem key={client.id} value={client.id}>
                               {client.name}
                             </SelectItem>
@@ -255,7 +258,7 @@ export function CreateQuoteDialog({
                           type="number"
                           placeholder="30"
                           {...field}
-                          onChange={e => field.onChange(parseInt(e.target.value) || 30)}
+                          onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 30)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -299,10 +302,7 @@ export function CreateQuoteDialog({
                             <FormItem>
                               <FormLabel>Description *</FormLabel>
                               <FormControl>
-                                <Textarea 
-                                  placeholder="Description du produit/service"
-                                  {...field} 
-                                />
+                                <Textarea placeholder="Description du produit/service" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -321,7 +321,7 @@ export function CreateQuoteDialog({
                                 step="0.01"
                                 placeholder="1"
                                 {...field}
-                                onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                               />
                             </FormControl>
                             <FormMessage />
@@ -340,7 +340,7 @@ export function CreateQuoteDialog({
                                 step="0.01"
                                 placeholder="0.00"
                                 {...field}
-                                onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                               />
                             </FormControl>
                             <FormMessage />
@@ -351,7 +351,8 @@ export function CreateQuoteDialog({
                     <div className="mt-3 pt-3 border-t bg-gray-50 rounded p-2">
                       <div className="text-sm text-right">
                         <span className="font-medium">
-                          Total ligne: {((field.quantity || 0) * (field.unitPrice || 0)).toFixed(2)} €
+                          Total ligne: {((field.quantity || 0) * (field.unitPrice || 0)).toFixed(2)}{' '}
+                          €
                         </span>
                       </div>
                     </div>
@@ -374,7 +375,7 @@ export function CreateQuoteDialog({
                           step="0.1"
                           placeholder="0"
                           {...field}
-                          onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -439,12 +440,7 @@ export function CreateQuoteDialog({
               )}
             />
             <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                 Annuler
               </Button>
               <Button type="submit" disabled={loading}>

@@ -1,32 +1,46 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useId, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState } from 'react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardHeader, CardTitle } from '../../../layout/card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+
 // Client validation schema
 const clientSchema = z.object({
   // Company Information
-  companyName: z.string().min(1, 'Le nom de l\'entreprise est requis'),
+  companyName: z.string().min(1, "Le nom de l'entreprise est requis"),
   siret: z.string().optional(),
   tvaNumber: z.string().optional(),
-  companyType: z.enum(['SARL', 'SAS', 'SA', 'EI', 'EURL', 'SCI', 'Autre']),
+  companyType: z.enum(['SARL', 'SAS', 'SA', 'EI', 'EURL', 'SCI', 'Autre']).default('SARL'),
   // Contact Information
   contactFirstName: z.string().min(1, 'Le prénom du contact est requis'),
   contactLastName: z.string().min(1, 'Le nom du contact est requis'),
-  contactEmail: z.string().email('Email invalide').min(1, 'L\'email est requis'),
+  contactEmail: z.string().email('Email invalide').min(1, "L'email est requis"),
   contactPhone: z.string().min(1, 'Le téléphone est requis'),
   contactPosition: z.string().optional(),
   // Address Information
-  address: z.string().min(1, 'L\'adresse est requise'),
+  address: z.string().min(1, "L'adresse est requise"),
   postalCode: z.string().min(1, 'Le code postal est requis'),
   city: z.string().min(1, 'La ville est requise'),
   country: z.string().default('France'),
@@ -54,18 +68,45 @@ interface AddClientDialogProps {
   onSubmit?: (data: ClientFormData) => void | Promise<void>
 }
 export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialogProps) {
+  const dialogTitleId = useId()
+  const dialogDescriptionId = useId()
+  const companyInfoSectionId = useId()
+  const contactInfoSectionId = useId()
+  const addressInfoSectionId = useId()
+  const billingInfoSectionId = useId()
+  const sameAddressHelpId = useId()
+  const creditInfoSectionId = useId()
+  const additionalInfoSectionId = useId()
+  const activeClientHelpId = useId()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
+      companyName: '',
+      siret: '',
+      tvaNumber: '',
       companyType: 'SARL',
+      contactFirstName: '',
+      contactLastName: '',
+      contactEmail: '',
+      contactPhone: '',
+      contactPosition: '',
+      address: '',
+      postalCode: '',
+      city: '',
       country: 'France',
+      billingAddress: '',
+      billingPostalCode: '',
+      billingCity: '',
+      billingCountry: '',
       useSameAddress: true,
       paymentTerms: '30days',
       paymentMethod: 'transfer',
       creditLimit: 0,
       creditUsed: 0,
+      sector: '',
+      notes: '',
       isActive: true,
       preferredLanguage: 'fr',
     },
@@ -98,24 +139,44 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
   }
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
+      <DialogContent
+        className="max-w-4xl max-h-[90vh]"
+        role="dialog"
+        aria-labelledby={dialogTitleId}
+        aria-describedby={dialogDescriptionId}
+      >
         <DialogHeader>
-          <DialogTitle>Ajouter un nouveau client</DialogTitle>
+          <DialogTitle id={dialogTitleId}>Ajouter un nouveau client</DialogTitle>
+          <p id={dialogDescriptionId} className="sr-only">
+            Formulaire pour créer un nouveau client avec ses informations d'entreprise, de contact,
+            d'adresse et de facturation
+          </p>
         </DialogHeader>
         <ScrollArea className="max-h-[70vh] pr-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-6"
+              noValidate
+              aria-label="Formulaire d'ajout de client"
+            >
               {error && (
-                <div className="rounded-md bg-red-50 p-4 border border-red-200">
+                <div
+                  className="rounded-md bg-red-50 p-4 border border-red-200"
+                  role="alert"
+                  aria-live="polite"
+                >
                   <p className="text-sm text-red-600">{error}</p>
                 </div>
               )}
               {/* Company Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Informations de l'entreprise</CardTitle>
+                  <CardTitle className="text-lg" id={companyInfoSectionId}>
+                    Informations de l'entreprise
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2">
+                <fieldset className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="companyName"
@@ -194,14 +255,16 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                       </FormItem>
                     )}
                   />
-                </CardContent>
+                </fieldset>
               </Card>
               {/* Contact Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Contact principal</CardTitle>
+                  <CardTitle className="text-lg" id={contactInfoSectionId}>
+                    Contact principal
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2">
+                <fieldset className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="contactFirstName"
@@ -267,14 +330,16 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                       </FormItem>
                     )}
                   />
-                </CardContent>
+                </fieldset>
               </Card>
               {/* Address Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Adresse de l'entreprise</CardTitle>
+                  <CardTitle className="text-lg" id={addressInfoSectionId}>
+                    Adresse de l'entreprise
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-3">
+                <fieldset className="grid gap-4 md:grid-cols-3">
                   <FormField
                     control={form.control}
                     name="address"
@@ -327,14 +392,16 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                       </FormItem>
                     )}
                   />
-                </CardContent>
+                </fieldset>
               </Card>
               {/* Billing Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Informations de facturation</CardTitle>
+                  <CardTitle className="text-lg" id={billingInfoSectionId}>
+                    Informations de facturation
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <fieldset className="space-y-4">
                   <FormField
                     control={form.control}
                     name="useSameAddress"
@@ -344,11 +411,16 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            aria-describedby="same-address-help"
                           />
                         </FormControl>
                         <FormLabel className="text-sm font-normal">
                           Utiliser la même adresse que l'entreprise
                         </FormLabel>
+                        <p id={sameAddressHelpId} className="sr-only">
+                          Si activé, les champs d'adresse de facturation seront automatiquement
+                          remplis avec l'adresse de l'entreprise
+                        </p>
                       </FormItem>
                     )}
                   />
@@ -457,14 +529,16 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                       )}
                     />
                   </div>
-                </CardContent>
+                </fieldset>
               </Card>
               {/* Credit Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Gestion du crédit</CardTitle>
+                  <CardTitle className="text-lg" id={creditInfoSectionId}>
+                    Gestion du crédit
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2">
+                <fieldset className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="creditLimit"
@@ -501,14 +575,16 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                       </FormItem>
                     )}
                   />
-                </CardContent>
+                </fieldset>
               </Card>
               {/* Additional Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Informations complémentaires</CardTitle>
+                  <CardTitle className="text-lg" id={additionalInfoSectionId}>
+                    Informations complémentaires
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <fieldset className="space-y-4">
                   <FormField
                     control={form.control}
                     name="preferredLanguage"
@@ -556,30 +632,42 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            aria-describedby={activeClientHelpId}
                           />
                         </FormControl>
-                        <FormLabel className="text-sm font-normal">
-                          Client actif
-                        </FormLabel>
+                        <FormLabel className="text-sm font-normal">Client actif</FormLabel>
+                        <p id={activeClientHelpId} className="sr-only">
+                          Indique si le client est actif et peut passer des commandes
+                        </p>
                       </FormItem>
                     )}
                   />
-                </CardContent>
+                </fieldset>
               </Card>
-              <div className="flex gap-2 pt-4 border-t">
+              <fieldset className="flex gap-2 pt-4 border-t">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleClose}
                   disabled={loading}
                   className="flex-1"
+                  aria-label="Annuler la création du client et fermer le dialog"
                 >
                   Annuler
                 </Button>
-                <Button type="submit" disabled={loading} className="flex-1">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1"
+                  aria-label={
+                    loading
+                      ? 'Création en cours, veuillez patienter'
+                      : 'Créer le nouveau client avec les informations saisies'
+                  }
+                >
                   {loading ? 'Création en cours...' : 'Créer le client'}
                 </Button>
-              </div>
+              </fieldset>
             </form>
           </Form>
         </ScrollArea>

@@ -75,7 +75,7 @@ export class PartnerGroup extends BusinessEntity {
     color?: string // Couleur d'affichage
     icon?: string // Icône du groupe
     tags?: string[] // Tags associés
-    customFields?: Record<string, any>
+    customFields?: Record<string, unknown>
     statistics?: {
       memberCount?: number
       totalRevenue?: number

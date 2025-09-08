@@ -1,7 +1,6 @@
 'use client'
 
 import { Badge, Button } from '@erp/ui'
-
 import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 
 export function StockAlertsPanel() {
@@ -34,7 +33,7 @@ export function StockAlertsPanel() {
 
   return (
     <div className="space-y-3">
-      {alertes.map((alerte) => (
+      {alertes?.map((alerte) => (
         <div key={alerte.id} className="flex items-center justify-between p-3 border rounded-lg">
           <div className="flex items-center gap-3">
             <div
@@ -59,14 +58,14 @@ export function StockAlertsPanel() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline">
+            <Button type="button" size="sm" variant="outline">
               <ShoppingCart className="h-3 w-3 mr-1" />
               Commander
             </Button>
           </div>
         </div>
       ))}
-      {alertes.length === 0 && (
+      {alertes?.length === 0 && (
         <div className="text-center py-6 text-muted-foreground">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
           <p>Aucune alerte de stock</p>

@@ -60,10 +60,10 @@ export function useUserMenuPreferences() {
       setError(null)
 
       const response = await callClientApi('user/menu-preferences')
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setPreferences(data.data)
+      if (data?.success) {
+        setPreferences(data?.data)
       } else {
         setError('Erreur lors du chargement des préférences')
       }
@@ -82,10 +82,10 @@ export function useUserMenuPreferences() {
         body: JSON.stringify(updates),
       })
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setPreferences(data.data)
+      if (data?.success) {
+        setPreferences(data?.data)
         return true
       } else {
         setError('Erreur lors de la mise à jour')
@@ -103,10 +103,10 @@ export function useUserMenuPreferences() {
         method: 'POST',
       })
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setPreferences(data.data)
+      if (data?.success) {
+        setPreferences(data?.data)
         return true
       } else {
         setError('Erreur lors de la réinitialisation')
@@ -128,7 +128,7 @@ export function useUserMenuPreferences() {
           body: JSON.stringify(action),
         })
 
-        if (response.ok) {
+        if (response?.ok) {
           await loadPreferences() // Recharger les préférences
           return true
         } else {
@@ -186,7 +186,7 @@ export function useUserMenuPreferences() {
           body: JSON.stringify({ items }),
         })
 
-        if (response.ok) {
+        if (response?.ok) {
           await loadPreferences()
           return true
         } else {
@@ -211,7 +211,7 @@ export function useUserMenuPreferences() {
           body: JSON.stringify(shortcut),
         })
 
-        if (response.ok) {
+        if (response?.ok) {
           await loadPreferences()
           return true
         } else {
@@ -233,7 +233,7 @@ export function useUserMenuPreferences() {
           method: 'DELETE',
         })
 
-        if (response.ok) {
+        if (response?.ok) {
           await loadPreferences()
           return true
         } else {
@@ -256,10 +256,10 @@ export function useUserMenuPreferences() {
           method: 'POST',
         })
 
-        const data = await response.json()
+        const data = await response?.json()
 
-        if (data.success) {
-          setPreferences(data.data)
+        if (data?.success) {
+          setPreferences(data?.data)
           return true
         } else {
           setError("Erreur lors de l'application du template")
@@ -292,10 +292,10 @@ export function useUserMenuPreferences() {
         body: JSON.stringify(importData),
       })
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setPreferences(data.data)
+      if (data?.success) {
+        setPreferences(data?.data)
         return true
       } else {
         setError("Erreur lors de l'import")

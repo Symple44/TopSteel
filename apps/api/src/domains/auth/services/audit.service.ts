@@ -80,7 +80,7 @@ export interface AuditEntry {
   success: boolean
   errorCode?: string
   errorMessage?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   duration?: number // Milliseconds
   affectedRecords?: number
   oldValue?: any
@@ -186,7 +186,7 @@ export class AuditService {
     userId: string,
     resource: string,
     action: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     await this.log({
       eventType: AuditEventType.ACCESS_GRANTED,
@@ -207,7 +207,7 @@ export class AuditService {
     resource: string,
     action: string,
     reason: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     await this.log({
       eventType: AuditEventType.ACCESS_DENIED,
@@ -230,7 +230,7 @@ export class AuditService {
     ipAddress: string,
     userAgent: string,
     sessionId: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     await this.log({
       eventType: AuditEventType.LOGIN_SUCCESS,
@@ -253,7 +253,7 @@ export class AuditService {
     ipAddress: string,
     userAgent: string,
     reason: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     await this.log({
       eventType: AuditEventType.LOGIN_FAILED,
@@ -274,7 +274,7 @@ export class AuditService {
     userId: string,
     activity: string,
     ipAddress: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     await this.log({
       eventType: AuditEventType.SUSPICIOUS_ACTIVITY,
@@ -304,9 +304,9 @@ export class AuditService {
     resource: string,
     resourceId: string,
     action: 'CREATE' | 'UPDATE' | 'DELETE',
-    oldValue?: any,
-    newValue?: any,
-    metadata?: Record<string, any>
+    oldValue?: unknown,
+    newValue?: unknown,
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const eventTypeMap = {
       CREATE: AuditEventType.DATA_CREATED,
@@ -340,7 +340,7 @@ export class AuditService {
       removed?: string[]
       restricted?: string[]
     },
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     await this.log({
       eventType: AuditEventType.PERMISSION_CHANGED,
@@ -529,27 +529,27 @@ export class AuditService {
     const statistics: AuditStatistics = {
       totalEvents,
       byEventType: byEventType.reduce((acc, item) => {
-        acc[item.type] = parseInt(item.count)
+        acc[item.type] = parseInt(item.count, 10)
         return acc
       }, {}),
       bySeverity: bySeverity.reduce((acc, item) => {
-        acc[item.severity] = parseInt(item.count)
+        acc[item.severity] = parseInt(item.count, 10)
         return acc
       }, {}),
       failureRate,
       avgDuration,
       topUsers: topUsers.map((u) => ({
         userId: u.userId,
-        count: parseInt(u.count),
+        count: parseInt(u.count, 10),
       })),
       topResources: topResources.map((r) => ({
         resource: r.resource,
-        count: parseInt(r.count),
+        count: parseInt(r.count, 10),
       })),
       suspiciousActivities,
       timeDistribution: timeDistribution.map((t) => ({
-        hour: parseInt(t.hour),
-        count: parseInt(t.count),
+        hour: parseInt(t.hour, 10),
+        count: parseInt(t.count, 10),
       })),
     }
 

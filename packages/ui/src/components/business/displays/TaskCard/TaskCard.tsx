@@ -1,28 +1,24 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { 
-  Clock,
-  Calendar,
-  User,
-  Users,
+import {
   AlertTriangle,
   CheckCircle,
-  Play,
-  Pause,
-  Flag,
-  FileText,
-  MessageSquare,
-  Paperclip,
-  Target,
-  Timer,
+  ChevronRight,
+  Clock,
   Edit3,
   Eye,
-  MoreHorizontal,
-  ChevronRight
+  Flag,
+  MessageSquare,
+  Paperclip,
+  Pause,
+  Play,
+  Timer,
+  User,
+  Users,
 } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
+import { Button } from '../../../primitives/button/Button'
 export interface Task {
   id: string
   title: string
@@ -142,49 +138,49 @@ export function TaskCard({
           label: 'À faire',
           icon: Clock,
           className: 'bg-gray-100 text-gray-800 border-gray-200',
-          color: 'text-gray-600'
+          color: 'text-gray-600',
         }
       case 'in_progress':
         return {
           label: 'En cours',
           icon: Play,
           className: 'bg-blue-100 text-blue-800 border-blue-200',
-          color: 'text-blue-600'
+          color: 'text-blue-600',
         }
       case 'review':
         return {
           label: 'En révision',
           icon: Eye,
           className: 'bg-purple-100 text-purple-800 border-purple-200',
-          color: 'text-purple-600'
+          color: 'text-purple-600',
         }
       case 'completed':
         return {
           label: 'Terminée',
           icon: CheckCircle,
           className: 'bg-green-100 text-green-800 border-green-200',
-          color: 'text-green-600'
+          color: 'text-green-600',
         }
       case 'cancelled':
         return {
           label: 'Annulée',
           icon: AlertTriangle,
           className: 'bg-red-100 text-red-900 border-red-300',
-          color: 'text-red-600'
+          color: 'text-red-600',
         }
       case 'blocked':
         return {
           label: 'Bloquée',
           icon: Pause,
           className: 'bg-orange-100 text-orange-800 border-orange-200',
-          color: 'text-orange-600'
+          color: 'text-orange-600',
         }
       default:
         return {
           label: 'Inconnu',
           icon: AlertTriangle,
           className: 'bg-gray-100 text-gray-800 border-gray-200',
-          color: 'text-gray-600'
+          color: 'text-gray-600',
         }
     }
   }
@@ -195,35 +191,35 @@ export function TaskCard({
           label: 'Urgent',
           icon: Flag,
           className: 'bg-red-100 text-red-800 border-red-200',
-          color: 'text-red-600'
+          color: 'text-red-600',
         }
       case 'high':
         return {
           label: 'Haute',
           icon: Flag,
           className: 'bg-orange-100 text-orange-800 border-orange-200',
-          color: 'text-orange-600'
+          color: 'text-orange-600',
         }
       case 'medium':
         return {
           label: 'Moyenne',
           icon: Flag,
           className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-          color: 'text-yellow-600'
+          color: 'text-yellow-600',
         }
       case 'low':
         return {
           label: 'Faible',
           icon: Flag,
           className: 'bg-green-100 text-green-800 border-green-200',
-          color: 'text-green-600'
+          color: 'text-green-600',
         }
       default:
         return {
           label: 'Non définie',
           icon: Flag,
           className: 'bg-gray-100 text-gray-800 border-gray-200',
-          color: 'text-gray-600'
+          color: 'text-gray-600',
         }
     }
   }
@@ -265,9 +261,12 @@ export function TaskCard({
     const diff = dueDate.getTime() - now.getTime()
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
     if (days < 0) {
-      return { label: `En retard de ${Math.abs(days)} jour${Math.abs(days) > 1 ? 's' : ''}`, color: 'text-red-600' }
+      return {
+        label: `En retard de ${Math.abs(days)} jour${Math.abs(days) > 1 ? 's' : ''}`,
+        color: 'text-red-600',
+      }
     } else if (days === 0) {
-      return { label: 'Échéance aujourd\'hui', color: 'text-orange-600' }
+      return { label: "Échéance aujourd'hui", color: 'text-orange-600' }
     } else if (days === 1) {
       return { label: 'Échéance demain', color: 'text-yellow-600' }
     } else if (days <= 7) {
@@ -278,12 +277,12 @@ export function TaskCard({
   }
   const getCompletedSubtasks = () => {
     if (!task.subtasks) return { completed: 0, total: 0 }
-    const completed = task.subtasks.filter(st => st.completed).length
+    const completed = task.subtasks.filter((st) => st.completed).length
     return { completed, total: task.subtasks.length }
   }
   const getUnblockedDependencies = () => {
     if (!task.dependencies) return { completed: 0, total: 0 }
-    const completed = task.dependencies.filter(dep => dep.status === 'completed').length
+    const completed = task.dependencies.filter((dep) => dep.status === 'completed').length
     return { completed, total: task.dependencies.length }
   }
   const statusConfig = getStatusConfig(task.status)
@@ -308,9 +307,7 @@ export function TaskCard({
                 {priorityConfig.label}
               </Badge>
             </div>
-            <CardTitle className="text-lg truncate">
-              {task.title}
-            </CardTitle>
+            <CardTitle className="text-lg truncate">{task.title}</CardTitle>
             {task.project && (
               <p className="text-sm text-muted-foreground">
                 {task.project.name}
@@ -321,8 +318,8 @@ export function TaskCard({
           {/* Assignee Avatar */}
           <div className="flex items-center gap-2 ml-3">
             {task.assignee.avatar ? (
-              <img 
-                src={task.assignee.avatar} 
+              <img
+                src={task.assignee.avatar}
                 alt={task.assignee.name}
                 className="h-8 w-8 rounded-full"
               />
@@ -337,9 +334,7 @@ export function TaskCard({
       <CardContent className="space-y-4">
         {/* Description */}
         {task.description && !compact && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {task.description}
-          </p>
+          <p className="text-sm text-muted-foreground line-clamp-2">{task.description}</p>
         )}
         {/* Progress Bar */}
         {task.progress > 0 && (
@@ -349,10 +344,12 @@ export function TaskCard({
               <span className="font-medium">{task.progress}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className={cn(
                   'h-2 rounded-full transition-all duration-300',
-                  task.progress === 100 ? 'bg-green-500' : statusConfig.color.replace('text-', 'bg-').replace('-600', '-500')
+                  task.progress === 100
+                    ? 'bg-green-500'
+                    : statusConfig.color.replace('text-', 'bg-').replace('-600', '-500')
                 )}
                 style={{ width: `${task.progress}%` }}
               />
@@ -376,9 +373,7 @@ export function TaskCard({
               <div className="flex flex-col">
                 <span className="font-medium">{formatDate(task.dates.dueDate)}</span>
                 {timeRemaining && (
-                  <span className={cn('text-xs', timeRemaining.color)}>
-                    {timeRemaining.label}
-                  </span>
+                  <span className={cn('text-xs', timeRemaining.color)}>{timeRemaining.label}</span>
                 )}
               </div>
             </div>
@@ -474,25 +469,29 @@ export function TaskCard({
                 {task.attachments && task.attachments.length > 0 && (
                   <div className="flex items-center gap-1">
                     <Paperclip className="h-3 w-3" />
-                    <span>{task.attachments.length} fichier{task.attachments.length > 1 ? 's' : ''}</span>
+                    <span>
+                      {task.attachments.length} fichier{task.attachments.length > 1 ? 's' : ''}
+                    </span>
                   </div>
                 )}
                 {task.comments.length > 0 && (
                   <div className="flex items-center gap-1">
                     <MessageSquare className="h-3 w-3" />
-                    <span>{task.comments.length} commentaire{task.comments.length > 1 ? 's' : ''}</span>
+                    <span>
+                      {task.comments.length} commentaire{task.comments.length > 1 ? 's' : ''}
+                    </span>
                   </div>
                 )}
                 {task.watchers.length > 0 && (
                   <div className="flex items-center gap-1">
                     <Users className="h-3 w-3" />
-                    <span>{task.watchers.length} observateur{task.watchers.length > 1 ? 's' : ''}</span>
+                    <span>
+                      {task.watchers.length} observateur{task.watchers.length > 1 ? 's' : ''}
+                    </span>
                   </div>
                 )}
               </div>
-              <div>
-                Mis à jour: {formatDateTime(task.dates.updated)}
-              </div>
+              <div>Mis à jour: {formatDateTime(task.dates.updated)}</div>
             </div>
           </>
         )}
@@ -500,15 +499,22 @@ export function TaskCard({
         {showActions && (
           <div className="flex flex-wrap gap-2 pt-3 border-t">
             {onViewDetails && (
-              <Button variant="outline" size="sm" onClick={onViewDetails} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewDetails}
+                className="flex items-center gap-1"
+              >
                 <Eye className="h-3 w-3" />
                 Détails
               </Button>
             )}
             {onStatusChange && task.status !== 'completed' && (
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => onStatusChange(task.status === 'todo' ? 'in_progress' : 'completed')}
                 className="flex items-center gap-1"
               >
@@ -526,25 +532,43 @@ export function TaskCard({
               </Button>
             )}
             {onComment && (
-              <Button variant="outline" size="sm" onClick={onComment} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onComment}
+                className="flex items-center gap-1"
+              >
                 <MessageSquare className="h-3 w-3" />
                 Commenter
               </Button>
             )}
             {onAssign && (
-              <Button variant="outline" size="sm" onClick={onAssign} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onAssign}
+                className="flex items-center gap-1"
+              >
                 <User className="h-3 w-3" />
                 Réassigner
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onEdit}
+                className="flex items-center gap-1"
+              >
                 <Edit3 className="h-3 w-3" />
                 Modifier
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" size="sm" onClick={onDelete}>
+              <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
                 Supprimer
               </Button>
             )}

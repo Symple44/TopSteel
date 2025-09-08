@@ -116,7 +116,7 @@ const idCacheMetrics: IDMetrics = {
 }
 
 function getFromIdCache(key: string): ParsedID | undefined {
-  const result = idCache.get(key)
+  const result = idCache?.get(key)
 
   if (result) {
     idCacheMetrics.cacheHits++
@@ -130,15 +130,15 @@ function getFromIdCache(key: string): ParsedID | undefined {
 
 function setInIdCache(key: string, value: ParsedID): void {
   // Fix TypeScript strict: nettoyage du cache si plein
-  if (idCache.size >= maxIdCacheSize) {
+  if (idCache?.size >= maxIdCacheSize) {
     // Méthode plus sûre : convertir en array pour éviter undefined
-    const keys = Array.from(idCache.keys())
+    const keys = Array.from(idCache?.keys())
 
-    if (keys.length > 0) {
-      idCache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
+    if (keys?.length > 0) {
+      idCache?.delete(keys?.[0]) // Supprimer la première (plus ancienne) clé
     }
   }
-  idCache.set(key, value)
+  idCache?.set(key, value)
 }
 
 function getIdCacheMetrics(): IDMetrics {
@@ -147,11 +147,11 @@ function getIdCacheMetrics(): IDMetrics {
 
 function recordIdGeneration(timeMs: number): void {
   idCacheMetrics.generated++
-  idCacheMetrics.performanceMs.push(timeMs)
+  idCacheMetrics?.performanceMs?.push(timeMs)
 
   // Garder seulement les 100 dernières mesures
-  if (idCacheMetrics.performanceMs.length > 100) {
-    idCacheMetrics.performanceMs = idCacheMetrics.performanceMs.slice(-100)
+  if (idCacheMetrics?.performanceMs?.length > 100) {
+    idCacheMetrics.performanceMs = idCacheMetrics?.performanceMs?.slice(-100)
   }
 }
 
@@ -160,7 +160,7 @@ function recordIdError(): void {
 }
 
 function clearIdCache(): void {
-  idCache.clear()
+  idCache?.clear()
   idCacheMetrics.generated = 0
   idCacheMetrics.errors = 0
   idCacheMetrics.cacheHits = 0
@@ -182,7 +182,7 @@ let idGeneratorEnvironment: 'production' | 'development' | 'test'
 function initializeIdGenerator() {
   // Détection environnement
   idGeneratorEnvironment =
-    (process.env.NODE_ENV as 'production' | 'development' | 'test') || 'development'
+    (process?.env?.NODE_ENV as 'production' | 'development' | 'test') || 'development'
 
   // ID de nœud stable
   if (idGeneratorIsClient) {
@@ -197,9 +197,9 @@ initializeIdGenerator()
 
 function initializeClientNodeId(): string {
   try {
-    let nodeId = localStorage.getItem('topsteel_node_id')
+    let nodeId = localStorage?.getItem('topsteel_node_id')
 
-    if (!nodeId || nodeId.length < 4) {
+    if (!nodeId || nodeId?.length < 4) {
       nodeId = generateSecureNodeId()
       localStorage.setItem('topsteel_node_id', nodeId)
     }
@@ -212,22 +212,22 @@ function initializeClientNodeId(): string {
 
 function initializeServerNodeId(): string {
   // Utiliser variables d'environnement pour l'ID serveur
-  const instanceId = process.env.INSTANCE_ID || process.env.HOSTNAME || 'server'
+  const instanceId = process?.env?.INSTANCE_ID || process?.env?.HOSTNAME || 'server'
 
-  return `${idGeneratorEnvironment.slice(0, 3)}-${instanceId.slice(0, 4)}`
+  return `${idGeneratorEnvironment?.slice(0, 3)}-${instanceId?.slice(0, 4)}`
 }
 
 function generateSecureNodeId(): string {
   if (crypto.randomUUID) {
-    return crypto.randomUUID().slice(0, 8)
+    return crypto?.randomUUID().slice(0, 8)
   }
 
   if (crypto.getRandomValues) {
     const array = new Uint8Array(4)
 
-    crypto.getRandomValues(array)
+    crypto?.getRandomValues(array)
 
-    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
+    return Array.from(array, (byte) => byte?.toString(16).padStart(2, '0')).join('')
   }
 
   return generateFallbackNodeId()
@@ -241,20 +241,20 @@ function generateFallbackNodeId(): string {
  * UUID V4 avec fallback robuste
  */
 export function generateUuid(): string {
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   try {
     let result: string
 
     if (idGeneratorIsClient && crypto.randomUUID) {
-      result = crypto.randomUUID()
+      result = crypto?.randomUUID()
     } else if (idGeneratorIsClient) {
       result = generateFallbackUUID()
     } else {
       result = generateServerUUID()
     }
 
-    recordIdGeneration(performance.now() - startTime)
+    recordIdGeneration(performance?.now() - startTime)
 
     return result
   } catch (_error) {
@@ -268,9 +268,9 @@ function generateServerUUID(): string {
   // UUID déterministe pour SSR
   const timestamp = Date.now()
   const counter = (++idGeneratorCounter).toString(16).padStart(4, '0')
-  const nodeId = idGeneratorNodeId.padEnd(12, '0').slice(0, 12)
+  const nodeId = idGeneratorNodeId?.padEnd(12, '0').slice(0, 12)
 
-  return `${timestamp.toString(16).padStart(8, '0')}-0000-4000-8000-${counter}${nodeId}`
+  return `${timestamp?.toString(16).padStart(8, '0')}-0000-4000-8000-${counter}${nodeId}`
 }
 
 function generateFallbackUUID(): string {
@@ -298,7 +298,7 @@ function generateFallbackUUID(): string {
  * NanoID optimisé pour performance
  */
 export function generateNanoid(length = 12, alphabet?: string): string {
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   // Fix: Alphabet par défaut si undefined
   const defaultAlphabet =
@@ -313,7 +313,7 @@ export function generateNanoid(length = 12, alphabet?: string): string {
         // Test direct sans condition
         const testArray = new Uint8Array(1)
 
-        crypto.getRandomValues(testArray)
+        crypto?.getRandomValues(testArray)
         result = generateSecureNanoId(length, defaultAlphabet)
       } catch {
         // Si crypto échoue, utiliser fallback
@@ -324,7 +324,7 @@ export function generateNanoid(length = 12, alphabet?: string): string {
       result = generateServerNanoId(length, defaultAlphabet)
     }
 
-    recordIdGeneration(performance.now() - startTime)
+    recordIdGeneration(performance?.now() - startTime)
 
     return result
   } catch (_error) {
@@ -343,7 +343,7 @@ function _isSecureCryptoAvailable(): boolean {
     // Test rapide pour vérifier que crypto.getRandomValues fonctionne
     const testArray = new Uint8Array(1)
 
-    crypto.getRandomValues(testArray)
+    crypto?.getRandomValues(testArray)
 
     return true
   } catch (_error) {
@@ -356,13 +356,13 @@ function generateServerNanoId(length: number, _alphabet: string): string {
   const counter = (++idGeneratorCounter).toString(36).padStart(3, '0')
   const combined = timestamp + counter + idGeneratorNodeId
 
-  return combined.slice(0, length)
+  return combined?.slice(0, length)
 }
 
 function generateSecureNanoId(length: number, alphabet: string): string {
   const bytes = new Uint8Array(length)
 
-  crypto.getRandomValues(bytes)
+  crypto?.getRandomValues(bytes)
 
   return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join('')
 }
@@ -384,7 +384,7 @@ export function generateBusinessId(
   prefix: keyof typeof ID_PREFIXES,
   config: IDConfig = {}
 ): string {
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   try {
     const prefixStr = ID_PREFIXES[prefix]
@@ -394,7 +394,7 @@ export function generateBusinessId(
       format = 'nanoid',
       length = 12,
       env = idGeneratorEnvironment,
-    } = config
+    } = config || {}
 
     let mainId: string
 
@@ -418,7 +418,7 @@ export function generateBusinessId(
     let result = prefixStr
 
     if (env !== 'production') {
-      result += `-${env.slice(0, 3).toUpperCase()}`
+      result += `-${env?.slice(0, 3).toUpperCase()}`
     }
 
     if (timestamp) {
@@ -433,7 +433,7 @@ export function generateBusinessId(
       result += `-${checksumValue}`
     }
 
-    recordIdGeneration(performance.now() - startTime)
+    recordIdGeneration(performance?.now() - startTime)
 
     return result
   } catch (_error) {
@@ -480,7 +480,7 @@ function calculateChecksum(input: string): string {
   let hash = 0
 
   for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i)
+    const char = input?.charCodeAt(i)
 
     hash = (hash << 5) - hash + char
     hash = hash & hash // Convert to 32-bit integer
@@ -498,7 +498,7 @@ export function parseId(id: string): ParsedID {
 
   if (cached) return cached
 
-  const startTime = performance.now()
+  const startTime = performance?.now()
 
   try {
     const result: ParsedID = {
@@ -519,31 +519,37 @@ export function parseId(id: string): ParsedID {
     }
 
     // Parse prefix
-    const parts = id.split('-')
+    const parts = id?.split('-')
 
-    if (parts.length >= 2) {
-      const potentialPrefix = parts[0]
+    if (parts?.length >= 2) {
+      const potentialPrefix = parts?.[0]
       const prefixKeys = Object.keys(ID_PREFIXES) as Array<keyof typeof ID_PREFIXES>
-      const matchingPrefix = prefixKeys.find((key) => ID_PREFIXES[key] === potentialPrefix)
+      const matchingPrefix = prefixKeys?.find((key) => ID_PREFIXES[key] === potentialPrefix)
 
       if (matchingPrefix) {
-        result.prefix = potentialPrefix
-        result.isValid = true
+        if (result) {
+          result.prefix = potentialPrefix
+          result.isValid = true
+        }
 
         // Parse environment
-        if (parts.length >= 3 && ['DEV', 'TEST', 'PROD'].includes(parts[1])) {
-          result.environment = parts[1].toLowerCase() as 'development' | 'test' | 'production'
+        if (parts?.length >= 3 && ['DEV', 'TEST', 'PROD'].includes(parts?.[1])) {
+          if (result && result.environment !== undefined) {
+            result.environment = parts?.[1]?.toLowerCase() as 'development' | 'test' | 'production'
+          }
         }
 
         // Parse timestamp si présent
-        if (parts.length >= 3) {
+        if (parts?.length >= 3) {
           const timestampPart = parts[result.environment ? 2 : 1]
 
           if (timestampPart && /^[0-9a-z]+$/.test(timestampPart)) {
-            const timestamp = Number.parseInt(timestampPart, 36)
+            const timestamp = Number?.parseInt(timestampPart, 36)
 
             if (!Number.isNaN(timestamp) && timestamp > 1000000) {
-              result.timestamp = timestamp
+              if (result) {
+                result.timestamp = timestamp
+              }
             }
           }
         }
@@ -553,8 +559,10 @@ export function parseId(id: string): ParsedID {
 
         if (mainPart) {
           for (const [format, config] of Object.entries(ID_FORMATS)) {
-            if (config.pattern.test(mainPart)) {
-              result.metadata.format = format
+            if (config?.pattern?.test(mainPart)) {
+              if (result?.metadata) {
+                result.metadata.format = format
+              }
               break
             }
           }
@@ -563,12 +571,16 @@ export function parseId(id: string): ParsedID {
     }
 
     // Validation UUID direct
-    if (!result.isValid && ID_FORMATS.uuid.pattern.test(id)) {
-      result.isValid = true
-      result.metadata.format = 'uuid'
+    if (!result?.isValid && ID_FORMATS?.uuid?.pattern?.test(id)) {
+      if (result) {
+        result.isValid = true
+      }
+      if (result?.metadata) {
+        result.metadata.format = 'uuid'
+      }
     }
 
-    recordIdGeneration(performance.now() - startTime)
+    recordIdGeneration(performance?.now() - startTime)
     setInIdCache(id, result)
 
     return result
@@ -595,9 +607,9 @@ export function validateId(id: string, expectedPrefix?: keyof typeof ID_PREFIXES
   try {
     const parsed = parseId(id)
 
-    if (!parsed.isValid) return false
+    if (!parsed?.isValid) return false
 
-    if (expectedPrefix && parsed.prefix !== ID_PREFIXES[expectedPrefix]) {
+    if (expectedPrefix && parsed?.prefix !== ID_PREFIXES[expectedPrefix]) {
       return false
     }
 
@@ -712,8 +724,8 @@ export function useIDMetrics(): IDMetrics & {
   }, [])
 
   const averageGenerationTime =
-    metrics.performanceMs.length > 0
-      ? metrics.performanceMs.reduce((a, b) => a + b, 0) / metrics.performanceMs.length
+    metrics?.performanceMs?.length > 0
+      ? metrics?.performanceMs?.reduce((a, b) => a + b, 0) / metrics?.performanceMs?.length
       : 0
 
   const errorRate = metrics.generated > 0 ? (metrics.errors / metrics.generated) * 100 : 0

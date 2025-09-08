@@ -77,7 +77,7 @@ export const AccountLayout: React.FC<AccountLayoutProps> = ({ children, classNam
 
   const handleLogout = () => {
     // Implement logout logic
-    router.push('/auth/login')
+    router?.push('/auth/login')
   }
 
   return (
@@ -108,14 +108,14 @@ export const AccountLayout: React.FC<AccountLayoutProps> = ({ children, classNam
 
               {/* Navigation Links */}
               <nav className="p-2">
-                {navigation.map((item) => {
+                {navigation?.map((item) => {
                   const Icon = item.icon
                   const isActive = pathname === item.href
 
                   return (
                     <button
                       key={item.name}
-                      onClick={() => router.push(item.href)}
+                      onClick={() => router?.push(item.href)}
                       className={cn(
                         'w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-colors',
                         isActive

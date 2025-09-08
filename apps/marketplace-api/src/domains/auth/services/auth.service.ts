@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
+import type { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcrypt'
+import type { Repository } from 'typeorm'
 import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
 
 export interface AuthPayload {
@@ -54,8 +54,8 @@ export class AuthService {
       where: {
         email: loginDto.email.toLowerCase(),
         tenantId,
-        isActive: true
-      }
+        isActive: true,
+      },
     })
 
     if (!customer) {
@@ -79,8 +79,8 @@ export class AuthService {
     const existingCustomer = await this.customerRepository.findOne({
       where: {
         email: registerDto.email.toLowerCase(),
-        tenantId
-      }
+        tenantId,
+      },
     })
 
     if (existingCustomer) {
@@ -106,8 +106,8 @@ export class AuthService {
       registrationDate: new Date(),
       metadata: {
         source: 'marketplace',
-        registrationSource: 'web'
-      }
+        registrationSource: 'web',
+      },
     })
 
     const savedCustomer = await this.customerRepository.save(customer)
@@ -121,12 +121,12 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<TokenResponse> {
     try {
       const payload = await this.jwtService.verifyAsync<AuthPayload>(refreshToken)
-      
+
       const customer = await this.customerRepository.findOne({
         where: {
           id: payload.customerId,
-          isActive: true
-        }
+          isActive: true,
+        },
       })
 
       if (!customer) {
@@ -134,7 +134,7 @@ export class AuthService {
       }
 
       return this.generateTokens(customer)
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedException('Invalid refresh token')
     }
   }
@@ -143,8 +143,8 @@ export class AuthService {
     return await this.customerRepository.findOne({
       where: {
         id: customerId,
-        isActive: true
-      }
+        isActive: true,
+      },
     })
   }
 
@@ -153,8 +153,8 @@ export class AuthService {
       where: {
         email: email.toLowerCase(),
         tenantId,
-        isActive: true
-      }
+        isActive: true,
+      },
     })
 
     if (!customer) {
@@ -179,8 +179,8 @@ export class AuthService {
       where: {
         resetToken: token,
         tenantId,
-        isActive: true
-      }
+        isActive: true,
+      },
     })
 
     if (!customer || !customer.resetTokenExpiry || customer.resetTokenExpiry < new Date()) {
@@ -200,15 +200,15 @@ export class AuthService {
       email: customer.email,
       firstName: customer.firstName,
       lastName: customer.lastName,
-      tenantId: customer.tenantId
+      tenantId: customer.tenantId,
     }
 
     const access_token = this.jwtService.sign(payload, {
-      expiresIn: '15m'
+      expiresIn: '15m',
     })
 
     const refresh_token = this.jwtService.sign(payload, {
-      expiresIn: '7d'
+      expiresIn: '7d',
     })
 
     return {
@@ -220,13 +220,12 @@ export class AuthService {
         email: customer.email,
         firstName: customer.firstName,
         lastName: customer.lastName,
-        company: customer.company
-      }
+        company: customer.company,
+      },
     }
   }
 
   private generateResetToken(): string {
-    return Math.random().toString(36).substring(2, 15) + 
-           Math.random().toString(36).substring(2, 15)
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
   }
 }

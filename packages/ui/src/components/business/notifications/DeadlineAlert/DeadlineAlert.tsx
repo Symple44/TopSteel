@@ -1,8 +1,14 @@
 'use client'
-import { Clock, AlertTriangle, Calendar, Package, Factory, Truck } from 'lucide-react'
+import { AlertTriangle, Calendar, Clock, Factory, Package, Truck } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
 export type DeadlineUrgency = 'low' | 'medium' | 'high' | 'critical' | 'overdue'
-export type DeadlineType = 'production' | 'delivery' | 'payment' | 'inspection' | 'maintenance' | 'order_confirmation'
+export type DeadlineType =
+  | 'production'
+  | 'delivery'
+  | 'payment'
+  | 'inspection'
+  | 'maintenance'
+  | 'order_confirmation'
 export interface DeadlineItem {
   id: string
   title: string
@@ -28,77 +34,77 @@ const urgencyConfig = {
     borderColor: 'border-blue-200',
     textColor: 'text-blue-800',
     iconColor: 'text-blue-600',
-    title: 'Échéance à venir'
+    title: 'Échéance à venir',
   },
   medium: {
     bgColor: 'bg-yellow-50',
     borderColor: 'border-yellow-200',
     textColor: 'text-yellow-800',
     iconColor: 'text-yellow-600',
-    title: 'Échéance proche'
+    title: 'Échéance proche',
   },
   high: {
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200',
     textColor: 'text-orange-800',
     iconColor: 'text-orange-600',
-    title: 'Échéance imminente'
+    title: 'Échéance imminente',
   },
   critical: {
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
     textColor: 'text-red-800',
     iconColor: 'text-red-600',
-    title: 'Échéance critique'
+    title: 'Échéance critique',
   },
   overdue: {
     bgColor: 'bg-red-100',
     borderColor: 'border-red-300',
     textColor: 'text-red-900',
     iconColor: 'text-red-700',
-    title: 'Échéance dépassée'
-  }
+    title: 'Échéance dépassée',
+  },
 }
 const typeConfig = {
   production: {
     icon: Factory,
     label: 'Production',
-    color: 'text-orange-600'
+    color: 'text-orange-600',
   },
   delivery: {
     icon: Truck,
     label: 'Livraison',
-    color: 'text-blue-600'
+    color: 'text-blue-600',
   },
   payment: {
     icon: Calendar,
     label: 'Paiement',
-    color: 'text-green-600'
+    color: 'text-green-600',
   },
   inspection: {
     icon: Package,
     label: 'Inspection',
-    color: 'text-purple-600'
+    color: 'text-purple-600',
   },
   maintenance: {
     icon: AlertTriangle,
     label: 'Maintenance',
-    color: 'text-yellow-600'
+    color: 'text-yellow-600',
   },
   order_confirmation: {
     icon: Package,
     label: 'Confirmation commande',
-    color: 'text-indigo-600'
-  }
+    color: 'text-indigo-600',
+  },
 }
-export function DeadlineAlert({ 
-  className, 
-  urgency, 
-  deadlines, 
-  onDismiss, 
-  onTakeAction, 
+export function DeadlineAlert({
+  className,
+  urgency,
+  deadlines,
+  onDismiss,
+  onTakeAction,
   onSnooze,
-  showActions = true 
+  showActions = true,
 }: DeadlineAlertProps) {
   const config = urgencyConfig[urgency]
   const formatDeadline = (deadlineString: string) => {
@@ -116,7 +122,7 @@ export function DeadlineAlert({
       return `En retard de ${overdueDays}j`
     }
     if (diffDays === 0) {
-      if (diffHours <= 1) return 'Dans moins d\'1h'
+      if (diffHours <= 1) return "Dans moins d'1h"
       return `Dans ${diffHours}h`
     }
     if (diffDays === 1) return 'Demain'
@@ -136,35 +142,37 @@ export function DeadlineAlert({
     onSnooze?.(deadlineId, duration)
   }
   return (
-    <div className={cn(
-      'rounded-lg border p-4',
-      config.bgColor,
-      config.borderColor,
-      className
-    )}>
+    <div className={cn('rounded-lg border p-4', config.bgColor, config.borderColor, className)}>
       <div className="flex items-start gap-3">
         <Clock className={cn('h-5 w-5 mt-0.5', config.iconColor)} />
         <div className="flex-1 space-y-3">
           <div>
-            <h3 className={cn('font-medium', config.textColor)}>
-              {config.title}
-            </h3>
+            <h3 className={cn('font-medium', config.textColor)}>{config.title}</h3>
             <p className={cn('text-sm mt-1', config.textColor)}>
-              {deadlines.length} échéance{deadlines.length > 1 ? 's' : ''} nécessite{deadlines.length === 1 ? '' : 'nt'} votre attention
+              {deadlines.length} échéance{deadlines.length > 1 ? 's' : ''} nécessite
+              {deadlines.length === 1 ? '' : 'nt'} votre attention
             </p>
           </div>
           <div className="space-y-3">
             {deadlines.map((deadline) => {
               const TypeIcon = typeConfig[deadline.type].icon
               return (
-                <div key={deadline.id} className="bg-white/50 rounded-lg p-3 border border-white/20">
+                <div
+                  key={deadline.id}
+                  className="bg-white/50 rounded-lg p-3 border border-white/20"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-2 flex-1">
                       <TypeIcon className={cn('h-4 w-4 mt-0.5', typeConfig[deadline.type].color)} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h4 className="text-sm font-medium text-gray-900">{deadline.title}</h4>
-                          <span className={cn('text-xs px-2 py-0.5 rounded-full bg-gray-100', typeConfig[deadline.type].color)}>
+                          <span
+                            className={cn(
+                              'text-xs px-2 py-0.5 rounded-full bg-gray-100',
+                              typeConfig[deadline.type].color
+                            )}
+                          >
                             {typeConfig[deadline.type].label}
                           </span>
                         </div>
@@ -179,7 +187,8 @@ export function DeadlineAlert({
                             <span className="text-xs text-gray-500">Éléments associés: </span>
                             <span className="text-xs text-gray-700">
                               {deadline.associatedItems.slice(0, 2).join(', ')}
-                              {deadline.associatedItems.length > 2 && ` +${deadline.associatedItems.length - 2} autres`}
+                              {deadline.associatedItems.length > 2 &&
+                                ` +${deadline.associatedItems.length - 2} autres`}
                             </span>
                           </div>
                         )}

@@ -33,7 +33,7 @@ export async function GET() {
       },
     })
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: "Erreur lors de l'export",

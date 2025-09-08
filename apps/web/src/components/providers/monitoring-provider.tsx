@@ -59,8 +59,8 @@ function ErrorFallback({
             className="cursor-pointer font-medium"
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                e.currentTarget.click()
+                e?.preventDefault()
+                e?.currentTarget?.click()
               }
             }}
           >
@@ -70,12 +70,14 @@ function ErrorFallback({
         </details>
         <div className="space-x-4">
           <Button
+            type="button"
             onClick={resetErrorBoundary}
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
           >
             Réessayer
           </Button>
           <Button
+            type="button"
             onClick={() => window.location.reload()}
             className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors"
           >
@@ -93,11 +95,11 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Initialiser le monitoring au chargement
-    metrics.track('app_loaded', {
+    metrics?.track('app_loaded', {
       userAgent: navigator.userAgent,
       screen: {
-        width: window.screen.width,
-        height: window.screen.height,
+        width: window?.screen?.width,
+        height: window?.screen?.height,
       },
       viewport: {
         width: window.innerWidth,
@@ -108,7 +110,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
 
     // Tracker les erreurs JavaScript globales
     const handleError = (event: ErrorEvent) => {
-      metrics.trackError(new Error(event.message), {
+      metrics?.trackError(new Error(event.message), {
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
@@ -117,7 +119,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
     }
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      metrics.trackError(new Error('Unhandled Promise Rejection'), {
+      metrics?.trackError(new Error('Unhandled Promise Rejection'), {
         reason: event.reason?.toString() || 'Unknown',
         source: 'unhandled_promise_rejection',
       })
@@ -126,15 +128,15 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
     // Tracker les changements de visibilité (utilisateur quitte/revient)
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        metrics.track('page_hidden')
+        metrics?.track('page_hidden')
       } else {
-        metrics.track('page_visible')
+        metrics?.track('page_visible')
       }
     }
 
     // Tracker les changements de focus
-    const handleFocus = () => metrics.track('window_focus')
-    const handleBlur = () => metrics.track('window_blur')
+    const handleFocus = () => metrics?.track('window_focus')
+    const handleBlur = () => metrics?.track('window_blur')
 
     // Event listeners
     window.addEventListener('error', handleError)
@@ -150,9 +152,9 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
         const perfObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
             if (entry.entryType === 'largest-contentful-paint') {
-              metrics.trackPerformanceMetric('LCP', entry.startTime)
+              metrics?.trackPerformanceMetric('LCP', entry.startTime)
             } else if (entry.entryType === 'first-input') {
-              metrics.trackPerformanceMetric(
+              metrics?.trackPerformanceMetric(
                 'FID',
                 (entry as unknown as { processingStart: number }).processingStart - entry.startTime
               )
@@ -160,7 +162,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
           }
         })
 
-        perfObserver.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] })
+        perfObserver?.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] })
       } catch (_e) {}
     }
 
@@ -179,7 +181,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
     if (webVitals) {
       for (const [metric, value] of Object.entries(webVitals)) {
         if (typeof value === 'number') {
-          metrics.trackPerformanceMetric(metric, value)
+          metrics?.trackPerformanceMetric(metric, value)
         }
 
         // Alertes pour les métriques dégradées
@@ -190,7 +192,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
         }
 
         if (thresholds[metric] && value > thresholds[metric]) {
-          metrics.trackPerformanceMetric(`${metric}_slow`, value, {
+          metrics?.trackPerformanceMetric(`${metric}_slow`, value, {
             threshold: thresholds[metric],
             severity: 'warning',
           })
@@ -216,8 +218,8 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
               }
             ).__businessMetrics
 
-            if (metrics && typeof metrics.trackError === 'function') {
-              metrics.trackError(error, {
+            if (metrics && typeof metrics?.trackError === 'function') {
+              metrics?.trackError(error, {
                 componentStack: errorInfo.componentStack,
                 source: 'error_boundary',
               })
@@ -239,30 +241,30 @@ export function useMonitoring(): MonitoringHook {
   return {
     // Méthodes rapides pour les cas d'usage courants
     trackClick: (element: string, context?: Record<string, unknown>) => {
-      metrics.trackUserAction('click', { element, ...context })
+      metrics?.trackUserAction('click', { element, ...context })
     },
 
     trackPageView: (page: string, context?: Record<string, unknown>) => {
-      metrics.track('page_view', { page, ...context })
+      metrics?.track('page_view', { page, ...context })
     },
 
     trackFormSubmit: (form: string, success: boolean, errors?: string[]) => {
-      metrics.trackFormSubmission(form, success, errors)
+      metrics?.trackFormSubmission(form, success, errors)
     },
 
     trackSearch: (query: string, results: number, filters?: Record<string, unknown>) => {
-      metrics.trackSearchPerformed(query, results, filters)
+      metrics?.trackSearchPerformed(query, results, filters)
     },
 
     // Wrapper pour setUserContext avec type unknown
     setUserContext: (context: unknown) => {
-      metrics.setUserContext(context as Record<string, unknown>)
+      metrics?.setUserContext(context as Record<string, unknown>)
     },
 
     // Accès direct aux autres méthodes
     track: metrics.track,
     trackProjectCreated: (projectData: unknown) =>
-      metrics.trackProjectCreated(projectData as Record<string, unknown>),
+      metrics?.trackProjectCreated(projectData as Record<string, unknown>),
     trackProjectStatusChanged: metrics.trackProjectStatusChanged,
     trackProjectViewed: metrics.trackProjectViewed,
     trackProductionStarted: metrics.trackProductionStarted,
@@ -272,7 +274,7 @@ export function useMonitoring(): MonitoringHook {
     trackSearchPerformed: metrics.trackSearchPerformed,
     trackPerformanceMetric: metrics.trackPerformanceMetric,
     trackError: metrics.trackError,
-    getEvents: (filters?: unknown) => metrics.getEvents(filters as Record<string, unknown>),
+    getEvents: (filters?: unknown) => metrics?.getEvents(filters as Record<string, unknown>),
     generateReport: metrics.generateReport,
     exportData: metrics.exportData,
     cleanup: metrics.cleanup,

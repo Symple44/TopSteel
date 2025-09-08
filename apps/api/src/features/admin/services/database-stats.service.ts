@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 
 interface DatabaseStats {
   totalSize: string
@@ -104,7 +105,7 @@ export class DatabaseStatsService {
           results.push({
             table: table.tablename,
             status: 'error',
-            message: error instanceof Error ? error.message : 'Erreur inconnue',
+            message: error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue',
           })
         }
       }
@@ -121,7 +122,7 @@ export class DatabaseStatsService {
         results.push({
           operation: 'reindex',
           status: 'error',
-          message: error instanceof Error ? error.message : 'Erreur inconnue',
+          message: error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue',
         })
       }
 
@@ -133,7 +134,7 @@ export class DatabaseStatsService {
     } catch (error) {
       return {
         success: false,
-        message: `Erreur lors de l'optimisation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+        message: `Erreur lors de l'optimisation: ${error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'}`,
       }
     }
   }
@@ -156,7 +157,7 @@ export class DatabaseStatsService {
         FROM information_schema.tables
         WHERE table_schema = 'public'
       `)
-      return parseInt(result[0]?.count) || 0
+      return parseInt(result[0]?.count, 10) || 0
     } catch (_error) {
       return 0
     }
@@ -168,7 +169,7 @@ export class DatabaseStatsService {
         SELECT SUM(n_tup_ins + n_tup_upd + n_tup_del) as total_rows
         FROM pg_stat_user_tables
       `)
-      return parseInt(result[0]?.total_rows) || 0
+      return parseInt(result[0]?.total_rows, 10) || 0
     } catch (_error) {
       return 0
     }
@@ -181,7 +182,7 @@ export class DatabaseStatsService {
         FROM pg_stat_activity
         WHERE state = 'active'
       `)
-      return parseInt(result[0]?.count) || 0
+      return parseInt(result[0]?.count, 10) || 0
     } catch (_error) {
       return 0
     }
@@ -218,7 +219,7 @@ export class DatabaseStatsService {
 
       return {
         avgResponseTime: parseFloat(avgResult[0]?.avg_time) || 0,
-        slowQueries: parseInt(slowResult[0]?.slow_count) || 0,
+        slowQueries: parseInt(slowResult[0]?.slow_count, 10) || 0,
       }
     } catch (_error) {
       // pg_stat_statements pourrait ne pas être disponible
@@ -247,12 +248,19 @@ export class DatabaseStatsService {
         LIMIT 20
       `)
 
-      return result.map((row) => ({
-        tableName: row.table_name,
-        totalSize: row.total_size || '0 B',
-        rowCount: parseInt(row.row_count) || 0,
-        indexSize: row.index_size || '0 B',
-      }))
+      return result.map(
+        (row: {
+          table_name: string
+          total_size: string
+          index_size: string
+          row_count: string
+        }) => ({
+          tableName: row.table_name,
+          totalSize: row.total_size || '0 B',
+          rowCount: parseInt(row.row_count, 10) || 0,
+          indexSize: row.index_size || '0 B',
+        })
+      )
     } catch (_error) {
       return []
     }

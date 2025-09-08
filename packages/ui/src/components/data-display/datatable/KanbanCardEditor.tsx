@@ -12,6 +12,17 @@ import { SimpleModal } from './SimpleModal'
 import type { ColumnConfig } from './types'
 import type { Card, KanbanColumn } from './use-data-views'
 
+interface KanbanSettings {
+  statusColumn?: string
+  cardTitleColumn?: string
+  cardSubtitleColumn?: string
+  cardDescriptionColumn?: string
+  cardImageColumn?: string
+  cardLabelsColumns?: string[]
+  metaColumns?: string[]
+  [key: string]: unknown
+}
+
 interface KanbanCardEditorProps {
   card: Card | null
   isOpen: boolean
@@ -19,7 +30,7 @@ interface KanbanCardEditorProps {
   onSave: (updatedCard: Card) => void
   columns: KanbanColumn[]
   tableColumns: ColumnConfig[]
-  kanbanSettings: any
+  kanbanSettings: KanbanSettings
   keyField?: string
 }
 
@@ -33,7 +44,7 @@ export function KanbanCardEditor({
   kanbanSettings,
   keyField = 'id',
 }: KanbanCardEditorProps) {
-  const [formData, setFormData] = useState<any>({})
+  const [formData, setFormData] = useState<Record<string, unknown>>({})
   const [selectedColumn, setSelectedColumn] = useState('')
 
   useEffect(() => {
@@ -47,8 +58,8 @@ export function KanbanCardEditor({
     }
   }, [card, isOpen, columns])
 
-  const handleFieldChange = (fieldId: string, value: any) => {
-    setFormData((prev: any) => ({
+  const handleFieldChange = (fieldId: string, value: unknown) => {
+    setFormData((prev: Record<string, unknown>) => ({
       ...prev,
       [fieldId]: value,
     }))
@@ -65,7 +76,7 @@ export function KanbanCardEditor({
   }
 
   // Fonction pour obtenir le composant input approprié selon le type de colonne
-  const renderInputForColumn = (column: ColumnConfig, currentValue: any) => {
+  const renderInputForColumn = (column: ColumnConfig, currentValue: unknown) => {
     const isEditable = isColumnEditable(column)
     const commonProps = {
       disabled: !isEditable,
@@ -80,8 +91,10 @@ export function KanbanCardEditor({
         return (
           <div className="flex items-center">
             <Input
-              value={currentValue || ''}
-              onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleFieldChange(column.id, e.target.value)
+              }
               placeholder={`Saisir ${column.title.toLowerCase()}`}
               {...commonProps}
             />
@@ -94,13 +107,13 @@ export function KanbanCardEditor({
           <div className="flex items-center">
             <Input
               type="number"
-              value={currentValue || ''}
-              onChange={(e: any) => {
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const val = e.target.value === '' ? null : Number(e.target.value)
                 handleFieldChange(column.id, val)
               }}
               placeholder={`Saisir ${column.title.toLowerCase()}`}
-              step={column.format?.decimals ? 10 ** -column.format.decimals : 'any'}
+              step={column.format?.decimals ? 10 ** -column.format.decimals : undefined}
               min={column.validation?.min}
               max={column.validation?.max}
               {...commonProps}
@@ -114,13 +127,13 @@ export function KanbanCardEditor({
         const dateValue =
           currentValue instanceof Date
             ? currentValue.toISOString().split('T')[0]
-            : currentValue || ''
+            : String(currentValue || '')
         return (
           <div className="flex items-center">
             <Input
               type={column.type === 'datetime' ? 'datetime-local' : 'date'}
               value={dateValue}
-              onChange={(e: any) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const val = e.target.value ? new Date(e.target.value) : null
                 handleFieldChange(column.id, val)
               }}
@@ -139,7 +152,9 @@ export function KanbanCardEditor({
             </span>
             <Checkbox
               checked={Boolean(currentValue)}
-              onCheckedChange={(checked: any) => handleFieldChange(column.id, checked)}
+              onCheckedChange={(checked: boolean | 'indeterminate') =>
+                handleFieldChange(column.id, checked)
+              }
               disabled={!isEditable}
             />
             {lockIcon}
@@ -151,8 +166,10 @@ export function KanbanCardEditor({
           return (
             <div className="flex items-center">
               <Input
-                value={currentValue || ''}
-                onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+                value={String(currentValue || '')}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleFieldChange(column.id, e.target.value)
+                }
                 placeholder={`Saisir ${column.title.toLowerCase()}`}
                 {...commonProps}
               />
@@ -163,7 +180,7 @@ export function KanbanCardEditor({
         return (
           <div className="flex items-center">
             <CustomSelect
-              value={currentValue || ''}
+              value={String(currentValue || '')}
               onValueChange={(value) => handleFieldChange(column.id, value)}
               placeholder={`Sélectionner ${column.title.toLowerCase()}`}
               options={column.options.map((opt) => ({
@@ -180,15 +197,15 @@ export function KanbanCardEditor({
         // Pour multiselect, on affiche une version simplifiée avec Input pour cette version
         const displayValue = Array.isArray(currentValue)
           ? currentValue.join(', ')
-          : currentValue || ''
+          : String(currentValue || '')
         return (
           <div className="flex items-center">
             <Input
               value={displayValue}
-              onChange={(e: any) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const values = e.target.value
                   .split(',')
-                  .map((v: any) => v.trim())
+                  .map((v: string) => v.trim())
                   .filter(Boolean)
                 handleFieldChange(column.id, values)
               }}
@@ -204,8 +221,10 @@ export function KanbanCardEditor({
         return (
           <div className="flex items-start">
             <Textarea
-              value={currentValue || ''}
-              onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                handleFieldChange(column.id, e.target.value)
+              }
               placeholder={`Saisir ${column.title.toLowerCase()}`}
               rows={4}
               className={`resize-none ${commonProps.className}`}
@@ -219,8 +238,10 @@ export function KanbanCardEditor({
         return (
           <div className="flex items-center">
             <Input
-              value={currentValue || ''}
-              onChange={(e: any) => handleFieldChange(column.id, e.target.value)}
+              value={String(currentValue || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleFieldChange(column.id, e.target.value)
+              }
               placeholder={`Saisir ${column.title.toLowerCase()}`}
               {...commonProps}
             />
@@ -241,15 +262,18 @@ export function KanbanCardEditor({
       ...card,
       originalData: updatedOriginalData,
       // Mettre à jour les champs affichés selon la configuration
-      title: updatedOriginalData[kanbanSettings.cardTitleColumn] || card.title,
+      title:
+        (kanbanSettings.cardTitleColumn
+          ? String(updatedOriginalData[kanbanSettings.cardTitleColumn] || '')
+          : '') || card.title,
       subtitle: kanbanSettings.cardSubtitleColumn
-        ? updatedOriginalData[kanbanSettings.cardSubtitleColumn]
+        ? String(updatedOriginalData[kanbanSettings.cardSubtitleColumn] || '')
         : card.subtitle,
       description: kanbanSettings.cardDescriptionColumn
-        ? updatedOriginalData[kanbanSettings.cardDescriptionColumn]
+        ? String(updatedOriginalData[kanbanSettings.cardDescriptionColumn] || '')
         : card.description,
       image: kanbanSettings.cardImageColumn
-        ? updatedOriginalData[kanbanSettings.cardImageColumn]
+        ? String(updatedOriginalData[kanbanSettings.cardImageColumn] || '')
         : card.image,
     }
 
@@ -329,7 +353,7 @@ export function KanbanCardEditor({
                   {column.id === kanbanSettings.statusColumn ? (
                     <div className="flex items-center">
                       <CustomSelect
-                        value={currentValue}
+                        value={String(currentValue || '')}
                         onValueChange={(value) => handleFieldChange(column.id, value)}
                         placeholder="Sélectionner un statut"
                         options={columns.map((col) => ({
@@ -350,8 +374,8 @@ export function KanbanCardEditor({
           </div>
 
           {/* Aperçu des métadonnées configurées */}
-          {(kanbanSettings.cardLabelsColumns?.length > 0 ||
-            kanbanSettings.metaColumns?.length > 0) && (
+          {((kanbanSettings.cardLabelsColumns?.length || 0) > 0 ||
+            (kanbanSettings.metaColumns?.length || 0) > 0) && (
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-foreground border-b pb-2">
                 Informations supplémentaires
@@ -427,11 +451,11 @@ export function KanbanCardEditor({
 
       {/* Actions */}
       <div className="p-6 border-t border-border flex justify-end gap-3">
-        <Button variant="outline" onClick={onClose}>
+        <Button type="button" variant="outline" onClick={onClose}>
           <X className="h-4 w-4 mr-2" />
           Annuler
         </Button>
-        <Button onClick={handleSave}>
+        <Button type="button" onClick={handleSave}>
           <Save className="h-4 w-4 mr-2" />
           Enregistrer
         </Button>

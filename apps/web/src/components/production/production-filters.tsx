@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
-
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { useState } from 'react'
 
@@ -45,7 +44,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
   // ✅ Handler pour les inputs (simplifié)
   const handleInputChange =
     (key: keyof ProductionFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      handleFilterChange(key, e.target.value)
+      handleFilterChange(key, e?.target?.value)
     }
 
   // ✅ Reset corrigé (sans accolade orpheline)
@@ -169,7 +168,12 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
 
         {/* ✅ Actions avec compteur amélioré */}
         <div className="flex justify-between items-center pt-4">
-          <Button variant="outline" onClick={handleReset} disabled={activeFiltersCount === 0}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleReset}
+            disabled={activeFiltersCount === 0}
+          >
             <RotateCcw className="h-4 w-4 mr-2" />
             Réinitialiser
           </Button>
@@ -208,7 +212,7 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
 
   const handleInputChange =
     (key: keyof ProductionFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      handleFilterChange(key, e.target.value)
+      handleFilterChange(key, e?.target?.value)
     }
 
   const handleReset = () => {
@@ -346,7 +350,12 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
 
         {/* Actions */}
         <div className="flex justify-between items-center pt-4">
-          <Button variant="outline" onClick={handleReset} disabled={activeFiltersCount === 0}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleReset}
+            disabled={activeFiltersCount === 0}
+          >
             <RotateCcw className="h-4 w-4 mr-2" />
             Réinitialiser
           </Button>

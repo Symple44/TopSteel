@@ -209,7 +209,7 @@ export class GroupService {
       relations: ['group', 'group.roles'],
     })
 
-    return userGroups.filter((ug) => ug.isValid()).map((ug) => ug.group)
+    return userGroups.filter((ug) => ug.isValid()).map((ug) => ug.group as Group)
   }
 
   async getGroupUsers(groupId: string): Promise<unknown[]> {
@@ -226,14 +226,14 @@ export class GroupService {
     const group = await this.findGroupById(groupId)
 
     const roles = await this._roleRepository.findByIds(roleIds)
-    group.roles = roles
+    group.roles = roles as Role[]
 
     await this._groupRepository.save(group)
   }
 
   async getGroupRoles(groupId: string): Promise<Role[]> {
     const group = await this.findGroupById(groupId)
-    return group.roles || []
+    return (group.roles as Role[]) || []
   }
 
   // ===== PERMISSIONS HÉRITÉES =====
@@ -246,8 +246,8 @@ export class GroupService {
 
     for (const group of userGroups) {
       if (group.roles) {
-        for (const role of group.roles) {
-          allRoles.set((role as { id: string }).id, role)
+        for (const role of group.roles as Role[]) {
+          allRoles.set(role.id, role)
         }
       }
     }

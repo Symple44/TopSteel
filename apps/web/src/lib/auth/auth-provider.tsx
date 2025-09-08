@@ -53,7 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsHydrated(true)
 
     // Générer un ID unique pour cet onglet
-    if (typeof window !== 'undefined' && !tabId.current) {
+    if (typeof window !== 'undefined' && !tabId?.current) {
       tabId.current = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     }
   }, [])
@@ -66,65 +66,71 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (typeof window === 'undefined') return
 
     try {
-      const config = authStorage.getConfig()
-      broadcastChannel.current = new BroadcastChannel(config.broadcastChannelName)
+      const config = authStorage?.getConfig()
+      if (broadcastChannel.current !== undefined && config) {
+        broadcastChannel.current = new BroadcastChannel(config.broadcastChannelName)
+      }
 
-      broadcastChannel.current.onmessage = (event: MessageEvent<AuthBroadcastEvent>) => {
-        const { type, tabId: senderTabId, data } = event.data
+      if (broadcastChannel.current) {
+        broadcastChannel.current.onmessage = (event: MessageEvent<AuthBroadcastEvent>) => {
+          const { type, tabId: senderTabId, data } = event.data
 
-        // Ignorer les messages de ce même onglet
-        if (senderTabId === tabId.current) return
+          // Ignorer les messages de ce même onglet
+          if (senderTabId === tabId?.current) return
 
-        switch (type) {
-          case 'USER_LOGIN': {
-            // Un autre onglet s'est connecté
-            const { user, tokens, company } = data
-            setAuthState((prev) => ({
-              ...prev,
-              isAuthenticated: true,
-              user,
-              tokens,
-              company: company || null,
-              requiresCompanySelection: !company,
-              mfa: { required: false },
-            }))
-            break
-          }
+          switch (type) {
+            case 'USER_LOGIN': {
+              // Un autre onglet s'est connecté
+              const { user, tokens, company } = data
+              setAuthState((prev) => ({
+                ...prev,
+                isAuthenticated: true,
+                user: user || null,
+                tokens: tokens || null,
+                company: company || null,
+                requiresCompanySelection: !company,
+                mfa: { required: false },
+              }))
+              break
+            }
 
-          case 'USER_LOGOUT':
-            // Un autre onglet s'est déconnecté
-            setAuthState({
-              ...defaultAuthState,
-              isLoading: false,
-              mounted: true,
-            })
-            break
+            case 'USER_LOGOUT':
+              // Un autre onglet s'est déconnecté
+              setAuthState({
+                ...defaultAuthState,
+                isLoading: false,
+                mounted: true,
+              })
+              break
 
-          case 'COMPANY_CHANGED': {
-            // Un autre onglet a changé de société
-            const { user: updatedUser, tokens: updatedTokens, company: newCompany } = data
-            setAuthState((prev) => ({
-              ...prev,
-              user: updatedUser,
-              tokens: updatedTokens,
-              company: newCompany,
-              requiresCompanySelection: false,
-            }))
-            break
-          }
+            case 'COMPANY_CHANGED': {
+              // Un autre onglet a changé de société
+              const { user: updatedUser, tokens: updatedTokens, company: newCompany } = data
+              setAuthState((prev) => ({
+                ...prev,
+                user: updatedUser || null,
+                tokens: updatedTokens || null,
+                company: newCompany || null,
+                requiresCompanySelection: false,
+              }))
+              break
+            }
 
-          case 'TOKEN_REFRESH': {
-            // Un autre onglet a rafraîchi les tokens
-            const { tokens: refreshedTokens } = data
-            setAuthState((prev) => ({
-              ...prev,
-              tokens: refreshedTokens,
-            }))
-            break
+            case 'TOKEN_REFRESH': {
+              // Un autre onglet a rafraîchi les tokens
+              const { tokens: refreshedTokens } = data
+              setAuthState((prev) => ({
+                ...prev,
+                tokens: refreshedTokens || null,
+              }))
+              break
+            }
           }
         }
       }
-    } catch (_error) {}
+    } catch (_error) {
+      // Ignore broadcast channel errors
+    }
   }, [])
 
   // ===========================================
@@ -132,35 +138,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ===========================================
 
   useEffect(() => {
-    if (!isHydrated || initializationRef.current) return
-    initializationRef.current = true
+    if (!isHydrated || initializationRef?.current) return undefined
+    if (initializationRef.current !== undefined) {
+      initializationRef.current = true
+    }
 
     const initializeAuth = async () => {
       try {
         // Récupérer la session stockée
-        const storedSession = authStorage.getStoredSession()
+        const storedSession = authStorage?.getStoredSession()
         let { user, tokens, company } = storedSession
 
         // Convertir l'utilisateur existant vers le nouveau format si nécessaire
         if (user && !(user as unknown).societeRoles) {
-          const extendedUser = AuthAdapter.toExtendedUser(
-            user as any,
-            (user as unknown).userSocieteRoles || (user as unknown).societeRoles || []
-          )
-          user = AuthAdapter.toAuthUser(extendedUser)
+          const userWithRole = {
+            ...user,
+            role: user.role || 'USER', // Ensure role is always present
+          }
+          const extendedUser = AuthAdapter?.toExtendedUser(userWithRole as unknown)
+          user = AuthAdapter?.toAuthUser(extendedUser)
         }
 
         // Convertir la société existante si nécessaire
         if (company && !(company as unknown).isActive) {
-          company = AuthAdapter.toNewCompany(company as unknown) as Company
+          company = AuthAdapter?.toNewCompany(company as unknown) as Company
         }
 
         if (user && tokens) {
           // Vérifier si les tokens ne sont pas expirés
-          if (authStorage.areTokensExpired(tokens)) {
+          if (authStorage?.areTokensExpired(tokens)) {
             try {
-              const newTokens = await AuthService.refreshTokens(tokens.refreshToken)
-              authStorage.updateTokens(newTokens)
+              const newTokens = await AuthService?.refreshTokens(tokens?.refreshToken)
+              authStorage?.updateTokens(newTokens)
 
               setAuthState({
                 isLoading: false,
@@ -173,7 +182,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 mounted: true,
               })
             } catch (_refreshError) {
-              authStorage.clearSession()
+              authStorage?.clearSession()
               setAuthState({
                 ...defaultAuthState,
                 isLoading: false,
@@ -182,7 +191,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             }
           } else {
             // Valider les tokens avec le serveur
-            const isValid = await AuthService.validateTokens(tokens)
+            const isValid = await AuthService?.validateTokens(tokens)
 
             if (isValid) {
               setAuthState({
@@ -196,7 +205,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 mounted: true,
               })
             } else {
-              authStorage.clearSession()
+              authStorage?.clearSession()
               setAuthState({
                 ...defaultAuthState,
                 isLoading: false,
@@ -216,7 +225,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Initialiser la synchronisation multi-onglets
         initializeBroadcastChannel()
       } catch (_error) {
-        authStorage.clearSession()
+        authStorage?.clearSession()
         setAuthState({
           ...defaultAuthState,
           isLoading: false,
@@ -229,8 +238,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Nettoyage lors du démontage
     return () => {
-      if (broadcastChannel.current) {
-        broadcastChannel.current.close()
+      if (broadcastChannel?.current) {
+        broadcastChannel?.current?.close()
       }
     }
   }, [
@@ -238,19 +247,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initializeBroadcastChannel,
   ])
 
-  const broadcastAuthEvent = useCallback((type: AuthBroadcastEvent['type'], data: any) => {
-    if (!broadcastChannel.current) return
+  const broadcastAuthEvent = useCallback(
+    (type: AuthBroadcastEvent['type'], data: Record<string, unknown>) => {
+      if (!broadcastChannel?.current) return
 
-    try {
-      const event: AuthBroadcastEvent = {
-        type,
-        tabId: tabId.current,
-        data,
-      }
+      try {
+        const event: AuthBroadcastEvent = {
+          type,
+          tabId: tabId.current,
+          data,
+        }
 
-      broadcastChannel.current.postMessage(event)
-    } catch (_error) {}
-  }, [])
+        broadcastChannel?.current?.postMessage(event)
+      } catch (_error) {}
+    },
+    [] // Dependencies are refs, which are stable
+  )
 
   // ===========================================
   // ACTIONS D'AUTHENTIFICATION
@@ -261,9 +273,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setAuthState((prev) => ({ ...prev, isLoading: true }))
 
       try {
-        const result = await AuthService.login(identifier, password)
+        const result = await AuthService?.login(identifier, password)
 
-        if (result.requiresMFA && result.mfa) {
+        if (result?.requiresMFA && result?.mfa) {
           // MFA requis
           setAuthState((prev) => ({
             ...prev,
@@ -273,14 +285,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           return
         }
 
-        if (result.user && result.tokens) {
+        if (result?.user && result?.tokens) {
           // Login réussi - convertir les données API vers le nouveau format
-          const extendedUser = AuthAdapter.toExtendedUser(result.user as unknown)
-          const user = AuthAdapter.toAuthUser(extendedUser)
-          const tokens = AuthAdapter.toNewAuthTokens(result.tokens as unknown)
+          const extendedUser = AuthAdapter?.toExtendedUser(result?.user as unknown)
+          const user = AuthAdapter?.toAuthUser(extendedUser)
+          const tokens = AuthAdapter?.toNewAuthTokens(result?.tokens as unknown)
 
           // Sauvegarder temporairement les tokens pour permettre les appels API
-          authStorage.saveSession(user, tokens, null, rememberMe)
+          authStorage?.saveSession(user, tokens, null, rememberMe)
 
           // Vérifier s'il y a une société par défaut
           try {
@@ -288,33 +300,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
               method: 'GET',
             })
 
-            if (response.ok) {
-              const defaultCompanyData = await response.json()
+            if (response?.ok) {
+              const defaultCompanyData = await response?.json()
 
-              if (defaultCompanyData.success && defaultCompanyData.data) {
+              if (defaultCompanyData?.success && defaultCompanyData?.data) {
                 // L'utilisateur a une société par défaut - se connecter automatiquement
-                const companyId = defaultCompanyData.data.id
-                const companySelectResult = await AuthService.selectCompany(
+                const companyId = defaultCompanyData?.data?.id
+
+                // IMPORTANT: Attendre un peu pour s'assurer que les tokens sont bien propagés
+                await new Promise((resolve) => setTimeout(resolve, 100))
+
+                const companySelectResult = await AuthService?.selectCompany(
                   companyId,
-                  tokens.accessToken
+                  tokens?.accessToken
                 )
 
-                const adaptedUser = AuthAdapter.toAuthUser(
-                  AuthAdapter.toExtendedUser(
-                    companySelectResult.user as any,
-                    (companySelectResult.user as unknown).userSocieteRoles ||
-                      (companySelectResult.user as unknown).societeRoles ||
-                      []
-                  )
+                const adaptedUser = AuthAdapter?.toAuthUser(
+                  AuthAdapter?.toExtendedUser(companySelectResult?.user as unknown)
                 )
-                const adaptedTokens = AuthAdapter.toNewAuthTokens(
-                  companySelectResult.tokens as unknown
+                const adaptedTokens = AuthAdapter?.toNewAuthTokens(
+                  companySelectResult?.tokens as unknown
                 )
-                const adaptedCompany = AuthAdapter.toNewCompany(
-                  companySelectResult.company as unknown
+                const adaptedCompany = AuthAdapter?.toNewCompany(
+                  companySelectResult?.company as unknown
                 )
 
-                authStorage.saveSession(adaptedUser, adaptedTokens, adaptedCompany, rememberMe)
+                authStorage?.saveSession(adaptedUser, adaptedTokens, adaptedCompany, rememberMe)
 
                 const newState = {
                   isLoading: false,
@@ -326,19 +337,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   requiresCompanySelection: false,
                   mounted: true,
                 }
-
-                setAuthState((prev) => ({ ...prev, ...newState }))
+                setAuthState(newState)
                 broadcastAuthEvent('USER_LOGIN', {
                   user: adaptedUser,
                   tokens: adaptedTokens,
                   company: adaptedCompany,
                 })
 
-                // IMPORTANT: Rediriger immédiatement vers le dashboard après avoir défini la société par défaut
+                // IMPORTANT: Rediriger immédiatement vers le dashboard
                 if (typeof window !== 'undefined') {
-                  setTimeout(() => {
-                    window.location.href = '/dashboard'
-                  }, 100) // Petit délai pour s'assurer que l'état est bien mis à jour
+                  window.location.href = '/dashboard'
                 }
 
                 return
@@ -373,28 +381,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
   )
 
   const verifyMFA = useCallback(
-    async (mfaType: string, code?: string, webauthnResponse?: any): Promise<void> => {
-      if (!authState.mfa.required || !authState.mfa.userId) {
+    async (
+      mfaType: string,
+      code?: string,
+      webauthnResponse?: PublicKeyCredential
+    ): Promise<void> => {
+      if (!authState?.mfa?.required || !authState?.mfa?.userId) {
         throw new Error('MFA not required or no user ID available')
       }
 
       setAuthState((prev) => ({ ...prev, isLoading: true }))
 
       try {
-        const { user: rawUser, tokens: rawTokens } = await AuthService.verifyMFA(
-          authState.mfa.userId!,
-          mfaType,
-          code,
-          webauthnResponse
-        )
+        const { user: rawUser, tokens: rawTokens } =
+          (await AuthService?.verifyMFA(
+            authState?.mfa?.userId!,
+            mfaType,
+            code,
+            webauthnResponse
+          )) || {}
 
         // Convertir les données vers le format attendu
-        const extendedUser = AuthAdapter.toExtendedUser(rawUser as unknown)
-        const user = AuthAdapter.toAuthUser(extendedUser)
-        const tokens = AuthAdapter.toNewAuthTokens(rawTokens as unknown)
+        const extendedUser = AuthAdapter?.toExtendedUser(rawUser as unknown)
+        const user = AuthAdapter?.toAuthUser(extendedUser)
+        const tokens = AuthAdapter?.toNewAuthTokens(rawTokens as unknown)
 
         // Forcer la sélection de société après MFA aussi
-        authStorage.saveSession(user, tokens, null)
+        authStorage?.saveSession(user, tokens, null)
 
         const newState = {
           isLoading: false,
@@ -427,15 +440,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setAuthState((prev) => ({ ...prev, isLoading: true }))
 
       try {
-        const result = await AuthService.selectCompany(company.id, authState.tokens.accessToken)
+        const result = await AuthService?.selectCompany(company.id, authState?.tokens?.accessToken)
 
         // Convertir les données vers le format attendu
-        const extendedUser = AuthAdapter.toExtendedUser(result.user as unknown)
-        const user = AuthAdapter.toAuthUser(extendedUser)
-        const tokens = AuthAdapter.toNewAuthTokens(result.tokens as unknown)
-        const adaptedCompany = AuthAdapter.toNewCompany(result.company as unknown)
+        const extendedUser = AuthAdapter?.toExtendedUser(result?.user as unknown)
+        const user = AuthAdapter?.toAuthUser(extendedUser)
+        const tokens = AuthAdapter?.toNewAuthTokens(result?.tokens as unknown)
+        const adaptedCompany = AuthAdapter?.toNewCompany(result?.company as unknown)
 
-        authStorage.saveSession(user, tokens, adaptedCompany)
+        authStorage?.saveSession(user, tokens, adaptedCompany)
 
         const newState = {
           isLoading: false,
@@ -460,11 +473,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
-      await AuthService.logout(authState.tokens?.accessToken)
+      await AuthService?.logout(authState.tokens?.accessToken)
     } catch (_error) {
     } finally {
       // Nettoyer la session
-      authStorage.clearSession()
+      authStorage?.clearSession()
 
       setAuthState({
         ...defaultAuthState,
@@ -496,14 +509,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const setUser = useCallback(
     (user: User | null): void => {
       if (user && authState.tokens) {
-        authStorage.saveSession(user, authState.tokens, authState.company)
+        authStorage?.saveSession(user, authState.tokens, authState.company)
         setAuthState((prev) => ({
           ...prev,
           user,
           isAuthenticated: true,
         }))
       } else {
-        authStorage.clearSession()
+        authStorage?.clearSession()
         setAuthState({
           ...defaultAuthState,
           isLoading: false,
@@ -515,14 +528,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   )
 
   const refreshTokens = useCallback(async (): Promise<void> => {
-    const { tokens: storedTokens } = authStorage.getStoredSession()
-    if (!storedTokens?.refreshToken) {
+    const storedSession = authStorage?.getStoredSession()
+    if (!storedSession?.tokens?.refreshToken) {
       throw new Error('No refresh token available')
     }
+    const { tokens: storedTokens } = storedSession
 
     try {
-      const newTokens = await AuthService.refreshTokens(storedTokens.refreshToken)
-      authStorage.updateTokens(newTokens)
+      const newTokens = await AuthService?.refreshTokens(storedTokens.refreshToken)
+      authStorage?.updateTokens(newTokens)
 
       setAuthState((prev) => ({ ...prev, tokens: newTokens }))
 
@@ -534,11 +548,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [logout, broadcastAuthEvent])
 
   const validateTokens = useCallback(async (tokens: AuthTokens): Promise<boolean> => {
-    return AuthService.validateTokens(tokens)
+    return AuthService?.validateTokens(tokens)
   }, [])
 
   const refreshAuth = useCallback(async (): Promise<void> => {
-    const { user, tokens, company } = authStorage.getStoredSession()
+    const storedSession = authStorage?.getStoredSession()
+    if (!storedSession) return
+
+    const { user, tokens, company } = storedSession
 
     if (user && tokens) {
       setAuthState((prev) => ({

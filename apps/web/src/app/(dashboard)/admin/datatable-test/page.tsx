@@ -134,7 +134,7 @@ export default function DataTableTestPage() {
 
         {/* Statistics Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
+          {stats?.map((stat) => (
             <Card
               key={stat.label}
               className={`group border-0 bg-gradient-to-br ${stat.gradient} text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 fade-in-up`}
@@ -161,7 +161,7 @@ export default function DataTableTestPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {features.map((feature) => (
+              {features?.map((feature) => (
                 <div
                   key={feature.title}
                   className="group p-6 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-100 hover:shadow-lg transition-all duration-300 hover:scale-105 feature-card fade-in-up"
@@ -235,7 +235,10 @@ export default function DataTableTestPage() {
                   Explorez toutes les fonctionnalités avancées du composant DataTable
                 </p>
               </div>
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shimmer-btn">
+              <Button
+                type="button"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shimmer-btn"
+              >
                 <ArrowUpRight className="h-4 w-4 mr-2" />
                 Documentation
               </Button>
@@ -261,7 +264,10 @@ export default function DataTableTestPage() {
                   Affichage et gestion de données hiérarchiques avec drag & drop
                 </p>
               </div>
-              <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shimmer-btn">
+              <Button
+                type="button"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shimmer-btn"
+              >
                 <ArrowUpRight className="h-4 w-4 mr-2" />
                 Voir Structure
               </Button>

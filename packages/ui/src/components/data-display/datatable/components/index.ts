@@ -2,14 +2,11 @@
  * Export centralisé des composants DataTable
  */
 
-export { DataTableHeader } from './DataTableHeader'
-export type { DataTableHeaderProps } from './DataTableHeader'
-
-export { DataTableBody } from './DataTableBody'
 export type { DataTableBodyProps } from './DataTableBody'
-
-export { TableCell } from './DataTableBody/TableCell'
+export { DataTableBody } from './DataTableBody'
 export { InlineActions } from './DataTableBody/InlineActions'
-
-export { DataTableFooter } from './DataTableFooter'
+export { TableCell } from './DataTableBody/TableCell'
 export type { DataTableFooterProps } from './DataTableFooter'
+export { DataTableFooter } from './DataTableFooter'
+export type { DataTableHeaderProps } from './DataTableHeader'
+export { DataTableHeader } from './DataTableHeader'

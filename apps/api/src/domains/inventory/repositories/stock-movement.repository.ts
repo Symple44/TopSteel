@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, Between, In, MoreThan, LessThan, Not, IsNull, Like } from 'typeorm'
+import { Between, In, Like, MoreThan, type Repository } from 'typeorm'
 import { StockMovement } from '../entities/stock-movement.entity'
 import {
-  StockMovementType,
+  type IStockMovementFilters,
+  type StockMovementPriority,
   StockMovementStatus,
-  StockMovementMotif,
-  StockMovementPriority,
-  IStockMovementFilters,
+  StockMovementType,
 } from '../interfaces/stock-movement.interface'
 
 export interface StockMovementStats {
@@ -50,20 +49,20 @@ export class StockMovementRepository {
   async findById(id: string): Promise<StockMovement | null> {
     return await this.repository.findOne({
       where: { id },
-      relations: ['article']
+      relations: ['article'],
     })
   }
 
   async findByReference(reference: string): Promise<StockMovement | null> {
     return await this.repository.findOne({
       where: { reference },
-      relations: ['article']
+      relations: ['article'],
     })
   }
 
   async findByArticle(
     articleId: string,
-    options?: { 
+    options?: {
       limit?: number
       offset?: number
       dateMin?: Date
@@ -72,14 +71,15 @@ export class StockMovementRepository {
       status?: StockMovementStatus[]
     }
   ): Promise<StockMovement[]> {
-    const query = this.repository.createQueryBuilder('movement')
+    const query = this.repository
+      .createQueryBuilder('movement')
       .where('movement.articleId = :articleId', { articleId })
       .orderBy('movement.dateCreation', 'DESC')
 
     if (options?.dateMin && options?.dateMax) {
       query.andWhere('movement.dateCreation BETWEEN :dateMin AND :dateMax', {
         dateMin: options.dateMin,
-        dateMax: options.dateMax
+        dateMax: options.dateMax,
       })
     }
 
@@ -108,7 +108,8 @@ export class StockMovementRepository {
     page: number
     limit: number
   }> {
-    const query = this.repository.createQueryBuilder('movement')
+    const query = this.repository
+      .createQueryBuilder('movement')
       .leftJoinAndSelect('movement.article', 'article')
 
     // Filtres de base
@@ -136,7 +137,7 @@ export class StockMovementRepository {
     if (filters.dateDebut && filters.dateFin) {
       query.andWhere('movement.dateCreation BETWEEN :dateDebut AND :dateFin', {
         dateDebut: filters.dateDebut,
-        dateFin: filters.dateFin
+        dateFin: filters.dateFin,
       })
     } else if (filters.dateDebut) {
       query.andWhere('movement.dateCreation >= :dateDebut', { dateDebut: filters.dateDebut })
@@ -146,11 +147,15 @@ export class StockMovementRepository {
 
     // Filtres de document
     if (filters.typeDocumentSource) {
-      query.andWhere('movement.documentType = :documentType', { documentType: filters.typeDocumentSource })
+      query.andWhere('movement.documentType = :documentType', {
+        documentType: filters.typeDocumentSource,
+      })
     }
 
     if (filters.documentSourceIds?.length) {
-      query.andWhere('movement.documentId IN (:...documentIds)', { documentIds: filters.documentSourceIds })
+      query.andWhere('movement.documentId IN (:...documentIds)', {
+        documentIds: filters.documentSourceIds,
+      })
     }
 
     // Filtres d'emplacement
@@ -192,7 +197,7 @@ export class StockMovementRepository {
       items,
       total,
       page,
-      limit
+      limit,
     }
   }
 
@@ -202,7 +207,8 @@ export class StockMovementRepository {
     priorite?: StockMovementPriority[]
     limit?: number
   }): Promise<StockMovement[]> {
-    const query = this.repository.createQueryBuilder('movement')
+    const query = this.repository
+      .createQueryBuilder('movement')
       .where('movement.statut = :status', { status: StockMovementStatus.EN_ATTENTE })
       .orderBy('movement.priorite', 'DESC')
       .addOrderBy('movement.dateCreation', 'ASC')
@@ -231,7 +237,10 @@ export class StockMovementRepository {
   }
 
   async update(id: string, data: Partial<StockMovement>): Promise<StockMovement> {
-    await this.repository.update(id, data)
+    // Exclure les propriétés de relation pour l'update
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { article: _article, ...updateData } = data
+    await this.repository.update(id, updateData as unknown)
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Movement ${id} not found`)
@@ -256,7 +265,7 @@ export class StockMovementRepository {
     }
 
     const movements = await this.repository.find({ where: whereClause })
-    
+
     return this.calculateStats(movements)
   }
 
@@ -270,7 +279,7 @@ export class StockMovementRepository {
     }
 
     const movements = await this.repository.find({ where: whereClause })
-    
+
     return this.calculateStats(movements)
   }
 
@@ -286,47 +295,52 @@ export class StockMovementRepository {
         where: {
           articleId,
           dateCreation: MoreThan(dayAgo),
-          statut: StockMovementStatus.COMPLETE
-        }
+          statut: StockMovementStatus.COMPLETE,
+        },
       }),
       this.repository.count({
         where: {
           articleId,
           dateCreation: MoreThan(weekAgo),
-          statut: StockMovementStatus.COMPLETE
-        }
+          statut: StockMovementStatus.COMPLETE,
+        },
       }),
       this.repository.count({
         where: {
           articleId,
           dateCreation: MoreThan(monthAgo),
-          statut: StockMovementStatus.COMPLETE
-        }
-      })
+          statut: StockMovementStatus.COMPLETE,
+        },
+      }),
     ])
 
     // Stock actuel (dernier mouvement complété)
     const lastMovement = await this.repository.findOne({
       where: {
         articleId,
-        statut: StockMovementStatus.COMPLETE
+        statut: StockMovementStatus.COMPLETE,
       },
-      order: { dateCreation: 'DESC' }
+      order: { dateCreation: 'DESC' },
     })
 
     const stockActuel = lastMovement?.stockApres || 0
 
     // Calculer la tendance
-    const tendance = mouvementsJour > mouvementsSemaine / 7 ? 'hausse' :
-                     mouvementsJour < mouvementsSemaine / 7 ? 'baisse' : 'stable'
+    const tendance =
+      mouvementsJour > mouvementsSemaine / 7
+        ? 'hausse'
+        : mouvementsJour < mouvementsSemaine / 7
+          ? 'baisse'
+          : 'stable'
 
     // Rotation du stock (sorties moyennes par jour)
-    const sortiesMois = await this.repository.sum('quantite', {
-      articleId,
-      type: In([StockMovementType.SORTIE, StockMovementType.CORRECTION_NEGATIVE]),
-      dateCreation: MoreThan(monthAgo),
-      statut: StockMovementStatus.COMPLETE
-    }) || 0
+    const sortiesMois =
+      (await this.repository.sum('quantite', {
+        articleId,
+        type: In([StockMovementType.SORTIE, StockMovementType.CORRECTION_NEGATIVE]),
+        dateCreation: MoreThan(monthAgo),
+        statut: StockMovementStatus.COMPLETE,
+      })) || 0
 
     const rotationStock = sortiesMois / 30
 
@@ -341,7 +355,7 @@ export class StockMovementRepository {
       mouvementsMois,
       tendance,
       rotationStock,
-      couvertureStock
+      couvertureStock,
     }
   }
 
@@ -349,24 +363,26 @@ export class StockMovementRepository {
     articleId: string,
     groupBy: 'day' | 'week' | 'month',
     period: { start: Date; end: Date }
-  ): Promise<Array<{
-    periode: string
-    entrees: number
-    sorties: number
-    solde: number
-  }>> {
+  ): Promise<
+    Array<{
+      periode: string
+      entrees: number
+      sorties: number
+      solde: number
+    }>
+  > {
     const movements = await this.repository.find({
       where: {
         articleId,
         dateCreation: Between(period.start, period.end),
-        statut: StockMovementStatus.COMPLETE
+        statut: StockMovementStatus.COMPLETE,
       },
-      order: { dateCreation: 'ASC' }
+      order: { dateCreation: 'ASC' },
     })
 
     const grouped = new Map<string, { entrees: number; sorties: number }>()
-    
-    movements.forEach(movement => {
+
+    movements.forEach((movement) => {
       const date = movement.dateCreation
       let key: string
 
@@ -374,11 +390,12 @@ export class StockMovementRepository {
         case 'day':
           key = date.toISOString().split('T')[0]
           break
-        case 'week':
+        case 'week': {
           const weekStart = new Date(date)
           weekStart.setDate(date.getDate() - date.getDay())
           key = weekStart.toISOString().split('T')[0]
           break
+        }
         case 'month':
           key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
           break
@@ -400,33 +417,27 @@ export class StockMovementRepository {
       periode,
       entrees: data.entrees,
       sorties: data.sorties,
-      solde: data.entrees - data.sorties
+      solde: data.entrees - data.sorties,
     }))
   }
 
-  async getLastMovements(
-    articleId: string,
-    limit = 10
-  ): Promise<StockMovement[]> {
+  async getLastMovements(articleId: string, limit = 10): Promise<StockMovement[]> {
     return await this.repository.find({
       where: { articleId },
       order: { dateCreation: 'DESC' },
       take: limit,
-      relations: ['article']
+      relations: ['article'],
     })
   }
 
-  async getMovementsByDocument(
-    documentType: string,
-    documentId: string
-  ): Promise<StockMovement[]> {
+  async getMovementsByDocument(documentType: string, documentId: string): Promise<StockMovement[]> {
     return await this.repository.find({
       where: {
         documentType,
-        documentId
+        documentId,
       },
       order: { dateCreation: 'DESC' },
-      relations: ['article']
+      relations: ['article'],
     })
   }
 
@@ -435,12 +446,12 @@ export class StockMovementRepository {
     const date = new Date()
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
-    
+
     // Compter les mouvements du mois
     const count = await this.repository.count({
       where: {
-        reference: Like(`${prefix}${year}${month}%`)
-      }
+        reference: Like(`${prefix}${year}${month}%`),
+      },
     })
 
     const sequence = String(count + 1).padStart(4, '0')
@@ -458,16 +469,13 @@ export class StockMovementRepository {
       case StockMovementType.INVENTAIRE:
         return 'INV'
       case StockMovementType.CORRECTION_POSITIVE:
+        return 'CRP'
       case StockMovementType.CORRECTION_NEGATIVE:
-        return 'AJU'
+        return 'CRN'
       case StockMovementType.RETOUR:
         return 'RET'
       case StockMovementType.RESERVATION:
         return 'RES'
-      case StockMovementType.CORRECTION_POSITIVE:
-        return 'CRP'
-      case StockMovementType.CORRECTION_NEGATIVE:
-        return 'CRN'
       default:
         return 'MVT'
     }
@@ -485,10 +493,10 @@ export class StockMovementRepository {
       valeurTotale: 0,
       mouvementsEnAttente: 0,
       mouvementsCompletes: 0,
-      mouvementsAnnules: 0
+      mouvementsAnnules: 0,
     }
 
-    movements.forEach(movement => {
+    movements.forEach((movement) => {
       // Par type
       if (movement.isEntree()) {
         stats.totalEntrees++
@@ -500,7 +508,10 @@ export class StockMovementRepository {
         stats.totalTransferts++
       } else if (movement.type === StockMovementType.INVENTAIRE) {
         stats.totalInventaires++
-      } else if (movement.type === StockMovementType.CORRECTION_POSITIVE || movement.type === StockMovementType.CORRECTION_NEGATIVE) {
+      } else if (
+        movement.type === StockMovementType.CORRECTION_POSITIVE ||
+        movement.type === StockMovementType.CORRECTION_NEGATIVE
+      ) {
         stats.totalAjustements++
       }
 

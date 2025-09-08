@@ -1,16 +1,21 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
-import { Euro, DollarSign, PoundSterling, AlertCircle, TrendingUp, TrendingDown, Calculator } from 'lucide-react'
+import {
+  AlertCircle,
+  Calculator,
+  DollarSign,
+  Euro,
+  PoundSterling,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { useUniqueId } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
 import { safeMathEval } from '../../../../utils/safe-math-eval'
-import { Label } from '../../../forms/label/Label'
-import { Button } from '../../../primitives/button/Button'
 import { Badge } from '../../../data-display/badge'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../../../primitives'
+import { Label } from '../../../forms/label/Label'
+import { Popover, PopoverContent, PopoverTrigger } from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface PriceInputProps {
   value?: number
   onChange?: (value: number | undefined) => void
@@ -67,6 +72,9 @@ export function PriceInput({
   size = 'md',
   variant = 'default',
 }: PriceInputProps) {
+  // Generate unique ID for the input
+  const inputId = useUniqueId('price-input')
+
   const [inputValue, setInputValue] = useState<string>(
     value !== undefined ? value.toFixed(precision) : ''
   )
@@ -100,7 +108,7 @@ export function PriceInput({
     if (regex.test(newValue)) {
       setInputValue(newValue)
       const numValue = parseFloat(newValue)
-      if (!isNaN(numValue)) {
+      if (!Number.isNaN(numValue)) {
         // Apply min/max constraints
         let constrainedValue = numValue
         if (min !== undefined && numValue < min) constrainedValue = min
@@ -119,7 +127,7 @@ export function PriceInput({
     // Format the value on blur
     if (inputValue !== '') {
       const numValue = parseFloat(inputValue)
-      if (!isNaN(numValue)) {
+      if (!Number.isNaN(numValue)) {
         setInputValue(numValue.toFixed(precision))
       }
     }
@@ -129,14 +137,14 @@ export function PriceInput({
     try {
       // Safe mathematical expression evaluation
       const result = safeMathEval(calcExpression)
-      if (!isNaN(result)) {
+      if (!Number.isNaN(result)) {
         const constrainedValue = Math.max(min || 0, Math.min(max || Infinity, result))
         onChange?.(constrainedValue)
         setInputValue(constrainedValue.toFixed(precision))
         setCalcExpression('')
         setShowCalc(false)
       }
-    } catch (e) {
+    } catch (_e) {
       // Invalid expression - silently ignore
     }
   }
@@ -181,7 +189,7 @@ export function PriceInput({
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <Label htmlFor="price-input">
+        <Label htmlFor={inputId}>
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
@@ -189,13 +197,11 @@ export function PriceInput({
       <div className="relative">
         <div className="relative flex items-center">
           {showCurrency && (
-            <div className="absolute left-3 text-muted-foreground">
-              {getCurrencySymbol().icon}
-            </div>
+            <div className="absolute left-3 text-muted-foreground">{getCurrencySymbol().icon}</div>
           )}
           <input
             ref={inputRef}
-            id="price-input"
+            id={inputId}
             type="text"
             inputMode="decimal"
             value={inputValue}
@@ -240,12 +246,7 @@ export function PriceInput({
                     placeholder="Ex: 100 * 1.2"
                     className="w-full rounded-md border px-3 py-2 text-sm"
                   />
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleCalculate}
-                    className="w-full"
-                  >
+                  <Button type="button" size="sm" onClick={handleCalculate} className="w-full">
                     Calculer
                   </Button>
                 </div>
@@ -269,7 +270,8 @@ export function PriceInput({
                   {formatCurrency(comparePrice)}
                 </span>
                 <Badge variant={getDiscount()! > 0 ? 'destructive' : 'default'} className="text-xs">
-                  {getDiscount()! > 0 ? '-' : '+'}{Math.abs(getDiscountPercentage()!).toFixed(0)}%
+                  {getDiscount()! > 0 ? '-' : '+'}
+                  {Math.abs(getDiscountPercentage()!).toFixed(0)}%
                 </Badge>
               </div>
             </div>
@@ -286,17 +288,16 @@ export function PriceInput({
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Marge</span>
               <div className="flex items-center gap-2">
-                <span className={cn(
-                  'font-medium',
-                  getMargin()! >= 0 ? 'text-green-600' : 'text-red-600'
-                )}>
+                <span
+                  className={cn(
+                    'font-medium',
+                    getMargin()! >= 0 ? 'text-green-600' : 'text-red-600'
+                  )}
+                >
                   {formatCurrency(getMargin()!)}
                 </span>
-                <Badge 
-                  variant={getMargin()! >= 0 ? 'default' : 'destructive'}
-                  className="text-xs"
-                >
-                  {getMarginPercentage()!.toFixed(1)}%
+                <Badge variant={getMargin()! >= 0 ? 'default' : 'destructive'} className="text-xs">
+                  {getMarginPercentage()?.toFixed(1)}%
                 </Badge>
                 {getMargin()! >= 0 ? (
                   <TrendingUp className="h-3 w-3 text-green-600" />
@@ -308,9 +309,7 @@ export function PriceInput({
           )}
         </div>
       </div>
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

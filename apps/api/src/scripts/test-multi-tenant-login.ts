@@ -190,7 +190,7 @@ async function testMultiTenantLogin() {
     console.log('\n📋 TEST 1 : Utilisateur avec une seule société')
     console.log('-'.repeat(80))
 
-    const singleSocieteLogin = await api.login('admin@topsteel.com', 'password123')
+    const singleSocieteLogin = await api.login('admin@topsteel.com', process.env.TEST_PASSWORD || 'test-pass')
     console.log('\n✅ Étape 1 - Login réussi')
     console.log(`   Utilisateur : ${singleSocieteLogin.user.email}`)
     console.log(`   Nombre de sociétés : ${singleSocieteLogin.societes.length}`)
@@ -204,7 +204,7 @@ async function testMultiTenantLogin() {
     )
 
     console.log('\n✅ Étape 2 - Société sélectionnée automatiquement')
-    const decodedToken = jwt.decode(singleSocieteResult.accessToken) as any
+    const decodedToken = jwt.decode(singleSocieteResult.accessToken) as unknown
     console.log(`   Token généré avec société : ${decodedToken.societeName}`)
     console.log(`   Rôle : ${decodedToken.role}`)
 
@@ -213,7 +213,7 @@ async function testMultiTenantLogin() {
     console.log('📋 TEST 2 : Utilisateur avec plusieurs sociétés')
     console.log('-'.repeat(80))
 
-    const multiSocieteLogin = await api.login('jean.martin@consultant.com', 'password123')
+    const multiSocieteLogin = await api.login('jean.martin@consultant.com', process.env.TEST_PASSWORD || 'test-pass')
     console.log('\n✅ Étape 1 - Login réussi')
     console.log(`   Utilisateur : ${multiSocieteLogin.user.email}`)
     console.log(`   Nombre de sociétés disponibles : ${multiSocieteLogin.societes.length}`)
@@ -237,7 +237,7 @@ async function testMultiTenantLogin() {
       multiSocieteLogin.temporaryToken
     )
 
-    const topsteelToken = jwt.decode(topsteelResult.accessToken) as any
+    const topsteelToken = jwt.decode(topsteelResult.accessToken) as unknown
     console.log('✅ Token généré pour TopSteel')
     console.log(`   Société ID : ${topsteelToken.societeId}`)
     console.log(`   Société : ${topsteelToken.societeName}`)
@@ -252,7 +252,7 @@ async function testMultiTenantLogin() {
       multiSocieteLogin.temporaryToken
     )
 
-    const metaluxToken = jwt.decode(metaluxResult.accessToken) as any
+    const metaluxToken = jwt.decode(metaluxResult.accessToken) as unknown
     console.log('✅ Token généré pour Metalux')
     console.log(`   Société ID : ${metaluxToken.societeId}`)
     console.log(`   Société : ${metaluxToken.societeName}`)
@@ -267,7 +267,7 @@ async function testMultiTenantLogin() {
       multiSocieteLogin.temporaryToken
     )
 
-    const demoToken = jwt.decode(demoResult.accessToken) as any
+    const demoToken = jwt.decode(demoResult.accessToken) as unknown
     console.log('✅ Token généré pour Demo Company')
     console.log(`   Société ID : ${demoToken.societeId}`)
     console.log(`   Société : ${demoToken.societeName}`)

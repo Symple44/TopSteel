@@ -14,20 +14,20 @@ export function ConnectionLostDialogWrapper({ isOpen, onRetry }: ConnectionLostD
   const { t } = useTranslation('common')
 
   const handleGoToLogin = () => {
-    router.push('/login')
+    router?.push('/login')
   }
 
   const translations = {
-    title: t('connection.lost.title'),
-    connectionInterrupted: t('connection.lost.connectionInterrupted'),
-    possibleReasons: t('connection.lost.possibleReasons'),
-    serverRestart: t('connection.lost.serverRestart'),
-    networkLoss: t('connection.lost.networkLoss'),
-    sessionExpired: t('connection.lost.sessionExpired'),
-    retrying: t('connection.lost.retrying'),
-    retry: t('connection.lost.retry'),
-    backToLogin: t('connection.lost.backToLogin'),
-    contactAdmin: t('connection.lost.contactAdmin'),
+    title: t('connection?.lost?.title'),
+    connectionInterrupted: t('connection?.lost?.connectionInterrupted'),
+    possibleReasons: t('connection?.lost?.possibleReasons'),
+    serverRestart: t('connection?.lost?.serverRestart'),
+    networkLoss: t('connection?.lost?.networkLoss'),
+    sessionExpired: t('connection?.lost?.sessionExpired'),
+    retrying: t('connection?.lost?.retrying'),
+    retry: t('connection?.lost?.retry'),
+    backToLogin: t('connection?.lost?.backToLogin'),
+    contactAdmin: t('connection?.lost?.contactAdmin'),
   }
 
   return (

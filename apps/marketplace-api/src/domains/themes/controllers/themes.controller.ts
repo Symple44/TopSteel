@@ -12,13 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { 
-  ApiBearerAuth, 
-  ApiOperation, 
-  ApiQuery, 
-  ApiResponse, 
-  ApiTags 
-} from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
@@ -40,17 +34,14 @@ export class ThemesController {
   @ApiOperation({ summary: 'Get all themes for the company' })
   @ApiResponse({ status: 200, description: 'List of themes' })
   @ApiQuery({ name: 'active', required: false, description: 'Filter by active status' })
-  async findAll(
-    @Req() req: Request,
-    @Query('active') active?: string
-  ) {
+  async findAll(@Req() req: Request, @Query('active') active?: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
-    
+
     if (active === 'true') {
       const activeTheme = await this.themesService.findActive(tenant.societeId)
       return activeTheme ? [activeTheme] : []
     }
-    
+
     return await this.themesService.findAll(tenant.societeId)
   }
 
@@ -60,12 +51,12 @@ export class ThemesController {
   @ApiResponse({ status: 404, description: 'No active theme found' })
   async findActive(@Req() req: Request) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
-    
+
     const activeTheme = await this.themesService.findActive(tenant.societeId)
     if (!activeTheme) {
       return { message: 'Aucun thème actif trouvé' }
     }
-    
+
     return activeTheme
   }
 
@@ -81,10 +72,7 @@ export class ThemesController {
   @ApiOperation({ summary: 'Get theme by ID' })
   @ApiResponse({ status: 200, description: 'Theme found' })
   @ApiResponse({ status: 404, description: 'Theme not found' })
-  async findOne(
-    @Req() req: Request,
-    @Param('id') id: string
-  ) {
+  async findOne(@Req() req: Request, @Param('id') id: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     return await this.themesService.findById(id, tenant.societeId)
   }
@@ -94,10 +82,7 @@ export class ThemesController {
   @ApiResponse({ status: 201, description: 'Theme created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Req() req: Request,
-    @Body() createDto: CreateThemeDto
-  ) {
+  async create(@Req() req: Request, @Body() createDto: CreateThemeDto) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     return await this.themesService.create(tenant.societeId, createDto)
   }
@@ -107,11 +92,7 @@ export class ThemesController {
   @ApiResponse({ status: 200, description: 'Theme updated successfully' })
   @ApiResponse({ status: 404, description: 'Theme not found' })
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
-  async update(
-    @Req() req: Request,
-    @Param('id') id: string,
-    @Body() updateDto: UpdateThemeDto
-  ) {
+  async update(@Req() req: Request, @Param('id') id: string, @Body() updateDto: UpdateThemeDto) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     return await this.themesService.update(id, tenant.societeId, updateDto)
   }
@@ -122,10 +103,7 @@ export class ThemesController {
   @ApiResponse({ status: 404, description: 'Theme not found' })
   @ApiResponse({ status: 400, description: 'Cannot delete active or default theme' })
   @HttpCode(HttpStatus.OK)
-  async delete(
-    @Req() req: Request,
-    @Param('id') id: string
-  ) {
+  async delete(@Req() req: Request, @Param('id') id: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     await this.themesService.delete(id, tenant.societeId)
     return { message: 'Thème supprimé avec succès' }
@@ -136,16 +114,13 @@ export class ThemesController {
   @ApiResponse({ status: 200, description: 'Theme activated successfully' })
   @ApiResponse({ status: 404, description: 'Theme not found' })
   @HttpCode(HttpStatus.OK)
-  async activate(
-    @Req() req: Request,
-    @Param('id') id: string
-  ) {
+  async activate(@Req() req: Request, @Param('id') id: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     const activatedTheme = await this.themesService.activate(id, tenant.societeId)
-    
+
     return {
       message: 'Thème activé avec succès',
-      theme: activatedTheme
+      theme: activatedTheme,
     }
   }
 
@@ -155,17 +130,13 @@ export class ThemesController {
   @ApiResponse({ status: 404, description: 'Theme not found' })
   @ApiResponse({ status: 400, description: 'Theme name already exists' })
   @HttpCode(HttpStatus.CREATED)
-  async clone(
-    @Req() req: Request,
-    @Param('id') id: string,
-    @Body() body: { name: string }
-  ) {
+  async clone(@Req() req: Request, @Param('id') id: string, @Body() body: { name: string }) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     const clonedTheme = await this.themesService.clone(id, tenant.societeId, body.name)
-    
+
     return {
       message: 'Thème cloné avec succès',
-      theme: clonedTheme
+      theme: clonedTheme,
     }
   }
 
@@ -173,16 +144,13 @@ export class ThemesController {
   @ApiOperation({ summary: 'Generate CSS for a theme' })
   @ApiResponse({ status: 200, description: 'CSS generated successfully' })
   @ApiResponse({ status: 404, description: 'Theme not found' })
-  async generateCSS(
-    @Req() req: Request,
-    @Param('id') id: string
-  ) {
+  async generateCSS(@Req() req: Request, @Param('id') id: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     const css = await this.themesService.generateCSS(id, tenant.societeId)
-    
+
     return {
       css,
-      contentType: 'text/css'
+      contentType: 'text/css',
     }
   }
 
@@ -205,16 +173,13 @@ export class ThemesController {
   @ApiResponse({ status: 200, description: 'Theme reset successfully' })
   @ApiResponse({ status: 404, description: 'Theme not found' })
   @HttpCode(HttpStatus.OK)
-  async resetToDefault(
-    @Req() req: Request,
-    @Param('id') id: string
-  ) {
+  async resetToDefault(@Req() req: Request, @Param('id') id: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     const resetTheme = await this.themesService.resetToDefault(id, tenant.societeId)
-    
+
     return {
       message: 'Thème remis à zéro avec succès',
-      theme: resetTheme
+      theme: resetTheme,
     }
   }
 
@@ -222,21 +187,25 @@ export class ThemesController {
   @ApiOperation({ summary: 'Export theme configuration' })
   @ApiResponse({ status: 200, description: 'Theme exported successfully' })
   @ApiResponse({ status: 404, description: 'Theme not found' })
-  async exportTheme(
-    @Req() req: Request,
-    @Param('id') id: string
-  ) {
+  async exportTheme(@Req() req: Request, @Param('id') id: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     const theme = await this.themesService.findById(id, tenant.societeId)
-    
+
     // Return theme configuration without sensitive data
-    const { id: _id, societeId: _societeId, createdAt, updatedAt, ...exportableData } = theme
-    
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {
+      id: _id,
+      societeId: _societeId,
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
+      ...exportableData
+    } = theme
+
     return {
       exported_at: new Date(),
       theme: exportableData,
       format_version: '1.0',
-      export_type: 'full'
+      export_type: 'full',
     }
   }
 
@@ -254,7 +223,7 @@ export class ThemesController {
     }
   ) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
-    
+
     try {
       // Create theme from imported data
       const importedTheme = await this.themesService.create(tenant.societeId, {
@@ -264,22 +233,22 @@ export class ThemesController {
           ...importData.theme.metadata,
           imported: true,
           importedAt: new Date().toISOString(),
-        }
+        },
       })
-      
+
       return {
         message: 'Thème importé avec succès',
-        theme: importedTheme
+        theme: importedTheme,
       }
     } catch (error) {
       if (error.message.includes('existe déjà') && importData.overwrite_existing) {
         // If overwrite is allowed, delete existing and create new
         const existingThemes = await this.themesService.findAll(tenant.societeId)
-        const existingTheme = existingThemes.find(t => t.name === importData.name)
-        
+        const existingTheme = existingThemes.find((t) => t.name === importData.name)
+
         if (existingTheme && !existingTheme.isActive && !existingTheme.isDefault) {
           await this.themesService.delete(existingTheme.id, tenant.societeId)
-          
+
           const importedTheme = await this.themesService.create(tenant.societeId, {
             name: importData.name,
             ...importData.theme,
@@ -288,16 +257,16 @@ export class ThemesController {
               imported: true,
               importedAt: new Date().toISOString(),
               overwritten: true,
-            }
+            },
           })
-          
+
           return {
             message: 'Thème importé et remplacé avec succès',
-            theme: importedTheme
+            theme: importedTheme,
           }
         }
       }
-      
+
       throw error
     }
   }
@@ -306,18 +275,15 @@ export class ThemesController {
   @ApiOperation({ summary: 'Get theme version history' })
   @ApiResponse({ status: 200, description: 'Version history' })
   @ApiResponse({ status: 404, description: 'Theme not found' })
-  async getVersionHistory(
-    @Req() req: Request,
-    @Param('id') id: string
-  ) {
+  async getVersionHistory(@Req() req: Request, @Param('id') id: string) {
     const { tenant } = req as unknown as { tenant: { societeId: string } }
     const theme = await this.themesService.findById(id, tenant.societeId)
-    
+
     return {
       current_version: theme.version,
       changelog: theme.metadata?.changelog || [],
       last_updated: theme.updatedAt,
-      created: theme.createdAt
+      created: theme.createdAt,
     }
   }
 }

@@ -154,7 +154,7 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
 
       {/* Account Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {accountStats.map((stat) => {
+        {accountStats?.map((stat) => {
           const Icon = stat.icon
           return (
             <div key={stat.label} className="bg-white border border-gray-200 rounded-lg p-6">
@@ -185,7 +185,7 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action) => {
+          {quickActions?.map((action) => {
             const Icon = action.icon
             return (
               <button
@@ -232,7 +232,7 @@ export const AccountOverview: React.FC<AccountOverviewProps> = ({ className }) =
             </button>
           </div>
           <div className="space-y-4">
-            {recentOrders.map((order) => (
+            {recentOrders?.map((order) => (
               <div key={order.id} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">

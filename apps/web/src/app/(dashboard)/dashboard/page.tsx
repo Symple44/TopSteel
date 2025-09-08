@@ -73,7 +73,7 @@ export default function Dashboard() {
   // Vérifier l'authentification
   React.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/dashboard')
+      router?.push('/login?redirect=/dashboard')
     }
   }, [isAuthenticated, authLoading, router])
 
@@ -222,7 +222,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <CompanyLogo size="lg" showName={false} className="flex-shrink-0" />
+            <CompanyLogo size="lg" showCompanyName={false} className="flex-shrink-0" />
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
                 {t('title')}
@@ -232,6 +232,7 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center space-x-3">
             <Button
+              type="button"
               variant="outline"
               size="sm"
               className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white"
@@ -239,7 +240,10 @@ export default function Dashboard() {
               <CalendarIcon className="mr-2 h-4 w-4 text-slate-600" />
               {t('thisWeek')}
             </Button>
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
+            <Button
+              type="button"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
+            >
               <BarChart3 className="mr-2 h-4 w-4" />
               {t('reports')}
             </Button>
@@ -259,12 +263,12 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-1">{stats.projets.enCours}</div>
+              <div className="text-3xl font-bold mb-1">{stats?.projets?.enCours}</div>
               <div className="flex items-center text-sm text-emerald-100">
-                {stats.projets.enRetard > 0 ? (
+                {stats?.projets?.enRetard > 0 ? (
                   <>
                     <AlertTriangle className="mr-1 h-3 w-3" />
-                    {stats.projets.enRetard} {t('delayedProjects')}
+                    {stats?.projets?.enRetard} {t('delayedProjects')}
                   </>
                 ) : (
                   <>
@@ -288,7 +292,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-1">
-                {formatCurrency(stats.chiffreAffaires.mensuel)}
+                {formatCurrency(stats?.chiffreAffaires?.mensuel)}
               </div>
               <div className="flex items-center text-sm text-blue-100">
                 <TrendingUp className="mr-1 h-3 w-3 text-green-300" />
@@ -308,11 +312,11 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{stats.production.tauxOccupation}%</div>
+              <div className="text-3xl font-bold mb-2">{stats?.production?.tauxOccupation}%</div>
               <div className="bg-white/20 rounded-full h-2 overflow-hidden">
                 <div
                   className="h-full bg-white rounded-full transition-all duration-500"
-                  style={{ width: `${stats.production.tauxOccupation}%` }}
+                  style={{ width: `${stats?.production?.tauxOccupation}%` }}
                 />
               </div>
             </CardContent>
@@ -329,10 +333,10 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-1">{stats.stocks.alertes}</div>
+              <div className="text-3xl font-bold mb-1">{stats?.stocks?.alertes}</div>
               <div className="flex items-center text-sm text-purple-100">
                 <AlertTriangle className="mr-1 h-3 w-3 text-yellow-300" />
-                {stats.stocks.ruptures} {t('stockBreaks')}
+                {stats?.stocks?.ruptures} {t('stockBreaks')}
               </div>
             </CardContent>
           </Card>
@@ -360,21 +364,21 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-slate-700">{t('objective2025')}</span>
                   <span className="text-slate-600">
-                    {formatCurrency(stats.chiffreAffaires.objectif)}
+                    {formatCurrency(stats?.chiffreAffaires?.objectif)}
                   </span>
                 </div>
                 <div className="bg-slate-100 rounded-full h-3 overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-700"
-                    style={{ width: `${stats.chiffreAffaires.progression}%` }}
+                    style={{ width: `${stats?.chiffreAffaires?.progression}%` }}
                   />
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-600">
-                    {formatCurrency(stats.chiffreAffaires.annuel)} {t('achieved')}
+                    {formatCurrency(stats?.chiffreAffaires?.annuel)} {t('achieved')}
                   </span>
                   <span className="font-medium text-slate-800">
-                    {stats.chiffreAffaires.progression}%
+                    {stats?.chiffreAffaires?.progression}%
                   </span>
                 </div>
               </div>
@@ -393,10 +397,10 @@ export default function Dashboard() {
                         width: '20px',
                         background: `linear-gradient(to top, hsl(${220 + i * 15}, 70%, ${50 + height * 0.3}%), hsl(${240 + i * 10}, 80%, ${60 + height * 0.2}%))`,
                       }}
-                      onClick={() => router.push(`/reports/monthly?month=${i + 1}`)}
+                      onClick={() => router?.push(`/reports/monthly?month=${i + 1}`)}
                       onKeyDown={(e) =>
                         (e.key === 'Enter' || e.key === ' ') &&
-                        router.push(`/reports/monthly?month=${i + 1}`)
+                        router?.push(`/reports/monthly?month=${i + 1}`)
                       }
                       aria-label={`Voir les détails du mois ${i + 1}`}
                     />
@@ -423,7 +427,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {activities.map((activity) => (
+                {activities?.map((activity) => (
                   <div key={activity.id} className="flex items-start space-x-3 group">
                     <div className="flex-shrink-0 mt-1">
                       <div
@@ -455,6 +459,7 @@ export default function Dashboard() {
               </div>
               <div className="mt-6">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="w-full border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white group"
@@ -472,8 +477,8 @@ export default function Dashboard() {
           <button
             type="button"
             className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative rounded-lg p-0 w-full text-left"
-            onClick={() => router.push('/projects/new')}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push('/projects/new')}
+            onClick={() => router?.push('/projects/new')}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router?.push('/projects/new')}
             aria-label={t('newProject')}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -495,9 +500,9 @@ export default function Dashboard() {
           <button
             type="button"
             className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative rounded-lg p-0 w-full text-left"
-            onClick={() => router.push('/production/orders/new')}
+            onClick={() => router?.push('/production/orders/new')}
             onKeyDown={(e) =>
-              (e.key === 'Enter' || e.key === ' ') && router.push('/production/orders/new')
+              (e.key === 'Enter' || e.key === ' ') && router?.push('/production/orders/new')
             }
             aria-label={t('productionOrder')}
           >
@@ -520,8 +525,8 @@ export default function Dashboard() {
           <button
             type="button"
             className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative rounded-lg p-0 w-full text-left"
-            onClick={() => router.push('/quotes/new')}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push('/quotes/new')}
+            onClick={() => router?.push('/quotes/new')}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router?.push('/quotes/new')}
             aria-label={t('newQuote')}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -91,6 +91,7 @@ export function TreeGroupingPanel<T = any>({
 
             <div className="flex items-center gap-2">
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={onExpandAll}
@@ -101,6 +102,7 @@ export function TreeGroupingPanel<T = any>({
               </Button>
 
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={onCollapseAll}
@@ -111,6 +113,7 @@ export function TreeGroupingPanel<T = any>({
               </Button>
 
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={onClearGrouping}
@@ -167,6 +170,7 @@ export function TreeGroupingPanel<T = any>({
                     {/* Actions */}
                     <div className="flex items-center gap-1">
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => onReorderColumns(index, Math.max(0, index - 1))}
@@ -176,6 +180,7 @@ export function TreeGroupingPanel<T = any>({
                       </Button>
 
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() =>
@@ -186,7 +191,12 @@ export function TreeGroupingPanel<T = any>({
                         <ArrowDown className="h-4 w-4" />
                       </Button>
 
-                      <Button variant="ghost" size="sm" onClick={() => onRemoveColumn(column.id)}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onRemoveColumn(column.id)}
+                      >
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
@@ -222,7 +232,12 @@ export function TreeGroupingPanel<T = any>({
                       <div className="text-xs text-muted-foreground">ID: {column.id}</div>
                     </div>
 
-                    <Button variant="outline" size="sm" onClick={() => onAddColumn(column.id)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onAddColumn(column.id)}
+                    >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
@@ -276,7 +291,7 @@ export function TreeGroupingPanel<T = any>({
       </div>
 
       <div className="p-6 border-t border-border">
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
           Fermer
         </Button>
       </div>

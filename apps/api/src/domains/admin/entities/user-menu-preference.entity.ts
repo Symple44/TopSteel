@@ -9,7 +9,15 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm'
-import { MenuConfiguration } from './menu-configuration.entity'
+
+// import { MenuConfiguration } from './menu-configuration.entity';
+
+// Type definition to avoid circular dependency
+type MenuConfiguration = {
+  id: string
+  code: string
+  // Other MenuConfiguration properties would be here
+}
 
 /**
  * User menu preferences entity
@@ -18,6 +26,8 @@ import { MenuConfiguration } from './menu-configuration.entity'
 @Unique(['userId', 'menuId'])
 @Index(['userId', 'menuId'])
 export class UserMenuPreference {
+  [key: string]: unknown
+
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
@@ -59,7 +69,7 @@ export class UserMenuPreference {
   }>
 
   @Column({ type: 'jsonb', default: {} })
-  preferences!: Record<string, any>
+  preferences!: Record<string, unknown>
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
@@ -68,11 +78,7 @@ export class UserMenuPreference {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => MenuConfiguration,
-    (menu) => menu.userPreferences,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('MenuConfiguration', 'userPreferences', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'menu_id' })
   menu!: MenuConfiguration
 
@@ -208,14 +214,15 @@ export class UserMenuPreference {
   /**
    * Get preference value
    */
-  getPreference<T>(key: string, defaultValue?: T): T | undefined {
-    return this.preferences?.[key] ?? defaultValue
+  getPreference<T = unknown>(key: string, defaultValue?: T): T | undefined {
+    const value = this.preferences?.[key]
+    return value !== undefined ? (value as T) : defaultValue
   }
 
   /**
    * Set preference value
    */
-  setPreference(key: string, value: any): void {
+  setPreference(key: string, value: unknown): void {
     if (!this.preferences) {
       this.preferences = {}
     }
@@ -228,7 +235,7 @@ export class UserMenuPreference {
   resetToDefaults(): void {
     this.hiddenItems = []
     this.pinnedItems = []
-    this.customOrder = null
+    this.customOrder = undefined
     this.collapsedGroups = []
     this.favorites = []
     this.recentItems = []
@@ -238,7 +245,7 @@ export class UserMenuPreference {
   /**
    * Export preferences for backup
    */
-  exportPreferences(): Record<string, any> {
+  exportPreferences(): Record<string, unknown> {
     return {
       hiddenItems: this.hiddenItems,
       pinnedItems: this.pinnedItems,
@@ -254,20 +261,85 @@ export class UserMenuPreference {
   /**
    * Import preferences from backup
    */
-  importPreferences(data: Record<string, any>): void {
-    if (data.hiddenItems) this.hiddenItems = data.hiddenItems
-    if (data.pinnedItems) this.pinnedItems = data.pinnedItems
-    if (data.customOrder) this.customOrder = data.customOrder
-    if (data.collapsedGroups) this.collapsedGroups = data.collapsedGroups
-    if (data.favorites) this.favorites = data.favorites
-    if (data.recentItems) this.recentItems = data.recentItems
-    if (data.preferences) this.preferences = data.preferences
+  importPreferences(data: Record<string, unknown>): void {
+    if (data.hiddenItems && Array.isArray(data.hiddenItems)) {
+      this.hiddenItems = data.hiddenItems.filter((item): item is string => typeof item === 'string')
+    }
+    if (data.pinnedItems && Array.isArray(data.pinnedItems)) {
+      this.pinnedItems = data.pinnedItems.filter((item): item is string => typeof item === 'string')
+    }
+    if (data.customOrder && typeof data.customOrder === 'object' && data.customOrder !== null) {
+      this.customOrder = data.customOrder as Record<string, number>
+    }
+    if (data.collapsedGroups && Array.isArray(data.collapsedGroups)) {
+      this.collapsedGroups = data.collapsedGroups.filter(
+        (item): item is string => typeof item === 'string'
+      )
+    }
+    if (data.favorites && Array.isArray(data.favorites)) {
+      this.favorites = data.favorites.filter(
+        (
+          item
+        ): item is {
+          itemId: string
+          label: string
+          route: string
+          icon?: string
+          addedAt: Date
+        } => {
+          return (
+            typeof item === 'object' &&
+            item !== null &&
+            'itemId' in item &&
+            typeof item.itemId === 'string' &&
+            'label' in item &&
+            typeof item.label === 'string' &&
+            'route' in item &&
+            typeof item.route === 'string' &&
+            'addedAt' in item &&
+            item.addedAt instanceof Date
+          )
+        }
+      )
+    }
+    if (data.recentItems && Array.isArray(data.recentItems)) {
+      this.recentItems = data.recentItems.filter(
+        (
+          item
+        ): item is {
+          itemId: string
+          label: string
+          route: string
+          icon?: string
+          accessedAt: Date
+          accessCount: number
+        } => {
+          return (
+            typeof item === 'object' &&
+            item !== null &&
+            'itemId' in item &&
+            typeof item.itemId === 'string' &&
+            'label' in item &&
+            typeof item.label === 'string' &&
+            'route' in item &&
+            typeof item.route === 'string' &&
+            'accessedAt' in item &&
+            item.accessedAt instanceof Date &&
+            'accessCount' in item &&
+            typeof item.accessCount === 'number'
+          )
+        }
+      )
+    }
+    if (data.preferences && typeof data.preferences === 'object' && data.preferences !== null) {
+      this.preferences = data.preferences as Record<string, unknown>
+    }
   }
 
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       userId: this.userId,

@@ -1,6 +1,5 @@
 'use client'
 
-import type { Notification } from '@erp/domains/notifications'
 import { Badge, Button, Input, ScrollArea, Separator } from '@erp/ui'
 import {
   Archive,
@@ -26,6 +25,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
+import type { ClientNotification as Notification } from '@/types/notifications'
 
 interface NotificationDashboardV2Props {
   isOpen: boolean
@@ -76,21 +76,21 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
     // Filtre par catégorie
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter((n) => (n.metadata?.category || 'system') === selectedCategory)
+      filtered = filtered?.filter((n) => (n.metadata?.category || 'system') === selectedCategory)
     }
 
     // Filtre par priorité
     if (selectedPriority !== 'all') {
-      filtered = filtered.filter(
+      filtered = filtered?.filter(
         (n) => (n.priority?.toLowerCase() || 'normal') === selectedPriority
       )
     }
 
     // Filtre par statut
     if (selectedStatus === 'read') {
-      filtered = filtered.filter((n) => n.readAt)
+      filtered = filtered?.filter((n) => n.readAt)
     } else if (selectedStatus === 'unread') {
-      filtered = filtered.filter((n) => !n.readAt)
+      filtered = filtered?.filter((n) => !n.readAt)
     } else if (selectedStatus === 'archived') {
       // Pour l'instant, aucune notification archivée car la propriété n'existe pas
       filtered = []
@@ -99,15 +99,15 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
     // Filtre par recherche
     if (searchTerm) {
-      filtered = filtered.filter(
+      filtered = filtered?.filter(
         (n) =>
-          n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          n.message.toLowerCase().includes(searchTerm.toLowerCase())
+          n?.title?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+          n?.message?.toLowerCase().includes(searchTerm?.toLowerCase())
       )
     }
 
-    return filtered.sort(
-      (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    return filtered?.sort(
+      (a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
     )
   }, [state.notifications, selectedCategory, selectedPriority, selectedStatus, searchTerm])
 
@@ -115,7 +115,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
   const categoryCounts = useMemo(() => {
     const activeNotifications = state.notifications
     const counts: Record<string, number> = { all: activeNotifications.length }
-    activeNotifications.forEach((n) => {
+    activeNotifications?.forEach((n) => {
       const cat = n.metadata?.category || 'system'
       counts[cat] = (counts[cat] || 0) + 1
     })
@@ -125,17 +125,17 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
   const formatDate = (date: Date | string) => {
     const d = new Date(date)
     const now = new Date()
-    const diff = now.getTime() - d.getTime()
+    const diff = now?.getTime() - d?.getTime()
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
 
     if (days === 0) {
-      return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+      return d?.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     } else if (days === 1) {
       return 'Hier'
     } else if (days < 7) {
       return `Il y a ${days} jours`
     } else {
-      return d.toLocaleDateString('fr-FR')
+      return d?.toLocaleDateString('fr-FR')
     }
   }
 
@@ -153,9 +153,9 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
           }),
         })
 
-        if (response.ok) {
+        if (response?.ok) {
           // Retirer la notification de la liste après transfert
-          actions.markAsRead(selectedNotification.id)
+          actions?.markAsRead(selectedNotification.id)
           setSelectedNotification(null)
         }
       } catch (_error) {
@@ -181,7 +181,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
             <div className="p-4 border-b">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Notifications</h2>
-                <Badge variant="secondary">{filteredNotifications.length}</Badge>
+                <Badge variant="secondary">{filteredNotifications?.length}</Badge>
               </div>
             </div>
 
@@ -194,7 +194,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     placeholder="Rechercher..."
                     value={searchTerm}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSearchTerm(e.target.value)
+                      setSearchTerm(e?.target?.value)
                     }
                     className="pl-9"
                   />
@@ -206,12 +206,12 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Statut</h3>
                 <div className="space-y-1">
                   {[
-                    { value: 'all', label: 'Toutes', count: state.notifications.length },
+                    { value: 'all', label: 'Toutes', count: state?.notifications?.length },
                     { value: 'unread', label: 'Non lues', count: state.unreadCount },
                     {
                       value: 'read',
                       label: 'Lues',
-                      count: state.notifications.filter((n) => n.readAt).length,
+                      count: state?.notifications?.filter((n) => n.readAt).length,
                     },
                     { value: 'archived', label: 'Archivées', count: 0 },
                   ].map((status) => (
@@ -288,7 +288,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     >
                       <span
                         className={cn(
-                          key !== 'all' && config.color.includes('bg-')
+                          key !== 'all' && config?.color?.includes('bg-')
                             ? `px-2 py-1 rounded-full ${config.color}`
                             : ''
                         )}
@@ -306,9 +306,10 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
             <div className="p-4 border-t">
               <Button
+                type="button"
                 variant="ghost"
                 className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => actions.deleteAll()}
+                onClick={() => actions?.deleteAll()}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Tout effacer
@@ -327,18 +328,23 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     : categoryConfig[selectedCategory as keyof typeof categoryConfig]?.label}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {filteredNotifications.length} notification
-                  {filteredNotifications.length !== 1 ? 's' : ''}
+                  {filteredNotifications?.length} notification
+                  {filteredNotifications?.length !== 1 ? 's' : ''}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 {state.unreadCount > 0 && (
-                  <Button variant="outline" size="sm" onClick={() => actions.markAllAsRead()}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => actions?.markAllAsRead()}
+                  >
                     <CheckCheck className="h-4 w-4 mr-2" />
                     Tout marquer comme lu
                   </Button>
                 )}
-                <Button variant="ghost" size="sm" onClick={onClose}>
+                <Button type="button" variant="ghost" size="sm" onClick={onClose}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -346,14 +352,14 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
             {/* Liste des notifications */}
             <ScrollArea className="flex-1">
-              {filteredNotifications.length === 0 ? (
+              {filteredNotifications?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-8 text-gray-500">
                   <Bell className="h-12 w-12 mb-4 text-gray-300" />
                   <p>Aucune notification trouvée</p>
                 </div>
               ) : (
                 <div className="divide-y">
-                  {filteredNotifications.map((notification) => {
+                  {filteredNotifications?.map((notification) => {
                     const category = notification.metadata?.category || 'system'
                     const CategoryIcon =
                       categoryConfig[category as keyof typeof categoryConfig]?.icon || Bell
@@ -401,28 +407,26 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                                 {categoryConfig[category as keyof typeof categoryConfig]?.label ||
                                   'Système'}
                               </Badge>
-
-                              {notification.priority && notification.priority !== 'NORMAL' && (
-                                <Badge
-                                  className={cn(
-                                    'text-xs',
-                                    priorityConfig[
-                                      notification.priority.toLowerCase() as keyof typeof priorityConfig
-                                    ]?.color
-                                  )}
-                                >
-                                  {
-                                    priorityConfig[
-                                      notification.priority.toLowerCase() as keyof typeof priorityConfig
-                                    ]?.label
-                                  }
-                                </Badge>
-                              )}
-
+                              {notification.priority &&
+                                notification.priority !== 'NORMAL' && (
+                                  <Badge
+                                    className={cn(
+                                      'text-xs',
+                                      priorityConfig[
+                                        notification?.priority?.toLowerCase() as keyof typeof priorityConfig
+                                      ]?.color
+                                    )}
+                                  >
+                                    {
+                                      priorityConfig[
+                                        notification?.priority?.toLowerCase() as keyof typeof priorityConfig
+                                      ]?.label
+                                    }
+                                  </Badge>
+                                )}
                               {!notification.readAt && (
                                 <div className="h-2 w-2 rounded-full bg-blue-600" />
                               )}
-
                               {false && <span className="text-xs text-gray-500">📁</span>}
                             </div>
                           </div>
@@ -442,7 +446,12 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
             <div className="w-96 border-l bg-gray-50 flex flex-col">
               <div className="p-4 border-b flex items-center justify-between">
                 <h3 className="font-semibold">Détails</h3>
-                <Button variant="ghost" size="sm" onClick={() => setSelectedNotification(null)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedNotification(null)}
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -513,10 +522,11 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
                     {!selectedNotification.readAt && (
                       <Button
+                        type="button"
                         variant="outline"
                         size="sm"
                         className="w-full"
-                        onClick={() => actions.markAsRead(selectedNotification.id)}
+                        onClick={() => actions?.markAsRead(selectedNotification.id)}
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         Marquer comme lue
@@ -524,6 +534,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     )}
 
                     <Button
+                      type="button"
                       variant="outline"
                       size="sm"
                       className="w-full"
@@ -534,11 +545,12 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     </Button>
 
                     <Button
+                      type="button"
                       variant="outline"
                       size="sm"
                       className="w-full"
                       onClick={() => {
-                        actions.deleteNotification(selectedNotification.id)
+                        actions?.deleteNotification(selectedNotification.id)
                         setSelectedNotification(null)
                       }}
                     >
@@ -547,11 +559,12 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     </Button>
 
                     <Button
+                      type="button"
                       variant="outline"
                       size="sm"
                       className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
                       onClick={() => {
-                        actions.deleteNotification(selectedNotification.id)
+                        actions?.deleteNotification(selectedNotification.id)
                         setSelectedNotification(null)
                       }}
                     >
@@ -584,12 +597,13 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                 placeholder="ID ou email de l'utilisateur"
                 value={transferUserId}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setTransferUserId(e.target.value)
+                  setTransferUserId(e?.target?.value)
                 }
                 className="mb-4"
               />
               <div className="flex justify-end gap-3">
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={() => {
                     setShowTransferModal(false)
@@ -598,7 +612,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                 >
                   Annuler
                 </Button>
-                <Button onClick={handleTransfer}>
+                <Button type="button" onClick={handleTransfer}>
                   <Send className="h-4 w-4 mr-2" />
                   Transférer
                 </Button>

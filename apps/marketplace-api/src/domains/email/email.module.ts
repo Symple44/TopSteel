@@ -5,10 +5,7 @@ import { EmailService } from './email.service'
 import { EmailLog } from './entities/email-log.entity'
 
 @Module({
-  imports: [
-    ConfigModule,
-    TypeOrmModule.forFeature([EmailLog], 'marketplace'),
-  ],
+  imports: [ConfigModule, TypeOrmModule.forFeature([EmailLog], 'marketplace')],
   providers: [EmailService],
   exports: [EmailService],
 })

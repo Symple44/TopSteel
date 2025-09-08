@@ -1,12 +1,18 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { Calendar, Clock, AlertTriangle, Bell, Zap, AlertCircle } from 'lucide-react'
+import { AlertCircle, AlertTriangle, Bell, Calendar, Clock, Zap } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export type UrgencyLevel = 'low' | 'normal' | 'high' | 'critical'
 export type ReminderType = 'none' | 'email' | 'notification' | 'both'
 export interface DeadlineValue {
@@ -71,12 +77,20 @@ export function DeadlinePicker({
     setDeadline(updatedDeadline)
     onChange?.(updatedDeadline)
   }
-  const handleReminderChange = (field: keyof NonNullable<DeadlineValue['reminder']>, newValue: any) => {
+  const handleReminderChange = (
+    field: keyof NonNullable<DeadlineValue['reminder']>,
+    newValue: any
+  ) => {
+    const currentReminder = deadline.reminder || {
+      type: 'none' as ReminderType,
+      advance: 0,
+      message: '',
+    }
     const updatedReminder = {
-      ...deadline.reminder,
+      ...currentReminder,
       [field]: newValue,
     }
-    const updatedDeadline = {
+    const updatedDeadline: Partial<DeadlineValue> = {
       ...deadline,
       reminder: updatedReminder,
     }
@@ -88,8 +102,7 @@ export function DeadlinePicker({
     setIsTestingReminder(true)
     try {
       await onReminderTest(deadline.reminder)
-    } catch (error) {
-      console.error('Error testing reminder:', error)
+    } catch (_error) {
     } finally {
       setIsTestingReminder(false)
     }
@@ -163,19 +176,26 @@ export function DeadlinePicker({
             min={minDate ? formatDate(minDate) : undefined}
             max={maxDate ? formatDate(maxDate) : undefined}
             disabled={disabled}
-            className={cn(
-              error && 'border-red-500'
-            )}
+            className={cn(error && 'border-red-500')}
           />
           {daysUntil !== null && (
-            <p className={cn(
-              'text-xs',
-              daysUntil < 0 ? 'text-red-600' : daysUntil <= 3 ? 'text-orange-600' : 'text-muted-foreground'
-            )}>
-              {daysUntil < 0 ? `En retard de ${Math.abs(daysUntil)} jour(s)` :
-               daysUntil === 0 ? "Aujourd'hui" :
-               daysUntil === 1 ? "Demain" :
-               `Dans ${daysUntil} jour(s)`}
+            <p
+              className={cn(
+                'text-xs',
+                daysUntil < 0
+                  ? 'text-red-600'
+                  : daysUntil <= 3
+                    ? 'text-orange-600'
+                    : 'text-muted-foreground'
+              )}
+            >
+              {daysUntil < 0
+                ? `En retard de ${Math.abs(daysUntil)} jour(s)`
+                : daysUntil === 0
+                  ? "Aujourd'hui"
+                  : daysUntil === 1
+                    ? 'Demain'
+                    : `Dans ${daysUntil} jour(s)`}
             </p>
           )}
         </div>
@@ -208,21 +228,23 @@ export function DeadlinePicker({
               const isSelected = deadline.urgency === level
               return (
                 <Button
+                  type="button"
                   key={level}
                   type="button"
                   variant={isSelected ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleDeadlineChange('urgency', level)}
                   disabled={disabled}
-                  className={cn(
-                    'justify-start gap-2',
-                    isSelected && getUrgencyColor(level)
-                  )}
+                  className={cn('justify-start gap-2', isSelected && getUrgencyColor(level))}
                 >
                   <LevelIcon className="h-4 w-4" />
-                  {level === 'low' ? 'Faible' :
-                   level === 'normal' ? 'Normal' :
-                   level === 'high' ? 'Élevé' : 'Critique'}
+                  {level === 'low'
+                    ? 'Faible'
+                    : level === 'normal'
+                      ? 'Normal'
+                      : level === 'high'
+                        ? 'Élevé'
+                        : 'Critique'}
                 </Button>
               )
             })}
@@ -278,7 +300,7 @@ export function DeadlinePicker({
                 <Label className="text-sm">Avance (minutes)</Label>
                 <Select
                   value={deadline.reminder?.advance?.toString() || '60'}
-                  onValueChange={(value) => handleReminderChange('advance', parseInt(value))}
+                  onValueChange={(value) => handleReminderChange('advance', parseInt(value, 10))}
                   disabled={disabled}
                 >
                   <SelectTrigger>
@@ -328,28 +350,30 @@ export function DeadlinePicker({
             <UrgencyIcon className="h-4 w-4" />
             <span className="text-sm font-medium">Résumé de l'échéance</span>
             <Badge className={getUrgencyColor(deadline.urgency!)}>
-              {deadline.urgency === 'low' ? 'Faible' :
-               deadline.urgency === 'normal' ? 'Normal' :
-               deadline.urgency === 'high' ? 'Élevé' : 'Critique'}
+              {deadline.urgency === 'low'
+                ? 'Faible'
+                : deadline.urgency === 'normal'
+                  ? 'Normal'
+                  : deadline.urgency === 'high'
+                    ? 'Élevé'
+                    : 'Critique'}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            {deadline.date.toLocaleDateString('fr-FR', { 
+            {deadline.date.toLocaleDateString('fr-FR', {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
-              day: 'numeric'
+              day: 'numeric',
             })}
             {deadline.time && ` à ${deadline.time}`}
-            {deadline.reminder?.type !== 'none' && deadline.reminder?.type && 
-              ` • Rappel ${deadline.reminder.type} ${deadline.reminder.advance} min avant`
-            }
+            {deadline.reminder?.type !== 'none' &&
+              deadline.reminder?.type &&
+              ` • Rappel ${deadline.reminder.type} ${deadline.reminder.advance} min avant`}
           </p>
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

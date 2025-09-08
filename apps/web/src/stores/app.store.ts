@@ -49,7 +49,7 @@ const initialAppState: InitialState<AppState> = {
   // Métriques
   metrics: {
     // Propriétés héritées de BaseStoreEntity
-    id: crypto.randomUUID(),
+    id: crypto?.randomUUID(),
     createdAt: new Date(),
     updatedAt: new Date(),
 
@@ -252,9 +252,9 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   addProjet: (projet) => {
     set((state) => {
-      state.projets.push(projet)
+      state?.projets?.push(projet)
       if (state.metrics) {
-        state.metrics.projectCount = state.projets.length
+        state.metrics.projectCount = state.projets?.length || 0
         state.metrics.actionCount++
       }
       state.lastUpdate = Date.now()
@@ -263,7 +263,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   updateProjet: (id, updates) => {
     set((state) => {
-      const index = state.projets.findIndex((p) => p.id === id)
+      const index = state?.projets?.findIndex((p) => p.id === id)
 
       if (index >= 0) {
         state.projets[index] = { ...state.projets[index], ...updates }
@@ -277,12 +277,12 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   removeProjet: (id) => {
     set((state) => {
-      state.projets = state.projets.filter((p) => p.id !== id)
+      state.projets = state?.projets?.filter((p) => p.id !== id)
       if (state.selectedProjet?.id === id) {
         state.selectedProjet = null
       }
       if (state.metrics) {
-        state.metrics.projectCount = state.projets.length
+        state.metrics.projectCount = state.projets?.length || 0
         state.metrics.actionCount++
       }
       state.lastUpdate = Date.now()
@@ -314,10 +314,10 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         priority: notification.priority || 'normal',
       }
 
-      state.notifications.unshift(newNotification)
+      state?.notifications?.unshift(newNotification)
       // Garder seulement les 100 dernières notifications
-      if (state.notifications.length > 100) {
-        state.notifications = state.notifications.slice(0, 100)
+      if (state?.notifications?.length > 100) {
+        state.notifications = state?.notifications?.slice(0, 100)
       }
       state.lastUpdate = Date.now()
     })
@@ -325,7 +325,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   removeNotification: (id) => {
     set((state) => {
-      state.notifications = state.notifications.filter((n) => n.id !== id)
+      state.notifications = state?.notifications?.filter((n) => n.id !== id)
       state.lastUpdate = Date.now()
     })
   },
@@ -339,7 +339,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   markNotificationAsRead: (id) => {
     set((state) => {
-      const notification = state.notifications.find((n) => n.id === id)
+      const notification = state?.notifications?.find((n) => n.id === id)
 
       if (notification) {
         notification.isRead = true
@@ -401,7 +401,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       }
       state.lastUpdate = Date.now()
 
-      if (isOnline && state.sync && state.sync.pendingChanges > 0) {
+      if (isOnline && state.sync && state?.sync?.pendingChanges > 0) {
       }
     })
   },
@@ -418,7 +418,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   triggerSync: async () => {
     const currentState = get()
 
-    if (!currentState.sync?.isOnline) {
+    if (!currentState?.sync?.isOnline) {
       return
     }
 

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -78,12 +78,21 @@
   },
   "overrides": [
     {
+      "includes": ["packages/domains/**/*.js"],
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
       "includes": ["**/*.css"],
       "linter": {
         "rules": {
           "correctness": {
             "noUnknownProperty": "off",
             "noUnknownPseudoClass": "off"
+          },
+          "suspicious": {
+            "noUnknownAtRules": "off"
           }
         }
       }
@@ -181,7 +190,8 @@
         "**/ReorderableList.tsx",
         "**/themed-reorderable-list.tsx",
         "**/DataTable.tsx",
-        "**/HierarchicalDataTable.tsx"
+        "**/HierarchicalDataTable.tsx",
+        "**/CuttingPlanViewer.tsx"
       ],
       "linter": {
         "rules": {

@@ -4,16 +4,16 @@ import { callBackendFromApi } from '@/utils/backend-api'
 export async function GET(request: NextRequest) {
   try {
     // Récupérer les headers d'authentification
-    const authHeader = request.headers.get('authorization')
-    const cookieHeader = request.headers.get('cookie')
+    const authHeader = request?.headers?.get('authorization')
+    const cookieHeader = request?.headers?.get('cookie')
 
     // Extraire le token d'accès du cookie si pas d'Authorization header
-    let accessToken = null
+    let accessToken: string | null = null
     if (cookieHeader) {
-      const cookies = cookieHeader.split(';').map((c) => c.trim())
-      const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
+      const cookies = cookieHeader?.split(';').map((c) => c?.trim())
+      const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
       if (accessTokenCookie) {
-        accessToken = accessTokenCookie.split('=')[1]
+        accessToken = accessTokenCookie?.split('=')[1]
       }
     }
 
@@ -35,21 +35,21 @@ export async function GET(request: NextRequest) {
 
     const response = await callBackendFromApi(request, 'admin/database/health', {
       method: 'GET',
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal?.timeout(10000),
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
+    if (response?.ok) {
+      const responseData = await response?.json()
       // Le backend NestJS enveloppe dans {data: {...}, statusCode, message}
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
     } else {
-      return NextResponse.json(
+      return NextResponse?.json(
         { error: 'API backend error', status: response.status },
         { status: response.status }
       )
     }
   } catch (_error) {
-    return NextResponse.json({ error: 'API backend non disponible' }, { status: 503 })
+    return NextResponse?.json({ error: 'API backend non disponible' }, { status: 503 })
   }
 }

@@ -1,4 +1,4 @@
-// apps/web/src/lib/api.ts - Client API pour Zustand stores
+// apps/web/src/lib/api?.ts - Client API pour Zustand stores
 import { ERPApiClient } from '@erp/api-client'
 import {
   type Projet,
@@ -6,10 +6,10 @@ import {
   ProjetPriorite,
   ProjetStatut,
   ProjetType,
-} from '@erp/domains/core'
+} from '@erp/domains'
 
 // Configuration API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
+const API_BASE_URL = process?.env?.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
 
 // Instance du client API
 const _apiClient = new ERPApiClient({
@@ -178,42 +178,42 @@ export const api = {
         let filteredProjets = mockProjets
 
         if (filters) {
-          if (filters.statut && filters.statut.length > 0) {
-            filteredProjets = filteredProjets.filter((p) => filters.statut?.includes(p.statut))
+          if (filters.statut && filters?.statut?.length > 0) {
+            filteredProjets = filteredProjets?.filter((p) => filters.statut?.includes(p.statut))
           }
 
-          if (filters.priorite && filters.priorite.length > 0) {
-            filteredProjets = filteredProjets.filter((p) => filters.priorite?.includes(p.priorite))
+          if (filters.priorite && filters?.priorite?.length > 0) {
+            filteredProjets = filteredProjets?.filter((p) => filters.priorite?.includes(p.priorite))
           }
 
           if (filters.clientId) {
-            filteredProjets = filteredProjets.filter((p) => p.clientId === filters.clientId)
+            filteredProjets = filteredProjets?.filter((p) => p.clientId === filters.clientId)
           }
 
           if (filters.dateDebutMin) {
-            filteredProjets = filteredProjets.filter(
+            filteredProjets = filteredProjets?.filter(
               (p) =>
-                p.delais.dateDebut &&
+                p?.delais?.dateDebut &&
                 filters.dateDebutMin &&
-                p.delais.dateDebut >= filters.dateDebutMin
+                p?.delais?.dateDebut >= filters.dateDebutMin
             )
           }
 
           if (filters.dateFinMax) {
-            filteredProjets = filteredProjets.filter(
+            filteredProjets = filteredProjets?.filter(
               (p) =>
-                p.delais.dateFin && filters.dateFinMax && p.delais.dateFin <= filters.dateFinMax
+                p?.delais?.dateFin && filters.dateFinMax && p?.delais?.dateFin <= filters.dateFinMax
             )
           }
 
           if (filters.search) {
-            const searchLower = filters.search.toLowerCase()
+            const searchLower = filters?.search?.toLowerCase()
 
-            filteredProjets = filteredProjets.filter(
+            filteredProjets = filteredProjets?.filter(
               (p) =>
-                p.reference.toLowerCase().includes(searchLower) ||
+                p?.reference?.toLowerCase().includes(searchLower) ||
                 p.description?.toLowerCase().includes(searchLower) ||
-                p.clientId.toLowerCase().includes(searchLower)
+                p?.clientId?.toLowerCase().includes(searchLower)
             )
           }
         }
@@ -229,9 +229,9 @@ export const api = {
         // Simulation d'appel API
         await new Promise((resolve) => setTimeout(resolve, 50))
 
-        const projets = await this.getAll()
+        const projets = await this?.getAll()
 
-        return projets.find((p) => p.id === id) || null
+        return projets?.find((p) => p.id === id) || null
       } catch (_error) {
         throw new Error('Impossible de récupérer le projet')
       }
@@ -282,7 +282,7 @@ export const api = {
           },
           materiaux: data.materiaux || [],
           operations: data.operations || [],
-          avancement: data.avancement || 0,
+          avancement: data.avancement ?? 0,
           tags: data.tags || [],
           notes: data.notes,
           createdBy: 'user-default',
@@ -301,7 +301,7 @@ export const api = {
         // Simulation d'appel API
         await new Promise((resolve) => setTimeout(resolve, 150))
 
-        const existingProjet = await this.getById(id)
+        const existingProjet = await this?.getById(id)
 
         if (!existingProjet) {
           throw new Error('Projet non trouvé')
@@ -336,11 +336,11 @@ export const api = {
     const parts = [domain]
 
     if (resource) {
-      parts.push(resource)
+      parts?.push(resource)
     }
 
     if (id !== undefined) {
-      parts.push(String(id))
+      parts?.push(String(id))
     }
 
     return parts

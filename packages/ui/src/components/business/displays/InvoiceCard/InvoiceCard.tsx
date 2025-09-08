@@ -1,21 +1,20 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { 
-  FileText, 
-  Calendar, 
-  DollarSign, 
-  Clock, 
+import {
   AlertTriangle,
-  CheckCircle,
-  User,
-  Building2,
   ArrowRight,
+  Building2,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Download,
   Eye,
-  Download
+  FileText,
+  User,
 } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
+import { Button } from '../../../primitives/button/Button'
 export interface Invoice {
   id: string
   invoiceNumber: string
@@ -94,43 +93,43 @@ export function InvoiceCard({
         return {
           label: 'Brouillon',
           icon: FileText,
-          className: 'bg-gray-100 text-gray-800 border-gray-200'
+          className: 'bg-gray-100 text-gray-800 border-gray-200',
         }
       case 'sent':
         return {
           label: 'Envoyée',
           icon: ArrowRight,
-          className: 'bg-blue-100 text-blue-800 border-blue-200'
+          className: 'bg-blue-100 text-blue-800 border-blue-200',
         }
       case 'pending':
         return {
           label: 'En attente',
           icon: Clock,
-          className: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+          className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
         }
       case 'paid':
         return {
           label: 'Payée',
           icon: CheckCircle,
-          className: 'bg-green-100 text-green-800 border-green-200'
+          className: 'bg-green-100 text-green-800 border-green-200',
         }
       case 'overdue':
         return {
           label: 'En retard',
           icon: AlertTriangle,
-          className: 'bg-red-100 text-red-800 border-red-200'
+          className: 'bg-red-100 text-red-800 border-red-200',
         }
       case 'cancelled':
         return {
           label: 'Annulée',
           icon: AlertTriangle,
-          className: 'bg-red-100 text-red-900 border-red-300'
+          className: 'bg-red-100 text-red-900 border-red-300',
         }
       default:
         return {
           label: 'Inconnu',
           icon: AlertTriangle,
-          className: 'bg-gray-100 text-gray-800 border-gray-200'
+          className: 'bg-gray-100 text-gray-800 border-gray-200',
         }
     }
   }
@@ -172,11 +171,11 @@ export function InvoiceCard({
               <FileText className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">
-                Facture #{invoice.invoiceNumber}
-              </CardTitle>
+              <CardTitle className="text-lg">Facture #{invoice.invoiceNumber}</CardTitle>
               <p className="text-sm text-muted-foreground">
-                {invoice.projectName ? `Projet: ${invoice.projectName}` : `Client: ${invoice.clientName}`}
+                {invoice.projectName
+                  ? `Projet: ${invoice.projectName}`
+                  : `Client: ${invoice.clientName}`}
               </p>
             </div>
           </div>
@@ -204,7 +203,9 @@ export function InvoiceCard({
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Total TTC</p>
-            <p className="font-bold text-lg">{formatCurrency(invoice.totalAmount, invoice.currency)}</p>
+            <p className="font-bold text-lg">
+              {formatCurrency(invoice.totalAmount, invoice.currency)}
+            </p>
           </div>
         </div>
         {/* Tax Information */}
@@ -229,7 +230,8 @@ export function InvoiceCard({
             )}
             {daysUntilDue !== null && daysUntilDue > 0 && daysUntilDue <= 7 && (
               <Badge className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
-                {daysUntilDue} jour{daysUntilDue > 1 ? 's' : ''} restant{daysUntilDue > 1 ? 's' : ''}
+                {daysUntilDue} jour{daysUntilDue > 1 ? 's' : ''} restant
+                {daysUntilDue > 1 ? 's' : ''}
               </Badge>
             )}
           </div>
@@ -269,7 +271,8 @@ export function InvoiceCard({
             ))}
             {invoice.items.length > 2 && (
               <p className="text-xs text-muted-foreground">
-                +{invoice.items.length - 2} autre{invoice.items.length - 2 > 1 ? 's' : ''} article{invoice.items.length - 2 > 1 ? 's' : ''}
+                +{invoice.items.length - 2} autre{invoice.items.length - 2 > 1 ? 's' : ''} article
+                {invoice.items.length - 2 > 1 ? 's' : ''}
               </p>
             )}
           </div>
@@ -290,30 +293,48 @@ export function InvoiceCard({
         {showActions && (
           <div className="flex flex-wrap gap-2 pt-3 border-t">
             {onView && (
-              <Button variant="outline" size="sm" onClick={onView} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onView}
+                className="flex items-center gap-1"
+              >
                 <Eye className="h-3 w-3" />
                 Voir
               </Button>
             )}
             {onDownload && (
-              <Button variant="outline" size="sm" onClick={onDownload} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onDownload}
+                className="flex items-center gap-1"
+              >
                 <Download className="h-3 w-3" />
                 Télécharger
               </Button>
             )}
             {onMarkAsPaid && invoice.status === 'pending' && (
-              <Button variant="outline" size="sm" onClick={onMarkAsPaid} className="flex items-center gap-1 text-green-600">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onMarkAsPaid}
+                className="flex items-center gap-1 text-green-600"
+              >
                 <CheckCircle className="h-3 w-3" />
                 Marquer payée
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit}>
+              <Button type="button" variant="outline" size="sm" onClick={onEdit}>
                 Modifier
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" size="sm" onClick={onDelete}>
+              <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
                 Supprimer
               </Button>
             )}

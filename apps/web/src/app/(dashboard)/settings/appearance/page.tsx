@@ -49,32 +49,33 @@ export default function AppearanceSettingsPage() {
   } = useAppearanceSettings()
 
   // Vérifier l'authentification
-  React.useEffect(() => {
+  React?.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/settings/appearance')
+      router?.push('/login?redirect=/settings/appearance')
     }
   }, [isAuthenticated, authLoading, router])
 
   // Sauvegarde automatique lorsque les paramètres changent
-  React.useEffect(() => {
+  React?.useEffect(() => {
     if (hasUnsavedChanges && !settingsLoading) {
       const timeoutId = setTimeout(async () => {
         try {
           await saveSettings()
           success(
-            t('settingsEnhanced.appearance.messages.saveSuccess'),
-            t('settingsEnhanced.appearance.messages.saveSuccessDesc')
+            t('settingsEnhanced?.appearance?.messages.saveSuccess'),
+            t('settingsEnhanced?.appearance?.messages.saveSuccessDesc')
           )
         } catch (_saveError) {
           error(
-            t('settingsEnhanced.appearance.messages.saveError'),
-            t('settingsEnhanced.appearance.messages.saveErrorDesc')
+            t('settingsEnhanced?.appearance?.messages.saveError'),
+            t('settingsEnhanced?.appearance?.messages.saveErrorDesc')
           )
         }
       }, 1000) // Attendre 1 seconde après le dernier changement
 
       return () => clearTimeout(timeoutId)
     }
+    return undefined
   }, [hasUnsavedChanges, saveSettings, success, error, settingsLoading, t])
 
   // Afficher un loader si pas encore authentifié ou si les paramètres chargent
@@ -97,71 +98,83 @@ export default function AppearanceSettingsPage() {
 
   const themes = [
     {
-      id: 'vibrant',
-      label: t('settingsEnhanced.appearance.themes.vibrant'),
+      id: 'vibrant' as const,
+      label: t('settingsEnhanced?.appearance?.themes.vibrant'),
       icon: Palette,
-      description: t('settingsEnhanced.appearance.themes.vibrantDesc'),
+      description: t('settingsEnhanced?.appearance?.themes.vibrantDesc'),
     },
     {
-      id: 'light',
-      label: t('settingsEnhanced.appearance.themes.light'),
+      id: 'light' as const,
+      label: t('settingsEnhanced?.appearance?.themes.light'),
       icon: Sun,
-      description: t('settingsEnhanced.appearance.themes.lightDesc'),
+      description: t('settingsEnhanced?.appearance?.themes.lightDesc'),
     },
     {
-      id: 'dark',
-      label: t('settingsEnhanced.appearance.themes.dark'),
+      id: 'dark' as const,
+      label: t('settingsEnhanced?.appearance?.themes.dark'),
       icon: Moon,
-      description: t('settingsEnhanced.appearance.themes.darkDesc'),
+      description: t('settingsEnhanced?.appearance?.themes.darkDesc'),
     },
     {
-      id: 'system',
-      label: t('settingsEnhanced.appearance.themes.system'),
+      id: 'system' as const,
+      label: t('settingsEnhanced?.appearance?.themes.system'),
       icon: Monitor,
-      description: t('settingsEnhanced.appearance.themes.systemDesc'),
+      description: t('settingsEnhanced?.appearance?.themes.systemDesc'),
     },
   ]
 
   const languages = [
-    { id: 'fr', label: t('settingsEnhanced.appearance.languages.fr'), flag: '🇫🇷' },
-    { id: 'en', label: t('settingsEnhanced.appearance.languages.en'), flag: '🇺🇸' },
-    { id: 'es', label: t('settingsEnhanced.appearance.languages.es'), flag: '🇪🇸' },
+    { id: 'fr', label: t('settingsEnhanced?.appearance?.languages.fr'), flag: '🇫🇷' },
+    { id: 'en', label: t('settingsEnhanced?.appearance?.languages.en'), flag: '🇺🇸' },
+    { id: 'es', label: t('settingsEnhanced?.appearance?.languages.es'), flag: '🇪🇸' },
     { id: 'de', label: 'Deutsch', flag: '🇩🇪' },
   ]
 
   const accentColors = [
-    { id: 'blue', label: t('settingsEnhanced.appearance.accentColors.blue'), color: 'bg-blue-500' },
     {
-      id: 'green',
-      label: t('settingsEnhanced.appearance.accentColors.green'),
+      id: 'blue' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.blue'),
+      color: 'bg-blue-500',
+    },
+    {
+      id: 'green' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.green'),
       color: 'bg-green-500',
     },
     {
-      id: 'purple',
-      label: t('settingsEnhanced.appearance.accentColors.purple'),
+      id: 'purple' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.purple'),
       color: 'bg-purple-500',
     },
     {
-      id: 'orange',
-      label: t('settingsEnhanced.appearance.accentColors.orange'),
+      id: 'orange' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.orange'),
       color: 'bg-orange-500',
     },
-    { id: 'pink', label: t('settingsEnhanced.appearance.accentColors.pink'), color: 'bg-pink-500' },
-    { id: 'red', label: t('settingsEnhanced.appearance.accentColors.red'), color: 'bg-red-500' },
-    { id: 'teal', label: 'Sarcelle', color: 'bg-teal-500' },
     {
-      id: 'indigo',
-      label: t('settingsEnhanced.appearance.accentColors.indigo'),
+      id: 'pink' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.pink'),
+      color: 'bg-pink-500',
+    },
+    {
+      id: 'red' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.red'),
+      color: 'bg-red-500',
+    },
+    { id: 'teal' as const, label: 'Sarcelle', color: 'bg-teal-500' },
+    {
+      id: 'indigo' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.indigo'),
       color: 'bg-indigo-500',
     },
     {
-      id: 'yellow',
-      label: t('settingsEnhanced.appearance.accentColors.yellow'),
+      id: 'yellow' as const,
+      label: t('settingsEnhanced?.appearance?.accentColors.yellow'),
       color: 'bg-yellow-500',
     },
-    { id: 'emerald', label: 'Émeraude', color: 'bg-emerald-500' },
-    { id: 'rose', label: 'Rose vif', color: 'bg-rose-500' },
-    { id: 'cyan', label: 'Cyan', color: 'bg-cyan-500' },
+    { id: 'emerald' as const, label: 'Émeraude', color: 'bg-emerald-500' },
+    { id: 'rose' as const, label: 'Rose vif', color: 'bg-rose-500' },
+    { id: 'cyan' as const, label: 'Cyan', color: 'bg-cyan-500' },
   ]
 
   return (
@@ -170,8 +183,9 @@ export default function AppearanceSettingsPage() {
         {/* Header */}
         <div className="mb-8">
           <Button
+            type="button"
             variant="ghost"
-            onClick={() => router.back()}
+            onClick={() => router?.back()}
             className="mb-4 text-slate-600 hover:text-slate-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -202,12 +216,12 @@ export default function AppearanceSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Palette className="h-6 w-6 mr-3 text-indigo-600" />
-                {t('settingsEnhanced.appearance.sections.theme')}
+                {t('settingsEnhanced?.appearance?.sections.theme')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {themes.map((themeOption) => (
+                {themes?.map((themeOption) => (
                   <button
                     key={themeOption.id}
                     type="button"
@@ -234,12 +248,12 @@ export default function AppearanceSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Globe className="h-6 w-6 mr-3 text-blue-600" />
-                {t('settingsEnhanced.appearance.sections.language')}
+                {t('settingsEnhanced?.appearance?.sections.language')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {languages.map((lang) => (
+                {languages?.map((lang) => (
                   <button
                     key={lang.id}
                     type="button"
@@ -263,12 +277,12 @@ export default function AppearanceSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Eye className="h-6 w-6 mr-3 text-purple-600" />
-                {t('settingsEnhanced.appearance.sections.accentColor')}
+                {t('settingsEnhanced?.appearance?.sections.accentColor')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                {accentColors.map((color) => (
+                {accentColors?.map((color) => (
                   <button
                     key={color.id}
                     type="button"
@@ -292,7 +306,7 @@ export default function AppearanceSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Type className="h-6 w-6 mr-3 text-green-600" />
-                {t('settingsEnhanced.appearance.sections.fontSize')}
+                {t('settingsEnhanced?.appearance?.sections.fontSize')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -300,17 +314,17 @@ export default function AppearanceSettingsPage() {
                 {[
                   {
                     id: 'small',
-                    label: t('settingsEnhanced.appearance.fontSizes.small'),
+                    label: t('settingsEnhanced?.appearance?.fontSizes.small'),
                     sample: 'text-sm',
                   },
                   {
                     id: 'medium',
-                    label: t('settingsEnhanced.appearance.fontSizes.medium'),
+                    label: t('settingsEnhanced?.appearance?.fontSizes.medium'),
                     sample: 'text-base',
                   },
                   {
                     id: 'large',
-                    label: t('settingsEnhanced.appearance.fontSizes.large'),
+                    label: t('settingsEnhanced?.appearance?.fontSizes.large'),
                     sample: 'text-lg',
                   },
                 ].map((size) => (
@@ -320,7 +334,12 @@ export default function AppearanceSettingsPage() {
                       name="fontSize"
                       value={size.id}
                       checked={settings.fontSize === size.id}
-                      onChange={(e) => updateSetting('fontSize', e.target.value as unknown)}
+                      onChange={(e) =>
+                        updateSetting(
+                          'fontSize',
+                          (e?.target?.value as 'small' | 'medium' | 'large') || 'medium'
+                        )
+                      }
                       className="text-green-600"
                     />
                     <span className={`${size.sample} text-slate-800`}>
@@ -337,7 +356,7 @@ export default function AppearanceSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Layout className="h-6 w-6 mr-3 text-orange-600" />
-                {t('settingsEnhanced.appearance.sections.density')}
+                {t('settingsEnhanced?.appearance?.sections.density')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -345,17 +364,17 @@ export default function AppearanceSettingsPage() {
                 {[
                   {
                     id: 'compact',
-                    label: t('settingsEnhanced.appearance.densities.compact'),
+                    label: t('settingsEnhanced?.appearance?.densities.compact'),
                     description: "Plus d'éléments visibles",
                   },
                   {
                     id: 'comfortable',
-                    label: t('settingsEnhanced.appearance.densities.comfortable'),
+                    label: t('settingsEnhanced?.appearance?.densities.comfortable'),
                     description: 'Équilibre optimal',
                   },
                   {
                     id: 'spacious',
-                    label: t('settingsEnhanced.appearance.densities.spacious'),
+                    label: t('settingsEnhanced?.appearance?.densities.spacious'),
                     description: "Plus d'espace entre les éléments",
                   },
                 ].map((densityOption) => (
@@ -368,7 +387,13 @@ export default function AppearanceSettingsPage() {
                       name="density"
                       value={densityOption.id}
                       checked={settings.density === densityOption.id}
-                      onChange={(e) => updateSetting('density', e.target.value as unknown)}
+                      onChange={(e) =>
+                        updateSetting(
+                          'density',
+                          (e?.target?.value as 'compact' | 'comfortable' | 'spacious') ||
+                            'comfortable'
+                        )
+                      }
                       className="text-orange-600"
                     />
                     <div>
@@ -386,7 +411,7 @@ export default function AppearanceSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Maximize className="h-6 w-6 mr-3 text-purple-600" />
-                {t('settingsEnhanced.appearance.sections.contentWidth')}
+                {t('settingsEnhanced?.appearance?.sections.contentWidth')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -394,12 +419,12 @@ export default function AppearanceSettingsPage() {
                 {[
                   {
                     id: 'compact',
-                    label: t('settingsEnhanced.appearance.contentWidths.narrow'),
+                    label: t('settingsEnhanced?.appearance?.contentWidths.narrow'),
                     description: 'Largeur limitée pour une meilleure lisibilité',
                   },
                   {
                     id: 'full',
-                    label: t('settingsEnhanced.appearance.contentWidths.full'),
+                    label: t('settingsEnhanced?.appearance?.contentWidths.full'),
                     description: "Utilise toute la largeur de l'écran",
                   },
                 ].map((widthOption) => (
@@ -412,7 +437,12 @@ export default function AppearanceSettingsPage() {
                       name="contentWidth"
                       value={widthOption.id}
                       checked={settings.contentWidth === widthOption.id}
-                      onChange={(e) => updateSetting('contentWidth', e.target.value as unknown)}
+                      onChange={(e) =>
+                        updateSetting(
+                          'contentWidth',
+                          (e?.target?.value as 'compact' | 'full') || 'compact'
+                        )
+                      }
                       className="text-purple-600"
                     />
                     <div>

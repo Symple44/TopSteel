@@ -62,46 +62,46 @@ import {
   useUpdatePartnerSite,
 } from '@/hooks/use-partner-details'
 
-const siteSchema = z.object({
-  code: z.string().min(1, 'Le code est requis'),
-  nom: z.string().min(1, 'Le nom est requis'),
-  description: z.string().optional(),
-  type: z.nativeEnum(SiteType),
-  status: z.nativeEnum(SiteStatus).optional(),
-  isPrincipal: z.boolean().optional(),
-  accepteLivraisons: z.boolean().optional(),
-  accepteEnlevements: z.boolean().optional(),
+const siteSchema = z?.object({
+  code: z?.string().min(1, 'Le code est requis'),
+  nom: z?.string().min(1, 'Le nom est requis'),
+  description: z?.string().optional(),
+  type: z?.nativeEnum(SiteType),
+  status: z?.nativeEnum(SiteStatus).optional(),
+  isPrincipal: z?.boolean().optional(),
+  accepteLivraisons: z?.boolean().optional(),
+  accepteEnlevements: z?.boolean().optional(),
 
   // Localisation
-  adresse: z.string().optional(),
-  adresseComplement: z.string().optional(),
-  codePostal: z.string().optional(),
-  ville: z.string().optional(),
-  pays: z.string().optional(),
-  region: z.string().optional(),
-  latitude: z.coerce.number().min(-90).max(90).optional(),
-  longitude: z.coerce.number().min(-180).max(180).optional(),
+  adresse: z?.string().optional(),
+  adresseComplement: z?.string().optional(),
+  codePostal: z?.string().optional(),
+  ville: z?.string().optional(),
+  pays: z?.string().optional(),
+  region: z?.string().optional(),
+  latitude: z?.coerce?.number().min(-90).max(90).optional(),
+  longitude: z?.coerce?.number().min(-180).max(180).optional(),
 
   // Contact
-  responsable: z.string().optional(),
-  telephone: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
+  responsable: z?.string().optional(),
+  telephone: z?.string().optional(),
+  email: z?.string().email().optional().or(z?.literal('')),
 
   // Capacités
-  surfaceM2: z.coerce.number().min(0).optional(),
-  capaciteStockageTonnes: z.coerce.number().min(0).optional(),
-  hauteurMaxM: z.coerce.number().min(0).optional(),
-  poidsMaxTonnes: z.coerce.number().min(0).optional(),
-  accessibilite: z.nativeEnum(AccessibiliteType).optional(),
-  typeVehiculeMax: z.string().optional(),
-  hasQuaiChargement: z.boolean().optional(),
-  hasChariot: z.boolean().optional(),
-  hasPontRoulant: z.boolean().optional(),
-  hasGrue: z.boolean().optional(),
+  surfaceM2: z?.coerce?.number().min(0).optional(),
+  capaciteStockageTonnes: z?.coerce?.number().min(0).optional(),
+  hauteurMaxM: z?.coerce?.number().min(0).optional(),
+  poidsMaxTonnes: z?.coerce?.number().min(0).optional(),
+  accessibilite: z?.nativeEnum(AccessibiliteType).optional(),
+  typeVehiculeMax: z?.string().optional(),
+  hasQuaiChargement: z?.boolean().optional(),
+  hasChariot: z?.boolean().optional(),
+  hasPontRoulant: z?.boolean().optional(),
+  hasGrue: z?.boolean().optional(),
 
   // Instructions
-  instructionsLivraison: z.string().optional(),
-  consignesSecurite: z.string().optional(),
+  instructionsLivraison: z?.string().optional(),
+  consignesSecurite: z?.string().optional(),
 })
 
 type SiteFormData = z.infer<typeof siteSchema>
@@ -116,13 +116,14 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
   const [editingSite, setEditingSite] = useState<PartnerSite | null>(null)
   const [activeTab, setActiveTab] = useState('general')
 
-  const { data: sites = initialSites } = usePartnerSites(partnerId)
+  const sitesQuery = usePartnerSites(partnerId)
+  const { data: sites = initialSites } = sitesQuery
   const createSite = useCreatePartnerSite()
   const updateSite = useUpdatePartnerSite()
   const deleteSite = useDeletePartnerSite()
 
   const form = useForm<SiteFormData>({
-    resolver: zodResolver(siteSchema),
+    resolver: zodResolver(siteSchema) as unknown,
     defaultValues: {
       type: SiteType.DEPOT,
       status: SiteStatus.ACTIF,
@@ -139,7 +140,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
   const handleCreate = () => {
     setEditingSite(null)
-    form.reset({
+    form?.reset({
       type: SiteType.DEPOT,
       status: SiteStatus.ACTIF,
       isPrincipal: false,
@@ -157,7 +158,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
   const handleEdit = (site: PartnerSite) => {
     setEditingSite(site)
-    form.reset({
+    form?.reset({
       ...site,
       latitude: site.latitude || undefined,
       longitude: site.longitude || undefined,
@@ -172,16 +173,16 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
   const handleDelete = async (site: PartnerSite) => {
     if (confirm(`Êtes-vous sûr de vouloir supprimer le site ${site.nom} ?`)) {
-      await deleteSite.mutateAsync(site.id)
+      await deleteSite?.mutateAsync(site.id)
     }
   }
 
   const onSubmit = async (data: SiteFormData) => {
     try {
       if (editingSite) {
-        await updateSite.mutateAsync({ id: editingSite.id, data: data as UpdatePartnerSiteDto })
+        await updateSite?.mutateAsync({ id: editingSite.id, data: data as UpdatePartnerSiteDto })
       } else {
-        await createSite.mutateAsync({ partnerId, data: data as CreatePartnerSiteDto })
+        await createSite?.mutateAsync({ partnerId, data: data as CreatePartnerSiteDto })
       }
       setIsFormOpen(false)
       form.reset()
@@ -238,7 +239,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sites.map((site) => (
+                {sites?.map((site: unknown) => (
                   <TableRow key={site.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -262,7 +263,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{site.type.replace(/_/g, ' ')}</Badge>
+                      <Badge variant="outline">{site?.type?.replace(/_/g, ' ')}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
@@ -344,7 +345,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form?.handleSubmit(onSubmit as unknown)} className="space-y-4">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="general">Général</TabsTrigger>
@@ -356,7 +357,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 <TabsContent value="general" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="code"
                       render={({ field }) => (
                         <FormItem>
@@ -370,7 +371,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="nom"
                       render={({ field }) => (
                         <FormItem>
@@ -385,7 +386,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                   </div>
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
@@ -400,7 +401,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="type"
                       render={({ field }) => (
                         <FormItem>
@@ -427,7 +428,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="status"
                       render={({ field }) => (
                         <FormItem>
@@ -453,7 +454,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-3 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="responsable"
                       render={({ field }) => (
                         <FormItem>
@@ -467,7 +468,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="telephone"
                       render={({ field }) => (
                         <FormItem>
@@ -481,7 +482,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
@@ -497,7 +498,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="space-y-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="isPrincipal"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -514,7 +515,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
-                        control={form.control}
+                        control={form?.control}
                         name="accepteLivraisons"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -529,7 +530,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                       />
 
                       <FormField
-                        control={form.control}
+                        control={form?.control}
                         name="accepteEnlevements"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -548,7 +549,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                 <TabsContent value="address" className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="adresse"
                     render={({ field }) => (
                       <FormItem>
@@ -562,7 +563,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="adresseComplement"
                     render={({ field }) => (
                       <FormItem>
@@ -577,7 +578,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-3 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="codePostal"
                       render={({ field }) => (
                         <FormItem>
@@ -591,7 +592,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="ville"
                       render={({ field }) => (
                         <FormItem>
@@ -605,7 +606,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="pays"
                       render={({ field }) => (
                         <FormItem>
@@ -620,7 +621,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                   </div>
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="region"
                     render={({ field }) => (
                       <FormItem>
@@ -635,7 +636,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="latitude"
                       render={({ field }) => (
                         <FormItem>
@@ -649,7 +650,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="longitude"
                       render={({ field }) => (
                         <FormItem>
@@ -667,7 +668,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 <TabsContent value="capacity" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="surfaceM2"
                       render={({ field }) => (
                         <FormItem>
@@ -681,7 +682,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="capaciteStockageTonnes"
                       render={({ field }) => (
                         <FormItem>
@@ -697,7 +698,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="hauteurMaxM"
                       render={({ field }) => (
                         <FormItem>
@@ -711,7 +712,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="poidsMaxTonnes"
                       render={({ field }) => (
                         <FormItem>
@@ -727,7 +728,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="accessibilite"
                       render={({ field }) => (
                         <FormItem>
@@ -753,7 +754,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="typeVehiculeMax"
                       render={({ field }) => (
                         <FormItem>
@@ -769,7 +770,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="hasQuaiChargement"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -782,7 +783,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="hasChariot"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -797,7 +798,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="hasPontRoulant"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -810,7 +811,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                     />
 
                     <FormField
-                      control={form.control}
+                      control={form?.control}
                       name="hasGrue"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -826,7 +827,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
 
                 <TabsContent value="instructions" className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="instructionsLivraison"
                     render={({ field }) => (
                       <FormItem>
@@ -844,7 +845,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="consignesSecurite"
                     render={({ field }) => (
                       <FormItem>
@@ -871,8 +872,8 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                   Annuler
                 </Button>
-                <Button type="submit" disabled={createSite.isPending || updateSite.isPending}>
-                  {createSite.isPending || updateSite.isPending
+                <Button type="submit" disabled={createSite?.isPending || updateSite?.isPending}>
+                  {createSite?.isPending || updateSite?.isPending
                     ? 'Enregistrement...'
                     : editingSite
                       ? 'Modifier'

@@ -1,0 +1,20 @@
+src/app/(auth)/admin/pricing/page.tsx(619,13): error TS2322: Type '(rule: any) => ({ label: string; onClick: () => void; variant?: undefined; } | { label: string; onClick: () => Promise<void>; variant: string; })[]' is not assignable to type '{ label: string; icon?: ReactNode; onClick: (row: PriceRule) => void; variant?: "default" | "outline" | "destructive" | undefined; disabled?: ((row: PriceRule) => boolean) | undefined; }[]'.
+src/app/(dashboard)/admin/users/users-datatable.tsx(474,9): error TS2322: Type '(row: User, column: ColumnConfig<User>, value: JsonValue) => void' is not assignable to type '(row: User, column: ColumnConfig<User>, value: unknown) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'unknown' is not assignable to type 'JsonValue'.
+src/app/(dashboard)/test-datatable/page.tsx(242,15): error TS2322: Type '{ pageSize: number; pageSizeOptions: number[]; }' is not assignable to type 'boolean | PaginationConfig | undefined'.
+  Type '{ pageSize: number; pageSizeOptions: number[]; }' is missing the following properties from type 'PaginationConfig': page, total
+src/app/(dashboard)/test-datatable/page.tsx(263,33): error TS2345: Argument of type 'Set<string | number>' is not assignable to parameter of type 'SetStateAction<Set<string>>'.
+  Type 'Set<string | number>' is not assignable to type 'Set<string>'.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/app/api/notifications/route.ts(100,36): error TS2345: Argument of type '{ id: {}; type: {}; category: {}; title: {}; message: {}; priority: {}; source: unknown; entity_type: unknown; entity_id: unknown; data: unknown; recipient_type: {}; recipient_id: unknown; action_url: unknown; action_label: unknown; action_type: {}; expires_at: unknown; ... 4 more ...; read_at: null; }' is not assignable to parameter of type 'Notification'.
+  Types of property 'id' are incompatible.
+    Type '{}' is not assignable to type 'string'.
+src/app/api/notifications/route.ts(171,7): error TS2322: Type 'import("D:/GitHub/TopSteel/packages/types/dist/cross-cutting/notifications").NotificationPriority[]' is not assignable to type 'import("D:/GitHub/TopSteel/packages/domains/dist/cross-cutting/notifications/domain/entities").NotificationPriority[]'.
+  Type 'import("D:/GitHub/TopSteel/packages/types/dist/cross-cutting/notifications").NotificationPriority' is not assignable to type 'import("D:/GitHub/TopSteel/packages/domains/dist/cross-cutting/notifications/domain/entities").NotificationPriority'.
+    Property 'MEDIUM' is missing in type 'import("D:/GitHub/TopSteel/packages/domains/dist/cross-cutting/notifications/domain/entities").NotificationPriority'.
+src/app/api/notifications/rules/[id]/test/route.ts(263,7): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/app/api/user/menu-preferences/custom-menu/route.ts(18,13): error TS2552: Cannot find name 'UserMenuItem'. Did you mean '_UserMenuItem'?
+src/app/api/user/menu-preferences/selected-pages/route.ts(23,9): error TS2322: Type 'any[]' is not assignable to type 'never[]'.

@@ -1,0 +1,46 @@
+# Build outputs
+dist/
+*.tsbuildinfo
+*.d.ts.map
+
+# Test coverage
+coverage/
+*.log
+.nyc_output/
+
+# Cache directories
+.turbo/
+node_modules/
+.cache/
+.vite/
+.rollup.cache/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/local/
+*.sublime-*
+
+# Test reports
+test-results/
+playwright-report/
+cypress/screenshots/
+cypress/videos/
+
+# Build analysis
+stats.html
+bundle-stats.html
+
+# Environment files (if any)
+.env.local
+.env.*.local

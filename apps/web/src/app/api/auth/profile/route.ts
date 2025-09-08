@@ -6,14 +6,14 @@ export async function GET(req: NextRequest) {
     // Rediriger vers l'API backend avec authentification automatique
     const response = await callBackendFromApi(req, 'auth/profile')
 
-    const data = await response.json()
+    const data = await response?.json()
 
-    if (!response.ok) {
-      return NextResponse.json(data, { status: response.status })
+    if (!response?.ok) {
+      return NextResponse?.json(data, { status: response.status })
     }
 
-    return NextResponse.json(data)
+    return NextResponse?.json(data)
   } catch (_error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse?.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

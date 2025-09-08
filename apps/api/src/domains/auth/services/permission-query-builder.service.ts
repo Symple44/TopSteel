@@ -12,6 +12,7 @@ import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
+import type { IPermission, IRolePermission } from '../types/entities.types'
 
 /**
  * Permission query operators
@@ -328,9 +329,14 @@ export class PermissionQueryBuilderService {
 
     // Analyze each role
     for (const userRole of userRoles) {
-      // Role permissions
-      for (const rolePerm of userRole.role.rolePermissions || []) {
-        const permCode = `${rolePerm.permission.resource}:${rolePerm.permission.action}`
+      // Role permissions - vérifier que le rôle existe et a des permissions
+      const role = userRole.role
+      if (!role) continue
+
+      for (const rolePerm of role.rolePermissions || []) {
+        const rp = rolePerm as IRolePermission
+        const permission = rp.permission as IPermission
+        const permCode = `${permission.resource}:${permission.action}`
         let conflict = permissionMap.get(permCode)
 
         if (!conflict) {
@@ -345,7 +351,7 @@ export class PermissionQueryBuilderService {
 
         conflict.sources.push({
           type: 'role',
-          source: userRole.role.name,
+          source: role.name,
           action: 'grant',
           priority: 1,
         })
@@ -483,7 +489,9 @@ export class PermissionQueryBuilderService {
       // Find root nodes (no parent)
       const allChildren = new Set<string>()
       for (const children of permissionTree.values()) {
-        children.forEach((child) => allChildren.add(child))
+        children.forEach((child) => {
+          allChildren.add(child)
+        })
       }
 
       for (const node of permissionTree.keys()) {
@@ -540,7 +548,7 @@ export class PermissionQueryBuilderService {
     stats.totalUsers = await userQuery
       .select('COUNT(DISTINCT userRole.userId)', 'count')
       .getRawOne()
-      .then((r) => parseInt(r.count))
+      .then((r) => parseInt(r.count, 10))
 
     // Most used permissions
     const permissionUsage = await this.rolePermissionRepository
@@ -556,7 +564,7 @@ export class PermissionQueryBuilderService {
 
     stats.mostUsedPermissions = permissionUsage.map((p) => ({
       permission: p.code,
-      count: parseInt(p.count),
+      count: parseInt(p.count, 10),
     }))
 
     // Least used permissions
@@ -573,7 +581,7 @@ export class PermissionQueryBuilderService {
 
     stats.leastUsedPermissions = leastUsed.map((p) => ({
       permission: p.code,
-      count: parseInt(p.count),
+      count: parseInt(p.count, 10),
     }))
 
     // Roles with most permissions
@@ -589,7 +597,7 @@ export class PermissionQueryBuilderService {
 
     stats.rolesWithMostPermissions = rolePermCounts.map((r) => ({
       role: r.name,
-      count: parseInt(r.count),
+      count: parseInt(r.count, 10),
     }))
 
     // Permissions by category
@@ -659,7 +667,7 @@ export class PermissionQueryBuilderService {
    * Apply permission condition to query
    */
   private applyPermissionCondition(
-    query: SelectQueryBuilder<any> | WhereExpressionBuilder,
+    query: SelectQueryBuilder<unknown> | WhereExpressionBuilder,
     condition: PermissionCondition
   ): void {
     switch (condition.operator) {
@@ -733,12 +741,12 @@ export class PermissionQueryBuilderService {
           switch (condition.operator) {
             case PermissionOperator.HAS:
               if (condition.permissions?.length === 1) {
-                subQb.where(`(permission.resource || \':\' || permission.action) = :perm${i}`, {
+                subQb.where(`(permission.resource || ':' || permission.action) = :perm${i}`, {
                   [`perm${i}`]: condition.permissions[0],
                 })
               } else if (condition.permissions?.length) {
                 subQb.where(
-                  `(permission.resource || \':\' || permission.action) IN (:...perms${i})`,
+                  `(permission.resource || ':' || permission.action) IN (:...perms${i})`,
                   {
                     [`perms${i}`]: condition.permissions,
                   }
@@ -768,7 +776,7 @@ export class PermissionQueryBuilderService {
             case PermissionOperator.HAS_ANY:
               if (condition.permissions?.length) {
                 subQb.where(
-                  `(permission.resource || \':\' || permission.action) IN (:...perms${i})`,
+                  `(permission.resource || ':' || permission.action) IN (:...perms${i})`,
                   {
                     [`perms${i}`]: condition.permissions,
                   }
@@ -779,7 +787,7 @@ export class PermissionQueryBuilderService {
             case PermissionOperator.HAS_NONE:
               if (condition.permissions?.length) {
                 subQb.where(
-                  `(permission.resource || \':\' || permission.action) NOT IN (:...perms${i})`,
+                  `(permission.resource || ':' || permission.action) NOT IN (:...perms${i})`,
                   {
                     [`perms${i}`]: condition.permissions,
                   }
@@ -789,7 +797,7 @@ export class PermissionQueryBuilderService {
 
             case PermissionOperator.MATCHES:
               if (condition.pattern) {
-                subQb.where(`(permission.resource || \':\' || permission.action) ~ :pattern${i}`, {
+                subQb.where(`(permission.resource || ':' || permission.action) ~ :pattern${i}`, {
                   [`pattern${i}`]: condition.pattern,
                 })
               }
@@ -797,23 +805,17 @@ export class PermissionQueryBuilderService {
 
             case PermissionOperator.STARTS_WITH:
               if (condition.pattern) {
-                subQb.where(
-                  `(permission.resource || \':\' || permission.action) LIKE :pattern${i}`,
-                  {
-                    [`pattern${i}`]: `${condition.pattern}%`,
-                  }
-                )
+                subQb.where(`(permission.resource || ':' || permission.action) LIKE :pattern${i}`, {
+                  [`pattern${i}`]: `${condition.pattern}%`,
+                })
               }
               break
 
             case PermissionOperator.CONTAINS:
               if (condition.pattern) {
-                subQb.where(
-                  `(permission.resource || \':\' || permission.action) LIKE :pattern${i}`,
-                  {
-                    [`pattern${i}`]: `%${condition.pattern}%`,
-                  }
-                )
+                subQb.where(`(permission.resource || ':' || permission.action) LIKE :pattern${i}`, {
+                  [`pattern${i}`]: `%${condition.pattern}%`,
+                })
               }
               break
           }
@@ -901,7 +903,7 @@ export class PermissionQueryBuilderService {
       // Collect permissions and roles
       // Note: userSocieteRoles relation would need to be loaded separately
       // For now, we'll skip this part as the relation isn't defined in the User entity
-      for (const userRole of [] as any[]) {
+      for (const userRole of [] as unknown[]) {
         if (userRole.role) {
           roles.push({
             code: userRole.role.parentRoleType || userRole.role.name, // Use parentRoleType or name as code

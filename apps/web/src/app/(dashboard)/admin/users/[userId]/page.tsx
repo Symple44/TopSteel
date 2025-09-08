@@ -19,7 +19,7 @@ import {
 import { ArrowLeft, Building, Calendar, Mail, Phone, RefreshCw, Shield, Users } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import BulkOperationsHistory from '@/components/admin/bulk-operations-history'
+import { BulkOperationsHistory } from '@/components/admin/bulk-operations-history'
 import { AdminGuard } from '@/components/auth/admin-guard'
 import { toast } from '@/hooks/use-toast'
 import { apiClient } from '@/lib/api-client'
@@ -54,7 +54,7 @@ export default function UserDetailsPage() {
   const { t } = useTranslation('admin')
   const params = useParams()
   const router = useRouter()
-  const userId = params.userId as string
+  const userId = params?.userId as string
 
   const [user, setUser] = useState<UserDetails | null>(null)
   const [loading, setLoading] = useState(true)
@@ -82,7 +82,7 @@ export default function UserDetailsPage() {
   }, [loadUserDetails])
 
   const handleBack = () => {
-    router.push('/admin/users')
+    router?.push('/admin/users')
   }
 
   const handleRefresh = () => {
@@ -105,7 +105,7 @@ export default function UserDetailsPage() {
       <AdminGuard requiredRoles={['SUPER_ADMIN', 'ADMIN']} requiredPermissions={['USER_VIEW']}>
         <div className="text-center py-12">
           <p className="text-gray-500">{t('users.userNotFound')}</p>
-          <Button onClick={handleBack} className="mt-4">
+          <Button type="button" onClick={handleBack} className="mt-4">
             {t('common.back')}
           </Button>
         </div>
@@ -122,6 +122,7 @@ export default function UserDetailsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button
+                  type="button"
                   variant="ghost"
                   size="icon"
                   onClick={handleBack}
@@ -161,6 +162,7 @@ export default function UserDetailsPage() {
 
               <div className="flex items-center space-x-2">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   onClick={handleRefresh}
@@ -259,9 +261,9 @@ export default function UserDetailsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {user.roles && user.roles.length > 0 ? (
+                    {user.roles && user?.roles?.length > 0 ? (
                       <div className="space-y-2">
-                        {user.roles.map((role) => (
+                        {user?.roles?.map((role) => (
                           <div
                             key={role.id}
                             className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100"
@@ -287,9 +289,9 @@ export default function UserDetailsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {user.groups && user.groups.length > 0 ? (
+                    {user.groups && user?.groups?.length > 0 ? (
                       <div className="space-y-2">
-                        {user.groups.map((group) => (
+                        {user?.groups?.map((group) => (
                           <div
                             key={group.id}
                             className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100"

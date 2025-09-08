@@ -6,8 +6,8 @@ export async function GET(request: NextRequest) {
   try {
     // Vérifier l'authentification
     const auth = await verifyAuthHelper(request)
-    if (!auth.isValid) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!auth?.isValid) {
+      return NextResponse?.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     // Appeler l'API backend pour récupérer les méthodes MFA
@@ -15,21 +15,21 @@ export async function GET(request: NextRequest) {
       method: 'GET',
     })
 
-    if (!apiResponse.ok) {
-      const errorData = await apiResponse.json().catch(() => ({ error: 'Erreur API backend' }))
-      return NextResponse.json(
+    if (!apiResponse?.ok) {
+      const errorData = await apiResponse?.json().catch(() => ({ error: 'Erreur API backend' }))
+      return NextResponse?.json(
         { error: errorData.error || 'Erreur lors de la récupération des méthodes MFA' },
         { status: apiResponse.status }
       )
     }
 
-    const methodsData = await apiResponse.json()
+    const methodsData = await apiResponse?.json()
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
-      data: methodsData.data,
+      data: methodsData?.data,
     })
   } catch (_error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

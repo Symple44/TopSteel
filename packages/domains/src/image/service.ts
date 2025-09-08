@@ -38,7 +38,7 @@ export class ImageService {
         width: metadata.width || 0,
         height: metadata.height || 0,
       }
-    } catch (error) {
+    } catch (_error) {
       return { width: 0, height: 0 }
     }
   }
@@ -75,7 +75,7 @@ export class ImageService {
         height: result.height,
         size: result.size,
       }
-    } catch (error) {
+    } catch (_error) {
       // Fallback: save original file as variant
       await fs.writeFile(outputPath, buffer)
       return {

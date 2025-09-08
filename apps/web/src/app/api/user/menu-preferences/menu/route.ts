@@ -5,10 +5,10 @@ import { callBackendFromApi } from '@/utils/backend-api'
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+    const token = cookieStore?.get('accessToken')?.value
 
     if (!token) {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: 'Authentification requise',
@@ -21,26 +21,26 @@ export async function GET(request: NextRequest) {
       // Appeler le vrai backend NestJS
       const response = await callBackendFromApi(request, 'user/menu-preferences/menu', {
         method: 'GET',
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal?.timeout(5000),
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      if (response?.ok) {
+        const data = await response?.json()
 
         // Gérer les différentes structures de réponse possibles
-        if (data.data?.success) {
-          return NextResponse.json({
-            success: data.data.success,
-            data: data.data.data,
+        if (data?.data?.success) {
+          return NextResponse?.json({
+            success: data?.data?.success,
+            data: data?.data?.data,
             message: data.message || 'Menu récupéré avec succès',
           })
-        } else if (data.success) {
-          return NextResponse.json(data)
+        } else if (data?.success) {
+          return NextResponse?.json(data)
         } else {
-          return NextResponse.json(data)
+          return NextResponse?.json(data)
         }
       } else {
-        throw new Error(`Backend API error: ${response.status}`)
+        throw new Error(`Backend API error: ${response?.status}`)
       }
     } catch (_backendError) {
       // Fallback uniquement si le backend est indisponible
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
         },
       ]
 
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: defaultCustomMenu,
         message: 'Menu personnalisé récupéré avec succès (fallback)',
@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     // Error loading menu (silenced)
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors du chargement du menu',
@@ -178,10 +178,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+    const token = cookieStore?.get('accessToken')?.value
 
     if (!token) {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: 'Authentification requise',
@@ -190,25 +190,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
+    const body = await request?.json()
 
     try {
       // Appeler le vrai backend NestJS pour la sauvegarde
       const response = await callBackendFromApi(request, 'user/menu-preferences/menu', {
         method: 'POST',
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal?.timeout(5000),
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        return NextResponse.json(data)
+      if (response?.ok) {
+        const data = await response?.json()
+        return NextResponse?.json(data)
       } else {
-        throw new Error(`Backend API error: ${response.status}`)
+        throw new Error(`Backend API error: ${response?.status}`)
       }
     } catch (_backendError) {
       // Fallback : simuler la sauvegarde si backend indisponible
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         data: body,
         message: 'Préférences de menu sauvegardées (mode fallback)',
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     // Error saving menu preferences (silenced)
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors de la sauvegarde des préférences',

@@ -1,9 +1,14 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { CheckCircle, XCircle, AlertTriangle, Star, Award, Target } from 'lucide-react'
+import { AlertTriangle, Award, CheckCircle, Target, XCircle } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 export type QualityLevel = 'excellent' | 'good' | 'average' | 'poor' | 'critical'
-export type QualityMetric = 'defect_rate' | 'compliance' | 'certification' | 'customer_satisfaction' | 'performance'
+export type QualityMetric =
+  | 'defect_rate'
+  | 'compliance'
+  | 'certification'
+  | 'customer_satisfaction'
+  | 'performance'
 interface QualityIndicatorProps {
   level: QualityLevel
   metric?: QualityMetric
@@ -140,7 +145,7 @@ export function QualityIndicator({
   }
   if (variant === 'badge') {
     return (
-      <Badge 
+      <Badge
         className={cn(
           'inline-flex items-center gap-1.5 font-medium',
           config.badgeColor,
@@ -150,9 +155,7 @@ export function QualityIndicator({
       >
         {showIcon && <Icon className={sizeConfig.icon} />}
         {displayLabel}
-        {showValue && value !== undefined && (
-          <span className="ml-1">({formatValue(value)})</span>
-        )}
+        {showValue && value !== undefined && <span className="ml-1">({formatValue(value)})</span>}
       </Badge>
     )
   }
@@ -164,9 +167,7 @@ export function QualityIndicator({
             <Icon className={cn(sizeConfig.icon, config.color)} />
             <span className="font-medium">{displayLabel}</span>
           </div>
-          <Badge className={config.badgeColor}>
-            {config.label}
-          </Badge>
+          <Badge className={config.badgeColor}>{config.label}</Badge>
         </div>
         {value !== undefined && (
           <div className="space-y-2">
@@ -183,7 +184,8 @@ export function QualityIndicator({
             {target !== undefined && (
               <div className="w-full bg-muted rounded-full h-2">
                 <div
-                  className={cn('h-2 rounded-full transition-all duration-300', 
+                  className={cn(
+                    'h-2 rounded-full transition-all duration-300',
                     value >= target ? 'bg-green-500' : 'bg-orange-500'
                   )}
                   style={{ width: `${Math.min((value / target) * 100, 100)}%` }}
@@ -192,9 +194,7 @@ export function QualityIndicator({
             )}
           </div>
         )}
-        <div className="text-xs text-muted-foreground">
-          Score qualité: {config.score}/100
-        </div>
+        <div className="text-xs text-muted-foreground">Score qualité: {config.score}/100</div>
       </div>
     )
   }
@@ -231,18 +231,12 @@ export function QualityIndicator({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {showIcon && <Icon className={cn(sizeConfig.icon, config.color)} />}
-            <span className={cn('font-bold', sizeConfig.text)}>
-              {config.score}%
-            </span>
+            <span className={cn('font-bold', sizeConfig.text)}>{config.score}%</span>
           </div>
         </div>
         <div className="text-center">
-          <div className={cn('font-medium', config.color, sizeConfig.text)}>
-            {config.label}
-          </div>
-          <div className="text-xs text-muted-foreground">
-            {displayLabel}
-          </div>
+          <div className={cn('font-medium', config.color, sizeConfig.text)}>{config.label}</div>
+          <div className="text-xs text-muted-foreground">{displayLabel}</div>
         </div>
       </div>
     )

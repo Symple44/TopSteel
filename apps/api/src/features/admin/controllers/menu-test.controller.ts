@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import { MenuConfigurationSimple } from '../entities/menu-configuration-simple.entity'
 
 @Controller('admin/menu-test')
@@ -23,7 +24,7 @@ export class MenuTestController {
     } catch (error: unknown) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? getErrorMessage(error) : getErrorMessage(error),
         stack: error instanceof Error ? error.stack?.split('\n').slice(0, 3).join('\n') : undefined,
       }
     }
@@ -45,7 +46,7 @@ export class MenuTestController {
     } catch (error: unknown) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? getErrorMessage(error) : getErrorMessage(error),
       }
     }
   }

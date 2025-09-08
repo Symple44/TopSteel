@@ -8,7 +8,7 @@ dotenv.config({ path: '.env' })
 const authDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
+  port: parseInt(process.env.DB_PORT || '5432', 10),
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_DATABASE_AUTH || 'erp_topsteel_auth',
@@ -33,12 +33,12 @@ async function ensureArticlesMenu() {
 
     if (existingMenus.length > 0) {
       console.log(`✅ ${existingMenus.length} menu(s) Articles trouvé(s):`)
-      existingMenus.forEach((menu: any) => {
+      existingMenus.forEach((menu: unknown) => {
         console.log(`  - ${menu.title} (${menu.programId}) - Visible: ${menu.isVisible}`)
       })
 
       // Vérifier si au moins un est visible
-      const visibleMenu = existingMenus.find((m: any) => m.isVisible)
+      const visibleMenu = existingMenus.find((m: unknown) => m.isVisible)
       if (!visibleMenu) {
         console.log('\n⚠️ Aucun menu Articles visible. Mise à jour...')
         const updateQuery = `

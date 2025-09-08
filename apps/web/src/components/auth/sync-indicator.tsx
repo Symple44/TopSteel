@@ -23,20 +23,20 @@ export default function SyncIndicator() {
       setLastSyncActivity(new Date())
     }
 
-    channel.addEventListener('message', handleMessage)
+    channel?.addEventListener('message', handleMessage)
 
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
-      channel.removeEventListener('message', handleMessage)
-      channel.close()
+      channel?.removeEventListener('message', handleMessage)
+      channel?.close()
     }
   }, [])
 
   const getTitle = () => {
     if (!isOnline) return 'Hors ligne'
     if (lastSyncActivity) {
-      return `Dernière synchronisation: ${lastSyncActivity.toLocaleTimeString()}`
+      return `Dernière synchronisation: ${lastSyncActivity?.toLocaleTimeString()}`
     }
     return 'En ligne'
   }

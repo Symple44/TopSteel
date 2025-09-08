@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Card, Input, Label, Separator } from '@erp/ui'
+import { Button, Card, Input, Label, Separator, useFormFieldIds, useUniqueId } from '@erp/ui'
 import { ArrowLeft, Building2, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -25,10 +25,21 @@ export default function RegisterPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // Generate unique IDs for form fields
+  const fieldIds = useFormFieldIds([
+    'firstName',
+    'lastName',
+    'email',
+    'company',
+    'password',
+    'confirmPassword',
+  ])
+  const acceptTermsId = useUniqueId('accept-terms')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    const value = e?.target.type === 'checkbox' ? e?.target?.checked : e?.target?.value
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -51,7 +62,7 @@ export default function RegisterPage() {
       return false
     }
 
-    if (formData.password.length < 8) {
+    if (formData?.password?.length < 8) {
       toast({
         title: t('error'),
         description: t('passwordMinLength'),
@@ -71,7 +82,7 @@ export default function RegisterPage() {
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
+    if (!emailRegex?.test(formData.email)) {
       toast({
         title: t('error'),
         description: t('enterValidEmail'),
@@ -84,7 +95,7 @@ export default function RegisterPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!validateForm()) return
 
@@ -100,7 +111,7 @@ export default function RegisterPage() {
         variant: 'success',
       })
 
-      router.push('/login')
+      router?.push('/login')
     } catch (_error) {
       toast({
         title: t('error'),
@@ -136,9 +147,9 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">{t('firstNameRequired')}</Label>
+                  <Label htmlFor={fieldIds.firstName}>{t('firstNameRequired')}</Label>
                   <Input
-                    id="firstName"
+                    id={fieldIds.firstName}
                     value={formData.firstName}
                     onChange={handleInputChange('firstName')}
                     placeholder={t('firstNamePlaceholder')}
@@ -147,9 +158,9 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">{t('lastNameRequired')}</Label>
+                  <Label htmlFor={fieldIds.lastName}>{t('lastNameRequired')}</Label>
                   <Input
-                    id="lastName"
+                    id={fieldIds.lastName}
                     value={formData.lastName}
                     onChange={handleInputChange('lastName')}
                     placeholder={t('lastNamePlaceholder')}
@@ -159,11 +170,11 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">{t('emailRequired')}</Label>
+                <Label htmlFor={fieldIds.email}>{t('emailRequired')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    id="email"
+                    id={fieldIds.email}
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange('email')}
@@ -175,11 +186,11 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company">{t('companyOptional')}</Label>
+                <Label htmlFor={fieldIds.company}>{t('companyOptional')}</Label>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    id="company"
+                    id={fieldIds.company}
                     value={formData.company}
                     onChange={handleInputChange('company')}
                     placeholder={t('companyPlaceholder')}
@@ -189,11 +200,11 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">{t('passwordRequired')}</Label>
+                <Label htmlFor={fieldIds.password}>{t('passwordRequired')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    id="password"
+                    id={fieldIds.password}
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={handleInputChange('password')}
@@ -213,11 +224,11 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t('confirmPasswordRequired')}</Label>
+                <Label htmlFor={fieldIds.confirmPassword}>{t('confirmPasswordRequired')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    id="confirmPassword"
+                    id={fieldIds.confirmPassword}
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={formData.confirmPassword}
                     onChange={handleInputChange('confirmPassword')}
@@ -240,8 +251,9 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-3">
-                <label className="flex items-start space-x-3 text-sm">
+                <label htmlFor={acceptTermsId} className="flex items-start space-x-3 text-sm">
                   <input
+                    id={acceptTermsId}
                     type="checkbox"
                     checked={formData.acceptTerms}
                     onChange={handleInputChange('acceptTerms')}
@@ -269,11 +281,11 @@ export default function RegisterPage() {
             {/* Avantages de l'inscription */}
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm">
               <h3 className="font-medium text-green-900 mb-2">{t('trialIncludes')}</h3>
-              <ul className="text-green-800 space-y-1">
-                <li>• {t('daysFree')}</li>
-                <li>• {t('accessAllModules')}</li>
-                <li>• {t('technicalSupport')}</li>
-                <li>• {t('freeTraining')}</li>
+              <ul className="text-green-800 space-y-1 list-disc list-inside">
+                <li key="daysFree">{t('daysFree')}</li>
+                <li key="accessAllModules">{t('accessAllModules')}</li>
+                <li key="technicalSupport">{t('technicalSupport')}</li>
+                <li key="freeTraining">{t('freeTraining')}</li>
               </ul>
             </div>
 

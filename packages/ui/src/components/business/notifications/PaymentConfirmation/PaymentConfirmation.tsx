@@ -1,7 +1,7 @@
 'use client'
-import { useState } from 'react'
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Select } from '../../../primitives'
-import { CreditCard, Shield, Calendar, User, Building, AlertCircle, CheckCircle, Euro } from 'lucide-react'
+import { Building, Calendar, CreditCard, Euro, Shield } from 'lucide-react'
+import { useId, useState } from 'react'
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives'
 export type PaymentMethod = 'bank_transfer' | 'credit_card' | 'check' | 'cash' | 'direct_debit'
 export interface PaymentDetails {
   id: string
@@ -35,51 +35,56 @@ const paymentMethodConfig = {
     icon: Building,
     processingTime: '1-2 jours ouvrés',
     fees: 'Gratuit',
-    security: 'Élevée'
+    security: 'Élevée',
   },
   credit_card: {
     label: 'Carte de crédit',
     icon: CreditCard,
     processingTime: 'Immédiat',
     fees: '2.9% + 0.30€',
-    security: 'Élevée'
+    security: 'Élevée',
   },
   check: {
     label: 'Chèque',
     icon: Calendar,
     processingTime: '3-5 jours ouvrés',
     fees: 'Gratuit',
-    security: 'Moyenne'
+    security: 'Moyenne',
   },
   cash: {
     label: 'Espèces',
     icon: Euro,
     processingTime: 'Immédiat',
     fees: 'Gratuit',
-    security: 'Faible'
+    security: 'Faible',
   },
   direct_debit: {
     label: 'Prélèvement automatique',
     icon: Shield,
     processingTime: '1-3 jours ouvrés',
     fees: 'Gratuit',
-    security: 'Élevée'
-  }
+    security: 'Élevée',
+  },
 }
 export function PaymentConfirmation({
   open,
   onOpenChange,
   payment,
   availableMethods,
-  onConfirm
+  onConfirm,
 }: PaymentConfirmationProps) {
+  const scheduledDateId = useId()
+  const confirmationCodeId = useId()
+  const termsId = useId()
   const [loading, setLoading] = useState(false)
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(availableMethods[0] || 'bank_transfer')
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(
+    availableMethods[0] || 'bank_transfer'
+  )
   const [scheduledDate, setScheduledDate] = useState('')
   const [confirmationCode, setConfirmationCode] = useState('')
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const selectedMethodConfig = paymentMethodConfig[selectedMethod]
-  const IconComponent = selectedMethodConfig.icon
+  const _IconComponent = selectedMethodConfig.icon
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -88,11 +93,10 @@ export function PaymentConfirmation({
         paymentId: payment.id,
         method: selectedMethod,
         scheduledDate: scheduledDate || undefined,
-        confirmationCode: confirmationCode || undefined
+        confirmationCode: confirmationCode || undefined,
       })
       onOpenChange(false)
-    } catch (error) {
-      console.error('Payment confirmation failed:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -100,7 +104,7 @@ export function PaymentConfirmation({
   const formatCurrency = (amount: number, currency = payment.currency) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency
+      currency,
     }).format(amount)
   }
   const formatDate = (dateString: string) => {
@@ -226,12 +230,12 @@ export function PaymentConfirmation({
           {/* Additional Options */}
           {isSchedulable && (
             <div className="space-y-2">
-              <label htmlFor="scheduledDate" className="text-sm font-medium text-gray-900">
+              <label htmlFor={scheduledDateId} className="text-sm font-medium text-gray-900">
                 Date d'exécution (optionnel)
               </label>
               <input
                 type="date"
-                id="scheduledDate"
+                id={scheduledDateId}
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
                 min={new Date().toISOString().split('T')[0]}
@@ -244,12 +248,12 @@ export function PaymentConfirmation({
           )}
           {requiresConfirmationCode && (
             <div className="space-y-2">
-              <label htmlFor="confirmationCode" className="text-sm font-medium text-gray-900">
+              <label htmlFor={confirmationCodeId} className="text-sm font-medium text-gray-900">
                 Code de confirmation
               </label>
               <input
                 type="text"
-                id="confirmationCode"
+                id={confirmationCodeId}
                 value={confirmationCode}
                 onChange={(e) => setConfirmationCode(e.target.value)}
                 placeholder="Entrez le code reçu par SMS/email"
@@ -281,15 +285,15 @@ export function PaymentConfirmation({
           <div className="flex items-start gap-2">
             <input
               type="checkbox"
-              id="terms"
+              id={termsId}
               checked={agreedToTerms}
               onChange={(e) => setAgreedToTerms(e.target.checked)}
               className="mt-1 rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               required
             />
-            <label htmlFor="terms" className="text-sm text-gray-700">
-              J'accepte les conditions générales et confirme que les informations de paiement sont correctes.
-              Ce paiement sera traité selon la méthode sélectionnée.
+            <label htmlFor={termsId} className="text-sm text-gray-700">
+              J'accepte les conditions générales et confirme que les informations de paiement sont
+              correctes. Ce paiement sera traité selon la méthode sélectionnée.
             </label>
           </div>
           <div className="flex gap-2 justify-end">
@@ -301,9 +305,11 @@ export function PaymentConfirmation({
             >
               Annuler
             </Button>
-            <Button 
-              type="submit" 
-              disabled={loading || !agreedToTerms || (requiresConfirmationCode && !confirmationCode.trim())}
+            <Button
+              type="submit"
+              disabled={
+                loading || !agreedToTerms || (requiresConfirmationCode && !confirmationCode.trim())
+              }
               className="bg-green-600 hover:bg-green-700"
             >
               {loading ? 'Traitement...' : 'Confirmer le paiement'}

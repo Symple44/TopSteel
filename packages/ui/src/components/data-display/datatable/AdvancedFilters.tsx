@@ -3,6 +3,7 @@
 import { Filter, Plus, RotateCcw, ToggleLeft, Trash2, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { cn } from '../../../lib/utils'
+import type { JsonValue, SafeObject } from '../../../types/common'
 import { Button } from '../../primitives/button'
 import { DropdownPortal } from '../../primitives/dropdown-portal'
 import { Input } from '../../primitives/input'
@@ -31,8 +32,8 @@ export interface AdvancedFilterRule {
   id: string
   column: string
   operator: FilterOperator
-  value: any
-  value2?: any // Pour l'opérateur "between"
+  value: JsonValue
+  value2?: JsonValue // Pour l'opérateur "between"
   enabled: boolean
 }
 
@@ -42,7 +43,7 @@ export interface AdvancedFilterGroup {
   rules: AdvancedFilterRule[]
 }
 
-interface AdvancedFiltersProps<T = any> {
+interface AdvancedFiltersProps<T = SafeObject> {
   columns: ColumnConfig<T>[]
   filters: AdvancedFilterGroup[]
   onFiltersChange: (filters: AdvancedFilterGroup[]) => void
@@ -223,7 +224,7 @@ export function AdvancedFilters<T>({
       case 'select':
         return (
           <SelectPortal
-            value={rule.value}
+            value={String(rule.value || '')}
             onValueChange={(value) => updateRule(group.id, rule.id, { value })}
             options={
               column.options?.map((opt) => ({
@@ -242,16 +243,20 @@ export function AdvancedFilters<T>({
           <div className="flex gap-1">
             <Input
               type="number"
-              value={rule.value || ''}
-              onChange={(e: any) => updateRule(group.id, rule.id, { value: e.target.value })}
+              value={String(rule.value || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateRule(group.id, rule.id, { value: e.target.value })
+              }
               placeholder="Valeur"
               className="h-8 text-xs w-20"
             />
             {operator.needsValue2 && (
               <Input
                 type="number"
-                value={rule.value2 || ''}
-                onChange={(e: any) => updateRule(group.id, rule.id, { value2: e.target.value })}
+                value={String(rule.value2 || '')}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  updateRule(group.id, rule.id, { value2: e.target.value })
+                }
                 placeholder="Valeur 2"
                 className="h-8 text-xs w-20"
               />
@@ -264,15 +269,19 @@ export function AdvancedFilters<T>({
           <div className="flex gap-1">
             <Input
               type="date"
-              value={rule.value || ''}
-              onChange={(e: any) => updateRule(group.id, rule.id, { value: e.target.value })}
+              value={String(rule.value || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateRule(group.id, rule.id, { value: e.target.value })
+              }
               className="h-8 text-xs w-32"
             />
             {operator.needsValue2 && (
               <Input
                 type="date"
-                value={rule.value2 || ''}
-                onChange={(e: any) => updateRule(group.id, rule.id, { value2: e.target.value })}
+                value={String(rule.value2 || '')}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  updateRule(group.id, rule.id, { value2: e.target.value })
+                }
                 className="h-8 text-xs w-32"
               />
             )}
@@ -282,8 +291,10 @@ export function AdvancedFilters<T>({
       default:
         return (
           <Input
-            value={rule.value || ''}
-            onChange={(e: any) => updateRule(group.id, rule.id, { value: e.target.value })}
+            value={String(rule.value || '')}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              updateRule(group.id, rule.id, { value: e.target.value })
+            }
             placeholder="Valeur"
             className="h-8 text-xs min-w-[120px]"
           />
@@ -359,6 +370,7 @@ export function AdvancedFilters<T>({
 
         {/* Enable/Disable toggle */}
         <Button
+          type="button"
           variant={rule.enabled ? 'default' : 'outline'}
           size="sm"
           onClick={() => updateRule(group.id, rule.id, { enabled: !rule.enabled })}
@@ -371,6 +383,7 @@ export function AdvancedFilters<T>({
 
         {/* Remove rule */}
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={() => removeRule(group.id, rule.id)}
@@ -396,6 +409,7 @@ export function AdvancedFilters<T>({
           </div>
           <div className="flex gap-1">
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => addRule(group.id)}
@@ -405,6 +419,7 @@ export function AdvancedFilters<T>({
               Règle
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => removeFilterGroup(group.id)}
@@ -434,7 +449,7 @@ export function AdvancedFilters<T>({
         side="bottom"
         className="min-w-[800px] max-w-[90vw] max-h-[80vh] overflow-auto p-0"
         trigger={
-          <Button variant="outline" size="sm" className="relative">
+          <Button type="button" variant="outline" size="sm" className="relative">
             <Filter className="h-4 w-4 mr-2" />
             Filtres avancés
             {activeFiltersCount > 0 && (
@@ -463,11 +478,18 @@ export function AdvancedFilters<T>({
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Filtres avancés</h3>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={addFilterGroup} className="text-xs">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addFilterGroup}
+                className="text-xs"
+              >
                 <Plus className="h-3 w-3 mr-1" />
                 Groupe
               </Button>
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={clearAllFilters}
@@ -491,7 +513,7 @@ export function AdvancedFilters<T>({
           </div>
 
           <div className="flex justify-end pt-3 border-t">
-            <Button onClick={() => setIsOpen(false)} size="sm">
+            <Button type="button" onClick={() => setIsOpen(false)} size="sm">
               Appliquer les filtres
             </Button>
           </div>

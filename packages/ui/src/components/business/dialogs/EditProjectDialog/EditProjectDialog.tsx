@@ -1,25 +1,10 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Calendar, Clock, DollarSign, FolderOpen, Target, TrendingUp } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Calendar, User, DollarSign, FolderOpen, TrendingUp, Clock, Target } from 'lucide-react'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-  Badge,
-  Switch
-} from '../../../primitives'
+import { Badge } from '../../../data-display/badge'
 import {
   Form,
   FormControl,
@@ -27,15 +12,31 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '../../../forms'
+  FormMessage,
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Switch } from '../../../primitives/switch/switch'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Project edit schema
 const editProjectSchema = z.object({
   name: z.string().min(1, 'Le nom du projet est obligatoire'),
   description: z.string().optional(),
   status: z.enum(['planning', 'in_progress', 'on_hold', 'completed', 'cancelled']),
   priority: z.enum(['low', 'medium', 'high']),
-  progress: z.number().min(0, 'Le progrès doit être positif').max(100, 'Le progrès ne peut pas dépasser 100%'),
+  progress: z
+    .number()
+    .min(0, 'Le progrès doit être positif')
+    .max(100, 'Le progrès ne peut pas dépasser 100%'),
   managerId: z.string().min(1, 'Le chef de projet est obligatoire'),
   startDate: z.string().min(1, 'La date de début est obligatoire'),
   endDate: z.string().min(1, 'La date de fin est obligatoire'),
@@ -43,14 +44,17 @@ const editProjectSchema = z.object({
   actualEndDate: z.string().optional(),
   budget: z.number().positive('Le budget doit être positif'),
   spentBudget: z.number().min(0, 'Le budget dépensé doit être positif ou nul'),
-  estimatedHours: z.number().min(0, 'Les heures estimées doivent être positives ou nulles').optional(),
+  estimatedHours: z
+    .number()
+    .min(0, 'Les heures estimées doivent être positives ou nulles')
+    .optional(),
   actualHours: z.number().min(0, 'Les heures réelles doivent être positives ou nulles').optional(),
   tags: z.string().optional(),
   isActive: z.boolean().default(true),
   notes: z.string().optional(),
   riskLevel: z.enum(['low', 'medium', 'high']).default('low'),
   nextMilestone: z.string().optional(),
-  blockers: z.string().optional()
+  blockers: z.string().optional(),
 })
 type EditProjectFormData = z.infer<typeof editProjectSchema>
 interface Project {
@@ -94,23 +98,44 @@ interface EditProjectDialogProps {
   project?: Project
   users?: User[]
 }
-export function EditProjectDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function EditProjectDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   project,
-  users = []
+  users = [],
 }: EditProjectDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // Mock users
-  const mockUsers: User[] = useMemo(() => [
-    { id: '1', firstName: 'Jean', lastName: 'Dupont', email: 'jean.dupont@company.com', role: 'Chef de projet' },
-    { id: '2', firstName: 'Marie', lastName: 'Martin', email: 'marie.martin@company.com', role: 'Ingénieur' },
-    { id: '3', firstName: 'Pierre', lastName: 'Bernard', email: 'pierre.bernard@company.com', role: 'Technicien' }
-  ], [])
+  const mockUsers: User[] = useMemo(
+    () => [
+      {
+        id: '1',
+        firstName: 'Jean',
+        lastName: 'Dupont',
+        email: 'jean.dupont@company.com',
+        role: 'Chef de projet',
+      },
+      {
+        id: '2',
+        firstName: 'Marie',
+        lastName: 'Martin',
+        email: 'marie.martin@company.com',
+        role: 'Ingénieur',
+      },
+      {
+        id: '3',
+        firstName: 'Pierre',
+        lastName: 'Bernard',
+        email: 'pierre.bernard@company.com',
+        role: 'Technicien',
+      },
+    ],
+    []
+  )
   const availableUsers = users.length > 0 ? users : mockUsers
-  const form = useForm<EditProjectFormData>({
+  const form = useForm({
     resolver: zodResolver(editProjectSchema),
     defaultValues: {
       name: '',
@@ -132,8 +157,8 @@ export function EditProjectDialog({
       notes: '',
       riskLevel: 'low',
       nextMilestone: '',
-      blockers: ''
-    }
+      blockers: '',
+    },
   })
   // Update form when project changes
   useEffect(() => {
@@ -158,7 +183,7 @@ export function EditProjectDialog({
         notes: project.notes || '',
         riskLevel: project.riskLevel,
         nextMilestone: project.nextMilestone || '',
-        blockers: project.blockers || ''
+        blockers: project.blockers || '',
       })
     }
   }, [project, open, form])
@@ -188,12 +213,18 @@ export function EditProjectDialog({
   }
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'planning': return 'bg-gray-100 text-gray-800'
-      case 'in_progress': return 'bg-blue-100 text-blue-800'
-      case 'on_hold': return 'bg-orange-100 text-orange-800'
-      case 'completed': return 'bg-green-100 text-green-800'
-      case 'cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'planning':
+        return 'bg-gray-100 text-gray-800'
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800'
+      case 'on_hold':
+        return 'bg-orange-100 text-orange-800'
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'cancelled':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
   const getProgressColor = (progress: number) => {
@@ -249,7 +280,9 @@ export function EditProjectDialog({
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Dépensé:</span>
-                    <span className={`ml-2 ${budgetUsagePercentage > 90 ? 'text-red-600 font-semibold' : ''}`}>
+                    <span
+                      className={`ml-2 ${budgetUsagePercentage > 90 ? 'text-red-600 font-semibold' : ''}`}
+                    >
                       {watchedSpentBudget.toLocaleString()} € ({budgetUsagePercentage.toFixed(1)}%)
                     </span>
                   </div>
@@ -280,10 +313,10 @@ export function EditProjectDialog({
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Textarea
                           placeholder="Description du projet"
                           className="min-h-[80px]"
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -303,7 +336,7 @@ export function EditProjectDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {availableUsers.map(user => (
+                          {availableUsers.map((user) => (
                             <SelectItem key={user.id} value={user.id}>
                               {user.firstName} {user.lastName}
                             </SelectItem>
@@ -379,11 +412,9 @@ export function EditProjectDialog({
                             max="100"
                             step="5"
                             {...field}
-                            onChange={e => field.onChange(parseInt(e.target.value))}
+                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                           />
-                          <div className="text-center text-sm font-medium">
-                            {field.value}%
-                          </div>
+                          <div className="text-center text-sm font-medium">{field.value}%</div>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -505,7 +536,7 @@ export function EditProjectDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -524,7 +555,7 @@ export function EditProjectDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -551,7 +582,7 @@ export function EditProjectDialog({
                             step="0.5"
                             placeholder="0"
                             {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -570,7 +601,7 @@ export function EditProjectDialog({
                             step="0.5"
                             placeholder="0"
                             {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -621,10 +652,10 @@ export function EditProjectDialog({
                   <FormItem>
                     <FormLabel>Blocages identifiés</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Décrire les éventuels blocages ou difficultés rencontrés..."
                         className="min-h-[80px]"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormDescription>
@@ -649,10 +680,7 @@ export function EditProjectDialog({
                       </FormDescription>
                     </div>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -676,12 +704,7 @@ export function EditProjectDialog({
               />
             </div>
             <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                 Annuler
               </Button>
               <Button type="submit" disabled={loading}>

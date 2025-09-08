@@ -50,6 +50,9 @@ export function useToast(): ToastContextType {
           }
         }
       }
+
+      // Return undefined when no duration is set
+      return undefined
     },
     [dismiss]
   )

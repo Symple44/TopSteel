@@ -31,7 +31,7 @@ export interface UploadedImage {
   uploaded: Date
   requireSignedURLs: boolean
   variants: string[]
-  meta?: Record<string, any>
+  meta?: Record<string, unknown>
   draft?: boolean
 }
 
@@ -98,7 +98,7 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         throw new Error(`Cloudflare upload failed: ${JSON.stringify(data.errors)}`)
@@ -233,7 +233,7 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         this.logger.error(`Failed to delete image: ${JSON.stringify(data.errors)}`)
@@ -263,13 +263,13 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         throw new Error(`Failed to list images: ${JSON.stringify(data.errors)}`)
       }
 
-      return data.result.images.map((img: any) => ({
+      return data.result.images.map((img: unknown) => ({
         id: img.id,
         filename: img.filename,
         uploaded: new Date(img.uploaded),
@@ -301,7 +301,7 @@ export class CloudflareConfigService {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         this.logger.error(`Cache purge failed: ${JSON.stringify(data.errors)}`)

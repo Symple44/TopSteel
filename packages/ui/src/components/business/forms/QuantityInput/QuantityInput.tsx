@@ -1,12 +1,19 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
-import { Minus, Plus, AlertCircle, Calculator, Package, Weight, Ruler } from 'lucide-react'
+import { AlertCircle, Calculator, Minus, Package, Plus, Ruler, Weight } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { useFormFieldIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
 import { safeMathEval } from '../../../../utils/safe-math-eval'
+import { Badge } from '../../../data-display/badge'
 import { Label } from '../../../forms/label/Label'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export interface QuantityInputProps {
   value?: number
   onChange?: (value: number | undefined) => void
@@ -46,7 +53,12 @@ const DEFAULT_UNITS = [
   { value: 'kg', label: 'Kilogrammes', icon: <Weight className="h-3 w-3" />, conversionFactor: 1 },
   { value: 'tons', label: 'Tonnes', icon: <Weight className="h-3 w-3" />, conversionFactor: 1000 },
   { value: 'm', label: 'Mètres', icon: <Ruler className="h-3 w-3" />, conversionFactor: 1 },
-  { value: 'mm', label: 'Millimètres', icon: <Ruler className="h-3 w-3" />, conversionFactor: 0.001 },
+  {
+    value: 'mm',
+    label: 'Millimètres',
+    icon: <Ruler className="h-3 w-3" />,
+    conversionFactor: 0.001,
+  },
   { value: 'm2', label: 'Mètres carrés', icon: <Ruler className="h-3 w-3" />, conversionFactor: 1 },
   { value: 'm3', label: 'Mètres cubes', icon: <Ruler className="h-3 w-3" />, conversionFactor: 1 },
 ]
@@ -79,6 +91,7 @@ export function QuantityInput({
   size = 'md',
   variant = 'default',
 }: QuantityInputProps) {
+  const ids = useFormFieldIds(['quantityInput'])
   const [inputValue, setInputValue] = useState<string>(
     value !== undefined ? value.toFixed(precision) : ''
   )
@@ -105,7 +118,7 @@ export function QuantityInput({
     if (regex.test(newValue)) {
       setInputValue(newValue)
       const numValue = parseFloat(newValue)
-      if (!isNaN(numValue)) {
+      if (!Number.isNaN(numValue)) {
         // Apply min/max constraints
         let constrainedValue = numValue
         if (min !== undefined && numValue < min) constrainedValue = min
@@ -132,7 +145,7 @@ export function QuantityInput({
     // Format the value on blur
     if (inputValue !== '') {
       const numValue = parseFloat(inputValue)
-      if (!isNaN(numValue)) {
+      if (!Number.isNaN(numValue)) {
         setInputValue(numValue.toFixed(precision))
       }
     }
@@ -146,19 +159,19 @@ export function QuantityInput({
     try {
       // Safe mathematical expression evaluation
       const result = safeMathEval(calcExpression)
-      if (!isNaN(result) && isFinite(result)) {
+      if (!Number.isNaN(result) && Number.isFinite(result)) {
         const constrainedValue = Math.max(min || 0, Math.min(max || Infinity, result))
         onChange?.(constrainedValue)
         setInputValue(constrainedValue.toFixed(precision))
         setCalcExpression('')
         setShowCalc(false)
       }
-    } catch (e) {
+    } catch (_e) {
       // Invalid expression - silently ignore
     }
   }
   const getSelectedUnit = () => {
-    return availableUnits.find(u => u.value === currentUnit) || availableUnits[0]
+    return availableUnits.find((u) => u.value === currentUnit) || availableUnits[0]
   }
   const getStockStatus = () => {
     if (!availableStock) return null
@@ -184,7 +197,7 @@ export function QuantityInput({
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <Label htmlFor="quantity-input">
+        <Label htmlFor={ids.quantityInput}>
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
@@ -194,7 +207,7 @@ export function QuantityInput({
           <div className="relative flex items-center">
             <input
               ref={inputRef}
-              id="quantity-input"
+              id={ids.quantityInput}
               type="text"
               inputMode="decimal"
               value={inputValue}
@@ -287,12 +300,7 @@ export function QuantityInput({
               placeholder="Ex: 100 + 50 * 2"
               className="w-full rounded-md border px-3 py-1 text-sm"
             />
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleCalculate}
-              className="w-full"
-            >
+            <Button type="button" size="sm" onClick={handleCalculate} className="w-full">
               Calculer
             </Button>
           </div>
@@ -303,35 +311,50 @@ export function QuantityInput({
         <div className="mt-2 space-y-1 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Stock disponible</span>
-            <span className="font-medium">{availableStock} {selectedUnit.label.toLowerCase()}</span>
+            <span className="font-medium">
+              {availableStock} {selectedUnit.label.toLowerCase()}
+            </span>
           </div>
           {reservedStock !== undefined && reservedStock > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Stock réservé</span>
-              <span className="font-medium">{reservedStock} {selectedUnit.label.toLowerCase()}</span>
+              <span className="font-medium">
+                {reservedStock} {selectedUnit.label.toLowerCase()}
+              </span>
             </div>
           )}
           {value !== undefined && value > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Reste après commande</span>
               <div className="flex items-center gap-2">
-                <span className={cn(
-                  'font-medium',
-                  stockStatus === 'exceeded' ? 'text-red-600' : 
-                  stockStatus === 'low' ? 'text-yellow-600' : 
-                  'text-green-600'
-                )}>
+                <span
+                  className={cn(
+                    'font-medium',
+                    stockStatus === 'exceeded'
+                      ? 'text-red-600'
+                      : stockStatus === 'low'
+                        ? 'text-yellow-600'
+                        : 'text-green-600'
+                  )}
+                >
                   {availableStock - (reservedStock || 0) - value} {selectedUnit.label.toLowerCase()}
                 </span>
                 {stockStatus !== 'normal' && (
-                  <Badge variant={
-                    stockStatus === 'exceeded' ? 'destructive' : 
-                    stockStatus === 'low' ? 'secondary' : 
-                    'default'
-                  } className="text-xs">
-                    {stockStatus === 'exceeded' ? 'Stock insuffisant' :
-                     stockStatus === 'low' ? 'Stock faible' :
-                     'Stock élevé'}
+                  <Badge
+                    variant={
+                      stockStatus === 'exceeded'
+                        ? 'destructive'
+                        : stockStatus === 'low'
+                          ? 'secondary'
+                          : 'default'
+                    }
+                    className="text-xs"
+                  >
+                    {stockStatus === 'exceeded'
+                      ? 'Stock insuffisant'
+                      : stockStatus === 'low'
+                        ? 'Stock faible'
+                        : 'Stock élevé'}
                   </Badge>
                 )}
               </div>
@@ -339,9 +362,7 @@ export function QuantityInput({
           )}
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

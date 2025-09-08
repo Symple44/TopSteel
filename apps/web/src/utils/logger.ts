@@ -2,8 +2,8 @@
  * Système de logs centralisé avec contrôle de niveau
  */
 
-const isProduction = process.env.NODE_ENV === 'production'
-const logLevel = process.env.NEXT_PUBLIC_LOG_LEVEL || (isProduction ? 'error' : 'warn')
+const isProduction = process?.env?.NODE_ENV === 'production'
+const logLevel = process?.env?.NEXT_PUBLIC_LOG_LEVEL || (isProduction ? 'error' : 'warn')
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent'
 
@@ -23,33 +23,33 @@ class Logger {
   }
 
   debug(..._args: unknown[]) {
-    if (this.shouldLog('debug')) {
+    if (this?.shouldLog('debug')) {
     }
   }
 
   info(..._args: unknown[]) {
-    if (this.shouldLog('info')) {
+    if (this?.shouldLog('info')) {
     }
   }
 
   warn(..._args: unknown[]) {
-    if (this.shouldLog('warn')) {
+    if (this?.shouldLog('warn')) {
     }
   }
 
   error(..._args: unknown[]) {
-    if (this.shouldLog('error')) {
+    if (this?.shouldLog('error')) {
     }
   }
 
   // Helpers spécialisés
   auth(..._args: unknown[]) {
-    if (this.shouldLog('debug')) {
+    if (this?.shouldLog('debug')) {
     }
   }
 
   api(..._args: unknown[]) {
-    if (this.shouldLog('debug')) {
+    if (this?.shouldLog('debug')) {
     }
   }
 }

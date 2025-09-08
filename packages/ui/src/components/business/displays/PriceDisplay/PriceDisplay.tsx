@@ -1,8 +1,9 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { TrendingUp, TrendingDown, Minus, Tag, Percent } from 'lucide-react'
-import { CurrencyDisplay } from '../CurrencyDisplay'
+import { Minus, Percent, Tag, TrendingDown, TrendingUp } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { CurrencyDisplay } from '../CurrencyDisplay'
+
 interface PriceDisplayProps {
   price: number
   originalPrice?: number
@@ -85,14 +86,8 @@ export function PriceDisplay({
   if (variant === 'compact') {
     return (
       <div className={cn('inline-flex items-center gap-2', className)}>
-        <CurrencyDisplay 
-          amount={displayPrice} 
-          currency={currency} 
-          size={size}
-        />
-        {unit && (
-          <span className={cn('text-muted-foreground', sizeConfig.unit)}>/{unit}</span>
-        )}
+        <CurrencyDisplay amount={displayPrice} currency={currency} size={size} />
+        {unit && <span className={cn('text-muted-foreground', sizeConfig.unit)}>/{unit}</span>}
         {hasDiscount && showDiscount && (
           <Badge variant="destructive" className="text-xs">
             -{discount.percentage}%
@@ -106,11 +101,7 @@ export function PriceDisplay({
       <div className={cn('text-center space-y-2', className)}>
         <div className="space-y-1">
           <div className={cn('font-bold', sizeConfig.price)}>
-            <CurrencyDisplay 
-              amount={displayPrice} 
-              currency={currency} 
-              size={size}
-            />
+            <CurrencyDisplay amount={displayPrice} currency={currency} size={size} />
             {unit && (
               <span className={cn('text-muted-foreground ml-1', sizeConfig.unit)}>/{unit}</span>
             )}
@@ -118,30 +109,36 @@ export function PriceDisplay({
           {hasDiscount && showDiscount && (
             <div className="flex items-center justify-center gap-2">
               <span className={cn('line-through text-muted-foreground', sizeConfig.original)}>
-                <CurrencyDisplay 
-                  amount={effectiveOriginalPrice} 
-                  currency={currency} 
+                <CurrencyDisplay
+                  amount={effectiveOriginalPrice}
+                  currency={currency}
                   variant="muted"
                 />
               </span>
               <Badge variant="destructive" className="text-xs">
-                <Percent className="h-3 w-3 mr-1" />
-                -{discount.percentage}%
+                <Percent className="h-3 w-3 mr-1" />-{discount.percentage}%
               </Badge>
             </div>
           )}
         </div>
         {showTrend && priceChange && TrendIcon && (
-          <div className={cn('flex items-center justify-center gap-1', getTrendColor(), sizeConfig.trend)}>
+          <div
+            className={cn(
+              'flex items-center justify-center gap-1',
+              getTrendColor(),
+              sizeConfig.trend
+            )}
+          >
             <TrendIcon className="h-4 w-4" />
             <span>
               {priceChange.amount > 0 ? '+' : ''}
-              <CurrencyDisplay 
-                amount={Math.abs(priceChange.amount)} 
-                currency={currency} 
+              <CurrencyDisplay
+                amount={Math.abs(priceChange.amount)}
+                currency={currency}
                 size="sm"
               />
-              ({priceChange.percentage > 0 ? '+' : ''}{priceChange.percentage.toFixed(1)}%)
+              ({priceChange.percentage > 0 ? '+' : ''}
+              {priceChange.percentage.toFixed(1)}%)
             </span>
             <span className="text-muted-foreground">vs {priceChange.period}</span>
           </div>
@@ -155,11 +152,7 @@ export function PriceDisplay({
         <div className="flex items-center justify-between">
           <div>
             <div className={cn('font-semibold', sizeConfig.price)}>
-              <CurrencyDisplay 
-                amount={displayPrice} 
-                currency={currency} 
-                size={size}
-              />
+              <CurrencyDisplay amount={displayPrice} currency={currency} size={size} />
               {unit && (
                 <span className={cn('text-muted-foreground ml-1', sizeConfig.unit)}>/{unit}</span>
               )}
@@ -167,23 +160,22 @@ export function PriceDisplay({
             {hasDiscount && showDiscount && (
               <div className="flex items-center gap-2 mt-1">
                 <span className={cn('line-through text-muted-foreground', sizeConfig.original)}>
-                  <CurrencyDisplay 
-                    amount={effectiveOriginalPrice} 
-                    currency={currency} 
+                  <CurrencyDisplay
+                    amount={effectiveOriginalPrice}
+                    currency={currency}
                     variant="muted"
                   />
                 </span>
                 <Badge variant="outline" className="text-xs">
                   <Tag className="h-3 w-3 mr-1" />
-                  Économie: <CurrencyDisplay amount={discount.amount} currency={currency} size="sm" />
+                  Économie:{' '}
+                  <CurrencyDisplay amount={discount.amount} currency={currency} size="sm" />
                 </Badge>
               </div>
             )}
           </div>
           {hasDiscount && showDiscount && (
-            <Badge variant="destructive">
-              -{discount.percentage}%
-            </Badge>
+            <Badge variant="destructive">-{discount.percentage}%</Badge>
           )}
         </div>
         {showTrend && priceChange && TrendIcon && (
@@ -191,12 +183,12 @@ export function PriceDisplay({
             <TrendIcon className="h-4 w-4" />
             <span>
               {priceChange.amount > 0 ? 'Augmentation' : 'Diminution'} de{' '}
-              <CurrencyDisplay 
-                amount={Math.abs(priceChange.amount)} 
-                currency={currency} 
+              <CurrencyDisplay
+                amount={Math.abs(priceChange.amount)}
+                currency={currency}
                 size="sm"
-              />
-              {' '}({Math.abs(priceChange.percentage).toFixed(1)}%) vs {priceChange.period}
+              />{' '}
+              ({Math.abs(priceChange.percentage).toFixed(1)}%) vs {priceChange.period}
             </span>
           </div>
         )}
@@ -208,22 +200,16 @@ export function PriceDisplay({
     <div className={cn('flex items-center gap-2', className)}>
       <div className="flex items-baseline gap-1">
         <span className={cn('font-semibold', sizeConfig.price)}>
-          <CurrencyDisplay 
-            amount={displayPrice} 
-            currency={currency} 
-            size={size}
-          />
+          <CurrencyDisplay amount={displayPrice} currency={currency} size={size} />
         </span>
-        {unit && (
-          <span className={cn('text-muted-foreground', sizeConfig.unit)}>/{unit}</span>
-        )}
+        {unit && <span className={cn('text-muted-foreground', sizeConfig.unit)}>/{unit}</span>}
       </div>
       {hasDiscount && showDiscount && (
         <div className="flex items-center gap-1">
           <span className={cn('line-through text-muted-foreground', sizeConfig.original)}>
-            <CurrencyDisplay 
-              amount={effectiveOriginalPrice} 
-              currency={currency} 
+            <CurrencyDisplay
+              amount={effectiveOriginalPrice}
+              currency={currency}
               variant="muted"
               size="sm"
             />
@@ -236,7 +222,10 @@ export function PriceDisplay({
       {showTrend && priceChange && TrendIcon && (
         <div className={cn('flex items-center gap-1', getTrendColor(), sizeConfig.trend)}>
           <TrendIcon className="h-3 w-3" />
-          <span>{priceChange.percentage > 0 ? '+' : ''}{priceChange.percentage.toFixed(1)}%</span>
+          <span>
+            {priceChange.percentage > 0 ? '+' : ''}
+            {priceChange.percentage.toFixed(1)}%
+          </span>
         </div>
       )}
     </div>

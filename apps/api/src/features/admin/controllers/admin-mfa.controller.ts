@@ -266,15 +266,15 @@ export class AdminMFAController {
           failedAuthentications: mfaSessions.filter((s) => s.status === 'failed').length,
           expiredSessions: mfaSessions.filter((s) => s.status === 'expired').length,
         },
-        methodPopularity: this.calculateMethodPopularity(mfaRecords as any),
+        methodPopularity: this.calculateMethodPopularity(mfaRecords as unknown),
         securityMetrics: {
-          averageAttemptsPerSession: this.calculateAverageAttempts(mfaSessions as any),
-          mostActiveHours: this.calculateActiveHours(mfaSessions as any),
-          topFailureReasons: this.calculateFailureReasons(mfaSessions as any),
+          averageAttemptsPerSession: this.calculateAverageAttempts(mfaSessions as unknown),
+          mostActiveHours: this.calculateActiveHours(mfaSessions as unknown),
+          topFailureReasons: this.calculateFailureReasons(mfaSessions as unknown),
         },
         trends: {
           adoptionRate: await this.calculateAdoptionTrend(days),
-          usageGrowth: this.calculateUsageGrowth(mfaSessions as any),
+          usageGrowth: this.calculateUsageGrowth(mfaSessions as unknown),
         },
       }
 
@@ -313,8 +313,8 @@ export class AdminMFAController {
           },
           methodDiversity: {
             status:
-              Object.keys((status as any).mfaMethodDistribution).length > 1 ? 'good' : 'warning',
-            value: Object.keys((status as any).mfaMethodDistribution).length,
+              Object.keys((status as unknown).mfaMethodDistribution).length > 1 ? 'good' : 'warning',
+            value: Object.keys((status as unknown).mfaMethodDistribution).length,
             description: 'Nombre de méthodes MFA utilisées',
           },
         },
@@ -335,21 +335,21 @@ export class AdminMFAController {
     const recommendations: string[] = []
 
     const adoptionRate =
-      (status as any).totalUsers > 0
-        ? ((status as any).usersWithMFA / (status as any).totalUsers) * 100
+      (status as unknown).totalUsers > 0
+        ? ((status as unknown).usersWithMFA / (status as unknown).totalUsers) * 100
         : 0
 
     if (adoptionRate < 50) {
       recommendations.push("Encourager l'adoption MFA - taux actuel faible")
     }
 
-    if (!(status as any).mfaMethodDistribution.totp) {
+    if (!(status as unknown).mfaMethodDistribution.totp) {
       recommendations.push('Promouvoir TOTP comme méthode MFA principale')
     }
 
     if (
-      (status as any).usersByRole.SUPER_ADMIN?.withMFA <
-      (status as any).usersByRole.SUPER_ADMIN?.total
+      (status as unknown).usersByRole.SUPER_ADMIN?.withMFA <
+      (status as unknown).usersByRole.SUPER_ADMIN?.total
     ) {
       recommendations.push('Assurer que tous les SUPER_ADMIN ont MFA activé')
     }
@@ -378,7 +378,7 @@ export class AdminMFAController {
   private calculateMethodPopularity(records: Record<string, unknown>[]): Record<string, number> {
     const popularity: Record<string, number> = {}
     for (const record of records) {
-      popularity[(record as any).type] = (popularity[(record as any).type] || 0) + 1
+      popularity[(record as unknown).type] = (popularity[(record as unknown).type] || 0) + 1
     }
     return popularity
   }
@@ -386,7 +386,7 @@ export class AdminMFAController {
   private calculateAverageAttempts(sessions: Record<string, unknown>[]): number {
     if (sessions.length === 0) return 0
     const totalAttempts = sessions.reduce(
-      (sum, session) => sum + ((session as any).getAttemptsCount() || 1),
+      (sum, session) => sum + ((session as unknown).getAttemptsCount() || 1),
       0
     )
     return totalAttempts / sessions.length
@@ -395,7 +395,7 @@ export class AdminMFAController {
   private calculateActiveHours(sessions: Record<string, unknown>[]): number[] {
     const hourCounts = new Array(24).fill(0)
     for (const session of sessions) {
-      const hour = new Date((session as any).createdAt).getHours()
+      const hour = new Date((session as unknown).createdAt).getHours()
       hourCounts[hour]++
     }
     return hourCounts
@@ -407,7 +407,7 @@ export class AdminMFAController {
 
     // Simple categorization - in production, you'd have more detailed failure tracking
     for (const session of failedSessions) {
-      const reason = (session as any).getAttemptsCount() >= 3 ? 'too_many_attempts' : 'invalid_code'
+      const reason = (session as unknown).getAttemptsCount() >= 3 ? 'too_many_attempts' : 'invalid_code'
       reasons[reason] = (reasons[reason] || 0) + 1
     }
 
@@ -448,8 +448,8 @@ export class AdminMFAController {
     const recommendations: string[] = []
 
     const adoptionRate =
-      (status as any).totalUsers > 0
-        ? ((status as any).usersWithMFA / (status as any).totalUsers) * 100
+      (status as unknown).totalUsers > 0
+        ? ((status as unknown).usersWithMFA / (status as unknown).totalUsers) * 100
         : 0
 
     if (adoptionRate < 25) {
@@ -462,7 +462,7 @@ export class AdminMFAController {
       recommendations.push("Pas d'activité MFA récente - vérifier la configuration")
     }
 
-    if (Object.keys((status as any).mfaMethodDistribution).length === 1) {
+    if (Object.keys((status as unknown).mfaMethodDistribution).length === 1) {
       recommendations.push('Diversifier les méthodes MFA disponibles')
     }
 

@@ -40,13 +40,13 @@ export interface PriceMatrixProps {
 interface EditableCell {
   ruleId: string
   field: keyof PriceRule
-  value: any
+  value: string | number | boolean
 }
-interface GroupedRules {
-  groupKey: string
-  groupLabel: string
-  rules: PriceRule[]
-}
+// interface GroupedRules {
+//   groupKey: string
+//   groupLabel: string
+//   rules: PriceRule[]
+// }
 const ADJUSTMENT_TYPES = [
   { value: 'PERCENTAGE', label: '%', color: 'bg-blue-100' },
   { value: 'FIXED_AMOUNT', label: '€', color: 'bg-green-100' },
@@ -77,7 +77,7 @@ export function PriceMatrix({
 }: PriceMatrixProps) {
   const [editingCell, setEditingCell] = useState<EditableCell | null>(null)
   const [selectedRules, setSelectedRules] = useState<Set<string>>(new Set())
-  const [tempValue, setTempValue] = useState<any>(null)
+  const [tempValue, setTempValue] = useState<string | number | boolean | null>(null)
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   // Grouper les règles selon le critère sélectionné
   const groupedRules = useMemo(() => {
@@ -132,7 +132,7 @@ export function PriceMatrix({
     }
   }, [rules, showTotals])
   const startEditing = useCallback(
-    (ruleId: string, field: keyof PriceRule, value: any) => {
+    (ruleId: string, field: keyof PriceRule, value: string | number | boolean) => {
       if (!editable) return
       setEditingCell({ ruleId, field, value })
       setTempValue(value)
@@ -187,16 +187,22 @@ export function PriceMatrix({
   }, [selectedRules, rules])
   const deleteSelectedRules = useCallback(() => {
     if (!onDelete) return
-    selectedRules.forEach((ruleId) => onDelete(ruleId))
+    selectedRules.forEach((ruleId) => {
+      onDelete(ruleId)
+    })
     setSelectedRules(new Set())
   }, [selectedRules, onDelete])
-  const renderEditableCell = (rule: PriceRule, field: keyof PriceRule, value: any) => {
+  const renderEditableCell = (
+    rule: PriceRule,
+    field: keyof PriceRule,
+    value: string | number | boolean
+  ) => {
     const isEditing = editingCell?.ruleId === rule.id && editingCell?.field === field
     if (isEditing) {
       switch (field) {
         case 'adjustmentType':
           return (
-            <Select value={tempValue} onValueChange={setTempValue}>
+            <Select value={tempValue as string} onValueChange={setTempValue}>
               <SelectTrigger className="h-8 w-24">
                 <SelectValue />
               </SelectTrigger>
@@ -211,7 +217,7 @@ export function PriceMatrix({
           )
         case 'channel':
           return (
-            <Select value={tempValue} onValueChange={setTempValue}>
+            <Select value={tempValue as string} onValueChange={setTempValue}>
               <SelectTrigger className="h-8 w-32">
                 <SelectValue />
               </SelectTrigger>
@@ -228,7 +234,7 @@ export function PriceMatrix({
           return (
             <input
               type="checkbox"
-              checked={tempValue}
+              checked={tempValue as boolean}
               onChange={(e) => setTempValue(e.target.checked)}
               className="w-4 h-4"
             />
@@ -240,7 +246,7 @@ export function PriceMatrix({
           return (
             <Input
               type="number"
-              value={tempValue}
+              value={tempValue as number}
               onChange={(e) => setTempValue(Number(e.target.value))}
               onKeyDown={handleKeyDown}
               className="h-8 w-20"
@@ -250,7 +256,7 @@ export function PriceMatrix({
         default:
           return (
             <Input
-              value={tempValue}
+              value={tempValue as string}
               onChange={(e) => setTempValue(e.target.value)}
               onKeyDown={handleKeyDown}
               className="h-8"
@@ -277,7 +283,7 @@ export function PriceMatrix({
         const channel = CHANNELS.find((c) => c.value === value)
         return (
           <Badge
-            variant={(channel?.color as any) || 'outline'}
+            variant={(channel?.color as 'default' | 'secondary' | 'outline') || 'outline'}
             className="cursor-pointer"
             onClick={() => startEditing(rule.id, field, value)}
           >
@@ -287,28 +293,40 @@ export function PriceMatrix({
       }
       case 'isActive':
         return (
-          <div className="cursor-pointer" onClick={() => startEditing(rule.id, field, value)}>
+          <button
+            type="button"
+            className="cursor-pointer"
+            onClick={() => startEditing(rule.id, field, value)}
+            aria-label="Toggle active state"
+          >
             {value ? (
               <Check className="w-4 h-4 text-green-600" />
             ) : (
               <X className="w-4 h-4 text-gray-400" />
             )}
-          </div>
+          </button>
         )
       case 'adjustmentValue':
         return (
-          <span
-            className="cursor-pointer font-mono"
+          <button
+            type="button"
+            className="cursor-pointer font-mono text-left"
             onClick={() => startEditing(rule.id, field, value)}
+            aria-label="Edit adjustment value"
           >
             {rule.adjustmentType === 'PERCENTAGE' ? `${value}%` : `${value}€`}
-          </span>
+          </button>
         )
       default:
         return (
-          <span className="cursor-pointer" onClick={() => startEditing(rule.id, field, value)}>
+          <button
+            type="button"
+            className="cursor-pointer text-left"
+            onClick={() => startEditing(rule.id, field, value)}
+            aria-label="Edit field"
+          >
             {value || '-'}
-          </span>
+          </button>
         )
     }
   }
@@ -397,14 +415,24 @@ export function PriceMatrix({
                       <div className="flex items-center gap-1">
                         {onDuplicate && (
                           <SimpleTooltip content="Dupliquer">
-                            <Button variant="ghost" size="sm" onClick={() => onDuplicate(rule)}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onDuplicate(rule)}
+                            >
                               <Copy className="w-4 h-4" />
                             </Button>
                           </SimpleTooltip>
                         )}
                         {onDelete && (
                           <SimpleTooltip content="Supprimer">
-                            <Button variant="ghost" size="sm" onClick={() => onDelete(rule.id)}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onDelete(rule.id)}
+                            >
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </SimpleTooltip>
@@ -464,6 +492,7 @@ export function PriceMatrix({
               <div className="flex items-center gap-2 pt-2 border-t">
                 {onDuplicate && (
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => onDuplicate(rule)}
@@ -474,6 +503,7 @@ export function PriceMatrix({
                 )}
                 {onDelete && (
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => onDelete(rule.id)}
@@ -499,13 +529,13 @@ export function PriceMatrix({
               <Badge variant="secondary">
                 {selectedRules.size} sélectionné{selectedRules.size > 1 ? 's' : ''}
               </Badge>
-              <Button variant="destructive" size="sm" onClick={deleteSelectedRules}>
+              <Button type="button" variant="destructive" size="sm" onClick={deleteSelectedRules}>
                 <Trash2 className="w-4 h-4 mr-2" />
                 Supprimer
               </Button>
             </div>
           )}
-          <Select value={groupBy} onValueChange={(_value: any) => {}}>
+          <Select value={groupBy} onValueChange={(_value: string) => {}}>
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -519,6 +549,7 @@ export function PriceMatrix({
         </div>
         <div className="flex items-center gap-2">
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}

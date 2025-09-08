@@ -3,12 +3,18 @@ import type { ConfigService } from '@nestjs/config'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
 import { LessThan, type Repository } from 'typeorm'
+import { GlobalUserRole } from '../../../domains/auth/core/constants/roles.constants'
 import { UserSession } from '../../../domains/auth/core/entities/user-session.entity'
 import { User } from '../../../domains/users/entities/user.entity'
+import {
+  NotificationCategory,
+  NotificationPriority,
+  Notifications,
+  NotificationType,
+  RecipientType,
+} from '../../../features/notifications/entities/notifications.entity'
 import { Societe } from '../entities/societe.entity'
 import { LicenseStatus, LicenseType, SocieteLicense } from '../entities/societe-license.entity'
-import { Notifications, NotificationType, NotificationCategory, RecipientType, NotificationPriority } from '../../../features/notifications/entities/notifications.entity'
-import { GlobalUserRole } from '../../../domains/auth/core/constants/roles.constants'
 
 export interface LicenseCheckResult {
   isValid: boolean
@@ -248,7 +254,7 @@ export class LicenseManagementService {
     await this.disconnectAllUsers(license.societeId)
 
     // Créer une notification de suspension
-    await this.createSuspensionNotification(license, reason)
+    await this.createSuspensionNotification(license, reason || 'Raison non spécifiée')
 
     this.logger.warn(`Licence suspendue pour la société ${license.societeId}: ${reason}`)
   }
@@ -329,9 +335,9 @@ export class LicenseManagementService {
     for (const license of licensesToNotify) {
       if (license.needsRenewalNotification()) {
         const daysUntilExpiration = license.getDaysUntilExpiration()
-        
+
         // Create renewal notification
-        await this.createRenewalNotification(license, daysUntilExpiration)
+        await this.createRenewalNotification(license, daysUntilExpiration || 0)
 
         this.logger.log(
           `Notification de renouvellement envoyée pour société ${license.societeId} - ${daysUntilExpiration} jours restants`
@@ -550,11 +556,13 @@ export class LicenseManagementService {
   ): Promise<void> {
     const societe = await this.societeRepository.findOne({
       where: { id: license.societeId },
-      relations: ['administrateurs']
+      relations: ['administrateurs'],
     })
 
     if (!societe) {
-      this.logger.warn(`Société ${license.societeId} non trouvée pour notification de renouvellement`)
+      this.logger.warn(
+        `Société ${license.societeId} non trouvée pour notification de renouvellement`
+      )
       return
     }
 
@@ -580,7 +588,7 @@ export class LicenseManagementService {
         daysUntilExpiration,
         currentUsers: license.currentUsers,
         maxUsers: license.maxUsers,
-        utilizationPercent: license.getUserUtilizationPercent()
+        utilizationPercent: license.getUserUtilizationPercent(),
       },
       recipientType: RecipientType.ROLE,
       recipientId: 'admin', // Pour les administrateurs de la société
@@ -597,10 +605,10 @@ export class LicenseManagementService {
 
     // Créer des notifications individuelles pour les super-administrateurs
     const adminUsers = await this.userRepository.find({
-      where: { 
+      where: {
         role: GlobalUserRole.SUPER_ADMIN,
-        actif: true 
-      }
+        actif: true,
+      },
     })
 
     for (const admin of adminUsers) {
@@ -673,7 +681,7 @@ export class LicenseManagementService {
     details: string
   ): Promise<void> {
     const societe = await this.societeRepository.findOne({
-      where: { id: license.societeId }
+      where: { id: license.societeId },
     })
 
     if (!societe) {
@@ -717,12 +725,9 @@ export class LicenseManagementService {
   /**
    * Créer une notification de suspension de licence
    */
-  async createSuspensionNotification(
-    license: SocieteLicense,
-    reason: string
-  ): Promise<void> {
+  async createSuspensionNotification(license: SocieteLicense, reason: string): Promise<void> {
     const societe = await this.societeRepository.findOne({
-      where: { id: license.societeId }
+      where: { id: license.societeId },
     })
 
     if (!societe) {
@@ -757,8 +762,6 @@ export class LicenseManagementService {
 
     await this.notificationRepository.save(notification)
 
-    this.logger.error(
-      `Notification de suspension créée pour ${societe.nom}: ${reason}`
-    )
+    this.logger.error(`Notification de suspension créée pour ${societe.nom}: ${reason}`)
   }
 }

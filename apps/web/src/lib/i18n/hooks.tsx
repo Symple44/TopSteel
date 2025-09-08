@@ -2,7 +2,12 @@
 
 import React, { type ReactNode } from 'react'
 import { translator } from './translator'
-import type { I18nContext } from './types'
+import type {
+  I18nContext,
+  PluralTranslationFunction,
+  TranslationFunction,
+  UseTranslationReturn,
+} from './types'
 
 // Create React Context with fallback
 const I18nReactContext = React.createContext<I18nContext | null>(null)
@@ -17,7 +22,7 @@ export function I18nProvider({ children }: I18nProviderProps) {
 
   React.useEffect(() => {
     // S'abonner aux changements du translator
-    const unsubscribe = translator.subscribe(() => {
+    const unsubscribe = translator?.subscribe(() => {
       // Forcer un re-render quand le translator change (langue ou overrides)
       forceUpdate()
     })
@@ -26,13 +31,13 @@ export function I18nProvider({ children }: I18nProviderProps) {
   }, [])
 
   const contextValue: I18nContext = {
-    currentLanguage: translator.getLanguageInfo(),
+    currentLanguage: translator?.getLanguageInfo(),
     setLanguage: async (langCode: string) => {
-      translator.setLanguage(langCode)
+      translator?.setLanguage(langCode)
     },
-    t: (key: string, params?: Record<string, string | number>): string => {
-      return translator.t(key, params)
-    },
+    t: ((key: string, params?: Record<string, string | number>): string => {
+      return translator?.t(key, params) || key
+    }) as TranslationFunction,
     isLoading: false,
   }
 
@@ -40,51 +45,69 @@ export function I18nProvider({ children }: I18nProviderProps) {
 }
 
 // Main hook for translations
-export function useTranslation(namespace?: string) {
+export function useTranslation(namespace?: string): UseTranslationReturn {
   const context = React.useContext(I18nReactContext)
 
   if (!context) {
-    const t = (key: string, params?: Record<string, string | number>): string => {
+    const t: TranslationFunction = (
+      key: string,
+      params?: Record<string, string | number>
+    ): string => {
       const fullKey = namespace ? `${namespace}.${key}` : key
-      return translator.t(fullKey, params)
+      return translator?.t(fullKey, params) || key
+    }
+
+    const plural: PluralTranslationFunction = (
+      key: string,
+      count: number,
+      params?: Record<string, string | number>
+    ): string => {
+      const fullKey = namespace ? `${namespace}.${key}` : key
+      return translator?.plural(fullKey, count, params) || key
     }
 
     return {
       t,
-      plural: (key: string, count: number, params?: Record<string, string | number>): string => {
-        const fullKey = namespace ? `${namespace}.${key}` : key
-        return translator.plural(fullKey, count, params)
-      },
-      currentLanguage: translator.getLanguageInfo(),
-      changeLanguage: (langCode: string) => translator.setLanguage(langCode),
-      setLanguage: (langCode: string) => translator.setLanguage(langCode),
-      supportedLanguages: translator.getSupportedLanguages(),
+      plural,
+      currentLanguage: translator?.getLanguageInfo(),
+      language: translator?.getLanguageInfo()?.code || 'fr',
+      changeLanguage: (langCode: string) => translator?.setLanguage(langCode),
+      setLanguage: (langCode: string) => translator?.setLanguage(langCode),
+      supportedLanguages: translator?.getSupportedLanguages() || [],
       isLoading: false,
     }
   }
 
-  const { currentLanguage, setLanguage, isLoading } = context
+  const { currentLanguage, setLanguage, isLoading } = context || {}
 
   // Create a scoped translation function for the namespace
-  const t = (key: string, params?: Record<string, string | number>): string => {
+  const t: TranslationFunction = (
+    key: string,
+    params?: Record<string, string | number>
+  ): string => {
     const fullKey = namespace ? `${namespace}.${key}` : key
-    return translator.t(fullKey, params)
+    return translator?.t(fullKey, params) || key
   }
 
   // Pluralization helper
-  const plural = (key: string, count: number, params?: Record<string, string | number>): string => {
+  const plural: PluralTranslationFunction = (
+    key: string,
+    count: number,
+    params?: Record<string, string | number>
+  ): string => {
     const fullKey = namespace ? `${namespace}.${key}` : key
-    return translator.plural(fullKey, count, params)
+    return translator?.plural(fullKey, count, params) || key
   }
 
   return {
     t,
     plural,
-    currentLanguage,
-    changeLanguage: setLanguage,
-    setLanguage,
-    supportedLanguages: translator.getSupportedLanguages(),
-    isLoading,
+    currentLanguage: currentLanguage || translator?.getLanguageInfo(),
+    language: (currentLanguage || translator?.getLanguageInfo())?.code || 'fr',
+    changeLanguage: setLanguage || ((langCode: string) => translator?.setLanguage(langCode)),
+    setLanguage: setLanguage || ((langCode: string) => translator?.setLanguage(langCode)),
+    supportedLanguages: translator?.getSupportedLanguages() || [],
+    isLoading: isLoading || false,
   }
 }
 
@@ -94,16 +117,16 @@ export function useLanguage() {
 
   if (!context) {
     return {
-      current: translator.getLanguageInfo(),
-      supported: translator.getSupportedLanguages(),
-      change: (langCode: string) => translator.setLanguage(langCode),
+      current: translator?.getLanguageInfo(),
+      supported: translator?.getSupportedLanguages(),
+      change: (langCode: string) => translator?.setLanguage(langCode),
       isLoading: false,
     }
   }
 
   return {
     current: context.currentLanguage,
-    supported: translator.getSupportedLanguages(),
+    supported: translator?.getSupportedLanguages(),
     change: context.setLanguage,
     isLoading: context.isLoading,
   }
@@ -114,19 +137,19 @@ export function useFormatting() {
   const { currentLanguage } = useTranslation()
 
   const formatDate = (date: Date, options?: Intl.DateTimeFormatOptions): string => {
-    return translator.formatDate(date, options)
+    return translator?.formatDate(date, options)
   }
 
   const formatNumber = (number: number, options?: Intl.NumberFormatOptions): string => {
-    return translator.formatNumber(number, options)
+    return translator?.formatNumber(number, options)
   }
 
   const formatCurrency = (amount: number, currency = 'EUR'): string => {
-    return translator.formatCurrency(amount, currency)
+    return translator?.formatCurrency(amount, currency)
   }
 
   const formatPercentage = (value: number, decimals = 1): string => {
-    return translator.formatNumber(value, {
+    return translator?.formatNumber(value, {
       style: 'percent',
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
@@ -138,34 +161,34 @@ export function useFormatting() {
     let size = bytes
     let unitIndex = 0
 
-    while (size >= 1024 && unitIndex < units.length - 1) {
+    while (size >= 1024 && unitIndex < units?.length - 1) {
       size /= 1024
       unitIndex++
     }
 
-    return `${translator.formatNumber(size, {
+    return `${translator?.formatNumber(size, {
       maximumFractionDigits: unitIndex === 0 ? 0 : 1,
     })} ${units[unitIndex]}`
   }
 
   const formatRelativeTime = (date: Date): string => {
     const now = new Date()
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    const diffInSeconds = Math.floor((now?.getTime() - date?.getTime()) / 1000)
 
-    if (diffInSeconds < 60) return translator.t('common.justNow') || 'Just now'
+    if (diffInSeconds < 60) return translator?.t('common.justNow') || 'Just now'
     if (diffInSeconds < 3600)
       return (
-        translator.t('common.minutesAgo', { count: Math.floor(diffInSeconds / 60) }) ||
+        translator?.t('common.minutesAgo', { count: Math.floor(diffInSeconds / 60) }) ||
         `${Math.floor(diffInSeconds / 60)} minutes ago`
       )
     if (diffInSeconds < 86400)
       return (
-        translator.t('common.hoursAgo', { count: Math.floor(diffInSeconds / 3600) }) ||
+        translator?.t('common.hoursAgo', { count: Math.floor(diffInSeconds / 3600) }) ||
         `${Math.floor(diffInSeconds / 3600)} hours ago`
       )
     if (diffInSeconds < 604800)
       return (
-        translator.t('common.daysAgo', { count: Math.floor(diffInSeconds / 86400) }) ||
+        translator?.t('common.daysAgo', { count: Math.floor(diffInSeconds / 86400) }) ||
         `${Math.floor(diffInSeconds / 86400)} days ago`
       )
 

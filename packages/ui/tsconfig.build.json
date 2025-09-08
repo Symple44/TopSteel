@@ -8,15 +8,25 @@
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
     "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
+    "sourceMap": false,
+    "inlineSourceMap": false,
     "outDir": "dist",
+    "rootDir": "src",
+    "removeComments": true,
+    "importHelpers": true,
+    "preserveValueImports": false,
+    "importsNotUsedAsValues": "remove",
+    "incremental": false,
+    "composite": false,
+    "tsBuildInfoFile": null,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
@@ -25,5 +35,17 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules", "**/*.test.tsx", "**/*.stories.tsx"]
+  "exclude": [
+    "dist",
+    "node_modules",
+    "**/*.test.tsx",
+    "**/*.stories.tsx",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "src/stories/**",
+    "**/test-examples/**",
+    "coverage/**",
+    "**/__tests__/**"
+  ]
 }

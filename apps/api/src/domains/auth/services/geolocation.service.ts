@@ -8,6 +8,7 @@ interface LocationData {
   latitude?: number
   longitude?: number
   timezone?: string
+  [key: string]: unknown
 }
 
 interface DeviceInfo {
@@ -15,6 +16,7 @@ interface DeviceInfo {
   os: string
   device: string
   isMobile: boolean
+  [key: string]: unknown
 }
 
 @Injectable()
@@ -77,7 +79,7 @@ export class GeolocationService {
       return {
         city: data.city || 'Inconnue',
         country: data.country || 'Inconnu',
-        countryCode: (data as any).countryCode || data.country || 'XX',
+        countryCode: (data as { countryCode?: string; country?: string }).countryCode || (data as { country?: string }).country || 'XX',
         latitude: data.lat,
         longitude: data.lon,
         timezone: data.timezone,
@@ -269,14 +271,14 @@ export class GeolocationService {
 
     // Vérifier les connexions depuis des pays différents
     const recentSessions = previousSessions.filter((session) => {
-      const sessionTime = new Date((session as any).loginTime)
+      const sessionTime = new Date((session as { loginTime: number | string }).loginTime)
       const now = new Date()
       const hoursDiff = (now.getTime() - sessionTime.getTime()) / (1000 * 60 * 60)
       return hoursDiff <= 24 // Dernières 24 heures
     })
 
     const recentCountries = new Set(
-      recentSessions.map((session) => (session as any).location?.countryCode).filter(Boolean)
+      recentSessions.map((session) => (session as { location?: { countryCode?: string } }).location?.countryCode).filter(Boolean)
     )
 
     if (recentCountries.size > 0 && !recentCountries.has(newLocation.countryCode)) {
@@ -286,7 +288,7 @@ export class GeolocationService {
 
     // Vérifier les connexions multiples simultanées
     const activeSessions = previousSessions.filter(
-      (session) => (session as any).status === 'active'
+      (session) => (session as { status?: string }).status === 'active'
     )
     if (activeSessions.length >= 3) {
       reasons.push(`Multiples sessions actives détectées (${activeSessions.length})`)

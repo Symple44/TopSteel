@@ -51,16 +51,16 @@ export function useAvailablePages() {
       // Appel API pour récupérer les pages disponibles
       const response = await callClientApi('user/menu-preferences/available-pages')
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      if (!response?.ok) {
+        throw new Error(`HTTP ${response?.status}: ${response?.statusText}`)
       }
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        setCategories(data.data)
+      if (data?.success) {
+        setCategories(data?.data)
       } else {
-        throw new Error(data.error || 'Erreur lors du chargement des pages')
+        throw new Error(data?.error || 'Erreur lors du chargement des pages')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur de chargement')
@@ -70,12 +70,12 @@ export function useAvailablePages() {
   }, [])
 
   const getAllPages = useCallback((): PageItem[] => {
-    return categories.flatMap((category) => category.pages)
+    return categories?.flatMap((category) => category?.pages)
   }, [categories])
 
   const getPagesByCategory = useCallback(
     (categoryId: string): PageItem[] => {
-      const category = categories.find((cat) => cat.id === categoryId)
+      const category = categories?.find((cat) => cat.id === categoryId)
       return category?.pages || []
     },
     [categories]
@@ -83,12 +83,12 @@ export function useAvailablePages() {
 
   const searchPages = useCallback(
     (query: string): PageItem[] => {
-      const lowerQuery = query.toLowerCase()
+      const lowerQuery = query?.toLowerCase()
       return getAllPages().filter(
         (page) =>
-          page.title.toLowerCase().includes(lowerQuery) ||
+          page?.title?.toLowerCase().includes(lowerQuery) ||
           page.description?.toLowerCase().includes(lowerQuery) ||
-          page.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery))
+          page.tags?.some((tag) => tag?.toLowerCase().includes(lowerQuery))
       )
     },
     [getAllPages]

@@ -25,13 +25,13 @@ export function MonitoringInitializer({
     if (typeof window !== 'undefined') {
       try {
         if (enablePerformanceTracking) {
-          PerformanceMonitor.initializeClient()
+          PerformanceMonitor?.initializeClient()
         }
 
         if (enableErrorTracking) {
           // Tracking global des erreurs
           window.addEventListener('error', (event) => {
-            PerformanceMonitor.getInstance().recordMetric('global_error', {
+            PerformanceMonitor?.getInstance().recordMetric('global_error', {
               message: event.error?.message || 'Unknown error',
               filename: event.filename,
               lineno: event.lineno,
@@ -40,7 +40,7 @@ export function MonitoringInitializer({
           })
 
           window.addEventListener('unhandledrejection', (event) => {
-            PerformanceMonitor.getInstance().recordMetric('unhandled_rejection', {
+            PerformanceMonitor?.getInstance().recordMetric('unhandled_rejection', {
               reason: event.reason?.toString() || 'Unknown reason',
             })
           })

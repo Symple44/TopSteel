@@ -65,8 +65,12 @@ export const wishlistSlice = createSlice({
       const item = state.items.find((item) => item.product.id === productId)
 
       if (item) {
-        if (notes !== undefined) item.notes = notes
-        if (priority !== undefined) item.priority = priority
+        if (notes !== undefined) {
+          item.notes = notes
+        }
+        if (priority !== undefined) {
+          item.priority = priority
+        }
         state.lastUpdated = new Date()
       }
     },
@@ -98,10 +102,10 @@ export const wishlistSlice = createSlice({
           state.items.sort((a, b) => a.product.price - b.product.price)
           break
         case 'priority': {
-          const priorityOrder = { high: 3, medium: 2, low: 1, undefined: 0 }
+          const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 }
           state.items.sort(
             (a, b) =>
-              (priorityOrder[b.priority || 'low'] || 0) - (priorityOrder[a.priority || 'low'] || 0)
+              (priorityOrder[b.priority ?? 'low'] ?? 0) - (priorityOrder[a.priority ?? 'low'] ?? 0)
           )
           break
         }

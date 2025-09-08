@@ -1,11 +1,12 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import { Calculator, DollarSign, Factory, Zap } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { cn } from '../../../../lib/utils'
+import { Label } from '../../../forms/label/Label'
 import { Card } from '../../../layout/card'
 import { Button } from '../../../primitives/button/Button'
 import { Input } from '../../../primitives/input/Input'
-import { Label } from '../../../forms/label/Label'
-import { Calculator, DollarSign, TrendingUp, Truck, Factory, Zap } from 'lucide-react'
+
 interface MaterialCost {
   material: string
   quantity: number
@@ -50,28 +51,33 @@ interface CostCalculatorProps {
   readOnly?: boolean
   currency?: string
 }
-export function CostCalculator({ 
-  className, 
+export function CostCalculator({
+  className,
   initialData,
   onCalculate,
   readOnly = false,
-  currency = 'EUR'
+  currency = 'EUR',
 }: CostCalculatorProps) {
   const [materials, setMaterials] = useState<MaterialCost[]>(initialData?.materials || [])
   const [processing, setProcessing] = useState<ProcessingCost[]>(initialData?.processing || [])
-  const [overheadPercentage, setOverheadPercentage] = useState(initialData?.overhead?.percentage || 15)
+  const [overheadPercentage, setOverheadPercentage] = useState(
+    initialData?.overhead?.percentage || 15
+  )
   const [markupPercentage, setMarkupPercentage] = useState(initialData?.markup?.percentage || 20)
   const [shippingCost, setShippingCost] = useState(initialData?.shipping?.cost || 0)
   const [breakdown, setBreakdown] = useState<CostBreakdown | null>(null)
   const addMaterial = () => {
-    setMaterials([...materials, {
-      material: '',
-      quantity: 0,
-      unit: 'kg',
-      unitPrice: 0,
-      totalCost: 0,
-      waste: 5
-    }])
+    setMaterials([
+      ...materials,
+      {
+        material: '',
+        quantity: 0,
+        unit: 'kg',
+        unitPrice: 0,
+        totalCost: 0,
+        waste: 5,
+      },
+    ])
   }
   const removeMaterial = (index: number) => {
     setMaterials(materials.filter((_, i) => i !== index))
@@ -88,16 +94,19 @@ export function CostCalculator({
     setMaterials(updated)
   }
   const addProcess = () => {
-    setProcessing([...processing, {
-      process: '',
-      description: '',
-      laborHours: 0,
-      hourlyRate: 25,
-      machineHours: 0,
-      machineRate: 50,
-      setupCost: 0,
-      totalCost: 0
-    }])
+    setProcessing([
+      ...processing,
+      {
+        process: '',
+        description: '',
+        laborHours: 0,
+        hourlyRate: 25,
+        machineHours: 0,
+        machineRate: 50,
+        setupCost: 0,
+        totalCost: 0,
+      },
+    ])
   }
   const removeProcess = (index: number) => {
     setProcessing(processing.filter((_, i) => i !== index))
@@ -114,7 +123,7 @@ export function CostCalculator({
     }
     setProcessing(updated)
   }
-  const calculateBreakdown = () => {
+  const calculateBreakdown = useCallback(() => {
     const materialTotal = materials.reduce((sum, m) => sum + m.totalCost, 0)
     const processingTotal = processing.reduce((sum, p) => sum + p.totalCost, 0)
     const subtotal = materialTotal + processingTotal + shippingCost
@@ -127,35 +136,43 @@ export function CostCalculator({
       processing,
       overhead: {
         percentage: overheadPercentage,
-        amount: overheadAmount
+        amount: overheadAmount,
       },
       shipping: {
         cost: shippingCost,
-        method: 'Standard'
+        method: 'Standard',
       },
       markup: {
         percentage: markupPercentage,
-        amount: markupAmount
+        amount: markupAmount,
       },
       subtotal,
       total,
-      currency
+      currency,
     }
     setBreakdown(newBreakdown)
     onCalculate?.(newBreakdown)
-  }
+  }, [
+    materials,
+    processing,
+    shippingCost,
+    overheadPercentage,
+    markupPercentage,
+    currency,
+    onCalculate,
+  ])
   useEffect(() => {
     calculateBreakdown()
-  }, [materials, processing, overheadPercentage, markupPercentage, shippingCost])
+  }, [calculateBreakdown])
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: currency,
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     }).format(amount)
   }
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -180,7 +197,7 @@ export function CostCalculator({
               Materials
             </h4>
             {!readOnly && (
-              <Button onClick={addMaterial} size="sm" variant="outline">
+              <Button type="button" onClick={addMaterial} size="sm" variant="outline">
                 Add Material
               </Button>
             )}
@@ -203,7 +220,9 @@ export function CostCalculator({
                   <Input
                     type="number"
                     value={material.quantity}
-                    onChange={(e) => updateMaterial(index, 'quantity', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateMaterial(index, 'quantity', parseFloat(e.target.value) || 0)
+                    }
                     disabled={readOnly}
                     className="h-8 text-xs"
                   />
@@ -223,7 +242,9 @@ export function CostCalculator({
                     type="number"
                     step="0.01"
                     value={material.unitPrice}
-                    onChange={(e) => updateMaterial(index, 'unitPrice', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateMaterial(index, 'unitPrice', parseFloat(e.target.value) || 0)
+                    }
                     disabled={readOnly}
                     className="h-8 text-xs"
                   />
@@ -233,7 +254,9 @@ export function CostCalculator({
                   <Input
                     type="number"
                     value={material.waste}
-                    onChange={(e) => updateMaterial(index, 'waste', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateMaterial(index, 'waste', parseFloat(e.target.value) || 0)
+                    }
                     disabled={readOnly}
                     className="h-8 text-xs"
                   />
@@ -247,6 +270,7 @@ export function CostCalculator({
                 {!readOnly && (
                   <div className="col-span-1 flex items-end">
                     <Button
+                      type="button"
                       onClick={() => removeMaterial(index)}
                       size="sm"
                       variant="destructive"
@@ -268,7 +292,7 @@ export function CostCalculator({
               Processing
             </h4>
             {!readOnly && (
-              <Button onClick={addProcess} size="sm" variant="outline">
+              <Button type="button" onClick={addProcess} size="sm" variant="outline">
                 Add Process
               </Button>
             )}
@@ -292,7 +316,9 @@ export function CostCalculator({
                     type="number"
                     step="0.1"
                     value={process.laborHours}
-                    onChange={(e) => updateProcess(index, 'laborHours', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateProcess(index, 'laborHours', parseFloat(e.target.value) || 0)
+                    }
                     disabled={readOnly}
                     className="h-8 text-xs"
                   />
@@ -303,7 +329,9 @@ export function CostCalculator({
                     type="number"
                     step="0.01"
                     value={process.hourlyRate}
-                    onChange={(e) => updateProcess(index, 'hourlyRate', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateProcess(index, 'hourlyRate', parseFloat(e.target.value) || 0)
+                    }
                     disabled={readOnly}
                     className="h-8 text-xs"
                   />
@@ -314,7 +342,9 @@ export function CostCalculator({
                     type="number"
                     step="0.1"
                     value={process.machineHours}
-                    onChange={(e) => updateProcess(index, 'machineHours', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateProcess(index, 'machineHours', parseFloat(e.target.value) || 0)
+                    }
                     disabled={readOnly}
                     className="h-8 text-xs"
                   />
@@ -325,7 +355,9 @@ export function CostCalculator({
                     type="number"
                     step="0.01"
                     value={process.setupCost}
-                    onChange={(e) => updateProcess(index, 'setupCost', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateProcess(index, 'setupCost', parseFloat(e.target.value) || 0)
+                    }
                     disabled={readOnly}
                     className="h-8 text-xs"
                   />
@@ -339,6 +371,7 @@ export function CostCalculator({
                 {!readOnly && (
                   <div className="col-span-1 flex items-end">
                     <Button
+                      type="button"
                       onClick={() => removeProcess(index)}
                       size="sm"
                       variant="destructive"
@@ -397,11 +430,15 @@ export function CostCalculator({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Materials:</span>
-                <span>{formatCurrency(breakdown.materials.reduce((sum, m) => sum + m.totalCost, 0))}</span>
+                <span>
+                  {formatCurrency(breakdown.materials.reduce((sum, m) => sum + m.totalCost, 0))}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Processing:</span>
-                <span>{formatCurrency(breakdown.processing.reduce((sum, p) => sum + p.totalCost, 0))}</span>
+                <span>
+                  {formatCurrency(breakdown.processing.reduce((sum, p) => sum + p.totalCost, 0))}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping:</span>

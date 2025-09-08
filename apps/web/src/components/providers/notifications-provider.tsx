@@ -1,56 +1,21 @@
 'use client'
 
-import type { Notification } from '@erp/domains/notifications'
 import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 // import { io, type Socket } from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
+import type {
+  ClientNotification as Notification,
+  NotificationProviderSettings,
+  NotificationsContextType,
+  NotificationsState,
+} from '@/types/notifications'
 import { callClientApi } from '@/utils/backend-api'
 
 // ===== TYPES ET INTERFACES =====
-
-export interface NotificationsState {
-  notifications: Notification[]
-  unreadCount: number
-  connected: boolean
-  settings: NotificationSettings
-  loading: boolean
-  error: string | null
-}
-
-export interface NotificationSettings {
-  enableToast: boolean
-  enableSound: boolean
-  enableVibration: boolean
-  enableBrowser: boolean
-  enableEmail: boolean
-  categories: {
-    system: boolean
-    production: boolean
-    commercial: boolean
-    admin: boolean
-  }
-  priority: {
-    low: boolean
-    normal: boolean
-    high: boolean
-    urgent: boolean
-  }
-}
-
-export interface NotificationsContextType {
-  state: NotificationsState
-  actions: {
-    markAsRead: (notificationId: string) => void
-    markAllAsRead: () => void
-    deleteNotification: (notificationId: string) => void
-    deleteAll: () => void
-    updateSettings: (settings: Partial<NotificationSettings>) => void
-    refreshNotifications: () => Promise<void>
-  }
-}
+// Les types sont importés de @/types/notifications
 
 interface NotificationsProviderProps {
   children: ReactNode
@@ -58,24 +23,21 @@ interface NotificationsProviderProps {
 
 // ===== ACTIONS =====
 
-interface NotificationsAction {
-  type:
-    | 'SET_NOTIFICATIONS'
-    | 'ADD_NOTIFICATION'
-    | 'MARK_AS_READ'
-    | 'MARK_ALL_AS_READ'
-    | 'DELETE_NOTIFICATION'
-    | 'DELETE_ALL'
-    | 'UPDATE_SETTINGS'
-    | 'SET_CONNECTED'
-    | 'SET_LOADING'
-    | 'SET_ERROR'
-  payload?: unknown
-}
+type NotificationsAction =
+  | { type: 'SET_NOTIFICATIONS'; payload: Notification[] }
+  | { type: 'ADD_NOTIFICATION'; payload: Notification }
+  | { type: 'MARK_AS_READ'; payload: string }
+  | { type: 'MARK_ALL_AS_READ' }
+  | { type: 'DELETE_NOTIFICATION'; payload: string }
+  | { type: 'DELETE_ALL' }
+  | { type: 'UPDATE_SETTINGS'; payload: Partial<NotificationProviderSettings> }
+  | { type: 'SET_CONNECTED'; payload: boolean }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null }
 
 // ===== REDUCER =====
 
-const initialSettings: NotificationSettings = {
+const initialSettings: NotificationProviderSettings = {
   enableToast: true,
   enableSound: false,
   enableVibration: false,
@@ -88,10 +50,10 @@ const initialSettings: NotificationSettings = {
     admin: true,
   },
   priority: {
-    low: true,
-    normal: true,
-    high: true,
-    urgent: true,
+    LOW: true,
+    NORMAL: true,
+    HIGH: true,
+    URGENT: true,
   },
 }
 
@@ -124,15 +86,21 @@ function notificationsReducer(
     case 'MARK_AS_READ':
       return {
         ...state,
-        notifications: state.notifications.map((n) =>
-          n.id === action.payload ? { ...n, readAt: new Date().toISOString() } : n
+        notifications: state.notifications.map(
+          (n): Notification =>
+            n.id === action.payload ? { ...n, readAt: new Date().toISOString() as unknown } : n
         ),
         unreadCount: Math.max(0, state.unreadCount - 1),
       }
     case 'MARK_ALL_AS_READ':
       return {
         ...state,
-        notifications: state.notifications.map((n) => ({ ...n, readAt: new Date().toISOString() })),
+        notifications: state.notifications.map(
+          (n): Notification => ({
+            ...n,
+            readAt: new Date().toISOString() as unknown,
+          })
+        ),
         unreadCount: 0,
       }
     case 'DELETE_NOTIFICATION': {
@@ -226,7 +194,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       const response = await callClientApi(`notifications/${notificationId}/read`, {
         method: 'POST',
       })
-      if (response.ok) {
+      if (response?.ok) {
         dispatch({ type: 'MARK_AS_READ', payload: notificationId })
       }
     } catch (_error) {
@@ -239,7 +207,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       const response = await callClientApi('notifications/mark-all-read', {
         method: 'POST',
       })
-      if (response.ok) {
+      if (response?.ok) {
         dispatch({ type: 'MARK_ALL_AS_READ' })
       }
     } catch (_error) {
@@ -252,7 +220,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       const response = await callClientApi(`notifications/${notificationId}`, {
         method: 'DELETE',
       })
-      if (response.ok) {
+      if (response?.ok) {
         dispatch({ type: 'DELETE_NOTIFICATION', payload: notificationId })
       }
     } catch (_error) {
@@ -265,7 +233,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       const response = await callClientApi('notifications', {
         method: 'DELETE',
       })
-      if (response.ok) {
+      if (response?.ok) {
         dispatch({ type: 'DELETE_ALL' })
       }
     } catch (_error) {
@@ -274,7 +242,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }, [])
 
   const updateSettings = useCallback(
-    (settings: Partial<NotificationSettings>) => {
+    (settings: Partial<NotificationProviderSettings>) => {
       dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
       // Sauvegarder dans localStorage
       localStorage.setItem(
@@ -291,9 +259,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     dispatch({ type: 'SET_LOADING', payload: true })
     try {
       const response = await callClientApi('notifications')
-      if (response.ok) {
-        const data = await response.json()
-        dispatch({ type: 'SET_NOTIFICATIONS', payload: data.data || [] })
+      if (response?.ok) {
+        const data = await response?.json()
+        dispatch({ type: 'SET_NOTIFICATIONS', payload: data?.data ?? [] })
       }
     } catch (_error) {
       // Error refreshing notifications (silenced)
@@ -325,7 +293,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       },
     }
 
-    socketRef.current = mockSocket as Socket
+    if (socketRef.current !== undefined) {
+      socketRef.current = mockSocket as unknown as Socket
+    }
 
     // Démarrer le polling pour les notifications
     const pollNotifications = () => {
@@ -339,51 +309,62 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
     /* 
     // Code WebSocket original - temporairement désactivé
-    const wsUrl = (process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001').replace('http://', 'ws://').replace('https://', 'wss://')
+    const wsUrl = (process?.env?.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001').replace('http://', 'ws://').replace('https://', 'wss://')
 
     try {
-      const ws = new WebSocket(`${wsUrl}?userId=${user.id}`)
+      const ws = new WebSocket(`${wsUrl}?userId=${user?.id}`)
       
       // Simuler Socket.IO interface
       const socketWrapper = {
         connected: false,
         readyState: ws.readyState,
         emit: (event, data) => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: event, data }))
+          if (ws?.readyState === WebSocket.OPEN) {
+            ws?.send(JSON.stringify({ type: event, data }))
           }
         },
         disconnect: () => {
-          ws.close()
+          ws?.close()
         }
       }
       
-      socketRef.current = socketWrapper
+      if (socketRef.current !== undefined) {
+        socketRef.current = socketWrapper
+      }
 
-      ws.onopen = () => {
-        socketWrapper.connected = true
-        socketWrapper.readyState = ws.readyState
+      if (ws) {
+        ws.onopen = () => {
+          if (socketWrapper) {
+            socketWrapper.connected = true
+            socketWrapper.readyState = ws.readyState
+          }
         dispatch({ type: 'SET_CONNECTED', payload: true })
         dispatch({ type: 'SET_ERROR', payload: null })
         reconnectAttempts.current = 0
         
         // Rejoindre la room de l'utilisateur
-        ws.send(JSON.stringify({ type: 'join', data: { userId: user.id } }))
+        if (ws) {
+          ws.send(JSON.stringify({ type: 'join', data: { userId: user.id } }))
+        }
       }
 
-      ws.onclose = (event) => {
-        socketWrapper.connected = false
-        socketWrapper.readyState = ws.readyState
+        ws.onclose = (event) => {
+          if (socketWrapper) {
+            socketWrapper.connected = false
+            socketWrapper.readyState = ws.readyState
+          }
         dispatch({ type: 'SET_CONNECTED', payload: false })
         
         // Reconnexion automatique si fermeture inattendue
         if (event.code !== 1000 && reconnectAttempts.current < 3) {
           const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 10000)
           
-          reconnectTimeoutRef.current = setTimeout(() => {
-            reconnectAttempts.current++
-            connectWebSocket()
-          }, delay)
+          if (reconnectTimeoutRef.current !== undefined) {
+            reconnectTimeoutRef.current = setTimeout(() => {
+              reconnectAttempts.current++
+              connectWebSocket()
+            }, delay)
+          }
         }
       }
 
@@ -395,21 +376,21 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     */
 
     /*
-      ws.onmessage = (event) => {
+      ws?.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data)
           
           if (message.type === 'notification') {
-            const notification = message.data
+            const notification = message?.data
             
             // Filtrer selon les paramètres utilisateur
-            if (!state.settings.categories[notification.metadata?.category || 'system']) return
-            if (!state.settings.priority[notification.priority?.toLowerCase() || 'normal']) return
+            if (!state?.settings?.categories[notification?.metadata?.category || 'system']) return
+            if (!state?.settings?.priority[notification?.priority?.toLowerCase() || 'normal']) return
 
             dispatch({ type: 'ADD_NOTIFICATION', payload: notification })
 
             // Afficher toast si activé
-            if (state.settings.enableToast) {
+            if (state?.settings?.enableToast) {
               toast({
                 title: notification.title,
                 description: notification.message,
@@ -418,31 +399,33 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
             }
 
             // Son si activé (désactivé temporairement - fichier son manquant)
-            if (state.settings.enableSound && false) {
+            if (state?.settings?.enableSound && false) {
               try {
                 const audio = new Audio('/sounds/notification.mp3')
-                audio.volume = 0.3
-                audio.play().catch(() => {
+                if (audio) {
+                  audio.volume = 0.3
+                }
+                audio?.play().catch(() => {
                 })
               } catch (error) {
               }
             }
 
             // Vibration si activé et supporté
-            if (state.settings.enableVibration && 'vibrate' in navigator) {
-              navigator.vibrate(200)
+            if (state?.settings?.enableVibration && 'vibrate' in navigator) {
+              navigator?.vibrate(200)
             }
 
             // Notification browser si activée
-            if (state.settings.enableBrowser && 'Notification' in window && Notification.permission === 'granted') {
+            if (state?.settings?.enableBrowser && 'Notification' in window && Notification.permission === 'granted') {
               new window.Notification(notification.title, {
                 body: notification.message,
-                icon: '/icons/notification.png',
+                icon: '/icons/notification?.png',
                 tag: notification.id,
               })
             }
           } else if (message.type === 'notification_read') {
-            dispatch({ type: 'MARK_AS_READ', payload: message.data.notificationId })
+            dispatch({ type: 'MARK_AS_READ', payload: message?.data?.notificationId })
           }
         } catch (error) {
           console.error('[NotificationsProvider] Erreur traitement message:', error)
@@ -522,3 +505,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     <NotificationsContext.Provider value={contextValue}>{children}</NotificationsContext.Provider>
   )
 }
+
+// Re-export types for external use
+export type { NotificationsState, NotificationsContextType }

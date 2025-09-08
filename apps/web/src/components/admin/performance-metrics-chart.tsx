@@ -18,7 +18,7 @@ interface PerformanceMetricsProps {
   refreshInterval?: number
 }
 
-export default function PerformanceMetricsChart({
+export function PerformanceMetricsChart({
   data = [],
   autoRefresh = true,
   refreshInterval: _refreshInterval = 30000,
@@ -66,33 +66,23 @@ export default function PerformanceMetricsChart({
     }
   }
 
-  const _getMetricIcon = () => {
-    switch (selectedMetric) {
-      case 'responseTime':
-        return <Clock className="w-4 h-4" />
-      case 'queryCount':
-        return <Zap className="w-4 h-4" />
-      case 'activeConnections':
-        return <Activity className="w-4 h-4" />
-    }
-  }
-
   const getCurrentAverage = () => {
     if (currentData.length === 0) return 0
-    const sum = currentData.reduce((acc, point) => acc + getMetricValue(point), 0)
+    const sum = currentData?.reduce((acc, point) => acc + getMetricValue(point), 0)
     return Math.round(sum / currentData.length)
   }
 
   const getTrend = () => {
     if (currentData.length < 2) return 'stable'
 
-    const recent = currentData.slice(-5)
-    const older = currentData.slice(-15, -10)
+    const recent = currentData?.slice(-5)
+    const older = currentData?.slice(-15, -10)
 
-    if (recent.length === 0 || older.length === 0) return 'stable'
+    if (recent?.length === 0 || older?.length === 0) return 'stable'
 
-    const recentAvg = recent.reduce((acc, point) => acc + getMetricValue(point), 0) / recent.length
-    const olderAvg = older.reduce((acc, point) => acc + getMetricValue(point), 0) / older.length
+    const recentAvg =
+      recent?.reduce((acc, point) => acc + getMetricValue(point), 0) / recent?.length
+    const olderAvg = older?.reduce((acc, point) => acc + getMetricValue(point), 0) / older?.length
 
     const diff = ((recentAvg - olderAvg) / olderAvg) * 100
 
@@ -115,10 +105,10 @@ export default function PerformanceMetricsChart({
             <CardDescription>Monitoring en temps réel des performances système</CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant={autoRefresh ? 'success' : 'secondary'} className="text-xs">
+            <Badge variant={autoRefresh ? 'default' : 'secondary'} className="text-xs">
               {autoRefresh ? 'Live' : 'Statique'}
             </Badge>
-            <Button size="sm" variant="outline">
+            <Button type="button" size="sm" variant="outline">
               <RefreshCw className="w-4 h-4" />
             </Button>
           </div>
@@ -131,6 +121,7 @@ export default function PerformanceMetricsChart({
           <div className="flex space-x-2">
             {(['responseTime', 'queryCount', 'activeConnections'] as const).map((metric) => (
               <Button
+                type="button"
                 key={metric}
                 size="sm"
                 variant={selectedMetric === metric ? 'default' : 'outline'}
@@ -194,7 +185,7 @@ export default function PerformanceMetricsChart({
             </div>
 
             <div className="h-32 flex items-end space-x-1 border-b border-l pl-2 pb-2">
-              {currentData.slice(-20).map((point, index) => {
+              {currentData?.slice(-20).map((point, index) => {
                 const value = getMetricValue(point)
                 const height = maxValue > 0 ? (value / maxValue) * 100 : 0
 
@@ -216,11 +207,11 @@ export default function PerformanceMetricsChart({
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>
                 {new Date(
-                  currentData[Math.max(0, currentData.length - 20)].timestamp
+                  currentData?.[Math.max(0, currentData.length - 20)]?.timestamp
                 ).toLocaleTimeString()}
               </span>
               <span>
-                {new Date(currentData[currentData.length - 1].timestamp).toLocaleTimeString()}
+                {new Date(currentData?.[currentData.length - 1]?.timestamp).toLocaleTimeString()}
               </span>
             </div>
           </div>

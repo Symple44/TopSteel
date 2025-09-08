@@ -1,5 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { MarketplaceOrder } from './marketplace-order.entity'
+// Removed direct import to avoid circular dependency
+// import { MarketplaceOrder } from './marketplace-order.entity'
 
 @Entity('marketplace_order_items')
 export class MarketplaceOrderItem {
@@ -81,12 +82,9 @@ export class MarketplaceOrderItem {
   }
 
   // Relations
-  @ManyToOne(
-    () => MarketplaceOrder,
-    (order) => order.items
-  )
+  @ManyToOne('MarketplaceOrder', 'items', { lazy: true })
   @JoinColumn({ name: 'orderId' })
-  order!: MarketplaceOrder
+  order!: any
 
   // Méthodes utilitaires
   calculateTotals(): void {

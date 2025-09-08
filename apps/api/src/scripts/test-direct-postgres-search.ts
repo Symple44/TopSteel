@@ -11,7 +11,7 @@ async function testDirectPostgreSQLSearch() {
   const tenantDataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432'),
+    port: parseInt(process.env.DB_PORT || '5432', 10),
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_NAME || 'erp_topsteel_topsteel',
@@ -52,7 +52,7 @@ async function testDirectPostgreSQLSearch() {
 
     if (results.length > 0) {
       console.log('\nPremiers résultats:')
-      results.slice(0, 5).forEach((r: any) => {
+      results.slice(0, 5).forEach((r: unknown) => {
         console.log(`  - ${r.designation || r.reference}`)
         console.log(`    Reference: ${r.reference}`)
         console.log(`    Société: ${r.societe_id}`)
@@ -103,7 +103,7 @@ async function testDirectPostgreSQLSearch() {
 
     if (preciseResults.length > 0) {
       console.log('\nRésultats:')
-      preciseResults.forEach((r: any) => {
+      preciseResults.forEach((r: unknown) => {
         console.log(`  - ${r.designation || r.reference}`)
         if (r.description) {
           console.log(`    Description: ${r.description.substring(0, 50)}...`)
@@ -124,7 +124,7 @@ async function testDirectPostgreSQLSearch() {
 
     const schema = await tenantDataSource.query(schemaQuery)
     console.log('Colonnes principales:')
-    schema.forEach((col: any) => {
+    schema.forEach((col: unknown) => {
       console.log(`  - ${col.column_name}: ${col.data_type}`)
     })
 

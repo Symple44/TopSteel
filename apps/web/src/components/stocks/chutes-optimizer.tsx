@@ -2,7 +2,6 @@
 'use client'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@erp/ui'
-
 import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from 'lucide-react'
 import { useState } from 'react'
 
@@ -64,8 +63,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     const results = chutes
       .map((chute) => ({
         chuteId: chute.id,
-        economie: chute.utilisationsProposees.reduce((sum, u) => sum + u.economie, 0),
-        utilisations: chute.utilisationsProposees.length,
+        economie: chute?.utilisationsProposees?.reduce((sum, u) => sum + u.economie, 0),
+        utilisations: chute?.utilisationsProposees?.length,
         score: Math.round(Math.random() * 100),
       }))
       .sort((a, b) => b.economie - a.economie)
@@ -73,8 +72,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     setOptimizationResults(results)
   }
 
-  const totalEconomie = optimizationResults.reduce((sum, r) => sum + r.economie, 0)
-  const totalChutesUtilisables = optimizationResults.filter((r) => r.utilisations > 0).length
+  const totalEconomie = optimizationResults?.reduce((sum, r) => sum + r.economie, 0)
+  const totalChutesUtilisables = optimizationResults?.filter((r) => r.utilisations > 0).length
 
   return (
     <div className="space-y-6">
@@ -86,7 +85,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
               <Recycle className="h-5 w-5" />
               Optimiseur de Chutes
             </CardTitle>
-            <Button onClick={runOptimization} className="flex items-center gap-2">
+            <Button type="button" onClick={runOptimization} className="flex items-center gap-2">
               <Zap className="h-4 w-4" />
               Optimiser
             </Button>
@@ -102,8 +101,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setSearchQuery(e.target.value)
-                    onSearch(e.target.value)
+                    setSearchQuery(e?.target?.value)
+                    onSearch(e?.target?.value)
                   }}
                 />
               </div>
@@ -124,7 +123,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                 <div>
                   <p className="text-sm text-muted-foreground">Économie totale</p>
                   <p className="text-2xl font-bold text-green-600">
-                    {totalEconomie.toLocaleString()} €
+                    {totalEconomie?.toLocaleString()} €
                   </p>
                 </div>
               </div>
@@ -172,7 +171,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {chutes.map((chute) => (
+              {chutes?.map((chute) => (
                 <button
                   type="button"
                   key={chute.id}
@@ -189,8 +188,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                       <div className="font-medium">{chute.reference}</div>
                       <div className="text-sm text-gray-600">{chute.materiau}</div>
                       <div className="text-sm text-gray-500">
-                        {chute.dimensions.longueur} × {chute.dimensions.largeur} ×{' '}
-                        {chute.dimensions.epaisseur} mm
+                        {chute?.dimensions?.longueur} × {chute?.dimensions?.largeur} ×{' '}
+                        {chute?.dimensions?.epaisseur} mm
                       </div>
                     </div>
                     <div className="text-right">
@@ -203,9 +202,9 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                     </div>
                   </div>
 
-                  {chute.utilisationsProposees.length > 0 && (
+                  {chute?.utilisationsProposees?.length > 0 && (
                     <div className="mt-2 text-xs text-green-600">
-                      {chute.utilisationsProposees.length} utilisation(s) proposée(s)
+                      {chute?.utilisationsProposees?.length} utilisation(s) proposée(s)
                     </div>
                   )}
                 </button>
@@ -222,7 +221,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {selectedChute.utilisationsProposees.length === 0 ? (
+                {selectedChute?.utilisationsProposees?.length === 0 ? (
                   <div className="text-center py-8">
                     <Recycle className="h-12 w-12 mx-auto text-gray-300 mb-4" />
                     <p className="text-gray-500">Aucune utilisation proposée</p>
@@ -231,7 +230,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                     </p>
                   </div>
                 ) : (
-                  selectedChute.utilisationsProposees.map((utilisation) => (
+                  selectedChute?.utilisationsProposees?.map((utilisation) => (
                     <div key={utilisation.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -266,6 +265,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                         </div>
 
                         <Button
+                          type="button"
                           size="sm"
                           onClick={() => onOptimize(selectedChute.id, utilisation.id)}
                           className="flex items-center gap-1"
@@ -293,7 +293,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
               Cliquez sur "Optimiser" pour analyser vos chutes et trouver les meilleures
               opportunités d'utilisation.
             </p>
-            <Button onClick={runOptimization} size="lg">
+            <Button type="button" onClick={runOptimization} size="lg">
               <Zap className="h-4 w-4 mr-2" />
               Lancer l'optimisation
             </Button>

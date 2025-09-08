@@ -7,9 +7,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { NotificationAction } from './notification-action.entity'
-import { NotificationCondition } from './notification-condition.entity'
-import { NotificationExecution } from './notification-execution.entity'
+// import { NotificationAction } from './notification-action.entity';
+// import { NotificationCondition } from './notification-condition.entity';
+// import { NotificationExecution } from './notification-execution.entity';
 
 /**
  * Rule types
@@ -121,8 +121,8 @@ export class NotificationRule {
 
   @Column({ type: 'jsonb', nullable: true })
   eventFilters?: {
-    properties?: Record<string, any>
-    metadata?: Record<string, any>
+    properties?: Record<string, unknown>
+    metadata?: Record<string, unknown>
     excludePatterns?: string[]
     includePatterns?: string[]
   }
@@ -215,7 +215,7 @@ export class NotificationRule {
   }
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @Column({ type: 'boolean', default: true })
   allowUserOverride!: boolean
@@ -254,23 +254,14 @@ export class NotificationRule {
   updatedBy?: string
 
   // Relations
-  @OneToMany(
-    () => NotificationCondition,
-    (condition) => condition.rule
-  )
-  conditions!: NotificationCondition[]
+  @OneToMany('NotificationCondition', 'rule', { lazy: true })
+  conditions!: unknown[]
 
-  @OneToMany(
-    () => NotificationAction,
-    (action) => action.rule
-  )
-  actions!: NotificationAction[]
+  @OneToMany('NotificationAction', 'rule', { lazy: true })
+  actions!: unknown[]
 
-  @OneToMany(
-    () => NotificationExecution,
-    (execution) => execution.rule
-  )
-  executions!: NotificationExecution[]
+  @OneToMany('NotificationExecution', 'rule', { lazy: true })
+  executions!: unknown[]
 
   // Utility methods
 
@@ -422,7 +413,7 @@ export class NotificationRule {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       code: this.code,

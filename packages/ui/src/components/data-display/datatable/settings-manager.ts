@@ -121,7 +121,9 @@ export class SettingsManager {
         }
       }
 
-      keysToRemove.forEach((key) => localStorage.removeItem(key))
+      keysToRemove.forEach((key) => {
+        localStorage.removeItem(key)
+      })
     } catch (_error) {}
   }
 
@@ -130,7 +132,7 @@ export class SettingsManager {
    */
   static exportSettings(userId?: string): object {
     try {
-      const settings: Record<string, any> = {}
+      const settings: Record<string, unknown> = {}
       const prefix = SettingsManager.getStoragePrefix(userId)
 
       if (typeof window === 'undefined') {
@@ -157,7 +159,7 @@ export class SettingsManager {
   /**
    * Importe des paramètres utilisateur
    */
-  static importSettings(settingsData: Record<string, any>, userId?: string): void {
+  static importSettings(settingsData: Record<string, unknown>, userId?: string): void {
     try {
       Object.entries(settingsData).forEach(([tableId, data]) => {
         SettingsManager.saveSettings(tableId, data.settings, userId)
@@ -311,7 +313,7 @@ export const usePersistedTableSettings = <T>(
   }, [userId])
 
   const importSettings = React.useCallback(
-    (settingsData: Record<string, any>) => {
+    (settingsData: Record<string, unknown>) => {
       SettingsManager.importSettings(settingsData, userId)
       // Recharger les paramètres après l'import
       const reloadedSettings = SettingsManager.loadSettings(tableId, userId)

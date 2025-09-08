@@ -15,10 +15,10 @@ export function useHierarchicalPreferences(
   tableId: string,
   _userId?: string,
   apiConfig?: {
-    loadPreferences?: (tableId: string) => Promise<any>
-    loadHierarchyOrder?: (tableId: string) => Promise<any>
-    savePreferences?: (tableId: string, config: HierarchicalDatatableConfig) => Promise<any>
-    saveHierarchyOrder?: (tableId: string, order: HierarchyOrderItem[]) => Promise<any>
+    loadPreferences?: (tableId: string) => Promise<unknown>
+    loadHierarchyOrder?: (tableId: string) => Promise<unknown>
+    savePreferences?: (tableId: string, config: HierarchicalDatatableConfig) => Promise<unknown>
+    saveHierarchyOrder?: (tableId: string, order: HierarchyOrderItem[]) => Promise<unknown>
   }
 ) {
   const [config, setConfig] = useState<HierarchicalDatatableConfig | null>(null)

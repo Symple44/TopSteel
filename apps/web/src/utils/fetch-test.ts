@@ -23,7 +23,8 @@ export async function testClientError() {
     try {
       // Test avec fetch original si disponible
       const patchedFetch = globalThis.fetch as unknown
-      const originalFetch = patchedFetch._nextOriginalFetch
+      // @ts-expect-error - Temporary TypeScript fix
+      const originalFetch = patchedFetch?._nextOriginalFetch
 
       if (originalFetch) {
         await originalFetch(url, {

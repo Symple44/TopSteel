@@ -15,8 +15,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  useFormFieldIds,
 } from '@erp/ui'
-
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
@@ -35,16 +35,22 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     type: '',
   })
 
+  const {
+    reference: referenceId,
+    client: clientId,
+    type: typeId,
+  } = useFormFieldIds(['reference', 'client', 'type'])
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     // Validation côté client - maintient la robustesse
-    if (!formData.reference.trim()) {
+    if (!formData?.reference?.trim()) {
       alert('La référence est obligatoire')
 
       return
     }
-    if (!formData.client.trim()) {
+    if (!formData?.client?.trim()) {
       alert('Le client est obligatoire')
 
       return
@@ -94,42 +100,42 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="reference" className="text-right">
+            <Label htmlFor={referenceId} className="text-right">
               Référence
             </Label>
             <Input
-              id="reference"
+              id={referenceId}
               placeholder="FAC-001"
               className="col-span-3"
               value={formData.reference}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, reference: e.target.value })
+                setFormData({ ...formData, reference: e?.target?.value })
               }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="client" className="text-right">
+            <Label htmlFor={clientId} className="text-right">
               Client
             </Label>
             <Input
-              id="client"
+              id={clientId}
               placeholder="Nom du client"
               className="col-span-3"
               value={formData.client}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, client: e.target.value })
+                setFormData({ ...formData, client: e?.target?.value })
               }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="type" className="text-right">
+            <Label htmlFor={typeId} className="text-right">
               Type
             </Label>
             <Select
               value={formData.type}
               onValueChange={(value: string) => setFormData({ ...formData, type: value })}
             >
-              <SelectTrigger className="col-span-3">
+              <SelectTrigger id={typeId} className="col-span-3">
                 <SelectValue placeholder="Type de facture" />
               </SelectTrigger>
               <SelectContent>

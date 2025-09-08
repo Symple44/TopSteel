@@ -263,7 +263,7 @@ export class PartnerApi {
   // Export/Import
   async exportPartners(
     format: 'CSV' | 'EXCEL' | 'PDF',
-    filters?: Record<string, any>
+    filters?: Record<string, unknown>
   ): Promise<{
     url: string
     filename: string
@@ -273,13 +273,13 @@ export class PartnerApi {
   }
 
   async importPartners(
-    data: Record<string, any>[],
+    data: Record<string, unknown>[],
     options?: { skipErrors?: boolean; dryRun?: boolean }
   ): Promise<{
     imported: number
     errors: number
     warnings: string[]
-    details: Record<string, any>[]
+    details: Record<string, unknown>[]
   }> {
     const response = await this.http.post('/business/partners/import', { data, options })
     return response.data

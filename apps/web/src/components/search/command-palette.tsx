@@ -27,11 +27,10 @@ import {
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { type SearchResult, useGlobalSearch } from '@/hooks/use-global-search'
-import { useTranslation } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 // Mapping des types vers les icônes
-const TYPE_ICONS: Record<string, any> = {
+const TYPE_ICONS: Record<string, unknown> = {
   menu: Menu,
   client: Users,
   fournisseur: Truck,
@@ -94,7 +93,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter()
-  const { t } = useTranslation('common')
+  // const { t } = useTranslation('common') // Unused for now
   const [selectedTab, setSelectedTab] = useState<string | null>(null)
 
   const {
@@ -103,7 +102,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     loading,
     error,
     suggestions,
-    facets,
     searchEngine,
     searchTime,
     total,
@@ -133,6 +131,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       window.addEventListener('keydown', handleKeyDown)
       return () => window.removeEventListener('keydown', handleKeyDown)
     }
+    return undefined
   }, [open, handleKeyDown])
 
   // Fermer avec Escape
@@ -147,6 +146,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       window.addEventListener('keydown', handleEscape)
       return () => window.removeEventListener('keydown', handleEscape)
     }
+    return undefined
   }, [open, onOpenChange])
 
   // Réinitialiser quand on ferme
@@ -163,10 +163,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       if (result.url) {
         onOpenChange(false)
 
-        if (result.url.startsWith('http')) {
+        if (result?.url?.startsWith('http')) {
           window.open(result.url, '_blank')
         } else {
-          router.push(result.url)
+          router?.push(result.url)
         }
       }
     },
@@ -182,7 +182,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   // Obtenir les résultats filtrés
   const getFilteredResults = () => {
     if (!selectedTab) return results
-    return results.filter((r) => r.type === selectedTab)
+    return results?.filter((r) => r.type === selectedTab)
   }
 
   const filteredResults = getFilteredResults()
@@ -199,7 +199,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               ref={searchInputRef}
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e?.target?.value)}
               placeholder="Rechercher clients, articles, projets..."
               className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground text-base"
               autoFocus
@@ -218,7 +218,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           </div>
 
           {/* Tabs pour filtrer par type */}
-          {types.length > 1 && (
+          {types?.length > 1 && (
             <div className="flex items-center gap-1 px-4 pb-2 overflow-x-auto">
               <button
                 onClick={() => setSelectedTab(null)}
@@ -231,7 +231,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               >
                 Tout ({total})
               </button>
-              {types.map((type) => {
+              {types?.map((type) => {
                 const count = getResultCountByType(type)
                 const Icon = getIcon(type)
 
@@ -261,7 +261,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           {error && <div className="p-4 text-sm text-destructive">{error}</div>}
 
           {/* Pas de résultats */}
-          {!loading && query && filteredResults.length === 0 && (
+          {!loading && query && filteredResults?.length === 0 && (
             <div className="py-12 text-center">
               <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-muted/50 flex items-center justify-center">
                 <Search className="h-7 w-7 text-muted-foreground" />
@@ -277,7 +277,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Recherches récentes
               </div>
-              {history.slice(0, 5).map((item, index) => (
+              {history?.slice(0, 5).map((item, index) => (
                 <button
                   key={index}
                   onClick={() => searchFromHistory(item)}
@@ -286,9 +286,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   <Clock className="mr-3 h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="flex-1 text-left font-medium">{item.query}</span>
                   <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                    {typeof item.resultCount === 'object'
-                      ? item.resultCount.value
-                      : item.resultCount}
+                    {item.resultCount}
                   </span>
                 </button>
               ))}
@@ -296,11 +294,11 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           )}
 
           {/* Résultats de recherche */}
-          {filteredResults.length > 0 && (
+          {filteredResults?.length > 0 && (
             <div className="p-3">
               {selectedTab
                 ? // Vue filtrée par type
-                  filteredResults.map((result, index) => {
+                  filteredResults?.map((result, index) => {
                     const typeColor = TYPE_COLORS[result.type] || 'text-gray-600 bg-gray-50'
 
                     return (
@@ -314,8 +312,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     )
                   })
                 : // Vue groupée par type
-                  types.map((type) => {
-                    const typeResults = groupedResults[type].slice(0, 5)
+                  types?.map((type) => {
+                    const typeResults = groupedResults?.[type]?.slice(0, 5)
                     const Icon = getIcon(type)
                     const typeColor = TYPE_COLORS[type] || 'text-gray-600 bg-gray-50'
 
@@ -326,21 +324,21 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                             <Icon className="mr-2 h-4 w-4" />
                             {TYPE_LABELS[type]}
                           </div>
-                          {groupedResults[type].length > 5 && (
+                          {groupedResults?.[type]?.length > 5 && (
                             <button
                               onClick={() => setSelectedTab(type)}
                               className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
                             >
-                              Voir tout ({groupedResults[type].length})
+                              Voir tout ({groupedResults?.[type]?.length})
                             </button>
                           )}
                         </div>
 
-                        {typeResults.map((result, _index) => (
+                        {typeResults?.map((result, _index) => (
                           <SearchResultItem
                             key={`${result.type}-${result.id}`}
                             result={result}
-                            isSelected={selectedIndex === results.indexOf(result)}
+                            isSelected={selectedIndex === results?.indexOf(result)}
                             onClick={() => navigateToResult(result)}
                             typeColor={typeColor}
                           />
@@ -357,7 +355,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
                 Suggestions
               </div>
-              {suggestions.map((suggestion, index) => (
+              {suggestions?.map((suggestion, index) => (
                 <button
                   key={index}
                   onClick={() => setQuery(suggestion)}
@@ -414,15 +412,15 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
     if (!highlights || highlights.length === 0) return text
 
     // Pour simplifier, on prend juste le premier highlight
-    const highlighted = highlights[0]
-    
+    const highlighted = highlights?.[0]
+
     // Sanitize HTML content to prevent XSS attacks from search highlights
-    const sanitizedHTML = DOMPurify.sanitize(highlighted, {
+    const sanitizedHTML = DOMPurify?.sanitize(highlighted, {
       ALLOWED_TAGS: ['mark', 'strong', 'em', 'span'],
       ALLOWED_ATTR: ['class'],
-      KEEP_CONTENT: true
+      KEEP_CONTENT: true,
     })
-    
+
     // Using dangerouslySetInnerHTML is necessary here to render search highlights from the API
     // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
     return <span dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
@@ -443,13 +441,13 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
       <div className="flex-1 text-left">
         <div className="font-semibold text-foreground">
           {result.highlight?.title
-            ? renderHighlighted(result.title, result.highlight.title)
+            ? renderHighlighted(result.title, result?.highlight?.title)
             : result.title}
         </div>
         {result.description && (
           <div className="text-xs text-muted-foreground line-clamp-1">
             {result.highlight?.description
-              ? renderHighlighted(result.description, result.highlight.description)
+              ? renderHighlighted(result.description, result?.highlight?.description)
               : result.description}
           </div>
         )}
@@ -457,11 +455,11 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
 
       {result.metadata && (
         <div className="ml-2 flex items-center gap-2 text-xs text-muted-foreground">
-          {result.metadata.statut && (
-            <span className="px-1.5 py-0.5 bg-muted rounded">{result.metadata.statut}</span>
+          {result?.metadata?.statut && (
+            <span className="px-1.5 py-0.5 bg-muted rounded">{result?.metadata?.statut}</span>
           )}
-          {result.metadata.montant && (
-            <span className="font-medium">{result.metadata.montant}€</span>
+          {result?.metadata?.montant && (
+            <span className="font-medium">{result?.metadata?.montant}€</span>
           )}
         </div>
       )}

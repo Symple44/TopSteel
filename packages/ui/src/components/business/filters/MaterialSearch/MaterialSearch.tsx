@@ -1,10 +1,10 @@
 'use client'
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { Search, Package, Wrench, Scale, X, Loader2 } from 'lucide-react'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
+import { Loader2, Package, Scale, Search, Wrench, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Button } from '../../../primitives/button/Button'
+import { Input } from '../../../primitives/input/Input'
 export interface MaterialSearchResult {
   id: string
   name: string
@@ -19,7 +19,7 @@ export interface MaterialSearchResult {
   stock?: number
   supplier?: string
   description?: string
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 }
 interface MaterialSearchProps {
   value?: MaterialSearchResult | null
@@ -38,7 +38,7 @@ export function MaterialSearch({
   value,
   onSelect,
   onSearch,
-  placeholder = "Rechercher un matériau...",
+  placeholder = 'Rechercher un matériau...',
   disabled = false,
   multiple = false,
   maxResults = 10,
@@ -57,7 +57,7 @@ export function MaterialSearch({
   )
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const searchTimeoutRef = useRef<NodeJS.Timeout>()
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   useEffect(() => {
     if (autoFocus && inputRef.current) {
       inputRef.current.focus()
@@ -73,89 +73,101 @@ export function MaterialSearch({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-  const performSearch = useCallback(async (searchQuery: string) => {
-    if (!onSearch || searchQuery.trim().length < 2) {
-      setResults([])
-      setIsOpen(false)
-      return
-    }
-    setIsLoading(true)
-    try {
-      const searchResults = await onSearch(searchQuery.trim())
-      setResults(searchResults.slice(0, maxResults))
-      setIsOpen(true)
-      setHighlightedIndex(-1)
-    } catch (error) {
-      console.error('Material search error:', error)
-      setResults([])
-    } finally {
-      setIsLoading(false)
-    }
-  }, [onSearch, maxResults])
-  const handleQueryChange = useCallback((value: string) => {
-    setQuery(value)
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current)
-    }
-    searchTimeoutRef.current = setTimeout(() => {
-      performSearch(value)
-    }, 300)
-  }, [performSearch])
-  const handleMaterialSelect = useCallback((material: MaterialSearchResult) => {
-    if (multiple) {
-      const isAlreadySelected = selectedMaterials.some(m => m.id === material.id)
-      let newSelection: MaterialSearchResult[]
-      if (isAlreadySelected) {
-        newSelection = selectedMaterials.filter(m => m.id !== material.id)
-      } else {
-        newSelection = [...selectedMaterials, material]
+  const performSearch = useCallback(
+    async (searchQuery: string) => {
+      if (!onSearch || searchQuery.trim().length < 2) {
+        setResults([])
+        setIsOpen(false)
+        return
       }
+      setIsLoading(true)
+      try {
+        const searchResults = await onSearch(searchQuery.trim())
+        setResults(searchResults.slice(0, maxResults))
+        setIsOpen(true)
+        setHighlightedIndex(-1)
+      } catch (_error) {
+        setResults([])
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [onSearch, maxResults]
+  )
+  const handleQueryChange = useCallback(
+    (value: string) => {
+      setQuery(value)
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch(value)
+      }, 300)
+    },
+    [performSearch]
+  )
+  const handleMaterialSelect = useCallback(
+    (material: MaterialSearchResult) => {
+      if (multiple) {
+        const isAlreadySelected = selectedMaterials.some((m) => m.id === material.id)
+        let newSelection: MaterialSearchResult[]
+        if (isAlreadySelected) {
+          newSelection = selectedMaterials.filter((m) => m.id !== material.id)
+        } else {
+          newSelection = [...selectedMaterials, material]
+        }
+        setSelectedMaterials(newSelection)
+        onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+      } else {
+        setSelectedMaterials([material])
+        onSelect?.(material)
+        setQuery('')
+        setIsOpen(false)
+      }
+      setHighlightedIndex(-1)
+    },
+    [multiple, selectedMaterials, onSelect]
+  )
+  const handleRemoveMaterial = useCallback(
+    (materialId: string) => {
+      const newSelection = selectedMaterials.filter((m) => m.id !== materialId)
       setSelectedMaterials(newSelection)
-      onSelect?.(newSelection.length > 0 ? newSelection as any : null)
-    } else {
-      setSelectedMaterials([material])
-      onSelect?.(material)
-      setQuery('')
-      setIsOpen(false)
-    }
-    setHighlightedIndex(-1)
-  }, [multiple, selectedMaterials, onSelect])
-  const handleRemoveMaterial = useCallback((materialId: string) => {
-    const newSelection = selectedMaterials.filter(m => m.id !== materialId)
-    setSelectedMaterials(newSelection)
-    onSelect?.(newSelection.length > 0 ? newSelection as any : null)
-  }, [selectedMaterials, onSelect])
+      onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+    },
+    [selectedMaterials, onSelect]
+  )
   const clearSelection = useCallback(() => {
     setSelectedMaterials([])
     setQuery('')
     onSelect?.(null)
     setIsOpen(false)
   }, [onSelect])
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!isOpen) return
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault()
-        setHighlightedIndex(prev => 
-          prev < results.length - 1 ? prev + 1 : prev
-        )
-        break
-      case 'ArrowUp':
-        e.preventDefault()
-        setHighlightedIndex(prev => prev > 0 ? prev - 1 : prev)
-        break
-      case 'Enter':
-        e.preventDefault()
-        if (highlightedIndex >= 0 && results[highlightedIndex]) {
-          handleMaterialSelect(results[highlightedIndex])
-        }
-        break
-      case 'Escape':
-        setIsOpen(false)
-        setHighlightedIndex(-1)
-        break
-    }
-  }, [isOpen, results, highlightedIndex, handleMaterialSelect])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!isOpen) return
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault()
+          setHighlightedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev))
+          break
+        case 'ArrowUp':
+          e.preventDefault()
+          setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev))
+          break
+        case 'Enter':
+          e.preventDefault()
+          if (highlightedIndex >= 0 && results[highlightedIndex]) {
+            handleMaterialSelect(results[highlightedIndex])
+          }
+          break
+        case 'Escape':
+          setIsOpen(false)
+          setHighlightedIndex(-1)
+          break
+      }
+    },
+    [isOpen, results, highlightedIndex, handleMaterialSelect]
+  )
   const formatPrice = (price: number, currency: string = 'EUR') => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -179,10 +191,20 @@ export function MaterialSearch({
               <Package className="h-3 w-3" />
               <span className="text-sm">{material.name}</span>
               <span className="text-xs text-muted-foreground">({material.code})</span>
-              <X
-                className="h-3 w-3 cursor-pointer hover:text-destructive"
+              <button
+                type="button"
+                className="h-3 w-3 cursor-pointer hover:text-destructive p-0 border-0 bg-transparent"
                 onClick={() => handleRemoveMaterial(material.id)}
-              />
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleRemoveMaterial(material.id)
+                  }
+                }}
+                aria-label={`Supprimer ${material.name}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
             </Badge>
           ))}
         </div>
@@ -222,17 +244,24 @@ export function MaterialSearch({
         <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg max-h-80 overflow-auto">
           {results.map((material, index) => {
             const isHighlighted = index === highlightedIndex
-            const isSelected = selectedMaterials.some(m => m.id === material.id)
+            const isSelected = selectedMaterials.some((m) => m.id === material.id)
             return (
-              <div
+              <button
                 key={material.id}
+                type="button"
                 className={cn(
-                  'flex items-start gap-3 p-3 cursor-pointer transition-colors',
+                  'flex items-start gap-3 p-3 cursor-pointer transition-colors w-full text-left',
                   isHighlighted && 'bg-muted',
                   isSelected && 'bg-primary/10',
                   'hover:bg-muted'
                 )}
                 onClick={() => handleMaterialSelect(material)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleMaterialSelect(material)
+                  }
+                }}
               >
                 <div className="flex-shrink-0 mt-1">
                   <Package className="h-5 w-5 text-muted-foreground" />
@@ -286,9 +315,7 @@ export function MaterialSearch({
                       </div>
                     )}
                     {material.supplier && (
-                      <div className="text-xs text-muted-foreground">
-                        {material.supplier}
-                      </div>
+                      <div className="text-xs text-muted-foreground">{material.supplier}</div>
                     )}
                   </div>
                 )}
@@ -298,7 +325,7 @@ export function MaterialSearch({
                     <div className="w-2 h-2 bg-primary rounded-full" />
                   </div>
                 )}
-              </div>
+              </button>
             )
           })}
         </div>

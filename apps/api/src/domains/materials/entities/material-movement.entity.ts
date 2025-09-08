@@ -270,7 +270,7 @@ export class MaterialMovement {
 
   /** Métadonnées JSON */
   @Column('jsonb', { nullable: true })
-  metadonnees?: Record<string, any>
+  metadonnees?: Record<string, unknown>
 
   /** Historique des modifications */
   @Column('jsonb', { nullable: true })

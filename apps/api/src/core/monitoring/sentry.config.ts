@@ -1,6 +1,13 @@
+import type { NodeClient } from '@sentry/node'
 import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
-import { CaptureConsole } from '@sentry/integrations'
+
+// Define a simple integration type that matches what Sentry actually returns
+interface SentryIntegration {
+  name: string
+  setup?: (client: NodeClient) => void
+  setupOnce?: (...args: unknown[]) => void
+}
 
 export interface SentryConfig {
   dsn: string
@@ -11,17 +18,15 @@ export interface SentryConfig {
   profilesSampleRate: number
   debug?: boolean
   attachStacktrace?: boolean
-  integrations?: any[]
+  integrations?: SentryIntegration[]
 }
 
 export function initSentry(config: SentryConfig): void {
   if (!config.enabled) {
-    console.log('Sentry monitoring is disabled')
     return
   }
 
   if (!config.dsn) {
-    console.warn('Sentry DSN not provided, monitoring disabled')
     return
   }
 
@@ -35,25 +40,25 @@ export function initSentry(config: SentryConfig): void {
       debug: config.debug || false,
       attachStacktrace: config.attachStacktrace !== false,
       integrations: [
-        // Capture console errors
-        new CaptureConsole({
-          levels: ['error', 'warn']
-        }),
         // Add profiling
         nodeProfilingIntegration(),
+        // Capture console errors
+        Sentry.captureConsoleIntegration({
+          levels: ['error', 'warn'],
+        }),
         // Add any custom integrations
-        ...(config.integrations || [])
+        ...(config.integrations || []),
       ],
       beforeSend(event, hint) {
         // Filter out sensitive data
         if (event.request) {
           // Remove auth headers
           if (event.request.headers) {
-            delete event.request.headers['authorization']
-            delete event.request.headers['cookie']
+            delete event.request.headers.authorization
+            delete event.request.headers.cookie
             delete event.request.headers['x-api-key']
           }
-          
+
           // Remove sensitive query params
           if (event.request.query_string) {
             const params = new URLSearchParams(event.request.query_string)
@@ -63,25 +68,25 @@ export function initSentry(config: SentryConfig): void {
             event.request.query_string = params.toString()
           }
         }
-        
+
         // Remove sensitive user data
         if (event.user) {
           delete event.user.email
           delete event.user.ip_address
         }
-        
+
         // Filter out non-error events in production
         if (config.environment === 'production') {
           const error = hint.originalException
           if (error && typeof error === 'object' && 'statusCode' in error) {
-            const statusCode = (error as any).statusCode
+            const statusCode = (error as { statusCode: number }).statusCode
             // Don't send 4xx errors to Sentry in production
             if (statusCode >= 400 && statusCode < 500) {
               return null
             }
           }
         }
-        
+
         return event
       },
       beforeSendTransaction(transaction) {
@@ -91,18 +96,14 @@ export function initSentry(config: SentryConfig): void {
           return null
         }
         return transaction
-      }
+      },
     })
-
-    console.log('Sentry monitoring initialized successfully')
-  } catch (error) {
-    console.error('Failed to initialize Sentry:', error)
-  }
+  } catch (_error) {}
 }
 
-export function captureError(error: Error, context?: Record<string, any>): void {
+export function captureError(error: Error, context?: Record<string, unknown>): void {
   Sentry.captureException(error, {
-    extra: context
+    extra: context,
   })
 }
 
@@ -110,7 +111,7 @@ export function captureMessage(message: string, level: Sentry.SeverityLevel = 'i
   Sentry.captureMessage(message, level)
 }
 
-export function setUser(user: { id: string; username?: string; [key: string]: any }): void {
+export function setUser(user: { id: string; username?: string; email?: string }): void {
   Sentry.setUser({
     id: user.id,
     username: user.username,
@@ -130,9 +131,12 @@ export function withScope(callback: (scope: Sentry.Scope) => void): void {
   Sentry.withScope(callback)
 }
 
-export function startTransaction(name: string, op: string): any {
-  return Sentry.startSpan({
-    name,
-    op
-  }, () => {})
+export function startTransaction(name: string, op: string): unknown {
+  return Sentry.startSpan(
+    {
+      name,
+      op,
+    },
+    () => {}
+  )
 }

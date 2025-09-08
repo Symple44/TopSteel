@@ -261,7 +261,7 @@ export function FormulaEditor<T>({
             const targetRow =
               targetRowIndex !== undefined ? sampleData[targetRowIndex] : sampleData[0]
             const targetColumn = columns.find((c) => c.id === columnId)
-            return targetColumn ? (targetRow as any)[targetColumn.key] : null
+            return targetColumn ? (targetRow as unknown)[targetColumn.key] : null
           },
         }
 
@@ -366,7 +366,7 @@ export function FormulaEditor<T>({
               <Textarea
                 ref={textareaRef}
                 value={formula}
-                onChange={(e: any) => setFormula(e.target.value)}
+                onChange={(e: unknown) => setFormula(e.target.value)}
                 placeholder="=SUM(A:A) + AVERAGE(B:B)"
                 className="h-32 font-mono text-sm"
                 spellCheck={false}
@@ -479,10 +479,14 @@ export function FormulaEditor<T>({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-          <Button onClick={handleSave} disabled={!validation.valid || !formula.trim()}>
+          <Button
+            type="button"
+            onClick={handleSave}
+            disabled={!validation.valid || !formula.trim()}
+          >
             <CheckCircle className="h-4 w-4 mr-2" />
             Appliquer la formule
           </Button>

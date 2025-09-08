@@ -1,12 +1,21 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { Check, ChevronDown, ChevronRight, X, Search, Folder, FolderOpen, Plus, AlertCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  Plus,
+  Search,
+  X,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { cn } from '../../../../lib/utils'
-import { Input } from '../../../primitives/input/Input'
-import { Button } from '../../../primitives/button/Button'
-import { Label } from '../../../forms/label/Label'
 import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
 import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
 export interface Category {
   id: string
   name: string
@@ -52,7 +61,7 @@ export function CategoriesMultiSelect({
   label,
   helperText,
   error,
-  placeholder = "Sélectionner des catégories...",
+  placeholder = 'Sélectionner des catégories...',
   showSearch = true,
   showCreateButton = false,
   showItemCount = true,
@@ -71,7 +80,7 @@ export function CategoriesMultiSelect({
     if (expandAll) {
       const allIds = new Set<string>()
       const addAllIds = (cats: Category[]) => {
-        cats.forEach(cat => {
+        cats.forEach((cat) => {
           allIds.add(cat.id)
           if (cat.children) {
             addAllIds(cat.children)
@@ -98,7 +107,7 @@ export function CategoriesMultiSelect({
   const getAllDescendants = (category: Category): string[] => {
     let descendants: string[] = []
     if (category.children) {
-      category.children.forEach(child => {
+      category.children.forEach((child) => {
         descendants.push(child.id)
         descendants = descendants.concat(getAllDescendants(child))
       })
@@ -106,7 +115,9 @@ export function CategoriesMultiSelect({
     return descendants
   }
   const getSelectedCategories = (): Category[] => {
-    return Array.from(selectedIds).map(id => findCategoryById(categories, id)).filter(Boolean) as Category[]
+    return Array.from(selectedIds)
+      .map((id) => findCategoryById(categories, id))
+      .filter(Boolean) as Category[]
   }
   const handleCategoryToggle = (categoryId: string, category: Category) => {
     if (maxSelections && !selectedIds.has(categoryId) && selectedIds.size >= maxSelections) {
@@ -118,14 +129,16 @@ export function CategoriesMultiSelect({
       if (cascadeSelection) {
         // Remove all descendants
         const descendants = getAllDescendants(category)
-        descendants.forEach(id => newSelected.delete(id))
+        descendants.forEach((id) => {
+          newSelected.delete(id)
+        })
       }
     } else {
       newSelected.add(categoryId)
       if (cascadeSelection) {
         // Add all descendants
         const descendants = getAllDescendants(category)
-        descendants.forEach(id => {
+        descendants.forEach((id) => {
           if (!maxSelections || newSelected.size < maxSelections) {
             newSelected.add(id)
           }
@@ -166,7 +179,7 @@ export function CategoriesMultiSelect({
   const selectAll = (cats: Category[]) => {
     const allIds = new Set<string>()
     const addAllIds = (categories: Category[]) => {
-      categories.forEach(cat => {
+      categories.forEach((cat) => {
         if (allowParentSelection || !cat.children || cat.children.length === 0) {
           allIds.add(cat.id)
         }
@@ -176,7 +189,9 @@ export function CategoriesMultiSelect({
       })
     }
     addAllIds(cats)
-    const limitedIds = maxSelections ? Array.from(allIds).slice(0, maxSelections) : Array.from(allIds)
+    const limitedIds = maxSelections
+      ? Array.from(allIds).slice(0, maxSelections)
+      : Array.from(allIds)
     const newSelected = new Set(limitedIds)
     setSelectedIds(newSelected)
     const selectedCategories = getSelectedCategories()
@@ -206,7 +221,11 @@ export function CategoriesMultiSelect({
               onClick={() => hasChildren && toggleExpanded(category.id)}
             >
               {hasChildren ? (
-                isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />
+                isExpanded ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
+                )
               ) : (
                 <div className="h-3 w-3" />
               )}
@@ -216,19 +235,26 @@ export function CategoriesMultiSelect({
               <Checkbox
                 checked={isSelected}
                 onCheckedChange={() => handleCategoryToggle(category.id, category)}
-                disabled={disabled || (maxSelections && !isSelected && selectedIds.size >= maxSelections)}
+                disabled={Boolean(
+                  disabled || (maxSelections && !isSelected && selectedIds.size >= maxSelections)
+                )}
               />
             )}
             {/* Category info */}
             <div className="flex items-center gap-2 flex-1">
               {hasChildren ? (
-                isExpanded ? <FolderOpen className="h-4 w-4" /> : <Folder className="h-4 w-4" />
+                isExpanded ? (
+                  <FolderOpen className="h-4 w-4" />
+                ) : (
+                  <Folder className="h-4 w-4" />
+                )
               ) : (
-                <div className="h-4 w-4 rounded-full bg-muted" style={{ backgroundColor: category.color }} />
+                <div
+                  className="h-4 w-4 rounded-full bg-muted"
+                  style={{ backgroundColor: category.color }}
+                />
               )}
-              <span className={cn('text-sm', isSelected && 'font-medium')}>
-                {category.name}
-              </span>
+              <span className={cn('text-sm', isSelected && 'font-medium')}>{category.name}</span>
               {showItemCount && category.itemCount !== undefined && (
                 <Badge variant="outline" className="text-xs">
                   {category.itemCount}
@@ -238,9 +264,7 @@ export function CategoriesMultiSelect({
           </div>
           {/* Children */}
           {hasChildren && isExpanded && (
-            <div>
-              {renderCategoryTree(category.children!, level + 1)}
-            </div>
+            <div>{renderCategoryTree(category.children!, level + 1)}</div>
           )}
         </div>
       )
@@ -248,9 +272,12 @@ export function CategoriesMultiSelect({
   }
   const filteredCategories = filterCategories(categories, searchQuery)
   const selectedCategories = getSelectedCategories()
-  const displayText = selectedIds.size === 0 ? placeholder :
-    selectedIds.size === 1 ? selectedCategories[0]?.name || '1 catégorie' :
-    `${selectedIds.size} catégories sélectionnées`
+  const displayText =
+    selectedIds.size === 0
+      ? placeholder
+      : selectedIds.size === 1
+        ? selectedCategories[0]?.name || '1 catégorie'
+        : `${selectedIds.size} catégories sélectionnées`
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
@@ -279,7 +306,9 @@ export function CategoriesMultiSelect({
           disabled={disabled}
         >
           <span className="truncate">{displayText}</span>
-          <ChevronDown className={cn('h-4 w-4 transition-transform', isDropdownOpen && 'rotate-180')} />
+          <ChevronDown
+            className={cn('h-4 w-4 transition-transform', isDropdownOpen && 'rotate-180')}
+          />
         </Button>
         {isDropdownOpen && (
           <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border rounded-md shadow-lg max-h-80 overflow-hidden">
@@ -367,9 +396,7 @@ export function CategoriesMultiSelect({
           )}
         </div>
       )}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
       {error && (
         <p className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />

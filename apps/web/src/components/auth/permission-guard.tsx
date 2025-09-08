@@ -1,13 +1,13 @@
 'use client'
 
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
-import { type Permission, usePermissions } from '@/hooks/use-permissions'
+import { type Permission, type Role, usePermissions } from '@/hooks/use-permissions'
 
 interface PermissionGuardProps {
   /** Permission(s) requise(s) pour afficher le composant */
   permission?: Permission | Permission[]
   /** Rôle(s) requis pour afficher le composant */
-  roles?: string[]
+  roles?: Role[]
   /** Enfants à afficher si les permissions sont valides */
   children: ReactNode
   /** Composant à afficher si les permissions ne sont pas valides */
@@ -56,7 +56,7 @@ export function PermissionGuard({
 
     // Vérifier les rôles
     if (roles && roles.length > 0) {
-      if (!hasAnyRole(roles as string[])) {
+      if (!hasAnyRole(roles)) {
         return false
       }
     }
@@ -122,7 +122,7 @@ export function PermissionHide({
   children,
 }: {
   permission?: Permission | Permission[]
-  roles?: string[]
+  roles?: Role[]
   children: ReactNode
 }) {
   return (
@@ -143,7 +143,7 @@ export function PermissionDisable({
   disabledClassName,
 }: {
   permission?: Permission | Permission[]
-  roles?: string[]
+  roles?: Role[]
   children: ReactNode
   errorMessage?: string
   disabledClassName?: string
@@ -171,7 +171,7 @@ export function PermissionError({
   errorMessage = "Vous n'avez pas les permissions nécessaires pour accéder à cette fonctionnalité.",
 }: {
   permission?: Permission | Permission[]
-  roles?: string[]
+  roles?: Role[]
   children: ReactNode
   errorMessage?: string
 }) {
@@ -193,7 +193,7 @@ export function PermissionError({
 export function usePermissionGuard() {
   const { hasPermission, hasAnyPermission, hasAnyRole } = usePermissions()
 
-  const checkAccess = (permission?: Permission | Permission[], roles?: string[]): boolean => {
+  const checkAccess = (permission?: Permission | Permission[], roles?: Role[]): boolean => {
     // Si aucune permission n'est spécifiée, autoriser l'accès
     if (!permission && !roles) {
       return true
@@ -214,7 +214,7 @@ export function usePermissionGuard() {
 
     // Vérifier les rôles
     if (roles && roles.length > 0) {
-      if (!hasAnyRole(roles as string[])) {
+      if (!hasAnyRole(roles)) {
         return false
       }
     }

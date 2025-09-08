@@ -51,8 +51,12 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --watchAll=false",
+    "test:vitest": "vitest",
+    "test:vitest:coverage": "vitest --coverage",
     "clean": "rimraf dist"
   },
   "dependencies": {
@@ -64,11 +68,18 @@
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
+    "@jest/globals": "^30.0.5",
+    "@swc/jest": "^0.2.39",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.2.0",
     "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.1",
     "eslint": "^9.32.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.0.5",
+    "jsdom": "^26.1.0",
     "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.1",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
@@ -88,6 +99,7 @@
     "email": "engineering@topsteel.tech"
   },
   "license": "UNLICENSED",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/topsteel/erp-topsteel.git",

@@ -1,15 +1,7 @@
 'use client'
 
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  type ColumnConfig,
-  AdvancedDataTable as DataTable,
-} from '@erp/ui'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable } from '@erp/ui'
+import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
 import {
   AlertCircle,
   Copy,
@@ -47,14 +39,17 @@ export default function ArticlesPage() {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
 
-  const { data: articles = [], isLoading, error } = useArticles(filters)
-  const { data: statistics } = useArticleStatistics()
+  const articlesQuery = useArticles(filters)
+  const { data: articles = [], isLoading, error } = articlesQuery
+  const errorMessage = error instanceof Error ? error.message : error ? String(error) : undefined
+  const statisticsQuery = useArticleStatistics()
+  const { data: statistics } = statisticsQuery
   const deleteArticle = useDeleteArticle()
 
   const handleDelete = useCallback(
     (id: string) => {
       if (window.confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
-        deleteArticle.mutate(id)
+        deleteArticle?.mutate(id)
       }
     },
     [deleteArticle]
@@ -68,7 +63,7 @@ export default function ArticlesPage() {
 
   const handleView = useCallback(
     (article: Article) => {
-      router.push(`/inventory/articles/${article.id}`)
+      router?.push(`/inventory/articles/${article.id}`)
     },
     [router]
   )
@@ -83,37 +78,51 @@ export default function ArticlesPage() {
     setShowInventoryDialog(true)
   }, [])
 
-  const typeLabels = {
-    [ArticleType.MATIERE_PREMIERE]: 'Matière première',
-    [ArticleType.PRODUIT_FINI]: 'Produit fini',
-    [ArticleType.PRODUIT_SEMI_FINI]: 'Produit semi-fini',
-    [ArticleType.FOURNITURE]: 'Fourniture',
-    [ArticleType.CONSOMMABLE]: 'Consommable',
-    [ArticleType.SERVICE]: 'Service',
-  }
+  const typeLabels = useMemo(
+    () => ({
+      [ArticleType.MATIERE_PREMIERE]: 'Matière première',
+      [ArticleType.PRODUIT_FINI]: 'Produit fini',
+      [ArticleType.PRODUIT_SEMI_FINI]: 'Produit semi-fini',
+      [ArticleType.FOURNITURE]: 'Fourniture',
+      [ArticleType.CONSOMMABLE]: 'Consommable',
+      [ArticleType.SERVICE]: 'Service',
+    }),
+    []
+  )
 
-  const typeColors = {
-    [ArticleType.MATIERE_PREMIERE]: 'bg-blue-100 text-blue-800',
-    [ArticleType.PRODUIT_FINI]: 'bg-green-100 text-green-800',
-    [ArticleType.PRODUIT_SEMI_FINI]: 'bg-orange-100 text-orange-800',
-    [ArticleType.FOURNITURE]: 'bg-purple-100 text-purple-800',
-    [ArticleType.CONSOMMABLE]: 'bg-yellow-100 text-yellow-800',
-    [ArticleType.SERVICE]: 'bg-gray-100 text-gray-800',
-  }
+  const typeColors = useMemo(
+    () => ({
+      [ArticleType.MATIERE_PREMIERE]: 'bg-blue-100 text-blue-800',
+      [ArticleType.PRODUIT_FINI]: 'bg-green-100 text-green-800',
+      [ArticleType.PRODUIT_SEMI_FINI]: 'bg-orange-100 text-orange-800',
+      [ArticleType.FOURNITURE]: 'bg-purple-100 text-purple-800',
+      [ArticleType.CONSOMMABLE]: 'bg-yellow-100 text-yellow-800',
+      [ArticleType.SERVICE]: 'bg-gray-100 text-gray-800',
+    }),
+    []
+  )
 
-  const statusLabels = {
-    [ArticleStatus.ACTIF]: 'Actif',
-    [ArticleStatus.INACTIF]: 'Inactif',
-    [ArticleStatus.OBSOLETE]: 'Obsolète',
-    [ArticleStatus.EN_COURS_CREATION]: 'En cours de création',
-  }
+  const statusLabels = useMemo(
+    () => ({
+      [ArticleStatus.ACTIF]: 'Actif',
+      [ArticleStatus.INACTIF]: 'Inactif',
+      [ArticleStatus.OBSOLETE]: 'Obsolète',
+      [ArticleStatus.EN_COURS_CREATION]: 'En cours de création',
+      [ArticleStatus.EN_ATTENTE]: 'En attente',
+    }),
+    []
+  )
 
-  const statusColors = {
-    [ArticleStatus.ACTIF]: 'bg-green-100 text-green-800',
-    [ArticleStatus.INACTIF]: 'bg-gray-100 text-gray-800',
-    [ArticleStatus.OBSOLETE]: 'bg-red-100 text-red-800',
-    [ArticleStatus.EN_COURS_CREATION]: 'bg-yellow-100 text-yellow-800',
-  }
+  const statusColors = useMemo(
+    () => ({
+      [ArticleStatus.ACTIF]: 'bg-green-100 text-green-800',
+      [ArticleStatus.INACTIF]: 'bg-gray-100 text-gray-800',
+      [ArticleStatus.OBSOLETE]: 'bg-red-100 text-red-800',
+      [ArticleStatus.EN_COURS_CREATION]: 'bg-yellow-100 text-yellow-800',
+      [ArticleStatus.EN_ATTENTE]: 'bg-blue-100 text-blue-800',
+    }),
+    []
+  )
 
   const columns = useMemo<ColumnConfig<Article>[]>(
     () => [
@@ -124,10 +133,12 @@ export default function ArticlesPage() {
         description: "Code référence unique de l'article",
         type: 'text',
         sortable: true,
-        searchable: true,
+
         width: 150,
         locked: true,
-        render: (_value, article) => <div className="font-medium">{article.reference}</div>,
+        render: (_value: unknown, article: Article, _column: ColumnConfig<Article>) => (
+          <div className="font-medium">{article.reference}</div>
+        ),
       },
       {
         id: 'designation',
@@ -136,9 +147,9 @@ export default function ArticlesPage() {
         description: "Nom et description de l'article",
         type: 'text',
         sortable: true,
-        searchable: true,
+
         width: 300,
-        render: (_value, article) => (
+        render: (_value: unknown, article: Article, _column: ColumnConfig<Article>) => (
           <div className="max-w-[300px]">
             <div className="font-medium truncate">{article.designation}</div>
             {article.description && (
@@ -156,13 +167,13 @@ export default function ArticlesPage() {
         description: "Type d'article",
         type: 'select',
         sortable: true,
-        searchable: true,
+
         width: 150,
         options: Object.entries(ArticleType).map(([_key, value]) => ({
           value: value,
           label: typeLabels[value],
         })),
-        render: (_value, article) => (
+        render: (_value: unknown, article: Article, _column: ColumnConfig<Article>) => (
           <Badge className={cn('text-xs', typeColors[article.type])}>
             {typeLabels[article.type]}
           </Badge>
@@ -175,9 +186,11 @@ export default function ArticlesPage() {
         description: "Famille d'articles",
         type: 'text',
         sortable: true,
-        searchable: true,
+
         width: 150,
-        render: (value) => <span>{String(value || '-')}</span>,
+        render: (value: unknown, _row: Article, _column: ColumnConfig<Article>) => (
+          <span>{String(value || '-')}</span>
+        ),
       },
       {
         id: 'status',
@@ -186,13 +199,13 @@ export default function ArticlesPage() {
         description: "Statut de l'article",
         type: 'select',
         sortable: true,
-        searchable: true,
+
         width: 130,
         options: Object.entries(ArticleStatus).map(([_key, value]) => ({
           value: value,
           label: statusLabels[value],
         })),
-        render: (_value, article) => (
+        render: (_value: unknown, article: Article, _column: ColumnConfig<Article>) => (
           <Badge className={cn('text-xs', statusColors[article.status])}>
             {statusLabels[article.status]}
           </Badge>
@@ -209,13 +222,13 @@ export default function ArticlesPage() {
         format: {
           decimals: 2,
         },
-        render: (_value, article) => {
+        render: (_value: unknown, article: Article, _column: ColumnConfig<Article>) => {
           if (!article.gereEnStock) {
             return <span className="text-muted-foreground">Non géré</span>
           }
 
-          const stock = Number(article.stockPhysique || 0)
-          const stockMini = Number(article.stockMini || 0)
+          const stock = Number(article.stockPhysique ?? 0)
+          const stockMini = Number(article.stockMini ?? 0)
 
           let className = ''
           if (stock === 0) {
@@ -226,7 +239,7 @@ export default function ArticlesPage() {
 
           return (
             <div className={className}>
-              {stock.toFixed(2)} {article.uniteStock}
+              {stock?.toFixed(2)} {article.uniteStock}
               {stock <= stockMini && stock > 0 && (
                 <AlertCircle className="inline-block ml-1 h-4 w-4" />
               )}
@@ -246,8 +259,8 @@ export default function ArticlesPage() {
           currency: 'EUR',
           decimals: 2,
         },
-        render: (_value, article) => {
-          const prix = Number(article.prixVenteHT || 0)
+        render: (_value: unknown, article: Article, _column: ColumnConfig<Article>) => {
+          const prix = Number(article.prixVenteHT ?? 0)
           return prix ? formatCurrency(prix) : '-'
         },
       },
@@ -259,38 +272,53 @@ export default function ArticlesPage() {
         type: 'custom',
         width: 200,
         locked: true,
-        render: (_value, article) => (
+        render: (_value: unknown, article: Article, _column: ColumnConfig<Article>) => (
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => handleView(article)} title="Voir">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => handleView(article)}
+              aria-label="Voir"
+            >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => handleEdit(article)} title="Modifier">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => handleEdit(article)}
+              aria-label="Modifier"
+            >
               <Edit className="h-4 w-4" />
             </Button>
             {article.gereEnStock && (
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => handleInventory(article)}
-                title="Inventaire"
+                aria-label="Inventaire"
               >
                 <Warehouse className="h-4 w-4" />
               </Button>
             )}
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => handleDuplicate(article)}
-              title="Dupliquer"
+              aria-label="Dupliquer"
             >
               <Copy className="h-4 w-4" />
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => handleDelete(article.id)}
               className="text-red-600 hover:text-red-900"
-              title="Supprimer"
+              aria-label="Supprimer"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -311,45 +339,8 @@ export default function ArticlesPage() {
     ]
   )
 
-  // Actions globales pour le DataTable
-  const _handleExport = useCallback(
-    async (format: 'csv' | 'excel' | 'pdf') => {
-      try {
-        const response = await fetch('/api/articles/export', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            format,
-            filters,
-            articles: articles.map((a) => ({
-              reference: a.reference,
-              designation: a.designation,
-              type: typeLabels[a.type],
-              famille: a.famille || '-',
-              status: statusLabels[a.status],
-              stockPhysique: a.gereEnStock ? `${a.stockPhysique} ${a.uniteStock}` : 'Non géré',
-              prixVenteHT: a.prixVenteHT || 0,
-            })),
-          }),
-        })
-
-        if (response.ok) {
-          const blob = await response.blob()
-          const url = window.URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = `articles_${new Date().toISOString().split('T')[0]}.${format}`
-          document.body.appendChild(a)
-          a.click()
-          document.body.removeChild(a)
-          window.URL.revokeObjectURL(url)
-        }
-      } catch (_error) {}
-    },
-    [articles, filters, statusLabels, typeLabels]
-  )
+  // Actions globales pour le DataTable - Export function removed (unused)
+  // const _handleExport = useCallback(...) removed
 
   const handleImport = useCallback(() => {
     const input = document.createElement('input')
@@ -360,7 +351,7 @@ export default function ArticlesPage() {
       if (!file) return
 
       const formData = new FormData()
-      formData.append('file', file)
+      formData?.append('file', file)
 
       try {
         const response = await fetch('/api/articles/import', {
@@ -368,7 +359,7 @@ export default function ArticlesPage() {
           body: formData,
         })
 
-        if (response.ok) {
+        if (response?.ok) {
           window.location.reload()
         }
       } catch (_error) {}
@@ -407,11 +398,11 @@ export default function ArticlesPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleImport}>
+          <Button type="button" variant="outline" size="sm" onClick={handleImport}>
             <Upload className="h-4 w-4 mr-2" />
             Importer
           </Button>
-          <Button onClick={handleCreate}>
+          <Button type="button" onClick={handleCreate}>
             <Plus className="h-4 w-4 mr-2" />
             Nouvel article
           </Button>
@@ -485,7 +476,7 @@ export default function ArticlesPage() {
             tableId="articles-table"
             userId={
               typeof window !== 'undefined'
-                ? localStorage.getItem('userId') || 'default-user'
+                ? localStorage?.getItem('userId') || 'default-user'
                 : 'default-user'
             }
             // Fonctionnalités supportées
@@ -504,7 +495,7 @@ export default function ArticlesPage() {
             }}
             // État
             loading={isLoading}
-            error={error}
+            error={errorMessage}
           />
         </CardContent>
       </Card>

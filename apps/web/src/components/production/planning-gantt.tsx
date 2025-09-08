@@ -2,7 +2,6 @@
 'use client'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-
 import { BarChart3, Calendar, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
 
@@ -41,34 +40,34 @@ export function PlanningGantt({
 
   const generateTimelineHeaders = (): GanttHeader[] => {
     const now = new Date()
-    const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-    const endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0)
+    const startDate = new Date(now?.getFullYear(), now?.getMonth() - 1, 1)
+    const endDate = new Date(now?.getFullYear(), now?.getMonth() + 3, 0)
 
     const headers: GanttHeader[] = []
     const current = new Date(startDate)
 
     while (current <= endDate) {
       if (viewMode === 'days') {
-        headers.push({
-          label: current.getDate().toString(),
+        headers?.push({
+          label: current?.getDate().toString(),
           date: new Date(current),
-          isWeekend: current.getDay() === 0 || current.getDay() === 6,
+          isWeekend: current?.getDay() === 0 || current?.getDay() === 6,
         })
-        current.setDate(current.getDate() + 1)
+        current?.setDate(current?.getDate() + 1)
       } else if (viewMode === 'weeks') {
-        headers.push({
-          label: `S${Math.ceil(current.getDate() / 7)}`,
+        headers?.push({
+          label: `S${Math.ceil(current?.getDate() / 7)}`,
           date: new Date(current),
           isWeekend: false,
         })
-        current.setDate(current.getDate() + 7)
+        current?.setDate(current?.getDate() + 7)
       } else {
-        headers.push({
-          label: current.toLocaleDateString('fr-FR', { month: 'short' }),
+        headers?.push({
+          label: current?.toLocaleDateString('fr-FR', { month: 'short' }),
           date: new Date(current),
           isWeekend: false,
         })
-        current.setMonth(current.getMonth() + 1)
+        current?.setMonth(current?.getMonth() + 1)
       }
     }
 
@@ -80,9 +79,11 @@ export function PlanningGantt({
     const dayWidth = 40 * zoomLevel
 
     const startDiff = Math.floor(
-      (task.start.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (task?.start?.getTime() - startDate?.getTime()) / (1000 * 60 * 60 * 24)
     )
-    const duration = Math.floor((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24))
+    const duration = Math.floor(
+      (task?.end?.getTime() - task?.start?.getTime()) / (1000 * 60 * 60 * 24)
+    )
 
     return {
       left: Math.max(0, startDiff * dayWidth),
@@ -132,6 +133,7 @@ export function PlanningGantt({
             <div className="flex border rounded-md">
               {(['days', 'weeks', 'months'] as const).map((mode) => (
                 <Button
+                  type="button"
                   key={mode}
                   variant={viewMode === mode ? 'default' : 'ghost'}
                   size="sm"
@@ -146,6 +148,7 @@ export function PlanningGantt({
             {/* Zoom */}
             <div className="flex items-center gap-1">
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
@@ -157,6 +160,7 @@ export function PlanningGantt({
                 {Math.round(zoomLevel * 100)}%
               </span>
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setZoomLevel(Math.min(2, zoomLevel + 0.25))}
@@ -175,9 +179,9 @@ export function PlanningGantt({
           <div className="flex border-b bg-gray-50">
             <div className="w-64 p-3 border-r font-medium">Tâches</div>
             <div className="flex">
-              {headers.map((header, _index) => (
+              {headers?.map((header, _index) => (
                 <div
-                  key={header.date.toISOString()}
+                  key={header?.date?.toISOString()}
                   className={`p-2 text-center text-sm border-r min-w-[40px] ${
                     header.isWeekend ? 'bg-gray-100' : ''
                   }`}
@@ -198,7 +202,7 @@ export function PlanningGantt({
                 <p className="text-sm">Les tâches apparaîtront ici une fois créées</p>
               </div>
             ) : (
-              tasks.map((task) => {
+              tasks?.map((task) => {
                 const position = calculateTaskPosition(task, headers)
 
                 return (
@@ -217,14 +221,14 @@ export function PlanningGantt({
                     {/* Timeline */}
                     <div
                       className="relative flex-1 p-2"
-                      style={{ minWidth: `${headers.length * 40 * zoomLevel}px` }}
+                      style={{ minWidth: `${headers?.length * 40 * zoomLevel}px` }}
                     >
                       <button
                         type="button"
                         className={`absolute top-2 bottom-2 rounded cursor-pointer transition-all hover:opacity-80 ${getStatusColor(task.status)}`}
                         style={{
-                          left: `${position.left}px`,
-                          width: `${position.width}px`,
+                          left: `${position?.left}px`,
+                          width: `${position?.width}px`,
                         }}
                         onClick={() => onTaskClick(task)}
                         aria-label={`Tâche: ${task.name} - ${task.progress}%`}
@@ -246,7 +250,7 @@ export function PlanningGantt({
 
                       {/* Dépendances (lignes de connexion) */}
                       {task.dependencies?.map((depId) => {
-                        const depTask = tasks.find((t) => t.id === depId)
+                        const depTask = tasks?.find((t) => t.id === depId)
 
                         if (!depTask) return null
 
@@ -257,8 +261,8 @@ export function PlanningGantt({
                             key={depId}
                             className="absolute border-t-2 border-gray-400 border-dashed"
                             style={{
-                              left: `${depPosition.left + depPosition.width}px`,
-                              width: `${position.left - (depPosition.left + depPosition.width)}px`,
+                              left: `${depPosition?.left + depPosition?.width}px`,
+                              width: `${position?.left - (depPosition.left + depPosition.width)}px`,
                               top: '50%',
                             }}
                           />

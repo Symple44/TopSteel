@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Index } from 'typeorm'
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('email_logs')
 @Index(['recipient', 'type'])
@@ -21,7 +21,7 @@ export class EmailLog {
   expiresAt?: Date
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 
   @CreateDateColumn()
   sentAt: Date

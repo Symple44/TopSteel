@@ -30,7 +30,7 @@ async function testTokenValidation() {
   console.log('✅ Token generated successfully\n')
 
   // Décoder le token (sans vérification)
-  const decoded = jwt.decode(testToken) as any
+  const decoded = jwt.decode(testToken) as Record<string, unknown> | null
   console.log('📋 Token Payload (decoded):')
   console.log(JSON.stringify(decoded, null, 2))
   console.log()
@@ -41,7 +41,7 @@ async function testTokenValidation() {
   let allFieldsPresent = true
 
   for (const field of requiredFields) {
-    const present = field in decoded
+    const present = decoded && field in decoded
     console.log(`  ${present ? '✅' : '❌'} ${field}: ${present ? 'Present' : 'Missing'}`)
     if (!present) allFieldsPresent = false
   }
@@ -62,7 +62,7 @@ async function testTokenValidation() {
   // Vérifier la signature (avec le secret)
   try {
     const jwtSecret = process.env.JWT_SECRET || 'test-secret-min-32-chars-for-testing'
-    const _verified = jwt.verify(testToken, jwtSecret) as any
+    const _verified = jwt.verify(testToken, jwtSecret)
     console.log('🔐 Signature Verification: ✅ VALID')
     console.log(`  Algorithm: ${jwt.decode(testToken, { complete: true })?.header.alg}`)
   } catch (error) {
@@ -82,9 +82,9 @@ async function testTokenValidation() {
       permissions: role === 'admin' ? ['*'] : ['read'],
     })
 
-    const roleDecoded = jwt.decode(roleToken) as any
+    const roleDecoded = jwt.decode(roleToken) as Record<string, unknown> | null
     console.log(
-      `  ${role}: ${roleDecoded.email} - Permissions: ${JSON.stringify(roleDecoded.permissions)}`
+      `  ${role}: ${roleDecoded?.email} - Permissions: ${JSON.stringify(roleDecoded?.permissions)}`
     )
   }
   console.log()
@@ -101,7 +101,7 @@ async function testTokenValidation() {
     jwt.verify(expiredToken, jwtSecret)
     console.log('  ❌ Expired token was accepted (should not happen)')
   } catch (error) {
-    if ((error as any).name === 'TokenExpiredError') {
+    if ((error as Error & { name?: string }).name === 'TokenExpiredError') {
       console.log('  ✅ Expired token correctly rejected')
     } else {
       console.log(`  ⚠️  Unexpected error: ${(error as Error).message}`)

@@ -1,6 +1,6 @@
 // apps/api/src/common/services/circuit-breaker.service.ts
 import { Injectable, Logger } from '@nestjs/common'
-import * as CircuitBreaker from 'opossum'
+import CircuitBreaker from 'opossum'
 import type { MetricsService } from './metrics.service'
 
 export interface CircuitBreakerOptions {
@@ -56,8 +56,11 @@ export class CircuitBreakerService {
       this.recordMetric(name, 'close')
     })
 
-    circuitBreaker.on('failure', (error) => {
-      this.logger.warn(`Circuit breaker '${name}' failure:`, error.message)
+    circuitBreaker.on('failure', (error: unknown) => {
+      this.logger.warn(
+        `Circuit breaker '${name}' failure:`,
+        error instanceof Error ? error.message : String(error)
+      )
       this.recordMetric(name, 'failure')
     })
 

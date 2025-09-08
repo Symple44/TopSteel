@@ -7,7 +7,7 @@ export async function getImageService() {
   if (!imageService) {
     try {
       const domainsServer = await import('@erp/domains/server')
-      const ImageService = domainsServer.ImageService
+      const ImageService = domainsServer?.ImageService
       imageService = new ImageService()
     } catch (_error) {
       throw new Error('Image service is not available in this environment')

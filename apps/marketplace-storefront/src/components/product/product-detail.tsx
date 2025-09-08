@@ -286,7 +286,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                     min="1"
                     max={product.stockDisponible || 999}
                     value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value, 10) || 1))}
                     className="w-16 text-center py-2 border-0 focus:outline-none"
                   />
                   <button
@@ -385,11 +385,27 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                     // Content is properly sanitized with DOMPurify to prevent XSS vulnerabilities
                     dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(product.description || '', {
-                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img'],
+                        ALLOWED_TAGS: [
+                          'p',
+                          'br',
+                          'strong',
+                          'em',
+                          'u',
+                          'h1',
+                          'h2',
+                          'h3',
+                          'h4',
+                          'h5',
+                          'h6',
+                          'ul',
+                          'ol',
+                          'li',
+                          'a',
+                          'img',
+                        ],
                         ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel', 'class'],
                         ALLOW_DATA_ATTR: false,
-                        FORBID_SCRIPT: true
-                      })
+                      }),
                     }}
                   />
                 ) : (

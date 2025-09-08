@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import type { ReorderableListConfig } from '@erp/ui'
 
 /**
@@ -21,8 +22,8 @@ export class UIPreferencesService {
     }
 
     try {
-      const key = UIPreferencesService.getStorageKey(userId, componentId)
-      const stored = localStorage.getItem(key)
+      const key = UIPreferencesService?.getStorageKey(userId, componentId)
+      const stored = localStorage?.getItem(key)
 
       if (!stored) {
         return null
@@ -47,13 +48,32 @@ export class UIPreferencesService {
     }
 
     try {
-      const key = UIPreferencesService.getStorageKey(userId, componentId)
-      const existing = await UIPreferencesService.getConfig(userId, componentId)
+      const key = UIPreferencesService?.getStorageKey(userId, componentId)
+      const existing = await UIPreferencesService?.getConfig(userId, componentId)
 
       const updated = {
         ...existing,
         ...config,
-        updatedAt: new Date().toISOString(),
+        id: config.id || existing?.id || crypto.randomUUID(),
+        componentId: componentId,
+        theme: config.theme || existing?.theme || 'default',
+        preferences: config.preferences ||
+          existing?.preferences || {
+            defaultExpanded: false,
+            showLevelIndicators: true,
+            showConnectionLines: true,
+            enableAnimations: true,
+            compactMode: false,
+          },
+        layout: config.layout ||
+          existing?.layout || {
+            maxDepth: 5,
+            allowNesting: true,
+            dragHandlePosition: 'left',
+            expandButtonPosition: 'left',
+          },
+        createdAt: existing?.createdAt || new Date(),
+        updatedAt: new Date(),
       }
 
       localStorage.setItem(key, JSON.stringify(updated))
@@ -73,8 +93,8 @@ export class UIPreferencesService {
     }
 
     try {
-      const key = UIPreferencesService.getStorageKey(userId, componentId)
-      localStorage.removeItem(key)
+      const key = UIPreferencesService?.getStorageKey(userId, componentId)
+      localStorage?.removeItem(key)
     } catch (_error) {}
   }
 
@@ -91,12 +111,12 @@ export class UIPreferencesService {
       const prefix = `ui_pref_${userId}_`
 
       for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
+        const key = localStorage?.key(i)
         if (key?.startsWith(prefix)) {
-          const value = localStorage.getItem(key)
+          const value = localStorage?.getItem(key)
           if (value) {
             try {
-              configs.push(JSON.parse(value))
+              configs?.push(JSON.parse(value))
             } catch {
               // Ignorer les entrées invalides
             }
@@ -118,13 +138,13 @@ export class UIPreferencesService {
     sourceComponentId: string,
     targetComponentId: string
   ): Promise<ReorderableListConfig | null> {
-    const sourceConfig = await UIPreferencesService.getConfig(userId, sourceComponentId)
+    const sourceConfig = await UIPreferencesService?.getConfig(userId, sourceComponentId)
 
     if (!sourceConfig) {
       return null
     }
 
-    return await UIPreferencesService.saveConfig(userId, targetComponentId, {
+    return await UIPreferencesService?.saveConfig(userId, targetComponentId, {
       ...sourceConfig,
       componentId: targetComponentId,
     })
@@ -134,7 +154,7 @@ export class UIPreferencesService {
    * Exporte toutes les configurations en JSON
    */
   static async exportConfigs(userId: string): Promise<string> {
-    const configs = await UIPreferencesService.getAllConfigs(userId)
+    const configs = await UIPreferencesService?.getAllConfigs(userId)
     return JSON.stringify(configs, null, 2)
   }
 
@@ -158,17 +178,20 @@ export class UIPreferencesService {
       for (const config of configs) {
         try {
           if (config.componentId) {
-            await UIPreferencesService.saveConfig(userId, config.componentId, config)
+            await UIPreferencesService?.saveConfig(userId, config.componentId, config)
             imported++
           }
         } catch (error) {
-          errors.push(`Erreur lors de l'import de ${config.componentId}: ${error}`)
+          errors?.push(`Erreur lors de l'import de ${config.componentId}: ${error}`)
         }
       }
     } catch (error) {
-      errors.push(`Erreur lors du parsing JSON: ${error}`)
+      errors?.push(`Erreur lors du parsing JSON: ${error}`)
     }
 
     return { imported, errors }
   }
 }
+
+// Export default instance with different name to avoid collision
+export const uiPreferencesClientService = UIPreferencesService

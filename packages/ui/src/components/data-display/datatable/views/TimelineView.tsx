@@ -128,6 +128,7 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
                           align="end"
                           trigger={
                             <Button
+                              type="button"
                               variant="ghost"
                               size="sm"
                               onClick={(e: React.MouseEvent) => {

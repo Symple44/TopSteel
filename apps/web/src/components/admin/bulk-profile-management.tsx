@@ -159,11 +159,7 @@ const BULK_OPERATIONS: BulkOperation[] = [
   },
 ]
 
-export default function BulkProfileManagement({
-  isOpen,
-  onClose,
-  onComplete,
-}: BulkProfileManagementProps) {
+export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfileManagementProps) {
   const [users, setUsers] = useState<User[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [groups, setGroups] = useState<Group[]>([])
@@ -186,9 +182,9 @@ export default function BulkProfileManagement({
   const loadUsers = useCallback(async () => {
     try {
       const response = await callClientApi('admin/users?includeGroups=true&includeRoles=true')
-      const data = await response.json()
-      if (data.success) {
-        setUsers(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setUsers(data?.data)
       }
     } catch {}
   }, [])
@@ -196,9 +192,9 @@ export default function BulkProfileManagement({
   const loadRoles = useCallback(async () => {
     try {
       const response = await callClientApi('admin/roles')
-      const data = await response.json()
-      if (data.success) {
-        setRoles(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setRoles(data?.data)
       }
     } catch {}
   }, [])
@@ -206,9 +202,9 @@ export default function BulkProfileManagement({
   const loadGroups = useCallback(async () => {
     try {
       const response = await callClientApi('admin/groups')
-      const data = await response.json()
-      if (data.success) {
-        setGroups(data.data)
+      const data = await response?.json()
+      if (data?.success) {
+        setGroups(data?.data)
       }
     } catch {}
   }, [])
@@ -222,25 +218,25 @@ export default function BulkProfileManagement({
   }, [isOpen, loadGroups, loadRoles, loadUsers])
 
   // Filtrage des utilisateurs
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = users?.filter((user) => {
     const matchesSearch =
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      user?.firstName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      user?.lastName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      user?.email?.toLowerCase().includes(searchTerm?.toLowerCase())
 
-    const matchesDepartment = !departmentFilter || user.department === departmentFilter
-    const matchesRole = !roleFilter || user.currentRoles?.includes(roleFilter)
+    const matchesDepartment = !departmentFilter || user?.department === departmentFilter
+    const matchesRole = !roleFilter || user?.currentRoles?.includes(roleFilter)
     const matchesStatus =
       !statusFilter ||
-      (statusFilter === 'active' && user.isActive) ||
-      (statusFilter === 'inactive' && !user.isActive)
+      (statusFilter === 'active' && user?.isActive) ||
+      (statusFilter === 'inactive' && !user?.isActive)
 
     return matchesSearch && matchesDepartment && matchesRole && matchesStatus
   })
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedUsers(filteredUsers.map((user) => user.id))
+      setSelectedUsers(filteredUsers?.map((user) => user?.id))
     } else {
       setSelectedUsers([])
     }
@@ -250,7 +246,7 @@ export default function BulkProfileManagement({
     if (checked) {
       setSelectedUsers([...selectedUsers, userId])
     } else {
-      setSelectedUsers(selectedUsers.filter((id) => id !== userId))
+      setSelectedUsers(selectedUsers?.filter((id) => id !== userId))
     }
   }
 
@@ -291,7 +287,7 @@ export default function BulkProfileManagement({
         body: JSON.stringify(operationData),
       })
 
-      if (response.ok) {
+      if (response?.ok) {
         onComplete()
         onClose()
         resetState()
@@ -312,8 +308,8 @@ export default function BulkProfileManagement({
     setActiveTab('select-users')
   }
 
-  const departments = [...new Set(users.map((u) => u.department).filter(Boolean))]
-  const userRoles = [...new Set(users.flatMap((u) => u.currentRoles || []))]
+  const departments = [...new Set(users?.map((u) => u.department).filter(Boolean))]
+  const userRoles = [...new Set(users?.flatMap((u) => u.currentRoles || []))]
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -364,7 +360,7 @@ export default function BulkProfileManagement({
                           placeholder="Nom, prénom, email..."
                           value={searchTerm}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setSearchTerm(e.target.value)
+                            setSearchTerm(e?.target?.value)
                           }
                           className="pl-8"
                         />
@@ -378,8 +374,8 @@ export default function BulkProfileManagement({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">Tous les départements</SelectItem>
-                          {departments.map((dept) => (
-                            <SelectItem key={dept} value={dept}>
+                          {departments?.map((dept) => (
+                            <SelectItem key={dept} value={dept || ''}>
                               {dept}
                             </SelectItem>
                           ))}
@@ -394,11 +390,11 @@ export default function BulkProfileManagement({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">Tous les rôles</SelectItem>
-                          {userRoles.map((roleId) => {
-                            const role = roles.find((r) => r.id === roleId)
+                          {userRoles?.map((roleId) => {
+                            const role = roles?.find((r) => r.id === roleId)
                             return role ? (
                               <SelectItem key={roleId} value={roleId}>
-                                {role.name}
+                                {role?.name}
                               </SelectItem>
                             ) : null
                           })}
@@ -420,6 +416,7 @@ export default function BulkProfileManagement({
                     </div>
                     <div className="flex items-end">
                       <Button
+                        type="button"
                         variant="outline"
                         onClick={() => {
                           setSearchTerm('')
@@ -440,11 +437,12 @@ export default function BulkProfileManagement({
               <Card className="flex-1 overflow-hidden">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>Utilisateurs ({filteredUsers.length})</CardTitle>
+                    <CardTitle>Utilisateurs ({filteredUsers?.length})</CardTitle>
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={
-                          selectedUsers.length === filteredUsers.length && filteredUsers.length > 0
+                          selectedUsers.length === filteredUsers?.length &&
+                          filteredUsers?.length > 0
                         }
                         onCheckedChange={handleSelectAll}
                       />
@@ -466,13 +464,13 @@ export default function BulkProfileManagement({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredUsers.map((user) => (
-                        <TableRow key={user.id}>
+                      {filteredUsers?.map((user) => (
+                        <TableRow key={user?.id}>
                           <TableCell>
                             <Checkbox
-                              checked={selectedUsers.includes(user.id)}
+                              checked={selectedUsers?.includes(user?.id)}
                               onCheckedChange={(checked: boolean) =>
-                                handleUserSelect(user.id, checked)
+                                handleUserSelect(user?.id, checked)
                               }
                             />
                           </TableCell>
@@ -480,31 +478,33 @@ export default function BulkProfileManagement({
                             <div className="flex items-center space-x-3">
                               <Avatar>
                                 <AvatarFallback>
-                                  {user.firstName[0]}
-                                  {user.lastName[0]}
+                                  {user?.firstName?.[0]}
+                                  {user?.lastName?.[0]}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
                                 <p className="font-medium">
-                                  {user.firstName} {user.lastName}
+                                  {user?.firstName} {user?.lastName}
                                 </p>
                                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                                   <Mail className="h-3 w-3" />
-                                  {user.email}
+                                  {user?.email}
                                 </p>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
-                            {user.department && <Badge variant="outline">{user.department}</Badge>}
+                            {user?.department && (
+                              <Badge variant="outline">{user?.department}</Badge>
+                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
-                              {user.currentRoles?.map((roleId) => {
-                                const role = roles.find((r) => r.id === roleId)
+                              {user?.currentRoles?.map((roleId) => {
+                                const role = roles?.find((r) => r.id === roleId)
                                 return role ? (
                                   <Badge key={roleId} variant="outline" className="text-xs">
-                                    {role.name}
+                                    {role?.name}
                                   </Badge>
                                 ) : null
                               })}
@@ -512,26 +512,26 @@ export default function BulkProfileManagement({
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
-                              {user.currentGroups?.map((groupId) => {
-                                const group = groups.find((g) => g.id === groupId)
+                              {user?.currentGroups?.map((groupId) => {
+                                const group = groups?.find((g) => g.id === groupId)
                                 return group ? (
                                   <Badge key={groupId} variant="secondary" className="text-xs">
-                                    {group.name}
+                                    {group?.name}
                                   </Badge>
                                 ) : null
                               })}
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant={user.isActive ? 'default' : 'secondary'}>
-                              {user.isActive ? 'Actif' : 'Inactif'}
+                            <Badge variant={user?.isActive ? 'default' : 'secondary'}>
+                              {user?.isActive ? 'Actif' : 'Inactif'}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {user.lastLogin && (
+                            {user?.lastLogin && (
                               <span className="text-sm flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
-                                {new Date(user.lastLogin).toLocaleDateString('fr-FR')}
+                                {new Date(user?.lastLogin).toLocaleDateString('fr-FR')}
                               </span>
                             )}
                           </TableCell>
@@ -550,7 +550,7 @@ export default function BulkProfileManagement({
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {BULK_OPERATIONS.map((operation) => (
+                    {BULK_OPERATIONS?.map((operation) => (
                       <button
                         type="button"
                         key={operation.type}
@@ -591,22 +591,22 @@ export default function BulkProfileManagement({
                       <div>
                         <Label>Rôles concernés</Label>
                         <div className="grid grid-cols-2 gap-2 mt-2 border rounded-md p-3 max-h-48 overflow-y-auto">
-                          {roles.map((role) => (
-                            <div key={role.id} className="flex items-center space-x-2">
+                          {roles?.map((role) => (
+                            <div key={role?.id} className="flex items-center space-x-2">
                               <Checkbox
-                                checked={selectedRoles.includes(role.id)}
+                                checked={selectedRoles?.includes(role?.id)}
                                 onCheckedChange={(checked: boolean) => {
                                   if (checked) {
-                                    setSelectedRoles([...selectedRoles, role.id])
+                                    setSelectedRoles([...selectedRoles, role?.id])
                                   } else {
-                                    setSelectedRoles(selectedRoles.filter((id) => id !== role.id))
+                                    setSelectedRoles(selectedRoles?.filter((id) => id !== role?.id))
                                   }
                                 }}
                               />
                               <Label className="flex-1 cursor-pointer">
-                                <span className="font-medium">{role.name}</span>
+                                <span className="font-medium">{role?.name}</span>
                                 <span className="text-sm text-muted-foreground block">
-                                  {role.description}
+                                  {role?.description}
                                 </span>
                               </Label>
                             </div>
@@ -620,24 +620,24 @@ export default function BulkProfileManagement({
                       <div>
                         <Label>Groupes concernés</Label>
                         <div className="grid grid-cols-2 gap-2 mt-2 border rounded-md p-3 max-h-48 overflow-y-auto">
-                          {groups.map((group) => (
-                            <div key={group.id} className="flex items-center space-x-2">
+                          {groups?.map((group) => (
+                            <div key={group?.id} className="flex items-center space-x-2">
                               <Checkbox
-                                checked={selectedGroups.includes(group.id)}
+                                checked={selectedGroups?.includes(group?.id)}
                                 onCheckedChange={(checked: boolean) => {
                                   if (checked) {
-                                    setSelectedGroups([...selectedGroups, group.id])
+                                    setSelectedGroups([...selectedGroups, group?.id])
                                   } else {
                                     setSelectedGroups(
-                                      selectedGroups.filter((id) => id !== group.id)
+                                      selectedGroups?.filter((id) => id !== group?.id)
                                     )
                                   }
                                 }}
                               />
                               <Label className="flex-1 cursor-pointer">
-                                <span className="font-medium">{group.name}</span>
+                                <span className="font-medium">{group?.name}</span>
                                 <span className="text-sm text-muted-foreground block">
-                                  {group.description}
+                                  {group?.description}
                                 </span>
                               </Label>
                             </div>
@@ -652,7 +652,7 @@ export default function BulkProfileManagement({
                         <Input
                           value={newDepartment}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setNewDepartment(e.target.value)
+                            setNewDepartment(e?.target?.value)
                           }
                           placeholder="Ex: Production, Commercial, Technique..."
                         />
@@ -669,7 +669,7 @@ export default function BulkProfileManagement({
                       <Textarea
                         value={operationReason}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                          setOperationReason(e.target.value)
+                          setOperationReason(e?.target?.value)
                         }
                         placeholder="Décrivez la raison de cette opération en masse..."
                         rows={3}
@@ -709,11 +709,11 @@ export default function BulkProfileManagement({
                         Utilisateurs concernés ({selectedUsers.length})
                       </h4>
                       <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                        {selectedUsers.map((userId) => {
-                          const user = users.find((u) => u.id === userId)
+                        {selectedUsers?.map((userId) => {
+                          const user = users?.find((u) => u.id === userId)
                           return user ? (
                             <Badge key={userId} variant="outline">
-                              {user.firstName} {user.lastName}
+                              {user?.firstName} {user?.lastName}
                             </Badge>
                           ) : null
                         })}
@@ -739,27 +739,27 @@ export default function BulkProfileManagement({
         </div>
 
         <div className="flex justify-between items-center pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Annuler
           </Button>
 
           <div className="flex gap-2">
             {activeTab === 'select-users' && selectedUsers.length > 0 && (
-              <Button onClick={() => setActiveTab('select-operation')}>
+              <Button type="button" onClick={() => setActiveTab('select-operation')}>
                 Suivant : Opération
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}
 
             {activeTab === 'select-operation' && selectedOperation && (
-              <Button onClick={() => setActiveTab('configure-operation')}>
+              <Button type="button" onClick={() => setActiveTab('configure-operation')}>
                 Suivant : Configuration
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}
 
             {activeTab === 'configure-operation' && selectedOperation && (
-              <Button onClick={() => setActiveTab('review')}>
+              <Button type="button" onClick={() => setActiveTab('review')}>
                 Suivant : Révision
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -767,6 +767,7 @@ export default function BulkProfileManagement({
 
             {activeTab === 'review' && (
               <Button
+                type="button"
                 onClick={handleBulkOperation}
                 disabled={loading}
                 className="bg-red-600 hover:bg-red-700 text-white"

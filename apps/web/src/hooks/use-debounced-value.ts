@@ -31,7 +31,7 @@ export function useDebouncedValue<T>(value: T, delay: number = 300): T {
  * @param deps - Les dépendances du callback
  * @returns La fonction debouncée
  */
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
+export function useDebouncedCallback<T extends (...args: unknown[]) => any>(
   callback: T,
   delay: number = 300,
   deps: React.DependencyList = []

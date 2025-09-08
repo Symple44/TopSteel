@@ -1,7 +1,6 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle, Input } from '@erp/ui'
-
 import { ArrowLeft, ArrowRight, Calendar, Package, RotateCcw, Search, User } from 'lucide-react'
 import { useState } from 'react'
 
@@ -96,7 +95,7 @@ export function MouvementsTable({
 
   const filteredMovements =
     type && type !== 'tous'
-      ? displayMovements.filter((m) => {
+      ? displayMovements?.filter((m) => {
           // Normaliser la comparaison pour les types
           const typeMapping: Record<string, string> = {
             entrees: 'ENTREE',
@@ -105,7 +104,7 @@ export function MouvementsTable({
             ajustements: 'AJUSTEMENT',
           }
 
-          const targetType = typeMapping[type.toLowerCase()] || type.toUpperCase()
+          const targetType = typeMapping[type?.toLowerCase()] || type?.toUpperCase()
 
           return m.type === targetType
         })
@@ -162,7 +161,7 @@ export function MouvementsTable({
         <CardTitle className="flex items-center justify-between">
           <span>Mouvements{type && type !== 'tous' ? ` - ${type}` : ''}</span>
           <span className="text-sm font-normal text-muted-foreground">
-            {filteredMovements.length} mouvement(s)
+            {filteredMovements?.length} mouvement(s)
           </span>
         </CardTitle>
       </CardHeader>
@@ -175,7 +174,7 @@ export function MouvementsTable({
               placeholder="Rechercher par matériau, référence, utilisateur..."
               className="pl-10"
               value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e?.target?.value)}
             />
           </div>
         </div>
@@ -196,8 +195,8 @@ export function MouvementsTable({
               </tr>
             </thead>
             <tbody>
-              {filteredMovements.length > 0 ? (
-                filteredMovements.map((mouvement) => (
+              {filteredMovements?.length > 0 ? (
+                filteredMovements?.map((mouvement) => (
                   <tr key={mouvement.id} className="border-b hover:bg-gray-50 transition-colors">
                     <td className="p-3">
                       <div className="flex items-center gap-2">
@@ -231,8 +230,8 @@ export function MouvementsTable({
                             className="text-xs text-muted-foreground mt-1"
                             title={mouvement.notes}
                           >
-                            {mouvement.notes.length > 30
-                              ? `${mouvement.notes.substring(0, 30)}...`
+                            {mouvement?.notes?.length > 30
+                              ? `${mouvement?.notes?.substring(0, 30)}...`
                               : mouvement.notes}
                           </div>
                         )}
@@ -246,7 +245,7 @@ export function MouvementsTable({
                     </td>
                     <td className="p-3">
                       {mouvement.prixUnitaire && (
-                        <span className="font-mono">{mouvement.prixUnitaire.toFixed(2)} €</span>
+                        <span className="font-mono">{mouvement?.prixUnitaire?.toFixed(2)} €</span>
                       )}
                     </td>
                     <td className="p-3">

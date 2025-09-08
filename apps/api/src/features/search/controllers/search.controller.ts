@@ -170,9 +170,15 @@ export class SearchController {
       }
     } catch (error) {
       this.logger.error('Stats error:', error)
+      const defaultStats: SearchStatistics = {
+        totalSearches: 0,
+        averageResponseTime: 0,
+        popularQueries: [],
+        searchEngineStatus: 'unavailable',
+      }
       return {
         success: false,
-        data: null,
+        data: defaultStats,
       }
     }
   }

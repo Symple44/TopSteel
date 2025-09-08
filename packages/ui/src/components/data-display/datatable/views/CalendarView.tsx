@@ -119,13 +119,18 @@ export function CalendarView({
           {monthNames[currentMonth]} {currentYear}
         </h2>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={previousMonth}>
+          <Button type="button" variant="outline" size="sm" onClick={previousMonth}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentDate(new Date())}
+          >
             Aujourd'hui
           </Button>
-          <Button variant="outline" size="sm" onClick={nextMonth}>
+          <Button type="button" variant="outline" size="sm" onClick={nextMonth}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -203,6 +208,7 @@ export function CalendarView({
                         align="end"
                         trigger={
                           <Button
+                            type="button"
                             variant="ghost"
                             size="sm"
                             className="opacity-0 group-hover:opacity-100 h-auto w-auto p-0.5"

@@ -49,7 +49,7 @@ import type { TranslationEntry, TranslationStats } from '@/lib/i18n/types'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
 import { TranslationDataTable } from './TranslationDataTable'
 
-export default function TranslationAdmin() {
+export function TranslationAdmin() {
   const { t } = useTranslation('admin')
   const { current: currentLanguage } = useLanguage()
 
@@ -70,7 +70,8 @@ export default function TranslationAdmin() {
     const timer = setTimeout(() => {
       setStats(calculateTranslationStats(entries))
     }, 500)
-    return () => clearTimeout(timer)
+    // Return the timer ID, not a cleanup function
+    return timer
   }, [entries])
 
   const loadTranslations = useCallback(async () => {
@@ -80,7 +81,7 @@ export default function TranslationAdmin() {
       setEntries(loadedEntries)
       setStats(calculateTranslationStats(loadedEntries))
     } catch (_error) {
-      toast.error(t('modules.translations.loadError'))
+      toast?.error(t('modules?.translations?.loadError'))
     } finally {
       setLoading(false)
     }
@@ -109,7 +110,7 @@ export default function TranslationAdmin() {
     if (categoryDropdownOpen) {
       const handleClickOutside = (event: MouseEvent) => {
         const target = event.target as Element
-        if (!target.closest('[data-category-dropdown]')) {
+        if (!target?.closest('[data-category-dropdown]')) {
           setCategoryDropdownOpen(false)
         }
       }
@@ -117,6 +118,8 @@ export default function TranslationAdmin() {
       document.addEventListener('mousedown', handleClickOutside)
       return () => document.removeEventListener('mousedown', handleClickOutside)
     }
+    // Toujours retourner une fonction, même si elle ne fait rien
+    return () => {}
   }, [categoryDropdownOpen])
 
   // Mémoriser les calculs coûteux - recalculer seulement quand les entrées changent
@@ -135,10 +138,10 @@ export default function TranslationAdmin() {
 
     const success = await saveTranslation(editingEntry)
     if (success) {
-      toast.success(t('modules.translations.saveSuccess'))
+      toast?.success(t('modules?.translations?.saveSuccess'))
 
       // Mettre à jour la liste
-      setEntries((prev) => prev.map((e) => (e.id === editingEntry.id ? editingEntry : e)))
+      setEntries((prev) => prev?.map((e) => (e.id === editingEntry.id ? editingEntry : e)))
 
       // Les stats seront recalculées automatiquement via useMemo
 
@@ -147,7 +150,7 @@ export default function TranslationAdmin() {
       // Déclencher un événement pour recharger les traductions
       window.dispatchEvent(new Event('translation-updated'))
     } else {
-      toast.error(t('modules.translations.saveError'))
+      toast?.error(t('modules?.translations?.saveError'))
     }
   }
 
@@ -156,10 +159,10 @@ export default function TranslationAdmin() {
     try {
       const success = await saveTranslation(row)
       if (success) {
-        toast.success('Traduction mise à jour')
+        toast?.success('Traduction mise à jour')
 
         // Mettre à jour la liste locale sans recalculer les stats immédiatement
-        setEntries((prev) => prev.map((e) => (e.id === row.id ? row : e)))
+        setEntries((prev) => prev?.map((e) => (e.id === row.id ? row : e)))
 
         // Déclencher un événement pour recharger les traductions
         window.dispatchEvent(new Event('translation-updated'))
@@ -167,10 +170,10 @@ export default function TranslationAdmin() {
         // Recalculer les stats de manière débouncée
         debouncedStatsUpdate()
       } else {
-        toast.error(t('modules.translations.saveError'))
+        toast?.error(t('modules?.translations?.saveError'))
       }
     } catch (_error) {
-      toast.error(t('modules.translations.saveError'))
+      toast?.error(t('modules?.translations?.saveError'))
     }
   }
 
@@ -180,34 +183,34 @@ export default function TranslationAdmin() {
       const languages = ['fr', 'en', 'es']
       const blob = exportToExcel(entries, languages)
 
-      const url = URL.createObjectURL(blob)
+      const url = URL?.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       a.download = `translations_${new Date().toISOString().split('T')[0]}.xlsx`
       a.click()
 
-      URL.revokeObjectURL(url)
-      toast.success(t('modules.translations.exportSuccess'))
+      URL?.revokeObjectURL(url)
+      toast?.success(t('modules.translations.exportSuccess'))
     } catch (_error) {
-      toast.error(t('modules.translations.exportError'))
+      toast?.error(t('modules.translations.exportError'))
     }
   }
 
   // Nouveaux handlers pour les fonctionnalités avancées du DataTable
   const handleCreateTranslation = () => {
-    toast.info('Fonctionnalité de création en développement')
+    toast?.info('Fonctionnalité de création en développement')
   }
 
   const handleDeleteTranslations = (translations: TranslationEntry[]) => {
     if (translations.length === 0) return
 
-    const translationKeys = translations.map((t) => t.fullKey).join(', ')
+    const translationKeys = translations?.map((t) => t.fullKey).join(', ')
     const confirmed = confirm(
       `Êtes-vous sûr de vouloir supprimer ${translations.length} traduction(s) ?\n\n${translationKeys}`
     )
 
     if (confirmed) {
-      toast.info('Fonctionnalité de suppression en développement')
+      toast?.info('Fonctionnalité de suppression en développement')
     }
   }
 
@@ -216,16 +219,16 @@ export default function TranslationAdmin() {
       const languages = ['fr', 'en', 'es']
       const blob = exportToExcel(translations, languages)
 
-      const url = URL.createObjectURL(blob)
+      const url = URL?.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       a.download = `translations_selected_${new Date().toISOString().split('T')[0]}.xlsx`
       a.click()
 
-      URL.revokeObjectURL(url)
-      toast.success(`Export de ${translations.length} traduction(s) réussi`)
+      URL?.revokeObjectURL(url)
+      toast?.success(`Export de ${translations.length} traduction(s) réussi`)
     } catch (_error) {
-      toast.error(t('modules.translations.exportError'))
+      toast?.error(t('modules.translations.exportError'))
     }
   }
 
@@ -236,7 +239,7 @@ export default function TranslationAdmin() {
   const handleDuplicateTranslation = (translation: TranslationEntry) => {
     const duplicatedTranslation = {
       ...translation,
-      id: crypto.randomUUID(),
+      id: crypto?.randomUUID(),
       fullKey: `${translation.fullKey}_copy`,
       key: `${translation.key}_copy`,
       isModified: true,
@@ -245,7 +248,7 @@ export default function TranslationAdmin() {
     }
 
     setEntries((prev) => [...prev, duplicatedTranslation])
-    toast.success(`Traduction "${translation.fullKey}" dupliquée`)
+    toast?.success(`Traduction "${translation.fullKey}" dupliquée`)
   }
 
   // Gérer l'import
@@ -256,8 +259,10 @@ export default function TranslationAdmin() {
       // Parser le fichier Excel pour extraire les données
       const parseResult = await importFromExcel(selectedFile, entries)
 
-      if (!parseResult.success) {
-        parseResult.errors.forEach((e) => toast.error(e))
+      if (!parseResult?.success) {
+        parseResult?.errors?.forEach((e) => {
+          toast?.error(e)
+        })
         return
       }
 
@@ -265,14 +270,16 @@ export default function TranslationAdmin() {
       // Note: importFromExcel modifie les entrées existantes, donc on utilise entries mis à jour
       const response = await bulkImportTranslations(entries)
 
-      if (response.success) {
-        toast.success(
-          response.message ||
-            `Import réussi: ${response.stats?.imported || 0} nouvelles, ${response.stats?.updated || 0} mises à jour`
+      if (response?.success) {
+        toast?.success(
+          response?.message ||
+            `Import réussi: ${response?.stats?.imported ?? 0} nouvelles, ${response?.stats?.updated ?? 0} mises à jour`
         )
 
-        if (parseResult.warnings.length > 0) {
-          parseResult.warnings.forEach((w) => toast.warning(w))
+        if (parseResult?.warnings?.length > 0) {
+          parseResult?.warnings?.forEach((w) => {
+            toast?.warning(w)
+          })
         }
 
         // Recharger les traductions depuis l'API
@@ -280,10 +287,10 @@ export default function TranslationAdmin() {
         setImportDialog(false)
         setSelectedFile(null)
       } else {
-        toast.error(response.message || "Erreur lors de l'import")
+        toast?.error(response?.message || "Erreur lors de l'import")
       }
     } catch (_error) {
-      toast.error(t('modules.translations.importError'))
+      toast?.error(t('modules.translations.importError'))
     }
   }
 
@@ -302,18 +309,18 @@ export default function TranslationAdmin() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setImportDialog(true)}>
+          <Button type="button" variant="outline" onClick={() => setImportDialog(true)}>
             <Upload className="h-4 w-4 mr-2" />
             {t('modules.translations.import')}
           </Button>
-          <Button onClick={handleExport}>
+          <Button type="button" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             {t('modules.translations.export')}
           </Button>
         </div>
       </div>
 
-      {/* {t('modules.translations.statistics')} */}
+      {/* {t('modules?.translations?.statistics')} */}
       {memoizedStats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
@@ -321,14 +328,14 @@ export default function TranslationAdmin() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total des clés</p>
-                  <p className="text-2xl font-bold">{memoizedStats.total}</p>
+                  <p className="text-2xl font-bold">{memoizedStats?.total}</p>
                 </div>
                 <Hash className="h-8 w-8 text-muted-foreground/20" />
               </div>
             </CardContent>
           </Card>
 
-          {SUPPORTED_LANGUAGES.map((lang) => (
+          {SUPPORTED_LANGUAGES?.map((lang) => (
             <Card key={lang.code}>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-2">
@@ -337,13 +344,13 @@ export default function TranslationAdmin() {
                     <p className="font-medium">{lang.name}</p>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {memoizedStats.percentageComplete[lang.code]}%
+                    {memoizedStats?.percentageComplete[lang.code]}%
                   </span>
                 </div>
-                <Progress value={memoizedStats.percentageComplete[lang.code]} className="h-2" />
+                <Progress value={memoizedStats?.percentageComplete[lang.code]} className="h-2" />
                 <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                  <span>{memoizedStats.translated[lang.code]} traduites</span>
-                  <span>{memoizedStats.untranslated[lang.code]} manquantes</span>
+                  <span>{memoizedStats?.translated[lang.code]} traduites</span>
+                  <span>{memoizedStats?.untranslated[lang.code]} manquantes</span>
                 </div>
               </CardContent>
             </Card>
@@ -351,17 +358,18 @@ export default function TranslationAdmin() {
         </div>
       )}
 
-      {/* {t('modules.translations.actions')} globales */}
+      {/* {t('modules?.translations?.actions')} globales */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Globe className="h-5 w-5" />
-            {t('modules.translations.quickActions')}
+            {t('modules?.translations?.quickActions')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
             <Button
+              type="button"
               onClick={() => handleExport()}
               variant="outline"
               className="flex items-center gap-2"
@@ -371,6 +379,7 @@ export default function TranslationAdmin() {
             </Button>
 
             <Button
+              type="button"
               onClick={() => setImportDialog(true)}
               variant="outline"
               className="flex items-center gap-2"
@@ -425,7 +434,7 @@ export default function TranslationAdmin() {
         >
           <div
             className="fixed left-[50%] top-[50%] z-[10000] grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e?.stopPropagation()}
             onKeyDown={(e) => {
               if (e.key === 'Escape') {
                 setEditingEntry(null)
@@ -458,7 +467,7 @@ export default function TranslationAdmin() {
               <Separator />
 
               <div className="space-y-4">
-                {SUPPORTED_LANGUAGES.map((lang) => (
+                {SUPPORTED_LANGUAGES?.map((lang) => (
                   <div key={lang.code}>
                     <Label className="flex items-center gap-2 mb-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       <span className="text-lg">{lang.flag}</span>
@@ -471,7 +480,7 @@ export default function TranslationAdmin() {
                           ...editingEntry,
                           translations: {
                             ...editingEntry.translations,
-                            [lang.code]: e.target.value,
+                            [lang.code]: e?.target?.value,
                           },
                         })
                       }
@@ -512,7 +521,7 @@ export default function TranslationAdmin() {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setEditingEntry({
                         ...editingEntry,
-                        description: e.target.value,
+                        description: e?.target?.value,
                       })
                     }
                     placeholder="Description..."
@@ -525,6 +534,7 @@ export default function TranslationAdmin() {
             {/* Footer */}
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
               <Button
+                type="button"
                 variant="outline"
                 onClick={() => {
                   setEditingEntry(null)
@@ -534,7 +544,7 @@ export default function TranslationAdmin() {
               >
                 Annuler
               </Button>
-              <Button onClick={handleSave}>
+              <Button type="button" onClick={handleSave}>
                 <Save className="h-4 w-4 mr-2" />
                 Sauvegarder
               </Button>
@@ -546,16 +556,16 @@ export default function TranslationAdmin() {
       {/* Category Dropdown Portal */}
       {categoryDropdownOpen &&
         mounted &&
-        dropdownTriggerRef.current &&
+        dropdownTriggerRef?.current &&
         (() => {
-          const triggerRect = dropdownTriggerRef.current?.getBoundingClientRect()
+          const triggerRect = dropdownTriggerRef?.current?.getBoundingClientRect()
           const uniqueCategories = Array.from(
-            new Set(entries.map((entry) => entry.category).filter(Boolean))
+            new Set(entries?.map((entry) => entry.category).filter(Boolean))
           ).sort()
           const dropdownHeight = Math.min((uniqueCategories.length + 1) * 40 + 8, 240) // +1 pour "(Aucune catégorie)"
           const viewportHeight = window.innerHeight
-          const spaceBelow = viewportHeight - triggerRect.bottom
-          const spaceAbove = triggerRect.top
+          const spaceBelow = viewportHeight - triggerRect?.bottom
+          const spaceAbove = triggerRect?.top
 
           // Déterminer si on affiche en dessous ou au-dessus
           const showAbove = spaceBelow < dropdownHeight + 10 && spaceAbove > spaceBelow
@@ -567,9 +577,9 @@ export default function TranslationAdmin() {
           }
 
           if (showAbove) {
-            style.bottom = viewportHeight - triggerRect.top + 4
+            style.bottom = viewportHeight - triggerRect?.top + 4
           } else {
-            style.top = triggerRect.bottom + 4
+            style.top = triggerRect?.bottom + 4
           }
 
           return createPortal(
@@ -598,7 +608,7 @@ export default function TranslationAdmin() {
                 />
                 (Aucune catégorie)
               </button>
-              {Array.from(new Set(entries.map((entry) => entry.category).filter(Boolean)))
+              {Array.from(new Set(entries?.map((entry) => entry.category).filter(Boolean)))
                 .sort()
                 .map((category) => (
                   <button
@@ -659,6 +669,7 @@ export default function TranslationAdmin() {
 
           <DialogFooter>
             <Button
+              type="button"
               variant="outline"
               onClick={() => {
                 setImportDialog(false)
@@ -667,7 +678,7 @@ export default function TranslationAdmin() {
             >
               Annuler
             </Button>
-            <Button onClick={handleImport} disabled={!selectedFile}>
+            <Button type="button" onClick={handleImport} disabled={!selectedFile}>
               <Upload className="h-4 w-4 mr-2" />
               {t('modules.translations.import')}
             </Button>

@@ -216,7 +216,7 @@ export class TOTPService {
       const codes = this.decryptBackupCodes(encryptedCodes)
       const upperCode = code.toUpperCase()
 
-      const codeIndex = codes.findIndex((c) => c === upperCode)
+      const codeIndex = codes.indexOf(upperCode)
 
       if (codeIndex === -1) {
         return { isValid: false }

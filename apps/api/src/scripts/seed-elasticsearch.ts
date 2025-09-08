@@ -7,7 +7,13 @@ const client = new Client({
   node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200',
   auth: {
     username: process.env.ELASTICSEARCH_USERNAME || 'elastic',
-    password: process.env.ELASTICSEARCH_PASSWORD || 'ogAceYjRKTIMmACWwhRA',
+    password: (() => {
+      const password = process.env.ELASTICSEARCH_PASSWORD
+      if (!password) {
+        throw new Error('ELASTICSEARCH_PASSWORD environment variable is required')
+      }
+      return password
+    })(),
   },
 })
 
@@ -160,8 +166,8 @@ async function seedElasticSearch() {
 
     if (bulkResponse.errors) {
       console.error("❌ Erreurs lors de l'indexation:")
-      const erroredDocuments: any[] = []
-      bulkResponse.items.forEach((action: any, i: number) => {
+      const erroredDocuments: unknown[] = []
+      bulkResponse.items.forEach((action: unknown, i: number) => {
         const operation = Object.keys(action)[0]
         if (action[operation].error) {
           erroredDocuments.push({
@@ -195,7 +201,7 @@ async function seedElasticSearch() {
 
     console.log('\n📊 Test de recherche pour "projet":')
     console.log(`   Nombre de résultats: ${searchResult.hits.total}`)
-    searchResult.hits.hits.forEach((hit: any) => {
+    searchResult.hits.hits.forEach((hit: unknown) => {
       console.log(`   - [${hit._source.type}] ${hit._source.title} (score: ${hit._score})`)
     })
   } catch (error) {

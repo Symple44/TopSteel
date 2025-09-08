@@ -1,12 +1,13 @@
 'use client'
-import React, { useState } from 'react'
+import { CheckSquare, FileText, Square, X } from 'lucide-react'
+import { useState } from 'react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Card } from '../../../layout/card'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
 import { Progress } from '../../../primitives/progress'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { CheckSquare, Square, X, FileText, Camera } from 'lucide-react'
+
 interface ChecklistItem {
   id: string
   title: string
@@ -27,31 +28,55 @@ interface QualityControlChecklistProps {
   editable?: boolean
   onItemCheck?: (itemId: string, status: ChecklistItem['status'], notes?: string) => void
 }
-export function QualityControlChecklist({ 
-  className, 
-  title = "Quality Control Checklist",
+export function QualityControlChecklist({
+  className,
+  title = 'Quality Control Checklist',
   productName,
   orderNumber,
   items,
   inspector,
   editable = false,
-  onItemCheck
+  onItemCheck,
 }: QualityControlChecklistProps) {
   const [notes, setNotes] = useState<Record<string, string>>({})
   const getStatusIcon = (status: ChecklistItem['status']) => {
     switch (status) {
-      case 'passed': return <CheckSquare className="w-5 h-5 text-green-600" />
-      case 'failed': return <X className="w-5 h-5 text-red-600" />
-      case 'na': return <Square className="w-5 h-5 text-gray-400" />
-      default: return <Square className="w-5 h-5 text-gray-300" />
+      case 'passed':
+        return <CheckSquare className="w-5 h-5 text-green-600" />
+      case 'failed':
+        return <X className="w-5 h-5 text-red-600" />
+      case 'na':
+        return <Square className="w-5 h-5 text-gray-400" />
+      default:
+        return <Square className="w-5 h-5 text-gray-300" />
     }
   }
   const getStatusBadge = (status: ChecklistItem['status']) => {
     switch (status) {
-      case 'passed': return <Badge variant="success" className="text-xs">Passed</Badge>
-      case 'failed': return <Badge variant="destructive" className="text-xs">Failed</Badge>
-      case 'na': return <Badge variant="secondary" className="text-xs">N/A</Badge>
-      default: return <Badge variant="outline" className="text-xs">Pending</Badge>
+      case 'passed':
+        return (
+          <Badge variant="default" className="text-xs">
+            Passed
+          </Badge>
+        )
+      case 'failed':
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Failed
+          </Badge>
+        )
+      case 'na':
+        return (
+          <Badge variant="secondary" className="text-xs">
+            N/A
+          </Badge>
+        )
+      default:
+        return (
+          <Badge variant="outline" className="text-xs">
+            Pending
+          </Badge>
+        )
     }
   }
   const handleStatusChange = (item: ChecklistItem, newStatus: ChecklistItem['status']) => {
@@ -59,20 +84,20 @@ export function QualityControlChecklist({
     onItemCheck?.(item.id, newStatus, itemNotes)
   }
   const getProgress = () => {
-    const completed = items.filter(item => item.status !== 'pending').length
+    const completed = items.filter((item) => item.status !== 'pending').length
     return (completed / items.length) * 100
   }
   const getResults = () => {
-    const passed = items.filter(item => item.status === 'passed').length
-    const failed = items.filter(item => item.status === 'failed').length
-    const na = items.filter(item => item.status === 'na').length
-    const pending = items.filter(item => item.status === 'pending').length
+    const passed = items.filter((item) => item.status === 'passed').length
+    const failed = items.filter((item) => item.status === 'failed').length
+    const na = items.filter((item) => item.status === 'na').length
+    const pending = items.filter((item) => item.status === 'pending').length
     return { passed, failed, na, pending }
   }
   const results = getResults()
   const progress = getProgress()
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -85,9 +110,7 @@ export function QualityControlChecklist({
             </p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-green-600">
-              {progress.toFixed(0)}%
-            </div>
+            <div className="text-2xl font-bold text-green-600">{progress.toFixed(0)}%</div>
             <div className="text-xs text-muted-foreground">
               {results.passed + results.failed + results.na}/{items.length} checked
             </div>
@@ -114,13 +137,13 @@ export function QualityControlChecklist({
         </div>
         <div className="space-y-3">
           {items.map((item) => (
-            <div 
+            <div
               key={item.id}
               className={cn(
-                "border rounded-lg p-4 transition-colors",
-                item.status === 'failed' && "border-red-200 bg-red-50",
-                item.status === 'passed' && "border-green-200 bg-green-50",
-                item.mandatory && "border-l-4 border-l-blue-500"
+                'border rounded-lg p-4 transition-colors',
+                item.status === 'failed' && 'border-red-200 bg-red-50',
+                item.status === 'passed' && 'border-green-200 bg-green-50',
+                item.mandatory && 'border-l-4 border-l-blue-500'
               )}
             >
               <div className="flex items-start justify-between">
@@ -136,14 +159,14 @@ export function QualityControlChecklist({
                       )}
                       {getStatusBadge(item.status)}
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {item.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
                     {editable && (
                       <Textarea
                         placeholder="Add inspection notes..."
                         value={notes[item.id] || item.notes || ''}
-                        onChange={(e) => setNotes(prev => ({ ...prev, [item.id]: e.target.value }))}
+                        onChange={(e) =>
+                          setNotes((prev) => ({ ...prev, [item.id]: e.target.value }))
+                        }
                         className="mt-2 h-16 text-xs"
                       />
                     )}
@@ -152,25 +175,28 @@ export function QualityControlChecklist({
                 {editable && (
                   <div className="flex gap-1 ml-3">
                     <Button
+                      type="button"
                       onClick={() => handleStatusChange(item, 'passed')}
                       size="sm"
-                      variant={item.status === 'passed' ? "default" : "outline"}
+                      variant={item.status === 'passed' ? 'default' : 'outline'}
                       className="h-8 px-2"
                     >
                       Pass
                     </Button>
                     <Button
+                      type="button"
                       onClick={() => handleStatusChange(item, 'failed')}
                       size="sm"
-                      variant={item.status === 'failed' ? "destructive" : "outline"}
+                      variant={item.status === 'failed' ? 'destructive' : 'outline'}
                       className="h-8 px-2"
                     >
                       Fail
                     </Button>
                     <Button
+                      type="button"
                       onClick={() => handleStatusChange(item, 'na')}
                       size="sm"
-                      variant={item.status === 'na' ? "secondary" : "outline"}
+                      variant={item.status === 'na' ? 'secondary' : 'outline'}
                       className="h-8 px-2"
                     >
                       N/A

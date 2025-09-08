@@ -5,10 +5,10 @@ import { callBackendFromApi } from '@/utils/backend-api'
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+    const token = cookieStore?.get('accessToken')?.value
 
     if (!token) {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: 'Non autorisé',
@@ -21,15 +21,15 @@ export async function POST(request: NextRequest) {
       method: 'POST',
     })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response?.ok) {
+      throw new Error(`HTTP error! status: ${response?.status}`)
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
-    return NextResponse.json(data)
+    return NextResponse?.json(data)
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Erreur lors de la réinitialisation',

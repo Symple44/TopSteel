@@ -58,7 +58,7 @@ export class PricingLog {
   error?: string
 
   @Column('jsonb', { nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date

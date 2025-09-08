@@ -5,9 +5,9 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetchBackend('/admin/groups', request)
 
-    if (!response.ok) {
-      const _errorBody = await response.text()
-      return NextResponse.json({
+    if (!response?.ok) {
+      const _errorBody = await response?.text()
+      return NextResponse?.json({
         success: true,
         data: [
           {
@@ -33,14 +33,14 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const data = await response.json()
+    const data = await response?.json()
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: data?.data || [],
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         error: 'Erreur lors de la récupération des groupes',

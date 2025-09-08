@@ -1,12 +1,7 @@
 'use client'
 
-import type { Operation } from '@erp/domains/production'
-import {
-  OperationStatut,
-  PrioriteProduction,
-  StatutProduction,
-  TypeOperation,
-} from '@erp/domains/production'
+import type { Operation } from '@erp/domains'
+import { OperationStatut, PrioriteProduction, StatutProduction, TypeOperation } from '@erp/domains'
 import type { StoreProjet } from '@erp/types'
 import {
   Badge,
@@ -44,8 +39,8 @@ interface MockOrdreFabrication {
   dateDebut: Date
   dateFin?: Date
   progression: number
-  statut: StatutProduction
-  priorite: PrioriteProduction
+  statut: (typeof StatutProduction)[keyof typeof StatutProduction]
+  priorite: (typeof PrioriteProduction)[keyof typeof PrioriteProduction]
   operations: Operation[]
 }
 
@@ -229,7 +224,7 @@ function createOperation(partial: Partial<Operation> & { id: string; nom: string
     ordre: partial.ordre || 1,
     schedule: partial.schedule || {
       dateDebut: now,
-      dateFin: new Date(now.getTime() + 4 * 60 * 60 * 1000), // +4h
+      dateFin: new Date(now?.getTime() + 4 * 60 * 60 * 1000), // +4h
       dureeEstimee: 4,
     },
     prerequis: partial.prerequis || [],
@@ -246,7 +241,7 @@ function createOperation(partial: Partial<Operation> & { id: string; nom: string
     },
     tempsEstime: partial.tempsEstime || 240,
     tempsReel: partial.tempsReel,
-    avancement: partial.avancement || 0,
+    avancement: partial.avancement ?? 0,
     ordreId: partial.ordreId || '',
     projetId: partial.projetId || 'proj_001',
     createdAt: partial.createdAt || now,
@@ -255,10 +250,10 @@ function createOperation(partial: Partial<Operation> & { id: string; nom: string
   }
 }
 
-export function ProjetProductionTab(_props: ProjetProductionTabProps) {
-  const [selectedOF, setSelectedOF] = useState(mockOrdresFabrication[0])
+export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
+  const [selectedOF, setSelectedOF] = useState(mockOrdresFabrication?.[0])
 
-  const getStatutBadge = (statut: StatutProduction) => {
+  const getStatutBadge = (statut: (typeof StatutProduction)[keyof typeof StatutProduction]) => {
     const statusConfig = {
       [StatutProduction.NON_COMMENCE]: {
         label: 'Planifié',
@@ -301,17 +296,19 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
 
     if (!config) return null
 
-    const Icon = config.icon
+    const Icon = config?.icon
 
     return (
-      <Badge variant={config.variant} className="flex items-center gap-1">
+      <Badge variant={config?.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
-        {config.label}
+        {config?.label}
       </Badge>
     )
   }
 
-  const getPrioriteBadge = (priorite: PrioriteProduction) => {
+  const getPrioriteBadge = (
+    priorite: (typeof PrioriteProduction)[keyof typeof PrioriteProduction]
+  ) => {
     const prioriteConfig = {
       [PrioriteProduction.BASSE]: {
         label: 'Basse',
@@ -335,10 +332,12 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
 
     if (!config) return null
 
-    return <Badge variant={config.variant}>{config.label}</Badge>
+    return <Badge variant={config?.variant}>{config?.label}</Badge>
   }
 
-  const getOperationStatusIcon = (statut: OperationStatut) => {
+  const getOperationStatusIcon = (
+    statut: (typeof OperationStatut)[keyof typeof OperationStatut]
+  ) => {
     switch (statut) {
       case OperationStatut.TERMINEE:
         return <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -366,7 +365,10 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockOrdresFabrication.filter((of) => of.statut === StatutProduction.EN_COURS).length}
+              {
+                mockOrdresFabrication?.filter((of) => of.statut === StatutProduction.EN_COURS)
+                  .length
+              }
             </div>
             <p className="text-xs text-muted-foreground">
               Sur {mockOrdresFabrication.length} au total
@@ -382,14 +384,14 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
           <CardContent>
             <div className="text-2xl font-bold">
               {Math.round(
-                mockOrdresFabrication.reduce((acc, of) => acc + of.progression, 0) /
+                mockOrdresFabrication?.reduce((acc, of) => acc + of.progression, 0) /
                   mockOrdresFabrication.length
               )}
               %
             </div>
             <Progress
               value={
-                mockOrdresFabrication.reduce((acc, of) => acc + of.progression, 0) /
+                mockOrdresFabrication?.reduce((acc, of) => acc + of.progression, 0) /
                 mockOrdresFabrication.length
               }
               className="mt-2 h-2"
@@ -428,7 +430,7 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
               <CardTitle>Ordres de fabrication</CardTitle>
               <CardDescription>Suivi de la production et des opérations</CardDescription>
             </div>
-            <Button>
+            <Button type="button">
               <Plus className="mr-2 h-4 w-4" />
               Nouvel ordre
             </Button>
@@ -436,12 +438,12 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockOrdresFabrication.map((of) => (
+            {mockOrdresFabrication?.map((of) => (
               <button
                 type="button"
                 key={of.id}
                 className={`rounded-lg border p-4 cursor-pointer transition-colors w-full text-left ${
-                  selectedOF?.id === of.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
+                  selectedOF.id === of.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
                 }`}
                 onClick={() => setSelectedOF(of)}
                 aria-label={`Sélectionner l'ordre de fabrication ${of.numero}`}
@@ -484,7 +486,7 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {selectedOF.operations.map((operation) => (
+              {selectedOF?.operations?.map((operation) => (
                 <div
                   key={operation.id}
                   className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
@@ -494,9 +496,9 @@ export function ProjetProductionTab(_props: ProjetProductionTabProps) {
                     <div>
                       <h5 className="font-medium">{operation.nom}</h5>
                       <p className="text-sm text-muted-foreground">{operation.description}</p>
-                      {operation.operateurIds.length > 0 && (
+                      {operation?.operateurIds?.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Opérateurs: {operation.operateurIds.length}
+                          Opérateurs: {operation?.operateurIds?.length}
                         </p>
                       )}
                     </div>

@@ -1,5 +1,4 @@
 import {
-  type NotificationSettings,
   type NotificationsContextType,
   type NotificationsState,
   useNotifications,
@@ -48,10 +47,7 @@ export function useNotificationsActions(): NotificationsContextType['actions'] {
  *
  * @returns Paramètres et fonction de mise à jour
  */
-export function useNotificationsSettings(): {
-  settings: NotificationSettings
-  updateSettings: (settings: Partial<NotificationSettings>) => void
-} {
+export function useNotificationsSettings() {
   const { state, actions } = useNotifications()
 
   return {
@@ -94,19 +90,22 @@ export function useNotificationsStats(): {
   const { state } = useNotifications()
 
   return {
-    total: state.notifications.length,
+    total: state?.notifications?.length,
     unread: state.unreadCount,
-    read: state.notifications.length - state.unreadCount,
-    byCategory: state.notifications.reduce(
+    read: state?.notifications?.length - state.unreadCount,
+    byCategory: state?.notifications?.reduce(
       (acc, notification) => {
-        const category = notification.metadata?.category || 'system'
+        const category =
+          (notification as unknown).metadata?.category ||
+          (notification as unknown).data?.category ||
+          'system'
         acc[category] = (acc[category] || 0) + 1
 
         return acc
       },
       {} as Record<string, number>
     ),
-    byType: state.notifications.reduce(
+    byType: state?.notifications?.reduce(
       (acc, notification) => {
         acc[notification.type] = (acc[notification.type] || 0) + 1
 
@@ -133,15 +132,20 @@ export function useFilteredNotifications(filters?: {
 
   if (!filters) return state.notifications
 
-  return state.notifications.filter((notification) => {
-    if (filters.category && !filters.category.includes(notification.metadata?.category || ''))
+  return state?.notifications?.filter((notification) => {
+    if (
+      filters.category &&
+      !filters.category?.includes(
+        (notification as unknown).metadata?.category || (notification as unknown).data?.category || ''
+      )
+    )
       return false
-    if (filters.type && !filters.type.includes(notification.type)) return false
+    if (filters.type && !filters?.type?.includes(notification.type)) return false
     if (filters.read !== undefined && notification.isRead !== filters.read) return false
     if (
       filters.priority &&
       notification.priority &&
-      !filters.priority.includes(notification.priority)
+      !filters?.priority?.includes(notification.priority)
     )
       return false
 

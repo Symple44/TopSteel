@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../../domains/auth/core/entities/role-permission.entity'
 
@@ -29,7 +30,7 @@ export class AdminRolesService {
         roleId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
       ) {
         role = await this._rolesRepository.findOne({
-          where: { id: roleId } as any,
+          where: { id: roleId } as unknown,
         })
       }
 
@@ -38,23 +39,26 @@ export class AdminRolesService {
       }
 
       const rolePermissions = await this._rolePermissionsRepository.find({
-        where: { roleId: (role as any).id },
+        where: { roleId: (role as unknown).id },
         relations: ['permission'],
       })
 
-      const permissions = rolePermissions.map((rp) => ({
-        id: (rp.permission as any).id,
-        name: rp.permission.name,
-        description: rp.permission.description,
-        moduleId: rp.permission.module,
-        action: rp.permission.action,
-      }))
+      const permissions = rolePermissions.map((rp) => {
+        const permission = rp.permission as unknown
+        return {
+          id: permission.id,
+          name: permission.name,
+          description: permission.description,
+          moduleId: permission.resource,
+          action: permission.action,
+        }
+      })
 
       return {
         success: true,
         data: {
           role: {
-            id: (role as any).id,
+            id: (role as unknown).id,
             name: role.name,
             description: role.description,
             isActive: role.isActive,
@@ -70,7 +74,7 @@ export class AdminRolesService {
         throw error
       }
       throw new Error(
-        `Failed to get permissions for role ${roleId}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to get permissions for role ${roleId}: ${error instanceof Error ? getErrorMessage(error) : 'Unknown error'}`
       )
     }
   }
@@ -83,7 +87,7 @@ export class AdminRolesService {
 
     return {
       data: roles.map((role) => ({
-        id: (role as any).id,
+        id: (role as unknown).id,
         name: role.name,
         description: role.description,
         isActive: role.isActive,

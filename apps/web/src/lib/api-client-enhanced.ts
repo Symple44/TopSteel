@@ -13,7 +13,7 @@ export class APIClientEnhanced extends APIClient {
 
   constructor(baseURL: string) {
     super(baseURL)
-    this.initializeTokenVersioning()
+    this?.initializeTokenVersioning()
   }
 
   /**
@@ -23,7 +23,7 @@ export class APIClientEnhanced extends APIClient {
     if (typeof window === 'undefined') return
 
     // Récupérer ou créer une version de token
-    const storedVersion = localStorage.getItem('topsteel-token-version')
+    const storedVersion = localStorage?.getItem('topsteel-token-version')
     if (storedVersion) {
       this.tokenVersion = storedVersion
     } else {
@@ -38,7 +38,7 @@ export class APIClientEnhanced extends APIClient {
   private isTokenValid(): boolean {
     if (typeof window === 'undefined') return true
 
-    const currentVersion = localStorage.getItem('topsteel-token-version')
+    const currentVersion = localStorage?.getItem('topsteel-token-version')
     return currentVersion === this.tokenVersion
   }
 
@@ -53,7 +53,7 @@ export class APIClientEnhanced extends APIClient {
     localStorage.setItem('topsteel-token-version', this.tokenVersion)
 
     // Supprimer les tokens existants
-    localStorage.removeItem('topsteel-tokens')
+    localStorage?.removeItem('topsteel-tokens')
 
     // Supprimer les cookies d'authentification
     // biome-ignore lint: Cookie cleanup required for logout
@@ -69,11 +69,11 @@ export class APIClientEnhanced extends APIClient {
    * S'abonner aux changements de connexion
    */
   public onConnectionChange(callback: ConnectionCallback): () => void {
-    this.connectionCallbacks.add(callback)
+    this?.connectionCallbacks?.add(callback)
 
     // Retourner une fonction de désabonnement
     return () => {
-      this.connectionCallbacks.delete(callback)
+      this?.connectionCallbacks?.delete(callback)
     }
   }
 
@@ -83,7 +83,9 @@ export class APIClientEnhanced extends APIClient {
   private notifyConnectionChange(isConnected: boolean): void {
     if (this.lastConnectionState !== isConnected) {
       this.lastConnectionState = isConnected
-      this.connectionCallbacks.forEach((callback) => callback(isConnected))
+      this?.connectionCallbacks?.forEach((callback) => {
+        callback(isConnected)
+      })
     }
   }
 
@@ -93,34 +95,34 @@ export class APIClientEnhanced extends APIClient {
   async request<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
     try {
       // Vérifier la validité du token avant chaque requête
-      if (!this.isTokenValid() && config.requireAuth !== false) {
-        this.invalidateAllTokens()
+      if (!this?.isTokenValid() && config.requireAuth !== false) {
+        this?.invalidateAllTokens()
         throw new Error('Token invalidé - redémarrage serveur détecté')
       }
 
       const result = await super.request<T>(endpoint, config)
 
       // Si la requête réussit, on est connecté
-      this.notifyConnectionChange(true)
+      this?.notifyConnectionChange(true)
 
       return result
     } catch (error) {
       // Analyser le type d'erreur
       if (error instanceof APIError) {
         // Erreur réseau = perte de connexion
-        if (error.isNetworkError() || error.code === 'NETWORK_ERROR') {
-          this.notifyConnectionChange(false)
+        if (error?.isNetworkError() || error.code === 'NETWORK_ERROR') {
+          this?.notifyConnectionChange(false)
         }
 
         // Erreur 401 avec token valide = serveur redémarré
-        if (error.code === 'HTTP_401' && this.isTokenValid()) {
+        if (error.code === 'HTTP_401' && this?.isTokenValid()) {
           // Le serveur a probablement redémarré et invalidé tous les tokens
-          this.invalidateAllTokens()
+          this?.invalidateAllTokens()
         }
       } else if (error instanceof Error) {
         // Erreurs de type timeout ou réseau
-        if (error.message.includes('timeout') || error.message.includes('fetch')) {
-          this.notifyConnectionChange(false)
+        if (error?.message?.includes('timeout') || error?.message?.includes('fetch')) {
+          this?.notifyConnectionChange(false)
         }
       }
 
@@ -133,7 +135,7 @@ export class APIClientEnhanced extends APIClient {
    */
   async checkHealth(): Promise<boolean> {
     try {
-      const healthData = await this.get('/health', {
+      const healthData = await this?.get('/health', {
         cache: false,
         retry: false,
         timeout: 5000,
@@ -155,7 +157,7 @@ export class APIClientEnhanced extends APIClient {
   async checkConnection(): Promise<{ connected: boolean; authenticated: boolean }> {
     try {
       // D'abord vérifier la connexion sans auth
-      const connected = await this.checkHealth()
+      const connected = await this?.checkHealth()
 
       if (!connected) {
         return { connected: false, authenticated: false }
@@ -163,7 +165,7 @@ export class APIClientEnhanced extends APIClient {
 
       // Ensuite vérifier l'authentification
       try {
-        await this.get('/auth/profile', {
+        await this?.get('/auth/profile', {
           cache: false,
           retry: false,
           timeout: 5000,
@@ -186,3 +188,8 @@ export const apiClientEnhanced = new APIClientEnhanced(process.env.NEXT_PUBLIC_A
 
 // Export de l'instance par défaut pour compatibilité
 export const apiClient = apiClientEnhanced
+
+// React hook pour utiliser l'API client enhanced
+export function useApiClient() {
+  return apiClientEnhanced
+}

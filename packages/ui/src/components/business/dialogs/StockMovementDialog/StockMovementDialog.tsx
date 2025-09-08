@@ -1,24 +1,55 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+
 // Stock movement validation schema
 const stockMovementSchema = z.object({
   // Movement Type
-  movementType: z.enum(['inbound', 'outbound', 'transfer', 'production', 'consumption', 'adjustment']),
-  transactionType: z.enum(['purchase', 'sale', 'return', 'scrap', 'transfer', 'production_input', 'production_output', 'adjustment', 'other']),
+  movementType: z.enum([
+    'inbound',
+    'outbound',
+    'transfer',
+    'production',
+    'consumption',
+    'adjustment',
+  ]),
+  transactionType: z.enum([
+    'purchase',
+    'sale',
+    'return',
+    'scrap',
+    'transfer',
+    'production_input',
+    'production_output',
+    'adjustment',
+    'other',
+  ]),
   // Material Information
-  materialId: z.string().min(1, 'L\'ID du matériau est requis'),
+  materialId: z.string().min(1, "L'ID du matériau est requis"),
   materialName: z.string().min(1, 'Le nom du matériau est requis'),
   materialCategory: z.enum(['steel', 'alloy', 'tools', 'consumables', 'equipment', 'other']),
   steelGrade: z.string().optional(),
@@ -33,8 +64,8 @@ const stockMovementSchema = z.object({
   sourceWarehouseId: z.string().optional(),
   sourceWarehouseName: z.string().optional(),
   sourceLocation: z.string().optional(),
-  destinationWarehouseId: z.string().min(1, 'L\'entrepôt de destination est requis'),
-  destinationWarehouseName: z.string().min(1, 'Le nom de l\'entrepôt de destination est requis'),
+  destinationWarehouseId: z.string().min(1, "L'entrepôt de destination est requis"),
+  destinationWarehouseName: z.string().min(1, "Le nom de l'entrepôt de destination est requis"),
   destinationLocation: z.string().optional(),
   binLocation: z.string().optional(),
   // Documentation and References
@@ -48,7 +79,7 @@ const stockMovementSchema = z.object({
   movementDate: z.string().min(1, 'La date de mouvement est requise'),
   expectedDate: z.string().optional(),
   // Personnel and Approval
-  initiatedBy: z.string().min(1, 'L\'initiateur est requis'),
+  initiatedBy: z.string().min(1, "L'initiateur est requis"),
   approvedBy: z.string().optional(),
   receivedBy: z.string().optional(),
   requiresApproval: z.boolean().default(false),
@@ -84,7 +115,9 @@ const stockMovementSchema = z.object({
   notes: z.string().optional(),
   // System Fields
   priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
-  status: z.enum(['draft', 'pending', 'approved', 'in_transit', 'received', 'completed', 'cancelled']).default('draft'),
+  status: z
+    .enum(['draft', 'pending', 'approved', 'in_transit', 'received', 'completed', 'cancelled'])
+    .default('draft'),
 })
 type StockMovementFormData = z.infer<typeof stockMovementSchema>
 interface StockMovementDialogProps {
@@ -93,15 +126,15 @@ interface StockMovementDialogProps {
   onSubmit?: (data: StockMovementFormData) => void | Promise<void>
   defaultValues?: Partial<StockMovementFormData>
 }
-export function StockMovementDialog({ 
-  open, 
-  onOpenChange, 
+export function StockMovementDialog({
+  open,
+  onOpenChange,
   onSubmit,
-  defaultValues 
+  defaultValues,
 }: StockMovementDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<StockMovementFormData>({
+  const form = useForm({
     resolver: zodResolver(stockMovementSchema),
     defaultValues: {
       movementType: 'inbound',
@@ -178,9 +211,7 @@ export function StockMovementDialog({
         { value: 'adjustment', label: 'Ajustement négatif' },
         { value: 'other', label: 'Autre' },
       ],
-      transfer: [
-        { value: 'transfer', label: 'Transfert inter-entrepôts' },
-      ],
+      transfer: [{ value: 'transfer', label: 'Transfert inter-entrepôts' }],
       production: [
         { value: 'production_input', label: 'Consommation' },
         { value: 'production_output', label: 'Production' },
@@ -189,9 +220,7 @@ export function StockMovementDialog({
         { value: 'production_input', label: 'Consommation' },
         { value: 'scrap', label: 'Rebut' },
       ],
-      adjustment: [
-        { value: 'adjustment', label: 'Ajustement d\'inventaire' },
-      ],
+      adjustment: [{ value: 'adjustment', label: "Ajustement d'inventaire" }],
     }
     return options[movementType] || []
   }
@@ -725,14 +754,9 @@ export function StockMovementDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Validation requise
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Validation requise</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -742,14 +766,9 @@ export function StockMovementDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Inspection requise
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Inspection requise</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -815,10 +834,7 @@ export function StockMovementDialog({
                           <FormItem>
                             <FormLabel>Notes qualité</FormLabel>
                             <FormControl>
-                              <Textarea
-                                placeholder="Observations qualité..."
-                                {...field}
-                              />
+                              <Textarea placeholder="Observations qualité..." {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -881,10 +897,7 @@ export function StockMovementDialog({
                         <FormItem>
                           <FormLabel>Composition chimique</FormLabel>
                           <FormControl>
-                            <Textarea
-                              placeholder="C: 0.15%, Mn: 1.20%, Si: 0.25%..."
-                              {...field}
-                            />
+                            <Textarea placeholder="C: 0.15%, Mn: 1.20%, Si: 0.25%..." {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -910,7 +923,8 @@ export function StockMovementDialog({
                 </Card>
               )}
               {/* Production Information */}
-              {(watchTransactionType === 'production_input' || watchTransactionType === 'production_output') && (
+              {(watchTransactionType === 'production_input' ||
+                watchTransactionType === 'production_output') && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Informations production</CardTitle>
@@ -980,7 +994,9 @@ export function StockMovementDialog({
                               step="0.1"
                               placeholder="95.5"
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value) || undefined)
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -991,7 +1007,9 @@ export function StockMovementDialog({
                 </Card>
               )}
               {/* Transportation */}
-              {(watchMovementType === 'transfer' || watchTransactionType === 'purchase' || watchTransactionType === 'sale') && (
+              {(watchMovementType === 'transfer' ||
+                watchTransactionType === 'purchase' ||
+                watchTransactionType === 'sale') && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Transport</CardTitle>

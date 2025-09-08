@@ -22,15 +22,15 @@ export async function debugMenuPreferences() {
 
         try {
           const response = await callClientApi(endpoint, config as RequestInit)
-          const data = await response.json()
+          const data = await response?.json()
 
           // Vérifier la structure des données
           if (data && typeof data === 'object') {
-            if (data.data) {
+            if (data?.data) {
             }
           }
         } catch (error: unknown) {
-          if (error instanceof Error && error.message.includes('CLIENT')) {
+          if (error instanceof Error && error?.message?.includes('CLIENT')) {
           }
         }
       }

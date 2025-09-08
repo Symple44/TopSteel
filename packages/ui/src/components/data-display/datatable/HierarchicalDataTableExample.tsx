@@ -262,7 +262,7 @@ export function HierarchicalDataTableExample() {
   }
 
   // Gestion des changements de configuration
-  const handleConfigChange = (newConfig: any) => {
+  const handleConfigChange = (newConfig: unknown) => {
     if (config) {
       savePreferences(newConfig)
     }
@@ -342,7 +342,7 @@ export function HierarchicalDataTableExample() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleAddItem} className="flex items-center gap-2">
+          <Button type="button" onClick={handleAddItem} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Ajouter un élément
           </Button>

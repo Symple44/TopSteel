@@ -27,6 +27,7 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import {
   CheckCircle,
@@ -155,7 +156,7 @@ const TYPE_COLORS = {
   error: 'bg-red-100 text-red-800',
 }
 
-export default function NotificationRulesPanel() {
+export function NotificationRulesPanel() {
   const [rules, setRules] = useState<NotificationRule[]>([])
   const [selectedRule, setSelectedRule] = useState<NotificationRule | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -256,17 +257,17 @@ export default function NotificationRulesPanel() {
 
   const handleToggleRule = (ruleId: string) => {
     setRules(
-      rules.map((rule) => (rule.id === ruleId ? { ...rule, isActive: !rule.isActive } : rule))
+      rules?.map((rule) => (rule.id === ruleId ? { ...rule, isActive: !rule.isActive } : rule))
     )
   }
 
   const handleDeleteRule = (ruleId: string) => {
-    setRules(rules.filter((rule) => rule.id !== ruleId))
+    setRules(rules?.filter((rule) => rule.id !== ruleId))
   }
 
   const getEventLabel = (trigger: EventTrigger) => {
     const events = AVAILABLE_EVENTS[trigger.type]
-    const event = events.find((e) => e.value === trigger.event)
+    const event = events?.find((e) => e.value === trigger.event)
     return event?.label || trigger.event
   }
 
@@ -285,7 +286,7 @@ export default function NotificationRulesPanel() {
         <PermissionHide permission="NOTIFICATION_RULES" roles={['ADMIN', 'MANAGER']}>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button type="button">
                 <Plus className="h-4 w-4 mr-2" />
                 Nouvelle règle
               </Button>
@@ -309,14 +310,14 @@ export default function NotificationRulesPanel() {
 
         <TabsContent value="rules" className="space-y-4">
           <div className="grid gap-4">
-            {rules.map((rule) => (
+            {rules?.map((rule) => (
               <Card key={rule.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="p-2 rounded-lg bg-gray-100">
                         {(() => {
-                          const Icon = CATEGORY_ICONS[rule.trigger.type]
+                          const Icon = CATEGORY_ICONS[rule?.trigger?.type]
                           return <Icon className="h-5 w-5 text-gray-600" />
                         })()}
                       </div>
@@ -356,27 +357,27 @@ export default function NotificationRulesPanel() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-muted-foreground">Type:</span>
-                        <Badge className={TYPE_COLORS[rule.notification.type]}>
-                          {rule.notification.type}
+                        <Badge className={TYPE_COLORS[rule?.notification?.type]}>
+                          {rule?.notification?.type}
                         </Badge>
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-muted-foreground">Priorité:</span>
-                        <Badge className={PRIORITY_COLORS[rule.notification.priority]}>
-                          {rule.notification.priority}
+                        <Badge className={PRIORITY_COLORS[rule?.notification?.priority]}>
+                          {rule?.notification?.priority}
                         </Badge>
                       </div>
                     </div>
 
                     {/* Conditions */}
-                    {rule.conditions.length > 0 && (
+                    {rule?.conditions?.length > 0 && (
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                           <Filter className="h-4 w-4" />
                           <span>Conditions:</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {rule.conditions.map((condition, index) => (
+                          {rule?.conditions?.map((condition, index) => (
                             <Badge
                               key={`${condition.field}-${condition.operator}-${index}`}
                               variant="outline"
@@ -384,7 +385,7 @@ export default function NotificationRulesPanel() {
                             >
                               {condition.field} {condition.operator}{' '}
                               {Array.isArray(condition.value)
-                                ? condition.value.join(', ')
+                                ? condition?.value?.join(', ')
                                 : condition.value}
                             </Badge>
                           ))}
@@ -411,6 +412,7 @@ export default function NotificationRulesPanel() {
                           roles={['ADMIN', 'MANAGER']}
                         >
                           <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => {
@@ -423,6 +425,7 @@ export default function NotificationRulesPanel() {
                         </PermissionHide>
                         <PermissionHide permission="NOTIFICATION_ADMIN" roles={['ADMIN']}>
                           <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => handleDeleteRule(rule.id)}
@@ -481,9 +484,37 @@ export default function NotificationRulesPanel() {
   )
 }
 
+// Types pour le formulaire
+interface FormData {
+  name: string
+  description: string
+  isActive: boolean
+  triggerType: 'user' | 'stock' | 'email' | 'project' | 'production' | 'system'
+  triggerEvent: string
+  notificationType: 'info' | 'success' | 'warning' | 'error'
+  notificationCategory: string
+  titleTemplate: string
+  messageTemplate: string
+  priority: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'
+  recipientType: 'all' | 'role' | 'user' | 'group'
+  actionUrl: string
+  actionLabel: string
+  persistent: boolean
+  expiresIn: number
+}
+
 // Composant formulaire pour créer/éditer une règle
 function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => void }) {
-  const [formData, setFormData] = useState({
+  const ids = useFormFieldIds([
+    'name',
+    'isActive',
+    'description',
+    'titleTemplate',
+    'messageTemplate',
+    'actionUrl',
+    'actionLabel',
+  ])
+  const [formData, setFormData] = useState<FormData>({
     name: rule?.name || '',
     description: rule?.description || '',
     isActive: rule?.isActive ?? true,
@@ -519,37 +550,37 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
         <TabsContent value="basic" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nom de la règle</Label>
+              <Label htmlFor={ids.name}>Nom de la règle</Label>
               <Input
-                id="name"
+                id={ids.name}
                 value={formData.name}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  setFormData((prev) => ({ ...prev, name: e?.target?.value }))
                 }
                 placeholder="Ex: Alerte stock critique"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="isActive">Statut</Label>
+              <Label htmlFor={ids.isActive}>Statut</Label>
               <div className="flex items-center space-x-2">
                 <Switch
-                  id="isActive"
+                  id={ids.isActive}
                   checked={formData.isActive}
                   onCheckedChange={(checked: boolean) =>
                     setFormData((prev) => ({ ...prev, isActive: checked }))
                   }
                 />
-                <Label htmlFor="isActive">{formData.isActive ? 'Actif' : 'Inactif'}</Label>
+                <Label htmlFor={ids.isActive}>{formData.isActive ? 'Actif' : 'Inactif'}</Label>
               </div>
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor={ids.description}>Description</Label>
             <Textarea
-              id="description"
+              id={ids.description}
               value={formData.description}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setFormData((prev) => ({ ...prev, description: e.target.value }))
+                setFormData((prev) => ({ ...prev, description: e?.target?.value }))
               }
               placeholder="Décrivez quand cette règle doit s'activer..."
               rows={3}
@@ -598,8 +629,8 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
                 <SelectContent>
                   {AVAILABLE_EVENTS[formData.triggerType as keyof typeof AVAILABLE_EVENTS]?.map(
                     (event) => (
-                      <SelectItem key={event.value} value={event.value}>
-                        {event.label}
+                      <SelectItem key={event?.value} value={event?.value}>
+                        {event?.label}
                       </SelectItem>
                     )
                   )}
@@ -613,7 +644,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">Conditions</h3>
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Ajouter une condition
               </Button>
@@ -670,12 +701,12 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="titleTemplate">Template du titre</Label>
+            <Label htmlFor={ids.titleTemplate}>Template du titre</Label>
             <Input
-              id="titleTemplate"
+              id={ids.titleTemplate}
               value={formData.titleTemplate}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData((prev) => ({ ...prev, titleTemplate: e.target.value }))
+                setFormData((prev) => ({ ...prev, titleTemplate: e?.target?.value }))
               }
               placeholder="Ex: Stock critique: {{material_name}}"
             />
@@ -684,12 +715,12 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="messageTemplate">Template du message</Label>
+            <Label htmlFor={ids.messageTemplate}>Template du message</Label>
             <Textarea
-              id="messageTemplate"
+              id={ids.messageTemplate}
               value={formData.messageTemplate}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setFormData((prev) => ({ ...prev, messageTemplate: e.target.value }))
+                setFormData((prev) => ({ ...prev, messageTemplate: e?.target?.value }))
               }
               placeholder="Ex: Le stock de {{material_name}} est maintenant de {{quantity}} unités"
               rows={3}
@@ -697,23 +728,23 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="actionUrl">URL d'action</Label>
+              <Label htmlFor={ids.actionUrl}>URL d'action</Label>
               <Input
-                id="actionUrl"
+                id={ids.actionUrl}
                 value={formData.actionUrl}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData((prev) => ({ ...prev, actionUrl: e.target.value }))
+                  setFormData((prev) => ({ ...prev, actionUrl: e?.target?.value }))
                 }
                 placeholder="Ex: /stock/materials/{{material_id}}"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="actionLabel">Label du bouton</Label>
+              <Label htmlFor={ids.actionLabel}>Label du bouton</Label>
               <Input
-                id="actionLabel"
+                id={ids.actionLabel}
                 value={formData.actionLabel}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData((prev) => ({ ...prev, actionLabel: e.target.value }))
+                  setFormData((prev) => ({ ...prev, actionLabel: e?.target?.value }))
                 }
                 placeholder="Ex: Voir le stock"
               />
@@ -725,10 +756,12 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
       <Separator />
 
       <div className="flex justify-end space-x-2">
-        <Button variant="outline" onClick={onSave}>
+        <Button type="button" variant="outline" onClick={onSave}>
           Annuler
         </Button>
-        <Button onClick={handleSave}>{rule ? 'Modifier' : 'Créer'} la règle</Button>
+        <Button type="button" onClick={handleSave}>
+          {rule ? 'Modifier' : 'Créer'} la règle
+        </Button>
       </div>
     </div>
   )

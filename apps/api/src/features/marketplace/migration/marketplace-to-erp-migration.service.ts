@@ -2,6 +2,7 @@ import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { DataSource, Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import {
   Partner,
   PartnerCategory,
@@ -100,7 +101,7 @@ export class MarketplaceToERPMigrationService {
 
     // Vérifier les clients sans partenaire ERP
     const customersWithoutPartner = await this.marketplaceCustomerRepository.count({
-      where: { erpPartnerId: null as any },
+      where: { erpPartnerId: null as unknown },
     })
 
     if (customersWithoutPartner > 0) {
@@ -180,7 +181,7 @@ export class MarketplaceToERPMigrationService {
           errors.push({
             type: 'ARTICLE',
             id: article.id,
-            error: error.message,
+            error: getErrorMessage(error),
           })
         }
       }
@@ -189,7 +190,7 @@ export class MarketplaceToERPMigrationService {
       this.updateProgress('CUSTOMERS', 0, 'Starting customer migration...')
 
       const customersWithoutPartner = await this.marketplaceCustomerRepository.find({
-        where: { erpPartnerId: null as any },
+        where: { erpPartnerId: null as unknown },
       })
 
       for (let i = 0; i < customersWithoutPartner.length; i++) {
@@ -208,7 +209,7 @@ export class MarketplaceToERPMigrationService {
           errors.push({
             type: 'CUSTOMER',
             id: customer.id,
-            error: error.message,
+            error: getErrorMessage(error),
           })
         }
       }
@@ -237,7 +238,7 @@ export class MarketplaceToERPMigrationService {
           errors.push({
             type: 'ORDER',
             id: order.id,
-            error: error.message,
+            error: getErrorMessage(error),
           })
         }
       }
@@ -267,14 +268,17 @@ export class MarketplaceToERPMigrationService {
       await queryRunner.rollbackTransaction()
       this.logger.error('Migration failed:', error)
 
-      this.updateProgress('FAILED', 0, `Migration failed: ${error.message}`)
+      this.updateProgress('FAILED', 0, `Migration failed: ${getErrorMessage(error)}`)
 
       return {
         success: false,
         articlesUpdated,
         customersProcessed,
         ordersUpdated,
-        errors: [...errors, { type: 'ORDER' as const, id: 'SYSTEM', error: error.message }],
+        errors: [
+          ...errors,
+          { type: 'ORDER' as const, id: 'SYSTEM', error: getErrorMessage(error) },
+        ],
         duration: Date.now() - startTime,
         timestamp,
       }
@@ -305,7 +309,7 @@ export class MarketplaceToERPMigrationService {
    * Créer un partenaire ERP pour un client marketplace
    */
   private async createPartnerForCustomer(
-    queryRunner: any,
+    queryRunner: unknown,
     customer: MarketplaceCustomer,
     tenantId: string
   ): Promise<void> {
@@ -349,7 +353,7 @@ export class MarketplaceToERPMigrationService {
    * Mettre à jour les références des commandes
    */
   private async updateOrderReferences(
-    queryRunner: any,
+    queryRunner: unknown,
     order: MarketplaceOrder,
     _tenantId: string
   ): Promise<void> {

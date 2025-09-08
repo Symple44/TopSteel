@@ -18,9 +18,9 @@ export async function POST(
       }
     )
 
-    if (!response.ok) {
+    if (!response?.ok) {
       // Simuler une réponse d'erreur
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: `API backend non disponible - impossible de fermer la connexion pour le tenant ${tenantCode}`,
@@ -29,11 +29,11 @@ export async function POST(
       )
     }
 
-    const responseData = await response.json()
-    return NextResponse.json(responseData.data || responseData)
+    const responseData = await response?.json()
+    return NextResponse?.json(responseData?.data || responseData)
   } catch (_error) {
     // Simuler une réponse d'erreur
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: `Erreur interne - impossible de fermer la connexion pour le tenant ${(await params).tenantCode}`,

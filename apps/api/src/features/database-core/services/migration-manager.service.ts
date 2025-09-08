@@ -66,11 +66,11 @@ export class MigrationManagerService {
       let allMigrations: string[] = []
       try {
         if (fs.existsSync(migrationDir)) {
-          const files = fs.readdirSync(migrationDir).filter((file) => file.endsWith('.ts'))
+          const files = fs.readdirSync(migrationDir).filter((file: string) => file.endsWith('.ts'))
 
           // Extraire les noms de classe des migrations depuis les fichiers
           allMigrations = files
-            .map((file) => {
+            .map((file: string) => {
               try {
                 const content = fs.readFileSync(path.join(migrationDir, file), 'utf8')
                 const nameMatch = content.match(/name = '([^']+)'/)
@@ -277,7 +277,7 @@ export class MigrationManagerService {
       // Chercher le fichier qui contient le nom de la migration
       const files = fs.readdirSync(migrationDir)
       const migrationFile = files.find(
-        (file) =>
+        (file: string) =>
           file.includes(migrationName) ||
           migrationName.includes(file.replace(/\.(ts|js)$/, '').replace(/^\d{3}-/, ''))
       )

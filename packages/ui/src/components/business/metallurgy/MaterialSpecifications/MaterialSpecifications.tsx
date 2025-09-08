@@ -1,9 +1,9 @@
 'use client'
-import React from 'react'
+import { AlertTriangle, Check, FileText, Info, X } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
 import { Badge } from '../../../data-display/badge'
 import { Card } from '../../../layout/card'
-import { FileText, Check, X, AlertTriangle, Info } from 'lucide-react'
+
 interface Specification {
   id: string
   category: 'chemical' | 'mechanical' | 'dimensional' | 'surface' | 'thermal' | 'other'
@@ -30,23 +30,29 @@ interface MaterialSpecificationsProps {
   showStatus?: boolean
   onSpecificationClick?: (spec: Specification) => void
 }
-export function MaterialSpecifications({ 
-  className, 
+export function MaterialSpecifications({
+  className,
   materialName,
   grade,
   standard,
   specifications,
   showStatus = false,
-  onSpecificationClick
+  onSpecificationClick,
 }: MaterialSpecificationsProps) {
   const getCategoryIcon = (category: Specification['category']) => {
     switch (category) {
-      case 'chemical': return '🧪'
-      case 'mechanical': return '⚙️'
-      case 'dimensional': return '📏'
-      case 'surface': return '🔍'
-      case 'thermal': return '🌡️'
-      default: return '📋'
+      case 'chemical':
+        return '🧪'
+      case 'mechanical':
+        return '⚙️'
+      case 'dimensional':
+        return '📏'
+      case 'surface':
+        return '🔍'
+      case 'thermal':
+        return '🌡️'
+      default:
+        return '📋'
     }
   }
   const getStatusIcon = (status?: Specification['status']) => {
@@ -64,11 +70,23 @@ export function MaterialSpecifications({
   const getStatusBadge = (status?: Specification['status']) => {
     switch (status) {
       case 'compliant':
-        return <Badge variant="success" className="text-xs">Compliant</Badge>
+        return (
+          <Badge variant="default" className="text-xs">
+            Compliant
+          </Badge>
+        )
       case 'non-compliant':
-        return <Badge variant="destructive" className="text-xs">Non-Compliant</Badge>
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Non-Compliant
+          </Badge>
+        )
       case 'not-tested':
-        return <Badge variant="secondary" className="text-xs">Not Tested</Badge>
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Not Tested
+          </Badge>
+        )
       default:
         return null
     }
@@ -89,24 +107,27 @@ export function MaterialSpecifications({
     }
     return spec.requirement
   }
-  const groupedSpecs = specifications.reduce((acc, spec) => {
-    if (!acc[spec.category]) {
-      acc[spec.category] = []
-    }
-    acc[spec.category].push(spec)
-    return acc
-  }, {} as Record<string, Specification[]>)
+  const groupedSpecs = specifications.reduce(
+    (acc, spec) => {
+      if (!acc[spec.category]) {
+        acc[spec.category] = []
+      }
+      acc[spec.category].push(spec)
+      return acc
+    },
+    {} as Record<string, Specification[]>
+  )
   const getComplianceStats = () => {
     if (!showStatus) return null
-    const compliant = specifications.filter(s => s.status === 'compliant').length
-    const nonCompliant = specifications.filter(s => s.status === 'non-compliant').length
-    const notTested = specifications.filter(s => s.status === 'not-tested').length
+    const compliant = specifications.filter((s) => s.status === 'compliant').length
+    const nonCompliant = specifications.filter((s) => s.status === 'non-compliant').length
+    const notTested = specifications.filter((s) => s.status === 'not-tested').length
     const total = specifications.length
     return { compliant, nonCompliant, notTested, total }
   }
   const stats = getComplianceStats()
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -147,7 +168,7 @@ export function MaterialSpecifications({
             </div>
             <div className="text-center p-3 bg-blue-50 rounded-lg">
               <div className="text-lg font-bold text-blue-600">
-                {specifications.filter(s => s.mandatory).length}
+                {specifications.filter((s) => s.mandatory).length}
               </div>
               <div className="text-xs text-muted-foreground">Mandatory</div>
             </div>
@@ -158,29 +179,43 @@ export function MaterialSpecifications({
           {Object.entries(groupedSpecs).map(([category, categorySpecs]) => (
             <div key={category} className="space-y-3">
               <h4 className="font-medium flex items-center gap-2 capitalize">
-                <span className="text-lg">{getCategoryIcon(category as Specification['category'])}</span>
+                <span className="text-lg">
+                  {getCategoryIcon(category as Specification['category'])}
+                </span>
                 {category} Specifications
                 <span className="text-sm text-muted-foreground">({categorySpecs.length})</span>
               </h4>
               <div className="space-y-2">
                 {categorySpecs.map((spec) => (
-                  <div 
+                  // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+                  <div
                     key={spec.id}
                     className={cn(
-                      "p-4 rounded-lg border transition-colors",
-                      onSpecificationClick && "cursor-pointer hover:bg-muted/50",
-                      spec.status === 'non-compliant' && "border-red-200 bg-red-50",
-                      spec.status === 'compliant' && "border-green-200 bg-green-50",
-                      spec.mandatory && "border-l-4 border-l-blue-500"
+                      'p-4 rounded-lg border transition-colors',
+                      onSpecificationClick && 'cursor-pointer hover:bg-muted/50',
+                      spec.status === 'non-compliant' && 'border-red-200 bg-red-50',
+                      spec.status === 'compliant' && 'border-green-200 bg-green-50',
+                      spec.mandatory && 'border-l-4 border-l-blue-500'
                     )}
+                    role={onSpecificationClick ? 'button' : undefined}
+                    tabIndex={onSpecificationClick ? 0 : undefined}
                     onClick={() => onSpecificationClick?.(spec)}
+                    onKeyDown={(e) => {
+                      if (onSpecificationClick && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault()
+                        onSpecificationClick(spec)
+                      }
+                    }}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h5 className="font-medium text-sm">{spec.parameter}</h5>
                           {spec.mandatory && (
-                            <Badge variant="outline" className="text-xs border-blue-200 text-blue-600">
+                            <Badge
+                              variant="outline"
+                              className="text-xs border-blue-200 text-blue-600"
+                            >
                               Mandatory
                             </Badge>
                           )}
@@ -194,12 +229,15 @@ export function MaterialSpecifications({
                           {showStatus && spec.actualValue !== undefined && (
                             <div>
                               <span className="text-muted-foreground">Actual Value:</span>
-                              <div className={cn(
-                                "font-medium",
-                                spec.status === 'compliant' && "text-green-600",
-                                spec.status === 'non-compliant' && "text-red-600"
-                              )}>
-                                {spec.actualValue}{spec.unit}
+                              <div
+                                className={cn(
+                                  'font-medium',
+                                  spec.status === 'compliant' && 'text-green-600',
+                                  spec.status === 'non-compliant' && 'text-red-600'
+                                )}
+                              >
+                                {spec.actualValue}
+                                {spec.unit}
                               </div>
                             </div>
                           )}
@@ -217,11 +255,7 @@ export function MaterialSpecifications({
                           </div>
                         )}
                       </div>
-                      {showStatus && (
-                        <div className="ml-4">
-                          {getStatusIcon(spec.status)}
-                        </div>
-                      )}
+                      {showStatus && <div className="ml-4">{getStatusIcon(spec.status)}</div>}
                     </div>
                   </div>
                 ))}

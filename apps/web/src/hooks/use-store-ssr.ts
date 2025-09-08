@@ -6,7 +6,7 @@ interface UseStoreSsrOptions<T> {
 }
 
 export function useStoreSsr<T>(options: UseStoreSsrOptions<T>) {
-  const { fallback, serverValue } = options
+  const { fallback, serverValue } = options || {}
 
   const value = useMemo(() => {
     if (typeof window === 'undefined') {

@@ -9,8 +9,8 @@ import {
   DialogTitle,
   Input,
   Label,
+  useFormFieldIds,
 } from '@erp/ui'
-
 import { useState } from 'react'
 
 // Interface correcte avec open et onOpenChange
@@ -33,15 +33,18 @@ export function CreatePaiementDialog({
     dateReception: new Date().toISOString().split('T')[0],
   })
 
+  // Generate unique IDs for form fields
+  const fieldIds = useFormFieldIds(['montant', 'reference', 'dateReception'])
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
     setLoading(true)
 
     // Simulation création paiement
     setTimeout(() => {
       const newPaiement = {
         id: `PAIEMENT-${Date.now()}`,
-        montant: Number.parseFloat(formData.montant),
+        montant: Number?.parseFloat(formData.montant),
         methode: formData.methode,
         reference: formData.reference,
         dateReception: formData.dateReception,
@@ -74,47 +77,47 @@ export function CreatePaiementDialog({
 
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="montant" className="text-right">
+            <Label htmlFor={fieldIds.montant} className="text-right">
               Montant
             </Label>
             <Input
-              id="montant"
+              id={fieldIds.montant}
               type="number"
               step="0.01"
               className="col-span-3"
               value={formData.montant}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, montant: e.target.value })
+                setFormData({ ...formData, montant: e?.target?.value })
               }
             />
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="reference" className="text-right">
+            <Label htmlFor={fieldIds.reference} className="text-right">
               Référence
             </Label>
             <Input
-              id="reference"
+              id={fieldIds.reference}
               className="col-span-3"
               value={formData.reference}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, reference: e.target.value })
+                setFormData({ ...formData, reference: e?.target?.value })
               }
               placeholder="Numéro de référence"
             />
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="dateReception" className="text-right">
+            <Label htmlFor={fieldIds.dateReception} className="text-right">
               Date
             </Label>
             <Input
-              id="dateReception"
+              id={fieldIds.dateReception}
               type="date"
               className="col-span-3"
               value={formData.dateReception}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, dateReception: e.target.value })
+                setFormData({ ...formData, dateReception: e?.target?.value })
               }
             />
           </div>

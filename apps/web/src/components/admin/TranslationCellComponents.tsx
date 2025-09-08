@@ -6,13 +6,13 @@ import React from 'react'
 import type { TranslationEntry } from '@/lib/i18n/types'
 import { sanitizeHtml } from '@/lib/security/security-enhanced'
 
-export const NamespaceCell = React.memo(({ value }: { value: string }) => (
+export const NamespaceCell = React?.memo(({ value }: { value: string }) => (
   <Badge variant="secondary" className="text-xs">
     {value}
   </Badge>
 ))
 
-export const CategoryCell = React.memo(({ value }: { value?: string }) =>
+export const CategoryCell = React?.memo(({ value }: { value?: string }) =>
   value ? (
     <Badge variant="outline" className="text-xs">
       <Tag className="h-3 w-3 mr-1" />
@@ -23,7 +23,7 @@ export const CategoryCell = React.memo(({ value }: { value?: string }) =>
   )
 )
 
-export const StatusCell = React.memo(({ value }: { value: boolean }) => (
+export const StatusCell = React?.memo(({ value }: { value: boolean }) => (
   <div className="flex items-center gap-2">
     {value ? (
       <Badge variant="default" className="text-xs bg-orange-100 text-orange-800">
@@ -38,7 +38,7 @@ export const StatusCell = React.memo(({ value }: { value: boolean }) => (
   </div>
 ))
 
-export const FullKeyCell = React.memo(({ entry }: { entry: TranslationEntry }) => (
+export const FullKeyCell = React?.memo(({ entry }: { entry: TranslationEntry }) => (
   <div className="space-y-1">
     <code className="text-sm font-mono bg-muted px-2 py-1 rounded">{entry.fullKey}</code>
     <div className="flex items-center gap-1 flex-wrap">
@@ -61,8 +61,8 @@ export const FullKeyCell = React.memo(({ entry }: { entry: TranslationEntry }) =
   </div>
 ))
 
-export const TranslationCell = React.memo(({ translation }: { translation: string }) => {
-  const isEmpty = typeof translation !== 'string' || !translation.trim()
+export const TranslationCell = React?.memo(({ translation }: { translation: string }) => {
+  const isEmpty = typeof translation !== 'string' || !translation?.trim()
 
   if (isEmpty) {
     return (
@@ -73,7 +73,7 @@ export const TranslationCell = React.memo(({ translation }: { translation: strin
   }
 
   // Si la traduction contient du HTML, l'afficher comme rich text
-  if (translation.includes('<') && translation.includes('>')) {
+  if (translation?.includes('<') && translation?.includes('>')) {
     return (
       <div
         className="min-h-[40px] richtext-cell text-sm"
@@ -91,7 +91,7 @@ export const TranslationCell = React.memo(({ translation }: { translation: strin
   )
 })
 
-export const DescriptionCell = React.memo(({ value }: { value?: string }) => (
+export const DescriptionCell = React?.memo(({ value }: { value?: string }) => (
   <span className="text-xs text-muted-foreground">{String(value || '(Aucune description)')}</span>
 ))
 

@@ -10,8 +10,7 @@ import type { Address } from '../../core/common'
 // Types simplifiés pour éviter les dépendances circulaires
 // Les types complets sont maintenant dans @erp/domains
 
-// Types locaux (les types complets sont dans @erp/domains)
-// FIXME: Synchroniser avec @erp/domains pour éviter les conflits
+// Types locaux pour éviter la dépendance directe à @erp/domains
 export enum ProjetType {
   STANDARD = 'STANDARD',
   EXPRESS = 'EXPRESS',
@@ -162,7 +161,7 @@ export interface StoreProjet extends BaseStoreEntity {
 
   // Relations
   documentsIds: string[]
-  documents?: any[] | any // Support pour les documents associés
+  documents?: unknown[] | any // Support pour les documents associés
   ordresFabricationIds: string[]
   devis?: SimpleDevis[] | SimpleDevis // Support pour les devis associés
 

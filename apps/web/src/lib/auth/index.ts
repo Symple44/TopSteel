@@ -6,6 +6,23 @@
 // Export auth hook and provider
 export { useAuth } from './auth-context'
 export { AuthProvider } from './auth-provider'
+
+// Export auth types
+export type {
+  AuthBroadcastEvent,
+  AuthConfig,
+  AuthContextType,
+  AuthState,
+  AuthTokens,
+  Company,
+  CompanySelectionResponse,
+  LoginResponse,
+  MFAState,
+  MFAVerificationResponse,
+  StoredSession,
+  User,
+} from './auth-types'
+
 export type {
   AuthenticatedUser,
   JWTPayload,

@@ -5,39 +5,40 @@ import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import Stripe from 'stripe'
 import type { Repository } from 'typeorm'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 import { MarketplacePayment } from '../entities/marketplace-payment.entity'
 import { PaymentMethod, PaymentStatus } from '../enums/payment.enum'
 import { MarketplacePaymentService } from '../services/marketplace-payment.service'
 
-jest.mock('stripe')
+vi.mock('stripe')
 
 describe('MarketplacePaymentService', () => {
   let service: MarketplacePaymentService
   let _paymentRepository: Repository<MarketplacePayment>
   let _orderRepository: Repository<MarketplaceOrder>
   let _eventEmitter: EventEmitter2
-  let stripe: jest.Mocked<Stripe>
+  let stripe: any
 
   const mockPaymentRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    findOne: jest.fn(),
-    find: jest.fn(),
-    createQueryBuilder: jest.fn(),
+    create: vi.fn(),
+    save: vi.fn(),
+    findOne: vi.fn(),
+    find: vi.fn(),
+    createQueryBuilder: vi.fn(),
   }
 
   const mockOrderRepository = {
-    findOne: jest.fn(),
-    save: jest.fn(),
+    findOne: vi.fn(),
+    save: vi.fn(),
   }
 
   const mockEventEmitter = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   }
 
   const mockConfigService = {
-    get: jest.fn().mockReturnValue('sk_test_stripe_key'),
+    get: vi.fn().mockReturnValue('sk_test_stripe_key'),
   }
 
   beforeEach(async () => {
@@ -73,12 +74,12 @@ describe('MarketplacePaymentService', () => {
     _eventEmitter = module.get<EventEmitter2>(EventEmitter2)
 
     // Mock Stripe instance
-    stripe = new Stripe('sk_test_stripe_key', { apiVersion: '2023-10-16' }) as jest.Mocked<Stripe>
-    ;(service as any).stripe = stripe
+    stripe = new Stripe('sk_test_stripe_key', { apiVersion: '2023-10-16' }) as unknown
+    ;(service as unknown).stripe = stripe
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('processPayment', () => {
@@ -113,8 +114,8 @@ describe('MarketplacePaymentService', () => {
 
       mockOrderRepository.findOne.mockResolvedValue(mockOrder)
       stripe.paymentIntents = {
-        create: jest.fn().mockResolvedValue(mockPaymentIntent),
-      } as any
+        create: vi.fn().mockResolvedValue(mockPaymentIntent),
+      } as unknown
       mockPaymentRepository.create.mockReturnValue(mockPayment)
       mockPaymentRepository.save.mockResolvedValue(mockPayment)
 
@@ -152,8 +153,8 @@ describe('MarketplacePaymentService', () => {
 
       mockOrderRepository.findOne.mockResolvedValue(mockOrder)
       stripe.paymentIntents = {
-        create: jest.fn().mockRejectedValue(new Error('Card declined')),
-      } as any
+        create: vi.fn().mockRejectedValue(new Error('Card declined')),
+      } as unknown
 
       await expect(
         service.processPayment(tenantId, {
@@ -240,8 +241,8 @@ describe('MarketplacePaymentService', () => {
 
       mockPaymentRepository.findOne.mockResolvedValue(mockPayment)
       stripe.refunds = {
-        create: jest.fn().mockResolvedValue(mockRefund),
-      } as any
+        create: vi.fn().mockResolvedValue(mockRefund),
+      } as unknown
       mockPaymentRepository.save.mockResolvedValue({
         ...mockPayment,
         status: PaymentStatus.REFUNDED,
@@ -308,7 +309,7 @@ describe('MarketplacePaymentService', () => {
           amount: 300,
           status: 'succeeded',
         }),
-      } as any
+      } as unknown
 
       const updatedPayment = {
         ...mockPayment,
@@ -386,7 +387,7 @@ describe('MarketplacePaymentService', () => {
         status: PaymentStatus.COMPLETED,
       })
 
-      await service.handleWebhook(event as any)
+      await service.handleWebhook(event as unknown)
 
       expect(mockPaymentRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({ status: PaymentStatus.COMPLETED })
@@ -423,7 +424,7 @@ describe('MarketplacePaymentService', () => {
         status: PaymentStatus.FAILED,
       })
 
-      await service.handleWebhook(event as any)
+      await service.handleWebhook(event as unknown)
 
       expect(mockPaymentRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({ status: PaymentStatus.FAILED })
@@ -438,10 +439,10 @@ describe('MarketplacePaymentService', () => {
       const endDate = new Date('2024-01-31')
 
       const mockQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        getRawOne: jest.fn().mockResolvedValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        getRawOne: vi.fn().mockResolvedValue({
           totalAmount: '10000',
           successCount: '50',
           failedCount: '5',

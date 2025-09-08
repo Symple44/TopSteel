@@ -1,4 +1,4 @@
-import type { FilterConfig, ColumnConfig } from '../types'
+import type { ColumnConfig, FilterConfig } from '../types'
 
 /**
  * Vérifie si une valeur est vide
@@ -37,12 +37,12 @@ export function applyFilter(value: unknown, filter: FilterConfig): boolean {
   // Nouveau format de filtre avec objet structuré
   if (filter.value && typeof filter.value === 'object') {
     const filterValue = filter.value as Record<string, unknown>
-    
+
     // Filtre par valeurs multiples (checkbox)
     if (filterValue.type === 'values' && Array.isArray(filterValue.values)) {
       const includesEmpty = filterValue.values.includes('(Vide)')
       const isEmpty = isEmptyValue(value)
-      
+
       if (isEmpty && includesEmpty) return true
       if (!isEmpty) {
         const stringValue = valueToString(value)
@@ -50,34 +50,34 @@ export function applyFilter(value: unknown, filter: FilterConfig): boolean {
       }
       return false
     }
-    
+
     // Filtre par plage numérique
     if (filterValue.type === 'range') {
       const numValue = Number(value)
       if (Number.isNaN(numValue)) return false
-      
+
       if (filterValue.min != null && numValue < Number(filterValue.min)) return false
       if (filterValue.max != null && numValue > Number(filterValue.max)) return false
       return true
     }
-    
+
     // Filtre par plage de dates
     if (filterValue.type === 'dateRange') {
       const dateValue = new Date(value as string | number | Date)
       if (Number.isNaN(dateValue.getTime())) return false
-      
+
       if (filterValue.start) {
         const startDate = new Date(filterValue.start as string | number | Date)
         if (dateValue < startDate) return false
       }
       if (filterValue.end) {
-        const endDate = new Date(filterValue.end as string | number | Date)  
+        const endDate = new Date(filterValue.end as string | number | Date)
         if (dateValue > endDate) return false
       }
       return true
     }
   }
-  
+
   // Ancien format de filtre (compatibilité)
   return applyLegacyFilter(value, filter)
 }
@@ -88,7 +88,7 @@ export function applyFilter(value: unknown, filter: FilterConfig): boolean {
 function applyLegacyFilter(value: unknown, filter: FilterConfig): boolean {
   const stringValue = String(value || '').toLowerCase()
   const filterString = String(filter.value || '').toLowerCase()
-  
+
   switch (filter.operator) {
     case 'equals':
       return value === filter.value
@@ -114,14 +114,10 @@ function applyLegacyFilter(value: unknown, filter: FilterConfig): boolean {
 /**
  * Applique un filtre avancé sur une valeur
  */
-export function applyAdvancedFilter<T>(
-  value: any,
-  rule: any,
-  _column?: ColumnConfig<T>
-): boolean {
+export function applyAdvancedFilter<T>(value: unknown, rule: unknown, _column?: ColumnConfig<T>): boolean {
   const stringValue = String(value || '').toLowerCase()
   const ruleValue = String(rule.value || '').toLowerCase()
-  
+
   switch (rule.operator) {
     case 'equals':
       return value === rule.value
@@ -147,9 +143,10 @@ export function applyAdvancedFilter<T>(
       return Number(value) >= Number(rule.value)
     case 'less_or_equal':
       return Number(value) <= Number(rule.value)
-    case 'between':
+    case 'between': {
       const num = Number(value)
       return num >= Number(rule.value) && num <= Number(rule.secondValue)
+    }
     case 'in':
       return Array.isArray(rule.value) && rule.value.includes(value)
     case 'not_in':
@@ -162,32 +159,33 @@ export function applyAdvancedFilter<T>(
 /**
  * Filtre les données selon les filtres de colonnes
  */
-export function filterDataByColumns<T extends Record<string, any>>(
+export function filterDataByColumns<T extends Record<string, unknown>>(
   data: T[],
   filters: FilterConfig[],
   columns: ColumnConfig<T>[]
 ): T[] {
   if (!filters || filters.length === 0) return data
-  
-  return data.filter(row => {
-    return filters.every(filter => {
+
+  return data.filter((row) => {
+    return filters.every((filter) => {
       if (!filter.value && filter.value !== 0 && filter.value !== false) {
         return true
       }
-      
-      const column = columns.find(col => col.id === filter.field)
-      
+
+      const column = columns.find((col) => col.id === filter.field)
+
       let value: any
       if (column?.getValue) {
         value = column.getValue(row)
       } else if (column?.accessor) {
-        value = typeof column.accessor === 'function'
-          ? column.accessor(row)
-          : row[column.accessor as keyof T]
+        value =
+          typeof column.accessor === 'function'
+            ? column.accessor(row)
+            : row[column.accessor as keyof T]
       } else {
         value = row[(filter.field || column?.key) as keyof T]
       }
-      
+
       return applyFilter(value, filter)
     })
   })
@@ -196,30 +194,31 @@ export function filterDataByColumns<T extends Record<string, any>>(
 /**
  * Filtre les données selon une recherche globale
  */
-export function filterDataBySearch<T extends Record<string, any>>(
+export function filterDataBySearch<T extends Record<string, unknown>>(
   data: T[],
   searchTerm: string,
   columns: ColumnConfig<T>[]
 ): T[] {
   if (!searchTerm || searchTerm.trim() === '') return data
-  
+
   const searchLower = searchTerm.toLowerCase()
-  
-  return data.filter(row => {
-    return columns.some(column => {
+
+  return data.filter((row) => {
+    return columns.some((column) => {
       if (!column.searchable) return false
-      
+
       let value: any
       if (column.getValue) {
         value = column.getValue(row)
       } else if (column.accessor) {
-        value = typeof column.accessor === 'function'
-          ? column.accessor(row)
-          : row[column.accessor as keyof T]
+        value =
+          typeof column.accessor === 'function'
+            ? column.accessor(row)
+            : row[column.accessor as keyof T]
       } else {
         value = row[(column.key || column.id) as keyof T]
       }
-      
+
       const stringValue = valueToString(value).toLowerCase()
       return stringValue.includes(searchLower)
     })

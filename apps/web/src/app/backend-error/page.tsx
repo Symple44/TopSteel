@@ -19,7 +19,7 @@ export default function BackendErrorPage() {
     // Si le backend devient disponible, rediriger vers le dashboard
     if (health.status === 'online') {
       setTimeout(() => {
-        router.push('/dashboard')
+        router?.push('/dashboard')
       }, 1000)
     }
   }, [health.status, router])
@@ -99,7 +99,7 @@ export default function BackendErrorPage() {
               )}
               <div>
                 <span className="font-medium">{t('backend.attemptedUrl')} :</span>{' '}
-                {process.env.NEXT_PUBLIC_API_URL || t('backend.notConfigured')}
+                {process?.env?.NEXT_PUBLIC_API_URL || t('backend.notConfigured')}
               </div>
             </div>
           </div>
@@ -107,12 +107,13 @@ export default function BackendErrorPage() {
           {/* Actions */}
           <div className="space-y-3">
             {health.status === 'online' ? (
-              <Button onClick={() => router.push('/dashboard')} className="w-full">
+              <Button type="button" onClick={() => router?.push('/dashboard')} className="w-full">
                 {t('backend.accessDashboard')}
               </Button>
             ) : (
               <>
                 <Button
+                  type="button"
                   onClick={handleRetry}
                   disabled={isRetrying || health.status === 'checking'}
                   className="w-full"
@@ -142,8 +143,8 @@ export default function BackendErrorPage() {
                 className="cursor-pointer font-medium text-gray-700 hover:text-gray-900"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    e.currentTarget.click()
+                    e?.preventDefault()
+                    e?.currentTarget?.click()
                   }
                 }}
               >

@@ -47,5 +47,5 @@ export interface SearchableRequest extends BaseRequest {
  * Requête complète avec pagination, tri et recherche
  */
 export interface ListRequest extends SortableRequest, SearchableRequest {
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
 }

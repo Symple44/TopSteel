@@ -106,9 +106,21 @@ export class TenantResolver {
         const connectionConfig = {
           type: 'postgres' as const,
           host: process.env.ERP_DB_HOST || 'localhost',
-          port: parseInt(process.env.ERP_DB_PORT) || 5432,
+          port: parseInt(process.env.ERP_DB_PORT, 10) || 5432,
           username: process.env.ERP_DB_USERNAME || 'postgres',
-          password: process.env.ERP_DB_PASSWORD || 'postgres',
+          password: (() => {
+            const password = process.env.ERP_DB_PASSWORD
+            const nodeEnv = process.env.NODE_ENV
+
+            if (!password) {
+              if (nodeEnv === 'production') {
+                throw new Error('ERP_DB_PASSWORD environment variable is required in production')
+              }
+              // Use development default password for non-production environments
+              return 'dev_password'
+            }
+            return password
+          })(),
           database: databaseName,
           entities: [
             // Entités ERP nécessaires

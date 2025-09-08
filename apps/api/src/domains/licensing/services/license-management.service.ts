@@ -349,7 +349,8 @@ export class LicenseManagementService {
 
     license.expiresAt = nextExpiration
     license.lastRenewalAt = new Date()
-    license.nextRenewalAt = license.calculateNextRenewalDate()
+    const nextRenewal = license.calculateNextRenewalDate()
+    license.nextRenewalAt = nextRenewal ?? undefined
     license.status = LicenseStatus.ACTIVE
 
     const renewed = await this.licenseRepository.save(license)

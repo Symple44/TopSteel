@@ -144,8 +144,8 @@ export class PricingCacheService {
 
     // Récupérer le hit rate depuis les métriques Redis
     const info = await this.redis.info('stats')
-    const hits = parseInt(info.match(/keyspace_hits:(\d+)/)?.[1] || '0')
-    const misses = parseInt(info.match(/keyspace_misses:(\d+)/)?.[1] || '0')
+    const hits = parseInt(info.match(/keyspace_hits:(\d+)/)?.[1] || '0', 10)
+    const misses = parseInt(info.match(/keyspace_misses:(\d+)/)?.[1] || '0', 10)
     const hitRate = hits + misses > 0 ? (hits / (hits + misses)) * 100 : 0
 
     return {
@@ -179,7 +179,7 @@ export class PricingCacheService {
             societeId,
             quantity,
             customerGroup,
-            channel: 'ERP' as any,
+            channel: 'ERP' as unknown,
           })
         }
       }

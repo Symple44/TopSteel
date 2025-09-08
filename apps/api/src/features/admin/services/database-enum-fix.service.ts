@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 
 @Injectable()
 export class DatabaseEnumFixService {
@@ -41,7 +42,7 @@ export class DatabaseEnumFixService {
       }
     } catch (error) {
       // Si l'enum n'existe pas, le créer
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
       if (errorMessage.includes('type "notifications_type_enum" does not exist')) {
         try {
           await this._dataSource.query(`

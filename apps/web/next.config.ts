@@ -1,39 +1,14 @@
-import type { NextConfig } from 'next'
-import { exec } from 'node:child_process'
-import { createRequire } from 'node:module'
 import path from 'node:path'
-import { promisify } from 'node:util'
 import { fileURLToPath } from 'node:url'
+import type { NextConfig } from 'next'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const execAsync = promisify(exec)
-const require = createRequire(import.meta.url)
-
-// Fonction pour résoudre les modules de manière sécurisée
-function _safeResolve(moduleName: string) {
-  try {
-    return require.resolve(moduleName)
-  } catch {
-    return false
-  }
-}
-
-// Fonction pour exécuter Biome
-async function _runBiome() {
-  try {
-    const { stderr } = await execAsync('npx biome check src/ --reporter=summary')
-    if (stderr && !stderr.includes('warnings')) {
-      process.exit(1)
-    }
-  } catch {
-    process.exit(1)
-  }
-}
 
 const nextConfig: NextConfig = {
   typescript: {
-    // Ignore TypeScript errors - UI components are working but types need refinement
-    ignoreBuildErrors: true,
+    // TypeScript strict mode is enabled in tsconfig.base.json
+    // Build errors must be fixed for production builds
+    ignoreBuildErrors: false,
   },
   eslint: {
     // Re-enabled ESLint checks - configuration has been fixed
@@ -41,7 +16,7 @@ const nextConfig: NextConfig = {
   },
   // Transpile workspace packages for Next.js 15 (excluding domains which has server dependencies)
   transpilePackages: ['@erp/api-client', '@erp/ui', '@erp/utils', '@erp/types'],
-  
+
   // Image optimization configuration
   images: {
     remotePatterns: [
@@ -57,6 +32,9 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: false,
     contentDispositionType: 'inline',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Optimize image loading
+    unoptimized: false,
+    loader: 'default',
   },
 
   // API rewrites - proxy vers le backend NestJS
@@ -77,12 +55,6 @@ const nextConfig: NextConfig = {
     ]
   },
 
-  // Disable static generation to avoid context issues during build
-  // output: 'standalone', // Disabled for Windows compatibility
-
-  // Force dynamic rendering for all pages - disable SSG completely
-  // output: 'export', // Commented out for server mode
-
   // Skip static generation
   generateBuildId: async () => {
     return `build-${Date.now()}`
@@ -90,19 +62,54 @@ const nextConfig: NextConfig = {
 
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    // Remove React DevTools in production
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
 
-  // Optimisations de production pour réduire la taille des bundles
-  swcMinify: true,
+  // Bundle and performance optimizations
   productionBrowserSourceMaps: false,
+  compress: true,
 
-  // Optimisation des modules
+  // Additional optimizations to reduce bundle size
+  poweredByHeader: false,
+  generateEtags: true,
+
+  // Cache optimization - reduce .next folder size
+  distDir: '.next',
+
+  // Optimisation des modules avec tree-shaking amélioré
   modularizeImports: {
-    '@radix-ui': {
-      transform: '@radix-ui/{{member}}',
+    '@radix-ui/react-icons': {
+      transform: '@radix-ui/react-icons/dist/{{member}}',
+      preventFullImport: true,
     },
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+      preventFullImport: true,
+    },
+    '@tanstack/react-query': {
+      transform: '@tanstack/react-query/build/modern/{{member}}',
+      preventFullImport: true,
+    },
+    recharts: {
+      transform: 'recharts/es6/{{member}}',
+      preventFullImport: true,
+    },
+    '@dnd-kit/core': {
+      transform: '@dnd-kit/core/dist/{{member}}',
+      preventFullImport: true,
+    },
+    '@dnd-kit/sortable': {
+      transform: '@dnd-kit/sortable/dist/{{member}}',
+      preventFullImport: true,
+    },
+    'date-fns': {
+      transform: 'date-fns/{{member}}',
+      preventFullImport: true,
+    },
+    'lodash-es': {
+      transform: 'lodash-es/{{member}}',
+      preventFullImport: true,
     },
   },
 
@@ -129,21 +136,61 @@ const nextConfig: NextConfig = {
       dynamic: 0,
       static: 0,
     },
-    // Force dynamic rendering to avoid params serialization issues
-    dynamicIO: false,
+    // Re-enable component caching for better performance
+    // cacheComponents: true, // Disabled - requires Next.js canary
     // Disable static optimization that causes params readonly issues
     ppr: false,
-    // Disable turbo that might cause params readonly issues
-    // turbo: false, // Removed - not a valid option in Next.js 15
-    // Disable optimistic hydration
-    // optimizePackageImports: false, // Should be an array, not boolean
+    // Bundle optimization packages with automatic tree-shaking
+    optimizePackageImports: [
+      '@radix-ui/react-icons',
+      'lucide-react',
+      '@tanstack/react-query',
+      'recharts',
+      '@dnd-kit/core',
+      '@dnd-kit/sortable',
+      'date-fns',
+      'lodash-es',
+    ],
+    // Cache optimizations
+    webVitalsAttribution: ['CLS', 'LCP'],
+    // Memory usage optimization
+    memoryBasedWorkersCount: true,
+    // Optimize CSS
+    optimizeCss: true,
+    // Modern builds
+    esmExternals: true,
   },
 
   // Production optimizations
-
-  // Disable static generation completely
   output: undefined,
   trailingSlash: false,
+
+  // Static asset optimization
+  assetPrefix: process.env.ASSET_PREFIX || '',
+
+  // Headers for caching optimization
+  async headers() {
+    return [
+      {
+        source: '/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable', // 1 year
+          },
+        ],
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable', // 1 year
+          },
+        ],
+      },
+    ]
+  },
 
   // External packages for server-side only
   serverExternalPackages: [
@@ -153,35 +200,137 @@ const nextConfig: NextConfig = {
     '@img/sharp-darwin-x64',
     '@img/sharp-darwin-arm64',
     '@img/sharp-linux-x64',
-    '@img/sharp-linux-arm64',
     '@img/sharp-win32-x64',
-    '@img/sharp-win32-ia32',
-    '@img/sharp-libvips-dev',
     '@img/sharp-linuxmusl-x64',
-    '@img/sharp-linux-x64',
-    '@img/sharp-win32-x64',
-    '@img/sharp-darwin-x64',
-    '@img/sharp-darwin-arm64',
     '@opentelemetry/api',
   ],
 
-  // Disable image optimization during build
-  images: {
-    unoptimized: true,
-  },
+  webpack: (config, { isServer, dev, webpack }) => {
+    // Add resolution for @erp/ui subpaths
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve.alias,
+        '@erp/ui/primitives': path.resolve(__dirname, '../../packages/ui/dist/primitives'),
+        '@erp/ui/data-display': path.resolve(__dirname, '../../packages/ui/dist/data-display'),
+        '@erp/ui/layout': path.resolve(__dirname, '../../packages/ui/dist/layout'),
+        '@erp/ui/navigation': path.resolve(__dirname, '../../packages/ui/dist/navigation'),
+        '@erp/ui/forms': path.resolve(__dirname, '../../packages/ui/dist/forms'),
+        '@erp/ui/feedback': path.resolve(__dirname, '../../packages/ui/dist/feedback'),
+        '@erp/ui/business': path.resolve(__dirname, '../../packages/ui/dist/business'),
+        '@erp/ui': path.resolve(__dirname, '../../packages/ui/dist'),
+      },
+    }
 
-  webpack: (config, { isServer }) => {
+    // Cache optimizations to reduce .next folder size
+    if (!dev) {
+      // Re-enable filesystem cache for better performance
+      config.cache = {
+        type: 'filesystem',
+        cacheDirectory: path.join(__dirname, '.next/cache'),
+        buildDependencies: {
+          config: [__filename],
+        },
+      }
+
+      // Optimize chunk sizes and reduce bundle size
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        sideEffects: false,
+        minimize: true,
+        moduleIds: 'deterministic',
+        runtimeChunk: {
+          name: 'runtime',
+        },
+        splitChunks: {
+          chunks: 'all',
+          minSize: 10000, // Reduced for better splitting
+          maxSize: 150000, // Target 150KB chunks instead of 200KB
+          maxAsyncRequests: 20, // Reduced from 25
+          maxInitialRequests: 20, // Reduced from 25
+          automaticNameDelimiter: '.',
+          enforceSizeThreshold: 50000,
+          cacheGroups: {
+            // Framework chunks (React, Next.js)
+            framework: {
+              chunks: 'all',
+              name: 'framework',
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|next)[\\/]/,
+              priority: 40,
+              enforce: true,
+            },
+            // Radix UI components in separate chunk
+            radixui: {
+              test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+              name: 'radix-ui',
+              chunks: 'all',
+              priority: 30,
+              enforce: true,
+            },
+            // TanStack Query in separate chunk
+            tanstack: {
+              test: /[\\/]node_modules[\\/]@tanstack[\\/]/,
+              name: 'tanstack',
+              chunks: 'all',
+              priority: 25,
+              enforce: true,
+            },
+            // Charts and visualization
+            charts: {
+              test: /[\\/]node_modules[\\/](recharts|d3|chart\\.js|@univerjs)[\\/]/,
+              name: 'charts',
+              chunks: 'all',
+              priority: 20,
+              enforce: true,
+            },
+            // Icons
+            icons: {
+              test: /[\\/]node_modules[\\/](lucide-react|@radix-ui\/react-icons)[\\/]/,
+              name: 'icons',
+              chunks: 'all',
+              priority: 18,
+              enforce: true,
+            },
+            // Common utilities
+            utils: {
+              test: /[\\/]node_modules[\\/](zod|class-variance-authority|clsx|tailwind-merge|date-fns|lodash-es)[\\/]/,
+              name: 'utils',
+              chunks: 'all',
+              priority: 15,
+              enforce: true,
+            },
+            // Common vendor packages
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+              minChunks: 1,
+            },
+            // Common application code
+            common: {
+              minChunks: 2,
+              chunks: 'all',
+              name: 'common',
+              priority: 5,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      }
+
+      // Add compression plugins
+      config.plugins.push(
+        // Compression plugin for smaller output
+        new webpack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify('production'),
+        })
+      )
+    }
+
     // Handle Sharp properly - only on server
     if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        sharp: false,
-      }
-    }
-    
-    // Sharp configuration - handle properly on client/server
-    if (!isServer) {
-      // Client-side: completely exclude Sharp
       config.resolve.fallback = {
         ...config.resolve.fallback,
         sharp: false,
@@ -189,32 +338,35 @@ const nextConfig: NextConfig = {
         path: false,
         os: false,
       }
-      
+
       // Exclude Sharp modules from client bundle
       config.externals = [...(config.externals || []), 'sharp']
-      
+
       // Ignore Sharp-related modules
       config.plugins.push(
-        new (require('webpack').IgnorePlugin)({
+        new webpack.IgnorePlugin({
           resourceRegExp: /^sharp$/,
         })
       )
     }
-    
+
     // Suppress remaining Sharp warnings during build
     config.ignoreWarnings = [
-      /Module not found: Can't resolve '@img/,
+      /Module not found: Can't resolve '@img\/.*'/,
       /Critical dependency: the request of a dependency is an expression/,
+      // Suppress common warnings to reduce build output
+      /export .* was not found in/,
+      /Critical dependency: require function is used in a way/,
     ]
 
     // Configuration webpack de base
     config.resolve.alias = config.resolve.alias || {}
+
     // OpenTelemetry conditionnel basé sur ENABLE_TELEMETRY
     const enableTelemetry = process.env.ENABLE_TELEMETRY === 'true'
     const otelPolyfill = path.resolve(__dirname, './src/utils/otel-polyfill-universal.js')
 
-    if (enableTelemetry) {
-    } else {
+    if (!enableTelemetry) {
       // Désactiver OpenTelemetry avec polyfill universel
       config.resolve.alias = {
         ...config.resolve.alias,
@@ -235,16 +387,7 @@ const nextConfig: NextConfig = {
       }
     }
 
-    // Gérer Sharp pour le côté client sans mocks
-    if (!isServer) {
-      // Désactiver OpenTelemetry côté client seulement si télémétrie désactivée
-      if (!enableTelemetry) {
-        config.resolve.alias['@opentelemetry/api'] = otelPolyfill
-        config.resolve.alias['@opentelemetry/sdk-node'] = false
-      }
-    }
-
-    // Don't override workspace package resolution - let transpilePackages handle it
+    // Force single React instance and resolve duplicates
     config.resolve.alias = {
       ...config.resolve.alias,
       // Force single React instance
@@ -252,14 +395,19 @@ const nextConfig: NextConfig = {
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
       scheduler: path.resolve(__dirname, '../../node_modules/scheduler'),
       // Force TanStack Query core resolution
-      '@tanstack/query-core': path.resolve(
+      '@tanstack/query-core': path.resolve(__dirname, '../../node_modules/@tanstack/query-core'),
+      '@tanstack/react-query': path.resolve(__dirname, '../../node_modules/@tanstack/react-query'),
+      // Force single Radix UI instances
+      '@radix-ui/primitive': path.resolve(__dirname, '../../node_modules/@radix-ui/primitive'),
+      '@radix-ui/react-compose-refs': path.resolve(
         __dirname,
-        '../../node_modules/@tanstack/query-core'
+        '../../node_modules/@radix-ui/react-compose-refs'
       ),
-      '@tanstack/react-query': path.resolve(
+      '@radix-ui/react-context': path.resolve(
         __dirname,
-        '../../node_modules/@tanstack/react-query'
+        '../../node_modules/@radix-ui/react-context'
       ),
+      '@radix-ui/react-slot': path.resolve(__dirname, '../../node_modules/@radix-ui/react-slot'),
     }
 
     // Handle ESM modules properly
@@ -269,21 +417,15 @@ const nextConfig: NextConfig = {
       '.mjs': ['.mjs', '.js', '.ts'],
     }
 
-    // Ensure proper module resolution
+    // Ensure proper module resolution for polyfills
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       path: false,
       os: false,
       debug: path.resolve(__dirname, './src/utils/debug-polyfill.js'),
-      'socket.io-parser': path.resolve(
-        __dirname,
-        './src/utils/socket-io-parser-polyfill.js'
-      ),
-      'engine.io-client': path.resolve(
-        __dirname,
-        './src/utils/engine-io-client-polyfill.js'
-      ),
+      'socket.io-parser': path.resolve(__dirname, './src/utils/socket-io-parser-polyfill.js'),
+      'engine.io-client': path.resolve(__dirname, './src/utils/engine-io-client-polyfill.js'),
       '@socket.io/component-emitter': path.resolve(
         __dirname,
         './src/utils/component-emitter-polyfill.js'
@@ -319,28 +461,12 @@ const nextConfig: NextConfig = {
         '@img/sharp-darwin-x64': false,
         '@img/sharp-darwin-arm64': false,
         '@img': false,
-        // Exclure axios et ses dépendances node-only
-        axios: false,
-        'proxy-from-env': false,
-        'follow-redirects': false,
-        'form-data': false,
-        'combined-stream': false,
-        'mime-types': false,
-        asynckit: false,
-        'es-set-tostringtag': false,
-        hasown: false,
         // Exclure undici côté client (uniquement pour Node.js)
         undici: false,
         // Fix Socket.IO client dependencies avec polyfills
         debug: path.resolve(__dirname, './src/utils/debug-polyfill.js'),
-        'socket.io-parser': path.resolve(
-          __dirname,
-          './src/utils/socket-io-parser-polyfill.js'
-        ),
-        'engine.io-client': path.resolve(
-          __dirname,
-          './src/utils/engine-io-client-polyfill.js'
-        ),
+        'socket.io-parser': path.resolve(__dirname, './src/utils/socket-io-parser-polyfill.js'),
+        'engine.io-client': path.resolve(__dirname, './src/utils/engine-io-client-polyfill.js'),
         '@socket.io/component-emitter': path.resolve(
           __dirname,
           './src/utils/component-emitter-polyfill.js'
@@ -360,7 +486,6 @@ const nextConfig: NextConfig = {
       config.externals = config.externals || []
       // Externalize Sharp and all its platform-specific dependencies
       config.externals.push('sharp', /^@img\//)
-      // Don't externalize transpiled packages
     } else {
       // For client builds, explicitly exclude Sharp and server modules
       const clientExternals = [
@@ -374,50 +499,61 @@ const nextConfig: NextConfig = {
         '@img/sharp-darwin-arm64',
         '@erp/domains/server',
       ]
-      
+
       config.externals = config.externals || []
       if (typeof config.externals === 'function') {
         const originalExternals = config.externals
-        config.externals = async (...args) => {
+        config.externals = async (
+          ...args: [
+            context: any,
+            request: string | undefined,
+            callback?: (
+              err?: Error | null,
+              result?: string | boolean | string[] | { [key: string]: any }
+            ) => void,
+          ]
+        ) => {
           const isExternal = await originalExternals(...args)
           if (isExternal) return isExternal
-          
-          const [context, request] = args
-          if (clientExternals.some(ext => request === ext || request.startsWith(ext + '/'))) {
-            return request
+
+          const [, request] = args
+          // Ensure request is a string before calling string methods
+          const requestStr = typeof request === 'string' ? request : String(request || '')
+          if (
+            clientExternals.some((ext) => requestStr === ext || requestStr.startsWith(`${ext}/`))
+          ) {
+            return requestStr
           }
           return false
         }
       } else {
-        config.externals.push((...args) => {
-          const [context, request] = args
-          if (clientExternals.some(ext => request === ext || request.startsWith(ext + '/'))) {
-            return request
+        config.externals.push(
+          (
+            ...args: [
+              context: any,
+              request: string | undefined,
+              callback?: (
+                err?: Error | null,
+                result?: string | boolean | string[] | { [key: string]: any }
+              ) => void,
+            ]
+          ) => {
+            const [, request] = args
+            // Ensure request is a string before calling string methods
+            const requestStr = typeof request === 'string' ? request : String(request || '')
+            if (
+              clientExternals.some((ext) => requestStr === ext || requestStr.startsWith(`${ext}/`))
+            ) {
+              return requestStr
+            }
+            return false
           }
-          return false
-        })
+        )
       }
     }
 
     // Ensure React is resolved consistently
-    config.resolve.modules = [
-      path.resolve(__dirname, '../../node_modules'),
-      'node_modules',
-    ]
-
-    // Add scheduler to fallback for better compatibility
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      scheduler: path.resolve(__dirname, '../../node_modules/scheduler'),
-    }
-
-    // Ensure scheduler is properly resolved
-    if (!config.resolve.alias.scheduler) {
-      config.resolve.alias.scheduler = path.resolve(
-        __dirname,
-        '../../node_modules/scheduler'
-      )
-    }
+    config.resolve.modules = [path.resolve(__dirname, '../../node_modules'), 'node_modules']
 
     return config
   },

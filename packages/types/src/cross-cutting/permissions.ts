@@ -89,7 +89,7 @@ export enum Action {
 export interface PermissionCheck {
   resource: Resource
   action: Action
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 }
 
 /**
@@ -100,7 +100,7 @@ export interface PermissionContext {
   ownerId?: string
   teamId?: string
   organizationId?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 /**

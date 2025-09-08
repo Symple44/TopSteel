@@ -22,11 +22,11 @@ export interface TestUser {
   societeCode: string
 }
 
-export class TestDataGenerator {
+export namespace TestDataGenerator {
   /**
    * Génère un UUID v4
    */
-  static generateUUID(): string {
+  export function generateUUID(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0
       const v = c === 'x' ? r : (r & 0x3) | 0x8
@@ -37,9 +37,9 @@ export class TestDataGenerator {
   /**
    * Génère une société de test
    */
-  static generateSociete(overrides?: Partial<TestSociete>): TestSociete {
-    const id = overrides?.id || TestDataGenerator.generateUUID()
-    const code = overrides?.code || TestDataGenerator.generateSocieteCode()
+  export function generateSociete(overrides?: Partial<TestSociete>): TestSociete {
+    const id = overrides?.id || generateUUID()
+    const code = overrides?.code || generateSocieteCode()
 
     return {
       id,
@@ -56,7 +56,7 @@ export class TestDataGenerator {
   /**
    * Génère un code de société unique
    */
-  static generateSocieteCode(): string {
+  export function generateSocieteCode(): string {
     const prefixes = ['TOP', 'METAL', 'STEEL', 'IRON', 'ALU', 'TECH']
     const suffixes = ['STEEL', 'WORKS', 'FORGE', 'CRAFT', 'PRO', 'PLUS']
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]
@@ -67,8 +67,8 @@ export class TestDataGenerator {
   /**
    * Génère un utilisateur de test
    */
-  static generateUser(societe?: TestSociete, overrides?: Partial<TestUser>): TestUser {
-    const testSociete = societe || TestDataGenerator.generateSociete()
+  export function generateUser(societe?: TestSociete, overrides?: Partial<TestUser>): TestUser {
+    const testSociete = societe || generateSociete()
     const prenoms = ['Jean', 'Marie', 'Pierre', 'Sophie', 'Luc', 'Anne']
     const noms = ['Dupont', 'Martin', 'Bernard', 'Thomas', 'Robert', 'Petit']
 
@@ -77,7 +77,7 @@ export class TestDataGenerator {
     const role = overrides?.role || 'user'
 
     return {
-      id: overrides?.id || TestDataGenerator.generateUUID(),
+      id: overrides?.id || generateUUID(),
       email:
         overrides?.email ||
         `${prenom.toLowerCase()}.${nom.toLowerCase()}@${testSociete.code.toLowerCase()}.com`,
@@ -93,24 +93,24 @@ export class TestDataGenerator {
   /**
    * Génère un ensemble complet de données de test
    */
-  static generateTestEnvironment() {
+  export function generateTestEnvironment() {
     // Sociétés de test
     const societes = {
-      topsteel: TestDataGenerator.generateSociete({
+      topsteel: generateSociete({
         code: 'TOPSTEEL',
         nom: 'TopSteel SA',
         email: 'contact@topsteel.com',
         status: 'ACTIVE',
         plan: 'ENTERPRISE',
       }),
-      metalux: TestDataGenerator.generateSociete({
+      metalux: generateSociete({
         code: 'METALUX',
         nom: 'Metalux Industries',
         email: 'info@metalux.com',
         status: 'ACTIVE',
         plan: 'PROFESSIONAL',
       }),
-      demo: TestDataGenerator.generateSociete({
+      demo: generateSociete({
         code: 'DEMO',
         nom: 'Demo Company',
         email: 'demo@example.com',
@@ -122,13 +122,13 @@ export class TestDataGenerator {
     // Utilisateurs de test
     const users = {
       // TopSteel users
-      topsteelAdmin: TestDataGenerator.generateUser(societes.topsteel, {
+      topsteelAdmin: generateUser(societes.topsteel, {
         email: 'admin@topsteel.com',
         prenom: 'Admin',
         nom: 'TopSteel',
         role: 'admin',
       }),
-      topsteelUser: TestDataGenerator.generateUser(societes.topsteel, {
+      topsteelUser: generateUser(societes.topsteel, {
         email: 'user@topsteel.com',
         prenom: 'Jean',
         nom: 'Dupont',
@@ -136,7 +136,7 @@ export class TestDataGenerator {
       }),
 
       // Metalux users
-      metaluxAdmin: TestDataGenerator.generateUser(societes.metalux, {
+      metaluxAdmin: generateUser(societes.metalux, {
         email: 'admin@metalux.com',
         prenom: 'Admin',
         nom: 'Metalux',
@@ -144,7 +144,7 @@ export class TestDataGenerator {
       }),
 
       // Demo user
-      demoUser: TestDataGenerator.generateUser(societes.demo, {
+      demoUser: generateUser(societes.demo, {
         email: 'demo@example.com',
         prenom: 'Demo',
         nom: 'User',
@@ -161,7 +161,7 @@ export class TestDataGenerator {
   /**
    * Génère un token JWT pour un utilisateur spécifique
    */
-  static generateTokenPayload(user: TestUser, societe: TestSociete) {
+  export function generateTokenPayload(user: TestUser, societe: TestSociete) {
     return {
       sub: user.id,
       email: user.email,
@@ -171,7 +171,7 @@ export class TestDataGenerator {
       societeCode: societe.code,
       societeName: societe.nom,
       role: user.role,
-      permissions: TestDataGenerator.getPermissionsByRole(user.role),
+      permissions: getPermissionsByRole(user.role),
       isTest: true,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 3600, // 1 heure
@@ -181,7 +181,7 @@ export class TestDataGenerator {
   /**
    * Retourne les permissions en fonction du rôle
    */
-  static getPermissionsByRole(role: string): string[] {
+  export function getPermissionsByRole(role: string): string[] {
     const permissionsMap: Record<string, string[]> = {
       'super-admin': ['*'],
       admin: ['users:*', 'societes:read', 'settings:*', 'reports:*'],
@@ -197,8 +197,8 @@ export class TestDataGenerator {
   /**
    * Affiche les données de test générées
    */
-  static displayTestData() {
-    const env = TestDataGenerator.generateTestEnvironment()
+  export function displayTestData() {
+    const env = generateTestEnvironment()
 
     console.log('🏢 SOCIÉTÉS DE TEST')
     console.log('='.repeat(80))
@@ -221,7 +221,7 @@ export class TestDataGenerator {
       console.log(`  Nom: ${user.prenom} ${user.nom}`)
       console.log(`  Rôle: ${user.role}`)
       console.log(`  Société: ${user.societeCode}`)
-      console.log(`  Permissions: ${TestDataGenerator.getPermissionsByRole(user.role).join(', ')}`)
+      console.log(`  Permissions: ${getPermissionsByRole(user.role).join(', ')}`)
     })
   }
 }

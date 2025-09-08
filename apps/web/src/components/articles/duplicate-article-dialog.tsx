@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import { Copy, Package2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -60,12 +61,24 @@ export function DuplicateArticleDialog({
   onOpenChange,
   article,
 }: DuplicateArticleDialogProps) {
+  const ids = useFormFieldIds([
+    'nouvelleReference',
+    'designation',
+    'description',
+    'famille',
+    'marque',
+    'modele',
+    'gereEnStock',
+    'stockPhysique',
+    'stockMini',
+    'prixVenteHT',
+  ])
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const dupliquerArticle = useDupliquerArticle()
 
-  const isSubmitting = dupliquerArticle.isPending
+  const isSubmitting = dupliquerArticle?.isPending
 
   useEffect(() => {
     if (article && open) {
@@ -82,7 +95,7 @@ export function DuplicateArticleDialog({
         modele: article.modele || '',
         gereEnStock: article.gereEnStock,
         stockPhysique: '0', // Nouveau stock à zéro par défaut
-        stockMini: String(article.stockMini || 0),
+        stockMini: String(article.stockMini ?? 0),
         prixVenteHT: String(article.prixVenteHT || ''),
       })
     } else {
@@ -94,11 +107,11 @@ export function DuplicateArticleDialog({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.nouvelleReference.trim()) {
+    if (!formData?.nouvelleReference?.trim()) {
       newErrors.nouvelleReference = 'La nouvelle référence est obligatoire'
     }
 
-    if (!formData.designation.trim()) {
+    if (!formData?.designation?.trim()) {
       newErrors.designation = 'La désignation est obligatoire'
     }
 
@@ -119,7 +132,7 @@ export function DuplicateArticleDialog({
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!article || !validateForm()) {
       return
@@ -139,7 +152,7 @@ export function DuplicateArticleDialog({
     }
 
     try {
-      await dupliquerArticle.mutateAsync({
+      await dupliquerArticle?.mutateAsync({
         id: article.id,
         nouvelleReference: sanitizeInput(formData.nouvelleReference),
         modifications,
@@ -204,11 +217,11 @@ export function DuplicateArticleDialog({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="nouvelleReference">Nouvelle référence *</Label>
+                  <Label htmlFor={ids.nouvelleReference}>Nouvelle référence *</Label>
                   <Input
-                    id="nouvelleReference"
+                    id={ids.nouvelleReference}
                     value={formData.nouvelleReference}
-                    onChange={(e) => handleInputChange('nouvelleReference', e.target.value)}
+                    onChange={(e) => handleInputChange('nouvelleReference', e?.target?.value)}
                     className={cn(errors.nouvelleReference && 'border-red-500')}
                   />
                   {errors.nouvelleReference && (
@@ -237,11 +250,11 @@ export function DuplicateArticleDialog({
               </div>
 
               <div>
-                <Label htmlFor="designation">Désignation *</Label>
+                <Label htmlFor={ids.designation}>Désignation *</Label>
                 <Input
-                  id="designation"
+                  id={ids.designation}
                   value={formData.designation}
-                  onChange={(e) => handleInputChange('designation', e.target.value)}
+                  onChange={(e) => handleInputChange('designation', e?.target?.value)}
                   className={cn(errors.designation && 'border-red-500')}
                 />
                 {errors.designation && (
@@ -250,40 +263,40 @@ export function DuplicateArticleDialog({
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor={ids.description}>Description</Label>
                 <Textarea
-                  id="description"
+                  id={ids.description}
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={(e) => handleInputChange('description', e?.target?.value)}
                   rows={3}
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="famille">Famille</Label>
+                  <Label htmlFor={ids.famille}>Famille</Label>
                   <Input
-                    id="famille"
+                    id={ids.famille}
                     value={formData.famille}
-                    onChange={(e) => handleInputChange('famille', e.target.value)}
+                    onChange={(e) => handleInputChange('famille', e?.target?.value)}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="marque">Marque</Label>
+                  <Label htmlFor={ids.marque}>Marque</Label>
                   <Input
-                    id="marque"
+                    id={ids.marque}
                     value={formData.marque}
-                    onChange={(e) => handleInputChange('marque', e.target.value)}
+                    onChange={(e) => handleInputChange('marque', e?.target?.value)}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="modele">Modèle</Label>
+                  <Label htmlFor={ids.modele}>Modèle</Label>
                   <Input
-                    id="modele"
+                    id={ids.modele}
                     value={formData.modele}
-                    onChange={(e) => handleInputChange('modele', e.target.value)}
+                    onChange={(e) => handleInputChange('modele', e?.target?.value)}
                   />
                 </div>
               </div>
@@ -296,25 +309,25 @@ export function DuplicateArticleDialog({
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="gereEnStock"
+                  id={ids.gereEnStock}
                   checked={formData.gereEnStock}
-                  onChange={(e) => handleInputChange('gereEnStock', e.target.checked)}
+                  onChange={(e) => handleInputChange('gereEnStock', e?.target?.checked)}
                   className="rounded border-gray-300"
                 />
-                <Label htmlFor="gereEnStock">Gérer en stock</Label>
+                <Label htmlFor={ids.gereEnStock}>Gérer en stock</Label>
               </div>
 
               {formData.gereEnStock && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="stockPhysique">Stock initial</Label>
+                    <Label htmlFor={ids.stockPhysique}>Stock initial</Label>
                     <Input
-                      id="stockPhysique"
+                      id={ids.stockPhysique}
                       type="number"
                       min="0"
                       step="0.01"
                       value={formData.stockPhysique}
-                      onChange={(e) => handleInputChange('stockPhysique', e.target.value)}
+                      onChange={(e) => handleInputChange('stockPhysique', e?.target?.value)}
                       className={cn(errors.stockPhysique && 'border-red-500')}
                     />
                     {errors.stockPhysique && (
@@ -326,14 +339,14 @@ export function DuplicateArticleDialog({
                   </div>
 
                   <div>
-                    <Label htmlFor="stockMini">Stock minimum</Label>
+                    <Label htmlFor={ids.stockMini}>Stock minimum</Label>
                     <Input
-                      id="stockMini"
+                      id={ids.stockMini}
                       type="number"
                       min="0"
                       step="0.01"
                       value={formData.stockMini}
-                      onChange={(e) => handleInputChange('stockMini', e.target.value)}
+                      onChange={(e) => handleInputChange('stockMini', e?.target?.value)}
                       className={cn(errors.stockMini && 'border-red-500')}
                     />
                     {errors.stockMini && (
@@ -349,14 +362,14 @@ export function DuplicateArticleDialog({
               <h3 className="text-lg font-medium">Tarification</h3>
 
               <div>
-                <Label htmlFor="prixVenteHT">Prix de vente HT</Label>
+                <Label htmlFor={ids.prixVenteHT}>Prix de vente HT</Label>
                 <Input
-                  id="prixVenteHT"
+                  id={ids.prixVenteHT}
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.prixVenteHT}
-                  onChange={(e) => handleInputChange('prixVenteHT', e.target.value)}
+                  onChange={(e) => handleInputChange('prixVenteHT', e?.target?.value)}
                 />
                 <p className="text-sm text-muted-foreground mt-1">
                   Laissez vide pour conserver le prix de l'article source

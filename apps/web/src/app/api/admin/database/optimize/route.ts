@@ -5,22 +5,22 @@ export async function POST(request: NextRequest) {
   try {
     const response = await callBackendFromApi(request, 'admin/database/optimize', {
       method: 'POST',
-      headers: {
-        ...(request.headers.get('authorization') && {
-          Authorization: request.headers.get('authorization'),
-        }),
-      },
+      headers: request?.headers?.get('authorization')
+        ? {
+            Authorization: request.headers.get('authorization')!,
+          }
+        : undefined,
     })
 
-    if (!response.ok) {
-      return NextResponse.json(
+    if (!response?.ok) {
+      return NextResponse?.json(
         { success: false, error: "Erreur lors de l'appel à l'API" },
         { status: response.status }
       )
     }
 
-    const responseData = await response.json()
-    return NextResponse.json(responseData.data || responseData)
+    const responseData = await response?.json()
+    return NextResponse?.json(responseData?.data || responseData)
   } catch {
     // Simuler une optimisation pour le mock
     const mockResponse = {
@@ -34,6 +34,6 @@ export async function POST(request: NextRequest) {
       ],
     }
 
-    return NextResponse.json(mockResponse)
+    return NextResponse?.json(mockResponse)
   }
 }

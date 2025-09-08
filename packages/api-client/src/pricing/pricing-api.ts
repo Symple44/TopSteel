@@ -1,6 +1,18 @@
 import type { PriceRuleChannel } from '@erp/entities'
 import type { HttpClient } from '../core/http-client'
 
+export interface PricingRule {
+  id: string
+  name: string
+  description?: string
+  conditions: Record<string, unknown>
+  actions: Record<string, unknown>
+  priority: number
+  enabled: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface PriceCalculationRequest {
   articleId?: string
   articleReference?: string
@@ -117,8 +129,8 @@ export class PricingApi {
     search?: string
     limit?: number
     offset?: number
-  }): Promise<{ rules: any[]; total: number }> {
-    const response = await this.httpClient.get<{ rules: any[]; total: number }>('/pricing/rules', {
+  }): Promise<{ rules: PricingRule[]; total: number }> {
+    const response = await this.httpClient.get<{ rules: PricingRule[]; total: number }>('/pricing/rules', {
       params: filters,
     })
     return response.data
@@ -127,24 +139,24 @@ export class PricingApi {
   /**
    * Récupère une règle de prix spécifique
    */
-  async getRule(ruleId: string): Promise<any> {
-    const response = await this.httpClient.get<any>(`/pricing/rules/${ruleId}`)
+  async getRule(ruleId: string): Promise<PricingRule> {
+    const response = await this.httpClient.get<PricingRule>(`/pricing/rules/${ruleId}`)
     return response.data
   }
 
   /**
    * Crée une nouvelle règle de prix (admin only)
    */
-  async createRule(rule: any): Promise<any> {
-    const response = await this.httpClient.post<any>('/pricing/rules', rule)
+  async createRule(rule: Partial<PricingRule>): Promise<PricingRule> {
+    const response = await this.httpClient.post<PricingRule>('/pricing/rules', rule)
     return response.data
   }
 
   /**
    * Met à jour une règle de prix (admin only)
    */
-  async updateRule(ruleId: string, updates: any): Promise<any> {
-    const response = await this.httpClient.put<any>(`/pricing/rules/${ruleId}`, updates)
+  async updateRule(ruleId: string, updates: Partial<PricingRule>): Promise<PricingRule> {
+    const response = await this.httpClient.put<PricingRule>(`/pricing/rules/${ruleId}`, updates)
     return response.data
   }
 

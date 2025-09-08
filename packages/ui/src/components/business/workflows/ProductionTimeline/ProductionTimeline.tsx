@@ -1,37 +1,34 @@
 'use client'
-import React from 'react'
-import { Badge } from '../../../data-display/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
-import { Progress } from '../../../data-display/progress/progress'
-import { cn } from '../../../../lib/utils'
-import { 
-  Factory, 
-  Wrench, 
-  CheckCircle2, 
-  Clock, 
+import {
   AlertTriangle,
   Calendar,
-  User,
-  MapPin,
+  CheckCircle2,
+  Clock,
+  Factory,
   Gauge,
-  Thermometer,
-  Zap,
-  Settings,
+  MapPin,
   Package,
+  Pause,
+  Play,
   Scale,
   Shield,
-  Play,
-  Pause,
-  StopCircle
+  StopCircle,
+  Thermometer,
+  User,
+  Zap,
 } from 'lucide-react'
-export type ProductionStatus = 
-  | 'planned' 
-  | 'queued' 
-  | 'in_progress' 
-  | 'paused' 
-  | 'quality_check' 
-  | 'completed' 
-  | 'delayed' 
+import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
+import { Progress } from '../../../primitives/progress'
+export type ProductionStatus =
+  | 'planned'
+  | 'queued'
+  | 'in_progress'
+  | 'paused'
+  | 'quality_check'
+  | 'completed'
+  | 'delayed'
   | 'cancelled'
 export type ProductionPriority = 'low' | 'normal' | 'high' | 'urgent'
 export interface ProductionOperation {
@@ -94,63 +91,66 @@ export interface ProductionTimelineProps {
   showProgress?: boolean
   showDetails?: boolean
   onOperationClick?: (operationId: string) => void
-  onOperationAction?: (operationId: string, action: 'start' | 'pause' | 'complete' | 'quality_check') => void
+  onOperationAction?: (
+    operationId: string,
+    action: 'start' | 'pause' | 'complete' | 'quality_check'
+  ) => void
 }
 const statusConfig = {
   planned: {
     color: 'bg-gray-100 text-gray-800 border-gray-200',
     icon: Calendar,
     label: 'Planifié',
-    bgColor: 'bg-gray-50/30'
+    bgColor: 'bg-gray-50/30',
   },
   queued: {
     color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     icon: Clock,
     label: 'En attente',
-    bgColor: 'bg-yellow-50/30'
+    bgColor: 'bg-yellow-50/30',
   },
   in_progress: {
     color: 'bg-blue-100 text-blue-800 border-blue-200',
     icon: Play,
     label: 'En cours',
-    bgColor: 'bg-blue-50/30'
+    bgColor: 'bg-blue-50/30',
   },
   paused: {
     color: 'bg-orange-100 text-orange-800 border-orange-200',
     icon: Pause,
     label: 'En pause',
-    bgColor: 'bg-orange-50/30'
+    bgColor: 'bg-orange-50/30',
   },
   quality_check: {
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     icon: Shield,
     label: 'Contrôle qualité',
-    bgColor: 'bg-purple-50/30'
+    bgColor: 'bg-purple-50/30',
   },
   completed: {
     color: 'bg-green-100 text-green-800 border-green-200',
     icon: CheckCircle2,
     label: 'Terminé',
-    bgColor: 'bg-green-50/30'
+    bgColor: 'bg-green-50/30',
   },
   delayed: {
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: AlertTriangle,
     label: 'En retard',
-    bgColor: 'bg-red-50/30'
+    bgColor: 'bg-red-50/30',
   },
   cancelled: {
     color: 'bg-gray-100 text-gray-800 border-gray-200',
     icon: StopCircle,
     label: 'Annulé',
-    bgColor: 'bg-gray-50/30'
-  }
+    bgColor: 'bg-gray-50/30',
+  },
 }
 const priorityConfig = {
   low: { color: 'bg-gray-100 text-gray-800', label: 'Basse' },
   normal: { color: 'bg-blue-100 text-blue-800', label: 'Normale' },
   high: { color: 'bg-orange-100 text-orange-800', label: 'Haute' },
-  urgent: { color: 'bg-red-100 text-red-800', label: 'Urgent' }
+  urgent: { color: 'bg-red-100 text-red-800', label: 'Urgent' },
 }
 export function ProductionTimeline({
   className,
@@ -166,20 +166,20 @@ export function ProductionTimeline({
   showProgress = true,
   showDetails = true,
   onOperationClick,
-  onOperationAction
+  onOperationAction,
 }: ProductionTimelineProps) {
-  const completedOperations = operations.filter(op => op.status === 'completed').length
+  const completedOperations = operations.filter((op) => op.status === 'completed').length
   const totalOperations = operations.length
   const calculatedProgress = totalOperations > 0 ? (completedOperations / totalOperations) * 100 : 0
   const progressPercentage = totalProgress || calculatedProgress
-  const currentOperation = operations.find(op => op.status === 'in_progress')
-  const delayedOperations = operations.filter(op => op.status === 'delayed').length
-  const pausedOperations = operations.filter(op => op.status === 'paused').length
+  const currentOperation = operations.find((op) => op.status === 'in_progress')
+  const delayedOperations = operations.filter((op) => op.status === 'delayed').length
+  const pausedOperations = operations.filter((op) => op.status === 'paused').length
   const isDelayed = actualEndDate ? actualEndDate > plannedEndDate : new Date() > plannedEndDate
-  const hasIssues = operations.some(op => op.issues && op.issues.length > 0)
+  const hasIssues = operations.some((op) => op.issues && op.issues.length > 0)
   if (compact) {
     return (
-      <Card className={cn(className, isDelayed && "border-red-300")}>
+      <Card className={cn(className, isDelayed && 'border-red-300')}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
@@ -193,31 +193,31 @@ export function ProductionTimeline({
               )}
             </div>
             <div className="text-right">
-              <Badge 
+              <Badge
                 variant="outline"
                 className={cn(
-                  progressPercentage === 100 && "bg-green-100 text-green-800",
-                  isDelayed && "bg-red-100 text-red-800"
+                  progressPercentage === 100 && 'bg-green-100 text-green-800',
+                  isDelayed && 'bg-red-100 text-red-800'
                 )}
               >
                 {Math.round(progressPercentage)}%
               </Badge>
               {currentOperation && (
-                <div className="text-xs text-muted-foreground mt-1">
-                  {currentOperation.name}
-                </div>
+                <div className="text-xs text-muted-foreground mt-1">{currentOperation.name}</div>
               )}
             </div>
           </div>
-          {showProgress && (
-            <Progress value={progressPercentage} className="h-2" />
-          )}
+          {showProgress && <Progress value={progressPercentage} className="h-2" />}
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>{completedOperations}/{totalOperations} opérations</span>
+            <span>
+              {completedOperations}/{totalOperations} opérations
+            </span>
             <span className={isDelayed ? 'text-red-600' : ''}>
-              {isDelayed ? 'En retard' : `Fin prévue: ${plannedEndDate.toLocaleDateString('fr-FR')}`}
+              {isDelayed
+                ? 'En retard'
+                : `Fin prévue: ${plannedEndDate.toLocaleDateString('fr-FR')}`}
             </span>
           </div>
         </CardContent>
@@ -225,7 +225,7 @@ export function ProductionTimeline({
     )
   }
   return (
-    <Card className={cn(className, isDelayed && "border-red-300")}>
+    <Card className={cn(className, isDelayed && 'border-red-300')}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -253,12 +253,12 @@ export function ProductionTimeline({
             </div>
           </div>
           <div className="text-right">
-            <Badge 
+            <Badge
               variant="outline"
               className={cn(
-                "mb-2",
-                progressPercentage === 100 && "bg-green-100 text-green-800",
-                isDelayed && "bg-red-100 text-red-800"
+                'mb-2',
+                progressPercentage === 100 && 'bg-green-100 text-green-800',
+                isDelayed && 'bg-red-100 text-red-800'
               )}
             >
               {Math.round(progressPercentage)}% terminé
@@ -282,7 +282,8 @@ export function ProductionTimeline({
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Progression de la production</span>
               <span className="text-sm text-muted-foreground">
-                {completedOperations}/{totalOperations} opérations ({Math.round(progressPercentage)}%)
+                {completedOperations}/{totalOperations} opérations ({Math.round(progressPercentage)}
+                %)
               </span>
             </div>
             <Progress value={progressPercentage} className="h-3" />
@@ -290,63 +291,77 @@ export function ProductionTimeline({
         )}
         {actualStartDate && (
           <div className="mt-3 text-sm text-muted-foreground">
-            Démarré le: {actualStartDate.toLocaleDateString('fr-FR')} à {actualStartDate.toLocaleTimeString('fr-FR')}
+            Démarré le: {actualStartDate.toLocaleDateString('fr-FR')} à{' '}
+            {actualStartDate.toLocaleTimeString('fr-FR')}
           </div>
         )}
         {actualEndDate && (
           <div className="mt-1 text-sm text-green-600 font-medium">
-            Terminé le: {actualEndDate.toLocaleDateString('fr-FR')} à {actualEndDate.toLocaleTimeString('fr-FR')}
+            Terminé le: {actualEndDate.toLocaleDateString('fr-FR')} à{' '}
+            {actualEndDate.toLocaleTimeString('fr-FR')}
           </div>
         )}
       </CardHeader>
       <CardContent className="space-y-4">
         {operations.map((operation, index) => {
           const StatusIcon = statusConfig[operation.status].icon
-          const isClickable = onOperationClick && (operation.status === 'completed' || operation.status === 'in_progress')
-          const isOverdue = operation.actualEndDate ? 
-            operation.actualEndDate > operation.plannedEndDate : 
-            new Date() > operation.plannedEndDate && operation.status !== 'completed'
+          const isClickable =
+            onOperationClick &&
+            (operation.status === 'completed' || operation.status === 'in_progress')
+          const isOverdue = operation.actualEndDate
+            ? operation.actualEndDate > operation.plannedEndDate
+            : new Date() > operation.plannedEndDate && operation.status !== 'completed'
           return (
             <div key={operation.id} className="relative">
               {/* Connection line */}
               {index < operations.length - 1 && (
                 <div className="absolute left-6 top-16 w-0.5 h-12 bg-gray-200" />
               )}
-              <div 
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: This div implements conditional click handling for production operation cards with complex nested interactive content. Using div is appropriate here for the card layout. */}
+              <div
                 className={cn(
-                  "flex items-start gap-4 p-4 rounded-lg border transition-all",
+                  'flex items-start gap-4 p-4 rounded-lg border transition-all',
                   `border-${statusConfig[operation.status].color.split(' ')[2].split('-')[1]}-300`,
                   statusConfig[operation.status].bgColor,
-                  isClickable && "cursor-pointer hover:shadow-sm"
+                  isClickable && 'cursor-pointer hover:shadow-sm'
                 )}
+                role={isClickable ? 'button' : undefined}
+                tabIndex={isClickable ? 0 : undefined}
                 onClick={isClickable ? () => onOperationClick(operation.id) : undefined}
+                onKeyDown={(e) => {
+                  if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault()
+                    onOperationClick(operation.id)
+                  }
+                }}
               >
-                <div className={cn(
-                  "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2",
-                  operation.status === 'completed' && "bg-green-100 border-green-300 text-green-600",
-                  operation.status === 'in_progress' && "bg-blue-100 border-blue-300 text-blue-600",
-                  operation.status === 'delayed' && "bg-red-100 border-red-300 text-red-600",
-                  operation.status === 'paused' && "bg-orange-100 border-orange-300 text-orange-600",
-                  operation.status === 'quality_check' && "bg-purple-100 border-purple-300 text-purple-600",
-                  operation.status === 'queued' && "bg-yellow-100 border-yellow-300 text-yellow-600",
-                  operation.status === 'planned' && "bg-gray-100 border-gray-300 text-gray-600",
-                  operation.status === 'cancelled' && "bg-gray-100 border-gray-300 text-gray-600"
-                )}>
+                <div
+                  className={cn(
+                    'flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2',
+                    operation.status === 'completed' &&
+                      'bg-green-100 border-green-300 text-green-600',
+                    operation.status === 'in_progress' &&
+                      'bg-blue-100 border-blue-300 text-blue-600',
+                    operation.status === 'delayed' && 'bg-red-100 border-red-300 text-red-600',
+                    operation.status === 'paused' &&
+                      'bg-orange-100 border-orange-300 text-orange-600',
+                    operation.status === 'quality_check' &&
+                      'bg-purple-100 border-purple-300 text-purple-600',
+                    operation.status === 'queued' &&
+                      'bg-yellow-100 border-yellow-300 text-yellow-600',
+                    operation.status === 'planned' && 'bg-gray-100 border-gray-300 text-gray-600',
+                    operation.status === 'cancelled' && 'bg-gray-100 border-gray-300 text-gray-600'
+                  )}
+                >
                   <StatusIcon className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-semibold text-gray-900">{operation.name}</h3>
-                    <Badge 
-                      variant="outline" 
-                      className={statusConfig[operation.status].color}
-                    >
+                    <Badge variant="outline" className={statusConfig[operation.status].color}>
                       {statusConfig[operation.status].label}
                     </Badge>
-                    <Badge 
-                      variant="outline" 
-                      className={priorityConfig[operation.priority].color}
-                    >
+                    <Badge variant="outline" className={priorityConfig[operation.priority].color}>
                       {priorityConfig[operation.priority].label}
                     </Badge>
                     {isOverdue && (
@@ -383,16 +398,19 @@ export function ProductionTimeline({
                     </div>
                     <div className="space-y-2">
                       <div className="text-sm text-muted-foreground">
-                        Planifié: {operation.plannedStartDate.toLocaleDateString('fr-FR')} - {operation.plannedEndDate.toLocaleDateString('fr-FR')}
+                        Planifié: {operation.plannedStartDate.toLocaleDateString('fr-FR')} -{' '}
+                        {operation.plannedEndDate.toLocaleDateString('fr-FR')}
                       </div>
                       {operation.actualStartDate && (
                         <div className="text-sm text-green-600">
-                          Démarré: {operation.actualStartDate.toLocaleDateString('fr-FR')} à {operation.actualStartDate.toLocaleTimeString('fr-FR')}
+                          Démarré: {operation.actualStartDate.toLocaleDateString('fr-FR')} à{' '}
+                          {operation.actualStartDate.toLocaleTimeString('fr-FR')}
                         </div>
                       )}
                       {operation.actualEndDate && (
                         <div className="text-sm text-green-600">
-                          Terminé: {operation.actualEndDate.toLocaleDateString('fr-FR')} à {operation.actualEndDate.toLocaleTimeString('fr-FR')}
+                          Terminé: {operation.actualEndDate.toLocaleDateString('fr-FR')} à{' '}
+                          {operation.actualEndDate.toLocaleTimeString('fr-FR')}
                         </div>
                       )}
                     </div>
@@ -442,10 +460,16 @@ export function ProductionTimeline({
                           <div key={idx} className="flex items-center justify-between text-sm">
                             <span>{material.name}</span>
                             <div className="flex items-center gap-2">
-                              <span>{material.quantity} {material.unit}</span>
-                              <Badge 
-                                variant="outline" 
-                                className={material.available ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                              <span>
+                                {material.quantity} {material.unit}
+                              </span>
+                              <Badge
+                                variant="outline"
+                                className={
+                                  material.available
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
+                                }
                               >
                                 {material.available ? 'Disponible' : 'Manquant'}
                               </Badge>
@@ -468,14 +492,16 @@ export function ProductionTimeline({
                             <span>{check.name}</span>
                             <div className="flex items-center gap-2">
                               {check.value !== undefined && (
-                                <span>{check.value} {check.unit}</span>
+                                <span>
+                                  {check.value} {check.unit}
+                                </span>
                               )}
-                              <Badge 
-                                variant="outline" 
+                              <Badge
+                                variant="outline"
                                 className={cn(
-                                  check.status === 'passed' && "bg-green-100 text-green-800",
-                                  check.status === 'failed' && "bg-red-100 text-red-800",
-                                  check.status === 'pending' && "bg-yellow-100 text-yellow-800"
+                                  check.status === 'passed' && 'bg-green-100 text-green-800',
+                                  check.status === 'failed' && 'bg-red-100 text-red-800',
+                                  check.status === 'pending' && 'bg-yellow-100 text-yellow-800'
                                 )}
                               >
                                 {check.status === 'passed' && 'Conforme'}
@@ -498,12 +524,15 @@ export function ProductionTimeline({
                           {issue.resolvedAt ? (
                             <span className="text-green-600 ml-2">(Résolu)</span>
                           ) : (
-                            <Badge variant="outline" className={cn(
-                              "ml-2 text-xs",
-                              issue.severity === 'high' && "bg-red-100 text-red-800",
-                              issue.severity === 'medium' && "bg-orange-100 text-orange-800",
-                              issue.severity === 'low' && "bg-yellow-100 text-yellow-800"
-                            )}>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                'ml-2 text-xs',
+                                issue.severity === 'high' && 'bg-red-100 text-red-800',
+                                issue.severity === 'medium' && 'bg-orange-100 text-orange-800',
+                                issue.severity === 'low' && 'bg-yellow-100 text-yellow-800'
+                              )}
+                            >
                               {issue.severity}
                             </Badge>
                           )}
@@ -577,9 +606,7 @@ export function ProductionTimeline({
                   {operation.status === 'delayed' && (
                     <AlertTriangle className="h-5 w-5 text-red-600 animate-pulse" />
                   )}
-                  {operation.status === 'paused' && (
-                    <Pause className="h-5 w-5 text-orange-600" />
-                  )}
+                  {operation.status === 'paused' && <Pause className="h-5 w-5 text-orange-600" />}
                 </div>
               </div>
             </div>

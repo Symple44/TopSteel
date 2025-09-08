@@ -1,6 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
 import { BaseAuditEntity } from '../../../core/common/base/base.entity'
-import { NotificationRule } from './notification-rule.entity'
+// Removed import to avoid circular dependencies
+// import { NotificationRule } from './notification-rule.entity'
 import { Notifications } from './notifications.entity'
 
 export enum ExecutionStatus {
@@ -57,13 +58,9 @@ export class NotificationRuleExecution extends BaseAuditEntity {
   @Index()
   executedAt!: Date
 
-  @ManyToOne(
-    () => NotificationRule,
-    (rule) => rule.executions,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('NotificationRule', 'executions', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ruleId' })
-  rule!: NotificationRule
+  rule!: any
 
   @ManyToOne(() => Notifications, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'notificationId' })

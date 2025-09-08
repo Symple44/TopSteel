@@ -8,7 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MarketplaceProduct } from './marketplace-product.entity'
+// Removed direct import to avoid circular dependency
+// import { MarketplaceProduct } from './marketplace-product.entity'
 
 export enum AdjustmentType {
   PERCENTAGE = 'PERCENTAGE',
@@ -86,12 +87,9 @@ export class MarketplacePriceRule {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => MarketplaceProduct,
-    (product) => product.priceRules
-  )
+  @ManyToOne('MarketplaceProduct', 'priceRules', { lazy: true })
   @JoinColumn({ name: 'productId' })
-  product!: MarketplaceProduct
+  product!: any
 
   // Méthodes utilitaires
   isValid(date: Date = new Date()): boolean {

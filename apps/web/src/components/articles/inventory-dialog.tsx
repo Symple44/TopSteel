@@ -10,6 +10,7 @@ import {
   Input,
   Label,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import { AlertCircle, Package2, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -34,17 +35,18 @@ const defaultFormData: FormData = {
 }
 
 export function InventoryDialog({ open, onOpenChange, article }: InventoryDialogProps) {
+  const ids = useFormFieldIds(['stockPhysiqueReel', 'commentaire'])
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const effectuerInventaire = useEffectuerInventaire()
 
-  const isSubmitting = effectuerInventaire.isPending
+  const isSubmitting = effectuerInventaire?.isPending
 
   useEffect(() => {
     if (article && open) {
       setFormData({
-        stockPhysiqueReel: String(article.stockPhysique || 0),
+        stockPhysiqueReel: String(article.stockPhysique ?? 0),
         commentaire: '',
       })
     } else {
@@ -66,14 +68,14 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!article || !validateForm()) {
       return
     }
 
     try {
-      await effectuerInventaire.mutateAsync({
+      await effectuerInventaire?.mutateAsync({
         id: article.id,
         stockPhysiqueReel: parseFloat(formData.stockPhysiqueReel),
         commentaire: sanitizeInput(formData.commentaire) || undefined,
@@ -93,13 +95,13 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
     return null
   }
 
-  const stockActuel = article.stockPhysique || 0
+  const stockActuel = article.stockPhysique ?? 0
   const stockReel = parseFloat(formData.stockPhysiqueReel) || 0
   const ecart = stockReel - stockActuel
   const ecartPourcentage = stockActuel > 0 ? (ecart / stockActuel) * 100 : 0
 
-  const valeurActuelle = stockActuel * (article.prixAchatStandard || article.prixVenteHT || 0)
-  const valeurReelle = stockReel * (article.prixAchatStandard || article.prixVenteHT || 0)
+  const valeurActuelle = stockActuel * ((article.prixAchatStandard || article.prixVenteHT) ?? 0)
+  const valeurReelle = stockReel * ((article.prixAchatStandard || article.prixVenteHT) ?? 0)
   const ecartValeur = valeurReelle - valeurActuelle
 
   return (
@@ -156,7 +158,7 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
               <div className="text-sm text-muted-foreground">Écart</div>
               <div className="text-xs text-muted-foreground">
                 {ecartPourcentage > 0 ? '+' : ''}
-                {ecartPourcentage.toFixed(1)}%
+                {ecartPourcentage?.toFixed(1)}%
               </div>
             </div>
           </div>
@@ -197,7 +199,7 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
           )}
 
           {/* Alertes */}
-          {stockReel <= (article.stockMini || 0) && stockReel > 0 && (
+          {stockReel <= (article.stockMini ?? 0) && stockReel > 0 && (
             <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg">
               <div className="flex items-center gap-2 text-orange-800">
                 <AlertCircle className="h-4 w-4" />
@@ -225,14 +227,14 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
           {/* Formulaire */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="stockPhysiqueReel">Stock physique réel *</Label>
+              <Label htmlFor={ids.stockPhysiqueReel}>Stock physique réel *</Label>
               <Input
-                id="stockPhysiqueReel"
+                id={ids.stockPhysiqueReel}
                 type="number"
                 min="0"
                 step="0.01"
                 value={formData.stockPhysiqueReel}
-                onChange={(e) => handleInputChange('stockPhysiqueReel', e.target.value)}
+                onChange={(e) => handleInputChange('stockPhysiqueReel', e?.target?.value)}
                 className={cn(errors.stockPhysiqueReel && 'border-red-500')}
               />
               {errors.stockPhysiqueReel && (
@@ -244,11 +246,11 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
             </div>
 
             <div>
-              <Label htmlFor="commentaire">Commentaire</Label>
+              <Label htmlFor={ids.commentaire}>Commentaire</Label>
               <Textarea
-                id="commentaire"
+                id={ids.commentaire}
                 value={formData.commentaire}
-                onChange={(e) => handleInputChange('commentaire', e.target.value)}
+                onChange={(e) => handleInputChange('commentaire', e?.target?.value)}
                 placeholder="Observations, raisons de l'écart..."
                 rows={3}
               />

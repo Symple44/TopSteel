@@ -1,5 +1,6 @@
 // Service pour gestion RBAC avancée
 import type {
+  AccessCondition,
   AccessContext,
   AccessPolicy,
   AuditLog,
@@ -27,12 +28,12 @@ export class RBACService {
     const cacheKey = `${user.id}-${societe.id}`
 
     // Vérifier le cache
-    if (this.permissionCache.has(cacheKey)) {
-      return this.permissionCache.get(cacheKey)!
+    if (this?.permissionCache?.has(cacheKey)) {
+      return this?.permissionCache?.get(cacheKey)!
     }
 
     // Trouver le rôle pour cette société
-    const userSocieteRole = user.societeRoles.find(
+    const userSocieteRole = user?.societeRoles?.find(
       (usr) => usr.societeId === societe.id && usr.isActive
     )
 
@@ -40,30 +41,30 @@ export class RBACService {
 
     if (userSocieteRole) {
       // Permissions du rôle
-      effectivePermissions = [...userSocieteRole.role.permissions]
+      effectivePermissions = [...(userSocieteRole?.role?.permissions || [])]
 
       // Ajouter les permissions additionnelles
-      if (userSocieteRole.additionalPermissions) {
-        effectivePermissions.push(...userSocieteRole.additionalPermissions)
+      if (userSocieteRole?.additionalPermissions) {
+        effectivePermissions.push(...(userSocieteRole?.additionalPermissions || []))
       }
 
       // Retirer les permissions explicitement refusées
-      if (userSocieteRole.deniedPermissions) {
-        const deniedCodes = userSocieteRole.deniedPermissions.map((p) => p.code)
-        effectivePermissions = effectivePermissions.filter((p) => !deniedCodes.includes(p.code))
+      if (userSocieteRole?.deniedPermissions) {
+        const deniedCodes = userSocieteRole?.deniedPermissions?.map((p) => p.code)
+        effectivePermissions = effectivePermissions?.filter((p) => !deniedCodes?.includes(p.code))
       }
     } else if (user.defaultRole) {
       // Utiliser le rôle par défaut
-      effectivePermissions = [...user.defaultRole.permissions]
+      effectivePermissions = [...(user?.defaultRole?.permissions || [])]
     }
 
     // Supprimer les doublons
-    effectivePermissions = this.deduplicatePermissions(effectivePermissions)
+    effectivePermissions = this?.deduplicatePermissions(effectivePermissions)
 
     // Mettre en cache
-    this.permissionCache.set(cacheKey, effectivePermissions)
+    this?.permissionCache?.set(cacheKey, effectivePermissions)
     setTimeout(() => {
-      this.permissionCache.delete(cacheKey)
+      this?.permissionCache?.delete(cacheKey)
     }, this.CACHE_DURATION)
 
     return effectivePermissions
@@ -73,49 +74,49 @@ export class RBACService {
    * Vérifie si l'utilisateur a une permission spécifique
    */
   hasPermission(user: ExtendedUser, societe: Company, permissionCode: string): boolean {
-    const permissions = this.getEffectivePermissions(user, societe)
-    return permissions.some((p) => p.code === permissionCode)
+    const permissions = this?.getEffectivePermissions(user, societe)
+    return permissions?.some((p) => p.code === permissionCode)
   }
 
   /**
    * Vérifie si l'utilisateur a toutes les permissions requises
    */
   hasAllPermissions(user: ExtendedUser, societe: Company, permissionCodes: string[]): boolean {
-    const permissions = this.getEffectivePermissions(user, societe)
-    const userPermissionCodes = permissions.map((p) => p.code)
+    const permissions = this?.getEffectivePermissions(user, societe)
+    const userPermissionCodes = permissions?.map((p) => p.code)
 
-    return permissionCodes.every((code) => userPermissionCodes.includes(code))
+    return permissionCodes?.every((code) => userPermissionCodes?.includes(code))
   }
 
   /**
    * Vérifie si l'utilisateur a au moins une des permissions requises
    */
   hasAnyPermission(user: ExtendedUser, societe: Company, permissionCodes: string[]): boolean {
-    const permissions = this.getEffectivePermissions(user, societe)
-    const userPermissionCodes = permissions.map((p) => p.code)
+    const permissions = this?.getEffectivePermissions(user, societe)
+    const userPermissionCodes = permissions?.map((p) => p.code)
 
-    return permissionCodes.some((code) => userPermissionCodes.includes(code))
+    return permissionCodes?.some((code) => userPermissionCodes?.includes(code))
   }
 
   /**
    * Vérifie l'accès selon une politique
    */
   checkAccess(context: AccessContext, policy: AccessPolicy): boolean {
-    const { user, societe } = context
-    const { requiredPermissions, mode } = policy
+    const { user, societe } = context || {}
+    const { requiredPermissions, mode } = policy || {}
 
     let hasAccess = false
 
     if (mode === 'ALL') {
-      hasAccess = this.hasAllPermissions(user, societe, requiredPermissions)
+      hasAccess = this?.hasAllPermissions(user, societe, requiredPermissions)
     } else {
       // mode === 'ANY'
-      hasAccess = this.hasAnyPermission(user, societe, requiredPermissions)
+      hasAccess = this?.hasAnyPermission(user, societe, requiredPermissions)
     }
 
     // Vérifier les conditions additionnelles
     if (hasAccess && policy.conditions) {
-      hasAccess = this.checkConditions(context, policy.conditions)
+      hasAccess = this?.checkConditions(context, policy.conditions)
     }
 
     return hasAccess
@@ -125,32 +126,32 @@ export class RBACService {
    * Filtre les permissions par module
    */
   getPermissionsByModule(user: ExtendedUser, societe: Company, module: string): Permission[] {
-    const permissions = this.getEffectivePermissions(user, societe)
-    return permissions.filter((p) => p.module === module)
+    const permissions = this?.getEffectivePermissions(user, societe)
+    return permissions?.filter((p) => p.module === module)
   }
 
   /**
    * Vérifie si l'utilisateur peut accéder à un module
    */
   canAccessModule(user: ExtendedUser, societe: Company, module: string): boolean {
-    const modulePermissions = this.getPermissionsByModule(user, societe, module)
-    return modulePermissions.length > 0
+    const modulePermissions = this?.getPermissionsByModule(user, societe, module)
+    return modulePermissions?.length > 0
   }
 
   /**
    * Obtient le niveau hiérarchique le plus élevé de l'utilisateur
    */
   getHighestRoleLevel(user: ExtendedUser, societe: Company): number {
-    const userSocieteRole = user.societeRoles.find(
+    const userSocieteRole = user?.societeRoles?.find(
       (usr) => usr.societeId === societe.id && usr.isActive
     )
 
     if (userSocieteRole) {
-      return userSocieteRole.role.level
+      return userSocieteRole?.role?.level
     }
 
     if (user.defaultRole) {
-      return user.defaultRole.level
+      return user?.defaultRole?.level
     }
 
     return 999 // Niveau le plus bas
@@ -160,23 +161,26 @@ export class RBACService {
    * Vérifie si l'utilisateur a un niveau hiérarchique suffisant
    */
   hasMinimumRoleLevel(user: ExtendedUser, societe: Company, minimumLevel: number): boolean {
-    const userLevel = this.getHighestRoleLevel(user, societe)
+    const userLevel = this?.getHighestRoleLevel(user, societe)
     return userLevel <= minimumLevel // Plus le niveau est bas, plus il est élevé hiérarchiquement
   }
 
   /**
    * Vérifie les conditions d'accès
    */
-  private checkConditions(context: AccessContext, conditions: any[]): boolean {
+  private checkConditions(context: AccessContext, conditions: AccessCondition[]): boolean {
     // Implémentation simplifiée - à étendre selon les besoins
-    return conditions.every((condition) => {
+    return conditions?.every((condition) => {
       switch (condition.type) {
         case 'time':
-          return this.checkTimeCondition(condition.rule)
+          return this?.checkTimeCondition(condition.rule)
         case 'ip':
-          return this.checkIPCondition(context.sessionInfo.ipAddress, condition.rule)
+          return this?.checkIPCondition(context?.sessionInfo?.ipAddress, condition.rule)
         case 'device':
-          return this.checkDeviceCondition(context.sessionInfo.deviceInfo, condition.rule)
+          return this?.checkDeviceCondition(context?.sessionInfo?.deviceInfo, condition.rule)
+        case 'custom':
+          // Handle custom conditions - returning true for now
+          return true
         default:
           return true
       }
@@ -206,11 +210,11 @@ export class RBACService {
    */
   private deduplicatePermissions(permissions: Permission[]): Permission[] {
     const seen = new Set<string>()
-    return permissions.filter((permission) => {
-      if (seen.has(permission.code)) {
+    return permissions?.filter((permission) => {
+      if (seen?.has(permission.code)) {
         return false
       }
-      seen.add(permission.code)
+      seen?.add(permission.code)
       return true
     })
   }
@@ -220,9 +224,9 @@ export class RBACService {
    */
   clearPermissionCache(userId?: string, societeId?: string): void {
     if (userId && societeId) {
-      this.permissionCache.delete(`${userId}-${societeId}`)
+      this?.permissionCache?.delete(`${userId}-${societeId}`)
     } else {
-      this.permissionCache.clear()
+      this?.permissionCache?.clear()
     }
   }
 
@@ -234,7 +238,7 @@ export class RBACService {
     societeId: string,
     action: string,
     resource: string,
-    details: Record<string, any> = {},
+    details: Record<string, unknown> = {},
     success = true,
     errorMessage?: string
   ): Promise<void> {
@@ -258,4 +262,4 @@ export class RBACService {
 }
 
 // Instance singleton
-export const rbacService = RBACService.getInstance()
+export const rbacService = RBACService?.getInstance()

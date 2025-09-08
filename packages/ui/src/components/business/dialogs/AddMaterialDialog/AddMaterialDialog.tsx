@@ -1,23 +1,35 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { AlertTriangle, Layers, Package } from 'lucide-react'
 import { useState } from 'react'
-import { Package, FileImage, Layers, AlertTriangle } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Alert } from '../../../feedback/alert'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { Badge } from '../../../data-display/badge'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
-import {
-  FormDescription,
-  Alert,
-} from '../../../'
+
+// div components removed - not available in the UI library
+
 // Material categories specific to steel manufacturing
 const STEEL_CATEGORIES = [
   'structural-steel',
@@ -29,7 +41,7 @@ const STEEL_CATEGORIES = [
   'consumables',
   'fasteners',
   'coatings',
-  'other'
+  'other',
 ] as const
 const STEEL_GRADES = [
   'S235',
@@ -45,17 +57,9 @@ const STEEL_GRADES = [
   '2205',
   'Hardox-400',
   'Hardox-500',
-  'Custom'
+  'Custom',
 ] as const
-const UNITS = [
-  'kg',
-  'tons',
-  'pieces',
-  'meters',
-  'square-meters',
-  'cubic-meters',
-  'liters'
-] as const
+const UNITS = ['kg', 'tons', 'pieces', 'meters', 'square-meters', 'cubic-meters', 'liters'] as const
 const SURFACE_TREATMENTS = [
   'none',
   'galvanized',
@@ -66,7 +70,7 @@ const SURFACE_TREATMENTS = [
   'zinc-plated',
   'sandblasted',
   'pickled',
-  'passivated'
+  'passivated',
 ] as const
 // Material validation schema for steel manufacturing
 const materialSchema = z.object({
@@ -84,7 +88,7 @@ const materialSchema = z.object({
     width: z.number().min(0, 'La largeur doit être positive').optional(),
     height: z.number().min(0, 'La hauteur doit être positive').optional(),
     diameter: z.number().min(0, 'Le diamètre doit être positif').optional(),
-    thickness: z.number().min(0, 'L\'épaisseur doit être positive').optional(),
+    thickness: z.number().min(0, "L'épaisseur doit être positive").optional(),
   }),
   // Material Properties
   density: z.number().min(0, 'La densité doit être positive').optional(),
@@ -92,9 +96,9 @@ const materialSchema = z.object({
   surfaceTreatment: z.enum(SURFACE_TREATMENTS).default('none'),
   // Mechanical Properties
   mechanicalProperties: z.object({
-    yieldStrength: z.number().min(0, 'La limite d\'élasticité doit être positive').optional(),
+    yieldStrength: z.number().min(0, "La limite d'élasticité doit être positive").optional(),
     tensileStrength: z.number().min(0, 'La résistance à la traction doit être positive').optional(),
-    elongation: z.number().min(0, 'L\'allongement doit être positif').optional(),
+    elongation: z.number().min(0, "L'allongement doit être positif").optional(),
     hardness: z.string().optional(),
   }),
   // Chemical Composition
@@ -133,22 +137,22 @@ interface AddMaterialDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit?: (data: MaterialFormData) => void | Promise<void>
-  defaultCategory?: string
+  defaultCategory?: (typeof STEEL_CATEGORIES)[number]
   defaultSupplier?: string
 }
-export function AddMaterialDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function AddMaterialDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   defaultCategory,
-  defaultSupplier 
+  defaultSupplier,
 }: AddMaterialDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<MaterialFormData>({
+  const form = useForm({
     resolver: zodResolver(materialSchema),
     defaultValues: {
-      category: (defaultCategory as any) || 'structural-steel',
+      category: defaultCategory || 'structural-steel',
       steelGrade: 'S235',
       dimensions: {},
       mechanicalProperties: {},
@@ -167,16 +171,16 @@ export function AddMaterialDialog({
       isCustomMade: false,
     },
   })
-  const watchCategory = form.watch('category')
+  const _watchCategory = form.watch('category')
   const watchSteelGrade = form.watch('steelGrade')
-  const watchIsCustomMade = form.watch('isCustomMade')
+  const _watchIsCustomMade = form.watch('isCustomMade')
   const handleSubmit = async (data: MaterialFormData) => {
     try {
       setLoading(true)
       setError(null)
       // Validate custom steel grade
       if (data.steelGrade === 'Custom' && !data.customGrade) {
-        setError('Veuillez spécifier la nuance d\'acier personnalisée')
+        setError("Veuillez spécifier la nuance d'acier personnalisée")
         return
       }
       await onSubmit?.(data)
@@ -198,40 +202,40 @@ export function AddMaterialDialog({
       'structural-steel': 'Acier de construction',
       'sheet-metal': 'Tôlerie',
       'tubes-pipes': 'Tubes et tuyaux',
-      'profiles': 'Profilés',
-      'reinforcement-bars': 'Barres d\'armature',
+      profiles: 'Profilés',
+      'reinforcement-bars': "Barres d'armature",
       'specialty-steels': 'Aciers spéciaux',
-      'consumables': 'Consommables',
-      'fasteners': 'Fixations',
-      'coatings': 'Revêtements',
-      'other': 'Autre'
+      consumables: 'Consommables',
+      fasteners: 'Fixations',
+      coatings: 'Revêtements',
+      other: 'Autre',
     }
     return labels[category] || category
   }
   const getSurfaceTreatmentLabel = (treatment: string) => {
     const labels: Record<string, string> = {
-      'none': 'Aucun',
-      'galvanized': 'Galvanisé',
-      'painted': 'Peint',
+      none: 'Aucun',
+      galvanized: 'Galvanisé',
+      painted: 'Peint',
       'powder-coated': 'Thermolaqué',
-      'anodized': 'Anodisé',
+      anodized: 'Anodisé',
       'chrome-plated': 'Chromé',
       'zinc-plated': 'Zingué',
-      'sandblasted': 'Sablé',
-      'pickled': 'Décapé',
-      'passivated': 'Passivé'
+      sandblasted: 'Sablé',
+      pickled: 'Décapé',
+      passivated: 'Passivé',
     }
     return labels[treatment] || treatment
   }
   const getUnitLabel = (unit: string) => {
     const labels: Record<string, string> = {
-      'kg': 'Kilogrammes',
-      'tons': 'Tonnes',
-      'pieces': 'Pièces',
-      'meters': 'Mètres',
+      kg: 'Kilogrammes',
+      tons: 'Tonnes',
+      pieces: 'Pièces',
+      meters: 'Mètres',
       'square-meters': 'Mètres carrés',
       'cubic-meters': 'Mètres cubes',
-      'liters': 'Litres'
+      liters: 'Litres',
     }
     return labels[unit] || unit
   }
@@ -254,14 +258,14 @@ export function AddMaterialDialog({
                 </Alert>
               )}
               {/* Basic Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
+              <div>
+                <div>
+                  <h3 className="text-lg flex items-center gap-2">
                     <Layers className="h-5 w-5" />
                     Informations générales
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2">
+                  </h3>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="name"
@@ -284,9 +288,7 @@ export function AddMaterialDialog({
                         <FormControl>
                           <Input placeholder="ex: IPE200-S235" {...field} />
                         </FormControl>
-                        <FormDescription>
-                          Code unique pour identifier le matériau
-                        </FormDescription>
+                        <FormDescription>Code unique pour identifier le matériau</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -304,7 +306,7 @@ export function AddMaterialDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {STEEL_CATEGORIES.map(cat => (
+                            {STEEL_CATEGORIES.map((cat) => (
                               <SelectItem key={cat} value={cat}>
                                 {getCategoryLabel(cat)}
                               </SelectItem>
@@ -328,7 +330,7 @@ export function AddMaterialDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {STEEL_GRADES.map(grade => (
+                            {STEEL_GRADES.map((grade) => (
                               <SelectItem key={grade} value={grade}>
                                 {grade}
                               </SelectItem>
@@ -361,24 +363,24 @@ export function AddMaterialDialog({
                       <FormItem className="md:col-span-2">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Textarea 
+                          <Textarea
                             placeholder="Description détaillée du matériau..."
                             className="min-h-[80px]"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
               {/* Dimensions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Dimensions (mm)</CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-3">
+              <div>
+                <div>
+                  <h3 className="text-lg">Dimensions (mm)</h3>
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
                   <FormField
                     control={form.control}
                     name="dimensions.length"
@@ -390,7 +392,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="0"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -408,7 +412,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="0"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -426,7 +432,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="0"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -444,7 +452,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="0"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -462,7 +472,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="0"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -480,21 +492,23 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="0"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
               {/* Surface Treatment */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Traitement de surface</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div>
+                <div>
+                  <h3 className="text-lg">Traitement de surface</h3>
+                </div>
+                <div>
                   <FormField
                     control={form.control}
                     name="surfaceTreatment"
@@ -508,7 +522,7 @@ export function AddMaterialDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {SURFACE_TREATMENTS.map(treatment => (
+                            {SURFACE_TREATMENTS.map((treatment) => (
                               <SelectItem key={treatment} value={treatment}>
                                 {getSurfaceTreatmentLabel(treatment)}
                               </SelectItem>
@@ -519,14 +533,14 @@ export function AddMaterialDialog({
                       </FormItem>
                     )}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
               {/* Mechanical Properties */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Propriétés mécaniques</CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2">
+              <div>
+                <div>
+                  <h3 className="text-lg">Propriétés mécaniques</h3>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="mechanicalProperties.yieldStrength"
@@ -538,7 +552,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="235"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -556,7 +572,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="360"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -574,7 +592,9 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="26"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -594,14 +614,14 @@ export function AddMaterialDialog({
                       </FormItem>
                     )}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
               {/* Pricing and Stock */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Prix et stock</CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <div>
+                  <h3 className="text-lg">Prix et stock</h3>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                   <FormField
                     control={form.control}
                     name="unitPrice"
@@ -634,7 +654,7 @@ export function AddMaterialDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {UNITS.map(unit => (
+                            {UNITS.map((unit) => (
                               <SelectItem key={unit} value={unit}>
                                 {getUnitLabel(unit)}
                               </SelectItem>
@@ -681,14 +701,14 @@ export function AddMaterialDialog({
                       </FormItem>
                     )}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
               {/* Procurement */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Approvisionnement</CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2">
+              <div>
+                <div>
+                  <h3 className="text-lg">Approvisionnement</h3>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="primarySupplier"
@@ -713,21 +733,23 @@ export function AddMaterialDialog({
                             type="number"
                             placeholder="7"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
               {/* Additional Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Informations complémentaires</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <div>
+                <div>
+                  <h3 className="text-lg">Informations complémentaires</h3>
+                </div>
+                <div className="space-y-4">
                   <div className="flex gap-6">
                     <FormField
                       control={form.control}
@@ -735,14 +757,9 @@ export function AddMaterialDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Matériau sur mesure
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Matériau sur mesure</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -752,14 +769,9 @@ export function AddMaterialDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Matériau actif
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Matériau actif</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -797,8 +809,8 @@ export function AddMaterialDialog({
                       </FormItem>
                     )}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
               <div className="flex gap-2 pt-4 border-t">
                 <Button
                   type="button"

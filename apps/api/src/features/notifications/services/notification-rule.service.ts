@@ -359,7 +359,7 @@ export class NotificationRuleService {
         value !== null &&
         part in (value as Record<string, unknown>)
       ) {
-        value = (value as Record<string, unknown>)[part] as any
+        value = (value as Record<string, unknown>)[part] as unknown
       } else {
         return undefined
       }
@@ -405,7 +405,7 @@ export class NotificationRuleService {
 
     const recentActivity = await this._eventRepository.find({
       where: {
-        occurredAt: yesterday as any,
+        occurredAt: yesterday as unknown,
       },
       order: { occurredAt: 'DESC' },
       take: 10,

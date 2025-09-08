@@ -29,6 +29,7 @@ export function DataTableError({ error, onRetry, className }: DataTableErrorProp
 
       {onRetry && (
         <Button
+          type="button"
           onClick={onRetry}
           variant="outline"
           className="border-red-300 text-red-700 hover:bg-red-100"

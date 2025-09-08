@@ -62,7 +62,7 @@ export class BrowserAPIManager {
       ...config,
     }
 
-    this.apis = this.initializeAPIs()
+    this.apis = this?.initializeAPIs()
   }
 
   static getInstance(config?: SSRSafeConfig): BrowserAPIManager {
@@ -95,7 +95,7 @@ export class BrowserAPIManager {
         location,
       }
     } catch (error) {
-      this.handleError(error as Error, 'initializeAPIs')
+      this?.handleError(error as Error, 'initializeAPIs')
 
       return {
         window: null,
@@ -109,7 +109,7 @@ export class BrowserAPIManager {
   }
 
   private handleError(error: Error, context: string): void {
-    if (this.config.enableDebugLogs) {
+    if (this?.config?.enableDebugLogs) {
     }
     this.config.errorCallback?.(error, context)
   }
@@ -117,30 +117,30 @@ export class BrowserAPIManager {
   // ===== MÉTHODES D'ACCÈS SÉCURISÉ =====
 
   getWindow(): Window | null {
-    return this.apis.window
+    return this?.apis?.window
   }
 
   getDocument(): Document | null {
-    return this.apis.document
+    return this?.apis?.document
   }
 
   getNavigator(): Navigator | null {
-    return this.apis.navigator
+    return this?.apis?.navigator
   }
 
   getLocation(): Location | null {
-    return this.apis.location
+    return this?.apis?.location
   }
 
   // ===== STORAGE SÉCURISÉ =====
 
   getFromStorage(key: string, storage: 'local' | 'session' = 'local'): string | null {
     try {
-      const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+      const storageAPI = storage === 'local' ? this?.apis?.localStorage : this?.apis?.sessionStorage
 
       return storageAPI?.getItem(key) || null
     } catch (error) {
-      this.handleError(error as Error, `getFromStorage(${key})`)
+      this?.handleError(error as Error, `getFromStorage(${key})`)
 
       return null
     }
@@ -148,13 +148,13 @@ export class BrowserAPIManager {
 
   setToStorage(key: string, value: string, storage: 'local' | 'session' = 'local'): boolean {
     try {
-      const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+      const storageAPI = storage === 'local' ? this?.apis?.localStorage : this?.apis?.sessionStorage
 
       storageAPI?.setItem(key, value)
 
       return true
     } catch (error) {
-      this.handleError(error as Error, `setToStorage(${key})`)
+      this?.handleError(error as Error, `setToStorage(${key})`)
 
       return false
     }
@@ -162,13 +162,13 @@ export class BrowserAPIManager {
 
   removeFromStorage(key: string, storage: 'local' | 'session' = 'local'): boolean {
     try {
-      const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+      const storageAPI = storage === 'local' ? this?.apis?.localStorage : this?.apis?.sessionStorage
 
       storageAPI?.removeItem(key)
 
       return true
     } catch (error) {
-      this.handleError(error as Error, `removeFromStorage(${key})`)
+      this?.handleError(error as Error, `removeFromStorage(${key})`)
 
       return false
     }
@@ -189,13 +189,13 @@ export class BrowserAPIManager {
   }
 
   getViewportSize(): { width: number; height: number } {
-    if (!this.apis.window) {
+    if (!this?.apis?.window) {
       return { width: 1024, height: 768 } // Fallback
     }
 
     return {
-      width: this.apis.window.innerWidth,
-      height: this.apis.window.innerHeight,
+      width: this?.apis?.window.innerWidth,
+      height: this?.apis?.window.innerHeight,
     }
   }
 
@@ -205,8 +205,8 @@ export class BrowserAPIManager {
     }
 
     return {
-      width: this.apis.window.screen.width,
-      height: this.apis.window.screen.height,
+      width: this?.apis?.window?.screen?.width,
+      height: this?.apis?.window?.screen?.height,
     }
   }
 
@@ -216,7 +216,7 @@ export class BrowserAPIManager {
 
   getTimezone(): string {
     try {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone
+      return Intl?.DateTimeFormat().resolvedOptions().timeZone
     } catch {
       return 'UTC'
     }
@@ -233,7 +233,7 @@ export class BrowserAPIManager {
  * Hook pour l'accès sécurisé aux APIs browser
  */
 export function useBrowserAPI(): BrowserAPIManager {
-  const [api] = useState(() => BrowserAPIManager.getInstance())
+  const [api] = useState(() => BrowserAPIManager?.getInstance())
 
   return api
 }
@@ -312,10 +312,10 @@ export function useSSRSafeLocalStorage<T>(
   // biome-ignore lint/correctness/useExhaustiveDependencies: serializer.deserialize is stable
   useEffect(() => {
     try {
-      const item = api.getFromStorage(key)
+      const item = api?.getFromStorage(key)
 
       if (item !== null) {
-        setStoredValue(serializer.deserialize(item))
+        setStoredValue(serializer?.deserialize(item))
       }
     } catch (_error) {
     } finally {
@@ -327,7 +327,7 @@ export function useSSRSafeLocalStorage<T>(
   const setValue = (value: T) => {
     try {
       setStoredValue(value)
-      api.setToStorage(key, serializer.serialize(value))
+      api?.setToStorage(key, serializer?.serialize(value))
     } catch (_error) {}
   }
 
@@ -395,17 +395,16 @@ export function safeExecute<T>(fn: () => T, fallback: T, _context?: string): T {
 /**
  * Créer un proxy pour les objets globaux avec fallbacks
  */
-export function createSafeGlobal<T extends object>(globalName: string, fallback: Partial<T>): T {
+export function createSafeGlobal<T extends object>(globalName: string, fallback: T): T {
   if (isServer) {
-    return fallback as T
+    return fallback
   }
 
   try {
     const globalObj = (window as typeof window & Record<string, unknown>)[globalName]
-
     return (globalObj as T) || fallback
   } catch {
-    return fallback as T
+    return fallback
   }
 }
 
@@ -438,7 +437,7 @@ export function hasFeature(feature: string): boolean {
       case 'webgl': {
         const canvas = document.createElement('canvas')
 
-        return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+        return !!(canvas?.getContext('webgl') || canvas?.getContext('experimental-webgl'))
       }
       default:
         return feature in window
@@ -458,7 +457,7 @@ export function useFeatureDetection(feature: string): boolean {
 // ===== EXPORTS =====
 
 // Instance globale pour faciliter l'utilisation
-export const browserAPI = () => BrowserAPIManager.getInstance()
+export const browserAPI = () => BrowserAPIManager?.getInstance()
 
 const ssrUtils = {
   isServer,

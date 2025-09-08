@@ -5,8 +5,8 @@
   "entryFile": "app/main",
   "compilerOptions": {
     "deleteOutDir": true,
-    "builder": "tsc",
-    "typeCheck": false,
+    "builder": "swc",
+    "typeCheck": true,
     "assets": ["**/*.proto", "**/*.graphql", "database/migrations/**/*.ts"],
     "watchAssets": true
   },

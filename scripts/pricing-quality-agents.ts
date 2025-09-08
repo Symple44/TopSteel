@@ -162,7 +162,7 @@ class PricingQualityOrchestrator {
         .toString()
         .trim()
 
-      const anyCount = parseInt(grepResult) || 0
+      const anyCount = parseInt(grepResult, 10) || 0
       if (anyCount === 0) {
         checks.push('✅ Aucun type any détecté')
       } else if (anyCount < 5) {
@@ -235,7 +235,7 @@ class PricingQualityOrchestrator {
         ).toString()
 
         const maxLines = complexFiles.split('\n')[0]?.split(' ')[0]
-        if (parseInt(maxLines) > 1000) {
+        if (parseInt(maxLines, 10) > 1000) {
           score -= 10
           checks.push(`⚠️ Fichier très volumineux détecté (${maxLines} lignes)`)
         } else {
@@ -497,8 +497,8 @@ class PricingQualityOrchestrator {
       const problematicPatterns = [
         'for.*in.*forEach',
         'while.*true',
-        '\.map.*\.map',
-        '\.filter.*\.filter',
+        '.map.*.map',
+        '.filter.*.filter',
       ]
 
       for (const pattern of problematicPatterns) {

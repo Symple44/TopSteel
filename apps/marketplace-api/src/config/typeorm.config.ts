@@ -16,8 +16,22 @@ export const AppDataSource = new DataSource({
     5432,
   username:
     configService.get('MARKETPLACE_DB_USERNAME') || configService.get('DB_USERNAME') || 'postgres',
-  password:
-    configService.get('MARKETPLACE_DB_PASSWORD') || configService.get('DB_PASSWORD') || 'postgres',
+  password: (() => {
+    const password =
+      configService.get('MARKETPLACE_DB_PASSWORD') || configService.get('DB_PASSWORD')
+    const nodeEnv = configService.get('NODE_ENV')
+
+    if (!password) {
+      if (nodeEnv === 'production') {
+        throw new Error(
+          'MARKETPLACE_DB_PASSWORD or DB_PASSWORD environment variable is required in production'
+        )
+      }
+      // Use development default password for non-production environments
+      return 'dev_password'
+    }
+    return password
+  })(),
   database: configService.get('MARKETPLACE_DB_NAME') || 'erp_topsteel_marketplace',
   entities: [
     'src/domains/page-builder/entities/*.entity.ts',

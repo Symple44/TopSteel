@@ -4,8 +4,10 @@ import { TooltipProvider } from '@erp/ui'
 import { QueryClient } from '@tanstack/react-query'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import dynamic from 'next/dynamic'
+import { useEffect } from 'react'
 import { Toaster } from 'sonner'
 import { NotificationsProvider } from '@/components/providers/notifications-provider'
+import { csrfManager } from '@/lib/csrf'
 import { I18nProvider } from '@/lib/i18n'
 
 const ThemeProvider = dynamic(() => import('next-themes').then((mod) => mod.ThemeProvider), {
@@ -31,6 +33,17 @@ const queryClient = new QueryClient({
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  // Initialize CSRF protection when the app starts
+  useEffect(() => {
+    const initializeCsrf = async () => {
+      try {
+        await csrfManager?.initialize()
+      } catch (_error) {}
+    }
+
+    initializeCsrf()
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>

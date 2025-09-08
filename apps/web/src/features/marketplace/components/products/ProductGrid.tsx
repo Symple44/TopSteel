@@ -14,7 +14,7 @@ interface ProductGridProps {
   productsPerPage?: number
   onPageChange: (page: number) => void
   onSortChange?: (sort: string) => void
-  onFilterChange?: (filters: any) => void
+  onFilterChange?: (filters: unknown) => void
   showFilters?: boolean
   loading?: boolean
   gridCols?: 2 | 3 | 4
@@ -80,7 +80,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   }
 
   const renderPagination = () => {
-    const pageNumbers = []
+    const pageNumbers: number[] = []
     const maxVisiblePages = 5
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
     const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
@@ -115,7 +115,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           </>
         )}
 
-        {pageNumbers.map((page) => (
+        {pageNumbers?.map((page) => (
           <button
             key={page}
             onClick={() => onPageChange(page)}
@@ -157,12 +157,19 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     <div className="relative">
       {/* Mobile Filters Overlay */}
       {showFilters && (
-        <div
+        <button
           className={cn(
             'fixed inset-0 z-40 bg-black/50 lg:hidden transition-opacity',
             mobileFiltersOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
           )}
           onClick={() => setMobileFiltersOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setMobileFiltersOpen(false)
+            }
+          }}
+          aria-label="Close filters overlay"
         />
       )}
 
@@ -238,10 +245,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
               <div className="relative">
                 <select
                   value={selectedSort}
-                  onChange={(e) => handleSortChange(e.target.value)}
+                  onChange={(e) => handleSortChange(e?.target?.value)}
                   className="appearance-none px-4 py-2 pr-10 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {sortOptions.map((option) => (
+                  {sortOptions?.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -293,7 +300,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           ) : (
             <>
               <div className={getGridClass()}>
-                {products.map((product) => (
+                {products?.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}

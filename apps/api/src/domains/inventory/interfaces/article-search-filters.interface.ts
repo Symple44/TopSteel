@@ -463,7 +463,7 @@ export interface IArticleAggregationResult {
  */
 export interface IArticleSearchResult {
   /** Articles trouvés */
-  articles: any[] // Remplacez par votre interface Article
+  articles: unknown[] // Remplacez par votre interface Article
 
   /** Informations de pagination */
   pagination: {

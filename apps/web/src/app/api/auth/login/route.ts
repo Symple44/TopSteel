@@ -5,12 +5,12 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { saveTokensInCookies, saveUserInfoInCookie } from '@/lib/auth/cookie-auth'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
+const API_URL = process?.env?.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, password, rememberMe = false } = body
+    const body = await request?.json()
+    const { email, password, rememberMe = false } = body || {}
 
     // Appeler l'API backend pour l'authentification
     const loginResponse = await fetch(`${API_URL}/auth/login`, {
@@ -21,19 +21,19 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({ email, password }),
     })
 
-    if (!loginResponse.ok) {
-      const error = await loginResponse.json()
-      return NextResponse.json(
+    if (!loginResponse?.ok) {
+      const error = await loginResponse?.json()
+      return NextResponse?.json(
         { error: error.message || 'Authentication failed' },
         { status: loginResponse.status }
       )
     }
 
-    const data = await loginResponse.json()
-    const { user, accessToken, refreshToken, expiresIn } = data
+    const data = await loginResponse?.json()
+    const { user, accessToken, refreshToken, expiresIn } = data || {}
 
     // Créer la réponse
-    const response = NextResponse.json({
+    const response = NextResponse?.json({
       success: true,
       user: {
         id: user.id,
@@ -61,6 +61,6 @@ export async function POST(request: NextRequest) {
 
     return response
   } catch (_error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse?.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

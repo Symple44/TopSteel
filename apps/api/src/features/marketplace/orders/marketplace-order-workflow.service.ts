@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
 import type { DataSource, Repository } from 'typeorm'
+import { getErrorMessage } from '../../../core/common/utils'
 import type { EmailService } from '../../../core/email/email.service'
 import type { PricingEngineService } from '../../pricing/services/pricing-engine.service'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
@@ -36,7 +37,7 @@ interface CreateOrderDto {
   items: Array<{
     productId: string
     quantity: number
-    customizations?: Record<string, any>
+    customizations?: Record<string, unknown>
   }>
   shippingAddress: {
     street: string
@@ -86,7 +87,7 @@ export class MarketplaceOrderWorkflowService {
   }
 
   private setupTransitions() {
-    ;(this as any).transitions = new Map([
+    ;(this as unknown).transitions = new Map([
       [
         OrderStatus.PENDING,
         {
@@ -203,10 +204,10 @@ export class MarketplaceOrderWorkflowService {
           if (!savedOrder.metadata.stockReservations) {
             savedOrder.metadata.stockReservations = []
           }
-          savedOrder.metadata.stockReservations.push(reservation.id)
+          ;(savedOrder.metadata.stockReservations as string[]).push(reservation.id)
         } catch (error) {
           throw new BadRequestException(
-            `Cannot reserve stock for ${product.designation}: ${error.message}`
+            `Cannot reserve stock for ${product.designation}: ${getErrorMessage(error)}`
           )
         }
 
@@ -215,7 +216,7 @@ export class MarketplaceOrderWorkflowService {
           articleId: product.id,
           quantity: itemData.quantity,
           customerId: customer.erpPartnerId,
-          channel: 'MARKETPLACE' as any,
+          channel: 'MARKETPLACE' as unknown,
           societeId: tenantId,
         })
 
@@ -331,6 +332,10 @@ export class MarketplaceOrderWorkflowService {
           lock: { mode: 'pessimistic_write' },
         })
 
+        if (!product) {
+          throw new BadRequestException(`Product not found: ${item.product.id}`)
+        }
+
         if ((product.stockDisponible || 0) < item.quantity) {
           throw new BadRequestException(`Insufficient stock for ${product.designation}`)
         }
@@ -378,7 +383,7 @@ export class MarketplaceOrderWorkflowService {
 
     // Confirmer les réservations de stock
     if (order.metadata?.stockReservations) {
-      for (const reservationId of order.metadata.stockReservations) {
+      for (const reservationId of order.metadata.stockReservations as string[]) {
         try {
           await this.stockService.confirmReservation(reservationId)
           this.logger.log(
@@ -436,7 +441,7 @@ export class MarketplaceOrderWorkflowService {
 
     // Libérer les réservations de stock
     if (order.metadata?.stockReservations) {
-      for (const reservationId of order.metadata.stockReservations) {
+      for (const reservationId of order.metadata.stockReservations as string[]) {
         try {
           await this.stockService.releaseReservation(reservationId)
           this.logger.log(
@@ -499,13 +504,15 @@ export class MarketplaceOrderWorkflowService {
   }
 
   private async notifyCustomer(order: MarketplaceOrder, newStatus: OrderStatus): Promise<void> {
-    const emailTemplates = {
+    const emailTemplates: Record<OrderStatus, string> = {
+      [OrderStatus.CART]: 'cart-reminder',
       [OrderStatus.PENDING]: 'order-received',
       [OrderStatus.CONFIRMED]: 'order-confirmed',
       [OrderStatus.PROCESSING]: 'order-processing',
       [OrderStatus.SHIPPED]: 'order-shipped',
       [OrderStatus.DELIVERED]: 'order-delivered',
       [OrderStatus.CANCELLED]: 'order-cancelled',
+      [OrderStatus.REFUNDED]: 'order-refunded',
     }
 
     const template = emailTemplates[newStatus]

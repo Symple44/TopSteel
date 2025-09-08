@@ -1,34 +1,34 @@
 'use client'
-import React from 'react'
-import { Badge } from '../../../data-display/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
-import { Progress } from '../../../data-display/progress/progress'
-import { cn } from '../../../../lib/utils'
-import { 
-  ShoppingCart, 
-  CreditCard, 
-  Package, 
-  Truck, 
-  CheckCircle2, 
-  Clock, 
+import {
   AlertTriangle,
-  MapPin,
   Calendar,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  FileText,
+  MapPin,
+  Package,
+  Scale,
+  ShoppingCart,
+  Truck,
   User,
   Wrench,
-  Scale,
-  FileText
 } from 'lucide-react'
-export type OrderStatus = 
-  | 'pending' 
-  | 'confirmed' 
-  | 'payment_processing' 
-  | 'payment_confirmed' 
-  | 'in_production' 
-  | 'quality_control' 
-  | 'ready_for_shipment' 
-  | 'shipped' 
-  | 'delivered' 
+import type React from 'react'
+import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card'
+import { Progress } from '../../../primitives/progress'
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'payment_processing'
+  | 'payment_confirmed'
+  | 'in_production'
+  | 'quality_control'
+  | 'ready_for_shipment'
+  | 'shipped'
+  | 'delivered'
   | 'completed'
   | 'cancelled'
 export interface OrderStep {
@@ -67,63 +67,113 @@ const defaultSteps: Record<string, Omit<OrderStep, 'status' | 'completedAt'>> = 
   order_placed: {
     id: 'order_placed',
     title: 'Commande passée',
-    description: 'Commande reçue et enregistrée dans le système'
+    description: 'Commande reçue et enregistrée dans le système',
   },
   payment_processing: {
     id: 'payment_processing',
     title: 'Traitement du paiement',
-    description: 'Vérification et traitement du paiement'
+    description: 'Vérification et traitement du paiement',
   },
   order_confirmed: {
     id: 'order_confirmed',
     title: 'Commande confirmée',
-    description: 'Commande validée et prête pour production'
+    description: 'Commande validée et prête pour production',
   },
   material_preparation: {
     id: 'material_preparation',
     title: 'Préparation matériaux',
-    description: 'Préparation et allocation des matériaux nécessaires'
+    description: 'Préparation et allocation des matériaux nécessaires',
   },
   production: {
     id: 'production',
     title: 'Production',
-    description: 'Fabrication et usinage des pièces'
+    description: 'Fabrication et usinage des pièces',
   },
   quality_control: {
     id: 'quality_control',
     title: 'Contrôle qualité',
-    description: 'Inspection et validation de la qualité'
+    description: 'Inspection et validation de la qualité',
   },
   packaging: {
     id: 'packaging',
     title: 'Emballage',
-    description: 'Emballage et préparation pour expédition'
+    description: 'Emballage et préparation pour expédition',
   },
   shipping: {
     id: 'shipping',
     title: 'Expédition',
-    description: 'Expédition vers le client'
+    description: 'Expédition vers le client',
   },
   delivered: {
     id: 'delivered',
     title: 'Livré',
-    description: 'Commande livrée au client'
-  }
+    description: 'Commande livrée au client',
+  },
 }
 const statusStepMapping: Record<OrderStatus, string[]> = {
-  'pending': ['order_placed'],
-  'confirmed': ['order_placed', 'order_confirmed'],
-  'payment_processing': ['order_placed', 'payment_processing'],
-  'payment_confirmed': ['order_placed', 'payment_processing', 'order_confirmed'],
-  'in_production': ['order_placed', 'payment_processing', 'order_confirmed', 'material_preparation', 'production'],
-  'quality_control': ['order_placed', 'payment_processing', 'order_confirmed', 'material_preparation', 'production', 'quality_control'],
-  'ready_for_shipment': ['order_placed', 'payment_processing', 'order_confirmed', 'material_preparation', 'production', 'quality_control', 'packaging'],
-  'shipped': ['order_placed', 'payment_processing', 'order_confirmed', 'material_preparation', 'production', 'quality_control', 'packaging', 'shipping'],
-  'delivered': ['order_placed', 'payment_processing', 'order_confirmed', 'material_preparation', 'production', 'quality_control', 'packaging', 'shipping', 'delivered'],
-  'completed': ['order_placed', 'payment_processing', 'order_confirmed', 'material_preparation', 'production', 'quality_control', 'packaging', 'shipping', 'delivered'],
-  'cancelled': []
+  pending: ['order_placed'],
+  confirmed: ['order_placed', 'order_confirmed'],
+  payment_processing: ['order_placed', 'payment_processing'],
+  payment_confirmed: ['order_placed', 'payment_processing', 'order_confirmed'],
+  in_production: [
+    'order_placed',
+    'payment_processing',
+    'order_confirmed',
+    'material_preparation',
+    'production',
+  ],
+  quality_control: [
+    'order_placed',
+    'payment_processing',
+    'order_confirmed',
+    'material_preparation',
+    'production',
+    'quality_control',
+  ],
+  ready_for_shipment: [
+    'order_placed',
+    'payment_processing',
+    'order_confirmed',
+    'material_preparation',
+    'production',
+    'quality_control',
+    'packaging',
+  ],
+  shipped: [
+    'order_placed',
+    'payment_processing',
+    'order_confirmed',
+    'material_preparation',
+    'production',
+    'quality_control',
+    'packaging',
+    'shipping',
+  ],
+  delivered: [
+    'order_placed',
+    'payment_processing',
+    'order_confirmed',
+    'material_preparation',
+    'production',
+    'quality_control',
+    'packaging',
+    'shipping',
+    'delivered',
+  ],
+  completed: [
+    'order_placed',
+    'payment_processing',
+    'order_confirmed',
+    'material_preparation',
+    'production',
+    'quality_control',
+    'packaging',
+    'shipping',
+    'delivered',
+  ],
+  cancelled: [],
 }
-const stepIcons: Record<string, React.ComponentType<any>> = {
+const stepIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   order_placed: ShoppingCart,
   payment_processing: CreditCard,
   order_confirmed: CheckCircle2,
@@ -132,13 +182,13 @@ const stepIcons: Record<string, React.ComponentType<any>> = {
   quality_control: FileText,
   packaging: Package,
   shipping: Truck,
-  delivered: MapPin
+  delivered: MapPin,
 }
 const statusColors = {
   completed: 'text-green-600 bg-green-100',
   current: 'text-blue-600 bg-blue-100',
   pending: 'text-gray-400 bg-gray-100',
-  error: 'text-red-600 bg-red-100'
+  error: 'text-red-600 bg-red-100',
 }
 export function OrderProgressTracker({
   className,
@@ -154,35 +204,38 @@ export function OrderProgressTracker({
   urgentOrder = false,
   compact = false,
   showDetails = true,
-  onStepClick
+  onStepClick,
 }: OrderProgressTrackerProps) {
   // Generate steps based on order status if no custom steps provided
   const generateStepsFromStatus = (): OrderStep[] => {
     const completedStepIds = statusStepMapping[orderStatus] || []
     const allStepIds = Object.keys(defaultSteps)
-    return allStepIds.map(stepId => {
+    return allStepIds.map((stepId) => {
       const stepIndex = completedStepIds.indexOf(stepId)
       const isCompleted = stepIndex !== -1
-      const isCurrentStep = stepIndex === completedStepIds.length - 1 && orderStatus !== 'completed' && orderStatus !== 'cancelled'
+      const isCurrentStep =
+        stepIndex === completedStepIds.length - 1 &&
+        orderStatus !== 'completed' &&
+        orderStatus !== 'cancelled'
       let status: OrderStep['status'] = 'pending'
       if (isCompleted && !isCurrentStep) status = 'completed'
       else if (isCurrentStep) status = 'current'
       else if (orderStatus === 'cancelled') status = 'error'
       return {
         ...defaultSteps[stepId],
-        status
+        status,
       }
     })
   }
   const steps = customSteps || generateStepsFromStatus()
-  const completedSteps = steps.filter(step => step.status === 'completed').length
+  const completedSteps = steps.filter((step) => step.status === 'completed').length
   const totalSteps = steps.length
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
   const isOverdue = estimatedDelivery && !actualDelivery && new Date() > estimatedDelivery
   const isUrgent = urgentOrder || isOverdue
   if (compact) {
     return (
-      <Card className={cn(className, isUrgent && "border-orange-300")}>
+      <Card className={cn(className, isUrgent && 'border-orange-300')}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
@@ -192,12 +245,13 @@ export function OrderProgressTracker({
               </CardTitle>
               <p className="text-sm text-muted-foreground">{customerName}</p>
             </div>
-            <Badge 
-              variant="outline" 
+            <Badge
+              variant="outline"
               className={cn(
-                orderStatus === 'completed' && "bg-green-100 text-green-800",
-                orderStatus === 'cancelled' && "bg-red-100 text-red-800",
-                (orderStatus === 'shipped' || orderStatus === 'delivered') && "bg-blue-100 text-blue-800"
+                orderStatus === 'completed' && 'bg-green-100 text-green-800',
+                orderStatus === 'cancelled' && 'bg-red-100 text-red-800',
+                (orderStatus === 'shipped' || orderStatus === 'delivered') &&
+                  'bg-blue-100 text-blue-800'
               )}
             >
               {orderStatus.replace('_', ' ').toUpperCase()}
@@ -207,10 +261,14 @@ export function OrderProgressTracker({
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>{completedSteps}/{totalSteps} étapes</span>
+            <span>
+              {completedSteps}/{totalSteps} étapes
+            </span>
             {estimatedDelivery && (
               <span className={isOverdue ? 'text-red-600' : ''}>
-                {isOverdue ? 'En retard' : `Livraison: ${estimatedDelivery.toLocaleDateString('fr-FR')}`}
+                {isOverdue
+                  ? 'En retard'
+                  : `Livraison: ${estimatedDelivery.toLocaleDateString('fr-FR')}`}
               </span>
             )}
           </div>
@@ -219,7 +277,7 @@ export function OrderProgressTracker({
     )
   }
   return (
-    <Card className={cn(className, isUrgent && "border-orange-300")}>
+    <Card className={cn(className, isUrgent && 'border-orange-300')}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -244,23 +302,26 @@ export function OrderProgressTracker({
             </div>
           </div>
           <div className="text-right">
-            <Badge 
-              variant="outline" 
+            <Badge
+              variant="outline"
               className={cn(
-                "mb-2",
-                orderStatus === 'completed' && "bg-green-100 text-green-800",
-                orderStatus === 'cancelled' && "bg-red-100 text-red-800",
-                (orderStatus === 'shipped' || orderStatus === 'delivered') && "bg-blue-100 text-blue-800"
+                'mb-2',
+                orderStatus === 'completed' && 'bg-green-100 text-green-800',
+                orderStatus === 'cancelled' && 'bg-red-100 text-red-800',
+                (orderStatus === 'shipped' || orderStatus === 'delivered') &&
+                  'bg-blue-100 text-blue-800'
               )}
             >
               {orderStatus.replace('_', ' ').toUpperCase()}
             </Badge>
             {estimatedDelivery && (
-              <div className={cn(
-                "text-sm",
-                isOverdue ? 'text-red-600 font-medium' : 'text-muted-foreground'
-              )}>
-                {isOverdue && "En retard - "}
+              <div
+                className={cn(
+                  'text-sm',
+                  isOverdue ? 'text-red-600 font-medium' : 'text-muted-foreground'
+                )}
+              >
+                {isOverdue && 'En retard - '}
                 Livraison prévue: {estimatedDelivery.toLocaleDateString('fr-FR')}
               </div>
             )}
@@ -284,27 +345,39 @@ export function OrderProgressTracker({
       <CardContent className="space-y-4">
         {steps.map((step, index) => {
           const StepIcon = stepIcons[step.id] || Clock
-          const isClickable = onStepClick && (step.status === 'completed' || step.status === 'current')
+          const isClickable =
+            onStepClick && (step.status === 'completed' || step.status === 'current')
           return (
             <div key={step.id} className="relative">
               {/* Connection line */}
               {index < steps.length - 1 && (
                 <div className="absolute left-6 top-12 w-0.5 h-8 bg-gray-200" />
               )}
-              <div 
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive */}
+              <div
                 className={cn(
-                  "flex items-start gap-4 p-3 rounded-lg border transition-all",
-                  step.status === 'current' && "border-blue-300 bg-blue-50/50",
-                  step.status === 'completed' && "border-green-300 bg-green-50/30",
-                  step.status === 'error' && "border-red-300 bg-red-50/30",
-                  isClickable && "cursor-pointer hover:shadow-sm"
+                  'flex items-start gap-4 p-3 rounded-lg border transition-all',
+                  step.status === 'current' && 'border-blue-300 bg-blue-50/50',
+                  step.status === 'completed' && 'border-green-300 bg-green-50/30',
+                  step.status === 'error' && 'border-red-300 bg-red-50/30',
+                  isClickable && 'cursor-pointer hover:shadow-sm'
                 )}
+                role={isClickable ? 'button' : undefined}
+                tabIndex={isClickable ? 0 : undefined}
                 onClick={isClickable ? () => onStepClick(step.id) : undefined}
+                onKeyDown={(e) => {
+                  if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault()
+                    onStepClick(step.id)
+                  }
+                }}
               >
-                <div className={cn(
-                  "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2",
-                  statusColors[step.status]
-                )}>
+                <div
+                  className={cn(
+                    'flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2',
+                    statusColors[step.status]
+                  )}
+                >
                   <StepIcon className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -350,9 +423,11 @@ export function OrderProgressTracker({
                     {step.estimatedDate && !step.completedAt && (
                       <span>Prévu le {step.estimatedDate.toLocaleDateString('fr-FR')}</span>
                     )}
-                    {step.actualDate && step.estimatedDate && step.actualDate > step.estimatedDate && (
-                      <span className="text-orange-600">En retard</span>
-                    )}
+                    {step.actualDate &&
+                      step.estimatedDate &&
+                      step.actualDate > step.estimatedDate && (
+                        <span className="text-orange-600">En retard</span>
+                      )}
                   </div>
                 </div>
                 {step.status === 'completed' && (

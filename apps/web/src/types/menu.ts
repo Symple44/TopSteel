@@ -1,7 +1,7 @@
 // Types pour le système de menus
 
 export interface MenuItem {
-  id?: string
+  id: string
   title: string
   type: 'M' | 'P' | 'L' | 'D'
   icon?: string
@@ -17,6 +17,12 @@ export interface MenuItem {
   requiredPermissions?: string[]
   inheritFromParent?: boolean
   isPublic?: boolean
+  // Additional optional properties
+  badge?: string | number
+  href?: string
+  // Additional properties for UI components
+  customIcon?: string
+  customIconColor?: string
 }
 
 export interface MenuType {
@@ -50,4 +56,49 @@ export interface Permission {
   description: string
   module: string
   action: string
+}
+
+export interface MenuConfiguration {
+  id: string // Required id field
+  name: string
+  description?: string
+  isActive: boolean
+  isSystem: boolean
+  createdAt: string
+  updatedAt?: string
+  createdBy?: string
+  items?: MenuItem[]
+}
+
+// Additional interfaces for menu settings
+export interface UserMenuItem {
+  id: string
+  title: string
+  type: 'M' | 'P' | 'L' | 'D'
+  icon?: string
+  orderIndex: number
+  isVisible: boolean
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
+  children?: UserMenuItem[]
+  customIcon?: string
+  customIconColor?: string
+  badge?: string | number
+  href?: string
+}
+
+export interface MenuItemConfig {
+  id: string
+  title: string
+  type: 'M' | 'P' | 'L' | 'D'
+  icon?: string
+  orderIndex: number
+  isVisible: boolean
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
+  children?: MenuItemConfig[]
+  customIcon?: string
+  customIconColor?: string
 }

@@ -1,26 +1,23 @@
 'use client'
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  Calendar,
+  Minus,
+  Settings,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Wrench,
+  Zap,
+} from 'lucide-react'
 import React from 'react'
+import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { 
-  Activity, 
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Clock,
-  AlertTriangle,
-  CheckCircle,
-  Zap,
-  Target,
-  Settings,
-  Calendar,
-  BarChart3,
-  Users,
-  Timer,
-  Wrench
-} from 'lucide-react'
-import { cn } from '../../../../lib/utils'
 export interface ProductionStats {
   id: string
   period: {
@@ -188,15 +185,18 @@ export function ProductionStatsCard({
   }
   const getAlertsSeverityCount = () => {
     if (!stats.alerts) return { critical: 0, high: 0, medium: 0, low: 0 }
-    return stats.alerts.reduce((acc, alert) => {
-      acc[alert.severity]++
-      return acc
-    }, { critical: 0, high: 0, medium: 0, low: 0 })
+    return stats.alerts.reduce(
+      (acc, alert) => {
+        acc[alert.severity]++
+        return acc
+      },
+      { critical: 0, high: 0, medium: 0, low: 0 }
+    )
   }
   const FacilityIcon = getFacilityIcon()
   const alertsCount = getAlertsSeverityCount()
   const totalAlerts = stats.alerts?.length || 0
-  const criticalAlerts = stats.alerts?.filter(a => a.severity === 'critical') || []
+  const criticalAlerts = stats.alerts?.filter((a) => a.severity === 'critical') || []
   return (
     <Card className={cn('hover:shadow-md transition-shadow', className)}>
       <CardHeader className="pb-3">
@@ -206,21 +206,24 @@ export function ProductionStatsCard({
               <FacilityIcon className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">
-                {stats.facility.name}
-              </CardTitle>
+              <CardTitle className="text-lg">{stats.facility.name}</CardTitle>
               <p className="text-sm text-muted-foreground">
-                {stats.period.label} • {formatDate(stats.period.start)} - {formatDate(stats.period.end)}
+                {stats.period.label} • {formatDate(stats.period.start)} -{' '}
+                {formatDate(stats.period.end)}
               </p>
             </div>
           </div>
           {totalAlerts > 0 && (
-            <Badge className={cn(
-              'text-xs',
-              criticalAlerts.length > 0 ? 'bg-red-100 text-red-800 border-red-200' :
-              alertsCount.high > 0 ? 'bg-orange-100 text-orange-800 border-orange-200' :
-              'bg-yellow-100 text-yellow-800 border-yellow-200'
-            )}>
+            <Badge
+              className={cn(
+                'text-xs',
+                criticalAlerts.length > 0
+                  ? 'bg-red-100 text-red-800 border-red-200'
+                  : alertsCount.high > 0
+                    ? 'bg-orange-100 text-orange-800 border-orange-200'
+                    : 'bg-yellow-100 text-yellow-800 border-yellow-200'
+              )}
+            >
               <AlertTriangle className="h-3 w-3 mr-1" />
               {totalAlerts} alerte{totalAlerts > 1 ? 's' : ''}
             </Badge>
@@ -234,24 +237,42 @@ export function ProductionStatsCard({
             <p className="text-xs text-muted-foreground">Production totale</p>
             <div className="flex items-center gap-2">
               <p className="font-bold text-lg">
-                {formatNumber(stats.metrics.totalProduction.value)} {stats.metrics.totalProduction.unit}
+                {formatNumber(stats.metrics.totalProduction.value)}{' '}
+                {stats.metrics.totalProduction.unit}
               </p>
               {stats.metrics.totalProduction.previousPeriod && (
                 <div className="flex items-center gap-1">
                   {React.createElement(
-                    getTrendIcon(stats.metrics.totalProduction.value, stats.metrics.totalProduction.previousPeriod),
-                    { 
+                    getTrendIcon(
+                      stats.metrics.totalProduction.value,
+                      stats.metrics.totalProduction.previousPeriod
+                    ),
+                    {
                       className: cn(
                         'h-3 w-3',
-                        getTrendColor(stats.metrics.totalProduction.value, stats.metrics.totalProduction.previousPeriod)
-                      )
+                        getTrendColor(
+                          stats.metrics.totalProduction.value,
+                          stats.metrics.totalProduction.previousPeriod
+                        )
+                      ),
                     }
                   )}
-                  <span className={cn(
-                    'text-xs font-medium',
-                    getTrendColor(stats.metrics.totalProduction.value, stats.metrics.totalProduction.previousPeriod)
-                  )}>
-                    {Math.abs(getTrendPercentage(stats.metrics.totalProduction.value, stats.metrics.totalProduction.previousPeriod)).toFixed(1)}%
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      getTrendColor(
+                        stats.metrics.totalProduction.value,
+                        stats.metrics.totalProduction.previousPeriod
+                      )
+                    )}
+                  >
+                    {Math.abs(
+                      getTrendPercentage(
+                        stats.metrics.totalProduction.value,
+                        stats.metrics.totalProduction.previousPeriod
+                      )
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
               )}
@@ -260,13 +281,23 @@ export function ProductionStatsCard({
               <div className="flex items-center gap-1 text-xs">
                 <Target className="h-3 w-3 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Objectif: {formatNumber(stats.metrics.totalProduction.target)} {stats.metrics.totalProduction.unit}
+                  Objectif: {formatNumber(stats.metrics.totalProduction.target)}{' '}
+                  {stats.metrics.totalProduction.unit}
                 </span>
-                <span className={cn(
-                  'font-medium',
-                  stats.metrics.totalProduction.value >= stats.metrics.totalProduction.target ? 'text-green-600' : 'text-red-600'
-                )}>
-                  ({((stats.metrics.totalProduction.value / stats.metrics.totalProduction.target) * 100).toFixed(0)}%)
+                <span
+                  className={cn(
+                    'font-medium',
+                    stats.metrics.totalProduction.value >= stats.metrics.totalProduction.target
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                  )}
+                >
+                  (
+                  {(
+                    (stats.metrics.totalProduction.value / stats.metrics.totalProduction.target) *
+                    100
+                  ).toFixed(0)}
+                  %)
                 </span>
               </div>
             )}
@@ -274,25 +305,40 @@ export function ProductionStatsCard({
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Efficacité</p>
             <div className="flex items-center gap-2">
-              <p className="font-bold text-lg">
-                {formatNumber(stats.metrics.efficiency.value)}%
-              </p>
+              <p className="font-bold text-lg">{formatNumber(stats.metrics.efficiency.value)}%</p>
               {stats.metrics.efficiency.previousPeriod && (
                 <div className="flex items-center gap-1">
                   {React.createElement(
-                    getTrendIcon(stats.metrics.efficiency.value, stats.metrics.efficiency.previousPeriod),
-                    { 
+                    getTrendIcon(
+                      stats.metrics.efficiency.value,
+                      stats.metrics.efficiency.previousPeriod
+                    ),
+                    {
                       className: cn(
                         'h-3 w-3',
-                        getTrendColor(stats.metrics.efficiency.value, stats.metrics.efficiency.previousPeriod)
-                      )
+                        getTrendColor(
+                          stats.metrics.efficiency.value,
+                          stats.metrics.efficiency.previousPeriod
+                        )
+                      ),
                     }
                   )}
-                  <span className={cn(
-                    'text-xs font-medium',
-                    getTrendColor(stats.metrics.efficiency.value, stats.metrics.efficiency.previousPeriod)
-                  )}>
-                    {Math.abs(getTrendPercentage(stats.metrics.efficiency.value, stats.metrics.efficiency.previousPeriod)).toFixed(1)}%
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      getTrendColor(
+                        stats.metrics.efficiency.value,
+                        stats.metrics.efficiency.previousPeriod
+                      )
+                    )}
+                  >
+                    {Math.abs(
+                      getTrendPercentage(
+                        stats.metrics.efficiency.value,
+                        stats.metrics.efficiency.previousPeriod
+                      )
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
               )}
@@ -310,14 +356,20 @@ export function ProductionStatsCard({
             <div className="grid grid-cols-3 gap-3 pt-2 border-t">
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">Qualité</p>
-                <p className="font-semibold text-sm">{formatNumber(stats.metrics.qualityRate.value)}%</p>
+                <p className="font-semibold text-sm">
+                  {formatNumber(stats.metrics.qualityRate.value)}%
+                </p>
                 {stats.metrics.qualityRate.defectCount && (
-                  <p className="text-xs text-red-600">{stats.metrics.qualityRate.defectCount} défauts</p>
+                  <p className="text-xs text-red-600">
+                    {stats.metrics.qualityRate.defectCount} défauts
+                  </p>
                 )}
               </div>
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">Arrêts</p>
-                <p className="font-semibold text-sm">{formatNumber(stats.metrics.downtime.value)}h</p>
+                <p className="font-semibold text-sm">
+                  {formatNumber(stats.metrics.downtime.value)}h
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {formatNumber(stats.metrics.downtime.unplanned)}h imprévu
                 </p>
@@ -325,7 +377,8 @@ export function ProductionStatsCard({
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">Énergie</p>
                 <p className="font-semibold text-sm">
-                  {formatNumber(stats.metrics.energyConsumption.value)} {stats.metrics.energyConsumption.unit}
+                  {formatNumber(stats.metrics.energyConsumption.value)}{' '}
+                  {stats.metrics.energyConsumption.unit}
                 </p>
                 {stats.metrics.energyConsumption.cost && (
                   <p className="text-xs text-muted-foreground">
@@ -368,14 +421,15 @@ export function ProductionStatsCard({
                 <div className="flex items-center gap-1">
                   <Settings className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    {stats.equipment.operational}/{stats.equipment.operational + stats.equipment.maintenance + stats.equipment.outOfService}
+                    {stats.equipment.operational}/
+                    {stats.equipment.operational +
+                      stats.equipment.maintenance +
+                      stats.equipment.outOfService}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">
-                    {formatNumber(stats.equipment.utilizationRate)}%
-                  </span>
+                  <span className="text-sm">{formatNumber(stats.equipment.utilizationRate)}%</span>
                 </div>
               </div>
             </div>
@@ -388,21 +442,26 @@ export function ProductionStatsCard({
                 </p>
                 <div className="space-y-1">
                   {criticalAlerts.slice(0, 2).map((alert) => (
-                    <div key={alert.id} className="text-xs bg-red-50 p-2 rounded border border-red-200">
+                    <div
+                      key={alert.id}
+                      className="text-xs bg-red-50 p-2 rounded border border-red-200"
+                    >
                       <p className="font-medium text-red-800">{alert.message}</p>
                       <p className="text-red-600 mt-1">
                         {new Intl.DateTimeFormat('fr-FR', {
                           hour: '2-digit',
                           minute: '2-digit',
                           day: '2-digit',
-                          month: '2-digit'
+                          month: '2-digit',
                         }).format(alert.timestamp)}
                       </p>
                     </div>
                   ))}
                   {criticalAlerts.length > 2 && (
                     <p className="text-xs text-red-600">
-                      +{criticalAlerts.length - 2} autre{criticalAlerts.length - 2 > 1 ? 's' : ''} alerte{criticalAlerts.length - 2 > 1 ? 's' : ''} critique{criticalAlerts.length - 2 > 1 ? 's' : ''}
+                      +{criticalAlerts.length - 2} autre{criticalAlerts.length - 2 > 1 ? 's' : ''}{' '}
+                      alerte{criticalAlerts.length - 2 > 1 ? 's' : ''} critique
+                      {criticalAlerts.length - 2 > 1 ? 's' : ''}
                     </p>
                   )}
                 </div>
@@ -414,24 +473,36 @@ export function ProductionStatsCard({
         {showActions && (
           <div className="flex flex-wrap gap-2 pt-3 border-t">
             {onViewDetails && (
-              <Button variant="outline" size="sm" onClick={onViewDetails} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewDetails}
+                className="flex items-center gap-1"
+              >
                 <BarChart3 className="h-3 w-3" />
                 Détails
               </Button>
             )}
             {onExport && (
-              <Button variant="outline" size="sm" onClick={onExport} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onExport}
+                className="flex items-center gap-1"
+              >
                 <Calendar className="h-3 w-3" />
                 Exporter
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit}>
+              <Button type="button" variant="outline" size="sm" onClick={onEdit}>
                 Modifier
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" size="sm" onClick={onDelete}>
+              <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
                 Supprimer
               </Button>
             )}

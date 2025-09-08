@@ -8,7 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MarketplaceCustomer } from './marketplace-customer.entity'
+// Removed import to avoid circular dependencies
+// import { MarketplaceCustomer } from './marketplace-customer.entity'
 
 @Entity('marketplace_customer_addresses')
 @Index(['customerId'])
@@ -19,13 +20,9 @@ export class MarketplaceCustomerAddress {
   @Column({ type: 'uuid', name: 'customer_id' })
   customerId: string
 
-  @ManyToOne(
-    () => MarketplaceCustomer,
-    (customer) => customer.addresses,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('MarketplaceCustomer', 'addresses', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'customer_id' })
-  customer: MarketplaceCustomer
+  customer: any
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   label?: string

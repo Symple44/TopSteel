@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { NotificationRule } from './notification-rule.entity'
+// import { NotificationRule } from './notification-rule.entity';
 
 /**
  * Action types
@@ -70,7 +70,7 @@ export class NotificationAction {
     templateId?: string
     title?: string
     body?: string
-    data?: Record<string, any>
+    data?: Record<string, unknown>
     channels?: ('email' | 'sms' | 'push' | 'in_app')[]
     priority?: 'low' | 'normal' | 'high' | 'urgent'
     ttl?: number // Time to live in seconds
@@ -98,7 +98,7 @@ export class NotificationAction {
   functionConfig?: {
     name: string
     module?: string
-    parameters?: Record<string, any>
+    parameters?: Record<string, unknown>
     async?: boolean
     timeout?: number
   }
@@ -128,14 +128,14 @@ export class NotificationAction {
     dueDate?: string
     priority?: 'low' | 'normal' | 'high' | 'urgent'
     tags?: string[]
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   }
 
   // Trigger workflow action
   @Column({ type: 'jsonb', nullable: true })
   workflowConfig?: {
     workflowId: string
-    parameters?: Record<string, any>
+    parameters?: Record<string, unknown>
     waitForCompletion?: boolean
     timeoutSeconds?: number
   }
@@ -146,7 +146,7 @@ export class NotificationAction {
     level: 'debug' | 'info' | 'warn' | 'error'
     message: string
     category?: string
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
     destination?: 'console' | 'file' | 'database' | 'external'
   }
 
@@ -155,17 +155,17 @@ export class NotificationAction {
   reportConfig?: {
     reportId: string
     format: 'pdf' | 'excel' | 'csv' | 'html'
-    parameters?: Record<string, any>
+    parameters?: Record<string, unknown>
     recipients?: string[]
     schedule?: string // Cron expression
   }
 
   // Custom action
   @Column({ type: 'jsonb', nullable: true })
-  customConfig?: Record<string, any>
+  customConfig?: Record<string, unknown>
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @Column({ type: 'integer', default: 0 })
   executionCount!: number
@@ -192,13 +192,9 @@ export class NotificationAction {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => NotificationRule,
-    (rule) => rule.actions,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('NotificationRule', 'actions', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'rule_id' })
-  rule!: NotificationRule
+  rule!: any
 
   // Utility methods
 
@@ -238,7 +234,7 @@ export class NotificationAction {
     if (success) {
       this.successCount++
       this.lastExecutionSuccess = true
-      this.lastExecutionError = null
+      this.lastExecutionError = undefined
     } else {
       this.errorCount++
       this.lastExecutionSuccess = false
@@ -267,7 +263,7 @@ export class NotificationAction {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       name: this.name,

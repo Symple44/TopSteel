@@ -54,16 +54,16 @@ export default function TermsOfServicePage() {
               </p>
               <div className="grid md:grid-cols-2 gap-4">
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Gestion de production</li>
-                  <li>Gestion des stocks</li>
-                  <li>Gestion clients/fournisseurs</li>
-                  <li>Facturation et devis</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Planning et ressources</li>
-                  <li>Qualité et traçabilité</li>
-                  <li>Maintenance préventive</li>
-                  <li>Tableau de bord analytique</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
               </div>
             </div>
@@ -79,20 +79,20 @@ export default function TermsOfServicePage() {
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Utilisation appropriée</h3>
                 <ul className="text-gray-700 text-sm space-y-1">
-                  <li>• Utiliser le service uniquement à des fins légales et professionnelles</li>
-                  <li>• Respecter les droits de propriété intellectuelle</li>
-                  <li>• Ne pas tenter de compromettre la sécurité du système</li>
-                  <li>• Ne pas surcharger nos serveurs par un usage excessif</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Sécurité du compte</h3>
                 <ul className="text-gray-700 text-sm space-y-1">
-                  <li>• Maintenir la confidentialité de vos identifiants</li>
-                  <li>• Utiliser des mots de passe robustes</li>
-                  <li>• Nous signaler immédiatement tout accès non autorisé</li>
-                  <li>• Activer l'authentification à deux facteurs quand disponible</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
               </div>
 
@@ -102,10 +102,10 @@ export default function TermsOfServicePage() {
                   Utilisations interdites
                 </h3>
                 <ul className="text-red-800 text-sm space-y-1">
-                  <li>• Tentatives de piratage ou d'intrusion</li>
-                  <li>• Partage de contenu illégal ou malveillant</li>
-                  <li>• Revente ou sous-licence du service</li>
-                  <li>• Ingénierie inverse du logiciel</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
+                  <li>{}</li>
                 </ul>
               </div>
             </div>
@@ -170,10 +170,10 @@ export default function TermsOfServicePage() {
                 Dans les limites autorisées par la loi, TopSteel ne saurait être tenu responsable :
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Des dommages indirects ou de la perte de données</li>
-                <li>Des interruptions de service indépendantes de notre volonté</li>
-                <li>De l'utilisation inappropriée du service par l'utilisateur</li>
-                <li>Des décisions prises sur la base des données du système</li>
+                <li>{}</li>
+                <li>{}</li>
+                <li>{}</li>
+                <li>{}</li>
               </ul>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                 <p className="text-blue-800 text-sm">
@@ -197,17 +197,17 @@ export default function TermsOfServicePage() {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 mb-2">Facturation</h3>
                   <ul className="text-gray-700 text-sm space-y-1">
-                    <li>• Facturation mensuelle ou annuelle</li>
-                    <li>• Paiement par prélèvement ou virement</li>
-                    <li>• Factures disponibles dans l'interface</li>
+                    <li>{}</li>
+                    <li>{}</li>
+                    <li>{}</li>
                   </ul>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 mb-2">Résiliation</h3>
                   <ul className="text-gray-700 text-sm space-y-1">
-                    <li>• Préavis de 30 jours par email</li>
-                    <li>• Export de données possible pendant 60 jours</li>
-                    <li>• Remboursement au prorata si annuel</li>
+                    <li>{}</li>
+                    <li>{}</li>
+                    <li>{}</li>
                   </ul>
                 </div>
               </div>

@@ -1,9 +1,9 @@
 'use client'
+import { Building2, Calendar, CreditCard, Mail, MapPin, Phone, Truck, User } from 'lucide-react'
+import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { Building2, MapPin, Phone, Mail, Calendar, CreditCard, User, Truck } from 'lucide-react'
-import { cn } from '../../../../lib/utils'
 export interface Client {
   id: string
   name: string
@@ -143,7 +143,9 @@ export function ClientCard({
               <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
               <div>
                 <div>{client.address.street}</div>
-                <div>{client.address.postalCode} {client.address.city}</div>
+                <div>
+                  {client.address.postalCode} {client.address.city}
+                </div>
                 <div>{client.address.country}</div>
               </div>
             </div>
@@ -188,27 +190,29 @@ export function ClientCard({
             <Calendar className="h-3 w-3" />
             Créé le {formatDate(client.createdAt)}
           </div>
-          {client.lastOrderDate && (
-            <div>
-              Dernière commande: {formatDate(client.lastOrderDate)}
-            </div>
-          )}
+          {client.lastOrderDate && <div>Dernière commande: {formatDate(client.lastOrderDate)}</div>}
         </div>
         {/* Actions */}
         {showActions && (
           <div className="flex gap-2 pt-3 border-t">
             {onViewDetails && (
-              <Button variant="outline" size="sm" onClick={onViewDetails} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewDetails}
+                className="flex-1"
+              >
                 Voir détails
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit}>
+              <Button type="button" variant="outline" size="sm" onClick={onEdit}>
                 Modifier
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" size="sm" onClick={onDelete}>
+              <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
                 Supprimer
               </Button>
             )}

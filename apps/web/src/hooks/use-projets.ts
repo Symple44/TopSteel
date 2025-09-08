@@ -4,7 +4,7 @@
  * Fichier: apps/web/src/hooks/use-projets.ts
  */
 
-import type { Projet, ProjetFilters } from '@erp/domains/core'
+import type { Projet, ProjetFilters } from '@erp/domains'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useProjetStore } from '@/stores/projet.store'
 
@@ -14,7 +14,7 @@ export const useProjets = (autoFetch = true) => {
 
   // ✅ CORRECTION: Accès sécurisé aux propriétés avec fallbacks
   const projets = useProjetStore((state) => state.projets || [])
-  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading ?? false)
   const error = useProjetStore((state) => (state as { error?: unknown }).error || null)
   const filters = useProjetStore((state) => state.filters || {})
   const fetchProjets = useProjetStore((state) => state.fetchProjets)
@@ -22,11 +22,13 @@ export const useProjets = (autoFetch = true) => {
   const clearError = useProjetStore((state) => (state as { clearError?: () => void }).clearError)
 
   const stableFetch = useCallback(async () => {
-    if (fetchInitiatedRef.current || !mounted || loading) {
+    if (fetchInitiatedRef?.current || !mounted || loading) {
       return
     }
 
-    fetchInitiatedRef.current = true
+    if (fetchInitiatedRef.current !== undefined) {
+      fetchInitiatedRef.current = true
+    }
 
     try {
       if (fetchProjets) {
@@ -35,7 +37,7 @@ export const useProjets = (autoFetch = true) => {
     } catch (_error) {
     } finally {
       setTimeout(() => {
-        if (mounted) {
+        if (mounted && fetchInitiatedRef.current !== undefined) {
           fetchInitiatedRef.current = false
         }
       }, 1000)
@@ -43,7 +45,9 @@ export const useProjets = (autoFetch = true) => {
   }, [fetchProjets, loading, mounted])
 
   const refetchWithFilters = useCallback(async () => {
-    fetchInitiatedRef.current = false
+    if (fetchInitiatedRef.current !== undefined) {
+      fetchInitiatedRef.current = false
+    }
     await stableFetch()
   }, [stableFetch])
 
@@ -54,10 +58,10 @@ export const useProjets = (autoFetch = true) => {
   }, [])
 
   useEffect(() => {
-    if (mounted && autoFetch && projets.length === 0 && !loading) {
+    if (mounted && autoFetch && projets?.length === 0 && !loading) {
       stableFetch()
     }
-  }, [mounted, autoFetch, projets.length, loading, stableFetch])
+  }, [mounted, autoFetch, projets?.length, loading, stableFetch])
 
   return {
     projets,
@@ -75,7 +79,7 @@ export const useProjets = (autoFetch = true) => {
 
 export const useProjet = (id?: string) => {
   const selectedProjet = useProjetStore((state) => state.selectedProjet)
-  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading ?? false)
   const error = useProjetStore((state) => (state as { error?: unknown }).error || null)
   const setSelectedProjet = useProjetStore((state) => state.setSelectedProjet)
   const selectProjetById = useProjetStore((state) => state.selectProjetById)
@@ -124,7 +128,7 @@ export const useProjet = (id?: string) => {
  */
 export const useProjetsStats = () => {
   const stats = useProjetStore((state) => state.stats)
-  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading ?? false)
   const refreshStats = useProjetStore((state) => state.refreshStats)
 
   return {
@@ -139,9 +143,9 @@ export const useProjetsStats = () => {
  * Hook pour la pagination des projets
  */
 export const useProjetsPagination = () => {
-  const currentPage = useProjetStore((state) => state.currentPage || 0)
+  const currentPage = useProjetStore((state) => state.currentPage ?? 0)
   const pageSize = useProjetStore((state) => state.pageSize || 20)
-  const totalCount = useProjetStore((state) => state.totalCount || 0)
+  const totalCount = useProjetStore((state) => state.totalCount ?? 0)
   const setPage = useProjetStore((state) => state.setPage)
   const setPageSize = useProjetStore((state) => state.setPageSize)
 
@@ -196,7 +200,7 @@ export const useProjetsFilters = () => {
 
       // ✅ Type-safe deletion
       if (key in newFilters) {
-        delete (newFilters as Record<string, unknown>)[key]
+        delete (newFilters as Record<string, unknown>)[key as string]
         setFilters?.(newFilters)
       }
     },
@@ -211,7 +215,7 @@ export const useProjetsActions = () => {
   const updateProjet = useProjetStore((state) => state.updateProjet)
   const deleteProjet = useProjetStore((state) => state.deleteProjet)
   const duplicateProjet = useProjetStore((state) => state.duplicateProjet)
-  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading ?? false)
   const error = useProjetStore((state) => (state as { error?: unknown }).error || null)
 
   return {

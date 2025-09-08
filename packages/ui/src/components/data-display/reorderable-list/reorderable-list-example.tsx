@@ -6,11 +6,11 @@ import React from 'react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../primitives/button'
 import { Badge } from '../badge'
+import type { ReorderableItem } from './reorderable-list-theme'
 import { ThemedReorderableList } from './themed-reorderable-list'
 
 // Type d'exemple basé sur MenuItem existant
-interface ExampleMenuItem {
-  id: string
+interface ExampleMenuItem extends ReorderableItem {
   title: string
   href?: string
   icon?: string
@@ -83,6 +83,7 @@ function ExampleMenuItemDisplay({
 
       {/* Toggle de visibilité */}
       <Button
+        type="button"
         variant="ghost"
         size="sm"
         onClick={(e: React.MouseEvent) => {

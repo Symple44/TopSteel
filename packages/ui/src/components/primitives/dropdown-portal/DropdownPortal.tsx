@@ -238,14 +238,29 @@ export function DropdownPortal({
   const triggerElement = React.cloneElement(trigger, {
     ref: (node: HTMLElement) => {
       if (node) {
-        triggerRef.current = node
+        // Use Object.defineProperty to bypass readonly
+        Object.defineProperty(triggerRef, 'current', {
+          value: node,
+          writable: true,
+          configurable: true,
+        })
       }
       // Forward ref si le trigger en a une
-      const originalRef = (trigger as any).ref || (trigger.props as any)?.ref
+      const originalRef = (trigger as unknown).ref || (trigger.props as unknown)?.ref
       if (typeof originalRef === 'function') {
         originalRef(node)
-      } else if (originalRef && 'current' in originalRef) {
-        originalRef.current = node
+      } else if (
+        originalRef &&
+        typeof originalRef === 'object' &&
+        originalRef !== null &&
+        'current' in originalRef
+      ) {
+        // Use Object.defineProperty to bypass readonly
+        Object.defineProperty(originalRef, 'current', {
+          value: node,
+          writable: true,
+          configurable: true,
+        })
       }
     },
     onClick: (e: React.MouseEvent) => {
@@ -254,11 +269,11 @@ export function DropdownPortal({
       e.nativeEvent.stopImmediatePropagation()
       toggleDropdown()
       // Appeler l'onClick original si présent
-      if (trigger.props && typeof (trigger.props as any).onClick === 'function') {
-        ;(trigger.props as any).onClick(e)
+      if (trigger.props && typeof (trigger.props as unknown).onClick === 'function') {
+        ;(trigger.props as unknown).onClick(e)
       }
     },
-  } as any)
+  } as unknown)
 
   // Portal pour le contenu du dropdown
   const dropdownContent =

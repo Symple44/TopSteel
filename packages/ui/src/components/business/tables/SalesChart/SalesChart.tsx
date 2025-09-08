@@ -1,7 +1,7 @@
 'use client'
+import { DollarSign, Package, ShoppingCart, TrendingDown, TrendingUp, Users } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
 import { Badge } from '../../../primitives'
-import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Package } from 'lucide-react'
 export interface SalesData {
   period: string // e.g., "2024-01", "Q1 2024", "Week 42"
   revenue: number
@@ -43,9 +43,9 @@ interface SalesChartProps {
   onPeriodChange?: (period: string) => void
   onViewDetails?: () => void
 }
-export function SalesChart({ 
+export function SalesChart({
   data = [],
-  title = "Graphique des ventes",
+  title = 'Graphique des ventes',
   period = 'monthly',
   showComparison = true,
   showBreakdown = false,
@@ -53,7 +53,7 @@ export function SalesChart({
   className,
   loading = false,
   onPeriodChange,
-  onViewDetails
+  onViewDetails,
 }: SalesChartProps) {
   if (loading) {
     return (
@@ -65,7 +65,9 @@ export function SalesChart({
           <div className="flex items-center justify-center" style={{ height }}>
             <div className="text-center">
               <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-              <p className="mt-2 text-sm text-muted-foreground">Chargement des données de ventes...</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Chargement des données de ventes...
+              </p>
             </div>
           </div>
         </CardContent>
@@ -84,26 +86,37 @@ export function SalesChart({
     return new Intl.NumberFormat('fr-FR').format(num)
   }
   const getGrowthIcon = (growth: number) => {
-    return growth >= 0 ? 
-      <TrendingUp className="h-4 w-4 text-green-600" /> : 
+    return growth >= 0 ? (
+      <TrendingUp className="h-4 w-4 text-green-600" />
+    ) : (
       <TrendingDown className="h-4 w-4 text-red-600" />
+    )
   }
   const getGrowthColor = (growth: number) => {
     return growth >= 0 ? 'text-green-600' : 'text-red-600'
   }
   // Simulated chart bars for visualization
   const renderBars = () => {
-    const maxRevenue = Math.max(...data.map(d => d.revenue))
+    const maxRevenue = Math.max(...data.map((d) => d.revenue))
     return (
       <div className="flex items-end justify-between gap-2 h-48 mt-4">
         {data.slice(0, 12).map((item, index) => {
           const height = (item.revenue / maxRevenue) * 100
           return (
-            <div 
+            // biome-ignore lint/a11y/noStaticElementInteractions: div has proper role and keyboard handlers when interactive
+            <div
               key={index}
               className="flex-1 bg-blue-500 hover:bg-blue-600 rounded-t transition-all cursor-pointer relative group"
               style={{ height: `${height}%` }}
+              role={onPeriodChange ? 'button' : undefined}
+              tabIndex={onPeriodChange ? 0 : undefined}
               onClick={() => onPeriodChange?.(item.period)}
+              onKeyDown={(e) => {
+                if (onPeriodChange && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  onPeriodChange(item.period)
+                }
+              }}
             >
               <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 {item.period}: {formatCurrency(item.revenue)}
@@ -119,16 +132,32 @@ export function SalesChart({
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
         <div className="flex gap-2">
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('daily')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('daily')}
+          >
             Jour
           </Badge>
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('weekly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('weekly')}
+          >
             Semaine
           </Badge>
-          <Badge variant={period === 'monthly' ? 'default' : 'outline'} className="cursor-pointer" onClick={() => onPeriodChange?.('monthly')}>
+          <Badge
+            variant={period === 'monthly' ? 'default' : 'outline'}
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('monthly')}
+          >
             Mois
           </Badge>
-          <Badge variant="outline" className="cursor-pointer" onClick={() => onPeriodChange?.('yearly')}>
+          <Badge
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => onPeriodChange?.('yearly')}
+          >
             Année
           </Badge>
         </div>
@@ -152,7 +181,9 @@ export function SalesChart({
                     {formatCurrency(currentData?.revenue || 0)}
                   </span>
                   {currentData?.growth !== undefined && (
-                    <div className={`flex items-center gap-1 ${getGrowthColor(currentData.growth)}`}>
+                    <div
+                      className={`flex items-center gap-1 ${getGrowthColor(currentData.growth)}`}
+                    >
                       {getGrowthIcon(currentData.growth)}
                       <span className="text-sm font-medium">{Math.abs(currentData.growth)}%</span>
                     </div>
@@ -169,9 +200,7 @@ export function SalesChart({
                   <ShoppingCart className="h-4 w-4" />
                   <span>Commandes</span>
                 </div>
-                <div className="text-2xl font-bold">
-                  {formatNumber(currentData?.orders || 0)}
-                </div>
+                <div className="text-2xl font-bold">{formatNumber(currentData?.orders || 0)}</div>
                 {currentData?.averageOrderValue && (
                   <div className="text-xs text-muted-foreground">
                     Panier moyen: {formatCurrency(currentData.averageOrderValue)}
@@ -198,9 +227,7 @@ export function SalesChart({
                   <Package className="h-4 w-4" />
                   <span>Produits vendus</span>
                 </div>
-                <div className="text-2xl font-bold">
-                  {formatNumber(currentData?.products || 0)}
-                </div>
+                <div className="text-2xl font-bold">{formatNumber(currentData?.products || 0)}</div>
               </div>
             </div>
             {/* Chart */}
@@ -250,10 +277,7 @@ export function SalesChart({
             )}
             {onViewDetails && (
               <div className="mt-4 flex justify-center">
-                <button
-                  onClick={onViewDetails}
-                  className="text-sm text-blue-600 hover:underline"
-                >
+                <button onClick={onViewDetails} className="text-sm text-blue-600 hover:underline">
                   Voir les détails complets →
                 </button>
               </div>

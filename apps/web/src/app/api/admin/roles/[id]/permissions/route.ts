@@ -6,10 +6,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     // Vérifier l'authentification
     const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+    const token = cookieStore?.get('accessToken')?.value
 
     if (!token) {
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: false,
           message: 'Authentification requise',
@@ -24,14 +24,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       // Appeler le vrai backend NestJS
       const response = await callBackendFromApi(request, `admin/roles/${roleId}/permissions`, {
         method: 'GET',
-        signal: AbortSignal.timeout(5000), // Timeout de 5 secondes
+        signal: AbortSignal?.timeout(5000), // Timeout de 5 secondes
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        return NextResponse.json(data, { status: 200 })
+      if (response?.ok) {
+        const data = await response?.json()
+        return NextResponse?.json(data, { status: 200 })
       } else {
-        throw new Error(`Backend error: ${response.status}`)
+        throw new Error(`Backend error: ${response?.status}`)
       }
     } catch (_backendError) {
       // Si le backend n'est pas disponible, utiliser des données par défaut temporaires
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         },
       ]
 
-      return NextResponse.json(
+      return NextResponse?.json(
         {
           success: true,
           data: {
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       {
         success: false,
         message: 'Error loading role permissions',

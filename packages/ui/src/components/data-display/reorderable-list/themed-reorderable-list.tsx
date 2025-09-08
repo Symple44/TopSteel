@@ -219,6 +219,7 @@ function ThemedDropIndicator({
 // Composant d'élément avec thème
 interface ThemedSortableItemProps<T extends ReorderableItem> {
   item: T
+  index: number
   level: number
   theme: ReorderableTheme
   renderItem: (props: RenderItemProps<T>) => React.ReactNode
@@ -238,6 +239,7 @@ interface ThemedSortableItemProps<T extends ReorderableItem> {
 
 function ThemedSortableItem<T extends ReorderableItem>({
   item,
+  index,
   level,
   theme,
   renderItem,
@@ -307,6 +309,7 @@ function ThemedSortableItem<T extends ReorderableItem>({
             {hasChildren && (
               <div className="flex items-center border-r border-border">
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={(e: React.MouseEvent) => {
@@ -365,9 +368,11 @@ function ThemedSortableItem<T extends ReorderableItem>({
                 <div className="flex-1">
                   {renderItem({
                     item,
+                    index,
                     level,
                     isExpanded,
                     hasChildren,
+                    isDragging,
                     onToggleExpand,
                     isDragOverlay: false,
                   })}
@@ -504,7 +509,7 @@ export function ThemedReorderableList<T extends ReorderableItem>({
   }, [])
 
   const handleConfigChange = useCallback(
-    (newConfig: any) => {
+    (newConfig: unknown) => {
       // Appliquer les changements de configuration
       if (newConfig.theme) updateTheme(newConfig.theme)
       if (newConfig.preferences) updatePreferences(newConfig.preferences)
@@ -514,10 +519,6 @@ export function ThemedReorderableList<T extends ReorderableItem>({
     },
     [updateTheme, updatePreferences, updateLayout, config, onConfigChange]
   )
-
-  const _handleSave = useCallback(() => {
-    onSave?.(localItems)
-  }, [localItems, onSave])
 
   // Styles du conteneur
   const containerStyles = createThemeStyles(resolvedTheme).container
@@ -572,6 +573,7 @@ export function ThemedReorderableList<T extends ReorderableItem>({
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Liste réorganisable</h3>
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setShowCustomization(!showCustomization)}
@@ -598,10 +600,11 @@ export function ThemedReorderableList<T extends ReorderableItem>({
               )}
             </div>
 
-            {localItems.map((item) => (
+            {localItems.map((item, index) => (
               <ThemedSortableItem
                 key={item.id}
                 item={item}
+                index={index}
                 level={0}
                 theme={resolvedTheme}
                 renderItem={renderItem}

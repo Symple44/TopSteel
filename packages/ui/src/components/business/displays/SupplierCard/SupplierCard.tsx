@@ -1,28 +1,25 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { 
-  Building2, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  Star,
-  Truck,
-  DollarSign,
-  Clock,
-  CheckCircle,
+import {
   AlertTriangle,
-  Package,
-  ShieldCheck,
-  Eye,
+  Building2,
+  Calendar,
+  CheckCircle,
+  Clock,
   Edit3,
+  Eye,
   FileText,
   Globe,
-  Award
+  Mail,
+  MapPin,
+  Package,
+  Phone,
+  ShieldCheck,
+  Star,
 } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
+import { Button } from '../../../primitives/button/Button'
 export interface Supplier {
   id: string
   name: string
@@ -153,37 +150,37 @@ export function SupplierCard({
         return {
           label: 'Actif',
           icon: CheckCircle,
-          className: 'bg-green-100 text-green-800 border-green-200'
+          className: 'bg-green-100 text-green-800 border-green-200',
         }
       case 'inactive':
         return {
           label: 'Inactif',
           icon: Clock,
-          className: 'bg-gray-100 text-gray-800 border-gray-200'
+          className: 'bg-gray-100 text-gray-800 border-gray-200',
         }
       case 'pending':
         return {
           label: 'En attente',
           icon: Clock,
-          className: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+          className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
         }
       case 'suspended':
         return {
           label: 'Suspendu',
           icon: AlertTriangle,
-          className: 'bg-red-100 text-red-800 border-red-200'
+          className: 'bg-red-100 text-red-800 border-red-200',
         }
       case 'preferred':
         return {
           label: 'Préféré',
           icon: Star,
-          className: 'bg-purple-100 text-purple-800 border-purple-200'
+          className: 'bg-purple-100 text-purple-800 border-purple-200',
         }
       default:
         return {
           label: 'Inconnu',
           icon: AlertTriangle,
-          className: 'bg-gray-100 text-gray-800 border-gray-200'
+          className: 'bg-gray-100 text-gray-800 border-gray-200',
         }
     }
   }
@@ -229,10 +226,12 @@ export function SupplierCard({
     return 'text-red-600'
   }
   const getCriticalRisks = () => {
-    return supplier.risks.filter(risk => risk.severity === 'critical' && risk.mitigationStatus !== 'resolved')
+    return supplier.risks.filter(
+      (risk) => risk.severity === 'critical' && risk.mitigationStatus !== 'resolved'
+    )
   }
   const getValidCertifications = () => {
-    return supplier.certifications.filter(cert => cert.status === 'valid')
+    return supplier.certifications.filter((cert) => cert.status === 'valid')
   }
   const statusConfig = getStatusConfig(supplier.status)
   const StatusIcon = statusConfig.icon
@@ -247,9 +246,7 @@ export function SupplierCard({
               <Building2 className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">
-                {supplier.name}
-              </CardTitle>
+              <CardTitle className="text-lg">{supplier.name}</CardTitle>
               <p className="text-sm text-muted-foreground">
                 {supplier.company} • {getTypeLabel(supplier.type)}
               </p>
@@ -263,7 +260,8 @@ export function SupplierCard({
             {criticalRisks.length > 0 && (
               <Badge className="bg-red-100 text-red-800 border-red-200 text-xs">
                 <AlertTriangle className="h-3 w-3 mr-1" />
-                {criticalRisks.length} risque{criticalRisks.length > 1 ? 's' : ''} critique{criticalRisks.length > 1 ? 's' : ''}
+                {criticalRisks.length} risque{criticalRisks.length > 1 ? 's' : ''} critique
+                {criticalRisks.length > 1 ? 's' : ''}
               </Badge>
             )}
           </div>
@@ -279,7 +277,9 @@ export function SupplierCard({
                   key={star}
                   className={cn(
                     'h-4 w-4',
-                    star <= supplier.rating.overall ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                    star <= supplier.rating.overall
+                      ? 'fill-yellow-400 text-yellow-400'
+                      : 'text-gray-300'
                   )}
                 />
               ))}
@@ -314,14 +314,21 @@ export function SupplierCard({
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
               <div>{supplier.address.street}</div>
-              <div>{supplier.address.postalCode} {supplier.address.city}</div>
+              <div>
+                {supplier.address.postalCode} {supplier.address.city}
+              </div>
               <div>{supplier.address.country}</div>
             </div>
           </div>
           {supplier.contact.website && (
             <div className="flex items-center gap-2 text-sm">
               <Globe className="h-4 w-4 text-muted-foreground" />
-              <a href={supplier.contact.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+              <a
+                href={supplier.contact.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
                 Site web
               </a>
             </div>
@@ -337,13 +344,17 @@ export function SupplierCard({
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Valeur totale</p>
-                <p className="font-semibold">{formatCurrency(supplier.business.totalValue, supplier.business.currency)}</p>
+                <p className="font-semibold">
+                  {formatCurrency(supplier.business.totalValue, supplier.business.currency)}
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-muted-foreground">Panier moyen</p>
-                <p className="font-semibold">{formatCurrency(supplier.business.averageOrderValue, supplier.business.currency)}</p>
+                <p className="font-semibold">
+                  {formatCurrency(supplier.business.averageOrderValue, supplier.business.currency)}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Contrats actifs</p>
@@ -359,27 +370,40 @@ export function SupplierCard({
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex justify-between items-center">
                   <span className="text-xs">Livraison à temps</span>
-                  <span className={cn('text-xs font-medium', getPerformanceColor(supplier.performance.onTimeDelivery))}>
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      getPerformanceColor(supplier.performance.onTimeDelivery)
+                    )}
+                  >
                     {supplier.performance.onTimeDelivery.toFixed(0)}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs">Score qualité</span>
-                  <span className={cn('text-xs font-medium', getPerformanceColor(supplier.performance.qualityScore))}>
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      getPerformanceColor(supplier.performance.qualityScore)
+                    )}
+                  >
                     {supplier.performance.qualityScore.toFixed(0)}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs">Compétitivité prix</span>
-                  <span className={cn('text-xs font-medium', getPerformanceColor(supplier.performance.priceCompetitiveness))}>
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      getPerformanceColor(supplier.performance.priceCompetitiveness)
+                    )}
+                  >
                     {supplier.performance.priceCompetitiveness.toFixed(0)}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs">Temps de réponse</span>
-                  <span className="text-xs font-medium">
-                    {supplier.performance.responseTime}h
-                  </span>
+                  <span className="text-xs font-medium">{supplier.performance.responseTime}h</span>
                 </div>
               </div>
             </div>
@@ -400,18 +424,19 @@ export function SupplierCard({
                       {product.priceRange && (
                         <div className="text-right text-xs">
                           <span className="font-medium">
-                            {formatCurrency(product.priceRange.min, supplier.business.currency)} - {formatCurrency(product.priceRange.max, supplier.business.currency)}
+                            {formatCurrency(product.priceRange.min, supplier.business.currency)} -{' '}
+                            {formatCurrency(product.priceRange.max, supplier.business.currency)}
                           </span>
-                          <div className="text-muted-foreground">
-                            /{product.priceRange.unit}
-                          </div>
+                          <div className="text-muted-foreground">/{product.priceRange.unit}</div>
                         </div>
                       )}
                     </div>
                   ))}
                   {supplier.products.length > 3 && (
                     <p className="text-xs text-muted-foreground">
-                      +{supplier.products.length - 3} autre{supplier.products.length - 3 > 1 ? 's' : ''} produit{supplier.products.length - 3 > 1 ? 's' : ''}
+                      +{supplier.products.length - 3} autre
+                      {supplier.products.length - 3 > 1 ? 's' : ''} produit
+                      {supplier.products.length - 3 > 1 ? 's' : ''}
                     </p>
                   )}
                 </div>
@@ -422,7 +447,9 @@ export function SupplierCard({
               <p className="text-xs text-muted-foreground mb-2">Contact principal</p>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">{supplier.contact.primaryContact.name}</span>
+                  <span className="font-medium text-sm">
+                    {supplier.contact.primaryContact.name}
+                  </span>
                   <Badge variant="outline" className="text-xs">
                     {supplier.contact.primaryContact.role}
                   </Badge>
@@ -444,7 +471,10 @@ export function SupplierCard({
                 </p>
                 <div className="space-y-1">
                   {criticalRisks.slice(0, 2).map((risk) => (
-                    <div key={risk.id} className="text-xs bg-red-50 p-2 rounded border border-red-200">
+                    <div
+                      key={risk.id}
+                      className="text-xs bg-red-50 p-2 rounded border border-red-200"
+                    >
                       <p className="font-medium text-red-800">{risk.description}</p>
                       <Badge className="bg-red-100 text-red-800 border-red-200 text-xs mt-1">
                         {risk.type}
@@ -453,7 +483,8 @@ export function SupplierCard({
                   ))}
                   {criticalRisks.length > 2 && (
                     <p className="text-xs text-red-600">
-                      +{criticalRisks.length - 2} autre{criticalRisks.length - 2 > 1 ? 's' : ''} risque{criticalRisks.length - 2 > 1 ? 's' : ''}
+                      +{criticalRisks.length - 2} autre{criticalRisks.length - 2 > 1 ? 's' : ''}{' '}
+                      risque{criticalRisks.length - 2 > 1 ? 's' : ''}
                     </p>
                   )}
                 </div>
@@ -469,9 +500,7 @@ export function SupplierCard({
                   <span>Aucune commande</span>
                 )}
               </div>
-              <div>
-                Conditions: {supplier.business.preferredPaymentTerms}
-              </div>
+              <div>Conditions: {supplier.business.preferredPaymentTerms}</div>
             </div>
           </>
         )}
@@ -479,31 +508,55 @@ export function SupplierCard({
         {showActions && (
           <div className="flex flex-wrap gap-2 pt-3 border-t">
             {onCreateOrder && supplier.status === 'active' && (
-              <Button variant="outline" size="sm" onClick={onCreateOrder} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onCreateOrder}
+                className="flex items-center gap-1"
+              >
                 <Package className="h-3 w-3" />
                 Commander
               </Button>
             )}
             {onViewDetails && (
-              <Button variant="outline" size="sm" onClick={onViewDetails} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewDetails}
+                className="flex items-center gap-1"
+              >
                 <Eye className="h-3 w-3" />
                 Détails
               </Button>
             )}
             {onViewContracts && (
-              <Button variant="outline" size="sm" onClick={onViewContracts} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewContracts}
+                className="flex items-center gap-1"
+              >
                 <FileText className="h-3 w-3" />
                 Contrats
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onEdit}
+                className="flex items-center gap-1"
+              >
                 <Edit3 className="h-3 w-3" />
                 Modifier
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" size="sm" onClick={onDelete}>
+              <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
                 Supprimer
               </Button>
             )}

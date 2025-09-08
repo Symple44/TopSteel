@@ -11,7 +11,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import type { JwtService } from '@nestjs/jwt'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 
@@ -66,15 +66,15 @@ export class CustomersController {
       lastName: customer.lastName,
       societeId: tenant.societeId,
       hasAccount: customer.hasAccount,
-      isActive: customer.isActive
+      isActive: customer.isActive,
     }
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '15m'
+      expiresIn: '15m',
     })
 
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d'
+      expiresIn: '7d',
     })
 
     const { passwordHash: _passwordHash, ...customerData } = customer
@@ -84,7 +84,7 @@ export class CustomersController {
       access_token: accessToken,
       refresh_token: refreshToken,
       expires_in: 900, // 15 minutes in seconds
-      token_type: 'Bearer'
+      token_type: 'Bearer',
     }
   }
 

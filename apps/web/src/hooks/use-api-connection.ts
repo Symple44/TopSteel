@@ -12,7 +12,7 @@ export function useApiConnection() {
 
   useEffect(() => {
     // S'abonner aux changements de connexion du client API
-    const unsubscribe = apiClientEnhanced.onConnectionChange((isConnected) => {
+    const unsubscribe = apiClientEnhanced?.onConnectionChange((isConnected) => {
       if (isConnected) {
         setConnectionRestored()
       } else {

@@ -1,22 +1,26 @@
 import { Injectable } from '@nestjs/common'
 import * as Sentry from '@sentry/node'
-import { 
-  captureError, 
-  captureMessage, 
-  setUser, 
-  clearUser, 
+import {
   addBreadcrumb,
+  captureError,
+  captureMessage,
+  clearUser,
+  setUser,
+  startTransaction,
   withScope,
-  startTransaction
 } from './sentry.config'
 
 @Injectable()
 export class SentryService {
-  captureException(error: Error, context?: Record<string, any>): void {
+  captureException(error: Error, context?: Record<string, unknown>): void {
     captureError(error, context)
   }
 
-  captureMessage(message: string, level: Sentry.SeverityLevel = 'info', context?: Record<string, any>): void {
+  captureMessage(
+    message: string,
+    level: Sentry.SeverityLevel = 'info',
+    context?: Record<string, unknown>
+  ): void {
     if (context) {
       withScope((scope) => {
         scope.setContext('extra', context)
@@ -27,9 +31,9 @@ export class SentryService {
     }
   }
 
-  setUser(user: { id: string; username?: string; email?: string; [key: string]: any }): void {
+  setUser(user: { id: string; username?: string; email?: string }): void {
     // Don't send email to Sentry for privacy
-    const { email, ...safeUser } = user
+    const { email: _email, ...safeUser } = user
     setUser(safeUser)
   }
 
@@ -41,7 +45,7 @@ export class SentryService {
     message: string
     category?: string
     level?: Sentry.SeverityLevel
-    data?: Record<string, any>
+    data?: Record<string, unknown>
     timestamp?: number
   }): void {
     addBreadcrumb({
@@ -53,13 +57,18 @@ export class SentryService {
     })
   }
 
-  startTransaction(name: string, op: string = 'http.server'): any {
+  startTransaction(name: string, op: string = 'http.server'): unknown {
     return startTransaction(name, op)
   }
 
-  finishTransaction(transaction: any): void {
-    if (transaction && typeof transaction.finish === 'function') {
-      transaction.finish()
+  finishTransaction(transaction: unknown): void {
+    if (
+      transaction &&
+      typeof transaction === 'object' &&
+      'finish' in transaction &&
+      typeof (transaction as { finish?: () => void }).finish === 'function'
+    ) {
+      ;(transaction as { finish: () => void }).finish()
     }
   }
 
@@ -71,7 +80,7 @@ export class SentryService {
     Sentry.setTag(key, value)
   }
 
-  setContext(key: string, context: Record<string, any>): void {
+  setContext(key: string, context: Record<string, unknown>): void {
     Sentry.setContext(key, context)
   }
 

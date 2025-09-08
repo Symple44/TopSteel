@@ -1,5 +1,6 @@
 import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common'
 import type { Reflector } from '@nestjs/core'
+import type { User } from '../../../users/entities/user.entity'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -16,7 +17,7 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest()
-    const user = request.user as any
+    const user = request.user as User & { roles?: unknown[] }
 
     if (!user) {
       return false
@@ -32,9 +33,10 @@ export class RolesGuard implements CanActivate {
 
     // Check if user has any of the required roles
     return requiredRoles.some((requiredRole) =>
-      userRoles.some((userRole: any) => {
+      userRoles.some((userRole: unknown) => {
         // Handle both string roles and role objects
-        const roleValue = typeof userRole === 'object' ? userRole.name || userRole.role : userRole
+        const roleObj = userRole as { name?: string; role?: string } | string
+        const roleValue = typeof roleObj === 'object' ? roleObj.name || roleObj.role : roleObj
         return roleValue === requiredRole
       })
     )

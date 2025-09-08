@@ -5,6 +5,12 @@ import { ParameterApplication } from '../entities/parameter-application.entity'
 import { ParameterClient } from '../entities/parameter-client.entity'
 import { ParameterScope, ParameterSystem, ParameterType } from '../entities/parameter-system.entity'
 
+type ParameterEntity = ParameterSystem | ParameterApplication | ParameterClient
+type ParameterRepository =
+  | Repository<ParameterSystem>
+  | Repository<ParameterApplication>
+  | Repository<ParameterClient>
+
 @Injectable()
 export class ParameterService {
   private readonly logger = new Logger(ParameterService.name)
@@ -24,7 +30,17 @@ export class ParameterService {
    * Récupère les rôles utilisateurs avec traductions et cache backend
    * SUPER_ADMIN est non-modifiable (réservé à l'équipe TOPSTEEL)
    */
-  async getUserRoles(language: string = 'fr') {
+  async getUserRoles(language: string = 'fr'): Promise<
+    Array<{
+      key: string
+      value: string
+      icon: string
+      color: string
+      order: number
+      isDefault?: boolean
+      isSuperAdmin?: boolean
+    }>
+  > {
     this.logger.debug(`🔍 getUserRoles appelé avec language: ${language}`)
 
     // Vérifier le cache d'abord
@@ -380,7 +396,7 @@ export class ParameterService {
     language: string = 'fr',
     scope: 'system' | 'application' | 'client' = 'system'
   ) {
-    let repository: any
+    let repository: ParameterRepository
     switch (scope) {
       case 'system':
         repository = this._systemRepo
@@ -398,7 +414,7 @@ export class ParameterService {
       order: { key: 'ASC' },
     })
 
-    return params.map((param: any) => ({
+    return params.map((param: ParameterEntity) => ({
       key: param.key,
       value: param.customTranslations?.[language] || param.value,
       type: param.type,
@@ -512,7 +528,7 @@ export class ParameterService {
     scope: 'system' | 'application' | 'client' = 'system',
     tenantId?: string
   ) {
-    let repository: any
+    let repository: ParameterRepository
     const whereClause: Record<string, unknown> = { group, key }
 
     switch (scope) {
@@ -542,7 +558,7 @@ export class ParameterService {
       param.metadata = { ...param.metadata, ...updates.metadata }
     }
 
-    const result = await repository.save(param)
+    const result = await (repository as Repository<ParameterEntity>).save(param as ParameterEntity)
 
     // Invalider le cache si c'est un paramètre de rôles
     if (group === 'user_roles') {
@@ -569,7 +585,7 @@ export class ParameterService {
     },
     scope: 'system' | 'application' | 'client' = 'system'
   ) {
-    let repository: any
+    let repository: ParameterRepository
     switch (scope) {
       case 'system':
         repository = this._systemRepo
@@ -583,7 +599,7 @@ export class ParameterService {
     }
 
     const param = repository.create(data as unknown)
-    const result = await repository.save(param)
+    const result = await (repository as Repository<ParameterEntity>).save(param as ParameterEntity)
 
     // Invalider le cache si c'est un paramètre de rôles
     if (data.group === 'user_roles') {

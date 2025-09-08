@@ -26,14 +26,14 @@ export function usePermissions() {
 
     try {
       // Utiliser le cache si disponible
-      const cached = permissionsCache.get(user.id)
+      const cached = permissionsCache?.get(user.id)
       // Get primary role for API call (using first role or legacy single role)
-      const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+      const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
       const primaryRole =
-        userRoles.length > 0
-          ? typeof userRoles[0] === 'object'
-            ? userRoles[0].name || userRoles[0].role
-            : userRoles[0]
+        userRoles?.length > 0
+          ? typeof userRoles?.[0] === 'object'
+            ? userRoles?.[0]?.name || userRoles?.[0]?.role
+            : userRoles?.[0]
           : ''
 
       if (cached) {
@@ -53,12 +53,12 @@ export function usePermissions() {
         },
       })
 
-      if (!response.ok) {
-        if (response.status === 401) {
+      if (!response?.ok) {
+        if (response?.status === 401) {
           // User not authenticated - redirecting
           // Rediriger vers la page de login si l'utilisateur n'est pas authentifié
           if (typeof window !== 'undefined') {
-            window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
+            window.location.href = `/login?redirect=${encodeURIComponent(window?.location?.pathname)}`
           }
         } else {
           // Permissions API error (silenced)
@@ -66,13 +66,13 @@ export function usePermissions() {
         return
       }
 
-      const data = await response.json()
+      const data = await response?.json()
 
-      if (data.success) {
-        const permissions = data.data.rolePermissions || data.data
+      if (data?.success) {
+        const permissions = data?.data?.rolePermissions || data?.data
 
         // Mettre en cache
-        permissionsCache.set(user.id, permissions)
+        permissionsCache?.set(user.id, permissions)
 
         setUserPermissions({
           roleId: primaryRole,
@@ -103,7 +103,7 @@ export function usePermissions() {
   const hasPermission = (permissionId: string): boolean => {
     if (!userPermissions) return false
 
-    const permission = userPermissions.permissions.find((p) => p.permissionId === permissionId)
+    const permission = userPermissions?.permissions?.find((p) => p.permissionId === permissionId)
     return permission ? permission.isGranted : false
   }
 
@@ -111,14 +111,14 @@ export function usePermissions() {
    * Vérifier si l'utilisateur a au moins une des permissions
    */
   const hasAnyPermission = (permissionIds: string[]): boolean => {
-    return permissionIds.some((id) => hasPermission(id))
+    return permissionIds?.some((id) => hasPermission(id))
   }
 
   /**
    * Vérifier si l'utilisateur a toutes les permissions
    */
   const hasAllPermissions = (permissionIds: string[]): boolean => {
-    return permissionIds.every((id) => hasPermission(id))
+    return permissionIds?.every((id) => hasPermission(id))
   }
 
   /**
@@ -127,7 +127,7 @@ export function usePermissions() {
   const getAccessLevel = (permissionId: string): AccessLevel | null => {
     if (!userPermissions) return null
 
-    const permission = userPermissions.permissions.find((p) => p.permissionId === permissionId)
+    const permission = userPermissions?.permissions?.find((p) => p.permissionId === permissionId)
     return permission ? permission.accessLevel : null
   }
 
@@ -139,8 +139,8 @@ export function usePermissions() {
     if (!userLevel) return false
 
     const levels: AccessLevel[] = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
-    const userLevelIndex = levels.indexOf(userLevel)
-    const minLevelIndex = levels.indexOf(minLevel)
+    const userLevelIndex = levels?.indexOf(userLevel)
+    const minLevelIndex = levels?.indexOf(minLevel)
 
     return userLevelIndex >= minLevelIndex
   }
@@ -179,9 +179,9 @@ export function usePermissions() {
   const hasRole = (roleId: string): boolean => {
     if (!user) return false
     // Get user roles array (new system) or single role (legacy)
-    const userRoles = (user as any).roles || (user.role ? [user.role] : [])
+    const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
 
-    return userRoles.some((role: any) => {
+    return userRoles?.some((role: unknown) => {
       const roleValue = typeof role === 'object' ? role.name || role.role : role
       return roleValue === roleId
     })
@@ -191,7 +191,7 @@ export function usePermissions() {
    * Vérifier si l'utilisateur a au moins un des rôles
    */
   const hasAnyRole = (roleIds: string[]): boolean => {
-    return roleIds.some((id) => hasRole(id))
+    return roleIds?.some((id) => hasRole(id))
   }
 
   /**
@@ -215,7 +215,7 @@ export function usePermissions() {
    */
   const canAccessModule = (moduleId: string): boolean => {
     const modulePermissions = getModulePermissions(moduleId)
-    return modulePermissions.some((p) => p.isGranted && p.accessLevel !== 'BLOCKED')
+    return modulePermissions?.some((p) => p.isGranted && p.accessLevel !== 'BLOCKED')
   }
 
   /**
@@ -223,14 +223,14 @@ export function usePermissions() {
    */
   const getHighestModuleAccess = (moduleId: string): AccessLevel | null => {
     const modulePermissions = getModulePermissions(moduleId)
-    const grantedPermissions = modulePermissions.filter((p) => p.isGranted)
+    const grantedPermissions = modulePermissions?.filter((p) => p.isGranted)
 
-    if (grantedPermissions.length === 0) return null
+    if (grantedPermissions?.length === 0) return null
 
     const levels: AccessLevel[] = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
-    const maxLevel = grantedPermissions.reduce((max, p) => {
-      const pLevel = levels.indexOf(p.accessLevel)
-      const maxLevel = levels.indexOf(max)
+    const maxLevel = grantedPermissions?.reduce((max, p) => {
+      const pLevel = levels?.indexOf(p.accessLevel)
+      const maxLevel = levels?.indexOf(max)
       return pLevel > maxLevel ? p.accessLevel : max
     }, 'BLOCKED' as AccessLevel)
 
@@ -256,7 +256,7 @@ export function usePermissions() {
    */
   const invalidateCache = () => {
     if (user) {
-      permissionsCache.delete(user.id)
+      permissionsCache?.delete(user.id)
       loadUserPermissions()
     }
   }

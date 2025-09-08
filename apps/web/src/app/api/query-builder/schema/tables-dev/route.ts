@@ -3,15 +3,15 @@ import { callBackendFromApi } from '@/utils/backend-api'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
-  const authHeader = request.headers.get('authorization')
-  const cookieHeader = request.headers.get('cookie')
+  const authHeader = request?.headers?.get('authorization')
+  const cookieHeader = request?.headers?.get('cookie')
 
-  let accessToken = null
+  let accessToken: string | null = null
   if (cookieHeader) {
-    const cookies = cookieHeader.split(';').map((c) => c.trim())
-    const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
+    const cookies = cookieHeader?.split(';').map((c) => c?.trim())
+    const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
     if (accessTokenCookie) {
-      accessToken = accessTokenCookie.split('=')[1]
+      accessToken = accessTokenCookie?.split('=')[1]
     }
   }
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
   try {
     const headers = getAuthHeaders(request)
     const { searchParams } = new URL(request.url)
-    const schema = searchParams.get('schema') || 'public'
+    const schema = searchParams?.get('schema') || 'public'
 
     // Essayer d'appeler le backend directement
     try {
@@ -50,9 +50,9 @@ export async function GET(request: NextRequest) {
         }
       )
 
-      if (response.ok) {
-        const tables = await response.json()
-        return NextResponse.json(tables)
+      if (response?.ok) {
+        const tables = await response?.json()
+        return NextResponse?.json(tables)
       } else {
         // Fallback sur des données mockées
       }
@@ -169,9 +169,9 @@ export async function GET(request: NextRequest) {
         ],
       },
     ]
-    return NextResponse.json(mockTables)
+    return NextResponse?.json(mockTables)
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Failed to get tables' },
       { status: 500 }
     )

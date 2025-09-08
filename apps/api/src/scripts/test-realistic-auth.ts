@@ -41,7 +41,7 @@ async function testRealisticAuth() {
     permissions: ['*'],
   })
 
-  const adminDecoded = jwt.decode(adminToken) as any
+  const adminDecoded = jwt.decode(adminToken) as unknown
   console.log('Token généré pour: admin@topsteel.com')
   console.log('Payload:')
   console.log(`  User ID: ${adminDecoded.sub}`)
@@ -62,7 +62,7 @@ async function testRealisticAuth() {
     permissions: ['inventory:read', 'inventory:update', 'reports:read'],
   })
 
-  const userDecoded = jwt.decode(userToken) as any
+  const userDecoded = jwt.decode(userToken) as unknown
   console.log('Token généré pour: user@topsteel.com')
   console.log('Payload:')
   console.log(`  User ID: ${userDecoded.sub}`)
@@ -81,7 +81,7 @@ async function testRealisticAuth() {
     permissions: ['*'],
   })
 
-  const metaluxDecoded = jwt.decode(metaluxToken) as any
+  const metaluxDecoded = jwt.decode(metaluxToken) as unknown
   console.log('Token généré pour: admin@metalux.com')
   console.log('Payload:')
   console.log(`  User ID: ${metaluxDecoded.sub}`)
@@ -100,7 +100,7 @@ async function testRealisticAuth() {
     permissions: ['inventory:read', 'reports:read'],
   })
 
-  const demoDecoded = jwt.decode(demoToken) as any
+  const demoDecoded = jwt.decode(demoToken) as unknown
   console.log('Token généré pour: demo@example.com')
   console.log('Payload:')
   console.log(`  User ID: ${demoDecoded.sub}`)

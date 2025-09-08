@@ -104,7 +104,7 @@ export function TemplateSelector({ className }: TemplateSelectorProps) {
           <Input
             placeholder="Rechercher un template..."
             value={searchQuery}
-            onChange={(e: any) => setSearchQuery(e.target.value)}
+            onChange={(e: unknown) => setSearchQuery(e?.target?.value)}
             className="pl-10"
           />
         </div>
@@ -130,22 +130,22 @@ export function TemplateSelector({ className }: TemplateSelectorProps) {
 
         <TabsContent value="all" className="space-y-6">
           {Object.entries(templateCategories).map(([categoryKey, category]) => {
-            const categoryTemplates = predefinedTemplates.filter((t) => t.category === categoryKey)
-            if (searchQuery && !categoryTemplates.some((t) => filteredTemplates.includes(t))) {
+            const categoryTemplates = predefinedTemplates?.filter((t) => t.category === categoryKey)
+            if (searchQuery && !categoryTemplates?.some((t) => filteredTemplates?.includes(t))) {
               return null
             }
 
             return (
               <div key={categoryKey} className="space-y-4">
                 <div className="flex items-center gap-2">
-                  {React.createElement(getCategoryIcon(categoryKey), { className: 'h-5 w-5' })}
+                  {React?.createElement(getCategoryIcon(categoryKey), { className: 'h-5 w-5' })}
                   <h3 className="text-lg font-semibold">{category.name}</h3>
                   <span className="text-sm text-muted-foreground">— {category.description}</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {categoryTemplates
-                    .filter((template) => !searchQuery || filteredTemplates.includes(template))
+                    .filter((template) => !searchQuery || filteredTemplates?.includes(template))
                     .map((template) => (
                       <TemplateCard
                         key={template.id}
@@ -165,7 +165,7 @@ export function TemplateSelector({ className }: TemplateSelectorProps) {
           <TabsContent key={categoryKey} value={categoryKey} className="space-y-4">
             <div className="text-center py-4">
               <div className="flex items-center justify-center gap-2 mb-2">
-                {React.createElement(getCategoryIcon(categoryKey), { className: 'h-6 w-6' })}
+                {React?.createElement(getCategoryIcon(categoryKey), { className: 'h-6 w-6' })}
                 <h3 className="text-xl font-semibold">{category.name}</h3>
               </div>
               <p className="text-muted-foreground">{category.description}</p>
@@ -190,7 +190,7 @@ export function TemplateSelector({ className }: TemplateSelectorProps) {
       </Tabs>
 
       {/* Message si aucun résultat */}
-      {filteredTemplates.length === 0 && searchQuery && (
+      {filteredTemplates?.length === 0 && searchQuery && (
         <div className="text-center py-12">
           <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">Aucun template trouvé</h3>
@@ -252,7 +252,7 @@ function TemplateCard({
     >
       {/* Preview image placeholder */}
       <div className="h-32 bg-gradient-to-br from-muted/50 to-muted flex items-center justify-center">
-        <div className="text-6xl opacity-20">{getThemeIcon(template.settings.theme)}</div>
+        <div className="text-6xl opacity-20">{getThemeIcon(template?.settings?.theme)}</div>
       </div>
 
       <CardHeader className="pb-3">
@@ -277,35 +277,35 @@ function TemplateCard({
         {/* Paramètres en aperçu */}
         <div className="flex flex-wrap gap-2">
           <div className="flex items-center gap-1 text-xs bg-muted/50 rounded px-2 py-1">
-            <span>{getThemeIcon(template.settings.theme)}</span>
-            <span className="capitalize">{template.settings.theme}</span>
+            <span>{getThemeIcon(template?.settings?.theme)}</span>
+            <span className="capitalize">{template?.settings?.theme}</span>
           </div>
 
           <div className="flex items-center gap-1 text-xs bg-muted/50 rounded px-2 py-1">
             <div
               className={cn(
                 'w-2 h-2 rounded-full',
-                getAccentColorPreview(template.settings.accentColor)
+                getAccentColorPreview(template?.settings?.accentColor)
               )}
             />
-            <span className="capitalize">{template.settings.accentColor}</span>
+            <span className="capitalize">{template?.settings?.accentColor}</span>
           </div>
 
           <div className="text-xs bg-muted/50 rounded px-2 py-1">
-            <span className="capitalize">{template.settings.density}</span>
+            <span className="capitalize">{template?.settings?.density}</span>
           </div>
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1">
-          {template.tags.slice(0, 3).map((tag) => (
+          {template?.tags?.slice(0, 3).map((tag) => (
             <Badge key={tag} variant="outline" className="text-xs">
               {tag}
             </Badge>
           ))}
-          {template.tags.length > 3 && (
+          {template?.tags?.length > 3 && (
             <Badge variant="outline" className="text-xs">
-              +{template.tags.length - 3}
+              +{template?.tags?.length - 3}
             </Badge>
           )}
         </div>
@@ -313,10 +313,11 @@ function TemplateCard({
         {/* Actions */}
         <div className="flex gap-2 pt-2">
           <Button
+            type="button"
             size="sm"
             variant="outline"
-            onClick={(e: any) => {
-              e.stopPropagation()
+            onClick={(e: unknown) => {
+              e?.stopPropagation()
               onPreview()
             }}
             className="flex-1"
@@ -325,9 +326,10 @@ function TemplateCard({
           </Button>
 
           <Button
+            type="button"
             size="sm"
-            onClick={(e: any) => {
-              e.stopPropagation()
+            onClick={(e: unknown) => {
+              e?.stopPropagation()
               onApply()
             }}
             className="flex-1"

@@ -1,16 +1,8 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Req,
-  UseGuards,
-  Get,
-  UnauthorizedException
-} from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Request } from 'express'
-import { AuthService, LoginDto, RegisterDto } from '../services/auth.service'
+import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { Request } from 'express'
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
+import type { AuthService, LoginDto, RegisterDto } from '../services/auth.service'
 
 interface TenantRequest extends Request {
   tenant: {
@@ -31,10 +23,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Customer login' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(
-    @Req() req: TenantRequest,
-    @Body() loginDto: LoginDto
-  ) {
+  async login(@Req() req: TenantRequest, @Body() loginDto: LoginDto) {
     return await this.authService.login(loginDto, req.tenant.societeId)
   }
 
@@ -42,10 +31,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Customer registration' })
   @ApiResponse({ status: 201, description: 'Registration successful' })
   @ApiResponse({ status: 400, description: 'Email already registered' })
-  async register(
-    @Req() req: TenantRequest,
-    @Body() registerDto: RegisterDto
-  ) {
+  async register(@Req() req: TenantRequest, @Body() registerDto: RegisterDto) {
     return await this.authService.register(registerDto, req.tenant.societeId)
   }
 
@@ -53,9 +39,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  async refreshToken(
-    @Body() body: { refresh_token: string }
-  ) {
+  async refreshToken(@Body() body: { refresh_token: string }) {
     return await this.authService.refreshToken(body.refresh_token)
   }
 
@@ -74,9 +58,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Customer info' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBearerAuth()
-  async getCurrentCustomer(
-    @Req() req: TenantRequest
-  ) {
+  async getCurrentCustomer(@Req() req: TenantRequest) {
     if (!req.user?.customerId) {
       throw new UnauthorizedException()
     }
@@ -94,20 +76,17 @@ export class AuthController {
       company: customer.company,
       phone: customer.phone,
       isVerified: customer.isVerified,
-      registrationDate: customer.registrationDate
+      registrationDate: customer.registrationDate,
     }
   }
 
   @Post('password/reset')
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Reset email sent if account exists' })
-  async requestPasswordReset(
-    @Req() req: TenantRequest,
-    @Body() body: { email: string }
-  ) {
+  async requestPasswordReset(@Req() req: TenantRequest, @Body() body: { email: string }) {
     await this.authService.resetPassword(body.email, req.tenant.societeId)
-    return { 
-      message: 'If an account exists with this email, a reset link has been sent' 
+    return {
+      message: 'If an account exists with this email, a reset link has been sent',
     }
   }
 
@@ -119,11 +98,7 @@ export class AuthController {
     @Req() req: TenantRequest,
     @Body() body: { token: string; newPassword: string }
   ) {
-    await this.authService.confirmResetPassword(
-      body.token, 
-      body.newPassword, 
-      req.tenant.societeId
-    )
+    await this.authService.confirmResetPassword(body.token, body.newPassword, req.tenant.societeId)
     return { message: 'Password reset successful' }
   }
 }

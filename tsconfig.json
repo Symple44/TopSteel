@@ -5,7 +5,7 @@
     { "path": "./packages/types" },
     { "path": "./packages/utils" },
     { "path": "./packages/config" },
-    { "path": "./packages/entities" },
+    { "path": "./packages/erp-entities" },
     { "path": "./packages/domains" },
     { "path": "./packages/ui" },
     { "path": "./packages/api-client" },

@@ -1,23 +1,8 @@
 'use client'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { 
-  Button, 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  Input,
-  Textarea,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Checkbox
-} from '../../../primitives'
 import {
   Form,
   FormControl,
@@ -25,12 +10,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../../../forms'
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Validation schema for payment
 const paymentFormSchema = z.object({
   amount: z.number().min(0.01, 'Le montant doit être supérieur à 0'),
   currency: z.string().min(1, 'La devise est requise'),
-  paymentMethod: z.enum(['cash', 'check', 'bank_transfer', 'card', 'letter_of_credit', 'wire_transfer']),
+  paymentMethod: z.enum([
+    'cash',
+    'check',
+    'bank_transfer',
+    'card',
+    'letter_of_credit',
+    'wire_transfer',
+  ]),
   paymentDate: z.string().min(1, 'La date de paiement est requise'),
   dueDate: z.string().optional(),
   invoiceId: z.string().optional(),
@@ -39,12 +44,14 @@ const paymentFormSchema = z.object({
   description: z.string().optional(),
   // Payment method specific fields
   checkNumber: z.string().optional(),
-  bankDetails: z.object({
-    bankName: z.string().optional(),
-    accountNumber: z.string().optional(),
-    routingNumber: z.string().optional(),
-    swiftCode: z.string().optional(),
-  }).optional(),
+  bankDetails: z
+    .object({
+      bankName: z.string().optional(),
+      accountNumber: z.string().optional(),
+      routingNumber: z.string().optional(),
+      swiftCode: z.string().optional(),
+    })
+    .optional(),
   // Reconciliation fields
   reconciled: z.boolean().default(false),
   reconciledDate: z.string().optional(),
@@ -78,10 +85,10 @@ interface AddPaymentDialogProps {
   availableInvoices?: Array<{ id: string; reference: string; amount: number; dueAmount: number }>
   availableProjects?: Array<{ id: string; name: string; client: string }>
 }
-export function AddPaymentDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function AddPaymentDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   invoiceId,
   clientId,
   initialData,
@@ -90,7 +97,7 @@ export function AddPaymentDialog({
   availableProjects = [],
 }: AddPaymentDialogProps) {
   const [loading, setLoading] = useState(false)
-  const form = useForm<PaymentFormData>({
+  const form = useForm({
     resolver: zodResolver(paymentFormSchema),
     defaultValues: {
       amount: initialData?.amount || 0,
@@ -134,7 +141,8 @@ export function AddPaymentDialog({
     setLoading(true)
     try {
       // Calculate net amount after discounts and fees
-      const netAmount = data.amount - (data.discountAmount || 0) + (data.taxAmount || 0) + (data.feeAmount || 0)
+      const netAmount =
+        data.amount - (data.discountAmount || 0) + (data.taxAmount || 0) + (data.feeAmount || 0)
       // Add calculated fields
       const paymentData = {
         ...data,
@@ -145,8 +153,7 @@ export function AddPaymentDialog({
       await onSubmit?.(paymentData)
       onOpenChange(false)
       form.reset()
-    } catch (error) {
-      console.error('Error processing payment:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -174,9 +181,11 @@ export function AddPaymentDialog({
     { value: 'CAD', label: '$ Dollar canadien' },
   ]
   // Filter invoices by selected client
-  const filteredInvoices = selectedClient 
-    ? availableInvoices.filter(invoice => 
-        availableClients.find(client => client.id === selectedClient)?.name === invoice.reference.split('-')[0]
+  const filteredInvoices = selectedClient
+    ? availableInvoices.filter(
+        (invoice) =>
+          availableClients.find((client) => client.id === selectedClient)?.name ===
+          invoice.reference.split('-')[0]
       )
     : availableInvoices
   return (
@@ -271,8 +280,8 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Montant *</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         min="0"
                         step="0.01"
                         placeholder="0.00"
@@ -391,10 +400,7 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Référence *</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="ex: PAY-2024-001"
-                        {...field} 
-                      />
+                      <Input placeholder="ex: PAY-2024-001" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -417,7 +423,8 @@ export function AddPaymentDialog({
                 )}
               />
             )}
-            {(selectedPaymentMethod === 'bank_transfer' || selectedPaymentMethod === 'wire_transfer') && (
+            {(selectedPaymentMethod === 'bank_transfer' ||
+              selectedPaymentMethod === 'wire_transfer') && (
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Détails bancaires</h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -485,10 +492,7 @@ export function AddPaymentDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Paiement d'avancement</FormLabel>
                     </FormItem>
@@ -502,8 +506,8 @@ export function AddPaymentDialog({
                       <FormItem>
                         <FormLabel>% d'avancement</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
+                          <Input
+                            type="number"
                             min="0"
                             max="100"
                             {...field}
@@ -523,8 +527,8 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Montant de rétention</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         min="0"
                         step="0.01"
                         {...field}
@@ -545,8 +549,8 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Montant des taxes</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         min="0"
                         step="0.01"
                         {...field}
@@ -564,8 +568,8 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Frais</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         min="0"
                         step="0.01"
                         {...field}
@@ -583,8 +587,8 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Remise</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         min="0"
                         step="0.01"
                         {...field}
@@ -604,10 +608,7 @@ export function AddPaymentDialog({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Notes et détails additionnels..."
-                      {...field} 
-                    />
+                    <Textarea placeholder="Notes et détails additionnels..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -623,10 +624,7 @@ export function AddPaymentDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel>Rapprochement effectué</FormLabel>
                     </FormItem>
@@ -653,10 +651,7 @@ export function AddPaymentDialog({
                   <FormItem>
                     <FormLabel>Note de rapprochement</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Détails du rapprochement..."
-                        {...field} 
-                      />
+                      <Textarea placeholder="Détails du rapprochement..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

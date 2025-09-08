@@ -49,6 +49,9 @@ export function CustomSelect({
       document.addEventListener('mousedown', handleClickOutside)
       return () => document.removeEventListener('mousedown', handleClickOutside)
     }
+
+    // Return undefined cleanup function when isOpen is false
+    return undefined
   }, [isOpen])
 
   useEffect(() => {
@@ -86,6 +89,7 @@ export function CustomSelect({
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Trigger */}
       <Button
+        type="button"
         variant="outline"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}

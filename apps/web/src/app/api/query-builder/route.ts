@@ -3,15 +3,15 @@ import { callBackendFromApi } from '@/utils/backend-api'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
-  const authHeader = request.headers.get('authorization')
-  const cookieHeader = request.headers.get('cookie')
+  const authHeader = request?.headers?.get('authorization')
+  const cookieHeader = request?.headers?.get('cookie')
 
-  let accessToken = null
+  let accessToken: string | null = null
   if (cookieHeader) {
-    const cookies = cookieHeader.split(';').map((c) => c.trim())
-    const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
+    const cookies = cookieHeader?.split(';').map((c) => c?.trim())
+    const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
     if (accessTokenCookie) {
-      accessToken = accessTokenCookie.split('=')[1]
+      accessToken = accessTokenCookie?.split('=')[1]
     }
   }
 
@@ -70,9 +70,9 @@ export async function GET(request: NextRequest) {
       },
     ]
 
-    return NextResponse.json(mockQueryBuilders)
+    return NextResponse?.json(mockQueryBuilders)
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const headers = getAuthHeaders(request)
-    const body = await request.json()
+    const body = await request?.json()
 
     const response = await callBackendFromApi(request, 'query-builder', {
       method: 'POST',
@@ -90,18 +90,18 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     })
 
-    if (response.ok) {
-      const responseData = await response.json()
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
     } else {
-      return NextResponse.json(
-        { error: `Backend responded with ${response.status}: ${response.statusText}` },
+      return NextResponse?.json(
+        { error: `Backend responded with ${response?.status}: ${response?.statusText}` },
         { status: response.status }
       )
     }
   } catch (error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
     )

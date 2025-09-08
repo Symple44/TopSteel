@@ -33,7 +33,7 @@ export enum NotificationCategory {
  */
 export enum NotificationPriority {
   LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
+  NORMAL = 'NORMAL',
   HIGH = 'HIGH',
   URGENT = 'URGENT',
 }
@@ -53,6 +53,7 @@ export enum NotificationChannel {
  * Interface notification principale
  */
 export interface Notification extends BaseEntity {
+  // Propriétés principales (français)
   titre: string
   message: string
   type: NotificationType
@@ -64,8 +65,20 @@ export interface Notification extends BaseEntity {
   luAt?: Date
   actionUrl?: string
   actionLabel?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   expiresAt?: Date
+
+  // Propriétés additionnelles (anglais)
+  title?: string // Alias pour titre
+  read?: boolean // Alias pour lu
+  readAt?: Date // Alias pour luAt
+  recipientId?: string // Alias pour destinataireId
+  actions?: NotificationAction[] // Actions disponibles
+  source?: string // Source de la notification
+  entity_type?: string // Type d'entité associée
+  entity_id?: string // ID de l'entité associée
+  recipient_type?: string // Type de destinataire
+  action_type?: string // Type d'action
 }
 
 /**
@@ -116,7 +129,7 @@ export interface SendNotificationRequest {
   destinataireIds: string[]
   actionUrl?: string
   actionLabel?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   scheduleAt?: Date
   expiresAt?: Date
 }
@@ -143,4 +156,85 @@ export interface NotificationFilters {
   dateDebut?: Date
   dateFin?: Date
   search?: string
+}
+
+/**
+ * DTO pour créer une notification
+ */
+export interface CreateNotificationDto {
+  type: NotificationType
+  title: string
+  message: string
+  data?: unknown
+  userId?: string
+  projetId?: string
+}
+
+/**
+ * DTO pour mettre à jour une notification
+ */
+export interface UpdateNotificationDto extends Partial<CreateNotificationDto> {
+  id: string
+}
+
+/**
+ * Trigger d'événement pour les règles
+ */
+export interface EventTrigger {
+  type: 'user' | 'stock' | 'email' | 'project' | 'production' | 'system'
+  event: string
+  source?: string
+}
+
+/**
+ * Configuration de notification pour les règles
+ */
+export interface NotificationConfig {
+  type: string
+  recipients?: string[]
+  template?: string
+  variables?: Record<string, unknown>
+  titleTemplate?: string
+  messageTemplate?: string
+  actionUrl?: string
+  actionLabel?: string
+  category?: string
+  priority?: string
+}
+
+/**
+ * Condition pour les règles de notification
+ */
+export interface NotificationCondition {
+  field: string
+  operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than'
+  value: unknown
+}
+
+/**
+ * Action pour les règles de notification
+ */
+export interface NotificationAction {
+  type: string
+  config?: Record<string, unknown>
+}
+
+/**
+ * Règle de notification
+ */
+export interface NotificationRule {
+  id: string
+  name: string
+  description?: string
+  type?: 'email' | 'sms' | 'push' | 'in-app'
+  conditions?: NotificationCondition[]
+  actions?: NotificationAction[]
+  enabled?: boolean
+  isActive?: boolean
+  trigger?: EventTrigger
+  notification?: NotificationConfig
+  createdAt?: Date
+  updatedAt?: Date
+  lastTriggered?: string
+  triggerCount?: number
 }

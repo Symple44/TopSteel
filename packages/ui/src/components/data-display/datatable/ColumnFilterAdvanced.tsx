@@ -8,26 +8,44 @@ import { Button } from '../../primitives/button'
 import { Checkbox } from '../../primitives/checkbox'
 import { Input } from '../../primitives/input'
 
-interface ColumnFilterAdvancedProps<T = any> {
-  column: {
-    id: string
-    title: string
-    type?: 'text' | 'number' | 'date' | 'boolean' | 'select' | 'richtext'
-    key?: keyof T | string
-    getValue?: (row: T) => any
-  }
-  data: T[]
-  currentSort?: 'asc' | 'desc' | null
-  currentFilters?: any
-  onSort: (direction: 'asc' | 'desc' | null) => void
-  onFilter: (filter: any) => void
+type FilterType =
+  | {
+      type: 'values'
+      values: string[]
+    }
+  | {
+      type: 'range'
+      min: number | null
+      max: number | null
+    }
+  | {
+      type: 'dateRange'
+      start: string | null
+      end: string | null
+    }
+
+interface ColumnConfig<T> {
+  id: string
+  title: string
+  type?: 'text' | 'number' | 'date' | 'boolean' | 'select' | 'richtext'
+  key?: keyof T | string
+  getValue?: (row: T) => unknown
 }
 
-export function ColumnFilterAdvanced<T = any>({
+interface ColumnFilterAdvancedProps<T = Record<string, unknown>> {
+  column: ColumnConfig<T>
+  data: T[]
+  currentSort?: 'asc' | 'desc' | null
+  currentFilters?: FilterType | null
+  onSort: (direction: 'asc' | 'desc' | null) => void
+  onFilter: (filter: FilterType | null) => void
+}
+
+export function ColumnFilterAdvanced<T = Record<string, unknown>>({
   column,
   data,
   currentSort,
-  currentFilters = {},
+  currentFilters = null,
   onSort,
   onFilter,
 }: ColumnFilterAdvancedProps<T>) {
@@ -80,7 +98,7 @@ export function ColumnFilterAdvanced<T = any>({
         if (typeof column.getValue === 'function') {
           return column.getValue(item)
         } else {
-          return (item as any)[column.key || column.id]
+          return (item as Record<string, unknown>)[String(column.key || column.id)]
         }
       })
       .filter((v) => v != null)
@@ -90,7 +108,7 @@ export function ColumnFilterAdvanced<T = any>({
     const firstValue = sample[0]
     if (typeof firstValue === 'number') return 'number'
     if (typeof firstValue === 'boolean') return 'boolean'
-    if (!Number.isNaN(Date.parse(firstValue))) return 'date'
+    if (typeof firstValue === 'string' && !Number.isNaN(Date.parse(firstValue))) return 'date'
     return 'text'
   }, [column, data])
 
@@ -113,7 +131,7 @@ export function ColumnFilterAdvanced<T = any>({
       if (typeof column.getValue === 'function') {
         value = column.getValue(item)
       } else {
-        value = (item as any)[column.key || column.id]
+        value = (item as Record<string, unknown>)[String(column.key || column.id)]
       }
 
       // Gérer les valeurs null/undefined/vides
@@ -156,7 +174,7 @@ export function ColumnFilterAdvanced<T = any>({
     let max = -Infinity
 
     data.forEach((item) => {
-      const value = (item as any)[column.id]
+      const value = (item as Record<string, unknown>)[column.id]
       if (typeof value === 'number') {
         min = Math.min(min, value)
         max = Math.max(max, value)
@@ -255,7 +273,7 @@ export function ColumnFilterAdvanced<T = any>({
   }
 
   const handleApplyFilter = () => {
-    let filter = null
+    let filter: FilterType | null = null
 
     if (
       (columnType === 'text' ||
@@ -347,10 +365,11 @@ export function ColumnFilterAdvanced<T = any>({
     <>
       <div className="relative">
         <Button
+          type="button"
           ref={buttonRef}
           variant="ghost"
           size="sm"
-          onClick={(e: any) => {
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation()
             setIsOpen(!isOpen)
           }}
@@ -400,9 +419,10 @@ export function ColumnFilterAdvanced<T = any>({
               {/* Boutons de tri */}
               <div className="flex gap-1">
                 <Button
+                  type="button"
                   variant={currentSort === 'desc' ? 'default' : 'outline'}
                   size="sm"
-                  onClick={(e: any) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation()
                     handleSort(currentSort === 'desc' ? null : 'desc')
                   }}
@@ -412,9 +432,10 @@ export function ColumnFilterAdvanced<T = any>({
                   Croissant
                 </Button>
                 <Button
+                  type="button"
                   variant={currentSort === 'asc' ? 'default' : 'outline'}
                   size="sm"
-                  onClick={(e: any) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation()
                     handleSort(currentSort === 'asc' ? null : 'asc')
                   }}
@@ -424,9 +445,10 @@ export function ColumnFilterAdvanced<T = any>({
                   Décroissant
                 </Button>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={(e: any) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation()
                     handleSort(null)
                   }}
@@ -452,8 +474,10 @@ export function ColumnFilterAdvanced<T = any>({
                       type="text"
                       placeholder="Rechercher..."
                       value={searchTerm}
-                      onChange={(e: any) => setSearchTerm(e.target.value)}
-                      onFocus={(e: any) => e.stopPropagation()}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setSearchTerm(e.target.value)
+                      }
+                      onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
                       className="pl-7 h-8 text-sm"
                     />
                   </div>
@@ -462,9 +486,10 @@ export function ColumnFilterAdvanced<T = any>({
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex gap-1">
                       <Button
+                        type="button"
                         variant={showOnlySelected ? 'ghost' : 'default'}
                         size="sm"
-                        onClick={(e: any) => {
+                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                           e.stopPropagation()
                           setShowOnlySelected(false)
                         }}
@@ -473,9 +498,10 @@ export function ColumnFilterAdvanced<T = any>({
                         Tous
                       </Button>
                       <Button
+                        type="button"
                         variant={showOnlySelected ? 'default' : 'ghost'}
                         size="sm"
-                        onClick={(e: any) => {
+                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                           e.stopPropagation()
                           setShowOnlySelected(true)
                         }}
@@ -493,9 +519,10 @@ export function ColumnFilterAdvanced<T = any>({
                   {/* Actions de sélection */}
                   <div className="flex justify-between items-center mb-2">
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={(e: any) => {
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation()
                         toggleAll()
                       }}
@@ -550,10 +577,10 @@ export function ColumnFilterAdvanced<T = any>({
                         type="number"
                         placeholder={`Min: ${numberBounds.min}`}
                         value={numberRange.min}
-                        onChange={(e: any) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setNumberRange((prev) => ({ ...prev, min: e.target.value }))
                         }
-                        onFocus={(e: any) => e.stopPropagation()}
+                        onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
                         className="h-8"
                       />
                     </div>
@@ -564,10 +591,10 @@ export function ColumnFilterAdvanced<T = any>({
                         type="number"
                         placeholder={`Max: ${numberBounds.max}`}
                         value={numberRange.max}
-                        onChange={(e: any) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setNumberRange((prev) => ({ ...prev, max: e.target.value }))
                         }
-                        onFocus={(e: any) => e.stopPropagation()}
+                        onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
                         className="h-8"
                       />
                     </div>
@@ -588,10 +615,10 @@ export function ColumnFilterAdvanced<T = any>({
                       <Input
                         type="date"
                         value={dateRange.start}
-                        onChange={(e: any) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setDateRange((prev) => ({ ...prev, start: e.target.value }))
                         }
-                        onFocus={(e: any) => e.stopPropagation()}
+                        onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
                         className="h-8"
                       />
                     </div>
@@ -601,10 +628,10 @@ export function ColumnFilterAdvanced<T = any>({
                       <Input
                         type="date"
                         value={dateRange.end}
-                        onChange={(e: any) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setDateRange((prev) => ({ ...prev, end: e.target.value }))
                         }
-                        onFocus={(e: any) => e.stopPropagation()}
+                        onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
                         className="h-8"
                       />
                     </div>
@@ -616,9 +643,10 @@ export function ColumnFilterAdvanced<T = any>({
             {/* Footer avec actions */}
             <div className="p-3 border-t border-border bg-muted/30 flex gap-2">
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
-                onClick={(e: any) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation()
                   handleClearFilter()
                 }}
@@ -628,9 +656,10 @@ export function ColumnFilterAdvanced<T = any>({
                 Effacer
               </Button>
               <Button
+                type="button"
                 variant="default"
                 size="sm"
-                onClick={(e: any) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation()
                   handleApplyFilter()
                 }}

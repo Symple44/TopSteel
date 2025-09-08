@@ -1,5 +1,21 @@
 'use client'
 import {
+  AlertTriangle,
+  ArrowDownRight,
+  ArrowUpRight,
+  CheckCircle,
+  Clock,
+  Edit,
+  Eye,
+  FileText,
+  MoreHorizontal,
+  Package,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  XCircle,
+} from 'lucide-react'
+import {
   Table,
   TableBody,
   TableCell,
@@ -7,24 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Package, 
-  TrendingUp, 
-  TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
-  AlertTriangle,
-  FileText,
-  CheckCircle,
-  Clock,
-  XCircle
-} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +31,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../primitives'
+import {
+  Badge,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface StockMovement {
   id: string
   reference: string
@@ -89,42 +94,44 @@ export function StockMovementsTable({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-          <p className="mt-2 text-sm text-muted-foreground">Chargement des mouvements de stock...</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Chargement des mouvements de stock...
+          </p>
         </div>
       </div>
     )
   }
   const getTypeBadge = (type: StockMovement['type']) => {
     const variants = {
-      entry: { 
-        label: 'Entrée', 
+      entry: {
+        label: 'Entrée',
         className: 'bg-green-100 text-green-800',
-        icon: <ArrowDownRight className="h-3 w-3" />
+        icon: <ArrowDownRight className="h-3 w-3" />,
       },
-      exit: { 
-        label: 'Sortie', 
+      exit: {
+        label: 'Sortie',
         className: 'bg-red-100 text-red-800',
-        icon: <ArrowUpRight className="h-3 w-3" />
+        icon: <ArrowUpRight className="h-3 w-3" />,
       },
-      transfer: { 
-        label: 'Transfert', 
+      transfer: {
+        label: 'Transfert',
         className: 'bg-blue-100 text-blue-800',
-        icon: <Package className="h-3 w-3" />
+        icon: <Package className="h-3 w-3" />,
       },
-      adjustment: { 
-        label: 'Ajustement', 
+      adjustment: {
+        label: 'Ajustement',
         className: 'bg-orange-100 text-orange-800',
-        icon: <AlertTriangle className="h-3 w-3" />
+        icon: <AlertTriangle className="h-3 w-3" />,
       },
-      return: { 
-        label: 'Retour', 
+      return: {
+        label: 'Retour',
         className: 'bg-purple-100 text-purple-800',
-        icon: <Package className="h-3 w-3" />
+        icon: <Package className="h-3 w-3" />,
       },
-      production: { 
-        label: 'Production', 
+      production: {
+        label: 'Production',
         className: 'bg-indigo-100 text-indigo-800',
-        icon: <Package className="h-3 w-3" />
+        icon: <Package className="h-3 w-3" />,
       },
     }
     const variant = variants[type] || variants.adjustment
@@ -137,20 +144,20 @@ export function StockMovementsTable({
   }
   const getStatusBadge = (status: StockMovement['status']) => {
     const variants = {
-      pending: { 
-        label: 'En attente', 
+      pending: {
+        label: 'En attente',
         className: 'bg-yellow-100 text-yellow-800',
-        icon: <Clock className="h-3 w-3" />
+        icon: <Clock className="h-3 w-3" />,
       },
-      completed: { 
-        label: 'Validé', 
+      completed: {
+        label: 'Validé',
         className: 'bg-green-100 text-green-800',
-        icon: <CheckCircle className="h-3 w-3" />
+        icon: <CheckCircle className="h-3 w-3" />,
       },
-      cancelled: { 
-        label: 'Annulé', 
+      cancelled: {
+        label: 'Annulé',
         className: 'bg-gray-100 text-gray-600',
-        icon: <XCircle className="h-3 w-3" />
+        icon: <XCircle className="h-3 w-3" />,
       },
     }
     const variant = variants[status] || variants.pending
@@ -181,7 +188,8 @@ export function StockMovementsTable({
       <div className={`flex items-center gap-1 ${color}`}>
         <Icon className="h-4 w-4" />
         <span className="font-medium">
-          {isPositive ? '+' : ''}{diff} {movement.unit}
+          {isPositive ? '+' : ''}
+          {diff} {movement.unit}
         </span>
       </div>
     )
@@ -230,8 +238,8 @@ export function StockMovementsTable({
               </TableRow>
             ) : (
               data.map((movement) => (
-                <TableRow 
-                  key={movement.id} 
+                <TableRow
+                  key={movement.id}
                   className={movement.status === 'cancelled' ? 'opacity-60' : ''}
                 >
                   <TableCell className="font-medium">
@@ -245,17 +253,13 @@ export function StockMovementsTable({
                   <TableCell>
                     <Tooltip>
                       <TooltipTrigger>
-                        <div className="text-sm">
-                          {formatDate(movement.date)}
-                        </div>
+                        <div className="text-sm">{formatDate(movement.date)}</div>
                       </TooltipTrigger>
                       {movement.validatedAt && (
                         <TooltipContent>
                           <div className="space-y-1">
                             <div>Validé le: {formatDate(movement.validatedAt)}</div>
-                            {movement.validatedBy && (
-                              <div>Par: {movement.validatedBy}</div>
-                            )}
+                            {movement.validatedBy && <div>Par: {movement.validatedBy}</div>}
                           </div>
                         </TooltipContent>
                       )}
@@ -322,7 +326,7 @@ export function StockMovementsTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -339,14 +343,14 @@ export function StockMovementsTable({
                               <Edit className="mr-2 h-4 w-4" />
                               Modifier
                             </DropdownMenuItem>
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => onValidate?.(movement)}
                               className="text-green-600"
                             >
                               <CheckCircle className="mr-2 h-4 w-4" />
                               Valider
                             </DropdownMenuItem>
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => onCancel?.(movement)}
                               className="text-orange-600"
                             >
@@ -362,7 +366,7 @@ export function StockMovementsTable({
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => onDelete?.(movement)}
                           className="text-red-600"
                           disabled={movement.status === 'completed'}

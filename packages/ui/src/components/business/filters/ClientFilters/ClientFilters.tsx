@@ -1,13 +1,20 @@
 'use client'
-import { useState, useCallback, useEffect } from 'react'
-import { Filter, X, Users, Building, MapPin, Star, Calendar, Euro } from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { Input } from '../../../primitives/input/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
-import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Building, Calendar, Euro, Filter, MapPin, Star, Users, X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { useCheckboxGroupIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export type ClientType = 'individual' | 'company' | 'government' | 'nonprofit'
 export type ClientStatus = 'active' | 'inactive' | 'pending' | 'blocked'
 export type ClientSegment = 'small' | 'medium' | 'large' | 'enterprise'
@@ -95,19 +102,14 @@ export function ClientFilters({
   availableTags = [],
   className,
 }: ClientFiltersProps) {
-  const [filters, setFilters] = useState<ClientFiltersState>(value || {
-    types: [],
-    statuses: [],
-    segments: [],
-    paymentTerms: [],
-    cities: [],
-    regions: [],
-    countries: [],
-    tags: [],
-  })
-  const [isExpanded, setIsExpanded] = useState(showAdvanced)
-  useEffect(() => {
-    setFilters(value || {
+  // Generate unique IDs for checkboxes
+  const checkboxIds = useCheckboxGroupIds('client-filters', [
+    'has-active-projects',
+    'has-outstanding-invoices',
+  ])
+
+  const [filters, setFilters] = useState<ClientFiltersState>(
+    value || {
       types: [],
       statuses: [],
       segments: [],
@@ -116,46 +118,86 @@ export function ClientFilters({
       regions: [],
       countries: [],
       tags: [],
-    })
+    }
+  )
+  const [isExpanded, setIsExpanded] = useState(showAdvanced)
+  useEffect(() => {
+    setFilters(
+      value || {
+        types: [],
+        statuses: [],
+        segments: [],
+        paymentTerms: [],
+        cities: [],
+        regions: [],
+        countries: [],
+        tags: [],
+      }
+    )
   }, [value])
-  const updateFilters = useCallback((updates: Partial<ClientFiltersState>) => {
-    const newFilters = { ...filters, ...updates }
-    setFilters(newFilters)
-    onChange?.(newFilters)
-  }, [filters, onChange])
+  const updateFilters = useCallback(
+    (updates: Partial<ClientFiltersState>) => {
+      const newFilters = { ...filters, ...updates }
+      setFilters(newFilters)
+      onChange?.(newFilters)
+    },
+    [filters, onChange]
+  )
   const toggleArrayValue = useCallback(<T,>(array: T[], value: T): T[] => {
-    return array.includes(value)
-      ? array.filter(item => item !== value)
-      : [...array, value]
+    return array.includes(value) ? array.filter((item) => item !== value) : [...array, value]
   }, [])
-  const handleTypeToggle = useCallback((type: ClientType) => {
-    updateFilters({ types: toggleArrayValue(filters.types, type) })
-  }, [filters.types, toggleArrayValue, updateFilters])
-  const handleStatusToggle = useCallback((status: ClientStatus) => {
-    updateFilters({ statuses: toggleArrayValue(filters.statuses, status) })
-  }, [filters.statuses, toggleArrayValue, updateFilters])
-  const handleSegmentToggle = useCallback((segment: ClientSegment) => {
-    updateFilters({ segments: toggleArrayValue(filters.segments, segment) })
-  }, [filters.segments, toggleArrayValue, updateFilters])
-  const handlePaymentTermsToggle = useCallback((terms: PaymentTerms) => {
-    updateFilters({ paymentTerms: toggleArrayValue(filters.paymentTerms, terms) })
-  }, [filters.paymentTerms, toggleArrayValue, updateFilters])
-  const handleLocationChange = useCallback((type: 'cities' | 'regions' | 'countries', value: string) => {
-    if (value && !filters[type].includes(value)) {
-      updateFilters({ [type]: [...filters[type], value] })
-    }
-  }, [filters, updateFilters])
-  const removeLocationFilter = useCallback((type: 'cities' | 'regions' | 'countries', value: string) => {
-    updateFilters({ [type]: filters[type].filter(item => item !== value) })
-  }, [filters, updateFilters])
-  const handleTagChange = useCallback((tag: string) => {
-    if (tag && !filters.tags.includes(tag)) {
-      updateFilters({ tags: [...filters.tags, tag] })
-    }
-  }, [filters.tags, updateFilters])
-  const removeTag = useCallback((tag: string) => {
-    updateFilters({ tags: filters.tags.filter(item => item !== tag) })
-  }, [filters.tags, updateFilters])
+  const handleTypeToggle = useCallback(
+    (type: ClientType) => {
+      updateFilters({ types: toggleArrayValue(filters.types, type) })
+    },
+    [filters.types, toggleArrayValue, updateFilters]
+  )
+  const handleStatusToggle = useCallback(
+    (status: ClientStatus) => {
+      updateFilters({ statuses: toggleArrayValue(filters.statuses, status) })
+    },
+    [filters.statuses, toggleArrayValue, updateFilters]
+  )
+  const handleSegmentToggle = useCallback(
+    (segment: ClientSegment) => {
+      updateFilters({ segments: toggleArrayValue(filters.segments, segment) })
+    },
+    [filters.segments, toggleArrayValue, updateFilters]
+  )
+  const handlePaymentTermsToggle = useCallback(
+    (terms: PaymentTerms) => {
+      updateFilters({ paymentTerms: toggleArrayValue(filters.paymentTerms, terms) })
+    },
+    [filters.paymentTerms, toggleArrayValue, updateFilters]
+  )
+  const handleLocationChange = useCallback(
+    (type: 'cities' | 'regions' | 'countries', value: string) => {
+      if (value && !filters[type].includes(value)) {
+        updateFilters({ [type]: [...filters[type], value] })
+      }
+    },
+    [filters, updateFilters]
+  )
+  const removeLocationFilter = useCallback(
+    (type: 'cities' | 'regions' | 'countries', value: string) => {
+      updateFilters({ [type]: filters[type].filter((item) => item !== value) })
+    },
+    [filters, updateFilters]
+  )
+  const handleTagChange = useCallback(
+    (tag: string) => {
+      if (tag && !filters.tags.includes(tag)) {
+        updateFilters({ tags: [...filters.tags, tag] })
+      }
+    },
+    [filters.tags, updateFilters]
+  )
+  const removeTag = useCallback(
+    (tag: string) => {
+      updateFilters({ tags: filters.tags.filter((item) => item !== tag) })
+    },
+    [filters.tags, updateFilters]
+  )
   const clearAllFilters = useCallback(() => {
     const clearedFilters: ClientFiltersState = {
       types: [],
@@ -253,7 +295,10 @@ export function ClientFilters({
                       onCheckedChange={() => handleTypeToggle(option.value as ClientType)}
                       disabled={disabled}
                     />
-                    <Label htmlFor={`type-${option.value}`} className="text-sm flex items-center gap-2">
+                    <Label
+                      htmlFor={`type-${option.value}`}
+                      className="text-sm flex items-center gap-2"
+                    >
                       <option.icon className="h-3 w-3" />
                       {option.label}
                     </Label>
@@ -314,7 +359,10 @@ export function ClientFilters({
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label className="text-xs">Pays</Label>
-                <Select onValueChange={(value) => handleLocationChange('countries', value)} disabled={disabled}>
+                <Select
+                  onValueChange={(value) => handleLocationChange('countries', value)}
+                  disabled={disabled}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un pays..." />
                   </SelectTrigger>
@@ -340,7 +388,10 @@ export function ClientFilters({
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Région</Label>
-                <Select onValueChange={(value) => handleLocationChange('regions', value)} disabled={disabled}>
+                <Select
+                  onValueChange={(value) => handleLocationChange('regions', value)}
+                  disabled={disabled}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner une région..." />
                   </SelectTrigger>
@@ -366,7 +417,10 @@ export function ClientFilters({
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Ville</Label>
-                <Select onValueChange={(value) => handleLocationChange('cities', value)} disabled={disabled}>
+                <Select
+                  onValueChange={(value) => handleLocationChange('cities', value)}
+                  disabled={disabled}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner une ville..." />
                   </SelectTrigger>
@@ -427,9 +481,11 @@ export function ClientFilters({
                   <Input
                     type="date"
                     value={filters.createdDateRange?.from || ''}
-                    onChange={(e) => updateFilters({
-                      createdDateRange: { ...filters.createdDateRange, from: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      updateFilters({
+                        createdDateRange: { ...filters.createdDateRange, from: e.target.value },
+                      })
+                    }
                     disabled={disabled}
                   />
                 </div>
@@ -438,9 +494,11 @@ export function ClientFilters({
                   <Input
                     type="date"
                     value={filters.createdDateRange?.to || ''}
-                    onChange={(e) => updateFilters({
-                      createdDateRange: { ...filters.createdDateRange, to: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      updateFilters({
+                        createdDateRange: { ...filters.createdDateRange, to: e.target.value },
+                      })
+                    }
                     disabled={disabled}
                   />
                 </div>
@@ -454,9 +512,11 @@ export function ClientFilters({
                   <Input
                     type="date"
                     value={filters.lastOrderDateRange?.from || ''}
-                    onChange={(e) => updateFilters({
-                      lastOrderDateRange: { ...filters.lastOrderDateRange, from: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      updateFilters({
+                        lastOrderDateRange: { ...filters.lastOrderDateRange, from: e.target.value },
+                      })
+                    }
                     disabled={disabled}
                   />
                 </div>
@@ -465,9 +525,11 @@ export function ClientFilters({
                   <Input
                     type="date"
                     value={filters.lastOrderDateRange?.to || ''}
-                    onChange={(e) => updateFilters({
-                      lastOrderDateRange: { ...filters.lastOrderDateRange, to: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      updateFilters({
+                        lastOrderDateRange: { ...filters.lastOrderDateRange, to: e.target.value },
+                      })
+                    }
                     disabled={disabled}
                   />
                 </div>
@@ -480,27 +542,31 @@ export function ClientFilters({
             <div className="grid gap-3 md:grid-cols-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="has-active-projects"
+                  id={checkboxIds['has-active-projects']}
                   checked={filters.hasActiveProjects === true}
-                  onCheckedChange={(checked) => updateFilters({ 
-                    hasActiveProjects: checked ? true : undefined 
-                  })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({
+                      hasActiveProjects: checked ? true : undefined,
+                    })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="has-active-projects" className="text-sm">
+                <Label htmlFor={checkboxIds['has-active-projects']} className="text-sm">
                   A des projets actifs
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="has-outstanding-invoices"
+                  id={checkboxIds['has-outstanding-invoices']}
                   checked={filters.hasOutstandingInvoices === true}
-                  onCheckedChange={(checked) => updateFilters({ 
-                    hasOutstandingInvoices: checked ? true : undefined 
-                  })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({
+                      hasOutstandingInvoices: checked ? true : undefined,
+                    })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="has-outstanding-invoices" className="text-sm">
+                <Label htmlFor={checkboxIds['has-outstanding-invoices']} className="text-sm">
                   A des factures impayées
                 </Label>
               </div>
@@ -519,7 +585,7 @@ export function ClientFilters({
                 </SelectTrigger>
                 <SelectContent>
                   {availableTags
-                    .filter(tag => !filters.tags.includes(tag))
+                    .filter((tag) => !filters.tags.includes(tag))
                     .map((tag) => (
                       <SelectItem key={tag} value={tag}>
                         {tag}
@@ -531,10 +597,7 @@ export function ClientFilters({
                 {filters.tags.map((tag) => (
                   <Badge key={tag} variant="secondary" className="text-xs">
                     {tag}
-                    <X
-                      className="h-3 w-3 ml-1 cursor-pointer"
-                      onClick={() => removeTag(tag)}
-                    />
+                    <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => removeTag(tag)} />
                   </Badge>
                 ))}
               </div>
@@ -543,10 +606,7 @@ export function ClientFilters({
           {/* Apply Button */}
           {onApply && (
             <div className="flex justify-end pt-4 border-t">
-              <Button
-                onClick={() => onApply(filters)}
-                disabled={disabled}
-              >
+              <Button type="button" onClick={() => onApply(filters)} disabled={disabled}>
                 Appliquer les filtres
               </Button>
             </div>

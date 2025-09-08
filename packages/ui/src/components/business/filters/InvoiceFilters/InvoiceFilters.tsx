@@ -1,13 +1,20 @@
 'use client'
-import { useState, useCallback } from 'react'
-import { Filter, FileText, Euro, Calendar, User, Building, X } from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { Input } from '../../../primitives/input/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../primitives/select/select'
-import { Label } from '../../../forms/label/Label'
-import { Badge } from '../../../data-display/badge'
-import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Calendar, Euro, FileText, Filter, X } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { useCheckboxGroupIds } from '../../../../hooks/useFormFieldIds'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
+import { Label } from '../../../forms/label/Label'
+import { Button } from '../../../primitives/button/Button'
+import { Checkbox } from '../../../primitives/checkbox/checkbox'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
 export type InvoiceType = 'invoice' | 'credit_note' | 'proforma' | 'receipt'
 export interface InvoiceFiltersState {
@@ -57,22 +64,32 @@ export function InvoiceFilters({
   availableCurrencies = ['EUR', 'USD'],
   className,
 }: InvoiceFiltersProps) {
-  const [filters, setFilters] = useState<InvoiceFiltersState>(value || {
-    statuses: [],
-    types: [],
-    clientIds: [],
-    projectIds: [],
-  })
+  // Generate unique IDs for checkboxes
+  const checkboxIds = useCheckboxGroupIds('invoice-filters', [
+    'is-overdue',
+    'is-paid',
+    'has-attachments',
+  ])
+
+  const [filters, setFilters] = useState<InvoiceFiltersState>(
+    value || {
+      statuses: [],
+      types: [],
+      clientIds: [],
+      projectIds: [],
+    }
+  )
   const [isExpanded, setIsExpanded] = useState(false)
-  const updateFilters = useCallback((updates: Partial<InvoiceFiltersState>) => {
-    const newFilters = { ...filters, ...updates }
-    setFilters(newFilters)
-    onChange?.(newFilters)
-  }, [filters, onChange])
+  const updateFilters = useCallback(
+    (updates: Partial<InvoiceFiltersState>) => {
+      const newFilters = { ...filters, ...updates }
+      setFilters(newFilters)
+      onChange?.(newFilters)
+    },
+    [filters, onChange]
+  )
   const toggleArrayValue = <T,>(array: T[], value: T): T[] => {
-    return array.includes(value)
-      ? array.filter(item => item !== value)
-      : [...array, value]
+    return array.includes(value) ? array.filter((item) => item !== value) : [...array, value]
   }
   const handleStatusToggle = (status: InvoiceStatus) => {
     updateFilters({ statuses: toggleArrayValue(filters.statuses, status) })
@@ -119,9 +136,7 @@ export function InvoiceFilters({
         >
           <Filter className="h-4 w-4" />
           Filtres factures
-          {activeFiltersCount > 0 && (
-            <Badge variant="secondary">{activeFiltersCount}</Badge>
-          )}
+          {activeFiltersCount > 0 && <Badge variant="secondary">{activeFiltersCount}</Badge>}
         </Button>
         {activeFiltersCount > 0 && (
           <Button
@@ -185,7 +200,10 @@ export function InvoiceFilters({
                       onCheckedChange={() => handleTypeToggle(option.value as InvoiceType)}
                       disabled={disabled}
                     />
-                    <Label htmlFor={`type-${option.value}`} className="text-sm flex items-center gap-2">
+                    <Label
+                      htmlFor={`type-${option.value}`}
+                      className="text-sm flex items-center gap-2"
+                    >
                       <option.icon className="h-3 w-3" />
                       {option.label}
                     </Label>
@@ -207,9 +225,14 @@ export function InvoiceFilters({
                   type="number"
                   placeholder="0"
                   value={filters.amountRange?.min || ''}
-                  onChange={(e) => updateFilters({
-                    amountRange: { ...filters.amountRange, min: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      amountRange: {
+                        ...filters.amountRange,
+                        min: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -219,9 +242,14 @@ export function InvoiceFilters({
                   type="number"
                   placeholder="Illimité"
                   value={filters.amountRange?.max || ''}
-                  onChange={(e) => updateFilters({
-                    amountRange: { ...filters.amountRange, max: parseFloat(e.target.value) || undefined }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      amountRange: {
+                        ...filters.amountRange,
+                        max: parseFloat(e.target.value) || undefined,
+                      },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -238,17 +266,21 @@ export function InvoiceFilters({
                 <Input
                   type="date"
                   value={filters.dateRange?.from || ''}
-                  onChange={(e) => updateFilters({
-                    dateRange: { ...filters.dateRange, from: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      dateRange: { ...filters.dateRange, from: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
                 <Input
                   type="date"
                   value={filters.dateRange?.to || ''}
-                  onChange={(e) => updateFilters({
-                    dateRange: { ...filters.dateRange, to: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      dateRange: { ...filters.dateRange, to: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -259,17 +291,21 @@ export function InvoiceFilters({
                 <Input
                   type="date"
                   value={filters.dueDateRange?.from || ''}
-                  onChange={(e) => updateFilters({
-                    dueDateRange: { ...filters.dueDateRange, from: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      dueDateRange: { ...filters.dueDateRange, from: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
                 <Input
                   type="date"
                   value={filters.dueDateRange?.to || ''}
-                  onChange={(e) => updateFilters({
-                    dueDateRange: { ...filters.dueDateRange, to: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    updateFilters({
+                      dueDateRange: { ...filters.dueDateRange, to: e.target.value },
+                    })
+                  }
                   disabled={disabled}
                 />
               </div>
@@ -281,30 +317,42 @@ export function InvoiceFilters({
             <div className="grid gap-3 md:grid-cols-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="is-overdue"
+                  id={checkboxIds['is-overdue']}
                   checked={filters.isOverdue === true}
-                  onCheckedChange={(checked) => updateFilters({ isOverdue: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ isOverdue: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="is-overdue" className="text-sm">En retard</Label>
+                <Label htmlFor={checkboxIds['is-overdue']} className="text-sm">
+                  En retard
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="is-paid"
+                  id={checkboxIds['is-paid']}
                   checked={filters.isPaid === true}
-                  onCheckedChange={(checked) => updateFilters({ isPaid: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ isPaid: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="is-paid" className="text-sm">Payée</Label>
+                <Label htmlFor={checkboxIds['is-paid']} className="text-sm">
+                  Payée
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="has-attachments"
+                  id={checkboxIds['has-attachments']}
                   checked={filters.hasAttachments === true}
-                  onCheckedChange={(checked) => updateFilters({ hasAttachments: checked ? true : undefined })}
+                  onCheckedChange={(checked) =>
+                    updateFilters({ hasAttachments: checked ? true : undefined })
+                  }
                   disabled={disabled}
                 />
-                <Label htmlFor="has-attachments" className="text-sm">Avec pièces jointes</Label>
+                <Label htmlFor={checkboxIds['has-attachments']} className="text-sm">
+                  Avec pièces jointes
+                </Label>
               </div>
             </div>
           </div>
@@ -333,7 +381,7 @@ export function InvoiceFilters({
           )}
           {onApply && (
             <div className="flex justify-end pt-4 border-t">
-              <Button onClick={() => onApply(filters)} disabled={disabled}>
+              <Button type="button" onClick={() => onApply(filters)} disabled={disabled}>
                 Appliquer les filtres
               </Button>
             </div>

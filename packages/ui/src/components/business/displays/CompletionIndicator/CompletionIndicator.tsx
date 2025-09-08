@@ -1,6 +1,7 @@
 'use client'
-import { CheckCircle, Circle, AlertCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle, Circle } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+
 interface CompletionIndicatorProps {
   percentage: number
   showPercentage?: boolean
@@ -60,7 +61,7 @@ export function CompletionIndicator({
   }
   const sizeConfig = getSizeClasses()
   if (variant === 'circular') {
-    const radius = 50 - parseInt(sizeConfig.stroke) / 2
+    const radius = 50 - parseInt(sizeConfig.stroke, 10) / 2
     const circumference = 2 * Math.PI * radius
     const strokeDashoffset = circumference - (clampedPercentage / 100) * circumference
     return (
@@ -88,12 +89,17 @@ export function CompletionIndicator({
               strokeLinecap="round"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
-              className={cn('transition-all duration-500 ease-in-out', getColorClass(clampedPercentage))}
+              className={cn(
+                'transition-all duration-500 ease-in-out',
+                getColorClass(clampedPercentage)
+              )}
             />
           </svg>
           {showPercentage && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className={cn('font-semibold', sizeConfig.text, getColorClass(clampedPercentage))}>
+              <span
+                className={cn('font-semibold', sizeConfig.text, getColorClass(clampedPercentage))}
+              >
                 {Math.round(clampedPercentage)}%
               </span>
             </div>
@@ -156,10 +162,12 @@ export function CompletionIndicator({
                   <Circle className="h-4 w-4 text-muted-foreground" />
                 )}
                 {index < steps - 1 && (
-                  <div className={cn(
-                    'w-4 h-0.5 mx-1',
-                    isCompleted ? 'bg-green-600' : 'bg-muted-foreground/20'
-                  )} />
+                  <div
+                    className={cn(
+                      'w-4 h-0.5 mx-1',
+                      isCompleted ? 'bg-green-600' : 'bg-muted-foreground/20'
+                    )}
+                  />
                 )}
               </div>
             )

@@ -6,25 +6,25 @@ import { NextResponse } from 'next/server'
 export async function GET() {
   try {
     // Lire les overrides depuis le fichier
-    const overridesPath = path.join(process.cwd(), 'data/translation-overrides.json')
+    const overridesPath = path?.join(process?.cwd(), 'data/translation-overrides.json')
     let overrides: Record<string, unknown> = {}
 
     try {
-      const overridesContent = await fs.readFile(overridesPath, 'utf-8')
+      const overridesContent = await fs?.readFile(overridesPath, 'utf-8')
       overrides = JSON.parse(overridesContent)
     } catch {
       // Fichier n'existe pas encore, retourner un objet vide
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         overrides: {},
       })
     }
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       overrides,
     })
   } catch {
-    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 })
+    return NextResponse?.json({ error: 'Erreur interne du serveur' }, { status: 500 })
   }
 }

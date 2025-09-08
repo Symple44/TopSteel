@@ -1,9 +1,9 @@
 // Data Display
 export * from './avatar'
 export * from './badge'
-export * from './data-table'
 export {
   type ColumnConfig,
+  DataTable,
   DataTable as AdvancedDataTable,
   DataTableExample,
   HierarchicalDataTable,
@@ -13,6 +13,6 @@ export {
   usePersistedTableSettings,
 } from './datatable'
 // Les types du DataTable sont déjà exportés via ./datatable
-export * from './progress'
+// export * from './progress' // Excluded to avoid conflict with primitives Progress
 export * from './reorderable-list'
 export * from './table'

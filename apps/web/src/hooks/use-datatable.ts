@@ -1,4 +1,5 @@
-import type { ColumnConfig, SelectionState } from '@erp/ui/data-display'
+import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
+import type { SelectionState } from '@erp/ui/data-display'
 import { usePersistedTableSettings } from '@erp/ui/data-display'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -42,15 +43,18 @@ export function useDataTable<T = any>({
 
   // Données sélectionnées
   const selectedData = useMemo(() => {
-    return data.filter((row) => selection.selectedRows.has((row as unknown)[keyField]))
+    return data?.filter((row) =>
+      selection?.selectedRows?.has((row as Record<string, unknown>)[keyField as string])
+    )
   }, [data, selection, keyField])
 
   // Gestionnaires d'événements
   const handleCellEdit = useCallback(
-    (value: any, row: T, column: ColumnConfig<T>) => {
+    (value: unknown, row: T, column: ColumnConfig<T>) => {
       setData((prevData) =>
-        prevData.map((item) =>
-          (item as unknown)[keyField] === (row as unknown)[keyField]
+        prevData?.map((item) =>
+          (item as Record<string, unknown>)[keyField as string] ===
+          (row as Record<string, unknown>)[keyField as string]
             ? { ...item, [column.key]: value }
             : item
         )
@@ -65,8 +69,14 @@ export function useDataTable<T = any>({
 
   const handleRowsDelete = useCallback(
     (rowsToDelete: T[]) => {
-      const idsToDelete = rowsToDelete.map((row) => (row as unknown)[keyField])
-      setData((prev) => prev.filter((item) => !idsToDelete.includes((item as unknown)[keyField])))
+      const idsToDelete = rowsToDelete?.map(
+        (row) => (row as Record<string, unknown>)[keyField as string]
+      )
+      setData((prev) =>
+        prev?.filter(
+          (item) => !idsToDelete?.includes((item as Record<string, unknown>)[keyField as string])
+        )
+      )
 
       // Nettoyer la sélection
       setSelection((_prev: SelectionState) => ({
@@ -80,8 +90,11 @@ export function useDataTable<T = any>({
   const handleRowUpdate = useCallback(
     (updatedRow: T) => {
       setData((prev) =>
-        prev.map((item) =>
-          (item as unknown)[keyField] === (updatedRow as unknown)[keyField] ? updatedRow : item
+        prev?.map((item) =>
+          (item as Record<string, unknown>)[keyField as string] ===
+          (updatedRow as Record<string, unknown>)[keyField as string]
+            ? updatedRow
+            : item
         )
       )
     },
@@ -92,8 +105,10 @@ export function useDataTable<T = any>({
     (updates: Partial<T>) => {
       const selectedIds = Array.from(selection.selectedRows)
       setData((prev) =>
-        prev.map((item) =>
-          selectedIds.includes((item as unknown)[keyField]) ? { ...item, ...updates } : item
+        prev?.map((item) =>
+          selectedIds?.includes((item as Record<string, unknown>)[keyField as string])
+            ? { ...item, ...updates }
+            : item
         )
       )
     },
@@ -105,7 +120,7 @@ export function useDataTable<T = any>({
   }, [])
 
   const selectAll = useCallback(() => {
-    const allIds = data.map((row) => (row as unknown)[keyField])
+    const allIds = data?.map((row) => (row as Record<string, unknown>)[keyField as string])
     setSelection({
       selectedRows: new Set(allIds),
       selectAll: true,
@@ -116,10 +131,10 @@ export function useDataTable<T = any>({
     (rowId: string | number) => {
       setSelection((prev: SelectionState) => {
         const newSelected = new Set(prev.selectedRows)
-        if (newSelected.has(rowId)) {
-          newSelected.delete(rowId)
+        if (newSelected?.has(rowId)) {
+          newSelected?.delete(rowId)
         } else {
-          newSelected.add(rowId)
+          newSelected?.add(rowId)
         }
 
         return {
@@ -153,7 +168,7 @@ export function useDataTable<T = any>({
       userId,
       editable: true,
       sortable: true,
-      searchable: true,
+
       selectable: true,
       actions: defaultActions,
       settings: persistedSettings?.settings,

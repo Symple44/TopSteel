@@ -9,7 +9,14 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { NotificationRule } from './notification-rule.entity'
+import type {
+  ConditionConfig,
+  ConditionEvaluationContext,
+  ExpressionEvaluationScope,
+  NotificationConditionJson,
+  NotificationRuleLazy,
+} from '../types/notification-condition.types'
+// import { NotificationRule } from './notification-rule.entity';
 
 /**
  * Condition types
@@ -92,10 +99,10 @@ export class NotificationCondition {
   operator?: ConditionOperator
 
   @Column({ type: 'jsonb', nullable: true })
-  value?: any
+  value?: unknown
 
   @Column({ type: 'jsonb', nullable: true })
-  value2?: any // For BETWEEN operator
+  value2?: unknown // For BETWEEN operator
 
   // Expression condition
   @Column({ type: 'text', nullable: true })
@@ -119,7 +126,7 @@ export class NotificationCondition {
   apiHeaders?: Record<string, string>
 
   @Column({ type: 'jsonb', nullable: true })
-  apiBody?: any
+  apiBody?: Record<string, unknown>
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   apiResponsePath?: string // JSON path to extract value
@@ -132,7 +139,7 @@ export class NotificationCondition {
   aggregateField?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  aggregateFilters?: Record<string, any>
+  aggregateFilters?: Record<string, unknown>
 
   @Column({ type: 'integer', nullable: true })
   aggregateWindow?: number // Time window in minutes
@@ -152,7 +159,7 @@ export class NotificationCondition {
   countEntity?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  countFilters?: Record<string, any>
+  countFilters?: Record<string, unknown>
 
   @Column({ type: 'integer', nullable: true })
   countWindow?: number // Time window in minutes
@@ -162,7 +169,7 @@ export class NotificationCondition {
   parentConditionId?: string
 
   @Column({ type: 'jsonb', default: {} })
-  metadata!: Record<string, any>
+  metadata!: Record<string, unknown>
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean
@@ -189,20 +196,16 @@ export class NotificationCondition {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => NotificationRule,
-    (rule) => rule.conditions,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('NotificationRule', 'conditions', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'rule_id' })
-  rule!: NotificationRule
+  rule!: NotificationRuleLazy
 
   // Utility methods
 
   /**
    * Evaluate field condition
    */
-  evaluateField(data: any): boolean {
+  evaluateField(data: ConditionEvaluationContext): boolean {
     if (this.type !== ConditionType.FIELD || !this.fieldPath || !this.operator) {
       return false
     }
@@ -216,7 +219,7 @@ export class NotificationCondition {
   /**
    * Evaluate expression condition
    */
-  evaluateExpression(context: any): boolean {
+  evaluateExpression(context: ConditionEvaluationContext): boolean {
     if (this.type !== ConditionType.EXPRESSION || !this.expression) {
       return false
     }
@@ -224,7 +227,7 @@ export class NotificationCondition {
     try {
       // Use mathjs for safe expression evaluation
       // Create a safe scope with limited access
-      const scope = {
+      const scope: ExpressionEvaluationScope = {
         ...context,
         // Add safe utility functions
         abs: Math.abs,
@@ -251,10 +254,10 @@ export class NotificationCondition {
    * Compare values based on operator
    */
   private compareValues(
-    fieldValue: any,
-    compareValue: any,
+    fieldValue: unknown,
+    compareValue: unknown,
     operator: ConditionOperator,
-    compareValue2?: any
+    compareValue2?: unknown
   ): boolean {
     switch (operator) {
       case ConditionOperator.EQUALS:
@@ -264,19 +267,22 @@ export class NotificationCondition {
         return fieldValue !== compareValue
 
       case ConditionOperator.GREATER_THAN:
-        return fieldValue > compareValue
+        return (fieldValue as number) > (compareValue as number)
 
       case ConditionOperator.GREATER_THAN_OR_EQUAL:
-        return fieldValue >= compareValue
+        return (fieldValue as number) >= (compareValue as number)
 
       case ConditionOperator.LESS_THAN:
-        return fieldValue < compareValue
+        return (fieldValue as number) < (compareValue as number)
 
       case ConditionOperator.LESS_THAN_OR_EQUAL:
-        return fieldValue <= compareValue
+        return (fieldValue as number) <= (compareValue as number)
 
       case ConditionOperator.BETWEEN:
-        return fieldValue >= compareValue && fieldValue <= compareValue2
+        return (
+          (fieldValue as number) >= (compareValue as number) &&
+          (fieldValue as number) <= (compareValue2 as number)
+        )
 
       case ConditionOperator.IN:
         return Array.isArray(compareValue) && compareValue.includes(fieldValue)
@@ -311,7 +317,9 @@ export class NotificationCondition {
           fieldValue === undefined ||
           fieldValue === '' ||
           (Array.isArray(fieldValue) && fieldValue.length === 0) ||
-          (typeof fieldValue === 'object' && Object.keys(fieldValue).length === 0)
+          (typeof fieldValue === 'object' &&
+            fieldValue !== null &&
+            Object.keys(fieldValue).length === 0)
         )
 
       case ConditionOperator.IS_NOT_EMPTY:
@@ -320,7 +328,9 @@ export class NotificationCondition {
           fieldValue === undefined ||
           fieldValue === '' ||
           (Array.isArray(fieldValue) && fieldValue.length === 0) ||
-          (typeof fieldValue === 'object' && Object.keys(fieldValue).length === 0)
+          (typeof fieldValue === 'object' &&
+            fieldValue !== null &&
+            Object.keys(fieldValue).length === 0)
         )
 
       default:
@@ -331,9 +341,9 @@ export class NotificationCondition {
   /**
    * Get nested value from object
    */
-  private getNestedValue(obj: any, path: string): any {
+  private getNestedValue(obj: ConditionEvaluationContext, path: string): unknown {
     const keys = path.split('.')
-    let value = obj
+    let value: unknown = obj
 
     for (const key of keys) {
       if (value === null || value === undefined) {
@@ -344,10 +354,13 @@ export class NotificationCondition {
       const arrayMatch = key.match(/^(.+)\[(\d+)\]$/)
       if (arrayMatch) {
         const arrayKey = arrayMatch[1]
-        const index = parseInt(arrayMatch[2])
-        value = value[arrayKey]?.[index]
+        const index = parseInt(arrayMatch[2], 10)
+        const objAsRecord = value as Record<string, unknown>
+        const arrayValue = objAsRecord[arrayKey] as unknown[]
+        value = arrayValue?.[index]
       } else {
-        value = value[key]
+        const objAsRecord = value as Record<string, unknown>
+        value = objAsRecord[key]
       }
     }
 
@@ -381,7 +394,7 @@ export class NotificationCondition {
   /**
    * Format for API response
    */
-  toJSON(): Record<string, any> {
+  toJSON(): NotificationConditionJson {
     return {
       id: this.id,
       name: this.name,
@@ -406,8 +419,8 @@ export class NotificationCondition {
   /**
    * Get condition configuration
    */
-  private getConfig(): Record<string, any> {
-    const config: Record<string, any> = {}
+  private getConfig(): ConditionConfig {
+    const config: Record<string, unknown> = {}
 
     switch (this.type) {
       case ConditionType.FIELD:
@@ -456,6 +469,6 @@ export class NotificationCondition {
         break
     }
 
-    return config
+    return config as ConditionConfig
   }
 }

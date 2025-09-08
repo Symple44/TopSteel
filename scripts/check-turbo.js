@@ -20,7 +20,7 @@ try {
     .filter(([_, config]) => config.persistent)
     .map(([name]) => name)
 
-  const concurrency = parseInt(turboConfig.concurrency || '10')
+  const concurrency = parseInt(turboConfig.concurrency || '10', 10)
   if (persistentTasks.length >= concurrency) {
   } else {
   }

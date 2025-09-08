@@ -59,7 +59,7 @@ export class EmailService {
     const host = this.configService.get<string>('SMTP_HOST')
     const user = this.configService.get<string>('SMTP_USER')
     const pass = this.configService.get<string>('SMTP_PASSWORD')
-    
+
     if (!host || !user || !pass) {
       this.logger.warn('SMTP configuration incomplete - email sending disabled')
       return
@@ -149,11 +149,13 @@ export class EmailService {
         messageId: result.messageId,
       }
     } catch (error) {
-      this.logger.error(`Failed to send email: ${error.message}`, error.stack)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorStack = error instanceof Error ? error.stack : undefined
+      this.logger.error(`Failed to send email: ${errorMessage}`, errorStack)
 
       return {
         success: false,
-        error: error.message,
+        error: errorMessage,
       }
     }
   }

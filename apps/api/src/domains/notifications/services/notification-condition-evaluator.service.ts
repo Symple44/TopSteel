@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { firstValueFrom } from 'rxjs'
 import type { Repository } from 'typeorm'
 import { ConditionType, NotificationCondition } from '../entities/notification-condition.entity'
-import type { RuleExecutionContext } from './notification-rules-engine.service'
+import type { RuleExecutionContext } from '../types/notification-types'
 
 /**
  * Notification condition evaluator service
@@ -130,7 +130,7 @@ export class NotificationConditionEvaluator {
         timeout: 30000,
       }
 
-      let response
+      let response: any
       if (condition.apiMethod === 'POST') {
         response = await firstValueFrom(
           this.httpService.post(condition.apiUrl, condition.apiBody || {}, requestConfig)
@@ -244,7 +244,7 @@ export class NotificationConditionEvaluator {
   /**
    * Extract value from object using dot notation path
    */
-  private extractValueFromPath(obj: any, path: string): any {
+  private extractValueFromPath(obj: unknown, path: string): any {
     const keys = path.split('.')
     let value = obj
 
@@ -261,7 +261,7 @@ export class NotificationConditionEvaluator {
   /**
    * Evaluate a value against condition operator
    */
-  private evaluateValue(value: any, condition: NotificationCondition): boolean {
+  private evaluateValue(value: unknown, condition: NotificationCondition): boolean {
     if (!condition.operator || condition.value === undefined) {
       return !!value
     }

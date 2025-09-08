@@ -14,6 +14,7 @@ import {
   Label,
   Separator,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } from 'lucide-react'
 import { useState } from 'react'
@@ -33,6 +34,7 @@ interface FormData {
 }
 
 export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
+  const ids = useFormFieldIds(['reference', 'description', 'dateDebut', 'dateFin'])
   const [isEditing, setIsEditing] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -40,7 +42,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
   const dateToInputValue = (date: Date | undefined): string => {
     if (!date) return ''
     const dateObj = date instanceof Date ? date : new Date(date)
-    return dateObj.toISOString().split('T')[0]
+    return dateObj?.toISOString().split('T')[0]
   }
 
   const [formData, setFormData] = useState<FormData>({
@@ -53,7 +55,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
   // ✅ Handler simplifié et réutilisable
   const handleInputChange =
     (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const value = e.target.value
+      const value = e?.target?.value
       setFormData((prev) => ({ ...prev, [field]: value }))
 
       // Clear error when user starts typing
@@ -67,14 +69,14 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
     const newErrors: Record<string, string> = {}
 
     // Validation reference
-    if (!formData.reference.trim()) {
+    if (!formData?.reference?.trim()) {
       newErrors.reference = 'Le nom du projet est requis'
     }
 
     // Validation description
-    if (!formData.description.trim()) {
+    if (!formData?.description?.trim()) {
       newErrors.description = 'La description est requise'
-    } else if (formData.description.length < 10) {
+    } else if (formData?.description?.length < 10) {
       newErrors.description = 'La description doit contenir au moins 10 caractères'
     }
 
@@ -139,17 +141,22 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
             <div className="flex gap-2">
               {isEditing ? (
                 <>
-                  <Button variant="outline" size="sm" onClick={handleCancel}>
+                  <Button type="button" variant="outline" size="sm" onClick={handleCancel}>
                     <X className="h-4 w-4 mr-2" />
                     Annuler
                   </Button>
-                  <Button size="sm" onClick={handleSave}>
+                  <Button type="button" size="sm" onClick={handleSave}>
                     <Save className="h-4 w-4 mr-2" />
                     Enregistrer
                   </Button>
                 </>
               ) : (
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Modifier
                 </Button>
@@ -160,11 +167,11 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="reference">Nom du projet</Label>
+              <Label htmlFor={ids.reference}>Nom du projet</Label>
               {isEditing ? (
                 <div className="space-y-1">
                   <Input
-                    id="reference"
+                    id={ids.reference}
                     value={formData.reference}
                     onChange={handleInputChange('reference')}
                     className={`mt-1 ${getInputClassName('reference')}`}
@@ -192,11 +199,11 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor={ids.description}>Description</Label>
             {isEditing ? (
               <div className="space-y-1">
                 <Textarea
-                  id="description"
+                  id={ids.description}
                   value={formData.description}
                   onChange={handleInputChange('description')}
                   className={`mt-1 ${getInputClassName('description')}`}
@@ -210,7 +217,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  {formData.description.length}/500 caractères
+                  {formData?.description?.length}/500 caractères
                 </p>
               </div>
             ) : (
@@ -222,11 +229,11 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="dateDebut">Date de début</Label>
+              <Label htmlFor={ids.dateDebut}>Date de début</Label>
               {isEditing ? (
                 <div className="space-y-1">
                   <Input
-                    id="dateDebut"
+                    id={ids.dateDebut}
                     type="date"
                     value={formData.dateDebut}
                     onChange={handleInputChange('dateDebut')}
@@ -249,11 +256,11 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
               )}
             </div>
             <div>
-              <Label htmlFor="dateFin">Date de fin prévue</Label>
+              <Label htmlFor={ids.dateFin}>Date de fin prévue</Label>
               {isEditing ? (
                 <div className="space-y-1">
                   <Input
-                    id="dateFin"
+                    id={ids.dateFin}
                     type="date"
                     value={formData.dateFin}
                     onChange={handleInputChange('dateFin')}
@@ -337,12 +344,12 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-sm text-muted-foreground mb-1">Montant HT</div>
-              <p className="text-lg font-semibold">{formatCurrency(projet.montantHT || 0)}</p>
+              <p className="text-lg font-semibold">{formatCurrency(projet.montantHT ?? 0)}</p>
             </div>
             <div>
               <div className="text-sm text-muted-foreground mb-1">TVA (20%)</div>
               <p className="text-lg font-semibold">
-                {formatCurrency((projet.montantTTC || 0) - (projet.montantHT || 0))}
+                {formatCurrency((projet.montantTTC ?? 0) - (projet.montantHT ?? 0))}
               </p>
             </div>
           </div>
@@ -352,7 +359,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
           <div>
             <div className="text-sm text-muted-foreground mb-1">Montant TTC</div>
             <p className="text-2xl font-bold text-primary">
-              {formatCurrency(projet.montantTTC || 0)}
+              {formatCurrency(projet.montantTTC ?? 0)}
             </p>
           </div>
 
@@ -363,7 +370,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
                 <span className="font-medium">Progression des paiements</span>
                 <span className="font-semibold">
                   {Math.round(
-                    (((projet as { montantPaye?: number }).montantPaye || 0) / projet.montantTTC) *
+                    (((projet as { montantPaye?: number }).montantPaye ?? 0) / projet.montantTTC) *
                       100
                   )}
                   %
@@ -373,19 +380,19 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
                 <div
                   className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500 ease-in-out"
                   style={{
-                    width: `${Math.min((((projet as { montantPaye?: number }).montantPaye || 0) / projet.montantTTC) * 100, 100)}%`,
+                    width: `${Math.min((((projet as { montantPaye?: number }).montantPaye ?? 0) / projet.montantTTC) * 100, 100)}%`,
                   }}
                 />
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>
                   <span className="font-medium">Payé:</span>{' '}
-                  {formatCurrency((projet as { montantPaye?: number }).montantPaye || 0)}
+                  {formatCurrency((projet as { montantPaye?: number }).montantPaye ?? 0)}
                 </span>
                 <span>
                   <span className="font-medium">Restant:</span>{' '}
                   {formatCurrency(
-                    projet.montantTTC - ((projet as { montantPaye?: number }).montantPaye || 0)
+                    projet.montantTTC - ((projet as { montantPaye?: number }).montantPaye ?? 0)
                   )}
                 </span>
               </div>

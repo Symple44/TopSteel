@@ -203,7 +203,7 @@ export class MenuSyncService {
         'Configuration Système Auto-Sync',
         'Configuration de menu synchronisée automatiquement depuis le sidebar'
       )
-      systemConfig.createdBy = null // Service système, pas d'utilisateur spécifique
+      systemConfig.createdBy = undefined // Service système, pas d'utilisateur spécifique
       systemConfig = await this.configRepository.save(systemConfig)
       this.logger.log(`Configuration système créée: ${systemConfig.id}`)
     }
@@ -253,7 +253,7 @@ export class MenuSyncService {
       }
 
       menuItem.orderIndex = orderIndex
-      menuItem.createdBy = null // Service système, pas d'utilisateur spécifique
+      menuItem.createdBy = undefined // Service système, pas d'utilisateur spécifique
 
       // Sauvegarder l'item
       const savedItem = await this.itemRepository.save(menuItem)

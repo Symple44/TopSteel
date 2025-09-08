@@ -13,6 +13,7 @@ import type { Request } from 'express'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
+import type { Site } from '../../features/societes/entities/site.entity'
 import type { LicenseManagementService } from '../../features/societes/services/license-management.service'
 import type { SocieteUsersService } from '../../features/societes/services/societe-users.service'
 import type { SocietesService } from '../../features/societes/services/societes.service'
@@ -49,7 +50,10 @@ export class AuthService {
     private readonly _userSessionRepository: Repository<UserSession>
   ) {}
 
-  async validateUser(emailOrAcronym: string, password: string): Promise<Omit<User, 'password'>> {
+  async validateUser(
+    emailOrAcronym: string,
+    password: string
+  ): Promise<Omit<User, 'password' | 'hashPassword'>> {
     const user = await this.usersService.findByEmailOrAcronym(emailOrAcronym)
 
     // Message d'erreur générique pour éviter de révéler si l'utilisateur existe
@@ -67,11 +71,11 @@ export class AuthService {
     }
 
     const { password: _, ...result } = user
-    return result as any
+    return result
   }
 
   async login(loginDto: LoginDto, request?: Request) {
-    let user: Omit<User, 'password'>
+    let user: Omit<User, 'password' | 'hashPassword'>
     user = await this.validateUser(loginDto.login, loginDto.password)
 
     // Vérifier si l'utilisateur a MFA activé
@@ -146,7 +150,7 @@ export class AuthService {
       isDefault: false, // SUPER_ADMIN n'a pas de société par défaut
       permissions: [], // SUPER_ADMIN a toutes les permissions
       sites:
-        societe.sites?.map((site) => ({
+        societe.sites?.map((site: Site) => ({
           id: site.id,
           nom: site.nom,
           code: site.code,
@@ -278,14 +282,14 @@ export class AuthService {
     // Extraire les informations de la requête pour le tracking
     let ipAddress = '0.0.0.0'
     let userAgent = 'Unknown'
-    let location: Record<string, unknown> | null = null
-    let deviceInfo: Record<string, unknown> | null = null
+    let location: Awaited<ReturnType<typeof this.geolocationService.getLocationFromIP>> = null
+    let deviceInfo: ReturnType<typeof this.geolocationService.parseUserAgent> | null = null
 
     if (request) {
-      ipAddress = this.geolocationService.extractRealIP(request as any)
+      ipAddress = this.geolocationService.extractRealIP(this.normalizeRequest(request))
       userAgent = request.headers['user-agent'] || 'Unknown'
-      location = (await this.geolocationService.getLocationFromIP(ipAddress)) as any
-      deviceInfo = this.geolocationService.parseUserAgent(userAgent) as any
+      location = await this.geolocationService.getLocationFromIP(ipAddress)
+      deviceInfo = this.geolocationService.parseUserAgent(userAgent)
     }
 
     // Créer la session en base de données avec les métadonnées de société
@@ -308,11 +312,11 @@ export class AuthService {
     }
 
     if (location) {
-      dbSession.location = location as any
+      dbSession.location = location
     }
 
     if (deviceInfo) {
-      dbSession.deviceInfo = deviceInfo as any
+      dbSession.deviceInfo = deviceInfo
     }
 
     await this._userSessionRepository.save(dbSession)
@@ -353,7 +357,7 @@ export class AuthService {
   /**
    * Compléter la connexion après validation MFA ou directement si pas de MFA
    */
-  async completeLogin(user: Omit<User, 'password'>, request?: Request) {
+  async completeLogin(user: Omit<User, 'password' | 'hashPassword'>, request?: Request) {
     // Générer un ID de session unique
     const sessionId = uuidv4()
 
@@ -374,16 +378,16 @@ export class AuthService {
     // Extraire les informations de la requête pour le tracking
     let ipAddress = '0.0.0.0'
     let userAgent = 'Unknown'
-    let location: Record<string, unknown> | null = null
-    let deviceInfo: Record<string, unknown> | null = null
+    let location: Awaited<ReturnType<typeof this.geolocationService.getLocationFromIP>> = null
+    let deviceInfo: ReturnType<typeof this.geolocationService.parseUserAgent> | null = null
 
     if (request) {
-      ipAddress = this.geolocationService.extractRealIP(request as any)
+      ipAddress = this.geolocationService.extractRealIP(this.normalizeRequest(request))
       userAgent = request.headers['user-agent'] || 'Unknown'
 
       // Obtenir la géolocalisation et les infos de l'appareil
-      location = (await this.geolocationService.getLocationFromIP(ipAddress)) as any
-      deviceInfo = this.geolocationService.parseUserAgent(userAgent) as any
+      location = await this.geolocationService.getLocationFromIP(ipAddress)
+      deviceInfo = this.geolocationService.parseUserAgent(userAgent)
     }
 
     // Créer la session en base de données
@@ -397,11 +401,11 @@ export class AuthService {
     )
 
     if (location) {
-      dbSession.location = location as any
+      dbSession.location = location
     }
 
     if (deviceInfo) {
-      dbSession.deviceInfo = deviceInfo as any
+      dbSession.deviceInfo = deviceInfo
     }
 
     await this._userSessionRepository.save(dbSession)
@@ -411,15 +415,15 @@ export class AuthService {
       sessionId,
       userId: user.id,
       email: user.email,
-      firstName: (user as any).firstName || user.prenom || '',
-      lastName: (user as any).lastName || user.nom || '',
+      firstName: user.prenom || '',
+      lastName: user.nom || '',
       role: user.role,
       loginTime: new Date().toISOString(),
       lastActivity: new Date().toISOString(),
       ipAddress,
       userAgent,
-      deviceInfo: deviceInfo as any,
-      location: location as any,
+      deviceInfo: deviceInfo || undefined,
+      location: location || undefined,
       isIdle: false,
       warningCount: 0,
     })
@@ -433,7 +437,7 @@ export class AuthService {
 
     const suspiciousActivity = await this.geolocationService.detectSuspiciousActivity(
       user.id,
-      location: location as any,
+      location,
       previousSessions
     )
 
@@ -616,7 +620,8 @@ export class AuthService {
       throw new BadRequestException('Current password is incorrect')
     }
 
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10)
+    const saltRounds = process.env.NODE_ENV === 'production' ? 12 : 10
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds)
     await this.usersService.update(userId, { password: hashedNewPassword })
   }
 
@@ -931,7 +936,7 @@ export class AuthService {
       const mfaMethods = await this.mfaService.getUserMFAMethods(userId)
 
       for (const method of mfaMethods) {
-        await this.mfaService.disableMFA(userId, method.type as any)
+        await this.mfaService.disableMFA(userId, method.type as 'totp' | 'webauthn' | 'sms')
       }
 
       return {
@@ -1032,6 +1037,34 @@ export class AuthService {
         success: false,
         message: 'Erreur lors de la récupération de la société par défaut',
       }
+    }
+  }
+
+  /**
+   * Normalize Express Request to format expected by GeolocationService
+   */
+  private normalizeRequest(request: Request): {
+    headers: Record<string, string | undefined>
+    connection?: { remoteAddress?: string }
+    socket?: { remoteAddress?: string }
+    ip?: string
+  } {
+    const normalizedHeaders: Record<string, string | undefined> = {}
+
+    // Normalize headers - convert string[] to string by taking first element
+    Object.entries(request.headers).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        normalizedHeaders[key] = value[0]
+      } else {
+        normalizedHeaders[key] = value
+      }
+    })
+
+    return {
+      headers: normalizedHeaders,
+      connection: request.connection,
+      socket: request.socket,
+      ip: request.ip,
     }
   }
 }

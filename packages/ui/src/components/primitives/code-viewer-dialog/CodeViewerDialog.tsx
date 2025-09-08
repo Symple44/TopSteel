@@ -2,8 +2,8 @@
 
 import { CheckCircle, Copy, FileText, Loader2, X } from 'lucide-react'
 import type React from 'react'
-import { useEffect, useState } from 'react'
-import { Badge } from '../../data-display'
+import { useCallback, useEffect, useState } from 'react'
+import { Badge } from '../../data-display/badge'
 import { Button } from '../button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../dialog'
 
@@ -95,7 +95,7 @@ export function CodeViewerDialog({
   const [selectedLines, setSelectedLines] = useState<Set<number>>(new Set())
   const [lastSelectedLine, setLastSelectedLine] = useState<number | null>(null)
 
-  const loadDetails = async () => {
+  const loadDetails = useCallback(async () => {
     if (!onLoadDetails) return
 
     setLoading(true)
@@ -109,7 +109,7 @@ export function CodeViewerDialog({
     } finally {
       setLoading(false)
     }
-  }
+  }, [onLoadDetails, t])
 
   const handleCopyToClipboard = async () => {
     if (!details?.content) return
@@ -168,10 +168,10 @@ export function CodeViewerDialog({
     }
   }
 
-  const clearSelection = () => {
+  const clearSelection = useCallback(() => {
     setSelectedLines(new Set())
     setLastSelectedLine(null)
-  }
+  }, [])
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 B'
@@ -228,7 +228,13 @@ export function CodeViewerDialog({
                 <FileText className="w-12 h-12 mx-auto mb-4 text-red-500" />
                 <p className="text-red-600 font-medium mb-2">{t('error')}</p>
                 <p className="text-muted-foreground">{error}</p>
-                <Button onClick={loadDetails} variant="outline" size="sm" className="mt-4">
+                <Button
+                  type="button"
+                  onClick={loadDetails}
+                  variant="outline"
+                  size="sm"
+                  className="mt-4"
+                >
                   {t('retry')}
                 </Button>
               </div>
@@ -259,6 +265,7 @@ export function CodeViewerDialog({
                     {selectedLines.size > 0 && (
                       <>
                         <Button
+                          type="button"
                           onClick={handleCopySelectedLines}
                           variant="outline"
                           size="sm"
@@ -272,6 +279,7 @@ export function CodeViewerDialog({
                           <span>{copied ? t('copied') : t('copySelection')}</span>
                         </Button>
                         <Button
+                          type="button"
                           onClick={clearSelection}
                           variant="outline"
                           size="sm"
@@ -283,6 +291,7 @@ export function CodeViewerDialog({
                       </>
                     )}
                     <Button
+                      type="button"
                       onClick={handleCopyToClipboard}
                       variant="outline"
                       size="sm"
@@ -360,7 +369,7 @@ export function CodeViewerDialog({
                                 onClick={(e) => handleLineClick(lineNumber, e)}
                                 onKeyDown={(e) =>
                                   (e.key === 'Enter' || e.key === ' ') &&
-                                  handleLineClick(lineNumber, e as any)
+                                  handleLineClick(lineNumber, e as unknown)
                                 }
                                 tabIndex={0}
                                 aria-label={`Toggle selection for line ${lineNumber}`}

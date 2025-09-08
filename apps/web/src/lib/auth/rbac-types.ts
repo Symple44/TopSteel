@@ -112,7 +112,7 @@ export interface MFAMethod {
   name: string
   isActive: boolean
   isPrimary: boolean
-  metadata?: Record<string, any> // Config spécifique au type
+  metadata?: Record<string, unknown> // Config spécifique au type
   createdAt: string
   lastUsed?: string
 }
@@ -142,7 +142,7 @@ export interface AccessPolicy {
 export interface AccessCondition {
   type: 'time' | 'ip' | 'device' | 'custom'
   rule: string
-  params?: Record<string, any>
+  params?: Record<string, unknown>
 }
 
 // Audit trail
@@ -153,7 +153,7 @@ export interface AuditLog {
   action: string // Ex: "USER_LOGIN", "PERMISSION_GRANTED", "DATA_EXPORT"
   resource: string
   resourceId?: string
-  details: Record<string, any>
+  details: Record<string, unknown>
   ipAddress: string
   userAgent: string
   timestamp: string

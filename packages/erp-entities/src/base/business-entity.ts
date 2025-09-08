@@ -7,7 +7,7 @@ export abstract class BusinessEntity extends TenantEntity {
   /**
    * Métadonnées métier extensibles
    */
-  businessMetadata?: Record<string, any>
+  businessMetadata?: Record<string, unknown>
 
   /**
    * Règles de validation métier

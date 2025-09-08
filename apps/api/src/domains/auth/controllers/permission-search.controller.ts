@@ -437,7 +437,7 @@ export class PermissionSearchController {
   /**
    * Generate cache key for search
    */
-  private generateCacheKey(prefix: string, dto: any): string {
+  private generateCacheKey(prefix: string, dto: unknown): string {
     const hash = require('node:crypto')
       .createHash('sha256')
       .update(JSON.stringify(dto))

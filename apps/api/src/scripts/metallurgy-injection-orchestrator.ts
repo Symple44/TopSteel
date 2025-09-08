@@ -55,7 +55,7 @@ export class CleanMetallurgyInjector {
       cleanupExisting: process.env.CLEANUP_EXISTING === 'true',
       validateReferences: process.env.VALIDATE_REFERENCES !== 'false',
       skipOnError: process.env.SKIP_ON_ERROR === 'true',
-      batchSize: parseInt(process.env.BATCH_SIZE || '50'),
+      batchSize: parseInt(process.env.BATCH_SIZE || '50', 10),
       logLevel: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
     }
 
@@ -70,7 +70,7 @@ export class CleanMetallurgyInjector {
     this.dataSource = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
+      port: parseInt(process.env.DB_PORT || '5432', 10),
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: dbName,
@@ -83,7 +83,7 @@ export class CleanMetallurgyInjector {
     this.authDataSource = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
+      port: parseInt(process.env.DB_PORT || '5432', 10),
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: authDbName,

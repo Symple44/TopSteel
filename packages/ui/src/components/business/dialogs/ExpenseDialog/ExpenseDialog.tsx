@@ -1,17 +1,31 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+
 // Expense validation schema
 const expenseSchema = z.object({
   // Basic Information
@@ -28,7 +42,7 @@ const expenseSchema = z.object({
     'professional_services',
     'insurance',
     'taxes',
-    'other'
+    'other',
   ]),
   subcategory: z.string().optional(),
   // Financial Information
@@ -48,7 +62,9 @@ const expenseSchema = z.object({
   // Project/Cost Center
   projectId: z.string().optional(),
   costCenter: z.string().optional(),
-  department: z.enum(['production', 'sales', 'administration', 'logistics', 'maintenance', 'other']).optional(),
+  department: z
+    .enum(['production', 'sales', 'administration', 'logistics', 'maintenance', 'other'])
+    .optional(),
   // Approval and Documentation
   receiptUrl: z.string().url('URL invalide').optional().or(z.literal('')),
   notes: z.string().optional(),
@@ -73,15 +89,10 @@ interface ExpenseDialogProps {
   onSubmit?: (data: ExpenseFormData) => void | Promise<void>
   defaultValues?: Partial<ExpenseFormData>
 }
-export function ExpenseDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit,
-  defaultValues 
-}: ExpenseDialogProps) {
+export function ExpenseDialog({ open, onOpenChange, onSubmit, defaultValues }: ExpenseDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<ExpenseFormData>({
+  const form = useForm({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
       currency: 'EUR',
@@ -145,7 +156,7 @@ export function ExpenseDialog({
       professional_services: ['Conseil', 'Audit', 'Formation', 'Juridique'],
       insurance: ['RC', 'Matériel', 'Transport', 'Personnel'],
       taxes: ['Taxes locales', 'Redevances', 'Contributions'],
-      other: ['Divers', 'Exceptionnel']
+      other: ['Divers', 'Exceptionnel'],
     }
     return subcategories[category] || []
   }
@@ -202,7 +213,9 @@ export function ExpenseDialog({
                             <SelectItem value="utilities">Services publics</SelectItem>
                             <SelectItem value="office">Bureau</SelectItem>
                             <SelectItem value="marketing">Marketing</SelectItem>
-                            <SelectItem value="professional_services">Services professionnels</SelectItem>
+                            <SelectItem value="professional_services">
+                              Services professionnels
+                            </SelectItem>
                             <SelectItem value="insurance">Assurance</SelectItem>
                             <SelectItem value="taxes">Taxes</SelectItem>
                             <SelectItem value="other">Autre</SelectItem>
@@ -227,7 +240,9 @@ export function ExpenseDialog({
                             </FormControl>
                             <SelectContent>
                               {getSubcategoriesByCategory(watchCategory).map((sub) => (
-                                <SelectItem key={sub} value={sub.toLowerCase()}>{sub}</SelectItem>
+                                <SelectItem key={sub} value={sub.toLowerCase()}>
+                                  {sub}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -243,10 +258,10 @@ export function ExpenseDialog({
                       <FormItem className="md:col-span-2">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Textarea 
+                          <Textarea
                             placeholder="Détails de la dépense..."
                             className="min-h-[80px]"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -388,11 +403,7 @@ export function ExpenseDialog({
                       <FormItem className="md:col-span-3">
                         <FormLabel>URL du reçu/justificatif</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="url" 
-                            placeholder="https://..." 
-                            {...field} 
-                          />
+                          <Input type="url" placeholder="https://..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -520,7 +531,9 @@ export function ExpenseDialog({
                 </CardContent>
               </Card>
               {/* Steel Industry Specific */}
-              {(watchCategory === 'materials' || watchCategory === 'equipment' || watchCategory === 'maintenance') && (
+              {(watchCategory === 'materials' ||
+                watchCategory === 'equipment' ||
+                watchCategory === 'maintenance') && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Spécifique sidérurgie</CardTitle>
@@ -609,10 +622,7 @@ export function ExpenseDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Nécessite une validation
@@ -626,14 +636,9 @@ export function ExpenseDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Dépense urgente
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Dépense urgente</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -669,14 +674,9 @@ export function ExpenseDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Dépense déductible
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Dépense déductible</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -686,14 +686,9 @@ export function ExpenseDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Dépense récurrente
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Dépense récurrente</FormLabel>
                         </FormItem>
                       )}
                     />

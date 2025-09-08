@@ -4,6 +4,7 @@ import { Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Job } from 'bull'
 import type { Repository } from 'typeorm'
+import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import type { MarketplaceSyncService } from '../../../domains/marketplace/services/marketplace-sync.service'
 
 interface SyncArticleJob {
@@ -74,7 +75,10 @@ export class MarketplaceSyncProcessor {
 
       return { success: true, articleId, action }
     } catch (error) {
-      this.logger.error(`Failed to sync article ${articleId}: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to sync article ${articleId}: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       throw error
     }
   }
@@ -84,7 +88,7 @@ export class MarketplaceSyncProcessor {
    */
   @Process('sync-stock')
   async handleStockSync(job: Job<SyncStockJob>) {
-    const { articleId, tenantId, newStock } = job.data
+    const { articleId, tenantId: _tenantId, newStock } = job.data
 
     this.logger.log(`Updating stock for article ${articleId}: ${newStock}`)
 
@@ -113,8 +117,8 @@ export class MarketplaceSyncProcessor {
       return { success: true, articleId, newStock }
     } catch (error) {
       this.logger.error(
-        `Failed to update stock for article ${articleId}: ${error.message}`,
-        error.stack
+        `Failed to update stock for article ${articleId}: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
       )
       throw error
     }
@@ -148,7 +152,10 @@ export class MarketplaceSyncProcessor {
 
       return { success: true, orderId: marketplaceOrderId, action }
     } catch (error) {
-      this.logger.error(`Failed to sync order ${marketplaceOrderId}: ${error.message}`, error.stack)
+      this.logger.error(
+        `Failed to sync order ${marketplaceOrderId}: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       throw error
     }
   }
@@ -157,7 +164,7 @@ export class MarketplaceSyncProcessor {
    * Process full synchronization jobs
    */
   @Process('full-sync')
-  async handleFullSync(job: Job<FullSyncJob>): Promise<any> {
+  async handleFullSync(job: Job<FullSyncJob>): Promise<unknown> {
     const { tenantId, timestamp } = job.data
 
     this.logger.log(`Starting full sync for tenant ${tenantId} at ${timestamp}`)
@@ -174,7 +181,10 @@ export class MarketplaceSyncProcessor {
 
       return result
     } catch (error) {
-      this.logger.error(`Full sync failed for tenant ${tenantId}: ${error.message}`, error.stack)
+      this.logger.error(
+        `Full sync failed for tenant ${tenantId}: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
       throw error
     }
   }
@@ -183,7 +193,7 @@ export class MarketplaceSyncProcessor {
    * Process bulk operations
    */
   @Process('bulk-update')
-  async handleBulkUpdate(job: Job<any>) {
+  async handleBulkUpdate(job: Job<unknown>) {
     const { operations, tenantId } = job.data
 
     this.logger.log(`Processing ${operations.length} bulk operations for tenant ${tenantId}`)
@@ -217,7 +227,7 @@ export class MarketplaceSyncProcessor {
           id: operation.productId,
           type: operation.type,
           success: false,
-          error: error.message,
+          error: getErrorMessage(error),
         })
       }
 

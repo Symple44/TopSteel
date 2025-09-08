@@ -1,6 +1,5 @@
 'use client'
 
-import { CompanyLogo } from '@erp/ui/business'
 import { useCompanyInfo } from '@/hooks/use-company-info'
 
 interface CompanyLogoWrapperProps {
@@ -12,17 +11,17 @@ interface CompanyLogoWrapperProps {
 }
 
 export function CompanyLogoWrapper(props: CompanyLogoWrapperProps) {
-  const { companyInfo, loading } = useCompanyInfo()
+  const { companyInfo } = useCompanyInfo()
 
   return (
-    <CompanyLogo
-      size={props.size}
-      className={props.className}
-      showName={props.showCompanyName}
-      fallbackIcon={props.fallbackIcon}
-      companyInfo={companyInfo || undefined}
-      loading={loading}
-    />
+    <div className={`flex items-center gap-2 ${props.className || ''}`}>
+      <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
+        {props.fallbackIcon ? '🏢' : companyInfo?.name?.[0] || 'C'}
+      </div>
+      {props.showCompanyName && (
+        <span className="font-semibold">{companyInfo?.name || 'Company'}</span>
+      )}
+    </div>
   )
 }
 

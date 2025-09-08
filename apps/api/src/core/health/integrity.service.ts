@@ -87,7 +87,7 @@ export class IntegrityService {
         WHERE dernier_login > NOW() - INTERVAL '30 minutes'
         AND actif = true
       `)
-      activeFromDB = Number.parseInt(result[0]?.count ?? '0')
+      activeFromDB = Number.parseInt(result[0]?.count ?? '0', 10)
       this.logger.debug(`Utilisateurs actifs depuis BDD: ${activeFromDB}`)
     } catch (error) {
       this.logger.warn('Erreur lors du comptage BDD', error)
@@ -117,7 +117,7 @@ export class IntegrityService {
         FROM pg_stat_activity 
         WHERE state = 'active'
       `)
-      return Number.parseInt(result[0]?.connections ?? '0')
+      return Number.parseInt(result[0]?.connections ?? '0', 10)
     } catch (_error) {
       this.logger.error('Erreur lors de la récupération du nombre de clients', _error)
       return 0
@@ -127,7 +127,7 @@ export class IntegrityService {
   private async getProjectCount() {
     try {
       const result = await this._dataSource.query('SELECT COUNT(*) as count FROM projets')
-      return Number.parseInt(result[0]?.count ?? '0')
+      return Number.parseInt(result[0]?.count ?? '0', 10)
     } catch (_error) {
       return 0
     }
@@ -136,7 +136,7 @@ export class IntegrityService {
   private async getClientCount() {
     try {
       const result = await this._dataSource.query('SELECT COUNT(*) as count FROM clients')
-      return Number.parseInt(result[0]?.count ?? '0')
+      return Number.parseInt(result[0]?.count ?? '0', 10)
     } catch (_error) {
       return 0
     }

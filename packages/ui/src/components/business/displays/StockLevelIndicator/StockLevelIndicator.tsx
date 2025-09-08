@@ -1,8 +1,8 @@
 'use client'
-import { AlertTriangle, Package, CheckCircle, XCircle } from 'lucide-react'
-import { Badge } from '../../../data-display/badge'
+import { AlertTriangle, CheckCircle, Package, XCircle } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
-export type StockStatus = 'critical' | 'low' | 'normal' | 'high' | 'overstock'
+import { Badge } from '../../../data-display/badge'
+export type StockLevel = 'critical' | 'low' | 'normal' | 'high' | 'overstock'
 interface StockLevelIndicatorProps {
   current: number
   minimum: number
@@ -27,7 +27,7 @@ export function StockLevelIndicator({
   size = 'md',
   className,
 }: StockLevelIndicatorProps) {
-  const getStockStatus = (): StockStatus => {
+  const getStockLevel = (): StockLevel => {
     const reorder = reorderPoint || minimum * 1.2
     if (current <= 0) return 'critical'
     if (current <= minimum) return 'critical'
@@ -36,7 +36,7 @@ export function StockLevelIndicator({
     if (current >= maximum * 0.8) return 'high'
     return 'normal'
   }
-  const getStatusConfig = (status: StockStatus) => {
+  const getStatusConfig = (status: StockLevel) => {
     switch (status) {
       case 'critical':
         return {
@@ -119,7 +119,7 @@ export function StockLevelIndicator({
         }
     }
   }
-  const status = getStockStatus()
+  const status = getStockLevel()
   const config = getStatusConfig(status)
   const sizeConfig = getSizeClasses()
   const percentage = Math.min((current / maximum) * 100, 100)
@@ -129,7 +129,7 @@ export function StockLevelIndicator({
   }
   if (variant === 'badge') {
     return (
-      <Badge 
+      <Badge
         className={cn(
           'inline-flex items-center gap-1.5 font-medium',
           config.badgeColor,
@@ -155,11 +155,7 @@ export function StockLevelIndicator({
               {formatValue(current)} {unit}
             </div>
           )}
-          {showLabel && (
-            <div className={cn('text-xs', config.color)}>
-              {config.label}
-            </div>
-          )}
+          {showLabel && <div className={cn('text-xs', config.color)}>{config.label}</div>}
         </div>
       </div>
     )
@@ -169,12 +165,8 @@ export function StockLevelIndicator({
       <div className={cn('space-y-2', className)}>
         {showLabel && (
           <div className="flex justify-between items-center">
-            <span className={cn('font-medium', sizeConfig.text)}>
-              Niveau de stock
-            </span>
-            <span className={cn('font-medium', config.color, sizeConfig.text)}>
-              {config.label}
-            </span>
+            <span className={cn('font-medium', sizeConfig.text)}>Niveau de stock</span>
+            <span className={cn('font-medium', config.color, sizeConfig.text)}>{config.label}</span>
           </div>
         )}
         <div className="relative">
@@ -185,13 +177,13 @@ export function StockLevelIndicator({
             />
           </div>
           {/* Minimum line */}
-          <div 
+          <div
             className="absolute top-0 h-3 w-0.5 bg-gray-400"
             style={{ left: `${(minimum / maximum) * 100}%` }}
           />
           {/* Reorder point line */}
           {reorderPoint && (
-            <div 
+            <div
               className="absolute top-0 h-3 w-0.5 bg-yellow-500"
               style={{ left: `${(reorderPoint / maximum) * 100}%` }}
             />
@@ -199,8 +191,12 @@ export function StockLevelIndicator({
         </div>
         {showValues && (
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{formatValue(current)} {unit}</span>
-            <span>Max: {formatValue(maximum)} {unit}</span>
+            <span>
+              {formatValue(current)} {unit}
+            </span>
+            <span>
+              Max: {formatValue(maximum)} {unit}
+            </span>
           </div>
         )}
       </div>
@@ -214,27 +210,33 @@ export function StockLevelIndicator({
             <Icon className={cn(sizeConfig.icon, config.color)} />
             <span className="font-medium">Stock actuel</span>
           </div>
-          <Badge className={config.badgeColor}>
-            {config.label}
-          </Badge>
+          <Badge className={config.badgeColor}>{config.label}</Badge>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Quantité actuelle:</span>
-            <span className="font-medium">{formatValue(current)} {unit}</span>
+            <span className="font-medium">
+              {formatValue(current)} {unit}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Stock minimum:</span>
-            <span>{formatValue(minimum)} {unit}</span>
+            <span>
+              {formatValue(minimum)} {unit}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Stock maximum:</span>
-            <span>{formatValue(maximum)} {unit}</span>
+            <span>
+              {formatValue(maximum)} {unit}
+            </span>
           </div>
           {reorderPoint && (
             <div className="flex justify-between text-sm">
               <span>Point de commande:</span>
-              <span>{formatValue(reorderPoint)} {unit}</span>
+              <span>
+                {formatValue(reorderPoint)} {unit}
+              </span>
             </div>
           )}
         </div>
@@ -287,17 +289,13 @@ export function StockLevelIndicator({
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <Icon className={cn(sizeConfig.icon, config.color)} />
           {showValues && (
-            <span className={cn('font-bold', sizeConfig.text)}>
-              {formatValue(current)}
-            </span>
+            <span className={cn('font-bold', sizeConfig.text)}>{formatValue(current)}</span>
           )}
         </div>
       </div>
       {showLabel && (
         <div className="text-center">
-          <div className={cn('font-medium', config.color, sizeConfig.text)}>
-            {config.label}
-          </div>
+          <div className={cn('font-medium', config.color, sizeConfig.text)}>{config.label}</div>
           {showValues && (
             <div className="text-xs text-muted-foreground">
               {unit} • {percentage.toFixed(0)}%

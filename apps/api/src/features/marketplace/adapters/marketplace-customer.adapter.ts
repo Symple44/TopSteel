@@ -189,13 +189,15 @@ export class MarketplaceCustomerAdapter {
 
       if (customer.erpPartnerId) {
         // Partenaire existant - mettre à jour
-        partner = await this.partnerRepository.findOne({
+        const existingPartner = await this.partnerRepository.findOne({
           where: { id: customer.erpPartnerId },
         })
 
-        if (!partner) {
+        if (!existingPartner) {
           throw new NotFoundException(`Partner ${customer.erpPartnerId} not found`)
         }
+
+        partner = existingPartner
 
         if (syncData.partnerData) {
           Object.assign(partner, syncData.partnerData)
@@ -347,7 +349,7 @@ export class MarketplaceCustomerAdapter {
         commentaires: 'Client créé automatiquement depuis le marketplace',
         tagsPersonnalises: ['marketplace', 'client-web'],
       },
-    } as any)
+    } as unknown)
 
     return (await this.partnerRepository.save(partner)) as unknown as Partner
   }

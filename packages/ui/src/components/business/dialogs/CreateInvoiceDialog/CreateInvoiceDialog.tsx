@@ -1,25 +1,9 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Calculator, FileText, Package, Plus, Trash2, User } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Plus, Trash2, Calculator, FileText, User, Calendar, Package } from 'lucide-react'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-  Badge,
-  Label
-} from '../../../primitives'
 import {
   Form,
   FormControl,
@@ -27,22 +11,41 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '../../../forms'
+  FormMessage,
+} from '../../../forms/form/form'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
+import { Textarea } from '../../../primitives/textarea/Textarea'
+
 // Invoice line item schema
 const invoiceLineSchema = z.object({
   description: z.string().min(1, 'La description est obligatoire'),
   quantity: z.number().positive('La quantité doit être positive'),
   unitPrice: z.number().positive('Le prix unitaire doit être positif'),
-  taxRate: z.number().min(0, 'Le taux de TVA doit être positif ou nul').max(100, 'Le taux de TVA ne peut pas dépasser 100%'),
-  discount: z.number().min(0, 'La remise doit être positive ou nulle').max(100, 'La remise ne peut pas dépasser 100%').default(0)
+  taxRate: z
+    .number()
+    .min(0, 'Le taux de TVA doit être positif ou nul')
+    .max(100, 'Le taux de TVA ne peut pas dépasser 100%'),
+  discount: z
+    .number()
+    .min(0, 'La remise doit être positive ou nulle')
+    .max(100, 'La remise ne peut pas dépasser 100%')
+    .default(0),
 })
 // Main invoice schema
 const invoiceSchema = z.object({
   invoiceNumber: z.string().min(1, 'Le numéro de facture est obligatoire'),
   clientId: z.string().min(1, 'Le client est obligatoire'),
-  issueDate: z.string().min(1, 'La date d\'émission est obligatoire'),
-  dueDate: z.string().min(1, 'La date d\'échéance est obligatoire'),
+  issueDate: z.string().min(1, "La date d'émission est obligatoire"),
+  dueDate: z.string().min(1, "La date d'échéance est obligatoire"),
   paymentTerms: z.string().min(1, 'Les conditions de paiement sont obligatoires'),
   paymentMethod: z.string().optional(),
   projectId: z.string().optional(),
@@ -53,7 +56,7 @@ const invoiceSchema = z.object({
   language: z.string().default('fr'),
   includeTransport: z.boolean().default(false),
   transportCost: z.number().min(0).optional(),
-  globalDiscount: z.number().min(0).max(100).default(0)
+  globalDiscount: z.number().min(0).max(100).default(0),
 })
 type InvoiceFormData = z.infer<typeof invoiceSchema>
 interface Client {
@@ -78,51 +81,57 @@ interface CreateInvoiceDialogProps {
   defaultClientId?: string
   defaultProjectId?: string
 }
-export function CreateInvoiceDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export function CreateInvoiceDialog({
+  open,
+  onOpenChange,
+  onSubmit,
   clients = [],
   projects = [],
   defaultClientId,
-  defaultProjectId
+  defaultProjectId,
 }: CreateInvoiceDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // Mock data for demonstration
-  const mockClients: Client[] = useMemo(() => [
-    {
-      id: '1',
-      name: 'Société Industrielle ABC',
-      email: 'contact@abc-industrie.fr',
-      address: '123 rue de l\'Industrie, 75001 Paris',
-      vatNumber: 'FR12345678901'
-    },
-    {
-      id: '2',
-      name: 'Construction XYZ',
-      email: 'admin@construction-xyz.fr',
-      address: '456 avenue des Bâtisseurs, 69000 Lyon',
-      vatNumber: 'FR98765432109'
-    }
-  ], [])
-  const mockProjects: Project[] = useMemo(() => [
-    {
-      id: '1',
-      name: 'Rénovation usine',
-      reference: 'PRJ-2024-001',
-      clientId: '1'
-    },
-    {
-      id: '2',
-      name: 'Construction hangar',
-      reference: 'PRJ-2024-002',
-      clientId: '2'
-    }
-  ], [])
+  const mockClients: Client[] = useMemo(
+    () => [
+      {
+        id: '1',
+        name: 'Société Industrielle ABC',
+        email: 'contact@abc-industrie.fr',
+        address: "123 rue de l'Industrie, 75001 Paris",
+        vatNumber: 'FR12345678901',
+      },
+      {
+        id: '2',
+        name: 'Construction XYZ',
+        email: 'admin@construction-xyz.fr',
+        address: '456 avenue des Bâtisseurs, 69000 Lyon',
+        vatNumber: 'FR98765432109',
+      },
+    ],
+    []
+  )
+  const mockProjects: Project[] = useMemo(
+    () => [
+      {
+        id: '1',
+        name: 'Rénovation usine',
+        reference: 'PRJ-2024-001',
+        clientId: '1',
+      },
+      {
+        id: '2',
+        name: 'Construction hangar',
+        reference: 'PRJ-2024-002',
+        clientId: '2',
+      },
+    ],
+    []
+  )
   const availableClients = clients.length > 0 ? clients : mockClients
   const availableProjects = projects.length > 0 ? projects : mockProjects
-  const form = useForm<InvoiceFormData>({
+  const form = useForm({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
       invoiceNumber: '',
@@ -132,25 +141,27 @@ export function CreateInvoiceDialog({
       paymentTerms: '30',
       paymentMethod: '',
       projectId: defaultProjectId || '',
-      lines: [{
-        description: '',
-        quantity: 1,
-        unitPrice: 0,
-        taxRate: 20,
-        discount: 0
-      }],
+      lines: [
+        {
+          description: '',
+          quantity: 1,
+          unitPrice: 0,
+          taxRate: 20,
+          discount: 0,
+        },
+      ],
       notes: '',
       internalNotes: '',
       currency: 'EUR',
       language: 'fr',
       includeTransport: false,
       transportCost: 0,
-      globalDiscount: 0
-    }
+      globalDiscount: 0,
+    },
   })
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'lines'
+    name: 'lines',
   })
   // Watch form values for calculations
   const watchedLines = form.watch('lines')
@@ -164,38 +175,40 @@ export function CreateInvoiceDialog({
       const date = new Date()
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
-      const invoiceNumber = `FACT-${year}${month}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+      const invoiceNumber = `FACT-${year}${month}-${Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, '0')}`
       form.setValue('invoiceNumber', invoiceNumber)
     }
   }, [open, form])
   // Filter projects based on selected client
   const filteredProjects = useMemo(() => {
     if (!watchedClientId) return availableProjects
-    return availableProjects.filter(project => project.clientId === watchedClientId)
+    return availableProjects.filter((project) => project.clientId === watchedClientId)
   }, [watchedClientId, availableProjects])
   // Calculate totals
   const calculations = useMemo(() => {
     const subtotalBeforeDiscount = watchedLines.reduce((sum, line) => {
-      return sum + (line.quantity * line.unitPrice)
+      return sum + line.quantity * line.unitPrice
     }, 0)
     const lineDiscounts = watchedLines.reduce((sum, line) => {
       const lineTotal = line.quantity * line.unitPrice
-      return sum + (lineTotal * (line.discount || 0) / 100)
+      return sum + (lineTotal * (line.discount || 0)) / 100
     }, 0)
     const subtotalAfterLineDiscounts = subtotalBeforeDiscount - lineDiscounts
-    const globalDiscountAmount = subtotalAfterLineDiscounts * (watchedGlobalDiscount || 0) / 100
+    const globalDiscountAmount = (subtotalAfterLineDiscounts * (watchedGlobalDiscount || 0)) / 100
     const subtotalAfterAllDiscounts = subtotalAfterLineDiscounts - globalDiscountAmount
-    const transportCost = watchedIncludeTransport ? (watchedTransportCost || 0) : 0
+    const transportCost = watchedIncludeTransport ? watchedTransportCost || 0 : 0
     const subtotalWithTransport = subtotalAfterAllDiscounts + transportCost
     const taxes = watchedLines.reduce((sum, line) => {
       const lineTotal = line.quantity * line.unitPrice
-      const lineDiscount = lineTotal * (line.discount || 0) / 100
+      const lineDiscount = (lineTotal * (line.discount || 0)) / 100
       const lineSubtotal = lineTotal - lineDiscount
-      const globalDiscountForLine = lineSubtotal * (watchedGlobalDiscount || 0) / 100
+      const globalDiscountForLine = (lineSubtotal * (watchedGlobalDiscount || 0)) / 100
       const lineAfterDiscounts = lineSubtotal - globalDiscountForLine
-      return sum + (lineAfterDiscounts * (line.taxRate || 0) / 100)
+      return sum + (lineAfterDiscounts * (line.taxRate || 0)) / 100
     }, 0)
-    const transportTax = transportCost * 0.20 // Assuming 20% VAT on transport
+    const transportTax = transportCost * 0.2 // Assuming 20% VAT on transport
     const totalTaxes = taxes + (watchedIncludeTransport ? transportTax : 0)
     const totalAmount = subtotalWithTransport + totalTaxes
     return {
@@ -204,7 +217,7 @@ export function CreateInvoiceDialog({
       globalDiscountAmount,
       transportCost,
       taxes: totalTaxes,
-      totalAmount
+      totalAmount,
     }
   }, [watchedLines, watchedGlobalDiscount, watchedTransportCost, watchedIncludeTransport])
   const handleSubmit = async (data: InvoiceFormData) => {
@@ -233,10 +246,10 @@ export function CreateInvoiceDialog({
       quantity: 1,
       unitPrice: 0,
       taxRate: 20,
-      discount: 0
+      discount: 0,
     })
   }
-  const selectedClient = availableClients.find(client => client.id === watchedClientId)
+  const selectedClient = availableClients.find((client) => client.id === watchedClientId)
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -320,7 +333,7 @@ export function CreateInvoiceDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {availableClients.map(client => (
+                          {availableClients.map((client) => (
                             <SelectItem key={client.id} value={client.id}>
                               {client.name}
                             </SelectItem>
@@ -334,8 +347,12 @@ export function CreateInvoiceDialog({
                 {selectedClient && (
                   <div className="bg-gray-50 p-3 rounded-lg text-sm">
                     <div className="font-medium">{selectedClient.name}</div>
-                    {selectedClient.address && <div className="text-gray-600">{selectedClient.address}</div>}
-                    {selectedClient.email && <div className="text-gray-600">{selectedClient.email}</div>}
+                    {selectedClient.address && (
+                      <div className="text-gray-600">{selectedClient.address}</div>
+                    )}
+                    {selectedClient.email && (
+                      <div className="text-gray-600">{selectedClient.email}</div>
+                    )}
                     {selectedClient.vatNumber && (
                       <div className="text-gray-600">TVA: {selectedClient.vatNumber}</div>
                     )}
@@ -355,7 +372,7 @@ export function CreateInvoiceDialog({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="">Aucun projet</SelectItem>
-                          {filteredProjects.map(project => (
+                          {filteredProjects.map((project) => (
                             <SelectItem key={project.id} value={project.id}>
                               {project.reference} - {project.name}
                             </SelectItem>
@@ -458,10 +475,10 @@ export function CreateInvoiceDialog({
                             <FormItem>
                               <FormLabel>Description *</FormLabel>
                               <FormControl>
-                                <Textarea 
+                                <Textarea
                                   placeholder="Description de l'article/service"
                                   className="min-h-[80px]"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -481,7 +498,7 @@ export function CreateInvoiceDialog({
                                 step="0.01"
                                 placeholder="1"
                                 {...field}
-                                onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                               />
                             </FormControl>
                             <FormMessage />
@@ -500,7 +517,7 @@ export function CreateInvoiceDialog({
                                 step="0.01"
                                 placeholder="0.00"
                                 {...field}
-                                onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                               />
                             </FormControl>
                             <FormMessage />
@@ -520,7 +537,7 @@ export function CreateInvoiceDialog({
                                   step="0.1"
                                   placeholder="20"
                                   {...field}
-                                  onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -539,7 +556,7 @@ export function CreateInvoiceDialog({
                                   step="0.1"
                                   placeholder="0"
                                   {...field}
-                                  onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -552,7 +569,13 @@ export function CreateInvoiceDialog({
                     <div className="mt-3 pt-3 border-t bg-gray-50 rounded p-2">
                       <div className="text-sm text-right">
                         <span className="font-medium">
-                          Total ligne: {((field.quantity || 0) * (field.unitPrice || 0) * (1 - (field.discount || 0) / 100)).toFixed(2)} € HT
+                          Total ligne:{' '}
+                          {(
+                            (field.quantity || 0) *
+                            (field.unitPrice || 0) *
+                            (1 - (field.discount || 0) / 100)
+                          ).toFixed(2)}{' '}
+                          € HT
                         </span>
                       </div>
                     </div>
@@ -576,12 +599,10 @@ export function CreateInvoiceDialog({
                           step="0.1"
                           placeholder="0"
                           {...field}
-                          onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Remise appliquée sur le sous-total
-                      </FormDescription>
+                      <FormDescription>Remise appliquée sur le sous-total</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -621,7 +642,7 @@ export function CreateInvoiceDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -639,7 +660,12 @@ export function CreateInvoiceDialog({
                 <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Sous-total HT:</span>
-                    <span>{(calculations.subtotalBeforeDiscount - calculations.lineDiscounts).toFixed(2)} €</span>
+                    <span>
+                      {(calculations.subtotalBeforeDiscount - calculations.lineDiscounts).toFixed(
+                        2
+                      )}{' '}
+                      €
+                    </span>
                   </div>
                   {calculations.globalDiscountAmount > 0 && (
                     <div className="flex justify-between text-orange-600">
@@ -681,9 +707,7 @@ export function CreateInvoiceDialog({
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Ces notes apparaîtront sur la facture
-                    </FormDescription>
+                    <FormDescription>Ces notes apparaîtront sur la facture</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -710,12 +734,7 @@ export function CreateInvoiceDialog({
               />
             </div>
             <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                 Annuler
               </Button>
               <Button type="submit" disabled={loading}>

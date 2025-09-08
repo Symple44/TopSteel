@@ -3,11 +3,11 @@ import { type NextRequest, NextResponse } from 'next/server'
 export async function GET(req: NextRequest) {
   try {
     // Créer une réponse qui efface tous les cookies et redirige vers login
-    const response = NextResponse.redirect(new URL('/login', req.url))
+    const response = NextResponse?.redirect(new URL('/login', req.url))
 
     // Effacer les cookies
-    response.cookies.delete('accessToken')
-    response.cookies.delete('refreshToken')
+    response?.cookies?.delete('accessToken')
+    response?.cookies?.delete('refreshToken')
 
     // Retourner avec un script pour effacer le localStorage
     return new Response(
@@ -19,14 +19,14 @@ export async function GET(req: NextRequest) {
         <body>
           <script>
             // Effacer tout le stockage local
-            localStorage.clear();
-            sessionStorage.clear();
+            localStorage?.clear();
+            sessionStorage?.clear();
             
             // Effacer les cookies côté client
             // biome-ignore lint/security/noDocumentCookie: Cookie enumeration for logout cleanup
-            document.cookie.split(";").forEach(function(c) { 
+            document?.cookie?.split(";").forEach(function(c) { 
               // biome-ignore lint/security/noDocumentCookie: Cookie expiration for logout cleanup
-              document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+              document.cookie = c?.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
             });
             
             // Rediriger vers la page de login
@@ -47,6 +47,6 @@ export async function GET(req: NextRequest) {
       }
     )
   } catch (_error) {
-    return NextResponse.json({ error: 'Logout failed' }, { status: 500 })
+    return NextResponse?.json({ error: 'Logout failed' }, { status: 500 })
   }
 }

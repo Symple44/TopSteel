@@ -46,7 +46,7 @@ export function useToast(): ToastContextType {
    * Ferme un toast spécifique
    */
   const dismiss = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+    setToasts((prev) => prev?.filter((toast) => toast?.id !== id))
   }, [])
 
   /**
@@ -221,9 +221,9 @@ export function useToastMetrics() {
 
   const metrics = {
     total: toasts.length,
-    byVariant: toasts.reduce(
+    byVariant: toasts?.reduce(
       (acc, toast) => {
-        const variant = toast.variant || 'default'
+        const variant = toast?.variant || 'default'
 
         acc[variant] = (acc[variant] || 0) + 1
 
@@ -231,7 +231,7 @@ export function useToastMetrics() {
       },
       {} as Record<string, number>
     ),
-    persistent: toasts.filter((t) => t.duration === 0).length,
+    persistent: toasts?.filter((t) => t.duration === 0).length,
   }
 
   return metrics
@@ -270,7 +270,7 @@ export function useToastWithPromise() {
         // Succès
         if (messages.success) {
           const successMessage =
-            typeof messages.success === 'function' ? messages.success(result) : messages.success
+            typeof messages.success === 'function' ? messages?.success(result) : messages.success
 
           toast({
             title: successMessage,
@@ -284,7 +284,7 @@ export function useToastWithPromise() {
         // Erreur
         if (messages.error) {
           const errorMessage =
-            typeof messages.error === 'function' ? messages.error(error as Error) : messages.error
+            typeof messages.error === 'function' ? messages?.error(error as Error) : messages.error
 
           toast({
             title: errorMessage,
@@ -318,10 +318,10 @@ export function toast({
 
   switch (variant) {
     case 'success':
-      sonnerToast.success(message)
+      sonnerToast?.success(message)
       break
     case 'destructive':
-      sonnerToast.error(message)
+      sonnerToast?.error(message)
       break
     default:
       sonnerToast(message)

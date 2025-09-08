@@ -1,12 +1,12 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { Partner } from './partner.entity'
 
@@ -50,7 +50,7 @@ export enum InteractionDirection {
 @Index(['type', 'status'])
 export class PartnerInteraction {
   [key: string]: any // Index signature for compatibility with Record<string, unknown>
-  
+
   @PrimaryGeneratedColumn('uuid')
   id: string
 
@@ -153,7 +153,7 @@ export class PartnerInteraction {
   satisfactionScore?: number // 1-5
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @Column({ type: 'jsonb', nullable: true })
   tags?: string[]
@@ -179,7 +179,9 @@ export class PartnerInteraction {
   }
 
   isHighPriority(): boolean {
-    return this.priority === InteractionPriority.HAUTE || this.priority === InteractionPriority.URGENTE
+    return (
+      this.priority === InteractionPriority.HAUTE || this.priority === InteractionPriority.URGENTE
+    )
   }
 
   getDurationInHours(): number {
@@ -187,15 +189,23 @@ export class PartnerInteraction {
   }
 
   hasAttachments(): boolean {
-    return this.piecesJointes !== null && this.piecesJointes.length > 0
+    return (
+      this.piecesJointes !== null &&
+      this.piecesJointes !== undefined &&
+      this.piecesJointes.length > 0
+    )
   }
 
   hasActions(): boolean {
-    return this.actionsRequises !== null && this.actionsRequises.length > 0
+    return (
+      this.actionsRequises !== null &&
+      this.actionsRequises !== undefined &&
+      this.actionsRequises.length > 0
+    )
   }
 
-  getOpenActions(): Array<any> {
+  getOpenActions(): Array<unknown> {
     if (!this.actionsRequises) return []
-    return this.actionsRequises.filter(action => action.statut !== 'TERMINE')
+    return this.actionsRequises.filter((action) => action.statut !== 'TERMINE')
   }
 }

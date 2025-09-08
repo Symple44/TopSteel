@@ -28,7 +28,7 @@ import {
   Table2,
   X,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { callClientApi } from '@/utils/backend-api'
 import { DataTablePreview } from './datatable-preview'
@@ -80,18 +80,18 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
   const [queryName, setQueryName] = useState(initialData?.name || 'New Query')
   const [queryDescription, setQueryDescription] = useState(initialData?.description || '')
 
-  const fetchTables = async () => {
+  const fetchTables = useCallback(async () => {
     try {
       const response = await callClientApi('query-builder/schema/tables')
-      if (response.ok) {
+      if (response?.ok) {
         const tables = await response.json()
         setAvailableTables(tables)
       } else {
       }
     } catch {}
-  }
+  }, [])
 
-  const loadInitialData = () => {
+  const loadInitialData = useCallback(() => {
     // Charger les données initiales si édition d'un query existant
     if (initialData?.mainTable) {
       const table = availableTables.find((t) => t.name === initialData.mainTable)
@@ -102,7 +102,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     if (initialData?.columns?.length > 0) {
       setSelectedColumns(initialData.columns)
     }
-  }
+  }, [availableTables, initialData])
 
   useEffect(() => {
     fetchTables()
@@ -111,102 +111,179 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     }
   }, [fetchTables, initialData, loadInitialData])
 
-  const generateSQL = () => {
+  /**
+   * Build SELECT clause
+   */
+  const buildSelectClause = useCallback((): string => {
+    const buildColumnPart = (col: SelectedColumn): string => {
+      let part = col.table ? `${col.table}.${col.column}` : col.column
+
+      if (col.aggregation) {
+        part = `${col.aggregation}(${part})`
+      }
+
+      if (col.alias) {
+        part += ` AS ${col.alias}`
+      }
+
+      return part
+    }
+
+    const columnParts = selectedColumns.map(buildColumnPart)
+    return `SELECT ${columnParts.join(', ')}`
+  }, [selectedColumns])
+
+  /**
+   * Build WHERE clause
+   */
+  const buildWhereClause = useCallback((): string => {
+    if (filters.length === 0) return ''
+
+    const formatFilterValue = (filter: Filter): string => {
+      const { value } = filter
+
+      switch (filter.operator) {
+        case 'contains':
+          return `'%${value}%'`
+        case 'starts_with':
+          return `'${value}%'`
+        default:
+          return typeof value === 'string' ? `'${value}'` : value
+      }
+    }
+
+    const buildFilterPart = (filter: Filter): string => {
+      const operators = {
+        equals: '=',
+        not_equals: '!=',
+        contains: 'LIKE',
+        starts_with: 'LIKE',
+        greater_than: '>',
+        less_than: '<',
+      }
+
+      const formattedValue = formatFilterValue(filter)
+      return `${filter.column} ${operators[filter.operator]} ${formattedValue}`
+    }
+
+    const filterParts = filters.map(buildFilterPart)
+    return `WHERE ${filterParts.join(' AND ')}`
+  }, [filters])
+
+  /**
+   * Build ORDER BY clause
+   */
+  const buildOrderByClause = useCallback((): string => {
+    return sortBy ? `ORDER BY ${sortBy} ${sortOrder}` : ''
+  }, [sortBy, sortOrder])
+
+  /**
+   * Build LIMIT clause
+   */
+  const buildLimitClause = useCallback((): string => {
+    return limit > 0 ? `LIMIT ${limit}` : ''
+  }, [limit])
+
+  /**
+   * Generate SQL with reduced cognitive complexity (reduced from ~12 to ~4)
+   */
+  const generateSQL = useCallback(() => {
     if (!selectedTable || selectedColumns.length === 0) {
       return ''
     }
 
-    let sql = 'SELECT '
-
-    // Colonnes
-    const columnParts = selectedColumns.map((col) => {
-      let part = `${col.table ? `${col.table}.` : ''}${col.column}`
-      if (col.aggregation) {
-        part = `${col.aggregation}(${part})`
-      }
-      if (col.alias) {
-        part += ` AS ${col.alias}`
-      }
-      return part
-    })
-
-    sql += columnParts.join(', ')
-    sql += `\nFROM ${selectedTable.name}`
-
-    // Filtres
-    if (filters.length > 0) {
-      sql += '\nWHERE '
-      const filterParts = filters.map((filter) => {
-        const operators = {
-          equals: '=',
-          not_equals: '!=',
-          contains: 'LIKE',
-          starts_with: 'LIKE',
-          greater_than: '>',
-          less_than: '<',
-        }
-
-        let value = filter.value
-        if (filter.operator === 'contains') {
-          value = `'%${value}%'`
-        } else if (filter.operator === 'starts_with') {
-          value = `'${value}%'`
-        } else if (typeof value === 'string') {
-          value = `'${value}'`
-        }
-
-        return `${filter.column} ${operators[filter.operator]} ${value}`
-      })
-      sql += filterParts.join(' AND ')
+    const sqlParts = {
+      select: buildSelectClause(),
+      from: `FROM ${selectedTable.name}`,
+      where: buildWhereClause(),
+      orderBy: buildOrderByClause(),
+      limit: buildLimitClause(),
     }
 
-    // Tri
-    if (sortBy) {
-      sql += `\nORDER BY ${sortBy} ${sortOrder}`
-    }
-
-    // Limite
-    if (limit > 0) {
-      sql += `\nLIMIT ${limit}`
-    }
+    const sql = [sqlParts.select, sqlParts.from, sqlParts.where, sqlParts.orderBy, sqlParts.limit]
+      .filter(Boolean)
+      .join('\n')
 
     setGeneratedSQL(sql)
     return sql
-  }
+  }, [
+    selectedTable,
+    selectedColumns,
+    buildSelectClause,
+    buildWhereClause,
+    buildOrderByClause,
+    buildLimitClause,
+  ])
 
+  /**
+   * Execute query with reduced complexity (reduced from ~8 to ~4)
+   */
   const executeQuery = async () => {
     const sql = generateSQL()
-    if (!sql) {
-      toast.error('Veuillez sélectionner au moins une table et une colonne')
+
+    if (!validateQueryExecution(sql)) {
       return
     }
 
     setLoading(true)
     try {
-      // Exécuter la vraie requête SQL via l'API
-      const response = await callClientApi('query-builder/execute-sql', {
-        method: 'POST',
-        body: JSON.stringify({
-          sql: sql,
-          limit: Math.min(limit, 100), // Limiter à 100 résultats max pour l'aperçu
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-
-        // Adapter les données selon le format retourné
-        const data = Array.isArray(result) ? result : result.data || result.rows || []
-        setPreviewData(data)
-        toast.success(`Requête exécutée avec succès (${data.length} résultats)`)
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        toast.error(`Erreur lors de l'exécution: ${errorData.error || 'Erreur inconnue'}`)
-      }
-    } catch {
-      toast.error("Erreur lors de l'exécution de la requête")
+      const result = await executeQueryRequest(sql)
+      handleQuerySuccess(result)
+    } catch (error) {
+      handleQueryError(error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  /**
+   * Validate query execution preconditions
+   */
+  const validateQueryExecution = (sql: string): boolean => {
+    if (!sql) {
+      toast.error('Veuillez sélectionner au moins une table et une colonne')
+      return false
+    }
+    return true
+  }
+
+  /**
+   * Execute query request
+   */
+  const executeQueryRequest = async (sql: string) => {
+    const response = await callClientApi('query-builder/execute-sql', {
+      method: 'POST',
+      body: JSON.stringify({
+        sql,
+        limit: Math.min(limit, 100), // Limiter à 100 résultats max pour l'aperçu
+      }),
+    })
+
+    if (!response?.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+      throw new Error(errorData.error || 'Erreur inconnue')
+    }
+
+    return await response.json()
+  }
+
+  /**
+   * Handle successful query execution
+   */
+  const handleQuerySuccess = (result: unknown) => {
+    const data = Array.isArray(result) ? result : result.data || result.rows || []
+    setPreviewData(data)
+    toast.success(`Requête exécutée avec succès (${data.length} résultats)`)
+  }
+
+  /**
+   * Handle query execution error
+   */
+  const handleQueryError = (error: unknown) => {
+    if (error instanceof Error) {
+      toast.error(`Erreur lors de l'exécution: ${error.message}`)
+    } else {
+      toast.error("Erreur lors de l'exécution de la requête")
     }
   }
 
@@ -226,7 +303,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     if (selectedColumns.length === 0) return
 
     const newFilter: Filter = {
-      column: selectedColumns[0].column,
+      column: selectedColumns[0]?.column,
       operator: 'equals',
       value: '',
     }
@@ -237,19 +314,52 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     setFilters(filters.filter((_, i) => i !== index))
   }
 
+  /**
+   * Update filter with immutable state update pattern
+   */
   const updateFilter = (index: number, field: keyof Filter, value: string) => {
-    const updatedFilters = [...filters]
-    updatedFilters[index] = { ...updatedFilters[index], [field]: value }
-    setFilters(updatedFilters)
+    setFilters((prevFilters) =>
+      prevFilters.map((filter, i) => (i === index ? { ...filter, [field]: value } : filter))
+    )
   }
 
+  /**
+   * Save query with reduced complexity (reduced from ~6 to ~3)
+   */
   const saveQuery = async () => {
-    if (!queryName.trim()) {
-      toast.error('Veuillez donner un nom à votre requête')
+    if (!validateQuerySave()) {
       return
     }
 
-    const queryData = {
+    const queryData = buildQueryData()
+
+    setLoading(true)
+    try {
+      await saveQueryRequest(queryData)
+      toast.success('Requête sauvegardée avec succès')
+    } catch (error) {
+      handleSaveError(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /**
+   * Validate query save preconditions
+   */
+  const validateQuerySave = (): boolean => {
+    if (!queryName?.trim()) {
+      toast.error('Veuillez donner un nom à votre requête')
+      return false
+    }
+    return true
+  }
+
+  /**
+   * Build query data object
+   */
+  const buildQueryData = () => {
+    return {
       name: queryName,
       description: queryDescription,
       mainTable: selectedTable?.name,
@@ -260,31 +370,35 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
       limit,
       sql: generateSQL(),
     }
+  }
 
-    setLoading(true)
-    try {
-      const endpoint =
-        queryBuilderId === 'new' ? 'query-builder' : `query-builder/${queryBuilderId}`
-      const method = queryBuilderId === 'new' ? 'POST' : 'PATCH'
+  /**
+   * Save query request
+   */
+  const saveQueryRequest = async (queryData: unknown) => {
+    const isNewQuery = queryBuilderId === 'new'
+    const endpoint = isNewQuery ? 'query-builder' : `query-builder/${queryBuilderId}`
+    const method = isNewQuery ? 'POST' : 'PATCH'
 
-      const response = await callClientApi(endpoint, {
-        method,
-        body: JSON.stringify(queryData),
-      })
+    const response = await callClientApi(endpoint, {
+      method,
+      body: JSON.stringify(queryData),
+    })
 
-      if (response.ok) {
-        toast.success('Requête sauvegardée avec succès')
-        if (queryBuilderId === 'new') {
-          const saved = await response.json()
-          window.location.href = `/query-builder/${saved.id}`
-        }
-      } else {
-        throw new Error('Save failed')
-      }
-    } catch {
+    if (!response?.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+      throw new Error(errorData.error || 'Erreur de sauvegarde')
+    }
+  }
+
+  /**
+   * Handle save error
+   */
+  const handleSaveError = (error: unknown) => {
+    if (error instanceof Error) {
+      toast.error(`Erreur lors de la sauvegarde: ${error.message}`)
+    } else {
       toast.error('Erreur lors de la sauvegarde')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -314,11 +428,11 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={executeQuery} disabled={loading}>
+            <Button type="button" variant="outline" onClick={executeQuery} disabled={loading}>
               <Play className="h-4 w-4 mr-2" />
               Exécuter
             </Button>
-            <Button onClick={saveQuery} disabled={loading}>
+            <Button type="button" onClick={saveQuery} disabled={loading}>
               <Save className="h-4 w-4 mr-2" />
               Sauvegarder
             </Button>
@@ -378,7 +492,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {selectedTable.columns.map((column) => (
+                    {selectedTable.columns?.map((column) => (
                       <button
                         key={column.name}
                         type="button"
@@ -445,6 +559,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                               </>
                             )}
                             <Button
+                              type="button"
                               variant="ghost"
                               size="sm"
                               onClick={() => removeColumn(index)}
@@ -463,7 +578,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="text-base">Filtres</CardTitle>
-                    <Button variant="outline" size="sm" onClick={addFilter}>
+                    <Button type="button" variant="outline" size="sm" onClick={addFilter}>
                       <Plus className="h-4 w-4 mr-2" />
                       Ajouter
                     </Button>
@@ -508,6 +623,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                               className="flex-1"
                             />
                             <Button
+                              type="button"
                               variant="ghost"
                               size="sm"
                               onClick={() => removeFilter(index)}
@@ -537,7 +653,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                           className="w-full text-sm border rounded px-2 py-1 mt-1"
                         >
                           <option value="">Aucun tri</option>
-                          {selectedColumns.map((col) => (
+                          {selectedColumns?.map((col) => (
                             <option key={col.column} value={col.column}>
                               {col.column}
                             </option>
@@ -595,12 +711,16 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                       <DataTablePreview
                         data={previewData}
                         columns={selectedColumns.map((col, index) => ({
+                          name: col.alias || `${col.table}.${col.column}`,
+                          type:
+                            selectedTable?.columns?.find((c) => c.name === col.column)?.type ||
+                            'text',
                           alias: col.alias || `${col.table}.${col.column}`,
                           columnName: col.column,
                           tableName: col.table,
                           label: col.alias || col.column,
                           dataType:
-                            selectedTable?.columns.find((c) => c.name === col.column)?.type ||
+                            selectedTable?.columns?.find((c) => c.name === col.column)?.type ||
                             'text',
                           isVisible: true,
                           isSortable: true,
@@ -662,11 +782,11 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                     <div className="space-y-2">
                       <Label>Actions</Label>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button type="button" variant="outline" size="sm">
                           <Download className="h-4 w-4 mr-2" />
                           Exporter CSV
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button type="button" variant="outline" size="sm">
                           <Download className="h-4 w-4 mr-2" />
                           Exporter Excel
                         </Button>

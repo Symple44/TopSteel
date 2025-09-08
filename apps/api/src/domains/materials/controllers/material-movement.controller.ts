@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -645,7 +644,7 @@ export class MaterialMovementController {
     const result = await this.materialMovementService.findMovements({
       materialIds: [id],
       tenantId,
-    } as any)
+    } as unknown)
 
     if (result.items.length === 0) {
       throw new NotFoundException(`Mouvement ${id} non trouvé`)
@@ -658,15 +657,3 @@ export class MaterialMovementController {
 /**
  * Pipe pour parser les dates
  */
-import { Injectable, type PipeTransform } from '@nestjs/common'
-
-@Injectable()
-class ParseDatePipe implements PipeTransform {
-  transform(value: any): Date {
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) {
-      throw new BadRequestException('Date invalide')
-    }
-    return date
-  }
-}

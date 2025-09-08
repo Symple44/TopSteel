@@ -7,10 +7,14 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MenuItem } from './menu-item.entity'
+// Circular dependency resolved - using string reference
+// import { MenuItem } from './menu-item.entity'
 
 @Entity('menu_configurations')
-@Index(['name'], { unique: true })
+@Index(['name'], { unique: true }) // Unique index for name lookups
+@Index(['isActive', 'isSystem']) // For filtering active/system configurations
+@Index(['createdBy']) // For audit queries
+@Index(['createdAt']) // For chronological queries
 export class MenuConfiguration {
   @PrimaryGeneratedColumn('uuid')
   id!: string
@@ -30,6 +34,7 @@ export class MenuConfiguration {
   isSystem!: boolean
 
   @Column({ type: 'json', nullable: true })
+  @Index() // GIN index for metadata queries
   metadata?: Record<string, unknown>
 
   @CreateDateColumn({ name: 'createdat' })
@@ -39,17 +44,16 @@ export class MenuConfiguration {
   updatedAt!: Date
 
   @Column({ type: 'uuid', nullable: true, name: 'createdby' })
+  @Index() // Index for audit queries
   createdBy?: string
 
   @Column({ type: 'uuid', nullable: true, name: 'updatedby' })
+  @Index() // Index for audit queries
   updatedBy?: string
 
   // Relations
-  @OneToMany(
-    () => MenuItem,
-    (menuItem) => menuItem.configuration
-  )
-  items!: MenuItem[]
+  @OneToMany('MenuItem', 'configuration', { lazy: true })
+  items!: unknown[]
 
   // Méthodes utilitaires
   static createSystem(name: string, description: string): MenuConfiguration {

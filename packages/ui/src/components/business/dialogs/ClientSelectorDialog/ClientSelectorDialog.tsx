@@ -1,18 +1,21 @@
 'use client'
-import { useState, useMemo } from 'react'
-import { Search, Filter, MapPin, Phone, Mail, Building, Check } from 'lucide-react'
-import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
-import { Input } from '../../../primitives/input/Input'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import { Building, Check, Mail, MapPin, Phone, Search } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Avatar, AvatarFallback } from '../../../data-display/avatar'
 import { Badge } from '../../../data-display/badge'
+import { Card, CardContent } from '../../../layout/card/Card'
 import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+import { Separator } from '../../../layout/separator'
+import { Button } from '../../../primitives/button/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
+import { Input } from '../../../primitives/input/Input'
 import {
-  Avatar,
-  AvatarFallback,
-  Separator,
-} from '../../../'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 // Client type for selection
 export interface SelectableClient {
   id: string
@@ -43,13 +46,13 @@ interface ClientSelectorDialogProps {
   title?: string // Custom title
   multiple?: boolean // Allow multiple selection (future feature)
 }
-export function ClientSelectorDialog({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
-  clients = [], 
+export function ClientSelectorDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+  clients = [],
   excludeIds = [],
-  title = "Sélectionner un client"
+  title = 'Sélectionner un client',
 }: ClientSelectorDialogProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedClient, setSelectedClient] = useState<SelectableClient | null>(null)
@@ -61,8 +64,8 @@ export function ClientSelectorDialog({
   // Filter and search clients
   const filteredClients = useMemo(() => {
     return clients
-      .filter(client => !excludeIds.includes(client.id))
-      .filter(client => {
+      .filter((client) => !excludeIds.includes(client.id))
+      .filter((client) => {
         // Search filter
         if (searchTerm) {
           const search = searchTerm.toLowerCase()
@@ -72,25 +75,25 @@ export function ClientSelectorDialog({
             client.contactLastName.toLowerCase().includes(search) ||
             client.contactEmail.toLowerCase().includes(search) ||
             client.city.toLowerCase().includes(search) ||
-            (client.sector && client.sector.toLowerCase().includes(search))
+            client.sector?.toLowerCase().includes(search)
           )
         }
         return true
       })
-      .filter(client => {
+      .filter((client) => {
         // Sector filter
         if (sectorFilter !== 'all') {
           return client.sector === sectorFilter
         }
         return true
       })
-      .filter(client => {
+      .filter((client) => {
         // Status filter
         if (statusFilter === 'active') return client.isActive
         if (statusFilter === 'inactive') return !client.isActive
         return true
       })
-      .filter(client => {
+      .filter((client) => {
         // Company type filter
         if (companyTypeFilter !== 'all') {
           return client.companyType === companyTypeFilter
@@ -102,7 +105,7 @@ export function ClientSelectorDialog({
   // Get unique sectors for filter dropdown
   const availableSectors = useMemo(() => {
     const sectors = clients
-      .map(client => client.sector)
+      .map((client) => client.sector)
       .filter((sector): sector is string => !!sector)
     return Array.from(new Set(sectors)).sort()
   }, [clients])
@@ -117,8 +120,7 @@ export function ClientSelectorDialog({
       onOpenChange(false)
       setSelectedClient(null)
       setSearchTerm('')
-    } catch (error) {
-      console.error('Error selecting client:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -163,7 +165,7 @@ export function ClientSelectorDialog({
               />
             </div>
             <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[130px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -195,7 +197,7 @@ export function ClientSelectorDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous secteurs</SelectItem>
-                    {availableSectors.map(sector => (
+                    {availableSectors.map((sector) => (
                       <SelectItem key={sector} value={sector}>
                         {sector}
                       </SelectItem>
@@ -207,7 +209,8 @@ export function ClientSelectorDialog({
           </div>
           {/* Results count */}
           <div className="text-sm text-gray-500">
-            {filteredClients.length} client{filteredClients.length !== 1 ? 's' : ''} trouvé{filteredClients.length !== 1 ? 's' : ''}
+            {filteredClients.length} client{filteredClients.length !== 1 ? 's' : ''} trouvé
+            {filteredClients.length !== 1 ? 's' : ''}
           </div>
           {/* Client List */}
           <ScrollArea className="h-[500px] pr-4">
@@ -223,11 +226,11 @@ export function ClientSelectorDialog({
                   const creditStatus = getCreditStatus(client.creditLimit, client.creditUsed)
                   const isSelected = selectedClient?.id === client.id
                   return (
-                    <Card 
-                      key={client.id} 
+                    <Card
+                      key={client.id}
                       className={`cursor-pointer transition-all hover:shadow-md ${
                         isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                      } ${!client.isActive ? 'opacity-60' : ''}`}
+                      } ${client.isActive ? '' : 'opacity-60'}`}
                       onClick={() => handleClientSelect(client)}
                     >
                       <CardContent className="p-4">
@@ -249,15 +252,16 @@ export function ClientSelectorDialog({
                                     Inactif
                                   </Badge>
                                 )}
-                                {isSelected && (
-                                  <Check className="h-4 w-4 text-blue-600" />
-                                )}
+                                {isSelected && <Check className="h-4 w-4 text-blue-600" />}
                               </div>
                               <div className="text-sm text-gray-600">
                                 <p className="font-medium">
                                   {client.contactFirstName} {client.contactLastName}
                                   {client.contactPosition && (
-                                    <span className="text-gray-500"> • {client.contactPosition}</span>
+                                    <span className="text-gray-500">
+                                      {' '}
+                                      • {client.contactPosition}
+                                    </span>
                                   )}
                                 </p>
                               </div>
@@ -285,21 +289,27 @@ export function ClientSelectorDialog({
                           <div className="text-right space-y-1">
                             {client.creditLimit > 0 && (
                               <div className="text-xs">
-                                <div className={`font-medium ${
-                                  creditStatus.status === 'danger' ? 'text-red-600' :
-                                  creditStatus.status === 'warning' ? 'text-orange-600' :
-                                  'text-green-600'
-                                }`}>
+                                <div
+                                  className={`font-medium ${
+                                    creditStatus.status === 'danger'
+                                      ? 'text-red-600'
+                                      : creditStatus.status === 'warning'
+                                        ? 'text-orange-600'
+                                        : 'text-green-600'
+                                  }`}
+                                >
                                   Crédit: {creditStatus.percentage.toFixed(0)}%
                                 </div>
                                 <div className="text-gray-500">
-                                  {client.creditUsed.toLocaleString()}€ / {client.creditLimit.toLocaleString()}€
+                                  {client.creditUsed.toLocaleString()}€ /{' '}
+                                  {client.creditLimit.toLocaleString()}€
                                 </div>
                               </div>
                             )}
                             {client.lastOrderDate && (
                               <div className="text-xs text-gray-500">
-                                Dernière commande:<br />
+                                Dernière commande:
+                                <br />
                                 {client.lastOrderDate.toLocaleDateString('fr-FR')}
                               </div>
                             )}
@@ -322,22 +332,16 @@ export function ClientSelectorDialog({
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-500">
               {selectedClient && (
-                <span>Client sélectionné: <strong>{selectedClient.companyName}</strong></span>
+                <span>
+                  Client sélectionné: <strong>{selectedClient.companyName}</strong>
+                </span>
               )}
             </div>
             <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                 Annuler
               </Button>
-              <Button 
-                onClick={handleSubmit} 
-                disabled={!selectedClient || loading}
-              >
+              <Button onClick={handleSubmit} disabled={!selectedClient || loading}>
                 {loading ? 'Sélection...' : 'Sélectionner ce client'}
               </Button>
             </div>

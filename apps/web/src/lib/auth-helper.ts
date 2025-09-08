@@ -16,7 +16,8 @@ export class AuthHelper {
   }
 
   static async fetchWithAuth(url: string, options?: RequestInit): Promise<Response> {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
+    const apiUrl =
+      process?.env?.NEXT_PUBLIC_API_URL || process?.env?.API_URL || 'http://localhost:3002'
     return fetch(`${apiUrl}/${url}`, options)
   }
 
@@ -31,18 +32,18 @@ export class AuthHelper {
 export async function verifyAuthHelper(request: NextRequest): Promise<AuthResult> {
   try {
     // Extract token from Authorization header or cookies
-    const authHeader = request.headers.get('authorization')
-    const cookieHeader = request.headers.get('cookie')
+    const authHeader = request?.headers?.get('authorization')
+    const cookieHeader = request?.headers?.get('cookie')
 
-    let token = null
+    let token: string | null = null
 
     if (authHeader?.startsWith('Bearer ')) {
-      token = authHeader.substring(7)
+      token = authHeader?.substring(7)
     } else if (cookieHeader) {
-      const cookies = cookieHeader.split(';').map((c) => c.trim())
-      const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
+      const cookies = cookieHeader?.split(';').map((c) => c?.trim())
+      const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
       if (accessTokenCookie) {
-        token = accessTokenCookie.split('=')[1]
+        token = accessTokenCookie?.split('=')[1]
       }
     }
 

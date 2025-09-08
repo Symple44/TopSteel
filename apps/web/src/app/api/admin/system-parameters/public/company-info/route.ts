@@ -12,8 +12,8 @@ export async function GET() {
       tva: 'FR12345678901',
     }
 
-    return NextResponse.json(companyInfo)
+    return NextResponse?.json(companyInfo)
   } catch {
-    return NextResponse.json({ error: 'Failed to fetch company info' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to fetch company info' }, { status: 500 })
   }
 }

@@ -341,7 +341,7 @@ export class MenuSyncService {
       )
     } catch (error) {
       this.logger.error('Menu sync failed:', error)
-      result.errors.push(error.message)
+      result.errors.push(error instanceof Error ? error.message : String(error))
     }
 
     return result
@@ -459,7 +459,7 @@ export class MenuSyncService {
       type: mapping.type || 'link',
       orderIndex: mapping.order || 999,
       permission: page.metadata.permissions?.[0],
-      requiredRoles: page.metadata.roles ? { roles: page.metadata.roles } : null,
+      requiredRoles: page.metadata.roles ? { roles: page.metadata.roles } : undefined,
       badge: mapping.badge,
       badgeColor: mapping.badgeColor,
       isActive: true,
@@ -500,12 +500,12 @@ export class MenuSyncService {
       return {
         ...item,
         permission: page.metadata.permissions?.[0],
-        requiredRoles: page.metadata.roles ? { roles: page.metadata.roles } : null,
+        requiredRoles: page.metadata.roles ? { roles: page.metadata.roles } : undefined,
       } as MenuItem
     }
 
     item.permission = page.metadata.permissions?.[0]
-    item.requiredRoles = page.metadata.roles ? { roles: page.metadata.roles } : null
+    item.requiredRoles = page.metadata.roles ? { roles: page.metadata.roles } : undefined
 
     // Update metadata
     item.metadata = {
@@ -570,8 +570,8 @@ export class MenuSyncService {
 
     const lastSync = menuItems
       .map((item) => item.metadata?.lastSyncedAt)
-      .filter(Boolean)
-      .sort()
+      .filter((date): date is Date => date instanceof Date)
+      .sort((a, b) => a.getTime() - b.getTime())
       .pop()
 
     return {
@@ -597,7 +597,7 @@ export class MenuSyncService {
       toCreate: result.items.created.map((item) => ({
         path: item.route || '',
         label: item.label,
-        module: item.metadata?.module || 'unknown',
+        module: typeof item.metadata?.module === 'string' ? item.metadata.module : 'unknown',
       })),
       toUpdate: result.items.updated.map((item) => ({
         path: item.route || '',

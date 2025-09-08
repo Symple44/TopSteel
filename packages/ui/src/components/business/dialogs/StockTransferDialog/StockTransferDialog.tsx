@@ -1,17 +1,31 @@
 'use client'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../../forms/form/form'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout/card/Card'
+import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
 import { Button } from '../../../primitives/button/Button'
-import { DialogTrigger } from '../../../primitives/dialog/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives/dialog/Dialog'
 import { Input } from '../../../primitives/input/Input'
-import { FormMessage } from '../../../forms/form/form'
-import { CardFooter } from '../../../layout/card'
-import { SelectValue } from '../../../primitives/select/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../primitives/select/select'
 import { Switch } from '../../../primitives/switch/switch'
 import { Textarea } from '../../../primitives/textarea/Textarea'
-import { ScrollArea } from '../../../layout/scroll-area/ScrollArea'
+
 // Stock transfer validation schema
 const stockTransferSchema = z.object({
   // Transfer Information
@@ -19,19 +33,19 @@ const stockTransferSchema = z.object({
   transferType: z.enum(['internal', 'external', 'production', 'maintenance', 'emergency']),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
   // Source Information
-  sourceWarehouseId: z.string().min(1, 'L\'entrepôt source est requis'),
-  sourceWarehouseName: z.string().min(1, 'Le nom de l\'entrepôt source est requis'),
+  sourceWarehouseId: z.string().min(1, "L'entrepôt source est requis"),
+  sourceWarehouseName: z.string().min(1, "Le nom de l'entrepôt source est requis"),
   sourceLocation: z.string().optional(),
   sourceBinLocation: z.string().optional(),
   sourceContactPerson: z.string().optional(),
   // Destination Information
-  destinationWarehouseId: z.string().min(1, 'L\'entrepôt de destination est requis'),
-  destinationWarehouseName: z.string().min(1, 'Le nom de l\'entrepôt de destination est requis'),
+  destinationWarehouseId: z.string().min(1, "L'entrepôt de destination est requis"),
+  destinationWarehouseName: z.string().min(1, "Le nom de l'entrepôt de destination est requis"),
   destinationLocation: z.string().optional(),
   destinationBinLocation: z.string().optional(),
   destinationContactPerson: z.string().optional(),
   // Material Information
-  materialId: z.string().min(1, 'L\'ID du matériau est requis'),
+  materialId: z.string().min(1, "L'ID du matériau est requis"),
   materialName: z.string().min(1, 'Le nom du matériau est requis'),
   materialCategory: z.enum(['steel', 'alloy', 'tools', 'consumables', 'equipment', 'other']),
   steelGrade: z.string().optional(),
@@ -58,7 +72,19 @@ const stockTransferSchema = z.object({
   shippedBy: z.string().optional(),
   receivedBy: z.string().optional(),
   // Transfer Status and Workflow
-  status: z.enum(['draft', 'requested', 'approved', 'rejected', 'preparing', 'in_transit', 'delivered', 'completed', 'cancelled']).default('draft'),
+  status: z
+    .enum([
+      'draft',
+      'requested',
+      'approved',
+      'rejected',
+      'preparing',
+      'in_transit',
+      'delivered',
+      'completed',
+      'cancelled',
+    ])
+    .default('draft'),
   requiresApproval: z.boolean().default(false),
   approvalLevel: z.enum(['supervisor', 'manager', 'director']).optional(),
   // Business Justification
@@ -72,7 +98,7 @@ const stockTransferSchema = z.object({
     'obsolete_movement',
     'cost_optimization',
     'seasonal_adjustment',
-    'other'
+    'other',
   ]),
   reasonDetails: z.string().min(1, 'Les détails de la raison sont requis'),
   businessImpact: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
@@ -83,7 +109,9 @@ const stockTransferSchema = z.object({
   qualityNotes: z.string().optional(),
   packagingCondition: z.enum(['excellent', 'good', 'fair', 'poor', 'damaged']).optional(),
   // Transportation
-  transportMethod: z.enum(['internal', 'external_carrier', 'customer_pickup', 'direct_delivery']).default('internal'),
+  transportMethod: z
+    .enum(['internal', 'external_carrier', 'customer_pickup', 'direct_delivery'])
+    .default('internal'),
   carrierId: z.string().optional(),
   carrierName: z.string().optional(),
   trackingNumber: z.string().optional(),
@@ -129,15 +157,15 @@ interface StockTransferDialogProps {
   onSubmit?: (data: StockTransferFormData) => void | Promise<void>
   defaultValues?: Partial<StockTransferFormData>
 }
-export function StockTransferDialog({ 
-  open, 
-  onOpenChange, 
+export function StockTransferDialog({
+  open,
+  onOpenChange,
   onSubmit,
-  defaultValues 
+  defaultValues,
 }: StockTransferDialogProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const form = useForm<StockTransferFormData>({
+  const form = useForm({
     resolver: zodResolver(stockTransferSchema),
     defaultValues: {
       transferType: 'internal',
@@ -181,10 +209,12 @@ export function StockTransferDialog({
   }, [watchTransferQuantity, watchUnitValue, form])
   // Auto-calculate total cost
   useEffect(() => {
-    const costs = [watchTransferCost, watchHandlingCost, watchTransportationCost].filter(cost => cost && cost > 0)
+    const costs = [watchTransferCost, watchHandlingCost, watchTransportationCost].filter(
+      (cost) => cost && cost > 0
+    )
     if (costs.length > 0) {
-      const totalCost = costs.reduce((sum, cost) => sum + (cost || 0), 0)
-      form.setValue('totalCost', parseFloat(totalCost.toFixed(2)))
+      const totalCost = costs.reduce((sum, cost) => (sum || 0) + (cost || 0), 0)
+      form.setValue('totalCost', parseFloat((totalCost || 0).toFixed(2)))
     }
   }, [watchTransferCost, watchHandlingCost, watchTransportationCost, form])
   const handleSubmit = async (data: StockTransferFormData) => {
@@ -215,18 +245,18 @@ export function StockTransferDialog({
     setError(null)
     onOpenChange(false)
   }
-  const getReasonLabel = (reason: string) => {
+  const _getReasonLabel = (reason: string) => {
     const reasons: Record<string, string> = {
       production_need: 'Besoin de production',
       stock_rebalancing: 'Rééquilibrage de stock',
-      emergency_supply: 'Approvisionnement d\'urgence',
+      emergency_supply: "Approvisionnement d'urgence",
       maintenance_repair: 'Maintenance/Réparation',
       customer_order: 'Commande client',
       quality_segregation: 'Ségrégation qualité',
-      obsolete_movement: 'Déplacement d\'obsolètes',
+      obsolete_movement: "Déplacement d'obsolètes",
       cost_optimization: 'Optimisation des coûts',
       seasonal_adjustment: 'Ajustement saisonnier',
-      other: 'Autre'
+      other: 'Autre',
     }
     return reasons[reason] || reason
   }
@@ -771,14 +801,28 @@ export function StockTransferDialog({
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="production_need">Besoin de production</SelectItem>
-                              <SelectItem value="stock_rebalancing">Rééquilibrage de stock</SelectItem>
-                              <SelectItem value="emergency_supply">Approvisionnement d'urgence</SelectItem>
-                              <SelectItem value="maintenance_repair">Maintenance/Réparation</SelectItem>
+                              <SelectItem value="stock_rebalancing">
+                                Rééquilibrage de stock
+                              </SelectItem>
+                              <SelectItem value="emergency_supply">
+                                Approvisionnement d'urgence
+                              </SelectItem>
+                              <SelectItem value="maintenance_repair">
+                                Maintenance/Réparation
+                              </SelectItem>
                               <SelectItem value="customer_order">Commande client</SelectItem>
-                              <SelectItem value="quality_segregation">Ségrégation qualité</SelectItem>
-                              <SelectItem value="obsolete_movement">Déplacement d'obsolètes</SelectItem>
-                              <SelectItem value="cost_optimization">Optimisation des coûts</SelectItem>
-                              <SelectItem value="seasonal_adjustment">Ajustement saisonnier</SelectItem>
+                              <SelectItem value="quality_segregation">
+                                Ségrégation qualité
+                              </SelectItem>
+                              <SelectItem value="obsolete_movement">
+                                Déplacement d'obsolètes
+                              </SelectItem>
+                              <SelectItem value="cost_optimization">
+                                Optimisation des coûts
+                              </SelectItem>
+                              <SelectItem value="seasonal_adjustment">
+                                Ajustement saisonnier
+                              </SelectItem>
                               <SelectItem value="other">Autre</SelectItem>
                             </SelectContent>
                           </Select>
@@ -883,14 +927,9 @@ export function StockTransferDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Validation requise
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Validation requise</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -900,14 +939,9 @@ export function StockTransferDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Transfert urgent
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Transfert urgent</FormLabel>
                         </FormItem>
                       )}
                     />
@@ -966,10 +1000,7 @@ export function StockTransferDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Contrôle qualité requis
@@ -1050,10 +1081,7 @@ export function StockTransferDialog({
                           <FormItem>
                             <FormLabel>Notes qualité</FormLabel>
                             <FormControl>
-                              <Textarea
-                                placeholder="Observations sur la qualité..."
-                                {...field}
-                              />
+                              <Textarea placeholder="Observations sur la qualité..." {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1174,7 +1202,9 @@ export function StockTransferDialog({
                               step="0.5"
                               placeholder="2"
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value) || undefined)
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -1267,7 +1297,9 @@ export function StockTransferDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -1286,7 +1318,9 @@ export function StockTransferDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -1305,7 +1339,9 @@ export function StockTransferDialog({
                             step="0.01"
                             placeholder="0.00"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -1385,14 +1421,9 @@ export function StockTransferDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
-                        <FormLabel className="text-sm font-normal">
-                          Matière dangereuse
-                        </FormLabel>
+                        <FormLabel className="text-sm font-normal">Matière dangereuse</FormLabel>
                       </FormItem>
                     )}
                   />
@@ -1476,10 +1507,7 @@ export function StockTransferDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Réception automatique
@@ -1493,10 +1521,7 @@ export function StockTransferDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
                             Notification à la livraison
@@ -1510,14 +1535,9 @@ export function StockTransferDialog({
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            Suivi activé
-                          </FormLabel>
+                          <FormLabel className="text-sm font-normal">Suivi activé</FormLabel>
                         </FormItem>
                       )}
                     />

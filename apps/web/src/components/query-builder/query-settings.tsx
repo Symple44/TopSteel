@@ -15,12 +15,12 @@ import { Database, FileSpreadsheet, Settings2, Shield } from 'lucide-react'
 
 interface QuerySettingsProps {
   settings: any
-  onSettingsChange: (updates: any) => void
+  onSettingsChange: (updates: unknown) => void
 }
 
 export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps) {
   const handleSettingChange = (key: string, value: any) => {
-    if (key.includes('.')) {
+    if (key?.includes('.')) {
       const [parent, child] = key.split('.')
       onSettingsChange({
         [parent]: {
@@ -47,7 +47,7 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
             <Label>Query Builder Name</Label>
             <Input
               value={settings.name}
-              onChange={(e) => handleSettingChange('name', e.target.value)}
+              onChange={(e) => handleSettingChange('name', e?.target?.value)}
               placeholder="My Query Builder"
             />
           </div>
@@ -56,7 +56,7 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
             <Label>Description</Label>
             <Textarea
               value={settings.description || ''}
-              onChange={(e) => handleSettingChange('description', e.target.value)}
+              onChange={(e) => handleSettingChange('description', e?.target?.value)}
               placeholder="Optional description"
               rows={3}
             />
@@ -108,7 +108,10 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
               type="number"
               value={settings.maxRows || ''}
               onChange={(e) =>
-                handleSettingChange('maxRows', e.target.value ? parseInt(e.target.value) : null)
+                handleSettingChange(
+                  'maxRows',
+                  e?.target?.value ? parseInt(e?.target?.value, 10) : null
+                )
               }
               placeholder="Unlimited"
             />
@@ -145,7 +148,9 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
               <Label>Default Page Size</Label>
               <Select
                 value={String(settings.settings?.pageSize || 50)}
-                onValueChange={(value) => handleSettingChange('settings.pageSize', parseInt(value))}
+                onValueChange={(value) =>
+                  handleSettingChange('settings.pageSize', parseInt(value, 10))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -224,12 +229,12 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
                           'json',
                         ]
                         const newFormats = isEnabled
-                          ? currentFormats.filter((f: any) => f !== format)
+                          ? currentFormats?.filter((f: unknown) => f !== format)
                           : [...currentFormats, format]
                         handleSettingChange('settings.exportFormats', newFormats)
                       }}
                     >
-                      {format.toUpperCase()}
+                      {format?.toUpperCase()}
                     </Badge>
                   )
                 })}

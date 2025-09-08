@@ -48,8 +48,8 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       dateCreation: new Date('2025-01-15'),
       dateValidite: new Date('2025-02-15'),
       statut: 'ENVOYE',
-      montantHT: projet.montantHT || 0,
-      montantTTC: projet.montantTTC || 0,
+      montantHT: projet.montantHT ?? 0,
+      montantTTC: projet.montantTTC ?? 0,
       accepte: false,
     },
     {
@@ -59,8 +59,8 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       dateCreation: new Date('2025-01-20'),
       dateValidite: new Date('2025-02-20'),
       statut: 'ACCEPTE',
-      montantHT: (projet.montantHT || 0) * 1.1,
-      montantTTC: (projet.montantTTC || 0) * 1.1,
+      montantHT: (projet.montantHT ?? 0) * 1.1,
+      montantTTC: (projet.montantTTC ?? 0) * 1.1,
       accepte: true,
     },
   ]
@@ -86,9 +86,9 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     }
   }
 
-  const devisAccepte = devis.find((d) => d.accepte)
-  const dernierDevis = devis[devis.length - 1]
-  const selectedDevisData = selectedDevis ? devis.find((d) => d.id === selectedDevis) : null
+  const devisAccepte = devis?.find((d) => d.accepte)
+  const dernierDevis = devis[devis?.length - 1]
+  const selectedDevisData = selectedDevis ? devis?.find((d) => d.id === selectedDevis) : null
 
   return (
     <div className="space-y-6">
@@ -102,7 +102,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{devis.length}</div>
+            <div className="text-2xl font-bold">{devis?.length}</div>
             <p className="text-xs text-muted-foreground">
               Version actuelle: {dernierDevis?.version}
             </p>
@@ -118,7 +118,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {devisAccepte ? formatCurrency(devisAccepte.montantHT) : '—'}
+              {devisAccepte ? formatCurrency(devisAccepte?.montantHT) : '—'}
             </div>
             <p className="text-xs text-muted-foreground">
               {devisAccepte ? 'HT accepté' : 'Aucun devis accepté'}
@@ -135,10 +135,10 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              {dernierDevis ? getStatutBadge(dernierDevis.statut) : '—'}
+              {dernierDevis ? getStatutBadge(dernierDevis?.statut) : '—'}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {dernierDevis ? formatDate(dernierDevis.dateCreation) : 'Aucun devis'}
+              {dernierDevis ? formatDate(dernierDevis?.dateCreation) : 'Aucun devis'}
             </p>
           </CardContent>
         </Card>
@@ -153,11 +153,11 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
               <CardDescription>Gestion des devis pour ce projet</CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Nouveau devis
               </Button>
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 <Calculator className="h-4 w-4 mr-2" />
                 Calculer
               </Button>
@@ -186,7 +186,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {devis.map((devisItem) => (
+              {devis?.map((devisItem) => (
                 <TableRow key={devisItem.id}>
                   <TableCell className="font-medium">{devisItem.numero}</TableCell>
                   <TableCell>{devisItem.version}</TableCell>
@@ -197,19 +197,20 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
                       <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedDevis(devisItem.id)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button type="button" variant="ghost" size="sm">
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button type="button" variant="ghost" size="sm">
                         <Send className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button type="button" variant="ghost" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>
                     </div>
@@ -230,7 +231,12 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                 <CardTitle>Détails du devis</CardTitle>
                 <CardDescription>Devis {selectedDevis} - Version actuelle</CardDescription>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedDevis(null)}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedDevis(null)}
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -252,7 +258,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Date création:</span>
                     <span>
                       {selectedDevisData?.dateCreation
-                        ? formatDate(selectedDevisData.dateCreation)
+                        ? formatDate(selectedDevisData?.dateCreation)
                         : '—'}
                     </span>
                   </div>
@@ -260,7 +266,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Validité:</span>
                     <span>
                       {selectedDevisData?.dateValidite
-                        ? formatDate(selectedDevisData.dateValidite)
+                        ? formatDate(selectedDevisData?.dateValidite)
                         : '—'}
                     </span>
                   </div>
@@ -274,7 +280,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Montant HT:</span>
                     <span className="font-medium">
                       {selectedDevisData?.montantHT
-                        ? formatCurrency(selectedDevisData.montantHT)
+                        ? formatCurrency(selectedDevisData?.montantHT)
                         : '—'}
                     </span>
                   </div>
@@ -282,7 +288,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Montant TTC:</span>
                     <span className="font-medium">
                       {selectedDevisData?.montantTTC
-                        ? formatCurrency(selectedDevisData.montantTTC)
+                        ? formatCurrency(selectedDevisData?.montantTTC)
                         : '—'}
                     </span>
                   </div>
@@ -290,7 +296,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Statut:</span>
                     <span>
-                      {selectedDevisData?.statut ? getStatutBadge(selectedDevisData.statut) : '—'}
+                      {selectedDevisData?.statut ? getStatutBadge(selectedDevisData?.statut) : '—'}
                     </span>
                   </div>
                 </div>
@@ -298,15 +304,15 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
             </div>
 
             <div className="mt-6 flex gap-2">
-              <Button size="sm">
+              <Button type="button" size="sm">
                 <Download className="h-4 w-4 mr-2" />
                 Télécharger PDF
               </Button>
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 <Send className="h-4 w-4 mr-2" />
                 Envoyer par email
               </Button>
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 <Edit className="h-4 w-4 mr-2" />
                 Modifier
               </Button>

@@ -1,8 +1,9 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
-import { Contact } from './contact.entity'
-import { Partner } from './partner.entity'
-import { PartnerAddress } from './partner-address.entity'
+// Removed direct imports to avoid circular dependencies
+// import { Contact } from './contact.entity';
+// import { Partner } from './partner.entity'
+// import { PartnerAddress } from './partner-address.entity';
 
 export enum SiteType {
   SIEGE_SOCIAL = 'SIEGE_SOCIAL', // Siège social
@@ -39,15 +40,12 @@ export class PartnerSite extends BusinessEntity {
   @Index()
   partnerId!: string
 
-  @ManyToOne(
-    () => Partner,
-    (partner) => partner.sites,
-    {
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('Partner', 'sites', {
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'partnerId' })
-  partner!: Partner
+  partner!: any
 
   @Column({ type: 'varchar', length: 20, unique: true })
   @Index()
@@ -228,17 +226,11 @@ export class PartnerSite extends BusinessEntity {
   }
 
   // Relations
-  @OneToMany(
-    () => Contact,
-    (contact) => contact.site
-  )
-  contacts!: Contact[]
+  @OneToMany('Contact', 'site', { lazy: true })
+  contacts!: unknown[]
 
-  @OneToMany(
-    () => PartnerAddress,
-    (address) => address.site
-  )
-  addresses!: PartnerAddress[]
+  @OneToMany('PartnerAddress', 'site', { lazy: true })
+  addresses!: unknown[]
 
   /**
    * Validation des règles métier

@@ -1,5 +1,17 @@
 'use client'
 import {
+  AlertTriangle,
+  BarChart3,
+  Calculator,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Package,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react'
+import {
   Table,
   TableBody,
   TableCell,
@@ -7,20 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
-import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../primitives'
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Package,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
-  Calculator
-} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +27,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../navigation'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../primitives'
+import {
+  Badge,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../../primitives'
+import { Button } from '../../../primitives/button/Button'
 export interface Material {
   id: string
   reference: string
@@ -111,21 +116,21 @@ export function MaterialsTable({
   }
   const getStatusBadge = (status: Material['status']) => {
     const variants = {
-      active: { 
-        label: 'Actif', 
-        className: 'bg-green-100 text-green-800' 
+      active: {
+        label: 'Actif',
+        className: 'bg-green-100 text-green-800',
       },
-      inactive: { 
-        label: 'Inactif', 
-        className: 'bg-gray-100 text-gray-800' 
+      inactive: {
+        label: 'Inactif',
+        className: 'bg-gray-100 text-gray-800',
       },
-      discontinued: { 
-        label: 'Abandonné', 
-        className: 'bg-orange-100 text-orange-800' 
+      discontinued: {
+        label: 'Abandonné',
+        className: 'bg-orange-100 text-orange-800',
       },
-      outOfStock: { 
-        label: 'Rupture', 
-        className: 'bg-red-100 text-red-800' 
+      outOfStock: {
+        label: 'Rupture',
+        className: 'bg-red-100 text-red-800',
       },
     }
     const variant = variants[status] || variants.inactive
@@ -149,47 +154,47 @@ export function MaterialsTable({
   const getStockStatus = (material: Material) => {
     const { physicalStock, minimumStock, maximumStock, reorderPoint } = material.stock
     if (physicalStock <= 0) {
-      return { 
-        level: 'critical', 
-        color: 'text-red-600', 
+      return {
+        level: 'critical',
+        color: 'text-red-600',
         bgColor: 'bg-red-50',
         icon: <AlertTriangle className="h-4 w-4 text-red-600" />,
-        text: 'Rupture de stock' 
+        text: 'Rupture de stock',
       }
     }
     if (physicalStock <= minimumStock) {
-      return { 
-        level: 'low', 
-        color: 'text-orange-600', 
+      return {
+        level: 'low',
+        color: 'text-orange-600',
         bgColor: 'bg-orange-50',
         icon: <TrendingDown className="h-4 w-4 text-orange-600" />,
-        text: 'Stock faible' 
+        text: 'Stock faible',
       }
     }
     if (reorderPoint && physicalStock <= reorderPoint) {
-      return { 
-        level: 'reorder', 
-        color: 'text-yellow-600', 
+      return {
+        level: 'reorder',
+        color: 'text-yellow-600',
         bgColor: 'bg-yellow-50',
         icon: <AlertTriangle className="h-4 w-4 text-yellow-600" />,
-        text: 'À commander' 
+        text: 'À commander',
       }
     }
     if (maximumStock && physicalStock >= maximumStock) {
-      return { 
-        level: 'excess', 
-        color: 'text-blue-600', 
+      return {
+        level: 'excess',
+        color: 'text-blue-600',
         bgColor: 'bg-blue-50',
         icon: <TrendingUp className="h-4 w-4 text-blue-600" />,
-        text: 'Surstock' 
+        text: 'Surstock',
       }
     }
-    return { 
-      level: 'normal', 
-      color: 'text-green-600', 
+    return {
+      level: 'normal',
+      color: 'text-green-600',
       bgColor: 'bg-green-50',
       icon: null,
-      text: 'Normal' 
+      text: 'Normal',
     }
   }
   const formatCurrency = (amount: number, currency = 'EUR') => {
@@ -238,7 +243,10 @@ export function MaterialsTable({
               data.map((material) => {
                 const stockStatus = getStockStatus(material)
                 return (
-                  <TableRow key={material.id} className={stockStatus.level === 'critical' ? 'bg-red-50/50' : ''}>
+                  <TableRow
+                    key={material.id}
+                    className={stockStatus.level === 'critical' ? 'bg-red-50/50' : ''}
+                  >
                     <TableCell className="font-medium">
                       {material.reference}
                       {material.specifications?.grade && (
@@ -266,9 +274,7 @@ export function MaterialsTable({
                     <TableCell>
                       <Tooltip>
                         <TooltipTrigger>
-                          <div className="text-sm">
-                            {formatDimensions(material.dimensions)}
-                          </div>
+                          <div className="text-sm">{formatDimensions(material.dimensions)}</div>
                         </TooltipTrigger>
                         {material.specifications && (
                           <TooltipContent>
@@ -296,7 +302,8 @@ export function MaterialsTable({
                           Disponible: {material.stock.availableStock}
                           {material.stock.reservedStock > 0 && (
                             <span className="text-orange-600">
-                              {' '}(Réservé: {material.stock.reservedStock})
+                              {' '}
+                              (Réservé: {material.stock.reservedStock})
                             </span>
                           )}
                         </div>
@@ -308,24 +315,31 @@ export function MaterialsTable({
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className={`flex items-center gap-2 px-2 py-1 rounded ${stockStatus.bgColor}`}>
+                      <div
+                        className={`flex items-center gap-2 px-2 py-1 rounded ${stockStatus.bgColor}`}
+                      >
                         {stockStatus.icon}
                         <span className={`text-sm font-medium ${stockStatus.color}`}>
                           {stockStatus.text}
                         </span>
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Min: {material.stock.minimumStock} | Max: {material.stock.maximumStock || 'N/A'}
+                        Min: {material.stock.minimumStock} | Max:{' '}
+                        {material.stock.maximumStock || 'N/A'}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
                       {formatCurrency(material.pricing.purchasePrice, material.pricing.currency)}
-                      {material.pricing.lastPurchasePrice && 
-                       material.pricing.lastPurchasePrice !== material.pricing.purchasePrice && (
-                        <div className="text-xs text-muted-foreground">
-                          Dernier: {formatCurrency(material.pricing.lastPurchasePrice, material.pricing.currency)}
-                        </div>
-                      )}
+                      {material.pricing.lastPurchasePrice &&
+                        material.pricing.lastPurchasePrice !== material.pricing.purchasePrice && (
+                          <div className="text-xs text-muted-foreground">
+                            Dernier:{' '}
+                            {formatCurrency(
+                              material.pricing.lastPurchasePrice,
+                              material.pricing.currency
+                            )}
+                          </div>
+                        )}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="font-medium">
@@ -333,7 +347,8 @@ export function MaterialsTable({
                       </div>
                       {material.pricing.averageCost && (
                         <div className="text-xs text-muted-foreground">
-                          PMP: {formatCurrency(material.pricing.averageCost, material.pricing.currency)}
+                          PMP:{' '}
+                          {formatCurrency(material.pricing.averageCost, material.pricing.currency)}
                         </div>
                       )}
                     </TableCell>
@@ -341,7 +356,7 @@ export function MaterialsTable({
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
+                          <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -370,7 +385,7 @@ export function MaterialsTable({
                             Calculer les besoins
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onDelete?.(material)}
                             className="text-red-600"
                             disabled={material.stock.physicalStock > 0}

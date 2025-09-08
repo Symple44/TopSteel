@@ -8,7 +8,15 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { MenuItem } from './menu-item.entity'
+
+// import { MenuItem } from './menu-item.entity';
+
+// Type definition to avoid circular dependency
+type MenuItem = {
+  id: string
+  menuId: string
+  // Other MenuItem properties would be here
+}
 
 /**
  * Menu item action entity
@@ -54,11 +62,7 @@ export class MenuItemAction {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(
-    () => MenuItem,
-    (menuItem) => menuItem.actions,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne('MenuItem', 'actions', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'menu_item_id' })
   menuItem!: MenuItem
 

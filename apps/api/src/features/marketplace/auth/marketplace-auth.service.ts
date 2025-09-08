@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import * as bcrypt from 'bcrypt'
 import type { Redis } from 'ioredis'
-import type { Repository } from 'typeorm'
+import type { DeepPartial, Repository } from 'typeorm'
 import type { EmailService } from '../../../core/email/email.service'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 
@@ -65,16 +65,18 @@ export class MarketplaceAuthService {
     @InjectRedis() private readonly redisService: Redis,
     private readonly emailService: EmailService
   ) {
-    this.jwtSecret =
+    const jwtSecret =
       this.configService.get<string>('MARKETPLACE_JWT_SECRET') ||
       this.configService.get<string>('JWT_SECRET')
 
     // Security: Ensure JWT secret is always defined
-    if (!this.jwtSecret) {
+    if (!jwtSecret) {
       throw new Error(
         'MARKETPLACE_JWT_SECRET or JWT_SECRET must be defined in environment variables'
       )
     }
+
+    this.jwtSecret = jwtSecret
 
     // Validate JWT secret strength
     if (this.jwtSecret.length < 32) {
@@ -113,7 +115,7 @@ export class MarketplaceAuthService {
     const hashedPassword = await bcrypt.hash(data.password, salt)
 
     // Create customer (aligned with entity)
-    const customer = this.customerRepository.create({
+    const customerData: DeepPartial<MarketplaceCustomer> = {
       email: data.email.toLowerCase(),
       passwordHash: hashedPassword,
       firstName: data.firstName,
@@ -125,12 +127,14 @@ export class MarketplaceAuthService {
       tenantId,
       metadata: {
         registeredAt: new Date(),
-        registrationIp: null, // Should be passed from request context
+        registrationIp: undefined, // Should be passed from request context
         lastLoginAt: new Date(),
       },
-    })
+    }
 
-    const savedCustomer = await this.customerRepository.save(customer)
+    const customer = this.customerRepository.create(customerData)
+
+    const savedCustomer = (await this.customerRepository.save(customer)) as MarketplaceCustomer
 
     // Generate email verification token
     const verificationToken = await this.generateVerificationToken(savedCustomer.id)
@@ -471,7 +475,7 @@ export class MarketplaceAuthService {
 
   private async isAccountLocked(email: string): Promise<boolean> {
     const attempts = await this.redisService.get(`failed_attempts:${email}`)
-    return parseInt(attempts || '0') >= this.maxLoginAttempts
+    return parseInt(attempts || '0', 10) >= this.maxLoginAttempts
   }
 
   private async recordFailedAttempt(email: string): Promise<void> {
@@ -600,7 +604,7 @@ export class MarketplaceAuthService {
     const rateLimitKey = `verify_email_rate_limit:${customer.email}`
     const attempts = await this.redisService.get(rateLimitKey)
 
-    if (parseInt(attempts || '0') >= 3) {
+    if (parseInt(attempts || '0', 10) >= 3) {
       throw new BadRequestException(
         'Too many verification emails sent. Please try again in 1 hour.'
       )

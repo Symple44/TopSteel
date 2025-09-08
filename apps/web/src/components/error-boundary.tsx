@@ -59,7 +59,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     this.state = {
       hasError: false,
-      errorId: this.generateErrorId(),
+      errorId: this?.generateErrorId(),
       retryCount: 0,
     }
   }
@@ -73,21 +73,21 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({ errorInfo })
+    this?.setState({ errorInfo })
 
     // ✅ LOGGING ENTERPRISE
-    this.logError(error, errorInfo)
+    this?.logError(error, errorInfo)
 
     // ✅ METRICS & MONITORING
-    this.trackErrorMetrics(error, errorInfo)
+    this?.trackErrorMetrics(error, errorInfo)
 
     // ✅ CALLBACK PARENT
-    if (this.props.onError) {
-      this.props.onError(error, errorInfo)
+    if (this?.props?.onError) {
+      this?.props?.onError(error, errorInfo)
     }
 
     // ✅ RETRY AUTOMATIQUE POUR CERTAINES ERREURS
-    this.scheduleRetryIfApplicable(error)
+    this?.scheduleRetryIfApplicable(error)
   }
 
   override componentWillUnmount() {
@@ -103,27 +103,27 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private logError(error: Error, errorInfo: ErrorInfo) {
     const errorData = {
-      errorId: this.state.errorId,
+      errorId: this?.state?.errorId,
       message: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack,
       timestamp: new Date().toISOString(),
-      url: typeof window !== 'undefined' ? window.location.href : 'SSR',
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Server',
+      url: typeof window !== 'undefined' ? window?.location?.href : 'SSR',
+      userAgent: typeof window !== 'undefined' ? window?.navigator?.userAgent : 'Server',
     }
 
     // Service de logging en production
-    if (process.env.NODE_ENV === 'production') {
-      this.sendErrorToService(errorData)
+    if (process?.env?.NODE_ENV === 'production') {
+      this?.sendErrorToService(errorData)
     }
   }
 
   private trackErrorMetrics(error: Error, _errorInfo: ErrorInfo) {
     const _metrics: ErrorMetrics = {
       timestamp: Date.now(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Server',
-      url: typeof window !== 'undefined' ? window.location.href : 'SSR',
-      errorBoundary: this.constructor.name,
+      userAgent: typeof window !== 'undefined' ? window?.navigator?.userAgent : 'Server',
+      url: typeof window !== 'undefined' ? window?.location?.href : 'SSR',
+      errorBoundary: this?.constructor?.name,
     }
 
     // Analytics/monitoring
@@ -131,7 +131,7 @@ export class ErrorBoundary extends Component<Props, State> {
       ;(window as WindowWithGtag).gtag?.('event', 'exception', {
         description: error.message,
         fatal: true,
-        custom_map: { error_id: this.state.errorId },
+        custom_map: { error_id: this?.state?.errorId },
       })
     }
   }
@@ -149,30 +149,30 @@ export class ErrorBoundary extends Component<Props, State> {
     // Retry pour certains types d'erreurs résolvables
     const retryableErrors = ['ChunkLoadError', 'Loading chunk', 'NetworkError', 'Failed to fetch']
 
-    const isRetryable = retryableErrors.some(
-      (pattern) => error.message.includes(pattern) || error.name.includes(pattern)
+    const isRetryable = retryableErrors?.some(
+      (pattern) => error?.message?.includes(pattern) || error?.name?.includes(pattern)
     )
 
-    if (isRetryable && this.state.retryCount < this.maxRetries) {
+    if (isRetryable && this?.state?.retryCount < this.maxRetries) {
       const timeout = setTimeout(
         () => {
-          this.setState({
+          this?.setState({
             hasError: false,
-            retryCount: this.state.retryCount + 1,
-            errorId: this.generateErrorId(),
+            retryCount: this?.state?.retryCount + 1,
+            errorId: this?.generateErrorId(),
           })
         },
-        this.retryDelay * 2 ** this.state.retryCount
+        this.retryDelay * 2 ** this?.state?.retryCount
       ) // Backoff exponentiel
 
-      this.retryTimeouts.push(timeout)
+      this?.retryTimeouts?.push(timeout)
     }
   }
 
   private handleManualRetry = () => {
-    this.setState({
+    this?.setState({
       hasError: false,
-      errorId: this.generateErrorId(),
+      errorId: this?.generateErrorId(),
       retryCount: 0,
     })
   }
@@ -184,11 +184,11 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleReportBug = () => {
-    const subject = `Bug Report - Error ${this.state.errorId}`
+    const subject = `Bug Report - Error ${this?.state?.errorId}`
     const body = `
-Error ID: ${this.state.errorId}
+Error ID: ${this?.state?.errorId}
 Error: ${this.state.error?.message || 'Unknown error'}
-URL: ${typeof window !== 'undefined' ? window.location.href : 'SSR'}
+URL: ${typeof window !== 'undefined' ? window?.location?.href : 'SSR'}
 Timestamp: ${new Date().toISOString()}
 
 Stack trace:
@@ -206,13 +206,13 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
   }
 
   override render() {
-    if (this.state.hasError) {
+    if (this?.state?.hasError) {
       // Fallback personnalisé fourni par le parent
-      if (this.props.fallback) {
-        return this.props.fallback
+      if (this?.props?.fallback) {
+        return this?.props?.fallback
       }
 
-      const t = this.props.translations || {
+      const t = this?.props?.translations || {
         title: "Oups ! Une erreur s'est produite",
         description: "Quelque chose s'est mal passé dans l'application.",
         technicalDetails: 'Détails techniques',
@@ -233,37 +233,37 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
               <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="w-8 h-8 text-destructive" />
               </div>
-              <h1 className="text-xl font-semibold text-foreground mb-2">{t.title}</h1>
-              <p className="text-muted-foreground text-sm">{t.description}</p>
+              <h1 className="text-xl font-semibold text-foreground mb-2">{t?.title}</h1>
+              <p className="text-muted-foreground text-sm">{t?.description}</p>
             </div>
 
             {/* Détails de l'erreur en mode développement */}
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process?.env?.NODE_ENV === 'development' && this?.state?.error && (
               <div className="mb-6 p-3 bg-muted rounded-md text-left">
                 <details className="text-xs">
                   <summary
                     className="cursor-pointer font-medium text-foreground mb-2"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        e.currentTarget.click()
+                        e?.preventDefault()
+                        e?.currentTarget?.click()
                       }
                     }}
                   >
-                    {t.technicalDetails}
+                    {t?.technicalDetails}
                   </summary>
                   <div className="space-y-2">
                     <div>
-                      <strong>{t.errorLabel}</strong>
+                      <strong>{t?.errorLabel}</strong>
                       <code className="block mt-1 p-2 bg-background rounded text-destructive text-xs">
-                        {this.state.error.message}
+                        {this?.state?.error.message}
                       </code>
                     </div>
                     {this.state.errorInfo?.componentStack && (
                       <div>
-                        <strong>{t.componentLabel}</strong>
+                        <strong>{t?.componentLabel}</strong>
                         <pre className="mt-1 p-2 bg-background rounded text-xs overflow-auto max-h-32">
-                          {this.state.errorInfo.componentStack}
+                          {this?.state?.errorInfo.componentStack}
                         </pre>
                       </div>
                     )}
@@ -274,42 +274,45 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
 
             {/* ID d'erreur pour le support */}
             <div className="mb-6 text-xs text-muted-foreground">
-              {t.errorId} <code className="bg-muted px-1 rounded">{this.state.errorId}</code>
+              {t?.errorId} <code className="bg-muted px-1 rounded">{this?.state?.errorId}</code>
             </div>
 
             {/* Actions */}
             <div className="space-y-3">
               <Button
+                type="button"
                 onClick={this.handleManualRetry}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
-                {t.retry}
+                {t?.retry}
               </Button>
 
               <div className="grid grid-cols-2 gap-2">
                 <Button
+                  type="button"
                   onClick={this.handleGoHome}
                   className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-3 py-2 rounded-md hover:bg-secondary/80 transition-colors text-sm"
                 >
                   <Home className="w-4 h-4" />
-                  {t.home}
+                  {t?.home}
                 </Button>
 
                 <Button
+                  type="button"
                   onClick={this.handleReportBug}
                   className="flex items-center justify-center gap-2 bg-muted text-muted-foreground px-3 py-2 rounded-md hover:bg-muted/80 transition-colors text-sm"
                 >
                   <Bug className="w-4 h-4" />
-                  {t.report}
+                  {t?.report}
                 </Button>
               </div>
             </div>
 
             {/* Information de retry automatique */}
-            {this.state.retryCount > 0 && (
+            {this?.state?.retryCount > 0 && (
               <div className="mt-4 text-xs text-muted-foreground">
-                {t.automaticRetries} {this.state.retryCount}/{this.maxRetries}
+                {t?.automaticRetries} {this?.state?.retryCount}/{this.maxRetries}
               </div>
             )}
           </div>
@@ -317,7 +320,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
       )
     }
 
-    return this.props.children
+    return this?.props?.children
   }
 }
 
@@ -363,7 +366,7 @@ export function ErrorBoundaryWithTranslations({ children, ...props }: Omit<Props
 // Hook pour déclencher des erreurs en développement
 export function useErrorHandler() {
   return (error: Error, _errorInfo?: string) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process?.env?.NODE_ENV === 'development') {
     }
     throw error
   }
@@ -377,7 +380,7 @@ export function ErrorTrigger({ children }: { children?: ReactNode }) {
     throw new Error('Test error triggered manually')
   }
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (process?.env?.NODE_ENV !== 'development') {
     return <>{children}</>
   }
 
@@ -385,6 +388,7 @@ export function ErrorTrigger({ children }: { children?: ReactNode }) {
     <div>
       {children}
       <Button
+        type="button"
         onClick={() => setShouldError(true)}
         className="mt-4 px-3 py-1 bg-destructive text-destructive-foreground rounded text-xs"
       >

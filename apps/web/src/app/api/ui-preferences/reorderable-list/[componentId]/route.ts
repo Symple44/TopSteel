@@ -14,19 +14,19 @@ export async function GET(
     // Récupérer l'utilisateur authentifié
     const user = await getAuthenticatedUser(request)
     if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+      return NextResponse?.json({ error: 'Authentication required' }, { status: 401 })
     }
 
     // Récupérer la configuration depuis la base de données
-    const config = await UIPreferencesService.getConfig(user.id, componentId)
+    const config = await UIPreferencesService?.getConfig(user?.id, componentId)
 
     if (!config) {
-      return NextResponse.json({ error: 'Configuration not found' }, { status: 404 })
+      return NextResponse?.json({ error: 'Configuration not found' }, { status: 404 })
     }
 
-    return NextResponse.json(config)
+    return NextResponse?.json(config)
   } catch (_error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse?.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -37,29 +37,29 @@ export async function POST(
 ) {
   try {
     const { componentId } = await params
-    const body = (await request.json()) as Partial<ReorderableListConfig>
+    const body = (await request?.json()) as Partial<ReorderableListConfig>
 
     // Validation basique
-    if (!body || (body.componentId && body.componentId !== componentId)) {
-      return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
+    if (!body || (body?.componentId && body?.componentId !== componentId)) {
+      return NextResponse?.json({ error: 'Invalid data' }, { status: 400 })
     }
 
     // Récupérer l'utilisateur authentifié
     const user = await getAuthenticatedUser(request)
     if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+      return NextResponse?.json({ error: 'Authentication required' }, { status: 401 })
     }
 
     // Sauvegarder en base de données
-    const savedConfig = await UIPreferencesService.saveConfig(user.id, componentId, {
+    const savedConfig = await UIPreferencesService?.saveConfig(user?.id, componentId, {
       theme: body.theme,
       preferences: body.preferences,
       layout: body.layout,
     })
 
-    return NextResponse.json(savedConfig)
+    return NextResponse?.json(savedConfig)
   } catch (_error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse?.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -74,18 +74,18 @@ export async function DELETE(
     // Récupérer l'utilisateur authentifié
     const user = await getAuthenticatedUser(request)
     if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+      return NextResponse?.json({ error: 'Authentication required' }, { status: 401 })
     }
 
     // Supprimer de la base de données
-    const deleted = await UIPreferencesService.deleteConfig(user.id, componentId)
+    const deleted = await UIPreferencesService?.deleteConfig(user?.id, componentId)
 
     if (!deleted) {
-      return NextResponse.json({ error: 'Configuration not found' }, { status: 404 })
+      return NextResponse?.json({ error: 'Configuration not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse?.json({ success: true })
   } catch (_error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse?.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

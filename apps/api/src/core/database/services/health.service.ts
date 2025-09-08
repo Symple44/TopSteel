@@ -181,7 +181,7 @@ export class DatabaseHealthService {
         AND state = 'active'
       `)
 
-      return parseInt(result[0]?.count || '0')
+      return parseInt(result[0]?.count || '0', 10)
     } catch (error) {
       this.logger.error('Failed to get connection count:', error)
       return 0
@@ -217,7 +217,7 @@ export class DatabaseHealthService {
                pg_database_size(current_database()) as bytes
       `)
 
-      return parseInt(result[0]?.bytes || '0')
+      return parseInt(result[0]?.bytes || '0', 10)
     } catch (error) {
       this.logger.error('Failed to get disk usage:', error)
       return undefined

@@ -3,9 +3,8 @@
 import { Button, Card, Input, Label } from '@erp/ui'
 import { ArrowLeft, CheckCircle, Mail, Shield } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import type { FC } from 'react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 
@@ -14,15 +13,16 @@ export const dynamic = 'force-dynamic'
 
 const ForgotPasswordPage: FC = () => {
   const { t } = useTranslation('auth')
-  const _router = useRouter()
+  // const _router = useRouter() // Unused - removed
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
+  const emailId = useId()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e?.preventDefault()
 
-    if (!email.trim()) {
+    if (!email?.trim()) {
       toast({
         title: t('common.error') || 'Erreur',
         description: t('enterEmail'),
@@ -33,7 +33,7 @@ const ForgotPasswordPage: FC = () => {
 
     // Validation email basique
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
+    if (!emailRegex?.test(email)) {
       toast({
         title: t('common.error') || 'Erreur',
         description: t('enterValidEmail'),
@@ -125,14 +125,14 @@ const ForgotPasswordPage: FC = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">{t('email')}</Label>
+              <Label htmlFor={emailId}>{t('email')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  id="email"
+                  id={emailId}
                   type="email"
                   value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e?.target?.value)}
                   placeholder="jean.dupont@entreprise.com"
                   className="pl-10"
                   required

@@ -10,15 +10,6 @@ interface EdgeWorkerConfig {
   durableObjectNamespaceId?: string
 }
 
-interface CacheRule {
-  pattern: string
-  ttl: number
-  cacheKey?: string
-  bypassCache?: boolean
-  edgeTTL?: number
-  browserTTL?: number
-}
-
 @Injectable()
 export class EdgeWorkerService {
   private readonly logger = new Logger(EdgeWorkerService.name)
@@ -239,7 +230,7 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         this.logger.error(`Worker deployment failed: ${JSON.stringify(data.errors)}`)
@@ -271,7 +262,7 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         this.logger.error(`KV namespace creation failed: ${JSON.stringify(data.errors)}`)
@@ -291,9 +282,9 @@ function getClosestOrigin(request) {
    */
   async putKV(
     key: string,
-    value: any,
+    value: unknown,
     ttl?: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<boolean> {
     try {
       const body: any = {
@@ -386,7 +377,7 @@ function getClosestOrigin(request) {
       key: string
       value: any
       ttl?: number
-      metadata?: Record<string, any>
+      metadata?: Record<string, unknown>
     }>
   ): Promise<boolean> {
     try {
@@ -409,7 +400,7 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         this.logger.error(`Bulk write failed: ${JSON.stringify(data.errors)}`)
@@ -449,7 +440,7 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as unknown
 
       if (!data.success) {
         this.logger.error(`List keys failed: ${JSON.stringify(data.errors)}`)
@@ -466,7 +457,7 @@ function getClosestOrigin(request) {
   /**
    * Generate cache key
    */
-  generateCacheKey(path: string, params?: Record<string, any>, userId?: string): string {
+  generateCacheKey(path: string, params?: Record<string, unknown>, userId?: string): string {
     const parts = [path]
 
     if (params) {
@@ -522,7 +513,7 @@ function getClosestOrigin(request) {
   async warmUpCache(
     endpoints: Array<{
       path: string
-      params?: Record<string, any>
+      params?: Record<string, unknown>
       data: any
       ttl?: number
     }>

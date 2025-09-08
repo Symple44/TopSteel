@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { QueryBuilder } from './query-builder.entity'
+// Removed import to avoid circular dependencies
+// import { QueryBuilder } from './query-builder.entity'
 
 export type JoinType = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL'
 
@@ -11,15 +12,12 @@ export class QueryBuilderJoin {
   @Column()
   queryBuilderId: string
 
-  @ManyToOne(
-    () => QueryBuilder,
-    (queryBuilder) => queryBuilder.joins,
-    {
-      onDelete: 'CASCADE',
-    }
-  )
+  @ManyToOne('QueryBuilder', 'joins', {
+    onDelete: 'CASCADE',
+    lazy: true,
+  })
   @JoinColumn({ name: 'queryBuilderId' })
-  queryBuilder: QueryBuilder
+  queryBuilder: any
 
   @Column()
   fromTable: string

@@ -12,7 +12,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
  */
 export function DevToolsWrapper() {
   // Sécurité: Pas d'affichage en production
-  if (process.env.NODE_ENV !== 'development') {
+  if (process?.env?.NODE_ENV !== 'development') {
     return null
   }
 

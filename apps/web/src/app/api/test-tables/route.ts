@@ -5,5 +5,5 @@ export async function GET() {
     { name: 'test_table_1', schema: 'test', columns: [{ name: 'id', type: 'int' }] },
     { name: 'test_table_2', schema: 'test', columns: [{ name: 'name', type: 'varchar' }] },
   ]
-  return NextResponse.json(testData)
+  return NextResponse?.json(testData)
 }

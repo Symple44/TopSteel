@@ -1,3 +1,4 @@
+import type { NotificationRule } from '@erp/types/cross-cutting'
 import { type NextRequest, NextResponse } from 'next/server'
 
 // Service de test des règles (mockée)
@@ -15,11 +16,10 @@ class RuleTestService {
 
     for (let i = 0; i < conditions.length; i++) {
       const condition = conditions[i]
-      const conditionResult = this.evaluateCondition(condition, testData)
-      results[condition.id] = {
-        condition: `${condition.field} ${condition.operator} ${JSON.stringify(condition.value)}`,
+      const conditionResult = this?.evaluateCondition(condition, testData)
+      results[`condition_${i}`] = {
         result: conditionResult,
-        actualValue: this.getFieldValue(condition.field, testData),
+        value: this?.getFieldValue(condition.field, testData),
       }
 
       if (i === 0) {
@@ -41,7 +41,7 @@ class RuleTestService {
     condition: { field: string; operator: string; value: unknown },
     testData: Record<string, unknown>
   ): boolean {
-    const fieldValue = this.getFieldValue(condition.field, testData)
+    const fieldValue = this?.getFieldValue(condition.field, testData)
     const conditionValue = condition.value
 
     switch (condition.operator) {
@@ -52,16 +52,32 @@ class RuleTestService {
         return fieldValue !== conditionValue
 
       case 'contains':
-        return typeof fieldValue === 'string' && fieldValue.includes(conditionValue)
+        return (
+          typeof fieldValue === 'string' &&
+          typeof conditionValue === 'string' &&
+          fieldValue.includes(conditionValue)
+        )
 
       case 'not_contains':
-        return typeof fieldValue === 'string' && !fieldValue.includes(conditionValue)
+        return (
+          typeof fieldValue === 'string' &&
+          typeof conditionValue === 'string' &&
+          !fieldValue.includes(conditionValue)
+        )
 
       case 'starts_with':
-        return typeof fieldValue === 'string' && fieldValue.startsWith(conditionValue)
+        return (
+          typeof fieldValue === 'string' &&
+          typeof conditionValue === 'string' &&
+          fieldValue.startsWith(conditionValue)
+        )
 
       case 'ends_with':
-        return typeof fieldValue === 'string' && fieldValue.endsWith(conditionValue)
+        return (
+          typeof fieldValue === 'string' &&
+          typeof conditionValue === 'string' &&
+          fieldValue.endsWith(conditionValue)
+        )
 
       case 'greater_than':
         return Number(fieldValue) > Number(conditionValue)
@@ -76,10 +92,10 @@ class RuleTestService {
         return Number(fieldValue) <= Number(conditionValue)
 
       case 'in':
-        return Array.isArray(conditionValue) && conditionValue.includes(fieldValue)
+        return Array.isArray(conditionValue) && conditionValue?.includes(fieldValue)
 
       case 'not_in':
-        return Array.isArray(conditionValue) && !conditionValue.includes(fieldValue)
+        return Array.isArray(conditionValue) && !conditionValue?.includes(fieldValue)
 
       case 'is_null':
         return fieldValue === null || fieldValue === undefined
@@ -89,6 +105,7 @@ class RuleTestService {
 
       case 'regex':
         try {
+          if (typeof conditionValue !== 'string') return false
           const regex = new RegExp(conditionValue)
           return regex.test(String(fieldValue))
         } catch {
@@ -101,12 +118,12 @@ class RuleTestService {
   }
 
   private getFieldValue(field: string, data: Record<string, unknown>): unknown {
-    const fieldParts = field.split('.')
-    let value = data
+    const fieldParts = field?.split('.')
+    let value: unknown = data
 
     for (const part of fieldParts) {
-      if (value && typeof value === 'object' && part in value) {
-        value = value[part]
+      if (value && typeof value === 'object' && part in (value as Record<string, unknown>)) {
+        value = (value as Record<string, unknown>)[part]
       } else {
         return undefined
       }
@@ -116,7 +133,7 @@ class RuleTestService {
   }
 
   substituteVariables(template: string, variables: Record<string, unknown>): string {
-    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+    return template?.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       return variables[key] !== undefined ? String(variables[key]) : match
     })
   }
@@ -128,14 +145,18 @@ class RuleTestService {
     const variables = { ...testData }
 
     // Ajouter des variables système
-    variables.timestamp = new Date().toISOString()
-    variables.test_mode = true
+    if (variables) {
+      variables.timestamp = new Date().toISOString()
+      variables.test_mode = true
+    }
 
     // Ajouter des variables spécifiques selon le type
     switch (triggerType) {
       case 'stock':
-        variables.stock_url = `/stock/materials/${variables.material_id || 'test'}`
-        if (variables.quantity && variables.threshold) {
+        if (variables) {
+          variables.stock_url = `/stock/materials/${variables.material_id || 'test'}`
+        }
+        if (typeof variables?.quantity === 'number' && typeof variables?.threshold === 'number') {
           variables.threshold_percentage = Math.round(
             (variables.quantity / variables.threshold) * 100
           )
@@ -143,23 +164,33 @@ class RuleTestService {
         break
 
       case 'user':
-        variables.user_profile_url = `/users/${variables.user_id || 'test'}/profile`
+        if (variables) {
+          variables.user_profile_url = `/users/${variables.user_id || 'test'}/profile`
+        }
         break
 
       case 'project':
-        variables.project_url = `/projets/${variables.project_id || 'test'}`
+        if (variables) {
+          variables.project_url = `/projets/${variables.project_id || 'test'}`
+        }
         break
 
       case 'production':
-        variables.machine_url = `/production/machines/${variables.machine_id || 'test'}`
+        if (variables) {
+          variables.machine_url = `/production/machines/${variables.machine_id || 'test'}`
+        }
         break
 
       case 'email':
-        variables.email_url = `/emails/${variables.email_id || 'test'}`
+        if (variables) {
+          variables.email_url = `/emails/${variables.email_id || 'test'}`
+        }
         break
 
       case 'system':
-        variables.system_logs_url = `/admin/logs?component=${variables.component || 'test'}`
+        if (variables) {
+          variables.system_logs_url = `/admin/logs?component=${variables.component || 'test'}`
+        }
         break
     }
 
@@ -170,70 +201,59 @@ class RuleTestService {
 const ruleTestService = new RuleTestService()
 
 // Stockage temporaire des règles
-interface NotificationRule {
-  id: string
-  name: string
-  conditions: Array<{ field: string; operator: string; value: unknown; logic?: 'AND' | 'OR' }>
-  notification: {
-    type: 'info' | 'success' | 'warning' | 'error'
-    category: string
-    title: string
-    message: string
-    [key: string]: unknown
-  }
-}
 
 const notificationRules: NotificationRule[] = [
   {
     id: '1',
     name: 'Alerte Stock Critique',
+    description: 'Notifie quand le stock est critique',
+    type: 'in-app',
+    enabled: true,
     isActive: true,
     trigger: { type: 'stock', event: 'stock_low' },
     conditions: [
-      { id: '1', field: 'quantity', operator: 'less_than', value: 10, type: 'number' },
-      {
-        id: '2',
-        field: 'category',
-        operator: 'in',
-        value: ['metal', 'steel'],
-        type: 'string',
-        logic: 'AND',
-      },
+      { field: 'quantity', operator: 'less_than', value: 10 },
+      { field: 'category', operator: 'equals', value: 'metal' },
     ],
+    actions: [{ type: 'notification', config: { priority: 'HIGH' } }],
     notification: {
       type: 'warning',
-      category: 'stock',
-      titleTemplate: 'Stock critique: {{material_name}}',
-      messageTemplate:
-        'Le stock de {{material_name}} est maintenant de {{quantity}} unités (seuil: {{threshold}})',
-      priority: 'HIGH',
-      actionUrl: '/stock/materials/{{material_id}}',
-      actionLabel: 'Voir le stock',
+      template: 'stock_alert_template',
+      variables: { material_name: '', quantity: 0, threshold: 10 },
     },
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-15'),
+    lastTriggered: '2024-01-15T10:30:00Z',
+    triggerCount: 5,
   },
 ]
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
+
+    if (!request) {
+      return NextResponse?.json({ success: false, error: 'Requête invalide' }, { status: 400 })
+    }
+
     const { testData } = await request.json()
 
     if (!testData || typeof testData !== 'object') {
-      return NextResponse.json(
+      return NextResponse?.json(
         { success: false, error: 'Données de test requises' },
         { status: 400 }
       )
     }
 
     // Trouver la règle
-    const rule = notificationRules.find((r) => r.id === id)
+    const rule = notificationRules?.find((r) => r.id === id)
     if (!rule) {
-      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
+      return NextResponse?.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Vérifier si la règle est active
-    if (!rule.isActive) {
-      return NextResponse.json({
+    if (!rule?.isActive) {
+      return NextResponse?.json({
         success: false,
         error: 'Règle inactive',
         result: {
@@ -245,10 +265,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Évaluer les conditions
-    const conditionResult = ruleTestService.evaluateConditions(rule.conditions, testData)
+    const conditionResult = ruleTestService?.evaluateConditions(rule?.conditions || [], testData)
 
     if (!conditionResult.result) {
-      return NextResponse.json({
+      return NextResponse?.json({
         success: true,
         result: {
           ruleActive: true,
@@ -259,17 +279,31 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Préparer les variables pour le template
-    const templateVariables = ruleTestService.prepareTemplateVariables(testData, rule.trigger.type)
+    const templateVariables = ruleTestService?.prepareTemplateVariables(
+      testData,
+      rule?.trigger?.type || 'system'
+    )
 
     // Générer un aperçu de la notification
-    const config = rule.notification
-    const title = ruleTestService.substituteVariables(config.titleTemplate, templateVariables)
-    const message = ruleTestService.substituteVariables(config.messageTemplate, templateVariables)
+    const config = rule?.notification
+    if (!config) {
+      return NextResponse.json(
+        { success: false, error: 'Configuration de notification manquante' },
+        { status: 400 }
+      )
+    }
+
+    const title = config.titleTemplate
+      ? ruleTestService?.substituteVariables(config.titleTemplate, templateVariables)
+      : 'Titre manquant'
+    const message = config.messageTemplate
+      ? ruleTestService?.substituteVariables(config.messageTemplate, templateVariables)
+      : 'Message manquant'
     const actionUrl = config.actionUrl
-      ? ruleTestService.substituteVariables(config.actionUrl, templateVariables)
+      ? ruleTestService?.substituteVariables(config.actionUrl, templateVariables)
       : undefined
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       result: {
         ruleActive: true,
@@ -288,7 +322,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { success: false, error: 'Erreur lors du test de la règle' },
       { status: 500 }
     )
@@ -301,13 +335,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const { id } = await params
 
     // Trouver la règle
-    const rule = notificationRules.find((r) => r.id === id)
+    const rule = notificationRules?.find((r) => r.id === id)
     if (!rule) {
-      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
+      return NextResponse?.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Générer des exemples de données selon le type d'événement
-    const triggerType = rule.trigger.type
+    const triggerType = rule?.trigger?.type
     let sampleData: Record<string, unknown> = {}
 
     switch (triggerType) {
@@ -401,7 +435,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         }
     }
 
-    return NextResponse.json({
+    return NextResponse?.json({
       success: true,
       data: {
         triggerType,
@@ -411,7 +445,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       },
     })
   } catch (_error) {
-    return NextResponse.json(
+    return NextResponse?.json(
       { success: false, error: "Erreur lors de la récupération des données d'exemple" },
       { status: 500 }
     )

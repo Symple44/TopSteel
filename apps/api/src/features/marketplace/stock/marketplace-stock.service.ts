@@ -75,7 +75,7 @@ export class MarketplaceStockService {
 
       // Calculate available stock (total - reserved - pending orders)
       const reservedStock = article.stockReserve || 0
-      const availableStock = Math.max(0, article.stockPhysique - reservedStock)
+      const availableStock = Math.max(0, (article.stockPhysique ?? 0) - reservedStock)
 
       // Cache the result
       await this.redisService.setex(cacheKey, this.STOCK_CACHE_TTL, availableStock.toString())
@@ -119,7 +119,7 @@ export class MarketplaceStockService {
 
       // Calculate available stock
       const reservedStock = article.stockReserve || 0
-      const availableStock = article.stockPhysique - reservedStock
+      const availableStock = (article.stockPhysique ?? 0) - reservedStock
 
       if (availableStock < quantity) {
         throw new BadRequestException(
@@ -207,7 +207,7 @@ export class MarketplaceStockService {
           throw new NotFoundException(`Article ${reservation.productId} not found`)
         }
 
-        const newStockQuantity = article.stockPhysique - reservation.quantity
+        const newStockQuantity = (article.stockPhysique ?? 0) - reservation.quantity
         const newReservedStock = Math.max(0, (article.stockReserve || 0) - reservation.quantity)
 
         await manager.update(Article, reservation.productId, {
@@ -334,7 +334,7 @@ export class MarketplaceStockService {
         return
       }
 
-      const availableStock = article.stockPhysique - (article.stockReserve || 0)
+      const availableStock = (article.stockPhysique ?? 0) - (article.stockReserve || 0)
       const minStock = article.stockMini || 0
 
       // Check for low stock
@@ -377,7 +377,7 @@ export class MarketplaceStockService {
         throw new NotFoundException(`Article ${productId} not found`)
       }
 
-      const oldQuantity = article.stockPhysique
+      const oldQuantity = article.stockPhysique ?? 0
       const difference = newQuantity - oldQuantity
 
       await this.articleRepository.update(productId, {

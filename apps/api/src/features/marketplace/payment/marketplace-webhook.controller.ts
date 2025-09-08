@@ -10,6 +10,8 @@ import {
   Req,
 } from '@nestjs/common'
 import type { Request } from 'express'
+import { getErrorMessage, hasStack } from '../../../core/common/utils'
+import { SkipCsrf } from '../../../infrastructure/security/csrf'
 import type { StripePaymentService } from './stripe-payment.service'
 
 @Controller('webhooks/stripe/marketplace')
@@ -18,10 +20,11 @@ export class MarketplaceWebhookController {
 
   constructor(private readonly stripePaymentService: StripePaymentService) {}
 
+  @SkipCsrf()
   @Post()
   @HttpCode(HttpStatus.OK)
   async handleStripeWebhook(
-    @Body() body: any,
+    @Body() body: unknown,
     @Headers('stripe-signature') signature: string,
     @Req() request: Request
   ) {
@@ -52,10 +55,10 @@ export class MarketplaceWebhookController {
 
       return { received: true }
     } catch (error) {
-      this.logger.error(`Stripe webhook processing failed: ${error.message}`, {
+      this.logger.error(`Stripe webhook processing failed: ${getErrorMessage(error)}`, {
         signature: `${signature?.substring(0, 20)}...`,
-        error: error.message,
-        stack: error.stack,
+        error: getErrorMessage(error),
+        stack: hasStack(error) ? error.stack : undefined,
       })
 
       if (error instanceof BadRequestException) {

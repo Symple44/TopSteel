@@ -1,19 +1,7 @@
 'use client'
-import { Badge } from '../../../data-display/badge'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Minus, 
-  DollarSign,
-  Target,
-  AlertTriangle,
-  CheckCircle,
-  BarChart3,
-  Calculator,
-  Percent,
-  ArrowUpDown
-} from 'lucide-react'
+import { DollarSign, Minus, Percent, TrendingDown, TrendingUp } from 'lucide-react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 export interface ProfitMarginData {
   id: string
   name: string
@@ -67,7 +55,7 @@ interface ProfitMarginDisplayProps {
   className?: string
   loading?: boolean
 }
-export function ProfitMarginDisplay({ 
+export function ProfitMarginDisplay({
   data,
   variant = 'detailed',
   size = 'md',
@@ -76,7 +64,7 @@ export function ProfitMarginDisplay({
   showTrend = true,
   showBenchmark = false,
   className,
-  loading = false
+  loading = false,
 }: ProfitMarginDisplayProps) {
   if (loading) {
     return (
@@ -149,22 +137,22 @@ export function ProfitMarginDisplay({
     return {
       marginChange,
       profitChange,
-      direction: marginChange > 0 ? 'up' : marginChange < 0 ? 'down' : 'neutral'
+      direction: marginChange > 0 ? 'up' : marginChange < 0 ? 'down' : 'neutral',
     }
   }
   const getTargetProgress = () => {
     if (!data.target) return null
-    const marginProgress = data.target.marginPercentage > 0 
-      ? (data.current.marginPercentage / data.target.marginPercentage) * 100 
-      : 0
-    const profitProgress = data.target.profit > 0 
-      ? (data.current.profit / data.target.profit) * 100 
-      : 0
+    const marginProgress =
+      data.target.marginPercentage > 0
+        ? (data.current.marginPercentage / data.target.marginPercentage) * 100
+        : 0
+    const profitProgress =
+      data.target.profit > 0 ? (data.current.profit / data.target.profit) * 100 : 0
     return {
       marginProgress: Math.min(marginProgress, 100),
       profitProgress: Math.min(profitProgress, 100),
       marginAchieved: data.current.marginPercentage >= data.target.marginPercentage,
-      profitAchieved: data.current.profit >= data.target.profit
+      profitAchieved: data.current.profit >= data.target.profit,
     }
   }
   const getSizeClasses = () => {
@@ -175,7 +163,7 @@ export function ProfitMarginDisplay({
           title: 'text-sm',
           value: 'text-lg',
           label: 'text-xs',
-          icon: 'h-3 w-3'
+          icon: 'h-3 w-3',
         }
       case 'lg':
         return {
@@ -183,7 +171,7 @@ export function ProfitMarginDisplay({
           title: 'text-lg',
           value: 'text-3xl',
           label: 'text-sm',
-          icon: 'h-5 w-5'
+          icon: 'h-5 w-5',
         }
       default:
         return {
@@ -191,7 +179,7 @@ export function ProfitMarginDisplay({
           title: 'text-base',
           value: 'text-2xl',
           label: 'text-sm',
-          icon: 'h-4 w-4'
+          icon: 'h-4 w-4',
         }
     }
   }
@@ -201,7 +189,13 @@ export function ProfitMarginDisplay({
   const sizeClasses = getSizeClasses()
   if (variant === 'compact') {
     return (
-      <div className={cn('flex items-center justify-between p-3 border rounded-lg', getMarginBgColor(marginLevel), className)}>
+      <div
+        className={cn(
+          'flex items-center justify-between p-3 border rounded-lg',
+          getMarginBgColor(marginLevel),
+          className
+        )}
+      >
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-white rounded">
             <Percent className="h-4 w-4 text-gray-600" />
@@ -232,16 +226,15 @@ export function ProfitMarginDisplay({
       <div className={cn('text-center space-y-3', sizeClasses.container, className)}>
         <h3 className={cn('font-medium', sizeClasses.title)}>{data.name}</h3>
         <div className="relative flex items-center justify-center">
-          <svg className="h-32 w-32" viewBox="0 0 100 100">
+          <svg
+            className="h-32 w-32"
+            viewBox="0 0 100 100"
+            role="img"
+            aria-label={`Graphique circulaire de marge bénéficiaire : ${formatPercentage(data.current.marginPercentage)}`}
+          >
+            <title>Graphique circulaire de marge bénéficiaire</title>
             {/* Background circle */}
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="#e5e7eb"
-              strokeWidth="8"
-            />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="8" />
             {/* Progress circle */}
             <circle
               cx="50"
@@ -257,7 +250,7 @@ export function ProfitMarginDisplay({
                 strokeDashoffset,
                 transform: 'rotate(-90deg)',
                 transformOrigin: '50px 50px',
-                transition: 'stroke-dashoffset 0.5s ease-in-out'
+                transition: 'stroke-dashoffset 0.5s ease-in-out',
               }}
             />
           </svg>
@@ -272,9 +265,7 @@ export function ProfitMarginDisplay({
           <p className="text-sm font-medium">
             {formatCurrency(data.current.profit, data.currency)}
           </p>
-          <p className="text-xs text-muted-foreground">
-            Bénéfice {data.period.label}
-          </p>
+          <p className="text-xs text-muted-foreground">Bénéfice {data.period.label}</p>
         </div>
         {showTarget && data.target && (
           <div className="text-xs text-muted-foreground">
@@ -294,12 +285,18 @@ export function ProfitMarginDisplay({
               {trendData.direction === 'up' && <TrendingUp className="h-4 w-4 text-green-600" />}
               {trendData.direction === 'down' && <TrendingDown className="h-4 w-4 text-red-600" />}
               {trendData.direction === 'neutral' && <Minus className="h-4 w-4 text-gray-600" />}
-              <span className={cn(
-                'text-sm font-medium',
-                trendData.direction === 'up' ? 'text-green-600' : 
-                trendData.direction === 'down' ? 'text-red-600' : 'text-gray-600'
-              )}>
-                {trendData.marginChange > 0 ? '+' : ''}{trendData.marginChange.toFixed(1)}pp
+              <span
+                className={cn(
+                  'text-sm font-medium',
+                  trendData.direction === 'up'
+                    ? 'text-green-600'
+                    : trendData.direction === 'down'
+                      ? 'text-red-600'
+                      : 'text-gray-600'
+                )}
+              >
+                {trendData.marginChange > 0 ? '+' : ''}
+                {trendData.marginChange.toFixed(1)}pp
               </span>
             </div>
           )}
@@ -321,13 +318,13 @@ export function ProfitMarginDisplay({
         {showTarget && targetProgress && (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span>Objectif marge: {formatPercentage(data.target!.marginPercentage)}</span>
+              <span>Objectif marge: {formatPercentage(data.target?.marginPercentage || 0)}</span>
               <span className={targetProgress.marginAchieved ? 'text-green-600' : 'text-red-600'}>
                 {targetProgress.marginProgress.toFixed(0)}%
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className={cn(
                   'h-2 rounded-full transition-all duration-300',
                   targetProgress.marginAchieved ? 'bg-green-500' : 'bg-blue-500'
@@ -354,13 +351,18 @@ export function ProfitMarginDisplay({
             <p className="text-xs text-muted-foreground">{data.period.label}</p>
           </div>
         </div>
-        <Badge className={cn(
-          'text-xs',
-          marginLevel === 'excellent' ? 'bg-green-100 text-green-800 border-green-200' :
-          marginLevel === 'good' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-          marginLevel === 'warning' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
-          'bg-red-100 text-red-800 border-red-200'
-        )}>
+        <Badge
+          className={cn(
+            'text-xs',
+            marginLevel === 'excellent'
+              ? 'bg-green-100 text-green-800 border-green-200'
+              : marginLevel === 'good'
+                ? 'bg-blue-100 text-blue-800 border-blue-200'
+                : marginLevel === 'warning'
+                  ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                  : 'bg-red-100 text-red-800 border-red-200'
+          )}
+        >
           {marginLevel === 'excellent' && 'Excellente'}
           {marginLevel === 'good' && 'Bonne'}
           {marginLevel === 'warning' && 'Attention'}
@@ -375,11 +377,15 @@ export function ProfitMarginDisplay({
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Coûts</p>
-          <p className="font-semibold text-red-600">{formatCurrency(data.current.cost, data.currency)}</p>
+          <p className="font-semibold text-red-600">
+            {formatCurrency(data.current.cost, data.currency)}
+          </p>
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Bénéfice</p>
-          <p className="font-semibold text-green-600">{formatCurrency(data.current.profit, data.currency)}</p>
+          <p className="font-semibold text-green-600">
+            {formatCurrency(data.current.profit, data.currency)}
+          </p>
         </div>
       </div>
       {/* Margin Display */}
@@ -393,12 +399,18 @@ export function ProfitMarginDisplay({
             {trendData.direction === 'up' && <TrendingUp className="h-4 w-4 text-green-600" />}
             {trendData.direction === 'down' && <TrendingDown className="h-4 w-4 text-red-600" />}
             {trendData.direction === 'neutral' && <Minus className="h-4 w-4 text-gray-600" />}
-            <span className={cn(
-              'text-sm font-medium',
-              trendData.direction === 'up' ? 'text-green-600' : 
-              trendData.direction === 'down' ? 'text-red-600' : 'text-gray-600'
-            )}>
-              {trendData.marginChange > 0 ? '+' : ''}{trendData.marginChange.toFixed(1)} points
+            <span
+              className={cn(
+                'text-sm font-medium',
+                trendData.direction === 'up'
+                  ? 'text-green-600'
+                  : trendData.direction === 'down'
+                    ? 'text-red-600'
+                    : 'text-gray-600'
+              )}
+            >
+              {trendData.marginChange > 0 ? '+' : ''}
+              {trendData.marginChange.toFixed(1)} points
             </span>
           </div>
         )}
@@ -408,15 +420,17 @@ export function ProfitMarginDisplay({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span>Objectif: {formatPercentage(data.target.marginPercentage)}</span>
-            <span className={cn(
-              'font-medium',
-              targetProgress.marginAchieved ? 'text-green-600' : 'text-red-600'
-            )}>
+            <span
+              className={cn(
+                'font-medium',
+                targetProgress.marginAchieved ? 'text-green-600' : 'text-red-600'
+              )}
+            >
               {targetProgress.marginAchieved ? 'Atteint' : 'Non atteint'}
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className={cn(
                 'h-2 rounded-full transition-all duration-300',
                 targetProgress.marginAchieved ? 'bg-green-500' : 'bg-blue-500'
@@ -433,20 +447,28 @@ export function ProfitMarginDisplay({
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span>Matériaux</span>
-              <span className="font-medium">{formatCurrency(data.breakdown.materialCosts, data.currency)}</span>
+              <span className="font-medium">
+                {formatCurrency(data.breakdown.materialCosts, data.currency)}
+              </span>
             </div>
             <div className="flex justify-between text-xs">
               <span>Main-d'œuvre</span>
-              <span className="font-medium">{formatCurrency(data.breakdown.laborCosts, data.currency)}</span>
+              <span className="font-medium">
+                {formatCurrency(data.breakdown.laborCosts, data.currency)}
+              </span>
             </div>
             <div className="flex justify-between text-xs">
               <span>Frais généraux</span>
-              <span className="font-medium">{formatCurrency(data.breakdown.overheadCosts, data.currency)}</span>
+              <span className="font-medium">
+                {formatCurrency(data.breakdown.overheadCosts, data.currency)}
+              </span>
             </div>
             {data.breakdown.otherCosts > 0 && (
               <div className="flex justify-between text-xs">
                 <span>Autres</span>
-                <span className="font-medium">{formatCurrency(data.breakdown.otherCosts, data.currency)}</span>
+                <span className="font-medium">
+                  {formatCurrency(data.breakdown.otherCosts, data.currency)}
+                </span>
               </div>
             )}
           </div>

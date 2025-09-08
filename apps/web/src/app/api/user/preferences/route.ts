@@ -28,15 +28,15 @@ let userPreferences = { ...mockPreferences }
 export async function GET() {
   try {
     await new Promise((resolve) => setTimeout(resolve, 100))
-    return NextResponse.json(userPreferences)
+    return NextResponse?.json(userPreferences)
   } catch {
-    return NextResponse.json({ error: 'Failed to fetch user preferences' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to fetch user preferences' }, { status: 500 })
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
-    const updates = await request.json()
+    const updates = await request?.json()
 
     userPreferences = {
       ...userPreferences,
@@ -45,8 +45,8 @@ export async function PATCH(request: NextRequest) {
 
     await new Promise((resolve) => setTimeout(resolve, 200))
 
-    return NextResponse.json(userPreferences)
+    return NextResponse?.json(userPreferences)
   } catch {
-    return NextResponse.json({ error: 'Failed to update user preferences' }, { status: 500 })
+    return NextResponse?.json({ error: 'Failed to update user preferences' }, { status: 500 })
   }
 }

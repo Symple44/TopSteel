@@ -77,5 +77,5 @@ export class SocieteUser extends CommonEntity {
 
   // Métadonnées - DISABLED: column doesn't exist in database
   // @Column({ type: 'jsonb', nullable: true })
-  // metadata?: Record<string, any>
+  // metadata?: Record<string, unknown>
 }

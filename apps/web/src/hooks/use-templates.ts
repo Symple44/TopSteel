@@ -68,7 +68,7 @@ export function useTemplates(): UseTemplatesReturn {
     let bestMatch: Template | null = null
     let bestScore = 0
 
-    predefinedTemplates.forEach((template) => {
+    predefinedTemplates?.forEach((template) => {
       const score = getTemplateScore(template)
       if (score === 100) {
         // Correspondance parfaite trouvée
@@ -89,7 +89,7 @@ export function useTemplates(): UseTemplatesReturn {
    * Template actuellement appliqué (correspondance parfaite uniquement)
    */
   const currentTemplate = useMemo((): Template | null => {
-    return predefinedTemplates.find((template) => isTemplateApplied(template.id)) || null
+    return predefinedTemplates?.find((template) => isTemplateApplied(template?.id)) || null
   }, [isTemplateApplied])
 
   /**
@@ -131,7 +131,7 @@ export function useTemplateRecommendations() {
   const getRecommendations = useCallback(
     (maxResults: number = 4): Template[] => {
       // Créer une liste de templates avec leurs scores
-      const templatesWithScores = predefinedTemplates.map((template) => ({
+      const templatesWithScores = predefinedTemplates?.map((template) => ({
         template,
         score: getTemplateScore(template),
       }))
@@ -154,13 +154,13 @@ export function useTemplateRecommendations() {
       if (!currentTemplate) return []
 
       return predefinedTemplates
-        .filter((template) => template.id !== currentTemplateId)
+        .filter((template) => template?.id !== currentTemplateId)
         .filter(
           (template) =>
             // Templates de la même catégorie ou avec des paramètres similaires
-            template.category === currentTemplate.category ||
-            template.settings.theme === currentTemplate.settings.theme ||
-            template.settings.accentColor === currentTemplate.settings.accentColor
+            template?.category === currentTemplate?.category ||
+            template?.settings?.theme === currentTemplate?.settings?.theme ||
+            template?.settings?.accentColor === currentTemplate?.settings?.accentColor
         )
         .slice(0, maxResults)
     },

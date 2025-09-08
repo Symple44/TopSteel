@@ -2,12 +2,33 @@
 
 import { Check, Package, Plus, Star, X } from 'lucide-react'
 import type React from 'react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { cn } from '@/lib/utils'
 import type { Product } from '../products/ProductCard'
 
+// Type-safe value type for nested object access
+type NestedValue = string | number | boolean | string[] | undefined | null
+
+// Product with nested specifications structure
+interface ProductWithSpecs extends Product {
+  specifications?: {
+    length?: string
+    weight?: string
+    grade?: string
+    power?: string
+    voltage?: string
+    thickness?: string
+    size?: string
+    coating?: string
+  }
+  warranty?: string
+  freeShipping?: boolean
+  expressDelivery?: boolean
+  returnsAllowed?: boolean
+}
+
 interface ProductComparisonProps {
-  products: Product[]
+  products: ProductWithSpecs[]
   onRemoveProduct: (productId: string) => void
   onAddProduct?: () => void
   onClearAll?: () => void
@@ -57,37 +78,43 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
   maxProducts = 4,
   className,
 }) => {
+  const categorySelectId = useId()
   const [highlightDifferences, setHighlightDifferences] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
   const categories = [
     'all',
-    ...Array.from(new Set(comparisonRows.map((r) => r.category).filter(Boolean))),
+    ...Array.from(new Set(comparisonRows?.map((r) => r.category).filter(Boolean))),
   ]
 
-  const getNestedValue = (obj: any, path: string): any => {
-    return path.split('.').reduce((current, key) => current?.[key], obj)
+  const getNestedValue = (obj: ProductWithSpecs, path: string): NestedValue => {
+    return path?.split('.').reduce((current: unknown, key: string) => {
+      if (current && typeof current === 'object' && key in current) {
+        return current[key as keyof typeof current]
+      }
+      return undefined
+    }, obj as unknown) as NestedValue
   }
 
-  const formatValue = (value: any, type: string): React.ReactNode => {
+  const formatValue = (value: NestedValue, type: string): React.ReactNode => {
     if (value === undefined || value === null) {
       return <span className="text-gray-400">—</span>
     }
 
     switch (type) {
       case 'price':
-        return <span className="font-semibold text-lg">€{value.toFixed(2)}</span>
+        return <span className="font-semibold text-lg">€{(value as number)?.toFixed(2)}</span>
 
       case 'rating':
         return (
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-500 fill-current" />
-            <span className="font-medium">{value}</span>
+            <span className="font-medium">{value as number}</span>
           </div>
         )
 
       case 'boolean':
-        return value ? (
+        return (value as boolean) ? (
           <Check className="w-5 h-5 text-green-600" />
         ) : (
           <X className="w-5 h-5 text-red-600" />
@@ -96,40 +123,40 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
       case 'list':
         return Array.isArray(value) ? (
           <ul className="text-sm space-y-1">
-            {value.map((item, idx) => (
+            {(value as string[])?.map((item, idx) => (
               <li key={idx}>• {item}</li>
             ))}
           </ul>
         ) : (
-          value
+          String(value)
         )
 
       default:
-        return <span>{value}</span>
+        return <span>{String(value)}</span>
     }
   }
 
   const areValuesDifferent = (row: ComparisonRow): boolean => {
     if (products.length < 2) return false
 
-    const values = products.map((p) => getNestedValue(p, row.key))
-    const firstValue = JSON.stringify(values[0])
+    const values = products?.map((p) => getNestedValue(p, row.key))
+    const firstValue = JSON.stringify(values?.[0])
 
-    return values.some((v) => JSON.stringify(v) !== firstValue)
+    return values?.some((v) => JSON.stringify(v) !== firstValue)
   }
 
-  const getBestValue = (row: ComparisonRow): any => {
+  const getBestValue = (row: ComparisonRow): NestedValue => {
     const values = products
       .map((p) => getNestedValue(p, row.key))
       .filter((v) => v !== undefined && v !== null)
 
-    if (values.length === 0) return null
+    if (values?.length === 0) return null
 
     switch (row.type) {
       case 'price':
-        return Math.min(...values)
+        return Math.min(...(values as number[]))
       case 'rating':
-        return Math.max(...values)
+        return Math.max(...(values as number[]))
       case 'boolean':
         return true
       default:
@@ -140,7 +167,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
   const filteredRows =
     selectedCategory === 'all'
       ? comparisonRows
-      : comparisonRows.filter((r) => r.category === selectedCategory)
+      : comparisonRows?.filter((r) => r.category === selectedCategory)
 
   const emptySlots = Math.max(0, maxProducts - products.length)
 
@@ -166,15 +193,18 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
         {/* Controls */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">Category:</label>
+            <label htmlFor={categorySelectId} className="text-sm font-medium text-gray-700">
+              Category:
+            </label>
             <select
+              id={categorySelectId}
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => setSelectedCategory(e?.target?.value)}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {categories.map((cat) => (
+              {categories?.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  {(cat?.charAt(0) || '')?.toUpperCase() + (cat?.slice(1) || '')}
                 </option>
               ))}
             </select>
@@ -184,7 +214,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
             <input
               type="checkbox"
               checked={highlightDifferences}
-              onChange={(e) => setHighlightDifferences(e.target.checked)}
+              onChange={(e) => setHighlightDifferences(e?.target?.checked)}
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <span className="text-sm text-gray-700">Highlight differences</span>
@@ -201,7 +231,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
               <th className="p-4 text-left text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10">
                 Feature
               </th>
-              {products.map((product) => (
+              {products?.map((product) => (
                 <th key={product.id} className="p-4 text-center min-w-[200px]">
                   <div className="relative">
                     <button
@@ -211,9 +241,9 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
                       <X className="w-4 h-4 text-gray-500 hover:text-red-600" />
                     </button>
 
-                    {product.image ? (
+                    {product.images?.[0] ? (
                       <img
-                        src={product.image}
+                        src={product.images?.[0]}
                         alt={product.name}
                         className="w-24 h-24 object-cover rounded-lg mx-auto mb-3"
                       />
@@ -246,7 +276,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
 
           {/* Comparison Rows */}
           <tbody>
-            {filteredRows.map((row, rowIndex) => {
+            {filteredRows?.map((row, rowIndex) => {
               const isDifferent = highlightDifferences && areValuesDifferent(row)
               const bestValue = getBestValue(row)
 
@@ -262,7 +292,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
                     {row.label}
                   </td>
 
-                  {products.map((product) => {
+                  {products?.map((product) => {
                     const value = getNestedValue(product, row.key)
                     const isBest =
                       bestValue !== null && JSON.stringify(value) === JSON.stringify(bestValue)
@@ -301,7 +331,7 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
               <td className="p-4 text-sm font-medium text-gray-700 sticky left-0 z-10 bg-gray-50">
                 Actions
               </td>
-              {products.map((product) => (
+              {products?.map((product) => (
                 <td key={product.id} className="p-4 text-center">
                   <div className="space-y-2">
                     <button className="w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">

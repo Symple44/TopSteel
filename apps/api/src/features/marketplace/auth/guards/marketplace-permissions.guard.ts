@@ -50,7 +50,7 @@ export class MarketplacePermissionsGuard implements CanActivate {
     return true
   }
 
-  private hasPermission(user: any, permission: MarketplacePermission): boolean {
+  private hasPermission(user: unknown, permission: MarketplacePermission): boolean {
     // Check user roles for permission
     const userRoles = user.roles || (user.role ? [user.role] : [])
 

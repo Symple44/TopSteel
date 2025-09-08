@@ -6,23 +6,23 @@ export async function GET(request: NextRequest) {
     const response = await callBackendFromApi(request, 'admin/database/backups', {
       method: 'GET',
       headers: {
-        ...(request.headers.get('authorization')
+        ...(request?.headers?.get('authorization')
           ? {
-              Authorization: request.headers.get('authorization') as string,
+              Authorization: request?.headers?.get('authorization') as string,
             }
           : {}),
       },
     })
 
-    if (!response.ok) {
-      return NextResponse.json(
+    if (!response?.ok) {
+      return NextResponse?.json(
         { success: false, error: "Erreur lors de l'appel à l'API" },
         { status: response.status }
       )
     }
 
-    const responseData = await response.json()
-    return NextResponse.json(responseData.data || responseData)
+    const responseData = await response?.json()
+    return NextResponse?.json(responseData?.data || responseData)
   } catch (_error) {
     // Retourner des données mock si l'API n'est pas disponible
     const mockBackups = {
@@ -55,6 +55,6 @@ export async function GET(request: NextRequest) {
       ],
     }
 
-    return NextResponse.json(mockBackups)
+    return NextResponse?.json(mockBackups)
   }
 }

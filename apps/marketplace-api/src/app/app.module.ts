@@ -38,9 +38,9 @@ import { AppService } from './app.service'
       useFactory: () => ({
         store: 'redis',
         host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT) || 6379,
-        db: parseInt(process.env.REDIS_DB) || 2,
-        ttl: parseInt(process.env.CACHE_TTL) || 300,
+        port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+        db: parseInt(process.env.REDIS_DB, 10) || 2,
+        ttl: parseInt(process.env.CACHE_TTL, 10) || 300,
       }),
     }),
 

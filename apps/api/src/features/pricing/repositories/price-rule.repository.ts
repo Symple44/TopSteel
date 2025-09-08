@@ -432,7 +432,7 @@ export class PriceRuleRepository implements IPriceRuleRepository {
     )
 
     return {
-      totalApplications: parseInt(result[0]?.total_applications || '0'),
+      totalApplications: parseInt(result[0]?.total_applications || '0', 10),
       lastApplied: result[0]?.last_applied,
       averageDiscount: parseFloat(result[0]?.average_discount || '0'),
     }

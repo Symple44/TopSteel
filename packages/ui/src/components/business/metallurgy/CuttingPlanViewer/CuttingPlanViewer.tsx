@@ -1,10 +1,12 @@
 'use client'
-import React, { useState, useRef } from 'react'
+import { Download, Eye, EyeOff, FileText, Grid, RotateCw, ZoomIn, ZoomOut } from 'lucide-react'
+import type React from 'react'
+import { useRef, useState } from 'react'
 import { cn } from '../../../../lib/utils'
+import { Badge } from '../../../data-display/badge'
 import { Card } from '../../../layout/card'
 import { Button } from '../../../primitives/button/Button'
-import { Badge } from '../../../data-display/badge'
-import { FileText, Download, ZoomIn, ZoomOut, RotateCw, Grid, Eye, EyeOff } from 'lucide-react'
+
 interface CutPiece {
   id: string
   x: number
@@ -42,14 +44,14 @@ interface CuttingPlanViewerProps {
   onPieceClick?: (piece: CutPiece) => void
   onPieceMove?: (pieceId: string, x: number, y: number) => void
 }
-export function CuttingPlanViewer({ 
-  className, 
+export function CuttingPlanViewer({
+  className,
   plan,
   editable = false,
   showGrid = true,
   showLabels = true,
   onPieceClick,
-  onPieceMove
+  onPieceMove,
 }: CuttingPlanViewerProps) {
   const [zoom, setZoom] = useState(1)
   const [selectedPiece, setSelectedPiece] = useState<string | null>(null)
@@ -60,23 +62,27 @@ export function CuttingPlanViewer({
     showGrid,
     showLabels,
     showDimensions: true,
-    showWaste: true
+    showWaste: true,
   })
   const maxDimension = Math.max(plan.stockMaterial.width, plan.stockMaterial.height)
   const viewBoxSize = 400
   const scale = (viewBoxSize / maxDimension) * zoom
   const scaledWidth = plan.stockMaterial.width * scale
   const scaledHeight = plan.stockMaterial.height * scale
-  const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.2, 5))
-  const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.2, 0.2))
+  const handleZoomIn = () => setZoom((prev) => Math.min(prev * 1.2, 5))
+  const handleZoomOut = () => setZoom((prev) => Math.max(prev / 1.2, 0.2))
   const handleZoomReset = () => setZoom(1)
   const getPieceColor = (piece: CutPiece) => {
     if (piece.color) return piece.color
     switch (piece.priority) {
-      case 'high': return '#ef4444'
-      case 'medium': return '#f59e0b'
-      case 'low': return '#10b981'
-      default: return '#6b7280'
+      case 'high':
+        return '#ef4444'
+      case 'medium':
+        return '#f59e0b'
+      case 'low':
+        return '#10b981'
+      default:
+        return '#6b7280'
     }
   }
   const getContrastColor = (backgroundColor: string) => {
@@ -97,7 +103,7 @@ export function CuttingPlanViewer({
       const y = (event.clientY - rect.top) / scale
       setDragOffset({
         x: x - piece.x,
-        y: y - piece.y
+        y: y - piece.y,
       })
     }
   }
@@ -153,23 +159,21 @@ export function CuttingPlanViewer({
     }
     return lines
   }
-  const calculateWasteAreas = () => {
+  const _calculateWasteAreas = () => {
     if (!viewSettings.showWaste) return []
     // Simple waste calculation - areas not covered by pieces
     const totalArea = plan.stockMaterial.width * plan.stockMaterial.height
-    const usedArea = plan.pieces.reduce((sum, piece) => 
-      sum + (piece.width * piece.height), 0
-    )
+    const usedArea = plan.pieces.reduce((sum, piece) => sum + piece.width * piece.height, 0)
     const wasteArea = totalArea - usedArea
     return [
       {
         area: wasteArea,
-        percentage: (wasteArea / totalArea) * 100
-      }
+        percentage: (wasteArea / totalArea) * 100,
+      },
     ]
   }
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -179,7 +183,8 @@ export function CuttingPlanViewer({
               {plan.name}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {plan.stockMaterial.material} - {plan.stockMaterial.width}×{plan.stockMaterial.height}×{plan.stockMaterial.thickness}mm
+              {plan.stockMaterial.material} - {plan.stockMaterial.width}×{plan.stockMaterial.height}
+              ×{plan.stockMaterial.thickness}mm
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -194,33 +199,39 @@ export function CuttingPlanViewer({
         {/* Controls */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Button onClick={handleZoomOut} size="sm" variant="outline">
+            <Button type="button" onClick={handleZoomOut} size="sm" variant="outline">
               <ZoomOut className="w-4 h-4" />
             </Button>
             <span className="text-xs px-2">{(zoom * 100).toFixed(0)}%</span>
-            <Button onClick={handleZoomIn} size="sm" variant="outline">
+            <Button type="button" onClick={handleZoomIn} size="sm" variant="outline">
               <ZoomIn className="w-4 h-4" />
             </Button>
-            <Button onClick={handleZoomReset} size="sm" variant="outline">
+            <Button type="button" onClick={handleZoomReset} size="sm" variant="outline">
               <RotateCw className="w-4 h-4" />
             </Button>
           </div>
           <div className="flex items-center gap-2">
             <Button
-              onClick={() => setViewSettings(prev => ({ ...prev, showGrid: !prev.showGrid }))}
+              type="button"
+              onClick={() => setViewSettings((prev) => ({ ...prev, showGrid: !prev.showGrid }))}
               size="sm"
-              variant={viewSettings.showGrid ? "default" : "outline"}
+              variant={viewSettings.showGrid ? 'default' : 'outline'}
             >
               <Grid className="w-4 h-4" />
             </Button>
             <Button
-              onClick={() => setViewSettings(prev => ({ ...prev, showLabels: !prev.showLabels }))}
+              type="button"
+              onClick={() => setViewSettings((prev) => ({ ...prev, showLabels: !prev.showLabels }))}
               size="sm"
-              variant={viewSettings.showLabels ? "default" : "outline"}
+              variant={viewSettings.showLabels ? 'default' : 'outline'}
             >
-              {viewSettings.showLabels ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              {viewSettings.showLabels ? (
+                <Eye className="w-4 h-4" />
+              ) : (
+                <EyeOff className="w-4 h-4" />
+              )}
             </Button>
-            <Button size="sm" variant="outline">
+            <Button type="button" size="sm" variant="outline">
               <Download className="w-4 h-4" />
             </Button>
           </div>
@@ -270,8 +281,18 @@ export function CuttingPlanViewer({
                       'transition-all duration-200',
                       editable && 'cursor-move hover:fill-opacity-80'
                     )}
+                    // biome-ignore lint/a11y/useSemanticElements: SVG rect element must use role="button" for interactive behavior
+                    role="button"
+                    tabIndex={editable ? 0 : -1}
+                    aria-label={`Piece ${piece.label}: ${piece.width}x${piece.height}mm`}
                     onMouseDown={(e) => handlePieceMouseDown(piece, e)}
                     onClick={() => handlePieceClick(piece)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handlePieceClick(piece)
+                      }
+                    }}
                   />
                   {/* Piece label */}
                   {viewSettings.showLabels && (
@@ -358,22 +379,27 @@ export function CuttingPlanViewer({
               <div>Pieces: {plan.pieces.length}</div>
               <div>Efficiency: {plan.efficiency.toFixed(1)}%</div>
               <div>Waste: {plan.wastePercentage.toFixed(1)}%</div>
-              <div>Total Area: {((plan.stockMaterial.width * plan.stockMaterial.height) / 1000000).toFixed(2)}m²</div>
+              <div>
+                Total Area:{' '}
+                {((plan.stockMaterial.width * plan.stockMaterial.height) / 1000000).toFixed(2)}m²
+              </div>
             </div>
           </div>
           <div className="space-y-2">
             <h4 className="font-medium text-sm">Piece Priorities</h4>
             <div className="space-y-1">
-              {['high', 'medium', 'low'].map(priority => {
-                const count = plan.pieces.filter(p => p.priority === priority).length
+              {['high', 'medium', 'low'].map((priority) => {
+                const count = plan.pieces.filter((p) => p.priority === priority).length
                 if (count === 0) return null
                 return (
                   <div key={priority} className="flex items-center gap-2 text-xs">
-                    <div 
+                    <div
                       className="w-3 h-3 rounded"
                       style={{ backgroundColor: getPieceColor({ priority } as CutPiece) }}
                     />
-                    <span className="capitalize">{priority}: {count}</span>
+                    <span className="capitalize">
+                      {priority}: {count}
+                    </span>
                   </div>
                 )
               })}

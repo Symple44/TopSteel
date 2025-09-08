@@ -39,7 +39,7 @@ export const Default: Story = {
         <p>Contenu principal de la carte.</p>
       </CardContent>
       <CardFooter>
-        <Button>Action</Button>
+        <Button type="button">Action</Button>
       </CardFooter>
     </Card>
   ),
@@ -71,8 +71,10 @@ export const ProjetCard = () => (
       </div>
     </CardContent>
     <CardFooter className="flex space-x-2">
-      <Button size="sm">Voir détails</Button>
-      <Button variant="outline" size="sm">
+      <Button type="button" size="sm">
+        Voir détails
+      </Button>
+      <Button type="button" variant="outline" size="sm">
         Modifier
       </Button>
     </CardFooter>
@@ -139,10 +141,12 @@ export const CommandeCard = () => (
       </div>
     </CardContent>
     <CardFooter className="flex justify-between">
-      <Button variant="outline" size="sm">
+      <Button type="button" variant="outline" size="sm">
         Télécharger PDF
       </Button>
-      <Button size="sm">Lancer production</Button>
+      <Button type="button" size="sm">
+        Lancer production
+      </Button>
     </CardFooter>
   </Card>
 )

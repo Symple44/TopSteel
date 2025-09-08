@@ -1,0 +1,50 @@
+src/app/(auth)/admin/pricing/page.tsx(619,13): error TS2322: Type '(rule: any) => ({ label: string; onClick: () => void; variant?: undefined; } | { label: string; onClick: () => Promise<void>; variant: string; })[]' is not assignable to type '{ label: string; icon?: ReactNode; onClick: (row: PriceRule) => void; variant?: "default" | "outline" | "destructive" | undefined; disabled?: ((row: PriceRule) => boolean) | undefined; }[]'.
+src/app/(dashboard)/admin/menus/components/menu-item-editor.tsx(83,11): error TS2741: Property 'id' is missing in type '{ title: string; type: "P"; icon: string; orderIndex: number; isVisible: true; children: never[]; }' but required in type 'MenuItem'.
+src/app/(dashboard)/admin/users/users-datatable.tsx(474,9): error TS2322: Type '(row: User, column: ColumnConfig<User>, value: JsonValue) => void' is not assignable to type '(row: User, column: ColumnConfig<User>, value: unknown) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'unknown' is not assignable to type 'JsonValue'.
+src/app/(dashboard)/test-datatable/page.tsx(242,15): error TS2322: Type '{ pageSize: number; pageSizeOptions: number[]; }' is not assignable to type 'boolean | PaginationConfig | undefined'.
+  Type '{ pageSize: number; pageSizeOptions: number[]; }' is missing the following properties from type 'PaginationConfig': page, total
+src/app/(dashboard)/test-datatable/page.tsx(263,33): error TS2345: Argument of type 'Set<string | number>' is not assignable to parameter of type 'SetStateAction<Set<string>>'.
+  Type 'Set<string | number>' is not assignable to type 'Set<string>'.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/app/api/notifications/route.ts(100,36): error TS2345: Argument of type '{ id: {}; type: {}; category: {}; title: {}; message: {}; priority: {}; source: unknown; entity_type: unknown; entity_id: unknown; data: unknown; recipient_type: {}; recipient_id: unknown; action_url: unknown; action_label: unknown; action_type: {}; expires_at: unknown; ... 4 more ...; read_at: null; }' is not assignable to parameter of type 'Notification'.
+  Types of property 'id' are incompatible.
+    Type '{}' is not assignable to type 'string'.
+src/app/api/notifications/route.ts(171,7): error TS2322: Type 'import("D:/GitHub/TopSteel/packages/types/dist/cross-cutting/notifications").NotificationPriority[]' is not assignable to type 'import("D:/GitHub/TopSteel/packages/domains/dist/cross-cutting/notifications/domain/entities").NotificationPriority[]'.
+  Type 'import("D:/GitHub/TopSteel/packages/types/dist/cross-cutting/notifications").NotificationPriority' is not assignable to type 'import("D:/GitHub/TopSteel/packages/domains/dist/cross-cutting/notifications/domain/entities").NotificationPriority'.
+    Property 'MEDIUM' is missing in type 'import("D:/GitHub/TopSteel/packages/domains/dist/cross-cutting/notifications/domain/entities").NotificationPriority'.
+src/app/api/notifications/rules/[id]/test/route.ts(263,7): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/app/api/user/menu-preferences/custom-menu/route.ts(18,13): error TS2552: Cannot find name 'UserMenuItem'. Did you mean '_UserMenuItem'?
+src/app/api/user/menu-preferences/selected-pages/route.ts(23,9): error TS2322: Type 'any[]' is not assignable to type 'never[]'.
+  Type 'any' is not assignable to type 'never'.
+src/components/admin/bulk-profile-management.tsx(378,52): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/admin/translation-admin.tsx(109,13): error TS7030: Not all code paths return a value.
+src/components/auth/company-selector.tsx(467,9): error TS2322: Type 'import("D:/GitHub/TopSteel/apps/web/src/types/auth").Company[]' is not assignable to type 'Company[]'.
+  Type 'import("D:/GitHub/TopSteel/apps/web/src/types/auth").Company' is not assignable to type 'Company'.
+    Types of property 'sites' are incompatible.
+      Type 'unknown[] | undefined' is not assignable to type '{ id: string; name: string; }[] | undefined'.
+        Type 'unknown[]' is not assignable to type '{ id: string; name: string; }[]'.
+          Type 'unknown' is not assignable to type '{ id: string; name: string; }'.
+src/components/client-only.tsx(408,3): error TS2779: The left-hand side of an assignment expression may not be an optional property access.
+src/components/facturation/create-devis-dialog.tsx(113,17): error TS2322: Type '(e: React.ChangeEvent<HTMLInputElement>) => void' is not assignable to type 'ChangeEventHandler<HTMLTextAreaElement>'.
+  Types of parameters 'e' and 'event' are incompatible.
+    Type 'ChangeEvent<HTMLTextAreaElement>' is not assignable to type 'ChangeEvent<HTMLInputElement>'.
+      Type 'HTMLTextAreaElement' is missing the following properties from type 'HTMLInputElement': accept, align, alt, capture, and 29 more.
+src/components/facturation/devis-filters.tsx(20,32): error TS2339: Property '_onFiltersChange' does not exist on type 'DevisFiltersProps'.
+src/components/facturation/factures-filters.tsx(19,35): error TS2339: Property '_onFiltersChange' does not exist on type 'FacturesFiltersProps'.
+src/components/layout/header.tsx(21,3): error TS2339: Property '_onToggleSidebar' does not exist on type 'HeaderProps'.
+src/components/layout/header.tsx(22,3): error TS2339: Property '_isSidebarCollapsed' does not exist on type 'HeaderProps'.
+src/components/lazy/lazy-imports.tsx(224,80): error TS2339: Property 'default' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/facturation/paiements-chart")'.
+src/components/lazy/lazy-imports.tsx(233,81): error TS2339: Property 'default' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/production/planning-calendar")'.
+src/components/lazy/lazy-imports.tsx(242,76): error TS2339: Property 'default' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/stocks/chutes-optimizer")'.
+src/components/lazy/lazy-imports.tsx(250,76): error TS2339: Property 'default' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/stocks/mouvements-chart")'.
+src/components/lazy/lazy-imports.tsx(259,74): error TS2339: Property 'CompanySelector' does not exist on type 'typeof import("D:/GitHub/TopSteel/apps/web/src/components/auth/company-selector")'.
+src/components/lazy/lazy-imports.tsx(278,5): error TS2322: Type 'ComponentType | (() => Element)' is not assignable to type '((loadingProps: DynamicOptionsLoadingProps) => ReactNode) | undefined'.
+  Type 'ComponentClass<{}, any>' is not assignable to type '(loadingProps: DynamicOptionsLoadingProps) => ReactNode'.
+    Type 'ComponentClass<{}, any>' provides no match for the signature '(loadingProps: DynamicOptionsLoadingProps): ReactNode'.
+src/components/notifications/condition-builder.tsx(225,11): error TS2322: Type 'string | number | boolean' is not assignable to type 'string | number | readonly string[] | undefined'.
+  Type 'false' is not assignable to type 'string | number | readonly string[] | undefined'.

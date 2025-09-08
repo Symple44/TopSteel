@@ -2,7 +2,6 @@
 
 import type { StoreProjet } from '@erp/types'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-
 import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
 
@@ -57,11 +56,11 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
           <p className="text-sm text-muted-foreground">Modèles 3D et plans techniques du projet</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button type="button" variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Télécharger modèles
           </Button>
-          <Button size="sm">
+          <Button type="button" size="sm">
             <Box className="h-4 w-4 mr-2" />
             Nouvelle version
           </Button>
@@ -79,16 +78,16 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                   Visualiseur 3D
                 </CardTitle>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <ZoomIn className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <ZoomOut className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <RotateCcw className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
                 </div>
@@ -110,7 +109,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                   <div className="text-center">
                     <Box className="h-16 w-16 mx-auto text-gray-400 mb-4" />
                     <p className="text-gray-600 mb-4">Viewer 3D non encore implémenté</p>
-                    <Button onClick={() => setIs3DLoaded(true)} size="sm">
+                    <Button type="button" onClick={() => setIs3DLoaded(true)} size="sm">
                       Simuler chargement 3D
                     </Button>
                   </div>
@@ -119,8 +118,9 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
 
               {/* Contrôles de vue */}
               <div className="flex gap-2 mt-4">
-                {vues.map((vue) => (
+                {vues?.map((vue) => (
                   <Button
+                    type="button"
                     key={vue.id}
                     variant={selectedView === vue.id ? 'default' : 'outline'}
                     size="sm"
@@ -143,7 +143,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {modeles3D.map((modele) => (
+                {modeles3D?.map((modele) => (
                   <button
                     type="button"
                     key={modele.id}
@@ -157,7 +157,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-500">
                       <span>{modele.taille}</span>
-                      <span>{modele.dateModification.toLocaleDateString()}</span>
+                      <span>{modele?.dateModification?.toLocaleDateString()}</span>
                     </div>
                   </button>
                 ))}

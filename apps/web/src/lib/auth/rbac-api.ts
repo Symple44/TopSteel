@@ -18,12 +18,12 @@ export class RBACApi {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Failed to fetch user permissions')
       }
 
-      const data = await response.json()
-      return data.data || []
+      const data = await response?.json()
+      return data?.data ?? []
     } catch (_error) {
       return []
     }
@@ -38,12 +38,12 @@ export class RBACApi {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Failed to fetch roles')
       }
 
-      const data = await response.json()
-      return data.data || []
+      const data = await response?.json()
+      return data?.data ?? []
     } catch (_error) {
       return []
     }
@@ -58,12 +58,12 @@ export class RBACApi {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Failed to fetch permissions')
       }
 
-      const data = await response.json()
-      return data.data || []
+      const data = await response?.json()
+      return data?.data ?? []
     } catch (_error) {
       return []
     }
@@ -78,12 +78,12 @@ export class RBACApi {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Failed to fetch user societe roles')
       }
 
-      const data = await response.json()
-      return data.data || []
+      const data = await response?.json()
+      return data?.data ?? []
     } catch (_error) {
       return []
     }
@@ -103,13 +103,13 @@ export class RBACApi {
       body: JSON.stringify(roleData),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to update user role')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to update user role')
     }
 
-    const data = await response.json()
-    return data.data
+    const data = await response?.json()
+    return data?.data
   }
 
   /**
@@ -131,13 +131,13 @@ export class RBACApi {
       }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to add user to societe')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to add user to societe')
     }
 
-    const data = await response.json()
-    return data.data
+    const data = await response?.json()
+    return data?.data
   }
 
   /**
@@ -148,9 +148,9 @@ export class RBACApi {
       method: 'DELETE',
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to remove user from societe')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to remove user from societe')
     }
   }
 
@@ -164,13 +164,13 @@ export class RBACApi {
       body: JSON.stringify(roleData),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to create role')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to create role')
     }
 
-    const data = await response.json()
-    return data.data
+    const data = await response?.json()
+    return data?.data
   }
 
   /**
@@ -183,13 +183,13 @@ export class RBACApi {
       body: JSON.stringify(roleData),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to update role')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to update role')
     }
 
-    const data = await response.json()
-    return data.data
+    const data = await response?.json()
+    return data?.data
   }
 
   /**
@@ -200,9 +200,9 @@ export class RBACApi {
       method: 'DELETE',
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to delete role')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to delete role')
     }
   }
 
@@ -216,9 +216,9 @@ export class RBACApi {
       body: JSON.stringify({ permissionIds }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to assign permissions')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to assign permissions')
     }
   }
 
@@ -232,9 +232,9 @@ export class RBACApi {
       body: JSON.stringify({ permissionIds }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to remove permissions')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to remove permissions')
     }
   }
 
@@ -259,12 +259,12 @@ export class RBACApi {
         }),
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         return false
       }
 
-      const data = await response.json()
-      return data.hasAccess === true
+      const data = await response?.json()
+      return data?.hasAccess === true
     } catch (_error) {
       return false
     }
@@ -281,25 +281,25 @@ export class RBACApi {
   ): Promise<{ logs: AuditLog[]; total: number }> {
     try {
       const params = new URLSearchParams({
-        limit: limit.toString(),
-        offset: offset.toString(),
+        limit: limit?.toString(),
+        offset: offset?.toString(),
       })
 
-      if (userId) params.append('userId', userId)
-      if (societeId) params.append('societeId', societeId)
+      if (userId) params?.append('userId', userId)
+      if (societeId) params?.append('societeId', societeId)
 
       const response = await callClientApi(`admin/audit-logs?${params}`, {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Failed to fetch audit logs')
       }
 
-      const data = await response.json()
+      const data = await response?.json()
       return {
-        logs: data.data || [],
-        total: data.meta?.total || 0,
+        logs: data?.data ?? [],
+        total: data.meta?.total ?? 0,
       }
     } catch (_error) {
       return { logs: [], total: 0 }
@@ -320,7 +320,7 @@ export class RBACApi {
         }),
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
       }
     } catch (_error) {}
   }
@@ -334,12 +334,12 @@ export class RBACApi {
         method: 'GET',
       })
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Failed to fetch user sessions')
       }
 
-      const data = await response.json()
-      return data.data || []
+      const data = await response?.json()
+      return data?.data ?? []
     } catch (_error) {
       return []
     }
@@ -353,9 +353,9 @@ export class RBACApi {
       method: 'POST',
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to invalidate session')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to invalidate session')
     }
   }
 
@@ -367,9 +367,9 @@ export class RBACApi {
       method: 'POST',
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || 'Failed to invalidate user sessions')
+    if (!response?.ok) {
+      const errorData = await response?.json().catch(() => ({}))
+      throw new Error(errorData?.message || 'Failed to invalidate user sessions')
     }
   }
 }

@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
 import type { Repository } from 'typeorm'
+import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import type { EmailService } from '../../../core/email/email.service'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 import type { MarketplaceOrderWorkflowService } from '../orders/marketplace-order-workflow.service'
@@ -13,11 +14,53 @@ import type { MarketplaceOrderWorkflowService } from '../orders/marketplace-orde
 export interface WebhookEvent {
   id: string
   type: string
-  data: any
+  data: Record<string, unknown>
   timestamp: Date
   processed: boolean
   source: 'stripe' | 'internal' | 'external'
   tenantId?: string
+}
+
+interface WebhookData {
+  id: string
+  url: string
+  events: string[]
+  secret: string
+  active: boolean
+  createdAt: Date
+  retryConfig: RetryConfig
+}
+
+interface PaymentEvent {
+  orderId: string
+  amount: number
+  currency: string
+  paymentIntentId?: string
+  reason?: string
+  refundId?: string
+}
+
+interface OrderEvent {
+  orderId: string
+  customerId?: string
+  tenantId?: string
+  trackingNumber?: string
+  carrier?: string
+  estimatedDelivery?: string
+  deliveredAt?: string
+}
+
+interface CustomerEvent {
+  customerId: string
+  email: string
+  tenantId?: string
+}
+
+interface ProductEvent {
+  articleId?: string
+  productId: string
+  tenantId?: string
+  stock?: number
 }
 
 export interface RetryConfig {
@@ -98,7 +141,7 @@ export class WebhookService {
   async sendWebhook(
     webhookId: string,
     eventType: string,
-    data: any,
+    data: Record<string, unknown>,
     retryConfig?: Partial<RetryConfig>
   ): Promise<boolean> {
     const webhookData = await this.getWebhookData(webhookId)
@@ -120,7 +163,7 @@ export class WebhookService {
       timestamp: new Date(),
       processed: false,
       source: 'internal',
-      tenantId: data.tenantId,
+      tenantId: data.tenantId as string,
     }
 
     return await this.sendWebhookWithRetry(webhookData, event, config)
@@ -129,14 +172,14 @@ export class WebhookService {
   /**
    * Broadcast event to all subscribed webhooks
    */
-  async broadcastEvent(eventType: string, data: any): Promise<void> {
+  async broadcastEvent(eventType: string, data: Record<string, unknown>): Promise<void> {
     const webhooks = await this.getAllActiveWebhooks()
 
     const promises = webhooks
       .filter((webhook) => webhook.events.includes(eventType) || webhook.events.includes('*'))
       .map((webhook) =>
         this.sendWebhook(webhook.id, eventType, data).catch((error) => {
-          this.logger.error(`Failed to send webhook ${webhook.id}: ${error.message}`)
+          this.logger.error(`Failed to send webhook ${webhook.id}: ${getErrorMessage(error)}`)
         })
       )
 
@@ -146,12 +189,12 @@ export class WebhookService {
   /**
    * Event Handlers
    */
-  private async handlePaymentSucceeded(event: any): Promise<void> {
+  private async handlePaymentSucceeded(event: PaymentEvent): Promise<void> {
     this.logger.log(`Payment succeeded for order ${event.orderId}`)
 
     try {
       // Update order status to confirmed
-      await this.orderWorkflowService.transitionOrder(event.orderId, 'CONFIRMED' as any)
+      await this.orderWorkflowService.transitionOrder(event.orderId, 'CONFIRMED' as unknown)
 
       // Send payment confirmation email
       const order = await this.orderRepository.findOne({
@@ -181,11 +224,14 @@ export class WebhookService {
         paymentIntentId: event.paymentIntentId,
       })
     } catch (error) {
-      this.logger.error(`Error handling payment success: ${error.message}`, error.stack)
+      this.logger.error(
+        `Error handling payment success: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
-  private async handlePaymentFailed(event: any): Promise<void> {
+  private async handlePaymentFailed(event: PaymentEvent): Promise<void> {
     this.logger.log(`Payment failed for order ${event.orderId}: ${event.reason}`)
 
     try {
@@ -216,11 +262,14 @@ export class WebhookService {
         amount: event.amount,
       })
     } catch (error) {
-      this.logger.error(`Error handling payment failure: ${error.message}`, error.stack)
+      this.logger.error(
+        `Error handling payment failure: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
-  private async handlePaymentRefunded(event: any): Promise<void> {
+  private async handlePaymentRefunded(event: PaymentEvent): Promise<void> {
     this.logger.log(`Payment refunded for order ${event.orderId}`)
 
     try {
@@ -253,11 +302,14 @@ export class WebhookService {
         reason: event.reason,
       })
     } catch (error) {
-      this.logger.error(`Error handling refund: ${error.message}`, error.stack)
+      this.logger.error(
+        `Error handling refund: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
-  private async handleOrderCreated(event: any): Promise<void> {
+  private async handleOrderCreated(event: OrderEvent): Promise<void> {
     this.logger.log(`Order created: ${event.orderId}`)
 
     await this.broadcastEvent('order.created', {
@@ -267,7 +319,7 @@ export class WebhookService {
     })
   }
 
-  private async handleOrderConfirmed(event: any): Promise<void> {
+  private async handleOrderConfirmed(event: OrderEvent): Promise<void> {
     this.logger.log(`Order confirmed: ${event.orderId}`)
 
     // Trigger ERP sync
@@ -282,7 +334,7 @@ export class WebhookService {
     })
   }
 
-  private async handleOrderShipped(event: any): Promise<void> {
+  private async handleOrderShipped(event: OrderEvent): Promise<void> {
     this.logger.log(`Order shipped: ${event.orderId}`)
 
     try {
@@ -312,11 +364,14 @@ export class WebhookService {
         carrier: event.carrier,
       })
     } catch (error) {
-      this.logger.error(`Error handling order shipped: ${error.message}`, error.stack)
+      this.logger.error(
+        `Error handling order shipped: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
-  private async handleOrderDelivered(event: any): Promise<void> {
+  private async handleOrderDelivered(event: OrderEvent): Promise<void> {
     this.logger.log(`Order delivered: ${event.orderId}`)
 
     try {
@@ -344,11 +399,14 @@ export class WebhookService {
         deliveredAt: event.deliveredAt,
       })
     } catch (error) {
-      this.logger.error(`Error handling order delivered: ${error.message}`, error.stack)
+      this.logger.error(
+        `Error handling order delivered: ${getErrorMessage(error)}`,
+        hasStack(error) ? error.stack : undefined
+      )
     }
   }
 
-  private async handleCustomerRegistered(event: any): Promise<void> {
+  private async handleCustomerRegistered(event: CustomerEvent): Promise<void> {
     this.logger.log(`Customer registered: ${event.customerId}`)
 
     await this.broadcastEvent('customer.registered', {
@@ -358,7 +416,7 @@ export class WebhookService {
     })
   }
 
-  private async handleProductSynced(event: any): Promise<void> {
+  private async handleProductSynced(event: ProductEvent): Promise<void> {
     this.logger.log(`Product synced: ${event.productId}`)
 
     await this.broadcastEvent('product.synced', {
@@ -368,7 +426,7 @@ export class WebhookService {
     })
   }
 
-  private async handleStockUpdated(event: any): Promise<void> {
+  private async handleStockUpdated(event: ProductEvent): Promise<void> {
     this.logger.log(`Stock updated: ${event.productId}`)
 
     await this.broadcastEvent('stock.updated', {
@@ -382,7 +440,7 @@ export class WebhookService {
    * Private helper methods
    */
   private async sendWebhookWithRetry(
-    webhookData: any,
+    webhookData: WebhookData,
     event: WebhookEvent,
     config: RetryConfig
   ): Promise<boolean> {
@@ -400,7 +458,9 @@ export class WebhookService {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       } catch (error) {
         attempt++
-        this.logger.warn(`Webhook ${webhookData.id} attempt ${attempt} failed: ${error.message}`)
+        this.logger.warn(
+          `Webhook ${webhookData.id} attempt ${attempt} failed: ${getErrorMessage(error)}`
+        )
 
         if (attempt < config.maxAttempts) {
           const delay = config.exponential
@@ -416,7 +476,10 @@ export class WebhookService {
     return false
   }
 
-  private async makeWebhookRequest(webhookData: any, event: WebhookEvent): Promise<Response> {
+  private async makeWebhookRequest(
+    webhookData: WebhookData,
+    event: WebhookEvent
+  ): Promise<Response> {
     const payload = JSON.stringify(event)
     const signature = crypto.createHmac('sha256', webhookData.secret).update(payload).digest('hex')
 
@@ -432,12 +495,12 @@ export class WebhookService {
     })
   }
 
-  private async getWebhookData(webhookId: string): Promise<any> {
+  private async getWebhookData(webhookId: string): Promise<WebhookData | null> {
     const data = await this.redisService.hget('webhooks:registered', webhookId)
     return data ? JSON.parse(data) : null
   }
 
-  private async getAllActiveWebhooks(): Promise<any[]> {
+  private async getAllActiveWebhooks(): Promise<WebhookData[]> {
     const webhookMap = await this.redisService.hgetall('webhooks:registered')
     return Object.values(webhookMap)
       .map((data) => JSON.parse(data as string))

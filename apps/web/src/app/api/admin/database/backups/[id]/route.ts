@@ -11,23 +11,23 @@ export async function DELETE(
     const response = await callBackendFromApi(request, `admin/database/backups/${id}`, {
       method: 'DELETE',
       headers: {
-        ...(request.headers.get('authorization')
+        ...(request?.headers?.get('authorization')
           ? {
-              Authorization: request.headers.get('authorization') as string,
+              Authorization: request?.headers?.get('authorization') as string,
             }
           : {}),
       },
     })
 
-    if (!response.ok) {
-      return NextResponse.json(
+    if (!response?.ok) {
+      return NextResponse?.json(
         { success: false, error: "Erreur lors de l'appel à l'API" },
         { status: response.status }
       )
     }
 
-    const responseData = await response.json()
-    return NextResponse.json(responseData.data || responseData)
+    const responseData = await response?.json()
+    return NextResponse?.json(responseData?.data || responseData)
   } catch (_error) {
     // Simuler une suppression pour le mock
     const mockResponse = {
@@ -35,6 +35,6 @@ export async function DELETE(
       message: 'Sauvegarde supprimée avec succès',
     }
 
-    return NextResponse.json(mockResponse)
+    return NextResponse?.json(mockResponse)
   }
 }

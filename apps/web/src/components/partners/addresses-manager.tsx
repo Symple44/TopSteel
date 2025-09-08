@@ -54,37 +54,37 @@ import {
 } from '@/hooks/use-partner-details'
 import { formatDate } from '@/lib/utils'
 
-const addressSchema = z.object({
-  libelle: z.string().min(1, 'Le libellé est requis'),
-  type: z.nativeEnum(AddressType),
-  status: z.nativeEnum(AddressStatus).optional(),
-  isDefault: z.boolean().optional(),
+const addressSchema = z?.object({
+  libelle: z?.string().min(1, 'Le libellé est requis'),
+  type: z?.nativeEnum(AddressType),
+  status: z?.nativeEnum(AddressStatus).optional(),
+  isDefault: z?.boolean().optional(),
 
   // Adresse
-  ligne1: z.string().min(1, "L'adresse est requise"),
-  ligne2: z.string().optional(),
-  ligne3: z.string().optional(),
-  codePostal: z.string().min(1, 'Le code postal est requis'),
-  ville: z.string().min(1, 'La ville est requise'),
-  region: z.string().optional(),
-  pays: z.string().optional(),
-  codePays: z.string().optional(),
+  ligne1: z?.string().min(1, "L'adresse est requise"),
+  ligne2: z?.string().optional(),
+  ligne3: z?.string().optional(),
+  codePostal: z?.string().min(1, 'Le code postal est requis'),
+  ville: z?.string().min(1, 'La ville est requise'),
+  region: z?.string().optional(),
+  pays: z?.string().optional(),
+  codePays: z?.string().optional(),
 
   // Géolocalisation
-  latitude: z.coerce.number().min(-90).max(90).optional(),
-  longitude: z.coerce.number().min(-180).max(180).optional(),
+  latitude: z?.coerce?.number().min(-90).max(90).optional(),
+  longitude: z?.coerce?.number().min(-180).max(180).optional(),
 
   // Contact
-  contactNom: z.string().optional(),
-  contactTelephone: z.string().optional(),
-  contactEmail: z.string().email().optional().or(z.literal('')),
+  contactNom: z?.string().optional(),
+  contactTelephone: z?.string().optional(),
+  contactEmail: z?.string().email().optional().or(z?.literal('')),
 
   // Instructions et validité
-  instructionsAcces: z.string().optional(),
-  notes: z.string().optional(),
-  partnerSiteId: z.string().optional(),
-  dateDebut: z.string().optional(),
-  dateFin: z.string().optional(),
+  instructionsAcces: z?.string().optional(),
+  notes: z?.string().optional(),
+  partnerSiteId: z?.string().optional(),
+  dateDebut: z?.string().optional(),
+  dateFin: z?.string().optional(),
 })
 
 type AddressFormData = z.infer<typeof addressSchema>
@@ -103,13 +103,14 @@ export function AddressesManager({
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState<PartnerAddress | null>(null)
 
-  const { data: addresses = initialAddresses } = usePartnerAddresses(partnerId)
+  const addressesQuery = usePartnerAddresses(partnerId)
+  const { data: addresses = initialAddresses } = addressesQuery
   const createAddress = useCreatePartnerAddress()
   const updateAddress = useUpdatePartnerAddress()
   const deleteAddress = useDeletePartnerAddress()
 
   const form = useForm<AddressFormData>({
-    resolver: zodResolver(addressSchema),
+    resolver: zodResolver(addressSchema) as unknown,
     defaultValues: {
       type: AddressType.FACTURATION,
       status: AddressStatus.ACTIVE,
@@ -121,7 +122,7 @@ export function AddressesManager({
 
   const handleCreate = () => {
     setEditingAddress(null)
-    form.reset({
+    form?.reset({
       type: AddressType.FACTURATION,
       status: AddressStatus.ACTIVE,
       isDefault: false,
@@ -133,7 +134,7 @@ export function AddressesManager({
 
   const handleEdit = (address: PartnerAddress) => {
     setEditingAddress(address)
-    form.reset({
+    form?.reset({
       ...address,
       latitude: address.latitude || undefined,
       longitude: address.longitude || undefined,
@@ -147,19 +148,19 @@ export function AddressesManager({
 
   const handleDelete = async (address: PartnerAddress) => {
     if (confirm(`Êtes-vous sûr de vouloir supprimer l'adresse ${address.libelle} ?`)) {
-      await deleteAddress.mutateAsync(address.id)
+      await deleteAddress?.mutateAsync(address.id)
     }
   }
 
   const onSubmit = async (data: AddressFormData) => {
     try {
       if (editingAddress) {
-        await updateAddress.mutateAsync({
+        await updateAddress?.mutateAsync({
           id: editingAddress.id,
           data: data as UpdatePartnerAddressDto,
         })
       } else {
-        await createAddress.mutateAsync({ partnerId, data: data as CreatePartnerAddressDto })
+        await createAddress?.mutateAsync({ partnerId, data: data as CreatePartnerAddressDto })
       }
       setIsFormOpen(false)
       form.reset()
@@ -224,7 +225,7 @@ export function AddressesManager({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {addresses.map((address) => (
+                {addresses?.map((address: unknown) => (
                   <TableRow key={address.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -275,7 +276,7 @@ export function AddressesManager({
                       {address.partnerSite ? (
                         <div className="text-sm">
                           <Building className="h-3 w-3 inline mr-1" />
-                          {address.partnerSite.nom}
+                          {address?.partnerSite?.nom}
                         </div>
                       ) : (
                         '-'
@@ -321,10 +322,10 @@ export function AddressesManager({
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit as unknown)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="libelle"
                   render={({ field }) => (
                     <FormItem>
@@ -338,7 +339,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="type"
                   render={({ field }) => (
                     <FormItem>
@@ -364,7 +365,7 @@ export function AddressesManager({
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="status"
                   render={({ field }) => (
                     <FormItem>
@@ -388,7 +389,7 @@ export function AddressesManager({
 
                 {sites.length > 0 && (
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="partnerSiteId"
                     render={({ field }) => (
                       <FormItem>
@@ -401,7 +402,7 @@ export function AddressesManager({
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="">Aucun</SelectItem>
-                            {sites.map((site) => (
+                            {sites?.map((site) => (
                               <SelectItem key={site.id} value={site.id}>
                                 {site.nom} ({site.type})
                               </SelectItem>
@@ -419,7 +420,7 @@ export function AddressesManager({
               </div>
 
               <FormField
-                control={form.control}
+                control={form?.control}
                 name="isDefault"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -440,7 +441,7 @@ export function AddressesManager({
                 <h3 className="text-lg font-semibold">Adresse</h3>
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="ligne1"
                   render={({ field }) => (
                     <FormItem>
@@ -454,7 +455,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="ligne2"
                   render={({ field }) => (
                     <FormItem>
@@ -468,7 +469,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="ligne3"
                   render={({ field }) => (
                     <FormItem>
@@ -483,7 +484,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="codePostal"
                     render={({ field }) => (
                       <FormItem>
@@ -497,7 +498,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="ville"
                     render={({ field }) => (
                       <FormItem>
@@ -511,7 +512,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="region"
                     render={({ field }) => (
                       <FormItem>
@@ -527,7 +528,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="pays"
                     render={({ field }) => (
                       <FormItem>
@@ -541,7 +542,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="codePays"
                     render={({ field }) => (
                       <FormItem>
@@ -561,7 +562,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="latitude"
                     render={({ field }) => (
                       <FormItem>
@@ -575,7 +576,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="longitude"
                     render={({ field }) => (
                       <FormItem>
@@ -594,7 +595,7 @@ export function AddressesManager({
                 <h3 className="text-lg font-semibold">Contact sur place (optionnel)</h3>
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="contactNom"
                   render={({ field }) => (
                     <FormItem>
@@ -609,7 +610,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="contactTelephone"
                     render={({ field }) => (
                       <FormItem>
@@ -623,7 +624,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="contactEmail"
                     render={({ field }) => (
                       <FormItem>
@@ -642,7 +643,7 @@ export function AddressesManager({
                 <h3 className="text-lg font-semibold">Informations complémentaires</h3>
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="instructionsAcces"
                   render={({ field }) => (
                     <FormItem>
@@ -660,7 +661,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form?.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
@@ -675,7 +676,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="dateDebut"
                     render={({ field }) => (
                       <FormItem>
@@ -692,7 +693,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form.control}
+                    control={form?.control}
                     name="dateFin"
                     render={({ field }) => (
                       <FormItem>
@@ -714,8 +715,11 @@ export function AddressesManager({
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                   Annuler
                 </Button>
-                <Button type="submit" disabled={createAddress.isPending || updateAddress.isPending}>
-                  {createAddress.isPending || updateAddress.isPending
+                <Button
+                  type="submit"
+                  disabled={createAddress?.isPending || updateAddress?.isPending}
+                >
+                  {createAddress?.isPending || updateAddress?.isPending
                     ? 'Enregistrement...'
                     : editingAddress
                       ? 'Modifier'
