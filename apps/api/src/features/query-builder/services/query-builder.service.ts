@@ -8,8 +8,43 @@ import {
   QueryBuilderCalculatedField,
   QueryBuilderColumn,
   QueryBuilderJoin,
+  type JoinType,
 } from '../entities'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
+
+// Interface for format field
+interface FieldFormat {
+  type?: 'date' | 'number' | 'currency' | 'percentage' | 'boolean' | 'custom'
+  pattern?: string
+  prefix?: string
+  suffix?: string
+  decimals?: number
+}
+
+// Interface for aggregation field
+interface FieldAggregation {
+  enabled?: boolean
+  type?: 'sum' | 'avg' | 'count' | 'min' | 'max'
+}
+
+// Interface for update data
+interface QueryBuilderUpdateData {
+  name?: string
+  description?: string
+  database?: string
+  mainTable?: string
+  isPublic?: boolean
+  maxRows?: number
+  settings?: {
+    enablePagination?: boolean
+    pageSize?: number
+    enableSorting?: boolean
+    enableFiltering?: boolean
+    enableExport?: boolean
+    exportFormats?: string[]
+  }
+  layout?: Record<string, unknown>
+}
 
 @Injectable()
 export class QueryBuilderService {
@@ -140,7 +175,7 @@ export class QueryBuilderService {
       calculatedFields: _calculatedFields,
       ...mainUpdate
     } = updateDto
-    await this._queryBuilderRepository.update(id, mainUpdate as unknown)
+    await this._queryBuilderRepository.update(id, mainUpdate as QueryBuilderUpdateData)
 
     return this.findOne(id, userId)
   }
@@ -183,36 +218,35 @@ export class QueryBuilderService {
           queryBuilderId: savedEntity.id,
         })
       )
-      await this._columnRepository.save(columns as unknown)
+      await this._columnRepository.save(columns)
     }
 
     // Duplicate joins
     if (original.joins && original.joins.length > 0) {
-      const joins = original.joins.map((join) =>
-        this._joinRepository.create({
-          ...join,
-          id: undefined,
+      const joins = original.joins.map((join) => {
+        const { id, ...joinData } = join
+        return this._joinRepository.create({
+          ...joinData,
           queryBuilderId: savedEntity.id,
         })
-      )
-      await this._joinRepository.save(joins as unknown)
+      })
+      await this._joinRepository.save(joins)
     }
 
     // Duplicate calculated fields
     if (original.calculatedFields && original.calculatedFields.length > 0) {
       const fields = original.calculatedFields.map((field) => {
-        const fieldData = {
-          ...field,
-          id: undefined,
-          queryBuilderId: savedEntity.id,
-        }
+        const { id, ...fieldData } = field
         
         // Ensure format is properly structured
         if (typeof fieldData.format === 'string') {
           fieldData.format = { type: 'custom' as const, pattern: fieldData.format }
         }
         
-        return this._calculatedFieldRepository.create(fieldData)
+        return this._calculatedFieldRepository.create({
+          ...fieldData,
+          queryBuilderId: savedEntity.id,
+        })
       })
       await this._calculatedFieldRepository.save(fields)
     }

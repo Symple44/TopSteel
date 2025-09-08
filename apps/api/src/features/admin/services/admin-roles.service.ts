@@ -5,6 +5,16 @@ import { getErrorMessage } from '../../../core/common/utils'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../../domains/auth/core/entities/role-permission.entity'
 
+// Interface for Permission entity properties
+interface PermissionData {
+  id: string
+  name: string
+  resource: string
+  action: string
+  description?: string
+  societeId?: string
+}
+
 @Injectable()
 export class AdminRolesService {
   constructor(
@@ -44,7 +54,7 @@ export class AdminRolesService {
       })
 
       const permissions = rolePermissions.map((rp) => {
-        const permission = rp.permission as unknown
+        const permission = rp.permission as PermissionData
         return {
           id: permission.id,
           name: permission.name,
@@ -58,7 +68,7 @@ export class AdminRolesService {
         success: true,
         data: {
           role: {
-            id: (role as unknown).id,
+            id: role.id,
             name: role.name,
             description: role.description,
             isActive: role.isActive,
@@ -87,7 +97,7 @@ export class AdminRolesService {
 
     return {
       data: roles.map((role) => ({
-        id: (role as unknown).id,
+        id: role.id,
         name: role.name,
         description: role.description,
         isActive: role.isActive,

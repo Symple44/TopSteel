@@ -9,6 +9,16 @@ import { getErrorMessage } from '../../../core/common/utils'
 
 const execAsync = promisify(exec)
 
+// Interface for PostgreSQL connection options
+interface PostgreSQLConnectionOptions {
+  host?: string
+  port?: number
+  username?: string
+  database?: string
+  password?: string
+  type: 'postgres'
+}
+
 interface BackupInfo {
   id: string
   filename: string
@@ -79,13 +89,13 @@ export class DatabaseBackupService {
         throw new Error('Ce service ne supporte que PostgreSQL')
       }
 
-      const pgOptions = connectionOptions as unknown
+      const pgOptions = connectionOptions as PostgreSQLConnectionOptions
       const pgDumpCommand = [
         'pg_dump',
-        `-h ${pgOptions.host}`,
-        `-p ${pgOptions.port}`,
-        `-U ${pgOptions.username}`,
-        `-d ${pgOptions.database}`,
+        `-h ${pgOptions.host || 'localhost'}`,
+        `-p ${pgOptions.port || 5432}`,
+        `-U ${pgOptions.username || 'postgres'}`,
+        `-d ${pgOptions.database || 'topsteel'}`,
         '--no-password',
         '--verbose',
         '--clean',
@@ -146,19 +156,28 @@ export class DatabaseBackupService {
         }
       }
 
-      const connectionOptions = this._dataSource.options as unknown
+      const connectionOptions = this._dataSource.options
+
+      if (connectionOptions.type !== 'postgres') {
+        return {
+          success: false,
+          message: 'Ce service ne supporte que PostgreSQL',
+        }
+      }
+
+      const pgOptions = connectionOptions as PostgreSQLConnectionOptions
       const isCompressed = backup.filename.endsWith('.gz')
 
       let command: string
       if (isCompressed) {
-        command = `gunzip -c "${backup.filePath}" | psql -h ${connectionOptions.host} -p ${connectionOptions.port} -U ${connectionOptions.username} -d ${connectionOptions.database}`
+        command = `gunzip -c "${backup.filePath}" | psql -h ${pgOptions.host || 'localhost'} -p ${pgOptions.port || 5432} -U ${pgOptions.username || 'postgres'} -d ${pgOptions.database || 'topsteel'}`
       } else {
-        command = `psql -h ${connectionOptions.host} -p ${connectionOptions.port} -U ${connectionOptions.username} -d ${connectionOptions.database} -f "${backup.filePath}"`
+        command = `psql -h ${pgOptions.host || 'localhost'} -p ${pgOptions.port || 5432} -U ${pgOptions.username || 'postgres'} -d ${pgOptions.database || 'topsteel'} -f "${backup.filePath}"`
       }
 
       const env = {
         ...process.env,
-        PGPASSWORD: connectionOptions.password as string,
+        PGPASSWORD: pgOptions.password as string,
       }
 
       await execAsync(command, { env: env as Record<string, string> })

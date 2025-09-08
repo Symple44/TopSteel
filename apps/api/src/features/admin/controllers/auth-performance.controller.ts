@@ -5,10 +5,16 @@ import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanc
 import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
-// Interface for performance metrics
+// Interface for performance metrics - compatible with AggregatedMetrics
 interface PerformanceMetrics {
-  responseTime?: number
+  totalOperations?: number
+  averageResponseTime?: number
   successRate?: number
+  cacheHitRate?: number
+  p95ResponseTime?: number
+  p99ResponseTime?: number
+  totalQueries?: number
+  averageQueriesPerOperation?: number
   [key: string]: unknown
 }
 

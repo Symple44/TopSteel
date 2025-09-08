@@ -8,20 +8,35 @@ import type {
 } from '../services/database-integrity.service'
 import type { DatabaseStatsService } from '../services/database-stats.service'
 
-// Interface for database stats
+// Interface for database stats - compatible with service return type
 interface DatabaseStats {
-  tableCount?: number
-  totalSize?: number
-  connections?: number
+  totalSize: string
+  totalTables?: number
+  totalRows?: number
+  activeConnections?: number
+  cacheHitRate?: number
+  queryPerformance?: {
+    avgResponseTime: number
+    slowQueries: number
+  }
+  tablesSizes?: Array<{
+    tableName: string
+    totalSize: string
+    rowCount: number
+    indexSize: string
+  }>
   [key: string]: unknown
 }
 
-// Interface for backup info
+// Interface for backup info - compatible with service return type
 interface BackupInfo {
   id: string
-  name: string
-  size: number
-  createdAt: Date
+  filename: string
+  createdAt: string
+  size: string
+  type: 'manual' | 'scheduled'
+  status: 'completed' | 'in-progress' | 'failed'
+  filePath?: string
   [key: string]: unknown
 }
 
