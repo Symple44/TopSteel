@@ -23,6 +23,48 @@ import type { PartnerSearchCriteria } from '../types/partner-search.types'
 // Re-export for backward compatibility
 export type { PartnerSearchCriteria }
 
+// Extended context with userName
+interface PartnerContext extends BusinessContext {
+  userName?: string
+}
+
+// Type for interaction data
+interface InteractionData {
+  type?: InteractionType
+  sujet?: string
+  description?: string
+  dateInteraction?: string | Date
+  status?: InteractionStatus
+  priority?: InteractionPriority
+  direction?: InteractionDirection
+  duree?: number
+  contactId?: string
+  contactNom?: string
+  lieu?: string
+  participants?: Array<{
+    id: string
+    nom: string
+    email?: string
+    role?: string
+  }>
+  piecesJointes?: Array<{
+    nom: string
+    url: string
+    taille: number
+    type: string
+  }>
+  resultat?: string
+  actionsRequises?: Array<{
+    description: string
+    responsable: string
+    dateEcheance?: Date
+    statut: string
+  }>
+  satisfactionScore?: number
+  metadata?: Record<string, unknown>
+  tags?: string[]
+}
+
 import type { Contact } from '../entities/contact.entity'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
 import type { PartnerAddress } from '../entities/partner-address.entity'
@@ -190,12 +232,12 @@ export class PartnerService extends BusinessService<Partner> {
     })
 
     // Appliquer les mises à jour autorisées
-    Object.keys(updates).forEach((key) => {
-      if (key in updates && !protectedFields.includes(key as unknown)) {
-        const updateKey = key as keyof Partial<Partner>
-        const updateValue = updates[updateKey]
+    const partnerKeys = Object.keys(updates) as Array<keyof Partner>
+    partnerKeys.forEach((key) => {
+      if (!protectedFields.includes(key as 'type' | 'code')) {
+        const updateValue = updates[key]
         if (updateValue !== undefined && key in existing) {
-          ;(existing as unknown)[key] = updateValue
+          Object.assign(existing, { [key]: updateValue })
         }
       }
     })
@@ -780,13 +822,13 @@ export class PartnerService extends BusinessService<Partner> {
   /**
    * Recherche avancée avec filtres multiples
    */
-  async searchPartnersAdvanced(filters: Record<string, unknown>): Promise<{
+  async searchPartnersAdvanced(filters: PartnerAdvancedFilters): Promise<{
     items: Partner[]
     total: number
     page: number
     limit: number
   }> {
-    return await this.partnerRepository.findWithFilters(filters as unknown)
+    return await this.partnerRepository.findWithFilters(filters)
   }
 
   /**
@@ -1008,8 +1050,8 @@ export class PartnerService extends BusinessService<Partner> {
    */
   async createInteraction(
     partnerId: string,
-    interactionData: Record<string, unknown>,
-    context: BusinessContext
+    interactionData: InteractionData,
+    context: PartnerContext
   ): Promise<PartnerInteraction> {
     // Vérifier que le partenaire existe
     const partner = await this.findById(partnerId, context)
@@ -1020,29 +1062,28 @@ export class PartnerService extends BusinessService<Partner> {
     const interaction = await this.interactionRepository.create({
       partnerId,
       userId: context.userId || 'SYSTEM',
-      utilisateurNom: (context as unknown).userName || 'System',
+      utilisateurNom: context.userName || 'System',
       societeId: context.societeId,
-      type: (interactionData.type as InteractionType) || InteractionType.AUTRE,
-      sujet: (interactionData.sujet as string) || '',
-      description: interactionData.description as string,
+      type: interactionData.type || InteractionType.AUTRE,
+      sujet: interactionData.sujet || '',
+      description: interactionData.description,
       dateInteraction: interactionData.dateInteraction
-        ? new Date(interactionData.dateInteraction as string)
+        ? new Date(interactionData.dateInteraction)
         : new Date(),
-      status: (interactionData.status as InteractionStatus) || InteractionStatus.TERMINEE,
-      priority: (interactionData.priority as InteractionPriority) || InteractionPriority.NORMALE,
-      direction:
-        (interactionData.direction as InteractionDirection) || InteractionDirection.SORTANT,
-      duree: interactionData.duree as number,
-      contactId: interactionData.contactId as string,
-      contactNom: interactionData.contactNom as string,
-      lieu: interactionData.lieu as string,
-      participants: interactionData.participants as unknown,
-      piecesJointes: interactionData.piecesJointes as unknown,
-      resultat: interactionData.resultat as string,
-      actionsRequises: interactionData.actionsRequises as unknown,
-      satisfactionScore: interactionData.satisfactionScore as number,
-      metadata: interactionData.metadata as unknown,
-      tags: interactionData.tags as string[],
+      status: interactionData.status || InteractionStatus.TERMINEE,
+      priority: interactionData.priority || InteractionPriority.NORMALE,
+      direction: interactionData.direction || InteractionDirection.SORTANT,
+      duree: interactionData.duree,
+      contactId: interactionData.contactId,
+      contactNom: interactionData.contactNom,
+      lieu: interactionData.lieu,
+      participants: interactionData.participants,
+      piecesJointes: interactionData.piecesJointes,
+      resultat: interactionData.resultat,
+      actionsRequises: interactionData.actionsRequises,
+      satisfactionScore: interactionData.satisfactionScore,
+      metadata: interactionData.metadata,
+      tags: interactionData.tags,
     })
 
     this.logger.log(
@@ -1649,16 +1690,19 @@ export class PartnerService extends BusinessService<Partner> {
    * Calculer le nombre de nouveaux partenaires
    */
   private async calculateNewPartners(): Promise<number> {
-    const _thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
 
-    const count = await (this.partnerRepository as unknown).count({
-      where: {
-        // Utiliser une condition GreaterThan avec thirtyDaysAgo si available dans l'interface
-        status: PartnerStatus.ACTIF,
-      },
+    // Get all active partners and filter by date in memory
+    const partners = await this.partnerRepository.findByTypeAndStatus(
+      [PartnerType.CLIENT, PartnerType.FOURNISSEUR, PartnerType.MIXTE],
+      PartnerStatus.ACTIF
+    )
+
+    const newPartners = partners.filter((partner) => {
+      return partner.createdAt && new Date(partner.createdAt) >= thirtyDaysAgo
     })
 
-    return Math.floor(count * 0.1) // Estimation: 10% de nouveaux partenaires
+    return newPartners.length
   }
 
   /**

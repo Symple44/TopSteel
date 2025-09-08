@@ -19,6 +19,6 @@ export class Societe extends BaseSociete {
   sites!: Site[]
 
   // Relation avec la licence
-  @OneToOne('SocieteLicense', (license: SocieteLicense) => license.societe, { nullable: true })
-  license?: SocieteLicense
+  // @OneToOne('SocieteLicense', (license: SocieteLicense) => license.societe, { nullable: true })
+  // license?: SocieteLicense
 }

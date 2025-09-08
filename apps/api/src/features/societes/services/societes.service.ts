@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DeepPartial, IsNull, type Repository } from 'typeorm'
-import type { DeepPartial } from 'typeorm'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 
 @Injectable()

@@ -174,13 +174,13 @@ export class Partner extends BusinessEntity {
   }
 
   // Relations
-  @OneToMany('Contact', (contact: unknown) => contact.partner)
+  @OneToMany('Contact', (contact: { partner: unknown }) => contact.partner)
   contacts!: unknown[]
 
-  @OneToMany('PartnerSite', (site: unknown) => site.partner)
+  @OneToMany('PartnerSite', (site: { partner: unknown }) => site.partner)
   sites!: unknown[]
 
-  @OneToMany('PartnerAddress', (address: unknown) => address.partner)
+  @OneToMany('PartnerAddress', (address: { partner: unknown }) => address.partner)
   addresses!: unknown[]
 
   // Relations futures

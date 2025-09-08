@@ -8,6 +8,7 @@ import type {
   ActionExecutionResult,
   ApiCallResult,
   CustomActionResult,
+  CustomConfig,
   FieldUpdateResult,
   FunctionExecutionResult,
   LogEventResult,
@@ -107,8 +108,9 @@ export class NotificationActionExecutor {
       recipientsNotified: recipients.length,
       channels: config.channels || ['email'],
       data: {
-        template: config.template,
-        subject: config.subject,
+        templateId: config.templateId,
+        title: config.title,
+        body: config.body,
         priority: config.priority,
       },
     }
@@ -229,7 +231,7 @@ export class NotificationActionExecutor {
     return {
       success: true,
       status: response.status,
-      data: response.data,
+      data: response.data as Record<string, unknown>,
       responseHeaders: response.headers as Record<string, string>,
       metadata: {
         method: config.method,
@@ -262,10 +264,11 @@ export class NotificationActionExecutor {
       created: true,
       data: {
         description: config.description,
-        assignee: config.assignee,
+        assignTo: config.assignTo,
         priority: config.priority,
         dueDate: config.dueDate,
-        labels: config.labels,
+        tags: config.tags,
+        metadata: config.metadata,
         timestamp: new Date().toISOString(),
       },
     }
@@ -293,8 +296,9 @@ export class NotificationActionExecutor {
       triggered: true,
       executionId: `execution-${Date.now()}`,
       data: {
-        version: config.version,
-        input: config.input,
+        parameters: config.parameters,
+        waitForCompletion: config.waitForCompletion,
+        timeoutSeconds: config.timeoutSeconds,
         timestamp: new Date().toISOString(),
       },
     }
@@ -392,10 +396,10 @@ export class NotificationActionExecutor {
     return {
       success: true,
       custom: true,
-      config,
+      config: { handlerName: 'custom', ...config } as CustomConfig,
       data: {
-        handlerName: config.handlerName,
-        parameters: config.parameters,
+        handlerName: (config as Record<string, unknown>).handlerName as string || 'custom',
+        parameters: (config as Record<string, unknown>).parameters as Record<string, unknown>,
         timestamp: new Date().toISOString(),
       },
     }

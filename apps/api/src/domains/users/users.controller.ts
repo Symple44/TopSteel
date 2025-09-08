@@ -32,6 +32,14 @@ import type { UserQueryDto } from './dto/user-query.dto'
 import { UserRole } from './entities/user.entity'
 import type { UsersService } from './users.service'
 
+// Interface for authenticated user
+interface AuthenticatedUser {
+  id: string
+  email?: string
+  roles?: string[]
+  [key: string]: unknown
+}
+
 @Controller('users')
 @ApiTags('👤 Users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -70,18 +78,18 @@ export class UsersController {
   @Get('settings/me')
   @ApiOperation({ summary: 'Récupérer mes paramètres utilisateur' })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
-  async getMySettings(@CurrentUser() user: Record<string, unknown>) {
-    return this.usersService.getUserSettings((user as unknown).id)
+  async getMySettings(@CurrentUser() user: AuthenticatedUser) {
+    return this.usersService.getUserSettings(user.id)
   }
 
   @Patch('settings/me')
   @ApiOperation({ summary: 'Mettre à jour mes paramètres utilisateur' })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
   async updateMySettings(
-    @CurrentUser() user: Record<string, unknown>,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() updateDto: UpdateUserSettingsDto
   ) {
-    return this.usersService.updateUserSettings((user as unknown).id, updateDto)
+    return this.usersService.updateUserSettings(user.id, updateDto)
   }
 
   // Endpoints spécialisés pour les préférences d'apparence (DOIVENT être avant :id)
@@ -93,7 +101,7 @@ export class UsersController {
     type: GetAppearanceSettingsResponseDto,
   })
   async getMyAppearanceSettings(
-    @CurrentUser() user: Record<string, unknown>
+    @CurrentUser() user: AuthenticatedUser
   ): Promise<GetAppearanceSettingsResponseDto> {
     const cacheKey = `user:appearance:${user.id}`
 
@@ -103,7 +111,7 @@ export class UsersController {
       return cachedResult
     }
 
-    const settings = await this.usersService.getUserSettings((user as unknown).id)
+    const settings = await this.usersService.getUserSettings(user.id)
     if (!settings?.preferences?.appearance) {
       throw new Error("Paramètres d'apparence non trouvés")
     }
@@ -124,10 +132,10 @@ export class UsersController {
     type: GetAppearanceSettingsResponseDto,
   })
   async updateMyAppearanceSettings(
-    @CurrentUser() user: Record<string, unknown>,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() updateDto: UpdateAppearanceSettingsDto
   ): Promise<GetAppearanceSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings((user as unknown).id, {
+    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
       preferences: { appearance: updateDto },
     })
 
@@ -152,10 +160,10 @@ export class UsersController {
     type: GetNotificationSettingsResponseDto,
   })
   async getMyNotificationSettings(
-    @CurrentUser() user: Record<string, unknown>
+    @CurrentUser() user: AuthenticatedUser
   ): Promise<GetNotificationSettingsResponseDto> {
-    const settings = await this.usersService.getUserSettings((user as unknown).id)
-    return new GetNotificationSettingsResponseDto(settings.preferences.notifications as unknown)
+    const settings = await this.usersService.getUserSettings(user.id)
+    return new GetNotificationSettingsResponseDto(settings.preferences.notifications as Record<string, unknown>)
   }
 
   @Patch('notifications/me')
@@ -166,13 +174,13 @@ export class UsersController {
     type: GetNotificationSettingsResponseDto,
   })
   async updateMyNotificationSettings(
-    @CurrentUser() user: Record<string, unknown>,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() updateDto: UpdateNotificationSettingsDto
   ): Promise<GetNotificationSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings((user as unknown).id, {
+    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
       preferences: { notifications: updateDto },
     })
-    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications as unknown)
+    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications as Record<string, unknown>)
   }
 
   // Endpoints avec paramètre ID (DOIVENT être APRÈS les endpoints spécifiques)

@@ -160,7 +160,7 @@ export interface FunctionExecutionResult extends ActionExecutionResult {
 
 export interface ApiCallResult extends ActionExecutionResult {
   status: number
-  data: unknown
+  data?: Record<string, unknown>
   responseHeaders?: Record<string, string>
 }
 

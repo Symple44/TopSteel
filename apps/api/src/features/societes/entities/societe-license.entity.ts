@@ -36,7 +36,7 @@ export class SocieteLicense {
 
   @OneToOne(
     () => Societe,
-    (societe) => societe.license,
+    () => null, // Relationship handled from Societe side
     { onDelete: 'CASCADE' }
   )
   @JoinColumn({ name: 'societeId' })

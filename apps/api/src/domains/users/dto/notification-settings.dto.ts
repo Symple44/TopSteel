@@ -173,11 +173,28 @@ export class GetNotificationSettingsResponseDto {
   }
 
   constructor(data: Record<string, unknown>) {
-    this.email = data.email as unknown
-    this.push = data.push as unknown
-    this.sms = data.sms as unknown
-    this.emailTypes = data.emailTypes as unknown
-    this.pushTypes = data.pushTypes as unknown
-    this.quietHours = data.quietHours as unknown
+    this.email = data.email as boolean
+    this.push = data.push as boolean
+    this.sms = data.sms as boolean
+    this.emailTypes = (data.emailTypes || {
+      newMessages: false,
+      systemAlerts: false,
+      taskReminders: false,
+      weeklyReports: false,
+      securityAlerts: false,
+      maintenanceNotice: false
+    }) as typeof this.emailTypes
+    this.pushTypes = (data.pushTypes || {
+      enabled: false,
+      sound: false,
+      urgent: false,
+      normal: false,
+      quiet: false
+    }) as typeof this.pushTypes
+    this.quietHours = (data.quietHours || {
+      enabled: false,
+      start: '22:00',
+      end: '08:00'
+    }) as typeof this.quietHours
   }
 }
