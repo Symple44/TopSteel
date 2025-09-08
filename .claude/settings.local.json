@@ -41,7 +41,8 @@
       "Bash(timeout 30 pnpm run build:packages)",
       "Bash(cat:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": [],

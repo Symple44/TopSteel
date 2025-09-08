@@ -6,7 +6,7 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import { type ParameterCategory, SystemParameter } from './entitites/system-parameter.entity'
+import { type ParameterCategory, type ParameterType, SystemParameter } from './entitites/system-parameter.entity'
 
 @Injectable()
 export class SystemParametersService {
@@ -159,8 +159,8 @@ export class SystemParametersService {
           const newParameter = await this.create({
             key: update.key,
             value: update.value,
-            type: this.getTypeFromKey(update.key) as unknown,
-            category: this.getCategoryFromKey(update.key) as unknown,
+            type: this.getTypeFromKey(update.key) as ParameterType,
+            category: this.getCategoryFromKey(update.key) as ParameterCategory,
             description: this.getDescriptionFromKey(update.key),
             defaultValue: update.value,
             isEditable: true,

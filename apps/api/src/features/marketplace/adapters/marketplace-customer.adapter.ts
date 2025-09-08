@@ -349,7 +349,7 @@ export class MarketplaceCustomerAdapter {
         commentaires: 'Client créé automatiquement depuis le marketplace',
         tagsPersonnalises: ['marketplace', 'client-web'],
       },
-    } as unknown)
+    })
 
     return (await this.partnerRepository.save(partner)) as unknown as Partner
   }

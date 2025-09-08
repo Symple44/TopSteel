@@ -5,6 +5,24 @@ import { UserMenuItemPreference } from '../entities/user-menu-item-preference.en
 import { UserMenuPreferences } from '../entities/user-menu-preferences.entity'
 import type { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
 
+// Interface for UserMenuItemPreference data
+interface UserMenuItemPreferenceData {
+  id: string
+  userPreferencesId: string
+  menuItemId: string
+  isVisible: boolean
+  isFavorite: boolean
+  isPinned: boolean
+  customOrder?: number
+  customTitle?: string
+  customIcon?: string
+  customColor?: string
+  customBadge?: string
+  metadata?: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface UpdateUserPreferencesDto {
   useCustomLayout?: boolean
   layoutType?: 'standard' | 'compact' | 'expanded' | 'minimal'
@@ -235,7 +253,7 @@ export class UserMenuPreferencesService {
     menuItems: MenuTreeNode[],
     preferences: UserMenuPreferences
   ): Promise<UserMenuWithPreferences[]> {
-    const itemPreferencesMap = new Map<string, UserMenuItemPreference>()
+    const itemPreferencesMap = new Map<string, UserMenuItemPreferenceData>()
 
     // Charger toutes les préférences d'items pour cet utilisateur
     if (preferences.itemPreferences) {

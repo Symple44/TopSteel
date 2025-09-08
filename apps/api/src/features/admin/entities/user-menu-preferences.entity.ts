@@ -10,6 +10,24 @@ import {
 // Removed import to avoid circular dependencies
 // import { UserMenuItemPreference } from './user-menu-item-preference.entity'
 
+// Interface for UserMenuItemPreference to avoid circular dependency
+interface UserMenuItemPreferenceData {
+  id: string
+  userPreferencesId: string
+  menuItemId: string
+  isVisible: boolean
+  isFavorite: boolean
+  isPinned: boolean
+  customOrder?: number
+  customTitle?: string
+  customIcon?: string
+  customColor?: string
+  customBadge?: string
+  metadata?: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+}
+
 @Entity('user_menu_preferences_admin')
 export class UserMenuPreferences {
   @PrimaryGeneratedColumn('uuid')
@@ -77,7 +95,7 @@ export class UserMenuPreferences {
 
   // Relations
   @OneToMany('UserMenuItemPreference', 'userPreferences')
-  itemPreferences!: unknown[]
+  itemPreferences!: UserMenuItemPreferenceData[]
 
   // Méthodes utilitaires
   static createDefault(userId: string, baseConfigId?: string): UserMenuPreferences {

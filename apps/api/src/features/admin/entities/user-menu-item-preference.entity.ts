@@ -11,6 +11,28 @@ import {
 // Removed import to avoid circular dependencies
 // import { UserMenuPreferences } from './user-menu-preferences.entity'
 
+// Interface for UserMenuPreferences to avoid circular dependency
+interface UserMenuPreferencesData {
+  id: string
+  userId: string
+  baseConfigId?: string
+  useCustomLayout: boolean
+  layoutType: 'standard' | 'compact' | 'expanded' | 'minimal'
+  showIcons: boolean
+  showBadges: boolean
+  allowCollapse: boolean
+  theme: 'light' | 'dark' | 'auto'
+  customColors?: {
+    primary?: string
+    secondary?: string
+    accent?: string
+  }
+  favoriteItems?: string[]
+  hiddenItems?: string[]
+  pinnedItems?: string[]
+  customOrder?: Record<string, number>
+}
+
 @Entity('user_menu_item_preferences')
 @Index(['userPreferencesId', 'menuItemId'], { unique: true })
 export class UserMenuItemPreference {
@@ -61,7 +83,7 @@ export class UserMenuItemPreference {
   // Relations
   @ManyToOne('UserMenuPreferences', 'itemPreferences')
   @JoinColumn({ name: 'userPreferencesId' })
-  userPreferences!: any
+  userPreferences!: UserMenuPreferencesData
 
   // Méthodes utilitaires
   static create(

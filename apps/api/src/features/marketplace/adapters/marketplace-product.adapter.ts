@@ -163,7 +163,7 @@ export class MarketplaceProductAdapter {
         id: productId,
         status: ArticleStatus.ACTIF,
         isMarketplaceEnabled: true,
-      } as unknown,
+      },
     })
 
     return article ? this.articleToMarketplaceView(article, tenantId) : null
@@ -181,7 +181,7 @@ export class MarketplaceProductAdapter {
         reference: sku,
         status: ArticleStatus.ACTIF,
         isMarketplaceEnabled: true,
-      } as unknown,
+      },
     })
 
     return article ? this.articleToMarketplaceView(article, tenantId) : null

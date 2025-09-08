@@ -7,6 +7,7 @@ import { Between, MoreThan, type Repository } from 'typeorm'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 import { MarketplaceShipment } from '../entities/marketplace-shipment.entity'
+import { TrackingStatus } from '../types/shipping.types'
 
 export interface DashboardMetrics {
   overview: {
@@ -434,7 +435,7 @@ export class MarketplaceDashboardService {
 
     const successfulDeliveries = await this.shipmentRepository.count({
       where: {
-        status: 'DELIVERED' as unknown,
+        status: TrackingStatus.DELIVERED,
         createdAt: Between(startDate, endDate),
       },
     })

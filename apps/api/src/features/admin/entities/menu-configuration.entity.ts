@@ -10,6 +10,29 @@ import {
 // Circular dependency resolved - using string reference
 // import { MenuItem } from './menu-item.entity'
 
+// Interface for MenuItem to avoid circular dependency
+interface MenuItemData {
+  id: string
+  configId: string
+  parentId?: string
+  title: string
+  orderIndex: number
+  isVisible: boolean
+  type: string
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
+  metadata?: Record<string, unknown>
+  // Virtual properties for compatibility
+  titleKey?: string
+  href?: string
+  icon?: string
+  gradient?: string
+  badge?: string
+  moduleId?: string
+  target?: string
+}
+
 @Entity('menu_configurations')
 @Index(['name'], { unique: true }) // Unique index for name lookups
 @Index(['isActive', 'isSystem']) // For filtering active/system configurations
@@ -53,7 +76,7 @@ export class MenuConfiguration {
 
   // Relations
   @OneToMany('MenuItem', 'configuration', { lazy: true })
-  items!: unknown[]
+  items!: MenuItemData[]
 
   // Méthodes utilitaires
   static createSystem(name: string, description: string): MenuConfiguration {

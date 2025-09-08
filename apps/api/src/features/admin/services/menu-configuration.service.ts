@@ -11,6 +11,51 @@ import { MenuItem, MenuItemType } from '../entities/menu-item.entity'
 import { MenuItemPermission } from '../entities/menu-item-permission.entity'
 import { MenuItemRole } from '../entities/menu-item-role.entity'
 
+// Interfaces for relations
+interface MenuItemPermissionData {
+  id: string
+  menuItemId: string
+  permissionId: string
+  isRequired?: boolean
+  createdAt: Date
+}
+
+interface MenuItemRoleData {
+  id: string
+  menuItemId: string
+  roleId: string
+  createdAt: Date
+}
+
+// Import interface from entity file
+interface MenuItemData {
+  id: string
+  configId: string
+  parentId?: string
+  title: string
+  orderIndex: number
+  isVisible: boolean
+  type: MenuItemType
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
+  metadata?: Record<string, unknown>
+  // Relations
+  permissions?: MenuItemPermissionData[]
+  roles?: MenuItemRoleData[]
+  children?: MenuItemData[]
+  // Virtual properties for compatibility
+  titleKey?: string
+  href?: string
+  icon?: string
+  gradient?: string
+  badge?: string
+  moduleId?: string
+  target?: string
+  // Method
+  getDepth?(): number
+}
+
 export interface MenuItemDto {
   id?: string
   parentId?: string
@@ -202,11 +247,11 @@ export class MenuConfigurationService {
     }
 
     // Construire l'arbre de menu
-    const items = config.items.filter((item) => !item.parentId)
-    return this.buildMenuTree(items, config.items)
+    const items = config.items.filter((item) => !item.parentId) as MenuItemData[]
+    return this.buildMenuTree(items, config.items as MenuItemData[])
   }
 
-  private buildMenuTree(rootItems: MenuItem[], allItems: MenuItem[]): MenuTreeNode[] {
+  private buildMenuTree(rootItems: MenuItemData[], allItems: MenuItemData[]): MenuTreeNode[] {
     return rootItems
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map((item) => {
@@ -231,7 +276,7 @@ export class MenuConfigurationService {
           permissions: item.permissions?.map((p) => p.permissionId) || [],
           roles: item.roles?.map((r) => r.roleId) || [],
           children: this.buildMenuTree(children, allItems),
-          depth: item.getDepth(),
+          depth: item.getDepth?.() || 0,
         }
       })
   }
@@ -513,7 +558,7 @@ export class MenuConfigurationService {
       {
         name: data.name as string,
         description: typeof data.description === 'string' ? data.description : undefined,
-        items: data.items as unknown,
+        items: data.items as MenuItemDto[],
       },
       createdBy
     )
