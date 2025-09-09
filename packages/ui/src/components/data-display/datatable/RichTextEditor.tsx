@@ -132,7 +132,7 @@ const ToolbarButton = ({
   isActive = false,
 }: {
   onClick: () => void
-  icon: React.ComponentType<unknown>
+  icon: React.ComponentType<{ className?: string }>
   title: string
   isActive?: boolean
 }) => (
@@ -155,7 +155,7 @@ const ColorPicker = ({
   colors: string[]
   onColorSelect: (color: string) => void
   title: string
-  icon: React.ComponentType<unknown>
+  icon: React.ComponentType<{ className?: string }>
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const IconComponent = icon
