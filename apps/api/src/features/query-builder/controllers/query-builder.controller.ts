@@ -35,7 +35,7 @@ import {
 } from '../security/query-builder-security.guard'
 import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
 import type { QueryBuilderService } from '../services/query-builder.service'
-import type { QueryBuilderExecutorService } from '../services/query-builder-executor.service'
+import type { QueryBuilderExecutorService, QueryExecutionParams } from '../services/query-builder-executor.service'
 import type { SchemaIntrospectionService } from '../services/schema-introspection.service'
 
 @Controller('query-builder')
@@ -303,7 +303,7 @@ export class QueryBuilderController {
 
       return await this.executorService.executeQuery(
         queryBuilder,
-        transformedExecuteDto as unknown,
+        transformedExecuteDto as QueryExecutionParams,
         req.user.id
       )
     } catch (error) {

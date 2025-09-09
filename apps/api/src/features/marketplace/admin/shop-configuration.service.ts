@@ -239,7 +239,7 @@ export class ShopConfigurationService {
 
       // Deep merge updates with existing configuration
       const updatedConfig = this.deepMerge(
-        config as Record<string, unknown>, 
+        config as unknown as Record<string, unknown>, 
         updates as Record<string, unknown>
       ) as unknown as MarketplaceShopConfiguration
       updatedConfig.updatedAt = new Date()

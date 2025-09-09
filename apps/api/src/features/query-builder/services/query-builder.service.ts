@@ -13,7 +13,7 @@ import {
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 // Interface for format field
-interface FieldFormat {
+export interface FieldFormat {
   type?: 'date' | 'number' | 'currency' | 'percentage' | 'boolean' | 'custom'
   pattern?: string
   prefix?: string
@@ -22,7 +22,7 @@ interface FieldFormat {
 }
 
 // Interface for aggregation field
-interface FieldAggregation {
+export interface FieldAggregation {
   enabled?: boolean
   type?: 'sum' | 'avg' | 'count' | 'min' | 'max'
 }

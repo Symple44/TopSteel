@@ -17,6 +17,26 @@ import {
   type WebhookSubscription,
 } from '../types/webhook.types'
 
+interface WebhookError {
+  response?: {
+    status: number
+  }
+}
+
+interface PriceChangeEvent {
+  previousPrice: number
+  newPrice: number
+  societeId: string
+  articleId?: string
+}
+
+interface RuleAppliedEvent {
+  societeId: string
+  ruleId: string
+  articleId?: string
+  channel?: string
+}
+
 @Injectable()
 export class PricingWebhooksService {
   async listSubscriptions(societeId: string): Promise<WebhookSubscription[]> {
@@ -67,7 +87,7 @@ export class PricingWebhooksService {
     } catch (error: unknown) {
       return {
         success: false,
-        statusCode: error.response?.status || 0,
+        statusCode: (error as WebhookError).response?.status || 0,
         responseTime: Date.now() - startTime,
         error: getErrorMessage(error),
       }
@@ -325,7 +345,7 @@ export class PricingWebhooksService {
       this.logger.log(`Webhook délivré avec succès: ${delivery.id}`)
     } catch (error: unknown) {
       delivery.response = {
-        statusCode: error.response?.status || 0,
+        statusCode: (error as WebhookError).response?.status || 0,
         error: getErrorMessage(error),
       }
 
@@ -424,18 +444,19 @@ export class PricingWebhooksService {
    */
   @OnEvent('price.calculated')
   async handlePriceCalculated(event: unknown): Promise<void> {
-    if (event.previousPrice && event.newPrice) {
-      const changePercent = ((event.newPrice - event.previousPrice) / event.previousPrice) * 100
+    const priceEvent = event as PriceChangeEvent
+    if (priceEvent.previousPrice && priceEvent.newPrice) {
+      const changePercent = ((priceEvent.newPrice - priceEvent.previousPrice) / priceEvent.previousPrice) * 100
 
       if (Math.abs(changePercent) > 10) {
         await this.emit({
           type: WebhookEventType.PRICE_CHANGED,
-          societeId: event.societeId,
-          data: event,
+          societeId: priceEvent.societeId,
+          data: priceEvent,
           metadata: {
-            articleId: event.articleId,
-            previousValue: event.previousPrice,
-            newValue: event.newPrice,
+            articleId: priceEvent.articleId,
+            previousValue: priceEvent.previousPrice,
+            newValue: priceEvent.newPrice,
             changePercent,
           },
         })
@@ -445,14 +466,15 @@ export class PricingWebhooksService {
 
   @OnEvent('rule.applied')
   async handleRuleApplied(event: unknown): Promise<void> {
+    const ruleEvent = event as RuleAppliedEvent
     await this.emit({
       type: WebhookEventType.RULE_APPLIED,
-      societeId: event.societeId,
-      data: event,
+      societeId: ruleEvent.societeId,
+      data: ruleEvent,
       metadata: {
-        ruleId: event.ruleId,
-        articleId: event.articleId,
-        channel: event.channel,
+        ruleId: ruleEvent.ruleId,
+        articleId: ruleEvent.articleId,
+        channel: ruleEvent.channel,
       },
     })
   }

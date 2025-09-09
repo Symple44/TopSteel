@@ -8,6 +8,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator'
+import type { FieldFormat, FieldAggregation } from '../services/query-builder.service'
 
 export class CreateQueryBuilderColumnDto {
   @IsString()
@@ -60,11 +61,11 @@ export class CreateQueryBuilderColumnDto {
 
   @IsOptional()
   @IsObject()
-  format?: unknown
+  format?: FieldFormat
 
   @IsOptional()
   @IsObject()
-  aggregation?: unknown
+  aggregation?: FieldAggregation
 }
 
 export class CreateQueryBuilderJoinDto {
@@ -116,7 +117,7 @@ export class CreateQueryBuilderCalculatedFieldDto {
 
   @IsOptional()
   @IsObject()
-  format?: unknown
+  format?: FieldFormat
 
   @IsOptional()
   @IsArray()

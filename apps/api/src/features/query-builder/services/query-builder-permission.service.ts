@@ -181,7 +181,7 @@ export class QueryBuilderPermissionService {
     userId: string
   ): Promise<Record<PermissionType, boolean>> {
     const permissionTypes: PermissionType[] = ['view', 'edit', 'delete', 'share', 'export']
-    const permissions: Record<PermissionType, boolean> = {} as unknown
+    const permissions: Record<PermissionType, boolean> = {} as Record<PermissionType, boolean>
 
     for (const permissionType of permissionTypes) {
       permissions[permissionType] = await this.checkPermission(

@@ -350,7 +350,7 @@ export class NotificationRuleService {
   private getFieldValue(field: string, data: Record<string, unknown>): unknown {
     // Support pour les champs imbriqués (ex: "user.profile.name")
     const fieldParts = field.split('.')
-    let value = data
+    let value: unknown = data
 
     for (const part of fieldParts) {
       if (
@@ -359,7 +359,7 @@ export class NotificationRuleService {
         value !== null &&
         part in (value as Record<string, unknown>)
       ) {
-        value = (value as Record<string, unknown>)[part] as unknown
+        value = (value as Record<string, unknown>)[part]
       } else {
         return undefined
       }
