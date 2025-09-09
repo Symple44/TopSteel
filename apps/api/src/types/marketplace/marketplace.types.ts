@@ -174,11 +174,7 @@ export interface MarketplacePromotion {
   updatedAt: Date | string
 }
 
-export type PromotionType =
-  | 'PERCENTAGE'
-  | 'FIXED_AMOUNT'
-  | 'BUY_X_GET_Y'
-  | 'FREE_SHIPPING'
+export type PromotionType = 'PERCENTAGE' | 'FIXED_AMOUNT' | 'BUY_X_GET_Y' | 'FREE_SHIPPING'
 
 export interface PromotionCondition {
   type: 'MIN_AMOUNT' | 'MIN_QUANTITY' | 'PRODUCT' | 'CATEGORY' | 'CUSTOMER'

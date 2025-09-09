@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { DeepPartial, IsNull, type Repository } from 'typeorm'
+import { type DeepPartial, IsNull, type Repository } from 'typeorm'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 
 @Injectable()
@@ -51,7 +51,10 @@ export class SocietesService {
   }
 
   async update(id: string, societeData: Partial<Societe>): Promise<Societe> {
-    await this._societeRepository.update(id, societeData as DeepPartial<Societe> as DeepPartial<any>)
+    await this._societeRepository.update(
+      id,
+      societeData as DeepPartial<Societe> as DeepPartial<any>
+    )
     const societe = await this._societeRepository.findOne({
       where: { id },
       relations: ['sites'],

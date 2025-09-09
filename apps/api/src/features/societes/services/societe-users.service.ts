@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { IsNull, type Repository } from 'typeorm'
 import type { DeepPartial } from 'typeorm'
+import { IsNull, type Repository } from 'typeorm'
 import { SocieteUser, type UserSocieteRole } from '../entities/societe-user.entity'
 
 @Injectable()
@@ -106,7 +106,9 @@ export class SocieteUsersService {
     // Puis définir la nouvelle association par défaut
     const association = await this.findUserSociete(userId, societeId)
     if (association) {
-      await this._societeUserRepository.update(association.id, { isDefault: true } as DeepPartial<any>)
+      await this._societeUserRepository.update(association.id, {
+        isDefault: true,
+      } as DeepPartial<any>)
       const updatedAssociation = await this._societeUserRepository.findOne({
         where: { id: association.id },
         relations: ['societe'],
@@ -301,10 +303,9 @@ export class SocieteUsersService {
     await this._societeUserRepository.update({ userId }, { isDefault: false } as DeepPartial<any>)
 
     // Ensuite, définir la société spécifiée comme par défaut
-    const result = await this._societeUserRepository.update(
-      { userId, societeId },
-      { isDefault: true } as DeepPartial<any>
-    )
+    const result = await this._societeUserRepository.update({ userId, societeId }, {
+      isDefault: true,
+    } as DeepPartial<any>)
 
     if (result.affected === 0) {
       throw new NotFoundException(`No access found for user ${userId} to company ${societeId}`)

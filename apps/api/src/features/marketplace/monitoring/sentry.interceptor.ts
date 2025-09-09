@@ -66,7 +66,9 @@ export class SentryInterceptor implements NestInterceptor {
       })
 
       // Set user if available
-      const req = request as Request & { user?: { id: string; email: string; username: string; tenantId: string } }
+      const req = request as Request & {
+        user?: { id: string; email: string; username: string; tenantId: string }
+      }
       if (req.user) {
         scope.setUser({
           id: req.user.id,

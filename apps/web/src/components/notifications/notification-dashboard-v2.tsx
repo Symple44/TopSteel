@@ -407,23 +407,22 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                                 {categoryConfig[category as keyof typeof categoryConfig]?.label ||
                                   'Système'}
                               </Badge>
-                              {notification.priority &&
-                                notification.priority !== 'NORMAL' && (
-                                  <Badge
-                                    className={cn(
-                                      'text-xs',
-                                      priorityConfig[
-                                        notification?.priority?.toLowerCase() as keyof typeof priorityConfig
-                                      ]?.color
-                                    )}
-                                  >
-                                    {
-                                      priorityConfig[
-                                        notification?.priority?.toLowerCase() as keyof typeof priorityConfig
-                                      ]?.label
-                                    }
-                                  </Badge>
-                                )}
+                              {notification.priority && notification.priority !== 'NORMAL' && (
+                                <Badge
+                                  className={cn(
+                                    'text-xs',
+                                    priorityConfig[
+                                      notification?.priority?.toLowerCase() as keyof typeof priorityConfig
+                                    ]?.color
+                                  )}
+                                >
+                                  {
+                                    priorityConfig[
+                                      notification?.priority?.toLowerCase() as keyof typeof priorityConfig
+                                    ]?.label
+                                  }
+                                </Badge>
+                              )}
                               {!notification.readAt && (
                                 <div className="h-2 w-2 rounded-full bg-blue-600" />
                               )}

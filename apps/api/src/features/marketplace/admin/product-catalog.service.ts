@@ -146,7 +146,7 @@ export class ProductCatalogService {
       }
       const article = this.articleRepository.create(articleData as any)
 
-      const savedArticle = await this.articleRepository.save(article) as unknown as Article
+      const savedArticle = (await this.articleRepository.save(article)) as unknown as Article
 
       // Clear cache
       await this.clearProductCache(tenantId)

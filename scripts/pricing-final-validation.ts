@@ -152,8 +152,8 @@ class PricingFinalValidation {
         status: 'success',
         message: 'Aucune erreur TypeScript',
       })
-    } catch (error: any) {
-      const output = error.stdout?.toString() || error.message
+    } catch (error) {
+      const output = (error as any).stdout?.toString() || (error as Error).message
       const errorCount = (output.match(/error TS/g) || []).length
 
       this.results.push({

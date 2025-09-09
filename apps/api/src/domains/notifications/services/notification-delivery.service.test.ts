@@ -381,7 +381,9 @@ describe('NotificationDeliveryService', () => {
     })
 
     it('should handle service unavailable scenarios', async () => {
-      jest.spyOn(service as unknown, 'sendSMS').mockRejectedValue(new Error('SMS service unavailable'))
+      jest
+        .spyOn(service as unknown, 'sendSMS')
+        .mockRejectedValue(new Error('SMS service unavailable'))
       jest
         .spyOn(service as unknown, 'sendPushNotification')
         .mockRejectedValue(new Error('Push service unavailable'))

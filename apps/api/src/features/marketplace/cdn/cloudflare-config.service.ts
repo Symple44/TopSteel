@@ -3,8 +3,11 @@ import * as path from 'node:path'
 import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
 import sharp from 'sharp'
-import type { CloudflareConfig, CloudflareImageUploadResponse, CloudflareZone } from '../../../types/marketplace/marketplace.types'
-
+import type {
+  CloudflareConfig,
+  CloudflareImageUploadResponse,
+  CloudflareZone,
+} from '../../../types/marketplace/marketplace.types'
 
 export interface ImageTransformOptions {
   width?: number

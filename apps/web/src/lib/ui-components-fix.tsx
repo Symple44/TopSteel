@@ -29,7 +29,9 @@ interface BaseUIProps {
 }
 
 // Type assertion helper to safely cast components
-function createSafeWrapper<P extends BaseUIProps>(Component: ComponentType<unknown>): ComponentType<P> {
+function createSafeWrapper<P extends BaseUIProps>(
+  Component: ComponentType<unknown>
+): ComponentType<P> {
   return Component as ComponentType<P>
 }
 

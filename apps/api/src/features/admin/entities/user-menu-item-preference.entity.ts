@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+
 // Removed import to avoid circular dependencies
 // import { UserMenuPreferences } from './user-menu-preferences.entity'
 

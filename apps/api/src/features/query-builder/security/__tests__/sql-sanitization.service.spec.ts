@@ -362,7 +362,11 @@ describe('SqlSanitizationService', () => {
           fromTable: 'clients',
           filters: [],
           sorts: [
-            { tableName: 'clients', columnName: 'nom', direction: 'ASC; DROP TABLE users;' as unknown },
+            {
+              tableName: 'clients',
+              columnName: 'nom',
+              direction: 'ASC; DROP TABLE users;' as unknown,
+            },
           ],
         })
       }).toThrow(BadRequestException)

@@ -465,6 +465,6 @@ export class ShopConfigurationController {
       },
     }
 
-    return templates[templateName as keyof typeof templates] as Partial<ShopConfiguration> || {}
+    return (templates[templateName as keyof typeof templates] as Partial<ShopConfiguration>) || {}
   }
 }

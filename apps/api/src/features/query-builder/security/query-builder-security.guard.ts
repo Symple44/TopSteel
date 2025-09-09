@@ -120,7 +120,7 @@ export class QueryBuilderSecurityGuard implements CanActivate {
    * Check read access (view existing queries, execute whitelisted queries)
    */
   private async checkReadAccess(
-    userId: string, 
+    userId: string,
     request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
   ): Promise<boolean> {
     // Check if user has any query builder permissions
@@ -144,7 +144,7 @@ export class QueryBuilderSecurityGuard implements CanActivate {
    * Check write access (create, modify queries)
    */
   private async checkWriteAccess(
-    userId: string, 
+    userId: string,
     request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
   ): Promise<boolean> {
     // Check if user has edit permissions
@@ -167,7 +167,7 @@ export class QueryBuilderSecurityGuard implements CanActivate {
    * Check admin access (raw SQL execution, system queries)
    */
   private async checkAdminAccess(
-    userId: string, 
+    userId: string,
     _request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
   ): Promise<boolean> {
     // Admin access is highly restricted
@@ -217,7 +217,7 @@ export class QueryBuilderSecurityGuard implements CanActivate {
   private extractQueryBuilderId(
     request: Request & { params?: Record<string, string>; body?: Record<string, unknown> }
   ): string | null {
-    return request.params?.id || request.body?.queryBuilderId as string || null
+    return request.params?.id || (request.body?.queryBuilderId as string) || null
   }
 
   /**
@@ -243,12 +243,16 @@ export class QueryBuilderSecurityGuard implements CanActivate {
     // Validate column access if columns are specified
     if (body.selectColumns && Array.isArray(body.selectColumns)) {
       for (const column of body.selectColumns) {
-        if (column && typeof column === 'object' && 
-            'tableName' in column && 'columnName' in column) {
+        if (
+          column &&
+          typeof column === 'object' &&
+          'tableName' in column &&
+          'columnName' in column
+        ) {
           try {
             this.securityService.validateColumn(
-              column.tableName as string, 
-              column.columnName as string, 
+              column.tableName as string,
+              column.columnName as string,
               'select'
             )
           } catch (_error) {
@@ -268,29 +272,25 @@ export class QueryBuilderSecurityGuard implements CanActivate {
     // Validate joins if specified
     if (body.joins && Array.isArray(body.joins)) {
       for (const join of body.joins) {
-        if (join && typeof join === 'object' && 
-            'fromTable' in join && 'toTable' in join) {
+        if (join && typeof join === 'object' && 'fromTable' in join && 'toTable' in join) {
           try {
-            this.securityService.validateJoin(
-              join.fromTable as string, 
-              join.toTable as string
-            )
+            this.securityService.validateJoin(join.fromTable as string, join.toTable as string)
           } catch (_error) {
             const fromTable = join.fromTable as string
             const toTable = join.toTable as string
-            this.logger.warn(
-              `Invalid join attempted by user ${userId}: ${fromTable} -> ${toTable}`
-            )
-            throw new ForbiddenException(
-              `Join from '${fromTable}' to '${toTable}' is not allowed`
-            )
+            this.logger.warn(`Invalid join attempted by user ${userId}: ${fromTable} -> ${toTable}`)
+            throw new ForbiddenException(`Join from '${fromTable}' to '${toTable}' is not allowed`)
           }
         }
       }
     }
 
     // For raw SQL (admin level only), validate SQL content
-    if (body.sql && typeof body.sql === 'string' && securityLevel === QueryBuilderSecurityLevel.ADMIN) {
+    if (
+      body.sql &&
+      typeof body.sql === 'string' &&
+      securityLevel === QueryBuilderSecurityLevel.ADMIN
+    ) {
       try {
         // This validation is performed in the service layer as well,
         // but we do an early check here for security

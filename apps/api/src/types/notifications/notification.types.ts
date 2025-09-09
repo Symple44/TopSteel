@@ -19,7 +19,7 @@ export interface NotificationRule {
   updatedAt: Date | string
 }
 
-export type NotificationEntityType = 
+export type NotificationEntityType =
   | 'USER'
   | 'SOCIETE'
   | 'COMMANDE'
@@ -94,20 +94,20 @@ export interface NotificationActionConfig {
   bcc?: string[]
   subject?: string
   template?: string
-  
+
   // Pour SMS
   phoneNumbers?: string[]
-  
+
   // Pour WEBHOOK/API_CALL
   url?: string
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   headers?: Record<string, string>
   body?: unknown
-  
+
   // Pour SLACK/TEAMS
   channel?: string
   webhookUrl?: string
-  
+
   // Commun
   message?: string
   variables?: Record<string, unknown>

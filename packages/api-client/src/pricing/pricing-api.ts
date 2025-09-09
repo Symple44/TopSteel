@@ -130,9 +130,12 @@ export class PricingApi {
     limit?: number
     offset?: number
   }): Promise<{ rules: PricingRule[]; total: number }> {
-    const response = await this.httpClient.get<{ rules: PricingRule[]; total: number }>('/pricing/rules', {
-      params: filters,
-    })
+    const response = await this.httpClient.get<{ rules: PricingRule[]; total: number }>(
+      '/pricing/rules',
+      {
+        params: filters,
+      }
+    )
     return response.data
   }
 

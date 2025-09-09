@@ -573,7 +573,7 @@ export class Material extends BusinessEntity {
       ancienneValeur: unknown
       nouvelleValeur: unknown
     }>
-    
+
     historique.push({
       date: new Date(),
       utilisateur,

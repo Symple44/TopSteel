@@ -199,7 +199,9 @@ export default function MenuAdminPage() {
 
   const handleExportConfig = async (configId: string) => {
     try {
-      const response = await apiClient.get<unknown>(`/admin/menus/configurations/${configId}/export`)
+      const response = await apiClient.get<unknown>(
+        `/admin/menus/configurations/${configId}/export`
+      )
       const data = ensureDataProperty<unknown>(response)
       const blob = new Blob([JSON.stringify(data?.data, null, 2)], {
         type: 'application/json',

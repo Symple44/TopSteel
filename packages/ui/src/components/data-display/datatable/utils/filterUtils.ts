@@ -114,7 +114,11 @@ function applyLegacyFilter(value: unknown, filter: FilterConfig): boolean {
 /**
  * Applique un filtre avancé sur une valeur
  */
-export function applyAdvancedFilter<T>(value: unknown, rule: unknown, _column?: ColumnConfig<T>): boolean {
+export function applyAdvancedFilter<T>(
+  value: unknown,
+  rule: unknown,
+  _column?: ColumnConfig<T>
+): boolean {
   const stringValue = String(value || '').toLowerCase()
   const ruleValue = String(rule.value || '').toLowerCase()
 

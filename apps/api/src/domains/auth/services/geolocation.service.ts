@@ -79,7 +79,10 @@ export class GeolocationService {
       return {
         city: data.city || 'Inconnue',
         country: data.country || 'Inconnu',
-        countryCode: (data as { countryCode?: string; country?: string }).countryCode || (data as { country?: string }).country || 'XX',
+        countryCode:
+          (data as { countryCode?: string; country?: string }).countryCode ||
+          (data as { country?: string }).country ||
+          'XX',
         latitude: data.lat,
         longitude: data.lon,
         timezone: data.timezone,
@@ -278,7 +281,11 @@ export class GeolocationService {
     })
 
     const recentCountries = new Set(
-      recentSessions.map((session) => (session as { location?: { countryCode?: string } }).location?.countryCode).filter(Boolean)
+      recentSessions
+        .map(
+          (session) => (session as { location?: { countryCode?: string } }).location?.countryCode
+        )
+        .filter(Boolean)
     )
 
     if (recentCountries.size > 0 && !recentCountries.has(newLocation.countryCode)) {

@@ -15,23 +15,23 @@ export class SafeExpressionEvaluator {
     try {
       // Clean the expression
       const cleaned = expression.replace(/\s/g, '')
-      
+
       // Validate characters
-      if (!this.ALLOWED_CHARS.test(cleaned)) {
+      if (!SafeExpressionEvaluator.ALLOWED_CHARS.test(cleaned)) {
         throw new Error('Invalid characters in expression')
       }
 
       // Check for balanced parentheses
-      if (!this.hasBalancedParentheses(cleaned)) {
+      if (!SafeExpressionEvaluator.hasBalancedParentheses(cleaned)) {
         throw new Error('Unbalanced parentheses')
       }
 
       // Handle basic functions
-      const processed = this.processFunctions(cleaned)
+      const processed = SafeExpressionEvaluator.processFunctions(cleaned)
 
       // Use Function constructor for safe evaluation (safer than eval)
       const result = new Function('return ' + processed)()
-      
+
       if (typeof result !== 'number' || isNaN(result)) {
         throw new Error('Invalid result')
       }
@@ -60,7 +60,7 @@ export class SafeExpressionEvaluator {
    * Process basic functions like SUM, AVG, etc.
    */
   private static processFunctions(expression: string): string {
-    return expression.replace(this.FUNCTION_REGEX, (match, funcName) => {
+    return expression.replace(SafeExpressionEvaluator.FUNCTION_REGEX, (match, funcName) => {
       // For now, just replace with 0 - would need proper implementation
       // based on the context of where this is used
       console.warn(`Function ${funcName} not implemented, returning 0`)
@@ -75,12 +75,12 @@ export class SafeExpressionEvaluator {
    */
   static evaluateMath(expression: string): { success: boolean; value?: number; error?: string } {
     try {
-      const result = this.evaluate(expression)
+      const result = SafeExpressionEvaluator.evaluate(expression)
       return { success: true, value: result }
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }

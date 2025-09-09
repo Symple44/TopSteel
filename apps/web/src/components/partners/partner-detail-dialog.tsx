@@ -45,7 +45,12 @@ export function PartnerDetailDialog({
   const [activeTab, setActiveTab] = useState('overview')
   const completeDataQuery = usePartnerComplete(partner.id)
   const { data: completeData } = completeDataQuery as {
-    data: Partner & { group?: unknown; contacts?: unknown[]; sites?: unknown[]; addresses?: unknown[] }
+    data: Partner & {
+      group?: unknown
+      contacts?: unknown[]
+      sites?: unknown[]
+      addresses?: unknown[]
+    }
   }
 
   const getStatusColor = (status: PartnerStatus) => {

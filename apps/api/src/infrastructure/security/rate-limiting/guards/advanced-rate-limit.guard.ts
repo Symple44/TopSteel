@@ -16,14 +16,6 @@ import type { Reflector } from '@nestjs/core'
 import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
-import type {
-  BanStatus,
-  CombinedRateLimitResult,
-  CustomRateLimitConfig,
-  RateLimitResult,
-  RateLimitStats,
-  UserContext,
-} from '../types/rate-limiting.types'
 import {
   RATE_LIMIT_BYPASS_KEY,
   RATE_LIMIT_CUSTOM_KEY,
@@ -37,6 +29,14 @@ import {
   type RateLimitingConfiguration,
   shouldBypassForRole,
 } from '../rate-limiting.config'
+import type {
+  BanStatus,
+  CombinedRateLimitResult,
+  CustomRateLimitConfig,
+  RateLimitResult,
+  RateLimitStats,
+  UserContext,
+} from '../types/rate-limiting.types'
 
 interface RequestWithUser extends Request {
   user?: {
@@ -256,7 +256,7 @@ export class AdvancedRateLimitGuard implements CanActivate {
     userContext: UserContext
   ): RateLimitDecoratorConfig | null {
     if (!userContext.globalRole || !config.roleConfigs[userContext.globalRole]) {
-      return config.defaultConfig as RateLimitDecoratorConfig || null
+      return (config.defaultConfig as RateLimitDecoratorConfig) || null
     }
 
     const roleConfig = config.roleConfigs[userContext.globalRole]

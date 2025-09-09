@@ -136,7 +136,9 @@ export function useFilteredNotifications(filters?: {
     if (
       filters.category &&
       !filters.category?.includes(
-        (notification as unknown).metadata?.category || (notification as unknown).data?.category || ''
+        (notification as unknown).metadata?.category ||
+          (notification as unknown).data?.category ||
+          ''
       )
     )
       return false

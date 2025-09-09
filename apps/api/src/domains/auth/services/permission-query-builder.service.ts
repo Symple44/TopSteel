@@ -7,7 +7,11 @@ import {
   type WhereExpressionBuilder,
 } from 'typeorm'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import type { UserSocieteRole as UserSocieteRoleType, PermissionData, RolePermission as RolePermissionType } from '../../../types/entities/user.types'
+import type {
+  PermissionData,
+  RolePermission as RolePermissionType,
+  UserSocieteRole as UserSocieteRoleType,
+} from '../../../types/entities/user.types'
 import { User } from '../../users/entities/user.entity'
 import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'

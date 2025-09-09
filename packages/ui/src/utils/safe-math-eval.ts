@@ -30,7 +30,7 @@ export function safeMathEval(expression: string): number {
 
   // Use SafeExpressionEvaluator instead of Function constructor
   const result = SafeExpressionEvaluator.evaluateMath(cleaned)
-  
+
   if (!result.success) {
     throw new Error(result.error || 'Invalid mathematical expression')
   }

@@ -12,7 +12,12 @@ import type { Redis } from 'ioredis'
 import Stripe from 'stripe'
 import type { Repository } from 'typeorm'
 import { getErrorMessage, hasStack } from '../../../core/common/utils'
-import type { StripePaymentIntent, StripeCustomer, StripeCheckoutSession, MarketplaceOrder } from '../../../types/marketplace/marketplace.types'
+import type {
+  MarketplaceOrder,
+  StripeCheckoutSession,
+  StripeCustomer,
+  StripePaymentIntent,
+} from '../../../types/marketplace/marketplace.types'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder as MarketplaceOrderEntity } from '../entities/marketplace-order.entity'
 
@@ -407,11 +412,17 @@ export class StripePaymentService {
           break
 
         case 'payment_intent.payment_failed':
-          await this.handlePaymentFailure(event.data.object as Stripe.PaymentIntent, 'Payment failed')
+          await this.handlePaymentFailure(
+            event.data.object as Stripe.PaymentIntent,
+            'Payment failed'
+          )
           break
 
         case 'payment_intent.canceled':
-          await this.handlePaymentFailure(event.data.object as Stripe.PaymentIntent, 'Payment was canceled')
+          await this.handlePaymentFailure(
+            event.data.object as Stripe.PaymentIntent,
+            'Payment was canceled'
+          )
           break
 
         case 'refund.created':
@@ -490,7 +501,7 @@ export class StripePaymentService {
 
     if (existingStripeId) {
       try {
-        return await this.stripe.customers.retrieve(existingStripeId) as Stripe.Customer
+        return (await this.stripe.customers.retrieve(existingStripeId)) as Stripe.Customer
       } catch (_error) {
         this.logger.warn(`Stripe customer ${existingStripeId} not found, creating new one`)
       }
@@ -540,7 +551,10 @@ export class StripePaymentService {
     )
   }
 
-  private async handlePaymentFailure(paymentIntent: Stripe.PaymentIntent, reason: string): Promise<void> {
+  private async handlePaymentFailure(
+    paymentIntent: Stripe.PaymentIntent,
+    reason: string
+  ): Promise<void> {
     const orderId = paymentIntent.metadata?.orderId
 
     if (!orderId) {
@@ -572,11 +586,11 @@ export class StripePaymentService {
     const updateData: any = {
       paymentStatus: status,
     }
-    
+
     if (status === 'PAID') {
       updateData.paidAt = new Date()
     }
-    
+
     await this.orderRepository.update(orderId, updateData)
   }
 }

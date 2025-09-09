@@ -174,8 +174,9 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
 
       const title = titleColumn
         ? String(
-            (titleColumn.getValue ? titleColumn.getValue(item) : (item as unknown)[titleColumn.key]) ||
-              'Sans titre'
+            (titleColumn.getValue
+              ? titleColumn.getValue(item)
+              : (item as unknown)[titleColumn.key]) || 'Sans titre'
           )
         : 'Sans titre'
 
@@ -197,8 +198,9 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
 
       const image = imageColumn
         ? String(
-            (imageColumn.getValue ? imageColumn.getValue(item) : (item as unknown)[imageColumn.key]) ||
-              ''
+            (imageColumn.getValue
+              ? imageColumn.getValue(item)
+              : (item as unknown)[imageColumn.key]) || ''
           )
         : undefined
 

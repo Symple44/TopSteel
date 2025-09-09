@@ -6,7 +6,11 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import { type ParameterCategory, type ParameterType, SystemParameter } from './entitites/system-parameter.entity'
+import {
+  type ParameterCategory,
+  type ParameterType,
+  SystemParameter,
+} from './entitites/system-parameter.entity'
 
 @Injectable()
 export class SystemParametersService {

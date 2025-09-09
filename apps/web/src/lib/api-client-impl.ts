@@ -89,7 +89,8 @@ class PartnersAPIImpl implements PartnersAPI {
     }
     if ((filters as unknown)?.search) params.append('search', (filters as unknown).search)
     if (filters?.page) params.append('page', filters.page.toString())
-    if ((filters as unknown)?.pageSize) params.append('pageSize', (filters as unknown).pageSize.toString())
+    if ((filters as unknown)?.pageSize)
+      params.append('pageSize', (filters as unknown).pageSize.toString())
 
     const queryString = params.toString()
     const endpoint = queryString ? `/partners?${queryString}` : '/partners'

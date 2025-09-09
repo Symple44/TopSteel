@@ -61,7 +61,10 @@ export class SMSService {
     private readonly smsLogRepository: Repository<SMSLog>
   ) {
     this.config = {
-      provider: this.configService.get<string>('SMS_PROVIDER', 'mock') as SMSProviderConfig['provider'],
+      provider: this.configService.get<string>(
+        'SMS_PROVIDER',
+        'mock'
+      ) as SMSProviderConfig['provider'],
       apiKey: this.configService.get<string>('SMS_API_KEY', ''),
       apiSecret: this.configService.get<string>('SMS_API_SECRET', ''),
       senderId: this.configService.get<string>('SMS_SENDER_ID', 'TopSteel'),

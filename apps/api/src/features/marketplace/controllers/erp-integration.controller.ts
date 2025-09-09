@@ -101,10 +101,14 @@ export class ERPIntegrationController {
 
     // Validation et typage sécurisé pour les paramètres de tri
     const validSortFields: Array<ProductSortOptions['field']> = [
-      'designation', 'prixVenteHT', 'stockDisponible', 'createdAt', 'updatedAt'
+      'designation',
+      'prixVenteHT',
+      'stockDisponible',
+      'createdAt',
+      'updatedAt',
     ]
     const validDirections: Array<ProductSortOptions['direction']> = ['ASC', 'DESC']
-    
+
     const sort: ProductSortOptions = {
       field: validSortFields.includes(query.sortField as ProductSortOptions['field'])
         ? (query.sortField as ProductSortOptions['field'])

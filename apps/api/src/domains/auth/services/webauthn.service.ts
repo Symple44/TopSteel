@@ -1,7 +1,10 @@
 import * as crypto from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
-import type { WebAuthnRegistrationResponse, WebAuthnAuthenticationResponse } from '../../../types/auth/webauthn.types'
+import type {
+  WebAuthnAuthenticationResponse,
+  WebAuthnRegistrationResponse,
+} from '../../../types/auth/webauthn.types'
 
 interface WebAuthnCredential {
   credentialId: string

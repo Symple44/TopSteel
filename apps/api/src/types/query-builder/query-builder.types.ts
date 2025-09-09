@@ -56,7 +56,7 @@ export interface QueryBuilderCondition {
   groupId?: string
 }
 
-export type QueryOperator = 
+export type QueryOperator =
   | '='
   | '!='
   | '<'

@@ -5,64 +5,26 @@
     "tsBuildInfoFile": "./.tsbuildinfo",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@erp/ui": [
-        "../../packages/ui/src/index.ts"
-      ],
-      "@erp/ui/*": [
-        "../../packages/ui/src/*"
-      ],
-      "@erp/types": [
-        "../../packages/types/src"
-      ],
-      "@erp/types/*": [
-        "../../packages/types/src/*"
-      ],
-      "@erp/utils": [
-        "../../packages/utils/src"
-      ],
-      "@erp/utils/*": [
-        "../../packages/utils/src/*"
-      ],
-      "@erp/domains": [
-        "../../packages/domains/src"
-      ],
-      "@erp/domains/*": [
-        "../../packages/domains/src/*"
-      ],
-      "@erp/api-client": [
-        "../../packages/api-client/src"
-      ],
-      "@erp/api-client/*": [
-        "../../packages/api-client/src/*"
-      ],
-      "@erp/utilities": [
-        "../../packages/utilities/src"
-      ],
-      "@erp/utilities/*": [
-        "../../packages/utilities/src/*"
-      ],
-      "@erp/shared": [
-        "../../packages/shared/src"
-      ],
-      "@erp/shared/*": [
-        "../../packages/shared/src/*"
-      ],
-      "@erp/config": [
-        "../../packages/config/src"
-      ],
-      "@erp/config/*": [
-        "../../packages/config/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@erp/ui": ["../../packages/ui/src/index.ts"],
+      "@erp/ui/*": ["../../packages/ui/src/*"],
+      "@erp/types": ["../../packages/types/src"],
+      "@erp/types/*": ["../../packages/types/src/*"],
+      "@erp/utils": ["../../packages/utils/src"],
+      "@erp/utils/*": ["../../packages/utils/src/*"],
+      "@erp/domains": ["../../packages/domains/src"],
+      "@erp/domains/*": ["../../packages/domains/src/*"],
+      "@erp/api-client": ["../../packages/api-client/src"],
+      "@erp/api-client/*": ["../../packages/api-client/src/*"],
+      "@erp/utilities": ["../../packages/utilities/src"],
+      "@erp/utilities/*": ["../../packages/utilities/src/*"],
+      "@erp/shared": ["../../packages/shared/src"],
+      "@erp/shared/*": ["../../packages/shared/src/*"],
+      "@erp/config": ["../../packages/config/src"],
+      "@erp/config/*": ["../../packages/config/src/*"]
     },
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "preserve",
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -85,12 +47,7 @@
     "skipLibCheck": true,
     "isolatedModules": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": [
     "node_modules",
     ".next",

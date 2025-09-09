@@ -10,12 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
-import type {
-  WebAuthnRegistrationResponse,
-  WebAuthnAuthenticationResponse,
-  MFAMethod,
-} from '../../../types/auth/webauthn.types'
-import type { UserData } from '../../../types/entities/user.types'
 import {
   ApiBearerAuth,
   ApiBody,
@@ -28,6 +22,12 @@ import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/com
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
 import type { MFAService } from '../../../domains/auth/services/mfa.service'
+import type {
+  MFAMethod,
+  WebAuthnAuthenticationResponse,
+  WebAuthnRegistrationResponse,
+} from '../../../types/auth/webauthn.types'
+import type { UserData } from '../../../types/entities/user.types'
 
 @Controller('admin/mfa')
 @ApiTags('🔧 Admin - Multi-Factor Authentication')
@@ -90,10 +90,12 @@ export class AdminMFAController {
               deviceInfo:
                 method.type === 'WEBAUTHN'
                   ? method.metadata?.deviceInfo
-                    ? [{
-                        deviceName: method.metadata.deviceInfo.deviceName,
-                        createdAt: method.createdAt,
-                      }]
+                    ? [
+                        {
+                          deviceName: method.metadata.deviceInfo.deviceName,
+                          createdAt: method.createdAt,
+                        },
+                      ]
                     : undefined
                   : undefined,
             },
@@ -322,7 +324,9 @@ export class AdminMFAController {
           },
           methodDiversity: {
             status:
-              Object.keys((status as any).mfaMethodDistribution || {}).length > 1 ? 'good' : 'warning',
+              Object.keys((status as any).mfaMethodDistribution || {}).length > 1
+                ? 'good'
+                : 'warning',
             value: Object.keys((status as any).mfaMethodDistribution || {}).length,
             description: 'Nombre de méthodes MFA utilisées',
           },
@@ -343,10 +347,7 @@ export class AdminMFAController {
   private generateMFARecommendations(status: any): string[] {
     const recommendations: string[] = []
 
-    const adoptionRate =
-      status.totalUsers > 0
-        ? (status.usersWithMFA / status.totalUsers) * 100
-        : 0
+    const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0
 
     if (adoptionRate < 50) {
       recommendations.push("Encourager l'adoption MFA - taux actuel faible")
@@ -356,10 +357,7 @@ export class AdminMFAController {
       recommendations.push('Promouvoir TOTP comme méthode MFA principale')
     }
 
-    if (
-      status.usersByRole?.SUPER_ADMIN?.withMFA <
-      status.usersByRole?.SUPER_ADMIN?.total
-    ) {
+    if (status.usersByRole?.SUPER_ADMIN?.withMFA < status.usersByRole?.SUPER_ADMIN?.total) {
       recommendations.push('Assurer que tous les SUPER_ADMIN ont MFA activé')
     }
 
@@ -373,11 +371,7 @@ export class AdminMFAController {
     return 'not_applicable'
   }
 
-  private getMFARecommendation(
-    hasMFA: boolean,
-    isRequired: boolean,
-    stats: any
-  ): string {
+  private getMFARecommendation(hasMFA: boolean, isRequired: boolean, stats: any): string {
     if (isRequired && !hasMFA) return 'MFA requis pour ce rôle - configuration nécessaire'
     if (!hasMFA) return 'MFA recommandé pour améliorer la sécurité'
     if (stats.securityLevel === 'basic') return "Considérer l'ajout d'une seconde méthode MFA"
@@ -450,16 +444,10 @@ export class AdminMFAController {
     return ((secondHalf - firstHalf) / firstHalf) * 100
   }
 
-  private generateHealthRecommendations(
-    status: any,
-    recentActivity: number
-  ): string[] {
+  private generateHealthRecommendations(status: any, recentActivity: number): string[] {
     const recommendations: string[] = []
 
-    const adoptionRate =
-      status.totalUsers > 0
-        ? (status.usersWithMFA / status.totalUsers) * 100
-        : 0
+    const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0
 
     if (adoptionRate < 25) {
       recommendations.push('Adoption MFA critique - implémenter une stratégie de déploiement')

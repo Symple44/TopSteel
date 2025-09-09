@@ -61,7 +61,7 @@ export interface OrderModerationItem {
   }[]
 }
 
-export type OrderFlagType = 
+export type OrderFlagType =
   | 'PAYMENT_FAILED'
   | 'HIGH_VALUE'
   | 'NEW_CUSTOMER'
@@ -346,7 +346,10 @@ export class OrderModerationService {
   /**
    * Apply moderation filters to query
    */
-  private applyModerationFilters(queryBuilder: SelectQueryBuilder<MarketplaceOrder>, filters: OrderModerationFilters): void {
+  private applyModerationFilters(
+    queryBuilder: SelectQueryBuilder<MarketplaceOrder>,
+    filters: OrderModerationFilters
+  ): void {
     if (filters.status) {
       queryBuilder.andWhere('order.status = :status', { status: filters.status })
     }

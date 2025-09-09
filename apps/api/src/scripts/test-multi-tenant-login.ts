@@ -190,7 +190,10 @@ async function testMultiTenantLogin() {
     console.log('\n📋 TEST 1 : Utilisateur avec une seule société')
     console.log('-'.repeat(80))
 
-    const singleSocieteLogin = await api.login('admin@topsteel.com', process.env.TEST_PASSWORD || 'test-pass')
+    const singleSocieteLogin = await api.login(
+      'admin@topsteel.com',
+      process.env.TEST_PASSWORD || 'test-pass'
+    )
     console.log('\n✅ Étape 1 - Login réussi')
     console.log(`   Utilisateur : ${singleSocieteLogin.user.email}`)
     console.log(`   Nombre de sociétés : ${singleSocieteLogin.societes.length}`)
@@ -213,7 +216,10 @@ async function testMultiTenantLogin() {
     console.log('📋 TEST 2 : Utilisateur avec plusieurs sociétés')
     console.log('-'.repeat(80))
 
-    const multiSocieteLogin = await api.login('jean.martin@consultant.com', process.env.TEST_PASSWORD || 'test-pass')
+    const multiSocieteLogin = await api.login(
+      'jean.martin@consultant.com',
+      process.env.TEST_PASSWORD || 'test-pass'
+    )
     console.log('\n✅ Étape 1 - Login réussi')
     console.log(`   Utilisateur : ${multiSocieteLogin.user.email}`)
     console.log(`   Nombre de sociétés disponibles : ${multiSocieteLogin.societes.length}`)

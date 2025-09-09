@@ -35,7 +35,9 @@ export class AuthAdapter {
       role: {
         id: usr.roleId || `role-${(usr as unknown).roleType || existingUser.role}`,
         code: ((usr as unknown).roleType || existingUser.role || 'USER').toUpperCase(),
-        name: AuthAdapter?.getRoleDisplayName((usr as unknown).roleType || existingUser.role || 'user'),
+        name: AuthAdapter?.getRoleDisplayName(
+          (usr as unknown).roleType || existingUser.role || 'user'
+        ),
         description: `Rôle ${(usr as unknown).roleType || existingUser.role}`,
         level: AuthAdapter?.getRoleLevel((usr as unknown).roleType || existingUser.role || 'user'),
         permissions: AuthAdapter?.convertPermissionsFromStrings(existingUser.permissions || []),
@@ -163,7 +165,9 @@ export class AuthAdapter {
     return (permissionStrings || []).map((permString) => {
       const [module, action] = (permString || '').toLowerCase().split('_')
       const validActions = ['create', 'read', 'update', 'delete', 'execute'] as const
-      const permissionAction = validActions.includes(action as unknown) ? (action as unknown) : 'read'
+      const permissionAction = validActions.includes(action as unknown)
+        ? (action as unknown)
+        : 'read'
 
       return {
         id: `perm-${permString}`,

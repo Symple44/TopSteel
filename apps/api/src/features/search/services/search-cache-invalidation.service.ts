@@ -80,7 +80,7 @@ export class SearchCacheInvalidationService implements OnModuleInit {
       await this.cacheService.invalidateTenantCache(tenantId)
       this.updateStats('tenant')
 
-      // Debug log - temporarily disabled due to compilation issue  
+      // Debug log - temporarily disabled due to compilation issue
       // this.logger.debug(`All cache invalidated for tenant ${tenantId}`)
 
       this.eventEmitter.emit('cache.tenant.invalidated', {
@@ -312,7 +312,13 @@ export function InvalidateCache(entityType: string, operation: 'create' | 'updat
 
         // Check if the class instance has an eventEmitter property
         if (tenantId && entityId && (this as any).eventEmitter) {
-          emitCacheInvalidationEvent((this as any).eventEmitter, tenantId, entityType, entityId, operation)
+          emitCacheInvalidationEvent(
+            (this as any).eventEmitter,
+            tenantId,
+            entityType,
+            entityId,
+            operation
+          )
         }
       } catch (_error) {}
 

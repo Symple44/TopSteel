@@ -264,10 +264,10 @@ export class CombinedSecurityGuard implements CanActivate {
     const headers = request.headers as unknown as Record<string, string | string[] | undefined>
     const forwardedFor = headers['x-forwarded-for']
     const realIp = headers['x-real-ip']
-    
+
     const forwardedForValue = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor
     const realIpValue = Array.isArray(realIp) ? realIp[0] : realIp
-    
+
     return (
       request.ip ||
       forwardedForValue?.split(',')[0] ||

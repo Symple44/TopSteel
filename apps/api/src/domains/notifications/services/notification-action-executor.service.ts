@@ -398,7 +398,7 @@ export class NotificationActionExecutor {
       custom: true,
       config: { handlerName: 'custom', ...config } as CustomConfig,
       data: {
-        handlerName: (config as Record<string, unknown>).handlerName as string || 'custom',
+        handlerName: ((config as Record<string, unknown>).handlerName as string) || 'custom',
         parameters: (config as Record<string, unknown>).parameters as Record<string, unknown>,
         timestamp: new Date().toISOString(),
       },

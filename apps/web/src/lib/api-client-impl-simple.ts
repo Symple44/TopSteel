@@ -246,7 +246,8 @@ class MaterialsAPIImpl implements MaterialsAPI {
     if (filters?.category) params.append('category', filters.category)
     if (filters?.search) params.append('search', filters.search)
     if (filters?.page) params.append('page', filters.page.toString())
-    if ((filters as unknown)?.pageSize) params.append('pageSize', (filters as unknown).pageSize.toString())
+    if ((filters as unknown)?.pageSize)
+      params.append('pageSize', (filters as unknown).pageSize.toString())
 
     const queryString = params.toString()
     const endpoint = queryString ? `/materials?${queryString}` : '/materials'

@@ -59,7 +59,13 @@ export class SentryConfig {
       // Environment filtering
       beforeSend(event: unknown, hint: any) {
         // Filter out sensitive data
-        const sentryEvent = event as { request?: { headers?: Record<string, unknown>; query_string?: string; data?: Record<string, unknown> } }
+        const sentryEvent = event as {
+          request?: {
+            headers?: Record<string, unknown>
+            query_string?: string
+            data?: Record<string, unknown>
+          }
+        }
         if (sentryEvent.request) {
           // Remove authorization headers
           if (sentryEvent.request.headers) {

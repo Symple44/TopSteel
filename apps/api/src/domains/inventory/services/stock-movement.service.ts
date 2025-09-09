@@ -355,7 +355,10 @@ export class StockMovementService {
   /**
    * Obtenir les statistiques de stock pour un article
    */
-  async getStockStatistics(articleId: string, period?: { start: Date; end: Date }): Promise<unknown> {
+  async getStockStatistics(
+    articleId: string,
+    period?: { start: Date; end: Date }
+  ): Promise<unknown> {
     return await this.stockMovementRepository.getStatsByArticle(articleId, period)
   }
 

@@ -11,15 +11,18 @@ import { ActionType, NotificationAction } from '../entities/notification-action.
 import { NotificationCondition } from '../entities/notification-condition.entity'
 import { ExecutionStatus, NotificationExecution } from '../entities/notification-execution.entity'
 import { NotificationRule, RuleStatus, RuleType } from '../entities/notification-rule.entity'
-import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
 import type {
-  NotificationActionResult,
   ActionExecutionResult,
-  NotificationConfig
+  NotificationActionResult,
+  NotificationConfig,
 } from '../types/notification-execution.types'
+import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
 import type { NotificationActionExecutor } from './notification-action-executor.service'
 import type { NotificationConditionEvaluator } from './notification-condition-evaluator.service'
-import type { NotificationDeliveryService, NotificationDeliveryOptions } from './notification-delivery.service'
+import type {
+  NotificationDeliveryOptions,
+  NotificationDeliveryService,
+} from './notification-delivery.service'
 
 /**
  * Notification rules engine service
@@ -515,8 +518,9 @@ export class NotificationRulesEngineService {
       const notificationOptions: NotificationDeliveryOptions = {
         title: `Escalation: ${rule.name}`,
         body: `Rule execution requires attention. Execution ID: ${execution.id}`,
-        channels: (level.channels as string[] || ['email']).filter((channel): channel is 'email' | 'sms' | 'push' | 'in_app' => 
-          ['email', 'sms', 'push', 'in_app'].includes(channel)
+        channels: ((level.channels as string[]) || ['email']).filter(
+          (channel): channel is 'email' | 'sms' | 'push' | 'in_app' =>
+            ['email', 'sms', 'push', 'in_app'].includes(channel)
         ),
         recipients,
         priority: 'high',

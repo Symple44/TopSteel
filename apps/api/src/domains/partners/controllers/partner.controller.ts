@@ -15,7 +15,10 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
-import type { BusinessContext, BusinessOperation } from '../../core/interfaces/business-service.interface'
+import type {
+  BusinessContext,
+  BusinessOperation,
+} from '../../core/interfaces/business-service.interface'
 import type { User } from '../../users/entities/user.entity'
 import type {
   CreateContactDto,

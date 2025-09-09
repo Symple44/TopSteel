@@ -4,11 +4,11 @@ import type { DeepPartial, Repository } from 'typeorm'
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
 import {
+  type JoinType,
   QueryBuilder,
   QueryBuilderCalculatedField,
   QueryBuilderColumn,
   QueryBuilderJoin,
-  type JoinType,
 } from '../entities'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
@@ -237,7 +237,7 @@ export class QueryBuilderService {
     if (original.calculatedFields && original.calculatedFields.length > 0) {
       const fields = original.calculatedFields.map((field) => {
         const { id, ...fieldData } = field
-        
+
         return this._calculatedFieldRepository.create({
           ...fieldData,
           queryBuilderId: savedEntity.id,

@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import type { MFAMethod, MFAVerificationRequest, WebAuthnAuthenticationResponse } from '../../../types/auth/webauthn.types'
+import type {
+  MFAMethod,
+  MFAVerificationRequest,
+  WebAuthnAuthenticationResponse,
+} from '../../../types/auth/webauthn.types'
 import { User } from '../../users/entities/user.entity'
 import { GlobalUserRole } from '../core/constants/roles.constants'
 import { MFASession } from '../core/entities/mfa-session.entity'
@@ -295,7 +299,11 @@ export class MFAService {
           lastUsed: new Date().toISOString(),
         } as MFAMethod['metadata']
         // Store SMS verification code temporarily
-        const metadata = existingSMS.metadata as MFAMethod['metadata'] & { pendingVerificationCode?: string; pendingCodeExpiry?: string; smsMessageId?: string }
+        const metadata = existingSMS.metadata as MFAMethod['metadata'] & {
+          pendingVerificationCode?: string
+          pendingCodeExpiry?: string
+          smsMessageId?: string
+        }
         metadata.pendingVerificationCode = verificationCode
         metadata.pendingCodeExpiry = new Date(Date.now() + 10 * 60 * 1000).toISOString()
         metadata.smsMessageId = smsResult.messageId

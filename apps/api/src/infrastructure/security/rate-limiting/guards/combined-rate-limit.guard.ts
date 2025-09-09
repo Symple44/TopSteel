@@ -16,17 +16,17 @@ import type { Reflector } from '@nestjs/core'
 import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
-import type {
-  CombinedRateLimitResult,
-  RateLimitConfig,
-  UserContext,
-} from '../types/rate-limiting.types'
 import {
   RATE_LIMIT_BYPASS_KEY,
   RATE_LIMIT_KEY,
   type RateLimitDecoratorConfig,
 } from '../decorators/rate-limit.decorators'
 import type { RateLimitingConfiguration } from '../rate-limiting.config'
+import type {
+  CombinedRateLimitResult,
+  RateLimitConfig,
+  UserContext,
+} from '../types/rate-limiting.types'
 
 interface RequestWithUser extends Request {
   user?: {
@@ -259,7 +259,12 @@ export class CombinedRateLimitGuard implements CanActivate {
    * Combine IP and user limit results
    */
   private combineLimitResults(ipResult: unknown, userResult?: any): any {
-    const typedIpResult = ipResult as { isAllowed?: boolean; remainingRequests?: number; resetTime?: number; retryAfter?: number }
+    const typedIpResult = ipResult as {
+      isAllowed?: boolean
+      remainingRequests?: number
+      resetTime?: number
+      retryAfter?: number
+    }
     let isAllowed = typedIpResult.isAllowed ?? false
     let limitingFactor: 'ip' | 'user' | 'both' = 'ip'
 
@@ -283,7 +288,11 @@ export class CombinedRateLimitGuard implements CanActivate {
         userResult?.remainingRequests ?? Number.MAX_SAFE_INTEGER
       ),
       resetTime: Math.max(typedIpResult.resetTime ?? 0, userResult?.resetTime ?? 0),
-      retryAfter: Math.max(typedIpResult.retryAfter ?? 0, (userResult as { retryAfter?: number } | undefined)?.retryAfter ?? 0) || undefined,
+      retryAfter:
+        Math.max(
+          typedIpResult.retryAfter ?? 0,
+          (userResult as { retryAfter?: number } | undefined)?.retryAfter ?? 0
+        ) || undefined,
       limitingFactor,
     }
   }

@@ -168,7 +168,9 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="date"
-            value={value instanceof Date ? value.toISOString().split('T')[0] : (value as unknown) || ''}
+            value={
+              value instanceof Date ? value.toISOString().split('T')[0] : (value as unknown) || ''
+            }
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -185,7 +187,9 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="datetime-local"
-            value={value instanceof Date ? value.toISOString().slice(0, 16) : (value as unknown) || ''}
+            value={
+              value instanceof Date ? value.toISOString().slice(0, 16) : (value as unknown) || ''
+            }
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}

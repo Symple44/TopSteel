@@ -157,18 +157,19 @@ export class SeederService {
 
     // Créer l'utilisateur admin par défaut avec un mot de passe sécurisé
     const bcrypt = require('bcrypt')
-    
+
     // Utiliser une variable d'environnement pour le mot de passe admin initial
-    const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || process.env.NODE_ENV === 'development' 
-      ? 'ChangeMe123!' // Mot de passe par défaut UNIQUEMENT en développement
-      : null
-    
+    const adminPassword =
+      process.env.INITIAL_ADMIN_PASSWORD || process.env.NODE_ENV === 'development'
+        ? 'ChangeMe123!' // Mot de passe par défaut UNIQUEMENT en développement
+        : null
+
     if (!adminPassword) {
       this.logger.error('❌ INITIAL_ADMIN_PASSWORD non défini. Utilisateur admin non créé.')
-      this.logger.warn('⚠️  Définissez INITIAL_ADMIN_PASSWORD dans vos variables d\'environnement')
+      this.logger.warn("⚠️  Définissez INITIAL_ADMIN_PASSWORD dans vos variables d'environnement")
       return
     }
-    
+
     const hashedPassword = await bcrypt.hash(adminPassword, 10)
 
     await manager.query(
@@ -186,7 +187,7 @@ export class SeederService {
     } else {
       this.logger.log('👥 Utilisateur admin créé avec succès')
     }
-    
+
     this.logger.warn('⚠️  IMPORTANT: Changez le mot de passe admin après la première connexion!')
   }
 

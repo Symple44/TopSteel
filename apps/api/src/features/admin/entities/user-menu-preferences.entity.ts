@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+
 // Removed import to avoid circular dependencies
 // import { UserMenuItemPreference } from './user-menu-item-preference.entity'
 

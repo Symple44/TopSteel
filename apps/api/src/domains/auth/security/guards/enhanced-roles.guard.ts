@@ -79,9 +79,10 @@ export class EnhancedRolesGuard implements CanActivate {
         const hasGlobalRole = roleRequirement.globalRoles.some((requiredRole) =>
           userRoles.some((userRole: unknown) => {
             const roleObj = userRole as { name?: string; role?: string } | string
-            const roleValue =
-              typeof roleObj === 'object' ? roleObj.name || roleObj.role : roleObj
-            return roleValue ? isGlobalRoleHigherOrEqual(roleValue as GlobalUserRole, requiredRole) : false
+            const roleValue = typeof roleObj === 'object' ? roleObj.name || roleObj.role : roleObj
+            return roleValue
+              ? isGlobalRoleHigherOrEqual(roleValue as GlobalUserRole, requiredRole)
+              : false
           })
         )
 

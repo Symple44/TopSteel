@@ -15,12 +15,8 @@ import type { ConfigService } from '@nestjs/config'
 import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
-import type {
-  RateLimitConfig,
-  RateLimitResult,
-  UserContext,
-} from '../types/rate-limiting.types'
 import type { RateLimitingConfiguration } from '../rate-limiting.config'
+import type { RateLimitConfig, RateLimitResult, UserContext } from '../types/rate-limiting.types'
 
 interface RequestWithUser extends Request {
   user?: {
@@ -177,13 +173,25 @@ export class UserRateLimitGuard implements CanActivate {
   /**
    * Add user-specific rate limit headers
    */
-  private addUserRateLimitHeaders(response: Response, result: unknown, userContext: UserContext): void {
-    const typedResult = result as { totalRequests?: number; remainingRequests?: number; resetTime?: number; retryAfter?: number }
+  private addUserRateLimitHeaders(
+    response: Response,
+    result: unknown,
+    userContext: UserContext
+  ): void {
+    const typedResult = result as {
+      totalRequests?: number
+      remainingRequests?: number
+      resetTime?: number
+      retryAfter?: number
+    }
     response.setHeader(
       'X-User-RateLimit-Limit',
       (typedResult.totalRequests ?? 0) + (typedResult.remainingRequests ?? 0) || 0
     )
-    response.setHeader('X-User-RateLimit-Remaining', Math.max(0, typedResult.remainingRequests ?? 0))
+    response.setHeader(
+      'X-User-RateLimit-Remaining',
+      Math.max(0, typedResult.remainingRequests ?? 0)
+    )
     response.setHeader('X-User-RateLimit-Reset', Math.ceil((typedResult.resetTime ?? 0) / 1000))
     response.setHeader('X-User-RateLimit-Policy', 'per-user-sliding-window')
 

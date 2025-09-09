@@ -819,7 +819,10 @@ export class MarketplacePromotionsService {
   /**
    * Get applicable order items for promotion
    */
-  private getApplicableOrderItems(order: MarketplaceOrder, promotion: MarketplacePromotion): OrderItemWithProduct[] {
+  private getApplicableOrderItems(
+    order: MarketplaceOrder,
+    promotion: MarketplacePromotion
+  ): OrderItemWithProduct[] {
     return (order.items as OrderItemWithProduct[]).filter((item) => {
       // Check excluded products
       if (promotion.excludedProducts?.includes(item.productId)) {
@@ -867,7 +870,9 @@ export class MarketplacePromotionsService {
     if (qualifyingTimes === 0) return 0
 
     // Calculate discount on get products
-    const getItems = (order.items as OrderItemWithProduct[]).filter((item) => getProducts.includes(item.productId))
+    const getItems = (order.items as OrderItemWithProduct[]).filter((item) =>
+      getProducts.includes(item.productId)
+    )
     const freeQuantity = qualifyingTimes * getQuantity
 
     let discount = 0
@@ -899,7 +904,9 @@ export class MarketplacePromotionsService {
     if (!hasAllProducts) return 0
 
     // Calculate bundle discount
-    const bundleItems = (order.items as OrderItemWithProduct[]).filter((item) => bundleProducts.includes(item.productId))
+    const bundleItems = (order.items as OrderItemWithProduct[]).filter((item) =>
+      bundleProducts.includes(item.productId)
+    )
     const bundleTotal = bundleItems.reduce((sum, item) => sum + item.totalPrice, 0)
 
     return promotion.type === 'PERCENTAGE'

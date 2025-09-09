@@ -881,7 +881,9 @@ export class MaterialMovementService {
     return 0
   }
 
-  private async validateTransformation(transformation: Partial<IMaterialTransformationInfo>): Promise<void> {
+  private async validateTransformation(
+    transformation: Partial<IMaterialTransformationInfo>
+  ): Promise<void> {
     if (!transformation.materiauxSources?.length) {
       throw new BadRequestException('Une transformation doit avoir des matériaux sources')
     }

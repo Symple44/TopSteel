@@ -262,7 +262,11 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as { success: boolean; errors?: unknown; result?: { id: string } }
+      const data = (await response.json()) as {
+        success: boolean
+        errors?: unknown
+        result?: { id: string }
+      }
 
       if (!data.success) {
         this.logger.error(`KV namespace creation failed: ${JSON.stringify(data.errors)}`)
@@ -440,7 +444,11 @@ function getClosestOrigin(request) {
         }
       )
 
-      const data = (await response.json()) as { success: boolean; errors?: unknown; result?: { keys: Array<{ name: string; metadata?: any }> } }
+      const data = (await response.json()) as {
+        success: boolean
+        errors?: unknown
+        result?: { keys: Array<{ name: string; metadata?: any }> }
+      }
 
       if (!data.success) {
         this.logger.error(`List keys failed: ${JSON.stringify(data.errors)}`)

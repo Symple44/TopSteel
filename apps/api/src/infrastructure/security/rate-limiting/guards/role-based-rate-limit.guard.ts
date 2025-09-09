@@ -19,8 +19,8 @@ import {
   GlobalUserRole,
 } from '../../../../domains/auth/core/constants/roles.constants'
 import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
-import type { RateLimitConfig, RateLimitResult, UserContext } from '../types/rate-limiting.types'
 import type { RateLimitingConfiguration } from '../rate-limiting.config'
+import type { RateLimitConfig, RateLimitResult, UserContext } from '../types/rate-limiting.types'
 
 interface RequestWithUser extends Request {
   user?: {
@@ -373,7 +373,11 @@ export class RoleBasedRateLimitGuard implements CanActivate {
   /**
    * Add role-specific headers
    */
-  private addRoleRateLimitHeaders(response: Response, result: RateLimitResult, userContext: UserContext): void {
+  private addRoleRateLimitHeaders(
+    response: Response,
+    result: RateLimitResult,
+    userContext: UserContext
+  ): void {
     response.setHeader(
       'X-Role-RateLimit-Limit',
       result.totalRequests + result.remainingRequests || 0

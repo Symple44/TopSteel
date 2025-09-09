@@ -446,7 +446,8 @@ export class PricingWebhooksService {
   async handlePriceCalculated(event: unknown): Promise<void> {
     const priceEvent = event as PriceChangeEvent
     if (priceEvent.previousPrice && priceEvent.newPrice) {
-      const changePercent = ((priceEvent.newPrice - priceEvent.previousPrice) / priceEvent.previousPrice) * 100
+      const changePercent =
+        ((priceEvent.newPrice - priceEvent.previousPrice) / priceEvent.previousPrice) * 100
 
       if (Math.abs(changePercent) > 10) {
         await this.emit({

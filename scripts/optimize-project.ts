@@ -173,8 +173,8 @@ function checkCircularDependencies() {
     execSync('npx madge --circular apps/web/src 2>/dev/null', {
       encoding: 'utf-8',
     })
-  } catch (error: any) {
-    if (error.stdout?.includes('Found')) {
+  } catch (error) {
+    if ((error as any).stdout?.includes('Found')) {
       reports.push({
         category: 'Architecture',
         severity: 'high',

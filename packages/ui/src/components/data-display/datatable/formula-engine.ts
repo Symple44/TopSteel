@@ -1,5 +1,5 @@
-import type { FormulaContext } from './types'
 import { SafeExpressionEvaluator } from '../../../utils/safe-expression-evaluator'
+import type { FormulaContext } from './types'
 
 /**
  * Moteur de formules pour le DataTable
@@ -309,7 +309,7 @@ export class FormulaEngine<T = any> {
 
       // Utiliser SafeExpressionEvaluator au lieu de new Function
       const result = SafeExpressionEvaluator.evaluateMath(expression)
-      
+
       if (result.success) {
         return result.value
       } else {

@@ -34,7 +34,10 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
     // 2. Valider les règles métier
     const validation = await this.validateBusinessRules(entity, BusinessOperation.CREATE)
     if (!validation.isValid) {
-      throw new BusinessValidationError('Validation failed', validation.errors as unknown as Record<string, unknown>[])
+      throw new BusinessValidationError(
+        'Validation failed',
+        validation.errors as unknown as Record<string, unknown>[]
+      )
     }
 
     // 3. Appliquer les hooks avant création
@@ -70,7 +73,10 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
     // 3. Valider les règles métier
     const validation = await this.validateBusinessRules(updatedEntity, BusinessOperation.UPDATE)
     if (!validation.isValid) {
-      throw new BusinessValidationError('Validation failed', validation.errors as unknown as Record<string, unknown>[])
+      throw new BusinessValidationError(
+        'Validation failed',
+        validation.errors as unknown as Record<string, unknown>[]
+      )
     }
 
     // 4. Hooks avant mise à jour
@@ -99,7 +105,10 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
     // Valider si la suppression est autorisée
     const validation = await this.validateBusinessRules(entity, BusinessOperation.DELETE)
     if (!validation.isValid) {
-      throw new BusinessValidationError('Cannot delete entity', validation.errors as unknown as Record<string, unknown>[])
+      throw new BusinessValidationError(
+        'Cannot delete entity',
+        validation.errors as unknown as Record<string, unknown>[]
+      )
     }
 
     await this.beforeDelete(entity, context)

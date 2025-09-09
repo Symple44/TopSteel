@@ -9,10 +9,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import type { SafeObject } from '../../../../../../packages/ui/src/types/common'
 // Removed imports to avoid circular dependencies
 // import { MarketplaceCustomer } from './marketplace-customer.entity'
 import type { MarketplaceOrderItem } from './marketplace-order-item.entity'
-import type { SafeObject } from '../../../../../../packages/ui/src/types/common'
 
 @Entity('marketplace_orders')
 @Index(['customerId', 'status']) // For customer order filtering

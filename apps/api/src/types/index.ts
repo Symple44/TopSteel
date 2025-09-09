@@ -3,21 +3,18 @@
  * Facilite l'import des types dans les services et contrôleurs
  */
 
+// Auth & Security
+export * from './auth/webauthn.types'
 // Entités
 export * from './entities/societe.types'
 export * from './entities/user.types'
-
-// Auth & Security
-export * from './auth/webauthn.types'
-
-// Query Builder
-export * from './query-builder/query-builder.types'
+// Marketplace
+export * from './marketplace/marketplace.types'
 
 // Notifications
 export * from './notifications/notification.types'
-
-// Marketplace
-export * from './marketplace/marketplace.types'
+// Query Builder
+export * from './query-builder/query-builder.types'
 
 // Types communs réutilisables
 export interface PaginationParams {

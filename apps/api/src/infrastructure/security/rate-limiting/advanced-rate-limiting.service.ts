@@ -196,10 +196,10 @@ export class AdvancedRateLimitingService {
       limitingFactor = 'both'
     } else if (!ipResult.isAllowed) {
       limitingFactor = 'ip'
-    } else if (!userResult?.isAllowed) {
-      limitingFactor = 'user'
-    } else {
+    } else if (userResult?.isAllowed) {
       limitingFactor = 'both' // Default when both are allowed
+    } else {
+      limitingFactor = 'user'
     }
 
     const combined = {

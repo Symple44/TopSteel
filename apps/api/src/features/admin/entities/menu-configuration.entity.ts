@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+
 // Circular dependency resolved - using string reference
 // import { MenuItem } from './menu-item.entity'
 

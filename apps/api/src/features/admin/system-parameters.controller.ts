@@ -21,7 +21,7 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import { ParameterCategory } from './entitites/system-parameter.entity'
+import type { ParameterCategory } from './entitites/system-parameter.entity'
 import type { SystemParametersService } from './system-parameters.service'
 
 @Controller('admin/system-parameters')

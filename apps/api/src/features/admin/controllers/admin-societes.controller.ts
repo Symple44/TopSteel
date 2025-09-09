@@ -12,12 +12,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
-import type {
-  SocieteData,
-  SocieteFiltered,
-  SiteData,
-} from '../../../types/entities/societe.types'
-import type { UserData, UserSocieteRole } from '../../../types/entities/user.types'
 import {
   ApiBearerAuth,
   ApiBody,
@@ -33,6 +27,8 @@ import type { RoleFormattingService } from '../../../domains/auth/services/role-
 import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import type { UsersService } from '../../../domains/users/users.service'
 import type { SocietesService } from '../../../features/societes/services/societes.service'
+import type { SiteData, SocieteData, SocieteFiltered } from '../../../types/entities/societe.types'
+import type { UserData, UserSocieteRole } from '../../../types/entities/user.types'
 
 interface SocieteQueryDto {
   page?: number
@@ -102,7 +98,9 @@ export class AdminSocietesController {
             const usersWithAccess: any[] = []
 
             for (const user of allUsers) {
-              const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+              const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(
+                user.id
+              )
               const hasAccessToSociete = userSocieteRoles.some(
                 (role: any) => role.societeId === societe.id && role.isActive
               )
@@ -119,7 +117,9 @@ export class AdminSocietesController {
                   lastName: user.nom || '',
                   globalRole: this.roleFormattingService.formatGlobalRole(user.role || 'USER'),
                   societeRole: userRoleInSociete
-                    ? this.roleFormattingService.formatSocieteRole(userRoleInSociete.effectiveRole || 'USER')
+                    ? this.roleFormattingService.formatSocieteRole(
+                        userRoleInSociete.effectiveRole || 'USER'
+                      )
                     : null,
                   isDefault: userRoleInSociete?.isDefaultSociete || false,
                   grantedAt: userRoleInSociete?.grantedAt || user.createdAt,
@@ -133,7 +133,9 @@ export class AdminSocietesController {
             // Compter seulement les utilisateurs
             const allUsers: any[] = await this.usersService.findAll({})
             for (const user of allUsers) {
-              const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+              const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(
+                user.id
+              )
               const hasAccess = userSocieteRoles.some(
                 (role: any) => role.societeId === societe.id && role.isActive
               )

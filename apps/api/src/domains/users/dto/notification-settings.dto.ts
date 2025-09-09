@@ -183,19 +183,19 @@ export class GetNotificationSettingsResponseDto {
       taskReminders: false,
       weeklyReports: false,
       securityAlerts: false,
-      maintenanceNotice: false
+      maintenanceNotice: false,
     }) as typeof this.emailTypes
     this.pushTypes = (data.pushTypes || {
       enabled: false,
       sound: false,
       urgent: false,
       normal: false,
-      quiet: false
+      quiet: false,
     }) as typeof this.pushTypes
     this.quietHours = (data.quietHours || {
       enabled: false,
       start: '22:00',
-      end: '08:00'
+      end: '08:00',
     }) as typeof this.quietHours
   }
 }

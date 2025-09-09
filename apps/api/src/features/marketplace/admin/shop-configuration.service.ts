@@ -239,7 +239,7 @@ export class ShopConfigurationService {
 
       // Deep merge updates with existing configuration
       const updatedConfig = this.deepMerge(
-        config as unknown as Record<string, unknown>, 
+        config as unknown as Record<string, unknown>,
         updates as Record<string, unknown>
       ) as unknown as MarketplaceShopConfiguration
       updatedConfig.updatedAt = new Date()
@@ -579,7 +579,10 @@ export class ShopConfigurationService {
   /**
    * Deep merge objects
    */
-  private deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+  private deepMerge(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>
+  ): Record<string, unknown> {
     const result: Record<string, unknown> = Object.assign({}, target)
 
     for (const key in source) {
@@ -587,9 +590,9 @@ export class ShopConfigurationService {
         const targetValue = target[key]
         const sourceValue = source[key]
         result[key] = this.deepMerge(
-          (typeof targetValue === 'object' && targetValue !== null && !Array.isArray(targetValue)
-            ? targetValue as Record<string, unknown>
-            : {}),
+          typeof targetValue === 'object' && targetValue !== null && !Array.isArray(targetValue)
+            ? (targetValue as Record<string, unknown>)
+            : {},
           sourceValue as Record<string, unknown>
         )
       } else {

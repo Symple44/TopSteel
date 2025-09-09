@@ -261,7 +261,9 @@ export class PricingResolver {
         .slice(0, 3),
       underperformingRules: dashboard.topRules.filter((r) => r.conversionRate < 20).slice(0, 3),
       peakHours: this.aggregatePeakHours(dashboard.topRules as unknown as RuleWithPeakUsage[]),
-      customerSegmentation: this.aggregateCustomerGroups(dashboard.topRules as unknown as RuleWithPeakUsage[]),
+      customerSegmentation: this.aggregateCustomerGroups(
+        dashboard.topRules as unknown as RuleWithPeakUsage[]
+      ),
     }
 
     return {

@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import * as crypto from 'node:crypto'
+import { Injectable, Logger } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
 import type { Request, Response } from 'express'
 
 interface RequestWithSession {
@@ -61,22 +61,22 @@ export class CsrfEnhancedService {
   generateTokens(req: Request): CsrfTokens {
     const sessionId = this.getSessionId(req)
     const timestamp = Date.now()
-    
+
     // Générer un secret unique pour cette requête
     const secret = this.generateSecret()
-    
+
     // Créer un token avec HMAC pour garantir l'intégrité
     const tokenData = `${sessionId}:${timestamp}:${secret}`
     const token = this.createHmacToken(tokenData)
-    
+
     // Créer un hash du token pour validation côté serveur
     const hash = this.hashToken(token)
-    
+
     // Stocker le token pour validation ultérieure
     this.storeToken(sessionId, hash)
-    
+
     this.logger.debug(`🔐 Tokens CSRF générés pour session: ${sessionId.substring(0, 8)}...`)
-    
+
     return {
       secret,
       token,
@@ -129,7 +129,7 @@ export class CsrfEnhancedService {
       // 5. Valider le token avec le secret
       const sessionId = this.getSessionId(req)
       const tokenHash = this.hashToken(token)
-      
+
       if (!this.isTokenValid(sessionId, tokenHash)) {
         return {
           valid: false,
@@ -149,9 +149,8 @@ export class CsrfEnhancedService {
 
       // Token valide - le consommer pour éviter la réutilisation
       this.consumeToken(sessionId, tokenHash)
-      
+
       return { valid: true }
-      
     } catch (error) {
       this.logger.error('❌ Erreur lors de la validation CSRF:', error)
       return {
@@ -167,7 +166,7 @@ export class CsrfEnhancedService {
    */
   setCsrfCookies(req: Request, res: Response): void {
     const tokens = this.generateTokens(req)
-    
+
     // Cookie sécurisé avec le secret (HttpOnly, Secure, SameSite)
     const cookieOptions = {
       httpOnly: true,
@@ -181,20 +180,20 @@ export class CsrfEnhancedService {
 
     // Secret dans un cookie HttpOnly
     res.cookie(this.cookieName, tokens.secret, cookieOptions)
-    
+
     // Token dans un cookie accessible (pour JavaScript)
     res.cookie(`${this.cookieName}-token`, tokens.token, {
       ...cookieOptions,
       httpOnly: false, // Accessible pour être lu par JavaScript
     })
-    
+
     // Ajouter le token dans le header de réponse pour une utilisation immédiate
     res.setHeader('X-CSRF-Token', tokens.token)
-    
+
     // Ajouter des headers de sécurité supplémentaires
     res.setHeader('X-Frame-Options', 'DENY')
     res.setHeader('X-Content-Type-Options', 'nosniff')
-    
+
     this.logger.debug('🍪 Cookies CSRF sécurisés configurés')
   }
 
@@ -204,13 +203,13 @@ export class CsrfEnhancedService {
   shouldProtectRoute(req: Request): boolean {
     const method = req.method.toUpperCase()
     const path = req.path.toLowerCase()
-    
+
     // Méthodes sûres qui ne nécessitent pas de protection
     const safeMethods = ['GET', 'HEAD', 'OPTIONS']
     if (safeMethods.includes(method)) {
       return false
     }
-    
+
     // Routes publiques exclues
     const publicRoutes = [
       '/api/auth/login',
@@ -220,11 +219,11 @@ export class CsrfEnhancedService {
       '/api/health',
       '/api/metrics',
     ]
-    
-    if (publicRoutes.some(route => path.startsWith(route))) {
+
+    if (publicRoutes.some((route) => path.startsWith(route))) {
       return false
     }
-    
+
     // Toutes les autres routes avec mutation nécessitent CSRF
     return true
   }
@@ -239,7 +238,7 @@ export class CsrfEnhancedService {
       req.get('x-xsrf-token') ||
       req.get('x-requested-with') ||
       req.body?._csrf ||
-      req.query?._csrf as string ||
+      (req.query?._csrf as string) ||
       null
     )
   }
@@ -250,25 +249,27 @@ export class CsrfEnhancedService {
   private validateOrigin(req: Request): boolean {
     const origin = req.get('origin')
     const host = req.get('host')
-    
+
     if (!origin && !this.isProduction) {
       // En développement, accepter les requêtes sans origine (Postman, etc.)
       return true
     }
-    
+
     if (!origin) {
       return false
     }
-    
+
     try {
       const originUrl = new URL(origin)
       const expectedHosts = [
         host,
         this.configService.get('FRONTEND_URL'),
         this.configService.get('ALLOWED_ORIGINS')?.split(','),
-      ].flat().filter(Boolean)
-      
-      return expectedHosts.some(allowed => {
+      ]
+        .flat()
+        .filter(Boolean)
+
+      return expectedHosts.some((allowed) => {
         if (!allowed) return false
         return originUrl.host === allowed || originUrl.host.endsWith(`.${allowed}`)
       })
@@ -282,19 +283,19 @@ export class CsrfEnhancedService {
    */
   private validateReferer(req: Request): boolean {
     const referer = req.get('referer')
-    
+
     if (!referer && !this.isProduction) {
       return true
     }
-    
+
     if (!referer) {
       return false
     }
-    
+
     try {
       const refererUrl = new URL(referer)
       const host = req.get('host')
-      
+
       return refererUrl.host === host || this.validateOrigin(req)
     } catch {
       return false
@@ -334,7 +335,9 @@ export class CsrfEnhancedService {
    */
   private generateMasterSecret(): string {
     const secret = crypto.randomBytes(64).toString('base64')
-    this.logger.warn('⚠️  CSRF_SECRET généré automatiquement. Définissez-le dans vos variables d\'environnement pour la production.')
+    this.logger.warn(
+      "⚠️  CSRF_SECRET généré automatiquement. Définissez-le dans vos variables d'environnement pour la production."
+    )
     return secret
   }
 
@@ -342,20 +345,14 @@ export class CsrfEnhancedService {
    * Crée un token HMAC
    */
   private createHmacToken(data: string): string {
-    return crypto
-      .createHmac('sha256', this.masterSecret)
-      .update(data)
-      .digest('base64url')
+    return crypto.createHmac('sha256', this.masterSecret).update(data).digest('base64url')
   }
 
   /**
    * Hash un token pour le stockage
    */
   private hashToken(token: string): string {
-    return crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex')
+    return crypto.createHash('sha256').update(token).digest('hex')
   }
 
   /**
@@ -374,13 +371,13 @@ export class CsrfEnhancedService {
       tokens: new Set<string>(),
       lastActivity: Date.now(),
     }
-    
+
     // Limiter le nombre de tokens par session
     if (session.tokens.size >= this.maxTokensPerSession) {
       const tokensArray = Array.from(session.tokens)
       session.tokens.delete(tokensArray[0]) // Supprimer le plus ancien
     }
-    
+
     session.tokens.add(tokenHash)
     session.lastActivity = Date.now()
     this.tokenStore.set(sessionId, session)
@@ -391,17 +388,17 @@ export class CsrfEnhancedService {
    */
   private isTokenValid(sessionId: string, tokenHash: string): boolean {
     const session = this.tokenStore.get(sessionId)
-    
+
     if (!session) {
       return false
     }
-    
+
     // Vérifier l'expiration
     if (Date.now() - session.lastActivity > this.tokenExpiry) {
       this.tokenStore.delete(sessionId)
       return false
     }
-    
+
     return session.tokens.has(tokenHash)
   }
 
@@ -422,14 +419,14 @@ export class CsrfEnhancedService {
   private cleanupExpiredTokens(): void {
     const now = Date.now()
     let cleaned = 0
-    
+
     for (const [sessionId, session] of this.tokenStore.entries()) {
       if (now - session.lastActivity > this.tokenExpiry) {
         this.tokenStore.delete(sessionId)
         cleaned++
       }
     }
-    
+
     if (cleaned > 0) {
       this.logger.debug(`🧹 Nettoyé ${cleaned} sessions CSRF expirées`)
     }

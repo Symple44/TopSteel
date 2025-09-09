@@ -3,4 +3,4 @@
  * Exports all rate limiting types for convenient imports
  */
 
-export * from './rate-limiting.types';
+export * from './rate-limiting.types'
