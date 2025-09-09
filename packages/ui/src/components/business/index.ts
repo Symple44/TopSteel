@@ -196,7 +196,7 @@ export {
 export * from './tables/QuotesTable'
 
 // ========== Upload et documents ==========
-export * from './uploads'
+// Note: uploads folder is gitignored and not included in builds
 // Autres workflows sans conflit
 export * from './workflows/ApprovalWorkflow'
 // ========== Workflow et processus ==========

@@ -75,7 +75,6 @@ export default defineConfig(({ mode }) => {
           ),
           'business/pricing': resolve(__dirname, 'src/components/business/pricing/index.ts'),
           'business/tables': resolve(__dirname, 'src/components/business/tables/index.ts'),
-          'business/uploads': resolve(__dirname, 'src/components/business/uploads/index.ts'),
           'business/workflows': resolve(__dirname, 'src/components/business/workflows/index.ts'),
           'theme/index': resolve(__dirname, 'src/components/theme/index.ts'),
         },
