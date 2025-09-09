@@ -207,7 +207,7 @@ export function EditUserDialog({
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const form = useForm<EditUserFormData>({
-    resolver: zodResolver(editUserSchema),
+    resolver: zodResolver(editUserSchema) as any,
     defaultValues: {
       id: '',
       firstName: '',
@@ -259,11 +259,11 @@ export function EditUserDialog({
         resetPassword: false,
         newPassword: '',
         mustChangePassword: false,
-        role: userData.role || 'USER',
-        department: userData.department || '',
+        role: (userData.role as any) || 'employee',
+        department: (userData.department as any) || 'administration',
         manager: userData.manager || '',
         team: userData.team || '',
-        contractType: userData.contractType || 'CDI',
+        contractType: (userData.contractType as any) || 'full_time',
         hourlyRate: userData.hourlyRate,
         isActive: userData.isActive,
         canAccessMobileApp: userData.canAccessMobileApp,
@@ -424,7 +424,7 @@ export function EditUserDialog({
         </DialogHeader>
         <ScrollArea className="max-h-[75vh] pr-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6">
               {error && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
@@ -472,7 +472,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
@@ -485,7 +485,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
@@ -498,7 +498,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
@@ -511,7 +511,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
@@ -524,7 +524,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="position"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
@@ -548,7 +548,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="username"
                     render={({ field }) => (
                       <FormItem className="max-w-md">
@@ -564,7 +564,7 @@ export function EditUserDialog({
                   <Separator />
                   <div className="space-y-4">
                     <FormField
-                      control={form.control}
+                      control={form.control as any}
                       name="resetPassword"
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
@@ -585,7 +585,7 @@ export function EditUserDialog({
                     {watchResetPassword && (
                       <div className="grid gap-4 md:grid-cols-2 pl-6 border-l-2">
                         <FormField
-                          control={form.control}
+                          control={form.control as any}
                           name="newPassword"
                           render={({ field }) => (
                             <FormItem>
@@ -617,7 +617,7 @@ export function EditUserDialog({
                           )}
                         />
                         <FormField
-                          control={form.control}
+                          control={form.control as any}
                           name="mustChangePassword"
                           render={({ field }) => (
                             <FormItem className="flex items-center space-x-2 space-y-0">
@@ -634,7 +634,7 @@ export function EditUserDialog({
                     )}
                   </div>
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="maxSessionDuration"
                     render={({ field }) => (
                       <FormItem className="max-w-xs">
@@ -664,7 +664,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="role"
                     render={({ field }) => (
                       <FormItem>
@@ -697,7 +697,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="department"
                     render={({ field }) => (
                       <FormItem>
@@ -722,7 +722,7 @@ export function EditUserDialog({
                   />
                   {availableManagers.length > 0 && (
                     <FormField
-                      control={form.control}
+                      control={form.control as any}
                       name="manager"
                       render={({ field }) => (
                         <FormItem>
@@ -749,7 +749,7 @@ export function EditUserDialog({
                   )}
                   {availableTeams.length > 0 && (
                     <FormField
-                      control={form.control}
+                      control={form.control as any}
                       name="team"
                       render={({ field }) => (
                         <FormItem>
@@ -794,7 +794,7 @@ export function EditUserDialog({
                         {permissions.map((permission) => (
                           <FormField
                             key={`${category}-${permission}`}
-                            control={form.control}
+                            control={form.control as any}
                             name={`permissions.${category as keyof EditUserFormData['permissions']}`}
                             render={({ field }) => (
                               <FormItem className="flex items-center space-x-2">
@@ -830,7 +830,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
@@ -843,7 +843,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="endDate"
                     render={({ field }) => (
                       <FormItem>
@@ -859,7 +859,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="contractType"
                     render={({ field }) => (
                       <FormItem>
@@ -882,7 +882,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="hourlyRate"
                     render={({ field }) => (
                       <FormItem>
@@ -915,7 +915,7 @@ export function EditUserDialog({
                 <CardContent className="space-y-4">
                   <div className="flex gap-6">
                     <FormField
-                      control={form.control}
+                      control={form.control as any}
                       name="isActive"
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
@@ -927,7 +927,7 @@ export function EditUserDialog({
                       )}
                     />
                     <FormField
-                      control={form.control}
+                      control={form.control as any}
                       name="canAccessMobileApp"
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
@@ -942,7 +942,7 @@ export function EditUserDialog({
                     />
                   </div>
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="notes"
                     render={({ field }) => (
                       <FormItem>

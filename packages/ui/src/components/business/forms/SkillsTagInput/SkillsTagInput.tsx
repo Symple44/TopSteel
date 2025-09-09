@@ -67,7 +67,7 @@ const proficiencyLevels: { value: ProficiencyLevel; label: string; color: string
 const skillCategories: {
   value: SkillCategory
   label: string
-  icon: React.ComponentType<unknown>
+  icon: React.ComponentType<{ className?: string }>
 }[] = [
   { value: 'technical', label: 'Technique', icon: Hash },
   { value: 'soft', label: 'Relationnelle', icon: Star },
