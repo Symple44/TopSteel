@@ -10,6 +10,7 @@ env:
   NODE_VERSION: '22.14.0'
   PNPM_VERSION: '10.13.1'
   NODE_OPTIONS: '--max-old-space-size=6144'
+  CI: 'true'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

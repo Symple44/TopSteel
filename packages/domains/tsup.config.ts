@@ -1,6 +1,14 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
+  // Skip DTS in CI to avoid memory/timeout issues
+  dts: process.env.CI ? false : {
+    resolve: false,
+    compilerOptions: {
+      composite: false,
+      incremental: false,
+    },
+  },
   entry: {
     index: 'src/index.ts',
     server: 'src/server.ts',
@@ -12,13 +20,6 @@ export default defineConfig({
     'image/index': 'src/image/index.ts',
   },
   format: ['cjs', 'esm'],
-  dts: {
-    resolve: false, // Don't resolve dependencies to save memory
-    compilerOptions: {
-      composite: false,
-      incremental: false,
-    },
-  },
   clean: true,
   sourcemap: process.env.NODE_ENV !== 'production',
   minify: process.env.NODE_ENV === 'production',
