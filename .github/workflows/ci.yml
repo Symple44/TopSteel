@@ -128,7 +128,7 @@ jobs:
 
     strategy:
       matrix:
-        test-type: [unit, integration]
+        test-type: [unit]
 
     steps:
       - name: 📥 Checkout repository
@@ -158,8 +158,8 @@ jobs:
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
-      - name: 🧪 Run ${{ matrix.test-type }} tests
-        run: pnpm test:${{ matrix.test-type }}
+      - name: 🧪 Run tests
+        run: pnpm test
 
       - name: 📊 Upload coverage
         if: matrix.test-type == 'unit'

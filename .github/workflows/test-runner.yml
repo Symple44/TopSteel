@@ -121,8 +121,8 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/erp_test
           REDIS_URL: redis://localhost:6379
       
-      - name: 🔗 Run integration tests
-        run: pnpm test:integration
+      - name: 🔗 Run tests
+        run: pnpm test
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/erp_test
           REDIS_URL: redis://localhost:6379

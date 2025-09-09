@@ -42,7 +42,10 @@
       "Bash(cat:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": [],
     "ask": [],

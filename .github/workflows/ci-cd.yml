@@ -120,18 +120,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run unit tests
-        run: pnpm test:unit --coverage
+      - name: Run tests
+        run: pnpm test:coverage
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/topsteel_test
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-secret-key-for-testing-only
 
-      - name: Run integration tests
-        run: pnpm test:integration
-        env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/topsteel_test
-          REDIS_URL: redis://localhost:6379
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
