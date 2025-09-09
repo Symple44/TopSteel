@@ -81,7 +81,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const form = useForm<ClientFormData>({
-    resolver: zodResolver(clientSchema),
+    resolver: zodResolver(clientSchema) as any,
     defaultValues: {
       companyName: '',
       siret: '',
@@ -155,7 +155,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
         <ScrollArea className="max-h-[70vh] pr-4">
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleSubmit)}
+              onSubmit={form.handleSubmit(handleSubmit as any)}
               className="space-y-6"
               noValidate
               aria-label="Formulaire d'ajout de client"
@@ -178,7 +178,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                 </CardHeader>
                 <fieldset className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="companyName"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
@@ -191,7 +191,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="companyType"
                     render={({ field }) => (
                       <FormItem>
@@ -217,7 +217,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="siret"
                     render={({ field }) => (
                       <FormItem>
@@ -230,7 +230,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="tvaNumber"
                     render={({ field }) => (
                       <FormItem>
@@ -243,7 +243,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="sector"
                     render={({ field }) => (
                       <FormItem>
@@ -266,7 +266,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                 </CardHeader>
                 <fieldset className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="contactFirstName"
                     render={({ field }) => (
                       <FormItem>
@@ -279,7 +279,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="contactLastName"
                     render={({ field }) => (
                       <FormItem>
@@ -292,7 +292,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="contactEmail"
                     render={({ field }) => (
                       <FormItem>
@@ -305,7 +305,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="contactPhone"
                     render={({ field }) => (
                       <FormItem>
@@ -318,7 +318,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="contactPosition"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
@@ -341,7 +341,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                 </CardHeader>
                 <fieldset className="grid gap-4 md:grid-cols-3">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="address"
                     render={({ field }) => (
                       <FormItem className="md:col-span-3">
@@ -354,7 +354,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="postalCode"
                     render={({ field }) => (
                       <FormItem>
@@ -367,7 +367,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="city"
                     render={({ field }) => (
                       <FormItem>
@@ -380,7 +380,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="country"
                     render={({ field }) => (
                       <FormItem>
@@ -403,7 +403,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                 </CardHeader>
                 <fieldset className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="useSameAddress"
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
@@ -427,7 +427,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                   {!watchUseSameAddress && (
                     <div className="grid gap-4 md:grid-cols-3">
                       <FormField
-                        control={form.control}
+                        control={form.control as any}
                         name="billingAddress"
                         render={({ field }) => (
                           <FormItem className="md:col-span-3">
@@ -440,7 +440,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                         )}
                       />
                       <FormField
-                        control={form.control}
+                        control={form.control as any}
                         name="billingPostalCode"
                         render={({ field }) => (
                           <FormItem>
@@ -453,7 +453,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                         )}
                       />
                       <FormField
-                        control={form.control}
+                        control={form.control as any}
                         name="billingCity"
                         render={({ field }) => (
                           <FormItem>
@@ -466,7 +466,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                         )}
                       />
                       <FormField
-                        control={form.control}
+                        control={form.control as any}
                         name="billingCountry"
                         render={({ field }) => (
                           <FormItem>
@@ -482,7 +482,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                   )}
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
-                      control={form.control}
+                      control={form.control as any}
                       name="paymentTerms"
                       render={({ field }) => (
                         <FormItem>
@@ -506,7 +506,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                       )}
                     />
                     <FormField
-                      control={form.control}
+                      control={form.control as any}
                       name="paymentMethod"
                       render={({ field }) => (
                         <FormItem>
@@ -540,7 +540,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                 </CardHeader>
                 <fieldset className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="creditLimit"
                     render={({ field }) => (
                       <FormItem>
@@ -558,7 +558,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="creditUsed"
                     render={({ field }) => (
                       <FormItem>
@@ -586,7 +586,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                 </CardHeader>
                 <fieldset className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="preferredLanguage"
                     render={({ field }) => (
                       <FormItem>
@@ -607,7 +607,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
@@ -624,7 +624,7 @@ export function AddClientDialog({ open, onOpenChange, onSubmit }: AddClientDialo
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="isActive"
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">

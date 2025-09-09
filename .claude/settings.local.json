@@ -48,7 +48,8 @@
       "Bash(gh run view:*)",
       "Bash(git push:*)",
       "Bash(timeout:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": [],
