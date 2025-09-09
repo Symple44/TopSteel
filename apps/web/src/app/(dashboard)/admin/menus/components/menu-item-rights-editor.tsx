@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import {
   AlertTriangle,
   CheckCircle,

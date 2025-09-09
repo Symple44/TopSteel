@@ -8,7 +8,7 @@ import {
   DataTableExample,
   HierarchicalDataTableExample,
   SimpleDataTableExample,
-} from '@erp/ui/data-display'
+} from '@erp/ui'
 import {
   ArrowUpRight,
   CheckCircle,

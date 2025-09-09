@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
+import { Button } from '@erp/ui'
 import { useState } from 'react'
 
 // Données fictives de planning

@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge, ScrollArea } from '@erp/ui'
-import { Button, Input } from '@erp/ui/primitives'
+import { Button, Input } from '@erp/ui'
 import { Database, Lock, Plus, Search, Unlock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -78,7 +78,7 @@ export function QueryBuilderSidebar() {
           <Input
             placeholder="Rechercher..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e?.target?.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e?.target?.value)}
             className="pl-8"
           />
         </div>

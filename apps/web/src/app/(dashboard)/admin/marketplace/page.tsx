@@ -12,7 +12,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
+import { Button } from '@erp/ui'
 import { Loader2, Package, Settings, Store, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '@/lib/i18n/hooks'

@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
+import { Button } from '@erp/ui'
 import { Database, Package, Table, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { callClientApi } from '@/utils/backend-api'

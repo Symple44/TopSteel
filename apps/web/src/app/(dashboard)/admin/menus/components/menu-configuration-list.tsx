@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { Download, Edit, MoreVertical, Play, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -46,7 +46,7 @@ export function MenuConfigurationList({
                 : 'border-border hover:bg-muted/50'
             )}
             onClick={() => onSelect(config)}
-            onKeyDown={(e) => {
+            onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e?.preventDefault()
                 onSelect(config)
@@ -84,7 +84,7 @@ export function MenuConfigurationList({
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0"
-                    onClick={(e) => e?.stopPropagation()}
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => e?.stopPropagation()}
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>

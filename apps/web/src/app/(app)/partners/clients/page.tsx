@@ -235,8 +235,8 @@ export default function ClientsPage() {
       <Card>
         <CardContent className="p-0">
           <DataTable
-            data={partners as any}
-            columns={columns as any}
+            data={partners as Array<Partner & Record<string, unknown>>}
+            columns={columns as ColumnConfig<Partner & Record<string, unknown>>[]}
             keyField="id"
             loading={isLoading}
             searchable
@@ -245,15 +245,15 @@ export default function ClientsPage() {
             actions={[
               {
                 label: 'Voir',
-                onClick: handleView as any,
+                onClick: (partner: Partner) => handleView(partner),
               },
               {
                 label: 'Modifier',
-                onClick: handleEdit as any,
+                onClick: (partner: Partner) => handleEdit(partner),
               },
               {
                 label: 'Supprimer',
-                onClick: handleDelete as any,
+                onClick: (partner: Partner) => handleDelete(partner),
                 variant: 'destructive' as const,
               },
             ]}

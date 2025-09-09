@@ -39,7 +39,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Input,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import {
   Activity,
   AlertTriangle,

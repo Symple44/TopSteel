@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle, Label, useFormFieldIds } from '@erp/ui'
-import { Button, Input, Textarea } from '@erp/ui/primitives'
+import { Button, Input, Textarea } from '@erp/ui'
 import { Save, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api-client'
@@ -162,7 +162,7 @@ export function MenuConfigurationEditor({
               <Input
                 id={fieldIds.name}
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e?.target?.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e?.target?.value })}
                 placeholder={t('menuConfig?.editor?.configurationNamePlaceholder')}
               />
             </div>
@@ -173,7 +173,7 @@ export function MenuConfigurationEditor({
               <Textarea
                 id={fieldIds.description}
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e?.target?.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e?.target?.value })}
                 placeholder={t('menuConfig?.editor?.configurationDescriptionPlaceholder')}
                 rows={3}
               />

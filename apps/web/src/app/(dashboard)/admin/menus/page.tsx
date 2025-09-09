@@ -14,7 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
+import { Button } from '@erp/ui'
 import { Download, Play, Plus, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api-client'
