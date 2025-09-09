@@ -9,6 +9,10 @@ on:
     # Run daily at 2 AM UTC
     - cron: '0 2 * * *'
 
+env:
+  NODE_VERSION: '22.14.0'
+  PNPM_VERSION: '10.13.1'
+
 permissions:
   contents: read
   security-events: write
@@ -20,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: ['22.14.0']
     
     steps:
       - name: Checkout code
@@ -140,7 +144,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Setup pnpm
@@ -319,7 +323,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2

@@ -9,7 +9,7 @@ on:
     - cron: '0 4 * * *' # Daily at 4 AM
 
 env:
-  NODE_VERSION: '22.12.0'
+  NODE_VERSION: '22.14.0'
   PNPM_VERSION: '10.13.1'
 
 jobs:
