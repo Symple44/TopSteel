@@ -6,6 +6,9 @@ on:
     tags:
       - "v*"
 
+env:
+  NODE_OPTIONS: '--max-old-space-size=6144'
+
 permissions:
   contents: write
   packages: write

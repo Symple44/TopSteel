@@ -5,6 +5,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+env:
+  NODE_OPTIONS: '--max-old-space-size=6144'
+
 permissions:
   contents: read
   pull-requests: write

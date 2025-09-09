@@ -9,6 +9,9 @@ on:
   schedule:
     - cron: "0 2 * * 1" # Tous les lundis à 2h du matin
 
+env:
+  NODE_OPTIONS: '--max-old-space-size=6144'
+
 jobs:
   analyze:
     name: Analyze

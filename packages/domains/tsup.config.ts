@@ -13,12 +13,12 @@ export default defineConfig({
   },
   format: ['cjs', 'esm'],
   dts: {
-    resolve: true,
+    resolve: false, // Don't resolve dependencies to save memory
     compilerOptions: {
       composite: false,
       incremental: false,
     },
-  },
+  }
   clean: true,
   sourcemap: process.env.NODE_ENV !== 'production',
   minify: process.env.NODE_ENV === 'production',
