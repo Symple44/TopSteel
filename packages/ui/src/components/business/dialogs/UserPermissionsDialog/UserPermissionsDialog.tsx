@@ -765,7 +765,7 @@ export function UserPermissionsDialog({
                                             field.onChange([...currentPerms, permKey])
                                           } else {
                                             field.onChange(
-                                              currentPerms.filter((p) => p !== permKey)
+                                              currentPerms.filter((p: string) => p !== permKey)
                                             )
                                           }
                                         }}

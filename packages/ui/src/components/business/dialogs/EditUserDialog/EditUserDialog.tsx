@@ -806,7 +806,7 @@ export function EditUserDialog({
                                       if (checked) {
                                         field.onChange([...currentPerms, permission])
                                       } else {
-                                        field.onChange(currentPerms.filter((p) => p !== permission))
+                                        field.onChange(currentPerms.filter((p: string) => p !== permission))
                                       }
                                     }}
                                   />

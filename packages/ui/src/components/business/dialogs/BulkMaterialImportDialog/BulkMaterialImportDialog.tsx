@@ -22,7 +22,7 @@ interface ImportColumn {
   sampleValue?: string
 }
 interface ImportPreviewRow {
-  [key: string]: string | number | boolean
+  [key: string]: string | number | boolean | string[]
   _rowIndex: number
   _hasErrors: boolean
   _errors: string[]

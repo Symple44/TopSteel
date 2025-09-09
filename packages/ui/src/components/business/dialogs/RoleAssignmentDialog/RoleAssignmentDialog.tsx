@@ -115,7 +115,7 @@ export function RoleAssignmentDialog({
       form.reset({
         userId: userData.id,
         newRole: 'employee',
-        department: userData.department as unknown,
+        department: userData.department as any,
         temporaryAssignment: false,
         notifyUser: true,
       })

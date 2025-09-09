@@ -165,7 +165,7 @@ export function ClientSelectorDialog({
               />
             </div>
             <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter} onValueChange={setStatusFilter as any}>
                 <SelectTrigger className="w-[130px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -175,7 +175,7 @@ export function ClientSelectorDialog({
                   <SelectItem value="inactive">Inactifs</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={companyTypeFilter} onValueChange={setCompanyTypeFilter}>
+              <Select value={companyTypeFilter} onValueChange={setCompanyTypeFilter as any}>
                 <SelectTrigger className="w-[120px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -191,7 +191,7 @@ export function ClientSelectorDialog({
                 </SelectContent>
               </Select>
               {availableSectors.length > 0 && (
-                <Select value={sectorFilter} onValueChange={setSectorFilter}>
+                <Select value={sectorFilter} onValueChange={setSectorFilter as any}>
                   <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="Secteur" />
                   </SelectTrigger>

@@ -117,7 +117,7 @@ export function ClientSearch({
           newSelection = [...selectedClients, client]
         }
         setSelectedClients(newSelection)
-        onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+        onSelect?.(newSelection.length > 0 ? (newSelection as any) : null)
       } else {
         setSelectedClients([client])
         onSelect?.(client)
@@ -132,7 +132,7 @@ export function ClientSearch({
     (clientId: string) => {
       const newSelection = selectedClients.filter((c) => c.id !== clientId)
       setSelectedClients(newSelection)
-      onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+      onSelect?.(newSelection.length > 0 ? (newSelection as any) : null)
     },
     [selectedClients, onSelect]
   )

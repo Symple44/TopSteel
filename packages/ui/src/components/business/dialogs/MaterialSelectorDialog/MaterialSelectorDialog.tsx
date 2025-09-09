@@ -218,7 +218,7 @@ export function MaterialSelectorDialog({
     setLoading(true)
     try {
       const materialsToReturn = allowQuantitySelection ? selected : selected.map((s) => s.material)
-      await onSelect?.(materialsToReturn as unknown)
+      await onSelect?.(materialsToReturn as any)
       onOpenChange(false)
       setSelected([])
       setSearchTerm('')
