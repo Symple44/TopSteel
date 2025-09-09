@@ -162,7 +162,7 @@ export class SettingsManager {
   static importSettings(settingsData: Record<string, unknown>, userId?: string): void {
     try {
       Object.entries(settingsData).forEach(([tableId, data]) => {
-        SettingsManager.saveSettings(tableId, data.settings, userId)
+        SettingsManager.saveSettings(tableId, (data as any).settings, userId)
       })
     } catch (_error) {}
   }

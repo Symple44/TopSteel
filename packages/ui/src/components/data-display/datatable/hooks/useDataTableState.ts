@@ -230,8 +230,8 @@ export function useDataTableState<T extends Record<string, unknown>>({
 
   // Hook d'export
   const { exportData, isExporting } = useDataExport({
-    data: sortedData,
-    columns: visibleColumns,
+    data: sortedData as any,
+    columns: visibleColumns as any,
     selectedRows: selection.selectedRows,
     keyField,
     exportable,

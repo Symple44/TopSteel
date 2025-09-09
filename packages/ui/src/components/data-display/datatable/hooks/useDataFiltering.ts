@@ -72,9 +72,9 @@ export function useDataFiltering<T extends Record<string, unknown>>({
       const validOperator = (operator || 'contains') as FilterConfig['operator']
 
       if (existing) {
-        return prev.map((f) => (f.field === field ? { ...f, value, operator: validOperator } : f))
+        return prev.map((f) => (f.field === field ? ({ ...f, value, operator: validOperator } as FilterConfig) : f))
       }
-      return [...prev, { field, value, operator: validOperator }]
+      return [...prev, { field, value, operator: validOperator } as FilterConfig]
     })
   }, [])
 

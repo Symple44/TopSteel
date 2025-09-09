@@ -117,7 +117,7 @@ export function MaterialSearch({
           newSelection = [...selectedMaterials, material]
         }
         setSelectedMaterials(newSelection)
-        onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+        onSelect?.(newSelection.length > 0 ? (newSelection as any) : null)
       } else {
         setSelectedMaterials([material])
         onSelect?.(material)
@@ -132,7 +132,7 @@ export function MaterialSearch({
     (materialId: string) => {
       const newSelection = selectedMaterials.filter((m) => m.id !== materialId)
       setSelectedMaterials(newSelection)
-      onSelect?.(newSelection.length > 0 ? (newSelection as unknown) : null)
+      onSelect?.(newSelection.length > 0 ? (newSelection as any) : null)
     },
     [selectedMaterials, onSelect]
   )

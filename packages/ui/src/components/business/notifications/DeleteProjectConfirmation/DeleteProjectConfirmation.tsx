@@ -247,7 +247,7 @@ export function DeleteProjectConfirmation({
                   name="handleDependencies"
                   value="archive"
                   checked={handleDependencies === 'archive'}
-                  onChange={(e) => setHandleDependencies(e.target.value as unknown)}
+                  onChange={(e) => setHandleDependencies(e.target.value as any)}
                   className="mt-1"
                 />
                 <div>
@@ -263,7 +263,7 @@ export function DeleteProjectConfirmation({
                   name="handleDependencies"
                   value="reassign"
                   checked={handleDependencies === 'reassign'}
-                  onChange={(e) => setHandleDependencies(e.target.value as unknown)}
+                  onChange={(e) => setHandleDependencies(e.target.value as any)}
                   className="mt-1"
                 />
                 <div>
@@ -279,7 +279,7 @@ export function DeleteProjectConfirmation({
                   name="handleDependencies"
                   value="delete"
                   checked={handleDependencies === 'delete'}
-                  onChange={(e) => setHandleDependencies(e.target.value as unknown)}
+                  onChange={(e) => setHandleDependencies(e.target.value as any)}
                   className="mt-1"
                 />
                 <div>

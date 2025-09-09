@@ -78,8 +78,8 @@ export function DataTableBody<T extends Record<string, unknown>>({
         {visibleColumns.map((column) => (
           <TableCell
             key={column.id}
-            row={row}
-            column={column}
+            row={row as any}
+            column={column as any}
             onEdit={onCellEdit ? (value) => onCellEdit(row, column, value) : undefined}
           />
         ))}

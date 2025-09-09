@@ -326,7 +326,7 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
       if (dropPosition === 'inside') {
         // Déplacer à l'intérieur du target (devenir enfant)
         if (config.reorderConfig.allowLevelChange) {
-          (draggedItemData as any)[parentField] = targetId
+          (draggedItemData as any)[parentField] = targetId as string
           (draggedItemData as any)[orderField] = 1 // Premier enfant
 
           // Auto-expand le parent si configuré

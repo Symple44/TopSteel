@@ -28,8 +28,8 @@ export function compareValues(aVal: unknown, bVal: unknown, direction: 'asc' | '
   if (aVal === bVal) return 0
 
   // Comparaison simple et fiable
-  if ((aVal as unknown) < (bVal as unknown)) return direction === 'desc' ? 1 : -1
-  if ((aVal as unknown) > (bVal as unknown)) return direction === 'desc' ? -1 : 1
+  if ((aVal as any) < (bVal as any)) return direction === 'desc' ? 1 : -1
+  if ((aVal as any) > (bVal as any)) return direction === 'desc' ? -1 : 1
 
   return 0
 }
@@ -45,7 +45,7 @@ export function getColumnValue<T>(
   if (column?.getValue) {
     return column.getValue(row)
   }
-  return (row as unknown)[column?.key || columnKey]
+  return (row as any)[column?.key || columnKey]
 }
 
 /**

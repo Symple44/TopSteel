@@ -156,7 +156,7 @@ function ViewSettingsForm<T = any>({
           ...prev.kanban,
           [key]: value,
         },
-      }))
+      } as ViewSettings))
     } else if (viewType === 'cards') {
       setSettings((prev: ViewSettings) => ({
         ...prev,
@@ -164,7 +164,7 @@ function ViewSettingsForm<T = any>({
           ...prev.cards,
           [key]: value,
         },
-      }))
+      } as ViewSettings))
     } else if (viewType === 'timeline') {
       setSettings((prev: ViewSettings) => ({
         ...prev,
@@ -172,7 +172,7 @@ function ViewSettingsForm<T = any>({
           ...prev.timeline,
           [key]: value,
         },
-      }))
+      } as ViewSettings))
     } else if (viewType === 'calendar') {
       setSettings((prev: ViewSettings) => ({
         ...prev,
@@ -180,16 +180,16 @@ function ViewSettingsForm<T = any>({
           ...prev.calendar,
           [key]: value,
         },
-      }))
+      } as ViewSettings))
     } else {
       // Fallback for other view types
       setSettings((prev: ViewSettings) => ({
         ...prev,
         [viewType]: {
-          ...prev[viewType as keyof ViewSettings],
+          ...(prev[viewType as keyof ViewSettings] as any),
           [key]: value,
         },
-      }))
+      } as ViewSettings))
     }
   }
 

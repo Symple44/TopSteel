@@ -58,7 +58,7 @@ export class ClipboardUtils {
     const rows = data.map((row) => {
       return columns
         .map((col) => {
-          const value = (row as unknown)[col.key]
+          const value = (row as any)[col.key]
           return ClipboardUtils.formatCellForClipboard(value, col)
         })
         .join('\t')
@@ -150,7 +150,7 @@ export class ClipboardUtils {
             })
           }
 
-          ;(processedRow as unknown)[column.key] = validationResult.value
+          ;(processedRow as any)[column.key] = validationResult.value
         } catch (_error) {
           result.errors.push({
             row: actualRowIndex,

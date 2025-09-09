@@ -25,7 +25,7 @@ export function useColorRules<T = any>(data: T[], columns: ColumnConfig<T>[], ru
 
       columns.forEach((column) => {
         // Obtenir la valeur de la cellule
-        const cellValue = column.getValue ? column.getValue(row) : (row as unknown)[column.key]
+        const cellValue = column.getValue ? column.getValue(row) : (row as any)[column.key]
         const appliedCellRules: ColorRule[] = []
 
         // Évaluer chaque règle pour cette cellule

@@ -311,18 +311,18 @@ export function ConditionBuilder({
           return String(contextValue).endsWith(String(condition.value))
         case 'in':
           return Array.isArray(condition.value)
-            ? condition.value.includes(contextValue)
+            ? condition.value.includes(contextValue as any)
             : String(condition.value)
                 .split(',')
                 .map((s) => s.trim())
-                .includes(contextValue)
+                .includes(contextValue as string)
         case 'not_in':
           return Array.isArray(condition.value)
-            ? !condition.value.includes(contextValue)
+            ? !condition.value.includes(contextValue as any)
             : !String(condition.value)
                 .split(',')
                 .map((s) => s.trim())
-                .includes(contextValue)
+                .includes(contextValue as string)
         default:
           return false
       }
@@ -697,7 +697,7 @@ export function ConditionBuilder({
                   <div key={key}>
                     <Label className="text-xs">{type?.label || key}</Label>
                     <Input
-                      value={value}
+                      value={value as string}
                       onChange={(e) =>
                         setTestContext((prev) => ({
                           ...prev,

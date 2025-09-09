@@ -512,7 +512,7 @@ export function UserPermissionsDialog({
           administration: currentPermissions.administration || [],
         },
         temporaryAccess: false,
-      })
+      } as any)
     }
   }, [userData, currentPermissions, open, form])
   const applyTemplate = (templateKey: string) => {

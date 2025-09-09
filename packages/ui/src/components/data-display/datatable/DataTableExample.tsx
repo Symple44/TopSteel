@@ -185,8 +185,8 @@ export function DataTableExample() {
       {/* DataTable */}
       <DataTable
         title="Gestion des utilisateurs"
-        data={data}
-        columns={columns}
+        data={data as any}
+        columns={columns as any}
         keyField="id"
         // Fonctionnalités activées
         sortable={true}
@@ -206,12 +206,12 @@ export function DataTableExample() {
         hoverable={true}
         height="600px"
         // Actions et callbacks
-        actions={actions}
+        actions={actions as any}
         onAddNew={handleAddNew}
-        onCellEdit={handleCellEdit}
+        onCellEdit={handleCellEdit as any}
         onSelectionChange={handleSelectionChange}
-        onRowClick={(_row: User) => {}}
-        onRowDoubleClick={(_row: User) => {}}
+        onRowClick={(_row: any) => {}}
+        onRowDoubleClick={(_row: any) => {}}
         // Pour la persistance des paramètres
         tableId="users-table"
       />

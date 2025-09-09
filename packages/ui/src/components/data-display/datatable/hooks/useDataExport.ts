@@ -139,7 +139,7 @@ export function useDataExport<T extends SafeObject>({
 
   // Préparer les données pour l'export
   const prepareExportData = useCallback(
-    (options: ExportOptions = {}): unknown[] => {
+    (options: ExportOptions = {}): SafeObject[] => {
       // Filtrer les colonnes
       const exportColumns = options.visibleColumnsOnly
         ? columns.filter((col) => col.visible !== false)
@@ -167,7 +167,7 @@ export function useDataExport<T extends SafeObject>({
           exportRow[column.title] = formatValue(value, column)
         })
 
-        return exportRow
+        return exportRow as SafeObject
       })
     },
     [data, columns, selectedRows, keyField, formatValue]
@@ -183,7 +183,7 @@ export function useDataExport<T extends SafeObject>({
       }
 
       // Obtenir les en-têtes
-      const headers = Object.keys(exportData[0])
+      const headers = Object.keys(exportData[0] as any)
 
       // Créer le contenu CSV
       const csvContent: string[] = []
@@ -196,7 +196,7 @@ export function useDataExport<T extends SafeObject>({
       // Ajouter les données
       exportData.forEach((row) => {
         const values = headers.map((header) => {
-          const value = row[header]
+          const value = (row as any)[header]
           // Échapper les guillemets et entourer de guillemets si nécessaire
           if (
             typeof value === 'string' &&

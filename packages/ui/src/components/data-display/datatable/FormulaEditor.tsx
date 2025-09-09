@@ -261,7 +261,7 @@ export function FormulaEditor<T>({
             const targetRow =
               targetRowIndex !== undefined ? sampleData[targetRowIndex] : sampleData[0]
             const targetColumn = columns.find((c) => c.id === columnId)
-            return targetColumn ? (targetRow as unknown)[targetColumn.key] : null
+            return targetColumn ? (targetRow as any)[targetColumn.key] : null
           },
         }
 
@@ -366,7 +366,7 @@ export function FormulaEditor<T>({
               <Textarea
                 ref={textareaRef}
                 value={formula}
-                onChange={(e: unknown) => setFormula(e.target.value)}
+                onChange={(e: any) => setFormula(e.target.value)}
                 placeholder="=SUM(A:A) + AVERAGE(B:B)"
                 className="h-32 font-mono text-sm"
                 spellCheck={false}

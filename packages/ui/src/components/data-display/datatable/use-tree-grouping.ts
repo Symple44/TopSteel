@@ -64,7 +64,7 @@ export function useTreeGrouping<T = any>(
       let currentParent: GroupNode<T> | undefined
 
       groupColumns.forEach((column, level) => {
-        const value = column.getValue ? column.getValue(item) : (item as unknown)[column.key]
+        const value = column.getValue ? column.getValue(item) : (item as any)[column.key]
         const groupKey = createGroupKey(column.id, value, level)
 
         let node = nodeMap.get(groupKey)
@@ -211,7 +211,7 @@ export function useTreeGrouping<T = any>(
     collapseAll,
     clearGrouping,
     isGroupNode: (item: unknown): item is GroupNode<T> => {
-      return item && typeof item === 'object' && 'groupLabel' in item && 'level' in item
+      return !!(item && typeof item === 'object' && 'groupLabel' in item && 'level' in item)
     },
   }
 }

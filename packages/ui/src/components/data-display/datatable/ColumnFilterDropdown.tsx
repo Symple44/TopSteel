@@ -44,7 +44,7 @@ export function ColumnFilterDropdown<T = any>({
   const uniqueValues = React.useMemo(() => {
     const values = new Set<string>()
     data.forEach((item) => {
-      const value = (item as unknown)[column.id]
+      const value = (item as any)[column.id]
       if (value !== null && value !== undefined) {
         values.add(String(value))
       }

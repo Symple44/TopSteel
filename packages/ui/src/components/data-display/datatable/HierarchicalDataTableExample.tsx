@@ -264,7 +264,7 @@ export function HierarchicalDataTableExample() {
   // Gestion des changements de configuration
   const handleConfigChange = (newConfig: unknown) => {
     if (config) {
-      savePreferences(newConfig)
+      savePreferences(newConfig as any)
     }
   }
 

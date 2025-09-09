@@ -221,7 +221,7 @@ export function ExportDialog<T>({
                   onChange={(e: unknown) =>
                     setSettings((prev) => ({
                       ...prev,
-                      filename: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '_'),
+                      filename: (e as any).target.value.replace(/[^a-zA-Z0-9_-]/g, '_'),
                     }))
                   }
                   placeholder="export"
