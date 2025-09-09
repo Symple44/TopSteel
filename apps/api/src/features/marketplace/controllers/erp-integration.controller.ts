@@ -99,9 +99,19 @@ export class ERPIntegrationController {
       priceMax: query.priceMax,
     }
 
+    // Validation et typage sécurisé pour les paramètres de tri
+    const validSortFields: Array<ProductSortOptions['field']> = [
+      'designation', 'prixVenteHT', 'stockDisponible', 'createdAt', 'updatedAt'
+    ]
+    const validDirections: Array<ProductSortOptions['direction']> = ['ASC', 'DESC']
+    
     const sort: ProductSortOptions = {
-      field: (query.sortField as ProductSortOptions['field']) || 'createdAt',
-      direction: (query.sortDirection as ProductSortOptions['direction']) || 'DESC',
+      field: validSortFields.includes(query.sortField as ProductSortOptions['field'])
+        ? (query.sortField as ProductSortOptions['field'])
+        : 'createdAt',
+      direction: validDirections.includes(query.sortDirection as ProductSortOptions['direction'])
+        ? (query.sortDirection as ProductSortOptions['direction'])
+        : 'DESC',
     }
 
     const pagination: PaginationOptions = {

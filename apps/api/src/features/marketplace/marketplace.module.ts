@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { JwtModule } from '@nestjs/jwt'
-import { ThrottlerModule } from '@nestjs/throttler'
+import { ThrottlerModule, type ThrottlerModuleOptions } from '@nestjs/throttler'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { RedisModule } from '@nestjs-modules/ioredis'
 // Core Services
@@ -77,14 +77,13 @@ import { MarketplaceSyncProcessor } from './processors/marketplace-sync.processo
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: async (configService: ConfigService): Promise<ThrottlerModuleOptions> => ({
         throttlers: [
           {
             ttl: configService.get<number>('THROTTLE_TTL') || 60,
             limit: configService.get<number>('THROTTLE_LIMIT') || 10,
           },
         ],
-        // Note: storage property should be configured with a proper ThrottlerStorage instance if needed
       }),
     }),
 

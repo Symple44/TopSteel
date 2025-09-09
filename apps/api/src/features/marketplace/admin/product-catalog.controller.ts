@@ -70,9 +70,19 @@ export class ProductCatalogController {
       tags: tags ? tags.split(',') : undefined,
     }
 
+    // Validation et typage sécurisé pour les paramètres de tri
+    const validSortFields: Array<ProductSortOptions['field']> = [
+      'designation', 'prixVenteHT', 'stockDisponible', 'createdAt', 'updatedAt'
+    ]
+    const validDirections: Array<ProductSortOptions['direction']> = ['ASC', 'DESC']
+    
     const sort: ProductSortOptions = {
-      field: sortField as ProductSortOptions['field'],
-      direction: sortDirection,
+      field: validSortFields.includes(sortField as ProductSortOptions['field']) 
+        ? (sortField as ProductSortOptions['field']) 
+        : 'createdAt',
+      direction: validDirections.includes(sortDirection as ProductSortOptions['direction'])
+        ? (sortDirection as ProductSortOptions['direction'])
+        : 'DESC',
     }
 
     const pagination: PaginationOptions = {

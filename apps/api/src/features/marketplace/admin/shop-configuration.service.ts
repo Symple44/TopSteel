@@ -238,11 +238,14 @@ export class ShopConfigurationService {
       }
 
       // Deep merge updates with existing configuration
-      const updatedConfig = this.deepMerge(config, updates)
+      const updatedConfig = this.deepMerge(
+        config as Record<string, unknown>, 
+        updates as Record<string, unknown>
+      ) as unknown as MarketplaceShopConfiguration
       updatedConfig.updatedAt = new Date()
 
       // Validate configuration
-      this.validateConfiguration(updatedConfig)
+      this.validateConfiguration(updatedConfig as ShopConfiguration)
 
       // Save to database
       const savedConfig = await this.configRepository.save(updatedConfig)
@@ -576,12 +579,15 @@ export class ShopConfigurationService {
   /**
    * Deep merge objects
    */
-  private deepMerge(target: unknown, source: any): any {
-    const result = { ...(target as Record<string, unknown>) }
+  private deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+    const result = { ...target }
 
     for (const key in source) {
       if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        result[key] = this.deepMerge((target as Record<string, unknown>)[key] || {}, source[key])
+        result[key] = this.deepMerge(
+          (target[key] as Record<string, unknown>) || {},
+          source[key] as Record<string, unknown>
+        )
       } else {
         result[key] = source[key]
       }

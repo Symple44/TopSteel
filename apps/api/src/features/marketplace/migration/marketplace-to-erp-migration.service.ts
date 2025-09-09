@@ -1,7 +1,7 @@
 import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DataSource, Repository } from 'typeorm'
+import type { DataSource, QueryRunner, Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import {
   Partner,
@@ -309,7 +309,7 @@ export class MarketplaceToERPMigrationService {
    * Créer un partenaire ERP pour un client marketplace
    */
   private async createPartnerForCustomer(
-    queryRunner: any,
+    queryRunner: QueryRunner,
     customer: MarketplaceCustomer,
     tenantId: string
   ): Promise<void> {
