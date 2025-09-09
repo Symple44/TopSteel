@@ -45,8 +45,8 @@ export function useHierarchicalPreferences(
         apiConfig.loadHierarchyOrder(tableId),
       ])
 
-      if (preferencesResponse.ok) {
-        const preferencesData = await preferencesResponse.json()
+      if ((preferencesResponse as any).ok) {
+        const preferencesData = await (preferencesResponse as any).json()
         setConfig({
           hierarchyConfig: preferencesData.hierarchyConfig,
           reorderConfig: preferencesData.reorderConfig,
@@ -57,8 +57,8 @@ export function useHierarchicalPreferences(
         setConfig(getDefaultConfig())
       }
 
-      if (orderResponse.ok) {
-        const orderData = await orderResponse.json()
+      if ((orderResponse as any).ok) {
+        const orderData = await (orderResponse as any).json()
         setHierarchyOrder(orderData.items || [])
       } else {
         setHierarchyOrder([])
@@ -78,7 +78,7 @@ export function useHierarchicalPreferences(
       try {
         if (apiConfig?.savePreferences) {
           const response = await apiConfig.savePreferences(tableId, newConfig)
-          if (response.ok) {
+          if ((response as any).ok) {
             setConfig(newConfig)
           } else {
             throw new Error('Erreur lors de la sauvegarde des préférences')
@@ -100,7 +100,7 @@ export function useHierarchicalPreferences(
       try {
         if (apiConfig?.saveHierarchyOrder) {
           const response = await apiConfig.saveHierarchyOrder(tableId, items)
-          if (response.ok) {
+          if ((response as any).ok) {
             setHierarchyOrder(items)
           } else {
             throw new Error("Erreur lors de la sauvegarde de l'ordre hiérarchique")
@@ -139,7 +139,7 @@ export function useHierarchicalPreferences(
               parent_id: order.parent_id,
               display_order: order.display_order,
               level: order.level,
-            }
+            } as T
           }
           return item
         })

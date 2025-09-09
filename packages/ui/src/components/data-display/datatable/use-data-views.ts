@@ -176,7 +176,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
         ? String(
             (titleColumn.getValue
               ? titleColumn.getValue(item)
-              : (item as unknown)[titleColumn.key]) || 'Sans titre'
+              : (item as any)[titleColumn.key]) || 'Sans titre'
           )
         : 'Sans titre'
 
@@ -184,7 +184,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
         ? String(
             (subtitleColumn.getValue
               ? subtitleColumn.getValue(item)
-              : (item as unknown)[subtitleColumn.key]) || ''
+              : (item as any)[subtitleColumn.key]) || ''
           )
         : undefined
 
@@ -192,7 +192,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
         ? String(
             (descriptionColumn.getValue
               ? descriptionColumn.getValue(item)
-              : (item as unknown)[descriptionColumn.key]) || ''
+              : (item as any)[descriptionColumn.key]) || ''
           )
         : undefined
 
@@ -200,7 +200,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
         ? String(
             (imageColumn.getValue
               ? imageColumn.getValue(item)
-              : (item as unknown)[imageColumn.key]) || ''
+              : (item as any)[imageColumn.key]) || ''
           )
         : undefined
 
@@ -212,7 +212,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
           if (colId) {
             const column = columns.find((c) => c.id === colId)
             if (column) {
-              const value = column.getValue ? column.getValue(item) : (item as unknown)[column.key]
+              const value = column.getValue ? column.getValue(item) : (item as any)[column.key]
 
               // Pour les colonnes boolean, toujours afficher avec case cochée/décochée
               if (
@@ -247,7 +247,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
           if (colId) {
             const column = columns.find((c) => c.id === colId)
             if (column) {
-              const value = column.getValue ? column.getValue(item) : (item as unknown)[column.key]
+              const value = column.getValue ? column.getValue(item) : (item as any)[column.key]
 
               // Pour les colonnes boolean, toujours afficher avec case cochée/décochée
               if (
@@ -275,7 +275,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
       }
 
       return {
-        id: (item as unknown)[keyField] || crypto.randomUUID(),
+        id: (item as any)[keyField] || crypto.randomUUID(),
         title,
         subtitle,
         description,
@@ -301,7 +301,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
     data.forEach((item) => {
       const value = statusColumn.getValue
         ? statusColumn.getValue(item)
-        : (item as unknown)[statusColumn.key]
+        : (item as any)[statusColumn.key]
       const normalizedValue = value === null || value === undefined ? 'Non défini' : String(value)
       statusValues.add(normalizedValue)
     })
@@ -318,7 +318,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
     data.forEach((item) => {
       const statusValue = statusColumn.getValue
         ? statusColumn.getValue(item)
-        : (item as unknown)[statusColumn.key]
+        : (item as any)[statusColumn.key]
       const normalizedStatus =
         statusValue === null || statusValue === undefined ? 'Non défini' : String(statusValue)
 
@@ -353,10 +353,10 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
       .map((item, index) => {
         const dateValue = dateColumn.getValue
           ? dateColumn.getValue(item)
-          : (item as unknown)[dateColumn.key]
+          : (item as any)[dateColumn.key]
         const titleValue = titleColumn.getValue
           ? titleColumn.getValue(item)
-          : (item as unknown)[titleColumn.key]
+          : (item as any)[titleColumn.key]
 
         let date: Date
         if (dateValue instanceof Date) {
@@ -368,21 +368,21 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
         }
 
         return {
-          id: (item as unknown)[keyField] || String(index),
+          id: (item as any)[keyField] || String(index),
           date,
           title: String(titleValue || 'Sans titre'),
           description: config.descriptionColumn
             ? String(
                 (columns.find((c) => c.id === config.descriptionColumn)?.getValue
                   ? columns.find((c) => c.id === config.descriptionColumn)?.getValue?.(item)
-                  : (item as unknown)[config.descriptionColumn!]) || ''
+                  : (item as any)[config.descriptionColumn!]) || ''
               )
             : undefined,
           category: config.categoryColumn
             ? String(
                 (columns.find((c) => c.id === config.categoryColumn)?.getValue
                   ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                  : (item as unknown)[config.categoryColumn!]) || ''
+                  : (item as any)[config.categoryColumn!]) || ''
               )
             : undefined,
           color: getColorForCategory(
@@ -390,7 +390,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
               ? String(
                   (columns.find((c) => c.id === config.categoryColumn)?.getValue
                     ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                    : (item as unknown)[config.categoryColumn!]) || ''
+                    : (item as any)[config.categoryColumn!]) || ''
                 )
               : undefined
           ),
@@ -414,10 +414,10 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
       .map((item, index) => {
         const startDateValue = startDateColumn.getValue
           ? startDateColumn.getValue(item)
-          : (item as unknown)[startDateColumn.key]
+          : (item as any)[startDateColumn.key]
         const titleValue = titleColumn.getValue
           ? titleColumn.getValue(item)
-          : (item as unknown)[titleColumn.key]
+          : (item as any)[titleColumn.key]
 
         let startDate: Date
         if (startDateValue instanceof Date) {
@@ -434,7 +434,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
           if (endDateColumn) {
             const endDateValue = endDateColumn.getValue
               ? endDateColumn.getValue(item)
-              : (item as unknown)[endDateColumn.key]
+              : (item as any)[endDateColumn.key]
             if (endDateValue instanceof Date) {
               endDate = endDateValue
             } else if (typeof endDateValue === 'string') {
@@ -444,7 +444,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
         }
 
         return {
-          id: (item as unknown)[keyField] || String(index),
+          id: (item as any)[keyField] || String(index),
           title: String(titleValue || 'Sans titre'),
           start: startDate,
           end: endDate,
@@ -452,7 +452,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
             ? String(
                 (columns.find((c) => c.id === config.categoryColumn)?.getValue
                   ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                  : (item as unknown)[config.categoryColumn!]) || ''
+                  : (item as any)[config.categoryColumn!]) || ''
               )
             : undefined,
           color: getColorForCategory(
@@ -460,7 +460,7 @@ export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], key
               ? String(
                   (columns.find((c) => c.id === config.categoryColumn)?.getValue
                     ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                    : (item as unknown)[config.categoryColumn!]) || ''
+                    : (item as any)[config.categoryColumn!]) || ''
                 )
               : undefined
           ),

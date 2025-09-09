@@ -116,17 +116,17 @@ function applyLegacyFilter(value: unknown, filter: FilterConfig): boolean {
  */
 export function applyAdvancedFilter<T>(
   value: unknown,
-  rule: unknown,
+  rule: any,
   _column?: ColumnConfig<T>
 ): boolean {
   const stringValue = String(value || '').toLowerCase()
-  const ruleValue = String(rule.value || '').toLowerCase()
+  const ruleValue = String((rule as any).value || '').toLowerCase()
 
-  switch (rule.operator) {
+  switch ((rule as any).operator) {
     case 'equals':
-      return value === rule.value
+      return value === (rule as any).value
     case 'not_equals':
-      return value !== rule.value
+      return value !== (rule as any).value
     case 'contains':
       return stringValue.includes(ruleValue)
     case 'not_contains':
@@ -140,21 +140,21 @@ export function applyAdvancedFilter<T>(
     case 'is_not_empty':
       return !isEmptyValue(value)
     case 'greater_than':
-      return Number(value) > Number(rule.value)
+      return Number(value) > Number((rule as any).value)
     case 'less_than':
-      return Number(value) < Number(rule.value)
+      return Number(value) < Number((rule as any).value)
     case 'greater_or_equal':
-      return Number(value) >= Number(rule.value)
+      return Number(value) >= Number((rule as any).value)
     case 'less_or_equal':
-      return Number(value) <= Number(rule.value)
+      return Number(value) <= Number((rule as any).value)
     case 'between': {
       const num = Number(value)
-      return num >= Number(rule.value) && num <= Number(rule.secondValue)
+      return num >= Number((rule as any).value) && num <= Number((rule as any).secondValue)
     }
     case 'in':
-      return Array.isArray(rule.value) && rule.value.includes(value)
+      return Array.isArray((rule as any).value) && (rule as any).value.includes(value)
     case 'not_in':
-      return Array.isArray(rule.value) && !rule.value.includes(value)
+      return Array.isArray((rule as any).value) && !(rule as any).value.includes(value)
     default:
       return true
   }
@@ -185,9 +185,9 @@ export function filterDataByColumns<T extends Record<string, unknown>>(
         value =
           typeof column.accessor === 'function'
             ? column.accessor(row)
-            : row[column.accessor as keyof T]
+            : (row as any)[column.accessor as keyof T]
       } else {
-        value = row[(filter.field || column?.key) as keyof T]
+        value = (row as any)[(filter.field || column?.key) as keyof T]
       }
 
       return applyFilter(value, filter)
@@ -218,9 +218,9 @@ export function filterDataBySearch<T extends Record<string, unknown>>(
         value =
           typeof column.accessor === 'function'
             ? column.accessor(row)
-            : row[column.accessor as keyof T]
+            : (row as any)[column.accessor as keyof T]
       } else {
-        value = row[(column.key || column.id) as keyof T]
+        value = (row as any)[(column.key || column.id) as keyof T]
       }
 
       const stringValue = valueToString(value).toLowerCase()

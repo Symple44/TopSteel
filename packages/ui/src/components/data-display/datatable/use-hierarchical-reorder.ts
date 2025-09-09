@@ -110,7 +110,7 @@ function buildHierarchicalTree<T extends HierarchicalItem>(
   const childrenMap = new Map<string, T[]>()
 
   items.forEach((item) => {
-    const parentId = item[parentField as keyof T] as string
+    const parentId = (item as any)[parentField] as string
     if (!parentId || parentId === null) {
       rootItems.push(item)
     } else {
@@ -124,8 +124,8 @@ function buildHierarchicalTree<T extends HierarchicalItem>(
   // Trier les éléments par ordre d'affichage
   const sortByOrder = (items: T[]) => {
     return items.sort((a, b) => {
-      const orderA = (a[orderField as keyof T] as number) || 0
-      const orderB = (b[orderField as keyof T] as number) || 0
+      const orderA = ((a as any)[orderField] as number) || 0
+      const orderB = ((b as any)[orderField] as number) || 0
       return orderA - orderB
     })
   }
@@ -326,8 +326,8 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
       if (dropPosition === 'inside') {
         // Déplacer à l'intérieur du target (devenir enfant)
         if (config.reorderConfig.allowLevelChange) {
-          draggedItemData[parentField as keyof T] = targetId as unknown
-          draggedItemData[orderField as keyof T] = 1 as unknown // Premier enfant
+          (draggedItemData as any)[parentField] = targetId
+          (draggedItemData as any)[orderField] = 1 // Premier enfant
 
           // Auto-expand le parent si configuré
           if (config.reorderConfig.autoExpand) {
@@ -337,31 +337,31 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
       } else {
         // Déplacer au même niveau (above/below)
         if (targetItemData) {
-          const targetParentId = targetItemData[parentField as keyof T] as string
-          const targetOrder = (targetItemData[orderField as keyof T] as number) || 0
+          const targetParentId = (targetItemData as any)[parentField] as string
+          const targetOrder = ((targetItemData as any)[orderField] as number) || 0
 
-          draggedItemData[parentField as keyof T] = targetParentId as unknown
+          ;(draggedItemData as any)[parentField] = targetParentId
 
           // Calculer le nouvel ordre
           if (dropPosition === 'above') {
-            draggedItemData[orderField as keyof T] = Math.max(0, targetOrder - 1) as unknown
+            (draggedItemData as any)[orderField] = Math.max(0, targetOrder - 1)
           } else {
-            draggedItemData[orderField as keyof T] = (targetOrder + 1) as unknown
+            (draggedItemData as any)[orderField] = targetOrder + 1
           }
         }
       }
 
       // Décaler les ordres des autres éléments si nécessaire
-      const parentId = draggedItemData[parentField as keyof T] as string
-      const newOrder = draggedItemData[orderField as keyof T] as number
+      const parentId = (draggedItemData as any)[parentField] as string
+      const newOrder = (draggedItemData as any)[orderField] as number
 
       updatedData.forEach((item) => {
-        if (item.id !== draggedItem.id && item[parentField as keyof T] === parentId) {
-          const itemOrder = (item[orderField as keyof T] as number) || 0
+        if (item.id !== draggedItem.id && (item as any)[parentField] === parentId) {
+          const itemOrder = ((item as any)[orderField] as number) || 0
           if (dropPosition === 'below' && itemOrder > newOrder - 1) {
-            item[orderField as keyof T] = (itemOrder + 1) as unknown
+            (item as any)[orderField] = itemOrder + 1
           } else if (dropPosition === 'above' && itemOrder >= newOrder) {
-            item[orderField as keyof T] = (itemOrder + 1) as unknown
+            (item as any)[orderField] = itemOrder + 1
           }
         }
       })
