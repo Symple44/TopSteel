@@ -58,7 +58,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "set NODE_OPTIONS=--max-old-space-size=8192 && tsup",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "jest",
     "test:watch": "jest --watch",
