@@ -366,7 +366,7 @@ importers:
         version: 8.0.0(typescript@5.9.2)
       null-loader:
         specifier: ^4.0.1
-        version: 4.0.1(webpack@5.100.2(@swc/core@1.13.4(@swc/helpers@0.5.17)))
+        version: 4.0.1(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
@@ -953,7 +953,7 @@ importers:
         version: 7.1.4
       ts-loader:
         specifier: ^9.5.2
-        version: 9.5.4(typescript@5.9.2)(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17)))
+        version: 9.5.4(typescript@5.9.2)(webpack@5.100.2(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@types/node@24.3.0)(typescript@5.9.2)
@@ -1351,7 +1351,7 @@ importers:
         version: 1.55.0
       '@sentry/nextjs':
         specifier: ^10.5.0
-        version: 10.5.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(next@15.5.0(@babel/core@7.28.3)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17)))
+        version: 10.5.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(next@15.5.0(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       '@tailwindcss/postcss':
         specifier: ^4.1.11
         version: 4.1.12
@@ -1583,9 +1583,6 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
-      cross-env:
-        specifier: ^10.0.0
-        version: 10.0.0
       identity-obj-proxy:
         specifier: ^3.0.0
         version: 3.0.0
@@ -1862,7 +1859,7 @@ importers:
         version: 3.0.0
       jest-environment-jsdom:
         specifier: ^30.0.5
-        version: 30.1.2
+        version: 30.0.5
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
@@ -3839,8 +3836,8 @@ packages:
     resolution: {integrity: sha512-n5H8QLDJ47QqbCNn5SuFjCRDrOLEZ0h8vAHCK5RL9Ls7Xa8AQLa/YxAc9UjFqoEDM48muwtBGjtMY5cr0PLDCw==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
-  '@jest/environment-jsdom-abstract@30.1.2':
-    resolution: {integrity: sha512-u8kTh/ZBl97GOmnGJLYK/1GuwAruMC4hoP6xuk/kwltmVWsA9u/6fH1/CsPVGt2O+Wn2yEjs8n1B1zZJ62Cx0w==}
+  '@jest/environment-jsdom-abstract@30.0.5':
+    resolution: {integrity: sha512-gpWwiVxZunkoglP8DCnT3As9x5O8H6gveAOpvaJd2ATAoSh7ZSSCWbr9LQtUMvr8WD3VjG9YnDhsmkCK5WN1rQ==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
@@ -3855,10 +3852,6 @@ packages:
 
   '@jest/environment@30.0.5':
     resolution: {integrity: sha512-aRX7WoaWx1oaOkDQvCWImVQ8XNtdv5sEWgk4gxR6NXb7WBUnL5sRak4WRzIQRZ1VTWPvV4VI4mgGjNL9TeKMYA==}
-    engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
-
-  '@jest/environment@30.1.2':
-    resolution: {integrity: sha512-N8t1Ytw4/mr9uN28OnVf0SYE2dGhaIxOVYcwsf9IInBKjvofAjbFRvedvBBlyTYk2knbJTiEjEJ2PyyDIBnd9w==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
   '@jest/expect-utils@29.7.0':
@@ -3883,10 +3876,6 @@ packages:
 
   '@jest/fake-timers@30.0.5':
     resolution: {integrity: sha512-ZO5DHfNV+kgEAeP3gK3XlpJLL4U3Sz6ebl/n68Uwt64qFFs5bv4bfEEjyRGK5uM0C90ewooNgFuKMdkbEoMEXw==}
-    engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
-
-  '@jest/fake-timers@30.1.2':
-    resolution: {integrity: sha512-Beljfv9AYkr9K+ETX9tvV61rJTY706BhBUtiaepQHeEGfe0DbpvUA5Z3fomwc5Xkhns6NWrcFDZn+72fLieUnA==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
   '@jest/get-type@30.0.1':
@@ -10796,8 +10785,8 @@ packages:
     resolution: {integrity: sha512-dKjRsx1uZ96TVyejD3/aAWcNKy6ajMaN531CwWIsrazIqIoXI9TnnpPlkrEYku/8rkS3dh2rbH+kMOyiEIv0xQ==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
-  jest-environment-jsdom@30.1.2:
-    resolution: {integrity: sha512-LXsfAh5+mDTuXDONGl1ZLYxtJEaS06GOoxJb2arcJTjIfh1adYg8zLD8f6P0df8VmjvCaMrLmc1PgHUI/YUTbg==}
+  jest-environment-jsdom@30.0.5:
+    resolution: {integrity: sha512-BmnDEoAH+jEjkPrvE9DTKS2r3jYSJWlN/r46h0/DBUxKrkgt2jAZ5Nj4wXLAcV1KWkRpcFqA5zri9SWzJZ1cCg==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
@@ -10847,10 +10836,6 @@ packages:
 
   jest-message-util@30.0.5:
     resolution: {integrity: sha512-NAiDOhsK3V7RU0Aa/HnrQo+E4JlbarbmI3q6Pi4KcxicdtjV82gcIUrejOtczChtVQR4kddu1E1EJlW6EN9IyA==}
-    engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
-
-  jest-message-util@30.1.0:
-    resolution: {integrity: sha512-HizKDGG98cYkWmaLUHChq4iN+oCENohQLb7Z5guBPumYs+/etonmNFlg1Ps6yN9LTPyZn+M+b/9BbnHx3WTMDg==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
   jest-mock@29.7.0:
@@ -17241,10 +17226,10 @@ snapshots:
 
   '@jest/diff-sequences@30.0.1': {}
 
-  '@jest/environment-jsdom-abstract@30.1.2(jsdom@26.1.0)':
+  '@jest/environment-jsdom-abstract@30.0.5(jsdom@26.1.0)':
     dependencies:
-      '@jest/environment': 30.1.2
-      '@jest/fake-timers': 30.1.2
+      '@jest/environment': 30.0.5
+      '@jest/fake-timers': 30.0.5
       '@jest/types': 30.0.5
       '@types/jsdom': 21.1.7
       '@types/node': 24.3.0
@@ -17262,13 +17247,6 @@ snapshots:
   '@jest/environment@30.0.5':
     dependencies:
       '@jest/fake-timers': 30.0.5
-      '@jest/types': 30.0.5
-      '@types/node': 24.3.0
-      jest-mock: 30.0.5
-
-  '@jest/environment@30.1.2':
-    dependencies:
-      '@jest/fake-timers': 30.1.2
       '@jest/types': 30.0.5
       '@types/node': 24.3.0
       jest-mock: 30.0.5
@@ -17310,15 +17288,6 @@ snapshots:
       '@sinonjs/fake-timers': 13.0.5
       '@types/node': 24.3.0
       jest-message-util: 30.0.5
-      jest-mock: 30.0.5
-      jest-util: 30.0.5
-
-  '@jest/fake-timers@30.1.2':
-    dependencies:
-      '@jest/types': 30.0.5
-      '@sinonjs/fake-timers': 13.0.5
-      '@types/node': 24.3.0
-      jest-message-util: 30.1.0
       jest-mock: 30.0.5
       jest-util: 30.0.5
 
@@ -19534,7 +19503,7 @@ snapshots:
       '@sentry/utils': 7.114.0
       localforage: 1.10.0
 
-  '@sentry/nextjs@10.5.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(next@15.5.0(@babel/core@7.28.3)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17)))':
+  '@sentry/nextjs@10.5.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(next@15.5.0(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17)))':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.36.0
@@ -25798,10 +25767,10 @@ snapshots:
       jest-util: 30.0.5
       pretty-format: 30.0.5
 
-  jest-environment-jsdom@30.1.2:
+  jest-environment-jsdom@30.0.5:
     dependencies:
-      '@jest/environment': 30.1.2
-      '@jest/environment-jsdom-abstract': 30.1.2(jsdom@26.1.0)
+      '@jest/environment': 30.0.5
+      '@jest/environment-jsdom-abstract': 30.0.5(jsdom@26.1.0)
       '@types/jsdom': 21.1.7
       '@types/node': 24.3.0
       jsdom: 26.1.0
@@ -25899,18 +25868,6 @@ snapshots:
       stack-utils: 2.0.6
 
   jest-message-util@30.0.5:
-    dependencies:
-      '@babel/code-frame': 7.27.1
-      '@jest/types': 30.0.5
-      '@types/stack-utils': 2.0.3
-      chalk: 4.1.2
-      graceful-fs: 4.2.11
-      micromatch: 4.0.8
-      pretty-format: 30.0.5
-      slash: 3.0.0
-      stack-utils: 2.0.6
-
-  jest-message-util@30.1.0:
     dependencies:
       '@babel/code-frame': 7.27.1
       '@jest/types': 30.0.5
@@ -27068,12 +27025,6 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
-
-  null-loader@4.0.1(webpack@5.100.2(@swc/core@1.13.4(@swc/helpers@0.5.17))):
-    dependencies:
-      loader-utils: 2.0.4
-      schema-utils: 3.3.0
-      webpack: 5.100.2(@swc/core@1.13.4(@swc/helpers@0.5.17))
 
   null-loader@4.0.1(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))):
     dependencies:
@@ -29302,6 +29253,16 @@ snapshots:
       '@jest/types': 30.0.5
       babel-jest: 30.0.5(@babel/core@7.28.3)
       jest-util: 30.0.5
+
+  ts-loader@9.5.4(typescript@5.9.2)(webpack@5.100.2(@swc/core@1.13.4(@swc/helpers@0.5.17))):
+    dependencies:
+      chalk: 4.1.2
+      enhanced-resolve: 5.18.3
+      micromatch: 4.0.8
+      semver: 7.7.2
+      source-map: 0.7.6
+      typescript: 5.9.2
+      webpack: 5.100.2(@swc/core@1.13.4(@swc/helpers@0.5.17))
 
   ts-loader@9.5.4(typescript@5.9.2)(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))):
     dependencies:
