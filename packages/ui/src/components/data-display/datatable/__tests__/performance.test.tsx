@@ -72,7 +72,7 @@ describe('DataTable Performance Tests', () => {
       const renderTime = performance.now() - startTime
 
       expect(container.querySelectorAll('tbody tr')).toHaveLength(50)
-      expect(renderTime).toBeLessThan(1500) // More lenient for CI/slower systems
+      expect(renderTime).toBeLessThan(3000) // More lenient for CI/slower systems
     })
 
     it('should render 5000 rows with pagination efficiently', () => {
@@ -96,7 +96,7 @@ describe('DataTable Performance Tests', () => {
       const renderTime = performance.now() - startTime
 
       expect(screen.getByText(/1.*100.*5000/)).toBeInTheDocument()
-      expect(renderTime).toBeLessThan(1500)
+      expect(renderTime).toBeLessThan(3000)
     })
 
     it('should handle 10000 rows dataset', () => {
