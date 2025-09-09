@@ -18,7 +18,7 @@ export default defineConfig({
       composite: false,
       incremental: false,
     },
-  }
+  },
   clean: true,
   sourcemap: process.env.NODE_ENV !== 'production',
   minify: process.env.NODE_ENV === 'production',
