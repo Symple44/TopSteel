@@ -94,7 +94,6 @@ export function CustomSelect({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className="w-full justify-between text-left font-normal"
-        type="button"
       >
         <span className="truncate">
           {selectedOption ? selectedOption.label : defaultPlaceholder}

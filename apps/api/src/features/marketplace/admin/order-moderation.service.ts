@@ -215,7 +215,7 @@ export class OrderModerationService {
         case 'FLAG':
           result = await this.flagOrder(
             order,
-            action.flagType ?? 'GENERAL',
+            (action.flagType as OrderFlagType) ?? 'CUSTOM',
             action.reason ?? '',
             moderatorId
           )
@@ -545,14 +545,14 @@ export class OrderModerationService {
    */
   private async flagOrder(
     order: MarketplaceOrder,
-    flagType: string,
+    flagType: OrderFlagType,
     reason: string,
     moderatorId: string
   ) {
     const flags = this.parseOrderFlags(order.flags)
 
     flags.push({
-      type: flagType as OrderFlagType,
+      type: flagType,
       severity: 'MEDIUM' as const,
       message: reason,
       createdAt: new Date(),

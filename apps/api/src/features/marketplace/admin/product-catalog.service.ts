@@ -134,18 +134,19 @@ export class ProductCatalogService {
       }
 
       // Create Article ERP with marketplace settings
-      const article = this.articleRepository.create({
+      const articleData = {
         ...productData,
-        type: 'PRODUIT_FINI', // Type par défaut pour marketplace
-        status: 'ACTIF',
-        uniteStock: 'PCS', // Unité par défaut
+        type: 'PRODUIT_FINI' as const, // Type par défaut pour marketplace
+        status: 'ACTIF' as const,
+        uniteStock: 'PCS' as const, // Unité par défaut
         gereEnStock: true,
         isMarketplaceEnabled: true,
         stockPhysique: productData.stockPhysique || 0,
         stockDisponible: productData.stockPhysique || 0,
-      } as any)
+      }
+      const article = this.articleRepository.create(articleData as any)
 
-      const savedArticle = (await this.articleRepository.save(article)) as unknown as Article
+      const savedArticle = await this.articleRepository.save(article) as unknown as Article
 
       // Clear cache
       await this.clearProductCache(tenantId)

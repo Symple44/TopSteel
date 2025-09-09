@@ -230,7 +230,6 @@ export function DeadlinePicker({
                 <Button
                   type="button"
                   key={level}
-                  type="button"
                   variant={isSelected ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleDeadlineChange('urgency', level)}

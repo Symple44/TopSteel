@@ -316,7 +316,6 @@ export function DateRangeFilter({
                   <Button
                     type="button"
                     key={preset.value}
-                    type="button"
                     variant={selectedPreset === preset.value ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handlePresetSelect(preset.value)}

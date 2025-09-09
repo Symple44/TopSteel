@@ -392,7 +392,6 @@ export function SkillsTagInput({
                             <Button
                               type="button"
                               key={level.value}
-                              type="button"
                               variant={skill.proficiency === level.value ? 'default' : 'outline'}
                               size="sm"
                               className="text-xs"

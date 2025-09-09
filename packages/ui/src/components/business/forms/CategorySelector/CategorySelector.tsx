@@ -263,7 +263,6 @@ export function CategorySelector({
         <Button
           type="button"
           id={selectorId}
-          type="button"
           variant="outline"
           className={cn(
             'w-full justify-between',

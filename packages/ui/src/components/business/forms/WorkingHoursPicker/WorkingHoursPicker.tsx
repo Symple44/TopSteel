@@ -294,7 +294,6 @@ export function WorkingHoursPicker({
               <Button
                 type="button"
                 key={shift}
-                type="button"
                 variant={isSelected ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleShiftChange(shift)}
