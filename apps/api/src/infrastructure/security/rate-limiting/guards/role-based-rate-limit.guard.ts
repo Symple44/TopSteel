@@ -93,8 +93,6 @@ export class RoleBasedRateLimitGuard implements CanActivate {
     },
   }
 
-  private config: RateLimitingConfiguration
-
   constructor(
     private readonly reflector: Reflector,
     private readonly rateLimitService: AdvancedRateLimitingService,

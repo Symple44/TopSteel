@@ -200,7 +200,7 @@ export interface ColumnFilterConfig {
   operators?: FilterOperator[]
   defaultOperator?: FilterOperator
   defaultValue?: FilterValue
-  options?: Array<{ label: string; value: any }>
+  options?: Array<{ label: string; value: string | number | boolean }>
   placeholder?: string
   validation?: (value: FilterValue) => string | null
   customComponent?: React.ComponentType<unknown>
