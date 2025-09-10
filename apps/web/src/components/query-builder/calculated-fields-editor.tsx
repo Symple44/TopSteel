@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { Calculator, Edit2, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 

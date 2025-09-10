@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { Menu, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'

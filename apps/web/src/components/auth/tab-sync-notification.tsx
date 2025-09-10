@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@erp/ui/primitives'
+import { Button } from '@erp/ui'
 import { AlertCircle, Building, LogOut, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'

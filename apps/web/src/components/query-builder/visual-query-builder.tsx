@@ -14,7 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
-import { Button, Input } from '@erp/ui/primitives'
+import { Button, Input } from '@erp/ui'
 import {
   Code,
   Columns,

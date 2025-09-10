@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, ScrollArea } from '@erp/ui'
-import { Checkbox, Input } from '@erp/ui/primitives'
+import { Checkbox, Input } from '@erp/ui'
 import {
   ArrowUpDown,
   Calendar,

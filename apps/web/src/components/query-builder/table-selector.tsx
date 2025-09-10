@@ -12,7 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { AlertTriangle, Database, Link, Plus, Search, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'

@@ -10,7 +10,7 @@ import {
   SelectValue,
   Switch,
   Textarea,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { Database, FileSpreadsheet, Settings2, Shield } from 'lucide-react'
 
 interface QuerySettingsProps {

@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { Download, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 

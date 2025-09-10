@@ -211,7 +211,6 @@ const nextConfig: NextConfig = {
       ...config.resolve,
       alias: {
         ...config.resolve.alias,
-        '@erp/ui/primitives': path.resolve(__dirname, '../../packages/ui/dist/primitives'),
         '@erp/ui/data-display': path.resolve(__dirname, '../../packages/ui/dist/data-display'),
         '@erp/ui/layout': path.resolve(__dirname, '../../packages/ui/dist/layout'),
         '@erp/ui/navigation': path.resolve(__dirname, '../../packages/ui/dist/navigation'),

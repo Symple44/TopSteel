@@ -1,6 +1,6 @@
 'use client'
 
-import { CodeViewerDialog } from '@erp/ui/primitives'
+import { CodeViewerDialog } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 interface CodeViewerDialogWrapperProps {

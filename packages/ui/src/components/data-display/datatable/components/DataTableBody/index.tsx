@@ -30,7 +30,7 @@ export interface DataTableBodyProps<T = Record<string, unknown>> {
 /**
  * Corps du DataTable avec rendu des lignes et cellules
  */
-export function DataTableBody<T>({
+export function DataTableBody<T extends Record<string, unknown>>({
   onRowClick,
   onRowDoubleClick,
   onCellEdit,

@@ -32,7 +32,7 @@ export interface UseDataSelectionReturn<T> {
 /**
  * Hook pour gérer la sélection des lignes dans une DataTable
  */
-export function useDataSelection<T>({
+export function useDataSelection<T extends Record<string, unknown>>({
   data,
   keyField,
   selectable = true,

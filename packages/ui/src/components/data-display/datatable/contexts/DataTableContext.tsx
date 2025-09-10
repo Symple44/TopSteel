@@ -14,7 +14,7 @@ export interface DataTableContextValue<T>
 }
 
 // Créer le contexte avec une valeur par défaut undefined
-const DataTableContext = createContext<DataTableContextValue | undefined>(undefined)
+const DataTableContext = createContext<DataTableContextValue<any> | undefined>(undefined)
 
 /**
  * Provider pour le contexte DataTable
@@ -31,7 +31,7 @@ export function DataTableProvider<T>({
   value,
 }: DataTableProviderProps<T>) {
   return (
-    <DataTableContext.Provider value={value as DataTableContextValue}>
+    <DataTableContext.Provider value={value}>
       {children}
     </DataTableContext.Provider>
   )

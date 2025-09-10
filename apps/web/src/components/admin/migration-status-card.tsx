@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Progress } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
+import { Button } from '@erp/ui'
 import {
   AlertCircle,
   CheckCircle2,

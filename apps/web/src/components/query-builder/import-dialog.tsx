@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Textarea,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { AlertCircle, FileJson, Upload } from 'lucide-react'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
