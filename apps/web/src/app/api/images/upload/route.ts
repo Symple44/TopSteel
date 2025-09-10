@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       category as 'avatar' | 'logo' | 'document',
       session?.user?.id,
       {
-        entityType: entityType as string,
+        entityType: entityType as 'user' | 'company' | 'project' | undefined,
         entityId,
         alt,
         description,
