@@ -4,8 +4,8 @@
  * Élimine les doublons et standardise les variables
  */
 
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 // Configuration des mappings de variables
 const VARIABLE_MAPPINGS = {
@@ -123,15 +123,11 @@ class EnvHarmonizer {
       'apps/marketplace-api/.env.local',
     ]
 
-    console.log('📊 Analyse des fichiers .env...\n')
-
     envFiles.forEach((file) => {
       const filePath = path.join(process.cwd(), file)
       if (fs.existsSync(filePath)) {
         const variables = this.parseEnvFile(filePath)
-        const count = Object.keys(variables).length
-
-        console.log(`✅ ${file}: ${count} variables`)
+        const _count = Object.keys(variables).length
 
         // Stocker les variables avec leur source
         Object.entries(variables).forEach(([key, value]) => {
@@ -146,7 +142,6 @@ class EnvHarmonizer {
           }
         })
       } else {
-        console.log(`⚠️  ${file}: Non trouvé`)
       }
     })
   }
@@ -180,8 +175,6 @@ class EnvHarmonizer {
    * Trouve les doublons et conflits
    */
   findConflicts() {
-    console.log('\n🔍 Analyse des conflits...\n')
-
     this.allVariables.forEach((sources, key) => {
       if (sources.length > 1) {
         const uniqueValues = [...new Set(sources.map((s) => s.value))]
@@ -205,26 +198,19 @@ class EnvHarmonizer {
 
     // Afficher les conflits
     if (this.conflicts.length > 0) {
-      console.log('❌ Conflits détectés (même variable, valeurs différentes):')
       this.conflicts.forEach((conflict) => {
-        console.log(`\n  ${conflict.variable}:`)
         conflict.sources.forEach((source) => {
-          const displayValue = this.isSensitive(conflict.variable, source.value)
+          const _displayValue = this.isSensitive(conflict.variable, source.value)
             ? '***REDACTED***'
             : source.value.substring(0, 50) + (source.value.length > 50 ? '...' : '')
-          console.log(`    ${source.file}: ${displayValue}`)
         })
       })
     }
 
     // Afficher les doublons
     if (this.duplicates.length > 0) {
-      console.log('\n⚠️  Doublons détectés (même variable, même valeur):')
-      this.duplicates.slice(0, 10).forEach((dup) => {
-        console.log(`  ${dup.variable}: présent dans ${dup.files.length} fichiers`)
-      })
+      this.duplicates.slice(0, 10).forEach((_dup) => {})
       if (this.duplicates.length > 10) {
-        console.log(`  ... et ${this.duplicates.length - 10} autres doublons`)
       }
     }
   }
@@ -233,8 +219,6 @@ class EnvHarmonizer {
    * Génère le fichier .env.defaults harmonisé
    */
   generateDefaults() {
-    console.log('\n✨ Génération de .env.defaults...\n')
-
     const defaults = new Map()
     const categories = {
       ENVIRONMENT: [],
@@ -307,7 +291,6 @@ class EnvHarmonizer {
     })
 
     fs.writeFileSync('.env.defaults', content)
-    console.log('✅ .env.defaults créé avec succès')
   }
 
   /**
@@ -315,7 +298,6 @@ class EnvHarmonizer {
    */
   reportSensitiveVariables() {
     if (this.sensitive.length > 0) {
-      console.log('\n🔐 Variables sensibles détectées (à migrer vers .env.local):')
       const uniqueSensitive = new Map()
       this.sensitive.forEach((s) => {
         if (!uniqueSensitive.has(s.key)) {
@@ -324,11 +306,7 @@ class EnvHarmonizer {
         uniqueSensitive.get(s.key).push(s.file)
       })
 
-      uniqueSensitive.forEach((files, key) => {
-        console.log(`  ${key}: ${files.join(', ')}`)
-      })
-
-      console.log('\n⚠️  Ces variables ne doivent JAMAIS être committées!')
+      uniqueSensitive.forEach((_files, _key) => {})
     }
   }
 
@@ -345,35 +323,17 @@ class EnvHarmonizer {
     }
 
     fs.writeFileSync('env-harmonization-report.json', JSON.stringify(report, null, 2))
-
-    console.log("\n📊 Rapport d'harmonisation:")
-    console.log(`  Variables totales: ${report.totalVariables}`)
-    console.log(`  Doublons: ${report.duplicates}`)
-    console.log(`  Conflits: ${report.conflicts}`)
-    console.log(`  Variables sensibles: ${report.sensitive}`)
-    console.log('\n✅ Rapport sauvegardé dans env-harmonization-report.json')
   }
 
   /**
    * Exécute l'harmonisation complète
    */
   run() {
-    console.log("🔄 Début de l'harmonisation des fichiers .env\n")
-    console.log('='.repeat(60))
-
     this.analyzeAllEnvFiles()
     this.findConflicts()
     this.reportSensitiveVariables()
     this.generateDefaults()
     this.generateReport()
-
-    console.log('\n' + '='.repeat(60))
-    console.log('✨ Harmonisation terminée!')
-    console.log('\n📋 Prochaines étapes:')
-    console.log('  1. Vérifier .env.defaults')
-    console.log('  2. Migrer les variables sensibles vers .env.local')
-    console.log('  3. Supprimer les fichiers .env redondants')
-    console.log('  4. Mettre à jour les applications pour utiliser les nouveaux noms')
   }
 }
 

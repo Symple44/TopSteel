@@ -22,12 +22,6 @@ import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/com
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
 import type { MFAService } from '../../../domains/auth/services/mfa.service'
-import type {
-  MFAMethod,
-  WebAuthnAuthenticationResponse,
-  WebAuthnRegistrationResponse,
-} from '../../../types/auth/webauthn.types'
-import type { UserData } from '../../../types/entities/user.types'
 
 @Controller('admin/mfa')
 @ApiTags('🔧 Admin - Multi-Factor Authentication')

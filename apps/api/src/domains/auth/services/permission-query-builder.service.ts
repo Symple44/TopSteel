@@ -9,7 +9,6 @@ import {
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type {
   PermissionData,
-  RolePermission as RolePermissionType,
   UserSocieteRole as UserSocieteRoleType,
 } from '../../../types/entities/user.types'
 import { User } from '../../users/entities/user.entity'
@@ -17,7 +16,7 @@ import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
-import type { IPermission, IRolePermission } from '../types/entities.types'
+import type { IRolePermission } from '../types/entities.types'
 
 /**
  * Permission query operators

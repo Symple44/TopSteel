@@ -16,7 +16,7 @@ import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
 import type { RateLimitingConfiguration } from '../rate-limiting.config'
-import type { RateLimitConfig, RateLimitResult, UserContext } from '../types/rate-limiting.types'
+import type { RateLimitConfig, UserContext } from '../types/rate-limiting.types'
 
 interface RequestWithUser extends Request {
   user?: {

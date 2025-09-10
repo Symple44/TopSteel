@@ -1,6 +1,5 @@
 'use client'
 
-import { Label, useFormFieldIds } from '@erp/ui'
 import {
   Button,
   Dialog,
@@ -8,7 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Label,
   Textarea,
+  useFormFieldIds,
 } from '@erp/ui'
 import { AlertCircle, FileJson, Upload } from 'lucide-react'
 import { useState } from 'react'

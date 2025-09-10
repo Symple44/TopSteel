@@ -6,8 +6,7 @@ import type { DataTableState, UseDataTableStateReturn } from '../hooks/useDataTa
 /**
  * Contexte pour partager l'état du DataTable entre les composants
  */
-export interface DataTableContextValue<T>
-  extends UseDataTableStateReturn<T> {
+export interface DataTableContextValue<T> extends UseDataTableStateReturn<T> {
   // État additionnel si nécessaire
   tableId?: string
   userId?: string
@@ -19,31 +18,20 @@ const DataTableContext = createContext<DataTableContextValue<any> | undefined>(u
 /**
  * Provider pour le contexte DataTable
  */
-export interface DataTableProviderProps<
-  T = unknown,
-> {
+export interface DataTableProviderProps<T = unknown> {
   children: ReactNode
   value: DataTableContextValue<T>
 }
 
-export function DataTableProvider<T>({
-  children,
-  value,
-}: DataTableProviderProps<T>) {
-  return (
-    <DataTableContext.Provider value={value}>
-      {children}
-    </DataTableContext.Provider>
-  )
+export function DataTableProvider<T>({ children, value }: DataTableProviderProps<T>) {
+  return <DataTableContext.Provider value={value}>{children}</DataTableContext.Provider>
 }
 
 /**
  * Hook pour utiliser le contexte DataTable
  * @throws {Error} Si utilisé en dehors du DataTableProvider
  */
-export function useDataTableContext<
-  T = unknown,
->(): DataTableContextValue<T> {
+export function useDataTableContext<T = unknown>(): DataTableContextValue<T> {
   const context = useContext(DataTableContext)
 
   if (!context) {
@@ -56,9 +44,7 @@ export function useDataTableContext<
 /**
  * Hook pour accéder uniquement à l'état du DataTable
  */
-export function useDataTableState<
-  T = unknown,
->(): DataTableState<T> {
+export function useDataTableState<T = unknown>(): DataTableState<T> {
   const context = useDataTableContext<T>()
   return context.state
 }
@@ -99,9 +85,7 @@ export function useDataTableSort<T>() {
 /**
  * Hook pour accéder aux actions de sélection
  */
-export function useDataTableSelection<
-  T = unknown,
->() {
+export function useDataTableSelection<T = unknown>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -117,9 +101,7 @@ export function useDataTableSelection<
 /**
  * Hook pour accéder aux actions de pagination
  */
-export function useDataTablePagination<
-  T = unknown,
->() {
+export function useDataTablePagination<T = unknown>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -177,9 +159,7 @@ export function useDataTableData<T>() {
 /**
  * Hook pour accéder aux paramètres
  */
-export function useDataTableSettings<
-  T = unknown,
->() {
+export function useDataTableSettings<T = unknown>() {
   const context = useDataTableContext<T>()
 
   return {

@@ -1,4 +1,4 @@
-import { Entity, OneToMany, OneToOne } from 'typeorm'
+import { Entity, OneToMany } from 'typeorm'
 import type { Site } from './site.entity'
 
 // import type { SocieteLicense } from '../../licensing/entities/societe-license.entity'

@@ -6,7 +6,6 @@ import sharp from 'sharp'
 import type {
   CloudflareConfig,
   CloudflareImageUploadResponse,
-  CloudflareZone,
 } from '../../../types/marketplace/marketplace.types'
 
 export interface ImageTransformOptions {

@@ -2,10 +2,12 @@
 
 import {
   Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  Input,
   Label,
   ScrollArea,
   Separator,
@@ -14,7 +16,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
-import { Button, Input } from '@erp/ui'
 import {
   Code,
   Columns,

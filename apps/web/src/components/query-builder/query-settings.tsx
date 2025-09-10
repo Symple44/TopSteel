@@ -1,8 +1,13 @@
 'use client'
 
-import { Badge, Card, CardContent, CardHeader, CardTitle, Label } from '@erp/ui'
 import {
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,

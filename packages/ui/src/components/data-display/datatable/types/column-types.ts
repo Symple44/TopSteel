@@ -161,8 +161,7 @@ export interface ColumnFormula {
 /**
  * Configuration complète d'une colonne avec type générique
  */
-export interface ColumnConfig<T>
-  extends BaseColumnConfig {
+export interface ColumnConfig<T> extends BaseColumnConfig {
   /** Configuration de validation */
   validation?: ColumnValidation
 
@@ -198,8 +197,7 @@ export interface ColumnConfig<T>
 /**
  * Configuration pour une colonne de texte
  */
-export interface TextColumnConfig<T>
-  extends ColumnConfig<T> {
+export interface TextColumnConfig<T> extends ColumnConfig<T> {
   type: 'text'
   validation?: ColumnValidation & {
     pattern?: RegExp
@@ -211,8 +209,7 @@ export interface TextColumnConfig<T>
 /**
  * Configuration pour une colonne numérique
  */
-export interface NumberColumnConfig<T>
-  extends ColumnConfig<T> {
+export interface NumberColumnConfig<T> extends ColumnConfig<T> {
   type: 'number'
   validation?: ColumnValidation & {
     min?: number
@@ -228,8 +225,7 @@ export interface NumberColumnConfig<T>
 /**
  * Configuration pour une colonne booléenne
  */
-export interface BooleanColumnConfig<T>
-  extends ColumnConfig<T> {
+export interface BooleanColumnConfig<T> extends ColumnConfig<T> {
   type: 'boolean'
   format?: ColumnFormat & {
     trueLabel?: string
@@ -242,8 +238,7 @@ export interface BooleanColumnConfig<T>
 /**
  * Configuration pour une colonne de date
  */
-export interface DateColumnConfig<T>
-  extends ColumnConfig<T> {
+export interface DateColumnConfig<T> extends ColumnConfig<T> {
   type: 'date' | 'datetime'
   format?: ColumnFormat & {
     dateFormat?: string
@@ -259,8 +254,7 @@ export interface DateColumnConfig<T>
 /**
  * Configuration pour une colonne de sélection
  */
-export interface SelectColumnConfig<T>
-  extends ColumnConfig<T> {
+export interface SelectColumnConfig<T> extends ColumnConfig<T> {
   type: 'select' | 'multiselect'
   options: SelectOption[]
   validation?: ColumnValidation & {
@@ -272,8 +266,7 @@ export interface SelectColumnConfig<T>
 /**
  * Configuration pour une colonne avec formule
  */
-export interface FormulaColumnConfig<T>
-  extends ColumnConfig<T> {
+export interface FormulaColumnConfig<T> extends ColumnConfig<T> {
   type: 'formula'
   formula: ColumnFormula
   editable: false // Les colonnes calculées ne sont pas éditables
@@ -282,8 +275,7 @@ export interface FormulaColumnConfig<T>
 /**
  * Configuration pour une colonne personnalisée
  */
-export interface CustomColumnConfig<T>
-  extends ColumnConfig<T> {
+export interface CustomColumnConfig<T> extends ColumnConfig<T> {
   type: 'custom'
   render: (value: unknown, row: T, column: ColumnConfig<T>) => ReactNode
 }
@@ -295,63 +287,49 @@ export interface CustomColumnConfig<T>
 /**
  * Vérifie si une colonne est de type texte
  */
-export function isTextColumn<T>(
-  column: ColumnConfig<T>
-): column is TextColumnConfig<T> {
+export function isTextColumn<T>(column: ColumnConfig<T>): column is TextColumnConfig<T> {
   return column.type === 'text'
 }
 
 /**
  * Vérifie si une colonne est de type numérique
  */
-export function isNumberColumn<T>(
-  column: ColumnConfig<T>
-): column is NumberColumnConfig<T> {
+export function isNumberColumn<T>(column: ColumnConfig<T>): column is NumberColumnConfig<T> {
   return column.type === 'number'
 }
 
 /**
  * Vérifie si une colonne est de type booléen
  */
-export function isBooleanColumn<T>(
-  column: ColumnConfig<T>
-): column is BooleanColumnConfig<T> {
+export function isBooleanColumn<T>(column: ColumnConfig<T>): column is BooleanColumnConfig<T> {
   return column.type === 'boolean'
 }
 
 /**
  * Vérifie si une colonne est de type date
  */
-export function isDateColumn<T>(
-  column: ColumnConfig<T>
-): column is DateColumnConfig<T> {
+export function isDateColumn<T>(column: ColumnConfig<T>): column is DateColumnConfig<T> {
   return column.type === 'date' || column.type === 'datetime'
 }
 
 /**
  * Vérifie si une colonne est de type sélection
  */
-export function isSelectColumn<T>(
-  column: ColumnConfig<T>
-): column is SelectColumnConfig<T> {
+export function isSelectColumn<T>(column: ColumnConfig<T>): column is SelectColumnConfig<T> {
   return column.type === 'select' || column.type === 'multiselect'
 }
 
 /**
  * Vérifie si une colonne est de type formule
  */
-export function isFormulaColumn<T>(
-  column: ColumnConfig<T>
-): column is FormulaColumnConfig<T> {
+export function isFormulaColumn<T>(column: ColumnConfig<T>): column is FormulaColumnConfig<T> {
   return column.type === 'formula'
 }
 
 /**
  * Vérifie si une colonne est de type personnalisé
  */
-export function isCustomColumn<T>(
-  column: ColumnConfig<T>
-): column is CustomColumnConfig<T> {
+export function isCustomColumn<T>(column: ColumnConfig<T>): column is CustomColumnConfig<T> {
   return column.type === 'custom'
 }
 

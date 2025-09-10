@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 function fixAllErrors() {
-  console.log('🔧 Fixing all TypeScript errors in strict mode...\n')
-
   // 1. Import BusinessOperation type in partner.controller.ts
   fixFile('../apps/api/src/domains/partners/controllers/partner.controller.ts', [
     {
@@ -201,7 +199,6 @@ function fixAllErrors() {
       )
 
       fs.writeFileSync(filePath, content)
-      console.log(`✓ Fixed TypeORM updates in ${path.basename(file)}`)
     }
   })
 
@@ -292,15 +289,12 @@ function fixAllErrors() {
       },
     ])
   })
-
-  console.log('\n✅ All TypeScript errors should be fixed!')
 }
 
 function fixFile(filePath, replacements) {
   const fullPath = path.join(__dirname, filePath)
 
   if (!fs.existsSync(fullPath)) {
-    console.log(`⚠ File not found: ${filePath}`)
     return
   }
 
@@ -317,7 +311,6 @@ function fixFile(filePath, replacements) {
 
   if (modified) {
     fs.writeFileSync(fullPath, content)
-    console.log(`✓ Fixed ${path.basename(filePath)}`)
   }
 }
 

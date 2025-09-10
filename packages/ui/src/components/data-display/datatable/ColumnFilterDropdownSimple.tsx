@@ -5,9 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '../../primitives/button'
 
-interface ColumnFilterDropdownSimpleProps<
-  T = Record<string, unknown>,
-> {
+interface ColumnFilterDropdownSimpleProps<T = Record<string, unknown>> {
   column: {
     id: string
     title: string
@@ -20,9 +18,7 @@ interface ColumnFilterDropdownSimpleProps<
   onAdvancedFilter: () => void
 }
 
-export function ColumnFilterDropdownSimple<
-  T = Record<string, unknown>,
->({
+export function ColumnFilterDropdownSimple<T = Record<string, unknown>>({
   column,
   data,
   currentSort,

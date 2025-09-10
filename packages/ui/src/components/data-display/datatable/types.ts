@@ -240,8 +240,7 @@ export interface DataTableConfig<T = DataRecord> {
 }
 
 // Props du composant DataTable (alias de DataTableConfig)
-export interface DataTableProps<T = DataRecord>
-  extends DataTableConfig<T> {}
+export interface DataTableProps<T = DataRecord> extends DataTableConfig<T> {}
 
 // Context pour les formules
 export interface FormulaContext<T = DataRecord> {

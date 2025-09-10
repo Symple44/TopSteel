@@ -27,8 +27,6 @@ import type { RoleFormattingService } from '../../../domains/auth/services/role-
 import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import type { UsersService } from '../../../domains/users/users.service'
 import type { SocietesService } from '../../../features/societes/services/societes.service'
-import type { SiteData, SocieteData, SocieteFiltered } from '../../../types/entities/societe.types'
-import type { UserData, UserSocieteRole } from '../../../types/entities/user.types'
 
 interface SocieteQueryDto {
   page?: number

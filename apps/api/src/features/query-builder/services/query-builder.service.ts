@@ -4,7 +4,6 @@ import type { DeepPartial, Repository } from 'typeorm'
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
 import {
-  type JoinType,
   QueryBuilder,
   QueryBuilderCalculatedField,
   QueryBuilderColumn,

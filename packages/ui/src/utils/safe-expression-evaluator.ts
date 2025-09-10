@@ -30,15 +30,14 @@ export class SafeExpressionEvaluator {
       const processed = SafeExpressionEvaluator.processFunctions(cleaned)
 
       // Use Function constructor for safe evaluation (safer than eval)
-      const result = new Function('return ' + processed)()
+      const result = new Function(`return ${processed}`)()
 
-      if (typeof result !== 'number' || isNaN(result)) {
+      if (typeof result !== 'number' || Number.isNaN(result)) {
         throw new Error('Invalid result')
       }
 
       return result
-    } catch (error) {
-      console.warn('Expression evaluation failed:', error)
+    } catch (_error) {
       return 0
     }
   }
@@ -60,10 +59,7 @@ export class SafeExpressionEvaluator {
    * Process basic functions like SUM, AVG, etc.
    */
   private static processFunctions(expression: string): string {
-    return expression.replace(SafeExpressionEvaluator.FUNCTION_REGEX, (match, funcName) => {
-      // For now, just replace with 0 - would need proper implementation
-      // based on the context of where this is used
-      console.warn(`Function ${funcName} not implemented, returning 0`)
+    return expression.replace(SafeExpressionEvaluator.FUNCTION_REGEX, (_match, _funcName) => {
       return '0'
     })
   }

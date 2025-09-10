@@ -3,11 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import type {
-  MFAMethod,
-  MFAVerificationRequest,
-  WebAuthnAuthenticationResponse,
-} from '../../../types/auth/webauthn.types'
+import type { MFAMethod, WebAuthnAuthenticationResponse } from '../../../types/auth/webauthn.types'
 import { User } from '../../users/entities/user.entity'
 import { GlobalUserRole } from '../core/constants/roles.constants'
 import { MFASession } from '../core/entities/mfa-session.entity'

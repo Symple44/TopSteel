@@ -14,7 +14,6 @@ import { NotificationRule, RuleStatus, RuleType } from '../entities/notification
 import type {
   ActionExecutionResult,
   NotificationActionResult,
-  NotificationConfig,
 } from '../types/notification-execution.types'
 import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
 import type { NotificationActionExecutor } from './notification-action-executor.service'

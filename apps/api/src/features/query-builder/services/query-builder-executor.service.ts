@@ -2,16 +2,8 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import * as mathjs from 'mathjs'
 import type { DataSource } from 'typeorm'
-import type {
-  QueryBuilderColumn,
-  QueryBuilderCondition,
-  QueryBuilderData,
-  QueryBuilderJoin,
-  QueryExecutionContext,
-  QueryOperator,
-  QueryExecutionResult as TypedQueryExecutionResult,
-} from '../../../types/query-builder/query-builder.types'
-import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
+import type { QueryOperator } from '../../../types/query-builder/query-builder.types'
+import type { QueryBuilder } from '../entities'
 import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
 import type { SqlSanitizationService } from '../security/sql-sanitization.service'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'

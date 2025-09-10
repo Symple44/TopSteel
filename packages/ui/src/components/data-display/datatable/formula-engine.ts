@@ -313,7 +313,6 @@ export class FormulaEngine<T = Record<string, unknown>> {
       if (result.success) {
         return result.value
       } else {
-        console.warn('Formula evaluation failed:', result.error)
         return '#ERROR'
       }
     } catch (_error) {

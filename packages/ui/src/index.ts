@@ -31,8 +31,8 @@ export {
   DataTable as AdvancedDataTable,
   DataTableExample,
   HierarchicalDataTableExample,
-  SimpleDataTableExample,
   type SelectionState,
+  SimpleDataTableExample,
   usePersistedTableSettings,
 } from './components/data-display/datatable'
 // Export ReorderableListConfig and related types

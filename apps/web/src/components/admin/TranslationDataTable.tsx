@@ -170,32 +170,38 @@ export const TranslationDataTable = memo(function TranslationDataTable({
     ]
 
     // Ajouter une colonne par langue supportée
-    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES?.map((lang): ColumnConfig<TranslationEntry> => ({
-      id: `translation_${lang.code}`,
-      key: 'id', // Utiliser une propriété existante comme fallback, on s'appuie sur getValue
-      title: `${lang.flag} ${lang.nativeName}`,
-      description: `Traduction en ${lang.nativeName}`,
-      type: 'richtext', // Utiliser le rich text pour les traductions
-      width: 300,
-      sortable: true,
-      editable: true,
+    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES?.map(
+      (lang): ColumnConfig<TranslationEntry> => ({
+        id: `translation_${lang.code}`,
+        key: 'id', // Utiliser une propriété existante comme fallback, on s'appuie sur getValue
+        title: `${lang.flag} ${lang.nativeName}`,
+        description: `Traduction en ${lang.nativeName}`,
+        type: 'richtext', // Utiliser le rich text pour les traductions
+        width: 300,
+        sortable: true,
+        editable: true,
 
-      render: (_value: unknown, row: TranslationEntry, _column: ColumnConfig<TranslationEntry>) => {
-        const translation = row.translations[lang.code] || ''
-        return <TranslationCell translation={translation} />
-      },
-      validation: {
-        custom: (value: unknown) => {
-          if (typeof value === 'string' && value.length > 1000) {
-            return 'La traduction ne peut pas dépasser 1000 caractères'
-          }
-          return null
+        render: (
+          _value: unknown,
+          row: TranslationEntry,
+          _column: ColumnConfig<TranslationEntry>
+        ) => {
+          const translation = row.translations[lang.code] || ''
+          return <TranslationCell translation={translation} />
         },
-        required: lang.code === 'fr', // Le français est obligatoire
-      },
-      // Fonction personnalisée pour obtenir la valeur à éditer
-      getValue: (row: TranslationEntry) => row.translations[lang.code] || '',
-    }))
+        validation: {
+          custom: (value: unknown) => {
+            if (typeof value === 'string' && value.length > 1000) {
+              return 'La traduction ne peut pas dépasser 1000 caractères'
+            }
+            return null
+          },
+          required: lang.code === 'fr', // Le français est obligatoire
+        },
+        // Fonction personnalisée pour obtenir la valeur à éditer
+        getValue: (row: TranslationEntry) => row.translations[lang.code] || '',
+      })
+    )
 
     return [...baseColumns, ...languageColumns]
   }, [namespaces, categories])

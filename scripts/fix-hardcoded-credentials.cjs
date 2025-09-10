@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-const fs = require('fs')
-const path = require('path')
-const glob = require('glob')
+const fs = require('node:fs')
+const path = require('node:path')
+const _glob = require('glob')
 
 // Scripts à corriger avec connexions database en dur
 const scriptsToFix = [
@@ -91,13 +91,12 @@ const replacements = [
   },
 ]
 
-let totalFixed = 0
+let _totalFixed = 0
 
 scriptsToFix.forEach((scriptPath) => {
   const fullPath = path.join(process.cwd(), scriptPath)
 
   if (!fs.existsSync(fullPath)) {
-    console.log(`⚠️  Fichier non trouvé: ${scriptPath}`)
     return
   }
 
@@ -109,18 +108,17 @@ scriptsToFix.forEach((scriptPath) => {
     if (matches) {
       content = content.replace(pattern, replacement)
       modified = true
-      console.log(`✅ Corrigé dans ${scriptPath}: ${matches.length} occurrence(s)`)
     }
   })
 
   if (modified) {
     // Ajouter l'import dotenv si nécessaire
     if (!content.includes('dotenv/config') && !content.includes('process.env')) {
-      content = "import 'dotenv/config';\n" + content
+      content = `import 'dotenv/config';\n${content}`
     }
 
     fs.writeFileSync(fullPath, content)
-    totalFixed++
+    _totalFixed++
   }
 })
 
@@ -186,14 +184,3 @@ STRIPE_TEST_TOKEN=tok_visa
 `
 
 fs.writeFileSync('.env.security.example', securityInstructions)
-
-console.log(`
-✅ Correction des credentials terminée:
-   - Fichiers corrigés: ${totalFixed}
-   - Fichier .env.security.example créé
-   
-⚠️  Actions requises:
-   1. Créer un fichier .env.security avec vos vrais credentials
-   2. Ajouter .env.security à .gitignore
-   3. Ne JAMAIS commiter de vrais mots de passe
-`)

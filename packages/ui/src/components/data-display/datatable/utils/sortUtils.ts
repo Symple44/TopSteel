@@ -51,11 +51,7 @@ export function getColumnValue<T>(
 /**
  * Applique le tri sur un tableau de données
  */
-export function sortData<T>(
-  data: T[],
-  sortConfigs: SortConfig[],
-  columns: ColumnConfig<T>[]
-): T[] {
+export function sortData<T>(data: T[], sortConfigs: SortConfig[], columns: ColumnConfig<T>[]): T[] {
   if (!sortConfigs || sortConfigs.length === 0) return data
 
   const sorted = [...data]

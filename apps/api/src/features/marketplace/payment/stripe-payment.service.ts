@@ -12,12 +12,6 @@ import type { Redis } from 'ioredis'
 import Stripe from 'stripe'
 import type { Repository } from 'typeorm'
 import { getErrorMessage, hasStack } from '../../../core/common/utils'
-import type {
-  MarketplaceOrder,
-  StripeCheckoutSession,
-  StripeCustomer,
-  StripePaymentIntent,
-} from '../../../types/marketplace/marketplace.types'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder as MarketplaceOrderEntity } from '../entities/marketplace-order.entity'
 

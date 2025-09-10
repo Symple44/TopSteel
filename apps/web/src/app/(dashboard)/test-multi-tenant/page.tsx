@@ -7,6 +7,7 @@ import {
   AlertDescription,
   AlertTitle,
   Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -16,8 +17,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  Textarea,
 } from '@erp/ui'
-import { Button, Textarea } from '@erp/ui'
 import { Database, Lock, ShieldAlert, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'
