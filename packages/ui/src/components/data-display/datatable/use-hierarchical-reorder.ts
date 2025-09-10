@@ -326,8 +326,8 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
       if (dropPosition === 'inside') {
         // Déplacer à l'intérieur du target (devenir enfant)
         if (config.reorderConfig.allowLevelChange) {
-          (draggedItemData as any)[parentField] = targetId as string
-          (draggedItemData as any)[orderField] = 1 // Premier enfant
+          ;(draggedItemData as any)[parentField] = targetId as string
+          ;(draggedItemData as any)[orderField] = 1 // Premier enfant
 
           // Auto-expand le parent si configuré
           if (config.reorderConfig.autoExpand) {
@@ -344,9 +344,9 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
 
           // Calculer le nouvel ordre
           if (dropPosition === 'above') {
-            (draggedItemData as any)[orderField] = Math.max(0, targetOrder - 1)
+            ;(draggedItemData as any)[orderField] = Math.max(0, targetOrder - 1)
           } else {
-            (draggedItemData as any)[orderField] = targetOrder + 1
+            ;(draggedItemData as any)[orderField] = targetOrder + 1
           }
         }
       }
@@ -359,9 +359,9 @@ export function useHierarchicalReorder<T extends HierarchicalItem = Hierarchical
         if (item.id !== draggedItem.id && (item as any)[parentField] === parentId) {
           const itemOrder = ((item as any)[orderField] as number) || 0
           if (dropPosition === 'below' && itemOrder > newOrder - 1) {
-            (item as any)[orderField] = itemOrder + 1
+            ;(item as any)[orderField] = itemOrder + 1
           } else if (dropPosition === 'above' && itemOrder >= newOrder) {
-            (item as any)[orderField] = itemOrder + 1
+            ;(item as any)[orderField] = itemOrder + 1
           }
         }
       })

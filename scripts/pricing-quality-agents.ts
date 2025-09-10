@@ -202,7 +202,8 @@ class PricingQualityOrchestrator {
         if (output) {
           const results = JSON.parse(output)
           const totalIssues = results.reduce(
-            (sum: number, file: { errorCount: number; warningCount: number }) => sum + file.errorCount + file.warningCount,
+            (sum: number, file: { errorCount: number; warningCount: number }) =>
+              sum + file.errorCount + file.warningCount,
             0
           )
 

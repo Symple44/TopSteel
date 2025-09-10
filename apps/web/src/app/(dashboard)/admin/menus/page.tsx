@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import {
   Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -14,7 +15,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
-import { Button } from '@erp/ui'
 import { Download, Play, Plus, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api-client'

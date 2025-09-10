@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge } from '@erp/ui'
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,

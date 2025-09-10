@@ -585,7 +585,9 @@ export function UserPermissionsDialog({
           acc[key] = {
             ...(permData as any),
             permissions: Object.fromEntries(
-              matchingPerms.length > 0 ? matchingPerms : Object.entries((permData as any).permissions)
+              matchingPerms.length > 0
+                ? matchingPerms
+                : Object.entries((permData as any).permissions)
             ),
           }
         }

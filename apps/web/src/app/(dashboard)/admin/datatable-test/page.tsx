@@ -3,8 +3,13 @@
 export const dynamic = 'force-dynamic'
 
 import '@/styles/datatable-demo.css'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   DataTableExample,
   HierarchicalDataTableExample,
   SimpleDataTableExample,

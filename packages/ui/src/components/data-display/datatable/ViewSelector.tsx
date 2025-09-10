@@ -150,46 +150,61 @@ function ViewSettingsForm<T = any>({
 
   const updateSettings = (key: string, value: any) => {
     if (viewType === 'kanban') {
-      setSettings((prev: ViewSettings) => ({
-        ...prev,
-        kanban: {
-          ...prev.kanban,
-          [key]: value,
-        },
-      } as ViewSettings))
+      setSettings(
+        (prev: ViewSettings) =>
+          ({
+            ...prev,
+            kanban: {
+              ...prev.kanban,
+              [key]: value,
+            },
+          }) as ViewSettings
+      )
     } else if (viewType === 'cards') {
-      setSettings((prev: ViewSettings) => ({
-        ...prev,
-        cards: {
-          ...prev.cards,
-          [key]: value,
-        },
-      } as ViewSettings))
+      setSettings(
+        (prev: ViewSettings) =>
+          ({
+            ...prev,
+            cards: {
+              ...prev.cards,
+              [key]: value,
+            },
+          }) as ViewSettings
+      )
     } else if (viewType === 'timeline') {
-      setSettings((prev: ViewSettings) => ({
-        ...prev,
-        timeline: {
-          ...prev.timeline,
-          [key]: value,
-        },
-      } as ViewSettings))
+      setSettings(
+        (prev: ViewSettings) =>
+          ({
+            ...prev,
+            timeline: {
+              ...prev.timeline,
+              [key]: value,
+            },
+          }) as ViewSettings
+      )
     } else if (viewType === 'calendar') {
-      setSettings((prev: ViewSettings) => ({
-        ...prev,
-        calendar: {
-          ...prev.calendar,
-          [key]: value,
-        },
-      } as ViewSettings))
+      setSettings(
+        (prev: ViewSettings) =>
+          ({
+            ...prev,
+            calendar: {
+              ...prev.calendar,
+              [key]: value,
+            },
+          }) as ViewSettings
+      )
     } else {
       // Fallback for other view types
-      setSettings((prev: ViewSettings) => ({
-        ...prev,
-        [viewType]: {
-          ...(prev[viewType as keyof ViewSettings] as any),
-          [key]: value,
-        },
-      } as ViewSettings))
+      setSettings(
+        (prev: ViewSettings) =>
+          ({
+            ...prev,
+            [viewType]: {
+              ...(prev[viewType as keyof ViewSettings] as any),
+              [key]: value,
+            },
+          }) as ViewSettings
+      )
     }
   }
 

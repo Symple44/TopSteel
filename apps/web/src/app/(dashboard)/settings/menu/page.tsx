@@ -21,16 +21,12 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import {
   Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Label,
-  useFormFieldIds,
-} from '@erp/ui'
-import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -39,6 +35,8 @@ import {
   DialogTitle,
   DialogTrigger,
   Input,
+  Label,
+  useFormFieldIds,
 } from '@erp/ui'
 import {
   Activity,

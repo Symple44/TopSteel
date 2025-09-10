@@ -1,9 +1,13 @@
 'use client'
 
-import { Badge, Card, CardContent, CardHeader, Label } from '@erp/ui'
 import {
+  Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -200,7 +204,9 @@ export function MenuItemEditor({
                 <Label>Titre</Label>
                 <Input
                   value={item.title}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('title', e?.target?.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleFieldChange('title', e?.target?.value)
+                  }
                   placeholder="Titre de l'élément"
                 />
               </div>
@@ -233,7 +239,9 @@ export function MenuItemEditor({
                 <Label>Icône</Label>
                 <Input
                   value={item.icon || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('icon', e?.target?.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleFieldChange('icon', e?.target?.value)
+                  }
                   placeholder="Nom de l'icône Lucide"
                 />
               </div>
@@ -267,7 +275,9 @@ export function MenuItemEditor({
                 <Label>ID du Programme</Label>
                 <Input
                   value={item.programId || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('programId', e?.target?.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleFieldChange('programId', e?.target?.value)
+                  }
                   placeholder="/dashboard, /admin/users, etc."
                 />
               </div>
@@ -278,7 +288,9 @@ export function MenuItemEditor({
                 <Label>URL Externe</Label>
                 <Input
                   value={item.externalUrl || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('externalUrl', e?.target?.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleFieldChange('externalUrl', e?.target?.value)
+                  }
                   placeholder="https://example.com"
                 />
               </div>
@@ -289,7 +301,9 @@ export function MenuItemEditor({
                 <Label>ID Query Builder</Label>
                 <Input
                   value={item.queryBuilderId || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('queryBuilderId', e?.target?.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleFieldChange('queryBuilderId', e?.target?.value)
+                  }
                   placeholder="UUID de la vue Query Builder"
                 />
               </div>
