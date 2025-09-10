@@ -18,7 +18,7 @@ export type ColumnType =
   | 'formula'
 
 // Configuration d'une colonne
-export interface ColumnConfig<T = Record<string, unknown>> {
+export interface ColumnConfig<T = unknown> {
   id: string
   key: string
   title: string
@@ -185,11 +185,11 @@ export interface TableSettings {
 }
 
 // Configuration globale de la table
-export interface DataTableConfig<T = Record<string, unknown>> {
+export interface DataTableConfig<T = unknown> {
   // Données
   data: T[]
   columns: ColumnConfig<T>[]
-  keyField: string
+  keyField: keyof T | string
 
   // Identifiants
   tableId?: string // Pour la sauvegarde des paramètres
@@ -237,10 +237,10 @@ export interface DataTableConfig<T = Record<string, unknown>> {
 }
 
 // Props du composant DataTable (alias de DataTableConfig)
-export interface DataTableProps<T = Record<string, unknown>> extends DataTableConfig<T> {}
+export interface DataTableProps<T = unknown> extends DataTableConfig<T> {}
 
 // Context pour les formules
-export interface FormulaContext<T = Record<string, unknown>> {
+export interface FormulaContext<T = unknown> {
   row: T
   rowIndex: number
   data: T[]
@@ -258,7 +258,7 @@ export interface ExportOptions {
 }
 
 // Types pour l'import
-export interface ImportResult<T = Record<string, unknown>> {
+export interface ImportResult<T = unknown> {
   success: boolean
   data: T[]
   errors: Array<{

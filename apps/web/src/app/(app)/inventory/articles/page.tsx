@@ -470,8 +470,8 @@ export default function ArticlesPage() {
       <Card>
         <CardContent className="p-0">
           <DataTable
-            data={articles as Array<Article & Record<string, unknown>>}
-            columns={columns as ColumnConfig<Article & Record<string, unknown>>[]}
+            data={articles}
+            columns={columns}
             keyField="id"
             tableId="articles-table"
             userId={

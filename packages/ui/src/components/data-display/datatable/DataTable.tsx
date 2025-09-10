@@ -14,10 +14,10 @@ import type { ColumnConfig, DataTableProps } from './types'
  * Composant DataTable refactorisé
  * Utilise les hooks et contextes pour une architecture modulaire
  */
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T>({
   data,
   columns,
-  keyField = 'id',
+  keyField = 'id' as keyof T,
 
   // Identifiants
   tableId,
@@ -61,7 +61,7 @@ export function DataTable<T extends Record<string, unknown>>({
   const tableState = useDataTableState({
     data,
     columns,
-    keyField: keyField as string,
+    keyField: String(keyField),
     sortable,
     filterable,
     searchable,
@@ -181,7 +181,7 @@ export function DataTable<T extends Record<string, unknown>>({
               striped={striped}
               hoverable={hoverable}
               actions={actions}
-              keyField={keyField as string}
+              keyField={String(keyField)}
               loading={loading}
               emptyMessage={emptyMessage}
             />

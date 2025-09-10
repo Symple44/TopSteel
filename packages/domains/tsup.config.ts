@@ -1,14 +1,8 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  // Skip DTS in CI to avoid memory/timeout issues
-  dts: process.env.CI ? false : {
-    resolve: false,
-    compilerOptions: {
-      composite: false,
-      incremental: false,
-    },
-  },
+  // Skip DTS to avoid memory issues
+  dts: false,
   entry: {
     index: 'src/index.ts',
     server: 'src/server.ts',

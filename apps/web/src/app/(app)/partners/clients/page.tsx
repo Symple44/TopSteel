@@ -235,8 +235,8 @@ export default function ClientsPage() {
       <Card>
         <CardContent className="p-0">
           <DataTable
-            data={partners as Array<Partner & Record<string, unknown>>}
-            columns={columns as ColumnConfig<Partner & Record<string, unknown>>[]}
+            data={partners}
+            columns={columns}
             keyField="id"
             loading={isLoading}
             searchable

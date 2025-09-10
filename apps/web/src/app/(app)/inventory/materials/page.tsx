@@ -306,8 +306,8 @@ export default function MaterialsPage() {
       <Card>
         <CardContent className="p-0">
           <DataTable
-            columns={columns as ColumnConfig<Material & Record<string, unknown>>[]}
-            data={materials as Array<Material & Record<string, unknown>>}
+            columns={columns}
+            data={materials}
             keyField="id"
             tableId="materials-table"
             userId={
