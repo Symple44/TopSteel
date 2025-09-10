@@ -201,7 +201,7 @@ export class PartnerInteractionRepository {
     partnerId: string,
     period?: { start: Date; end: Date }
   ): Promise<InteractionStats> {
-    const whereClause: any = { partnerId }
+    const whereClause: Record<string, unknown> = { partnerId }
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -215,7 +215,7 @@ export class PartnerInteractionRepository {
     userId: string,
     period?: { start: Date; end: Date }
   ): Promise<InteractionStats> {
-    const whereClause: any = { userId }
+    const whereClause: Record<string, unknown> = { userId }
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -226,7 +226,7 @@ export class PartnerInteractionRepository {
   }
 
   async getGlobalStats(period?: { start: Date; end: Date }): Promise<InteractionStats> {
-    const whereClause: any = {}
+    const whereClause: Record<string, unknown> = {}
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -246,7 +246,7 @@ export class PartnerInteractionRepository {
     topUsers: Array<{ userId: string; userName: string; count: number }>
     topPartners: Array<{ partnerId: string; partnerName: string; count: number }>
   }> {
-    const whereClause: any = { type }
+    const whereClause: Record<string, unknown> = { type }
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -358,7 +358,7 @@ export class PartnerInteractionRepository {
   }
 
   async getUpcomingInteractions(limit = 10, userId?: string): Promise<PartnerInteraction[]> {
-    const whereClause: any = {
+    const whereClause: Record<string, unknown> = {
       status: InteractionStatus.PLANIFIE,
       dateInteraction: MoreThan(new Date()),
     }
@@ -376,7 +376,7 @@ export class PartnerInteractionRepository {
   }
 
   async getOverdueInteractions(userId?: string): Promise<PartnerInteraction[]> {
-    const whereClause: any = {
+    const whereClause: Record<string, unknown> = {
       status: In([InteractionStatus.PLANIFIE, InteractionStatus.EN_COURS]),
       dateInteraction: LessThan(new Date()),
     }

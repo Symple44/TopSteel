@@ -32,7 +32,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2, CreditCard, FileText, MapPin, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { type Control, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useCreatePartner, usePartnerGroups, useUpdatePartner } from '@/hooks/use-partners'
 

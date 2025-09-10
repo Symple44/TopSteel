@@ -37,7 +37,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown as React.MouseEvent)
       }
     }
 
@@ -91,7 +91,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown as React.MouseEvent)
       }
     }
 
@@ -208,7 +208,7 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown as React.MouseEvent)
       }
     }
 
@@ -261,7 +261,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as any)
+        onClick(e as unknown as React.MouseEvent)
       }
     }
 

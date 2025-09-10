@@ -28,7 +28,6 @@ import type { UnifiedRolesService } from '../../../domains/auth/services/unified
 import type { UsersService } from '../../../domains/users/users.service'
 import type { SocietesService } from '../../../features/societes/services/societes.service'
 import type { SocieteData } from '../../../types/entities/societe.types'
-import type { UserSocieteRole } from '../../../types/entities/user.types'
 
 interface SocieteQueryDto {
   page?: number
