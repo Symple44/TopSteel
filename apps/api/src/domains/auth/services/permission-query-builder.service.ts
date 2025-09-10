@@ -859,7 +859,16 @@ export class PermissionQueryBuilderService {
     const formatted = []
 
     for (const permission of permissions) {
-      const result: any = {
+      const result: {
+        code: string
+        name: string
+        description?: string
+        category?: string
+        scope: PermissionScope
+        users?: Array<{ id: string; email: string; name: string }>
+        roles?: Array<{ id: string; code: string; name: string }>
+        societes?: Array<{ id: string; name: string }>
+      } = {
         code: `${permission.resource}:${permission.action}`,
         name: permission.name,
         description: permission.description,

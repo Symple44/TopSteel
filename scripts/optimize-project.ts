@@ -174,7 +174,7 @@ function checkCircularDependencies() {
       encoding: 'utf-8',
     })
   } catch (error) {
-    if ((error as any).stdout?.includes('Found')) {
+    if ((error as { stdout?: string }).stdout?.includes('Found')) {
       reports.push({
         category: 'Architecture',
         severity: 'high',
@@ -266,4 +266,7 @@ async function main() {
 }
 
 // Exécuter
-main().catch(console.error)
+main().catch((err) => {
+  process.stderr.write(`Error: ${err}\n`)
+  process.exit(1)
+})

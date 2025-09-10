@@ -26,6 +26,7 @@ import { IsDate, IsEnum, IsNumber, IsOptional, IsString, IsUUID, Min } from 'cla
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
+import type { User } from '../../users/entities/user.entity'
 import {
   type IStockMovement,
   type IStockMovementFilters,
@@ -184,7 +185,7 @@ export class StockMovementController {
   async createMovement(
     @Body() dto: CreateStockMovementDto,
     @CurrentTenant() _tenantId: string,
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<IStockMovement> {
     this.logger.log(`Creating stock movement for article ${dto.articleId} by user ${user.id}`)
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Between, In, Like, MoreThan, type Repository } from 'typeorm'
+import { Between, In, Like, MoreThan, type FindOptionsWhere, type Repository } from 'typeorm'
 import { StockMovement } from '../entities/stock-movement.entity'
 import {
   type IStockMovementFilters,
@@ -240,12 +240,16 @@ export class StockMovementRepository {
     // Exclure les propriétés de relation pour l'update
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { article: _article, ...updateData } = data
-    await this.repository.update(id, updateData as any)
-    const updated = await this.findById(id)
-    if (!updated) {
+    
+    // Use the safer save method instead of update to handle complex types
+    const existingMovement = await this.findById(id)
+    if (!existingMovement) {
       throw new Error(`Movement ${id} not found`)
     }
-    return updated
+    
+    // Merge the update data with the existing movement
+    const updatedMovement = this.repository.merge(existingMovement, updateData)
+    return await this.repository.save(updatedMovement)
   }
 
   async delete(id: string): Promise<void> {
@@ -259,7 +263,7 @@ export class StockMovementRepository {
     articleId: string,
     period?: { start: Date; end: Date }
   ): Promise<StockMovementStats> {
-    const whereClause: any = { articleId }
+    const whereClause: FindOptionsWhere<StockMovement> = { articleId }
     if (period) {
       whereClause.dateCreation = Between(period.start, period.end)
     }
@@ -273,7 +277,7 @@ export class StockMovementRepository {
     tenantId: string,
     period?: { start: Date; end: Date }
   ): Promise<StockMovementStats> {
-    const whereClause: any = { tenantId }
+    const whereClause: FindOptionsWhere<StockMovement> = { tenantId }
     if (period) {
       whereClause.dateCreation = Between(period.start, period.end)
     }

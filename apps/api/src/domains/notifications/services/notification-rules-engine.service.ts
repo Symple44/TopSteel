@@ -14,6 +14,7 @@ import { NotificationRule, RuleStatus, RuleType } from '../entities/notification
 import type {
   ActionExecutionResult,
   NotificationActionResult,
+  RuleExecutionContext as ExecutionRuleContext,
 } from '../types/notification-execution.types'
 import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
 import type { NotificationActionExecutor } from './notification-action-executor.service'
@@ -427,7 +428,24 @@ export class NotificationRulesEngineService {
       let error: string | undefined
 
       try {
-        result = await this.actionExecutor.execute(action, context, execution)
+        // Convert context to the expected format for action executor
+        const executionContext: ExecutionRuleContext = {
+          rule: {
+            id: context.rule.id,
+            name: context.rule.name,
+            description: context.rule.description,
+            isActive: context.rule.isActive(),
+          },
+          triggerType: context.triggerType,
+          triggerSource: context.triggerSource,
+          triggerData: context.triggerData,
+          societeId: context.societeId,
+          siteId: context.siteId,
+          userId: context.userId,
+          metadata: context.metadata,
+        }
+        
+        result = await this.actionExecutor.execute(action, executionContext, execution)
         success = true
         executed++
 

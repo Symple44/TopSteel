@@ -3,6 +3,8 @@
  * Créé pour résoudre les erreurs TypeScript TS18046 et TS2345
  */
 
+import type { GlobalUserRole } from '../../domains/auth/core/constants/roles.constants'
+
 export interface UserData {
   id: string
   email: string
@@ -15,6 +17,32 @@ export interface UserData {
   lastLogin?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+}
+
+/**
+ * Extended User interface with additional properties needed by controllers
+ * Includes firstName, lastName, currentSocieteId and role for compatibility
+ */
+export interface ExtendedUser {
+  id: string
+  email: string
+  nom?: string
+  prenom?: string
+  // Legacy compatibility fields
+  firstName?: string
+  lastName?: string
+  // Current société context
+  currentSocieteId?: string
+  societeId?: string
+  role: GlobalUserRole
+  actif: boolean
+  // Additional fields
+  acronyme?: string
+  dernier_login?: Date
+  refreshToken?: string
+  metadata?: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface UserWithRelations extends UserData {

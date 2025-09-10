@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-// import { NotificationRule } from './notification-rule.entity';
+import type { NotificationRule } from './notification-rule.entity'
 
 /**
  * Execution status
@@ -59,7 +59,7 @@ export class NotificationExecution {
   triggerSource?: string // Event name, cron expression, user ID, etc.
 
   @Column({ type: 'jsonb', nullable: true })
-  triggerData?: any // Event data or context
+  triggerData?: Record<string, unknown> // Event data or context
 
   @Column({ type: 'jsonb', nullable: true })
   conditionResults?: Array<{
@@ -80,7 +80,7 @@ export class NotificationExecution {
     type: string
     success: boolean
     executionTime: number
-    result?: any
+    result?: unknown
     error?: string
   }>
 
@@ -128,7 +128,7 @@ export class NotificationExecution {
   errorMessage?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  errorDetails?: any
+  errorDetails?: Record<string, unknown>
 
   @Column({ type: 'jsonb', nullable: true })
   escalations?: Array<{
@@ -159,7 +159,7 @@ export class NotificationExecution {
   // Relations
   @ManyToOne('NotificationRule', 'executions', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'rule_id' })
-  rule!: any
+  rule!: NotificationRule
 
   // Utility methods
 
@@ -248,7 +248,7 @@ export class NotificationExecution {
     type: string
     success: boolean
     executionTime: number
-    result?: any
+    result?: unknown
     error?: string
   }): void {
     if (!this.actionResults) {

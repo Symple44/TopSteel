@@ -39,6 +39,7 @@ import {
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
+import type { ExtendedUser } from '../../../types/entities/user.types'
 import {
   type ICreateMaterialMovement,
   type IMaterialMovement,
@@ -388,15 +389,18 @@ export class MaterialMovementController {
   async createMovement(
     @Body() dto: CreateMaterialMovementDto,
     @CurrentTenant() tenantId: string,
-    @CurrentUser() user: any
+    @CurrentUser() user: ExtendedUser
   ): Promise<IMaterialMovement> {
     this.logger.log(`Creating material movement for material ${dto.materialId} by user ${user.id}`)
+
+    const userName = user.firstName || user.prenom || 'Unknown'
+    const userLastName = user.lastName || user.nom || 'User'
 
     return await this.materialMovementService.createMovement({
       ...dto,
       tenantId,
       utilisateurId: user.id,
-      utilisateurNom: `${user.firstName} ${user.lastName}`,
+      utilisateurNom: `${userName} ${userLastName}`,
     })
   }
 
@@ -423,14 +427,17 @@ export class MaterialMovementController {
   async validateMovement(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { commentaires?: string; updateMaterial?: boolean },
-    @CurrentUser() user: any
+    @CurrentUser() user: ExtendedUser
   ): Promise<IMaterialMovement> {
     this.logger.log(`Validating movement ${id} by user ${user.id}`)
+
+    const userName = user.firstName || user.prenom || 'Unknown'
+    const userLastName = user.lastName || user.nom || 'User'
 
     return await this.materialMovementService.validateMovement(
       id,
       user.id,
-      `${user.firstName} ${user.lastName}`,
+      `${userName} ${userLastName}`,
       body
     )
   }
@@ -488,14 +495,17 @@ export class MaterialMovementController {
   async cancelMovement(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { motif: string; reverseStock?: boolean },
-    @CurrentUser() user: any
+    @CurrentUser() user: ExtendedUser
   ): Promise<IMaterialMovement> {
     this.logger.log(`Cancelling movement ${id}: ${body.motif}`)
+
+    const userName = user.firstName || user.prenom || 'Unknown'
+    const userLastName = user.lastName || user.nom || 'User'
 
     return await this.materialMovementService.cancelMovement(id, body.motif, {
       reverseStock: body.reverseStock,
       utilisateurId: user.id,
-      utilisateurNom: `${user.firstName} ${user.lastName}`,
+      utilisateurNom: `${userName} ${userLastName}`,
     })
   }
 

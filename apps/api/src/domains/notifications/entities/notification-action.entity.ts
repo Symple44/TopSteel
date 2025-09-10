@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-// import { NotificationRule } from './notification-rule.entity';
+import type { NotificationRule } from './notification-rule.entity'
 
 /**
  * Action types
@@ -88,7 +88,7 @@ export class NotificationAction {
   updateFieldConfig?: {
     entity: string
     fieldPath: string
-    value: any
+    value: unknown
     operation?: 'set' | 'increment' | 'decrement' | 'append' | 'prepend'
     condition?: string // JavaScript expression
   }
@@ -109,7 +109,7 @@ export class NotificationAction {
     url: string
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
     headers?: Record<string, string>
-    body?: any
+    body?: unknown
     authentication?: {
       type: 'none' | 'basic' | 'bearer' | 'api_key'
       credentials?: Record<string, string>
@@ -194,14 +194,14 @@ export class NotificationAction {
   // Relations
   @ManyToOne('NotificationRule', 'actions', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'rule_id' })
-  rule!: any
+  rule!: NotificationRule
 
   // Utility methods
 
   /**
    * Get action configuration
    */
-  getConfig(): any {
+  getConfig(): unknown {
     switch (this.type) {
       case ActionType.SEND_NOTIFICATION:
         return this.notificationConfig

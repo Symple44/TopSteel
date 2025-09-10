@@ -130,7 +130,7 @@ export class NotificationConditionEvaluator {
         timeout: 30000,
       }
 
-      let response: any
+      let response: { data: unknown; status: number }
       if (condition.apiMethod === 'POST') {
         response = await firstValueFrom(
           this.httpService.post(condition.apiUrl, condition.apiBody || {}, requestConfig)
@@ -186,14 +186,20 @@ export class NotificationConditionEvaluator {
     let referenceTime: Date
 
     switch (condition.timeReference) {
-      case 'event_time':
-        referenceTime = new Date(context.triggerData?.timestamp || now)
+      case 'event_time': {
+        const timestampValue = context.triggerData?.timestamp
+        referenceTime = timestampValue && (typeof timestampValue === 'string' || typeof timestampValue === 'number' || timestampValue instanceof Date)
+          ? new Date(timestampValue as string | number | Date)
+          : now
         break
-      case 'field_value':
-        referenceTime = new Date(
-          context.triggerData?.[condition.aggregateField || 'createdAt'] || now
-        )
+      }
+      case 'field_value': {
+        const fieldValue = context.triggerData?.[condition.aggregateField || 'createdAt']
+        referenceTime = fieldValue && (typeof fieldValue === 'string' || typeof fieldValue === 'number' || fieldValue instanceof Date)
+          ? new Date(fieldValue as string | number | Date)
+          : now
         break
+      }
       default:
         referenceTime = now
         break
@@ -244,7 +250,7 @@ export class NotificationConditionEvaluator {
   /**
    * Extract value from object using dot notation path
    */
-  private extractValueFromPath(obj: unknown, path: string): any {
+  private extractValueFromPath(obj: unknown, path: string): unknown {
     const keys = path.split('.')
     let value = obj
 
@@ -252,7 +258,7 @@ export class NotificationConditionEvaluator {
       if (value === null || value === undefined) {
         return undefined
       }
-      value = (value as any)[key]
+      value = (value as Record<string, unknown>)[key]
     }
 
     return value

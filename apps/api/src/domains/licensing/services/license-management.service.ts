@@ -35,7 +35,13 @@ export interface CreateLicenseOptions {
   maxStorage?: number
   maxApiCalls?: number
   features?: string[]
-  restrictions?: any
+  restrictions?: {
+    ipWhitelist?: string[]
+    domainWhitelist?: string[]
+    maxConcurrentSessions?: number
+    allowedCountries?: string[]
+    blockedCountries?: string[]
+  }
   autoActivate?: boolean
   price?: number
   currency?: string
@@ -55,7 +61,13 @@ export interface UpdateLicenseOptions {
   maxStorage?: number
   maxApiCalls?: number
   autoRenew?: boolean
-  restrictions?: any
+  restrictions?: {
+    ipWhitelist?: string[]
+    domainWhitelist?: string[]
+    maxConcurrentSessions?: number
+    allowedCountries?: string[]
+    blockedCountries?: string[]
+  }
   notes?: string
 }
 

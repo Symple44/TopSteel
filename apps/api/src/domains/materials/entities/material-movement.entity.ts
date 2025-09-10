@@ -278,8 +278,8 @@ export class MaterialMovement {
     date: Date
     utilisateur: string
     champ: string
-    ancienneValeur: any
-    nouvelleValeur: any
+    ancienneValeur: unknown
+    nouvelleValeur: unknown
   }[]
 
   /** Date de création */

@@ -297,7 +297,7 @@ export class NotificationRule {
   /**
    * Check if rule matches event
    */
-  matchesEvent(eventName: string, eventData?: any): boolean {
+  matchesEvent(eventName: string, eventData?: Record<string, unknown>): boolean {
     if (this.type !== RuleType.EVENT) {
       return false
     }

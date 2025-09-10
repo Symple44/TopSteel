@@ -19,7 +19,7 @@ import type {
   BusinessContext,
   BusinessOperation,
 } from '../../core/interfaces/business-service.interface'
-import type { User } from '../../users/entities/user.entity'
+import type { ExtendedUser } from '../../../types/entities/user.types'
 import type {
   CreateContactDto,
   CreatePartnerAddressDto,
@@ -54,7 +54,7 @@ export class PartnerController {
     private readonly partnerParametersService: PartnerParametersInitService
   ) {}
 
-  private getContext(user: any): BusinessContext {
+  private getContext(user: ExtendedUser): BusinessContext {
     return {
       userId: user.id,
       tenantId: 'current-tenant',
@@ -79,7 +79,7 @@ export class PartnerController {
   })
   async createPartner(
     @Body() createDto: CreatePartnerDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Partner> {
     const context: BusinessContext = {
       userId: user.id,
@@ -101,7 +101,7 @@ export class PartnerController {
   })
   async getPartners(
     @Query() filters: PartnerFiltersDto,
-    @CurrentUser() _user: User
+    @CurrentUser() _user: ExtendedUser
   ): Promise<Partner[]> {
     return await this.partnerService.searchPartners(filters)
   }
@@ -142,7 +142,7 @@ export class PartnerController {
     summary: 'Récupérer un partenaire',
     description: "Récupérer les détails d'un partenaire",
   })
-  async getPartner(@Param('id') id: string, @CurrentUser() user: User): Promise<Partner | null> {
+  async getPartner(@Param('id') id: string, @CurrentUser() user: ExtendedUser): Promise<Partner | null> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
@@ -164,7 +164,7 @@ export class PartnerController {
   async updatePartner(
     @Param('id') id: string,
     @Body() updateDto: UpdatePartnerDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Partner> {
     const context: BusinessContext = {
       userId: user.id,
@@ -185,7 +185,7 @@ export class PartnerController {
     summary: 'Supprimer un partenaire',
     description: 'Supprimer un partenaire (soft delete)',
   })
-  async deletePartner(@Param('id') id: string, @CurrentUser() user: User): Promise<void> {
+  async deletePartner(@Param('id') id: string, @CurrentUser() user: ExtendedUser): Promise<void> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
@@ -233,7 +233,7 @@ export class PartnerController {
     summary: 'Convertir un prospect en client',
     description: "Changer le statut d'un prospect en client actif",
   })
-  async convertirProspect(@Param('id') id: string, @CurrentUser() user: User): Promise<Partner> {
+  async convertirProspect(@Param('id') id: string, @CurrentUser() user: ExtendedUser): Promise<Partner> {
     return await this.partnerService.convertirProspect(id, this.getContext(user))
   }
 
@@ -249,7 +249,7 @@ export class PartnerController {
   async suspendrePartenaire(
     @Param('id') id: string,
     @Body() body: { raison: string },
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Partner> {
     return await this.partnerService.suspendrePartenaire(id, body.raison, this.getContext(user))
   }
@@ -266,7 +266,7 @@ export class PartnerController {
   async fusionnerPartenaires(
     @Param('principalId') principalId: string,
     @Param('secondaireId') secondaireId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Partner> {
     const context: BusinessContext = {
       userId: user.id,
@@ -289,7 +289,7 @@ export class PartnerController {
   })
   async searchAdvanced(
     @Body() searchCriteria: Record<string, unknown>,
-    @CurrentUser() _user: User
+    @CurrentUser() _user: ExtendedUser
   ): Promise<Partner[]> {
     return await this.partnerService.searchPartners(searchCriteria)
   }
@@ -314,7 +314,7 @@ export class PartnerController {
     summary: 'Lister les groupes de partenaires',
     description: 'Récupérer tous les groupes tarifaires disponibles',
   })
-  async getPartnerGroups(@CurrentUser() user: User): Promise<PartnerGroup[]> {
+  async getPartnerGroups(@CurrentUser() user: ExtendedUser): Promise<PartnerGroup[]> {
     return await this.partnerService.getPartnerGroups(this.getContext(user))
   }
 
@@ -326,7 +326,7 @@ export class PartnerController {
   })
   async createPartnerGroup(
     @Body() createDto: CreatePartnerGroupDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerGroup> {
     return await this.partnerService.createPartnerGroup(createDto, this.getContext(user))
   }
@@ -339,7 +339,7 @@ export class PartnerController {
   async updatePartnerGroup(
     @Param('groupId') groupId: string,
     @Body() updateDto: UpdatePartnerGroupDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerGroup> {
     return await this.partnerService.updatePartnerGroup(groupId, updateDto, this.getContext(user))
   }
@@ -353,7 +353,7 @@ export class PartnerController {
   async assignPartnerToGroup(
     @Param('partnerId') partnerId: string,
     @Param('groupId') groupId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Partner> {
     return await this.partnerService.assignPartnerToGroup(partnerId, groupId, this.getContext(user))
   }
@@ -368,7 +368,7 @@ export class PartnerController {
   })
   async getPartnerContacts(
     @Param('partnerId') partnerId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Contact[]> {
     return await this.partnerService.getPartnerContacts(partnerId, this.getContext(user))
   }
@@ -382,7 +382,7 @@ export class PartnerController {
   async createContact(
     @Param('partnerId') partnerId: string,
     @Body() createDto: CreateContactDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Contact> {
     return await this.partnerService.createContact(partnerId, createDto, this.getContext(user))
   }
@@ -395,7 +395,7 @@ export class PartnerController {
   async updateContact(
     @Param('contactId') contactId: string,
     @Body() updateDto: UpdateContactDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Contact> {
     return await this.partnerService.updateContact(contactId, updateDto, this.getContext(user))
   }
@@ -408,7 +408,7 @@ export class PartnerController {
   })
   async deleteContact(
     @Param('contactId') contactId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<void> {
     await this.partnerService.deleteContact(contactId, this.getContext(user))
   }
@@ -423,7 +423,7 @@ export class PartnerController {
   })
   async getPartnerSites(
     @Param('partnerId') partnerId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerSite[]> {
     return await this.partnerService.getPartnerSites(partnerId, this.getContext(user))
   }
@@ -437,7 +437,7 @@ export class PartnerController {
   async createPartnerSite(
     @Param('partnerId') partnerId: string,
     @Body() createDto: CreatePartnerSiteDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerSite> {
     return await this.partnerService.createPartnerSite(partnerId, createDto, this.getContext(user))
   }
@@ -450,7 +450,7 @@ export class PartnerController {
   async updatePartnerSite(
     @Param('siteId') siteId: string,
     @Body() updateDto: UpdatePartnerSiteDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerSite> {
     return await this.partnerService.updatePartnerSite(siteId, updateDto, this.getContext(user))
   }
@@ -463,7 +463,7 @@ export class PartnerController {
   })
   async deletePartnerSite(
     @Param('siteId') siteId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<void> {
     await this.partnerService.deletePartnerSite(siteId, this.getContext(user))
   }
@@ -478,7 +478,7 @@ export class PartnerController {
   })
   async getPartnerAddresses(
     @Param('partnerId') partnerId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerAddress[]> {
     return await this.partnerService.getPartnerAddresses(partnerId, this.getContext(user))
   }
@@ -492,7 +492,7 @@ export class PartnerController {
   async createPartnerAddress(
     @Param('partnerId') partnerId: string,
     @Body() createDto: CreatePartnerAddressDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerAddress> {
     return await this.partnerService.createPartnerAddress(
       partnerId,
@@ -509,7 +509,7 @@ export class PartnerController {
   async updatePartnerAddress(
     @Param('addressId') addressId: string,
     @Body() updateDto: UpdatePartnerAddressDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<PartnerAddress> {
     return await this.partnerService.updatePartnerAddress(
       addressId,
@@ -526,7 +526,7 @@ export class PartnerController {
   })
   async deletePartnerAddress(
     @Param('addressId') addressId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<void> {
     await this.partnerService.deletePartnerAddress(addressId, this.getContext(user))
   }
@@ -541,7 +541,7 @@ export class PartnerController {
   })
   async getPartnerComplete(
     @Param('partnerId') partnerId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<{
     partner: Partner
     contacts: Contact[]
@@ -564,7 +564,7 @@ export class PartnerController {
   async duplicatePartner(
     @Param('partnerId') partnerId: string,
     @Body() body: { newCode: string },
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Partner> {
     return await this.partnerService.duplicatePartner(
       partnerId,
@@ -584,7 +584,7 @@ export class PartnerController {
   })
   async searchPartnersAdvanced(
     @Body() filters: Record<string, unknown>,
-    @CurrentUser() _user: User
+    @CurrentUser() _user: ExtendedUser
   ): Promise<{
     items: Partner[]
     total: number
@@ -751,7 +751,7 @@ export class PartnerController {
   async createInteraction(
     @Param('partnerId') partnerId: string,
     @Body() createDto: Record<string, unknown>,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Record<string, unknown>> {
     const context = this.getContext(user)
     return await this.partnerService.createInteraction(partnerId, createDto, context)
@@ -798,7 +798,7 @@ export class PartnerController {
   async updateInteraction(
     @Param('interactionId') interactionId: string,
     @Body() updateDto: Record<string, unknown>,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Record<string, unknown>> {
     const context = this.getContext(user)
     return await this.partnerService.updateInteraction(interactionId, updateDto, context)
@@ -815,7 +815,7 @@ export class PartnerController {
   })
   async deleteInteraction(
     @Param('interactionId') interactionId: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<void> {
     const context = this.getContext(user)
     await this.partnerService.deleteInteraction(interactionId, context)
@@ -1017,7 +1017,7 @@ export class PartnerController {
   })
   async exportPartners(
     @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: Record<string, unknown> },
-    @CurrentUser() _user: User
+    @CurrentUser() _user: ExtendedUser
   ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
     // Pour l'exemple, on retourne une URL fictive
@@ -1041,7 +1041,7 @@ export class PartnerController {
       data: Record<string, unknown>[]
       options?: { skipErrors?: boolean; dryRun?: boolean }
     },
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<{
     imported: number
     errors: number
@@ -1097,7 +1097,7 @@ export class PartnerController {
   })
   async validateBatch(
     @Body() partnerIds: string[],
-    @CurrentUser() user: User
+    @CurrentUser() user: ExtendedUser
   ): Promise<Array<{ id: string; valid: boolean; errors: string[] }>> {
     const context: BusinessContext = {
       userId: user.id,

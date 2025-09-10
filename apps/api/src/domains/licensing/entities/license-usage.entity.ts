@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-// import { License } from './license.entity';
+import type { License } from './license.entity'
 
 /**
  * Usage metric types
@@ -93,7 +93,7 @@ export class LicenseUsage {
   // Relations
   @ManyToOne('License', 'usage', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'license_id' })
-  license!: any
+  license!: License
 
   // Utility methods
 
@@ -155,7 +155,7 @@ export class LicenseUsage {
   /**
    * Format for time series data
    */
-  toTimeSeriesPoint(): { x: Date; y: number; metadata?: any } {
+  toTimeSeriesPoint(): { x: Date; y: number; metadata?: Record<string, unknown> } {
     return {
       x: this.recordedAt,
       y: this.value,

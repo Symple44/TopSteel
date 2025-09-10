@@ -9,7 +9,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm'
-// import { License } from './license.entity';
+import type { License } from './license.entity'
 
 /**
  * Feature categories
@@ -91,7 +91,7 @@ export class LicenseFeature {
   // Relations
   @ManyToOne('License', 'features', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'license_id' })
-  license!: any
+  license!: License
 
   // Utility methods
 
@@ -202,7 +202,7 @@ export class LicenseFeature {
   /**
    * Set configuration value
    */
-  setConfig(key: string, value: any): void {
+  setConfig(key: string, value: unknown): void {
     if (!this.configuration) {
       this.configuration = {}
     }

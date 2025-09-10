@@ -1,11 +1,13 @@
+import type { NotificationRule } from '../entities/notification-rule.entity'
+
 /**
  * Rule execution context shared between services
  */
 export interface RuleExecutionContext {
-  rule: any // Using any to avoid circular dependency
+  rule: NotificationRule
   triggerType: string
   triggerSource: string
-  triggerData?: any
+  triggerData?: Record<string, unknown>
   societeId?: string
   siteId?: string
   userId?: string

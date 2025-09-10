@@ -153,7 +153,7 @@ class PricingFinalValidation {
         message: 'Aucune erreur TypeScript',
       })
     } catch (error) {
-      const output = (error as any).stdout?.toString() || (error as Error).message
+      const output = (error as { stdout?: Buffer }).stdout?.toString() || (error as Error).message
       const errorCount = (output.match(/error TS/g) || []).length
 
       this.results.push({
@@ -522,4 +522,7 @@ class PricingFinalValidation {
 
 // Exécution
 const validator = new PricingFinalValidation()
-validator.run().catch(console.error)
+validator.run().catch((err) => {
+  process.stderr.write(`Error: ${err}\n`)
+  process.exit(1)
+})

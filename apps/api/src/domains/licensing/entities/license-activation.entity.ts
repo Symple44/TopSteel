@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-// import { License } from './license.entity';
+import type { License } from './license.entity'
 
 /**
  * Activation status
@@ -129,7 +129,7 @@ export class LicenseActivation {
   // Relations
   @ManyToOne('License', 'activations', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'license_id' })
-  license!: any
+  license!: License
 
   // Utility methods
 
