@@ -12,24 +12,29 @@ export async function GET(request: NextRequest) {
       const data = await response?.json()
 
       // Vérifier la structure des données et extraire les pages visibles
-      let menuPreferences: unknown[] = []
+      type MenuPreference = {
+        menuId: string
+        isVisible?: boolean
+      }
+      
+      let menuPreferences: MenuPreference[] = []
 
       // Gérer la structure imbriquée du backend : { data: { success: true, data: [...] } }
       if (data.data?.success && Array.isArray(data?.data?.data)) {
-        menuPreferences = data?.data?.data
+        menuPreferences = data?.data?.data as MenuPreference[]
       } else if (Array.isArray(data.data)) {
-        menuPreferences = data?.data
+        menuPreferences = data?.data as MenuPreference[]
       } else if (Array.isArray(data)) {
-        menuPreferences = data
+        menuPreferences = data as MenuPreference[]
       } else if (data.preferences && Array.isArray(data.preferences)) {
-        menuPreferences = data?.preferences
+        menuPreferences = data?.preferences as MenuPreference[]
       } else {
         menuPreferences = []
       }
 
       const selectedPages = menuPreferences
-        .filter((p: { isVisible?: boolean }) => p.isVisible)
-        .map((p: { menuId: string }) => p.menuId)
+        .filter((p) => p.isVisible)
+        .map((p) => p.menuId)
 
       return NextResponse?.json({
         success: true,

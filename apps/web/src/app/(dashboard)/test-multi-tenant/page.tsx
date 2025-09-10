@@ -440,6 +440,7 @@ export default function TestMultiTenantPage() {
                                   primary?: boolean
                                   isForeignKey?: boolean
                                   foreign?: boolean
+                                  nullable?: boolean
                                 },
                                 colIdx: number
                               ) => {
@@ -494,7 +495,7 @@ export default function TestMultiTenantPage() {
                                         🛡️
                                       </span>
                                     )}
-                                    {(col as unknown)?.nullable === false && !isPrimaryKey && (
+                                    {col?.nullable === false && !isPrimaryKey && (
                                       <span className="ml-1 text-red-500 text-xs" title="Non-null">
                                         *
                                       </span>

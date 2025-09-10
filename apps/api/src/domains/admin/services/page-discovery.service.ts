@@ -153,7 +153,7 @@ export class PageDiscoveryService {
     }
 
     if (criteria.permission) {
-      pages = pages.filter((p) => p.metadata.permissions?.includes(criteria.permission))
+      pages = pages.filter((p) => p.metadata.permissions?.includes(criteria.permission!))
     }
 
     if (criteria.isPublic !== undefined) {

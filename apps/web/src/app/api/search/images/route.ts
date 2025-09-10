@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Vérifier si Elasticsearch est disponible
-    const isConnected = await elasticsearchClient?.isConnected()
+    const isConnected = await elasticsearchClient.isConnected()
     if (!isConnected) {
       return NextResponse?.json({
         results: [],
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     const body = await request?.json()
     const { action, ..._ } = body || {}
 
-    const isConnected = await elasticsearchClient?.isConnected()
+    const isConnected = await elasticsearchClient.isConnected()
     if (!isConnected) {
       return NextResponse?.json({ error: 'Search service unavailable' }, { status: 503 })
     }

@@ -51,7 +51,7 @@ global.Blob = vi.fn().mockImplementation((content, options) => ({
   options,
   type: options?.type || 'text/plain',
   size: content.length,
-})) as Blob
+})) as unknown as typeof Blob
 
 if (!process.env.NODE_ENV) {
   Object.defineProperty(process.env, 'NODE_ENV', {

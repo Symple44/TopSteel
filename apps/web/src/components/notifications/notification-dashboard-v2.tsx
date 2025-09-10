@@ -26,6 +26,7 @@ import { createPortal } from 'react-dom'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
 import type { ClientNotification as Notification } from '@/types/notifications'
+import { NotificationPriority } from '@erp/domains'
 
 interface NotificationDashboardV2Props {
   isOpen: boolean
@@ -407,7 +408,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                                 {categoryConfig[category as keyof typeof categoryConfig]?.label ||
                                   'Système'}
                               </Badge>
-                              {notification.priority && notification.priority !== 'NORMAL' && (
+                              {notification.priority && notification.priority !== NotificationPriority.NORMAL && (
                                 <Badge
                                   className={cn(
                                     'text-xs',

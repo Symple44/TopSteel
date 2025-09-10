@@ -30,7 +30,7 @@ export function NotificationSettings() {
     'general'
   )
 
-  const categoryIcons: Record<string, React.ComponentType> = {
+  const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
     system: Settings2,
     stock: Package,
     projet: FileText,
@@ -54,7 +54,7 @@ export function NotificationSettings() {
     utilisateur: 'Messages utilisateurs',
   }
 
-  const priorityIcons: Record<string, React.ComponentType> = {
+  const priorityIcons: Record<string, React.ComponentType<{ className?: string }>> = {
     LOW: Info,
     NORMAL: Bell,
     HIGH: AlertTriangle,

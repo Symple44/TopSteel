@@ -22,13 +22,13 @@ export async function GET(request: NextRequest) {
     switch (action) {
       case 'status': {
         // Utiliser un timeout plus court pour éviter les attentes trop longues
-        const connectionInfo = await elasticsearchClient?.getConnectionInfo(3000)
+        const connectionInfo = await elasticsearchClient.getConnectionInfo(3000)
 
         // Si connecté, récupérer les informations sur les index
         let indices = {}
         if (connectionInfo?.connected) {
           try {
-            indices = await migrationService?.checkIndexHealth()
+            indices = await migrationService.checkIndexHealth()
           } catch (_error) {}
         }
 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'health': {
-        const indexHealth = await migrationService?.checkIndexHealth()
+        const indexHealth = await migrationService.checkIndexHealth()
         return NextResponse?.json(indexHealth)
       }
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'migrate': {
-        const migrationSuccess = await migrationService?.runAllMigrations()
+        const migrationSuccess = await migrationService.runAllMigrations()
 
         return NextResponse?.json({
           success: migrationSuccess,
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         if (!indexName) {
           return NextResponse?.json({ error: 'Index name required' }, { status: 400 })
         }
-        const resetSuccess = await migrationService?.resetIndex(indexName)
+        const resetSuccess = await migrationService.resetIndex(indexName)
 
         return NextResponse?.json({
           success: resetSuccess,

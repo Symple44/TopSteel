@@ -76,6 +76,32 @@ interface NavItem {
   isCustomized?: boolean
 }
 
+interface DynamicMenuItem {
+  userPreferences?: {
+    customTitle?: string
+    customIcon?: string
+    customBadge?: string
+    customColor?: string
+    isFavorite?: boolean
+    isPinned?: boolean
+  }
+  titleKey?: string
+  icon?: string
+  badge?: string
+  gradient?: string
+  type?: string
+  href?: string
+  path?: string
+  id?: string
+  title: string // Made required to match TranslatableMenuItem
+  roles?: string[]
+  children?: DynamicMenuItem[]
+  // Additional properties for different menu types
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
+}
+
 // Mapping des noms d'icônes vers les composants Lucide
 const iconMap: Record<string, LucideIcon> = {
   Home,
@@ -280,12 +306,12 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
   // Convertir le menu dynamique au format NavItem (mémoïsé pour éviter les re-renders)
   const convertDynamicToNavItem = useCallback(
-    (items: unknown[]): NavItem[] => {
+    (items: DynamicMenuItem[]): NavItem[] => {
       if (!Array.isArray(items)) {
         return []
       }
 
-      const converted = items?.map((item: unknown) => {
+      const converted = items?.map((item: DynamicMenuItem) => {
         // Appliquer les préférences utilisateur si disponibles
         const displayTitle =
           item.userPreferences?.customTitle ||
@@ -314,7 +340,9 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
         return {
           title: displayTitle,
           href,
-          icon: typeof displayIcon === 'string' ? iconMap[displayIcon] || Settings : displayIcon,
+          icon: displayIcon 
+            ? (typeof displayIcon === 'string' ? iconMap[displayIcon] || Settings : displayIcon)
+            : Settings, // Fallback icon when displayIcon is undefined
           badge: displayBadge,
           gradient: item.gradient,
           customIconColor: item.userPreferences?.customColor, // Ajouter la couleur personnalisée
@@ -323,10 +351,11 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           // Ajouter des indicateurs visuels pour les préférences
           isFavorite: item.userPreferences?.isFavorite,
           isPinned: item.userPreferences?.isPinned,
-          isCustomized:
+          isCustomized: !!(
             item.userPreferences?.customTitle ||
             item.userPreferences?.customIcon ||
-            item.userPreferences?.customBadge,
+            item.userPreferences?.customBadge
+          ),
         }
       })
 

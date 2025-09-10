@@ -24,13 +24,13 @@ async function performInitialization(): Promise<boolean> {
     const migrationService = await getMigrationService()
 
     // Vérifier la connexion
-    const isConnected = await elasticsearchClient?.isConnected()
+    const isConnected = await elasticsearchClient.isConnected()
     if (!isConnected) {
       return false
     }
 
     // Lancer les migrations
-    const success = await migrationService?.runAllMigrations()
+    const success = await migrationService.runAllMigrations()
 
     if (success) {
     } else {

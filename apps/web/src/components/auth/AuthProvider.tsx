@@ -191,7 +191,7 @@ export function RouteGuard({
 
     if (requiredPermissions.length > 0 && user) {
       // Get user roles array (new system) or single role (legacy)
-      const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
+      const userRoles = user.roles || (user.role ? [user.role] : [])
 
       const hasPermission = requiredPermissions?.some((permission) => {
         // Check if user has the permission directly
@@ -200,8 +200,8 @@ export function RouteGuard({
         }
 
         // Check if any user role matches the permission
-        return userRoles?.some((role: unknown) => {
-          const roleValue = typeof role === 'object' ? role.name || role.role : role
+        return userRoles?.some((role) => {
+          const roleValue = typeof role === 'object' ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
           return roleValue === permission
         })
       })
@@ -238,7 +238,7 @@ export function RouteGuard({
   // Vérifier les permissions si spécifiées
   if (requiredPermissions.length > 0 && user) {
     // Get user roles array (new system) or single role (legacy)
-    const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
+    const userRoles = user.roles || (user.role ? [user.role] : [])
 
     const hasPermission = requiredPermissions?.some((permission) => {
       // Check if user has the permission directly
@@ -247,8 +247,8 @@ export function RouteGuard({
       }
 
       // Check if any user role matches the permission
-      return userRoles?.some((role: unknown) => {
-        const roleValue = typeof role === 'object' ? role.name || role.role : role
+      return userRoles?.some((role) => {
+        const roleValue = typeof role === 'object' ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
         return roleValue === permission
       })
     })

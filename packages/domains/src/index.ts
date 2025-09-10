@@ -34,6 +34,13 @@ export type {
   UserRole,
   UserStatut,
 } from './core'
+
+// Core enums
+export {
+  ProjetPriorite,
+  ProjetStatut,
+  ProjetType,
+} from './core'
 // ===== SERVICES MÉTIER =====
 export { ClientBusinessService } from './core/client/domain/services'
 // Cross-cutting types

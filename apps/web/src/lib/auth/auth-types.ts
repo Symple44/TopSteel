@@ -5,6 +5,7 @@ export interface User {
   prenom: string
   email: string
   role: string
+  roles?: Array<{ name: string; role: string } | string>
   permissions?: string[]
   isActive: boolean
   createdAt: string

@@ -26,6 +26,11 @@ export type {
   UserRole,
   UserStatut,
 } from './core'
+export {
+  ProjetPriorite,
+  ProjetStatut,
+  ProjetType,
+} from './core'
 export { ClientBusinessService } from './core/client/domain/services'
 export type {
   Notification,

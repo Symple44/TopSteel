@@ -303,7 +303,7 @@ export function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTestDialog
                         {Object.entries(testResult?.result?.conditionResult.details).map(
                           ([conditionId, details]: [
                             string,
-                            { result: boolean; value?: unknown; expected?: unknown },
+                            { result: boolean; value?: unknown; expected?: unknown; condition?: string; actualValue?: unknown },
                           ]) => (
                             <div key={conditionId} className="flex items-center space-x-2 text-sm">
                               {details.result ? (
@@ -311,10 +311,10 @@ export function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTestDialog
                               ) : (
                                 <XCircle className="h-4 w-4 text-red-500" />
                               )}
-                              <span>{(details as unknown).condition || 'N/A'}</span>
+                              <span>{details.condition || 'N/A'}</span>
                               <span className="text-muted-foreground">
                                 (valeur:{' '}
-                                {JSON.stringify((details as unknown).actualValue || details.value)})
+                                {JSON.stringify(details.actualValue || details.value)})
                               </span>
                             </div>
                           )

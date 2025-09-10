@@ -6,12 +6,8 @@ import 'server-only'
 
 // Re-export server modules
 export {
-  // elasticsearchClient, // Missing export from @erp/domains/server
+  elasticsearchClient,
   ImageService,
   imageElasticsearchService,
-  // migrationService, // Missing export from @erp/domains/server
+  migrationService,
 } from '@erp/domains/server'
-
-// Temporary stubs for missing exports
-export const elasticsearchClient = {} as unknown
-export const migrationService = {} as unknown

@@ -35,7 +35,7 @@ import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
 import type { ClientNotification as Notification } from '@/types/notifications'
 
-const categoryIcons: Record<string, React.ComponentType> = {
+const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   system: Database,
   stock: Package,
   projet: FileText,

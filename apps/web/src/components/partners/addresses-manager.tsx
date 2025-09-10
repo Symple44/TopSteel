@@ -109,8 +109,9 @@ export function AddressesManager({
   const updateAddress = useUpdatePartnerAddress()
   const deleteAddress = useDeletePartnerAddress()
 
-  const form = useForm<AddressFormData>({
-    resolver: zodResolver(addressSchema) as unknown,
+  const form = useForm({
+    resolver: zodResolver(addressSchema),
+    mode: 'onChange',
     defaultValues: {
       type: AddressType.FACTURATION,
       status: AddressStatus.ACTIVE,
@@ -225,7 +226,7 @@ export function AddressesManager({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {addresses?.map((address: unknown) => (
+                {addresses?.map((address: PartnerAddress) => (
                   <TableRow key={address.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -322,10 +323,10 @@ export function AddressesManager({
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit as unknown)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="libelle"
                   render={({ field }) => (
                     <FormItem>
@@ -339,7 +340,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="type"
                   render={({ field }) => (
                     <FormItem>
@@ -365,7 +366,7 @@ export function AddressesManager({
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="status"
                   render={({ field }) => (
                     <FormItem>
@@ -389,7 +390,7 @@ export function AddressesManager({
 
                 {sites.length > 0 && (
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="partnerSiteId"
                     render={({ field }) => (
                       <FormItem>
@@ -441,7 +442,7 @@ export function AddressesManager({
                 <h3 className="text-lg font-semibold">Adresse</h3>
 
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="ligne1"
                   render={({ field }) => (
                     <FormItem>
@@ -455,7 +456,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="ligne2"
                   render={({ field }) => (
                     <FormItem>
@@ -469,7 +470,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="ligne3"
                   render={({ field }) => (
                     <FormItem>
@@ -484,7 +485,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="codePostal"
                     render={({ field }) => (
                       <FormItem>
@@ -498,7 +499,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="ville"
                     render={({ field }) => (
                       <FormItem>
@@ -512,7 +513,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="region"
                     render={({ field }) => (
                       <FormItem>
@@ -528,7 +529,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="pays"
                     render={({ field }) => (
                       <FormItem>
@@ -542,7 +543,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="codePays"
                     render={({ field }) => (
                       <FormItem>
@@ -562,7 +563,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="latitude"
                     render={({ field }) => (
                       <FormItem>
@@ -576,7 +577,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="longitude"
                     render={({ field }) => (
                       <FormItem>
@@ -595,7 +596,7 @@ export function AddressesManager({
                 <h3 className="text-lg font-semibold">Contact sur place (optionnel)</h3>
 
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="contactNom"
                   render={({ field }) => (
                     <FormItem>
@@ -610,7 +611,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="contactTelephone"
                     render={({ field }) => (
                       <FormItem>
@@ -624,7 +625,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="contactEmail"
                     render={({ field }) => (
                       <FormItem>
@@ -643,7 +644,7 @@ export function AddressesManager({
                 <h3 className="text-lg font-semibold">Informations complémentaires</h3>
 
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="instructionsAcces"
                   render={({ field }) => (
                     <FormItem>
@@ -661,7 +662,7 @@ export function AddressesManager({
                 />
 
                 <FormField
-                  control={form?.control}
+                  control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
@@ -676,7 +677,7 @@ export function AddressesManager({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="dateDebut"
                     render={({ field }) => (
                       <FormItem>
@@ -693,7 +694,7 @@ export function AddressesManager({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control}
                     name="dateFin"
                     render={({ field }) => (
                       <FormItem>

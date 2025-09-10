@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     // Upload de l'image
     const imageService = await getImageService()
-    const result = await (imageService as unknown)?.uploadImage(
+    const result = await imageService.uploadImage(
       buffer,
       file?.name,
       file?.type,
@@ -78,7 +78,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const imageService = await getImageService()
-    await (imageService as unknown)?.deleteImage(imageId, category)
+    await imageService.deleteImage(imageId, category)
 
     return NextResponse?.json({ success: true })
   } catch (error) {

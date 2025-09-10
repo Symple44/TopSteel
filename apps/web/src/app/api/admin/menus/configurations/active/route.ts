@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         message: (error as Error).message || 'Erreur serveur',
       },
       {
-        status: (error as unknown)?.response?.status || 500,
+        status: (error as { response?: { status?: number } })?.response?.status || 500,
       }
     )
   }

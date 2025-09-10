@@ -91,7 +91,7 @@ import {
   Users,
   Wrench,
 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { TranslationFieldWrapper } from '@/components/wrappers/translation-field-wrapper'
 import { fetchTyped, postTyped } from '@/lib/api-typed'
 import { useTranslation } from '@/lib/i18n/hooks'
@@ -135,7 +135,7 @@ interface UserMenuItem {
   isUserCreated?: boolean // Indique si l'élément a été créé par l'utilisateur (éditable)
 }
 
-const iconMap: Record<string, unknown> = {
+const iconMap: Record<string, React.ComponentType<{className?: string; style?: React.CSSProperties}>> = {
   // Navigation & Structure
   Home,
   LayoutDashboard,
@@ -241,7 +241,7 @@ const getIconsByCategory = (t: TranslationFunction) => {
   }
 }
 
-const getIconComponent = (iconName: string) => {
+const getIconComponent = (iconName: string): React.ComponentType<{className?: string; style?: React.CSSProperties}> => {
   return iconMap[iconName] || Settings
 }
 
@@ -388,7 +388,7 @@ function FolderMenuItem({
               </Button>
             )}
           </div>
-          {Icon && React.isValidElement(<Icon />) && <Icon className="h-4 w-4" style={iconStyle} />}
+          {Icon && <Icon className="h-4 w-4" style={iconStyle} />}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{getTranslatedTitle(item)}</span>
@@ -527,7 +527,7 @@ function SortableUserMenuItem({
           <div {...attributes} {...listeners} className="cursor-move">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
-          {Icon && React.isValidElement(<Icon />) && <Icon className="h-4 w-4" style={iconStyle} />}
+          {Icon && <Icon className="h-4 w-4" style={iconStyle} />}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{getTranslatedTitle(item)}</span>
@@ -600,7 +600,7 @@ function StandardMenuItemDisplay({
   const hasChildren = item.children && item?.children?.length > 0
   const isExpanded = expandedItems?.includes(item.id)
 
-  const handleItemClick = (e: React.MouseEvent) => {
+  const handleItemClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     e?.stopPropagation()
     if (hasChildren && onToggleExpandedItem) {
       onToggleExpandedItem(item.id)
@@ -620,7 +620,7 @@ function StandardMenuItemDisplay({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e?.preventDefault()
-            hasChildren && handleItemClick(e as React.MouseEvent<Element, MouseEvent>)
+            hasChildren && handleItemClick(e)
           }
         }}
         draggable={true}
@@ -772,7 +772,7 @@ const getTypeBadgeColor = (type: string) => {
   }
 }
 
-const getTypeIcon = (type: string) => {
+const getTypeIcon = (type: string): React.ComponentType<{className?: string; style?: React.CSSProperties}> => {
   switch (type) {
     case 'M':
       return FolderOpen
