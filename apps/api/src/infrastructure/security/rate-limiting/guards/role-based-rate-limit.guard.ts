@@ -43,6 +43,7 @@ export interface RoleRateLimitConfig {
 @Injectable()
 export class RoleBasedRateLimitGuard implements CanActivate {
   private readonly logger = new Logger(RoleBasedRateLimitGuard.name)
+  private config: RateLimitingConfiguration
 
   // Predefined role-based limits for different operation types
   private readonly operationLimits = {

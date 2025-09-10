@@ -27,7 +27,7 @@ import type { RoleFormattingService } from '../../../domains/auth/services/role-
 import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import type { UsersService } from '../../../domains/users/users.service'
 import type { SocietesService } from '../../../features/societes/services/societes.service'
-import type { SocieteData } from '../../../types/entities/societe.types'
+import type { SiteData, SocieteData } from '../../../types/entities/societe.types'
 
 interface SocieteQueryDto {
   page?: number
@@ -154,7 +154,7 @@ export class AdminSocietesController {
             userCount,
             users: query.includeUsers ? users : undefined,
             sites:
-              societe.sites?.map((site) => ({
+              societe.sites?.map((site: SiteData) => ({
                 id: site.id,
                 nom: site.nom,
                 code: site.code,

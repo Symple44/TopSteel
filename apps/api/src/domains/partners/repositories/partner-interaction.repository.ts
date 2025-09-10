@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Between, In, LessThan, MoreThan, type Repository } from 'typeorm'
+import { Between, In, LessThan, MoreThan, type Repository, type FindOptionsWhere } from 'typeorm'
 import { toTypeORMUpdate } from '../../../core/database/typeorm-helpers'
 import {
   type InteractionDirection,
@@ -201,7 +201,7 @@ export class PartnerInteractionRepository {
     partnerId: string,
     period?: { start: Date; end: Date }
   ): Promise<InteractionStats> {
-    const whereClause: Record<string, unknown> = { partnerId }
+    const whereClause: FindOptionsWhere<PartnerInteraction> = { partnerId } as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -215,7 +215,7 @@ export class PartnerInteractionRepository {
     userId: string,
     period?: { start: Date; end: Date }
   ): Promise<InteractionStats> {
-    const whereClause: Record<string, unknown> = { userId }
+    const whereClause: FindOptionsWhere<PartnerInteraction> = { userId } as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -226,7 +226,7 @@ export class PartnerInteractionRepository {
   }
 
   async getGlobalStats(period?: { start: Date; end: Date }): Promise<InteractionStats> {
-    const whereClause: Record<string, unknown> = {}
+    const whereClause: FindOptionsWhere<PartnerInteraction> = {} as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -246,7 +246,7 @@ export class PartnerInteractionRepository {
     topUsers: Array<{ userId: string; userName: string; count: number }>
     topPartners: Array<{ partnerId: string; partnerName: string; count: number }>
   }> {
-    const whereClause: Record<string, unknown> = { type }
+    const whereClause: FindOptionsWhere<PartnerInteraction> = { type } as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -358,10 +358,10 @@ export class PartnerInteractionRepository {
   }
 
   async getUpcomingInteractions(limit = 10, userId?: string): Promise<PartnerInteraction[]> {
-    const whereClause: Record<string, unknown> = {
+    const whereClause: FindOptionsWhere<PartnerInteraction> = {
       status: InteractionStatus.PLANIFIE,
       dateInteraction: MoreThan(new Date()),
-    }
+    } as FindOptionsWhere<PartnerInteraction>
 
     if (userId) {
       whereClause.userId = userId
@@ -376,10 +376,10 @@ export class PartnerInteractionRepository {
   }
 
   async getOverdueInteractions(userId?: string): Promise<PartnerInteraction[]> {
-    const whereClause: Record<string, unknown> = {
+    const whereClause: FindOptionsWhere<PartnerInteraction> = {
       status: In([InteractionStatus.PLANIFIE, InteractionStatus.EN_COURS]),
       dateInteraction: LessThan(new Date()),
-    }
+    } as FindOptionsWhere<PartnerInteraction>
 
     if (userId) {
       whereClause.userId = userId
