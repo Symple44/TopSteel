@@ -1,6 +1,6 @@
 'use client'
 
-import { AutoBreadcrumb, type AutoBreadcrumbProps } from '@erp/ui/navigation'
+import { AutoBreadcrumb, type AutoBreadcrumbProps } from '@erp/ui'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/hooks'
 

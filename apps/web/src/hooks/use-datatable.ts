@@ -1,6 +1,5 @@
-import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
-import type { SelectionState } from '@erp/ui/data-display'
-import { usePersistedTableSettings } from '@erp/ui/data-display'
+import type { ColumnConfig, SelectionState } from '@erp/ui'
+import { usePersistedTableSettings } from '@erp/ui'
 import { useCallback, useMemo, useState } from 'react'
 
 interface UseDataTableOptions<T> {

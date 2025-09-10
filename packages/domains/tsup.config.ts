@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  // Skip DTS to avoid memory issues
+  // Skip DTS to avoid memory issues - use tsc for declarations
   dts: false,
   entry: {
     index: 'src/index.ts',

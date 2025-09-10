@@ -95,7 +95,7 @@ export function AddToMenuButton({
       toast({
         title: 'Erreur',
         description:
-          (error as unknown)?.response?.data?.message ||
+          (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
           (error instanceof Error ? error.message : "Impossible d'ajouter la vue au menu"),
         variant: 'destructive',
       })

@@ -88,7 +88,7 @@ function notificationsReducer(
         ...state,
         notifications: state.notifications.map(
           (n): Notification =>
-            n.id === action.payload ? { ...n, readAt: new Date().toISOString() as unknown } : n
+            n.id === action.payload ? { ...n, readAt: new Date() } : n
         ),
         unreadCount: Math.max(0, state.unreadCount - 1),
       }
@@ -98,7 +98,7 @@ function notificationsReducer(
         notifications: state.notifications.map(
           (n): Notification => ({
             ...n,
-            readAt: new Date().toISOString() as unknown,
+            readAt: new Date(),
           })
         ),
         unreadCount: 0,

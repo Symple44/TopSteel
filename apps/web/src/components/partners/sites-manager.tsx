@@ -123,7 +123,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
   const deleteSite = useDeletePartnerSite()
 
   const form = useForm<SiteFormData>({
-    resolver: zodResolver(siteSchema) as unknown,
+    resolver: zodResolver(siteSchema),
     defaultValues: {
       type: SiteType.DEPOT,
       status: SiteStatus.ACTIF,
@@ -239,7 +239,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sites?.map((site: unknown) => (
+                {sites?.map((site: PartnerSite) => (
                   <TableRow key={site.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form?.handleSubmit(onSubmit as unknown)} className="space-y-4">
+            <form onSubmit={form?.handleSubmit(onSubmit)} className="space-y-4">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="general">Général</TabsTrigger>

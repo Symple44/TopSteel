@@ -1,6 +1,6 @@
 'use client'
 
-import { LanguageSelector } from '@erp/ui/navigation'
+import { LanguageSelector } from '@erp/ui'
 import { useLanguage } from '@/lib/i18n'
 
 interface LanguageSelectorWrapperProps {

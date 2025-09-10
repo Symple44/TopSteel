@@ -19,12 +19,12 @@ import {
 import { Database, FileSpreadsheet, Settings2, Shield } from 'lucide-react'
 
 interface QuerySettingsProps {
-  settings: any
+  settings: unknown
   onSettingsChange: (updates: unknown) => void
 }
 
 export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps) {
-  const handleSettingChange = (key: string, value: any) => {
+  const handleSettingChange = (key: string, value: unknown) => {
     if (key?.includes('.')) {
       const [parent, child] = key.split('.')
       onSettingsChange({

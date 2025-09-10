@@ -15,9 +15,30 @@ import { QueryPreview } from './query-preview'
 import { QuerySettings } from './query-settings'
 import { TableSelector } from './table-selector'
 
+interface QueryBuilderData {
+  name: string
+  description: string
+  database: string
+  mainTable: string
+  isPublic: boolean
+  maxRows?: number
+  settings: {
+    enablePagination: boolean
+    pageSize: number
+    enableSorting: boolean
+    enableFiltering: boolean
+    enableExport: boolean
+    exportFormats: string[]
+  }
+  columns: unknown[]
+  joins: unknown[]
+  calculatedFields: unknown[]
+  layout: Record<string, unknown>
+}
+
 interface QueryBuilderInterfaceProps {
   queryBuilderId: string
-  initialData?: any
+  initialData?: Partial<QueryBuilderData>
 }
 
 export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuilderInterfaceProps) {
@@ -27,13 +48,13 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
   const [activeTab, setActiveTab] = useState('design')
 
   // Query Builder State
-  const [queryBuilder, setQueryBuilder] = useState({
+  const [queryBuilder, setQueryBuilder] = useState<QueryBuilderData>({
     name: initialData?.name || t('title'),
     description: initialData?.description || '',
     database: initialData?.database || 'default',
     mainTable: initialData?.mainTable || '',
     isPublic: initialData?.isPublic ?? false,
-    maxRows: initialData?.maxRows || null,
+    maxRows: initialData?.maxRows || undefined,
     settings: initialData?.settings || {
       enablePagination: true,
       pageSize: 50,
@@ -151,18 +172,23 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
     }
   }
 
-  const updateQueryBuilder = (updates: Partial<typeof queryBuilder>) => {
-    setQueryBuilder((prev) => ({ ...prev, ...updates }))
+  const updateQueryBuilder = (updates: unknown) => {
+    if (typeof updates === 'object' && updates !== null) {
+      setQueryBuilder((prev) => ({ ...prev, ...updates as Partial<QueryBuilderData> }))
+    }
   }
 
   const handleImport = (importedData: unknown) => {
-    setQueryBuilder(importedData)
-    // Mettre à jour les tables sélectionnées
-    if (importedData.mainTable) {
-      setSelectedTables([
-        importedData.mainTable,
-        ...(importedData.joins?.map((j: unknown) => j.toTable) || []),
-      ])
+    if (typeof importedData === 'object' && importedData !== null) {
+      const data = importedData as Partial<QueryBuilderData>
+      setQueryBuilder(data as QueryBuilderData)
+      // Mettre à jour les tables sélectionnées
+      if (data.mainTable) {
+        setSelectedTables([
+          data.mainTable,
+          ...(data.joins?.map((j: { toTable: string }) => j.toTable) || []),
+        ])
+      }
     }
   }
 
@@ -264,7 +290,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
               columns={queryBuilder.columns}
               calculatedFields={queryBuilder.calculatedFields}
               layout={queryBuilder.layout}
-              settings={queryBuilder.settings}
+              settings={{ settings: queryBuilder.settings }}
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-full">
@@ -312,10 +338,10 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
             {queryBuilder.mainTable ? (
               <DataTablePreview
                 data={previewData || []}
-                columns={queryBuilder?.columns?.filter((col: unknown) => col.isVisible)}
+                columns={queryBuilder?.columns?.filter((col: any) => col.isVisible)}
                 calculatedFields={queryBuilder.calculatedFields}
                 layout={queryBuilder.layout}
-                settings={queryBuilder.settings}
+                settings={{ settings: queryBuilder.settings }}
               />
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">

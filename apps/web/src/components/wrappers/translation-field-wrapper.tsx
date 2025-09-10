@@ -1,6 +1,6 @@
 'use client'
 
-import { TranslationField } from '@erp/ui/forms'
+import { TranslationField } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { translator } from '@/lib/i18n/translator'
 

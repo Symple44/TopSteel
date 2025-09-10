@@ -148,7 +148,7 @@ export function PartnerFormDialog({
   const isEditing = !!partner
 
   const form = useForm<PartnerFormData>({
-    resolver: zodResolver(partnerSchema, {}, { mode: 'async' }) as any,
+    resolver: zodResolver(partnerSchema),
     defaultValues: {
       type: (defaultType as PartnerType) || PartnerType.CLIENT,
       status: PartnerStatus.ACTIF,
@@ -196,7 +196,7 @@ export function PartnerFormDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="general">

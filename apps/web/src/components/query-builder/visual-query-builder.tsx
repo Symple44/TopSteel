@@ -272,7 +272,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
    * Handle successful query execution
    */
   const handleQuerySuccess = (result: unknown) => {
-    const data = Array.isArray(result) ? result : result.data || result.rows || []
+    const data = Array.isArray(result) ? result : (result as any)?.data || (result as any)?.rows || []
     setPreviewData(data)
     toast.success(`Requête exécutée avec succès (${data.length} résultats)`)
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { ImageUpload } from '@erp/ui/business'
+import { ImageUpload } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n'
 import { callClientApi } from '@/utils/backend-api'
 

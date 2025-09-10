@@ -1,6 +1,6 @@
 'use client'
 
-import { ErpInfoModal } from '@erp/ui/business'
+import { ErpInfoModal } from '@erp/ui'
 import { useBackendHealth } from '@/hooks/use-backend-health'
 import { useTranslation } from '@/lib/i18n'
 

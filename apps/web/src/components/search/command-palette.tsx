@@ -30,7 +30,7 @@ import { type SearchResult, useGlobalSearch } from '@/hooks/use-global-search'
 import { cn } from '@/lib/utils'
 
 // Mapping des types vers les icônes
-const TYPE_ICONS: Record<string, unknown> = {
+const TYPE_ICONS: Record<string, React.ComponentType<any>> = {
   menu: Menu,
   client: Users,
   fournisseur: Truck,
@@ -456,10 +456,10 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
       {result.metadata && (
         <div className="ml-2 flex items-center gap-2 text-xs text-muted-foreground">
           {result?.metadata?.statut && (
-            <span className="px-1.5 py-0.5 bg-muted rounded">{result?.metadata?.statut}</span>
+            <span className="px-1.5 py-0.5 bg-muted rounded">{result?.metadata?.statut as string}</span>
           )}
           {result?.metadata?.montant && (
-            <span className="font-medium">{result?.metadata?.montant}€</span>
+            <span className="font-medium">{result?.metadata?.montant as string}€</span>
           )}
         </div>
       )}

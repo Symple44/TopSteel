@@ -52,6 +52,16 @@ interface ColumnSelectorProps {
   onColumnsChange: (columns: Column[]) => void
 }
 
+interface DraggableColumnProps {
+  column: Column
+  index: number
+  moveColumn?: (fromIndex: number, toIndex: number) => void
+  toggleVisibility: (index: number) => void
+  onRemove: (index: number) => void
+  selected: boolean
+  onSelect: () => void
+}
+
 const DraggableColumn = ({
   column,
   index,
@@ -59,7 +69,7 @@ const DraggableColumn = ({
   onRemove,
   selected,
   onSelect,
-}: unknown) => {
+}: DraggableColumnProps) => {
   // Temporairement désactivé le drag & drop
   const isDragging = false
 
