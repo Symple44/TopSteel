@@ -49,7 +49,7 @@ interface RequestWithUser extends Request {
 @Injectable()
 export class AdvancedRateLimitGuard implements CanActivate {
   private readonly logger = new Logger(AdvancedRateLimitGuard.name)
-  private readonly config: RateLimitingConfiguration
+  private config: RateLimitingConfiguration
 
   constructor(
     private readonly reflector: Reflector,
