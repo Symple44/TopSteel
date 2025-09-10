@@ -290,7 +290,7 @@ function FolderMenuItem({
 }) {
   const { t } = useTranslation('settings')
   const IconComponent = item.customIcon ? getIconComponent(item.customIcon) : getTypeIcon(item.type)
-  const Icon = IconComponent
+  const Icon = IconComponent || Home
   const iconStyle = getColorStyle(item.customIconColor)
   const [isDragOver, setIsDragOver] = useState(false)
   const hasChildren = item.children && item?.children?.length > 0
@@ -388,7 +388,7 @@ function FolderMenuItem({
               </Button>
             )}
           </div>
-          <Icon className="h-4 w-4" style={iconStyle} />
+          {Icon && React.isValidElement(<Icon />) && <Icon className="h-4 w-4" style={iconStyle} />}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{getTranslatedTitle(item)}</span>
@@ -511,7 +511,7 @@ function SortableUserMenuItem({
   }
 
   const IconComponent = item.customIcon ? getIconComponent(item.customIcon) : getTypeIcon(item.type)
-  const Icon = IconComponent
+  const Icon = IconComponent || Home
   const iconStyle = getColorStyle(item.customIconColor)
 
   return (
@@ -527,7 +527,7 @@ function SortableUserMenuItem({
           <div {...attributes} {...listeners} className="cursor-move">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
-          <Icon className="h-4 w-4" style={iconStyle} />
+          {Icon && React.isValidElement(<Icon />) && <Icon className="h-4 w-4" style={iconStyle} />}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{getTranslatedTitle(item)}</span>
@@ -620,7 +620,7 @@ function StandardMenuItemDisplay({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e?.preventDefault()
-            hasChildren && handleItemClick(e as unknown)
+            hasChildren && handleItemClick(e as React.MouseEvent<Element, MouseEvent>)
           }
         }}
         draggable={true}
@@ -1666,12 +1666,12 @@ export default function MenuDragDropPage() {
                         : editingItem.customIconColor
                           ? { color: editingItem.customIconColor }
                           : {}
-                      return (
+                      return IconComponent ? (
                         <IconComponent
                           className="h-8 w-8 transition-all duration-300"
                           style={iconStyle}
                         />
-                      )
+                      ) : null
                     })()}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/30 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-lg flex items-center justify-center backdrop-blur-sm">
                       <Edit className="h-4 w-4 text-white drop-shadow-lg" />
@@ -1784,6 +1784,7 @@ export default function MenuDragDropPage() {
                           <div className="grid grid-cols-8 gap-1">
                             {icons?.map((iconName) => {
                               const IconComponent = getIconComponent(iconName)
+                              if (!IconComponent) return null
                               return (
                                 <button
                                   key={iconName}
@@ -1828,12 +1829,12 @@ export default function MenuDragDropPage() {
                       : editingItem.customIconColor
                         ? { color: editingItem.customIconColor }
                         : {}
-                    return (
+                    return IconComponent ? (
                       <IconComponent
                         className="h-5 w-5 transition-all duration-300"
                         style={previewIconStyle}
                       />
-                    )
+                    ) : null
                   })()}
                   <span className="font-medium transition-all duration-300">
                     {editTitle?.trim() || editingItem.title}

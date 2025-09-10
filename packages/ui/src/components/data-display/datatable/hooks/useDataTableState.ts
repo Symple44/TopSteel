@@ -204,9 +204,9 @@ export function useDataTableState<T>({
     toggleAll,
     selectRange,
     deselectAll: clearSelection,
-  } = useDataSelection({
-    data: sortedData,
-    keyField,
+  } = useDataSelection<T>({
+    data: sortedData as T[],
+    keyField: keyField as string | number,
     selectable,
     onSelectionChange,
   })
