@@ -144,7 +144,7 @@ export function hasProperty<T extends object, K extends PropertyKey>(
 /**
  * Validation result type
  */
-export interface ValidationResult<T = any> {
+export interface ValidationResult<T = unknown> {
   isValid: boolean
   value?: T
   errors?: string[]
