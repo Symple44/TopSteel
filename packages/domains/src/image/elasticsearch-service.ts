@@ -40,7 +40,6 @@ export interface ElasticsearchImageDocument {
 }
 
 export class ImageElasticsearchService {
-  private indexName: string
   private baseUrl: string
 
   constructor(indexName: string = 'images', baseUrl: string = '/api/images') {

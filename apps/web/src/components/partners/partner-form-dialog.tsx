@@ -147,7 +147,9 @@ export function PartnerFormDialog({
 
   const isEditing = !!partner
 
+  // biome-ignore lint/suspicious/noExplicitAny: Required for React Hook Form v7 strict TypeScript compatibility
   const form = useForm<PartnerFormData, any, PartnerFormData>({
+    // biome-ignore lint/suspicious/noExplicitAny: Zod resolver type casting needed for strict mode
     resolver: zodResolver(partnerSchema) as any,
     defaultValues: {
       type: (defaultType as PartnerType) || PartnerType.CLIENT,
@@ -632,7 +634,11 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value !== undefined && field.value !== null ? field.value : ''}
+                                value={
+                                  field.value !== undefined && field.value !== null
+                                    ? field.value
+                                    : ''
+                                }
                                 type="number"
                                 placeholder="0"
                               />
@@ -651,7 +657,11 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value !== undefined && field.value !== null ? field.value : ''}
+                                value={
+                                  field.value !== undefined && field.value !== null
+                                    ? field.value
+                                    : ''
+                                }
                                 type="number"
                                 min="0"
                                 max="100"
@@ -695,7 +705,11 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value !== undefined && field.value !== null ? field.value : ''}
+                                value={
+                                  field.value !== undefined && field.value !== null
+                                    ? field.value
+                                    : ''
+                                }
                                 type="number"
                                 placeholder="0"
                               />
@@ -714,7 +728,11 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value !== undefined && field.value !== null ? field.value : ''}
+                                value={
+                                  field.value !== undefined && field.value !== null
+                                    ? field.value
+                                    : ''
+                                }
                                 type="number"
                                 placeholder="0"
                               />

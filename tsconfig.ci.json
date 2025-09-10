@@ -17,12 +17,7 @@
     "noEmit": true,
     "composite": false
   },
-  "include": [
-    "packages/**/*.ts",
-    "packages/**/*.tsx",
-    "apps/**/*.ts",
-    "apps/**/*.tsx"
-  ],
+  "include": ["packages/**/*.ts", "packages/**/*.tsx", "apps/**/*.ts", "apps/**/*.tsx"],
   "exclude": [
     "node_modules",
     "**/node_modules",

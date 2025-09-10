@@ -42,5 +42,10 @@ export default function QueryBuilderDetailPage() {
     )
   }
 
-  return <QueryBuilderInterface queryBuilderId={params?.id as string} initialData={queryBuilder || undefined} />
+  return (
+    <QueryBuilderInterface
+      queryBuilderId={params?.id as string}
+      initialData={queryBuilder || undefined}
+    />
+  )
 }

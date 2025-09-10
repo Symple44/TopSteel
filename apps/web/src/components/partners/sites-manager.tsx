@@ -106,7 +106,6 @@ const siteSchema = z?.object({
 
 type SiteFormData = z.infer<typeof siteSchema>
 
-
 interface SitesManagerProps {
   partnerId: string
   sites: PartnerSite[]
@@ -123,7 +122,9 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
   const updateSite = useUpdatePartnerSite()
   const deleteSite = useDeletePartnerSite()
 
+  // biome-ignore lint/suspicious/noExplicitAny: Required for React Hook Form v7 strict TypeScript compatibility
   const form = useForm<SiteFormData, any, SiteFormData>({
+    // biome-ignore lint/suspicious/noExplicitAny: Zod resolver type casting needed for strict mode
     resolver: zodResolver(siteSchema) as any,
     defaultValues: {
       type: SiteType.DEPOT,

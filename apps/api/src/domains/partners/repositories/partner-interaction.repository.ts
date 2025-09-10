@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Between, In, LessThan, MoreThan, type Repository, type FindOptionsWhere } from 'typeorm'
+import { Between, type FindOptionsWhere, In, LessThan, MoreThan, type Repository } from 'typeorm'
 import { toTypeORMUpdate } from '../../../core/database/typeorm-helpers'
 import {
   type InteractionDirection,
@@ -201,7 +201,9 @@ export class PartnerInteractionRepository {
     partnerId: string,
     period?: { start: Date; end: Date }
   ): Promise<InteractionStats> {
-    const whereClause: FindOptionsWhere<PartnerInteraction> = { partnerId } as FindOptionsWhere<PartnerInteraction>
+    const whereClause: FindOptionsWhere<PartnerInteraction> = {
+      partnerId,
+    } as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -215,7 +217,9 @@ export class PartnerInteractionRepository {
     userId: string,
     period?: { start: Date; end: Date }
   ): Promise<InteractionStats> {
-    const whereClause: FindOptionsWhere<PartnerInteraction> = { userId } as FindOptionsWhere<PartnerInteraction>
+    const whereClause: FindOptionsWhere<PartnerInteraction> = {
+      userId,
+    } as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -226,7 +230,8 @@ export class PartnerInteractionRepository {
   }
 
   async getGlobalStats(period?: { start: Date; end: Date }): Promise<InteractionStats> {
-    const whereClause: FindOptionsWhere<PartnerInteraction> = {} as FindOptionsWhere<PartnerInteraction>
+    const whereClause: FindOptionsWhere<PartnerInteraction> =
+      {} as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }
@@ -246,7 +251,9 @@ export class PartnerInteractionRepository {
     topUsers: Array<{ userId: string; userName: string; count: number }>
     topPartners: Array<{ partnerId: string; partnerName: string; count: number }>
   }> {
-    const whereClause: FindOptionsWhere<PartnerInteraction> = { type } as FindOptionsWhere<PartnerInteraction>
+    const whereClause: FindOptionsWhere<PartnerInteraction> = {
+      type,
+    } as FindOptionsWhere<PartnerInteraction>
     if (period) {
       whereClause.dateInteraction = Between(period.start, period.end)
     }

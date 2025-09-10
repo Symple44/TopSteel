@@ -320,10 +320,16 @@ export class AdminMFAController {
           },
           methodDiversity: {
             status:
-              Object.keys((status as any).mfaMethodDistribution || {}).length > 1
+              Object.keys(
+                (status as unknown as { mfaMethodDistribution?: Record<string, unknown> })
+                  .mfaMethodDistribution || {}
+              ).length > 1
                 ? 'good'
                 : 'warning',
-            value: Object.keys((status as any).mfaMethodDistribution || {}).length,
+            value: Object.keys(
+              (status as unknown as { mfaMethodDistribution?: Record<string, unknown> })
+                .mfaMethodDistribution || {}
+            ).length,
             description: 'Nombre de méthodes MFA utilisées',
           },
         },
@@ -340,7 +346,7 @@ export class AdminMFAController {
   }
 
   // Helper methods
-  private generateMFARecommendations(status: any): string[] {
+  private generateMFARecommendations(status: unknown): string[] {
     const recommendations: string[] = []
 
     const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0
@@ -367,7 +373,7 @@ export class AdminMFAController {
     return 'not_applicable'
   }
 
-  private getMFARecommendation(hasMFA: boolean, isRequired: boolean, stats: any): string {
+  private getMFARecommendation(hasMFA: boolean, isRequired: boolean, stats: unknown): string {
     if (isRequired && !hasMFA) return 'MFA requis pour ce rôle - configuration nécessaire'
     if (!hasMFA) return 'MFA recommandé pour améliorer la sécurité'
     if (stats.securityLevel === 'basic') return "Considérer l'ajout d'une seconde méthode MFA"
@@ -440,7 +446,7 @@ export class AdminMFAController {
     return ((secondHalf - firstHalf) / firstHalf) * 100
   }
 
-  private generateHealthRecommendations(status: any, recentActivity: number): string[] {
+  private generateHealthRecommendations(status: unknown, recentActivity: number): string[] {
     const recommendations: string[] = []
 
     const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0
