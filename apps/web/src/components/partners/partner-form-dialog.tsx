@@ -632,7 +632,7 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value ?? ''}
+                                value={field.value || ''}
                                 type="number"
                                 placeholder="0"
                               />
@@ -651,7 +651,7 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value ?? ''}
+                                value={field.value || ''}
                                 type="number"
                                 min="0"
                                 max="100"
@@ -695,7 +695,7 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value ?? ''}
+                                value={field.value || ''}
                                 type="number"
                                 placeholder="0"
                               />
@@ -714,7 +714,7 @@ export function PartnerFormDialog({
                             <FormControl>
                               <Input
                                 {...field}
-                                value={field.value ?? ''}
+                                value={field.value || ''}
                                 type="number"
                                 placeholder="0"
                               />

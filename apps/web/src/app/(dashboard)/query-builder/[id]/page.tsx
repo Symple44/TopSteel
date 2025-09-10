@@ -11,7 +11,7 @@ import { callClientApi } from '@/utils/backend-api'
 export default function QueryBuilderDetailPage() {
   const params = useParams()
   const [loading, setLoading] = useState(true)
-  const [queryBuilder, setQueryBuilder] = useState(null)
+  const [queryBuilder, setQueryBuilder] = useState<unknown>(null)
 
   const fetchQueryBuilder = useCallback(async (id: string) => {
     try {
@@ -42,5 +42,5 @@ export default function QueryBuilderDetailPage() {
     )
   }
 
-  return <QueryBuilderInterface queryBuilderId={params?.id as string} initialData={queryBuilder} />
+  return <QueryBuilderInterface queryBuilderId={params?.id as string} initialData={queryBuilder || undefined} />
 }

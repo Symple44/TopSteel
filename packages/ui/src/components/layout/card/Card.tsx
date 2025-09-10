@@ -34,10 +34,12 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 
     const finalClassName = cn(cardVariants({ variant, padding }), interactiveClasses, className)
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown as React.MouseEvent)
+        // Create a synthetic mouse event from keyboard event
+        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
+        onClick(syntheticEvent)
       }
     }
 
@@ -88,10 +90,12 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
       : ''
     const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown as React.MouseEvent)
+        // Create a synthetic mouse event from keyboard event
+        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
+        onClick(syntheticEvent)
       }
     }
 
@@ -205,10 +209,12 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
       : ''
     const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown as React.MouseEvent)
+        // Create a synthetic mouse event from keyboard event
+        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
+        onClick(syntheticEvent)
       }
     }
 
@@ -258,10 +264,12 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
       : ''
     const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (onClick && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
-        onClick(e as unknown as React.MouseEvent)
+        // Create a synthetic mouse event from keyboard event
+        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
+        onClick(syntheticEvent)
       }
     }
 
