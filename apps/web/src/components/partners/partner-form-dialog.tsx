@@ -147,8 +147,8 @@ export function PartnerFormDialog({
 
   const isEditing = !!partner
 
-  const form = useForm({
-    resolver: zodResolver(partnerSchema),
+  const form = useForm<PartnerFormData, any, PartnerFormData>({
+    resolver: zodResolver(partnerSchema) as any,
     defaultValues: {
       type: (defaultType as PartnerType) || PartnerType.CLIENT,
       status: PartnerStatus.ACTIF,

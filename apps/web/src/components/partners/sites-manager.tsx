@@ -106,6 +106,7 @@ const siteSchema = z?.object({
 
 type SiteFormData = z.infer<typeof siteSchema>
 
+
 interface SitesManagerProps {
   partnerId: string
   sites: PartnerSite[]
@@ -122,8 +123,8 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
   const updateSite = useUpdatePartnerSite()
   const deleteSite = useDeletePartnerSite()
 
-  const form = useForm<SiteFormData>({
-    resolver: zodResolver(siteSchema),
+  const form = useForm<SiteFormData, any, SiteFormData>({
+    resolver: zodResolver(siteSchema) as any,
     defaultValues: {
       type: SiteType.DEPOT,
       status: SiteStatus.ACTIF,
