@@ -190,7 +190,7 @@ export function ContactsManager({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contacts?.map((contact: unknown) => (
+                {contacts?.map((contact: Contact) => (
                   <TableRow key={contact.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -281,7 +281,7 @@ export function ContactsManager({
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form?.handleSubmit(onSubmit as unknown)} className="space-y-4">
+            <form onSubmit={form?.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form?.control}

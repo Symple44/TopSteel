@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       buffer,
       file?.name,
       file?.type,
-      category as string,
+      category as 'avatar' | 'logo' | 'document',
       session?.user?.id,
       {
         entityType: entityType as string,

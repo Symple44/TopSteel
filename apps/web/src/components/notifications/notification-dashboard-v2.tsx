@@ -49,7 +49,7 @@ const categoryConfig = {
 const priorityConfig = {
   all: { label: 'Toutes priorités', color: 'bg-gray-100 text-gray-700' },
   low: { label: 'Faible', color: 'bg-green-100 text-green-700' },
-  normal: { label: 'Normal', color: 'bg-blue-100 text-blue-700' },
+  medium: { label: 'Normal', color: 'bg-blue-100 text-blue-700' },
   high: { label: 'Élevée', color: 'bg-orange-100 text-orange-700' },
   urgent: { label: 'Urgente', color: 'bg-red-100 text-red-700' },
 } as const
@@ -83,7 +83,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
     // Filtre par priorité
     if (selectedPriority !== 'all') {
       filtered = filtered?.filter(
-        (n) => (n.priority?.toLowerCase() || 'normal') === selectedPriority
+        (n) => (n.priority?.toLowerCase() || 'medium') === selectedPriority
       )
     }
 
@@ -408,7 +408,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                                 {categoryConfig[category as keyof typeof categoryConfig]?.label ||
                                   'Système'}
                               </Badge>
-                              {notification.priority && notification.priority !== NotificationPriority.NORMAL && (
+                              {notification.priority && notification.priority !== 'medium' && (
                                 <Badge
                                   className={cn(
                                     'text-xs',
@@ -493,14 +493,14 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                         className={cn(
                           priorityConfig[
                             (selectedNotification.priority?.toLowerCase() ||
-                              'normal') as keyof typeof priorityConfig
+                              'medium') as keyof typeof priorityConfig
                           ]?.color
                         )}
                       >
                         {
                           priorityConfig[
                             (selectedNotification.priority?.toLowerCase() ||
-                              'normal') as keyof typeof priorityConfig
+                              'medium') as keyof typeof priorityConfig
                           ]?.label
                         }
                       </Badge>

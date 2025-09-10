@@ -148,7 +148,7 @@ export function PartnerFormDialog({
   const isEditing = !!partner
 
   const form = useForm<PartnerFormData>({
-    resolver: zodResolver(partnerSchema) as unknown,
+    resolver: zodResolver(partnerSchema),
     defaultValues: {
       type: (defaultType as PartnerType) || PartnerType.CLIENT,
       status: PartnerStatus.ACTIF,
@@ -196,7 +196,7 @@ export function PartnerFormDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form?.handleSubmit(onSubmit as unknown)} className="space-y-6">
+          <form onSubmit={form?.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="general">
@@ -551,7 +551,7 @@ export function PartnerFormDialog({
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="">Aucun</SelectItem>
-                            {groups?.map((group: unknown) => (
+                            {groups?.map((group) => (
                               <SelectItem key={group.id} value={group.id}>
                                 {group.name}
                                 {group.defaultDiscount && ` (-${group.defaultDiscount}%)`}
