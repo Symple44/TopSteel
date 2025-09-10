@@ -340,8 +340,10 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
         return {
           title: displayTitle,
           href,
-          icon: displayIcon 
-            ? (typeof displayIcon === 'string' ? iconMap[displayIcon] || Settings : displayIcon)
+          icon: displayIcon
+            ? typeof displayIcon === 'string'
+              ? iconMap[displayIcon] || Settings
+              : displayIcon
             : Settings, // Fallback icon when displayIcon is undefined
           badge: displayBadge,
           gradient: item.gradient,

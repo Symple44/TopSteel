@@ -1,8 +1,8 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
-// Removed direct imports to avoid circular dependencies
-// import { Partner } from './partner.entity'
-// import { PartnerSite } from './partner-site.entity';
+// Type imports to avoid circular dependencies
+import type { Partner } from './partner.entity'
+import type { PartnerSite } from './partner-site.entity'
 
 export enum AddressType {
   FACTURATION = 'FACTURATION', // Adresse de facturation
@@ -33,7 +33,7 @@ export class PartnerAddress extends BusinessEntity {
     lazy: true,
   })
   @JoinColumn({ name: 'partnerId' })
-  partner!: any
+  partner!: Partner
 
   @Column({ type: 'uuid', nullable: true })
   @Index()
@@ -45,7 +45,7 @@ export class PartnerAddress extends BusinessEntity {
     lazy: true,
   })
   @JoinColumn({ name: 'partnerSiteId' })
-  site?: any
+  site?: PartnerSite
 
   @Column({ type: 'varchar', length: 100 })
   @Index()

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
         menuId: string
         isVisible?: boolean
       }
-      
+
       let menuPreferences: MenuPreference[] = []
 
       // Gérer la structure imbriquée du backend : { data: { success: true, data: [...] } }
@@ -32,9 +32,7 @@ export async function GET(request: NextRequest) {
         menuPreferences = []
       }
 
-      const selectedPages = menuPreferences
-        .filter((p) => p.isVisible)
-        .map((p) => p.menuId)
+      const selectedPages = menuPreferences.filter((p) => p.isVisible).map((p) => p.menuId)
 
       return NextResponse?.json({
         success: true,

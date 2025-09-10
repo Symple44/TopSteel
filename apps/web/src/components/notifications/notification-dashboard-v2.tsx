@@ -26,7 +26,6 @@ import { createPortal } from 'react-dom'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
 import type { ClientNotification as Notification } from '@/types/notifications'
-import { NotificationPriority } from '@erp/domains'
 
 interface NotificationDashboardV2Props {
   isOpen: boolean

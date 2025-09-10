@@ -22,6 +22,8 @@ import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/com
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
 import type { MFAService } from '../../../domains/auth/services/mfa.service'
+import type { MFASession } from '../../../domains/auth/core/entities/mfa-session.entity'
+import type { UserMFA } from '../../../domains/auth/core/entities/user-mfa.entity'
 
 @Controller('admin/mfa')
 @ApiTags('🔧 Admin - Multi-Factor Authentication')
@@ -71,7 +73,7 @@ export class AdminMFAController {
           userId,
           hasMFAEnabled,
           isMFARequired,
-          methods: mfaMethods.map((method: any) => ({
+          methods: mfaMethods.map((method: UserMFA) => ({
             id: method.id,
             type: method.type,
             isEnabled: method.isEnabled,
@@ -82,7 +84,7 @@ export class AdminMFAController {
               usageCount: method.metadata?.usageCount || 0,
               failedAttempts: method.metadata?.failedAttempts || 0,
               deviceInfo:
-                method.type === 'WEBAUTHN'
+                method.type === 'webauthn'
                   ? method.metadata?.deviceInfo
                     ? [
                         {
@@ -136,7 +138,7 @@ export class AdminMFAController {
 
       return {
         success: true,
-        data: sessions.map((session: any) => ({
+        data: sessions.map((session: MFASession) => ({
           id: session.id,
           userId: session.userId,
           sessionToken: `${session.sessionToken.substring(0, 8)}***`, // Masked for security
@@ -271,15 +273,15 @@ export class AdminMFAController {
           failedAuthentications: mfaSessions.filter((s) => s.status === 'failed').length,
           expiredSessions: mfaSessions.filter((s) => s.status === 'expired').length,
         },
-        methodPopularity: this.calculateMethodPopularity(mfaRecords as any[]),
+        methodPopularity: this.calculateMethodPopularity(mfaRecords as UserMFA[]),
         securityMetrics: {
-          averageAttemptsPerSession: this.calculateAverageAttempts(mfaSessions as any[]),
-          mostActiveHours: this.calculateActiveHours(mfaSessions as any[]),
-          topFailureReasons: this.calculateFailureReasons(mfaSessions as any[]),
+          averageAttemptsPerSession: this.calculateAverageAttempts(mfaSessions as MFASession[]),
+          mostActiveHours: this.calculateActiveHours(mfaSessions as MFASession[]),
+          topFailureReasons: this.calculateFailureReasons(mfaSessions as MFASession[]),
         },
         trends: {
           adoptionRate: await this.calculateAdoptionTrend(days),
-          usageGrowth: this.calculateUsageGrowth(mfaSessions as any[]),
+          usageGrowth: this.calculateUsageGrowth(mfaSessions as MFASession[]),
         },
       }
 
@@ -372,7 +374,7 @@ export class AdminMFAController {
     return 'Configuration MFA optimale'
   }
 
-  private calculateMethodPopularity(records: any[]): Record<string, number> {
+  private calculateMethodPopularity(records: UserMFA[]): Record<string, number> {
     const popularity: Record<string, number> = {}
     for (const record of records) {
       popularity[record.type] = (popularity[record.type] || 0) + 1
@@ -380,7 +382,7 @@ export class AdminMFAController {
     return popularity
   }
 
-  private calculateAverageAttempts(sessions: any[]): number {
+  private calculateAverageAttempts(sessions: MFASession[]): number {
     if (sessions.length === 0) return 0
     const totalAttempts = sessions.reduce(
       (sum, session) => sum + (session.getAttemptsCount?.() || 1),
@@ -389,7 +391,7 @@ export class AdminMFAController {
     return totalAttempts / sessions.length
   }
 
-  private calculateActiveHours(sessions: any[]): number[] {
+  private calculateActiveHours(sessions: MFASession[]): number[] {
     const hourCounts = new Array(24).fill(0)
     for (const session of sessions) {
       const hour = new Date(session.createdAt).getHours()
@@ -398,7 +400,7 @@ export class AdminMFAController {
     return hourCounts
   }
 
-  private calculateFailureReasons(sessions: any[]): Record<string, number> {
+  private calculateFailureReasons(sessions: MFASession[]): Record<string, number> {
     const reasons: Record<string, number> = {}
     const failedSessions = sessions.filter((s) => s.status === 'failed')
 
@@ -427,7 +429,7 @@ export class AdminMFAController {
     return newCount - oldCount
   }
 
-  private calculateUsageGrowth(sessions: any[]): number {
+  private calculateUsageGrowth(sessions: MFASession[]): number {
     if (sessions.length === 0) return 0
 
     const midpoint = Math.floor(sessions.length / 2)

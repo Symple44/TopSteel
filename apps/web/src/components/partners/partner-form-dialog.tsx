@@ -1,6 +1,6 @@
 'use client'
 
-import type { CreatePartnerDto, Partner, UpdatePartnerDto } from '@erp/types'
+import type { CreatePartnerDto, Partner, PartnerGroup, UpdatePartnerDto } from '@erp/types'
 import { PartnerStatus, PartnerType } from '@erp/types'
 import {
   Button,
@@ -32,53 +32,53 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2, CreditCard, FileText, MapPin, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { type Control, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useCreatePartner, usePartnerGroups, useUpdatePartner } from '@/hooks/use-partners'
 
-const partnerSchema = z?.object({
-  code: z?.string().optional(),
-  type: z?.nativeEnum(PartnerType),
-  denomination: z?.string().min(1, 'La dénomination est requise'),
-  denominationCommerciale: z?.string().optional(),
-  category: z?.string().min(1, 'La catégorie est requise'),
-  status: z?.nativeEnum(PartnerStatus).optional(),
+const partnerSchema = z.object({
+  code: z.string().optional(),
+  type: z.nativeEnum(PartnerType),
+  denomination: z.string().min(1, 'La dénomination est requise'),
+  denominationCommerciale: z.string().optional(),
+  category: z.string().min(1, 'La catégorie est requise'),
+  status: z.nativeEnum(PartnerStatus).optional(),
 
   // Identification
-  siret: z?.string().optional(),
-  numeroTVA: z?.string().optional(),
-  codeAPE: z?.string().optional(),
+  siret: z.string().optional(),
+  numeroTVA: z.string().optional(),
+  codeAPE: z.string().optional(),
 
   // Contact
-  contactPrincipal: z?.string().optional(),
-  telephone: z?.string().optional(),
-  mobile: z?.string().optional(),
-  email: z?.string().email().optional().or(z?.literal('')),
-  siteWeb: z?.string().url().optional().or(z?.literal('')),
+  contactPrincipal: z.string().optional(),
+  telephone: z.string().optional(),
+  mobile: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+  siteWeb: z.string().url().optional().or(z.literal('')),
 
   // Adresse
-  adresse: z?.string().optional(),
-  adresseComplement: z?.string().optional(),
-  codePostal: z?.string().optional(),
-  ville: z?.string().optional(),
-  pays: z?.string().optional(),
+  adresse: z.string().optional(),
+  adresseComplement: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  pays: z.string().optional(),
 
   // Commercial
-  conditionsPaiement: z?.string().optional(),
-  modePaiement: z?.string().optional(),
-  plafondCredit: z?.coerce?.number().optional(),
-  tauxRemise: z?.coerce?.number().min(0).max(100).optional(),
-  representantCommercial: z?.string().optional(),
-  groupId: z?.string().optional(),
+  conditionsPaiement: z.string().optional(),
+  modePaiement: z.string().optional(),
+  plafondCredit: z.coerce.number().optional(),
+  tauxRemise: z.coerce.number().min(0).max(100).optional(),
+  representantCommercial: z.string().optional(),
+  groupId: z.string().optional(),
 
   // Fournisseur
-  delaiLivraison: z?.coerce?.number().optional(),
-  montantMiniCommande: z?.coerce?.number().optional(),
-  fournisseurPrefere: z?.boolean().optional(),
+  delaiLivraison: z.coerce.number().optional(),
+  montantMiniCommande: z.coerce.number().optional(),
+  fournisseurPrefere: z.boolean().optional(),
 
   // Comptabilité
-  compteComptableClient: z?.string().optional(),
-  compteComptableFournisseur: z?.string().optional(),
+  compteComptableClient: z.string().optional(),
+  compteComptableFournisseur: z.string().optional(),
 })
 
 type PartnerFormData = z.infer<typeof partnerSchema>
@@ -148,7 +148,7 @@ export function PartnerFormDialog({
   const isEditing = !!partner
 
   const form = useForm<PartnerFormData>({
-    resolver: zodResolver(partnerSchema),
+    resolver: zodResolver(partnerSchema, {}, { mode: 'async' }) as any,
     defaultValues: {
       type: (defaultType as PartnerType) || PartnerType.CLIENT,
       status: PartnerStatus.ACTIF,
@@ -161,7 +161,7 @@ export function PartnerFormDialog({
 
   useEffect(() => {
     if (partner) {
-      form?.reset({
+      form.reset({
         ...partner,
         plafondCredit: partner.plafondCredit || undefined,
         tauxRemise: partner.tauxRemise || undefined,
@@ -174,16 +174,16 @@ export function PartnerFormDialog({
   const onSubmit = async (data: PartnerFormData) => {
     try {
       if (isEditing && partner) {
-        await updatePartner?.mutateAsync({ id: partner.id, data: data as UpdatePartnerDto })
+        await updatePartner.mutateAsync({ id: partner.id, data: data as UpdatePartnerDto })
       } else {
-        await createPartner?.mutateAsync(data as CreatePartnerDto)
+        await createPartner.mutateAsync(data as CreatePartnerDto)
       }
       onOpenChange(false)
       form.reset()
     } catch (_error) {}
   }
 
-  const partnerType = form?.watch('type')
+  const partnerType = form.watch('type')
   const showClientFields = partnerType === PartnerType.CLIENT || partnerType === PartnerType.MIXTE
   const showSupplierFields =
     partnerType === PartnerType.FOURNISSEUR || partnerType === PartnerType.MIXTE
@@ -196,7 +196,7 @@ export function PartnerFormDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form?.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="general">
@@ -224,7 +224,7 @@ export function PartnerFormDialog({
               <TabsContent value="general" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="type"
                     render={({ field }) => (
                       <FormItem>
@@ -247,7 +247,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="status"
                     render={({ field }) => (
                       <FormItem>
@@ -273,7 +273,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="code"
                     render={({ field }) => (
                       <FormItem>
@@ -287,7 +287,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="category"
                     render={({ field }) => (
                       <FormItem>
@@ -299,9 +299,9 @@ export function PartnerFormDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {PARTNER_CATEGORIES?.map((cat) => (
+                            {PARTNER_CATEGORIES.map((cat) => (
                               <SelectItem key={cat} value={cat}>
-                                {cat?.replace(/_/g, ' ')}
+                                {cat.replace(/_/g, ' ')}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -313,7 +313,7 @@ export function PartnerFormDialog({
                 </div>
 
                 <FormField
-                  control={form?.control}
+                  control={form.control as Control<PartnerFormData>}
                   name="denomination"
                   render={({ field }) => (
                     <FormItem>
@@ -327,7 +327,7 @@ export function PartnerFormDialog({
                 />
 
                 <FormField
-                  control={form?.control}
+                  control={form.control as Control<PartnerFormData>}
                   name="denominationCommerciale"
                   render={({ field }) => (
                     <FormItem>
@@ -344,7 +344,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="siret"
                     render={({ field }) => (
                       <FormItem>
@@ -358,7 +358,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="numeroTVA"
                     render={({ field }) => (
                       <FormItem>
@@ -372,7 +372,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="codeAPE"
                     render={({ field }) => (
                       <FormItem>
@@ -389,7 +389,7 @@ export function PartnerFormDialog({
 
               <TabsContent value="contact" className="space-y-4">
                 <FormField
-                  control={form?.control}
+                  control={form.control as Control<PartnerFormData>}
                   name="contactPrincipal"
                   render={({ field }) => (
                     <FormItem>
@@ -404,7 +404,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="telephone"
                     render={({ field }) => (
                       <FormItem>
@@ -418,7 +418,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="mobile"
                     render={({ field }) => (
                       <FormItem>
@@ -433,7 +433,7 @@ export function PartnerFormDialog({
                 </div>
 
                 <FormField
-                  control={form?.control}
+                  control={form.control as Control<PartnerFormData>}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
@@ -447,13 +447,13 @@ export function PartnerFormDialog({
                 />
 
                 <FormField
-                  control={form?.control}
+                  control={form.control as Control<PartnerFormData>}
                   name="siteWeb"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Site web</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="https://www?.entreprise?.fr" />
+                        <Input {...field} placeholder="https://www.entreprise.fr" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -463,7 +463,7 @@ export function PartnerFormDialog({
 
               <TabsContent value="address" className="space-y-4">
                 <FormField
-                  control={form?.control}
+                  control={form.control as Control<PartnerFormData>}
                   name="adresse"
                   render={({ field }) => (
                     <FormItem>
@@ -477,7 +477,7 @@ export function PartnerFormDialog({
                 />
 
                 <FormField
-                  control={form?.control}
+                  control={form.control as Control<PartnerFormData>}
                   name="adresseComplement"
                   render={({ field }) => (
                     <FormItem>
@@ -492,7 +492,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="codePostal"
                     render={({ field }) => (
                       <FormItem>
@@ -506,7 +506,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="ville"
                     render={({ field }) => (
                       <FormItem>
@@ -520,7 +520,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="pays"
                     render={({ field }) => (
                       <FormItem>
@@ -538,7 +538,7 @@ export function PartnerFormDialog({
               <TabsContent value="commercial" className="space-y-4">
                 {groups.length > 0 && (
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="groupId"
                     render={({ field }) => (
                       <FormItem>
@@ -551,7 +551,7 @@ export function PartnerFormDialog({
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="">Aucun</SelectItem>
-                            {groups?.map((group) => (
+                            {groups.map((group: PartnerGroup) => (
                               <SelectItem key={group.id} value={group.id}>
                                 {group.name}
                                 {group.defaultDiscount && ` (-${group.defaultDiscount}%)`}
@@ -570,7 +570,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="conditionsPaiement"
                     render={({ field }) => (
                       <FormItem>
@@ -582,9 +582,9 @@ export function PartnerFormDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {PAYMENT_TERMS?.map((term) => (
+                            {PAYMENT_TERMS.map((term) => (
                               <SelectItem key={term} value={term}>
-                                {term?.replace(/_/g, ' ')}
+                                {term.replace(/_/g, ' ')}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -595,7 +595,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="modePaiement"
                     render={({ field }) => (
                       <FormItem>
@@ -607,9 +607,9 @@ export function PartnerFormDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {PAYMENT_METHODS?.map((method) => (
+                            {PAYMENT_METHODS.map((method) => (
                               <SelectItem key={method} value={method}>
-                                {method?.replace(/_/g, ' ')}
+                                {method.replace(/_/g, ' ')}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -624,7 +624,7 @@ export function PartnerFormDialog({
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
-                        control={form?.control}
+                        control={form.control as Control<PartnerFormData>}
                         name="plafondCredit"
                         render={({ field }) => (
                           <FormItem>
@@ -638,7 +638,7 @@ export function PartnerFormDialog({
                       />
 
                       <FormField
-                        control={form?.control}
+                        control={form.control as Control<PartnerFormData>}
                         name="tauxRemise"
                         render={({ field }) => (
                           <FormItem>
@@ -653,7 +653,7 @@ export function PartnerFormDialog({
                     </div>
 
                     <FormField
-                      control={form?.control}
+                      control={form.control as Control<PartnerFormData>}
                       name="representantCommercial"
                       render={({ field }) => (
                         <FormItem>
@@ -675,7 +675,7 @@ export function PartnerFormDialog({
 
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
-                        control={form?.control}
+                        control={form.control as Control<PartnerFormData>}
                         name="delaiLivraison"
                         render={({ field }) => (
                           <FormItem>
@@ -689,7 +689,7 @@ export function PartnerFormDialog({
                       />
 
                       <FormField
-                        control={form?.control}
+                        control={form.control as Control<PartnerFormData>}
                         name="montantMiniCommande"
                         render={({ field }) => (
                           <FormItem>
@@ -704,7 +704,7 @@ export function PartnerFormDialog({
                     </div>
 
                     <FormField
-                      control={form?.control}
+                      control={form.control as Control<PartnerFormData>}
                       name="fournisseurPrefere"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -727,7 +727,7 @@ export function PartnerFormDialog({
               <TabsContent value="accounting" className="space-y-4">
                 {showClientFields && (
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="compteComptableClient"
                     render={({ field }) => (
                       <FormItem>
@@ -746,7 +746,7 @@ export function PartnerFormDialog({
 
                 {showSupplierFields && (
                   <FormField
-                    control={form?.control}
+                    control={form.control as Control<PartnerFormData>}
                     name="compteComptableFournisseur"
                     render={({ field }) => (
                       <FormItem>
@@ -769,8 +769,8 @@ export function PartnerFormDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
-              <Button type="submit" disabled={createPartner?.isPending || updatePartner?.isPending}>
-                {createPartner?.isPending || updatePartner?.isPending
+              <Button type="submit" disabled={createPartner.isPending || updatePartner.isPending}>
+                {createPartner.isPending || updatePartner.isPending
                   ? 'Enregistrement...'
                   : isEditing
                     ? 'Modifier'

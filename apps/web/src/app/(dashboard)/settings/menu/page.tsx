@@ -91,7 +91,8 @@ import {
   Users,
   Wrench,
 } from 'lucide-react'
-import React, { useCallback, useEffect, useState } from 'react'
+import type React from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { TranslationFieldWrapper } from '@/components/wrappers/translation-field-wrapper'
 import { fetchTyped, postTyped } from '@/lib/api-typed'
 import { useTranslation } from '@/lib/i18n/hooks'
@@ -135,7 +136,10 @@ interface UserMenuItem {
   isUserCreated?: boolean // Indique si l'élément a été créé par l'utilisateur (éditable)
 }
 
-const iconMap: Record<string, React.ComponentType<{className?: string; style?: React.CSSProperties}>> = {
+const iconMap: Record<
+  string,
+  React.ComponentType<{ className?: string; style?: React.CSSProperties }>
+> = {
   // Navigation & Structure
   Home,
   LayoutDashboard,
@@ -241,7 +245,9 @@ const getIconsByCategory = (t: TranslationFunction) => {
   }
 }
 
-const getIconComponent = (iconName: string): React.ComponentType<{className?: string; style?: React.CSSProperties}> => {
+const getIconComponent = (
+  iconName: string
+): React.ComponentType<{ className?: string; style?: React.CSSProperties }> => {
   return iconMap[iconName] || Settings
 }
 
@@ -772,7 +778,9 @@ const getTypeBadgeColor = (type: string) => {
   }
 }
 
-const getTypeIcon = (type: string): React.ComponentType<{className?: string; style?: React.CSSProperties}> => {
+const getTypeIcon = (
+  type: string
+): React.ComponentType<{ className?: string; style?: React.CSSProperties }> => {
   switch (type) {
     case 'M':
       return FolderOpen

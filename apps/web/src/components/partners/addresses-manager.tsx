@@ -569,13 +569,15 @@ export function AddressesManager({
                       <FormItem>
                         <FormLabel>Latitude</FormLabel>
                         <FormControl>
-                          <Input 
-                            {...field} 
-                            type="number" 
-                            step="0.000001" 
-                            placeholder="48.8566" 
+                          <Input
+                            {...field}
+                            type="number"
+                            step="0.000001"
+                            placeholder="48.8566"
                             value={field.value?.toString() ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -590,13 +592,15 @@ export function AddressesManager({
                       <FormItem>
                         <FormLabel>Longitude</FormLabel>
                         <FormControl>
-                          <Input 
-                            {...field} 
-                            type="number" 
-                            step="0.000001" 
-                            placeholder="2.3522" 
+                          <Input
+                            {...field}
+                            type="number"
+                            step="0.000001"
+                            placeholder="2.3522"
                             value={field.value?.toString() ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                            }
                           />
                         </FormControl>
                         <FormMessage />

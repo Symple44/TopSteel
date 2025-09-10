@@ -38,8 +38,8 @@ import {
 } from 'class-validator'
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
-import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
 import type { ExtendedUser } from '../../../types/entities/user.types'
+import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
 import {
   type ICreateMaterialMovement,
   type IMaterialMovement,

@@ -13,8 +13,8 @@ import { ExecutionStatus, NotificationExecution } from '../entities/notification
 import { NotificationRule, RuleStatus, RuleType } from '../entities/notification-rule.entity'
 import type {
   ActionExecutionResult,
-  NotificationActionResult,
   RuleExecutionContext as ExecutionRuleContext,
+  NotificationActionResult,
 } from '../types/notification-execution.types'
 import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
 import type { NotificationActionExecutor } from './notification-action-executor.service'
@@ -444,7 +444,7 @@ export class NotificationRulesEngineService {
           userId: context.userId,
           metadata: context.metadata,
         }
-        
+
         result = await this.actionExecutor.execute(action, executionContext, execution)
         success = true
         executed++

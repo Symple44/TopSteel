@@ -5,7 +5,7 @@
 
 // Type imports for better type inference
 type ElasticsearchClient = import('@erp/domains/server').ElasticsearchClient
-type ElasticsearchMigrationService = import('@erp/domains/server').ElasticsearchMigrationService  
+type ElasticsearchMigrationService = import('@erp/domains/server').ElasticsearchMigrationService
 type ImageElasticsearchService = import('@erp/domains/server').ImageElasticsearchService
 
 // Import from local wrapper to ensure proper server-only isolation

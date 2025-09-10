@@ -1,9 +1,7 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
-// Removed direct imports to avoid circular dependencies
-// import { Contact } from './contact.entity';
-// import { Partner } from './partner.entity'
-// import { PartnerAddress } from './partner-address.entity';
+// Type imports to avoid circular dependencies
+import type { Partner } from './partner.entity'
 
 export enum SiteType {
   SIEGE_SOCIAL = 'SIEGE_SOCIAL', // Siège social
@@ -45,7 +43,7 @@ export class PartnerSite extends BusinessEntity {
     lazy: true,
   })
   @JoinColumn({ name: 'partnerId' })
-  partner!: any
+  partner!: Partner
 
   @Column({ type: 'varchar', length: 20, unique: true })
   @Index()

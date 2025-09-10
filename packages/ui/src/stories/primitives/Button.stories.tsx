@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Download, Edit, Plus, Save, Trash2 } from 'lucide-react'
 import { Button } from '../../components/primitives/button'
 
-const meta: Meta<Button type="button"Props> = {
+const meta: Meta<typeof Button> = {
   title: '02-Primitives/Button',
   component: Button,
   parameters: {
@@ -30,7 +30,7 @@ const meta: Meta<Button type="button"Props> = {
 }
 
 export default meta
-type Story = StoryObj<Button type="button"Props>
+type Story = StoryObj<typeof Button>
 
 // Variants de base
 export const Default: Story = {

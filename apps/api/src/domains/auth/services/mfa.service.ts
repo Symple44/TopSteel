@@ -750,10 +750,14 @@ export class MFAService {
       let userAgent: string | undefined
 
       if (request) {
-        ipAddress = request.ip || (request.headers ? this.geolocationService.extractRealIP({
-          headers: request.headers,
-          ip: request.ip
-        }) : undefined)
+        ipAddress =
+          request.ip ||
+          (request.headers
+            ? this.geolocationService.extractRealIP({
+                headers: request.headers,
+                ip: request.ip,
+              })
+            : undefined)
         userAgent = request.userAgent || request.headers?.['user-agent']
       }
 

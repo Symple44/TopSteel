@@ -211,7 +211,7 @@ export class QueryBuilderService {
     // Duplicate columns
     if (original.columns && original.columns.length > 0) {
       const columns = original.columns.map((col) => {
-        const { id, ...columnData } = col
+        const { id: _id, ...columnData } = col
         return this._columnRepository.create({
           ...columnData,
           queryBuilderId: savedEntity.id,
@@ -223,7 +223,7 @@ export class QueryBuilderService {
     // Duplicate joins
     if (original.joins && original.joins.length > 0) {
       const joins = original.joins.map((join) => {
-        const { id, ...joinData } = join
+        const { id: _id, ...joinData } = join
         return this._joinRepository.create({
           ...joinData,
           queryBuilderId: savedEntity.id,
@@ -235,7 +235,7 @@ export class QueryBuilderService {
     // Duplicate calculated fields
     if (original.calculatedFields && original.calculatedFields.length > 0) {
       const fields = original.calculatedFields.map((field) => {
-        const { id, ...fieldData } = field
+        const { id: _id, ...fieldData } = field
 
         return this._calculatedFieldRepository.create({
           ...fieldData,

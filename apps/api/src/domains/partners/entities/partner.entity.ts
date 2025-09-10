@@ -1,5 +1,6 @@
 import { BusinessEntity } from '@erp/entities'
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
+import type { PartnerGroup } from './partner-group.entity'
 
 export enum PartnerType {
   CLIENT = 'CLIENT',
@@ -41,11 +42,11 @@ export class Partner extends BusinessEntity {
   @Index()
   groupId?: string
 
-  @ManyToOne('PartnerGroup', (group: any) => group.partners, {
+  @ManyToOne('PartnerGroup', (group: PartnerGroup) => group.partners, {
     nullable: true,
   })
   @JoinColumn({ name: 'groupId' })
-  group?: any
+  group?: PartnerGroup
 
   @Column({ type: 'enum', enum: PartnerType })
   @Index()

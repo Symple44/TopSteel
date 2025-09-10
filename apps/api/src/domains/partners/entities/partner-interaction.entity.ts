@@ -49,7 +49,7 @@ export enum InteractionDirection {
 @Index(['userId', 'dateInteraction'])
 @Index(['type', 'status'])
 export class PartnerInteraction {
-  [key: string]: any // Index signature for compatibility with Record<string, unknown>
+  [key: string]: unknown // Index signature for compatibility with Record<string, unknown>
 
   @PrimaryGeneratedColumn('uuid')
   id: string

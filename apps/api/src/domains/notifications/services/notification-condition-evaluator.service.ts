@@ -188,16 +188,24 @@ export class NotificationConditionEvaluator {
     switch (condition.timeReference) {
       case 'event_time': {
         const timestampValue = context.triggerData?.timestamp
-        referenceTime = timestampValue && (typeof timestampValue === 'string' || typeof timestampValue === 'number' || timestampValue instanceof Date)
-          ? new Date(timestampValue as string | number | Date)
-          : now
+        referenceTime =
+          timestampValue &&
+          (typeof timestampValue === 'string' ||
+            typeof timestampValue === 'number' ||
+            timestampValue instanceof Date)
+            ? new Date(timestampValue as string | number | Date)
+            : now
         break
       }
       case 'field_value': {
         const fieldValue = context.triggerData?.[condition.aggregateField || 'createdAt']
-        referenceTime = fieldValue && (typeof fieldValue === 'string' || typeof fieldValue === 'number' || fieldValue instanceof Date)
-          ? new Date(fieldValue as string | number | Date)
-          : now
+        referenceTime =
+          fieldValue &&
+          (typeof fieldValue === 'string' ||
+            typeof fieldValue === 'number' ||
+            fieldValue instanceof Date)
+            ? new Date(fieldValue as string | number | Date)
+            : now
         break
       }
       default:

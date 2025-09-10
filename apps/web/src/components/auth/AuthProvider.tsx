@@ -201,7 +201,11 @@ export function RouteGuard({
 
         // Check if any user role matches the permission
         return userRoles?.some((role) => {
-          const roleValue = typeof role === 'object' ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
+          const roleValue =
+            typeof role === 'object'
+              ? (role as { name?: string; role?: string }).name ||
+                (role as { name?: string; role?: string }).role
+              : role
           return roleValue === permission
         })
       })
@@ -248,7 +252,11 @@ export function RouteGuard({
 
       // Check if any user role matches the permission
       return userRoles?.some((role) => {
-        const roleValue = typeof role === 'object' ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
+        const roleValue =
+          typeof role === 'object'
+            ? (role as { name?: string; role?: string }).name ||
+              (role as { name?: string; role?: string }).role
+            : role
         return roleValue === permission
       })
     })

@@ -14,12 +14,12 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
+import type { ExtendedUser } from '../../../types/entities/user.types'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
 import type {
   BusinessContext,
   BusinessOperation,
 } from '../../core/interfaces/business-service.interface'
-import type { ExtendedUser } from '../../../types/entities/user.types'
 import type {
   CreateContactDto,
   CreatePartnerAddressDto,
@@ -142,7 +142,10 @@ export class PartnerController {
     summary: 'Récupérer un partenaire',
     description: "Récupérer les détails d'un partenaire",
   })
-  async getPartner(@Param('id') id: string, @CurrentUser() user: ExtendedUser): Promise<Partner | null> {
+  async getPartner(
+    @Param('id') id: string,
+    @CurrentUser() user: ExtendedUser
+  ): Promise<Partner | null> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
@@ -233,7 +236,10 @@ export class PartnerController {
     summary: 'Convertir un prospect en client',
     description: "Changer le statut d'un prospect en client actif",
   })
-  async convertirProspect(@Param('id') id: string, @CurrentUser() user: ExtendedUser): Promise<Partner> {
+  async convertirProspect(
+    @Param('id') id: string,
+    @CurrentUser() user: ExtendedUser
+  ): Promise<Partner> {
     return await this.partnerService.convertirProspect(id, this.getContext(user))
   }
 

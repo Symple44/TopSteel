@@ -2,6 +2,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
+import type { Repository } from 'typeorm'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { GlobalUserRole } from '../../auth/core/constants/roles.constants'
 import { User } from '../entities/user.entity'
@@ -14,8 +15,8 @@ const bcryptMock = bcrypt as unknown
 
 describe('UsersService', () => {
   let service: UsersService
-  let userRepository: any
-  let userSettingsRepository: any
+  let userRepository: jest.Mocked<Repository<User>>
+  let userSettingsRepository: jest.Mocked<Repository<UserSettings>>
 
   const mockUser: User = {
     id: 'user-123',

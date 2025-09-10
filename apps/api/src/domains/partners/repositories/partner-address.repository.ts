@@ -35,7 +35,16 @@ export class PartnerAddressRepository implements IPartnerAddressRepository {
   }
 
   async findDefaultAddress(partnerId: string, type?: AddressType): Promise<PartnerAddress | null> {
-    const where: any = { partnerId, isDefault: true, status: AddressStatus.ACTIVE }
+    const where: {
+      partnerId: string
+      isDefault: boolean
+      status: AddressStatus
+      type?: AddressType
+    } = {
+      partnerId,
+      isDefault: true,
+      status: AddressStatus.ACTIVE,
+    }
     if (type) {
       where.type = type
     }
