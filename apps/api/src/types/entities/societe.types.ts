@@ -8,6 +8,7 @@ export enum SocieteStatus {
   INACTIVE = 'INACTIVE',
   SUSPENDED = 'SUSPENDED',
   ARCHIVED = 'ARCHIVED',
+  TRIAL = 'TRIAL',
 }
 
 export interface SiteData {

@@ -27,6 +27,8 @@ import type { RoleFormattingService } from '../../../domains/auth/services/role-
 import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import type { UsersService } from '../../../domains/users/users.service'
 import type { SocietesService } from '../../../features/societes/services/societes.service'
+import type { SocieteData } from '../../../types/entities/societe.types'
+import type { UserSocieteRole } from '../../../types/entities/user.types'
 
 interface SocieteQueryDto {
   page?: number
@@ -60,7 +62,7 @@ export class AdminSocietesController {
   async findAllSocietes(@Query() query: SocieteQueryDto) {
     try {
       // Récupérer les sociétés selon les filtres
-      let societes: any[]
+      let societes: SocieteData[]
       if (query.status === 'ALL') {
         societes = await this.societesService.findAll()
       } else {
@@ -71,7 +73,7 @@ export class AdminSocietesController {
       if (query.search) {
         const searchTerm = query.search.toLowerCase()
         societes = societes.filter(
-          (societe: any) =>
+          (societe) =>
             societe.nom.toLowerCase().includes(searchTerm) ||
             societe.code.toLowerCase().includes(searchTerm)
         )
@@ -153,7 +155,7 @@ export class AdminSocietesController {
             userCount,
             users: query.includeUsers ? users : undefined,
             sites:
-              societe.sites?.map((site: any) => ({
+              societe.sites?.map((site) => ({
                 id: site.id,
                 nom: site.nom,
                 code: site.code,
@@ -191,8 +193,8 @@ export class AdminSocietesController {
     }
 
     // Récupérer tous les utilisateurs ayant accès à cette société
-    const allUsers: any[] = await this.usersService.findAll({})
-    const usersWithAccess: any[] = []
+    const allUsers = await this.usersService.findAll({})
+    const usersWithAccess: unknown[] = []
 
     for (const user of allUsers) {
       const userSocieteRoles: any[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)

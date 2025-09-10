@@ -87,8 +87,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: state.notifications.map(
-          (n): Notification =>
-            n.id === action.payload ? { ...n, readAt: new Date() } : n
+          (n): Notification => (n.id === action.payload ? { ...n, readAt: new Date() } : n)
         ),
         unreadCount: Math.max(0, state.unreadCount - 1),
       }

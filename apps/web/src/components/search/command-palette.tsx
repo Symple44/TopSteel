@@ -456,7 +456,9 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
       {result.metadata && (
         <div className="ml-2 flex items-center gap-2 text-xs text-muted-foreground">
           {result?.metadata?.statut && (
-            <span className="px-1.5 py-0.5 bg-muted rounded">{result?.metadata?.statut as string}</span>
+            <span className="px-1.5 py-0.5 bg-muted rounded">
+              {result?.metadata?.statut as string}
+            </span>
           )}
           {result?.metadata?.montant && (
             <span className="font-medium">{result?.metadata?.montant as string}€</span>

@@ -32,7 +32,7 @@ export class MenuItemRole {
   // Relations
   @ManyToOne('MenuItem', 'roles', { lazy: true })
   @JoinColumn({ name: 'menuItemId' })
-  menuItem!: any
+  menuItem!: unknown
 
   // Méthodes utilitaires
   static create(menuItemId: string, roleId: string, isRequired: boolean = true): MenuItemRole {

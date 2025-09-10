@@ -147,7 +147,7 @@ export function PartnerFormDialog({
 
   const isEditing = !!partner
 
-  const form = useForm<PartnerFormData>({
+  const form = useForm({
     resolver: zodResolver(partnerSchema),
     defaultValues: {
       type: (defaultType as PartnerType) || PartnerType.CLIENT,
@@ -224,7 +224,7 @@ export function PartnerFormDialog({
               <TabsContent value="general" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="type"
                     render={({ field }) => (
                       <FormItem>
@@ -247,7 +247,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="status"
                     render={({ field }) => (
                       <FormItem>
@@ -273,7 +273,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="code"
                     render={({ field }) => (
                       <FormItem>
@@ -287,7 +287,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="category"
                     render={({ field }) => (
                       <FormItem>
@@ -313,7 +313,7 @@ export function PartnerFormDialog({
                 </div>
 
                 <FormField
-                  control={form.control as Control<PartnerFormData>}
+                  control={form.control}
                   name="denomination"
                   render={({ field }) => (
                     <FormItem>
@@ -327,7 +327,7 @@ export function PartnerFormDialog({
                 />
 
                 <FormField
-                  control={form.control as Control<PartnerFormData>}
+                  control={form.control}
                   name="denominationCommerciale"
                   render={({ field }) => (
                     <FormItem>
@@ -344,7 +344,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="siret"
                     render={({ field }) => (
                       <FormItem>
@@ -358,7 +358,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="numeroTVA"
                     render={({ field }) => (
                       <FormItem>
@@ -372,7 +372,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="codeAPE"
                     render={({ field }) => (
                       <FormItem>
@@ -389,7 +389,7 @@ export function PartnerFormDialog({
 
               <TabsContent value="contact" className="space-y-4">
                 <FormField
-                  control={form.control as Control<PartnerFormData>}
+                  control={form.control}
                   name="contactPrincipal"
                   render={({ field }) => (
                     <FormItem>
@@ -404,7 +404,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="telephone"
                     render={({ field }) => (
                       <FormItem>
@@ -418,7 +418,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="mobile"
                     render={({ field }) => (
                       <FormItem>
@@ -433,7 +433,7 @@ export function PartnerFormDialog({
                 </div>
 
                 <FormField
-                  control={form.control as Control<PartnerFormData>}
+                  control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
@@ -447,7 +447,7 @@ export function PartnerFormDialog({
                 />
 
                 <FormField
-                  control={form.control as Control<PartnerFormData>}
+                  control={form.control}
                   name="siteWeb"
                   render={({ field }) => (
                     <FormItem>
@@ -463,7 +463,7 @@ export function PartnerFormDialog({
 
               <TabsContent value="address" className="space-y-4">
                 <FormField
-                  control={form.control as Control<PartnerFormData>}
+                  control={form.control}
                   name="adresse"
                   render={({ field }) => (
                     <FormItem>
@@ -477,7 +477,7 @@ export function PartnerFormDialog({
                 />
 
                 <FormField
-                  control={form.control as Control<PartnerFormData>}
+                  control={form.control}
                   name="adresseComplement"
                   render={({ field }) => (
                     <FormItem>
@@ -492,7 +492,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="codePostal"
                     render={({ field }) => (
                       <FormItem>
@@ -506,7 +506,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="ville"
                     render={({ field }) => (
                       <FormItem>
@@ -520,7 +520,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="pays"
                     render={({ field }) => (
                       <FormItem>
@@ -538,7 +538,7 @@ export function PartnerFormDialog({
               <TabsContent value="commercial" className="space-y-4">
                 {groups.length > 0 && (
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="groupId"
                     render={({ field }) => (
                       <FormItem>
@@ -570,7 +570,7 @@ export function PartnerFormDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="conditionsPaiement"
                     render={({ field }) => (
                       <FormItem>
@@ -595,7 +595,7 @@ export function PartnerFormDialog({
                   />
 
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="modePaiement"
                     render={({ field }) => (
                       <FormItem>
@@ -624,13 +624,18 @@ export function PartnerFormDialog({
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
-                        control={form.control as Control<PartnerFormData>}
+                        control={form.control}
                         name="plafondCredit"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Plafond de crédit (€)</FormLabel>
                             <FormControl>
-                              <Input {...field} type="number" placeholder="0" />
+                              <Input
+                                {...field}
+                                value={field.value ?? ''}
+                                type="number"
+                                placeholder="0"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -638,13 +643,20 @@ export function PartnerFormDialog({
                       />
 
                       <FormField
-                        control={form.control as Control<PartnerFormData>}
+                        control={form.control}
                         name="tauxRemise"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Taux de remise (%)</FormLabel>
                             <FormControl>
-                              <Input {...field} type="number" min="0" max="100" placeholder="0" />
+                              <Input
+                                {...field}
+                                value={field.value ?? ''}
+                                type="number"
+                                min="0"
+                                max="100"
+                                placeholder="0"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -653,7 +665,7 @@ export function PartnerFormDialog({
                     </div>
 
                     <FormField
-                      control={form.control as Control<PartnerFormData>}
+                      control={form.control}
                       name="representantCommercial"
                       render={({ field }) => (
                         <FormItem>
@@ -675,13 +687,18 @@ export function PartnerFormDialog({
 
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
-                        control={form.control as Control<PartnerFormData>}
+                        control={form.control}
                         name="delaiLivraison"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Délai de livraison (jours)</FormLabel>
                             <FormControl>
-                              <Input {...field} type="number" placeholder="0" />
+                              <Input
+                                {...field}
+                                value={field.value ?? ''}
+                                type="number"
+                                placeholder="0"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -689,13 +706,18 @@ export function PartnerFormDialog({
                       />
 
                       <FormField
-                        control={form.control as Control<PartnerFormData>}
+                        control={form.control}
                         name="montantMiniCommande"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Montant minimum commande (€)</FormLabel>
                             <FormControl>
-                              <Input {...field} type="number" placeholder="0" />
+                              <Input
+                                {...field}
+                                value={field.value ?? ''}
+                                type="number"
+                                placeholder="0"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -704,7 +726,7 @@ export function PartnerFormDialog({
                     </div>
 
                     <FormField
-                      control={form.control as Control<PartnerFormData>}
+                      control={form.control}
                       name="fournisseurPrefere"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -727,7 +749,7 @@ export function PartnerFormDialog({
               <TabsContent value="accounting" className="space-y-4">
                 {showClientFields && (
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="compteComptableClient"
                     render={({ field }) => (
                       <FormItem>
@@ -746,7 +768,7 @@ export function PartnerFormDialog({
 
                 {showSupplierFields && (
                   <FormField
-                    control={form.control as Control<PartnerFormData>}
+                    control={form.control}
                     name="compteComptableFournisseur"
                     render={({ field }) => (
                       <FormItem>

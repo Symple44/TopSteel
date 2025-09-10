@@ -18,12 +18,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
+import type { MFASession } from '../../../domains/auth/core/entities/mfa-session.entity'
+import type { UserMFA } from '../../../domains/auth/core/entities/user-mfa.entity'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
 import type { MFAService } from '../../../domains/auth/services/mfa.service'
-import type { MFASession } from '../../../domains/auth/core/entities/mfa-session.entity'
-import type { UserMFA } from '../../../domains/auth/core/entities/user-mfa.entity'
 
 @Controller('admin/mfa')
 @ApiTags('🔧 Admin - Multi-Factor Authentication')

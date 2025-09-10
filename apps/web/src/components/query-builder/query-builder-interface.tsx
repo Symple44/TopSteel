@@ -174,7 +174,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
 
   const updateQueryBuilder = (updates: unknown) => {
     if (typeof updates === 'object' && updates !== null) {
-      setQueryBuilder((prev) => ({ ...prev, ...updates as Partial<QueryBuilderData> }))
+      setQueryBuilder((prev) => ({ ...prev, ...(updates as Partial<QueryBuilderData>) }))
     }
   }
 
