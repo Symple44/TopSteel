@@ -14,7 +14,7 @@ import type { ColumnConfig, DataTableProps } from './types'
  * Composant DataTable refactorisé
  * Utilise les hooks et contextes pour une architecture modulaire
  */
-export function DataTable<T>({
+export function DataTable<T extends Record<string, unknown> = Record<string, unknown>>({
   data,
   columns,
   keyField = 'id' as keyof T,
