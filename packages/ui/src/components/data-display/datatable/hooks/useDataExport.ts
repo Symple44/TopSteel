@@ -43,7 +43,7 @@ export interface UseDataExportReturn {
 /**
  * Hook pour gérer l'export des données d'une DataTable
  */
-export function useDataExport<T extends SafeObject>({
+export function useDataExport<T>({
   data,
   columns,
   selectedRows = new Set(),

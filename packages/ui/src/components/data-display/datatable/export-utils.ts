@@ -311,7 +311,12 @@ export class ExportUtils {
     }
 
     // Appliquer les améliorations avancées
-    ExportUtils.applyAdvancedFormatting(workbook, exportColumns, exportData, options)
+    ExportUtils.applyAdvancedFormatting(
+      workbook,
+      exportColumns as ColumnConfig<Record<string, unknown>>[],
+      exportData,
+      options
+    )
 
     // Définir la largeur des colonnes
     ExportUtils.setColumnWidths(workbook, exportColumns, exportData)
@@ -1111,7 +1116,7 @@ export class ExportUtils {
    */
   private static applyConditionalFormattingUniver(
     _workbook: UniverWorkbook,
-    columns: ColumnConfig[],
+    columns: ColumnConfig<Record<string, unknown>>[],
     data: Record<string, unknown>[]
   ): void {
     try {

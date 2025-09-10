@@ -10,7 +10,11 @@ export interface ColorRuleResult {
   matchedRules: string[] // Noms des règles appliquées
 }
 
-export function useColorRules<T = any>(data: T[], columns: ColumnConfig<T>[], rules: ColorRule[]) {
+export function useColorRules<T = Record<string, unknown>>(
+  data: T[],
+  columns: ColumnConfig<T>[],
+  rules: ColorRule[]
+) {
   // Créer une carte des styles pour chaque cellule/ligne
   const styleMap = useMemo(() => {
     const map = new Map<string, ColorRuleResult>()

@@ -7,7 +7,7 @@ import { Edit, Eye, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 // Type de données pour le test
-interface TestData {
+interface TestData extends Record<string, unknown> {
   id: string
   name: string
   email: string

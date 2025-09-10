@@ -9,7 +9,7 @@ export class RenderUtils {
   /**
    * Convertit de manière sécurisée une valeur en string pour l'affichage React
    */
-  static safeRender(value: unknown, column: ColumnConfig): string {
+  static safeRender<T = unknown>(value: unknown, column: ColumnConfig<T>): string {
     // Valeurs nulles/undefined
     if (value === null || value === undefined) {
       return ''
@@ -90,7 +90,10 @@ export class RenderUtils {
   /**
    * Formate un nombre selon la configuration de la colonne
    */
-  private static formatNumber(value: number, format: NonNullable<ColumnConfig['format']>): string {
+  private static formatNumber<T = unknown>(
+    value: number,
+    format: NonNullable<ColumnConfig<T>['format']>
+  ): string {
     let result = value.toString()
 
     // Décimales
@@ -142,7 +145,7 @@ export class RenderUtils {
   /**
    * Convertit une valeur pour qu'elle soit sécurisée pour React
    */
-  static makeReactSafe(value: unknown, column: ColumnConfig): React.ReactNode {
+  static makeReactSafe<T = unknown>(value: unknown, column: ColumnConfig<T>): React.ReactNode {
     if (RenderUtils.isReactSafe(value)) {
       // Si c'est une Date ou un Object, on les convertit
       if (value instanceof Date || (typeof value === 'object' && value !== null)) {
@@ -157,10 +160,10 @@ export class RenderUtils {
   /**
    * Rend la valeur d'une cellule avec support pour l'édition
    */
-  static renderCellValue(
+  static renderCellValue<T>(
     value: unknown,
-    column: ColumnConfig,
-    item: unknown,
+    column: ColumnConfig<T>,
+    item: T,
     readonly: boolean = false,
     onValueChange?: (newValue: unknown) => void
   ): React.ReactNode {
@@ -176,10 +179,10 @@ export class RenderUtils {
   /**
    * Rend une cellule éditable selon son type
    */
-  private static renderEditableCell(
+  private static renderEditableCell<T = unknown>(
     value: unknown,
-    column: ColumnConfig,
-    _item: unknown,
+    column: ColumnConfig<T>,
+    _item: T,
     onValueChange: (newValue: unknown) => void
   ): React.ReactNode {
     const handleChange = (newValue: unknown) => {

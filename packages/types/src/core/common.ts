@@ -6,7 +6,7 @@
 /**
  * Adresse postale
  */
-export interface Address {
+export interface Address extends Record<string, unknown> {
   rue: string
   codePostal: string
   ville: string
@@ -17,7 +17,7 @@ export interface Address {
 /**
  * Contact personne
  */
-export interface Contact {
+export interface Contact extends Record<string, unknown> {
   nom: string
   prenom?: string
   telephone?: string

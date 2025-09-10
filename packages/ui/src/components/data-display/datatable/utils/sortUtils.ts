@@ -51,7 +51,7 @@ export function getColumnValue<T>(
 /**
  * Applique le tri sur un tableau de données
  */
-export function sortData<T extends Record<string, unknown>>(
+export function sortData<T>(
   data: T[],
   sortConfigs: SortConfig[],
   columns: ColumnConfig<T>[]
@@ -165,7 +165,7 @@ export function clearAllSorts(): SortConfig[] {
  * Applique un tri multi-colonnes
  * (utile pour trier par plusieurs colonnes en même temps)
  */
-export function multiColumnSort<T extends Record<string, unknown>>(
+export function multiColumnSort<T>(
   data: T[],
   sortConfigs: SortConfig[],
   columns: ColumnConfig<T>[]

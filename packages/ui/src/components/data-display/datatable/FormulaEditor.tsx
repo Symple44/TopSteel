@@ -20,7 +20,7 @@ import {
 import { FormulaEngine } from './formula-engine'
 import type { ColumnConfig } from './types'
 
-interface FormulaEditorProps<T = any> {
+interface FormulaEditorProps<T = Record<string, unknown>> {
   open: boolean
   onOpenChange: (open: boolean) => void
   currentFormula?: string
@@ -232,7 +232,11 @@ export function FormulaEditor<T>({
 }: FormulaEditorProps<T>) {
   const [formula, setFormula] = useState(currentFormula)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [validation, setValidation] = useState<{ valid: boolean; error?: string; result?: any }>({
+  const [validation, setValidation] = useState<{
+    valid: boolean
+    error?: string
+    result?: unknown
+  }>({
     valid: true,
   })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -261,7 +265,7 @@ export function FormulaEditor<T>({
             const targetRow =
               targetRowIndex !== undefined ? sampleData[targetRowIndex] : sampleData[0]
             const targetColumn = columns.find((c) => c.id === columnId)
-            return targetColumn ? (targetRow as any)[targetColumn.key] : null
+            return targetColumn ? (targetRow as Record<string, unknown>)[targetColumn.key] : null
           },
         }
 
@@ -366,7 +370,7 @@ export function FormulaEditor<T>({
               <Textarea
                 ref={textareaRef}
                 value={formula}
-                onChange={(e: any) => setFormula(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormula(e.target.value)}
                 placeholder="=SUM(A:A) + AVERAGE(B:B)"
                 className="h-32 font-mono text-sm"
                 spellCheck={false}

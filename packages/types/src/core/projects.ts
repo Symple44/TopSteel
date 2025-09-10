@@ -45,7 +45,7 @@ export enum ProjectPriority {
 /**
  * Interface principale pour les projets
  */
-export interface Project extends BaseEntity {
+export interface Project extends BaseEntity, Record<string, unknown> {
   nom: string
   reference: string
   description?: string

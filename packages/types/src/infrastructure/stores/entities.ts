@@ -42,7 +42,7 @@ export enum ProjetPriorite {
 /**
  * Client simplifié pour les stores
  */
-export interface SimpleClient {
+export interface SimpleClient extends Record<string, unknown> {
   id: string
   nom: string
   email: string
@@ -52,7 +52,7 @@ export interface SimpleClient {
 /**
  * Devis simplifié pour les stores
  */
-export interface SimpleDevis {
+export interface SimpleDevis extends Record<string, unknown> {
   id: string
   reference: string
   statut: string
@@ -64,7 +64,7 @@ export interface SimpleDevis {
 /**
  * Interface de base pour toutes les entités de store
  */
-export interface BaseStoreEntity {
+export interface BaseStoreEntity extends Record<string, unknown> {
   id: string
   createdAt: Date
   updatedAt: Date
@@ -75,7 +75,7 @@ export interface BaseStoreEntity {
 /**
  * Représentation utilisateur optimisée pour les stores
  */
-export interface StoreUser extends BaseStoreEntity {
+export interface StoreUser extends BaseStoreEntity, Record<string, unknown> {
   email: string
   nom: string
   prenom: string
@@ -91,7 +91,7 @@ export interface StoreUser extends BaseStoreEntity {
 /**
  * Représentation client optimisée pour les stores
  */
-export interface StoreClient extends BaseStoreEntity {
+export interface StoreClient extends BaseStoreEntity, Record<string, unknown> {
   nom: string
   email: string
   type: string
@@ -129,7 +129,7 @@ export interface StoreProjetFilters {
 /**
  * Représentation projet optimisée pour les stores
  */
-export interface StoreProjet extends BaseStoreEntity {
+export interface StoreProjet extends BaseStoreEntity, Record<string, unknown> {
   reference: string
   description: string
   type: ProjetType
@@ -189,7 +189,7 @@ export interface StoreProjetStats {
 /**
  * Notification optimisée pour les stores
  */
-export interface StoreNotification extends BaseStoreEntity {
+export interface StoreNotification extends BaseStoreEntity, Record<string, unknown> {
   title: string
   message: string
   type: 'info' | 'success' | 'warning' | 'error'
@@ -220,7 +220,7 @@ export interface StoreNotification extends BaseStoreEntity {
 /**
  * Métriques de performance pour les stores
  */
-export interface StoreMetrics extends BaseStoreEntity {
+export interface StoreMetrics extends BaseStoreEntity, Record<string, unknown> {
   // Métriques générales
   totalUsers: number
   activeUsers: number
@@ -262,7 +262,7 @@ export interface StoreMetrics extends BaseStoreEntity {
 /**
  * État de synchronisation pour les stores
  */
-export interface StoreSyncState {
+export interface StoreSyncState extends Record<string, unknown> {
   isOnline: boolean
   lastSync: Date
   pendingChanges: number

@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '../../primitives/button'
 import { DropdownPortal } from './DropdownPortal'
 
-interface ColumnFilterDropdownProps<T = any> {
+interface ColumnFilterDropdownProps<T = Record<string, unknown>> {
   column: {
     id: string
     title: string
@@ -24,7 +24,7 @@ interface ColumnFilterDropdownProps<T = any> {
   }
 }
 
-export function ColumnFilterDropdown<T = any>({
+export function ColumnFilterDropdown<T = Record<string, unknown>>({
   column,
   data,
   currentSort,
@@ -44,7 +44,7 @@ export function ColumnFilterDropdown<T = any>({
   const uniqueValues = React.useMemo(() => {
     const values = new Set<string>()
     data.forEach((item) => {
-      const value = (item as any)[column.id]
+      const value = (item as Record<string, unknown>)[column.id]
       if (value !== null && value !== undefined) {
         values.add(String(value))
       }

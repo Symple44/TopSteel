@@ -7,7 +7,7 @@ import type { SortConfig } from '../types'
  * Simple hook for sorting data based on sort configuration
  * Used for testing purposes
  */
-export function useDataSorting<T extends Record<string, unknown>>(
+export function useDataSorting<T>(
   data: T[],
   sortConfig: SortConfig[]
 ): T[] {

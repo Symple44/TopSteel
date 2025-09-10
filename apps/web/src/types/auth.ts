@@ -2,7 +2,7 @@
  * Types pour le système d'authentification
  */
 
-export interface User {
+export interface User extends Record<string, unknown> {
   id: string
   nom: string
   prenom: string
@@ -39,7 +39,7 @@ export interface User {
   }>
 }
 
-export interface Company {
+export interface Company extends Record<string, unknown> {
   id: string
   nom: string
   name?: string // Add name property for compatibility

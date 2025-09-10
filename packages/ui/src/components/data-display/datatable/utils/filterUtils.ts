@@ -163,7 +163,7 @@ export function applyAdvancedFilter<T>(
 /**
  * Filtre les données selon les filtres de colonnes
  */
-export function filterDataByColumns<T extends Record<string, unknown>>(
+export function filterDataByColumns<T>(
   data: T[],
   filters: FilterConfig[],
   columns: ColumnConfig<T>[]
@@ -198,7 +198,7 @@ export function filterDataByColumns<T extends Record<string, unknown>>(
 /**
  * Filtre les données selon une recherche globale
  */
-export function filterDataBySearch<T extends Record<string, unknown>>(
+export function filterDataBySearch<T>(
   data: T[],
   searchTerm: string,
   columns: ColumnConfig<T>[]

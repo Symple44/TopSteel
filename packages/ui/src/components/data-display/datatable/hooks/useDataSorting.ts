@@ -37,7 +37,7 @@ export interface UseDataSortingReturn<T> {
 /**
  * Hook pour gérer le tri des données d'une DataTable
  */
-export function useDataSorting<T extends Record<string, unknown>>({
+export function useDataSorting<T>({
   data,
   columns,
   initialSorts = [],

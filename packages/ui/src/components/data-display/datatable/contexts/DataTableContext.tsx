@@ -6,7 +6,8 @@ import type { DataTableState, UseDataTableStateReturn } from '../hooks/useDataTa
 /**
  * Contexte pour partager l'état du DataTable entre les composants
  */
-export interface DataTableContextValue<T = any> extends UseDataTableStateReturn<T> {
+export interface DataTableContextValue<T>
+  extends UseDataTableStateReturn<T> {
   // État additionnel si nécessaire
   tableId?: string
   userId?: string
@@ -18,12 +19,17 @@ const DataTableContext = createContext<DataTableContextValue | undefined>(undefi
 /**
  * Provider pour le contexte DataTable
  */
-export interface DataTableProviderProps<T = any> {
+export interface DataTableProviderProps<
+  T = unknown,
+> {
   children: ReactNode
   value: DataTableContextValue<T>
 }
 
-export function DataTableProvider<T = any>({ children, value }: DataTableProviderProps<T>) {
+export function DataTableProvider<T>({
+  children,
+  value,
+}: DataTableProviderProps<T>) {
   return (
     <DataTableContext.Provider value={value as DataTableContextValue}>
       {children}
@@ -35,7 +41,9 @@ export function DataTableProvider<T = any>({ children, value }: DataTableProvide
  * Hook pour utiliser le contexte DataTable
  * @throws {Error} Si utilisé en dehors du DataTableProvider
  */
-export function useDataTableContext<T = any>(): DataTableContextValue<T> {
+export function useDataTableContext<
+  T = unknown,
+>(): DataTableContextValue<T> {
   const context = useContext(DataTableContext)
 
   if (!context) {
@@ -48,7 +56,9 @@ export function useDataTableContext<T = any>(): DataTableContextValue<T> {
 /**
  * Hook pour accéder uniquement à l'état du DataTable
  */
-export function useDataTableState<T = any>(): DataTableState<T> {
+export function useDataTableState<
+  T = unknown,
+>(): DataTableState<T> {
   const context = useDataTableContext<T>()
   return context.state
 }
@@ -56,7 +66,7 @@ export function useDataTableState<T = any>(): DataTableState<T> {
 /**
  * Hook pour accéder aux actions de filtrage
  */
-export function useDataTableFilters<T = any>() {
+export function useDataTableFilters<T>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -76,7 +86,7 @@ export function useDataTableFilters<T = any>() {
 /**
  * Hook pour accéder aux actions de tri
  */
-export function useDataTableSort<T = any>() {
+export function useDataTableSort<T>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -89,7 +99,9 @@ export function useDataTableSort<T = any>() {
 /**
  * Hook pour accéder aux actions de sélection
  */
-export function useDataTableSelection<T = any>() {
+export function useDataTableSelection<
+  T = unknown,
+>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -105,7 +117,9 @@ export function useDataTableSelection<T = any>() {
 /**
  * Hook pour accéder aux actions de pagination
  */
-export function useDataTablePagination<T = any>() {
+export function useDataTablePagination<
+  T = unknown,
+>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -123,7 +137,7 @@ export function useDataTablePagination<T = any>() {
 /**
  * Hook pour accéder aux actions d'export
  */
-export function useDataTableExport<T = any>() {
+export function useDataTableExport<T>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -135,7 +149,7 @@ export function useDataTableExport<T = any>() {
 /**
  * Hook pour accéder aux actions sur les colonnes
  */
-export function useDataTableColumns<T = any>() {
+export function useDataTableColumns<T>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -150,7 +164,7 @@ export function useDataTableColumns<T = any>() {
 /**
  * Hook pour accéder aux données affichées
  */
-export function useDataTableData<T = any>() {
+export function useDataTableData<T>() {
   const context = useDataTableContext<T>()
 
   return {
@@ -163,7 +177,9 @@ export function useDataTableData<T = any>() {
 /**
  * Hook pour accéder aux paramètres
  */
-export function useDataTableSettings<T = any>() {
+export function useDataTableSettings<
+  T = unknown,
+>() {
   const context = useDataTableContext<T>()
 
   return {

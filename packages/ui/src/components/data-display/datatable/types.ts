@@ -185,7 +185,7 @@ export interface TableSettings {
 }
 
 // Configuration globale de la table
-export interface DataTableConfig<T = unknown> {
+export interface DataTableConfig<T = Record<string, unknown>> {
   // Données
   data: T[]
   columns: ColumnConfig<T>[]
@@ -237,7 +237,8 @@ export interface DataTableConfig<T = unknown> {
 }
 
 // Props du composant DataTable (alias de DataTableConfig)
-export interface DataTableProps<T = unknown> extends DataTableConfig<T> {}
+export interface DataTableProps<T = Record<string, unknown>>
+  extends DataTableConfig<T> {}
 
 // Context pour les formules
 export interface FormulaContext<T = unknown> {

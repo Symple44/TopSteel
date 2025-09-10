@@ -130,7 +130,7 @@ export interface UseDataTableStateReturn<T> {
 /**
  * Hook principal pour gérer l'état complet d'une DataTable
  */
-export function useDataTableState<T extends Record<string, unknown>>({
+export function useDataTableState<T>({
   data,
   columns: initialColumns,
   keyField,

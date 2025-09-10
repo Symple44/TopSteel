@@ -22,7 +22,7 @@ import { SimpleModal } from './SimpleModal'
 import type { ColumnConfig } from './types'
 import type { TreeGroupingConfig } from './use-tree-grouping'
 
-interface TreeGroupingPanelProps<T = any> {
+interface TreeGroupingPanelProps<T = Record<string, unknown>> {
   open: boolean
   onOpenChange: (open: boolean) => void
   columns: ColumnConfig<T>[]
@@ -36,7 +36,7 @@ interface TreeGroupingPanelProps<T = any> {
   onClearGrouping: () => void
 }
 
-export function TreeGroupingPanel<T = any>({
+export function TreeGroupingPanel<T = Record<string, unknown>>({
   open,
   onOpenChange,
   columns,

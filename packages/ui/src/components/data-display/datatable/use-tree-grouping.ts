@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { ColumnConfig } from './types'
 
-export interface GroupNode<T = any> {
+export interface GroupNode<T = Record<string, unknown>> {
   id: string
   level: number
   groupValue: any
@@ -20,7 +20,7 @@ export interface TreeGroupingConfig {
   expanded: Set<string> // IDs des nœuds étendus
 }
 
-export function useTreeGrouping<T = any>(
+export function useTreeGrouping<T = Record<string, unknown>>(
   data: T[],
   columns: ColumnConfig<T>[],
   initialConfig: TreeGroupingConfig = { columns: [], expanded: new Set() }

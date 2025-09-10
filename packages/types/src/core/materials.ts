@@ -210,7 +210,7 @@ export interface ProductionInfo {
  * Interface Material - Représentation TypeScript du matériau
  * Note: Cette interface correspond aux propriétés de l'entité Material de l'API
  */
-export interface Material {
+export interface Material extends Record<string, unknown> {
   id: string
   reference: string
   nom: string

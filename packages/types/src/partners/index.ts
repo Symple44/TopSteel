@@ -81,7 +81,7 @@ export enum AddressStatus {
 }
 
 // Entities
-export interface Partner {
+export interface Partner extends Record<string, unknown> {
   id: string
   code: string
   type: PartnerType
@@ -144,7 +144,7 @@ export interface Partner {
   societeId?: string
 }
 
-export interface PartnerGroup {
+export interface PartnerGroup extends Record<string, unknown> {
   id: string
   code: string
   name: string
@@ -188,7 +188,7 @@ export interface PartnerGroup {
   societeId?: string
 }
 
-export interface Contact {
+export interface Contact extends Record<string, unknown> {
   id: string
   partnerId: string
   partner?: Partner
@@ -240,7 +240,7 @@ export interface Contact {
   societeId?: string
 }
 
-export interface PartnerSite {
+export interface PartnerSite extends Record<string, unknown> {
   id: string
   partnerId: string
   partner?: Partner
@@ -313,7 +313,7 @@ export interface PartnerSite {
   societeId?: string
 }
 
-export interface PartnerAddress {
+export interface PartnerAddress extends Record<string, unknown> {
   id: string
   partnerId: string
   partner?: Partner

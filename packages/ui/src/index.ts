@@ -29,6 +29,9 @@ export {
   type ColumnConfig,
   DataTable,
   DataTable as AdvancedDataTable,
+  DataTableExample,
+  HierarchicalDataTableExample,
+  SimpleDataTableExample,
   type SelectionState,
   usePersistedTableSettings,
 } from './components/data-display/datatable'

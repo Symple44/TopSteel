@@ -397,8 +397,8 @@ export function InlineEditor<T = Record<string, unknown>>({
           open={showFormulaEditor}
           onOpenChange={setShowFormulaEditor}
           currentFormula={value as string}
-          columns={allColumns}
-          sampleData={sampleData}
+          columns={allColumns as ColumnConfig<Record<string, unknown>>[]}
+          sampleData={sampleData as Record<string, unknown>[]}
           onSave={(formula) => {
             setValue(formula)
             setTimeout(() => handleSave(), 0) // Auto-save après modification

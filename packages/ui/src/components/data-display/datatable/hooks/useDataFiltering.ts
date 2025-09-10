@@ -29,7 +29,7 @@ export interface UseDataFilteringReturn<T> {
 /**
  * Hook pour gérer le filtrage des données d'une DataTable
  */
-export function useDataFiltering<T extends Record<string, unknown>>({
+export function useDataFiltering<T>({
   data,
   columns,
   initialFilters = [],

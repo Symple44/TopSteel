@@ -5,7 +5,7 @@ import type { FormulaContext } from './types'
  * Moteur de formules pour le DataTable
  * Supporte les formules Excel-like : =A1+B1, =SUM(A:A), =IF(A1>0,B1,C1)
  */
-export class FormulaEngine<T = any> {
+export class FormulaEngine<T = Record<string, unknown>> {
   private context: FormulaContext<T>
 
   constructor(context: FormulaContext<T>) {

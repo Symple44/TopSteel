@@ -18,7 +18,7 @@ export enum UserStatus {
 /**
  * Interface principale pour les utilisateurs
  */
-export interface User extends BaseEntity {
+export interface User extends BaseEntity, Record<string, unknown> {
   nom: string
   prenom: string
   email: string

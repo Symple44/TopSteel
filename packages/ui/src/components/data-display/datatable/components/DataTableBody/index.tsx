@@ -9,10 +9,10 @@ import type { ColumnConfig } from '../../types'
 import { InlineActions } from './InlineActions'
 import { TableCell } from './TableCell'
 
-export interface DataTableBodyProps<T = any> {
+export interface DataTableBodyProps<T = Record<string, unknown>> {
   onRowClick?: (row: T, index: number) => void
   onRowDoubleClick?: (row: T, index: number) => void
-  onCellEdit?: (row: T, column: ColumnConfig<T>, value: any) => void
+  onCellEdit?: (row: T, column: ColumnConfig<T>, value: unknown) => void
   striped?: boolean
   hoverable?: boolean
   actions?: Array<{
@@ -30,7 +30,7 @@ export interface DataTableBodyProps<T = any> {
 /**
  * Corps du DataTable avec rendu des lignes et cellules
  */
-export function DataTableBody<T extends Record<string, unknown>>({
+export function DataTableBody<T>({
   onRowClick,
   onRowDoubleClick,
   onCellEdit,

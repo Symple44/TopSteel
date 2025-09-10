@@ -7,7 +7,7 @@ import type { FilterConfig } from '../types'
  * Simple hook for filtering data
  * Used for testing purposes
  */
-export function useDataFiltering<T extends Record<string, unknown>>(
+export function useDataFiltering<T>(
   data: T[],
   filters: FilterConfig[],
   searchTerm?: string

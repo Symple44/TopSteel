@@ -67,7 +67,7 @@ export interface I18nContext {
 }
 
 // Types pour l'interface admin des traductions
-export interface TranslationEntry {
+export interface TranslationEntry extends Record<string, unknown> {
   id: string
   namespace: string
   key: string

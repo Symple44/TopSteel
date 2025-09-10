@@ -20,7 +20,7 @@ const VIEW_ICONS: Record<ViewType, React.ComponentType<{ className?: string }>> 
   calendar: Calendar,
 }
 
-interface ViewSelectorProps<T = any> {
+interface ViewSelectorProps<T = Record<string, unknown>> {
   currentView: ViewType
   onViewChange: (view: ViewType) => void
   availableViews: ViewConfig[]
@@ -29,7 +29,7 @@ interface ViewSelectorProps<T = any> {
   onViewConfigUpdate: (viewType: ViewType, settings: ViewSettings) => void
 }
 
-export function ViewSelector<T = any>({
+export function ViewSelector<T = Record<string, unknown>>({
   currentView,
   onViewChange,
   availableViews,
@@ -131,7 +131,7 @@ export function ViewSelector<T = any>({
   )
 }
 
-interface ViewSettingsFormProps<T = any> {
+interface ViewSettingsFormProps<T = Record<string, unknown>> {
   viewType: ViewType
   config: ViewConfig
   columns: ColumnConfig<T>[]
@@ -139,7 +139,7 @@ interface ViewSettingsFormProps<T = any> {
   onCancel: () => void
 }
 
-function ViewSettingsForm<T = any>({
+function ViewSettingsForm<T = Record<string, unknown>>({
   viewType,
   config,
   columns,

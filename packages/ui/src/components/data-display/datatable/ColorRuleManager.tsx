@@ -24,7 +24,7 @@ export interface ColorRule {
   enabled: boolean
 }
 
-interface ColorRuleManagerProps<T = any> {
+interface ColorRuleManagerProps<T = Record<string, unknown>> {
   open: boolean
   onOpenChange: (open: boolean) => void
   columns: ColumnConfig<T>[]
@@ -53,7 +53,7 @@ const CONDITIONS = [
   { value: 'not_empty', label: 'Non vide' },
 ]
 
-export function ColorRuleManager<T = any>({
+export function ColorRuleManager<T = Record<string, unknown>>({
   open,
   onOpenChange,
   columns,

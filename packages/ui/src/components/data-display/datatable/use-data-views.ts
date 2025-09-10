@@ -90,7 +90,11 @@ export interface CalendarEvent extends Record<string, unknown> {
   originalData: any
 }
 
-export function useDataViews<T = any>(data: T[], columns: ColumnConfig<T>[], keyField: string) {
+export function useDataViews<T = Record<string, unknown>>(
+  data: T[],
+  columns: ColumnConfig<T>[],
+  keyField: string
+) {
   const [currentView, setCurrentView] = useState<ViewType>('table')
   const [viewConfigs, setViewConfigs] = useState<Record<ViewType, ViewConfig>>({
     table: {

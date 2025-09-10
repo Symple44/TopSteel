@@ -8,7 +8,7 @@
  * Type utilisateur pour l'authentification
  * Note: Le type User complet est maintenant dans @erp/domains
  */
-export interface AuthUser {
+export interface AuthUser extends Record<string, unknown> {
   id: string
   email: string
   nom: string

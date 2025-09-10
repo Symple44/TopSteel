@@ -8,7 +8,7 @@ import { APIClientEnhanced } from './api-client-enhanced'
 // ========================= TYPE DEFINITIONS =========================
 
 // Basic types needed for the APIs (extracted from @erp/types)
-interface BaseEntity {
+interface BaseEntity extends Record<string, unknown> {
   id: string
   createdAt: Date
   updatedAt: Date

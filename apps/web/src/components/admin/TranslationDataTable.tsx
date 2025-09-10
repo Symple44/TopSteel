@@ -170,9 +170,9 @@ export const TranslationDataTable = memo(function TranslationDataTable({
     ]
 
     // Ajouter une colonne par langue supportée
-    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES?.map((lang) => ({
+    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES?.map((lang): ColumnConfig<TranslationEntry> => ({
       id: `translation_${lang.code}`,
-      key: 'id' as keyof TranslationEntry, // Utiliser une propriété existante comme fallback, on s'appuie sur getValue
+      key: 'id', // Utiliser une propriété existante comme fallback, on s'appuie sur getValue
       title: `${lang.flag} ${lang.nativeName}`,
       description: `Traduction en ${lang.nativeName}`,
       type: 'richtext', // Utiliser le rich text pour les traductions

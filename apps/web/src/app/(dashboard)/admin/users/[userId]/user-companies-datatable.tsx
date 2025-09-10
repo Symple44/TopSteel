@@ -25,7 +25,7 @@ import { toast } from '@/hooks/use-toast'
 import { apiClient } from '@/lib/api-client'
 import { postTyped } from '@/lib/api-typed'
 
-interface CompanyAccess {
+interface CompanyAccess extends Record<string, unknown> {
   id: string
   societeId: string
   societe: {

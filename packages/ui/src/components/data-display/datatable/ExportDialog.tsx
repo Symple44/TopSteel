@@ -23,7 +23,7 @@ import {
 import { ExportUtils } from './export-utils'
 import type { ColumnConfig } from './types'
 
-interface ExportDialogProps<T = any> {
+interface ExportDialogProps<T = Record<string, unknown>> {
   open: boolean
   onOpenChange: (open: boolean) => void
   data: T[]
@@ -218,10 +218,10 @@ export function ExportDialog<T>({
                 <Label>Nom du fichier</Label>
                 <Input
                   value={settings.filename}
-                  onChange={(e: unknown) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setSettings((prev) => ({
                       ...prev,
-                      filename: (e as any).target.value.replace(/[^a-zA-Z0-9_-]/g, '_'),
+                      filename: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '_'),
                     }))
                   }
                   placeholder="export"

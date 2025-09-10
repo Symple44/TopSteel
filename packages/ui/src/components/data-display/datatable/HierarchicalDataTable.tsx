@@ -23,7 +23,7 @@ export interface HierarchicalDataTableProps<T extends HierarchicalItem = Hierarc
   className?: string
   onRowClick?: (item: T) => void
   onRowDoubleClick?: (item: T) => void
-  onCellEdit?: (item: T, columnId: string, value: any) => void
+  onCellEdit?: (item: T, columnId: string, value: unknown) => void
   actions?: React.ReactNode
 }
 
@@ -141,7 +141,7 @@ function HierarchicalNode<T extends HierarchicalItem>({
   dropPosition: 'above' | 'below' | 'inside'
   onRowClick?: (item: T) => void
   onRowDoubleClick?: (item: T) => void
-  onCellEdit?: (item: T, columnId: string, value: any) => void
+  onCellEdit?: (item: T, columnId: string, value: unknown) => void
 }) {
   const { item, level, hasChildren, isExpanded } = node
   const { displayConfig, reorderConfig } = config
@@ -237,7 +237,7 @@ function HierarchicalNode<T extends HierarchicalItem>({
                 type="button"
                 variant="ghost"
                 size={displayConfig.compactMode ? 'sm' : 'default'}
-                onClick={(e: any) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   onToggleExpansion(node.id)
                 }}
@@ -290,9 +290,11 @@ function HierarchicalNode<T extends HierarchicalItem>({
                   <div
                     className={cn('truncate', displayConfig.compactMode ? 'text-sm' : 'text-base')}
                   >
-                    {RenderUtils.renderCellValue(
-                      column.getValue ? column.getValue(item) : (item as any)[column.key],
-                      column as ColumnConfig<Record<string, unknown>>,
+                    {RenderUtils.renderCellValue<T>(
+                      column.getValue
+                        ? column.getValue(item)
+                        : (item as Record<string, unknown>)[column.key],
+                      column,
                       item,
                       !column.editable, // readonly si la colonne n'est pas éditable
                       (value) => onCellEdit?.(item, column.id, value)

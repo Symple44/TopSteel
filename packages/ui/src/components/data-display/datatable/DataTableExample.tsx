@@ -10,7 +10,7 @@ import { DataTable } from './DataTable'
 import type { ColumnConfig, SelectionState } from './types'
 
 // Type des données d'exemple
-interface User {
+interface User extends Record<string, unknown> {
   id: number
   name: string
   email: string
@@ -185,8 +185,8 @@ export function DataTableExample() {
       {/* DataTable */}
       <DataTable
         title="Gestion des utilisateurs"
-        data={data as any}
-        columns={columns as any}
+        data={data}
+        columns={columns}
         keyField="id"
         // Fonctionnalités activées
         sortable={true}
@@ -206,12 +206,12 @@ export function DataTableExample() {
         hoverable={true}
         height="600px"
         // Actions et callbacks
-        actions={actions as any}
+        actions={actions}
         onAddNew={handleAddNew}
-        onCellEdit={handleCellEdit as any}
+        onCellEdit={handleCellEdit}
         onSelectionChange={handleSelectionChange}
-        onRowClick={(_row: any) => {}}
-        onRowDoubleClick={(_row: any) => {}}
+        onRowClick={(_row: User) => {}}
+        onRowDoubleClick={(_row: User) => {}}
         // Pour la persistance des paramètres
         tableId="users-table"
       />

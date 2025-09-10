@@ -31,7 +31,7 @@ export enum ArticleStatus {
 /**
  * Interface principale pour les articles
  */
-export interface Article extends BaseEntity {
+export interface Article extends BaseEntity, Record<string, unknown> {
   reference: string
   designation: string
   type: ArticleType

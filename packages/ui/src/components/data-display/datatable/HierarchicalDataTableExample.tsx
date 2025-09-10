@@ -6,7 +6,7 @@ import { Button } from '../../primitives/button'
 import { HierarchicalDataTable } from './HierarchicalDataTable'
 import type { ColumnConfig } from './types'
 import { useHierarchicalPreferences } from './use-hierarchical-preferences'
-import type { HierarchicalItem } from './use-hierarchical-reorder'
+import type { HierarchicalDatatableConfig, HierarchicalItem } from './use-hierarchical-reorder'
 
 // Interface pour les éléments de devis hiérarchiques
 interface QuotationItem extends HierarchicalItem {
@@ -264,7 +264,7 @@ export function HierarchicalDataTableExample() {
   // Gestion des changements de configuration
   const handleConfigChange = (newConfig: unknown) => {
     if (config) {
-      savePreferences(newConfig as any)
+      savePreferences(newConfig as HierarchicalDatatableConfig)
     }
   }
 
@@ -275,7 +275,7 @@ export function HierarchicalDataTableExample() {
   const handleRowDoubleClick = (_item: QuotationItem) => {}
 
   // Gestion de l'édition de cellule
-  const handleCellEdit = (item: QuotationItem, columnId: string, value: any) => {
+  const handleCellEdit = (item: QuotationItem, columnId: string, value: unknown) => {
     const updatedData = data.map((d) => (d.id === item.id ? { ...d, [columnId]: value } : d))
     handleDataChange(updatedData)
   }

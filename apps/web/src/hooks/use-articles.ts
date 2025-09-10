@@ -4,7 +4,7 @@ import { apiClient } from '@/lib/api-client-instance'
 import { deleteTyped, fetchTyped, postTyped } from '@/lib/api-typed'
 
 // Types pour les articles (similaires aux matériaux)
-export interface Article {
+export interface Article extends Record<string, unknown> {
   id: string
   reference: string
   designation: string

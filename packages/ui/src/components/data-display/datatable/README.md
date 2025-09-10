@@ -8,12 +8,20 @@ The DataTable is a powerful, feature-rich table component built with React and T
 ```tsx
 import { DataTable, type ColumnConfig } from '@erp/ui'
 
-const data = [
+// Toutes les interfaces doivent étendre Record<string, unknown>
+interface TableData extends Record<string, unknown> {
+  id: number
+  name: string
+  role: string
+  salary: number
+}
+
+const data: TableData[] = [
   { id: 1, name: 'John Doe', role: 'Developer', salary: 75000 },
   { id: 2, name: 'Jane Smith', role: 'Designer', salary: 65000 },
 ]
 
-const columns: ColumnConfig<typeof data[0]>[] = [
+const columns: ColumnConfig<TableData>[] = [
   { key: 'id', header: 'ID', sortable: true },
   { key: 'name', header: 'Name', searchable: true },
   { key: 'role', header: 'Role', filterable: true },
@@ -476,11 +484,13 @@ function LazyTable() {
 }
 ```
 
-## Migration from Legacy DataTable
+## Migration Guide
 
-If you're migrating from the legacy DataTable:
+### Migration depuis l'ancienne version
 
-### Old (Legacy)
+Si vous migrez depuis l'ancienne version du DataTable :
+
+#### Ancien code (Legacy)
 ```tsx
 <DataTable
   columns={[
@@ -491,8 +501,15 @@ If you're migrating from the legacy DataTable:
 />
 ```
 
-### New (Current)
+#### Nouveau code (Actuel)
 ```tsx
+// S'assurer que l'interface étend Record<string, unknown>
+interface MyData extends Record<string, unknown> {
+  id: string
+  name: string
+  // ...
+}
+
 <DataTable
   data={data}
   columns={[
@@ -503,37 +520,96 @@ If you're migrating from the legacy DataTable:
 />
 ```
 
-### Key Changes:
+### Changements Clés :
 - `accessorKey` → `key`
 - `cell: (value)` → `render: (row)`
-- Added required `keyField` prop
-- Actions are now passed as a prop, not in columns
-- Better TypeScript support with generics
+- Ajout du prop obligatoire `keyField`
+- Les actions sont maintenant passées comme prop, pas dans les colonnes
+- **IMPORTANT** : Toutes les interfaces doivent étendre `Record<string, unknown>`
+- Plus d'utilisation de `any`, tout est typé avec `unknown`
+
+### Migration des Types
+
+#### Avant
+```tsx
+// Interface simple
+interface User {
+  id: string
+  name: string
+}
+
+// Colonnes avec any
+interface MyColumn {
+  render?: (value: any, row: any) => React.ReactNode
+}
+```
+
+#### Après
+```tsx
+// Interface étendant Record<string, unknown>
+interface User extends Record<string, unknown> {
+  id: string
+  name: string
+}
+
+// Colonnes avec types génériques
+interface ColumnConfig<T extends Record<string, unknown>> {
+  render?: (value: unknown, row: T, column: ColumnConfig<T>) => React.ReactNode
+}
+```
 
 ## TypeScript
 
-The DataTable is fully typed with TypeScript generics:
+The DataTable is fully typed with TypeScript generics. **Important**: Toutes les interfaces utilisées avec DataTable doivent étendre `Record<string, unknown>` pour garantir la sécurité des types.
+
+### Convention Standard
+
+Toutes les interfaces de données doivent étendre `Record<string, unknown>` :
 
 ```tsx
-interface User {
+// ✅ Correct
+interface User extends Record<string, unknown> {
   id: number
   name: string
   email: string
   role: string
 }
 
-const columns: ColumnConfig<User>[] = [
-  { key: 'name', header: 'Name' },    // Type-safe keys
-  { key: 'email', header: 'Email' },
-  { key: 'role', header: 'Role' },
+// ❌ Incorrect - ne compilera pas
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+}
+```
+
+### Utilisation avec les Types du Projet
+
+Tous les types métier du projet (`@erp/types`) ont été mis à jour pour étendre `Record<string, unknown>` :
+
+```tsx
+import { DataTable } from '@erp/ui'
+import type { Partner, Material, Article } from '@erp/types' // Tous étendent Record<string, unknown>
+
+const columns: ColumnConfig<Partner>[] = [
+  { key: 'code', header: 'Code', sortable: true },
+  { key: 'denomination', header: 'Dénomination' },
+  { key: 'ville', header: 'Ville' },
 ]
 
-<DataTable<User>
-  data={users}
+<DataTable
+  data={partners}
   columns={columns}
   keyField="id"
 />
 ```
+
+### Contraintes de Types
+
+- **DataTable** : Requiert `T extends Record<string, unknown>`
+- **ColumnConfig** : Utilise des génériques pour la sécurité des types sur les clés et les rendus
+- **Pas de type `any`** : Tout est typé avec `unknown` pour une meilleure sécurité
 
 ## Styling
 
