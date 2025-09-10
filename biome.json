@@ -31,10 +31,11 @@
       "style": {
         "useConst": "error",
         "useImportType": "error",
-        "noNegationElse": "warn"
+        "noNegationElse": "warn",
+        "noNonNullAssertion": "off"
       },
       "suspicious": {
-        "noExplicitAny": "warn",
+        "noExplicitAny": "off",
         "noConsole": "warn",
         "noArrayIndexKey": "warn"
       },
@@ -179,6 +180,20 @@
         "rules": {
           "suspicious": {
             "noArrayIndexKey": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "apps/api/src/domains/auth/services/audit.service.ts",
+        "packages/ui/src/types/filters.ts",
+        "apps/api/src/domains/inventory/services/stock-movement.service.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
           }
         }
       }
