@@ -362,3 +362,12 @@ export function getInputType<T>(column: ColumnConfig<T>): string {
         return 'text'
     }
   }
+
+/**
+ * Export groupé pour compatibilité avec l'ancien code utilisant ValidationUtils
+ */
+export const ValidationUtils = {
+  validateValue,
+  formatValueForDisplay,
+  getInputType
+}
