@@ -11,7 +11,7 @@ import {
 } from 'typeorm'
 import type { SafeObject } from '../../../../../../packages/ui/src/types/common'
 // Removed imports to avoid circular dependencies
-// import { MarketplaceCustomer } from './marketplace-customer.entity'
+import type { MarketplaceCustomer } from './marketplace-customer.entity'
 import type { MarketplaceOrderItem } from './marketplace-order-item.entity'
 
 @Entity('marketplace_orders')
@@ -35,7 +35,7 @@ export class MarketplaceOrder {
 
   @ManyToOne('MarketplaceCustomer', 'orders', { onDelete: 'RESTRICT', lazy: true })
   @JoinColumn({ name: 'customer_id' })
-  customer: any
+  customer: MarketplaceCustomer
 
   @OneToMany('MarketplaceOrderItem', 'order', { cascade: true, lazy: true })
   items: MarketplaceOrderItem[]

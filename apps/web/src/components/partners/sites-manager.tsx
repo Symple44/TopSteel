@@ -241,7 +241,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sites?.map((site: PartnerSite) => (
+                {sites?.map((site: PartnerSite): React.ReactElement => (
                   <TableRow key={site.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">

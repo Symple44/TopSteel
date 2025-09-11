@@ -190,7 +190,7 @@ export function ContactsManager({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contacts?.map((contact: Contact) => (
+                {contacts?.map((contact: Contact): React.ReactElement => (
                   <TableRow key={contact.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">

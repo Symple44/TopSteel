@@ -14,7 +14,10 @@ import type {
 } from '@erp/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { apiClient, APIError } from '@/lib/api-client-instance'
+import { apiClient, type APIClientInterface, APIError } from '@/lib/api-client-instance'
+
+// Type the apiClient properly
+const typedApiClient = apiClient as APIClientInterface
 
 // Helper function to extract error message
 const getErrorMessage = (error: unknown, defaultMessage: string): string => {
@@ -57,7 +60,7 @@ const GROUP_KEYS = {
 export function usePartnerContacts(partnerId: string) {
   return useQuery({
     queryKey: CONTACT_KEYS?.byPartner(partnerId),
-    queryFn: () => apiClient.partners.getPartnerContacts(partnerId),
+    queryFn: () => typedApiClient.partners.getPartnerContacts(partnerId),
     enabled: !!partnerId,
   })
 }
@@ -67,14 +70,14 @@ export function useCreateContact() {
 
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreateContactDto }) =>
-      apiClient.partners.createContact(partnerId, data),
+      typedApiClient.partners.createContact(partnerId, data),
     onSuccess: (_contact, { partnerId }) => {
-      queryClient?.invalidateQueries({ queryKey: CONTACT_KEYS?.byPartner(partnerId) })
-      queryClient?.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
-      toast?.success('Contact créé avec succès')
+      queryClient.invalidateQueries({ queryKey: CONTACT_KEYS.byPartner(partnerId) })
+      queryClient.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
+      toast.success('Contact créé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(getErrorMessage(error, 'Erreur lors de la création du contact'))
+      toast.error(getErrorMessage(error, 'Erreur lors de la création du contact'))
     },
   })
 }
@@ -84,14 +87,14 @@ export function useUpdateContact() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateContactDto }) =>
-      apiClient.partners.updateContact(id, data),
+      typedApiClient.partners.updateContact(id, data),
     onSuccess: (contact: Contact) => {
-      queryClient?.invalidateQueries({ queryKey: CONTACT_KEYS.all })
-      queryClient?.setQueryData(CONTACT_KEYS?.detail(contact.id), contact)
-      toast?.success('Contact mis à jour avec succès')
+      queryClient.invalidateQueries({ queryKey: CONTACT_KEYS.all })
+      queryClient.setQueryData(CONTACT_KEYS.detail(contact.id), contact)
+      toast.success('Contact mis à jour avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(getErrorMessage(error, 'Erreur lors de la mise à jour du contact'))
+      toast.error(getErrorMessage(error, 'Erreur lors de la mise à jour du contact'))
     },
   })
 }
@@ -100,13 +103,13 @@ export function useDeleteContact() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => apiClient.partners.deleteContact(id),
+    mutationFn: (id: string) => typedApiClient.partners.deleteContact(id),
     onSuccess: () => {
-      queryClient?.invalidateQueries({ queryKey: CONTACT_KEYS.all })
-      toast?.success('Contact supprimé avec succès')
+      queryClient.invalidateQueries({ queryKey: CONTACT_KEYS.all })
+      toast.success('Contact supprimé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(getErrorMessage(error, 'Erreur lors de la suppression du contact'))
+      toast.error(getErrorMessage(error, 'Erreur lors de la suppression du contact'))
     },
   })
 }
@@ -116,7 +119,7 @@ export function useDeleteContact() {
 export function usePartnerSites(partnerId: string) {
   return useQuery({
     queryKey: SITE_KEYS?.byPartner(partnerId),
-    queryFn: () => apiClient.partners.getPartnerSites(partnerId),
+    queryFn: () => typedApiClient.partners.getPartnerSites(partnerId),
     enabled: !!partnerId,
   })
 }
@@ -126,14 +129,14 @@ export function useCreatePartnerSite() {
 
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreatePartnerSiteDto }) =>
-      apiClient.partners.createPartnerSite(partnerId, data),
+      typedApiClient.partners.createPartnerSite(partnerId, data),
     onSuccess: (_site, { partnerId }) => {
-      queryClient?.invalidateQueries({ queryKey: SITE_KEYS?.byPartner(partnerId) })
-      queryClient?.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
-      toast?.success('Site créé avec succès')
+      queryClient.invalidateQueries({ queryKey: SITE_KEYS.byPartner(partnerId) })
+      queryClient.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
+      toast.success('Site créé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(getErrorMessage(error, 'Erreur lors de la création du site'))
+      toast.error(getErrorMessage(error, 'Erreur lors de la création du site'))
     },
   })
 }
@@ -143,7 +146,7 @@ export function useUpdatePartnerSite() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePartnerSiteDto }) =>
-      apiClient.partners.updatePartnerSite(id, data),
+      typedApiClient.partners.updatePartnerSite(id, data),
     onSuccess: (site: PartnerSite) => {
       queryClient?.invalidateQueries({ queryKey: SITE_KEYS.all })
       queryClient?.setQueryData(SITE_KEYS?.detail(site.id), site)
@@ -159,7 +162,7 @@ export function useDeletePartnerSite() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => apiClient.partners.deletePartnerSite(id),
+    mutationFn: (id: string) => typedApiClient.partners.deletePartnerSite(id),
     onSuccess: () => {
       queryClient?.invalidateQueries({ queryKey: SITE_KEYS.all })
       toast?.success('Site supprimé avec succès')
@@ -175,7 +178,7 @@ export function useDeletePartnerSite() {
 export function usePartnerAddresses(partnerId: string) {
   return useQuery({
     queryKey: ADDRESS_KEYS?.byPartner(partnerId),
-    queryFn: () => apiClient.partners.getPartnerAddresses(partnerId),
+    queryFn: () => typedApiClient.partners.getPartnerAddresses(partnerId),
     enabled: !!partnerId,
   })
 }
@@ -185,7 +188,7 @@ export function useCreatePartnerAddress() {
 
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreatePartnerAddressDto }) =>
-      apiClient.partners.createPartnerAddress(partnerId, data),
+      typedApiClient.partners.createPartnerAddress(partnerId, data),
     onSuccess: (_address, { partnerId }) => {
       queryClient?.invalidateQueries({ queryKey: ADDRESS_KEYS?.byPartner(partnerId) })
       queryClient?.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
@@ -202,7 +205,7 @@ export function useUpdatePartnerAddress() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePartnerAddressDto }) =>
-      apiClient.partners.updatePartnerAddress(id, data),
+      typedApiClient.partners.updatePartnerAddress(id, data),
     onSuccess: (address: PartnerAddress) => {
       queryClient?.invalidateQueries({ queryKey: ADDRESS_KEYS.all })
       queryClient?.setQueryData(ADDRESS_KEYS?.detail(address.id), address)
@@ -218,7 +221,7 @@ export function useDeletePartnerAddress() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => apiClient.partners.deletePartnerAddress(id),
+    mutationFn: (id: string) => typedApiClient.partners.deletePartnerAddress(id),
     onSuccess: () => {
       queryClient?.invalidateQueries({ queryKey: ADDRESS_KEYS.all })
       toast?.success('Adresse supprimée avec succès')
@@ -235,7 +238,7 @@ export function useCreatePartnerGroup() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: CreatePartnerGroupDto) => apiClient.partners.createPartnerGroup(data),
+    mutationFn: (data: CreatePartnerGroupDto) => typedApiClient.partners.createPartnerGroup(data),
     onSuccess: (group: PartnerGroup) => {
       queryClient?.invalidateQueries({ queryKey: GROUP_KEYS?.list() })
       queryClient?.setQueryData(GROUP_KEYS?.detail(group.id), group)
@@ -252,7 +255,7 @@ export function useUpdatePartnerGroup() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePartnerGroupDto }) =>
-      apiClient.partners.updatePartnerGroup(id, data),
+      typedApiClient.partners.updatePartnerGroup(id, data),
     onSuccess: (group: PartnerGroup) => {
       queryClient?.invalidateQueries({ queryKey: GROUP_KEYS?.list() })
       queryClient?.setQueryData(GROUP_KEYS?.detail(group.id), group)

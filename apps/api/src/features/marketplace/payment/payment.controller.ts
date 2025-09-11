@@ -27,6 +27,7 @@ import { ThrottlerGuard } from '@nestjs/throttler'
 import { IsIn, IsNumber, IsOptional, IsPositive, IsString, IsUUID, Min } from 'class-validator'
 import { CurrentMarketplaceCustomer } from '../auth/decorators/current-customer.decorator'
 import { MarketplaceAuthGuard } from '../auth/guards/marketplace-auth.guard'
+import { MarketplaceCustomerJwtPayload } from '../auth/interfaces/marketplace-customer.interface'
 import type {
   CreatePaymentIntentDto,
   PaymentResult,
@@ -157,7 +158,7 @@ export class PaymentController {
   })
   async createPaymentIntent(
     @Body() dto: CreatePaymentDto,
-    @CurrentMarketplaceCustomer() customer: any
+    @CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload
   ): Promise<PaymentResult> {
     const paymentData: CreatePaymentIntentDto = {
       ...dto,
@@ -185,7 +186,7 @@ export class PaymentController {
   })
   async confirmPayment(
     @Body() dto: ConfirmPaymentDto,
-    @CurrentMarketplaceCustomer() _customer: any
+    @CurrentMarketplaceCustomer() _customer: MarketplaceCustomerJwtPayload
   ): Promise<PaymentResult> {
     return await this.paymentService.confirmPayment(dto.paymentIntentId, dto.paymentMethodId)
   }
@@ -213,7 +214,7 @@ export class PaymentController {
   async createRefund(
     @Param('paymentIntentId') paymentIntentId: string,
     @Body() dto: RefundPaymentDto,
-    @CurrentMarketplaceCustomer() _customer: any
+    @CurrentMarketplaceCustomer() _customer: MarketplaceCustomerJwtPayload
   ): Promise<RefundResult> {
     // Note: In production, add role-based authorization for refunds
     // Only customer service or admin should be able to create refunds
@@ -239,7 +240,7 @@ export class PaymentController {
   })
   async savePaymentMethod(
     @Body() dto: SavePaymentMethodDto,
-    @CurrentMarketplaceCustomer() customer: any
+    @CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload
   ) {
     const result = await this.paymentService.savePaymentMethod(
       customer.sub || customer.id,
@@ -265,7 +266,7 @@ export class PaymentController {
     status: HttpStatus.OK,
     description: 'Payment methods retrieved successfully',
   })
-  async getPaymentMethods(@CurrentMarketplaceCustomer() customer: any) {
+  async getPaymentMethods(@CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload) {
     const paymentMethods = await this.paymentService.getPaymentMethods(customer.sub || customer.id)
 
     // Sanitize payment method data for client
@@ -344,7 +345,7 @@ export class PaymentController {
   })
   async getPaymentStatus(
     @Param('orderId', ParseUUIDPipe) orderId: string,
-    @CurrentMarketplaceCustomer() _customer: any
+    @CurrentMarketplaceCustomer() _customer: MarketplaceCustomerJwtPayload
   ) {
     // This would typically fetch from the order and return payment status
     // For now, return a placeholder response

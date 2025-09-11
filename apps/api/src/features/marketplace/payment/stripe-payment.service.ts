@@ -577,7 +577,7 @@ export class StripePaymentService {
   }
 
   private async updateOrderPaymentStatus(orderId: string, status: string): Promise<void> {
-    const updateData: any = {
+    const updateData: { paymentStatus: string; paidAt?: Date } = {
       paymentStatus: status,
     }
 

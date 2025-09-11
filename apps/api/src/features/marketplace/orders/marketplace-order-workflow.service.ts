@@ -314,7 +314,7 @@ export class MarketplaceOrderWorkflowService {
   /**
    * Processus de checkout
    */
-  async checkout(orderId: string, paymentDetails: any): Promise<MarketplaceOrder> {
+  async checkout(orderId: string, paymentDetails: { paymentMethodId: string; savePaymentMethod?: boolean }): Promise<MarketplaceOrder> {
     const order = await this.orderRepository.findOne({
       where: { id: orderId, status: OrderStatus.CART },
       relations: ['customer', 'items', 'items.product'],
