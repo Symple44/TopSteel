@@ -6,6 +6,7 @@ import * as mathjs from 'mathjs'
 import type { DataSource, Repository } from 'typeorm'
 import type {
   AppliedRuleInfo,
+  BreakdownContext,
   BreakdownStep,
   BuildDetailedBreakdownParams,
   BuildFinalResultParams,
@@ -15,51 +16,14 @@ import type {
   FormulaPriceResult,
   LengthPriceResult,
   PriceRuleApplication,
+  PricingContext,
   SkippedRule,
   SurfacePriceResult,
   VolumePriceResult,
   WeightPriceResult,
 } from '../types/pricing-engine.types'
 
-export interface PricingContext {
-  // Identifiants
-  articleId?: string
-  articleReference?: string
-  customerId?: string
-  societeId: string
-
-  // Données article
-  article?: {
-    id: string
-    reference: string
-    designation: string
-    famille?: string
-    prixVenteHT?: number
-    prixAchatHT?: number
-    poids?: number
-    longueur?: number
-    largeur?: number
-    hauteur?: number
-    surface?: number
-    volume?: number
-    uniteStock?: string
-    uniteVente?: string
-    uniteAchat?: string
-    coefficientVente?: number
-    coefficientAchat?: number
-  }
-
-  // Contexte commercial
-  quantity?: number
-  customerGroup?: string
-  customerEmail?: string
-  channel?: PriceRuleChannel
-  promotionCode?: string
-
-  // Métadonnées
-  isFirstOrder?: boolean
-  orderTotal?: number
-}
+export type { PricingContext } from '../types/pricing-engine.types'
 
 export interface PriceCalculationResult {
   basePrice: number
@@ -547,7 +511,7 @@ export class PricingEngineService {
   private buildBreakdownContext(
     article: NonNullable<PricingContext['article']>,
     context: PricingContext
-  ) {
+  ): BreakdownContext {
     return {
       article: {
         id: article.id,
@@ -951,6 +915,7 @@ export class PricingEngineService {
         designation: article.designation,
         famille: article.famille,
         prixVenteHT: Number(article.prixVenteHT) || 0,
+        prixAchatHT: Number(article.prixAchatStandard || article.prixAchatMoyen) || undefined,
         poids: Number(article.poids) || undefined,
         longueur: Number(article.longueur) || undefined,
         largeur: Number(article.largeur) || undefined,

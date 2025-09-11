@@ -280,14 +280,13 @@ export class NotificationRuleEngineService {
     const maxAgeDate = new Date()
     maxAgeDate.setHours(maxAgeDate.getHours() - maxAge)
 
-    const failedEvents = await this.ruleService._eventRepository.find({
-      where: {
-        status: EventStatus.FAILED,
-        occurredAt: maxAgeDate as any,
-      },
-      order: { occurredAt: 'ASC' },
-      take: 50,
-    })
+    const failedEvents = await this.ruleService._eventRepository
+      .createQueryBuilder('event')
+      .where('event.status = :status', { status: EventStatus.FAILED })
+      .andWhere('event.occurredAt >= :date', { date: maxAgeDate })
+      .orderBy('event.occurredAt', 'ASC')
+      .take(50)
+      .getMany()
 
     this.logger.log(`Reprocessing ${failedEvents.length} failed events`)
 

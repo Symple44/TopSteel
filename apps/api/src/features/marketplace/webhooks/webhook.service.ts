@@ -9,6 +9,7 @@ import type { Repository } from 'typeorm'
 import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import type { EmailService } from '../../../core/email/email.service'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
+import { OrderStatus } from '../orders/marketplace-order-workflow.service'
 import type { MarketplaceOrderWorkflowService } from '../orders/marketplace-order-workflow.service'
 
 export interface WebhookEvent {
@@ -194,7 +195,7 @@ export class WebhookService {
 
     try {
       // Update order status to confirmed
-      await this.orderWorkflowService.transitionOrder(event.orderId, 'CONFIRMED' as any)
+      await this.orderWorkflowService.transitionOrder(event.orderId, OrderStatus.CONFIRMED)
 
       // Send payment confirmation email
       const order = await this.orderRepository.findOne({

@@ -248,7 +248,7 @@ export class MarketplacePromotionsController {
       tenantId,
       body.couponCode,
       body.orderId,
-      body.customerId || user.customerId
+      body.customerId || user.id
     )
   }
 
@@ -281,14 +281,14 @@ export class MarketplacePromotionsController {
   async calculateOrderDiscount(
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
-    @CurrentUser() user: unknown,
+    @CurrentUser() user: { id: string; customerId?: string; [key: string]: unknown },
     @Query('couponCode') couponCode?: string,
     @Query('customerId') customerId?: string
   ) {
     return this.promotionsService.calculateOrderDiscount(
       tenantId,
       orderId,
-      customerId || (user as any).customerId,
+      customerId || user.customerId,
       couponCode
     )
   }

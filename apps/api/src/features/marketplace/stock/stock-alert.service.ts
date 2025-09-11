@@ -8,6 +8,7 @@ import type { Redis } from 'ioredis'
 import type { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import type { EmailService } from '../../../core/email/email.service'
+import type { StockAlert } from '../../../domains/inventory/repositories/article.repository'
 
 interface StockAlertEvent {
   productId: string
@@ -354,7 +355,7 @@ export class StockAlertService {
   /**
    * Get stock alert history for a product
    */
-  async getAlertHistory(productId: string): Promise<any[]> {
+  async getAlertHistory(productId: string): Promise<StockAlert[]> {
     try {
       const pattern = `stock_alert_log:${productId}:*`
       const keys = await this.redisService.keys(pattern)

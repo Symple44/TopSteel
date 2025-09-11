@@ -6,6 +6,7 @@ import {
 } from '../auth/decorators/marketplace-permissions.decorator'
 import { MarketplacePermissionsGuard } from '../auth/guards/marketplace-permissions.guard'
 import type { MarketplaceShipment } from '../entities/marketplace-shipment.entity'
+import type { TrackingStatus } from '../types/shipping.types'
 import type {
   CreateShipmentDto,
   MarketplaceShippingService,
@@ -67,7 +68,7 @@ export class MarketplaceShippingController {
     const trackingUpdate: TrackingUpdate = {
       ...updateTrackingDto,
       timestamp: new Date(),
-      status: updateTrackingDto.status as any,
+      status: updateTrackingDto.status as TrackingStatus,
     }
 
     return this.shippingService.updateTrackingInfo(shipmentId, trackingUpdate)

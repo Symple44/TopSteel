@@ -16,6 +16,7 @@ import { IsNumber, IsOptional, IsString, Min } from 'class-validator'
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import type {
+  ArticleCustomization,
   MarketplacePriceResult,
   MarketplacePricingIntegrationService,
   MarketplacePricingOptions,
@@ -44,7 +45,7 @@ class BulkPriceDto {
   items: Array<{
     articleId: string
     quantity: number
-    customizations?: unknown
+    customizations?: ArticleCustomization[]
   }>
 
   @IsString()

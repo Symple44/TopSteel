@@ -86,8 +86,8 @@ export class SentryInterceptor implements NestInterceptor {
       tags: {
         'http.method': method,
         'http.url': url,
-        'http.host': headers.host,
-        'tenant.id': headers['x-tenant-id'] as string,
+        'http.host': headers.host || 'unknown',
+        'tenant.id': (headers['x-tenant-id'] as string) || 'unknown',
       },
     })
 
@@ -214,7 +214,7 @@ export class SentryInterceptor implements NestInterceptor {
               statusCode.toString(),
             ])
 
-            const eventId = this.sentry.captureException(error)
+            const eventId = this.sentry!.captureException(error)
             if (eventId) {
               this.logger.error(`Error captured to Sentry: ${eventId}`, error.stack)
             } else {

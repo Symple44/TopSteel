@@ -18,7 +18,7 @@ describe('MarketplacePaymentService', () => {
   let _paymentRepository: Repository<MarketplacePayment>
   let _orderRepository: Repository<MarketplaceOrder>
   let _eventEmitter: EventEmitter2
-  let stripe: any
+  let stripe: { paymentIntents: { create: () => void; confirm: () => void }; customers: { create: () => void } }
 
   const mockPaymentRepository = {
     create: vi.fn(),

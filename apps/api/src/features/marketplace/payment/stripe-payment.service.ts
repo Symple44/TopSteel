@@ -174,7 +174,7 @@ export class StripePaymentService {
         hasStack(error) ? error.stack : undefined
       )
 
-      if ((error as any).type === 'StripeError') {
+      if (error instanceof Error && 'type' in error && 'code' in error) {
         return {
           success: false,
           paymentIntentId: '',
@@ -233,7 +233,7 @@ export class StripePaymentService {
         hasStack(error) ? error.stack : undefined
       )
 
-      if ((error as any).type === 'StripeError') {
+      if (error instanceof Error && 'type' in error && 'code' in error) {
         return {
           success: false,
           paymentIntentId,

@@ -238,7 +238,7 @@ export class PriceRulesController {
     const total = rules.length
 
     this.logger.log(
-      `${total} règles de prix trouvées pour société ${(user as any).societeId || (user as any).currentSocieteId || 'default'}`
+      `${total} règles de prix trouvées pour société ${user.societeId || user.currentSocieteId || 'default'}`
     )
 
     return { rules: paginatedRules, total }
@@ -265,7 +265,7 @@ export class PriceRulesController {
     const rule = await this.priceRuleRepository.findOne({
       where: {
         id,
-        societeId: (user as any).societeId || (user as any).currentSocieteId || 'default',
+        societeId: user.societeId || user.currentSocieteId || 'default',
       },
     })
 
@@ -343,7 +343,7 @@ export class PriceRulesController {
     const existingRule = await this.priceRuleRepository.findOne({
       where: {
         id,
-        societeId: (user as any).societeId || (user as any).currentSocieteId || 'default',
+        societeId: user.societeId || user.currentSocieteId || 'default',
       },
     })
 
@@ -393,7 +393,7 @@ export class PriceRulesController {
     const rule = await this.priceRuleRepository.findOne({
       where: {
         id,
-        societeId: (user as any).societeId || (user as any).currentSocieteId || 'default',
+        societeId: user.societeId || user.currentSocieteId || 'default',
       },
     })
 
@@ -425,7 +425,7 @@ export class PriceRulesController {
     const rule = await this.priceRuleRepository.findOne({
       where: {
         id,
-        societeId: (user as any).societeId || (user as any).currentSocieteId || 'default',
+        societeId: user.societeId || user.currentSocieteId || 'default',
       },
     })
 

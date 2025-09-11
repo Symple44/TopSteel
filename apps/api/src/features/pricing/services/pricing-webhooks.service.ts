@@ -23,14 +23,14 @@ interface WebhookError {
   }
 }
 
-interface PriceChangeEvent {
+interface PriceChangeEvent extends Record<string, unknown> {
   previousPrice: number
   newPrice: number
   societeId: string
   articleId?: string
 }
 
-interface RuleAppliedEvent {
+interface RuleAppliedEvent extends Record<string, unknown> {
   societeId: string
   ruleId: string
   articleId?: string

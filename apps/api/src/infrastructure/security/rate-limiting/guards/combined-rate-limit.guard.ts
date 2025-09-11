@@ -229,7 +229,7 @@ export class CombinedRateLimitGuard implements CanActivate {
     }
 
     // Check IP-based rate limit
-    const ipResult = await this.rateLimitService.checkRateLimit(
+    const ipResult: RateLimitResult = await this.rateLimitService.checkRateLimit(
       `ip:${userContext.ip}:${endpoint}`,
       ipConfig,
       userContext
@@ -259,24 +259,18 @@ export class CombinedRateLimitGuard implements CanActivate {
   /**
    * Combine IP and user limit results
    */
-  private combineLimitResults(ipResult: unknown, userResult?: unknown): Record<string, unknown> {
-    const typedIpResult = ipResult as {
-      isAllowed?: boolean
-      remainingRequests?: number
-      resetTime?: number
-      retryAfter?: number
-    }
-    let isAllowed = typedIpResult.isAllowed ?? false
+  private combineLimitResults(ipResult: RateLimitResult, userResult?: RateLimitResult): RateLimitResult & { limitingFactor: 'ip' | 'user' | 'both' } {
+    let isAllowed = ipResult.isAllowed
     let limitingFactor: 'ip' | 'user' | 'both' = 'ip'
 
     if (userResult) {
-      if (typedIpResult.isAllowed && !userResult.isAllowed) {
+      if (ipResult.isAllowed && !userResult.isAllowed) {
         isAllowed = false
         limitingFactor = 'user'
-      } else if (!typedIpResult.isAllowed && !userResult.isAllowed) {
+      } else if (!ipResult.isAllowed && !userResult.isAllowed) {
         isAllowed = false
         limitingFactor = 'both'
-      } else if (typedIpResult.isAllowed && userResult.isAllowed) {
+      } else if (ipResult.isAllowed && userResult.isAllowed) {
         isAllowed = true
         limitingFactor = 'ip' // Default to IP when both allow
       }
@@ -285,15 +279,17 @@ export class CombinedRateLimitGuard implements CanActivate {
     return {
       isAllowed,
       remainingRequests: Math.min(
-        typedIpResult.remainingRequests ?? 0,
+        ipResult.remainingRequests,
         userResult?.remainingRequests ?? Number.MAX_SAFE_INTEGER
       ),
-      resetTime: Math.max(typedIpResult.resetTime ?? 0, userResult?.resetTime ?? 0),
+      resetTime: Math.max(ipResult.resetTime, userResult?.resetTime ?? 0),
       retryAfter:
         Math.max(
-          typedIpResult.retryAfter ?? 0,
-          (userResult as { retryAfter?: number } | undefined)?.retryAfter ?? 0
+          ipResult.retryAfter ?? 0,
+          userResult?.retryAfter ?? 0
         ) || undefined,
+      totalRequests: Math.max(ipResult.totalRequests, userResult?.totalRequests ?? 0),
+      windowStartTime: Math.min(ipResult.windowStartTime, userResult?.windowStartTime ?? Date.now()),
       limitingFactor,
     }
   }

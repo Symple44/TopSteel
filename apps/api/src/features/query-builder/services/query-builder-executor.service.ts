@@ -5,7 +5,7 @@ import type { DataSource } from 'typeorm'
 import type { QueryOperator } from '../../../types/query-builder/query-builder.types'
 import type { QueryBuilder } from '../entities'
 import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
-import type { SqlSanitizationService } from '../security/sql-sanitization.service'
+import type { SqlSanitizationService, FilterCondition } from '../security/sql-sanitization.service'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 export interface QueryExecutionParams {
@@ -154,13 +154,7 @@ export class QueryBuilderExecutorService {
       fromAlias?: string
       toAlias?: string
     }>
-    filters: Array<{
-      tableName: string
-      columnName: string
-      operator: QueryOperator
-      value: unknown
-      tableAlias?: string
-    }>
+    filters: FilterCondition[]
     sorts: Array<{
       tableName: string
       columnName: string
@@ -192,19 +186,13 @@ export class QueryBuilderExecutorService {
     }))
 
     // Convert legacy filters to structured format
-    const filters: Array<{
-      tableName: string
-      columnName: string
-      operator: QueryOperator
-      value: unknown
-      tableAlias?: string
-    }> = []
+    const filters: FilterCondition[] = []
     Object.entries(params.filters || {}).forEach(([columnAlias, filterValue]) => {
       const column = queryBuilder.columns.find((col) => col.alias === columnAlias)
       if (column?.isFilterable) {
         // Determine operator based on value type
-        let operator: QueryOperator = '='
-        let value: unknown = filterValue
+        let operator: string = '='
+        let value: string | number | boolean | null | Date | string[] | number[] = filterValue as string | number | boolean | null | Date | string[] | number[]
 
         if (Array.isArray(filterValue)) {
           operator = 'IN'
@@ -213,13 +201,18 @@ export class QueryBuilderExecutorService {
           const rangeFilter = filterValue as Record<string, unknown>
           if (rangeFilter.min !== undefined && rangeFilter.max !== undefined) {
             operator = 'BETWEEN'
-            value = [rangeFilter.min, rangeFilter.max]
+            // Ensure both values are of the same type (string or number) for BETWEEN operator
+            const minVal = rangeFilter.min as string | number
+            const maxVal = rangeFilter.max as string | number
+            value = typeof minVal === 'string' || typeof maxVal === 'string' 
+              ? [String(minVal), String(maxVal)] as string[]
+              : [Number(minVal), Number(maxVal)] as number[]
           } else if (rangeFilter.min !== undefined) {
             operator = '>='
-            value = rangeFilter.min
+            value = rangeFilter.min as string | number | boolean | null | Date
           } else if (rangeFilter.max !== undefined) {
             operator = '<='
-            value = rangeFilter.max
+            value = rangeFilter.max as string | number | boolean | null | Date
           }
         }
 

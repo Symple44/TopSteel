@@ -1,4 +1,4 @@
-import { Article } from '@erp/entities'
+import { Article, PriceRuleChannel } from '@erp/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -87,7 +87,7 @@ export class MarketplaceOrderWorkflowService {
   }
 
   private setupTransitions() {
-    ;(this as any).transitions = new Map([
+    const transitionsMap = new Map([
       [
         OrderStatus.PENDING,
         {
@@ -143,6 +143,14 @@ export class MarketplaceOrderWorkflowService {
         },
       ],
     ])
+
+    // Utilisation d'Object.defineProperty pour contourner la propriété readonly
+    Object.defineProperty(this, 'transitions', {
+      value: transitionsMap,
+      writable: false,
+      enumerable: false,
+      configurable: false
+    })
   }
 
   /**
@@ -216,19 +224,19 @@ export class MarketplaceOrderWorkflowService {
           articleId: product.id,
           quantity: itemData.quantity,
           customerId: customer.erpPartnerId,
-          channel: 'MARKETPLACE' as any,
+          channel: PriceRuleChannel.MARKETPLACE,
           societeId: tenantId,
         })
 
         const item = manager.create(MarketplaceOrderItem, {
-          order: savedOrder,
+          orderId: savedOrder.id,
           product,
           quantity: itemData.quantity,
           price: priceCalculation.basePrice,
           totalPrice: priceCalculation.finalPrice,
-          customizations: itemData.customizations,
+          customizations: itemData.customizations as import('../../../../../../packages/ui/src/types/common').SafeObject,
           discount: priceCalculation.totalDiscount || 0,
-        } as any)
+        })
 
         items.push(item)
         subtotal += priceCalculation.finalPrice

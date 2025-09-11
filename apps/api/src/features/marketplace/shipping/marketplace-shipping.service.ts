@@ -268,7 +268,7 @@ export class MarketplaceShippingService {
   /**
    * Calculate shipping cost based on order and destination
    */
-  async calculateShippingCost(order: unknown, shippingMethod: ShippingMethod): Promise<number> {
+  async calculateShippingCost(order: MarketplaceOrder, shippingMethod: ShippingMethod): Promise<number> {
     try {
       // This is a simplified calculation
       // In production, this would integrate with carrier APIs
@@ -283,10 +283,10 @@ export class MarketplaceShippingService {
       let cost = baseRates[shippingMethod]
 
       // Add weight-based pricing
-      const orderData = order as any
       const totalWeight =
-        orderData.items?.reduce(
-          (weight: number, item: any) => weight + (item.product?.weight || 1) * item.quantity,
+        order.items?.reduce(
+          (weight: number, item: { product?: { poids?: number }; quantity: number }) => 
+            weight + (item.product?.poids || 1) * item.quantity,
           0
         ) || 1
 
@@ -295,7 +295,7 @@ export class MarketplaceShippingService {
       }
 
       // Free shipping for orders over €100
-      if (orderData.total >= 100) {
+      if ((order.total || 0) >= 100) {
         cost = shippingMethod === ShippingMethod.PICKUP ? 0 : Math.max(0, cost - 5.99)
       }
 

@@ -139,8 +139,8 @@ export interface FormulaPriceResult {
 
 // Build result parameters interface
 export interface BuildFinalResultParams {
-  article: NonNullable<BreakdownContext['article']>
-  context: BreakdownContext
+  article: NonNullable<PricingContext['article']>
+  context: PricingContext
   options?: {
     detailed?: boolean
     includeMargins?: boolean
@@ -154,10 +154,51 @@ export interface BuildFinalResultParams {
   calculationState: CalculationState
 }
 
+// PricingContext type that should be imported
+export interface PricingContext {
+  // Identifiants
+  articleId?: string
+  articleReference?: string
+  customerId?: string
+  societeId: string
+
+  // Données article
+  article?: {
+    id: string
+    reference: string
+    designation: string
+    famille?: string
+    prixVenteHT?: number
+    prixAchatHT?: number
+    poids?: number
+    longueur?: number
+    largeur?: number
+    hauteur?: number
+    surface?: number
+    volume?: number
+    uniteStock?: string
+    uniteVente?: string
+    uniteAchat?: string
+    coefficientVente?: number
+    coefficientAchat?: number
+  }
+
+  // Contexte commercial
+  quantity?: number
+  customerGroup?: string
+  customerEmail?: string
+  channel?: PriceRuleChannel
+  promotionCode?: string
+
+  // Métadonnées
+  isFirstOrder?: boolean
+  orderTotal?: number
+}
+
 // Build detailed breakdown parameters interface
 export interface BuildDetailedBreakdownParams {
-  article: NonNullable<BreakdownContext['article']>
-  context: BreakdownContext
+  article: NonNullable<PricingContext['article']>
+  context: PricingContext
   options?: {
     includeMargins?: boolean
     includeSkippedRules?: boolean

@@ -403,13 +403,12 @@ export class NotificationRuleService {
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
 
-    const recentActivity = await this._eventRepository.find({
-      where: {
-        occurredAt: yesterday as any,
-      },
-      order: { occurredAt: 'DESC' },
-      take: 10,
-    })
+    const recentActivity = await this._eventRepository
+      .createQueryBuilder('event')
+      .where('event.occurredAt >= :date', { date: yesterday })
+      .orderBy('event.occurredAt', 'DESC')
+      .take(10)
+      .getMany()
 
     return {
       totalRules,
