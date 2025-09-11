@@ -222,7 +222,12 @@ export function usePermissions() {
 
     // L'admin et super admin ont toutes les permissions
     const hasAdminRole = userRoles?.some((role) => {
-      const roleValue = typeof role === 'object' && role ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
+      if (!role) return false
+      
+      const roleValue = typeof role === 'object' && role && 'name' in role 
+        ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role 
+        : role as string
+        
       return roleValue === 'ADMIN' || roleValue === 'SUPER_ADMIN'
     })
 
@@ -237,7 +242,12 @@ export function usePermissions() {
 
     // Vérifier dans les permissions des rôles
     for (const role of userRoles) {
-      const roleValue = typeof role === 'object' ? role.name || role.role : role
+      if (!role) continue
+      
+      const roleValue = typeof role === 'object' && role && 'name' in role 
+        ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role 
+        : role as string
+        
       const rolePermissions = ROLE_PERMISSIONS[roleValue as Role]
       if (rolePermissions?.includes(permission)) {
         return true
@@ -270,7 +280,12 @@ export function usePermissions() {
     const userRoles = user.roles || (user.role ? [user.role] : [])
 
     return userRoles?.some((userRole: unknown) => {
-      const roleValue = typeof userRole === 'object' ? userRole.name || userRole.role : userRole
+      if (!userRole) return false
+      
+      const roleValue = typeof userRole === 'object' && userRole && 'name' in userRole 
+        ? (userRole as { name?: string; role?: string }).name || (userRole as { name?: string; role?: string }).role
+        : userRole as string
+        
       return roleValue === role || roleValue === role?.toLowerCase()
     })
   }
@@ -293,7 +308,12 @@ export function usePermissions() {
 
     // L'admin a toutes les permissions
     const hasAdminRole = userRoles?.some((role) => {
-      const roleValue = typeof role === 'object' && role ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
+      if (!role) return false
+      
+      const roleValue = typeof role === 'object' && role && 'name' in role 
+        ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role 
+        : role as string
+        
       return roleValue === 'admin' || roleValue === 'ADMIN'
     })
 
@@ -303,7 +323,12 @@ export function usePermissions() {
 
     const rolePermissions: Permission[] = []
     for (const role of userRoles) {
-      const roleValue = typeof role === 'object' ? role.name || role.role : role
+      if (!role) continue
+      
+      const roleValue = typeof role === 'object' && role && 'name' in role 
+        ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role 
+        : role as string
+        
       const permissions = ROLE_PERMISSIONS[roleValue as Role] || []
       rolePermissions?.push(...permissions)
     }

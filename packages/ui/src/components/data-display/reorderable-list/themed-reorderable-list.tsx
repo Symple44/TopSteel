@@ -246,7 +246,7 @@ function ThemedSortableItem<T extends ReorderableItem>({
   renderItem,
   isExpanded,
   onToggleExpand,
-  expandedItems,
+  expandedItems: _expandedItems,
   config,
   isDragging,
   isDragOver,
@@ -350,7 +350,7 @@ function ThemedSortableItem<T extends ReorderableItem>({
                   <div className="flex items-center gap-1 mr-2">
                     {Array.from({ length: level }, (_, i) => (
                       <div
-                        key={i}
+                        key={`level-indicator-${level}-${i}`}
                         className="rounded-full transition-all duration-300"
                         style={{
                           width: theme.hierarchy.levelIndicator.size,
@@ -447,8 +447,7 @@ export function ThemedReorderableList<T extends ReorderableItem>({
   showCustomizationPanel = false,
   customizationPanelPosition = 'right',
   onConfigChange,
-  onError,
-  ...otherProps
+  onError
 }: ThemedReorderableListProps<T>) {
   const [localItems, setLocalItems] = useState<T[]>(items)
   const [showCustomization, setShowCustomization] = useState(showCustomizationPanel)

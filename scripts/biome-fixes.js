@@ -73,7 +73,7 @@ function fixFile(filePath) {
   let fileChanged = false
 
   // Appliquer les remplacements 'as any'
-  anyReplacements.forEach(({ pattern, replacement, description }) => {
+  anyReplacements.forEach(({ pattern, replacement }) => {
     if (pattern.test(newContent)) {
       newContent = newContent.replace(pattern, replacement)
       fileChanged = true

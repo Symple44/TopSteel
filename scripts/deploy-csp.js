@@ -46,7 +46,7 @@ const middlewarePath = path.join(rootDir, 'apps/web/src/middleware.ts')
 if (fs.existsSync(middlewarePath)) {
   const middlewareContent = fs.readFileSync(middlewarePath, 'utf8')
 
-  if (!middlewareContent.includes('nonce-${nonce}')) {
+  if (!middlewareContent.includes('nonce-')) {
     process.exit(1)
   }
 

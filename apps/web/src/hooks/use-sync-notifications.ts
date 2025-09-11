@@ -30,7 +30,7 @@ export function useSyncNotifications() {
 
     // Cleanup function pour éviter les fuites mémoire
     return () => {
-      syncChecker?.setToastCallback(undefined as unknown)
+      syncChecker?.setToastCallback(() => {})
     }
   }, [toast])
 }

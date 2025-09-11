@@ -6,6 +6,12 @@
 import { APIClientEnhanced } from './api-client-enhanced'
 import type { RequestConfig } from './api-client'
 
+// Extended RequestConfig for HTTP methods with params support
+interface HTTPRequestConfig extends RequestConfig {
+  params?: Record<string, unknown>
+  responseType?: 'json' | 'blob' | 'text'
+}
+
 // Import proper types from @erp/types instead of redefining them
 import type {
   Partner,
@@ -22,7 +28,15 @@ import type {
   CreatePartnerGroupDto,
   UpdatePartnerGroupDto,
   CreatePartnerSiteDto,
-  UpdatePartnerSiteDto
+  UpdatePartnerSiteDto,
+  Material,
+  Article,
+  CreateMaterialDto,
+  UpdateMaterialDto,
+  CreateArticleDto,
+  UpdateArticleDto,
+  MaterialFilters,
+  ArticleFilters
 } from '@erp/types'
 
 // Import PaginatedResponse from existing types
@@ -79,44 +93,7 @@ interface PartnerAnalytics {
   repartitionGeographique: Array<{ region: string; count: number }>
 }
 
-// Material and Article types (keeping these as they may not exist in @erp/types)
-interface Material {
-  id: string
-  code: string
-  designation: string
-  description?: string
-  type?: string
-  category?: string
-  unit?: string
-  price?: number
-  stock?: number
-  minStock?: number
-  maxStock?: number
-  createdAt: Date
-  updatedAt: Date
-  deletedAt?: Date
-}
-
-interface Article {
-  id: string
-  code: string
-  designation: string
-  description?: string
-  materiau?: string
-  longueur?: number
-  largeur?: number
-  epaisseur?: number
-  poids?: number
-  prix?: number
-  coutProduction?: number
-  stock?: number
-  tempsUsinage?: number
-  outillageRequis?: string[]
-  planDessin?: string
-  createdAt: Date
-  updatedAt: Date
-  deletedAt?: Date
-}
+// Note: Material and Article types are now imported from @erp/types
 
 // ========================= API INTERFACE DEFINITIONS =========================
 
@@ -179,8 +156,8 @@ interface PartnersAPI {
 interface MaterialsAPI {
   getMaterials(params?: SearchParams): Promise<PaginatedResponse<Material>>
   getMaterial(id: string): Promise<Material | null>
-  createMaterial(data: Omit<Material, 'id' | 'createdAt' | 'updatedAt'>): Promise<Material>
-  updateMaterial(id: string, data: Partial<Material>): Promise<Material>
+  createMaterial(data: CreateMaterialDto): Promise<Material>
+  updateMaterial(id: string, data: UpdateMaterialDto): Promise<Material>
   deleteMaterial(id: string): Promise<void>
   searchMaterials(query: string): Promise<Material[]>
   getMaterialsByCategory(category: string): Promise<Material[]>
@@ -192,8 +169,8 @@ interface MaterialsAPI {
 interface ArticlesAPI {
   getArticles(params?: SearchParams): Promise<PaginatedResponse<Article>>
   getArticle(id: string): Promise<Article | null>
-  createArticle(data: Omit<Article, 'id' | 'createdAt' | 'updatedAt'>): Promise<Article>
-  updateArticle(id: string, data: Partial<Article>): Promise<Article>
+  createArticle(data: CreateArticleDto): Promise<Article>
+  updateArticle(id: string, data: UpdateArticleDto): Promise<Article>
   deleteArticle(id: string): Promise<void>
   searchArticles(query: string): Promise<Article[]>
   getArticlesByMaterial(materiau: string): Promise<Article[]>
@@ -263,35 +240,43 @@ class PartnersAPIImpl implements PartnersAPI {
   }
 
   async getPartners(params?: SearchParams): Promise<PaginatedResponse<Partner>> {
-    return this.apiClient.get('/partners', { params })
+    const config: HTTPRequestConfig = params ? { params } : {}
+    return this.apiClient.get('/partners', config)
   }
 
   async searchPartners(params: SearchParams): Promise<PaginatedResponse<Partner>> {
-    return this.apiClient.get('/partners/search', { params })
+    const config: HTTPRequestConfig = { params }
+    return this.apiClient.get('/partners/search', config)
   }
 
   async getPartnersAutocomplete(query: string): Promise<Array<{ id: string; label: string }>> {
-    return this.apiClient.get('/partners/autocomplete', { params: { query } })
+    const config: HTTPRequestConfig = { params: { query } }
+    return this.apiClient.get('/partners/autocomplete', config)
   }
 
   async getClients(): Promise<Partner[]> {
-    return this.apiClient.get('/partners', { params: { type: 'CLIENT' } })
+    const config: HTTPRequestConfig = { params: { type: 'CLIENT' } }
+    return this.apiClient.get('/partners', config)
   }
 
   async getFournisseurs(): Promise<Partner[]> {
-    return this.apiClient.get('/partners', { params: { type: 'FOURNISSEUR' } })
+    const config: HTTPRequestConfig = { params: { type: 'FOURNISSEUR' } }
+    return this.apiClient.get('/partners', config)
   }
 
   async getProspects(): Promise<Partner[]> {
-    return this.apiClient.get('/partners', { params: { status: 'PROSPECT' } })
+    const config: HTTPRequestConfig = { params: { status: 'PROSPECT' } }
+    return this.apiClient.get('/partners', config)
   }
 
   async getClientsActifs(): Promise<Partner[]> {
-    return this.apiClient.get('/partners', { params: { type: 'CLIENT', status: 'ACTIF' } })
+    const config: HTTPRequestConfig = { params: { type: 'CLIENT', status: 'ACTIF' } }
+    return this.apiClient.get('/partners', config)
   }
 
   async getFournisseursActifs(): Promise<Partner[]> {
-    return this.apiClient.get('/partners', { params: { type: 'FOURNISSEUR', status: 'ACTIF' } })
+    const config: HTTPRequestConfig = { params: { type: 'FOURNISSEUR', status: 'ACTIF' } }
+    return this.apiClient.get('/partners', config)
   }
 
   async duplicatePartner(id: string, newCode: string): Promise<Partner> {
@@ -382,7 +367,8 @@ class PartnersAPIImpl implements PartnersAPI {
   }
 
   async exportPartners(params: ExportParams): Promise<Blob> {
-    return this.apiClient.get('/partners/export', { params, responseType: 'blob' })
+    const config: HTTPRequestConfig = { params, responseType: 'blob' }
+    return this.apiClient.get('/partners/export', config)
   }
 
   async getPartnerAnalytics(): Promise<PartnerAnalytics> {
@@ -399,7 +385,8 @@ class MaterialsAPIImpl implements MaterialsAPI {
   constructor(private apiClient: APIClientEnhanced) {}
 
   async getMaterials(params?: SearchParams): Promise<PaginatedResponse<Material>> {
-    return this.apiClient.get('/materials', { params })
+    const config: HTTPRequestConfig = params ? { params } : {}
+    return this.apiClient.get('/materials', config)
   }
 
   async getMaterial(id: string): Promise<Material | null> {
@@ -410,11 +397,11 @@ class MaterialsAPIImpl implements MaterialsAPI {
     }
   }
 
-  async createMaterial(data: Omit<Material, 'id' | 'createdAt' | 'updatedAt'>): Promise<Material> {
+  async createMaterial(data: CreateMaterialDto): Promise<Material> {
     return this.apiClient.post('/materials', data)
   }
 
-  async updateMaterial(id: string, data: Partial<Material>): Promise<Material> {
+  async updateMaterial(id: string, data: UpdateMaterialDto): Promise<Material> {
     return this.apiClient.put(`/materials/${id}`, data)
   }
 
@@ -423,11 +410,13 @@ class MaterialsAPIImpl implements MaterialsAPI {
   }
 
   async searchMaterials(query: string): Promise<Material[]> {
-    return this.apiClient.get('/materials/search', { params: { query } })
+    const config: HTTPRequestConfig = { params: { query } }
+    return this.apiClient.get('/materials/search', config)
   }
 
   async getMaterialsByCategory(category: string): Promise<Material[]> {
-    return this.apiClient.get('/materials', { params: { category } })
+    const config: HTTPRequestConfig = { params: { category } }
+    return this.apiClient.get('/materials', config)
   }
 
   async updateStock(id: string, quantity: number): Promise<Material> {
@@ -439,7 +428,8 @@ class MaterialsAPIImpl implements MaterialsAPI {
   }
 
   async getMaterialAutocomplete(query: string): Promise<Array<{ id: string; label: string }>> {
-    return this.apiClient.get('/materials/autocomplete', { params: { query } })
+    const config: HTTPRequestConfig = { params: { query } }
+    return this.apiClient.get('/materials/autocomplete', config)
   }
 }
 
@@ -447,7 +437,8 @@ class ArticlesAPIImpl implements ArticlesAPI {
   constructor(private apiClient: APIClientEnhanced) {}
 
   async getArticles(params?: SearchParams): Promise<PaginatedResponse<Article>> {
-    return this.apiClient.get('/articles', { params })
+    const config: HTTPRequestConfig = params ? { params } : {}
+    return this.apiClient.get('/articles', config)
   }
 
   async getArticle(id: string): Promise<Article | null> {
@@ -458,11 +449,11 @@ class ArticlesAPIImpl implements ArticlesAPI {
     }
   }
 
-  async createArticle(data: Omit<Article, 'id' | 'createdAt' | 'updatedAt'>): Promise<Article> {
+  async createArticle(data: CreateArticleDto): Promise<Article> {
     return this.apiClient.post('/articles', data)
   }
 
-  async updateArticle(id: string, data: Partial<Article>): Promise<Article> {
+  async updateArticle(id: string, data: UpdateArticleDto): Promise<Article> {
     return this.apiClient.put(`/articles/${id}`, data)
   }
 
@@ -471,11 +462,13 @@ class ArticlesAPIImpl implements ArticlesAPI {
   }
 
   async searchArticles(query: string): Promise<Article[]> {
-    return this.apiClient.get('/articles/search', { params: { query } })
+    const config: HTTPRequestConfig = { params: { query } }
+    return this.apiClient.get('/articles/search', config)
   }
 
   async getArticlesByMaterial(materiau: string): Promise<Article[]> {
-    return this.apiClient.get('/articles', { params: { materiau } })
+    const config: HTTPRequestConfig = { params: { materiau } }
+    return this.apiClient.get('/articles', config)
   }
 
   async duplicateArticle(id: string, newCode: string): Promise<Article> {
@@ -487,12 +480,13 @@ class ArticlesAPIImpl implements ArticlesAPI {
   }
 
   async generateDrawing(id: string): Promise<string> {
-    const response = await this.apiClient.get(`/articles/${id}/drawing`)
+    const response: { url: string } = await this.apiClient.get(`/articles/${id}/drawing`)
     return response.url
   }
 
   async getArticleAutocomplete(query: string): Promise<Array<{ id: string; label: string }>> {
-    return this.apiClient.get('/articles/autocomplete', { params: { query } })
+    const config: HTTPRequestConfig = { params: { query } }
+    return this.apiClient.get('/articles/autocomplete', config)
   }
 }
 
@@ -514,11 +508,11 @@ export interface IAPIClientFinal {
   getAuthToken(): string | null
   
   // HTTP Methods
-  get<T>(endpoint: string, config?: RequestConfig): Promise<T>
-  post<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
-  put<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
-  patch<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
-  delete<T>(endpoint: string, config?: RequestConfig): Promise<T>
+  get<T>(endpoint: string, config?: HTTPRequestConfig): Promise<T>
+  post<T>(endpoint: string, data?: unknown, config?: HTTPRequestConfig): Promise<T>
+  put<T>(endpoint: string, data?: unknown, config?: HTTPRequestConfig): Promise<T>
+  patch<T>(endpoint: string, data?: unknown, config?: HTTPRequestConfig): Promise<T>
+  delete<T>(endpoint: string, config?: HTTPRequestConfig): Promise<T>
 }
 
 export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal {
@@ -530,7 +524,7 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
   public readonly notifications: NotificationsAPI
 
   constructor(baseURL: string, options?: { timeout?: number }) {
-    super(baseURL, options)
+    super(baseURL)
     
     this.partners = new PartnersAPIImpl(this)
     this.materials = new MaterialsAPIImpl(this)
@@ -558,16 +552,90 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
     }
   }
 
+  // Override HTTP methods to support HTTPRequestConfig
+  async get<T>(endpoint: string, config: HTTPRequestConfig = {}): Promise<T> {
+    // Convert params to query string if provided
+    let finalEndpoint = endpoint
+    if (config.params) {
+      const queryString = new URLSearchParams(
+        Object.entries(config.params)
+          .filter(([_, value]) => value !== undefined && value !== null)
+          .map(([key, value]) => [key, String(value)])
+      ).toString()
+      finalEndpoint = `${endpoint}${queryString ? '?' + queryString : ''}`
+    }
+
+    // Remove params from config to avoid conflicts
+    const { params, ...restConfig } = config
+    return super.get<T>(finalEndpoint, restConfig)
+  }
+
+  async post<T>(endpoint: string, data?: unknown, config: HTTPRequestConfig = {}): Promise<T> {
+    const { params, ...restConfig } = config
+    return super.post<T>(endpoint, data, restConfig)
+  }
+
+  async put<T>(endpoint: string, data?: unknown, config: HTTPRequestConfig = {}): Promise<T> {
+    const { params, ...restConfig } = config
+    return super.put<T>(endpoint, data, restConfig)
+  }
+
+  async patch<T>(endpoint: string, data?: unknown, config: HTTPRequestConfig = {}): Promise<T> {
+    const { params, ...restConfig } = config
+    return super.patch<T>(endpoint, data, restConfig)
+  }
+
+  async delete<T>(endpoint: string, config: HTTPRequestConfig = {}): Promise<T> {
+    const { params, ...restConfig } = config
+    return super.delete<T>(endpoint, restConfig)
+  }
+
   async health(): Promise<{ status: string; timestamp: string }> {
     return this.get('/health')
   }
 
   authenticate(token: string): void {
-    this.setAuthToken(token)
+    // Store the token in the appropriate storage
+    if (typeof window === 'undefined') return
+
+    try {
+      const authData = {
+        tokens: {
+          accessToken: token,
+          refreshToken: null
+        },
+        timestamp: Date.now()
+      }
+      
+      // Store in sessionStorage by default
+      sessionStorage?.setItem('topsteel_auth_tokens', JSON.stringify(authData))
+    } catch (error) {
+      console.error('Failed to store auth token:', error)
+    }
   }
 
   getAuthToken(): string | null {
-    return this.authToken
+    // Access the authToken via the protected property or implement token retrieval
+    if (typeof window === 'undefined') return null
+
+    try {
+      // Chercher d'abord dans localStorage (remember me)
+      let authData = localStorage?.getItem('topsteel_auth_tokens')
+
+      // Si pas dans localStorage, chercher dans sessionStorage
+      if (!authData) {
+        authData = sessionStorage?.getItem('topsteel_auth_tokens')
+      }
+
+      if (!authData) return null
+
+      const sessionData = JSON.parse(authData)
+      const accessToken = sessionData?.tokens?.accessToken
+
+      return accessToken || null
+    } catch {
+      return null
+    }
   }
 }
 

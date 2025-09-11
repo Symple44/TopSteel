@@ -176,7 +176,6 @@ const CommandItem = React.forwardRef<HTMLDivElement, CommandItemProps>(
     }
 
     return (
-      // biome-ignore lint/a11y/noStaticElementInteractions: This div implements a command menu item with complex state management (selected/disabled states) and data attributes. It's part of a larger command palette system.
       <div
         ref={ref}
         className={cn(
