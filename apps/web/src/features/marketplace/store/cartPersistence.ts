@@ -1,6 +1,37 @@
 import type { Middleware } from '@reduxjs/toolkit'
 import type { CartItem, CartState } from './cartSlice'
 
+// API Response Types
+interface CartSyncResponse {
+  items: Array<{
+    product: CartItem['product']
+    quantity: number
+    availableQuantity?: number
+    options: Record<string, string | number | boolean>
+    addedAt: string
+    reservationId?: string
+  }>
+}
+
+interface StockReservationResponse {
+  reservations: Array<{
+    productId: string
+    reservationId: string
+  }>
+}
+
+interface CartValidationResponse {
+  valid: boolean
+  issues?: Array<{
+    productId: string
+    type: 'OUT_OF_STOCK' | 'PRICE_CHANGED' | 'DISCONTINUED'
+    message: string
+    currentPrice?: number
+    availableQuantity?: number
+  }>
+  updatedItems?: CartItem[]
+}
+
 const CART_STORAGE_KEY = 'topsteel_marketplace_cart'
 const CART_EXPIRY_DAYS = 30
 
@@ -99,7 +130,7 @@ export const cartPersistenceMiddleware: Middleware = (store) => (next) => (actio
     'cart/syncCart',
   ]
 
-  if (persistActions?.includes((action as unknown).type)) {
+  if (persistActions?.includes((action as { type: string }).type)) {
     const state = store?.getState()
     if (state?.cart) {
       saveCartToStorage(state?.cart)
@@ -107,7 +138,7 @@ export const cartPersistenceMiddleware: Middleware = (store) => (next) => (actio
   }
 
   // Clear storage when cart is cleared
-  if ((action as unknown).type === 'cart/clearCart') {
+  if ((action as { type: string }).type === 'cart/clearCart') {
     clearCartFromStorage()
   }
 
@@ -143,10 +174,10 @@ export const syncCartWithBackend = async (
       throw new Error('Failed to sync cart with backend')
     }
 
-    const data = await response?.json()
+    const data: CartSyncResponse = await response?.json()
 
     // Update items with latest product data and stock availability
-    return data?.items?.map((item: unknown) => ({
+    return data?.items?.map((item) => ({
       product: item.product,
       quantity: item.availableQuantity || item.quantity,
       selectedOptions: item.options,
@@ -185,9 +216,9 @@ export const mergeCartsAfterLogin = async (
       throw new Error('Failed to merge carts')
     }
 
-    const data = await response?.json()
+    const data: CartSyncResponse = await response?.json()
 
-    return data?.items?.map((item: unknown) => ({
+    return data?.items?.map((item) => ({
       product: item.product,
       quantity: item.quantity,
       selectedOptions: item.options,
@@ -229,9 +260,9 @@ export const reserveCartStock = async (
       throw new Error('Failed to reserve stock')
     }
 
-    const data = await response?.json()
+    const data: StockReservationResponse = await response?.json()
 
-    data?.reservations?.forEach((reservation: unknown) => {
+    data?.reservations?.forEach((reservation) => {
       reservations?.set(reservation.productId, reservation.reservationId)
     })
 
@@ -276,7 +307,7 @@ export const validateCart = async (
       throw new Error('Failed to validate cart')
     }
 
-    const data = await response?.json()
+    const data: CartValidationResponse = await response?.json()
 
     return {
       valid: data.valid,

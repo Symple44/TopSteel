@@ -15,67 +15,13 @@ import {
 import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
 import { Download, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
-
-// Define proper interfaces for query builder columns
-interface QueryBuilderColumn {
-  name: string
-  type: string
-  label?: string
-  columnName?: string
-  tableName?: string
-  alias?: string
-  dataType?: string
-  description?: string
-  isVisible?: boolean
-  displayOrder?: number
-  isSortable?: boolean
-  isFilterable?: boolean
-  format?: {
-    type?: 'currency' | 'percentage' | 'number' | 'date'
-    decimals?: number
-  }
-}
-
-interface QueryBuilderCalculatedField {
-  name: string
-  expression: string
-  type: string
-  isVisible?: boolean
-  displayOrder?: number
-}
-
-interface QueryBuilderSettings {
-  settings?: {
-    enableExport?: boolean
-    exportFormats?: string[]
-  }
-}
-
-// Data row interface for the preview table
-interface PreviewDataRow extends Record<string, unknown> {
-  id?: string | number
-}
-
-// Column data type for DataTable
-interface PreviewColumn {
-  id: string
-  key: string
-  title: string
-  description: string
-  type: 'text' | 'number' | 'boolean' | 'date' | 'datetime'
-  width: number
-  sortable: boolean
-  searchable: boolean
-  render?: (value: unknown, row: PreviewDataRow, column: PreviewColumn) => string
-}
-
-interface DataTablePreviewProps {
-  data: PreviewDataRow[]
-  columns?: QueryBuilderColumn[]
-  calculatedFields?: QueryBuilderCalculatedField[]
-  layout?: Record<string, unknown>
-  settings?: QueryBuilderSettings
-}
+import type {
+  DataTablePreviewProps,
+  PreviewColumn,
+  PreviewDataRow,
+  QueryBuilderCalculatedField,
+  QueryBuilderColumn,
+} from '@/types/query-builder.types'
 
 // Convert query builder data types to DataTable types
 const getDataTableType = (dataType: string): PreviewColumn['type'] => {
@@ -105,8 +51,17 @@ export function DataTablePreview({
   data = [],
   columns = [],
   calculatedFields = [],
-  layout = {},
-  settings = {},
+  layout: _layout = {},
+  settings = {
+    settings: {
+      enablePagination: true,
+      pageSize: 50,
+      enableSorting: true,
+      enableFiltering: true,
+      enableExport: false,
+      exportFormats: [],
+    },
+  },
 }: DataTablePreviewProps) {
   const [loading, setLoading] = useState(false)
 
@@ -143,7 +98,7 @@ export function DataTablePreview({
         ? `Champ calculé: ${calcCol.expression || ''}`
         : queryCol.description || `Colonne ${queryCol.tableName || ''}.${queryCol.columnName || ''}`
 
-      const dataType = isCalculatedField ? calcCol.type : queryCol.dataType || queryCol.type
+      const dataType = isCalculatedField ? calcCol.dataType : queryCol.dataType
 
       const columnConfig: PreviewColumn = {
         id: columnId,

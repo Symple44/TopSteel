@@ -1,11 +1,26 @@
 'use client'
 
 // import { useSession } from 'next-auth/react' // Disabled - next-auth not installed
-const useSession = () => ({ data: null, status: 'unauthenticated' })
+
+interface User {
+  id: string
+  email: string
+  name?: string
+}
+
+interface SessionData {
+  user: User
+}
+
+const useSession = () => ({ 
+  data: null as SessionData | null, 
+  status: 'unauthenticated' as 'authenticated' | 'unauthenticated' | 'loading' 
+})
 
 import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import type { Product } from '../products/ProductCard'
 import {
   loadCartFromStorage,
   mergeCartsAfterLogin,
@@ -15,6 +30,8 @@ import {
 import { addToCart, clearCart, selectCartItems, syncCart } from '../../store/cartSlice'
 import { CartButton } from './CartButton'
 import { ShoppingCart } from './ShoppingCart'
+
+type CartOptions = Record<string, string | number | boolean>
 
 interface CartProviderProps {
   children: React.ReactNode
@@ -30,7 +47,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({
   syncInterval = 60000, // 1 minute
 }) => {
   const dispatch = useDispatch()
-  const { data: session, status } = useSession() as { data: unknown; status: string }
+  const { data: session, status } = useSession()
   const cartItems = useSelector(selectCartItems)
   const [isInitialized, setIsInitialized] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
@@ -184,7 +201,7 @@ export const useCart = () => {
   const dispatch = useDispatch()
   const cartItems = useSelector(selectCartItems)
 
-  const addItemToCart = (product: unknown, quantity: number = 1, options?: any) => {
+  const addItemToCart = (product: Product, quantity: number = 1, options?: CartOptions) => {
     dispatch(addToCart({ product, quantity, options }))
   }
 

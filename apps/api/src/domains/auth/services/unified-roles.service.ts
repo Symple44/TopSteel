@@ -19,6 +19,7 @@ import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 import type { PermissionCalculatorService } from './permission-calculator.service'
 
 export interface UserSocieteInfo {
+  id: string
   userId: string
   societeId: string
   globalRole: GlobalUserRole
@@ -30,6 +31,7 @@ export interface UserSocieteInfo {
   additionalPermissions: string[]
   restrictedPermissions: string[]
   allowedSiteIds?: string[]
+  grantedAt: Date
   expiresAt?: Date
   // OPTIMIZED: Include société details to avoid additional queries
   societe?: {
@@ -450,6 +452,7 @@ export class UnifiedRolesService {
     )
 
     return {
+      id: userSocieteRole.id,
       userId: user.id,
       societeId: userSocieteRole.societeId,
       globalRole,
@@ -461,6 +464,7 @@ export class UnifiedRolesService {
       additionalPermissions: userSocieteRole.additionalPermissions,
       restrictedPermissions: userSocieteRole.restrictedPermissions,
       allowedSiteIds: userSocieteRole.allowedSiteIds,
+      grantedAt: userSocieteRole.createdAt,
       expiresAt: userSocieteRole.expiresAt,
       // OPTIMIZED: Include société details from the joined query
       societe: userSocieteRole.societe
@@ -492,6 +496,7 @@ export class UnifiedRolesService {
     )
 
     return {
+      id: `virtual-${user.id}-${societeId}`,
       userId: user.id,
       societeId,
       globalRole: GlobalUserRole.SUPER_ADMIN,
@@ -502,6 +507,7 @@ export class UnifiedRolesService {
       permissions: permissionSet.effectivePermissions,
       additionalPermissions: [],
       restrictedPermissions: [],
+      grantedAt: user.createdAt,
     }
   }
 

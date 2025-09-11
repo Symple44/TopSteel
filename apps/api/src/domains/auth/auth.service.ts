@@ -233,6 +233,7 @@ export class AuthService {
     // Pour SUPER_ADMIN, le service unifié crée automatiquement un rôle virtuel
     if (!userSocieteInfo && user.role === GlobalUserRole.SUPER_ADMIN) {
       userSocieteInfo = {
+        id: `virtual-${user.id}-${societeId}`,
         userId: user.id,
         societeId: societeId,
         globalRole: GlobalUserRole.SUPER_ADMIN,
@@ -243,6 +244,7 @@ export class AuthService {
         permissions: [],
         additionalPermissions: [],
         restrictedPermissions: [],
+        grantedAt: user.createdAt,
       }
     }
 

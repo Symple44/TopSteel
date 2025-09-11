@@ -26,7 +26,7 @@ import type { Product } from './ProductCard'
 interface ProductDetailProps {
   product: Product & {
     longDescription?: string
-    specifications?: Record<string, unknown>
+    specifications?: Record<string, string | number | boolean | null>
     features?: string[]
     weight?: number
     dimensions?: {
@@ -450,7 +450,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                           {key?.replace(/_/g, ' ')}
                         </td>
                         <td className="px-4 py-3 text-gray-600">
-                          {typeof value === 'object' ? JSON.stringify(value) : value}
+                          {typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}
                         </td>
                       </tr>
                     ))}

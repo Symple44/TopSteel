@@ -17,22 +17,20 @@ import {
   Textarea,
 } from '@erp/ui'
 import { Database, FileSpreadsheet, Settings2, Shield } from 'lucide-react'
-
-interface QuerySettingsProps {
-  settings: unknown
-  onSettingsChange: (updates: unknown) => void
-}
+import type { QuerySettingsProps } from '@/types/query-builder.types'
 
 export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps) {
   const handleSettingChange = (key: string, value: unknown) => {
     if (key?.includes('.')) {
       const [parent, child] = key.split('.')
-      onSettingsChange({
-        [parent]: {
-          ...settings[parent],
-          [child]: value,
-        },
-      })
+      if (parent === 'settings' && typeof settings.settings === 'object') {
+        onSettingsChange({
+          settings: {
+            ...settings.settings,
+            [child]: value,
+          },
+        })
+      }
     } else {
       onSettingsChange({ [key]: value })
     }
@@ -234,7 +232,7 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
                           'json',
                         ]
                         const newFormats = isEnabled
-                          ? currentFormats?.filter((f: unknown) => f !== format)
+                          ? currentFormats.filter((f) => f !== format)
                           : [...currentFormats, format]
                         handleSettingChange('settings.exportFormats', newFormats)
                       }}

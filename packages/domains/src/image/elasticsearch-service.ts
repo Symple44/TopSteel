@@ -1,37 +1,38 @@
-import type { ImageMetadata, ImageVariant } from './types'
+/**
+ * Service Elasticsearch pour la gestion des métadonnées d'images
+ *
+ * Ce service fournit une interface pour indexer et rechercher des métadonnées d'images
+ * dans Elasticsearch. Il permet la synchronisation des données d'images avec l'index
+ * de recherche pour améliorer les performances de recherche.
+ */
 
-export interface ElasticsearchImageDocument {
+/**
+ * Interface pour les métadonnées d'image indexées dans Elasticsearch
+ */
+export interface ImageMetadata {
   id: string
   fileName: string
-  originalName: string
+  filePath: string
+  fileSize: number
   mimeType: string
-  size: number
-  dimensions: {
-    width: number
-    height: number
-  }
-  hash: string
-  category: string
-  uploadedBy: string
-  uploadedAt: string
+  width?: number
+  height?: number
+  createdAt: string
+  updatedAt: string
   tags?: string[]
-  alt?: string
   description?: string
-  entity?: {
-    type: string
-    id: string
-  }
-  variants: Array<{
-    variant: string
-    fileName: string
-    dimensions: {
-      width: number
-      height: number
-    }
-    size: number
-    url: string
-  }>
-  searchText: string
+  userId?: string
+  albumId?: string
+  isPublic: boolean
+  thumbnailPath?: string
+  originalPath?: string
+  metadata?: Record<string, unknown>
+}
+
+/**
+ * Interface pour les documents Elasticsearch
+ */
+export interface ElasticsearchImageDocument extends ImageMetadata {
   suggest: {
     input: string[]
     weight: number
@@ -40,6 +41,7 @@ export interface ElasticsearchImageDocument {
 }
 
 export class ImageElasticsearchService {
+  private readonly indexName: string
   private baseUrl: string
 
   constructor(indexName: string = 'images', baseUrl: string = '/api/images') {
@@ -50,282 +52,253 @@ export class ImageElasticsearchService {
   /**
    * Convertit les métadonnées d'image en document Elasticsearch
    */
-  toElasticsearchDocument(
-    metadata: ImageMetadata,
-    variants: ImageVariant[]
-  ): ElasticsearchImageDocument {
-    // Construction du texte de recherche
-    const searchParts = [
-      metadata.originalName,
+  private convertToElasticsearchDocument(metadata: ImageMetadata): ElasticsearchImageDocument {
+    const suggestInput = [
       metadata.fileName,
-      metadata.alt || '',
       metadata.description || '',
       ...(metadata.tags || []),
     ].filter(Boolean)
 
-    // Suggestions basées sur le nom de fichier et les tags
-    const suggestions = [
-      metadata.originalName,
-      metadata.fileName.replace(/\.[^/.]+$/, ''), // nom sans extension
-      ...(metadata.tags || []),
-    ].filter(Boolean)
-
     return {
+      ...metadata,
+      suggest: {
+        input: suggestInput,
+        weight: metadata.isPublic ? 10 : 5,
+      },
+    }
+  }
+
+  /**
+   * Public method to convert image metadata and variants to Elasticsearch document
+   * This method is used by the ImageService to index images
+   */
+  toElasticsearchDocument(
+    metadata: import('./types').ImageMetadata, 
+    variants: import('./types').ImageVariant[]
+  ): ElasticsearchImageDocument {
+    // Convert domain ImageMetadata to elasticsearch ImageMetadata format
+    const elasticsearchMetadata: ImageMetadata = {
       id: metadata.id,
       fileName: metadata.fileName,
-      originalName: metadata.originalName,
+      filePath: variants.find(v => v.variant === 'original')?.path || '',
+      fileSize: metadata.size,
       mimeType: metadata.mimeType,
-      size: metadata.size,
-      dimensions: {
-        width: metadata.width,
-        height: metadata.height,
-      },
-      hash: metadata.hash,
-      category: metadata.category,
-      uploadedBy: metadata.uploadedBy,
-      uploadedAt: metadata.uploadedAt.toISOString(),
+      width: metadata.width,
+      height: metadata.height,
+      createdAt: metadata.uploadedAt.toISOString(),
+      updatedAt: metadata.uploadedAt.toISOString(),
       tags: metadata.tags,
-      alt: metadata.alt,
       description: metadata.description,
-      entity:
-        metadata.entityType && metadata.entityId
-          ? {
-              type: metadata.entityType,
-              id: metadata.entityId,
-            }
-          : undefined,
-      variants: variants.map((variant) => ({
-        variant: variant.variant,
-        fileName: variant.fileName,
-        dimensions: {
-          width: variant.width,
-          height: variant.height,
-        },
-        size: variant.size,
-        url: `${this.baseUrl}/${metadata.category}/${variant.variant}/${variant.fileName}`,
-      })),
-      searchText: searchParts.join(' '),
-      suggest: {
-        input: suggestions,
-        weight: this.calculateWeight(metadata),
-      },
-    }
-  }
-
-  /**
-   * Calcule le poids pour les suggestions basé sur la catégorie et la taille
-   */
-  private calculateWeight(metadata: ImageMetadata): number {
-    let weight = 1
-
-    // Poids basé sur la catégorie
-    switch (metadata.category) {
-      case 'logo':
-        weight += 3
-        break
-      case 'avatar':
-        weight += 2
-        break
-      case 'document':
-        weight += 1
-        break
-    }
-
-    // Poids basé sur la taille (plus grande = plus importante)
-    if (metadata.size > 1024 * 1024) {
-      // > 1MB
-      weight += 2
-    } else if (metadata.size > 100 * 1024) {
-      // > 100KB
-      weight += 1
-    }
-
-    return weight
-  }
-
-  /**
-   * Génère une requête de recherche Elasticsearch
-   */
-  buildSearchQuery(params: {
-    query?: string
-    category?: string
-    entityType?: string
-    entityId?: string
-    tags?: string[]
-    mimeType?: string
-    sizeRange?: { min?: number; max?: number }
-    dateRange?: { from?: Date; to?: Date }
-    limit?: number
-    offset?: number
-    sortBy?: 'relevance' | 'date' | 'size' | 'name'
-    sortOrder?: 'asc' | 'desc'
-  }) {
-    const {
-      query,
-      category,
-      entityType,
-      entityId,
-      tags,
-      mimeType,
-      sizeRange,
-      dateRange,
-      limit = 20,
-      offset = 0,
-      sortBy = 'relevance',
-      sortOrder = 'desc',
-    } = params
-
-    const must: Array<Record<string, unknown>> = []
-    const filter: Array<Record<string, unknown>> = []
-
-    // Recherche textuelle
-    if (query) {
-      must.push({
-        multi_match: {
-          query,
-          fields: ['searchText^2', 'originalName^3', 'fileName^2', 'alt', 'description', 'tags^2'],
-          type: 'best_fields',
-          fuzziness: 'AUTO',
-        },
-      })
-    }
-
-    // Filtres exacts
-    if (category) {
-      filter.push({ term: { category } })
-    }
-
-    if (entityType) {
-      filter.push({ term: { 'entity.type': entityType } })
-    }
-
-    if (entityId) {
-      filter.push({ term: { 'entity.id': entityId } })
-    }
-
-    if (mimeType) {
-      filter.push({ term: { mimeType } })
-    }
-
-    if (tags && tags.length > 0) {
-      filter.push({ terms: { tags } })
-    }
-
-    // Filtres de plage
-    if (sizeRange) {
-      const range: Record<string, unknown> = {}
-      if (sizeRange.min !== undefined) range.gte = sizeRange.min
-      if (sizeRange.max !== undefined) range.lte = sizeRange.max
-      filter.push({ range: { size: range } })
-    }
-
-    if (dateRange) {
-      const range: Record<string, unknown> = {}
-      if (dateRange.from) range.gte = dateRange.from.toISOString()
-      if (dateRange.to) range.lte = dateRange.to.toISOString()
-      filter.push({ range: { uploadedAt: range } })
-    }
-
-    // Construction de la query
-    const esQuery: Record<string, unknown> = {
-      from: offset,
-      size: limit,
-      query: {
-        bool: {
-          must: must.length > 0 ? must : [{ match_all: {} }],
-          filter,
-        },
-      },
-      highlight: {
-        fields: {
-          originalName: {},
-          alt: {},
-          description: {},
-        },
-      },
-    }
-
-    // Tri
-    if (sortBy !== 'relevance') {
-      const sortField = {
-        date: 'uploadedAt',
-        size: 'size',
-        name: 'originalName.keyword',
-      }[sortBy]
-
-      if (sortField) {
-        esQuery.sort = [{ [sortField]: { order: sortOrder } }]
+      userId: metadata.uploadedBy,
+      albumId: metadata.entityId,
+      isPublic: true, // Default to public, can be configured
+      thumbnailPath: variants.find(v => v.variant === 'thumbnail')?.path,
+      originalPath: variants.find(v => v.variant === 'original')?.path,
+      metadata: {
+        category: metadata.category,
+        entityType: metadata.entityType,
+        hash: metadata.hash,
+        alt: metadata.alt,
+        variants: variants.map(v => ({
+          id: v.id,
+          variant: v.variant,
+          fileName: v.fileName,
+          width: v.width,
+          height: v.height,
+          size: v.size,
+          path: v.path
+        }))
       }
     }
 
-    return esQuery
+    return this.convertToElasticsearchDocument(elasticsearchMetadata)
   }
 
   /**
-   * Génère une requête d'autocomplétion
+   * Indexe une image dans Elasticsearch
    */
-  buildSuggestQuery(text: string, limit: number = 5) {
-    return {
-      suggest: {
-        image_suggest: {
-          prefix: text,
-          completion: {
-            field: 'suggest',
-            size: limit,
-          },
+  async indexImage(metadata: ImageMetadata): Promise<boolean> {
+    try {
+      const document = this.convertToElasticsearchDocument(metadata)
+
+      const response = await fetch(`${this.baseUrl}/elasticsearch/index`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      },
+        body: JSON.stringify({
+          index: this.indexName,
+          id: metadata.id,
+          document,
+        }),
+      })
+
+      return response.ok
+    } catch (error) {
+      console.error("Erreur lors de l'indexation de l'image:", error)
+      return false
     }
   }
 
   /**
-   * Génère des agrégations pour les facettes de recherche
+   * Met à jour une image dans l'index Elasticsearch
    */
-  buildAggregationQuery() {
-    return {
-      size: 0,
-      aggs: {
-        categories: {
-          terms: {
-            field: 'category',
-            size: 10,
+  async updateImage(metadata: ImageMetadata): Promise<boolean> {
+    try {
+      const document = this.convertToElasticsearchDocument(metadata)
+
+      const response = await fetch(`${this.baseUrl}/elasticsearch/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          index: this.indexName,
+          id: metadata.id,
+          document,
+        }),
+      })
+
+      return response.ok
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'image:", error)
+      return false
+    }
+  }
+
+  /**
+   * Supprime une image de l'index Elasticsearch
+   */
+  async deleteImage(imageId: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.baseUrl}/elasticsearch/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          index: this.indexName,
+          id: imageId,
+        }),
+      })
+
+      return response.ok
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'image:", error)
+      return false
+    }
+  }
+
+  /**
+   * Recherche des images dans Elasticsearch
+   */
+  async searchImages(query: string, filters?: Record<string, unknown>): Promise<ImageMetadata[]> {
+    try {
+      const searchBody = {
+        index: this.indexName,
+        query: {
+          bool: {
+            must: query
+              ? [
+                  {
+                    multi_match: {
+                      query,
+                      fields: ['fileName^3', 'description^2', 'tags^2', 'suggest.input'],
+                    },
+                  },
+                ]
+              : [{ match_all: {} }],
+            filter: filters
+              ? Object.entries(filters).map(([field, value]) => ({
+                  term: { [field]: value },
+                }))
+              : [],
           },
         },
-        mimeTypes: {
-          terms: {
-            field: 'mimeType',
-            size: 20,
+        sort: [{ _score: { order: 'desc' } }, { createdAt: { order: 'desc' } }],
+      }
+
+      const response = await fetch(`${this.baseUrl}/elasticsearch/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(searchBody),
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la recherche')
+      }
+
+      const result = await response.json()
+      return result.hits?.hits?.map((hit: { _source: ImageMetadata }) => hit._source) || []
+    } catch (error) {
+      console.error("Erreur lors de la recherche d'images:", error)
+      return []
+    }
+  }
+
+  /**
+   * Obtient des suggestions d'autocomplétion
+   */
+  async getSuggestions(query: string): Promise<string[]> {
+    try {
+      const searchBody = {
+        index: this.indexName,
+        suggest: {
+          image_suggest: {
+            prefix: query,
+            completion: {
+              field: 'suggest',
+              size: 10,
+            },
           },
         },
-        tags: {
-          terms: {
-            field: 'tags',
-            size: 50,
-          },
+      }
+
+      const response = await fetch(`${this.baseUrl}/elasticsearch/suggest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        entityTypes: {
-          terms: {
-            field: 'entity.type',
-            size: 10,
-          },
+        body: JSON.stringify(searchBody),
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des suggestions')
+      }
+
+      const result = await response.json()
+      const suggestions = result.suggest?.image_suggest?.[0]?.options || []
+      return suggestions.map((option: { text: string }) => option.text)
+    } catch (error) {
+      console.error('Erreur lors de la récupération des suggestions:', error)
+      return []
+    }
+  }
+
+  /**
+   * Synchronise toutes les images avec l'index Elasticsearch
+   */
+  async bulkIndex(images: ImageMetadata[]): Promise<boolean> {
+    try {
+      const documents = images.map((metadata) => ({
+        index: { _index: this.indexName, _id: metadata.id },
+        ...this.convertToElasticsearchDocument(metadata),
+      }))
+
+      const response = await fetch(`${this.baseUrl}/elasticsearch/bulk`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        sizeRanges: {
-          range: {
-            field: 'size',
-            ranges: [
-              { key: 'small', to: 100000 }, // < 100KB
-              { key: 'medium', from: 100000, to: 1000000 }, // 100KB - 1MB
-              { key: 'large', from: 1000000 }, // > 1MB
-            ],
-          },
-        },
-        uploadedBy: {
-          terms: {
-            field: 'uploadedBy',
-            size: 20,
-          },
-        },
-      },
+        body: JSON.stringify({ documents }),
+      })
+
+      return response.ok
+    } catch (error) {
+      console.error("Erreur lors de l'indexation en masse:", error)
+      return false
     }
   }
 }

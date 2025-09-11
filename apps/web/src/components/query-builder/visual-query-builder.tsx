@@ -33,6 +33,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { callClientApi } from '@/utils/backend-api'
 import { DataTablePreview } from './datatable-preview'
+import type { QueryBuilderColumn } from '@/types/query-builder.types'
 
 interface Table {
   name: string
@@ -713,27 +714,32 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                     ) : (
                       <DataTablePreview
                         data={previewData}
-                        columns={selectedColumns.map((col, index) => ({
-                          name: col.alias || `${col.table}.${col.column}`,
-                          type:
-                            selectedTable?.columns?.find((c) => c.name === col.column)?.type ||
-                            'text',
-                          alias: col.alias || `${col.table}.${col.column}`,
-                          columnName: col.column,
+                        columns={selectedColumns.map((col, index): QueryBuilderColumn => ({
                           tableName: col.table,
+                          columnName: col.column,
+                          alias: col.alias || `${col.table}.${col.column}`,
                           label: col.alias || col.column,
-                          dataType:
-                            selectedTable?.columns?.find((c) => c.name === col.column)?.type ||
-                            'text',
+                          dataType: selectedTable?.columns?.find((c) => c.name === col.column)?.type || 'text',
                           isVisible: true,
-                          isSortable: true,
                           isFilterable: true,
+                          isSortable: true,
                           displayOrder: index,
-                          aggregation: col.aggregation,
+                          // Compatibility properties
+                          name: col.alias || `${col.table}.${col.column}`,
+                          type: selectedTable?.columns?.find((c) => c.name === col.column)?.type || 'text',
                         }))}
                         calculatedFields={[]}
                         layout={{}}
-                        settings={{}}
+                        settings={{
+                          settings: {
+                            enablePagination: true,
+                            pageSize: 50,
+                            enableSorting: true,
+                            enableFiltering: true,
+                            enableExport: true,
+                            exportFormats: ['csv', 'excel', 'json']
+                          }
+                        }}
                       />
                     )}
                   </CardContent>

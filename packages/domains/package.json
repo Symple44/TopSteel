@@ -58,7 +58,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "dev": "tsup --watch",
     "test": "jest",
     "test:watch": "jest --watch",

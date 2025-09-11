@@ -104,7 +104,7 @@ export function TemplateSelector({ className }: TemplateSelectorProps) {
           <Input
             placeholder="Rechercher un template..."
             value={searchQuery}
-            onChange={(e: unknown) => setSearchQuery(e?.target?.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -316,8 +316,8 @@ function TemplateCard({
             type="button"
             size="sm"
             variant="outline"
-            onClick={(e: unknown) => {
-              e?.stopPropagation()
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation()
               onPreview()
             }}
             className="flex-1"
@@ -328,8 +328,8 @@ function TemplateCard({
           <Button
             type="button"
             size="sm"
-            onClick={(e: unknown) => {
-              e?.stopPropagation()
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation()
               onApply()
             }}
             className="flex-1"

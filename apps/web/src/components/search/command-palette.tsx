@@ -30,7 +30,7 @@ import { type SearchResult, useGlobalSearch } from '@/hooks/use-global-search'
 import { cn } from '@/lib/utils'
 
 // Mapping des types vers les icônes
-const TYPE_ICONS: Record<string, React.ComponentType<any>> = {
+const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   menu: Menu,
   client: Users,
   fournisseur: Truck,
@@ -221,6 +221,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           {types?.length > 1 && (
             <div className="flex items-center gap-1 px-4 pb-2 overflow-x-auto">
               <button
+                type="button"
                 onClick={() => setSelectedTab(null)}
                 className={cn(
                   'px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
@@ -238,6 +239,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 return (
                   <button
                     key={type}
+                    type="button"
                     onClick={() => setSelectedTab(type)}
                     className={cn(
                       'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
@@ -279,7 +281,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               </div>
               {history?.slice(0, 5).map((item, index) => (
                 <button
-                  key={index}
+                  key={`history-${item.query}-${index}`}
+                  type="button"
                   onClick={() => searchFromHistory(item)}
                   className="flex items-center w-full px-3 py-2.5 text-sm hover:bg-accent rounded-lg transition-colors"
                 >
@@ -326,6 +329,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                           </div>
                           {groupedResults?.[type]?.length > 5 && (
                             <button
+                              type="button"
                               onClick={() => setSelectedTab(type)}
                               className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
                             >
@@ -357,7 +361,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               </div>
               {suggestions?.map((suggestion, index) => (
                 <button
-                  key={index}
+                  key={suggestion}
+                  type="button"
                   onClick={() => setQuery(suggestion)}
                   className="flex items-center w-full px-2 py-2 text-sm hover:bg-muted rounded-md"
                 >
@@ -428,6 +433,7 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
 
   return (
     <button
+      type="button"
       onClick={onClick}
       className={cn(
         'flex items-center w-full px-3 py-3 text-sm rounded-lg transition-all duration-200',
@@ -455,13 +461,11 @@ function SearchResultItem({ result, isSelected, onClick, typeColor }: SearchResu
 
       {result.metadata && (
         <div className="ml-2 flex items-center gap-2 text-xs text-muted-foreground">
-          {result?.metadata?.statut && (
-            <span className="px-1.5 py-0.5 bg-muted rounded">
-              {result?.metadata?.statut as string}
-            </span>
+          {result.metadata.statut != null && (
+            <span className="px-1.5 py-0.5 bg-muted rounded">{String(result.metadata.statut)}</span>
           )}
-          {result?.metadata?.montant && (
-            <span className="font-medium">{result?.metadata?.montant as string}€</span>
+          {result.metadata.montant != null && (
+            <span className="font-medium">{String(result.metadata.montant)}€</span>
           )}
         </div>
       )}

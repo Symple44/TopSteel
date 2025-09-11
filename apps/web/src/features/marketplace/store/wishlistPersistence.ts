@@ -1,6 +1,20 @@
 import type { Middleware } from '@reduxjs/toolkit'
 import type { WishlistItem, WishlistState } from './wishlistSlice'
 
+// API Response Types
+interface WishlistSyncResponse {
+  items: Array<{
+    product: WishlistItem['product']
+    addedAt: string
+    notes?: string
+    priority: WishlistItem['priority']
+  }>
+}
+
+interface WishlistShareResponse {
+  shareUrl?: string
+}
+
 const WISHLIST_STORAGE_KEY = 'topsteel_marketplace_wishlist'
 const WISHLIST_EXPIRY_DAYS = 90
 
@@ -91,7 +105,7 @@ export const wishlistPersistenceMiddleware: Middleware = (store) => (next) => (a
     'wishlist/sortWishlist',
   ]
 
-  if (persistActions?.includes((action as unknown).type)) {
+  if (persistActions?.includes((action as { type: string }).type)) {
     const state = store?.getState()
     if (state?.wishlist) {
       saveWishlistToStorage(state?.wishlist)
@@ -99,7 +113,7 @@ export const wishlistPersistenceMiddleware: Middleware = (store) => (next) => (a
   }
 
   // Clear storage when wishlist is cleared
-  if ((action as unknown).type === 'wishlist/clearWishlist') {
+  if ((action as { type: string }).type === 'wishlist/clearWishlist') {
     clearWishlistFromStorage()
   }
 
@@ -134,10 +148,10 @@ export const syncWishlistWithBackend = async (
       throw new Error('Failed to sync wishlist with backend')
     }
 
-    const data = await response?.json()
+    const data: WishlistSyncResponse = await response?.json()
 
     // Update items with latest product data
-    return data?.items?.map((item: unknown) => ({
+    return data?.items?.map((item) => ({
       product: item.product,
       addedAt: new Date(item.addedAt),
       notes: item.notes,
@@ -173,7 +187,7 @@ export const shareWishlist = async (
       throw new Error('Failed to share wishlist')
     }
 
-    const data = await response?.json()
+    const data: WishlistShareResponse = await response?.json()
 
     return {
       success: true,

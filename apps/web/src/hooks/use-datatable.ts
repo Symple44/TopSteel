@@ -43,7 +43,7 @@ export function useDataTable<T = any>({
   // Données sélectionnées
   const selectedData = useMemo(() => {
     return data?.filter((row) =>
-      selection?.selectedRows?.has((row as Record<string, unknown>)[keyField as string])
+      selection?.selectedRows?.has((row as Record<string, unknown>)[keyField as string] as string | number)
     )
   }, [data, selection, keyField])
 
@@ -105,7 +105,7 @@ export function useDataTable<T = any>({
       const selectedIds = Array.from(selection.selectedRows)
       setData((prev) =>
         prev?.map((item) =>
-          selectedIds?.includes((item as Record<string, unknown>)[keyField as string])
+          selectedIds?.includes((item as Record<string, unknown>)[keyField as string] as string | number)
             ? { ...item, ...updates }
             : item
         )
@@ -119,7 +119,7 @@ export function useDataTable<T = any>({
   }, [])
 
   const selectAll = useCallback(() => {
-    const allIds = data?.map((row) => (row as Record<string, unknown>)[keyField as string])
+    const allIds = data?.map((row) => (row as Record<string, unknown>)[keyField as string] as string | number)
     setSelection({
       selectedRows: new Set(allIds),
       selectAll: true,

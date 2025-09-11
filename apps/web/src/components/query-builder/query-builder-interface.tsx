@@ -6,6 +6,17 @@ import { useCallback, useEffect, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { cn } from '@/lib/utils'
+import type {
+  DatabaseTable,
+  LegacyColumn,
+  QueryBuilderColumn,
+  QueryBuilderColumnFormat,
+  QueryBuilderData,
+  QueryBuilderInterfaceProps,
+  QueryBuilderJoin,
+  QueryExecutionResult,
+} from '@/types/query-builder.types'
+import { fromLegacyColumn, toLegacyColumn } from '@/types/query-builder.types'
 import { callClientApi } from '@/utils/backend-api'
 import { CalculatedFieldsEditor } from './calculated-fields-editor'
 import { ColumnSelector } from './column-selector'
@@ -15,37 +26,100 @@ import { QueryPreview } from './query-preview'
 import { QuerySettings } from './query-settings'
 import { TableSelector } from './table-selector'
 
-interface QueryBuilderData {
-  name: string
-  description: string
-  database: string
-  mainTable: string
-  isPublic: boolean
-  maxRows?: number
-  settings: {
-    enablePagination: boolean
-    pageSize: number
-    enableSorting: boolean
-    enableFiltering: boolean
-    enableExport: boolean
-    exportFormats: string[]
-  }
-  columns: unknown[]
-  joins: unknown[]
-  calculatedFields: unknown[]
-  layout: Record<string, unknown>
-}
-
-interface QueryBuilderInterfaceProps {
-  queryBuilderId: string
-  initialData?: Partial<QueryBuilderData>
-}
-
 export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuilderInterfaceProps) {
   const { toast } = useToast()
   const { t } = useTranslation('queryBuilder')
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('design')
+
+  // Column interface that matches ColumnSelector expectations
+  interface LocalColumn {
+    id?: string
+    tableName: string
+    columnName: string
+    alias: string
+    label: string
+    description?: string
+    dataType: string
+    isPrimaryKey: boolean
+    isForeignKey: boolean
+    isVisible: boolean
+    isFilterable: boolean
+    isSortable: boolean
+    displayOrder: number
+  }
+
+  // Conversion functions for legacy component interfaces
+  const convertToLegacyColumns = (columns: QueryBuilderColumn[]): LegacyColumn[] =>
+    columns.map(toLegacyColumn)
+
+  const convertFromLegacyColumns = (columns: LegacyColumn[]): QueryBuilderColumn[] =>
+    columns.map(fromLegacyColumn)
+
+  const convertToLocalColumns = (columns: QueryBuilderColumn[]): LocalColumn[] =>
+    columns.map((col) => ({
+      id: col.id,
+      tableName: col.tableName,
+      columnName: col.columnName,
+      alias: col.alias,
+      label: col.label,
+      description: col.description,
+      dataType: col.dataType,
+      isPrimaryKey: col.isPrimaryKey || false,
+      isForeignKey: col.isForeignKey || false,
+      isVisible: col.isVisible,
+      isFilterable: col.isFilterable,
+      isSortable: col.isSortable,
+      displayOrder: col.displayOrder,
+    }))
+
+  const convertFromLocalColumns = (columns: LocalColumn[]): QueryBuilderColumn[] =>
+    columns.map((col) => ({
+      id: col.id,
+      tableName: col.tableName,
+      columnName: col.columnName,
+      alias: col.alias,
+      label: col.label,
+      description: col.description,
+      dataType: col.dataType,
+      isPrimaryKey: col.isPrimaryKey,
+      isForeignKey: col.isForeignKey,
+      isVisible: col.isVisible,
+      isFilterable: col.isFilterable,
+      isSortable: col.isSortable,
+      displayOrder: col.displayOrder,
+    }))
+
+  // Legacy join type for backward compatibility
+  interface LegacyJoin {
+    fromTable: string
+    fromColumn: string
+    toTable: string
+    toColumn: string
+    joinType: 'INNER' | 'LEFT' | 'RIGHT' | 'FULL'
+    alias?: string
+  }
+
+  const convertToLegacyJoins = (joins: QueryBuilderJoin[]): LegacyJoin[] =>
+    joins.map((join) => ({
+      fromTable: join.fromTable,
+      fromColumn: join.fromColumn,
+      toTable: join.toTable,
+      toColumn: join.toColumn,
+      joinType: join.joinType,
+      alias: join.alias,
+    }))
+
+  const convertFromLegacyJoins = (joins: LegacyJoin[]): QueryBuilderJoin[] =>
+    joins.map((join, index) => ({
+      fromTable: join.fromTable,
+      fromColumn: join.fromColumn,
+      toTable: join.toTable,
+      toColumn: join.toColumn,
+      joinType: join.joinType,
+      alias: join.alias || `t${index + 1}`,
+      order: index,
+    }))
 
   // Query Builder State
   const [queryBuilder, setQueryBuilder] = useState<QueryBuilderData>({
@@ -69,8 +143,8 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
     layout: initialData?.layout || {},
   })
 
-  const [previewData, setPreviewData] = useState(null)
-  const [availableTables, setAvailableTables] = useState([])
+  const [previewData, setPreviewData] = useState<QueryExecutionResult | null>(null)
+  const [availableTables, setAvailableTables] = useState<DatabaseTable[]>([])
   const [selectedTables, setSelectedTables] = useState([queryBuilder.mainTable].filter(Boolean))
 
   const fetchAvailableTables = useCallback(async () => {
@@ -172,23 +246,18 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
     }
   }
 
-  const updateQueryBuilder = (updates: unknown) => {
-    if (typeof updates === 'object' && updates !== null) {
-      setQueryBuilder((prev) => ({ ...prev, ...(updates as Partial<QueryBuilderData>) }))
-    }
+  const updateQueryBuilder = (updates: Partial<QueryBuilderData>) => {
+    setQueryBuilder((prev) => ({ ...prev, ...updates }))
   }
 
-  const handleImport = (importedData: unknown) => {
-    if (typeof importedData === 'object' && importedData !== null) {
-      const data = importedData as Partial<QueryBuilderData>
-      setQueryBuilder(data as QueryBuilderData)
-      // Mettre à jour les tables sélectionnées
-      if (data.mainTable) {
-        setSelectedTables([
-          data.mainTable,
-          ...(data.joins?.map((j: { toTable: string }) => j.toTable) || []),
-        ])
-      }
+  const handleImport = (importedData: Partial<QueryBuilderData>) => {
+    setQueryBuilder(importedData as QueryBuilderData)
+    // Mettre à jour les tables sélectionnées
+    if (importedData.mainTable) {
+      setSelectedTables([
+        importedData.mainTable,
+        ...(importedData.joins?.map((j) => j.toTable) || []),
+      ])
     }
   }
 
@@ -257,19 +326,25 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
                 availableTables={availableTables}
                 selectedTables={selectedTables}
                 mainTable={queryBuilder.mainTable}
-                joins={queryBuilder.joins}
-                columns={queryBuilder.columns}
+                joins={convertToLegacyJoins(queryBuilder.joins)}
+                columns={convertToLegacyColumns(queryBuilder.columns)}
                 onMainTableChange={(table) => updateQueryBuilder({ mainTable: table })}
-                onJoinsChange={(joins) => updateQueryBuilder({ joins })}
+                onJoinsChange={(joins) =>
+                  updateQueryBuilder({ joins: convertFromLegacyJoins(joins) })
+                }
                 onTablesChange={setSelectedTables}
-                onColumnsChange={(columns) => updateQueryBuilder({ columns })}
+                onColumnsChange={(columns) =>
+                  updateQueryBuilder({ columns: convertFromLegacyColumns(columns) })
+                }
               />
             </div>
             <div className="flex-1">
               <ColumnSelector
                 selectedTables={selectedTables}
-                columns={queryBuilder.columns}
-                onColumnsChange={(columns) => updateQueryBuilder({ columns })}
+                columns={convertToLocalColumns(queryBuilder.columns)}
+                onColumnsChange={(columns) =>
+                  updateQueryBuilder({ columns: convertFromLocalColumns(columns) })
+                }
               />
             </div>
           </div>
@@ -277,16 +352,30 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
 
         <TabsContent value="calculated" className="flex-1 p-4">
           <CalculatedFieldsEditor
-            fields={queryBuilder.calculatedFields}
-            columns={queryBuilder.columns}
-            onFieldsChange={(fields) => updateQueryBuilder({ calculatedFields: fields })}
+            fields={queryBuilder.calculatedFields.map((field) => ({
+              ...field,
+              format: field.format as Record<string, unknown>,
+            }))}
+            columns={queryBuilder.columns.map((col) => ({
+              name: col.columnName,
+              type: col.dataType,
+              label: col.label,
+            }))}
+            onFieldsChange={(fields) =>
+              updateQueryBuilder({
+                calculatedFields: fields.map((field) => ({
+                  ...field,
+                  format: field.format as QueryBuilderColumnFormat,
+                })),
+              })
+            }
           />
         </TabsContent>
 
         <TabsContent value="preview" className="flex-1 overflow-hidden">
           {previewData ? (
             <DataTablePreview
-              data={previewData}
+              data={previewData.data}
               columns={queryBuilder.columns}
               calculatedFields={queryBuilder.calculatedFields}
               layout={queryBuilder.layout}
@@ -323,10 +412,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
             <div className="flex items-center gap-2">
               {previewData && (
                 <span className="text-sm text-muted-foreground">
-                  {Array.isArray(previewData)
-                    ? (previewData as unknown[]).length
-                    : ((previewData as { data?: unknown[] })?.data?.length ?? 0)}{' '}
-                  {t('results')}
+                  {previewData.data?.length ?? 0} {t('results')}
                 </span>
               )}
               {!previewData && queryBuilder.mainTable && (
@@ -337,8 +423,8 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
           <div className="h-[400px] overflow-hidden border rounded-lg bg-muted/10">
             {queryBuilder.mainTable ? (
               <DataTablePreview
-                data={previewData || []}
-                columns={queryBuilder?.columns?.filter((col: any) => col.isVisible)}
+                data={previewData?.data || []}
+                columns={queryBuilder.columns.filter((col) => col.isVisible)}
                 calculatedFields={queryBuilder.calculatedFields}
                 layout={queryBuilder.layout}
                 settings={{ settings: queryBuilder.settings }}

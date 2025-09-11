@@ -24,6 +24,7 @@ import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/com
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
 import type { MFAService } from '../../../domains/auth/services/mfa.service'
+import type { MFASecurityStats, MFAStatusData } from '../interfaces/mfa-admin.interfaces'
 
 @Controller('admin/mfa')
 @ApiTags('🔧 Admin - Multi-Factor Authentication')
@@ -319,17 +320,8 @@ export class AdminMFAController {
             description: 'Sessions MFA dernières 24h',
           },
           methodDiversity: {
-            status:
-              Object.keys(
-                (status as unknown as { mfaMethodDistribution?: Record<string, unknown> })
-                  .mfaMethodDistribution || {}
-              ).length > 1
-                ? 'good'
-                : 'warning',
-            value: Object.keys(
-              (status as unknown as { mfaMethodDistribution?: Record<string, unknown> })
-                .mfaMethodDistribution || {}
-            ).length,
+            status: Object.keys(status.mfaMethodDistribution || {}).length > 1 ? 'good' : 'warning',
+            value: Object.keys(status.mfaMethodDistribution || {}).length,
             description: 'Nombre de méthodes MFA utilisées',
           },
         },
@@ -346,7 +338,7 @@ export class AdminMFAController {
   }
 
   // Helper methods
-  private generateMFARecommendations(status: unknown): string[] {
+  private generateMFARecommendations(status: MFAStatusData): string[] {
     const recommendations: string[] = []
 
     const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0
@@ -359,7 +351,11 @@ export class AdminMFAController {
       recommendations.push('Promouvoir TOTP comme méthode MFA principale')
     }
 
-    if (status.usersByRole?.SUPER_ADMIN?.withMFA < status.usersByRole?.SUPER_ADMIN?.total) {
+    if (
+      status.usersByRole?.SUPER_ADMIN?.withMFA &&
+      status.usersByRole?.SUPER_ADMIN?.total &&
+      status.usersByRole.SUPER_ADMIN.withMFA < status.usersByRole.SUPER_ADMIN.total
+    ) {
       recommendations.push('Assurer que tous les SUPER_ADMIN ont MFA activé')
     }
 
@@ -373,7 +369,11 @@ export class AdminMFAController {
     return 'not_applicable'
   }
 
-  private getMFARecommendation(hasMFA: boolean, isRequired: boolean, stats: unknown): string {
+  private getMFARecommendation(
+    hasMFA: boolean,
+    isRequired: boolean,
+    stats: MFASecurityStats
+  ): string {
     if (isRequired && !hasMFA) return 'MFA requis pour ce rôle - configuration nécessaire'
     if (!hasMFA) return 'MFA recommandé pour améliorer la sécurité'
     if (stats.securityLevel === 'basic') return "Considérer l'ajout d'une seconde méthode MFA"
@@ -446,7 +446,7 @@ export class AdminMFAController {
     return ((secondHalf - firstHalf) / firstHalf) * 100
   }
 
-  private generateHealthRecommendations(status: unknown, recentActivity: number): string[] {
+  private generateHealthRecommendations(status: MFAStatusData, recentActivity: number): string[] {
     const recommendations: string[] = []
 
     const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0

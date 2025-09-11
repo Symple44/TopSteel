@@ -200,7 +200,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                   name="paymentMethod"
                   value={method.id}
                   checked={data?.payment?.method === method.id}
-                  onChange={() => handlePaymentMethodChange(method.id as unknown)}
+                  onChange={() => handlePaymentMethodChange(method.id as 'card' | 'paypal' | 'bank_transfer')}
                   className="text-blue-600 focus:ring-blue-500"
                 />
                 <div className="ml-3 flex-1">
