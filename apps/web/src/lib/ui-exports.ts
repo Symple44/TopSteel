@@ -14,7 +14,6 @@ export {
   AvatarFallback,
   AvatarImage,
   Badge,
-  // @ts-expect-error - Temporary TypeScript fix
   DataTable,
   Table,
   TableBody,

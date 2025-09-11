@@ -4,19 +4,9 @@
  */
 
 import * as UIComponents from '@erp/ui'
-import type React from 'react'
-import type { ReactNode } from 'react'
+import * as React from 'react'
 import { forwardRef } from 'react'
-
-// Create a helper function to create React 19 compatible components
-function _createComponent<_T extends keyof JSX.IntrinsicElements>(
-  OriginalComponent: unknown,
-  displayName: string
-) {
-  const Component = (props: unknown) => <OriginalComponent {...props} />
-  Component.displayName = displayName
-  return Component
-}
+import type { ReactNode } from 'react'
 
 // Base component props that include children
 interface BaseComponentProps {
@@ -31,11 +21,11 @@ export interface BadgeProps extends BaseComponentProps {
 
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
   ({ children, variant = 'default', className, ...props }, ref) => {
-    const Component = UIComponents.Badge as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} variant={variant} className={className} {...props}>
-        {children}
-      </Component>
+    const Component = UIComponents.Badge as React.ComponentType<any>
+    return React.createElement(
+      Component,
+      { ref, variant, className, ...props },
+      children
     )
   }
 )
@@ -69,26 +59,26 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
     className,
     ...rest
   } = props || {}
-  const Component = UIComponents.Button as React.ComponentType<unknown>
-  return (
-    <Component
-      ref={ref}
-      variant={variant}
-      size={size}
-      asChild={asChild}
-      loading={loading}
-      leftIcon={leftIcon}
-      rightIcon={rightIcon}
-      onClick={onClick}
-      type={type}
-      disabled={disabled}
-      className={className}
-      {...rest}
-    >
-      {children}
-    </Component>
+  const Component = UIComponents.Button as React.ComponentType<any>
+  return React.createElement(
+    Component,
+    {
+      ref,
+      variant,
+      size,
+      asChild,
+      loading,
+      leftIcon,
+      rightIcon,
+      onClick,
+      type,
+      disabled,
+      className,
+      ...rest
+    },
+    children
   )
-}) as React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>>
+})
 Button.displayName = 'Button'
 
 // Card components
@@ -100,47 +90,31 @@ export interface CardDescriptionProps extends BaseComponentProps {}
 export interface CardFooterProps extends BaseComponentProps {}
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(({ children, ...props }, ref) => {
-  const Component = UIComponents.Card as React.ComponentType<unknown>
-  return (
-    <Component ref={ref} {...props}>
-      {children}
-    </Component>
-  )
+  const Component = UIComponents.Card as React.ComponentType<any>
+  return React.createElement(Component, { ref, ...props }, children)
 })
 Card.displayName = 'Card'
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.CardContent as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.CardContent as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 CardContent.displayName = 'CardContent'
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.CardHeader as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.CardHeader as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 CardHeader.displayName = 'CardHeader'
 
 export const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.CardTitle as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.CardTitle as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 CardTitle.displayName = 'CardTitle'
@@ -159,56 +133,44 @@ export interface SelectItemProps extends BaseComponentProps {
 }
 
 export const Select = ({ children, ...props }: SelectProps) => {
-  const Component = UIComponents.Select as React.ComponentType<unknown>
-  return <Component {...props}>{children}</Component>
+  const Component = UIComponents.Select as React.ComponentType<any>
+  return React.createElement(Component, props, children)
 }
 Select.displayName = 'Select'
 
 export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.SelectTrigger as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.SelectTrigger as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 SelectTrigger.displayName = 'SelectTrigger'
 
 export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.SelectContent as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.SelectContent as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 SelectContent.displayName = 'SelectContent'
 
 export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
   ({ children, value, ...props }, ref) => {
-    const Component = UIComponents.SelectItem as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} value={value} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.SelectItem as React.ComponentType<any>
+    return React.createElement(Component, { ref, value, ...props }, children)
   }
 )
 SelectItem.displayName = 'SelectItem'
 
 export const SelectValue = ({ ...props }) => {
-  const Component = UIComponents.SelectValue as React.ComponentType<unknown>
-  return <Component {...props} />
+  const Component = UIComponents.SelectValue as React.ComponentType<any>
+  return React.createElement(Component, props)
 }
 SelectValue.displayName = 'SelectValue'
 
 // Re-export DataTable and other complex components as-is
 export const DataTable = UIComponents.DataTable
-export type { ColumnConfig } from '@/lib/ui-exports'
+export type { ColumnConfig } from './ui-exports'
 
 // PageHeader component wrapper
 export interface PageHeaderProps extends BaseComponentProps {
@@ -224,16 +186,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   className,
   ...props
 }) => {
-  const Component = UIComponents.PageHeader as React.ComponentType<unknown>
-  return (
-    <Component
-      title={title}
-      description={description}
-      actions={actions}
-      className={className}
-      {...props}
-    />
-  )
+  const Component = UIComponents.PageHeader as React.ComponentType<any>
+  return React.createElement(Component, {
+    title,
+    description,
+    actions,
+    className,
+    ...props
+  })
 }
 PageHeader.displayName = 'PageHeader'
 
@@ -243,12 +203,8 @@ export interface LabelProps extends BaseComponentProps {
 }
 
 export const Label: React.FC<LabelProps> = ({ children, htmlFor, className, ...props }) => {
-  const Component = UIComponents.Label as unknown
-  return (
-    <Component htmlFor={htmlFor} className={className} {...props}>
-      {children}
-    </Component>
-  )
+  const Component = UIComponents.Label as React.ComponentType<any>
+  return React.createElement(Component, { htmlFor, className, ...props }, children)
 }
 
 // Dialog components
@@ -264,67 +220,47 @@ export interface DialogDescriptionProps extends BaseComponentProps {}
 export interface DialogFooterProps extends BaseComponentProps {}
 
 export const Dialog = ({ children, ...props }: DialogProps) => {
-  const Component = UIComponents.Dialog as React.ComponentType<unknown>
-  return <Component {...props}>{children}</Component>
+  const Component = UIComponents.Dialog as React.ComponentType<any>
+  return React.createElement(Component, props, children)
 }
 Dialog.displayName = 'Dialog'
 
 export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogContent as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.DialogContent as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 DialogContent.displayName = 'DialogContent'
 
 export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogHeader as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.DialogHeader as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 DialogHeader.displayName = 'DialogHeader'
 
 export const DialogTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogTitle as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.DialogTitle as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 DialogTitle.displayName = 'DialogTitle'
 
 export const DialogDescription = forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogDescription as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.DialogDescription as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 DialogDescription.displayName = 'DialogDescription'
 
 export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogFooter as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.DialogFooter as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 DialogFooter.displayName = 'DialogFooter'
@@ -360,35 +296,29 @@ export const Input: React.FC<InputProps> = ({
   disabled,
   ...props
 }) => {
-  const Component = UIComponents.Input as unknown
-  return (
-    <Component
-      type={type}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      id={id}
-      className={className}
-      maxLength={maxLength}
-      autoComplete={autoComplete}
-      autoFocus={autoFocus}
-      required={required}
-      accept={accept}
-      disabled={disabled}
-      {...props}
-    />
-  )
+  const Component = UIComponents.Input as React.ComponentType<any>
+  return React.createElement(Component, {
+    type,
+    placeholder,
+    value,
+    onChange,
+    id,
+    className,
+    maxLength,
+    autoComplete,
+    autoFocus,
+    required,
+    accept,
+    disabled,
+    ...props
+  }, children)
 }
 
 // Separator component
 export const Separator = forwardRef<HTMLDivElement, BaseComponentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.Separator as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.Separator as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 Separator.displayName = 'Separator'
@@ -402,35 +332,23 @@ export interface AlertDescriptionProps extends BaseComponentProps {}
 export interface AlertTitleProps extends BaseComponentProps {}
 
 export const Alert = forwardRef<HTMLDivElement, AlertProps>(({ children, ...props }, ref) => {
-  const Component = UIComponents.Alert as React.ComponentType<unknown>
-  return (
-    <Component ref={ref} {...props}>
-      {children}
-    </Component>
-  )
+  const Component = UIComponents.Alert as React.ComponentType<any>
+  return React.createElement(Component, { ref, ...props }, children)
 })
 Alert.displayName = 'Alert'
 
 export const AlertDescription = forwardRef<HTMLParagraphElement, AlertDescriptionProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.AlertDescription as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.AlertDescription as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 AlertDescription.displayName = 'AlertDescription'
 
 export const AlertTitle = forwardRef<HTMLHeadingElement, AlertTitleProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.AlertTitle as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.AlertTitle as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 AlertTitle.displayName = 'AlertTitle'
@@ -445,12 +363,8 @@ export interface TextareaProps extends BaseComponentProps {
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.Textarea as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.Textarea as React.ComponentType<any>
+    return React.createElement(Component, { ref, ...props }, children)
   }
 )
 Textarea.displayName = 'Textarea'
@@ -463,12 +377,8 @@ export interface ProgressProps extends BaseComponentProps {
 
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   ({ children, value, max, className, ...props }, ref) => {
-    const Component = UIComponents.Progress as React.ComponentType<unknown>
-    return (
-      <Component ref={ref} value={value} max={max} className={className} {...props}>
-        {children}
-      </Component>
-    )
+    const Component = UIComponents.Progress as React.ComponentType<any>
+    return React.createElement(Component, { ref, value, max, className, ...props }, children)
   }
 )
 Progress.displayName = 'Progress'
@@ -495,52 +405,40 @@ export interface TabsContentProps extends BaseComponentProps {
 
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>((props, ref) => {
   const { children, value, onValueChange, defaultValue, className, ...rest } = props || {}
-  const Component = UIComponents.Tabs as React.ComponentType<unknown>
-  return (
-    <Component
-      ref={ref}
-      value={value}
-      onValueChange={onValueChange}
-      defaultValue={defaultValue}
-      className={className}
-      {...rest}
-    >
-      {children}
-    </Component>
+  const Component = UIComponents.Tabs as React.ComponentType<any>
+  return React.createElement(
+    Component,
+    {
+      ref,
+      value,
+      onValueChange,
+      defaultValue,
+      className,
+      ...rest
+    },
+    children
   )
 })
 Tabs.displayName = 'Tabs'
 
 export const TabsList = forwardRef<HTMLDivElement, TabsListProps>((props, ref) => {
   const { children, className, ...rest } = props || {}
-  const Component = UIComponents.TabsList as React.ComponentType<unknown>
-  return (
-    <Component ref={ref} className={className} {...rest}>
-      {children}
-    </Component>
-  )
+  const Component = UIComponents.TabsList as React.ComponentType<any>
+  return React.createElement(Component, { ref, className, ...rest }, children)
 })
 TabsList.displayName = 'TabsList'
 
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>((props, ref) => {
   const { children, value, className, disabled, ...rest } = props || {}
-  const Component = UIComponents.TabsTrigger as React.ComponentType<unknown>
-  return (
-    <Component ref={ref} value={value} disabled={disabled} className={className} {...rest}>
-      {children}
-    </Component>
-  )
+  const Component = UIComponents.TabsTrigger as React.ComponentType<any>
+  return React.createElement(Component, { ref, value, disabled, className, ...rest }, children)
 })
 TabsTrigger.displayName = 'TabsTrigger'
 
 export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>((props, ref) => {
   const { children, value, className, ...rest } = props || {}
-  const Component = UIComponents.TabsContent as React.ComponentType<unknown>
-  return (
-    <Component ref={ref} value={value} className={className} {...rest}>
-      {children}
-    </Component>
-  )
+  const Component = UIComponents.TabsContent as React.ComponentType<any>
+  return React.createElement(Component, { ref, value, className, ...rest }, children)
 })
 TabsContent.displayName = 'TabsContent'
 
