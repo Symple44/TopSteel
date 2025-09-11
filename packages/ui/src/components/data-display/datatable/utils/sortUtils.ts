@@ -27,11 +27,32 @@ export function compareValues(aVal: unknown, bVal: unknown, direction: 'asc' | '
   // Si les valeurs sont égales
   if (aVal === bVal) return 0
 
-  // Comparaison simple et fiable
-  if ((aVal as any) < (bVal as any)) return direction === 'desc' ? 1 : -1
-  if ((aVal as any) > (bVal as any)) return direction === 'desc' ? -1 : 1
+  // Comparaison type-safe
+  if (typeof aVal === 'string' && typeof bVal === 'string') {
+    const comparison = aVal.localeCompare(bVal)
+    return direction === 'desc' ? -comparison : comparison
+  }
+  
+  if (typeof aVal === 'number' && typeof bVal === 'number') {
+    const comparison = aVal - bVal
+    return direction === 'desc' ? -comparison : comparison
+  }
+  
+  if (typeof aVal === 'boolean' && typeof bVal === 'boolean') {
+    const comparison = Number(aVal) - Number(bVal)
+    return direction === 'desc' ? -comparison : comparison
+  }
+  
+  if (aVal instanceof Date && bVal instanceof Date) {
+    const comparison = aVal.getTime() - bVal.getTime()
+    return direction === 'desc' ? -comparison : comparison
+  }
 
-  return 0
+  // Pour les autres types, convertir en string pour la comparaison
+  const aStr = String(aVal)
+  const bStr = String(bVal)
+  const comparison = aStr.localeCompare(bStr)
+  return direction === 'desc' ? -comparison : comparison
 }
 
 /**
@@ -45,7 +66,14 @@ export function getColumnValue<T>(
   if (column?.getValue) {
     return column.getValue(row)
   }
-  return (row as any)[column?.key || columnKey]
+  
+  // Type-safe property access
+  const key = column?.key || columnKey
+  if (typeof row === 'object' && row !== null && key in row) {
+    return (row as Record<string, unknown>)[key]
+  }
+  
+  return undefined
 }
 
 /**

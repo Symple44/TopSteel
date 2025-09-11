@@ -226,7 +226,7 @@ export function AddressesManager({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {addresses?.map((address: PartnerAddress): React.ReactElement => (
+                {addresses?.map((address: PartnerAddress) => (
                   <TableRow key={address.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">

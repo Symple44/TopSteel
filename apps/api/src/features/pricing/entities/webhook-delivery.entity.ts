@@ -14,7 +14,7 @@ export type DeliveryStatus = 'pending' | 'success' | 'failed'
 
 export interface WebhookResponse {
   statusCode: number
-  body?: any
+  body?: string
   error?: string
 }
 

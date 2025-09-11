@@ -115,7 +115,7 @@ export class ProgressivePenaltyService {
     identifier: string,
     endpoint: string,
     userRole?: GlobalUserRole,
-    context?: any
+    context?: Record<string, unknown>
   ): Promise<{ shouldPenalize: boolean; penaltyLevel: number; banDurationMs?: number }> {
     if (!this.redis || !this.config?.penalties?.enabled) {
       return { shouldPenalize: false, penaltyLevel: 0 }
@@ -333,7 +333,7 @@ export class ProgressivePenaltyService {
     penalty: (typeof this.penaltyLevels)[0],
     record: PenaltyRecord,
     userRole?: GlobalUserRole,
-    context?: any
+    context?: Record<string, unknown>
   ): Promise<void> {
     const now = Date.now()
     const endTime = now + penalty.banDurationMs
@@ -498,7 +498,7 @@ export class ProgressivePenaltyService {
     identifier: string,
     banRecord: BanRecord,
     penaltyRecord: PenaltyRecord,
-    context?: any
+    context?: Record<string, unknown>
   ): Promise<void> {
     // This would integrate with your notification system
     const alert = {

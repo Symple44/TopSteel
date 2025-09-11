@@ -18,6 +18,13 @@ export interface MarketplacePricingOptions {
   channel?: 'WEB' | 'MOBILE' | 'API'
 }
 
+export interface ArticleCustomization {
+  type: string
+  value: string
+  price?: number
+  description?: string
+}
+
 export interface MarketplacePriceResult extends PriceCalculationResult {
   displayPrice: number // Prix affiché (TTC ou HT selon config)
   originalPrice?: number // Prix barré si promotion
@@ -91,7 +98,7 @@ export class MarketplacePricingIntegrationService {
    * Calcule les prix pour plusieurs articles (panier)
    */
   async calculateBulkPrices(
-    items: Array<{ articleId: string; quantity: number; customizations?: any }>,
+    items: Array<{ articleId: string; quantity: number; customizations?: ArticleCustomization[] }>,
     tenantId: string,
     customerId?: string
   ): Promise<Map<string, MarketplacePriceResult>> {

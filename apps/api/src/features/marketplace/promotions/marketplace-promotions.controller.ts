@@ -242,7 +242,7 @@ export class MarketplacePromotionsController {
       orderId: string
       customerId?: string
     },
-    @CurrentUser() user: any
+    @CurrentUser() user: { id: string; societeId: string }
   ): Promise<ApplyCouponResult> {
     return this.promotionsService.applyCoupon(
       tenantId,

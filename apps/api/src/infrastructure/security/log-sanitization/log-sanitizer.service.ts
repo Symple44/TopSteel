@@ -179,7 +179,7 @@ export class LogSanitizerService {
   /**
    * Sanitise un objet de log en profondeur
    */
-  sanitizeLogObject(obj: unknown): any {
+  sanitizeLogObject(obj: unknown): unknown {
     if (!this.enableSanitization || !this.isProduction) {
       return obj
     }

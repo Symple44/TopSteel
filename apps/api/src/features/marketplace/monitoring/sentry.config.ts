@@ -10,7 +10,6 @@ interface SentryModule {
   captureMessage: (message: string, context?: Record<string, unknown>) => string
   setUser: (user: Record<string, unknown> | null) => void
   addBreadcrumb: (breadcrumb: Record<string, unknown>) => void
-  startTransaction: (options: Record<string, unknown>) => { finish: () => void }
   flush: (timeout: number) => Promise<boolean>
   close: (timeout: number) => Promise<boolean>
 }
@@ -27,8 +26,18 @@ export class SentryConfig {
   private async loadSentry(): Promise<void> {
     try {
       // Essayer de charger Sentry dynamiquement
-      this.sentry = await import('@sentry/node').catch(() => null)
-      if (this.sentry) {
+      const sentryModule = await import('@sentry/node').catch(() => null)
+      if (sentryModule) {
+        // Adapter l'interface du module Sentry importé à notre interface
+        this.sentry = {
+          init: sentryModule.init,
+          captureException: sentryModule.captureException,
+          captureMessage: sentryModule.captureMessage,
+          setUser: sentryModule.setUser,
+          addBreadcrumb: sentryModule.addBreadcrumb,
+          flush: sentryModule.flush,
+          close: sentryModule.close,
+        }
         this.logger.log('Sentry module loaded successfully')
       }
     } catch (_error) {
@@ -226,16 +235,10 @@ export class SentryConfig {
   }
 
   // Start transaction for performance monitoring
-  startTransaction(name: string, op: string, description?: string): { finish: () => void } {
-    if (!this.sentry) {
-      return { finish: () => {} } // No-op transaction
-    }
-
-    return this.sentry.startTransaction({
-      name,
-      op,
-      description,
-    })
+  startTransaction(_name: string, _op: string, _description?: string): { finish: () => void } {
+    // Note: startTransaction not available in this Sentry configuration
+    // Return a no-op transaction for compatibility
+    return { finish: () => {} }
   }
 
   // Flush events before shutdown

@@ -234,7 +234,7 @@ export class CombinedRateLimitGuard implements CanActivate {
       userContext
     )
 
-    let userResult: any
+    let userResult: unknown
 
     // Check user-based rate limit if authenticated
     if (userContext.isAuthenticated && userContext.userId) {
@@ -258,7 +258,7 @@ export class CombinedRateLimitGuard implements CanActivate {
   /**
    * Combine IP and user limit results
    */
-  private combineLimitResults(ipResult: unknown, userResult?: any): any {
+  private combineLimitResults(ipResult: unknown, userResult?: unknown): Record<string, unknown> {
     const typedIpResult = ipResult as {
       isAllowed?: boolean
       remainingRequests?: number

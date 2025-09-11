@@ -26,7 +26,7 @@ export interface FilterCondition {
   tableName: string
   columnName: string
   operator: string
-  value: any
+  value: string | number | boolean | null | Date | string[] | number[]
   tableAlias?: string
 }
 

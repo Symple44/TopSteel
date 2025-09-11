@@ -2,34 +2,33 @@ import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
-import { MarketplaceModule as MarketplaceModuleEntity } from '../entities/marketplace-module.entity'
+import { 
+  MarketplaceModule as MarketplaceModuleEntity,
+  type MarketplaceCategory,
+  type ModulePricing,
+  type PermissionDefinition,
+  type MenuItemDto,
+  type ApiRouteDefinition,
+  type ModuleMetadata
+} from '../entities/marketplace-module.entity'
 // Import des modules réels - Supprimés pour optimiser le debug
-import type { MarketplaceService } from './marketplace.service'
+import type { MarketplaceService, UpdateModuleDto, CreateModuleDto } from './marketplace.service'
 
 export interface ModuleInfo {
   moduleKey: string
   displayName: string
   description: string
   shortDescription?: string
-  category: string
+  category: MarketplaceCategory
   version: string
   publisher: string
-  pricing: {
-    type: string
-    amount?: number
-    currency?: string
-    period?: 'MONTH' | 'YEAR'
-    setupFee?: number
-    commissionRate?: number
-    usageUnit?: string
-    description?: string
-  }
+  pricing: ModulePricing
   dependencies?: string[]
-  menuConfiguration?: unknown[]
-  permissions?: string[]
-  apiRoutes?: unknown[]
+  menuConfiguration?: MenuItemDto[]
+  permissions?: PermissionDefinition[]
+  apiRoutes?: ApiRouteDefinition[]
   icon?: string
-  metadata?: Record<string, unknown>
+  metadata?: ModuleMetadata
 }
 
 export interface ModuleClass {
@@ -189,20 +188,22 @@ export class ModuleRegistryService implements OnModuleInit {
     existingModule: MarketplaceModuleEntity,
     moduleInfo: ModuleInfo
   ): Promise<void> {
+    const updateDto: UpdateModuleDto = {
+      displayName: moduleInfo.displayName,
+      description: moduleInfo.description,
+      shortDescription: moduleInfo.shortDescription,
+      pricing: moduleInfo.pricing,
+      dependencies: moduleInfo.dependencies,
+      menuConfiguration: moduleInfo.menuConfiguration,
+      permissions: moduleInfo.permissions,
+      apiRoutes: moduleInfo.apiRoutes,
+      icon: moduleInfo.icon,
+      metadata: moduleInfo.metadata,
+    }
+    
     await this.marketplaceService.updateModule(
       existingModule.id,
-      {
-        displayName: moduleInfo.displayName,
-        description: moduleInfo.description,
-        shortDescription: moduleInfo.shortDescription,
-        pricing: moduleInfo.pricing as any,
-        dependencies: moduleInfo.dependencies,
-        menuConfiguration: moduleInfo.menuConfiguration as any,
-        permissions: moduleInfo.permissions as any,
-        apiRoutes: moduleInfo.apiRoutes as any,
-        icon: moduleInfo.icon,
-        metadata: moduleInfo.metadata as any,
-      },
+      updateDto,
       '00000000-0000-0000-0000-000000000000'
     )
   }
@@ -211,22 +212,24 @@ export class ModuleRegistryService implements OnModuleInit {
    * Crée un nouveau module en base de données
    */
   private async createModuleInDatabase(moduleInfo: ModuleInfo): Promise<void> {
+    const createDto: CreateModuleDto = {
+      moduleKey: moduleInfo.moduleKey,
+      displayName: moduleInfo.displayName,
+      description: moduleInfo.description,
+      shortDescription: moduleInfo.shortDescription,
+      category: moduleInfo.category,
+      publisher: moduleInfo.publisher,
+      pricing: moduleInfo.pricing,
+      dependencies: moduleInfo.dependencies,
+      menuConfiguration: moduleInfo.menuConfiguration,
+      permissions: moduleInfo.permissions,
+      apiRoutes: moduleInfo.apiRoutes,
+      icon: moduleInfo.icon,
+      metadata: moduleInfo.metadata,
+    }
+    
     await this.marketplaceService.createModule(
-      {
-        moduleKey: moduleInfo.moduleKey,
-        displayName: moduleInfo.displayName,
-        description: moduleInfo.description,
-        shortDescription: moduleInfo.shortDescription,
-        category: moduleInfo.category as any,
-        publisher: moduleInfo.publisher,
-        pricing: moduleInfo.pricing as any,
-        dependencies: moduleInfo.dependencies,
-        menuConfiguration: moduleInfo.menuConfiguration as any,
-        permissions: moduleInfo.permissions as any,
-        apiRoutes: moduleInfo.apiRoutes as any,
-        icon: moduleInfo.icon,
-        metadata: moduleInfo.metadata as any,
-      },
+      createDto,
       '00000000-0000-0000-0000-000000000000'
     )
   }

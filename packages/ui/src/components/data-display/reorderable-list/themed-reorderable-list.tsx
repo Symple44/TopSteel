@@ -510,7 +510,7 @@ export function ThemedReorderableList<T extends ReorderableItem>({
   }, [])
 
   const handleConfigChange = useCallback(
-    (newConfig: any) => {
+    (newConfig: Partial<ReorderableListConfig>) => {
       // Appliquer les changements de configuration
       if (newConfig.theme) updateTheme(newConfig.theme)
       if (newConfig.preferences) updatePreferences(newConfig.preferences)

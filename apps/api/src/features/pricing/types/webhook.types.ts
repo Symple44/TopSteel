@@ -46,7 +46,7 @@ export interface WebhookEvent {
   type: WebhookEventType
   societeId: string
   timestamp: Date
-  data: any
+  data: Record<string, unknown>
   metadata?: {
     articleId?: string
     ruleId?: string
@@ -68,7 +68,7 @@ export interface WebhookDelivery {
   lastAttempt?: Date
   response?: {
     statusCode: number
-    body?: any
+    body?: string
     error?: string
   }
 }

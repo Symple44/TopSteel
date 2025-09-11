@@ -26,8 +26,8 @@ interface AuthenticatedRequest {
   method: string
   url: string
   ip: string
-  body?: any
-  query?: any
+  body?: Record<string, unknown>
+  query?: Record<string, unknown>
 }
 
 @Injectable()

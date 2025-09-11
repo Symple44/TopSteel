@@ -38,9 +38,9 @@ export class SearchCacheController {
   @Roles('admin', 'developer')
   async getCacheStatistics(): Promise<{
     cache: CacheStatistics
-    invalidation: any
+    invalidation: Record<string, unknown>
     health: boolean
-    config: any
+    config: Record<string, unknown>
   }> {
     const [cacheStats, invalidationStats, health, config] = await Promise.all([
       this.cacheService.getCacheStatistics(),

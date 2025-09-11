@@ -9,8 +9,22 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/**', 'dist/**', '*.config.ts', '**/*.d.ts', 'test/**'],
+      exclude: [
+        'node_modules/**', 
+        'dist/**', 
+        '*.config.ts', 
+        '**/*.d.ts', 
+        'test/**',
+        '**/*.bundled_*',
+        'tsup.config.bundled_*'
+      ],
     },
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/*.bundled_*',
+      'tsup.config.bundled_*'
+    ],
   },
   resolve: {
     alias: {

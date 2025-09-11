@@ -47,7 +47,7 @@ export function ReorderableListCustomizationPanel({
     onConfigChange({ theme: themeId })
   }
 
-  const handlePreferenceChange = (key: keyof ReorderableListConfig['preferences'], value: any) => {
+  const handlePreferenceChange = (key: keyof ReorderableListConfig['preferences'], value: boolean | string) => {
     onConfigChange({
       preferences: {
         ...config.preferences,
@@ -56,7 +56,7 @@ export function ReorderableListCustomizationPanel({
     })
   }
 
-  const handleLayoutChange = (key: keyof ReorderableListConfig['layout'], value: any) => {
+  const handleLayoutChange = (key: keyof ReorderableListConfig['layout'], value: number | boolean | 'left' | 'right') => {
     onConfigChange({
       layout: {
         ...config.layout,

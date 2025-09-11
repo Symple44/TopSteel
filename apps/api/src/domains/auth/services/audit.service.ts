@@ -83,8 +83,8 @@ export interface AuditEntry {
   metadata?: Record<string, unknown>
   duration?: number // Milliseconds
   affectedRecords?: number
-  oldValue?: any
-  newValue?: any
+  oldValue?: Record<string, unknown>
+  newValue?: Record<string, unknown>
   location?: {
     country?: string
     region?: string

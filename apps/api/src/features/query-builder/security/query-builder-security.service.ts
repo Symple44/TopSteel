@@ -637,7 +637,7 @@ export class QueryBuilderSecurityService {
   /**
    * Validate column value against its validation pattern
    */
-  validateColumnValue(tableName: string, columnName: string, value: any): void {
+  validateColumnValue(tableName: string, columnName: string, value: unknown): void {
     const columnConfig = this.validateColumn(tableName, columnName, 'filter')
 
     if (columnConfig.validationPattern && typeof value === 'string') {

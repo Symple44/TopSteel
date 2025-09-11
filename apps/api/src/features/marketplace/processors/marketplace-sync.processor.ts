@@ -30,6 +30,19 @@ interface FullSyncJob {
   timestamp: Date
 }
 
+interface BulkOperation {
+  type: 'PRICE_UPDATE' | 'STOCK_UPDATE' | 'STATUS_UPDATE'
+  productId: string
+  newPrice?: number
+  newStock?: number
+  isActive?: boolean
+}
+
+interface BulkUpdateJob {
+  operations: BulkOperation[]
+  tenantId: string
+}
+
 @Processor('marketplace-sync')
 export class MarketplaceSyncProcessor {
   private readonly logger = new Logger(MarketplaceSyncProcessor.name)
@@ -193,8 +206,8 @@ export class MarketplaceSyncProcessor {
    * Process bulk operations
    */
   @Process('bulk-update')
-  async handleBulkUpdate(job: Job<unknown>) {
-    const { operations, tenantId } = job.data as { operations: any[]; tenantId: string }
+  async handleBulkUpdate(job: Job<BulkUpdateJob>) {
+    const { operations, tenantId } = job.data
 
     this.logger.log(`Processing ${operations.length} bulk operations for tenant ${tenantId}`)
 

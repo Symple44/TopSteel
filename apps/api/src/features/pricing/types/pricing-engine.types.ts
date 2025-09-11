@@ -139,8 +139,8 @@ export interface FormulaPriceResult {
 
 // Build result parameters interface
 export interface BuildFinalResultParams {
-  article: NonNullable<any>
-  context: any
+  article: NonNullable<BreakdownContext['article']>
+  context: BreakdownContext
   options?: {
     detailed?: boolean
     includeMargins?: boolean
@@ -156,8 +156,8 @@ export interface BuildFinalResultParams {
 
 // Build detailed breakdown parameters interface
 export interface BuildDetailedBreakdownParams {
-  article: NonNullable<any>
-  context: any
+  article: NonNullable<BreakdownContext['article']>
+  context: BreakdownContext
   options?: {
     includeMargins?: boolean
     includeSkippedRules?: boolean

@@ -47,7 +47,7 @@ export interface QuoteLineResult {
     ruleName: string
     discount: number
   }>
-  breakdown?: any
+  breakdown?: Record<string, unknown>
   warnings?: string[]
 }
 
@@ -258,7 +258,7 @@ export class PricingQuoteController {
       discount: number
       discountPercentage: number
       appliedRules: number
-      breakdown?: any
+      breakdown?: Record<string, unknown>
     }>
     comparison: {
       bestPrice: number

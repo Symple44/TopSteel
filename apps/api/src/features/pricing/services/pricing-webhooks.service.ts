@@ -67,7 +67,7 @@ export class PricingWebhooksService {
     await this.subscriptionRepo.delete({ id, societeId })
   }
 
-  async testWebhook(url: string, event: any): Promise<unknown> {
+  async testWebhook(url: string, event: Record<string, unknown>): Promise<unknown> {
     const startTime = Date.now()
 
     try {

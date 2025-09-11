@@ -56,7 +56,7 @@ export class RateLimitingModule {
   static forRoot(options?: {
     enableMonitoring?: boolean
     enableProgressivePenalties?: boolean
-    customConfig?: any
+    customConfig?: Record<string, unknown>
   }) {
     return {
       module: RateLimitingModule,

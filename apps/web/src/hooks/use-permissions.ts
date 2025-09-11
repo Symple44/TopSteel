@@ -218,11 +218,11 @@ export function usePermissions() {
     if (!user) return false
 
     // Get user roles array (new system) or single role (legacy)
-    const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
+    const userRoles = user.roles || (user.role ? [user.role] : [])
 
     // L'admin et super admin ont toutes les permissions
-    const hasAdminRole = userRoles?.some((role: unknown) => {
-      const roleValue = typeof role === 'object' ? role.name || role.role : role
+    const hasAdminRole = userRoles?.some((role) => {
+      const roleValue = typeof role === 'object' && role ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
       return roleValue === 'ADMIN' || roleValue === 'SUPER_ADMIN'
     })
 
@@ -267,7 +267,7 @@ export function usePermissions() {
   const hasRole = (role: Role): boolean => {
     if (!user) return false
     // Get user roles array (new system) or single role (legacy)
-    const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
+    const userRoles = user.roles || (user.role ? [user.role] : [])
 
     return userRoles?.some((userRole: unknown) => {
       const roleValue = typeof userRole === 'object' ? userRole.name || userRole.role : userRole
@@ -289,11 +289,11 @@ export function usePermissions() {
     if (!user) return []
 
     // Get user roles array (new system) or single role (legacy)
-    const userRoles = (user as unknown).roles || (user.role ? [user.role] : [])
+    const userRoles = user.roles || (user.role ? [user.role] : [])
 
     // L'admin a toutes les permissions
-    const hasAdminRole = userRoles?.some((role: unknown) => {
-      const roleValue = typeof role === 'object' ? role.name || role.role : role
+    const hasAdminRole = userRoles?.some((role) => {
+      const roleValue = typeof role === 'object' && role ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
       return roleValue === 'admin' || roleValue === 'ADMIN'
     })
 
