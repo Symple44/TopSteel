@@ -23,6 +23,7 @@ interface RequestConfig {
   retryAttempts?: number
   timeout?: number
   requireAuth?: boolean
+  signal?: AbortSignal
 }
 
 interface CacheEntry {
@@ -331,6 +332,7 @@ export class APIClient {
         method: config.method || 'GET',
         headers,
         ...(config.body ? { body: JSON.stringify(config.body) } : {}),
+        ...(config.signal ? { signal: config.signal } : {}),
       }
 
       // Exécution avec retry et timeout - Utiliser callClientApi pour les appels côté client

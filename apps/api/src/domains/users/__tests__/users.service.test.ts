@@ -15,8 +15,12 @@ const bcryptMock = bcrypt as unknown
 
 describe('UsersService', () => {
   let service: UsersService
-  let userRepository: jest.Mocked<Repository<User>>
-  let userSettingsRepository: jest.Mocked<Repository<UserSettings>>
+  let userRepository: Repository<User> & {
+    [K in keyof Repository<User>]: vi.MockedFunction<Repository<User>[K]>
+  }
+  let userSettingsRepository: Repository<UserSettings> & {
+    [K in keyof Repository<UserSettings>]: vi.MockedFunction<Repository<UserSettings>[K]>
+  }
 
   const mockUser: User = {
     id: 'user-123',

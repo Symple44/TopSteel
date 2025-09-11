@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getDataSourceToken } from '@nestjs/typeorm'
+import { vi } from 'vitest'
 import { QueryBuilderExecutorService } from '../../services/query-builder-executor.service'
 import { QueryBuilderPermissionService } from '../../services/query-builder-permission.service'
 import { QueryBuilderSecurityService } from '../query-builder-security.service'
@@ -13,24 +14,24 @@ describe('Query Builder Security Integration Tests', () => {
   let _permissionService: QueryBuilderPermissionService
 
   const mockTenantDataSource = {
-    query: jest.fn(),
+    query: vi.fn(),
   }
 
   const mockAuthDataSource = {
-    query: jest.fn(),
+    query: vi.fn(),
   }
 
   const mockPermissionRepository = {
-    findOne: jest.fn(),
-    find: jest.fn(),
+    findOne: vi.fn(),
+    find: vi.fn(),
   }
 
   const mockUserRepository = {
-    createQueryBuilder: jest.fn(() => ({
-      leftJoin: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      where: jest.fn().mockReturnThis(),
-      getRawMany: jest.fn().mockResolvedValue([]),
+    createQueryBuilder: vi.fn(() => ({
+      leftJoin: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      getRawMany: vi.fn().mockResolvedValue([]),
     })),
   }
 
@@ -67,7 +68,7 @@ describe('Query Builder Security Integration Tests', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('End-to-End SQL Injection Prevention', () => {

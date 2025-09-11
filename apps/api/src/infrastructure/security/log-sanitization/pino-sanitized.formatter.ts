@@ -11,7 +11,9 @@ import type { LogSanitizerService } from './log-sanitizer.service'
 /**
  * Crée une configuration Pino avec sanitisation (stub)
  */
-export function createSanitizedPinoConfig(_logSanitizer: LogSanitizerService): Record<string, unknown> {
+export function createSanitizedPinoConfig(
+  _logSanitizer: LogSanitizerService
+): Record<string, unknown> {
   return {
     level: 'info',
     transport: {
@@ -23,7 +25,9 @@ export function createSanitizedPinoConfig(_logSanitizer: LogSanitizerService): R
 /**
  * Crée un logger Pino sanitisé (stub)
  */
-export function createSanitizedPinoLogger(_logSanitizer: LogSanitizerService): Record<string, unknown> {
+export function createSanitizedPinoLogger(
+  _logSanitizer: LogSanitizerService
+): Record<string, unknown> {
   return {
     info: console.log,
     warn: console.warn,

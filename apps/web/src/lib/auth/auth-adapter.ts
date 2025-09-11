@@ -6,7 +6,13 @@ import type {
   User as ExistingUser,
 } from '@/types/auth'
 import type { MFAState as AuthMFAState, AuthTokens, User } from './auth-types'
-import type { Company, ExtendedUser, Permission, PermissionAction, UserSocieteRole } from './rbac-types'
+import type {
+  Company,
+  ExtendedUser,
+  Permission,
+  PermissionAction,
+  UserSocieteRole,
+} from './rbac-types'
 
 interface UserSocieteRoleInput {
   id?: string
@@ -27,10 +33,7 @@ interface ExtendedUserSocieteRoleInput extends UserSocieteRoleInput {
   updatedAt?: string
 }
 
-function hasProperty<T extends Record<string, unknown>>(
-  obj: unknown, 
-  prop: string
-): obj is T {
+function hasProperty<T extends Record<string, unknown>>(obj: unknown, prop: string): obj is T {
   return typeof obj === 'object' && obj !== null && prop in obj
 }
 
@@ -56,7 +59,8 @@ export class AuthAdapter {
     const convertedRoles: UserSocieteRole[] = userSocieteRoles?.map((usr) => ({
       id: usr.id || `${existingUser.id}-${usr.societeId || 'default'}`,
       userId: existingUser.id,
-      societeId: usr.societeId || (existingUser as Record<string, unknown>).societeId as string || '',
+      societeId:
+        usr.societeId || ((existingUser as Record<string, unknown>).societeId as string) || '',
       roleId: usr.roleId || `role-${safeGet(usr, 'roleType', existingUser.role)}`,
       role: {
         id: usr.roleId || `role-${safeGet(usr, 'roleType', existingUser.role)}`,
@@ -175,10 +179,10 @@ export class AuthAdapter {
 
     // Ajouter les propriétés optionnelles seulement si elles existent sur le type
     if ('methods' in existingMFA && existingMFA.methods) {
-      (result as unknown as Record<string, unknown>).methods = existingMFA.methods
+      ;(result as unknown as Record<string, unknown>).methods = existingMFA.methods
     }
     if ('backupCodes' in existingMFA && existingMFA.backupCodes !== undefined) {
-      (result as unknown as Record<string, unknown>).backupCodes = existingMFA.backupCodes
+      ;(result as unknown as Record<string, unknown>).backupCodes = existingMFA.backupCodes
     }
 
     return result
@@ -190,7 +194,19 @@ export class AuthAdapter {
   static convertPermissionsFromStrings(permissionStrings: string[]): Permission[] {
     return (permissionStrings || []).map((permString) => {
       const [module, action] = (permString || '').toLowerCase().split('_')
-      const validActions: PermissionAction[] = ['create', 'read', 'update', 'delete', 'export', 'import', 'approve', 'reject', 'view_all', 'view_own', 'manage']
+      const validActions: PermissionAction[] = [
+        'create',
+        'read',
+        'update',
+        'delete',
+        'export',
+        'import',
+        'approve',
+        'reject',
+        'view_all',
+        'view_own',
+        'manage',
+      ]
       const permissionAction: PermissionAction = validActions.includes(action as PermissionAction)
         ? (action as PermissionAction)
         : 'read'

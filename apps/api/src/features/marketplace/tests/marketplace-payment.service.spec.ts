@@ -18,7 +18,10 @@ describe('MarketplacePaymentService', () => {
   let _paymentRepository: Repository<MarketplacePayment>
   let _orderRepository: Repository<MarketplaceOrder>
   let _eventEmitter: EventEmitter2
-  let stripe: { paymentIntents: { create: () => void; confirm: () => void }; customers: { create: () => void } }
+  let stripe: {
+    paymentIntents: { create: () => void; confirm: () => void }
+    customers: { create: () => void }
+  }
 
   const mockPaymentRepository = {
     create: vi.fn(),
@@ -304,7 +307,7 @@ describe('MarketplacePaymentService', () => {
 
       mockPaymentRepository.findOne.mockResolvedValue(mockPayment)
       stripe.refunds = {
-        create: jest.fn().mockResolvedValue({
+        create: vi.fn().mockResolvedValue({
           id: 're_test_123',
           amount: 300,
           status: 'succeeded',

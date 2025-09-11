@@ -613,7 +613,7 @@ export class ParameterService {
       translationKey: data.translationKey as string | undefined,
       customTranslations: data.translations,
     }
-    
+
     const param = repository.create(cleanData)
     const result = await (repository as Repository<ParameterEntity>).save(param as ParameterEntity)
 

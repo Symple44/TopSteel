@@ -112,7 +112,22 @@ function applyLegacyFilter(value: unknown, filter: FilterConfig): boolean {
 }
 
 interface FilterRule {
-  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'starts_with' | 'ends_with' | 'is_empty' | 'is_not_empty' | 'greater_than' | 'less_than' | 'greater_or_equal' | 'less_or_equal' | 'between' | 'in' | 'not_in'
+  operator:
+    | 'equals'
+    | 'not_equals'
+    | 'contains'
+    | 'not_contains'
+    | 'starts_with'
+    | 'ends_with'
+    | 'is_empty'
+    | 'is_not_empty'
+    | 'greater_than'
+    | 'less_than'
+    | 'greater_or_equal'
+    | 'less_or_equal'
+    | 'between'
+    | 'in'
+    | 'not_in'
   value?: unknown
   secondValue?: unknown
 }
@@ -184,16 +199,17 @@ export function filterDataByColumns<T>(
 
       const column = columns.find((col) => col.id === filter.field)
 
-      let value: any
+      let value: unknown
       if (column?.getValue) {
         value = column.getValue(row)
       } else if (column?.accessor) {
         value =
           typeof column.accessor === 'function'
             ? column.accessor(row)
-            : (row as any)[column.accessor as keyof T]
+            : (row as Record<string, unknown>)[column.accessor as keyof T]
       } else {
-        value = (row as any)[(filter.field || column?.key) as keyof T]
+        const rowData = row as Record<string, unknown>
+        value = rowData[(filter.field || column?.key) as keyof T]
       }
 
       return applyFilter(value, filter)
@@ -217,16 +233,17 @@ export function filterDataBySearch<T>(
     return columns.some((column) => {
       if (!column.searchable) return false
 
-      let value: any
+      let value: unknown
       if (column.getValue) {
         value = column.getValue(row)
       } else if (column.accessor) {
         value =
           typeof column.accessor === 'function'
             ? column.accessor(row)
-            : (row as any)[column.accessor as keyof T]
+            : (row as Record<string, unknown>)[column.accessor as keyof T]
       } else {
-        value = (row as any)[(column.key || column.id) as keyof T]
+        const rowData = row as Record<string, unknown>
+        value = rowData[(column.key || column.id) as keyof T]
       }
 
       const stringValue = valueToString(value).toLowerCase()

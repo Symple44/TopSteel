@@ -4,10 +4,59 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { SalesHistory } from '../entities/sales-history.entity'
 
+// Types TensorFlow.js
+interface TensorFlowTensor {
+  data(): Promise<Float32Array>
+  dispose(): void
+}
+
+interface TensorFlowModel {
+  predict(inputs: TensorFlowTensor): TensorFlowTensor
+  fit(xs: TensorFlowTensor, ys: TensorFlowTensor, options: {
+    epochs: number
+    batchSize: number
+    validationSplit: number
+    callbacks?: {
+      onEpochEnd?: (epoch: number, logs?: { loss?: number; [key: string]: number | undefined }) => void
+    }
+  }): Promise<void>
+  save(path: string): Promise<void>
+  compile(config: {
+    optimizer: TensorFlowOptimizer
+    loss: string
+    metrics: string[]
+  }): void
+}
+
+interface TensorFlowModule {
+  loadLayersModel(path: string): Promise<TensorFlowModel>
+  sequential(config: { layers: TensorFlowLayer[] }): TensorFlowModel
+  tensor2d(data: number[][]): TensorFlowTensor
+  layers: {
+    dense(config: {
+      inputShape?: number[]
+      units: number
+      activation: string
+    }): TensorFlowLayer
+    dropout(config: { rate: number }): TensorFlowLayer
+  }
+  train: {
+    adam(learningRate: number): TensorFlowOptimizer
+  }
+}
+
+interface TensorFlowLayer {
+  // Layer configuration
+}
+
+interface TensorFlowOptimizer {
+  // Optimizer configuration
+}
+
 // TensorFlow.js optionnel pour Windows
-let tf: any
+let tf: TensorFlowModule | null = null
 try {
-  tf = require('@tensorflow/tfjs-node')
+  tf = require('@tensorflow/tfjs-node') as TensorFlowModule
 } catch (_error) {
   // TensorFlow.js not available, ML features will be disabled
 }
@@ -46,7 +95,7 @@ export interface MLPricingContext {
 @Injectable()
 export class PricingMLService {
   private readonly logger = new Logger(PricingMLService.name)
-  private model: any = null
+  private model: TensorFlowModel | null = null
   private readonly modelPath = './models/pricing-optimization'
 
   constructor(
@@ -86,7 +135,7 @@ export class PricingMLService {
   /**
    * Crée un modèle de base pour la prédiction de prix
    */
-  private createBaseModel(): any {
+  private createBaseModel(): TensorFlowModel | null {
     if (!tf) {
       return null
     }
@@ -276,7 +325,7 @@ export class PricingMLService {
     }
 
     const input = tf.tensor2d([features])
-    const prediction = this.model.predict(input) as any
+    const prediction = this.model.predict(input)
     const result = await prediction.data()
 
     input.dispose()

@@ -3,8 +3,8 @@
  * This file includes all necessary types and implementations to fix the APIClient property errors
  */
 
-import { APIClientEnhanced } from './api-client-enhanced'
 import type { RequestConfig } from './api-client'
+import { APIClientEnhanced } from './api-client-enhanced'
 
 // Extended RequestConfig for HTTP methods with params support
 interface HTTPRequestConfig extends RequestConfig {
@@ -14,29 +14,29 @@ interface HTTPRequestConfig extends RequestConfig {
 
 // Import proper types from @erp/types instead of redefining them
 import type {
+  Article,
+  ArticleFilters,
+  Contact,
+  CreateArticleDto,
+  CreateContactDto,
+  CreateMaterialDto,
+  CreatePartnerAddressDto,
+  CreatePartnerDto,
+  CreatePartnerGroupDto,
+  CreatePartnerSiteDto,
+  Material,
+  MaterialFilters,
   Partner,
   PartnerAddress,
   PartnerGroup,
   PartnerSite,
-  Contact,
-  CreatePartnerDto,
-  UpdatePartnerDto,
-  CreateContactDto,
-  UpdateContactDto,
-  CreatePartnerAddressDto,
-  UpdatePartnerAddressDto,
-  CreatePartnerGroupDto,
-  UpdatePartnerGroupDto,
-  CreatePartnerSiteDto,
-  UpdatePartnerSiteDto,
-  Material,
-  Article,
-  CreateMaterialDto,
-  UpdateMaterialDto,
-  CreateArticleDto,
   UpdateArticleDto,
-  MaterialFilters,
-  ArticleFilters
+  UpdateContactDto,
+  UpdateMaterialDto,
+  UpdatePartnerAddressDto,
+  UpdatePartnerDto,
+  UpdatePartnerGroupDto,
+  UpdatePartnerSiteDto,
 } from '@erp/types'
 
 // Import PaginatedResponse from existing types
@@ -338,7 +338,10 @@ class PartnersAPIImpl implements PartnersAPI {
     return this.apiClient.get(`/partners/${partnerId}/addresses`)
   }
 
-  async createPartnerAddress(partnerId: string, data: CreatePartnerAddressDto): Promise<PartnerAddress> {
+  async createPartnerAddress(
+    partnerId: string,
+    data: CreatePartnerAddressDto
+  ): Promise<PartnerAddress> {
     return this.apiClient.post(`/partners/${partnerId}/addresses`, data)
   }
 
@@ -477,7 +480,9 @@ class ArticlesAPIImpl implements ArticlesAPI {
     return this.apiClient.post(`/articles/${id}/duplicate`, { newCode })
   }
 
-  async calculateProductionCost(id: string): Promise<{ cost: number; details: Record<string, number> }> {
+  async calculateProductionCost(
+    id: string
+  ): Promise<{ cost: number; details: Record<string, number> }> {
     return this.apiClient.get(`/articles/${id}/production-cost`)
   }
 
@@ -501,13 +506,13 @@ export interface IAPIClientFinal {
   users: UsersAPI
   projects: ProjectsAPI
   notifications: NotificationsAPI
-  
+
   // Health check
   health(): Promise<{ status: string; timestamp: string }>
-  
+
   // Authentication
   authenticate(token: string): void
-  
+
   // HTTP Methods
   get<T>(endpoint: string, config?: HTTPRequestConfig): Promise<T>
   post<T>(endpoint: string, data?: unknown, config?: HTTPRequestConfig): Promise<T>
@@ -526,7 +531,7 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
 
   constructor(baseURL: string, options?: { timeout?: number }) {
     super(baseURL)
-    
+
     this.partners = new PartnersAPIImpl(this)
     this.materials = new MaterialsAPIImpl(this)
     this.articles = new ArticlesAPIImpl(this)
@@ -535,21 +540,21 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
       getUser: () => Promise.resolve(null),
       createUser: () => Promise.resolve({}),
       updateUser: () => Promise.resolve({}),
-      deleteUser: () => Promise.resolve()
+      deleteUser: () => Promise.resolve(),
     }
     this.projects = {
       getProjects: () => Promise.resolve([]),
       getProject: () => Promise.resolve(null),
       createProject: () => Promise.resolve({}),
       updateProject: () => Promise.resolve({}),
-      deleteProject: () => Promise.resolve()
+      deleteProject: () => Promise.resolve(),
     }
     this.notifications = {
       getNotifications: () => Promise.resolve([]),
       markAsRead: () => Promise.resolve(),
       markAllAsRead: () => Promise.resolve(),
       deleteNotification: () => Promise.resolve(),
-      createNotification: () => Promise.resolve({})
+      createNotification: () => Promise.resolve({}),
     }
   }
 
@@ -603,11 +608,11 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
       const authData = {
         tokens: {
           accessToken: token,
-          refreshToken: null
+          refreshToken: null,
         },
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
-      
+
       // Store in sessionStorage by default
       sessionStorage?.setItem('topsteel_auth_tokens', JSON.stringify(authData))
     } catch (error) {
@@ -640,4 +645,6 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
   }
 }
 
-export const apiClientFinal = new APIClientFinal(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001')
+export const apiClientFinal = new APIClientFinal(
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+)

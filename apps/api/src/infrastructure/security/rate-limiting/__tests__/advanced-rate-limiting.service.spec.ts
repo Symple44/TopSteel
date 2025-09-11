@@ -5,21 +5,22 @@
 
 import { ConfigService } from '@nestjs/config'
 import { Test, type TestingModule } from '@nestjs/testing'
+import { vi } from 'vitest'
 import { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import { AdvancedRateLimitingService, type UserContext } from '../advanced-rate-limiting.service'
 import { rateLimitingConfig } from '../rate-limiting.config'
 
 // Mock Redis client
 const mockRedis = {
-  eval: jest.fn(),
-  zremrangebyscore: jest.fn(),
-  zadd: jest.fn(),
-  expire: jest.fn(),
-  hgetall: jest.fn(),
-  hmset: jest.fn(),
-  del: jest.fn(),
-  keys: jest.fn(),
-  zcard: jest.fn(),
+  eval: vi.fn(),
+  zremrangebyscore: vi.fn(),
+  zadd: vi.fn(),
+  expire: vi.fn(),
+  hgetall: vi.fn(),
+  hmset: vi.fn(),
+  del: vi.fn(),
+  keys: vi.fn(),
+  zcard: vi.fn(),
 }
 
 describe('AdvancedRateLimitingService', () => {
@@ -37,7 +38,7 @@ describe('AdvancedRateLimitingService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn().mockReturnValue(rateLimitingConfig()),
+            get: vi.fn().mockReturnValue(rateLimitingConfig()),
           },
         },
       ],
@@ -47,7 +48,7 @@ describe('AdvancedRateLimitingService', () => {
     configService = module.get<ConfigService>(ConfigService)
 
     // Reset mocks
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('checkRateLimit', () => {

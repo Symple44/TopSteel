@@ -335,7 +335,7 @@ class ArticlesAPIImpl implements ArticlesAPI {
     // ArticleFilters doesn't have category, use type instead
     if (filters?.type) params.append('category', filters.type)
     if (filters?.page) params.append('page', filters.page.toString())
-    // Use limit instead of pageSize for ArticleFilters  
+    // Use limit instead of pageSize for ArticleFilters
     if (filters?.limit) params.append('pageSize', filters.limit.toString())
 
     const queryString = params.toString()
@@ -454,7 +454,9 @@ class ProjectsAPIImpl implements ProjectsAPI {
 class NotificationsAPIImpl implements NotificationsAPI {
   constructor(private client: APIClientEnhanced) {}
 
-  async getNotifications(_filters?: NotificationFilters): Promise<PaginatedResponse<ClientNotification>> {
+  async getNotifications(
+    _filters?: NotificationFilters
+  ): Promise<PaginatedResponse<ClientNotification>> {
     return this.client.get<PaginatedResponse<ClientNotification>>('/notifications')
   }
 
@@ -660,12 +662,14 @@ class ReportsAPIImpl implements ReportsAPI {
       status: string
     }>
   > {
-    return this.client.get<Array<{
-      id: string
-      type: string
-      created: string
-      status: string
-    }>>('/reports')
+    return this.client.get<
+      Array<{
+        id: string
+        type: string
+        created: string
+        status: string
+      }>
+    >('/reports')
   }
 }
 

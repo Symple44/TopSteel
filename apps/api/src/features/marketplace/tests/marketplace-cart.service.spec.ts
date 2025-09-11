@@ -5,6 +5,7 @@ import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Cache } from 'cache-manager'
 import type { Repository } from 'typeorm'
+import { vi } from 'vitest'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceProduct } from '../entities/marketplace-product.entity'
 import { MarketplaceCartService } from '../services/marketplace-cart.service'
@@ -17,22 +18,22 @@ describe('MarketplaceCartService', () => {
   let _eventEmitter: EventEmitter2
 
   const mockProductRepository = {
-    findOne: jest.fn(),
-    find: jest.fn(),
+    findOne: vi.fn(),
+    find: vi.fn(),
   }
 
   const mockCustomerRepository = {
-    findOne: jest.fn(),
+    findOne: vi.fn(),
   }
 
   const mockCacheManager = {
-    get: jest.fn(),
-    set: jest.fn(),
-    del: jest.fn(),
+    get: vi.fn(),
+    set: vi.fn(),
+    del: vi.fn(),
   }
 
   const mockEventEmitter = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -70,7 +71,7 @@ describe('MarketplaceCartService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('getCart', () => {

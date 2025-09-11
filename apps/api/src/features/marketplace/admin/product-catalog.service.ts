@@ -1,4 +1,4 @@
-import { Article, ArticleType, ArticleStatus, UniteStock } from '@erp/entities'
+import { Article, ArticleStatus, ArticleType, UniteStock } from '@erp/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'

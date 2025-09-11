@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common'
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
-import { User } from '../../../domains/users/entities/user.entity'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
+import type { User } from '../../../domains/users/entities/user.entity'
 import {
   MarketplacePermission,
   RequireMarketplacePermissions,

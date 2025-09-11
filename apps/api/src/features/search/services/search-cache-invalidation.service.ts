@@ -293,6 +293,18 @@ export function emitCacheInvalidationEvent(
   eventEmitter.emit(`${entityType}.${operation}`, event)
 }
 
+// Types pour le decorator
+interface EntityWithTenantAndId {
+  tenantId?: string
+  id?: string
+}
+
+interface ServiceWithEventEmitter {
+  eventEmitter?: {
+    emit: (event: string, data: CacheInvalidationEvent) => boolean
+  }
+}
+
 /**
  * Decorator to automatically emit cache invalidation events
  * Usage: @InvalidateCache('product', 'update')
@@ -301,19 +313,22 @@ export function InvalidateCache(entityType: string, operation: 'create' | 'updat
   return (_target: unknown, _propertyName: string, descriptor: PropertyDescriptor) => {
     const method = descriptor.value
 
-    descriptor.value = async function (this: unknown, ...args: unknown[]) {
+    descriptor.value = async function (this: ServiceWithEventEmitter, ...args: unknown[]) {
       const result = await method.apply(this, args)
 
       // Try to extract tenant and entity information from result or arguments
       // This is a simplified implementation - you might need to customize based on your data structure
       try {
-        const tenantId = (args[0] as any)?.tenantId || (result as any)?.tenantId
-        const entityId = (args[0] as any)?.id || (result as any)?.id
+        const firstArg = args[0] as Partial<EntityWithTenantAndId> | undefined
+        const resultEntity = result as Partial<EntityWithTenantAndId> | undefined
+        
+        const tenantId = firstArg?.tenantId || resultEntity?.tenantId
+        const entityId = firstArg?.id || resultEntity?.id
 
         // Check if the class instance has an eventEmitter property
-        if (tenantId && entityId && (this as any).eventEmitter) {
+        if (tenantId && entityId && this.eventEmitter) {
           emitCacheInvalidationEvent(
-            (this as any).eventEmitter,
+            this.eventEmitter,
             tenantId,
             entityType,
             entityId,

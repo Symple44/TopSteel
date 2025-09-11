@@ -222,7 +222,11 @@ export class SentryConfig {
   }
 
   // Capture message
-  captureMessage(message: string, level: 'info' | 'warning' | 'error' | 'debug' = 'info', context?: Record<string, unknown>): string {
+  captureMessage(
+    message: string,
+    level: 'info' | 'warning' | 'error' | 'debug' = 'info',
+    context?: Record<string, unknown>
+  ): string {
     if (!this.sentry) {
       this.logger.log(`Message captured (Sentry disabled): ${message}`)
       return 'sentry-disabled'

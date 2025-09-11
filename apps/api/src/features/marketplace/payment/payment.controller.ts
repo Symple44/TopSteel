@@ -27,7 +27,7 @@ import { ThrottlerGuard } from '@nestjs/throttler'
 import { IsIn, IsNumber, IsOptional, IsPositive, IsString, IsUUID, Min } from 'class-validator'
 import { CurrentMarketplaceCustomer } from '../auth/decorators/current-customer.decorator'
 import { MarketplaceAuthGuard } from '../auth/guards/marketplace-auth.guard'
-import { MarketplaceCustomerJwtPayload } from '../auth/interfaces/marketplace-customer.interface'
+import type { MarketplaceCustomerJwtPayload } from '../auth/interfaces/marketplace-customer.interface'
 import type {
   CreatePaymentIntentDto,
   PaymentResult,

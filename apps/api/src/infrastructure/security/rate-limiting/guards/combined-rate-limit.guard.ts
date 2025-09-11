@@ -259,7 +259,10 @@ export class CombinedRateLimitGuard implements CanActivate {
   /**
    * Combine IP and user limit results
    */
-  private combineLimitResults(ipResult: RateLimitResult, userResult?: RateLimitResult): RateLimitResult & { limitingFactor: 'ip' | 'user' | 'both' } {
+  private combineLimitResults(
+    ipResult: RateLimitResult,
+    userResult?: RateLimitResult
+  ): RateLimitResult & { limitingFactor: 'ip' | 'user' | 'both' } {
     let isAllowed = ipResult.isAllowed
     let limitingFactor: 'ip' | 'user' | 'both' = 'ip'
 
@@ -283,13 +286,12 @@ export class CombinedRateLimitGuard implements CanActivate {
         userResult?.remainingRequests ?? Number.MAX_SAFE_INTEGER
       ),
       resetTime: Math.max(ipResult.resetTime, userResult?.resetTime ?? 0),
-      retryAfter:
-        Math.max(
-          ipResult.retryAfter ?? 0,
-          userResult?.retryAfter ?? 0
-        ) || undefined,
+      retryAfter: Math.max(ipResult.retryAfter ?? 0, userResult?.retryAfter ?? 0) || undefined,
       totalRequests: Math.max(ipResult.totalRequests, userResult?.totalRequests ?? 0),
-      windowStartTime: Math.min(ipResult.windowStartTime, userResult?.windowStartTime ?? Date.now()),
+      windowStartTime: Math.min(
+        ipResult.windowStartTime,
+        userResult?.windowStartTime ?? Date.now()
+      ),
       limitingFactor,
     }
   }

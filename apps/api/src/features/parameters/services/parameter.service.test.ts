@@ -1,6 +1,7 @@
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { vi } from 'vitest'
 import { ParameterApplication } from '../entities/parameter-application.entity'
 import { ParameterClient } from '../entities/parameter-client.entity'
 import { ParameterScope, ParameterSystem, ParameterType } from '../entities/parameter-system.entity'
@@ -8,9 +9,17 @@ import { ParameterService } from './parameter.service'
 
 describe('ParameterService', () => {
   let service: ParameterService
-  let systemRepo: jest.Mocked<Repository<ParameterSystem>>
-  let appRepo: jest.Mocked<Repository<ParameterApplication>>
-  let clientRepo: jest.Mocked<Repository<ParameterClient>>
+  let systemRepo: Repository<ParameterSystem> & {
+    [K in keyof Repository<ParameterSystem>]: vi.MockedFunction<Repository<ParameterSystem>[K]>
+  }
+  let appRepo: Repository<ParameterApplication> & {
+    [K in keyof Repository<ParameterApplication>]: vi.MockedFunction<
+      Repository<ParameterApplication>[K]
+    >
+  }
+  let clientRepo: Repository<ParameterClient> & {
+    [K in keyof Repository<ParameterClient>]: vi.MockedFunction<Repository<ParameterClient>[K]>
+  }
 
   const mockSystemParameter: ParameterSystem = {
     id: 1,
@@ -43,12 +52,12 @@ describe('ParameterService', () => {
 
   beforeEach(async () => {
     const mockRepository = {
-      find: jest.fn(),
-      findOne: jest.fn(),
-      create: jest.fn(),
-      save: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
+      find: vi.fn(),
+      findOne: vi.fn(),
+      create: vi.fn(),
+      save: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     }
 
     systemRepo = mockRepository as unknown
@@ -77,7 +86,7 @@ describe('ParameterService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Clear cache after each test
     service.invalidateRolesCache()
   })
@@ -413,7 +422,7 @@ describe('ParameterService', () => {
       systemRepo.findOne.mockResolvedValue(existingParam)
       systemRepo.save.mockResolvedValue(existingParam)
 
-      const invalidateSpy = jest.spyOn(service, 'invalidateRolesCache')
+      const invalidateSpy = vi.spyOn(service, 'invalidateRolesCache')
 
       await service.updateParameter('user_roles', 'ADMIN', { value: 'New Value' })
 
@@ -472,7 +481,7 @@ describe('ParameterService', () => {
       systemRepo.create.mockReturnValue(newRoleData as unknown)
       systemRepo.save.mockResolvedValue(newRoleData as unknown)
 
-      const invalidateSpy = jest.spyOn(service, 'invalidateRolesCache')
+      const invalidateSpy = vi.spyOn(service, 'invalidateRolesCache')
 
       await service.createParameter(newRoleData, 'system')
 

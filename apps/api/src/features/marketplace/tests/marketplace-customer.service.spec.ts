@@ -3,6 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { vi } from 'vitest'
 import { User } from '../../auth/entities/user.entity'
 import type { CreateCustomerDto, UpdateCustomerDto } from '../dto/customer.dto'
 import { MarketplaceAddress } from '../entities/marketplace-address.entity'
@@ -17,28 +18,28 @@ describe('MarketplaceCustomerService', () => {
   let _eventEmitter: EventEmitter2
 
   const mockCustomerRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    findOne: jest.fn(),
-    find: jest.fn(),
-    update: jest.fn(),
-    createQueryBuilder: jest.fn(),
+    create: vi.fn(),
+    save: vi.fn(),
+    findOne: vi.fn(),
+    find: vi.fn(),
+    update: vi.fn(),
+    createQueryBuilder: vi.fn(),
   }
 
   const mockAddressRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    delete: jest.fn(),
+    create: vi.fn(),
+    save: vi.fn(),
+    find: vi.fn(),
+    findOne: vi.fn(),
+    delete: vi.fn(),
   }
 
   const mockUserRepository = {
-    findOne: jest.fn(),
+    findOne: vi.fn(),
   }
 
   const mockEventEmitter = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -76,7 +77,7 @@ describe('MarketplaceCustomerService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('create', () => {
@@ -351,10 +352,10 @@ describe('MarketplaceCustomerService', () => {
       }
 
       const mockQueryBuilder = {
-        leftJoin: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        getRawOne: jest.fn().mockResolvedValue({
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        getRawOne: vi.fn().mockResolvedValue({
           totalOrders: '15',
           totalSpent: '5000',
           averageOrderValue: '333.33',
@@ -405,13 +406,13 @@ describe('MarketplaceCustomerService', () => {
       ]
 
       const mockQueryBuilder = {
-        leftJoin: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        groupBy: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        getRawMany: jest.fn().mockResolvedValue(mockTopCustomers),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        getRawMany: vi.fn().mockResolvedValue(mockTopCustomers),
       }
 
       mockCustomerRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)

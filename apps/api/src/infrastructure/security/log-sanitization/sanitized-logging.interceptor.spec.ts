@@ -5,6 +5,7 @@
 import type { CallHandler, ExecutionContext } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { of, throwError } from 'rxjs'
+import { vi } from 'vitest'
 import { LogSanitizerService } from './log-sanitizer.service'
 import { SanitizedLoggingInterceptor } from './sanitized-logging.interceptor'
 
@@ -22,8 +23,8 @@ describe('SanitizedLoggingInterceptor', () => {
         {
           provide: LogSanitizerService,
           useValue: {
-            sanitizeLogMessage: jest.fn((msg) => msg.replace(/password=\w+/g, 'password=[MASKED]')),
-            sanitizeLogObject: jest.fn((obj) => ({
+            sanitizeLogMessage: vi.fn((msg) => msg.replace(/password=\w+/g, 'password=[MASKED]')),
+            sanitizeLogObject: vi.fn((obj) => ({
               ...obj,
               password: obj.password ? '[MASKED]' : obj.password,
             })),
@@ -69,16 +70,16 @@ describe('SanitizedLoggingInterceptor', () => {
 
     // Mock CallHandler
     mockCallHandler = {
-      handle: jest.fn(),
+      handle: vi.fn(),
     } as unknown
 
     // Mock console/logger
-    jest.spyOn(console, 'log').mockImplementation()
-    jest.spyOn(console, 'error').mockImplementation()
+    vi.spyOn(console, 'log').mockImplementation()
+    vi.spyOn(console, 'error').mockImplementation()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {
@@ -87,13 +88,13 @@ describe('SanitizedLoggingInterceptor', () => {
 
   describe('successful request', () => {
     beforeEach(() => {
-      ;(mockCallHandler.handle as jest.Mock).mockReturnValue(
+      ;(mockCallHandler.handle as vi.Mock).mockReturnValue(
         of({ data: 'success', userId: 'user_123' })
       )
     })
 
     it('should log request and response data', (done) => {
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: (result) => {
@@ -116,7 +117,7 @@ describe('SanitizedLoggingInterceptor', () => {
     })
 
     it('should sanitize sensitive data in logs', (done) => {
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {
@@ -134,7 +135,7 @@ describe('SanitizedLoggingInterceptor', () => {
     })
 
     it('should extract user ID from request.user', (done) => {
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {
@@ -151,7 +152,7 @@ describe('SanitizedLoggingInterceptor', () => {
       mockRequest.headers.authorization =
         'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzQ1NiJ9.test'
 
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {
@@ -166,7 +167,7 @@ describe('SanitizedLoggingInterceptor', () => {
       mockRequest.user = undefined
       mockRequest.headers.authorization = undefined
 
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {
@@ -180,7 +181,7 @@ describe('SanitizedLoggingInterceptor', () => {
     it('should generate request ID if not present', (done) => {
       mockRequest.headers['x-request-id'] = undefined
 
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {
@@ -197,11 +198,11 @@ describe('SanitizedLoggingInterceptor', () => {
     mockError.stack = 'Error stack trace with token=abc123'
 
     beforeEach(() => {
-      ;(mockCallHandler.handle as jest.Mock).mockReturnValue(throwError(() => mockError))
+      ;(mockCallHandler.handle as vi.Mock).mockReturnValue(throwError(() => mockError))
     })
 
     it('should log error and sanitize sensitive data', (done) => {
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'error')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'error')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         error: (error) => {
@@ -239,13 +240,13 @@ describe('SanitizedLoggingInterceptor', () => {
 
   describe('IP address sanitization', () => {
     beforeEach(() => {
-      ;(mockCallHandler.handle as jest.Mock).mockReturnValue(of({ success: true }))
+      ;(mockCallHandler.handle as vi.Mock).mockReturnValue(of({ success: true }))
     })
 
     it('should sanitize IP addresses when enabled', (done) => {
       process.env.LOG_MASK_IP_ADDRESSES = 'true'
 
-      const _loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const _loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {
@@ -259,7 +260,7 @@ describe('SanitizedLoggingInterceptor', () => {
     it('should not sanitize IP addresses when disabled', (done) => {
       process.env.LOG_MASK_IP_ADDRESSES = 'false'
 
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {
@@ -273,11 +274,11 @@ describe('SanitizedLoggingInterceptor', () => {
 
   describe('performance', () => {
     beforeEach(() => {
-      ;(mockCallHandler.handle as jest.Mock).mockReturnValue(of({ data: 'test' }))
+      ;(mockCallHandler.handle as vi.Mock).mockReturnValue(of({ data: 'test' }))
     })
 
     it('should measure response time accurately', (done) => {
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
       const startTime = Date.now()
 
       setTimeout(() => {
@@ -299,9 +300,9 @@ describe('SanitizedLoggingInterceptor', () => {
 
     it('should handle large response data', (done) => {
       const largeData = { data: 'x'.repeat(10000) }
-      ;(mockCallHandler.handle as jest.Mock).mockReturnValue(of(largeData))
+      ;(mockCallHandler.handle as vi.Mock).mockReturnValue(of(largeData))
 
-      const loggerSpy = jest.spyOn((interceptor as unknown).logger, 'log')
+      const loggerSpy = vi.spyOn((interceptor as unknown).logger, 'log')
 
       interceptor.intercept(mockExecutionContext, mockCallHandler).subscribe({
         next: () => {

@@ -12,12 +12,21 @@ import { extractData, extractError } from './api-response-handler'
 interface HTTPRequestConfig extends RequestConfig {
   params?: Record<string, unknown>
   responseType?: 'json' | 'blob' | 'text'
+  signal?: AbortSignal
 }
 
 // Generic typed fetch function
 export async function fetchTyped<T>(url: string, options?: HTTPRequestConfig): Promise<T> {
   try {
-    const response = await apiClient.get<ApiResponse<T>>(url, options)
+    // Extract signal from options if present and pass it to the RequestConfig
+    const { signal, ...configOptions } = options || {}
+    const requestConfig: RequestConfig = {
+      ...configOptions,
+      // Pass signal as part of headers or as a custom property if supported
+      ...(signal && { signal }),
+    }
+
+    const response = await apiClient.get<ApiResponse<T>>(url, requestConfig)
 
     // Handle direct data response
     if (response && typeof response === 'object') {

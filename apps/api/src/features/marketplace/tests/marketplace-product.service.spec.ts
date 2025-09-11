@@ -3,6 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { vi } from 'vitest'
 import type { CreateProductDto, UpdateProductDto } from '../dto/product.dto'
 import { MarketplaceCategory } from '../entities/marketplace-category.entity'
 import { MarketplaceProduct } from '../entities/marketplace-product.entity'
@@ -15,24 +16,24 @@ describe('MarketplaceProductService', () => {
   let _eventEmitter: EventEmitter2
 
   const mockProductRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    findOne: jest.fn(),
-    find: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    createQueryBuilder: jest.fn(),
+    create: vi.fn(),
+    save: vi.fn(),
+    findOne: vi.fn(),
+    find: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    createQueryBuilder: vi.fn(),
     manager: {
-      transaction: jest.fn(),
+      transaction: vi.fn(),
     },
   }
 
   const mockCategoryRepository = {
-    findOne: jest.fn(),
+    findOne: vi.fn(),
   }
 
   const mockEventEmitter = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -65,7 +66,7 @@ describe('MarketplaceProductService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('create', () => {
@@ -152,12 +153,12 @@ describe('MarketplaceProductService', () => {
       ]
 
       const mockQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        take: jest.fn().mockReturnThis(),
-        getManyAndCount: jest.fn().mockResolvedValue([mockProducts, 2]),
+        where: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        skip: vi.fn().mockReturnThis(),
+        take: vi.fn().mockReturnThis(),
+        getManyAndCount: vi.fn().mockResolvedValue([mockProducts, 2]),
       }
 
       mockProductRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)
@@ -178,13 +179,13 @@ describe('MarketplaceProductService', () => {
       const mockProducts = [{ id: '1', name: 'Product 1', categoryId }]
 
       const mockQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        take: jest.fn().mockReturnThis(),
-        getManyAndCount: jest.fn().mockResolvedValue([mockProducts, 1]),
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        skip: vi.fn().mockReturnThis(),
+        take: vi.fn().mockReturnThis(),
+        getManyAndCount: vi.fn().mockResolvedValue([mockProducts, 1]),
       }
 
       mockProductRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)
@@ -210,13 +211,13 @@ describe('MarketplaceProductService', () => {
       ]
 
       const mockQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        take: jest.fn().mockReturnThis(),
-        getManyAndCount: jest.fn().mockResolvedValue([mockProducts, 2]),
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        skip: vi.fn().mockReturnThis(),
+        take: vi.fn().mockReturnThis(),
+        getManyAndCount: vi.fn().mockResolvedValue([mockProducts, 2]),
       }
 
       mockProductRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)
@@ -357,14 +358,14 @@ describe('MarketplaceProductService', () => {
       }
 
       const mockQueryBuilder = {
-        setLock: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(mockProduct),
+        setLock: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        getOne: vi.fn().mockResolvedValue(mockProduct),
       }
 
       const mockTransactionManager = {
-        createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
-        save: jest.fn().mockResolvedValue({
+        createQueryBuilder: vi.fn().mockReturnValue(mockQueryBuilder),
+        save: vi.fn().mockResolvedValue({
           ...mockProduct,
           stockQuantity: 5,
         }),
@@ -392,13 +393,13 @@ describe('MarketplaceProductService', () => {
       }
 
       const mockQueryBuilder = {
-        setLock: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(mockProduct),
+        setLock: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        getOne: vi.fn().mockResolvedValue(mockProduct),
       }
 
       const mockTransactionManager = {
-        createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
+        createQueryBuilder: vi.fn().mockReturnValue(mockQueryBuilder),
       }
 
       mockProductRepository.manager.transaction.mockImplementation(async (callback) =>

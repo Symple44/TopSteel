@@ -2,6 +2,7 @@ import { AdjustmentType, PriceRule, PriceRuleChannel } from '@erp/entities'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
+import { vi } from 'vitest'
 import { Article } from '../../../domains/inventory/entities/article.entity'
 import { type PricingContext, PricingEngineService } from './pricing-engine.service'
 
@@ -42,9 +43,9 @@ describe('PricingEngineService', () => {
         value: 'VIP',
       },
     ],
-    canBeApplied: jest.fn().mockReturnValue(true),
-    incrementUsage: jest.fn(),
-    validate: jest.fn().mockReturnValue([]),
+    canBeApplied: vi.fn().mockReturnValue(true),
+    incrementUsage: vi.fn(),
+    validate: vi.fn().mockReturnValue([]),
   }
 
   const mockContext: PricingContext = {
@@ -83,25 +84,25 @@ describe('PricingEngineService', () => {
     _dataSource = module.get<DataSource>(DataSource)
 
     // Setup default mocks
-    jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      getOne: jest.fn().mockResolvedValue(mockArticle),
+    vi.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
+      where: vi.fn().mockReturnThis(),
+      andWhere: vi.fn().mockReturnThis(),
+      getOne: vi.fn().mockResolvedValue(mockArticle),
     } as unknown)
 
-    jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      orderBy: jest.fn().mockReturnThis(),
-      addOrderBy: jest.fn().mockReturnThis(),
-      getMany: jest.fn().mockResolvedValue([mockPriceRule]),
+    vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+      where: vi.fn().mockReturnThis(),
+      andWhere: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      addOrderBy: vi.fn().mockReturnThis(),
+      getMany: vi.fn().mockResolvedValue([mockPriceRule]),
     } as unknown)
 
-    jest.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as unknown)
+    vi.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as unknown)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {
@@ -111,12 +112,12 @@ describe('PricingEngineService', () => {
   describe('calculatePrice', () => {
     it('should calculate price without rules', async () => {
       // Mock no rules found
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -152,19 +153,19 @@ describe('PricingEngineService', () => {
         coefficientVente: 1.2,
       }
 
-      jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(articleWithCoeff),
+      vi.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        getOne: vi.fn().mockResolvedValue(articleWithCoeff),
       } as unknown)
 
       // No rules to focus on coefficient
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -180,12 +181,12 @@ describe('PricingEngineService', () => {
         adjustmentValue: -15, // -15€
       }
 
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([fixedAmountRule]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([fixedAmountRule]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -201,12 +202,12 @@ describe('PricingEngineService', () => {
         adjustmentValue: 75, // 75€ fixe
       }
 
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([fixedPriceRule]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([fixedPriceRule]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -230,12 +231,12 @@ describe('PricingEngineService', () => {
         adjustmentValue: -10,
       }
 
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([lowPriorityRule, highPriorityRule]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([lowPriorityRule, highPriorityRule]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -257,12 +258,12 @@ describe('PricingEngineService', () => {
         priority: 90,
       }
 
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([nonCombinableRule, secondRule]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([nonCombinableRule, secondRule]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -272,10 +273,10 @@ describe('PricingEngineService', () => {
     })
 
     it('should handle missing article', async () => {
-      jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(null),
+      vi.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        getOne: vi.fn().mockResolvedValue(null),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -323,7 +324,7 @@ describe('PricingEngineService', () => {
 
   describe('previewRule', () => {
     it('should preview a specific rule', async () => {
-      jest.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as unknown)
+      vi.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as unknown)
 
       const result = await service.previewRule('rule-123', 'article-123', {
         societeId: 'societe-123',
@@ -334,7 +335,7 @@ describe('PricingEngineService', () => {
     })
 
     it('should handle missing rule', async () => {
-      jest.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(null)
+      vi.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(null)
 
       const result = await service.previewRule('missing-rule', 'article-123', {
         societeId: 'societe-123',
@@ -346,7 +347,7 @@ describe('PricingEngineService', () => {
 
   describe('Error handling', () => {
     it('should handle database errors gracefully', async () => {
-      jest.spyOn(articleRepository, 'createQueryBuilder').mockImplementation(() => {
+      vi.spyOn(articleRepository, 'createQueryBuilder').mockImplementation(() => {
         throw new Error('Database connection failed')
       })
 
@@ -358,17 +359,17 @@ describe('PricingEngineService', () => {
     it('should handle rule evaluation errors', async () => {
       const problematicRule = {
         ...mockPriceRule,
-        canBeApplied: jest.fn().mockImplementation(() => {
+        canBeApplied: vi.fn().mockImplementation(() => {
           throw new Error('Rule evaluation failed')
         }),
       }
 
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([problematicRule]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([problematicRule]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -387,10 +388,10 @@ describe('PricingEngineService', () => {
         prixVenteHT: 0,
       }
 
-      jest.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(zeroPriceArticle),
+      vi.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        getOne: vi.fn().mockResolvedValue(zeroPriceArticle),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)
@@ -406,12 +407,12 @@ describe('PricingEngineService', () => {
         adjustmentValue: -150, // Plus que le prix de base
       }
 
-      jest.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([largeDiscountRule]),
+      vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        addOrderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([largeDiscountRule]),
       } as unknown)
 
       const result = await service.calculatePrice(mockContext)

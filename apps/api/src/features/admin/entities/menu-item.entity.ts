@@ -8,6 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
+
 // Removed direct imports to avoid circular dependencies
 // import { MenuConfiguration } from './menu-configuration.entity'
 // import { MenuItemPermission } from './menu-item-permission.entity'

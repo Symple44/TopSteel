@@ -1,6 +1,13 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-// Removed import to avoid circular dependencies
-// import { QueryBuilder } from './query-builder.entity'
+// Type forward reference pour éviter les imports circulaires
+interface QueryBuilderEntity {
+  id: string
+  name: string
+  mainTable: string
+  isPublic: boolean
+  createdAt: Date
+  updatedAt: Date
+}
 
 @Entity('query_builder_calculated_fields')
 export class QueryBuilderCalculatedField {
@@ -15,7 +22,7 @@ export class QueryBuilderCalculatedField {
     lazy: true,
   })
   @JoinColumn({ name: 'queryBuilderId' })
-  queryBuilder: any
+  queryBuilder: Promise<QueryBuilderEntity>
 
   @Column()
   name: string

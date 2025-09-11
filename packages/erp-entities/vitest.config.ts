@@ -10,21 +10,16 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
-        'node_modules/**', 
-        'dist/**', 
-        '*.config.ts', 
-        '**/*.d.ts', 
+        'node_modules/**',
+        'dist/**',
+        '*.config.ts',
+        '**/*.d.ts',
         'test/**',
         '**/*.bundled_*',
-        'tsup.config.bundled_*'
+        'tsup.config.bundled_*',
       ],
     },
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/*.bundled_*',
-      'tsup.config.bundled_*'
-    ],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/*.bundled_*', 'tsup.config.bundled_*'],
   },
   resolve: {
     alias: {

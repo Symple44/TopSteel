@@ -8,7 +8,7 @@ import type {
 } from '@erp/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { apiClient, type APIClientInterface } from '@/lib/api-client-instance'
+import { type APIClientInterface, apiClient } from '@/lib/api-client-instance'
 import type { PaginatedResponse } from '@/types/api-types'
 
 // Type the apiClient properly
@@ -34,21 +34,23 @@ export function usePartners(filters?: PartnerFilters) {
     queryKey: PARTNER_KEYS?.list(filters),
     queryFn: (): Promise<PaginatedResponse<Partner>> => {
       // Convert PartnerFilters to SearchParams
-      const searchParams = filters ? {
-        page: filters.page,
-        pageSize: filters.limit,
-        type: filters.type?.join(','),
-        status: filters.status?.join(','),
-        category: filters.category?.join(','),
-        query: filters.denomination,
-        // Map additional filter properties
-        ...(filters.groupId && { groupId: filters.groupId }),
-        ...(filters.ville && { ville: filters.ville }),
-        ...(filters.codePostal && { codePostal: filters.codePostal }),
-        ...(filters.email && { email: filters.email }),
-        ...(filters.telephone && { telephone: filters.telephone })
-      } : undefined
-      
+      const searchParams = filters
+        ? {
+            page: filters.page,
+            pageSize: filters.limit,
+            type: filters.type?.join(','),
+            status: filters.status?.join(','),
+            category: filters.category?.join(','),
+            query: filters.denomination,
+            // Map additional filter properties
+            ...(filters.groupId && { groupId: filters.groupId }),
+            ...(filters.ville && { ville: filters.ville }),
+            ...(filters.codePostal && { codePostal: filters.codePostal }),
+            ...(filters.email && { email: filters.email }),
+            ...(filters.telephone && { telephone: filters.telephone }),
+          }
+        : undefined
+
       return typedApiClient.partners.getPartners(searchParams)
     },
   })
@@ -75,7 +77,7 @@ export function usePartnerStatistics() {
     queryKey: PARTNER_KEYS?.statistics(),
     queryFn: (): Promise<PartnerStatistics> => {
       // getStatistics returns PartnerAnalytics, which needs to be mapped to PartnerStatistics
-      return typedApiClient.partners.getStatistics().then(analytics => ({
+      return typedApiClient.partners.getStatistics().then((analytics) => ({
         totalPartenaires: analytics.totalClients + analytics.totalFournisseurs,
         totalClients: analytics.totalClients,
         totalFournisseurs: analytics.totalFournisseurs,
@@ -83,16 +85,19 @@ export function usePartnerStatistics() {
         partenairesActifs: analytics.totalClients + analytics.totalFournisseurs,
         partenairesInactifs: 0, // Default value as not available in analytics
         partenairesSuspendus: 0, // Default value as not available in analytics
-        repartitionParCategorie: analytics.repartitionGeographique.reduce((acc, item) => {
-          acc[item.region] = item.count
-          return acc
-        }, {} as Record<string, number>),
+        repartitionParCategorie: analytics.repartitionGeographique.reduce(
+          (acc, item) => {
+            acc[item.region] = item.count
+            return acc
+          },
+          {} as Record<string, number>
+        ),
         repartitionParGroupe: {}, // Default empty object
-        top10ClientsAnciennete: analytics.topClients.map(item => ({
+        top10ClientsAnciennete: analytics.topClients.map((item) => ({
           code: item.partner.code,
           denomination: item.partner.denomination,
-          anciennete: 0 // Default value as not available
-        }))
+          anciennete: 0, // Default value as not available
+        })),
       }))
     },
   })
@@ -270,7 +275,7 @@ export function useExportPartners() {
     }) => {
       const exportParams = {
         format: format.toLowerCase() as 'csv' | 'excel' | 'pdf',
-        filters: filters as Record<string, unknown>
+        filters: filters as Record<string, unknown>,
       }
       return typedApiClient.partners.exportPartners(exportParams)
     },
@@ -305,7 +310,7 @@ export function useImportPartners() {
       const jsonString = JSON.stringify(data)
       const blob = new Blob([jsonString], { type: 'application/json' })
       const file = new File([blob], 'partners_import.json', { type: 'application/json' })
-      
+
       return typedApiClient.partners.importPartners(file)
     },
     onSuccess: (result) => {

@@ -15,6 +15,7 @@ import type {
   Company,
   User,
 } from './auth-types'
+import type { ExtendedUser } from './rbac-types'
 
 // État par défaut
 const defaultAuthState: AuthState = {
@@ -30,6 +31,88 @@ const defaultAuthState: AuthState = {
 
 interface AuthProviderProps {
   children: React.ReactNode
+}
+
+// Type guards pour valider les types unknown
+function isValidUser(user: unknown): user is User {
+  return (
+    typeof user === 'object' &&
+    user !== null &&
+    'id' in user &&
+    'email' in user &&
+    'nom' in user &&
+    'prenom' in user &&
+    'role' in user &&
+    'isActive' in user &&
+    typeof (user as User).id === 'string' &&
+    typeof (user as User).email === 'string'
+  )
+}
+
+function isValidCompany(company: unknown): company is Company {
+  return (
+    typeof company === 'object' &&
+    company !== null &&
+    'id' in company &&
+    'nom' in company &&
+    'code' in company &&
+    typeof (company as Company).id === 'string' &&
+    typeof (company as Company).nom === 'string' &&
+    typeof (company as Company).code === 'string'
+  )
+}
+
+function isValidAuthTokens(tokens: unknown): tokens is AuthTokens {
+  return (
+    typeof tokens === 'object' &&
+    tokens !== null &&
+    'accessToken' in tokens &&
+    'refreshToken' in tokens &&
+    typeof (tokens as AuthTokens).accessToken === 'string' &&
+    typeof (tokens as AuthTokens).refreshToken === 'string'
+  )
+}
+
+function isValidExtendedUser(user: unknown): user is ExtendedUser {
+  return (
+    typeof user === 'object' &&
+    user !== null &&
+    'id' in user &&
+    'email' in user &&
+    'firstName' in user &&
+    'lastName' in user &&
+    'societeRoles' in user &&
+    typeof (user as ExtendedUser).id === 'string' &&
+    typeof (user as ExtendedUser).email === 'string' &&
+    Array.isArray((user as ExtendedUser).societeRoles)
+  )
+}
+
+function hasRoleProperty(user: unknown): user is { role: string } {
+  return (
+    typeof user === 'object' &&
+    user !== null &&
+    'role' in user &&
+    typeof (user as { role: string }).role === 'string'
+  )
+}
+
+function hasSocieteRoles(user: unknown): user is { societeRoles: unknown[] } {
+  return (
+    typeof user === 'object' &&
+    user !== null &&
+    'societeRoles' in user &&
+    Array.isArray((user as { societeRoles: unknown[] }).societeRoles)
+  )
+}
+
+function hasIsActiveProperty(company: unknown): company is { isActive: boolean } {
+  return (
+    typeof company === 'object' &&
+    company !== null &&
+    'isActive' in company &&
+    typeof (company as { isActive: boolean }).isActive === 'boolean'
+  )
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -150,18 +233,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
         let { user, tokens, company } = storedSession
 
         // Convertir l'utilisateur existant vers le nouveau format si nécessaire
-        if (user && !(user as unknown).societeRoles) {
-          const userWithRole = {
-            ...user,
-            role: user.role || 'USER', // Ensure role is always present
+        if (user && !hasSocieteRoles(user)) {
+          // Convertir vers le format ExistingUser attendu par l'adaptateur
+          const existingUserFormat = {
+            id: user.id,
+            nom: user.nom,
+            prenom: user.prenom,
+            email: user.email,
+            role: user.role || 'USER',
+            permissions: user.permissions || [],
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
           }
-          const extendedUser = AuthAdapter?.toExtendedUser(userWithRole as unknown)
+          const extendedUser = AuthAdapter?.toExtendedUser(existingUserFormat)
           user = AuthAdapter?.toAuthUser(extendedUser)
         }
 
         // Convertir la société existante si nécessaire
-        if (company && !(company as unknown).isActive) {
-          company = AuthAdapter?.toNewCompany(company as unknown) as Company
+        if (company && !hasIsActiveProperty(company)) {
+          if (isValidCompany(company)) {
+            company = AuthAdapter?.toNewCompany(company)
+          }
         }
 
         if (user && tokens) {
@@ -287,9 +380,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         if (result?.user && result?.tokens) {
           // Login réussi - convertir les données API vers le nouveau format
-          const extendedUser = AuthAdapter?.toExtendedUser(result?.user as unknown)
+          if (!isValidUser(result.user)) {
+            throw new Error('Invalid user data received from login')
+          }
+          if (!isValidAuthTokens(result.tokens)) {
+            throw new Error('Invalid tokens received from login')
+          }
+
+          const extendedUser = AuthAdapter?.toExtendedUser(result.user)
           const user = AuthAdapter?.toAuthUser(extendedUser)
-          const tokens = AuthAdapter?.toNewAuthTokens(result?.tokens as unknown)
+          const tokens = AuthAdapter?.toNewAuthTokens(result.tokens)
 
           // Sauvegarder temporairement les tokens pour permettre les appels API
           authStorage?.saveSession(user, tokens, null, rememberMe)
@@ -315,15 +415,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   tokens?.accessToken
                 )
 
+                if (!companySelectResult?.user || !isValidUser(companySelectResult.user)) {
+                  throw new Error('Invalid user data received from company selection')
+                }
+                if (
+                  !companySelectResult?.tokens ||
+                  !isValidAuthTokens(companySelectResult.tokens)
+                ) {
+                  throw new Error('Invalid tokens received from company selection')
+                }
+                if (!companySelectResult?.company || !isValidCompany(companySelectResult.company)) {
+                  throw new Error('Invalid company data received from company selection')
+                }
+
                 const adaptedUser = AuthAdapter?.toAuthUser(
-                  AuthAdapter?.toExtendedUser(companySelectResult?.user as unknown)
+                  AuthAdapter?.toExtendedUser(companySelectResult.user)
                 )
-                const adaptedTokens = AuthAdapter?.toNewAuthTokens(
-                  companySelectResult?.tokens as unknown
-                )
-                const adaptedCompany = AuthAdapter?.toNewCompany(
-                  companySelectResult?.company as unknown
-                )
+                const adaptedTokens = AuthAdapter?.toNewAuthTokens(companySelectResult.tokens)
+                const adaptedCompany = AuthAdapter?.toNewCompany(companySelectResult.company)
 
                 authStorage?.saveSession(adaptedUser, adaptedTokens, adaptedCompany, rememberMe)
 
@@ -393,18 +502,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setAuthState((prev) => ({ ...prev, isLoading: true }))
 
       try {
-        const { user: rawUser, tokens: rawTokens } =
-          (await AuthService?.verifyMFA(
-            authState?.mfa?.userId!,
-            mfaType,
-            code,
-            webauthnResponse
-          )) || {}
+        const mfaResult = await AuthService?.verifyMFA(
+          authState?.mfa?.userId!,
+          mfaType,
+          code,
+          webauthnResponse
+        )
+
+        if (!mfaResult?.user || !isValidUser(mfaResult.user)) {
+          throw new Error('Invalid user data received from MFA verification')
+        }
+        if (!mfaResult?.tokens || !isValidAuthTokens(mfaResult.tokens)) {
+          throw new Error('Invalid tokens received from MFA verification')
+        }
 
         // Convertir les données vers le format attendu
-        const extendedUser = AuthAdapter?.toExtendedUser(rawUser as unknown)
+        const extendedUser = AuthAdapter?.toExtendedUser(mfaResult.user)
         const user = AuthAdapter?.toAuthUser(extendedUser)
-        const tokens = AuthAdapter?.toNewAuthTokens(rawTokens as unknown)
+        const tokens = AuthAdapter?.toNewAuthTokens(mfaResult.tokens)
 
         // Forcer la sélection de société après MFA aussi
         authStorage?.saveSession(user, tokens, null)
@@ -442,11 +557,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const result = await AuthService?.selectCompany(company.id, authState?.tokens?.accessToken)
 
+        if (!result?.user || !isValidUser(result.user)) {
+          throw new Error('Invalid user data received from company selection')
+        }
+        if (!result?.tokens || !isValidAuthTokens(result.tokens)) {
+          throw new Error('Invalid tokens received from company selection')
+        }
+        if (!result?.company || !isValidCompany(result.company)) {
+          throw new Error('Invalid company data received from company selection')
+        }
+
         // Convertir les données vers le format attendu
-        const extendedUser = AuthAdapter?.toExtendedUser(result?.user as unknown)
+        const extendedUser = AuthAdapter?.toExtendedUser(result.user)
         const user = AuthAdapter?.toAuthUser(extendedUser)
-        const tokens = AuthAdapter?.toNewAuthTokens(result?.tokens as unknown)
-        const adaptedCompany = AuthAdapter?.toNewCompany(result?.company as unknown)
+        const tokens = AuthAdapter?.toNewAuthTokens(result.tokens)
+        const adaptedCompany = AuthAdapter?.toNewCompany(result.company)
 
         authStorage?.saveSession(user, tokens, adaptedCompany)
 

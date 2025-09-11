@@ -149,7 +149,7 @@ export class MarketplaceOrderWorkflowService {
       value: transitionsMap,
       writable: false,
       enumerable: false,
-      configurable: false
+      configurable: false,
     })
   }
 
@@ -234,7 +234,8 @@ export class MarketplaceOrderWorkflowService {
           quantity: itemData.quantity,
           price: priceCalculation.basePrice,
           totalPrice: priceCalculation.finalPrice,
-          customizations: itemData.customizations as import('../../../../../../packages/ui/src/types/common').SafeObject,
+          customizations:
+            itemData.customizations as import('../../../../../../packages/ui/src/types/common').SafeObject,
           discount: priceCalculation.totalDiscount || 0,
         })
 
@@ -322,7 +323,10 @@ export class MarketplaceOrderWorkflowService {
   /**
    * Processus de checkout
    */
-  async checkout(orderId: string, paymentDetails: { paymentMethodId: string; savePaymentMethod?: boolean }): Promise<MarketplaceOrder> {
+  async checkout(
+    orderId: string,
+    paymentDetails: { paymentMethodId: string; savePaymentMethod?: boolean }
+  ): Promise<MarketplaceOrder> {
     const order = await this.orderRepository.findOne({
       where: { id: orderId, status: OrderStatus.CART },
       relations: ['customer', 'items', 'items.product'],

@@ -2,17 +2,17 @@ import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
-import { 
-  MarketplaceModule as MarketplaceModuleEntity,
+import {
+  type ApiRouteDefinition,
   type MarketplaceCategory,
+  MarketplaceModule as MarketplaceModuleEntity,
+  type MenuItemDto,
+  type ModuleMetadata,
   type ModulePricing,
   type PermissionDefinition,
-  type MenuItemDto,
-  type ApiRouteDefinition,
-  type ModuleMetadata
 } from '../entities/marketplace-module.entity'
 // Import des modules réels - Supprimés pour optimiser le debug
-import type { MarketplaceService, UpdateModuleDto, CreateModuleDto } from './marketplace.service'
+import type { CreateModuleDto, MarketplaceService, UpdateModuleDto } from './marketplace.service'
 
 export interface ModuleInfo {
   moduleKey: string
@@ -200,7 +200,7 @@ export class ModuleRegistryService implements OnModuleInit {
       icon: moduleInfo.icon,
       metadata: moduleInfo.metadata,
     }
-    
+
     await this.marketplaceService.updateModule(
       existingModule.id,
       updateDto,
@@ -227,11 +227,8 @@ export class ModuleRegistryService implements OnModuleInit {
       icon: moduleInfo.icon,
       metadata: moduleInfo.metadata,
     }
-    
-    await this.marketplaceService.createModule(
-      createDto,
-      '00000000-0000-0000-0000-000000000000'
-    )
+
+    await this.marketplaceService.createModule(createDto, '00000000-0000-0000-0000-000000000000')
   }
 
   /**

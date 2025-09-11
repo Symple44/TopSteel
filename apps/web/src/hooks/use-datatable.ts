@@ -14,7 +14,7 @@ interface UseDataTableOptions<T> {
 /**
  * Hook personnalisé pour simplifier l'utilisation du DataTable
  */
-export function useDataTable<T = any>({
+export function useDataTable<T = Record<string, unknown>>({
   tableId,
   userId,
   initialData = [],

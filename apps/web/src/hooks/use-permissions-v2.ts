@@ -182,7 +182,11 @@ export function usePermissions() {
     const userRoles = user.roles || (user.role ? [user.role] : [])
 
     return userRoles?.some((role) => {
-      const roleValue = typeof role === 'object' && role ? (role as { name?: string; role?: string }).name || (role as { name?: string; role?: string }).role : role
+      const roleValue =
+        typeof role === 'object' && role
+          ? (role as { name?: string; role?: string }).name ||
+            (role as { name?: string; role?: string }).role
+          : role
       return roleValue === roleId
     })
   }

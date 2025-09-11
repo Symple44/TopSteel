@@ -1,52 +1,55 @@
 import { ConfigService } from '@nestjs/config'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { DataSource, type QueryRunner } from 'typeorm'
+import { vi } from 'vitest'
 import { CreateInitialTables1737178800000 } from '../migrations/1737178800000-CreateInitialTables'
 import { MigrationLoaderService } from './migration-loader.service'
 
 // Mock the migration class
-jest.mock('../migrations/1737178800000-CreateInitialTables', () => ({
-  CreateInitialTables1737178800000: jest.fn().mockImplementation(() => ({
-    up: jest.fn().mockResolvedValue(undefined),
-    down: jest.fn().mockResolvedValue(undefined),
+vi.mock('../migrations/1737178800000-CreateInitialTables', () => ({
+  CreateInitialTables1737178800000: vi.fn().mockImplementation(() => ({
+    up: vi.fn().mockResolvedValue(undefined),
+    down: vi.fn().mockResolvedValue(undefined),
   })),
 }))
 
 describe('MigrationLoaderService', () => {
   let service: MigrationLoaderService
-  let dataSource: jest.Mocked<DataSource>
-  let configService: jest.Mocked<ConfigService>
-  let queryRunner: jest.Mocked<QueryRunner>
+  let dataSource: DataSource & { [K in keyof DataSource]: vi.MockedFunction<DataSource[K]> }
+  let configService: ConfigService & {
+    [K in keyof ConfigService]: vi.MockedFunction<ConfigService[K]>
+  }
+  let queryRunner: QueryRunner & { [K in keyof QueryRunner]: vi.MockedFunction<QueryRunner[K]> }
   let transactionManager: {
-    query: jest.MockedFunction<(...args: unknown[]) => unknown>
-    queryRunner: jest.Mocked<QueryRunner>
+    query: vi.MockedFunction<(...args: unknown[]) => unknown>
+    queryRunner: QueryRunner & { [K in keyof QueryRunner]: vi.MockedFunction<QueryRunner[K]> }
   }
 
   beforeEach(async () => {
     // Create mocked QueryRunner
     queryRunner = {
-      query: jest.fn(),
+      query: vi.fn(),
       manager: {
-        query: jest.fn(),
+        query: vi.fn(),
       },
-    } as jest.Mocked<QueryRunner>
+    } as QueryRunner & { [K in keyof QueryRunner]: vi.MockedFunction<QueryRunner[K]> }
 
     // Create mocked transaction manager
     transactionManager = {
-      query: jest.fn(),
+      query: vi.fn(),
       queryRunner,
     }
 
     // Create mocked DataSource
     dataSource = {
-      query: jest.fn(),
-      transaction: jest.fn().mockImplementation((callback) => callback(transactionManager)),
-    } as jest.Mocked<DataSource>
+      query: vi.fn(),
+      transaction: vi.fn().mockImplementation((callback) => callback(transactionManager)),
+    } as DataSource & { [K in keyof DataSource]: vi.MockedFunction<DataSource[K]> }
 
     // Create mocked ConfigService
     configService = {
-      get: jest.fn(),
-    } as jest.Mocked<ConfigService>
+      get: vi.fn(),
+    } as ConfigService & { [K in keyof ConfigService]: vi.MockedFunction<ConfigService[K]> }
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -66,7 +69,7 @@ describe('MigrationLoaderService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Constructor and Environment Detection', () => {
@@ -124,7 +127,7 @@ describe('MigrationLoaderService', () => {
       transactionManager.query.mockResolvedValueOnce(undefined) // INSERT migration record
 
       const mockMigrationInstance = new (
-        CreateInitialTables1737178800000 as jest.MockedClass<
+        CreateInitialTables1737178800000 as vi.MockedFunction<
           typeof CreateInitialTables1737178800000
         >
       )()
@@ -180,7 +183,7 @@ describe('MigrationLoaderService', () => {
 
       // Mock: transaction with no QueryRunner
       const transactionManagerNoQueryRunner = {
-        query: jest.fn(),
+        query: vi.fn(),
         queryRunner: null,
       }
       dataSource.transaction.mockImplementation((callback) =>
@@ -240,7 +243,7 @@ describe('MigrationLoaderService', () => {
   describe('ensureMigrations', () => {
     it('should skip migrations when tables already exist', async () => {
       // Mock checkBaseTables to return true
-      jest.spyOn(service, 'checkBaseTables').mockResolvedValue(true)
+      vi.spyOn(service, 'checkBaseTables').mockResolvedValue(true)
       const runInitialMigrationsSpy = jest
         .spyOn(service, 'runInitialMigrations')
         .mockResolvedValue()
@@ -252,7 +255,7 @@ describe('MigrationLoaderService', () => {
 
     it('should run migrations when tables are missing', async () => {
       // Mock checkBaseTables to return false
-      jest.spyOn(service, 'checkBaseTables').mockResolvedValue(false)
+      vi.spyOn(service, 'checkBaseTables').mockResolvedValue(false)
       const runInitialMigrationsSpy = jest
         .spyOn(service, 'runInitialMigrations')
         .mockResolvedValue()
@@ -264,8 +267,8 @@ describe('MigrationLoaderService', () => {
 
     it('should propagate errors from runInitialMigrations', async () => {
       const mockError = new Error('Migration failed')
-      jest.spyOn(service, 'checkBaseTables').mockResolvedValue(false)
-      jest.spyOn(service, 'runInitialMigrations').mockRejectedValue(mockError)
+      vi.spyOn(service, 'checkBaseTables').mockResolvedValue(false)
+      vi.spyOn(service, 'runInitialMigrations').mockRejectedValue(mockError)
 
       await expect(service.ensureMigrations()).rejects.toThrow('Migration failed')
     })

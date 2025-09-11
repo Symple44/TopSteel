@@ -46,9 +46,13 @@ interface SentryNode {
     level: string
     data?: Record<string, unknown>
   }): void
-  captureMessage(message: string, level: string, options?: {
-    extra: Record<string, unknown>
-  }): string
+  captureMessage(
+    message: string,
+    level: string,
+    options?: {
+      extra: Record<string, unknown>
+    }
+  ): string
   withScope(callback: (scope: SentryScope) => void): void
   captureException(error: Error): string
 }
@@ -269,7 +273,7 @@ export class SentryInterceptor implements NestInterceptor {
       return body
     }
 
-    const sanitized = { ...body as Record<string, unknown> }
+    const sanitized = { ...(body as Record<string, unknown>) }
     const sensitiveFields = [
       'password',
       'passwordConfirm',
@@ -290,8 +294,8 @@ export class SentryInterceptor implements NestInterceptor {
         return obj
       }
 
-      const result: Record<string, unknown> = Array.isArray(obj) 
-        ? [...(obj as unknown[])] as unknown as Record<string, unknown>
+      const result: Record<string, unknown> = Array.isArray(obj)
+        ? ([...(obj as unknown[])] as unknown as Record<string, unknown>)
         : { ...(obj as Record<string, unknown>) }
 
       Object.keys(result).forEach((key) => {

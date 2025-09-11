@@ -16,6 +16,7 @@ interface ShippingAddress {
 }
 
 interface BillingAddress extends ShippingAddress {}
+
 import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
 
 export interface ERPOrderView {

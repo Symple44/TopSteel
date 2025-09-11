@@ -6,9 +6,13 @@ import { GlobalUserRole } from '../core/constants/roles.constants'
 
 describe('AuthController', () => {
   let controller: AuthController
-  let authService: jest.Mocked<{ login: jest.Mock; validateUser: jest.Mock; register: jest.Mock }>
-  let sessionInvalidationService: jest.Mocked<{ invalidateUserSessions: jest.Mock }>
-  let cacheService: jest.Mocked<{ del: jest.Mock; set: jest.Mock }>
+  let authService: {
+    login: vi.MockedFunction<() => unknown>
+    validateUser: vi.MockedFunction<() => unknown>
+    register: vi.MockedFunction<() => unknown>
+  }
+  let sessionInvalidationService: { invalidateUserSessions: vi.MockedFunction<() => unknown> }
+  let cacheService: { del: vi.MockedFunction<() => unknown>; set: vi.MockedFunction<() => unknown> }
 
   const mockUser = {
     id: 'user-123',

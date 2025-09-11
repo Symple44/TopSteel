@@ -43,7 +43,7 @@ function hasAxiosResponse(obj: unknown): obj is AxiosLikeResponse {
 /**
  * Safe access to response data with type guards
  */
-export function isApiResponse<T = any>(obj: unknown): obj is ApiResponse<T> {
+export function isApiResponse<T = unknown>(obj: unknown): obj is ApiResponse<T> {
   return (
     typeof obj === 'object' && obj !== null && 'success' in obj && typeof obj.success === 'boolean'
   )

@@ -1,5 +1,6 @@
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
+import { type MockedFunction, vi } from 'vitest'
 import {
   type NotificationDeliveryOptions,
   NotificationDeliveryService,
@@ -7,7 +8,7 @@ import {
 
 describe('NotificationDeliveryService', () => {
   let service: NotificationDeliveryService
-  let eventEmitter: jest.Mocked<EventEmitter2>
+  let eventEmitter: { emit: MockedFunction<EventEmitter2['emit']> }
 
   const mockDeliveryOptions: NotificationDeliveryOptions = {
     title: 'Test Notification',
@@ -21,7 +22,7 @@ describe('NotificationDeliveryService', () => {
 
   beforeEach(async () => {
     const mockEventEmitter = {
-      emit: jest.fn(),
+      emit: vi.fn(),
     }
 
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +40,7 @@ describe('NotificationDeliveryService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('sendNotification', () => {
@@ -103,7 +104,9 @@ describe('NotificationDeliveryService', () => {
 
     it('should handle mixed success and failure scenarios', async () => {
       // Mock email to fail
-      jest.spyOn(service as unknown, 'sendEmail').mockRejectedValue(new Error('Email service down'))
+      vi.spyOn(service as unknown as Record<string, unknown>, 'sendEmail').mockRejectedValue(
+        new Error('Email service down')
+      )
 
       const options: NotificationDeliveryOptions = {
         ...mockDeliveryOptions,
@@ -122,10 +125,13 @@ describe('NotificationDeliveryService', () => {
 
     it('should handle all channels failing', async () => {
       // Mock all channels to fail
-      jest.spyOn(service as unknown, 'sendEmail').mockRejectedValue(new Error('Email failed'))
-      jest
-        .spyOn(service as unknown, 'sendInAppNotification')
-        .mockRejectedValue(new Error('In-app failed'))
+      vi.spyOn(service as unknown as Record<string, unknown>, 'sendEmail').mockRejectedValue(
+        new Error('Email failed')
+      )
+      vi.spyOn(
+        service as unknown as Record<string, unknown>,
+        'sendInAppNotification'
+      ).mockRejectedValue(new Error('In-app failed'))
 
       const result = await service.sendNotification(mockDeliveryOptions)
 
@@ -169,7 +175,7 @@ describe('NotificationDeliveryService', () => {
 
   describe('Channel-specific delivery methods', () => {
     it('should handle email delivery', async () => {
-      const emailSpy = jest.spyOn(service as unknown, 'sendEmail')
+      const emailSpy = vi.spyOn(service as unknown as Record<string, unknown>, 'sendEmail')
 
       const options: NotificationDeliveryOptions = {
         ...mockDeliveryOptions,
@@ -182,7 +188,7 @@ describe('NotificationDeliveryService', () => {
     })
 
     it('should handle SMS delivery', async () => {
-      const smsSpy = jest.spyOn(service as unknown, 'sendSMS')
+      const smsSpy = vi.spyOn(service as unknown as Record<string, unknown>, 'sendSMS')
 
       const options: NotificationDeliveryOptions = {
         ...mockDeliveryOptions,
@@ -195,7 +201,10 @@ describe('NotificationDeliveryService', () => {
     })
 
     it('should handle push notification delivery', async () => {
-      const pushSpy = jest.spyOn(service as unknown, 'sendPushNotification')
+      const pushSpy = vi.spyOn(
+        service as unknown as Record<string, unknown>,
+        'sendPushNotification'
+      )
 
       const options: NotificationDeliveryOptions = {
         ...mockDeliveryOptions,
@@ -208,7 +217,10 @@ describe('NotificationDeliveryService', () => {
     })
 
     it('should handle in-app notification delivery', async () => {
-      const inAppSpy = jest.spyOn(service as unknown, 'sendInAppNotification')
+      const inAppSpy = vi.spyOn(
+        service as unknown as Record<string, unknown>,
+        'sendInAppNotification'
+      )
 
       const options: NotificationDeliveryOptions = {
         ...mockDeliveryOptions,
@@ -288,12 +300,14 @@ describe('NotificationDeliveryService', () => {
 
     it('should handle partial batch failures', async () => {
       // Mock email to fail for specific conditions
-      jest.spyOn(service as unknown, 'sendEmail').mockImplementation((options) => {
-        if (options.title.includes('fail')) {
-          throw new Error('Intentional failure')
+      vi.spyOn(service as unknown as Record<string, unknown>, 'sendEmail').mockImplementation(
+        (options) => {
+          if (options.title.includes('fail')) {
+            throw new Error('Intentional failure')
+          }
+          return Promise.resolve()
         }
-        return Promise.resolve()
-      })
+      )
 
       const batchNotifications: NotificationDeliveryOptions[] = [
         {
@@ -364,7 +378,7 @@ describe('NotificationDeliveryService', () => {
 
     it('should handle network timeout scenarios', async () => {
       // Mock a timeout scenario
-      jest.spyOn(service as unknown, 'sendEmail').mockImplementation(
+      vi.spyOn(service as unknown as Record<string, unknown>, 'sendEmail').mockImplementation(
         () =>
           new Promise((_resolve, reject) => {
             setTimeout(() => reject(new Error('Network timeout')), 50)
@@ -381,12 +395,13 @@ describe('NotificationDeliveryService', () => {
     })
 
     it('should handle service unavailable scenarios', async () => {
-      jest
-        .spyOn(service as unknown, 'sendSMS')
-        .mockRejectedValue(new Error('SMS service unavailable'))
-      jest
-        .spyOn(service as unknown, 'sendPushNotification')
-        .mockRejectedValue(new Error('Push service unavailable'))
+      vi.spyOn(service as unknown as Record<string, unknown>, 'sendSMS').mockRejectedValue(
+        new Error('SMS service unavailable')
+      )
+      vi.spyOn(
+        service as unknown as Record<string, unknown>,
+        'sendPushNotification'
+      ).mockRejectedValue(new Error('Push service unavailable'))
 
       const options: NotificationDeliveryOptions = {
         ...mockDeliveryOptions,

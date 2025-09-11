@@ -20,7 +20,6 @@ const useSession = () => ({
 import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import type { Product } from '../products/ProductCard'
 import {
   loadCartFromStorage,
   mergeCartsAfterLogin,
@@ -28,6 +27,7 @@ import {
   syncCartWithBackend,
 } from '../../store/cartPersistence'
 import { addToCart, clearCart, selectCartItems, syncCart } from '../../store/cartSlice'
+import type { Product } from '../products/ProductCard'
 import { CartButton } from './CartButton'
 import { ShoppingCart } from './ShoppingCart'
 

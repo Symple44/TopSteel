@@ -1,8 +1,15 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { User } from '../../../domains/users/entities/user.entity'
-// Removed import to avoid circular dependencies
-// import { QueryBuilder } from './query-builder.entity'
+// Type forward reference pour éviter les imports circulaires
+interface QueryBuilderEntity {
+  id: string
+  name: string
+  mainTable: string
+  isPublic: boolean
+  createdAt: Date
+  updatedAt: Date
+}
 
 export type PermissionType = 'view' | 'edit' | 'delete' | 'execute' | 'share' | 'export'
 
@@ -19,7 +26,7 @@ export class QueryBuilderPermission {
     lazy: true,
   })
   @JoinColumn({ name: 'queryBuilderId' })
-  queryBuilder: any
+  queryBuilder: Promise<QueryBuilderEntity>
 
   @Column()
   permissionType: PermissionType

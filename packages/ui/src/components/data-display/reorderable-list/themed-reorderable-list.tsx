@@ -447,7 +447,7 @@ export function ThemedReorderableList<T extends ReorderableItem>({
   showCustomizationPanel = false,
   customizationPanelPosition = 'right',
   onConfigChange,
-  onError
+  onError,
 }: ThemedReorderableListProps<T>) {
   const [localItems, setLocalItems] = useState<T[]>(items)
   const [showCustomization, setShowCustomization] = useState(showCustomizationPanel)

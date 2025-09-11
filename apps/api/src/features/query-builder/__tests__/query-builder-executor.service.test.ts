@@ -1,9 +1,10 @@
 import { BadRequestException } from '@nestjs/common'
-import { Test } from '@nestjs/testing'
 import type { TestingModule } from '@nestjs/testing'
+import { Test } from '@nestjs/testing'
 import { getDataSourceToken } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { MockedFunction } from 'vitest'
 import type {
   QueryBuilder,
   QueryBuilderCalculatedField,
@@ -18,10 +19,30 @@ import {
 
 describe('QueryBuilderExecutorService', () => {
   let service: QueryBuilderExecutorService
-  let mockDataSource: any
-  let mockPermissionService: any
-  let mockSecurityService: any
-  let mockSanitizationService: any
+  let mockDataSource: {
+    query: MockedFunction<(sql: string, parameters?: unknown[]) => Promise<unknown[]>>
+    createQueryRunner: MockedFunction<() => {
+      connect: MockedFunction<() => Promise<void>>
+      startTransaction: MockedFunction<() => Promise<void>>
+      commitTransaction: MockedFunction<() => Promise<void>>
+      rollbackTransaction: MockedFunction<() => Promise<void>>
+      release: MockedFunction<() => Promise<void>>
+      query: MockedFunction<(sql: string, parameters?: unknown[]) => Promise<unknown[]>>
+    }>
+  }
+  let mockPermissionService: {
+    checkPermission: MockedFunction<(userId: string, queryBuilderId: string, action: string) => Promise<boolean>>
+  }
+  let mockSecurityService: {
+    getAllowedTables: MockedFunction<(userId: string) => Promise<string[]>>
+    validateTable: MockedFunction<(tableName: string, userId: string) => Promise<boolean>>
+  }
+  let mockSanitizationService: {
+    buildSafeSelectQuery: MockedFunction<(params: unknown) => Promise<string>>
+    buildCompleteQuery: MockedFunction<(params: unknown) => Promise<string>>
+    validateRawSqlQuery: MockedFunction<(sql: string) => Promise<boolean>>
+    extractTableNames: MockedFunction<(sql: string) => string[]>
+  }
 
   const mockQueryBuilder: QueryBuilder = {
     id: 'query-123',
@@ -550,7 +571,9 @@ describe('QueryBuilderExecutorService', () => {
 
       await service.executeQuery(mockQueryBuilder, { page: 1 }, 'user-123')
 
-      expect(logSpy).toHaveBeenCalledWith('Query executed successfully', expect.any(Object))
+      expect(logSpy).toHaveBeenCalledWith('Query executed successfully', expect.objectContaining({
+        queryId: expect.stringMatching(/^[a-f\d-]+$/i)
+      }))
     })
 
     it('should log and handle permission violations', async () => {
@@ -561,7 +584,10 @@ describe('QueryBuilderExecutorService', () => {
 
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('attempted to execute query'),
-        expect.any(Object)
+        expect.objectContaining({
+          userId: expect.stringMatching(/^user-/),
+          queryId: expect.stringMatching(/^query-/)
+        })
       )
     })
 
@@ -577,7 +603,7 @@ describe('QueryBuilderExecutorService', () => {
 
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('Could not determine tenant ID'),
-        expect.any(Error)
+        expect.toBeInstanceOf(Error)
       )
     })
   })

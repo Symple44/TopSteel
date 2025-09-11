@@ -2,6 +2,7 @@ import { PriceRuleChannel, PriceRuleStatus, PriceRuleType } from '@erp/entities'
 import type { INestApplication } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
+import { vi } from 'vitest'
 import { PricingUnifiedModule } from '../pricing-unified.module'
 import { PricingAnalyticsService } from '../services/pricing-analytics.service'
 import { PricingCacheService } from '../services/pricing-cache.service'
@@ -67,7 +68,7 @@ describe('Pricing System Integration Tests', () => {
       }
 
       // Mock the rule repository to return our test rule
-      jest.spyOn(pricingEngine as unknown, 'findApplicableRules').mockResolvedValue([mockRule])
+      vi.spyOn(pricingEngine as unknown, 'findApplicableRules').mockResolvedValue([mockRule])
 
       const context = {
         articleId: 'test-article-1',
@@ -270,7 +271,7 @@ describe('Pricing System Integration Tests', () => {
       }
 
       // Mock URL validation
-      jest.spyOn(webhooksService as unknown, 'validateWebhookUrl').mockResolvedValue(undefined)
+      vi.spyOn(webhooksService as unknown, 'validateWebhookUrl').mockResolvedValue(undefined)
 
       const subscription = await webhooksService.createSubscription(subscriptionData)
 
@@ -416,7 +417,7 @@ describe('Pricing System Integration Tests', () => {
 
     it('should handle cache errors gracefully', async () => {
       // Simulate Redis connection error
-      jest.spyOn(cacheService as unknown, 'redis').mockImplementation(() => {
+      vi.spyOn(cacheService as unknown, 'redis').mockImplementation(() => {
         throw new Error('Redis connection failed')
       })
 

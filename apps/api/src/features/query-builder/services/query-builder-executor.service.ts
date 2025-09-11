@@ -5,7 +5,7 @@ import type { DataSource } from 'typeorm'
 import type { QueryOperator } from '../../../types/query-builder/query-builder.types'
 import type { QueryBuilder } from '../entities'
 import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
-import type { SqlSanitizationService, FilterCondition } from '../security/sql-sanitization.service'
+import type { FilterCondition, SqlSanitizationService } from '../security/sql-sanitization.service'
 import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 export interface QueryExecutionParams {
@@ -192,7 +192,14 @@ export class QueryBuilderExecutorService {
       if (column?.isFilterable) {
         // Determine operator based on value type
         let operator: string = '='
-        let value: string | number | boolean | null | Date | string[] | number[] = filterValue as string | number | boolean | null | Date | string[] | number[]
+        let value: string | number | boolean | null | Date | string[] | number[] = filterValue as
+          | string
+          | number
+          | boolean
+          | null
+          | Date
+          | string[]
+          | number[]
 
         if (Array.isArray(filterValue)) {
           operator = 'IN'
@@ -204,9 +211,10 @@ export class QueryBuilderExecutorService {
             // Ensure both values are of the same type (string or number) for BETWEEN operator
             const minVal = rangeFilter.min as string | number
             const maxVal = rangeFilter.max as string | number
-            value = typeof minVal === 'string' || typeof maxVal === 'string' 
-              ? [String(minVal), String(maxVal)] as string[]
-              : [Number(minVal), Number(maxVal)] as number[]
+            value =
+              typeof minVal === 'string' || typeof maxVal === 'string'
+                ? ([String(minVal), String(maxVal)] as string[])
+                : ([Number(minVal), Number(maxVal)] as number[])
           } else if (rangeFilter.min !== undefined) {
             operator = '>='
             value = rangeFilter.min as string | number | boolean | null | Date

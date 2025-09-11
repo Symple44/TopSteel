@@ -3,6 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import { vi } from 'vitest'
 import type { CreateOrderDto } from '../dto/order.dto'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
@@ -20,32 +21,32 @@ describe('MarketplaceOrderService', () => {
   let _eventEmitter: EventEmitter2
 
   const mockOrderRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    findOne: jest.fn(),
-    find: jest.fn(),
-    createQueryBuilder: jest.fn(),
+    create: vi.fn(),
+    save: vi.fn(),
+    findOne: vi.fn(),
+    find: vi.fn(),
+    createQueryBuilder: vi.fn(),
     manager: {
-      transaction: jest.fn(),
+      transaction: vi.fn(),
     },
   }
 
   const mockOrderItemRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
+    create: vi.fn(),
+    save: vi.fn(),
   }
 
   const mockProductRepository = {
-    findOne: jest.fn(),
-    save: jest.fn(),
+    findOne: vi.fn(),
+    save: vi.fn(),
   }
 
   const mockCustomerRepository = {
-    findOne: jest.fn(),
+    findOne: vi.fn(),
   }
 
   const mockEventEmitter = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -92,7 +93,7 @@ describe('MarketplaceOrderService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('createOrder', () => {
@@ -144,13 +145,13 @@ describe('MarketplaceOrderService', () => {
       })
 
       const mockTransactionManager = {
-        save: jest.fn().mockImplementation((entity) => {
+        save: vi.fn().mockImplementation((entity) => {
           if (entity.constructor.name === 'MarketplaceOrder') {
             return mockOrder
           }
           return entity
         }),
-        create: jest.fn().mockImplementation((_Entity, data) => data),
+        create: vi.fn().mockImplementation((_Entity, data) => data),
       }
 
       mockOrderRepository.manager.transaction.mockImplementation(async (callback) =>
@@ -228,8 +229,8 @@ describe('MarketplaceOrderService', () => {
       mockProductRepository.findOne.mockResolvedValue(mockProduct)
 
       const mockTransactionManager = {
-        save: jest.fn().mockResolvedValue(mockOrder),
-        create: jest.fn().mockImplementation((_Entity, data) => data),
+        save: vi.fn().mockResolvedValue(mockOrder),
+        create: vi.fn().mockImplementation((_Entity, data) => data),
       }
 
       mockOrderRepository.manager.transaction.mockImplementation(async (callback) =>
@@ -379,12 +380,12 @@ describe('MarketplaceOrderService', () => {
       ]
 
       const mockQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        take: jest.fn().mockReturnThis(),
-        getManyAndCount: jest.fn().mockResolvedValue([mockOrders, 2]),
+        where: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        skip: vi.fn().mockReturnThis(),
+        take: vi.fn().mockReturnThis(),
+        getManyAndCount: vi.fn().mockResolvedValue([mockOrders, 2]),
       }
 
       mockOrderRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)
@@ -411,10 +412,10 @@ describe('MarketplaceOrderService', () => {
       const endDate = new Date('2024-01-31')
 
       const mockQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        getRawOne: jest.fn().mockResolvedValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        getRawOne: vi.fn().mockResolvedValue({
           totalOrders: '10',
           totalRevenue: '5000',
           averageOrderValue: '500',

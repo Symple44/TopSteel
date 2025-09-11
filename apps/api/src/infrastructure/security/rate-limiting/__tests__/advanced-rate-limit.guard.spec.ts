@@ -7,6 +7,7 @@ import { type ExecutionContext, HttpException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Reflector } from '@nestjs/core'
 import { Test, type TestingModule } from '@nestjs/testing'
+import { vi } from 'vitest'
 import { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
 import { AdvancedRateLimitGuard } from '../guards/advanced-rate-limit.guard'
@@ -14,19 +15,19 @@ import { rateLimitingConfig } from '../rate-limiting.config'
 
 // Mock services
 const mockRateLimitService = {
-  checkCombinedRateLimit: jest.fn(),
-  checkBanStatus: jest.fn(),
-  recordViolation: jest.fn(),
-  getRateLimitStats: jest.fn(),
-  imposeBan: jest.fn(),
+  checkCombinedRateLimit: vi.fn(),
+  checkBanStatus: vi.fn(),
+  recordViolation: vi.fn(),
+  getRateLimitStats: vi.fn(),
+  imposeBan: vi.fn(),
 }
 
 const mockReflector = {
-  get: jest.fn(),
+  get: vi.fn(),
 }
 
 const mockConfigService = {
-  get: jest.fn().mockReturnValue(rateLimitingConfig()),
+  get: vi.fn().mockReturnValue(rateLimitingConfig()),
 }
 
 // Mock request and response objects
@@ -48,7 +49,7 @@ const createMockRequest = (overrides = {}) => ({
 })
 
 const createMockResponse = () => ({
-  setHeader: jest.fn(),
+  setHeader: vi.fn(),
 })
 
 const createMockExecutionContext = (
@@ -89,7 +90,7 @@ describe('AdvancedRateLimitGuard', () => {
     guard = module.get<AdvancedRateLimitGuard>(AdvancedRateLimitGuard)
 
     // Reset mocks
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('canActivate', () => {

@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getDataSourceToken } from '@nestjs/typeorm'
+import { vi } from 'vitest'
 import { QueryBuilderSecurityService } from '../query-builder-security.service'
 import { SqlSanitizationService } from '../sql-sanitization.service'
 
@@ -9,7 +10,7 @@ describe('SqlSanitizationService', () => {
   let _securityService: QueryBuilderSecurityService
 
   const mockDataSource = {
-    query: jest.fn(),
+    query: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -29,7 +30,7 @@ describe('SqlSanitizationService', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('buildSafeSelectQuery', () => {

@@ -268,7 +268,10 @@ export class MarketplaceShippingService {
   /**
    * Calculate shipping cost based on order and destination
    */
-  async calculateShippingCost(order: MarketplaceOrder, shippingMethod: ShippingMethod): Promise<number> {
+  async calculateShippingCost(
+    order: MarketplaceOrder,
+    shippingMethod: ShippingMethod
+  ): Promise<number> {
     try {
       // This is a simplified calculation
       // In production, this would integrate with carrier APIs
@@ -285,7 +288,7 @@ export class MarketplaceShippingService {
       // Add weight-based pricing
       const totalWeight =
         order.items?.reduce(
-          (weight: number, item: { product?: { poids?: number }; quantity: number }) => 
+          (weight: number, item: { product?: { poids?: number }; quantity: number }) =>
             weight + (item.product?.poids || 1) * item.quantity,
           0
         ) || 1

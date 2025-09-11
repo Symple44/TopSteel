@@ -290,12 +290,14 @@ export class CachedGlobalSearchService implements ISearchStrategy {
    */
   private extractTenantIdFromDocument(document: SearchDocument): string | null {
     // Check common tenant ID fields
-    if ((document as any).tenantId) {
-      return (document as any).tenantId
+    if (document.tenantId) {
+      return document.tenantId
     }
 
-    if ((document as any).tenant_id) {
-      return (document as any).tenant_id
+    // Check alternative field name if needed
+    const docWithTenantId = document as SearchDocument & { tenant_id?: string }
+    if (docWithTenantId.tenant_id) {
+      return docWithTenantId.tenant_id
     }
 
     return null

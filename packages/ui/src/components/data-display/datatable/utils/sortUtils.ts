@@ -32,17 +32,17 @@ export function compareValues(aVal: unknown, bVal: unknown, direction: 'asc' | '
     const comparison = aVal.localeCompare(bVal)
     return direction === 'desc' ? -comparison : comparison
   }
-  
+
   if (typeof aVal === 'number' && typeof bVal === 'number') {
     const comparison = aVal - bVal
     return direction === 'desc' ? -comparison : comparison
   }
-  
+
   if (typeof aVal === 'boolean' && typeof bVal === 'boolean') {
     const comparison = Number(aVal) - Number(bVal)
     return direction === 'desc' ? -comparison : comparison
   }
-  
+
   if (aVal instanceof Date && bVal instanceof Date) {
     const comparison = aVal.getTime() - bVal.getTime()
     return direction === 'desc' ? -comparison : comparison
@@ -66,13 +66,13 @@ export function getColumnValue<T>(
   if (column?.getValue) {
     return column.getValue(row)
   }
-  
+
   // Type-safe property access
   const key = column?.key || columnKey
   if (typeof row === 'object' && row !== null && key in row) {
     return (row as Record<string, unknown>)[key]
   }
-  
+
   return undefined
 }
 

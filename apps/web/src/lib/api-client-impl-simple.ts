@@ -491,7 +491,10 @@ class SearchAPIImpl implements SearchAPI {
 
 class FilesAPIImpl implements FilesAPI {
   constructor(private client: APIClientEnhanced) {}
-  async uploadFile(file: File | FormData, _options?: Record<string, unknown>): Promise<FileUploadResponse> {
+  async uploadFile(
+    file: File | FormData,
+    _options?: Record<string, unknown>
+  ): Promise<FileUploadResponse> {
     const formData = file instanceof FormData ? file : new FormData()
     if (file instanceof File) formData.append('file', file)
     return this.client.upload<FileUploadResponse>('/files/upload', formData)
@@ -566,18 +569,22 @@ class ReportsAPIImpl implements ReportsAPI {
   async downloadReport(id: string): Promise<Blob> {
     return this.client.get<Blob>(`/reports/${id}/download`)
   }
-  async listReports(): Promise<Array<{
-    id: string
-    type: string
-    created: string
-    status: string
-  }>> {
-    return this.client.get<Array<{
+  async listReports(): Promise<
+    Array<{
       id: string
       type: string
       created: string
       status: string
-    }>>('/reports')
+    }>
+  > {
+    return this.client.get<
+      Array<{
+        id: string
+        type: string
+        created: string
+        status: string
+      }>
+    >('/reports')
   }
 }
 
