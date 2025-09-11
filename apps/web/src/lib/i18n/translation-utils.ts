@@ -204,31 +204,37 @@ export const filterTranslations = (
   })
 }
 
-// Interface pour les données de cellule Univer
-interface UniverCellData {
-  v?: unknown // value
+// Interface pour les valeurs de cellule Univer compatible
+type CellValue = string | number | boolean | null
+
+// Interface pour les données de cellule compatible avec IWorkbookData
+interface CompatibleCellData {
+  v?: CellValue
   t?: number // type (1=string, 2=number, 3=boolean, 4=date)
 }
 
-// Interface pour les données de feuille Univer
-interface UniverSheetData {
+// Interface pour les données de feuille compatible avec IWorkbookData
+interface CompatibleSheetData {
   id: string
   name: string
-  cellData: Record<string, Record<string, UniverCellData>>
+  cellData: Record<string, Record<string, CompatibleCellData>>
   rowCount: number
   columnCount: number
 }
 
-// Interface pour les données de workbook Univer
-interface UniverWorkbookData {
+// Interface compatible avec IWorkbookData
+interface CompatibleWorkbookData {
   id: string
   name: string
+  appVersion?: string
+  locale?: string
+  styles?: Record<string, unknown>
   sheetOrder: string[]
-  sheets: Record<string, UniverSheetData>
+  sheets: Record<string, Partial<CompatibleSheetData>>
 }
 
 // Type guard pour vérifier si un objet est un IWorkbookData Univer valide
-function isValidIWorkbookData(data: unknown): data is Partial<UniverWorkbookData> {
+function isValidIWorkbookData(data: unknown): data is Partial<CompatibleWorkbookData> {
   return (
     typeof data === 'object' &&
     data !== null &&
@@ -237,13 +243,34 @@ function isValidIWorkbookData(data: unknown): data is Partial<UniverWorkbookData
   )
 }
 
-// Types pour les options de theme et locale Univer
+// Types pour les options de theme et locale Univer compatibles
 interface UniverThemeOptions {
-  theme?: string | Record<string, unknown>
+  theme?: 'default' | 'green' | 'red' | Record<string, unknown>
 }
 
 interface UniverLocaleOptions {
-  locale?: string | Record<string, unknown>
+  locale?: 'fr-FR' | 'en-US' | 'es-ES' | Record<string, unknown>
+}
+
+// Interface de base pour Univer Config compatible
+interface CompatibleUniverConfig {
+  theme?: 'default' | 'green' | 'red'
+  locale?: 'fr-FR' | 'en-US' | 'es-ES'
+}
+
+// Interface étendue pour les méthodes Univer
+interface ExtendedUniver {
+  createUniverSheet?: (data: Partial<CompatibleWorkbookData>) => {
+    exportAsExcel?: () => Promise<Blob>
+    save?: () => Promise<Blob>
+  }
+  importExcel?: (buffer: ArrayBuffer) => Promise<{
+    getActiveSheet?: () => {
+      getUsedRange(): { endRow?: number; endColumn?: number } | null
+      getCell(row: number, col: number): { getValue(): unknown } | null
+    } | null
+  } | null>
+  importFromBuffer?: (buffer: ArrayBuffer) => Promise<CompatibleWorkbookData | null>
 }
 
 // Instance Univer singleton pour les traductions
@@ -284,10 +311,8 @@ class TranslationUniverUtils {
 
     if (!TranslationUniverUtils.univerInstance && Univer) {
       try {
-        const univerOptions: UniverThemeOptions & UniverLocaleOptions = {
-          theme: 'default',
-          locale: 'fr-FR',
-        }
+        // Configuration Univer compatible - utiliser undefined pour les valeurs par défaut
+        const univerOptions = {}
         TranslationUniverUtils.univerInstance = new Univer(univerOptions)
 
         // Registrer seulement les plugins nécessaires pour les traductions
@@ -312,9 +337,9 @@ class TranslationUniverUtils {
   static createWorkbookFromTranslations(
     entries: TranslationEntry[],
     languages: string[]
-  ): UniverWorkbookData {
+  ): CompatibleWorkbookData {
     const sheetId = 'translations'
-    const cellData: Record<string, Record<string, UniverCellData>> = {}
+    const cellData: Record<string, Record<string, CompatibleCellData>> = {}
 
     // En-têtes (ligne 0)
     const headers = ['ID', 'Namespace', 'Key', 'Category', 'Description']
@@ -322,7 +347,7 @@ class TranslationUniverUtils {
       headers?.push(`Translation_${lang}`)
     })
 
-    const headerRow: Record<string, UniverCellData> = {}
+    const headerRow: Record<string, CompatibleCellData> = {}
     headers?.forEach((header, colIndex) => {
       headerRow[colIndex?.toString()] = {
         v: header,
@@ -333,7 +358,7 @@ class TranslationUniverUtils {
 
     // Données (lignes 1+)
     entries?.forEach((entry, rowIndex) => {
-      const dataRow: Record<string, UniverCellData> = {}
+      const dataRow: Record<string, CompatibleCellData> = {}
 
       // Colonnes fixes
       const rowData = [
@@ -362,6 +387,9 @@ class TranslationUniverUtils {
     return {
       id: 'translations-workbook',
       name: 'Translations',
+      appVersion: '1.0.0',
+      locale: 'fr-FR',
+      styles: {},
       sheetOrder: [sheetId],
       sheets: {
         [sheetId]: {
@@ -378,7 +406,7 @@ class TranslationUniverUtils {
   /**
    * Exporte les données Univer vers un blob Excel avec fallback robuste
    */
-  static async exportWorkbookToBlob(workbookData: UniverWorkbookData): Promise<Blob> {
+  static async exportWorkbookToBlob(workbookData: CompatibleWorkbookData): Promise<Blob> {
     // Server-side: always use fallback
     if (!isClient) {
       return TranslationUniverUtils?.createFallbackExcelBlob(workbookData)
@@ -392,18 +420,18 @@ class TranslationUniverUtils {
         if (!isValidIWorkbookData(workbookData)) {
           throw new Error('Invalid workbook data format')
         }
-        const univerSheet = univer?.createUniverSheet(workbookData as Partial<UniverWorkbookData>)
+        
+        const extendedUniver = univer as unknown as ExtendedUniver
+        const univerSheet = extendedUniver?.createUniverSheet?.(workbookData)
 
         // Utiliser l'API d'export d'Univer pour générer le blob Excel
-
-        if (univerSheet && typeof (univerSheet as unknown)?.exportAsExcel === 'function') {
-          const blob = await (univerSheet as unknown)?.exportAsExcel()
+        if (univerSheet?.exportAsExcel) {
+          const blob = await univerSheet.exportAsExcel()
           return blob
-        } else if (univerSheet && typeof (univerSheet as unknown)?.save === 'function') {
+        } else if (univerSheet?.save) {
           // Alternative: méthode save
-
-          const blob = await (univerSheet as unknown)?.save()
-          return blob as Blob
+          const blob = await univerSheet.save()
+          return blob
         }
       } catch (_error) {
         TranslationUniverUtils.univerAvailable = false
@@ -417,7 +445,7 @@ class TranslationUniverUtils {
   /**
    * Crée un blob Excel basique en cas de fallback
    */
-  static createFallbackExcelBlob(workbookData: UniverWorkbookData): Blob {
+  static createFallbackExcelBlob(workbookData: CompatibleWorkbookData): Blob {
     try {
       // Créer un contenu Excel compatible (format CSV avec BOM UTF-8)
       const sheet = workbookData?.sheets[workbookData?.sheetOrder?.[0]]
@@ -427,13 +455,13 @@ class TranslationUniverUtils {
 
       const lines: string[] = []
 
-      for (let row = 0; row < sheet.rowCount; row++) {
+      for (let row = 0; row < (sheet.rowCount || 0); row++) {
         const rowKey = row?.toString()
         const cells: string[] = []
 
-        for (let col = 0; col < sheet.columnCount; col++) {
+        for (let col = 0; col < (sheet.columnCount || 0); col++) {
           const colKey = col?.toString()
-          const cellData = sheet.cellData[rowKey]?.[colKey]
+          const cellData = sheet.cellData?.[rowKey]?.[colKey]
           const value = cellData?.v || ''
           // Échapper les guillemets et virgules pour CSV
           const escapedValue = String(value).replace(/"/g, '""')
@@ -461,7 +489,7 @@ class TranslationUniverUtils {
   /**
    * Importe un fichier Excel et le convertit en données de workbook Univer
    */
-  static async importExcelToWorkbook(buffer: ArrayBuffer): Promise<UniverWorkbookData | null> {
+  static async importExcelToWorkbook(buffer: ArrayBuffer): Promise<CompatibleWorkbookData | null> {
     // Server-side: always use fallback
     if (!isClient) {
       return TranslationUniverUtils?.parseFallbackExcel(buffer)
@@ -473,20 +501,20 @@ class TranslationUniverUtils {
     if (univer && TranslationUniverUtils.univerAvailable) {
       try {
         // Utiliser l'API d'import d'Univer pour lire le fichier Excel
-
-        if (typeof (univer as unknown)?.importExcel === 'function') {
-          const workbook = await (univer as unknown)?.importExcel(buffer)
+        const extendedUniver = univer as unknown as ExtendedUniver
+        
+        if (extendedUniver?.importExcel) {
+          const workbook = await extendedUniver.importExcel(buffer)
           if (workbook) {
             // Convertir en format de données standard
-            const firstSheet = workbook.getActiveSheet ? workbook?.getActiveSheet() : null
+            const firstSheet = workbook.getActiveSheet ? workbook.getActiveSheet() : null
             if (firstSheet) {
               return TranslationUniverUtils?.extractWorkbookData(firstSheet)
             }
           }
-        } else if (typeof (univer as unknown)?.importFromBuffer === 'function') {
+        } else if (extendedUniver?.importFromBuffer) {
           // Alternative: méthode importFromBuffer
-
-          const workbookData = await (univer as unknown)?.importFromBuffer(buffer)
+          const workbookData = await extendedUniver.importFromBuffer(buffer)
           if (workbookData) {
             return workbookData
           }
@@ -506,8 +534,8 @@ class TranslationUniverUtils {
   private static extractWorkbookData(sheet: {
     getUsedRange(): { endRow?: number; endColumn?: number } | null
     getCell(row: number, col: number): { getValue(): unknown } | null
-  }): UniverWorkbookData {
-    const cellData: Record<string, Record<string, UniverCellData>> = {}
+  }): CompatibleWorkbookData {
+    const cellData: Record<string, Record<string, CompatibleCellData>> = {}
 
     // Obtenir les dimensions de la feuille
     const range = sheet?.getUsedRange()
@@ -516,13 +544,17 @@ class TranslationUniverUtils {
 
     // Extraire toutes les cellules
     for (let row = 0; row < rowCount; row++) {
-      const rowData: Record<string, UniverCellData> = {}
+      const rowData: Record<string, CompatibleCellData> = {}
 
       for (let col = 0; col < columnCount; col++) {
         const cell = sheet?.getCell(row, col)
         if (cell) {
+          const cellValue = cell?.getValue()
+          // Type assertion pour gérer les valeurs de cellule compatibles
+          const typedValue = (typeof cellValue === 'object' && cellValue !== null) ? 
+            String(cellValue) : (cellValue as CellValue)
           rowData[col?.toString()] = {
-            v: cell?.getValue() || '',
+            v: typedValue || null,
             t: 1, // string type par défaut
           }
         }
@@ -536,6 +568,9 @@ class TranslationUniverUtils {
     return {
       id: 'imported-workbook',
       name: 'Imported',
+      appVersion: '1.0.0',
+      locale: 'fr-FR',
+      styles: {},
       sheetOrder: ['sheet1'],
       sheets: {
         sheet1: {
@@ -552,7 +587,7 @@ class TranslationUniverUtils {
   /**
    * Parse un fichier Excel en fallback
    */
-  private static parseFallbackExcel(buffer: ArrayBuffer): UniverWorkbookData | null {
+  private static parseFallbackExcel(buffer: ArrayBuffer): CompatibleWorkbookData | null {
     try {
       // Vérifier s'il s'agit d'un fichier Excel réel (signature XLSX)
       if (buffer?.byteLength < 4) return null
@@ -606,7 +641,7 @@ class TranslationUniverUtils {
         separator = ';'
       }
 
-      const cellData: Record<string, Record<string, UniverCellData>> = {}
+      const cellData: Record<string, Record<string, CompatibleCellData>> = {}
       let maxColumns = 0
 
       lines?.forEach((line, rowIndex) => {
@@ -618,7 +653,7 @@ class TranslationUniverUtils {
 
         maxColumns = Math.max(maxColumns, cells.length)
 
-        const rowData: Record<string, UniverCellData> = {}
+        const rowData: Record<string, CompatibleCellData> = {}
         cells?.forEach((cell, colIndex) => {
           rowData[colIndex?.toString()] = {
             v: cell?.trim(),
@@ -632,6 +667,9 @@ class TranslationUniverUtils {
       return {
         id: 'fallback-workbook',
         name: 'Fallback',
+        appVersion: '1.0.0',
+        locale: 'fr-FR',
+        styles: {},
         sheetOrder: ['sheet1'],
         sheets: {
           sheet1: {
@@ -689,7 +727,7 @@ class TranslationUniverUtils {
   /**
    * Convertit les données de workbook Univer en tableau 2D
    */
-  static extractDataFromWorkbook(workbook: UniverWorkbookData): unknown[][] {
+  static extractDataFromWorkbook(workbook: CompatibleWorkbookData): unknown[][] {
     const firstSheetId = workbook?.sheetOrder?.[0]
     const sheet = workbook?.sheets[firstSheetId]
 
@@ -697,13 +735,13 @@ class TranslationUniverUtils {
 
     const result: unknown[][] = []
 
-    for (let row = 0; row < sheet.rowCount; row++) {
+    for (let row = 0; row < (sheet.rowCount || 0); row++) {
       const rowKey = row?.toString()
       const rowData: unknown[] = []
 
-      for (let col = 0; col < sheet.columnCount; col++) {
+      for (let col = 0; col < (sheet.columnCount || 0); col++) {
         const colKey = col?.toString()
-        const cellData = sheet.cellData[rowKey]?.[colKey]
+        const cellData = sheet.cellData?.[rowKey]?.[colKey]
         rowData?.push(cellData?.v || '')
       }
 
