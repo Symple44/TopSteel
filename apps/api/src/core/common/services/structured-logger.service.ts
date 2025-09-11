@@ -53,9 +53,9 @@ export class StructuredLogger {
     }
   }
 
-  private sanitizeLogData(
-    data: LogContext | Record<string, unknown>
-  ): LogContext | Record<string, unknown> {
+  private sanitizeLogData<T extends LogContext | Record<string, unknown>>(
+    data: T
+  ): T {
     return this.logSanitizer ? this.logSanitizer.sanitizeLogObject(data) : data
   }
 

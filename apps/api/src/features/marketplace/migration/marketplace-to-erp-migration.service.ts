@@ -2,6 +2,7 @@ import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { DataSource, QueryRunner, Repository } from 'typeorm'
+import { IsNull } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import {
   Partner,
@@ -101,7 +102,7 @@ export class MarketplaceToERPMigrationService {
 
     // Vérifier les clients sans partenaire ERP
     const customersWithoutPartner = await this.marketplaceCustomerRepository.count({
-      where: { erpPartnerId: null },
+      where: { erpPartnerId: IsNull() },
     })
 
     if (customersWithoutPartner > 0) {
@@ -190,7 +191,7 @@ export class MarketplaceToERPMigrationService {
       this.updateProgress('CUSTOMERS', 0, 'Starting customer migration...')
 
       const customersWithoutPartner = await this.marketplaceCustomerRepository.find({
-        where: { erpPartnerId: null },
+        where: { erpPartnerId: IsNull() },
       })
 
       for (let i = 0; i < customersWithoutPartner.length; i++) {

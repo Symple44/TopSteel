@@ -179,13 +179,13 @@ export class LogSanitizerService {
   /**
    * Sanitise un objet de log en profondeur
    */
-  sanitizeLogObject(obj: unknown): unknown {
+  sanitizeLogObject<T extends Record<string, unknown> | unknown[] | unknown>(obj: T): T {
     if (!this.enableSanitization || !this.isProduction) {
       return obj
     }
 
     if (typeof obj === 'string') {
-      return this.sanitizeLogMessage(obj)
+      return this.sanitizeLogMessage(obj) as T
     }
 
     if (typeof obj !== 'object' || obj === null) {
@@ -193,10 +193,10 @@ export class LogSanitizerService {
     }
 
     if (Array.isArray(obj)) {
-      return obj.map((item) => this.sanitizeLogObject(item))
+      return obj.map((item) => this.sanitizeLogObject(item)) as T
     }
 
-    const sanitizedObj: Record<string, any> = { ...obj }
+    const sanitizedObj: Record<string, unknown> = { ...(obj as Record<string, unknown>) }
 
     for (const [key, value] of Object.entries(sanitizedObj)) {
       // Masquer complètement certaines clés sensibles
@@ -209,7 +209,7 @@ export class LogSanitizerService {
       }
     }
 
-    return sanitizedObj
+    return sanitizedObj as T
   }
 
   /**

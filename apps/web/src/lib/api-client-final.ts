@@ -4,6 +4,7 @@
  */
 
 import { APIClientEnhanced } from './api-client-enhanced'
+import type { RequestConfig } from './api-client'
 
 // Import proper types from @erp/types instead of redefining them
 import type {
@@ -123,6 +124,7 @@ interface PartnersAPI {
   // CRUD Operations
   createPartner(data: CreatePartnerDto): Promise<Partner>
   getPartner(id: string): Promise<Partner | null>
+  getPartnerComplete(id: string): Promise<Partner | null>
   updatePartner(id: string, data: UpdatePartnerDto): Promise<Partner>
   deletePartner(id: string): Promise<void>
 
@@ -171,6 +173,7 @@ interface PartnersAPI {
 
   // Analytics
   getPartnerAnalytics(): Promise<PartnerAnalytics>
+  getStatistics(): Promise<PartnerAnalytics>
 }
 
 interface MaterialsAPI {
@@ -238,6 +241,14 @@ class PartnersAPIImpl implements PartnersAPI {
   async getPartner(id: string): Promise<Partner | null> {
     try {
       return await this.apiClient.get(`/partners/${id}`)
+    } catch {
+      return null
+    }
+  }
+
+  async getPartnerComplete(id: string): Promise<Partner | null> {
+    try {
+      return await this.apiClient.get(`/partners/${id}/complete`)
     } catch {
       return null
     }
@@ -377,6 +388,10 @@ class PartnersAPIImpl implements PartnersAPI {
   async getPartnerAnalytics(): Promise<PartnerAnalytics> {
     return this.apiClient.get('/partners/analytics')
   }
+
+  async getStatistics(): Promise<PartnerAnalytics> {
+    return this.apiClient.get('/partners/statistics')
+  }
 }
 
 // Other API implementations (MaterialsAPI, ArticlesAPI, etc.)
@@ -497,6 +512,13 @@ export interface IAPIClientFinal {
   // Authentication
   authenticate(token: string): void
   getAuthToken(): string | null
+  
+  // HTTP Methods
+  get<T>(endpoint: string, config?: RequestConfig): Promise<T>
+  post<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
+  put<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
+  patch<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
+  delete<T>(endpoint: string, config?: RequestConfig): Promise<T>
 }
 
 export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal {

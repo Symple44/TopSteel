@@ -304,8 +304,8 @@ export class AuditService {
     resource: string,
     resourceId: string,
     action: 'CREATE' | 'UPDATE' | 'DELETE',
-    oldValue?: unknown,
-    newValue?: unknown,
+    oldValue?: Record<string, unknown>,
+    newValue?: Record<string, unknown>,
     metadata?: Record<string, unknown>
   ): Promise<void> {
     const eventTypeMap = {

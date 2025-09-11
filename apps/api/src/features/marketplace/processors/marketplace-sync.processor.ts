@@ -218,15 +218,21 @@ export class MarketplaceSyncProcessor {
       try {
         switch (operation.type) {
           case 'PRICE_UPDATE':
-            await this.updateProductPrice(operation.productId, operation.newPrice, tenantId)
+            if (operation.newPrice !== undefined) {
+              await this.updateProductPrice(operation.productId, operation.newPrice, tenantId)
+            }
             break
 
           case 'STOCK_UPDATE':
-            await this.updateProductStock(operation.productId, operation.newStock, tenantId)
+            if (operation.newStock !== undefined) {
+              await this.updateProductStock(operation.productId, operation.newStock, tenantId)
+            }
             break
 
           case 'STATUS_UPDATE':
-            await this.updateProductStatus(operation.productId, operation.isActive, tenantId)
+            if (operation.isActive !== undefined) {
+              await this.updateProductStatus(operation.productId, operation.isActive, tenantId)
+            }
             break
         }
 

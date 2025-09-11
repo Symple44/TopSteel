@@ -25,6 +25,7 @@ import type { RateLimitingConfiguration } from '../rate-limiting.config'
 import type {
   CombinedRateLimitResult,
   RateLimitConfig,
+  RateLimitResult,
   UserContext,
 } from '../types/rate-limiting.types'
 
@@ -234,7 +235,7 @@ export class CombinedRateLimitGuard implements CanActivate {
       userContext
     )
 
-    let userResult: unknown
+    let userResult: RateLimitResult | undefined
 
     // Check user-based rate limit if authenticated
     if (userContext.isAuthenticated && userContext.userId) {

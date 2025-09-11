@@ -84,10 +84,10 @@ export class SanitizedLoggingInterceptor implements NestInterceptor {
    * Sanitise les données de la requête avant de les logger
    */
   private sanitizeRequestData(request: AuthenticatedRequest): Partial<AuthenticatedRequest> {
-    const sanitizedHeaders = this.logSanitizer.sanitizeLogObject(request.headers)
-    const sanitizedBody = this.logSanitizer.sanitizeLogObject(request.body)
-    const sanitizedQuery = this.logSanitizer.sanitizeLogObject(request.query)
-    const sanitizedCookies = this.logSanitizer.sanitizeLogObject(request.cookies)
+    const sanitizedHeaders = this.logSanitizer.sanitizeLogObject(request.headers) as Record<string, string>
+    const sanitizedBody = this.logSanitizer.sanitizeLogObject(request.body) as Record<string, unknown> | undefined
+    const sanitizedQuery = this.logSanitizer.sanitizeLogObject(request.query) as Record<string, unknown> | undefined
+    const sanitizedCookies = this.logSanitizer.sanitizeLogObject(request.cookies) as Record<string, string> | undefined
 
     return {
       method: request.method,

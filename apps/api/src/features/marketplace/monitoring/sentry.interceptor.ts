@@ -13,10 +13,50 @@ import { type Observable, throwError } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
 import { getErrorMessage } from '../../../core/common/utils'
 
+// Sentry type interfaces
+interface SentryTransaction {
+  setHttpStatus(status: number): void
+  setData(key: string, value: unknown): void
+  finish(): void
+}
+
+interface SentryScope {
+  setSpan(span: SentryTransaction): void
+  setContext(key: string, context: Record<string, unknown>): void
+  setUser(user: Record<string, string>): void
+  setTag(key: string, value: string): void
+  setLevel(level: string): void
+  setFingerprint(fingerprint: string[]): void
+}
+
+interface SentryHub {
+  configureScope(callback: (scope: SentryScope) => void): void
+}
+
+interface SentryNode {
+  startTransaction(options: {
+    op: string
+    name: string
+    tags: Record<string, string>
+  }): SentryTransaction
+  getCurrentHub(): SentryHub
+  addBreadcrumb(breadcrumb: {
+    category: string
+    message: string
+    level: string
+    data?: Record<string, unknown>
+  }): void
+  captureMessage(message: string, level: string, options?: {
+    extra: Record<string, unknown>
+  }): string
+  withScope(callback: (scope: SentryScope) => void): void
+  captureException(error: Error): string
+}
+
 @Injectable()
 export class SentryInterceptor implements NestInterceptor {
   private readonly logger = new Logger(SentryInterceptor.name)
-  private sentry: any = null
+  private sentry: SentryNode | null = null
 
   constructor() {
     this.loadSentry()
@@ -24,7 +64,7 @@ export class SentryInterceptor implements NestInterceptor {
 
   private async loadSentry(): Promise<void> {
     try {
-      this.sentry = await import('@sentry/node').catch(() => null)
+      this.sentry = (await import('@sentry/node').catch(() => null)) as SentryNode | null
     } catch (_error) {
       this.logger.debug('Sentry not available for interceptor')
     }
@@ -52,7 +92,7 @@ export class SentryInterceptor implements NestInterceptor {
     })
 
     // Set transaction on scope
-    this.sentry.getCurrentHub().configureScope((scope: any) => {
+    this.sentry.getCurrentHub().configureScope((scope: SentryScope) => {
       scope.setSpan(transaction)
 
       // Add request context
@@ -82,10 +122,10 @@ export class SentryInterceptor implements NestInterceptor {
       scope.setTag('component', 'api')
       scope.setTag('feature', 'marketplace')
       if (headers['x-tenant-id']) {
-        scope.setTag('tenant.id', headers['x-tenant-id'] as string)
+        scope.setTag('tenant.id', String(headers['x-tenant-id']))
       }
       if (headers['x-request-id']) {
-        scope.setTag('request.id', headers['x-request-id'] as string)
+        scope.setTag('request.id', String(headers['x-request-id']))
       }
     })
 
@@ -134,16 +174,17 @@ export class SentryInterceptor implements NestInterceptor {
         // Determine status code
         let statusCode = HttpStatus.INTERNAL_SERVER_ERROR
         let errorMessage = getErrorMessage(error) || 'Internal server error'
-        let errorData: any = {}
+        let errorData: Record<string, unknown> = {}
 
         if (error instanceof HttpException) {
           statusCode = error.getStatus()
           const response = error.getResponse()
-          if (typeof response === 'object') {
-            errorMessage = (response as any).message || errorMessage
-            errorData = response
+          if (typeof response === 'object' && response !== null) {
+            const responseObj = response as Record<string, unknown>
+            errorMessage = (responseObj.message as string) || errorMessage
+            errorData = responseObj
           } else {
-            errorMessage = response
+            errorMessage = String(response)
           }
         }
 
@@ -154,7 +195,7 @@ export class SentryInterceptor implements NestInterceptor {
 
         // Capture to Sentry if it's a server error
         if (statusCode >= 500 && this.sentry) {
-          this.sentry.withScope((scope: any) => {
+          this.sentry.withScope((scope: SentryScope) => {
             scope.setLevel('error')
             scope.setContext('error', {
               statusCode,
@@ -174,7 +215,11 @@ export class SentryInterceptor implements NestInterceptor {
             ])
 
             const eventId = this.sentry.captureException(error)
-            this.logger.error(`Error captured to Sentry: ${eventId}`, error.stack)
+            if (eventId) {
+              this.logger.error(`Error captured to Sentry: ${eventId}`, error.stack)
+            } else {
+              this.logger.error('Error occurred but could not capture to Sentry', error.stack)
+            }
           })
         } else if (statusCode >= 400 && this.sentry) {
           // Log client errors as breadcrumbs
@@ -219,12 +264,12 @@ export class SentryInterceptor implements NestInterceptor {
     return sanitized
   }
 
-  private sanitizeBody(body: unknown): any {
+  private sanitizeBody(body: unknown): unknown {
     if (!body || typeof body !== 'object') {
       return body
     }
 
-    const sanitized = { ...body }
+    const sanitized = { ...body as Record<string, unknown> }
     const sensitiveFields = [
       'password',
       'passwordConfirm',
@@ -240,17 +285,19 @@ export class SentryInterceptor implements NestInterceptor {
       'ssn',
     ]
 
-    const sanitizeObject = (obj: unknown): any => {
+    const sanitizeObject = (obj: unknown): unknown => {
       if (!obj || typeof obj !== 'object') {
         return obj
       }
 
-      const result: any = Array.isArray(obj) ? [...obj] : { ...obj }
+      const result: Record<string, unknown> = Array.isArray(obj) 
+        ? [...(obj as unknown[])] as unknown as Record<string, unknown>
+        : { ...(obj as Record<string, unknown>) }
 
       Object.keys(result).forEach((key) => {
         if (sensitiveFields.includes(key.toLowerCase())) {
           result[key] = '[REDACTED]'
-        } else if (typeof result[key] === 'object') {
+        } else if (typeof result[key] === 'object' && result[key] !== null) {
           result[key] = sanitizeObject(result[key])
         }
       })
