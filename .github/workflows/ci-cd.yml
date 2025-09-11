@@ -124,9 +124,14 @@ jobs:
             .turbo
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
-      - name: 📥 Install dependencies (if cache miss)
-        if: needs.setup.outputs.cache-hit != 'true'
-        run: pnpm ci:install
+      - name: 📥 Install dependencies
+        run: |
+          if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/turbo" ]; then
+            echo "📦 Installing dependencies..."
+            pnpm install --frozen-lockfile
+          else
+            echo "✅ Dependencies already cached"
+          fi
 
       - name: 🏗️ Build packages
         run: pnpm build:packages
@@ -184,9 +189,14 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
-      - name: 📥 Install dependencies (if cache miss)
-        if: needs.setup.outputs.cache-hit != 'true'
-        run: pnpm ci:install
+      - name: 📥 Install dependencies
+        run: |
+          if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/turbo" ]; then
+            echo "📦 Installing dependencies..."
+            pnpm install --frozen-lockfile
+          else
+            echo "✅ Dependencies already cached"
+          fi
 
       - name: 🔒 Run security audit
         run: |
@@ -262,9 +272,14 @@ jobs:
             .turbo
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
-      - name: 📥 Install dependencies (if cache miss)
-        if: needs.setup.outputs.cache-hit != 'true'
-        run: pnpm ci:install
+      - name: 📥 Install dependencies
+        run: |
+          if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/turbo" ]; then
+            echo "📦 Installing dependencies..."
+            pnpm install --frozen-lockfile
+          else
+            echo "✅ Dependencies already cached"
+          fi
 
       - name: 🏗️ Build packages
         run: pnpm build:packages
@@ -328,9 +343,14 @@ jobs:
             .turbo
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
-      - name: 📥 Install dependencies (if cache miss)
-        if: needs.setup.outputs.cache-hit != 'true'
-        run: pnpm ci:install
+      - name: 📥 Install dependencies
+        run: |
+          if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/turbo" ]; then
+            echo "📦 Installing dependencies..."
+            pnpm install --frozen-lockfile
+          else
+            echo "✅ Dependencies already cached"
+          fi
 
       - name: 🏗️ Build packages first
         run: pnpm build:packages
@@ -392,9 +412,14 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
-      - name: 📥 Install dependencies (if cache miss)
-        if: needs.setup.outputs.cache-hit != 'true'
-        run: pnpm ci:install
+      - name: 📥 Install dependencies
+        run: |
+          if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/turbo" ]; then
+            echo "📦 Installing dependencies..."
+            pnpm install --frozen-lockfile
+          else
+            echo "✅ Dependencies already cached"
+          fi
 
       - name: 🎭 Install Playwright browsers
         run: npx playwright install --with-deps
