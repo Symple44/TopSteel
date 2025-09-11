@@ -9,6 +9,7 @@ import { ReorderableListCustomizationPanel } from './reorderable-list-customizat
 import type {
   RenderItemProps,
   ReorderableItem,
+  ReorderableListConfig,
   ReorderableTheme,
   ThemedReorderableListProps,
 } from './reorderable-list-theme'
@@ -226,7 +227,7 @@ interface ThemedSortableItemProps<T extends ReorderableItem> {
   isExpanded: boolean
   onToggleExpand?: (id: string) => void
   expandedItems?: Set<string>
-  config: any
+  config: ReorderableListConfig
   isDragging: boolean
   isDragOver: boolean
   dropPosition: 'above' | 'below' | 'inside'

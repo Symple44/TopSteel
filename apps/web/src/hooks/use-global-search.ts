@@ -75,11 +75,15 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         const parsedHistory = JSON.parse(stored)
         // Valider et nettoyer l'historique
         const validHistory = parsedHistory?.filter(
-          (item: unknown) =>
-            item &&
-            typeof item.query === 'string' &&
-            typeof item.timestamp === 'number' &&
-            typeof item.resultCount === 'number'
+          (item: unknown): item is SearchHistoryItem =>
+            item !== null &&
+            typeof item === 'object' &&
+            'query' in item &&
+            'timestamp' in item &&
+            'resultCount' in item &&
+            typeof (item as SearchHistoryItem).query === 'string' &&
+            typeof (item as SearchHistoryItem).timestamp === 'number' &&
+            typeof (item as SearchHistoryItem).resultCount === 'number'
         )
         setHistory(validHistory)
 
@@ -184,8 +188,20 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
           setTotal(0)
         }
       } catch (err: unknown) {
-        if (err.name !== 'AbortError') {
+        if (err instanceof Error && err.name !== 'AbortError') {
           setError(err.message || 'Erreur lors de la recherche')
+          setResults([])
+          setSuggestions([])
+          setFacets({})
+          setTotal(0)
+        } else if (typeof err === 'string') {
+          setError(err)
+          setResults([])
+          setSuggestions([])
+          setFacets({})
+          setTotal(0)
+        } else {
+          setError('Erreur lors de la recherche')
           setResults([])
           setSuggestions([])
           setFacets({})

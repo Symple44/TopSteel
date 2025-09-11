@@ -73,14 +73,14 @@ export class ImageElasticsearchService {
    * This method is used by the ImageService to index images
    */
   toElasticsearchDocument(
-    metadata: import('./types').ImageMetadata, 
+    metadata: import('./types').ImageMetadata,
     variants: import('./types').ImageVariant[]
   ): ElasticsearchImageDocument {
     // Convert domain ImageMetadata to elasticsearch ImageMetadata format
     const elasticsearchMetadata: ImageMetadata = {
       id: metadata.id,
       fileName: metadata.fileName,
-      filePath: variants.find(v => v.variant === 'original')?.path || '',
+      filePath: variants.find((v) => v.variant === 'original')?.path || '',
       fileSize: metadata.size,
       mimeType: metadata.mimeType,
       width: metadata.width,
@@ -92,23 +92,23 @@ export class ImageElasticsearchService {
       userId: metadata.uploadedBy,
       albumId: metadata.entityId,
       isPublic: true, // Default to public, can be configured
-      thumbnailPath: variants.find(v => v.variant === 'thumbnail')?.path,
-      originalPath: variants.find(v => v.variant === 'original')?.path,
+      thumbnailPath: variants.find((v) => v.variant === 'thumbnail')?.path,
+      originalPath: variants.find((v) => v.variant === 'original')?.path,
       metadata: {
         category: metadata.category,
         entityType: metadata.entityType,
         hash: metadata.hash,
         alt: metadata.alt,
-        variants: variants.map(v => ({
+        variants: variants.map((v) => ({
           id: v.id,
           variant: v.variant,
           fileName: v.fileName,
           width: v.width,
           height: v.height,
           size: v.size,
-          path: v.path
-        }))
-      }
+          path: v.path,
+        })),
+      },
     }
 
     return this.convertToElasticsearchDocument(elasticsearchMetadata)

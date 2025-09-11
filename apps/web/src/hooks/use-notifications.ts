@@ -95,10 +95,7 @@ export function useNotificationsStats(): {
     read: state?.notifications?.length - state.unreadCount,
     byCategory: state?.notifications?.reduce(
       (acc, notification) => {
-        const category =
-          (notification as unknown).metadata?.category ||
-          (notification as unknown).data?.category ||
-          'system'
+        const category = notification.metadata?.category || 'system'
         acc[category] = (acc[category] || 0) + 1
 
         return acc
@@ -133,14 +130,7 @@ export function useFilteredNotifications(filters?: {
   if (!filters) return state.notifications
 
   return state?.notifications?.filter((notification) => {
-    if (
-      filters.category &&
-      !filters.category?.includes(
-        (notification as unknown).metadata?.category ||
-          (notification as unknown).data?.category ||
-          ''
-      )
-    )
+    if (filters.category && !filters.category?.includes(notification.metadata?.category || ''))
       return false
     if (filters.type && !filters?.type?.includes(notification.type)) return false
     if (filters.read !== undefined && notification.isRead !== filters.read) return false

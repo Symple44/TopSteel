@@ -141,7 +141,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
             const syntheticEvent = new MouseEvent('click', {
               bubbles: true,
               cancelable: true,
-              view: window
+              view: window,
             })
             e.currentTarget.dispatchEvent(syntheticEvent)
           }
@@ -179,7 +179,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionPr
             const syntheticEvent = new MouseEvent('click', {
               bubbles: true,
               cancelable: true,
-              view: window
+              view: window,
             })
             e.currentTarget.dispatchEvent(syntheticEvent)
           }

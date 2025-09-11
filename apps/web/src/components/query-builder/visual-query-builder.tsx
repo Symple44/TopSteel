@@ -714,20 +714,26 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                     ) : (
                       <DataTablePreview
                         data={previewData}
-                        columns={selectedColumns.map((col, index): QueryBuilderColumn => ({
-                          tableName: col.table,
-                          columnName: col.column,
-                          alias: col.alias || `${col.table}.${col.column}`,
-                          label: col.alias || col.column,
-                          dataType: selectedTable?.columns?.find((c) => c.name === col.column)?.type || 'text',
-                          isVisible: true,
-                          isFilterable: true,
-                          isSortable: true,
-                          displayOrder: index,
-                          // Compatibility properties
-                          name: col.alias || `${col.table}.${col.column}`,
-                          type: selectedTable?.columns?.find((c) => c.name === col.column)?.type || 'text',
-                        }))}
+                        columns={selectedColumns.map(
+                          (col, index): QueryBuilderColumn => ({
+                            tableName: col.table,
+                            columnName: col.column,
+                            alias: col.alias || `${col.table}.${col.column}`,
+                            label: col.alias || col.column,
+                            dataType:
+                              selectedTable?.columns?.find((c) => c.name === col.column)?.type ||
+                              'text',
+                            isVisible: true,
+                            isFilterable: true,
+                            isSortable: true,
+                            displayOrder: index,
+                            // Compatibility properties
+                            name: col.alias || `${col.table}.${col.column}`,
+                            type:
+                              selectedTable?.columns?.find((c) => c.name === col.column)?.type ||
+                              'text',
+                          })
+                        )}
                         calculatedFields={[]}
                         layout={{}}
                         settings={{
@@ -737,8 +743,8 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                             enableSorting: true,
                             enableFiltering: true,
                             enableExport: true,
-                            exportFormats: ['csv', 'excel', 'json']
-                          }
+                            exportFormats: ['csv', 'excel', 'json'],
+                          },
                         }}
                       />
                     )}

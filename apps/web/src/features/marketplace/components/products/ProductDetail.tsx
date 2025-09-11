@@ -450,7 +450,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                           {key?.replace(/_/g, ' ')}
                         </td>
                         <td className="px-4 py-3 text-gray-600">
-                          {typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}
+                          {typeof value === 'object' && value !== null
+                            ? JSON.stringify(value)
+                            : String(value)}
                         </td>
                       </tr>
                     ))}

@@ -199,7 +199,7 @@ export function isMFAStatusData(obj: unknown): obj is MFAStatusData {
   if (obj === null || typeof obj !== 'object') {
     return false
   }
-  
+
   const candidate = obj as Record<string, unknown>
   return (
     typeof candidate.totalUsers === 'number' &&
@@ -215,7 +215,7 @@ export function isMFASecurityStats(obj: unknown): obj is MFASecurityStats {
   if (obj === null || typeof obj !== 'object') {
     return false
   }
-  
+
   const candidate = obj as Record<string, unknown>
   return (
     typeof candidate.hasActiveMFA === 'boolean' &&

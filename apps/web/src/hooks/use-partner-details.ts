@@ -1,8 +1,12 @@
 import type {
+  Contact,
   CreateContactDto,
   CreatePartnerAddressDto,
   CreatePartnerGroupDto,
   CreatePartnerSiteDto,
+  PartnerAddress,
+  PartnerGroup,
+  PartnerSite,
   UpdateContactDto,
   UpdatePartnerAddressDto,
   UpdatePartnerGroupDto,
@@ -10,7 +14,18 @@ import type {
 } from '@erp/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client-instance'
+import { apiClient, APIError } from '@/lib/api-client-instance'
+
+// Helper function to extract error message
+const getErrorMessage = (error: unknown, defaultMessage: string): string => {
+  if (error instanceof APIError) {
+    return error.message || defaultMessage
+  }
+  if (error instanceof Error) {
+    return error.message || defaultMessage
+  }
+  return defaultMessage
+}
 
 // Query keys
 const CONTACT_KEYS = {
@@ -42,7 +57,7 @@ const GROUP_KEYS = {
 export function usePartnerContacts(partnerId: string) {
   return useQuery({
     queryKey: CONTACT_KEYS?.byPartner(partnerId),
-    queryFn: () => (apiClient as unknown)?.partners?.getPartnerContacts(partnerId),
+    queryFn: () => apiClient.partners.getPartnerContacts(partnerId),
     enabled: !!partnerId,
   })
 }
@@ -52,14 +67,14 @@ export function useCreateContact() {
 
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreateContactDto }) =>
-      (apiClient as unknown)?.partners?.createContact(partnerId, data),
+      apiClient.partners.createContact(partnerId, data),
     onSuccess: (_contact, { partnerId }) => {
       queryClient?.invalidateQueries({ queryKey: CONTACT_KEYS?.byPartner(partnerId) })
       queryClient?.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
       toast?.success('Contact créé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la création du contact')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la création du contact'))
     },
   })
 }
@@ -69,14 +84,14 @@ export function useUpdateContact() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateContactDto }) =>
-      (apiClient as unknown)?.partners?.updateContact(id, data),
-    onSuccess: (contact: unknown) => {
+      apiClient.partners.updateContact(id, data),
+    onSuccess: (contact: Contact) => {
       queryClient?.invalidateQueries({ queryKey: CONTACT_KEYS.all })
       queryClient?.setQueryData(CONTACT_KEYS?.detail(contact.id), contact)
       toast?.success('Contact mis à jour avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la mise à jour du contact')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la mise à jour du contact'))
     },
   })
 }
@@ -85,13 +100,13 @@ export function useDeleteContact() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => (apiClient as unknown)?.partners?.deleteContact(id),
+    mutationFn: (id: string) => apiClient.partners.deleteContact(id),
     onSuccess: () => {
       queryClient?.invalidateQueries({ queryKey: CONTACT_KEYS.all })
       toast?.success('Contact supprimé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la suppression du contact')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la suppression du contact'))
     },
   })
 }
@@ -101,7 +116,7 @@ export function useDeleteContact() {
 export function usePartnerSites(partnerId: string) {
   return useQuery({
     queryKey: SITE_KEYS?.byPartner(partnerId),
-    queryFn: () => (apiClient as unknown)?.partners?.getPartnerSites(partnerId),
+    queryFn: () => apiClient.partners.getPartnerSites(partnerId),
     enabled: !!partnerId,
   })
 }
@@ -111,14 +126,14 @@ export function useCreatePartnerSite() {
 
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreatePartnerSiteDto }) =>
-      (apiClient as unknown)?.partners?.createPartnerSite(partnerId, data),
+      apiClient.partners.createPartnerSite(partnerId, data),
     onSuccess: (_site, { partnerId }) => {
       queryClient?.invalidateQueries({ queryKey: SITE_KEYS?.byPartner(partnerId) })
       queryClient?.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
       toast?.success('Site créé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la création du site')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la création du site'))
     },
   })
 }
@@ -128,14 +143,14 @@ export function useUpdatePartnerSite() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePartnerSiteDto }) =>
-      (apiClient as unknown)?.partners?.updatePartnerSite(id, data),
-    onSuccess: (site: unknown) => {
+      apiClient.partners.updatePartnerSite(id, data),
+    onSuccess: (site: PartnerSite) => {
       queryClient?.invalidateQueries({ queryKey: SITE_KEYS.all })
       queryClient?.setQueryData(SITE_KEYS?.detail(site.id), site)
       toast?.success('Site mis à jour avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la mise à jour du site')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la mise à jour du site'))
     },
   })
 }
@@ -144,13 +159,13 @@ export function useDeletePartnerSite() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => (apiClient as unknown)?.partners?.deletePartnerSite(id),
+    mutationFn: (id: string) => apiClient.partners.deletePartnerSite(id),
     onSuccess: () => {
       queryClient?.invalidateQueries({ queryKey: SITE_KEYS.all })
       toast?.success('Site supprimé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la suppression du site')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la suppression du site'))
     },
   })
 }
@@ -160,7 +175,7 @@ export function useDeletePartnerSite() {
 export function usePartnerAddresses(partnerId: string) {
   return useQuery({
     queryKey: ADDRESS_KEYS?.byPartner(partnerId),
-    queryFn: () => (apiClient as unknown)?.partners?.getPartnerAddresses(partnerId),
+    queryFn: () => apiClient.partners.getPartnerAddresses(partnerId),
     enabled: !!partnerId,
   })
 }
@@ -170,14 +185,14 @@ export function useCreatePartnerAddress() {
 
   return useMutation({
     mutationFn: ({ partnerId, data }: { partnerId: string; data: CreatePartnerAddressDto }) =>
-      (apiClient as unknown)?.partners?.createPartnerAddress(partnerId, data),
+      apiClient.partners.createPartnerAddress(partnerId, data),
     onSuccess: (_address, { partnerId }) => {
       queryClient?.invalidateQueries({ queryKey: ADDRESS_KEYS?.byPartner(partnerId) })
       queryClient?.invalidateQueries({ queryKey: ['partners', 'detail', partnerId, 'complete'] })
       toast?.success('Adresse créée avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || "Erreur lors de la création de l'adresse")
+      toast?.error(getErrorMessage(error, "Erreur lors de la création de l'adresse"))
     },
   })
 }
@@ -187,14 +202,14 @@ export function useUpdatePartnerAddress() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePartnerAddressDto }) =>
-      (apiClient as unknown)?.partners?.updatePartnerAddress(id, data),
-    onSuccess: (address: unknown) => {
+      apiClient.partners.updatePartnerAddress(id, data),
+    onSuccess: (address: PartnerAddress) => {
       queryClient?.invalidateQueries({ queryKey: ADDRESS_KEYS.all })
       queryClient?.setQueryData(ADDRESS_KEYS?.detail(address.id), address)
       toast?.success('Adresse mise à jour avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || "Erreur lors de la mise à jour de l'adresse")
+      toast?.error(getErrorMessage(error, "Erreur lors de la mise à jour de l'adresse"))
     },
   })
 }
@@ -203,13 +218,13 @@ export function useDeletePartnerAddress() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => (apiClient as unknown)?.partners?.deletePartnerAddress(id),
+    mutationFn: (id: string) => apiClient.partners.deletePartnerAddress(id),
     onSuccess: () => {
       queryClient?.invalidateQueries({ queryKey: ADDRESS_KEYS.all })
       toast?.success('Adresse supprimée avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || "Erreur lors de la suppression de l'adresse")
+      toast?.error(getErrorMessage(error, "Erreur lors de la suppression de l'adresse"))
     },
   })
 }
@@ -220,15 +235,14 @@ export function useCreatePartnerGroup() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: CreatePartnerGroupDto) =>
-      (apiClient as unknown)?.partners?.createPartnerGroup(data),
-    onSuccess: (group: unknown) => {
+    mutationFn: (data: CreatePartnerGroupDto) => apiClient.partners.createPartnerGroup(data),
+    onSuccess: (group: PartnerGroup) => {
       queryClient?.invalidateQueries({ queryKey: GROUP_KEYS?.list() })
       queryClient?.setQueryData(GROUP_KEYS?.detail(group.id), group)
       toast?.success('Groupe créé avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la création du groupe')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la création du groupe'))
     },
   })
 }
@@ -238,14 +252,14 @@ export function useUpdatePartnerGroup() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePartnerGroupDto }) =>
-      (apiClient as unknown)?.partners?.updatePartnerGroup(id, data),
-    onSuccess: (group: unknown) => {
+      apiClient.partners.updatePartnerGroup(id, data),
+    onSuccess: (group: PartnerGroup) => {
       queryClient?.invalidateQueries({ queryKey: GROUP_KEYS?.list() })
       queryClient?.setQueryData(GROUP_KEYS?.detail(group.id), group)
       toast?.success('Groupe mis à jour avec succès')
     },
     onError: (error: unknown) => {
-      toast?.error(error.response?.data?.message || 'Erreur lors de la mise à jour du groupe')
+      toast?.error(getErrorMessage(error, 'Erreur lors de la mise à jour du groupe'))
     },
   })
 }

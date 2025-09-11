@@ -10,6 +10,7 @@ import type { Redis } from 'ioredis'
 import type { DeepPartial, Repository } from 'typeorm'
 import type { EmailService } from '../../../core/email/email.service'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
+import type { MarketplaceCustomerSession } from './interfaces/marketplace-customer.interface'
 
 interface RegisterDto {
   email: string
@@ -632,11 +633,26 @@ export class MarketplaceAuthService {
   }
 
   /**
+   * Get customer by ID
+   */
+  async getCustomerById(customerId: string): Promise<MarketplaceCustomer> {
+    const customer = await this.customerRepository.findOne({
+      where: { id: customerId, isActive: true },
+    })
+
+    if (!customer) {
+      throw new UnauthorizedException('Customer not found')
+    }
+
+    return customer
+  }
+
+  /**
    * Get active sessions for customer
    */
-  async getActiveSessions(customerId: string): Promise<any[]> {
+  async getActiveSessions(customerId: string): Promise<MarketplaceCustomerSession[]> {
     const sessionKeys = await this.redisService.keys(`session:${customerId}:*`)
-    const sessions = []
+    const sessions: MarketplaceCustomerSession[] = []
 
     for (const key of sessionKeys) {
       const sessionData = await this.redisService.get(key)

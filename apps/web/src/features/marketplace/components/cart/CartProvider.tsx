@@ -12,9 +12,9 @@ interface SessionData {
   user: User
 }
 
-const useSession = () => ({ 
-  data: null as SessionData | null, 
-  status: 'unauthenticated' as 'authenticated' | 'unauthenticated' | 'loading' 
+const useSession = () => ({
+  data: null as SessionData | null,
+  status: 'unauthenticated' as 'authenticated' | 'unauthenticated' | 'loading',
 })
 
 import type React from 'react'

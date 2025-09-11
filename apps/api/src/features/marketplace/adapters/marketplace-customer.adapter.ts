@@ -133,7 +133,11 @@ export class MarketplaceCustomerAdapter {
       const savedCustomer = await this.customerRepository.save(customer)
 
       // Créer automatiquement le partenaire ERP associé
-      const partner = await this.createPartnerFromCustomer(tenantId, savedCustomer, customerData as unknown as PartnerAdditionalData)
+      const partner = await this.createPartnerFromCustomer(
+        tenantId,
+        savedCustomer,
+        customerData as unknown as PartnerAdditionalData
+      )
 
       // Lier le client au partenaire
       savedCustomer.erpPartnerId = partner.id

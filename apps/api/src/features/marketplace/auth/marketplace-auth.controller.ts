@@ -27,6 +27,7 @@ import {
   type VerifyEmailDto,
 } from './dto/marketplace-auth.dto'
 import { MarketplaceAuthGuard } from './guards/marketplace-auth.guard'
+import type { MarketplaceCustomerJwtPayload } from './interfaces/marketplace-customer.interface'
 import type { MarketplaceAuthService } from './marketplace-auth.service'
 
 @ApiTags('Marketplace Authentication')
@@ -153,7 +154,9 @@ export class MarketplaceAuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Not authenticated',
   })
-  async logout(@CurrentMarketplaceCustomer() customer: any): Promise<void> {
+  async logout(
+    @CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload
+  ): Promise<void> {
     await this.authService.logout(customer.id)
   }
 
@@ -237,7 +240,7 @@ export class MarketplaceAuthController {
   })
   async changePassword(
     @Body() dto: ChangePasswordDto,
-    @CurrentMarketplaceCustomer() customer: any
+    @CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload
   ): Promise<MessageResponse> {
     await this.authService.changePassword(customer.sub || customer.id, {
       currentPassword: dto.currentPassword,
@@ -292,7 +295,7 @@ export class MarketplaceAuthController {
     description: 'Not authenticated',
   })
   async resendVerificationEmail(
-    @CurrentMarketplaceCustomer() customer: any
+    @CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload
   ): Promise<MessageResponse> {
     await this.authService.resendVerificationEmail(customer.sub || customer.id)
 
@@ -317,15 +320,18 @@ export class MarketplaceAuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Not authenticated',
   })
-  async getCurrentCustomer(@CurrentMarketplaceCustomer() customer: any) {
+  async getCurrentCustomer(@CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload) {
+    // Fetch complete customer data from database
+    const fullCustomer = await this.authService.getCustomerById(customer.sub || customer.id)
+
     // Return sanitized customer data
     return {
-      id: customer.id,
-      email: customer.email,
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      emailVerified: customer.emailVerified,
-      createdAt: customer.createdAt,
+      id: fullCustomer.id,
+      email: fullCustomer.email,
+      firstName: fullCustomer.firstName,
+      lastName: fullCustomer.lastName,
+      emailVerified: fullCustomer.emailVerified,
+      createdAt: fullCustomer.createdAt,
     }
   }
 
@@ -344,7 +350,7 @@ export class MarketplaceAuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Not authenticated',
   })
-  async getActiveSessions(@CurrentMarketplaceCustomer() customer: any) {
+  async getActiveSessions(@CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload) {
     const sessions = await this.authService.getActiveSessions(customer.sub || customer.id)
 
     return {
@@ -369,7 +375,9 @@ export class MarketplaceAuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Not authenticated',
   })
-  async revokeAllSessions(@CurrentMarketplaceCustomer() customer: any): Promise<void> {
+  async revokeAllSessions(
+    @CurrentMarketplaceCustomer() customer: MarketplaceCustomerJwtPayload
+  ): Promise<void> {
     await this.authService.logout(customer.id)
   }
 }

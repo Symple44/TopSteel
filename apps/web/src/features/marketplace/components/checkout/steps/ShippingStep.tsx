@@ -130,16 +130,16 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({ data, onUpdate, onNe
     })
   }
 
-  const handleSelectSavedAddress = (address: { 
-    id: string; 
-    firstName: string; 
-    lastName: string; 
-    address: string; 
-    address2?: string; 
-    city: string; 
-    state?: string; 
-    postalCode: string; 
-    country: string; 
+  const handleSelectSavedAddress = (address: {
+    id: string
+    firstName: string
+    lastName: string
+    address: string
+    address2?: string
+    city: string
+    state?: string
+    postalCode: string
+    country: string
   }) => {
     setSelectedAddress(address.id)
     setShowNewAddress(false)
