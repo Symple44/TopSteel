@@ -9,6 +9,17 @@ import {
 } from '../../../domains/partners/entities/partner.entity'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 
+interface PartnerAdditionalData {
+  category?: string
+  adresse?: string
+  codePostal?: string
+  ville?: string
+  pays?: string
+  siret?: string
+  numeroTVA?: string
+  [key: string]: unknown
+}
+
 export interface MarketplaceCustomerView {
   id: string
   email: string
@@ -122,7 +133,7 @@ export class MarketplaceCustomerAdapter {
       const savedCustomer = await this.customerRepository.save(customer)
 
       // Créer automatiquement le partenaire ERP associé
-      const partner = await this.createPartnerFromCustomer(tenantId, savedCustomer, customerData)
+      const partner = await this.createPartnerFromCustomer(tenantId, savedCustomer, customerData as unknown as PartnerAdditionalData)
 
       // Lier le client au partenaire
       savedCustomer.erpPartnerId = partner.id
@@ -315,7 +326,7 @@ export class MarketplaceCustomerAdapter {
   private async createPartnerFromCustomer(
     _tenantId: string,
     customer: MarketplaceCustomer,
-    additionalData: any = {}
+    additionalData: PartnerAdditionalData = {}
   ): Promise<Partner> {
     // Générer un code unique pour le partenaire
     const baseCode = `CLI${Date.now().toString().slice(-6)}`
@@ -331,7 +342,7 @@ export class MarketplaceCustomerAdapter {
       code,
       type: PartnerType.CLIENT,
       status: PartnerStatus.ACTIF,
-      category: additionalData.category || PartnerCategory.PARTICULIER,
+      category: (additionalData.category as PartnerCategory) || PartnerCategory.PARTICULIER,
       denomination: `${customer.firstName} ${customer.lastName}`,
       contactPrincipal: `${customer.firstName} ${customer.lastName}`,
       email: customer.email,

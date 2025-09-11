@@ -196,24 +196,34 @@ export interface MFAResetData {
  */
 
 export function isMFAStatusData(obj: unknown): obj is MFAStatusData {
+  if (obj === null || typeof obj !== 'object') {
+    return false
+  }
+  
+  const candidate = obj as Record<string, unknown>
   return (
-    obj !== null &&
-    typeof obj === 'object' &&
-    typeof (obj as any).totalUsers === 'number' &&
-    typeof (obj as any).usersWithMFA === 'number' &&
-    typeof (obj as any).usersByRole === 'object' &&
-    typeof (obj as any).mfaMethodDistribution === 'object'
+    typeof candidate.totalUsers === 'number' &&
+    typeof candidate.usersWithMFA === 'number' &&
+    typeof candidate.usersByRole === 'object' &&
+    candidate.usersByRole !== null &&
+    typeof candidate.mfaMethodDistribution === 'object' &&
+    candidate.mfaMethodDistribution !== null
   )
 }
 
 export function isMFASecurityStats(obj: unknown): obj is MFASecurityStats {
+  if (obj === null || typeof obj !== 'object') {
+    return false
+  }
+  
+  const candidate = obj as Record<string, unknown>
   return (
-    obj !== null &&
-    typeof obj === 'object' &&
-    typeof (obj as any).hasActiveMFA === 'boolean' &&
-    typeof (obj as any).methods === 'object' &&
-    typeof (obj as any).totalUsage === 'number' &&
-    ['none', 'basic', 'enhanced'].includes((obj as any).securityLevel)
+    typeof candidate.hasActiveMFA === 'boolean' &&
+    typeof candidate.methods === 'object' &&
+    candidate.methods !== null &&
+    typeof candidate.totalUsage === 'number' &&
+    typeof candidate.securityLevel === 'string' &&
+    ['none', 'basic', 'enhanced'].includes(candidate.securityLevel)
   )
 }
 

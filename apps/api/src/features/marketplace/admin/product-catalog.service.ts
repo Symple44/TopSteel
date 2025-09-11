@@ -1,4 +1,4 @@
-import { Article } from '@erp/entities'
+import { Article, ArticleType, ArticleStatus, UniteStock } from '@erp/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import type { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -134,19 +134,19 @@ export class ProductCatalogService {
       }
 
       // Create Article ERP with marketplace settings
-      const articleData = {
+      const articleData: Partial<Article> = {
         ...productData,
-        type: 'PRODUIT_FINI' as const, // Type par défaut pour marketplace
-        status: 'ACTIF' as const,
-        uniteStock: 'PCS' as const, // Unité par défaut
+        type: ArticleType.PRODUIT_FINI,
+        status: ArticleStatus.ACTIF,
+        uniteStock: UniteStock.PIECE,
         gereEnStock: true,
         isMarketplaceEnabled: true,
         stockPhysique: productData.stockPhysique || 0,
         stockDisponible: productData.stockPhysique || 0,
       }
-      const article = this.articleRepository.create(articleData as any)
+      const article = this.articleRepository.create(articleData)
 
-      const savedArticle = (await this.articleRepository.save(article)) as unknown as Article
+      const savedArticle = await this.articleRepository.save(article)
 
       // Clear cache
       await this.clearProductCache(tenantId)

@@ -60,7 +60,7 @@ export class ShopConfigurationController {
   async updateConfigurationSection(
     @CurrentTenant() tenantId: string,
     @Param('section') section: keyof ShopConfiguration,
-    @Body() sectionData: any
+    @Body() sectionData: Record<string, unknown>
   ): Promise<ShopConfiguration> {
     return this.configService.updateConfigurationSection(tenantId, section, sectionData)
   }
@@ -80,7 +80,13 @@ export class ShopConfigurationController {
       supportEmail?: string
       phone?: string
       companyName?: string
-      companyAddress?: any
+      companyAddress?: {
+        street: string
+        city: string
+        postalCode: string
+        country: string
+        region?: string
+      }
       vatNumber?: string
       businessRegistration?: string
     }

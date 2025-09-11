@@ -13,6 +13,35 @@ import {
 // import { MenuItemPermission } from './menu-item-permission.entity'
 // import { MenuItemRole } from './menu-item-role.entity'
 
+// Interfaces to avoid circular dependencies
+interface MenuConfigurationData {
+  id: string
+  name: string
+  description?: string
+  isActive: boolean
+  isSystem: boolean
+  metadata?: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+  createdBy?: string
+  updatedBy?: string
+}
+
+interface MenuItemPermissionData {
+  id: string
+  menuItemId: string
+  permissionId: string
+  isRequired?: boolean
+  createdAt: Date
+}
+
+interface MenuItemRoleData {
+  id: string
+  menuItemId: string
+  roleId: string
+  createdAt: Date
+}
+
 export enum MenuItemType {
   FOLDER = 'M', // Dossier - pour regrouper des éléments
   PROGRAM = 'P', // Programme - appelle un menu/module
@@ -129,20 +158,20 @@ export class MenuItem {
   // Relations
   @ManyToOne('MenuConfiguration', 'items', { lazy: true })
   @JoinColumn({ name: 'configId' })
-  configuration!: any
+  configuration!: MenuConfigurationData
 
   @ManyToOne('MenuItem', 'children', { lazy: true })
   @JoinColumn({ name: 'parentId' })
-  parent?: any
+  parent?: MenuItem
 
   @OneToMany('MenuItem', 'parent', { lazy: true })
-  children!: unknown[]
+  children!: MenuItem[]
 
   @OneToMany('MenuItemPermission', 'menuItem', { lazy: true })
-  permissions!: unknown[]
+  permissions!: MenuItemPermissionData[]
 
   @OneToMany('MenuItemRole', 'menuItem', { lazy: true })
-  roles!: unknown[]
+  roles!: MenuItemRoleData[]
 
   // Méthodes utilitaires
   static create(

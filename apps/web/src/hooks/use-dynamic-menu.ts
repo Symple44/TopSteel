@@ -9,7 +9,7 @@ import { usePermissions } from './use-permissions-v2'
 // Types pour les réponses API
 interface MenuApiResponse {
   success: boolean
-  data: MenuItemConfig[]
+  data: RawMenuItemData[]
 }
 
 interface MenuConfigResponse {
@@ -20,8 +20,40 @@ interface MenuConfigResponse {
   }
 }
 
+// Interface pour les données brutes du menu depuis l'API
+interface RawMenuItemData {
+  id: string
+  parentId?: string
+  title: string
+  titleKey?: string
+  titleTranslations?: Record<string, string>
+  href?: string
+  icon?: string
+  gradient?: string
+  badge?: string
+  orderIndex?: number
+  isVisible?: boolean
+  moduleId?: string
+  target?: string
+  type: 'M' | 'P' | 'L' | 'D'
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
+  permissions?: string[]
+  roles?: string[]
+  depth?: number
+  // Propriétés personnalisées
+  isFavorite?: boolean
+  isPinned?: boolean
+  customTitle?: string
+  customIcon?: string
+  customIconColor?: string
+  customBadge?: string
+  children?: RawMenuItemData[]
+}
+
 // Fonction pour mapper les données du menu personnalisé vers la structure attendue
-function mapCustomMenuItemRecursively(item: Record<string, unknown>): MenuItemConfig {
+function mapCustomMenuItemRecursively(item: RawMenuItemData): MenuItemConfig {
   return {
     id: item.id,
     parentId: item.parentId,
@@ -48,15 +80,15 @@ function mapCustomMenuItemRecursively(item: Record<string, unknown>): MenuItemCo
       isVisible: item.isVisible ?? true,
       isFavorite: item.isFavorite ?? false,
       isPinned: item.isPinned ?? false,
-      customTitle: item.customTitle || undefined,
-      customIcon: item.customIcon || undefined,
-      customColor: item.customIconColor || undefined, // Mapper customIconColor vers customColor
-      customBadge: item.customBadge || undefined,
-      customOrder: item.orderIndex || undefined,
+      customTitle: item.customTitle,
+      customIcon: item.customIcon,
+      customColor: item.customIconColor,
+      customBadge: item.customBadge,
+      customOrder: item.orderIndex,
     },
     // Traiter récursivement les enfants
     children: Array.isArray(item.children)
-      ? item.children.map((child: Record<string, unknown>) => mapCustomMenuItemRecursively(child))
+      ? item.children.map((child) => mapCustomMenuItemRecursively(child))
       : [],
   }
 }
@@ -127,7 +159,7 @@ export function useDynamicMenu() {
 
         if (response.success && Array.isArray(response.data)) {
           // Mapper les données pour inclure les préférences personnalisées dans la structure attendue
-          const menuItems = response.data.map((item: Record<string, unknown>) =>
+          const menuItems = response.data.map((item: RawMenuItemData) =>
             mapCustomMenuItemRecursively(item)
           )
           setCustomMenu(menuItems)
@@ -268,7 +300,7 @@ export function useDynamicMenu() {
       const customEvent = event as CustomEvent
       // Si l'événement contient directement les données du menu, les utiliser
       if (customEvent?.detail?.menuItems && mode === 'custom') {
-        const mappedItems = customEvent?.detail?.menuItems?.map((item: unknown) =>
+        const mappedItems = customEvent?.detail?.menuItems?.map((item: RawMenuItemData) =>
           mapCustomMenuItemRecursively(item)
         )
         setCustomMenu(mappedItems)

@@ -6,6 +6,16 @@ import { getErrorMessage } from '../../../core/common/utils'
 import { Partner } from '../../../domains/partners/entities/partner.entity'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
+
+interface ShippingAddress {
+  street: string
+  city: string
+  postalCode: string
+  country: string
+  additionalInfo?: string
+}
+
+interface BillingAddress extends ShippingAddress {}
 import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
 
 export interface ERPOrderView {
@@ -33,8 +43,8 @@ export interface ERPOrderView {
   shippingCost: number
   discountAmount: number
   // Adresses
-  shippingAddress?: any
-  billingAddress?: any
+  shippingAddress?: ShippingAddress
+  billingAddress?: BillingAddress
   // Dates
   orderDate: Date
   deliveryDate?: Date

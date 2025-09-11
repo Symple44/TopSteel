@@ -9,6 +9,21 @@ import {
 } from 'typeorm'
 // import { MenuItem } from './menu-item.entity';
 
+// Interface to avoid circular dependency
+interface MenuItemData {
+  id: string
+  configId: string
+  parentId?: string
+  title: string
+  orderIndex: number
+  isVisible: boolean
+  type: string
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
+  metadata?: Record<string, unknown>
+}
+
 @Entity('menu_item_permissions')
 @Index(['menuItemId', 'permissionId'], { unique: true })
 export class MenuItemPermission {
@@ -32,7 +47,7 @@ export class MenuItemPermission {
   // Relations
   @ManyToOne('MenuItem', 'permissions', { lazy: true })
   @JoinColumn({ name: 'menuItemId' })
-  menuItem!: any
+  menuItem!: MenuItemData
 
   // Méthodes utilitaires
   static create(

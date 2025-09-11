@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common'
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
+import { User } from '../../../domains/users/entities/user.entity'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import {
   MarketplacePermission,
@@ -112,7 +113,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() action: OrderModerationAction,
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     return this.moderationService.performModerationAction(tenantId, orderId, action, user.id)
   }
@@ -124,7 +125,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() body: { reason?: string },
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'APPROVE',
@@ -141,7 +142,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() body: { reason: string },
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'REJECT',
@@ -158,7 +159,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() body: { reason: string },
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'HOLD',
@@ -175,7 +176,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() body: { flagType: string; reason: string },
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'FLAG',
@@ -193,7 +194,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() body: { assignTo: string },
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'ASSIGN',
@@ -210,7 +211,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() body: { message: string; isInternal?: boolean },
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'ADD_NOTE',
@@ -228,7 +229,7 @@ export class OrderModerationController {
     @CurrentTenant() tenantId: string,
     @Param('orderId') orderId: string,
     @Body() body: { flagType: string },
-    @CurrentUser() user: any
+    @CurrentUser() user: User
   ): Promise<{ success: boolean; message: string }> {
     const action: OrderModerationAction = {
       action: 'RESOLVE_FLAG',

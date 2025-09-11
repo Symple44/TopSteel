@@ -240,7 +240,7 @@ export function DropdownPortal({
 
   // Clone du trigger avec les event handlers
   const triggerElement = React.cloneElement(trigger, {
-    ref: (node: HTMLElement) => {
+    ref: (node: HTMLElement | null) => {
       if (node) {
         // Use Object.defineProperty to bypass readonly
         Object.defineProperty(triggerRef, 'current', {
