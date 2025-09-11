@@ -294,13 +294,33 @@ class MaterialsAPIImpl implements MaterialsAPI {
   }
 }
 
-// Define Article types for the implementation
-interface Article {
+// Import the BasicArticle type from interfaces
+interface BasicArticle {
   id: string
   code: string
-  description: string
-  category?: string
-  [key: string]: unknown
+  designation: string
+  stock?: number
+}
+
+interface BasicUser {
+  id: string
+  email: string
+  firstName?: string
+  lastName?: string
+  role?: string
+}
+
+interface BasicProject {
+  id: string
+  name: string
+  status: string
+}
+
+interface BasicNotification {
+  id: string
+  title: string
+  message: string
+  read: boolean
 }
 
 interface ArticleFilters {
@@ -316,74 +336,83 @@ interface ArticleFilters {
 class ArticlesAPIImpl implements ArticlesAPI {
   constructor(private client: APIClientEnhanced) {}
 
-  async getArticles(filters?: ArticleFilters): Promise<PaginatedResponse<Article>> {
+  async getArticles(filters?: unknown): Promise<PaginatedResponse<BasicArticle>> {
+    const articleFilters = filters as ArticleFilters
     const params = new URLSearchParams()
-    if (filters?.search) params.append('search', filters.search)
-    if (filters?.category) params.append('category', filters.category)
-    if (filters?.page) params.append('page', filters.page.toString())
+    if (articleFilters?.search) params.append('search', articleFilters.search)
+    if (articleFilters?.category) params.append('category', articleFilters.category)
+    if (articleFilters?.page) params.append('page', articleFilters.page.toString())
 
     const queryString = params.toString()
     const endpoint = queryString ? `/articles?${queryString}` : '/articles'
-    return this.client.get<PaginatedResponse<Article>>(endpoint)
+    return this.client.get<PaginatedResponse<BasicArticle>>(endpoint)
   }
 
-  async getArticle(id: string): Promise<Article> {
-    return this.client.get<Article>(`/articles/${id}`)
+  async getArticle(id: string): Promise<BasicArticle> {
+    return this.client.get<BasicArticle>(`/articles/${id}`)
   }
 
-  async createArticle(data: Partial<Article>): Promise<Article> {
-    return this.client.post<Article>('/articles', data)
+  async createArticle(data: Partial<BasicArticle>): Promise<BasicArticle> {
+    return this.client.post<BasicArticle>('/articles', data)
   }
 
-  async updateArticle(id: string, data: Partial<Article>): Promise<Article> {
-    return this.client.put<Article>(`/articles/${id}`, data)
+  async updateArticle(id: string, data: Partial<BasicArticle>): Promise<BasicArticle> {
+    return this.client.put<BasicArticle>(`/articles/${id}`, data)
   }
 
   async deleteArticle(id: string): Promise<void> {
     return this.client.delete<void>(`/articles/${id}`)
   }
 
-  async adjustStock(id: string, adjustment: { quantity: number; reason?: string }): Promise<Article> {
-    return this.client.patch<Article>(`/articles/${id}/adjust-stock`, adjustment)
+  async adjustStock(
+    id: string,
+    adjustment: {
+      quantity: number
+      type: 'IN' | 'OUT' | 'ADJUSTMENT'
+      reason: string
+      location?: string
+    }
+  ): Promise<BasicArticle> {
+    return this.client.patch<BasicArticle>(`/articles/${id}/adjust-stock`, adjustment)
   }
 }
 
 // Basic implementations for remaining APIs
 class UsersAPIImpl implements UsersAPI {
   constructor(private client: APIClientEnhanced) {}
-  async getUsers(_filters?: unknown): Promise<PaginatedResponse<unknown>> {
-    return this.client.get<PaginatedResponse<unknown>>('/users')
+  async getUsers(_filters?: unknown): Promise<PaginatedResponse<BasicUser>> {
+    return this.client.get<PaginatedResponse<BasicUser>>('/users')
   }
-  async getUser(id: string): Promise<unknown> {
-    return this.client.get<unknown>(`/users/${id}`)
+  async getUser(id: string): Promise<BasicUser> {
+    return this.client.get<BasicUser>(`/users/${id}`)
   }
-  async createUser(data: unknown): Promise<unknown> {
-    return this.client.post<unknown>('/users', data)
+  async createUser(data: Partial<BasicUser>): Promise<BasicUser> {
+    return this.client.post<BasicUser>('/users', data)
   }
-  async updateUser(id: string, data: Record<string, unknown>): Promise<unknown> {
-    return this.client.put<unknown>(`/users/${id}`, data)
+  async updateUser(id: string, data: Partial<BasicUser>): Promise<BasicUser> {
+    return this.client.put<BasicUser>(`/users/${id}`, data)
   }
   async deleteUser(id: string): Promise<void> {
     return this.client.delete<void>(`/users/${id}`)
   }
-  async getCurrentUser(): Promise<unknown> {
-    return this.client.get<unknown>('/auth/profile')
+  async getCurrentUser(): Promise<BasicUser> {
+    return this.client.get<BasicUser>('/auth/profile')
   }
 }
 
 class ProjectsAPIImpl implements ProjectsAPI {
   constructor(private client: APIClientEnhanced) {}
-  async getProjects(_filters?: unknown): Promise<PaginatedResponse<unknown>> {
-    return this.client.get<PaginatedResponse<unknown>>('/projects')
+  async getProjects(_filters?: unknown): Promise<PaginatedResponse<BasicProject>> {
+    return this.client.get<PaginatedResponse<BasicProject>>('/projects')
   }
-  async getProject(id: string): Promise<unknown> {
-    return this.client.get<unknown>(`/projects/${id}`)
+  async getProject(id: string): Promise<BasicProject> {
+    return this.client.get<BasicProject>(`/projects/${id}`)
   }
-  async createProject(data: unknown): Promise<unknown> {
-    return this.client.post<unknown>('/projects', data)
+  async createProject(data: Partial<BasicProject>): Promise<BasicProject> {
+    return this.client.post<BasicProject>('/projects', data)
   }
-  async updateProject(id: string, data: Record<string, unknown>): Promise<unknown> {
-    return this.client.put<unknown>(`/projects/${id}`, data)
+  async updateProject(id: string, data: Partial<BasicProject>): Promise<BasicProject> {
+    return this.client.put<BasicProject>(`/projects/${id}`, data)
   }
   async deleteProject(id: string): Promise<void> {
     return this.client.delete<void>(`/projects/${id}`)
@@ -392,17 +421,17 @@ class ProjectsAPIImpl implements ProjectsAPI {
 
 class NotificationsAPIImpl implements NotificationsAPI {
   constructor(private client: APIClientEnhanced) {}
-  async getNotifications(_filters?: unknown): Promise<PaginatedResponse<unknown>> {
-    return this.client.get<PaginatedResponse<unknown>>('/notifications')
+  async getNotifications(_filters?: unknown): Promise<PaginatedResponse<BasicNotification>> {
+    return this.client.get<PaginatedResponse<BasicNotification>>('/notifications')
   }
-  async getNotification(id: string): Promise<unknown> {
-    return this.client.get<unknown>(`/notifications/${id}`)
+  async getNotification(id: string): Promise<BasicNotification> {
+    return this.client.get<BasicNotification>(`/notifications/${id}`)
   }
-  async createNotification(data: unknown): Promise<unknown> {
-    return this.client.post<unknown>('/notifications', data)
+  async createNotification(data: Partial<BasicNotification>): Promise<BasicNotification> {
+    return this.client.post<BasicNotification>('/notifications', data)
   }
-  async markAsRead(id: string): Promise<unknown> {
-    return this.client.patch<unknown>(`/notifications/${id}/read`)
+  async markAsRead(id: string): Promise<BasicNotification> {
+    return this.client.patch<BasicNotification>(`/notifications/${id}/read`)
   }
   async markAllAsRead(): Promise<void> {
     return this.client.patch<void>('/notifications/read-all')
@@ -414,12 +443,41 @@ class NotificationsAPIImpl implements NotificationsAPI {
 
 class SearchAPIImpl implements SearchAPI {
   constructor(private client: APIClientEnhanced) {}
-  async globalSearch(query: string, options?: { types?: string[]; limit?: number; offset?: number }): Promise<unknown> {
+  async globalSearch(
+    query: string,
+    options?: {
+      types?: string[]
+      limit?: number
+      offset?: number
+    }
+  ): Promise<{
+    results: Array<{
+      type: string
+      id: string
+      title: string
+      description?: string
+      url?: string
+      score?: number
+    }>
+    total: number
+    took: number
+  }> {
     const params = new URLSearchParams({ q: query })
     if (options?.types) params.append('types', options.types.join(','))
     if (options?.limit) params.append('limit', options.limit.toString())
     if (options?.offset) params.append('offset', options.offset.toString())
-    return this.client.get<unknown>(`/search/global?${params}`)
+    return this.client.get<{
+      results: Array<{
+        type: string
+        id: string
+        title: string
+        description?: string
+        url?: string
+        score?: number
+      }>
+      total: number
+      took: number
+    }>(`/search/global?${params}`)
   }
   async searchSuggestions(query: string): Promise<string[]> {
     return this.client.get<string[]>(`/search/suggestions?q=${query}`)
@@ -462,7 +520,7 @@ class SettingsAPIImpl implements SettingsAPI {
     const endpoint = category ? `/settings?category=${category}` : '/settings'
     return this.client.get<Record<string, unknown>>(endpoint)
   }
-  async updateSetting(key: string, value: unknown): Promise<void> {
+  async updateSetting(key: string, value: any): Promise<void> {
     return this.client.patch<void>('/settings', { [key]: value })
   }
   async updateSettings(settings: Record<string, unknown>): Promise<void> {
@@ -476,17 +534,48 @@ class SettingsAPIImpl implements SettingsAPI {
 
 class ReportsAPIImpl implements ReportsAPI {
   constructor(private client: APIClientEnhanced) {}
-  async generateReport(type: string, params?: Record<string, unknown>): Promise<unknown> {
-    return this.client.post<unknown>('/reports/generate', { type, params })
+  async generateReport(
+    type: string,
+    params?: Record<string, unknown>
+  ): Promise<{
+    id: string
+    status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+    downloadUrl?: string
+  }> {
+    return this.client.post<{
+      id: string
+      status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+      downloadUrl?: string
+    }>('/reports/generate', { type, params })
   }
-  async getReportStatus(id: string): Promise<unknown> {
-    return this.client.get<unknown>(`/reports/${id}/status`)
+  async getReportStatus(id: string): Promise<{
+    status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+    progress?: number
+    downloadUrl?: string
+    error?: string
+  }> {
+    return this.client.get<{
+      status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+      progress?: number
+      downloadUrl?: string
+      error?: string
+    }>(`/reports/${id}/status`)
   }
   async downloadReport(id: string): Promise<Blob> {
     return this.client.get<Blob>(`/reports/${id}/download`)
   }
-  async listReports(): Promise<Record<string, unknown>[]> {
-    return this.client.get<Record<string, unknown>[]>('/reports')
+  async listReports(): Promise<Array<{
+    id: string
+    type: string
+    created: string
+    status: string
+  }>> {
+    return this.client.get<Array<{
+      id: string
+      type: string
+      created: string
+      status: string
+    }>>('/reports')
   }
 }
 

@@ -615,8 +615,8 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
     }
   }
 
-  protected getAuthToken(): string | null {
-    // Access the authToken via the protected property or implement token retrieval
+  private getAuthTokenOverride(): string | null {
+    // Custom token retrieval logic for APIClientFinal
     if (typeof window === 'undefined') return null
 
     try {

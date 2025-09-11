@@ -598,7 +598,23 @@ export class ParameterService {
         break
     }
 
-    const param = repository.create(data)
+    // Create clean data object without index signature
+    const cleanData = {
+      group: data.group,
+      key: data.key,
+      value: data.value,
+      type: data.type as ParameterType,
+      arrayValues: data.arrayValues,
+      objectValues: data.objectValues,
+      metadata: data.metadata,
+      description: data.description as string | undefined,
+      isActive: data.isActive as boolean | undefined,
+      isReadonly: data.isReadonly as boolean | undefined,
+      translationKey: data.translationKey as string | undefined,
+      customTranslations: data.translations,
+    }
+    
+    const param = repository.create(cleanData)
     const result = await (repository as Repository<ParameterEntity>).save(param as ParameterEntity)
 
     // Invalider le cache si c'est un paramètre de rôles

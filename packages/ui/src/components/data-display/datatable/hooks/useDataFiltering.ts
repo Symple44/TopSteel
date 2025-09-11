@@ -105,7 +105,31 @@ export function useDataFiltering<T>({
           value = row[(ruleField || column?.key) as keyof T]
         }
 
-        return applyAdvancedFilter(value, rule, column)
+        // Convert AdvancedFilterRule to FilterRule format
+        const operatorMapping: Record<string, string> = {
+          'equals': 'equals',
+          'not_equals': 'not_equals',
+          'contains': 'contains',
+          'not_contains': 'not_contains',
+          'starts_with': 'starts_with',
+          'ends_with': 'ends_with',
+          'gt': 'greater_than',
+          'gte': 'greater_or_equal',
+          'lt': 'less_than',
+          'lte': 'less_or_equal',
+          'is_empty': 'is_empty',
+          'is_not_empty': 'is_not_empty',
+          'in': 'in',
+          'not_in': 'not_in',
+          'between': 'between',
+        }
+        
+        const simpleRule = {
+          operator: (operatorMapping[rule.operator] || rule.operator) as 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'starts_with' | 'ends_with' | 'is_empty' | 'is_not_empty' | 'greater_than' | 'less_than' | 'greater_or_equal' | 'less_or_equal' | 'between' | 'in' | 'not_in',
+          value: rule.value,
+          secondValue: rule.value2,
+        }
+        return applyAdvancedFilter(value, simpleRule, column)
       })
 
       // Appliquer la logique AND/OR

@@ -87,10 +87,11 @@ class PartnersAPIImpl implements PartnersAPI {
         params.append('status', filters.status)
       }
     }
-    if ((filters as unknown)?.search) params.append('search', (filters as unknown).search)
+    // PartnerFilters doesn't have search, use denomination instead
+    if (filters?.denomination) params.append('search', filters.denomination)
     if (filters?.page) params.append('page', filters.page.toString())
-    if ((filters as unknown)?.pageSize)
-      params.append('pageSize', (filters as unknown).pageSize.toString())
+    // Use limit instead of pageSize for PartnerFilters
+    if (filters?.limit) params.append('pageSize', filters.limit.toString())
 
     const queryString = params.toString()
     const endpoint = queryString ? `/partners?${queryString}` : '/partners'
@@ -268,9 +269,12 @@ class MaterialsAPIImpl implements MaterialsAPI {
         params.append('type', filters.type)
       }
     }
-    if ((filters as unknown)?.category) params.append('category', (filters as unknown).category)
+    // MaterialFilters doesn't have category, use type instead
+    if (typeof filters?.type === 'string') params.append('category', filters.type)
     if (filters?.search) params.append('search', filters.search)
     if (filters?.page) params.append('page', filters.page.toString())
+    // Use limit instead of pageSize for MaterialFilters
+    if (filters?.limit) params.append('pageSize', filters.limit.toString())
 
     const queryString = params.toString()
     const endpoint = queryString ? `/materials?${queryString}` : '/materials'
@@ -326,8 +330,11 @@ class ArticlesAPIImpl implements ArticlesAPI {
   async getArticles(filters?: ArticleFilters): Promise<PaginatedResponse<Article>> {
     const params = new URLSearchParams()
     if (filters?.search) params.append('search', filters.search)
-    if ((filters as unknown)?.category) params.append('category', (filters as unknown).category)
+    // ArticleFilters doesn't have category, use type instead
+    if (filters?.type) params.append('category', filters.type)
     if (filters?.page) params.append('page', filters.page.toString())
+    // Use limit instead of pageSize for ArticleFilters  
+    if (filters?.limit) params.append('pageSize', filters.limit.toString())
 
     const queryString = params.toString()
     const endpoint = queryString ? `/articles?${queryString}` : '/articles'
