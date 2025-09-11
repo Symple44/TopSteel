@@ -319,19 +319,13 @@ export function InvalidateCache(entityType: string, operation: 'create' | 'updat
       try {
         const firstArg = args[0] as Partial<EntityWithTenantAndId> | undefined
         const resultEntity = result as Partial<EntityWithTenantAndId> | undefined
-        
+
         const tenantId = firstArg?.tenantId || resultEntity?.tenantId
         const entityId = firstArg?.id || resultEntity?.id
 
         // Check if the class instance has an eventEmitter property
         if (tenantId && entityId && this.eventEmitter) {
-          emitCacheInvalidationEvent(
-            this.eventEmitter,
-            tenantId,
-            entityType,
-            entityId,
-            operation
-          )
+          emitCacheInvalidationEvent(this.eventEmitter, tenantId, entityType, entityId, operation)
         }
       } catch (_error) {}
 

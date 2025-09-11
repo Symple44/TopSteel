@@ -80,7 +80,7 @@ export class ElasticsearchSearchService implements IElasticsearchSearchService {
 
       const response = (await this.client.search({
         index: process.env.ELASTICSEARCH_INDEX || 'topsteel',
-        ...searchBody
+        ...searchBody,
       })) as ElasticsearchSearchResponse
 
       if (process.env.NODE_ENV === 'development') {

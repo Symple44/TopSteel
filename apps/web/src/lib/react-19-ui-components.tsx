@@ -4,9 +4,9 @@
  */
 
 import * as UIComponents from '@erp/ui'
+import type { ReactNode } from 'react'
 import * as React from 'react'
 import { forwardRef } from 'react'
-import type { ReactNode } from 'react'
 
 // Base component props that include children
 interface BaseComponentProps {
@@ -22,11 +22,7 @@ export interface BadgeProps extends BaseComponentProps {
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
   ({ children, variant = 'default', className, ...props }, ref) => {
     const Component = UIComponents.Badge as React.ComponentType<any>
-    return React.createElement(
-      Component,
-      { ref, variant, className, ...props },
-      children
-    )
+    return React.createElement(Component, { ref, variant, className, ...props }, children)
   }
 )
 Badge.displayName = 'Badge'
@@ -74,7 +70,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
       type,
       disabled,
       className,
-      ...rest
+      ...rest,
     },
     children
   )
@@ -192,7 +188,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     description,
     actions,
     className,
-    ...props
+    ...props,
   })
 }
 PageHeader.displayName = 'PageHeader'
@@ -297,21 +293,25 @@ export const Input: React.FC<InputProps> = ({
   ...props
 }) => {
   const Component = UIComponents.Input as React.ComponentType<any>
-  return React.createElement(Component, {
-    type,
-    placeholder,
-    value,
-    onChange,
-    id,
-    className,
-    maxLength,
-    autoComplete,
-    autoFocus,
-    required,
-    accept,
-    disabled,
-    ...props
-  }, children)
+  return React.createElement(
+    Component,
+    {
+      type,
+      placeholder,
+      value,
+      onChange,
+      id,
+      className,
+      maxLength,
+      autoComplete,
+      autoFocus,
+      required,
+      accept,
+      disabled,
+      ...props,
+    },
+    children
+  )
 }
 
 // Separator component
@@ -414,7 +414,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>((props, ref) => {
       onValueChange,
       defaultValue,
       className,
-      ...rest
+      ...rest,
     },
     children
   )

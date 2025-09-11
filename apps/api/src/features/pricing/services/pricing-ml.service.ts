@@ -12,20 +12,23 @@ interface TensorFlowTensor {
 
 interface TensorFlowModel {
   predict(inputs: TensorFlowTensor): TensorFlowTensor
-  fit(xs: TensorFlowTensor, ys: TensorFlowTensor, options: {
-    epochs: number
-    batchSize: number
-    validationSplit: number
-    callbacks?: {
-      onEpochEnd?: (epoch: number, logs?: { loss?: number; [key: string]: number | undefined }) => void
+  fit(
+    xs: TensorFlowTensor,
+    ys: TensorFlowTensor,
+    options: {
+      epochs: number
+      batchSize: number
+      validationSplit: number
+      callbacks?: {
+        onEpochEnd?: (
+          epoch: number,
+          logs?: { loss?: number; [key: string]: number | undefined }
+        ) => void
+      }
     }
-  }): Promise<void>
+  ): Promise<void>
   save(path: string): Promise<void>
-  compile(config: {
-    optimizer: TensorFlowOptimizer
-    loss: string
-    metrics: string[]
-  }): void
+  compile(config: { optimizer: TensorFlowOptimizer; loss: string; metrics: string[] }): void
 }
 
 interface TensorFlowModule {
@@ -33,11 +36,7 @@ interface TensorFlowModule {
   sequential(config: { layers: TensorFlowLayer[] }): TensorFlowModel
   tensor2d(data: number[][]): TensorFlowTensor
   layers: {
-    dense(config: {
-      inputShape?: number[]
-      units: number
-      activation: string
-    }): TensorFlowLayer
+    dense(config: { inputShape?: number[]; units: number; activation: string }): TensorFlowLayer
     dropout(config: { rate: number }): TensorFlowLayer
   }
   train: {
@@ -46,11 +45,13 @@ interface TensorFlowModule {
 }
 
 interface TensorFlowLayer {
-  // Layer configuration
+  units?: number
+  activation?: string
+  inputShape?: number[]
 }
 
 interface TensorFlowOptimizer {
-  // Optimizer configuration
+  learningRate?: number
 }
 
 // TensorFlow.js optionnel pour Windows

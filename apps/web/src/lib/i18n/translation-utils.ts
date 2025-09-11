@@ -420,7 +420,7 @@ class TranslationUniverUtils {
         if (!isValidIWorkbookData(workbookData)) {
           throw new Error('Invalid workbook data format')
         }
-        
+
         const extendedUniver = univer as unknown as ExtendedUniver
         const univerSheet = extendedUniver?.createUniverSheet?.(workbookData)
 
@@ -502,7 +502,7 @@ class TranslationUniverUtils {
       try {
         // Utiliser l'API d'import d'Univer pour lire le fichier Excel
         const extendedUniver = univer as unknown as ExtendedUniver
-        
+
         if (extendedUniver?.importExcel) {
           const workbook = await extendedUniver.importExcel(buffer)
           if (workbook) {
@@ -551,8 +551,10 @@ class TranslationUniverUtils {
         if (cell) {
           const cellValue = cell?.getValue()
           // Type assertion pour gérer les valeurs de cellule compatibles
-          const typedValue = (typeof cellValue === 'object' && cellValue !== null) ? 
-            String(cellValue) : (cellValue as CellValue)
+          const typedValue =
+            typeof cellValue === 'object' && cellValue !== null
+              ? String(cellValue)
+              : (cellValue as CellValue)
           rowData[col?.toString()] = {
             v: typedValue || null,
             t: 1, // string type par défaut

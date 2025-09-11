@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+
 // Type forward reference pour éviter les imports circulaires
 interface QueryBuilderEntity {
   id: string

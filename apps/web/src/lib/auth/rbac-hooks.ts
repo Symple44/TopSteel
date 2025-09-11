@@ -1,10 +1,10 @@
 // Hooks React pour RBAC avancé
 import { useMemo } from 'react'
+import type { User } from '../../types/auth'
 import { AuthAdapter } from './auth-adapter'
 import { useAuth } from './auth-context'
 import { rbacService } from './rbac-service'
 import type { AccessPolicy, ExtendedUser, Permission } from './rbac-types'
-import type { User } from '../../types/auth'
 
 /**
  * Type guard pour vérifier si un objet est un User valide

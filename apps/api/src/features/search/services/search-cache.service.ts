@@ -123,11 +123,14 @@ export class SearchCacheService implements OnModuleInit {
       filters: options.filters
         ? Object.keys(options.filters)
             .sort()
-            .reduce((acc, key) => {
-              const typedAcc = acc as Record<string, unknown>
-              typedAcc[key] = options.filters?.[key]
-              return typedAcc
-            }, {} as Record<string, unknown>)
+            .reduce(
+              (acc, key) => {
+                const typedAcc = acc as Record<string, unknown>
+                typedAcc[key] = options.filters?.[key]
+                return typedAcc
+              },
+              {} as Record<string, unknown>
+            )
         : undefined,
       limit: options.limit,
       offset: options.offset,

@@ -170,7 +170,7 @@ export class CachedGlobalSearchService implements ISearchStrategy {
   /**
    * Get enhanced search statistics including cache metrics
    */
-  async getSearchStatistics(): Promise<SearchStatistics & { cache?: any }> {
+  async getSearchStatistics(): Promise<SearchStatistics & { cache?: Record<string, unknown> }> {
     const baseStats = await this.globalSearchService.getSearchStatistics()
     const cacheStats = await this.cacheService.getCacheStatistics()
 

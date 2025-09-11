@@ -3,8 +3,8 @@ import type { TestingModule } from '@nestjs/testing'
 import { Test } from '@nestjs/testing'
 import { getDataSourceToken } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { MockedFunction } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type {
   QueryBuilder,
   QueryBuilderCalculatedField,
@@ -21,17 +21,21 @@ describe('QueryBuilderExecutorService', () => {
   let service: QueryBuilderExecutorService
   let mockDataSource: {
     query: MockedFunction<(sql: string, parameters?: unknown[]) => Promise<unknown[]>>
-    createQueryRunner: MockedFunction<() => {
-      connect: MockedFunction<() => Promise<void>>
-      startTransaction: MockedFunction<() => Promise<void>>
-      commitTransaction: MockedFunction<() => Promise<void>>
-      rollbackTransaction: MockedFunction<() => Promise<void>>
-      release: MockedFunction<() => Promise<void>>
-      query: MockedFunction<(sql: string, parameters?: unknown[]) => Promise<unknown[]>>
-    }>
+    createQueryRunner: MockedFunction<
+      () => {
+        connect: MockedFunction<() => Promise<void>>
+        startTransaction: MockedFunction<() => Promise<void>>
+        commitTransaction: MockedFunction<() => Promise<void>>
+        rollbackTransaction: MockedFunction<() => Promise<void>>
+        release: MockedFunction<() => Promise<void>>
+        query: MockedFunction<(sql: string, parameters?: unknown[]) => Promise<unknown[]>>
+      }
+    >
   }
   let mockPermissionService: {
-    checkPermission: MockedFunction<(userId: string, queryBuilderId: string, action: string) => Promise<boolean>>
+    checkPermission: MockedFunction<
+      (userId: string, queryBuilderId: string, action: string) => Promise<boolean>
+    >
   }
   let mockSecurityService: {
     getAllowedTables: MockedFunction<(userId: string) => Promise<string[]>>
@@ -571,9 +575,12 @@ describe('QueryBuilderExecutorService', () => {
 
       await service.executeQuery(mockQueryBuilder, { page: 1 }, 'user-123')
 
-      expect(logSpy).toHaveBeenCalledWith('Query executed successfully', expect.objectContaining({
-        queryId: expect.stringMatching(/^[a-f\d-]+$/i)
-      }))
+      expect(logSpy).toHaveBeenCalledWith(
+        'Query executed successfully',
+        expect.objectContaining({
+          queryId: expect.stringMatching(/^[a-f\d-]+$/i),
+        })
+      )
     })
 
     it('should log and handle permission violations', async () => {
@@ -586,7 +593,7 @@ describe('QueryBuilderExecutorService', () => {
         expect.stringContaining('attempted to execute query'),
         expect.objectContaining({
           userId: expect.stringMatching(/^user-/),
-          queryId: expect.stringMatching(/^query-/)
+          queryId: expect.stringMatching(/^query-/),
         })
       )
     })

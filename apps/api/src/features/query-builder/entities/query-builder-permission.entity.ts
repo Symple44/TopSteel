@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { User } from '../../../domains/users/entities/user.entity'
+
 // Type forward reference pour éviter les imports circulaires
 interface QueryBuilderEntity {
   id: string
