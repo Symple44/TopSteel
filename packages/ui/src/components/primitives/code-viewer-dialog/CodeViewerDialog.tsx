@@ -54,39 +54,42 @@ export function CodeViewerDialog({
   onLoadDetails,
   translations = {},
 }: CodeViewerDialogProps) {
-  // Default translations with fallbacks
-  const t = (key: string, params?: Record<string, string | number>) => {
-    const defaultTranslations = {
-      title: 'Code Viewer',
-      loading: 'Loading...',
-      loadError: 'Failed to load file',
-      error: 'Error',
-      retry: 'Retry',
-      linesSelected: 'lines selected',
-      copied: 'Copied!',
-      copySelection: 'Copy Selection',
-      clear: 'Clear',
-      copyAll: 'Copy All',
-      code: 'Code',
-      clickLineNumbers: 'Click line numbers to select',
-      lines: 'lines',
-      lineTooltip: 'Line {{number}}',
-    }
+  // Default translations with fallbacks - memoized for useCallback
+  const t = useCallback(
+    (key: string, params?: Record<string, string | number>) => {
+      const defaultTranslations = {
+        title: 'Code Viewer',
+        loading: 'Loading...',
+        loadError: 'Failed to load file',
+        error: 'Error',
+        retry: 'Retry',
+        linesSelected: 'lines selected',
+        copied: 'Copied!',
+        copySelection: 'Copy Selection',
+        clear: 'Clear',
+        copyAll: 'Copy All',
+        code: 'Code',
+        clickLineNumbers: 'Click line numbers to select',
+        lines: 'lines',
+        lineTooltip: 'Line {{number}}',
+      }
 
-    let translation =
-      translations[key as keyof typeof translations] ||
-      defaultTranslations[key as keyof typeof defaultTranslations] ||
-      key
+      let translation =
+        translations[key as keyof typeof translations] ||
+        defaultTranslations[key as keyof typeof defaultTranslations] ||
+        key
 
-    // Simple parameter replacement
-    if (params && typeof translation === 'string') {
-      Object.entries(params).forEach(([paramKey, value]) => {
-        translation = translation.replace(`{{${paramKey}}}`, String(value))
-      })
-    }
+      // Simple parameter replacement
+      if (params && typeof translation === 'string') {
+        Object.entries(params).forEach(([paramKey, value]) => {
+          translation = translation.replace(`{{${paramKey}}}`, String(value))
+        })
+      }
 
-    return translation
-  }
+      return translation
+    },
+    [translations]
+  )
 
   const [details, setDetails] = useState<FileDetails | null>(fileDetails || null)
   const [loading, setLoading] = useState(false)
@@ -137,7 +140,7 @@ export function CodeViewerDialog({
     } catch (_err) {}
   }
 
-  const handleLineClick = (lineNumber: number, event: React.MouseEvent) => {
+  const handleLineClick = (lineNumber: number, event: React.MouseEvent | React.KeyboardEvent) => {
     event.preventDefault()
 
     if (event.shiftKey && lastSelectedLine !== null) {
@@ -369,7 +372,7 @@ export function CodeViewerDialog({
                                 onClick={(e) => handleLineClick(lineNumber, e)}
                                 onKeyDown={(e) =>
                                   (e.key === 'Enter' || e.key === ' ') &&
-                                  handleLineClick(lineNumber, e as any)
+                                  handleLineClick(lineNumber, e)
                                 }
                                 tabIndex={0}
                                 aria-label={`Toggle selection for line ${lineNumber}`}

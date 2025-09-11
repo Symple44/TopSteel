@@ -16,6 +16,10 @@ interface DropdownPortalProps {
   onInteractOutside?: (event: Event) => void
 }
 
+interface TriggerWithRef extends React.ReactElement {
+  ref?: React.RefObject<HTMLElement> | ((node: HTMLElement | null) => void) | null
+}
+
 export function DropdownPortal({
   trigger,
   children,
@@ -246,7 +250,8 @@ export function DropdownPortal({
         })
       }
       // Forward ref si le trigger en a une
-      const originalRef = (trigger as any).ref || trigger.props?.ref
+      const triggerWithRef = trigger as TriggerWithRef
+      const originalRef = triggerWithRef.ref || trigger.props?.ref
       if (typeof originalRef === 'function') {
         originalRef(node)
       } else if (
@@ -273,7 +278,10 @@ export function DropdownPortal({
         trigger.props.onClick(e)
       }
     },
-  } as any)
+  } satisfies Partial<React.HTMLAttributes<HTMLElement>> & {
+    ref?: React.RefObject<HTMLElement> | ((node: HTMLElement | null) => void) | null
+    onClick?: (e: React.MouseEvent) => void
+  })
 
   // Portal pour le contenu du dropdown
   const dropdownContent =

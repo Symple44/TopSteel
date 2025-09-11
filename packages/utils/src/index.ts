@@ -48,7 +48,7 @@ export * from './validation'
  * Safe logging function that checks for console availability
  */
 export function safeLog(..._args: unknown[]) {
-  // biome-ignore lint/suspicious/noConsole: Debug function that safely checks for console availability
+  // Empty function - console logging removed for security
 }
 
 /**

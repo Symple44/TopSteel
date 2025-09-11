@@ -8,9 +8,36 @@
 import DOMPurify from 'isomorphic-dompurify'
 
 /**
+ * DOMPurify configuration interface
+ */
+export interface SanitizerConfig {
+  ALLOWED_TAGS?: string[]
+  ALLOWED_ATTR?: string[]
+  ALLOW_DATA_ATTR?: boolean
+  FORBID_TAGS?: string[]
+  FORBID_ATTR?: string[]
+  KEEP_CONTENT?: boolean
+  ALLOW_UNKNOWN_PROTOCOLS?: boolean
+  SANITIZE_DOM?: boolean
+  USE_PROFILES?: object
+  WHOLE_DOCUMENT?: boolean
+  RETURN_DOM?: boolean
+  RETURN_DOM_FRAGMENT?: boolean
+  RETURN_DOM_IMPORT?: boolean
+  RETURN_TRUSTED_TYPE?: boolean
+  FORCE_BODY?: boolean
+  IN_PLACE?: boolean
+  CUSTOM_ELEMENT_HANDLING?: {
+    tagNameCheck?: RegExp | ((tagName: string) => boolean)
+    attributeNameCheck?: RegExp | ((attrName: string) => boolean)
+    allowCustomizedBuiltInElements?: boolean
+  }
+}
+
+/**
  * Default configuration for rich text content
  */
-const RICH_TEXT_CONFIG = {
+const RICH_TEXT_CONFIG: SanitizerConfig = {
   ALLOWED_TAGS: [
     'p',
     'br',
@@ -62,7 +89,7 @@ const RICH_TEXT_CONFIG = {
 /**
  * Minimal configuration for search highlights and simple text
  */
-const HIGHLIGHT_CONFIG = {
+const HIGHLIGHT_CONFIG: SanitizerConfig = {
   ALLOWED_TAGS: ['mark', 'strong', 'em', 'span'],
   ALLOWED_ATTR: ['class'],
   KEEP_CONTENT: true,
@@ -81,7 +108,7 @@ const HIGHLIGHT_CONFIG = {
 /**
  * Basic configuration for simple formatted text
  */
-const BASIC_CONFIG = {
+const BASIC_CONFIG: SanitizerConfig = {
   ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'span'],
   ALLOWED_ATTR: ['class'],
   ALLOW_DATA_ATTR: false,
@@ -104,7 +131,7 @@ const BASIC_CONFIG = {
  * @param customConfig - Optional custom DOMPurify configuration
  * @returns Sanitized HTML string safe for dangerouslySetInnerHTML
  */
-export function sanitizeRichText(html: string, customConfig?: any): string {
+export function sanitizeRichText(html: string, customConfig?: Partial<SanitizerConfig>): string {
   if (!html) return ''
 
   const config = customConfig ? { ...RICH_TEXT_CONFIG, ...customConfig } : RICH_TEXT_CONFIG
@@ -118,7 +145,7 @@ export function sanitizeRichText(html: string, customConfig?: any): string {
  * @param customConfig - Optional custom DOMPurify configuration
  * @returns Sanitized HTML string safe for dangerouslySetInnerHTML
  */
-export function sanitizeHighlight(html: string, customConfig?: any): string {
+export function sanitizeHighlight(html: string, customConfig?: Partial<SanitizerConfig>): string {
   if (!html) return ''
 
   const config = customConfig ? { ...HIGHLIGHT_CONFIG, ...customConfig } : HIGHLIGHT_CONFIG
@@ -132,7 +159,7 @@ export function sanitizeHighlight(html: string, customConfig?: any): string {
  * @param customConfig - Optional custom DOMPurify configuration
  * @returns Sanitized HTML string safe for dangerouslySetInnerHTML
  */
-export function sanitizeBasic(html: string, customConfig?: any): string {
+export function sanitizeBasic(html: string, customConfig?: Partial<SanitizerConfig>): string {
   if (!html) return ''
 
   const config = customConfig ? { ...BASIC_CONFIG, ...customConfig } : BASIC_CONFIG
@@ -146,7 +173,7 @@ export function sanitizeBasic(html: string, customConfig?: any): string {
  * @param config - DOMPurify configuration object
  * @returns Sanitized HTML string safe for dangerouslySetInnerHTML
  */
-export function sanitizeHtml(html: string, config: any): string {
+export function sanitizeHtml(html: string, config: SanitizerConfig): string {
   if (!html) return ''
   return DOMPurify.sanitize(html, config) as unknown as string
 }

@@ -67,7 +67,7 @@ export function TranslationField({
   fieldTranslations = {},
 }: TranslationFieldProps) {
   // Default translations with fallbacks
-  const t = (key: string, params?: { [key: string]: any }) => {
+  const t = (key: string, params?: { [key: string]: string | number }) => {
     const defaultTranslations = {
       translateField: 'Translate field',
       fieldTranslations: 'Field Translations',

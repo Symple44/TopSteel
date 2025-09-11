@@ -4,7 +4,6 @@
  */
 
 import type { SocieteRoleType } from '../../../domains/auth/core/constants/roles.constants'
-import type { UserSocieteInfo } from '../../../domains/auth/services/unified-roles.service'
 
 export interface AdminUserWithSocieteRole {
   id: string

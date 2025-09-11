@@ -24,26 +24,26 @@ import { SocieteRoleType } from '../../../domains/auth/core/constants/roles.cons
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import type { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
-import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import type {
+  UnifiedRolesService,
+  UserSocieteInfo,
+} from '../../../domains/auth/services/unified-roles.service'
 import type { UsersService } from '../../../domains/users/users.service'
 import type { SocietesService } from '../../../features/societes/services/societes.service'
 import type { SiteData, SocieteData } from '../../../types/entities/societe.types'
 import type {
-  AdminUserWithSocieteRole,
   AddUserToSocieteBody,
   AddUserToSocieteResponse,
+  AdminUserWithSocieteRole,
   AuthenticatedRequest,
   FormattedUserForSociete,
   RemoveUserFromSocieteResponse,
   RoleDistribution,
-  SocieteDetailsResponse,
-  SocietesListResponse,
   SocieteStatsResponse,
   SocieteWithUserInfo,
   UpdateUserRoleBody,
-  UpdateUserRoleResponse
+  UpdateUserRoleResponse,
 } from '../interfaces/admin-societes.interfaces'
-import type { UserSocieteInfo } from '../../../domains/auth/services/unified-roles.service'
 
 interface SocieteQueryDto {
   page?: number
@@ -113,9 +113,8 @@ export class AdminSocietesController {
             const usersWithAccess: FormattedUserForSociete[] = []
 
             for (const user of allUsers) {
-              const userSocieteRoles: UserSocieteInfo[] = await this.unifiedRolesService.getUserSocieteRoles(
-                user.id
-              )
+              const userSocieteRoles: UserSocieteInfo[] =
+                await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccessToSociete = userSocieteRoles.some(
                 (role) => role.societeId === societe.id && role.isActive
               )
@@ -130,7 +129,10 @@ export class AdminSocietesController {
                   email: user.email,
                   firstName: user.prenom || '',
                   lastName: user.nom || '',
-                  globalRole: this.roleFormattingService.formatGlobalRole((user.role || 'USER') as import('../../../domains/auth/core/constants/roles.constants').GlobalUserRole),
+                  globalRole: this.roleFormattingService.formatGlobalRole(
+                    (user.role ||
+                      'USER') as import('../../../domains/auth/core/constants/roles.constants').GlobalUserRole
+                  ),
                   societeRole: userRoleInSociete
                     ? this.roleFormattingService.formatSocieteRole(
                         userRoleInSociete.effectiveRole || 'USER'
@@ -148,9 +150,8 @@ export class AdminSocietesController {
             // Compter seulement les utilisateurs
             const allUsers: AdminUserWithSocieteRole[] = await this.usersService.findAll({})
             for (const user of allUsers) {
-              const userSocieteRoles: UserSocieteInfo[] = await this.unifiedRolesService.getUserSocieteRoles(
-                user.id
-              )
+              const userSocieteRoles: UserSocieteInfo[] =
+                await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccess = userSocieteRoles.some(
                 (role) => role.societeId === societe.id && role.isActive
               )
@@ -212,7 +213,8 @@ export class AdminSocietesController {
     const usersWithAccess: FormattedUserForSociete[] = []
 
     for (const user of allUsers) {
-      const userSocieteRoles: UserSocieteInfo[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+      const userSocieteRoles: UserSocieteInfo[] =
+        await this.unifiedRolesService.getUserSocieteRoles(user.id)
       const userRoleInSociete = userSocieteRoles.find(
         (role) => role.societeId === societe.id && role.isActive
       )
@@ -223,7 +225,10 @@ export class AdminSocietesController {
           email: user.email,
           firstName: user.prenom || '',
           lastName: user.nom || '',
-          globalRole: this.roleFormattingService.formatGlobalRole((user.role || 'USER') as import('../../../domains/auth/core/constants/roles.constants').GlobalUserRole),
+          globalRole: this.roleFormattingService.formatGlobalRole(
+            (user.role ||
+              'USER') as import('../../../domains/auth/core/constants/roles.constants').GlobalUserRole
+          ),
           societeRole: this.roleFormattingService.formatSocieteRole(
             userRoleInSociete.effectiveRole || 'USER'
           ),
@@ -320,7 +325,8 @@ export class AdminSocietesController {
           id: userSocieteRole.id,
           userId: userSocieteRole.userId,
           societeId: userSocieteRole.societeId,
-          roleType: userSocieteRole.roleType as import('../../../domains/auth/core/constants/roles.constants').SocieteRoleType,
+          roleType:
+            userSocieteRole.roleType as import('../../../domains/auth/core/constants/roles.constants').SocieteRoleType,
           isDefault: userSocieteRole.isDefaultSociete,
           isActive: userSocieteRole.isActive,
           grantedAt: userSocieteRole.grantedAt,
@@ -410,7 +416,8 @@ export class AdminSocietesController {
           id: updatedRole.id,
           userId: updatedRole.userId,
           societeId: updatedRole.societeId,
-          roleType: updatedRole.roleType as import('../../../domains/auth/core/constants/roles.constants').SocieteRoleType,
+          roleType:
+            updatedRole.roleType as import('../../../domains/auth/core/constants/roles.constants').SocieteRoleType,
           isDefault: updatedRole.isDefaultSociete,
           isActive: updatedRole.isActive,
           grantedAt: updatedRole.grantedAt,
@@ -440,7 +447,8 @@ export class AdminSocietesController {
     let activeUsers = 0
 
     for (const user of allUsers) {
-      const userSocieteRoles: UserSocieteInfo[] = await this.unifiedRolesService.getUserSocieteRoles(user.id)
+      const userSocieteRoles: UserSocieteInfo[] =
+        await this.unifiedRolesService.getUserSocieteRoles(user.id)
       const userRoleInSociete = userSocieteRoles.find((role) => role.societeId === societe.id)
 
       if (userRoleInSociete) {
@@ -462,10 +470,13 @@ export class AdminSocietesController {
         totalUsers,
         activeUsers,
         inactiveUsers: totalUsers - activeUsers,
-        roleDistribution: Object.entries(roleStats).map(([role, count]) => ({
-          role: this.roleFormattingService.formatSocieteRole(role as SocieteRoleType),
-          count,
-        } as RoleDistribution)),
+        roleDistribution: Object.entries(roleStats).map(
+          ([role, count]) =>
+            ({
+              role: this.roleFormattingService.formatSocieteRole(role as SocieteRoleType),
+              count,
+            }) as RoleDistribution
+        ),
         sitesCount: societe.sites?.length || 0,
       },
     }

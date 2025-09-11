@@ -52,7 +52,8 @@
       "Bash(grep:*)",
       "Bash(tee:*)",
       "WebSearch",
-      "Bash(npx biome format:*)"
+      "Bash(npx biome format:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": [],

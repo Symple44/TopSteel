@@ -137,7 +137,13 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
         onClick={onClick}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            onClick?.(e as any)
+            e.preventDefault()
+            const syntheticEvent = new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window
+            })
+            e.currentTarget.dispatchEvent(syntheticEvent)
           }
         }}
         onMouseEnter={onMouseEnter}
@@ -169,7 +175,13 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionPr
         onClick={onClick}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            onClick?.(e as any)
+            e.preventDefault()
+            const syntheticEvent = new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window
+            })
+            e.currentTarget.dispatchEvent(syntheticEvent)
           }
         }}
         onMouseEnter={onMouseEnter}
