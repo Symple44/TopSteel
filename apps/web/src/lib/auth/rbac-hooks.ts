@@ -4,6 +4,19 @@ import { AuthAdapter } from './auth-adapter'
 import { useAuth } from './auth-context'
 import { rbacService } from './rbac-service'
 import type { AccessPolicy, ExtendedUser, Permission } from './rbac-types'
+import type { User } from './auth-types'
+
+/**
+ * Type guard pour vérifier si un objet est un User valide
+ */
+function isValidUser(user: unknown): user is User {
+  return (
+    typeof user === 'object' &&
+    user !== null &&
+    typeof (user as Record<string, unknown>).id === 'string' &&
+    typeof (user as Record<string, unknown>).email === 'string'
+  )
+}
 
 /**
  * Helper pour convertir User vers ExtendedUser
@@ -20,7 +33,10 @@ function useExtendedUser(): ExtendedUser | null {
     }
 
     // Sinon, utiliser l'adaptateur pour convertir
-    return AuthAdapter?.toExtendedUser(user as unknown)
+    if (!isValidUser(user)) {
+      return null
+    }
+    return AuthAdapter?.toExtendedUser(user)
   }, [user])
 }
 

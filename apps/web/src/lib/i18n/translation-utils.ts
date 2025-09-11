@@ -227,6 +227,25 @@ interface UniverWorkbookData {
   sheets: Record<string, UniverSheetData>
 }
 
+// Type guard pour vérifier si un objet est un IWorkbookData Univer valide
+function isValidIWorkbookData(data: unknown): data is Partial<UniverWorkbookData> {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    typeof (data as Record<string, unknown>)?.id === 'string' &&
+    typeof (data as Record<string, unknown>)?.name === 'string'
+  )
+}
+
+// Types pour les options de theme et locale Univer
+interface UniverThemeOptions {
+  theme?: string | Record<string, unknown>
+}
+
+interface UniverLocaleOptions {
+  locale?: string | Record<string, unknown>
+}
+
 // Instance Univer singleton pour les traductions
 class TranslationUniverUtils {
   private static univerInstance: InstanceType<typeof import('@univerjs/core').Univer> | null = null
@@ -265,10 +284,11 @@ class TranslationUniverUtils {
 
     if (!TranslationUniverUtils.univerInstance && Univer) {
       try {
-        TranslationUniverUtils.univerInstance = new Univer({
-          theme: 'default' as unknown,
-          locale: 'fr-FR' as unknown,
-        })
+        const univerOptions: UniverThemeOptions & UniverLocaleOptions = {
+          theme: 'default',
+          locale: 'fr-FR',
+        }
+        TranslationUniverUtils.univerInstance = new Univer(univerOptions)
 
         // Registrer seulement les plugins nécessaires pour les traductions
         if (UniverSheetsPlugin) {
@@ -369,7 +389,10 @@ class TranslationUniverUtils {
 
     if (univer && TranslationUniverUtils.univerAvailable) {
       try {
-        const univerSheet = univer?.createUniverSheet(workbookData as unknown)
+        if (!isValidIWorkbookData(workbookData)) {
+          throw new Error('Invalid workbook data format')
+        }
+        const univerSheet = univer?.createUniverSheet(workbookData as Partial<UniverWorkbookData>)
 
         // Utiliser l'API d'export d'Univer pour générer le blob Excel
 

@@ -206,10 +206,10 @@ export function filterDataByColumns<T>(
         value =
           typeof column.accessor === 'function'
             ? column.accessor(row)
-            : (row as Record<string, unknown>)[column.accessor as keyof T]
+            : (row as Record<string, unknown>)[column.accessor as string]
       } else {
         const rowData = row as Record<string, unknown>
-        value = rowData[(filter.field || column?.key) as keyof T]
+        value = rowData[(filter.field || column?.key) as string]
       }
 
       return applyFilter(value, filter)
@@ -240,10 +240,10 @@ export function filterDataBySearch<T>(
         value =
           typeof column.accessor === 'function'
             ? column.accessor(row)
-            : (row as Record<string, unknown>)[column.accessor as keyof T]
+            : (row as Record<string, unknown>)[column.accessor as string]
       } else {
         const rowData = row as Record<string, unknown>
-        value = rowData[(column.key || column.id) as keyof T]
+        value = rowData[(column.key || column.id) as string]
       }
 
       const stringValue = valueToString(value).toLowerCase()

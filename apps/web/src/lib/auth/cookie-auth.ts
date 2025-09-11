@@ -7,6 +7,13 @@ import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 import type { AuthTokens, Company, User } from './auth-types'
 
+/**
+ * Type guard pour vérifier si un objet a la propriété isSuperAdmin
+ */
+function hasIsSuperAdminProperty(obj: unknown): obj is { isSuperAdmin?: boolean } {
+  return typeof obj === 'object' && obj !== null
+}
+
 // Configuration des cookies
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -68,7 +75,7 @@ export async function saveUserInfoInCookie(
     email: user.email,
     prenom: user.prenom,
     nom: user.nom,
-    isSuperAdmin: (user as unknown).isSuperAdmin || false,
+    isSuperAdmin: hasIsSuperAdminProperty(user) ? user.isSuperAdmin || false : false,
     company: company
       ? {
           id: company.id,

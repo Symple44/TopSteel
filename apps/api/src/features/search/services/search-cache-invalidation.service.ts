@@ -300,9 +300,7 @@ interface EntityWithTenantAndId {
 }
 
 interface ServiceWithEventEmitter {
-  eventEmitter?: {
-    emit: (event: string, data: CacheInvalidationEvent) => boolean
-  }
+  eventEmitter?: EventEmitter2
 }
 
 /**
