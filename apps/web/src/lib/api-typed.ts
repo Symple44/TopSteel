@@ -4,11 +4,18 @@
  */
 
 import type { ApiResponse } from '@/types/api-types'
+import type { RequestConfig } from './api-client'
 import { apiClient } from './api-client-instance'
 import { extractData, extractError } from './api-response-handler'
 
+// HTTPRequestConfig compatible with the API client
+interface HTTPRequestConfig extends RequestConfig {
+  params?: Record<string, unknown>
+  responseType?: 'json' | 'blob' | 'text'
+}
+
 // Generic typed fetch function
-export async function fetchTyped<T>(url: string, options?: RequestInit): Promise<T> {
+export async function fetchTyped<T>(url: string, options?: HTTPRequestConfig): Promise<T> {
   try {
     const response = await apiClient.get<ApiResponse<T>>(url, options)
 
@@ -42,7 +49,7 @@ export async function fetchTyped<T>(url: string, options?: RequestInit): Promise
 export async function postTyped<T, D = any>(
   url: string,
   data?: D,
-  options?: RequestInit
+  options?: HTTPRequestConfig
 ): Promise<T> {
   try {
     const response = await apiClient.post<ApiResponse<T>>(url, data, options)
@@ -73,7 +80,7 @@ export async function postTyped<T, D = any>(
 export async function putTyped<T, D = any>(
   url: string,
   data?: D,
-  options?: RequestInit
+  options?: HTTPRequestConfig
 ): Promise<T> {
   try {
     const response = await apiClient.put<ApiResponse<T>>(url, data, options)
@@ -100,7 +107,7 @@ export async function putTyped<T, D = any>(
 }
 
 // DELETE with typed response
-export async function deleteTyped<T = void>(url: string, options?: RequestInit): Promise<T> {
+export async function deleteTyped<T = void>(url: string, options?: HTTPRequestConfig): Promise<T> {
   try {
     const response = await apiClient.delete<ApiResponse<T>>(url, options)
 
@@ -130,7 +137,7 @@ export async function deleteTyped<T = void>(url: string, options?: RequestInit):
 export function ensureDataProperty<T>(response: unknown): { data: T } {
   if (response && typeof response === 'object') {
     if ('data' in response) {
-      return response
+      return response as { data: T }
     }
     // Wrap in data property
     return { data: response as T }
@@ -140,7 +147,7 @@ export function ensureDataProperty<T>(response: unknown): { data: T } {
 
 // Type guard for checking if response has data
 export function hasDataProperty<T>(response: unknown): response is { data: T } {
-  return response && typeof response === 'object' && 'data' in response
+  return response !== null && typeof response === 'object' && 'data' in response
 }
 
 // Extract or default

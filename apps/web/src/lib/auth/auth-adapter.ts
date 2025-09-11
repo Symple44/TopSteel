@@ -6,13 +6,39 @@ import type {
   User as ExistingUser,
 } from '@/types/auth'
 import type { MFAState as AuthMFAState, AuthTokens, User } from './auth-types'
-import type { Company, ExtendedUser, Permission, UserSocieteRole } from './rbac-types'
+import type { Company, ExtendedUser, Permission, PermissionAction, UserSocieteRole } from './rbac-types'
 
 interface UserSocieteRoleInput {
   id?: string
   societeId?: string
   roleId?: string
   roleType?: string
+}
+
+// Extended interface for type safety
+interface ExtendedUserSocieteRoleInput extends UserSocieteRoleInput {
+  isDefaultSociete?: boolean
+  isActive?: boolean
+  additionalPermissions?: string[]
+  restrictedPermissions?: string[]
+  grantedAt?: string
+  expiresAt?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+function hasProperty<T extends Record<string, unknown>>(
+  obj: unknown, 
+  prop: string
+): obj is T {
+  return typeof obj === 'object' && obj !== null && prop in obj
+}
+
+function safeGet<T>(obj: unknown, prop: string, defaultValue: T): T {
+  if (hasProperty(obj, prop)) {
+    return (obj[prop] as T) ?? defaultValue
+  }
+  return defaultValue
 }
 
 /**
@@ -30,30 +56,30 @@ export class AuthAdapter {
     const convertedRoles: UserSocieteRole[] = userSocieteRoles?.map((usr) => ({
       id: usr.id || `${existingUser.id}-${usr.societeId || 'default'}`,
       userId: existingUser.id,
-      societeId: usr.societeId || (existingUser as unknown).societeId || '',
-      roleId: usr.roleId || `role-${(usr as unknown).roleType || existingUser.role}`,
+      societeId: usr.societeId || (existingUser as Record<string, unknown>).societeId as string || '',
+      roleId: usr.roleId || `role-${safeGet(usr, 'roleType', existingUser.role)}`,
       role: {
-        id: usr.roleId || `role-${(usr as unknown).roleType || existingUser.role}`,
-        code: ((usr as unknown).roleType || existingUser.role || 'USER').toUpperCase(),
+        id: usr.roleId || `role-${safeGet(usr, 'roleType', existingUser.role)}`,
+        code: (safeGet(usr, 'roleType', existingUser.role) || 'USER').toUpperCase(),
         name: AuthAdapter?.getRoleDisplayName(
-          (usr as unknown).roleType || existingUser.role || 'user'
+          safeGet(usr, 'roleType', existingUser.role) || 'user'
         ),
-        description: `Rôle ${(usr as unknown).roleType || existingUser.role}`,
-        level: AuthAdapter?.getRoleLevel((usr as unknown).roleType || existingUser.role || 'user'),
+        description: `Rôle ${safeGet(usr, 'roleType', existingUser.role)}`,
+        level: AuthAdapter?.getRoleLevel(safeGet(usr, 'roleType', existingUser.role) || 'user'),
         permissions: AuthAdapter?.convertPermissionsFromStrings(existingUser.permissions || []),
         isSystemRole: true,
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
-      isDefault: (usr as unknown).isDefaultSociete || true,
-      isActive: (usr as unknown).isActive !== false,
-      additionalPermissions: (usr as unknown).additionalPermissions || [],
-      deniedPermissions: (usr as unknown).restrictedPermissions || [],
-      validFrom: (usr as unknown).grantedAt,
-      validTo: (usr as unknown).expiresAt,
-      createdAt: (usr as unknown).createdAt || new Date().toISOString(),
-      updatedAt: (usr as unknown).updatedAt || new Date().toISOString(),
+      isDefault: safeGet(usr, 'isDefaultSociete', true),
+      isActive: safeGet(usr, 'isActive', true),
+      additionalPermissions: safeGet(usr, 'additionalPermissions', []),
+      deniedPermissions: safeGet(usr, 'restrictedPermissions', []),
+      validFrom: safeGet(usr, 'grantedAt', undefined),
+      validTo: safeGet(usr, 'expiresAt', undefined),
+      createdAt: safeGet(usr, 'createdAt', new Date().toISOString()),
+      updatedAt: safeGet(usr, 'updatedAt', new Date().toISOString()),
     }))
 
     // Si pas de rôles société, créer un rôle par défaut basé sur le rôle global
@@ -63,7 +89,7 @@ export class AuthAdapter {
       convertedRoles?.push({
         id: `${existingUser.id}-default`,
         userId: existingUser.id,
-        societeId: (existingUser as unknown).societeId || 'default',
+        societeId: safeGet(existingUser, 'societeId', 'default'),
         roleId: `role-${globalRole}`,
         role: {
           id: `role-${globalRole}`,
@@ -149,10 +175,10 @@ export class AuthAdapter {
 
     // Ajouter les propriétés optionnelles seulement si elles existent sur le type
     if ('methods' in existingMFA && existingMFA.methods) {
-      ;(result as unknown).methods = existingMFA.methods
+      (result as unknown as Record<string, unknown>).methods = existingMFA.methods
     }
     if ('backupCodes' in existingMFA && existingMFA.backupCodes !== undefined) {
-      ;(result as unknown).backupCodes = existingMFA.backupCodes
+      (result as unknown as Record<string, unknown>).backupCodes = existingMFA.backupCodes
     }
 
     return result
@@ -164,9 +190,9 @@ export class AuthAdapter {
   static convertPermissionsFromStrings(permissionStrings: string[]): Permission[] {
     return (permissionStrings || []).map((permString) => {
       const [module, action] = (permString || '').toLowerCase().split('_')
-      const validActions = ['create', 'read', 'update', 'delete', 'execute'] as const
-      const permissionAction = validActions.includes(action as unknown)
-        ? (action as unknown)
+      const validActions: PermissionAction[] = ['create', 'read', 'update', 'delete', 'export', 'import', 'approve', 'reject', 'view_all', 'view_own', 'manage']
+      const permissionAction: PermissionAction = validActions.includes(action as PermissionAction)
+        ? (action as PermissionAction)
         : 'read'
 
       return {

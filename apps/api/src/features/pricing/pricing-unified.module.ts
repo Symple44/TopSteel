@@ -262,6 +262,7 @@ import { PricingWebhooksService } from './services/pricing-webhooks.service'
     'PRICING_CONFIG',
   ],
 })
+// biome-ignore lint/complexity/noStaticOnlyClass: NestJS module pattern requires static methods for configuration
 export class PricingUnifiedModule {
   /**
    * Configuration dynamique pour différents environnements

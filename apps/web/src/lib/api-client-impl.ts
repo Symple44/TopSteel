@@ -20,6 +20,7 @@ import type {
   Material,
   MaterialFilters,
   MaterialStatistics,
+  Notification,
   NotificationFilters,
   Partner,
   PartnerAddress,
@@ -46,6 +47,7 @@ import type {
   FileUploadResponse,
   PaginatedResponse,
 } from '@/types/api-types'
+import type { ClientNotification } from '@/types/notifications'
 import { APIClientEnhanced } from './api-client-enhanced'
 import type {
   ArticlesAPI,
@@ -452,20 +454,20 @@ class ProjectsAPIImpl implements ProjectsAPI {
 class NotificationsAPIImpl implements NotificationsAPI {
   constructor(private client: APIClientEnhanced) {}
 
-  async getNotifications(_filters?: NotificationFilters): Promise<PaginatedResponse<unknown>> {
-    return this.client.get<PaginatedResponse<unknown>>('/notifications')
+  async getNotifications(_filters?: NotificationFilters): Promise<PaginatedResponse<ClientNotification>> {
+    return this.client.get<PaginatedResponse<ClientNotification>>('/notifications')
   }
 
-  async getNotification(id: string): Promise<unknown> {
-    return this.client.get<unknown>(`/notifications/${id}`)
+  async getNotification(id: string): Promise<ClientNotification> {
+    return this.client.get<ClientNotification>(`/notifications/${id}`)
   }
 
-  async createNotification(data: CreateNotificationDto): Promise<unknown> {
-    return this.client.post<unknown>('/notifications', data)
+  async createNotification(data: CreateNotificationDto): Promise<ClientNotification> {
+    return this.client.post<ClientNotification>('/notifications', data)
   }
 
-  async markAsRead(id: string): Promise<unknown> {
-    return this.client.patch<unknown>(`/notifications/${id}/read`)
+  async markAsRead(id: string): Promise<ClientNotification> {
+    return this.client.patch<ClientNotification>(`/notifications/${id}/read`)
   }
 
   async markAllAsRead(): Promise<void> {
@@ -512,7 +514,18 @@ class SearchAPIImpl implements SearchAPI {
     if (options?.limit) params.append('limit', options.limit.toString())
     if (options?.offset) params.append('offset', options.offset.toString())
 
-    return this.client.get<unknown>(`/search/global?${params}`)
+    return this.client.get<{
+      results: Array<{
+        type: string
+        id: string
+        title: string
+        description?: string
+        url?: string
+        score?: number
+      }>
+      total: number
+      took: number
+    }>(`/search/global?${params}`)
   }
 
   async searchSuggestions(query: string): Promise<string[]> {
@@ -577,7 +590,7 @@ class SettingsAPIImpl implements SettingsAPI {
     return this.client.get<Record<string, unknown>>(endpoint)
   }
 
-  async updateSetting(key: string, value: any): Promise<void> {
+  async updateSetting(key: string, value: unknown): Promise<void> {
     return this.client.patch<void>('/settings', { [key]: value })
   }
 
@@ -594,7 +607,7 @@ class SettingsAPIImpl implements SettingsAPI {
     return this.client.get<Record<string, unknown>>('/user/preferences')
   }
 
-  async updateUserPreference(key: string, value: any): Promise<void> {
+  async updateUserPreference(key: string, value: unknown): Promise<void> {
     return this.client.patch<void>('/user/preferences', { [key]: value })
   }
 
@@ -614,7 +627,11 @@ class ReportsAPIImpl implements ReportsAPI {
     status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
     downloadUrl?: string
   }> {
-    return this.client.post<unknown>('/reports/generate', { type, params })
+    return this.client.post<{
+      id: string
+      status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+      downloadUrl?: string
+    }>('/reports/generate', { type, params })
   }
 
   async getReportStatus(id: string): Promise<{
@@ -623,7 +640,12 @@ class ReportsAPIImpl implements ReportsAPI {
     downloadUrl?: string
     error?: string
   }> {
-    return this.client.get<unknown>(`/reports/${id}/status`)
+    return this.client.get<{
+      status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+      progress?: number
+      downloadUrl?: string
+      error?: string
+    }>(`/reports/${id}/status`)
   }
 
   async downloadReport(id: string): Promise<Blob> {
@@ -638,7 +660,12 @@ class ReportsAPIImpl implements ReportsAPI {
       status: string
     }>
   > {
-    return this.client.get<any[]>('/reports')
+    return this.client.get<Array<{
+      id: string
+      type: string
+      created: string
+      status: string
+    }>>('/reports')
   }
 }
 

@@ -5,6 +5,41 @@
 
 import type { ApiError, ApiResponse } from '@/types/api-types'
 
+// Type guards for unknown responses
+interface ResponseWithData {
+  data?: unknown
+}
+
+interface ResponseWithError {
+  error?: string | { message?: string }
+}
+
+interface ResponseWithMessage {
+  message?: string
+}
+
+interface AxiosLikeResponse {
+  response?: {
+    data?: unknown
+  }
+}
+
+function hasData(obj: unknown): obj is ResponseWithData {
+  return typeof obj === 'object' && obj !== null && 'data' in obj
+}
+
+function hasError(obj: unknown): obj is ResponseWithError {
+  return typeof obj === 'object' && obj !== null && 'error' in obj
+}
+
+function hasMessage(obj: unknown): obj is ResponseWithMessage {
+  return typeof obj === 'object' && obj !== null && 'message' in obj
+}
+
+function hasAxiosResponse(obj: unknown): obj is AxiosLikeResponse {
+  return typeof obj === 'object' && obj !== null && 'response' in obj
+}
+
 /**
  * Safe access to response data with type guards
  */
@@ -21,18 +56,25 @@ export function extractData<T>(response: unknown): T | null {
   if (!response) return null
 
   // Handle direct data response
-  if (response?.data !== undefined) {
-    return response?.data as T
+  if (hasData(response) && response.data !== undefined) {
+    return response.data as T
   }
 
-  // Handle axios-like response
-  if (response !== undefined) {
-    return response?.data?.data as T
+  // Handle axios-like response with nested data
+  if (hasAxiosResponse(response) && response.response?.data !== undefined) {
+    const axiosData = response.response.data
+    if (hasData(axiosData) && axiosData.data !== undefined) {
+      return axiosData.data as T
+    }
+    return axiosData as T
   }
 
-  // If response itself looks like the data
-  if (!('success' in response) && !('error' in response)) {
-    return response as T
+  // If response itself looks like the data (no success/error wrapper)
+  if (typeof response === 'object' && response !== null) {
+    const hasSuccessOrError = 'success' in response || 'error' in response
+    if (!hasSuccessOrError) {
+      return response as T
+    }
   }
 
   return null
@@ -45,28 +87,28 @@ export function extractError(response: unknown): string | null {
   if (!response) return null
 
   // Check for error property
-  if (response?.error) {
-    if (typeof response?.error === 'string') {
-      return response?.error
+  if (hasError(response) && response.error) {
+    if (typeof response.error === 'string') {
+      return response.error
     }
-    if (typeof response?.error === 'object' && response?.error?.message) {
-      return response?.error?.message
+    if (typeof response.error === 'object' && response.error.message) {
+      return response.error.message
     }
   }
 
   // Check for message property
-  if (response?.message && typeof response?.message === 'string') {
-    return response?.message
+  if (hasMessage(response) && response.message && typeof response.message === 'string') {
+    return response.message
   }
 
   // Check axios error structure
-  if (response?.response?.data?.error) {
-    return extractError(response?.response?.data)
+  if (hasAxiosResponse(response) && response.response?.data) {
+    return extractError(response.response.data)
   }
 
   // Check for standard Error object
   if (response instanceof Error) {
-    return response?.message
+    return response.message
   }
 
   return null
