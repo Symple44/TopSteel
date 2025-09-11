@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { User } from '../../../users/entities/user.entity'
 import { GlobalUserRole, SocieteRoleType } from '../../core/constants/roles.constants'
 import { UserSocieteRole } from '../../core/entities/user-societe-role.entity'
-import { UnifiedRolesService, type UserSocieteInfo } from '../unified-roles.service'
+import { UnifiedRolesService } from '../unified-roles.service'
+import type { UserSocieteInfo } from '../unified-roles.service'
 
 /**
  * Tests unitaires pour UnifiedRolesService
