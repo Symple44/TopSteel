@@ -1,90 +1,86 @@
 import type { ColumnConfig } from './types'
 
 /**
- * Utilitaires de validation pour le DataTable
+ * Valide une valeur selon la configuration de colonne
  */
-export class ValidationUtils {
-  /**
-   * Valide une valeur selon la configuration de colonne
-   */
-  static validateValue<T>(
-    value: unknown,
-    column: ColumnConfig<T>,
-    row?: T
-  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
-    // Validation vide/requis
-    if (value === null || value === undefined || value === '') {
-      if (column.required) {
-        return { isValid: false, error: 'Valeur requise' }
-      }
-      return { isValid: true, convertedValue: null }
+export function validateValue<T>(
+  value: unknown,
+  column: ColumnConfig<T>,
+  row?: T
+): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
+  // Validation vide/requis
+  if (value === null || value === undefined || value === '') {
+    if (column.required) {
+      return { isValid: false, error: 'Valeur requise' }
     }
+    return { isValid: true, convertedValue: null }
+  }
 
-    try {
-      // Validation selon le type
-      const typeValidation = ValidationUtils.validateByType(value, column)
-      if (!typeValidation.isValid) {
-        return typeValidation
-      }
-
-      // Validation personnalisée
-      if (column.validation?.custom && row) {
-        const customError = column.validation.custom(typeValidation.convertedValue)
-        if (customError) {
-          return { isValid: false, error: customError }
-        }
-      }
-
-      // Callback de validation de colonne
-      if (column.onValidate && row) {
-        const validateError = column.onValidate(typeValidation.convertedValue, row, column)
-        if (validateError) {
-          return { isValid: false, error: validateError }
-        }
-      }
-
+  try {
+    // Validation selon le type
+    const typeValidation = validateByType(value, column)
+    if (!typeValidation.isValid) {
       return typeValidation
-    } catch (_error) {
-      return { isValid: false, error: 'Erreur de validation' }
     }
-  }
 
-  /**
-   * Validation selon le type de colonne
-   */
-  private static validateByType<T>(
-    value: unknown,
-    column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
-    switch (column.type) {
-      case 'text':
-        return ValidationUtils.validateText(value, column)
-
-      case 'number':
-        return ValidationUtils.validateNumber(value, column)
-
-      case 'boolean':
-        return ValidationUtils.validateBoolean(value, column)
-
-      case 'date':
-      case 'datetime':
-        return ValidationUtils.validateDate(value, column)
-
-      case 'select':
-        return ValidationUtils.validateSelect(value, column)
-
-      case 'multiselect':
-        return ValidationUtils.validateMultiSelect(value, column)
-
-      default:
-        return { isValid: true, convertedValue: value }
+    // Validation personnalisée
+    if (column.validation?.custom && row) {
+      const customError = column.validation.custom(typeValidation.convertedValue)
+      if (customError) {
+        return { isValid: false, error: customError }
+      }
     }
-  }
 
-  /**
-   * Validation du type text
-   */
-  private static validateText<T>(
+    // Callback de validation de colonne
+    if (column.onValidate && row) {
+      const validateError = column.onValidate(typeValidation.convertedValue, row, column)
+      if (validateError) {
+        return { isValid: false, error: validateError }
+      }
+    }
+
+    return typeValidation
+  } catch (_error) {
+    return { isValid: false, error: 'Erreur de validation' }
+  }
+}
+
+/**
+ * Validation selon le type de colonne
+ */
+function validateByType<T>(
+  value: unknown,
+  column: ColumnConfig<T>
+): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
+  switch (column.type) {
+    case 'text':
+      return validateText(value, column)
+
+    case 'number':
+      return validateNumber(value, column)
+
+    case 'boolean':
+      return validateBoolean(value, column)
+
+    case 'date':
+    case 'datetime':
+      return validateDate(value, column)
+
+    case 'select':
+      return validateSelect(value, column)
+
+    case 'multiselect':
+      return validateMultiSelect(value, column)
+
+    default:
+      return { isValid: true, convertedValue: value }
+  }
+}
+
+/**
+ * Validation du type text
+ */
+function validateText<T>(
     value: unknown,
     column: ColumnConfig<T>
   ): { isValid: boolean; error?: string; convertedValue?: string } {
@@ -107,10 +103,10 @@ export class ValidationUtils {
     return { isValid: true, convertedValue: strValue }
   }
 
-  /**
-   * Validation du type number
-   */
-  private static validateNumber<T>(
+/**
+ * Validation du type number
+ */
+function validateNumber<T>(
     value: unknown,
     column: ColumnConfig<T>
   ): { isValid: boolean; error?: string; convertedValue?: number } {
@@ -140,10 +136,10 @@ export class ValidationUtils {
     return { isValid: true, convertedValue: numValue }
   }
 
-  /**
-   * Validation du type boolean
-   */
-  private static validateBoolean<T>(
+/**
+ * Validation du type boolean
+ */
+function validateBoolean<T>(
     value: unknown,
     _column: ColumnConfig<T>
   ): { isValid: boolean; error?: string; convertedValue?: boolean } {
@@ -164,10 +160,10 @@ export class ValidationUtils {
     return { isValid: false, error: 'Doit être vrai/faux' }
   }
 
-  /**
-   * Validation du type date
-   */
-  private static validateDate<T>(
+/**
+ * Validation du type date
+ */
+function validateDate<T>(
     value: unknown,
     _column: ColumnConfig<T>
   ): { isValid: boolean; error?: string; convertedValue?: Date } {
@@ -186,10 +182,10 @@ export class ValidationUtils {
     return { isValid: true, convertedValue: dateValue }
   }
 
-  /**
-   * Validation du type select
-   */
-  private static validateSelect<T>(
+/**
+ * Validation du type select
+ */
+function validateSelect<T>(
     value: unknown,
     column: ColumnConfig<T>
   ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
@@ -217,10 +213,10 @@ export class ValidationUtils {
     }
   }
 
-  /**
-   * Validation du type multiselect
-   */
-  private static validateMultiSelect<T>(
+/**
+ * Validation du type multiselect
+ */
+function validateMultiSelect<T>(
     value: unknown,
     column: ColumnConfig<T>
   ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown[] } {
@@ -231,7 +227,7 @@ export class ValidationUtils {
           .split(',')
           .map((v) => v.trim())
           .filter((v) => v)
-        return ValidationUtils.validateMultiSelect(parsed, column)
+        return validateMultiSelect(parsed, column)
       }
       return { isValid: false, error: 'Doit être une liste' }
     }
@@ -266,10 +262,10 @@ export class ValidationUtils {
     }
   }
 
-  /**
-   * Formate une valeur pour l'affichage selon le type
-   */
-  static formatValueForDisplay<T>(value: unknown, column: ColumnConfig<T>): string {
+/**
+ * Formate une valeur pour l'affichage selon le type
+ */
+export function formatValueForDisplay<T>(value: unknown, column: ColumnConfig<T>): string {
     if (value === null || value === undefined) return ''
 
     // Formatage personnalisé
@@ -349,10 +345,10 @@ export class ValidationUtils {
     return String(value)
   }
 
-  /**
-   * Obtient le type d'input HTML approprié pour une colonne
-   */
-  static getInputType<T>(column: ColumnConfig<T>): string {
+/**
+ * Obtient le type d'input HTML approprié pour une colonne
+ */
+export function getInputType<T>(column: ColumnConfig<T>): string {
     switch (column.type) {
       case 'number':
         return 'number'
@@ -366,4 +362,3 @@ export class ValidationUtils {
         return 'text'
     }
   }
-}

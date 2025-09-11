@@ -55,6 +55,7 @@ interface SearchParams {
   sortBy?: string
   sortOrder?: 'ASC' | 'DESC'
   fields?: string[]
+  [key: string]: unknown
 }
 
 // Export params
@@ -62,6 +63,7 @@ interface ExportParams {
   format: 'csv' | 'excel' | 'pdf'
   fields?: string[]
   filters?: SearchParams
+  [key: string]: unknown
 }
 
 // File upload response
@@ -505,7 +507,6 @@ export interface IAPIClientFinal {
   
   // Authentication
   authenticate(token: string): void
-  getAuthToken(): string | null
   
   // HTTP Methods
   get<T>(endpoint: string, config?: HTTPRequestConfig): Promise<T>
@@ -614,7 +615,7 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
     }
   }
 
-  getAuthToken(): string | null {
+  protected getAuthToken(): string | null {
     // Access the authToken via the protected property or implement token retrieval
     if (typeof window === 'undefined') return null
 

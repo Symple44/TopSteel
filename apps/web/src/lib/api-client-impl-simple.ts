@@ -246,8 +246,8 @@ class MaterialsAPIImpl implements MaterialsAPI {
     if (filters?.category) params.append('category', filters.category)
     if (filters?.search) params.append('search', filters.search)
     if (filters?.page) params.append('page', filters.page.toString())
-    if ((filters as unknown)?.pageSize)
-      params.append('pageSize', (filters as unknown).pageSize.toString())
+    if ((filters as MaterialFilters & { pageSize?: number })?.pageSize)
+      params.append('pageSize', (filters as MaterialFilters & { pageSize?: number }).pageSize.toString())
 
     const queryString = params.toString()
     const endpoint = queryString ? `/materials?${queryString}` : '/materials'
@@ -294,13 +294,29 @@ class MaterialsAPIImpl implements MaterialsAPI {
   }
 }
 
+// Define Article types for the implementation
+interface Article {
+  id: string
+  code: string
+  description: string
+  category?: string
+  [key: string]: unknown
+}
+
+interface ArticleFilters {
+  search?: string
+  category?: string
+  page?: number
+  [key: string]: unknown
+}
+
 /**
  * Simple implementations for other APIs - using basic types
  */
 class ArticlesAPIImpl implements ArticlesAPI {
   constructor(private client: APIClientEnhanced) {}
 
-  async getArticles(filters?: unknown): Promise<PaginatedResponse<unknown>> {
+  async getArticles(filters?: ArticleFilters): Promise<PaginatedResponse<Article>> {
     const params = new URLSearchParams()
     if (filters?.search) params.append('search', filters.search)
     if (filters?.category) params.append('category', filters.category)
@@ -308,27 +324,27 @@ class ArticlesAPIImpl implements ArticlesAPI {
 
     const queryString = params.toString()
     const endpoint = queryString ? `/articles?${queryString}` : '/articles'
-    return this.client.get<PaginatedResponse<unknown>>(endpoint)
+    return this.client.get<PaginatedResponse<Article>>(endpoint)
   }
 
-  async getArticle(id: string): Promise<unknown> {
-    return this.client.get<unknown>(`/articles/${id}`)
+  async getArticle(id: string): Promise<Article> {
+    return this.client.get<Article>(`/articles/${id}`)
   }
 
-  async createArticle(data: unknown): Promise<unknown> {
-    return this.client.post<unknown>('/articles', data)
+  async createArticle(data: Partial<Article>): Promise<Article> {
+    return this.client.post<Article>('/articles', data)
   }
 
-  async updateArticle(id: string, data: any): Promise<unknown> {
-    return this.client.put<unknown>(`/articles/${id}`, data)
+  async updateArticle(id: string, data: Partial<Article>): Promise<Article> {
+    return this.client.put<Article>(`/articles/${id}`, data)
   }
 
   async deleteArticle(id: string): Promise<void> {
     return this.client.delete<void>(`/articles/${id}`)
   }
 
-  async adjustStock(id: string, adjustment: any): Promise<unknown> {
-    return this.client.patch<unknown>(`/articles/${id}/adjust-stock`, adjustment)
+  async adjustStock(id: string, adjustment: { quantity: number; reason?: string }): Promise<Article> {
+    return this.client.patch<Article>(`/articles/${id}/adjust-stock`, adjustment)
   }
 }
 
@@ -344,7 +360,7 @@ class UsersAPIImpl implements UsersAPI {
   async createUser(data: unknown): Promise<unknown> {
     return this.client.post<unknown>('/users', data)
   }
-  async updateUser(id: string, data: any): Promise<unknown> {
+  async updateUser(id: string, data: Record<string, unknown>): Promise<unknown> {
     return this.client.put<unknown>(`/users/${id}`, data)
   }
   async deleteUser(id: string): Promise<void> {
@@ -366,7 +382,7 @@ class ProjectsAPIImpl implements ProjectsAPI {
   async createProject(data: unknown): Promise<unknown> {
     return this.client.post<unknown>('/projects', data)
   }
-  async updateProject(id: string, data: any): Promise<unknown> {
+  async updateProject(id: string, data: Record<string, unknown>): Promise<unknown> {
     return this.client.put<unknown>(`/projects/${id}`, data)
   }
   async deleteProject(id: string): Promise<void> {
@@ -398,7 +414,7 @@ class NotificationsAPIImpl implements NotificationsAPI {
 
 class SearchAPIImpl implements SearchAPI {
   constructor(private client: APIClientEnhanced) {}
-  async globalSearch(query: string, options?: any): Promise<unknown> {
+  async globalSearch(query: string, options?: { types?: string[]; limit?: number; offset?: number }): Promise<unknown> {
     const params = new URLSearchParams({ q: query })
     if (options?.types) params.append('types', options.types.join(','))
     if (options?.limit) params.append('limit', options.limit.toString())
@@ -415,7 +431,7 @@ class SearchAPIImpl implements SearchAPI {
 
 class FilesAPIImpl implements FilesAPI {
   constructor(private client: APIClientEnhanced) {}
-  async uploadFile(file: File | FormData, _options?: any): Promise<FileUploadResponse> {
+  async uploadFile(file: File | FormData, _options?: Record<string, unknown>): Promise<FileUploadResponse> {
     const formData = file instanceof FormData ? file : new FormData()
     if (file instanceof File) formData.append('file', file)
     return this.client.upload<FileUploadResponse>('/files/upload', formData)
@@ -446,7 +462,7 @@ class SettingsAPIImpl implements SettingsAPI {
     const endpoint = category ? `/settings?category=${category}` : '/settings'
     return this.client.get<Record<string, unknown>>(endpoint)
   }
-  async updateSetting(key: string, value: any): Promise<void> {
+  async updateSetting(key: string, value: unknown): Promise<void> {
     return this.client.patch<void>('/settings', { [key]: value })
   }
   async updateSettings(settings: Record<string, unknown>): Promise<void> {
@@ -469,8 +485,8 @@ class ReportsAPIImpl implements ReportsAPI {
   async downloadReport(id: string): Promise<Blob> {
     return this.client.get<Blob>(`/reports/${id}/download`)
   }
-  async listReports(): Promise<any[]> {
-    return this.client.get<any[]>('/reports')
+  async listReports(): Promise<Record<string, unknown>[]> {
+    return this.client.get<Record<string, unknown>[]>('/reports')
   }
 }
 

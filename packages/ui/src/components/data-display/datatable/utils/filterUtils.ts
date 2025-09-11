@@ -111,22 +111,28 @@ function applyLegacyFilter(value: unknown, filter: FilterConfig): boolean {
   }
 }
 
+interface FilterRule {
+  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'starts_with' | 'ends_with' | 'is_empty' | 'is_not_empty' | 'greater_than' | 'less_than' | 'greater_or_equal' | 'less_or_equal' | 'between' | 'in' | 'not_in'
+  value?: unknown
+  secondValue?: unknown
+}
+
 /**
  * Applique un filtre avancé sur une valeur
  */
 export function applyAdvancedFilter<T>(
   value: unknown,
-  rule: any,
+  rule: FilterRule,
   _column?: ColumnConfig<T>
 ): boolean {
   const stringValue = String(value || '').toLowerCase()
-  const ruleValue = String((rule as any).value || '').toLowerCase()
+  const ruleValue = String(rule.value || '').toLowerCase()
 
-  switch ((rule as any).operator) {
+  switch (rule.operator) {
     case 'equals':
-      return value === (rule as any).value
+      return value === rule.value
     case 'not_equals':
-      return value !== (rule as any).value
+      return value !== rule.value
     case 'contains':
       return stringValue.includes(ruleValue)
     case 'not_contains':
@@ -140,21 +146,21 @@ export function applyAdvancedFilter<T>(
     case 'is_not_empty':
       return !isEmptyValue(value)
     case 'greater_than':
-      return Number(value) > Number((rule as any).value)
+      return Number(value) > Number(rule.value)
     case 'less_than':
-      return Number(value) < Number((rule as any).value)
+      return Number(value) < Number(rule.value)
     case 'greater_or_equal':
-      return Number(value) >= Number((rule as any).value)
+      return Number(value) >= Number(rule.value)
     case 'less_or_equal':
-      return Number(value) <= Number((rule as any).value)
+      return Number(value) <= Number(rule.value)
     case 'between': {
       const num = Number(value)
-      return num >= Number((rule as any).value) && num <= Number((rule as any).secondValue)
+      return num >= Number(rule.value) && num <= Number(rule.secondValue)
     }
     case 'in':
-      return Array.isArray((rule as any).value) && (rule as any).value.includes(value)
+      return Array.isArray(rule.value) && (rule.value as unknown[]).includes(value)
     case 'not_in':
-      return Array.isArray((rule as any).value) && !(rule as any).value.includes(value)
+      return Array.isArray(rule.value) && !(rule.value as unknown[]).includes(value)
     default:
       return true
   }

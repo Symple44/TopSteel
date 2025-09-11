@@ -613,7 +613,7 @@ function SortableItem<T extends ReorderableItem>({
                   <div className="flex items-center gap-1 group-hover:scale-105 transition-transform duration-300">
                     {Array.from({ length: level }, (_, i) => (
                       <div
-                        key={i}
+                        key={`level-indicator-${level}-${i}`}
                         className={cn(
                           'w-1 h-1 rounded-full transition-all duration-300',
                           'bg-primary/30 group-hover:bg-primary/50',

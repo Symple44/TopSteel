@@ -270,16 +270,16 @@ export function useExportPartners() {
     }) => {
       const exportParams = {
         format: format.toLowerCase() as 'csv' | 'excel' | 'pdf',
-        filters: filters as any
+        filters: filters as Record<string, unknown>
       }
       return typedApiClient.partners.exportPartners(exportParams)
     },
-    onSuccess: (result: Blob) => {
+    onSuccess: (result: Blob, variables) => {
       // Télécharger le fichier
       const url = URL.createObjectURL(result)
       const link = document.createElement('a')
       link.href = url
-      link.download = `partners_export.${format.toLowerCase()}`
+      link.download = `partners_export.${variables.format.toLowerCase()}`
       link.click()
       URL.revokeObjectURL(url)
       toast.success('Export réussi')
