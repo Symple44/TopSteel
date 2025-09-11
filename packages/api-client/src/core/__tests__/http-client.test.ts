@@ -7,7 +7,22 @@ const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('HttpClient', () => {
   let httpClient: HttpClient
-  let mockAxiosInstance: any
+  let mockAxiosInstance: jest.Mocked<{
+    create: jest.MockedFunction<typeof axios.create>
+    get: jest.MockedFunction<any>
+    post: jest.MockedFunction<any>
+    put: jest.MockedFunction<any>
+    patch: jest.MockedFunction<any>
+    delete: jest.MockedFunction<any>
+    interceptors: {
+      request: {
+        use: jest.MockedFunction<any>
+      }
+      response: {
+        use: jest.MockedFunction<any>
+      }
+    }
+  }>
   const mockConfig: ApiConfig = {
     baseURL: 'https://api.example.com',
     timeout: 5000,
@@ -303,8 +318,8 @@ describe('HttpClient', () => {
 
   describe('error transformation', () => {
     describe('response interceptor', () => {
-      let responseInterceptorSuccess: any
-      let responseInterceptorError: any
+      let responseInterceptorSuccess: (response: AxiosResponse) => AxiosResponse
+      let responseInterceptorError: (error: unknown) => Promise<never>
 
       beforeEach(() => {
         // Get the response interceptor functions

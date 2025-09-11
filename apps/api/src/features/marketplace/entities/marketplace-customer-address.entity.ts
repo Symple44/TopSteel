@@ -22,7 +22,7 @@ export class MarketplaceCustomerAddress {
 
   @ManyToOne('MarketplaceCustomer', 'addresses', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'customer_id' })
-  customer: any
+  customer: Promise<import('./marketplace-customer.entity').MarketplaceCustomer>
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   label?: string

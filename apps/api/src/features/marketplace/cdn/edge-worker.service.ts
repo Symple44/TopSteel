@@ -291,7 +291,7 @@ function getClosestOrigin(request) {
     metadata?: Record<string, unknown>
   ): Promise<boolean> {
     try {
-      const body: any = {
+      const body: Record<string, unknown> = {
         value: JSON.stringify(value),
         metadata,
       }
@@ -327,7 +327,7 @@ function getClosestOrigin(request) {
   /**
    * Get data from KV
    */
-  async getKV(key: string): Promise<any | null> {
+  async getKV(key: string): Promise<unknown | null> {
     try {
       const response = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${this.config.accountId}/storage/kv/namespaces/${this.config.kvNamespaceId}/values/${key}`,
@@ -379,7 +379,7 @@ function getClosestOrigin(request) {
   async bulkWriteKV(
     items: Array<{
       key: string
-      value: any
+      value: unknown
       ttl?: number
       metadata?: Record<string, unknown>
     }>
@@ -424,7 +424,7 @@ function getClosestOrigin(request) {
   async listKVKeys(
     prefix?: string,
     limit = 1000
-  ): Promise<Array<{ name: string; metadata?: any }>> {
+  ): Promise<Array<{ name: string; metadata?: Record<string, unknown> }>> {
     try {
       const params = new URLSearchParams({
         limit: limit.toString(),
@@ -447,7 +447,7 @@ function getClosestOrigin(request) {
       const data = (await response.json()) as {
         success: boolean
         errors?: unknown
-        result?: { keys: Array<{ name: string; metadata?: any }> }
+        result?: { keys: Array<{ name: string; metadata?: Record<string, unknown> }> }
       }
 
       if (!data.success) {
@@ -522,7 +522,7 @@ function getClosestOrigin(request) {
     endpoints: Array<{
       path: string
       params?: Record<string, unknown>
-      data: any
+      data: unknown
       ttl?: number
     }>
   ): Promise<void> {

@@ -147,9 +147,7 @@ export function PartnerFormDialog({
 
   const isEditing = !!partner
 
-  // biome-ignore lint/suspicious/noExplicitAny: Required for React Hook Form v7 strict TypeScript compatibility
-  const form = useForm<PartnerFormData, any, PartnerFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Zod resolver type casting needed for strict mode
+  const form = useForm<PartnerFormData>({
     resolver: zodResolver(partnerSchema) as any,
     defaultValues: {
       type: (defaultType as PartnerType) || PartnerType.CLIENT,

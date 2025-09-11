@@ -4,10 +4,21 @@
 import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
 
+interface SentryModule {
+  init: (options: Record<string, unknown>) => void
+  captureException: (error: Error, context?: Record<string, unknown>) => string
+  captureMessage: (message: string, context?: Record<string, unknown>) => string
+  setUser: (user: Record<string, unknown> | null) => void
+  addBreadcrumb: (breadcrumb: Record<string, unknown>) => void
+  startTransaction: (options: Record<string, unknown>) => { finish: () => void }
+  flush: (timeout: number) => Promise<boolean>
+  close: (timeout: number) => Promise<boolean>
+}
+
 @Injectable()
 export class SentryConfig {
   private readonly logger = new Logger(SentryConfig.name)
-  private sentry: any = null
+  private sentry: SentryModule | null = null
 
   constructor(private configService: ConfigService) {
     this.loadSentry()
@@ -57,7 +68,7 @@ export class SentryConfig {
       release: process.env.npm_package_version || 'unknown',
 
       // Environment filtering
-      beforeSend(event: unknown, hint: any) {
+      beforeSend(event: unknown, hint: { originalException?: Error }) {
         // Filter out sensitive data
         const sentryEvent = event as {
           request?: {
@@ -95,7 +106,7 @@ export class SentryConfig {
 
         // Filter out non-error events in production
         if (environment === 'production') {
-          const error = hint.originalException
+          const error = hint.originalException as Error & { statusCode?: number }
           // Skip non-critical errors
           if (error?.statusCode && error.statusCode < 500) {
             return null
@@ -164,7 +175,7 @@ export class SentryConfig {
   addBreadcrumb(
     message: string,
     category: string,
-    level: any = 'info',
+    level: 'info' | 'warning' | 'error' | 'debug' = 'info',
     data?: Record<string, unknown>
   ): void {
     if (!this.sentry) return
@@ -185,7 +196,7 @@ export class SentryConfig {
       tags?: Record<string, string>
       extra?: Record<string, unknown>
       user?: { id?: string; email?: string }
-      level?: any
+      level?: 'info' | 'warning' | 'error' | 'debug'
     }
   ): string {
     if (!this.sentry) {
@@ -202,7 +213,7 @@ export class SentryConfig {
   }
 
   // Capture message
-  captureMessage(message: string, level: any = 'info', context?: Record<string, unknown>): string {
+  captureMessage(message: string, level: 'info' | 'warning' | 'error' | 'debug' = 'info', context?: Record<string, unknown>): string {
     if (!this.sentry) {
       this.logger.log(`Message captured (Sentry disabled): ${message}`)
       return 'sentry-disabled'
@@ -215,7 +226,7 @@ export class SentryConfig {
   }
 
   // Start transaction for performance monitoring
-  startTransaction(name: string, op: string, description?: string): any {
+  startTransaction(name: string, op: string, description?: string): { finish: () => void } {
     if (!this.sentry) {
       return { finish: () => {} } // No-op transaction
     }

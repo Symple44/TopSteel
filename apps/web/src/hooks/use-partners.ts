@@ -94,7 +94,7 @@ export function useCreatePartner() {
       queryClient.setQueryData(PARTNER_KEYS.detail(partner.id), partner)
       toast.success('Partenaire créé avec succès')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || 'Erreur lors de la création du partenaire')
     },
   })
@@ -112,7 +112,7 @@ export function useUpdatePartner() {
       queryClient.invalidateQueries({ queryKey: PARTNER_KEYS.complete(partner.id) })
       toast.success('Partenaire mis à jour avec succès')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour du partenaire')
     },
   })
@@ -128,7 +128,7 @@ export function useDeletePartner() {
       queryClient.removeQueries({ queryKey: PARTNER_KEYS.detail(id) })
       toast.success('Partenaire supprimé avec succès')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || 'Erreur lors de la suppression du partenaire')
     },
   })
@@ -144,7 +144,7 @@ export function useDuplicatePartner() {
       queryClient.invalidateQueries({ queryKey: PARTNER_KEYS.lists() })
       toast.success(`Partenaire dupliqué avec succès (${partner.code})`)
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || 'Erreur lors de la duplication du partenaire')
     },
   })
@@ -160,7 +160,7 @@ export function useConvertProspect() {
       queryClient.setQueryData(PARTNER_KEYS.detail(partner.id), partner)
       toast.success('Prospect converti en client avec succès')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || 'Erreur lors de la conversion du prospect')
     },
   })
@@ -177,7 +177,7 @@ export function useSuspendPartner() {
       queryClient.setQueryData(PARTNER_KEYS.detail(partner.id), partner)
       toast.success('Partenaire suspendu')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || 'Erreur lors de la suspension du partenaire')
     },
   })
@@ -194,7 +194,7 @@ export function useMergePartners() {
       queryClient.setQueryData(PARTNER_KEYS.detail(partner.id), partner)
       toast.success('Partenaires fusionnés avec succès')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || 'Erreur lors de la fusion des partenaires')
     },
   })
@@ -212,7 +212,7 @@ export function useAssignPartnerToGroup() {
       queryClient.invalidateQueries({ queryKey: PARTNER_KEYS.complete(partner.id) })
       toast.success('Groupe assigné au partenaire')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || "Erreur lors de l'assignation du groupe")
     },
   })
@@ -236,7 +236,7 @@ export function useExportPartners() {
       link.click()
       toast.success('Export réussi')
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || "Erreur lors de l'export")
     },
   })
@@ -260,7 +260,7 @@ export function useImportPartners() {
         toast.warning(`${result.errors} erreurs rencontrées`)
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || "Erreur lors de l'import")
     },
   })

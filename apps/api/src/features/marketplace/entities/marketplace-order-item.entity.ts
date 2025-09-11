@@ -22,7 +22,7 @@ export class MarketplaceOrderItem {
 
   @ManyToOne('MarketplaceOrder', 'items', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'order_id' })
-  order: any
+  order: Promise<import('./marketplace-order.entity').MarketplaceOrder>
 
   @Column({ name: 'product_id' })
   productId: string // Référence vers Article.id ERP

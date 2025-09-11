@@ -44,7 +44,7 @@ class BulkPriceDto {
   items: Array<{
     articleId: string
     quantity: number
-    customizations?: any
+    customizations?: Record<string, unknown>
   }>
 
   @IsString()

@@ -9,7 +9,12 @@ import { Button } from '../../primitives/button'
 export interface ReorderableItem {
   id: string
   children?: ReorderableItem[]
-  [key: string]: any
+  title?: string
+  label?: string
+  content?: string
+  data?: Record<string, string | number | boolean>
+  parentId?: string | null
+  level?: number
 }
 
 export interface RenderItemProps<T extends ReorderableItem> {
@@ -267,8 +272,7 @@ function useDragAndDrop<T extends ReorderableItem>(
                   // inside
 
                   // Nettoyer l'item avant de l'insérer (retirer d'éventuels parents)
-                  const cleanItem = { ...item }
-                  delete cleanItem.parentId
+                  const { parentId, ...cleanItem } = item
 
                   if (newItems[i].children) {
                     const updatedChildren = [...(newItems[i].children as T[]), cleanItem]

@@ -122,9 +122,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
   const updateSite = useUpdatePartnerSite()
   const deleteSite = useDeletePartnerSite()
 
-  // biome-ignore lint/suspicious/noExplicitAny: Required for React Hook Form v7 strict TypeScript compatibility
-  const form = useForm<SiteFormData, any, SiteFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Zod resolver type casting needed for strict mode
+  const form = useForm<SiteFormData>({
     resolver: zodResolver(siteSchema) as any,
     defaultValues: {
       type: SiteType.DEPOT,
@@ -241,7 +239,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sites?.map((site: PartnerSite): React.ReactElement => (
+                {sites?.map((site: PartnerSite) => (
                   <TableRow key={site.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
