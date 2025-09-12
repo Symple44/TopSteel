@@ -7,8 +7,8 @@ import type { Repository } from 'typeorm'
 import { vi } from 'vitest'
 import { User } from '../../../domains/users/entities/user.entity'
 import type { CreateCustomerDto, UpdateCustomerDto } from '../dto/customer.dto'
-import { MarketplaceCustomerAddress } from '../entities/marketplace-customer-address.entity'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
+import { MarketplaceCustomerAddress } from '../entities/marketplace-customer-address.entity'
 import { MarketplaceCustomerService } from '../services/marketplace-customer.service'
 
 describe('MarketplaceCustomerService', () => {

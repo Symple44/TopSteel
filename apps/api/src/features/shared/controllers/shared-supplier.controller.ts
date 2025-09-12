@@ -42,7 +42,10 @@ export class SharedSupplierController {
     @Param('id') id: string,
     @Body() supplierData: Partial<SharedSupplier>
   ): Promise<SharedSupplier> {
-    return this.sharedSupplierService.update(id, supplierData as QueryDeepPartialEntity<SharedSupplier>)
+    return this.sharedSupplierService.update(
+      id,
+      supplierData as QueryDeepPartialEntity<SharedSupplier>
+    )
   }
 
   @Delete(':id')

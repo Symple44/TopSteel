@@ -7,21 +7,6 @@ import {
   SharedQualityStandard,
 } from '../entities/shared-quality-standard.entity'
 
-// Update interface that excludes problematic nested properties
-interface SharedQualityStandardUpdateData {
-  nom?: string
-  description?: string
-  code?: string
-  type?: QualityStandardType
-  norme?: string
-  version?: string
-  organisme?: string
-  datePublication?: Date
-  domaineApplication?: string
-  niveau?: string
-  toleranceGenerale?: number
-  // Note: metadata excluded as it contains Record<string, unknown>
-}
 
 @Injectable()
 export class SharedQualityStandardService {

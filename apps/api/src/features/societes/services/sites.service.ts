@@ -4,25 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { Site } from '../entities/site.entity'
 
-// Update interface that excludes relations and problematic nested properties
-interface SiteUpdateData {
-  nom?: string
-  code?: string
-  adresse?: string
-  ville?: string
-  codePostal?: string
-  pays?: string
-  telephone?: string
-  email?: string
-  responsable?: string
-  type?: string
-  superficie?: number
-  nombreEmployes?: number
-  heuresOuverture?: string
-  isPrincipal?: boolean
-  actif?: boolean
-  // Note: societe relation and metadata excluded, capaciteProduction excluded as it contains Record<string, unknown>
-}
 
 @Injectable()
 export class SitesService {

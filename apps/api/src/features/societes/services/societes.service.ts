@@ -4,39 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 
-// Update interface that excludes relations
-interface SocieteUpdateData {
-  nom?: string
-  code?: string
-  databaseName?: string
-  status?: SocieteStatus
-  adresse?: string
-  ville?: string
-  codePostal?: string
-  pays?: string
-  telephone?: string
-  email?: string
-  siteWeb?: string
-  siret?: string
-  secteurActivite?: string
-  nombreEmployes?: number
-  chiffreAffaires?: number
-  dateCreation?: Date
-  dateActivation?: Date
-  configuration?: {
-    modules?: string[]
-    features?: string[]
-    theme?: Record<string, unknown>
-    locale?: string
-    timezone?: string
-    marketplace?: {
-      enabled?: boolean
-      publicProfile?: boolean
-      allowedServices?: string[]
-    }
-  }
-  // Note: sites relation excluded
-}
 
 @Injectable()
 export class SocietesService {
@@ -86,10 +53,7 @@ export class SocietesService {
   }
 
   async update(id: string, societeData: QueryDeepPartialEntity<Societe>): Promise<Societe> {
-    await this._societeRepository.update(
-      id,
-      societeData
-    )
+    await this._societeRepository.update(id, societeData)
     const societe = await this._societeRepository.findOne({
       where: { id },
       relations: ['sites'],

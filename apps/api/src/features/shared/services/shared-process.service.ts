@@ -4,21 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { type ProcessType, SharedProcess } from '../entities/shared-process.entity'
 
-// Update interface that excludes problematic nested properties
-interface SharedProcessUpdateData {
-  nom?: string
-  description?: string
-  code?: string
-  type?: ProcessType
-  dureeEstimee?: number
-  complexite?: number
-  precision?: number
-  competencesRequises?: string[]
-  outilsNecessaires?: string[]
-  consommationEnergie?: number
-  coutHoraire?: number
-  // Note: etapes and metadata excluded as they contain complex nested objects
-}
 
 @Injectable()
 export class SharedProcessService {
@@ -50,7 +35,10 @@ export class SharedProcessService {
     return this._sharedProcessRepository.save(process)
   }
 
-  async update(id: string, processData: QueryDeepPartialEntity<SharedProcess>): Promise<SharedProcess> {
+  async update(
+    id: string,
+    processData: QueryDeepPartialEntity<SharedProcess>
+  ): Promise<SharedProcess> {
     await this._sharedProcessRepository.update(id, processData)
     const process = await this._sharedProcessRepository.findOne({ where: { id } })
     if (!process) {

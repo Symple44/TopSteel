@@ -314,9 +314,11 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         priority: (notification.priority as 'low' | 'normal' | 'high' | 'urgent') || 'normal',
         title: typeof notification.title === 'string' ? notification.title : 'Notification',
         message: typeof notification.message === 'string' ? notification.message : '',
-        type: (typeof notification.type === 'string' && ['error', 'info', 'success', 'warning'].includes(notification.type)) 
-              ? (notification.type as 'error' | 'info' | 'success' | 'warning') 
-              : 'info',
+        type:
+          typeof notification.type === 'string' &&
+          ['error', 'info', 'success', 'warning'].includes(notification.type)
+            ? (notification.type as 'error' | 'info' | 'success' | 'warning')
+            : 'info',
       }
 
       state?.notifications?.unshift(newNotification)

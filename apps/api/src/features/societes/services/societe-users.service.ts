@@ -4,18 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { SocieteUser, type UserSocieteRole } from '../entities/societe-user.entity'
 
-// Update interface that excludes relations and problematic nested properties
-interface SocieteUserUpdateData {
-  userId?: string
-  societeId?: string
-  role?: UserSocieteRole
-  permissions?: string[]
-  restrictedPermissions?: string[]
-  actif?: boolean
-  isDefault?: boolean
-  lastActivityAt?: Date
-  // Note: societe relation excluded, dashboard excluded as it contains Record<string, unknown>
-}
 
 @Injectable()
 export class SocieteUsersService {
@@ -96,7 +84,10 @@ export class SocieteUsersService {
     return this._societeUserRepository.save(association)
   }
 
-  async update(id: string, associationData: QueryDeepPartialEntity<SocieteUser>): Promise<SocieteUser> {
+  async update(
+    id: string,
+    associationData: QueryDeepPartialEntity<SocieteUser>
+  ): Promise<SocieteUser> {
     await this._societeUserRepository.update(id, associationData)
     const association = await this._societeUserRepository.findOne({
       where: { id },
@@ -275,7 +266,10 @@ export class SocieteUsersService {
     if (updates.permissions !== undefined) updateData.permissions = updates.permissions
     if (updates.isActive !== undefined) updateData.actif = updates.isActive
 
-    await this._societeUserRepository.update(societeUserId, updateData as QueryDeepPartialEntity<SocieteUser>)
+    await this._societeUserRepository.update(
+      societeUserId,
+      updateData as QueryDeepPartialEntity<SocieteUser>
+    )
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },
@@ -290,7 +284,9 @@ export class SocieteUsersService {
   }
 
   async updateUserPermissions(societeUserId: string, permissions: string[]): Promise<SocieteUser> {
-    await this._societeUserRepository.update(societeUserId, { permissions } as QueryDeepPartialEntity<SocieteUser>)
+    await this._societeUserRepository.update(societeUserId, {
+      permissions,
+    } as QueryDeepPartialEntity<SocieteUser>)
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },
@@ -316,9 +312,12 @@ export class SocieteUsersService {
     await this._societeUserRepository.update({ userId }, { isDefault: false })
 
     // Ensuite, définir la société spécifiée comme par défaut
-    const result = await this._societeUserRepository.update({ userId, societeId }, {
-      isDefault: true,
-    })
+    const result = await this._societeUserRepository.update(
+      { userId, societeId },
+      {
+        isDefault: true,
+      }
+    )
 
     if (result.affected === 0) {
       throw new NotFoundException(`No access found for user ${userId} to company ${societeId}`)

@@ -1,7 +1,7 @@
 // Type-safe wrappers for @erp/ui components to resolve React 19 + Next.js 15 compatibility issues
 'use client'
 
-import type { ComponentType, ReactNode, ForwardRefExoticComponent, RefAttributes } from 'react'
+import type { ComponentType, ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react'
 import {
   Badge as UIBadge,
   Button as UIButton,
@@ -29,7 +29,7 @@ interface BaseUIProps {
 }
 
 // Type helper to handle different React component types
-type ReactComponentLike<P = BaseUIProps> = 
+type ReactComponentLike<P = BaseUIProps> =
   | ComponentType<P>
   | ForwardRefExoticComponent<P & RefAttributes<unknown>>
 
@@ -45,19 +45,35 @@ function createSafeWrapper<P extends BaseUIProps>(
 export const Badge = createSafeWrapper<BaseUIProps>(UIBadge as ReactComponentLike<unknown>)
 export const Button = createSafeWrapper<BaseUIProps>(UIButton as ReactComponentLike<unknown>)
 export const Card = createSafeWrapper<BaseUIProps>(UICard as ReactComponentLike<unknown>)
-export const CardContent = createSafeWrapper<BaseUIProps>(UICardContent as ReactComponentLike<unknown>)
-export const CardHeader = createSafeWrapper<BaseUIProps>(UICardHeader as ReactComponentLike<unknown>)
+export const CardContent = createSafeWrapper<BaseUIProps>(
+  UICardContent as ReactComponentLike<unknown>
+)
+export const CardHeader = createSafeWrapper<BaseUIProps>(
+  UICardHeader as ReactComponentLike<unknown>
+)
 export const CardTitle = createSafeWrapper<BaseUIProps>(UICardTitle as ReactComponentLike<unknown>)
 export const Tabs = createSafeWrapper<BaseUIProps>(UITabs as ReactComponentLike<unknown>)
-export const TabsContent = createSafeWrapper<BaseUIProps>(UITabsContent as ReactComponentLike<unknown>)
+export const TabsContent = createSafeWrapper<BaseUIProps>(
+  UITabsContent as ReactComponentLike<unknown>
+)
 export const TabsList = createSafeWrapper<BaseUIProps>(UITabsList as ReactComponentLike<unknown>)
-export const TabsTrigger = createSafeWrapper<BaseUIProps>(UITabsTrigger as ReactComponentLike<unknown>)
+export const TabsTrigger = createSafeWrapper<BaseUIProps>(
+  UITabsTrigger as ReactComponentLike<unknown>
+)
 export const Input = createSafeWrapper<BaseUIProps>(UIInput as ReactComponentLike<unknown>)
 export const Select = createSafeWrapper<BaseUIProps>(UISelect as ReactComponentLike<unknown>)
-export const SelectContent = createSafeWrapper<BaseUIProps>(UISelectContent as ReactComponentLike<unknown>)
-export const SelectItem = createSafeWrapper<BaseUIProps>(UISelectItem as ReactComponentLike<unknown>)
-export const SelectTrigger = createSafeWrapper<BaseUIProps>(UISelectTrigger as ReactComponentLike<unknown>)
-export const SelectValue = createSafeWrapper<BaseUIProps>(UISelectValue as ReactComponentLike<unknown>)
+export const SelectContent = createSafeWrapper<BaseUIProps>(
+  UISelectContent as ReactComponentLike<unknown>
+)
+export const SelectItem = createSafeWrapper<BaseUIProps>(
+  UISelectItem as ReactComponentLike<unknown>
+)
+export const SelectTrigger = createSafeWrapper<BaseUIProps>(
+  UISelectTrigger as ReactComponentLike<unknown>
+)
+export const SelectValue = createSafeWrapper<BaseUIProps>(
+  UISelectValue as ReactComponentLike<unknown>
+)
 
 // Re-export other components that don't have typing issues
 export {

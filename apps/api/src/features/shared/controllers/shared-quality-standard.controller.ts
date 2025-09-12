@@ -43,7 +43,10 @@ export class SharedQualityStandardController {
     @Param('id') id: string,
     @Body() standardData: Partial<SharedQualityStandard>
   ): Promise<SharedQualityStandard> {
-    return this.sharedQualityStandardService.update(id, standardData as QueryDeepPartialEntity<SharedQualityStandard>)
+    return this.sharedQualityStandardService.update(
+      id,
+      standardData as QueryDeepPartialEntity<SharedQualityStandard>
+    )
   }
 
   @Delete(':id')

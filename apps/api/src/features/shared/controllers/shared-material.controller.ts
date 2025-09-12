@@ -47,7 +47,10 @@ export class SharedMaterialController {
     @Param('id') id: string,
     @Body() materialData: Partial<SharedMaterial>
   ): Promise<SharedMaterial> {
-    return this.sharedMaterialService.update(id, materialData as QueryDeepPartialEntity<SharedMaterial>)
+    return this.sharedMaterialService.update(
+      id,
+      materialData as QueryDeepPartialEntity<SharedMaterial>
+    )
   }
 
   @Delete(':id')

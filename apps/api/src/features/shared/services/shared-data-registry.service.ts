@@ -64,7 +64,10 @@ export class SharedDataRegistryService {
 
   async update(id: string, registryData: Partial<SharedDataRegistry>): Promise<SharedDataRegistry> {
     // Use type assertion to bypass strict TypeORM type checking for update operations
-    await this._sharedDataRegistryRepository.update(id, registryData as Parameters<Repository<SharedDataRegistry>['update']>[1])
+    await this._sharedDataRegistryRepository.update(
+      id,
+      registryData as Parameters<Repository<SharedDataRegistry>['update']>[1]
+    )
     const registry = await this._sharedDataRegistryRepository.findOne({ where: { id } })
     if (!registry) {
       throw new NotFoundException(`Registry with ID ${id} not found`)

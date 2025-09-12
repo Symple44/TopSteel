@@ -41,7 +41,10 @@ export class SharedProcessController {
     @Param('id') id: string,
     @Body() processData: Partial<SharedProcess>
   ): Promise<SharedProcess> {
-    return this.sharedProcessService.update(id, processData as QueryDeepPartialEntity<SharedProcess>)
+    return this.sharedProcessService.update(
+      id,
+      processData as QueryDeepPartialEntity<SharedProcess>
+    )
   }
 
   @Delete(':id')
