@@ -53,7 +53,7 @@ export class SocietesService {
   async update(id: string, societeData: Partial<Societe>): Promise<Societe> {
     await this._societeRepository.update(
       id,
-      societeData as DeepPartial<Societe> as DeepPartial<any>
+      societeData as DeepPartial<Societe>
     )
     const societe = await this._societeRepository.findOne({
       where: { id },
@@ -73,7 +73,7 @@ export class SocietesService {
     await this._societeRepository.update(id, {
       status: SocieteStatus.ACTIVE,
       dateActivation: new Date(),
-    } as DeepPartial<any>)
+    } as DeepPartial<Societe>)
     const societe = await this.findById(id)
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)
@@ -84,7 +84,7 @@ export class SocietesService {
   async suspend(id: string): Promise<Societe> {
     await this._societeRepository.update(id, {
       status: SocieteStatus.SUSPENDED,
-    } as DeepPartial<any>)
+    } as DeepPartial<Societe>)
     const societe = await this.findById(id)
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)

@@ -41,7 +41,7 @@ export class SharedQualityStandardService {
     id: string,
     standardData: Partial<SharedQualityStandard>
   ): Promise<SharedQualityStandard> {
-    await this._sharedQualityStandardRepository.update(id, standardData as DeepPartial<any>)
+    await this._sharedQualityStandardRepository.update(id, standardData as DeepPartial<SharedQualityStandard>)
     const standard = await this._sharedQualityStandardRepository.findOne({ where: { id } })
     if (!standard) {
       throw new NotFoundException(`Quality standard with ID ${id} not found`)

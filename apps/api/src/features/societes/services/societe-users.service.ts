@@ -84,7 +84,7 @@ export class SocieteUsersService {
   }
 
   async update(id: string, associationData: Partial<SocieteUser>): Promise<SocieteUser> {
-    await this._societeUserRepository.update(id, associationData as DeepPartial<any>)
+    await this._societeUserRepository.update(id, associationData as DeepPartial<SocieteUser>)
     const association = await this._societeUserRepository.findOne({
       where: { id },
       relations: ['societe'],
@@ -101,14 +101,14 @@ export class SocieteUsersService {
 
   async setDefault(userId: string, societeId: string): Promise<SocieteUser> {
     // D'abord, retirer le statut par défaut des autres associations
-    await this._societeUserRepository.update({ userId }, { isDefault: false } as DeepPartial<any>)
+    await this._societeUserRepository.update({ userId }, { isDefault: false } as DeepPartial<SocieteUser>)
 
     // Puis définir la nouvelle association par défaut
     const association = await this.findUserSociete(userId, societeId)
     if (association) {
       await this._societeUserRepository.update(association.id, {
         isDefault: true,
-      } as DeepPartial<any>)
+      } as DeepPartial<SocieteUser>)
       const updatedAssociation = await this._societeUserRepository.findOne({
         where: { id: association.id },
         relations: ['societe'],
@@ -123,7 +123,7 @@ export class SocieteUsersService {
   }
 
   async activate(id: string): Promise<SocieteUser> {
-    await this._societeUserRepository.update(id, { actif: true } as DeepPartial<any>)
+    await this._societeUserRepository.update(id, { actif: true } as DeepPartial<SocieteUser>)
     const association = await this._societeUserRepository.findOne({
       where: { id },
       relations: ['societe'],
@@ -135,7 +135,7 @@ export class SocieteUsersService {
   }
 
   async deactivate(id: string): Promise<SocieteUser> {
-    await this._societeUserRepository.update(id, { actif: false } as DeepPartial<any>)
+    await this._societeUserRepository.update(id, { actif: false } as DeepPartial<SocieteUser>)
     const association = await this._societeUserRepository.findOne({
       where: { id },
       relations: ['societe'],
@@ -151,7 +151,7 @@ export class SocieteUsersService {
     if (association) {
       await this._societeUserRepository.update(association.id, {
         lastActivityAt: new Date(),
-      } as DeepPartial<any>)
+      } as DeepPartial<SocieteUser>)
     }
   }
 
@@ -163,7 +163,7 @@ export class SocieteUsersService {
 
       await this._societeUserRepository.update(id, {
         permissions: newPermissions,
-      } as DeepPartial<any>)
+      } as DeepPartial<SocieteUser>)
     }
 
     const updatedAssociation = await this._societeUserRepository.findOne({
@@ -184,7 +184,7 @@ export class SocieteUsersService {
 
       await this._societeUserRepository.update(id, {
         permissions: newPermissions,
-      } as DeepPartial<any>)
+      } as DeepPartial<SocieteUser>)
     }
 
     const updatedAssociation = await this._societeUserRepository.findOne({
@@ -227,7 +227,7 @@ export class SocieteUsersService {
         role: roleEnum,
         permissions,
         actif: isActive,
-      } as DeepPartial<any>)
+      } as DeepPartial<SocieteUser>)
       const updated = await this._societeUserRepository.findOne({
         where: { id: existingAccess.id },
         relations: ['societe'],
@@ -262,7 +262,7 @@ export class SocieteUsersService {
     if (updates.permissions !== undefined) updateData.permissions = updates.permissions
     if (updates.isActive !== undefined) updateData.actif = updates.isActive
 
-    await this._societeUserRepository.update(societeUserId, updateData as DeepPartial<any>)
+    await this._societeUserRepository.update(societeUserId, updateData as DeepPartial<SocieteUser>)
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },
@@ -277,7 +277,7 @@ export class SocieteUsersService {
   }
 
   async updateUserPermissions(societeUserId: string, permissions: string[]): Promise<SocieteUser> {
-    await this._societeUserRepository.update(societeUserId, { permissions } as DeepPartial<any>)
+    await this._societeUserRepository.update(societeUserId, { permissions } as DeepPartial<SocieteUser>)
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },
@@ -300,12 +300,12 @@ export class SocieteUsersService {
 
   async setDefaultSociete(userId: string, societeId: string): Promise<void> {
     // D'abord, enlever le statut par défaut de toutes les sociétés de l'utilisateur
-    await this._societeUserRepository.update({ userId }, { isDefault: false } as DeepPartial<any>)
+    await this._societeUserRepository.update({ userId }, { isDefault: false } as DeepPartial<SocieteUser>)
 
     // Ensuite, définir la société spécifiée comme par défaut
     const result = await this._societeUserRepository.update({ userId, societeId }, {
       isDefault: true,
-    } as DeepPartial<any>)
+    } as DeepPartial<SocieteUser>)
 
     if (result.affected === 0) {
       throw new NotFoundException(`No access found for user ${userId} to company ${societeId}`)

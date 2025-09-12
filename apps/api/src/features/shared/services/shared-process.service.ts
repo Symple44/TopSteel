@@ -35,7 +35,7 @@ export class SharedProcessService {
   }
 
   async update(id: string, processData: Partial<SharedProcess>): Promise<SharedProcess> {
-    await this._sharedProcessRepository.update(id, processData as DeepPartial<any>)
+    await this._sharedProcessRepository.update(id, processData as DeepPartial<SharedProcess>)
     const process = await this._sharedProcessRepository.findOne({ where: { id } })
     if (!process) {
       throw new NotFoundException(`Process with ID ${id} not found`)

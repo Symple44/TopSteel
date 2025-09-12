@@ -35,7 +35,7 @@ export class SharedMaterialService {
   }
 
   async update(id: string, materialData: Partial<SharedMaterial>): Promise<SharedMaterial> {
-    await this._sharedMaterialRepository.update(id, materialData as DeepPartial<any>)
+    await this._sharedMaterialRepository.update(id, materialData as DeepPartial<SharedMaterial>)
     const material = await this._sharedMaterialRepository.findOne({ where: { id } })
     if (!material) {
       throw new NotFoundException(`Material with ID ${id} not found`)

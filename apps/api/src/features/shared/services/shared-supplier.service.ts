@@ -35,7 +35,7 @@ export class SharedSupplierService {
   }
 
   async update(id: string, supplierData: Partial<SharedSupplier>): Promise<SharedSupplier> {
-    await this._sharedSupplierRepository.update(id, supplierData as DeepPartial<any>)
+    await this._sharedSupplierRepository.update(id, supplierData as DeepPartial<SharedSupplier>)
     const supplier = await this._sharedSupplierRepository.findOne({ where: { id } })
     if (!supplier) {
       throw new NotFoundException(`Supplier with ID ${id} not found`)

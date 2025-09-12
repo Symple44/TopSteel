@@ -52,7 +52,7 @@ export class SitesService {
   }
 
   async update(id: string, siteData: Partial<Site>): Promise<Site> {
-    await this._siteRepository.update(id, siteData as DeepPartial<any>)
+    await this._siteRepository.update(id, siteData as DeepPartial<Site>)
     const site = await this._siteRepository.findOne({
       where: { id },
       relations: ['societe'],
@@ -69,10 +69,10 @@ export class SitesService {
 
   async setPrincipal(id: string, societeId: string): Promise<Site> {
     // D'abord, retirer le statut principal des autres sites
-    await this._siteRepository.update({ societeId }, { isPrincipal: false } as DeepPartial<any>)
+    await this._siteRepository.update({ societeId }, { isPrincipal: false } as DeepPartial<Site>)
 
     // Puis définir le nouveau site principal
-    await this._siteRepository.update(id, { isPrincipal: true } as DeepPartial<any>)
+    await this._siteRepository.update(id, { isPrincipal: true } as DeepPartial<Site>)
 
     const site = await this.findById(id)
     if (!site) {
@@ -82,7 +82,7 @@ export class SitesService {
   }
 
   async activate(id: string): Promise<Site> {
-    await this._siteRepository.update(id, { actif: true } as DeepPartial<any>)
+    await this._siteRepository.update(id, { actif: true } as DeepPartial<Site>)
     const site = await this.findById(id)
     if (!site) {
       throw new NotFoundException(`Site with ID ${id} not found`)
@@ -91,7 +91,7 @@ export class SitesService {
   }
 
   async deactivate(id: string): Promise<Site> {
-    await this._siteRepository.update(id, { actif: false } as DeepPartial<any>)
+    await this._siteRepository.update(id, { actif: false } as DeepPartial<Site>)
     const site = await this.findById(id)
     if (!site) {
       throw new NotFoundException(`Site with ID ${id} not found`)
