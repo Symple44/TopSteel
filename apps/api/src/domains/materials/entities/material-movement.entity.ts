@@ -31,15 +31,15 @@ import { Material } from './material.entity'
 @Index(['commandeId'])
 export class MaterialMovement {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id!: string
 
   /** Référence unique du mouvement */
   @Column({ unique: true })
-  reference: string
+  reference!: string
 
   /** Matériau concerné */
   @Column('uuid')
-  materialId: string
+  materialId!: string
 
   @ManyToOne(() => Material, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'materialId' })
@@ -50,14 +50,14 @@ export class MaterialMovement {
     type: 'enum',
     enum: MaterialMovementType,
   })
-  type: MaterialMovementType
+  type!: MaterialMovementType
 
   /** Motif du mouvement */
   @Column({
     type: 'enum',
     enum: MaterialMovementReason,
   })
-  motif: MaterialMovementReason
+  motif!: MaterialMovementReason
 
   /** Priorité du mouvement */
   @Column({
@@ -65,7 +65,7 @@ export class MaterialMovement {
     enum: MaterialMovementPriority,
     default: MaterialMovementPriority.NORMALE,
   })
-  priorite: MaterialMovementPriority
+  priorite!: MaterialMovementPriority
 
   /** Statut du mouvement */
   @Column({
@@ -73,15 +73,15 @@ export class MaterialMovement {
     enum: MaterialMovementStatus,
     default: MaterialMovementStatus.BROUILLON,
   })
-  status: MaterialMovementStatus
+  status!: MaterialMovementStatus
 
   /** Quantité du mouvement */
   @Column('decimal', { precision: 12, scale: 3 })
-  quantite: number
+  quantite!: number
 
   /** Unité de mesure */
   @Column()
-  unite: string
+  unite!: string
 
   /** Poids total du mouvement */
   @Column('decimal', { precision: 12, scale: 3, nullable: true })
@@ -93,11 +93,11 @@ export class MaterialMovement {
 
   /** Stock avant le mouvement */
   @Column('decimal', { precision: 12, scale: 3 })
-  stockAvant: number
+  stockAvant!: number
 
   /** Stock après le mouvement */
   @Column('decimal', { precision: 12, scale: 3 })
-  stockApres: number
+  stockApres!: number
 
   /** Valeur unitaire */
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
@@ -113,7 +113,7 @@ export class MaterialMovement {
 
   /** Date du mouvement */
   @Column('timestamp')
-  dateMovement: Date
+  dateMovement!: Date
 
   /** Date prévue */
   @Column('timestamp', { nullable: true })
@@ -185,11 +185,11 @@ export class MaterialMovement {
 
   /** Utilisateur ayant créé le mouvement */
   @Column('uuid')
-  utilisateurId: string
+  utilisateurId!: string
 
   /** Nom de l'utilisateur */
   @Column()
-  utilisateurNom: string
+  utilisateurNom!: string
 
   /** Validateur */
   @Column('uuid', { nullable: true })
@@ -284,11 +284,11 @@ export class MaterialMovement {
 
   /** Date de création */
   @CreateDateColumn()
-  dateCreation: Date
+  dateCreation!: Date
 
   /** Date de dernière modification */
   @UpdateDateColumn()
-  dateModification: Date
+  dateModification!: Date
 
   /** Tenant ID pour multi-tenancy */
   @Column('uuid')

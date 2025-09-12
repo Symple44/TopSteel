@@ -26,22 +26,37 @@ export class QueryBuilder {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column()
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   @Index() // Index for query name searches
   name: string
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
   description: string
 
-  @Column()
+  @Column({
+    type: 'varchar',
+    length: 100,
+  })
   @Index() // Index for database-specific queries
   database: string
 
-  @Column()
+  @Column({
+    type: 'varchar',
+    length: 100,
+  })
   @Index() // Index for table-specific queries
   mainTable: string
 
-  @Column({ default: false })
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
   @Index() // Index for public/private filtering
   isPublic: boolean
 
@@ -70,7 +85,10 @@ export class QueryBuilder {
     }>
   }
 
-  @Column()
+  @Column({
+    type: 'varchar',
+    length: 36,
+  })
   @Index() // Index for user-specific queries
   createdById: string
 

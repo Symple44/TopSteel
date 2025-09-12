@@ -33,7 +33,7 @@ export interface NotificationDeliveryResult {
 export class NotificationDeliveryService {
   private readonly logger = new Logger(NotificationDeliveryService.name)
 
-  constructor(private readonly eventEmitter: EventEmitter2) {}
+  constructor(private readonly eventEmitter?: EventEmitter2) {}
 
   /**
    * Send notification through multiple channels
@@ -76,7 +76,7 @@ export class NotificationDeliveryService {
     }
 
     // Emit event for tracking
-    this.eventEmitter.emit('notification.sent', {
+    this.eventEmitter?.emit('notification.sent', {
       options,
       result,
       timestamp: new Date(),
@@ -126,7 +126,7 @@ export class NotificationDeliveryService {
     this.logger.log(`Creating in-app notification for ${options.recipients.length} recipients`)
 
     // Emit real-time event for connected clients
-    this.eventEmitter.emit('notification.in-app', {
+    this.eventEmitter?.emit('notification.in-app', {
       recipients: options.recipients,
       title: options.title,
       body: options.body,

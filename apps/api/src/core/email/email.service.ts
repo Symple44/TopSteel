@@ -29,7 +29,7 @@ export interface EmailResult {
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name)
-  private transporter: Transporter
+  private transporter!: Transporter
   private templatesPath: string
   private compiledTemplates = new Map<string, HandlebarsTemplateDelegate>()
 

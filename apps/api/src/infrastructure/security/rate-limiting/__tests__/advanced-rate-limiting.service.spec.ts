@@ -383,13 +383,13 @@ describe('AdvancedRateLimitingService', () => {
 
       await service.checkRateLimit('repeat-offender', config, userContext)
 
-      // With 15 violations, should get penalty multiplier of 2
-      // So effective limit should be 100 / 2 = 50
+      // With 15 violations, should get penalty multiplier of 8 (>= 10 violations threshold)
+      // So effective limit should be 100 / 8 = 12.5, rounded down to 12
       const lastCall = mockRedis.eval.mock.calls[mockRedis.eval.mock.calls.length - 1]
       // Skip the first parameter (lua script) and get limit argument
       const args = lastCall.slice(1)
       const effectiveLimit = Number.parseInt(args[3], 10)
-      expect(effectiveLimit).toBe(50) // 100 / 2 (penalty multiplier)
+      expect(effectiveLimit).toBe(12) // Math.floor(100 / 8) (penalty multiplier)
     })
   })
 

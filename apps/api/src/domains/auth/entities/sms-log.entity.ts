@@ -8,32 +8,35 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 
 @Index(['messageType', 'status'])
 export class SMSLog {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id!: string
 
-  @Column()
-  phoneNumber: string
+  @Column({
+    type: 'varchar',
+    length: 20,
+  })
+  phoneNumber!: string
 
   @Column('text')
-  message: string
+  message!: string
 
   @Column({
     type: 'varchar',
     length: 50,
     default: 'info',
   })
-  messageType: string
+  messageType!: string
 
   @Column({
     type: 'varchar',
     length: 50,
   })
-  provider: string
+  provider!: string
 
   @Column({
     type: 'varchar',
     length: 50,
   })
-  status: string
+  status!: string
 
   @Column({
     type: 'varchar',
@@ -53,7 +56,7 @@ export class SMSLog {
     type: 'int',
     default: 1,
   })
-  segmentCount: number
+  segmentCount!: number
 
   @Column({
     type: 'text',
@@ -68,7 +71,7 @@ export class SMSLog {
   metadata?: Record<string, unknown>
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt!: Date
 
   @Column({
     type: 'varchar',

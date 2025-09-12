@@ -8,6 +8,8 @@ export {
   AuditEventStatus,
   AuditEventType,
   AuditSeverity,
+} from './audit-log.interface'
+export type {
   IAuditConfiguration,
   IAuditLog,
   IAuditLogFilters,
@@ -15,12 +17,16 @@ export {
   IAuditStatistics,
 } from './audit-log.interface'
 // Interfaces JWT existantes
-export {
+export type {
   JwtPayload,
   MultiTenantJwtPayload,
 } from './jwt-payload.interface'
 // Interfaces de vérification MFA
 export {
+  MFAMethodType,
+  MFAVerificationStatus,
+} from './mfa-verification.interface'
+export type {
   IInitiateMFAVerification,
   IMFAStatistics,
   IMFAVerification,
@@ -28,18 +34,18 @@ export {
   IMFAVerificationResult,
   IUserMFAConfiguration,
   IVerifyMFACode,
-  MFAMethodType,
-  MFAVerificationStatus,
 } from './mfa-verification.interface'
 // Interfaces des permissions utilisateur
 export {
+  PermissionContext,
+  PermissionLevel,
+  PermissionStatus,
+  PermissionType,
+} from './user-permissions.interface'
+export type {
   IPermissionRequest,
   IPermissionStatistics,
   IUserPermission,
   IUserPermissionFilters,
   IUserPermissions,
-  PermissionContext,
-  PermissionLevel,
-  PermissionStatus,
-  PermissionType,
 } from './user-permissions.interface'

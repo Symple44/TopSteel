@@ -89,20 +89,20 @@ export class TraceabilityDto {
 export class CreateMaterialMovementDto implements Partial<ICreateMaterialMovement> {
   @ApiProperty({ description: 'ID du matériau' })
   @IsUUID()
-  materialId: string
+  materialId!: string
 
   @ApiProperty({ enum: MaterialMovementType })
   @IsEnum(MaterialMovementType)
-  type: MaterialMovementType
+  type!: MaterialMovementType
 
   @ApiProperty({ enum: MaterialMovementReason })
   @IsEnum(MaterialMovementReason)
-  motif: MaterialMovementReason
+  motif!: MaterialMovementReason
 
   @ApiProperty({ description: 'Quantité du mouvement', minimum: 0 })
   @IsNumber()
   @Min(0)
-  quantite: number
+  quantite!: number
 
   @ApiProperty({ enum: MaterialMovementPriority, required: false })
   @IsOptional()

@@ -167,10 +167,17 @@ export function useDataViews<T = Record<string, unknown>>(
     ): Card => {
       // Handle different config structures (kanban vs cards vs other views)
       const configObj = config as Record<string, unknown>
-      const titleColumnId = (configObj?.cardTitleColumn || configObj?.titleColumn) as string | undefined
-      const subtitleColumnId = (configObj?.cardSubtitleColumn || configObj?.subtitleColumn) as string | undefined
-      const descriptionColumnId = (configObj?.cardDescriptionColumn || configObj?.descriptionColumn) as string | undefined
-      const imageColumnId = (configObj?.cardImageColumn || configObj?.imageColumn) as string | undefined
+      const titleColumnId = (configObj?.cardTitleColumn || configObj?.titleColumn) as
+        | string
+        | undefined
+      const subtitleColumnId = (configObj?.cardSubtitleColumn || configObj?.subtitleColumn) as
+        | string
+        | undefined
+      const descriptionColumnId = (configObj?.cardDescriptionColumn ||
+        configObj?.descriptionColumn) as string | undefined
+      const imageColumnId = (configObj?.cardImageColumn || configObj?.imageColumn) as
+        | string
+        | undefined
 
       const titleColumn = columns.find((c) => c.id === titleColumnId)
       const subtitleColumn = subtitleColumnId
@@ -215,7 +222,8 @@ export function useDataViews<T = Record<string, unknown>>(
 
       // Créer les labels à partir des colonnes configurées
       const labels: { text: string; color?: string }[] = []
-      const labelsColumns = ((configObj?.cardLabelsColumns || configObj?.labelsColumns) as string[]) || []
+      const labelsColumns =
+        ((configObj?.cardLabelsColumns || configObj?.labelsColumns) as string[]) || []
       if (labelsColumns && Array.isArray(labelsColumns)) {
         labelsColumns.forEach((colId: string) => {
           if (colId) {

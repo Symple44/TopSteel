@@ -38,7 +38,7 @@ export class ElasticsearchMigrationService {
 
     let allSuccess = true
 
-    for (const [, config] of this.migrations) {
+    for (const config of this.migrations.values()) {
       try {
         const success = await this.runMigration(config)
         if (success) {
@@ -108,7 +108,7 @@ export class ElasticsearchMigrationService {
   async checkIndexHealth(): Promise<Record<string, unknown>> {
     const health: Record<string, unknown> = {}
 
-    for (const [indexName] of this.migrations) {
+    for (const indexName of this.migrations.keys()) {
       try {
         const stats = await elasticsearchClient.search(indexName, {
           size: 0,

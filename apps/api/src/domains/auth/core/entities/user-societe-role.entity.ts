@@ -14,13 +14,13 @@ import { Role } from './role.entity'
 @Entity('user_societe_roles')
 export class UserSocieteRole {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id!: string
 
   @Column('uuid')
-  userId: string
+  userId!: string
 
   @Column('uuid')
-  societeId: string
+  societeId!: string
 
   @Column('uuid', {
     nullable: true,
@@ -32,16 +32,16 @@ export class UserSocieteRole {
     length: 50,
     comment: 'Type de rôle (référence vers parameters_system.user_roles)',
   })
-  roleType: string
+  roleType!: string
 
   @Column('boolean', { default: false, comment: 'Société par défaut pour cet utilisateur' })
-  isDefaultSociete: boolean
+  isDefaultSociete!: boolean
 
   @Column('jsonb', { default: [], comment: 'Permissions supplémentaires accordées' })
-  additionalPermissions: string[]
+  additionalPermissions!: string[]
 
   @Column('jsonb', { default: [], comment: 'Permissions retirées pour cet utilisateur' })
-  restrictedPermissions: string[]
+  restrictedPermissions!: string[]
 
   @Column('uuid', {
     array: true,
@@ -54,22 +54,22 @@ export class UserSocieteRole {
   grantedById?: string
 
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
-  grantedAt: Date
+  grantedAt!: Date
 
   @Column('timestamp', { nullable: true, comment: "Date d'expiration du rôle" })
   expiresAt?: Date
 
   @Column('boolean', { default: true })
-  isActive: boolean
+  isActive!: boolean
 
   @Column('jsonb', { default: {}, comment: 'Métadonnées additionnelles' })
-  metadata: Record<string, unknown>
+  metadata!: Record<string, unknown>
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt!: Date
 
   @Column({ name: 'deleted_at', nullable: true, type: 'timestamp' })
   deletedAt?: Date

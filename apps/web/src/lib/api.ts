@@ -1,4 +1,4 @@
-// apps/web/src/lib/api?.ts - Client API pour Zustand stores
+// apps/web/src/lib/api.ts - Client API pour Zustand stores
 import { ERPApiClient } from '@erp/api-client'
 import {
   type Projet,

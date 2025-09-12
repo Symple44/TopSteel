@@ -13,7 +13,9 @@ on:
         type: boolean
 
 env:
-  NODE_OPTIONS: '--max-old-space-size=6144'
+  NODE_OPTIONS: '--max-old-space-size=8192'
+  FORCE_COLOR: '1'
+  NPM_CONFIG_COLOR: 'always'
 
 permissions:
   contents: read
@@ -25,6 +27,7 @@ jobs:
   dependency-scan:
     name: 📦 Dependency Security Scan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     
     steps:
       - name: 📥 Checkout code
@@ -40,9 +43,23 @@ jobs:
         with:
           node-version: '22.14.0'
           cache: 'pnpm'
+
+      - name: 💾 Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: security-${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            security-${{ runner.os }}-pnpm-
       
       - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm config set store-dir ~/.pnpm-store
+          pnpm install --frozen-lockfile --prefer-offline
       
       - name: 🔍 Run audit
         run: |
@@ -66,13 +83,14 @@ jobs:
   sast-scan:
     name: 🔐 SAST Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
       
       - name: 🔍 Run Semgrep
-        uses: returntocorp/semgrep-action@v1
+        uses: semgrep/semgrep-action@v1
         with:
           config: >-
             p/security-audit
@@ -109,11 +127,13 @@ jobs:
 
   # Analyse des conteneurs Docker
   container-scan:
-    name: 🐳 Container Security
+    name: 🐳 Container Security (${{ matrix.dockerfile }})
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: ${{ github.event.inputs.full_scan == 'true' || github.event.inputs.full_scan == null }}
     
     strategy:
+      fail-fast: false
       matrix:
         dockerfile:
           - Dockerfile.api

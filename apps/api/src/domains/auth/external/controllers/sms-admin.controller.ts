@@ -9,8 +9,8 @@ import type { SMSService } from '../../services/sms.service'
  * DTO pour tester l'envoi SMS
  */
 class TestSMSDto {
-  phoneNumber: string
-  message: string
+  phoneNumber!: string
+  message!: string
 }
 
 /**

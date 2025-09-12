@@ -83,13 +83,15 @@ describe('PricingEngineService', () => {
         {
           provide: getDataSourceToken('tenant'),
           useValue: {
-            manager: { 
-              transaction: vi.fn((cb) => cb({
-                findOne: vi.fn(),
-                save: vi.fn(),
-                update: vi.fn()
-              }))
-            }
+            manager: {
+              transaction: vi.fn((cb) =>
+                cb({
+                  findOne: vi.fn(),
+                  save: vi.fn(),
+                  update: vi.fn(),
+                })
+              ),
+            },
           },
         },
       ],

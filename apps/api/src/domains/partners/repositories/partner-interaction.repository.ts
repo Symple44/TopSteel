@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Between, type FindOptionsWhere, In, LessThan, MoreThan, type Repository } from 'typeorm'
-import { toTypeORMUpdate } from '../../../core/database/typeorm-helpers'
+import { Between, type FindOptionsWhere, In, LessThan, MoreThan, type Repository, type DeepPartial } from 'typeorm'
 import {
   type InteractionDirection,
   type InteractionPriority,
@@ -182,7 +181,8 @@ export class PartnerInteractionRepository {
   }
 
   async update(id: string, data: Partial<PartnerInteraction>): Promise<PartnerInteraction> {
-    await this.repository.update(id, toTypeORMUpdate(data))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.repository.update(id, data as any)
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Interaction ${id} not found`)

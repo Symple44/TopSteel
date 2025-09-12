@@ -6,13 +6,12 @@
  */
 
 import type { DeepPartial } from 'typeorm'
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 
 /**
  * Type helper for TypeORM update operations
- * Converts a Partial<T> to TypeORM's expected QueryDeepPartialEntity<T>
+ * Uses DeepPartial as a safe alternative to QueryDeepPartialEntity
  */
-export type TypeORMUpdateData<T> = QueryDeepPartialEntity<T>
+export type TypeORMUpdateData<T> = DeepPartial<T>
 
 /**
  * Type helper for TypeORM partial entities

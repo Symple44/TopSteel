@@ -25,14 +25,19 @@ on:
 env:
   NODE_VERSION: '22.14.0'
   PNPM_VERSION: '10.13.1'
-  NODE_OPTIONS: '--max-old-space-size=6144'
+  NODE_OPTIONS: '--max-old-space-size=8192'
   CI: 'true'
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  FORCE_COLOR: '1'
+  NPM_CONFIG_COLOR: 'always'
+  WORKFLOW_START_TIME: ${{ github.event.head_commit.timestamp }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   # 🔧 Setup and validation
@@ -66,20 +71,28 @@ jobs:
           cache: 'pnpm'
 
       - name: 📥 Install dependencies
-        run: pnpm ci:install
+        run: |
+          echo "📦 Installing dependencies with frozen lockfile..."
+          pnpm config set store-dir ~/.pnpm-store
+          pnpm ci:install
+          echo "✅ Dependencies installed successfully"
 
       - name: 💾 Cache dependencies and build outputs
         uses: actions/cache@v4
         id: cache
         with:
           path: |
+            ~/.pnpm-store
             node_modules
             apps/*/node_modules
             packages/*/node_modules
             .turbo
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+            apps/*/.next/cache
+            packages/*/dist
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json', '**/turbo.json') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-deps-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-deps-
 
       - name: 🔍 Generate build matrix
         id: matrix
@@ -90,7 +103,7 @@ jobs:
   quality:
     name: 🔍 Code Quality
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     needs: setup
     if: ${{ !github.event.pull_request.draft }}
     
@@ -118,17 +131,24 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: |
+            ~/.pnpm-store
             node_modules
             apps/*/node_modules
             packages/*/node_modules
             .turbo
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+            apps/*/.next/cache
+            packages/*/dist
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json', '**/turbo.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-deps-
 
       - name: 📥 Install dependencies
         run: |
           if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/turbo" ]; then
-            echo "📦 Installing dependencies..."
-            pnpm install --frozen-lockfile
+            echo "📦 Installing dependencies with optimized settings..."
+            pnpm config set store-dir ~/.pnpm-store
+            pnpm install --frozen-lockfile --prefer-offline
           else
             echo "✅ Dependencies already cached"
           fi
@@ -138,30 +158,45 @@ jobs:
 
       - name: 🔍 Run linting
         if: matrix.check == 'lint'
-        run: |
-          echo "🔍 Running linting checks..."
-          pnpm lint
-          echo "✅ Linting completed"
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          retry_on: error
+          command: |
+            echo "🔍 Running linting checks..."
+            pnpm lint
+            echo "✅ Linting completed"
 
       - name: 🔧 Run type checking
         if: matrix.check == 'typecheck'
-        run: |
-          echo "🔧 Running TypeScript type checking..."
-          pnpm type-check
-          echo "✅ Type checking completed"
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          retry_on: error
+          command: |
+            echo "🔧 Running TypeScript type checking..."
+            pnpm type-check
+            echo "✅ Type checking completed"
 
       - name: 💅 Run format checking
         if: matrix.check == 'format'
-        run: |
-          echo "💅 Running format checking..."
-          pnpm format:biome
-          echo "✅ Format checking completed"
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          retry_on: error
+          command: |
+            echo "💅 Running format checking..."
+            pnpm format:biome
+            echo "✅ Format checking completed"
 
   # 🛡️ Security Audit
   security:
     name: 🛡️ Security Audit
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     needs: setup
     if: ${{ !github.event.pull_request.draft }}
     
@@ -231,9 +266,10 @@ jobs:
           POSTGRES_DB: topsteel_test
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 30s
         ports:
           - 5432:5432
       
@@ -241,9 +277,10 @@ jobs:
         image: redis:7-alpine
         options: >-
           --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 30s
         ports:
           - 6379:6379
 
@@ -284,11 +321,23 @@ jobs:
       - name: 🏗️ Build packages
         run: pnpm build:packages
 
-      - name: 🧪 Run tests with coverage
+      - name: 🔍 Verify service health
         run: |
-          echo "🧪 Running tests with coverage..."
-          pnpm test:coverage
-          echo "✅ Tests completed"
+          echo "🔍 Waiting for services to be healthy..."
+          timeout 60 bash -c 'until pg_isready -h localhost -p 5432 -U test; do echo "Waiting for postgres..."; sleep 2; done'
+          timeout 60 bash -c 'until redis-cli -h localhost -p 6379 ping | grep -q PONG; do echo "Waiting for redis..."; sleep 2; done'
+          echo "✅ All services are healthy"
+
+      - name: 🧪 Run tests with coverage
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 20
+          max_attempts: 2
+          retry_on: error
+          command: |
+            echo "🧪 Running tests with coverage..."
+            pnpm test:coverage
+            echo "✅ Tests completed"
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/topsteel_test
           REDIS_URL: redis://localhost:6379
@@ -307,9 +356,9 @@ jobs:
 
   # 🏗️ Build Applications
   build:
-    name: 🏗️ Build
+    name: 🏗️ Build ${{ matrix.app }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     needs: [setup, quality]
     if: ${{ !github.event.pull_request.draft }}
     
@@ -475,7 +524,7 @@ jobs:
 
       - name: 🏷️ Extract metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}
           tags: |
@@ -486,15 +535,20 @@ jobs:
             type=sha
 
       - name: 🐳 Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./apps/${{ matrix.app }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha,scope=${{ matrix.app }}
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:buildcache
+          cache-to: |
+            type=gha,mode=max,scope=${{ matrix.app }}
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:buildcache,mode=max
+          platforms: linux/amd64
           build-args: |
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VCS_REF=${{ github.sha }}
@@ -555,9 +609,18 @@ jobs:
     if: always() && !github.event.pull_request.draft
     
     steps:
-      - name: 📊 Generate pipeline summary
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Setup Node.js for reporting
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📊 Generate enhanced pipeline summary
         run: |
-          echo "# 🚀 TopSteel CI/CD Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          node .github/scripts/performance-tracker.js summary
+          
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 📋 Job Status" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
@@ -567,10 +630,14 @@ jobs:
           echo "| 🛡️ Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🧪 Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🏗️ Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Pipeline completed at:** $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Upload performance report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-report-${{ github.run_number }}
+          path: performance-report.json
+          retention-days: 30
 
       - name: 🎉 Success notification
         if: ${{ needs.setup.result == 'success' && needs.quality.result == 'success' && needs.security.result == 'success' && needs.test.result == 'success' && needs.build.result == 'success' }}

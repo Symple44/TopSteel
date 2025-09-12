@@ -6,8 +6,10 @@
     "tsBuildInfoFile": null,
     "emitDeclarationOnly": true,
     "noEmit": false,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "rootDir": "./src"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "../domains/src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts", "**/*.stories.tsx"]
 }

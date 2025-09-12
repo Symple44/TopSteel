@@ -6,6 +6,7 @@ import type { CallHandler, ExecutionContext } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { of, throwError } from 'rxjs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { LogSanitizationModule } from './log-sanitization.module'
 import { LogSanitizerService } from './log-sanitizer.service'
 import { SanitizedLoggingInterceptor } from './sanitized-logging.interceptor'
 
@@ -45,7 +46,7 @@ describe('SanitizedLoggingInterceptor', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [LogSanitizerService, SanitizedLoggingInterceptor],
+      imports: [LogSanitizationModule],
     }).compile()
 
     interceptor = module.get<SanitizedLoggingInterceptor>(SanitizedLoggingInterceptor)

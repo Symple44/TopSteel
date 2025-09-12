@@ -2,10 +2,9 @@ import 'reflect-metadata'
 import { ConfigService } from '@nestjs/config'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { SecurityService } from '../security.service'
 
 // Mock crypto for testing
-const mockCrypto = {
+vi.mock('crypto', () => ({
   randomBytes: vi.fn(),
   createHash: vi.fn().mockReturnValue({
     update: vi.fn().mockReturnThis(),
@@ -18,9 +17,13 @@ const mockCrypto = {
   timingSafeEqual: vi.fn(),
   scrypt: vi.fn(),
   randomInt: vi.fn(),
-}
+}))
 
-vi.mock('crypto', () => mockCrypto)
+// Import after mock is defined
+import * as crypto from 'crypto'
+import { SecurityService } from '../security.service'
+
+const mockCrypto = vi.mocked(crypto)
 
 interface MockConfigService {
   get: ReturnType<typeof vi.fn>
@@ -29,13 +32,12 @@ interface MockConfigService {
 describe('SecurityService', () => {
   let service: SecurityService
   let _configService: MockConfigService
-
-  const mockConfigService = {
-    get: vi.fn(),
-  }
+  let mockConfigService: { get: ReturnType<typeof vi.fn> }
 
   beforeEach(async () => {
-    vi.clearAllMocks()
+    mockConfigService = {
+      get: vi.fn(),
+    }
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

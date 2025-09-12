@@ -26,15 +26,15 @@ import {
 @Index(['dateCreation'])
 export class StockMovement {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id!: string
 
   /** Référence unique du mouvement */
   @Column({ unique: true })
-  reference: string
+  reference!: string
 
   /** Article concerné */
   @Column('uuid')
-  articleId: string
+  articleId!: string
 
   @ManyToOne(() => Article, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'articleId' })
@@ -45,11 +45,11 @@ export class StockMovement {
     type: 'enum',
     enum: StockMovementType,
   })
-  type: StockMovementType
+  type!: StockMovementType
 
   /** Quantité du mouvement */
   @Column('decimal', { precision: 10, scale: 3 })
-  quantite: number
+  quantite!: number
 
   /** Unité de mesure */
   @Column({ nullable: true })
@@ -57,11 +57,11 @@ export class StockMovement {
 
   /** Stock avant le mouvement */
   @Column('decimal', { precision: 10, scale: 3 })
-  stockAvant: number
+  stockAvant!: number
 
   /** Stock après le mouvement */
   @Column('decimal', { precision: 10, scale: 3 })
-  stockApres: number
+  stockApres!: number
 
   /** Motif du mouvement */
   @Column({
@@ -113,7 +113,7 @@ export class StockMovement {
     enum: StockMovementStatus,
     default: StockMovementStatus.EN_ATTENTE,
   })
-  statut: StockMovementStatus
+  statut!: StockMovementStatus
 
   /** Priorité du mouvement */
   @Column({
@@ -121,15 +121,15 @@ export class StockMovement {
     enum: StockMovementPriority,
     default: StockMovementPriority.NORMALE,
   })
-  priorite: StockMovementPriority
+  priorite!: StockMovementPriority
 
   /** Utilisateur ayant créé le mouvement */
   @Column('uuid')
-  creeParId: string
+  creeParId!: string
 
   /** Nom de l'utilisateur */
   @Column()
-  creeParNom: string
+  creeParNom!: string
 
   /** Utilisateur ayant traité le mouvement */
   @Column('uuid', { nullable: true })
@@ -177,16 +177,16 @@ export class StockMovement {
 
   /** Date de création */
   @CreateDateColumn()
-  dateCreation: Date
+  dateCreation!: Date
 
   /** Date de dernière modification */
   @UpdateDateColumn()
-  dateModification: Date
+  dateModification!: Date
 
   /** Tenant ID pour multi-tenancy */
   @Column('uuid')
   @Index()
-  tenantId: string
+  tenantId!: string
 
   /**
    * Méthodes utilitaires

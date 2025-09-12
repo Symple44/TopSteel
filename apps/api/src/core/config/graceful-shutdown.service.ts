@@ -7,8 +7,8 @@ import { cleanupPort, killProcessOnPort } from './enhanced-server-manager'
 @Injectable()
 export class GracefulShutdownService implements OnApplicationShutdown {
   private readonly logger = new Logger(GracefulShutdownService.name)
-  private app: INestApplication
-  private actualPort: number
+  private app!: INestApplication
+  private actualPort!: number
   private shutdownInProgress = false
 
   setApp(app: INestApplication, port: number) {

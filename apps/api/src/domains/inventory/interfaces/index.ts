@@ -3,7 +3,7 @@
  */
 
 // Interfaces des filtres de recherche d'articles
-export {
+export type {
   IArticleAggregationOptions,
   IArticleAggregationResult,
   IArticlePagination,
@@ -13,7 +13,7 @@ export {
 } from './article-search-filters.interface'
 
 // Interfaces des statistiques d'inventaire
-export {
+export type {
   IArticleStats,
   IInventoryPerformanceStats,
   IInventoryPeriodStats,
@@ -22,6 +22,11 @@ export {
 } from './inventory-stats.interface'
 // Interfaces des mouvements de stock
 export {
+  StockMovementReason,
+  StockMovementStatus,
+  StockMovementType,
+} from './stock-movement.interface'
+export type {
   ICreateStockMovement,
   IStockMovement,
   IStockMovementFilters,
@@ -29,7 +34,4 @@ export {
   IStockMovementPagination,
   IStockMovementSortOptions,
   IUpdateStockMovement,
-  StockMovementReason,
-  StockMovementStatus,
-  StockMovementType,
 } from './stock-movement.interface'

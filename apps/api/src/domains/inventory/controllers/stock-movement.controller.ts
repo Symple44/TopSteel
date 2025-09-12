@@ -43,16 +43,16 @@ import type { StockMovementService } from '../services/stock-movement.service'
 export class CreateStockMovementDto {
   @ApiProperty({ description: "ID de l'article" })
   @IsUUID()
-  articleId: string
+  articleId!: string
 
   @ApiProperty({ enum: StockMovementType })
   @IsEnum(StockMovementType)
-  type: StockMovementType
+  type!: StockMovementType
 
   @ApiProperty({ description: 'Quantité du mouvement', minimum: 0 })
   @IsNumber()
   @Min(0)
-  quantite: number
+  quantite!: number
 
   @ApiProperty({ required: false })
   @IsOptional()

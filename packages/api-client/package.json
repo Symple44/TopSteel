@@ -47,7 +47,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "build": "tsup && tsc --project tsconfig.build.json --emitDeclarationOnly && tsc",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",

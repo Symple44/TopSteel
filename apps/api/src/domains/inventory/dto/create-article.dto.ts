@@ -18,13 +18,13 @@ export class CreateArticleDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
-  reference: string
+  reference!: string
 
   @ApiProperty({ description: "Désignation de l'article", maxLength: 200 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)
-  designation: string
+  designation!: string
 
   @ApiPropertyOptional({ description: 'Description détaillée', maxLength: 1000 })
   @IsOptional()
@@ -34,11 +34,11 @@ export class CreateArticleDto {
 
   @ApiProperty({ description: "Type d'article", enum: ArticleType })
   @IsEnum(ArticleType)
-  type: ArticleType
+  type!: ArticleType
 
   @ApiProperty({ description: "Statut de l'article", enum: ArticleStatus })
   @IsEnum(ArticleStatus)
-  status: ArticleStatus
+  status!: ArticleStatus
 
   @ApiPropertyOptional({ description: "Famille d'article", maxLength: 100 })
   @IsOptional()
@@ -68,7 +68,7 @@ export class CreateArticleDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(20)
-  uniteStock: string
+  uniteStock!: string
 
   @ApiPropertyOptional({ description: "Unité d'achat", maxLength: 20 })
   @IsOptional()
@@ -86,17 +86,17 @@ export class CreateArticleDto {
   @IsNumber()
   @Min(0.01)
   @Transform(({ value }) => parseFloat(value))
-  coefficientAchat: number
+  coefficientAchat!: number
 
   @ApiProperty({ description: 'Coefficient de vente', minimum: 0.01 })
   @IsNumber()
   @Min(0.01)
   @Transform(({ value }) => parseFloat(value))
-  coefficientVente: number
+  coefficientVente!: number
 
   @ApiProperty({ description: 'Article géré en stock' })
   @IsBoolean()
-  gereEnStock: boolean
+  gereEnStock!: boolean
 
   @ApiPropertyOptional({ description: 'Stock physique', minimum: 0 })
   @IsOptional()
@@ -130,7 +130,7 @@ export class CreateArticleDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
-  methodeValorisation: string
+  methodeValorisation!: string
 
   @ApiPropertyOptional({ description: "Prix d'achat standard", minimum: 0 })
   @IsOptional()
