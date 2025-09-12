@@ -9,7 +9,13 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
-COPY packages/*/package.json ./packages/*/
+COPY packages/api-client/package.json ./packages/api-client/
+COPY packages/config/package.json ./packages/config/
+COPY packages/domains/package.json ./packages/domains/
+COPY packages/erp-entities/package.json ./packages/erp-entities/
+COPY packages/types/package.json ./packages/types/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/utils/package.json ./packages/utils/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -33,14 +39,20 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
-COPY packages/*/package.json ./packages/*/
+COPY packages/api-client/package.json ./packages/api-client/
+COPY packages/config/package.json ./packages/config/
+COPY packages/domains/package.json ./packages/domains/
+COPY packages/erp-entities/package.json ./packages/erp-entities/
+COPY packages/types/package.json ./packages/types/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/utils/package.json ./packages/utils/
 
 # Install production dependencies only
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy built application
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/packages/*/dist ./packages/*/dist
+COPY --from=builder /app/packages ./packages
 
 # Set environment
 ENV NODE_ENV=production

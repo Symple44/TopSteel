@@ -9,7 +9,13 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
-COPY packages/*/package.json ./packages/*/
+COPY packages/api-client/package.json ./packages/api-client/
+COPY packages/config/package.json ./packages/config/
+COPY packages/domains/package.json ./packages/domains/
+COPY packages/erp-entities/package.json ./packages/erp-entities/
+COPY packages/types/package.json ./packages/types/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/utils/package.json ./packages/utils/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -33,7 +39,13 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
-COPY packages/*/package.json ./packages/*/
+COPY packages/api-client/package.json ./packages/api-client/
+COPY packages/config/package.json ./packages/config/
+COPY packages/domains/package.json ./packages/domains/
+COPY packages/erp-entities/package.json ./packages/erp-entities/
+COPY packages/types/package.json ./packages/types/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/utils/package.json ./packages/utils/
 
 # Install production dependencies
 RUN pnpm install --frozen-lockfile --prod
@@ -41,7 +53,7 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy built application
 COPY --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/public ./apps/web/public
-COPY --from=builder /app/packages/*/dist ./packages/*/dist
+COPY --from=builder /app/packages ./packages
 
 # Copy Next.js configuration
 COPY apps/web/next.config.ts ./apps/web/

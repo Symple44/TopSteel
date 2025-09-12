@@ -484,13 +484,13 @@ jobs:
 
       - name: 📤 Upload Playwright report
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
           name: playwright-report-${{ github.run_number }}
           path: |
-            playwright-report/
-            test-results/
-          if-no-files-found: warn
+            apps/web/playwright-report/
+            apps/web/test-results/
+          if-no-files-found: ignore
           retention-days: 7
 
   # 🐳 Build Docker Images
