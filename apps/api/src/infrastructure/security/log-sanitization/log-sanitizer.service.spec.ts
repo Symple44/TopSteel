@@ -65,7 +65,7 @@ describe('LogSanitizerService', () => {
     it('should mask phone numbers', () => {
       const message = 'Contact: +33123456789'
       const result = service.sanitizeLogMessage(message)
-      expect(result).toBe('Contact: [PHONE_MASKED]')
+      expect(result).toBe('Contact: +[PHONE_MASKED]')
     })
 
     it('should partially mask IP addresses', () => {

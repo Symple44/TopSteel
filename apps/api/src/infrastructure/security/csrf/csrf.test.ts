@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Test } from '@nestjs/testing'
 import type { Request, Response } from 'express'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CsrfMiddleware } from './csrf.middleware'
 import { CsrfService } from './csrf.service'
 
@@ -43,6 +43,10 @@ describe('CSRF Protection', () => {
     csrfService = module.get<CsrfService>(CsrfService)
     csrfMiddleware = module.get<CsrfMiddleware>(CsrfMiddleware)
     configService = module.get<ConfigService>(ConfigService)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   describe('CsrfService', () => {

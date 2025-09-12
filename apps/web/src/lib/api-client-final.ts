@@ -76,7 +76,7 @@ interface UploadResponse {
 }
 
 // Bulk operation response
-interface BulkOperationResponse {
+export interface BulkOperationResponse {
   success: boolean
   processed: number
   errors: Array<{

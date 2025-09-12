@@ -1,6 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
-import { type MockedFunction, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { MockedFunction } from 'vitest'
 import {
   type NotificationDeliveryOptions,
   NotificationDeliveryService,
@@ -36,7 +37,7 @@ describe('NotificationDeliveryService', () => {
     }).compile()
 
     service = module.get<NotificationDeliveryService>(NotificationDeliveryService)
-    eventEmitter = module.get(EventEmitter2)
+    eventEmitter = module.get<{ emit: MockedFunction<EventEmitter2['emit']> }>(EventEmitter2)
   })
 
   afterEach(() => {
