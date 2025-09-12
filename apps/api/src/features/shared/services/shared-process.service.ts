@@ -4,7 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { type ProcessType, SharedProcess } from '../entities/shared-process.entity'
 
-
 @Injectable()
 export class SharedProcessService {
   constructor(

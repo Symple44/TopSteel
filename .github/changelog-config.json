@@ -1,0 +1,55 @@
+{
+  "categories": [
+    {
+      "title": "🚀 Features",
+      "labels": ["enhancement", "feature"]
+    },
+    {
+      "title": "🐛 Bug Fixes",
+      "labels": ["bug", "bugfix", "fix"]
+    },
+    {
+      "title": "📚 Documentation",
+      "labels": ["documentation", "docs"]
+    },
+    {
+      "title": "🔧 Maintenance",
+      "labels": ["chore", "maintenance", "dependencies"]
+    },
+    {
+      "title": "⚡ Performance",
+      "labels": ["performance", "optimization"]
+    },
+    {
+      "title": "🔒 Security",
+      "labels": ["security"]
+    },
+    {
+      "title": "♻️ Refactoring",
+      "labels": ["refactoring", "refactor"]
+    },
+    {
+      "title": "🧪 Tests",
+      "labels": ["test", "tests", "testing"]
+    },
+    {
+      "title": "🏗️ CI/CD",
+      "labels": ["ci", "cd", "ci/cd", "github-actions"]
+    }
+  ],
+  "ignore_labels": ["skip-changelog", "duplicate", "wontfix", "invalid"],
+  "sort": {
+    "order": "ASC",
+    "on_property": "mergedAt"
+  },
+  "template": "${{CHANGELOG}}\n\n**Full Changelog**: ${{RELEASE_DIFF}}",
+  "pr_template": "- ${{TITLE}} by @${{AUTHOR}} in #${{NUMBER}}",
+  "empty_template": "- No changes",
+  "max_tags_to_fetch": 200,
+  "max_pull_requests": 250,
+  "max_back_track_time_days": 365,
+  "exclude_merge_branches": [],
+  "tag_resolver": {
+    "method": "semver"
+  }
+}

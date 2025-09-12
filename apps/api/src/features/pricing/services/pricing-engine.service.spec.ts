@@ -2,10 +2,20 @@ import 'reflect-metadata'
 import { AdjustmentType, PriceRule, PriceRuleChannel } from '@erp/entities'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { DataSource, Repository } from 'typeorm'
+import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
 import { vi } from 'vitest'
 import { Article } from '../../../domains/inventory/entities/article.entity'
 import { type PricingContext, PricingEngineService } from './pricing-engine.service'
+
+// Mock interfaces for TypeORM repositories
+interface MockedSelectQueryBuilder<T> extends Partial<SelectQueryBuilder<T>> {
+  where: ReturnType<typeof vi.fn>
+  andWhere: ReturnType<typeof vi.fn>
+  orderBy: ReturnType<typeof vi.fn>
+  addOrderBy: ReturnType<typeof vi.fn>
+  getOne: ReturnType<typeof vi.fn>
+  getMany: ReturnType<typeof vi.fn>
+}
 
 describe('PricingEngineService', () => {
   let service: PricingEngineService
@@ -89,7 +99,7 @@ describe('PricingEngineService', () => {
       where: vi.fn().mockReturnThis(),
       andWhere: vi.fn().mockReturnThis(),
       getOne: vi.fn().mockResolvedValue(mockArticle),
-    } as any)
+    } as unknown as SelectQueryBuilder<Article>)
 
     vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
       where: vi.fn().mockReturnThis(),
@@ -97,9 +107,9 @@ describe('PricingEngineService', () => {
       orderBy: vi.fn().mockReturnThis(),
       addOrderBy: vi.fn().mockReturnThis(),
       getMany: vi.fn().mockResolvedValue([mockPriceRule]),
-    } as any)
+    } as unknown as SelectQueryBuilder<PriceRule>)
 
-    vi.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as any)
+    vi.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as PriceRule)
   })
 
   afterEach(() => {
@@ -119,7 +129,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([]),
-      } as any)
+      } as unknown as SelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -158,7 +168,7 @@ describe('PricingEngineService', () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         getOne: vi.fn().mockResolvedValue(articleWithCoeff),
-      } as any)
+      } as unknown as SelectQueryBuilder<Article>)
 
       // No rules to focus on coefficient
       vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -167,7 +177,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([]),
-      } as any)
+      } as unknown as SelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -188,7 +198,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([fixedAmountRule]),
-      } as any)
+      } as MockedSelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -209,7 +219,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([fixedPriceRule]),
-      } as any)
+      } as MockedSelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -238,7 +248,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([lowPriorityRule, highPriorityRule]),
-      } as any)
+      } as MockedSelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -265,7 +275,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([nonCombinableRule, secondRule]),
-      } as any)
+      } as MockedSelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -278,7 +288,7 @@ describe('PricingEngineService', () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         getOne: vi.fn().mockResolvedValue(null),
-      } as any)
+      } as MockedSelectQueryBuilder<Article>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -325,7 +335,7 @@ describe('PricingEngineService', () => {
 
   describe('previewRule', () => {
     it('should preview a specific rule', async () => {
-      vi.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as any)
+      vi.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as PriceRule)
 
       const result = await service.previewRule('rule-123', 'article-123', {
         societeId: 'societe-123',
@@ -371,7 +381,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([problematicRule]),
-      } as any)
+      } as MockedSelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -393,7 +403,7 @@ describe('PricingEngineService', () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         getOne: vi.fn().mockResolvedValue(zeroPriceArticle),
-      } as any)
+      } as MockedSelectQueryBuilder<Article>)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -414,7 +424,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([largeDiscountRule]),
-      } as any)
+      } as MockedSelectQueryBuilder<PriceRule>)
 
       const result = await service.calculatePrice(mockContext)
 

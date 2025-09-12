@@ -255,7 +255,11 @@ export class RangeSelectionManager {
    */
   async copyToClipboard<T>(
     data: T[],
-    columns: Array<{ id: string; key: keyof T | string; getValue?: (row: T) => any }>
+    columns: Array<{
+      id: string
+      key: keyof T | string
+      getValue?: (row: T) => string | number | boolean | null | undefined
+    }>
   ) {
     const columnOrder = columns.map((c) => c.id)
     const selectedCells = this.getAllSelectedCells(columnOrder)
@@ -274,7 +278,7 @@ export class RangeSelectionManager {
     const rows = Object.keys(cellsByRow)
       .map((k) => parseInt(k, 10))
       .sort((a, b) => a - b)
-    const allColumns = [...new Set(selectedCells.map((c) => c.column))]
+    const allColumns = Array.from(new Set(selectedCells.map((c) => c.column)))
     allColumns.sort((a, b) => columnOrder.indexOf(a) - columnOrder.indexOf(b))
 
     // Générer le texte TSV (Tab-Separated Values) pour Excel
@@ -287,7 +291,9 @@ export class RangeSelectionManager {
 
             const value = column.getValue
               ? column.getValue(data[rowIndex])
-              : (data[rowIndex] as any)[column.key]
+              : (data[rowIndex] as Record<string, string | number | boolean | null | undefined>)[
+                  column.key as string
+                ]
 
             return String(value ?? '')
           })
@@ -307,7 +313,11 @@ export class RangeSelectionManager {
   fillDown<T>(
     data: T[],
     columns: Array<{ id: string; key: keyof T | string }>,
-    onCellChange: (rowIndex: number, columnId: string, value: any) => void
+    onCellChange: (
+      rowIndex: number,
+      columnId: string,
+      value: string | number | boolean | null | undefined
+    ) => void
   ) {
     const selectedCells = this.getAllSelectedCells(columns.map((c) => c.id))
     if (selectedCells.length === 0) return
@@ -331,7 +341,9 @@ export class RangeSelectionManager {
         const column = columns.find((c) => c.id === columnId)
         if (!column || !data[sourceRow]) return
 
-        const sourceValue = (data[sourceRow] as any)[column.key]
+        const sourceValue = (
+          data[sourceRow] as Record<string, string | number | boolean | null | undefined>
+        )[column.key as string]
 
         // Remplir toutes les autres cellules avec cette valeur
         for (let i = 1; i < rows.length; i++) {
@@ -350,7 +362,11 @@ export class RangeSelectionManager {
   fillRight<T>(
     data: T[],
     columns: Array<{ id: string; key: keyof T | string }>,
-    onCellChange: (rowIndex: number, columnId: string, value: any) => void
+    onCellChange: (
+      rowIndex: number,
+      columnId: string,
+      value: string | number | boolean | null | undefined
+    ) => void
   ) {
     const selectedCells = this.getAllSelectedCells(columns.map((c) => c.id))
     if (selectedCells.length === 0) return
@@ -379,7 +395,9 @@ export class RangeSelectionManager {
         const sourceColumn = columns.find((c) => c.id === sourceColumnId)
         if (!sourceColumn) return
 
-        const sourceValue = (data[row] as any)[sourceColumn.key]
+        const sourceValue = (
+          data[row] as Record<string, string | number | boolean | null | undefined>
+        )[sourceColumn.key as string]
 
         // Remplir toutes les autres colonnes avec cette valeur
         for (let i = 1; i < columnIds.length; i++) {

@@ -2,8 +2,8 @@ import 'reflect-metadata'
 import { BadRequestException } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getDataSourceToken } from '@nestjs/typeorm'
-import { vi } from 'vitest'
 import type { DataSource } from 'typeorm'
+import { vi } from 'vitest'
 import { QueryBuilderExecutorService } from '../../services/query-builder-executor.service'
 import { QueryBuilderPermissionService } from '../../services/query-builder-permission.service'
 import { QueryBuilderSecurityService } from '../query-builder-security.service'
@@ -197,8 +197,10 @@ describe('Query Builder Security Integration Tests', () => {
 
       // Verify that tenant isolation was applied
       const executedQueries = mockTenantDataSource.query?.mock.calls || []
-      const countQuery = executedQueries.find((call: any) => call[0].includes('COUNT(*)'))
-      const selectQuery = executedQueries.find((call: any) => call[0].includes('SELECT clients.nom'))
+      const countQuery = executedQueries.find((call: unknown[]) => call[0].includes('COUNT(*)'))
+      const selectQuery = executedQueries.find((call: unknown[]) =>
+        call[0].includes('SELECT clients.nom')
+      )
 
       expect(countQuery?.[0]).toContain('company_id = $1')
       expect(countQuery?.[1]).toContain(tenantId)
@@ -322,7 +324,11 @@ describe('Query Builder Security Integration Tests', () => {
 
       // Test that permission denial prevents execution
       await expect(
-        executorService.executeQuery(mockQueryBuilder as MockQueryBuilder, { page: 1, pageSize: 50 }, userId)
+        executorService.executeQuery(
+          mockQueryBuilder as MockQueryBuilder,
+          { page: 1, pageSize: 50 },
+          userId
+        )
       ).rejects.toThrow(BadRequestException)
     })
 
@@ -470,7 +476,7 @@ describe('Query Builder Security Integration Tests', () => {
         (call) => call[0].includes('clients') && !call[0].includes('SELECT su.societeId')
       )
 
-      dataQueries.forEach((call: any) => {
+      dataQueries.forEach((call: unknown[]) => {
         expect(call[0]).toContain('company_id = $1')
         expect(call[1]).toContain(userTenantId)
       })
@@ -528,7 +534,7 @@ describe('Query Builder Security Integration Tests', () => {
       // Check that the LIMIT was applied correctly
       const executedQueries = mockTenantDataSource.query?.mock.calls || []
       const selectQuery = executedQueries.find(
-        (call: any) => call[0].includes('LIMIT') && call[0].includes('clients.nom')
+        (call: unknown[]) => call[0].includes('LIMIT') && call[0].includes('clients.nom')
       )
 
       // Should be limited to table's max rows (1000), not the requested 5000
@@ -600,7 +606,7 @@ describe('Query Builder Security Integration Tests', () => {
               name: 'test_calc',
               expression,
               isVisible: true,
-              queryBuilder: null as any,
+              queryBuilder: null as unknown as { id: string },
               queryBuilderId: 'qb-1',
             },
           ]

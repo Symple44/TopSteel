@@ -4,7 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { Site } from '../entities/site.entity'
 
-
 @Injectable()
 export class SitesService {
   constructor(

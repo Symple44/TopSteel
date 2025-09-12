@@ -4,7 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { SocieteUser, type UserSocieteRole } from '../entities/societe-user.entity'
 
-
 @Injectable()
 export class SocieteUsersService {
   constructor(

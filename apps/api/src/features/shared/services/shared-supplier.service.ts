@@ -4,7 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { SharedSupplier, type SupplierType } from '../entities/shared-supplier.entity'
 
-
 @Injectable()
 export class SharedSupplierService {
   constructor(

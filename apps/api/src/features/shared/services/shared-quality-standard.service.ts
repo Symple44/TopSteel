@@ -7,7 +7,6 @@ import {
   SharedQualityStandard,
 } from '../entities/shared-quality-standard.entity'
 
-
 @Injectable()
 export class SharedQualityStandardService {
   constructor(

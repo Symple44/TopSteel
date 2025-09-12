@@ -61,7 +61,11 @@ export function useRangeSelection() {
     <T>(
       data: T[],
       columns: Array<{ id: string; key: keyof T | string }>,
-      onCellChange: (rowIndex: number, columnId: string, value: any) => void
+      onCellChange: (
+        rowIndex: number,
+        columnId: string,
+        value: string | number | boolean | null | undefined
+      ) => void
     ) => {
       managerRef.current.fillDown(data, columns, onCellChange)
     },
@@ -72,7 +76,11 @@ export function useRangeSelection() {
     <T>(
       data: T[],
       columns: Array<{ id: string; key: keyof T | string }>,
-      onCellChange: (rowIndex: number, columnId: string, value: any) => void
+      onCellChange: (
+        rowIndex: number,
+        columnId: string,
+        value: string | number | boolean | null | undefined
+      ) => void
     ) => {
       managerRef.current.fillRight(data, columns, onCellChange)
     },
@@ -82,7 +90,11 @@ export function useRangeSelection() {
   const copyToClipboard = useCallback(
     <T>(
       data: T[],
-      columns: Array<{ id: string; key: keyof T | string; getValue?: (row: T) => any }>
+      columns: Array<{
+        id: string
+        key: keyof T | string
+        getValue?: (row: T) => string | number | boolean | null | undefined
+      }>
     ) => {
       return managerRef.current.copyToClipboard(data, columns)
     },

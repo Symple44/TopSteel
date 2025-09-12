@@ -6,9 +6,12 @@ import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { vi } from 'vitest'
-import type { CreateMarketplaceProductDto, UpdateMarketplaceProductDto } from '../admin/product-catalog.service'
-import { ProductCatalogService } from '../admin/product-catalog.service'
 import type { MarketplaceProductAdapter } from '../adapters/marketplace-product.adapter'
+import type {
+  CreateMarketplaceProductDto,
+  UpdateMarketplaceProductDto,
+} from '../admin/product-catalog.service'
+import { ProductCatalogService } from '../admin/product-catalog.service'
 import type { MarketplaceStockService } from '../stock/marketplace-stock.service'
 
 describe('ProductCatalogService', () => {
@@ -173,7 +176,6 @@ describe('ProductCatalogService', () => {
         BadRequestException
       )
     })
-
   })
 
   describe('getProducts', () => {
@@ -192,7 +194,12 @@ describe('ProductCatalogService', () => {
 
       mockAdapter.getMarketplaceProducts.mockResolvedValue(mockResponse)
 
-      const result = await service.getProducts(tenantId, {}, { field: 'createdAt', direction: 'DESC' }, { page: 1, limit: 10 })
+      const result = await service.getProducts(
+        tenantId,
+        {},
+        { field: 'createdAt', direction: 'DESC' },
+        { page: 1, limit: 10 }
+      )
 
       expect(result).toEqual(mockResponse)
       expect(mockAdapter.getMarketplaceProducts).toHaveBeenCalledWith(
@@ -337,7 +344,6 @@ describe('ProductCatalogService', () => {
         changes: updateProductDto,
       })
     })
-
   })
 
   describe('deleteProduct', () => {
@@ -397,7 +403,6 @@ describe('ProductCatalogService', () => {
       })
       expect(mockStockService.updateStock).toHaveBeenCalledWith(productId, quantity, reason)
     })
-
   })
 
   describe('bulkUpdateProducts', () => {

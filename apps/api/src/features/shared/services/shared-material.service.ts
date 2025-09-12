@@ -4,7 +4,6 @@ import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { type MaterialType, SharedMaterial } from '../entities/shared-material.entity'
 
-
 @Injectable()
 export class SharedMaterialService {
   constructor(

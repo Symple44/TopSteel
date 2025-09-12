@@ -1,12 +1,12 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import type { ColumnConfig } from './types'
+import type { ColumnConfig, DataValue } from './types'
 
-export interface GroupNode<T = Record<string, unknown>> {
+export interface GroupNode<T = Record<string, DataValue>> {
   id: string
   level: number
-  groupValue: any
+  groupValue: DataValue
   groupLabel: string
   isExpanded: boolean
   items: T[]
@@ -20,7 +20,7 @@ export interface TreeGroupingConfig {
   expanded: Set<string> // IDs des nœuds étendus
 }
 
-export function useTreeGrouping<T = Record<string, unknown>>(
+export function useTreeGrouping<T = Record<string, DataValue>>(
   data: T[],
   columns: ColumnConfig<T>[],
   initialConfig: TreeGroupingConfig = { columns: [], expanded: new Set() }
@@ -46,16 +46,15 @@ export function useTreeGrouping<T = Record<string, unknown>>(
     const roots: GroupNode<T>[] = []
 
     // Fonction pour créer une clé unique pour un groupe
-    const createGroupKey = (columnId: string, value: unknown, level: number) => {
+    const createGroupKey = (columnId: string, value: DataValue, level: number) => {
       return `${level}_${columnId}_${String(value)}`
     }
 
     // Fonction pour obtenir la valeur d'affichage d'un groupe
-    const getGroupLabel = (_column: ColumnConfig<T>, value: any) => {
+    const getGroupLabel = (_column: ColumnConfig<T>, value: DataValue) => {
       if (value === null || value === undefined) return 'Vide'
       if (typeof value === 'boolean') return value ? 'Oui' : 'Non'
-      if (Array.isArray(value)) return value.join(', ')
-      if (typeof value === 'object') return JSON.stringify(value)
+      if (value instanceof Date) return value.toLocaleDateString()
       return String(value)
     }
 
@@ -64,7 +63,9 @@ export function useTreeGrouping<T = Record<string, unknown>>(
       let currentParent: GroupNode<T> | undefined
 
       groupColumns.forEach((column, level) => {
-        const value = column.getValue ? column.getValue(item) : (item as any)[column.key]
+        const value = column.getValue
+          ? (column.getValue(item) as DataValue)
+          : ((item as Record<string, DataValue>)[column.key as string] as DataValue)
         const groupKey = createGroupKey(column.id, value, level)
 
         let node = nodeMap.get(groupKey)
@@ -210,7 +211,7 @@ export function useTreeGrouping<T = Record<string, unknown>>(
     expandAll,
     collapseAll,
     clearGrouping,
-    isGroupNode: (item: unknown): item is GroupNode<T> => {
+    isGroupNode: (item: T | GroupNode<T>): item is GroupNode<T> => {
       return !!(item && typeof item === 'object' && 'groupLabel' in item && 'level' in item)
     },
   }

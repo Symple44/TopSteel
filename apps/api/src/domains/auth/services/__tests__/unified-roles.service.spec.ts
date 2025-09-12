@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Repository, SelectQueryBuilder } from 'typeorm'
-import type { User } from '../../../users/entities/user.entity'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { OptimizedCacheService } from '../../../../infrastructure/cache/redis-optimized.service'
+import type { User } from '../../../users/entities/user.entity'
 import { GlobalUserRole, SocieteRoleType } from '../../core/constants/roles.constants'
 import { UserSocieteRole } from '../../core/entities/user-societe-role.entity'
 import type { UserSocieteInfo } from '../unified-roles.service'
@@ -124,7 +124,9 @@ describe('UnifiedRolesService', () => {
     }
 
     // Configure createQueryBuilder to return the mock itself
-    mockQueryBuilder.createQueryBuilder?.mockReturnValue(mockQueryBuilder as any)
+    mockQueryBuilder.createQueryBuilder?.mockReturnValue(
+      mockQueryBuilder as SelectQueryBuilder<UserSocieteRole>
+    )
 
     userSocieteRoleRepository = {
       createQueryBuilder: vi.fn().mockReturnValue(mockQueryBuilder),
@@ -150,10 +152,10 @@ describe('UnifiedRolesService', () => {
 
     // Create service instance with direct dependency injection
     service = new UnifiedRolesService(
-      userSocieteRoleRepository as Repository<UserSocieteRole>,
-      userRepository as Repository<User>,
-      cacheService as OptimizedCacheService,
-      {} as any // permissionCalculator - mock minimal pour les tests
+      userSocieteRoleRepository as unknown as Repository<UserSocieteRole>,
+      userRepository as unknown as Repository<User>,
+      cacheService as unknown as OptimizedCacheService,
+      {} as never // permissionCalculator - mock minimal pour les tests
     )
   })
 

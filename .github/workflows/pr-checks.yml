@@ -69,7 +69,7 @@ jobs:
     name: Lint Commits
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -87,7 +87,7 @@ jobs:
       api: ${{ steps.changes.outputs.api }}
       packages: ${{ steps.changes.outputs.packages }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - uses: dorny/paths-filter@v3
         id: changes

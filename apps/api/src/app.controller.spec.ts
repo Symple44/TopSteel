@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { MockedObject } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppController } from './app/app.controller'
 import type { AppService } from './app/app.service'
 
@@ -10,17 +10,19 @@ describe('AppController', () => {
   beforeEach(() => {
     // Créer un mock du service avec le bon typage
     appService = {
-      getHello: vi.fn().mockReturnValue('TopSteel ERP API v1.0.0 - Système de gestion métallurgique'),
+      getHello: vi
+        .fn()
+        .mockReturnValue('TopSteel ERP API v1.0.0 - Système de gestion métallurgique'),
       getVersion: vi.fn().mockReturnValue({
         name: 'TopSteel ERP API',
         version: '1.0.0',
         description: "API de gestion ERP pour l'industrie métallurgique",
         timestamp: new Date().toISOString(),
       }),
-    } as MockedObject<AppService>
+    } as unknown as MockedObject<AppService>
 
     // Créer directement une instance du controller avec le service mocké
-    appController = new AppController(appService)
+    appController = new AppController(appService as unknown as AppService)
   })
 
   describe('root', () => {

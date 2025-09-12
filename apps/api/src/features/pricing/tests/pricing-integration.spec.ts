@@ -68,7 +68,7 @@ describe('Pricing System Integration Tests', () => {
       }
 
       // Mock the rule repository to return our test rule
-      vi.spyOn(pricingEngine as any, 'findApplicableRules').mockResolvedValue([mockRule])
+      vi.spyOn(pricingEngine as unknown as { findApplicableRules: (context: unknown) => Promise<unknown[]> }, 'findApplicableRules').mockResolvedValue([mockRule])
 
       const context = {
         articleId: 'test-article-1',
@@ -271,7 +271,7 @@ describe('Pricing System Integration Tests', () => {
       }
 
       // Mock URL validation
-      vi.spyOn(webhooksService as any, 'validateWebhookUrl').mockResolvedValue(undefined)
+      vi.spyOn(webhooksService as unknown as { validateWebhookUrl: (url: string) => Promise<void> }, 'validateWebhookUrl').mockResolvedValue(undefined)
 
       const subscription = await webhooksService.createSubscription(subscriptionData)
 
@@ -417,7 +417,7 @@ describe('Pricing System Integration Tests', () => {
 
     it('should handle cache errors gracefully', async () => {
       // Simulate Redis connection error
-      vi.spyOn(cacheService as any, 'redis').mockImplementation(() => {
+      vi.spyOn(cacheService as unknown as { redis: () => unknown }, 'redis').mockImplementation(() => {
         throw new Error('Redis connection failed')
       })
 
