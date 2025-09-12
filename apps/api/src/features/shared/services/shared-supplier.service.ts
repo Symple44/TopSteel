@@ -1,8 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DeepPartial } from 'typeorm'
 import { IsNull, type Repository } from 'typeorm'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { SharedSupplier, type SupplierType } from '../entities/shared-supplier.entity'
+
+// Update interface that excludes problematic nested properties
+interface SharedSupplierUpdateData {
+  nom?: string
+  description?: string
+  code?: string
+  type?: SupplierType
+  adresse?: string
+  telephone?: string
+  email?: string
+  siteWeb?: string
+  contact?: string
+  specialites?: string[]
+  certifications?: string[]
+  noteQualite?: number
+  delaiLivraison?: number
+  conditionsPaiement?: string
+  // Note: metadata excluded as it contains Record<string, unknown>
+}
 
 @Injectable()
 export class SharedSupplierService {
@@ -34,8 +53,8 @@ export class SharedSupplierService {
     return this._sharedSupplierRepository.save(supplier)
   }
 
-  async update(id: string, supplierData: Partial<SharedSupplier>): Promise<SharedSupplier> {
-    await this._sharedSupplierRepository.update(id, supplierData as DeepPartial<SharedSupplier>)
+  async update(id: string, supplierData: QueryDeepPartialEntity<SharedSupplier>): Promise<SharedSupplier> {
+    await this._sharedSupplierRepository.update(id, supplierData)
     const supplier = await this._sharedSupplierRepository.findOne({ where: { id } })
     if (!supplier) {
       throw new NotFoundException(`Supplier with ID ${id} not found`)

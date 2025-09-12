@@ -1,8 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DeepPartial } from 'typeorm'
 import { IsNull, type Repository } from 'typeorm'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { Site } from '../entities/site.entity'
+
+// Update interface that excludes relations and problematic nested properties
+interface SiteUpdateData {
+  nom?: string
+  code?: string
+  adresse?: string
+  ville?: string
+  codePostal?: string
+  pays?: string
+  telephone?: string
+  email?: string
+  responsable?: string
+  type?: string
+  superficie?: number
+  nombreEmployes?: number
+  heuresOuverture?: string
+  isPrincipal?: boolean
+  actif?: boolean
+  // Note: societe relation and metadata excluded, capaciteProduction excluded as it contains Record<string, unknown>
+}
 
 @Injectable()
 export class SitesService {
@@ -51,8 +71,8 @@ export class SitesService {
     return this._siteRepository.save(site)
   }
 
-  async update(id: string, siteData: Partial<Site>): Promise<Site> {
-    await this._siteRepository.update(id, siteData as DeepPartial<Site>)
+  async update(id: string, siteData: QueryDeepPartialEntity<Site>): Promise<Site> {
+    await this._siteRepository.update(id, siteData)
     const site = await this._siteRepository.findOne({
       where: { id },
       relations: ['societe'],
@@ -69,10 +89,10 @@ export class SitesService {
 
   async setPrincipal(id: string, societeId: string): Promise<Site> {
     // D'abord, retirer le statut principal des autres sites
-    await this._siteRepository.update({ societeId }, { isPrincipal: false } as DeepPartial<Site>)
+    await this._siteRepository.update({ societeId }, { isPrincipal: false })
 
     // Puis définir le nouveau site principal
-    await this._siteRepository.update(id, { isPrincipal: true } as DeepPartial<Site>)
+    await this._siteRepository.update(id, { isPrincipal: true })
 
     const site = await this.findById(id)
     if (!site) {
@@ -82,7 +102,7 @@ export class SitesService {
   }
 
   async activate(id: string): Promise<Site> {
-    await this._siteRepository.update(id, { actif: true } as DeepPartial<Site>)
+    await this._siteRepository.update(id, { actif: true })
     const site = await this.findById(id)
     if (!site) {
       throw new NotFoundException(`Site with ID ${id} not found`)
@@ -91,7 +111,7 @@ export class SitesService {
   }
 
   async deactivate(id: string): Promise<Site> {
-    await this._siteRepository.update(id, { actif: false } as DeepPartial<Site>)
+    await this._siteRepository.update(id, { actif: false })
     const site = await this.findById(id)
     if (!site) {
       throw new NotFoundException(`Site with ID ${id} not found`)

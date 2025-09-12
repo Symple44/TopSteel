@@ -1,7 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { type DeepPartial, IsNull, type Repository } from 'typeorm'
+import { IsNull, type Repository } from 'typeorm'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
+
+// Update interface that excludes relations
+interface SocieteUpdateData {
+  nom?: string
+  code?: string
+  databaseName?: string
+  status?: SocieteStatus
+  adresse?: string
+  ville?: string
+  codePostal?: string
+  pays?: string
+  telephone?: string
+  email?: string
+  siteWeb?: string
+  siret?: string
+  secteurActivite?: string
+  nombreEmployes?: number
+  chiffreAffaires?: number
+  dateCreation?: Date
+  dateActivation?: Date
+  configuration?: {
+    modules?: string[]
+    features?: string[]
+    theme?: Record<string, unknown>
+    locale?: string
+    timezone?: string
+    marketplace?: {
+      enabled?: boolean
+      publicProfile?: boolean
+      allowedServices?: string[]
+    }
+  }
+  // Note: sites relation excluded
+}
 
 @Injectable()
 export class SocietesService {
@@ -50,10 +85,10 @@ export class SocietesService {
     return this._societeRepository.save(societe)
   }
 
-  async update(id: string, societeData: Partial<Societe>): Promise<Societe> {
+  async update(id: string, societeData: QueryDeepPartialEntity<Societe>): Promise<Societe> {
     await this._societeRepository.update(
       id,
-      societeData as DeepPartial<Societe>
+      societeData
     )
     const societe = await this._societeRepository.findOne({
       where: { id },
@@ -73,7 +108,7 @@ export class SocietesService {
     await this._societeRepository.update(id, {
       status: SocieteStatus.ACTIVE,
       dateActivation: new Date(),
-    } as DeepPartial<Societe>)
+    })
     const societe = await this.findById(id)
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)
@@ -84,7 +119,7 @@ export class SocietesService {
   async suspend(id: string): Promise<Societe> {
     await this._societeRepository.update(id, {
       status: SocieteStatus.SUSPENDED,
-    } as DeepPartial<Societe>)
+    })
     const societe = await this.findById(id)
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)

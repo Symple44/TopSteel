@@ -1,11 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DeepPartial } from 'typeorm'
 import { IsNull, type Repository } from 'typeorm'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import {
   type QualityStandardType,
   SharedQualityStandard,
 } from '../entities/shared-quality-standard.entity'
+
+// Update interface that excludes problematic nested properties
+interface SharedQualityStandardUpdateData {
+  nom?: string
+  description?: string
+  code?: string
+  type?: QualityStandardType
+  norme?: string
+  version?: string
+  organisme?: string
+  datePublication?: Date
+  domaineApplication?: string
+  niveau?: string
+  toleranceGenerale?: number
+  // Note: metadata excluded as it contains Record<string, unknown>
+}
 
 @Injectable()
 export class SharedQualityStandardService {
@@ -39,9 +55,9 @@ export class SharedQualityStandardService {
 
   async update(
     id: string,
-    standardData: Partial<SharedQualityStandard>
+    standardData: QueryDeepPartialEntity<SharedQualityStandard>
   ): Promise<SharedQualityStandard> {
-    await this._sharedQualityStandardRepository.update(id, standardData as DeepPartial<SharedQualityStandard>)
+    await this._sharedQualityStandardRepository.update(id, standardData)
     const standard = await this._sharedQualityStandardRepository.findOne({ where: { id } })
     if (!standard) {
       throw new NotFoundException(`Quality standard with ID ${id} not found`)

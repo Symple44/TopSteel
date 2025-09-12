@@ -1,8 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DeepPartial } from 'typeorm'
 import { IsNull, type Repository } from 'typeorm'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { type MaterialType, SharedMaterial } from '../entities/shared-material.entity'
+
+// Update interface that excludes problematic nested properties
+interface SharedMaterialUpdateData {
+  nom?: string
+  description?: string
+  code?: string
+  type?: MaterialType
+  forme?: string
+  densite?: number
+  moduleElasticite?: number
+  limiteElastique?: number
+  chargeRupture?: number
+  conductiviteThermique?: number
+  coefficientDilatation?: number
+  resistanceCorrosion?: number
+  usinage?: number
+  soudage?: number
+  pliage?: number
+  coutHoraire?: number
+  prixUnitaire?: number
+  uniteMesure?: string
+  // Note: metadata excluded as it contains Record<string, unknown>
+}
 
 @Injectable()
 export class SharedMaterialService {
@@ -34,8 +57,8 @@ export class SharedMaterialService {
     return this._sharedMaterialRepository.save(material)
   }
 
-  async update(id: string, materialData: Partial<SharedMaterial>): Promise<SharedMaterial> {
-    await this._sharedMaterialRepository.update(id, materialData as DeepPartial<SharedMaterial>)
+  async update(id: string, materialData: QueryDeepPartialEntity<SharedMaterial>): Promise<SharedMaterial> {
+    await this._sharedMaterialRepository.update(id, materialData)
     const material = await this._sharedMaterialRepository.findOne({ where: { id } })
     if (!material) {
       throw new NotFoundException(`Material with ID ${id} not found`)
