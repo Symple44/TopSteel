@@ -28,7 +28,7 @@ env:
   NODE_OPTIONS: '--max-old-space-size=8192'
   CI: 'true'
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: symple44/topsteel
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
   FORCE_COLOR: '1'
