@@ -20,21 +20,23 @@ export async function safeFetch(
     if (typeof window === 'undefined') {
       try {
         const { fetch: undiciFetch } = (await import('undici')) || {}
-        const response = await undiciFetch(url, fetchOptions as Parameters<typeof undiciFetch>[1]) as Response
+        const response = await undiciFetch(url, fetchOptions as Parameters<typeof undiciFetch>[1])
+        // Type assertion sûre pour compatibilité avec Response standard
+        const typedResponse = response as unknown as Response
 
         clearTimeout(timeoutId)
 
         // Gestion spéciale du rate limiting (429)
-        if (response?.status === 429 && retries > 0) {
+        if (typedResponse?.status === 429 && retries > 0) {
           await new Promise((resolve) => setTimeout(resolve, 1000))
           return safeFetch(url, options, retries - 1)
         }
 
         // Log failed HTTP status for monitoring
-        if (!response?.ok) {
+        if (!typedResponse?.ok) {
         }
 
-        return response
+        return typedResponse
       } catch (undiciError) {
         // Fallback to globalThis.fetch if undici fails
         if (typeof globalThis.fetch === 'function') {
