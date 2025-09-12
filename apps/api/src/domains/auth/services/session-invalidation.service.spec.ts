@@ -1,8 +1,9 @@
+import 'reflect-metadata'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { User } from '../../use../core/entities/user.entity'
+import { User } from '../../users/entities/user.entity'
 import { SessionInvalidationService } from './session-invalidation.service'
 
 describe('SessionInvalidationService', () => {
@@ -18,14 +19,14 @@ describe('SessionInvalidationService', () => {
       providers: [
         SessionInvalidationService,
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(User, 'auth'),
           useValue: mockRepository,
         },
       ],
     }).compile()
 
     service = module.get<SessionInvalidationService>(SessionInvalidationService)
-    _userRepository = module.get<Repository<User>>(getRepositoryToken(User))
+    _userRepository = module.get<Repository<User>>(getRepositoryToken(User, 'auth'))
   })
 
   afterEach(() => {

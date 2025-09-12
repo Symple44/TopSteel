@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { AdjustmentType, PriceRule, PriceRuleChannel } from '@erp/entities'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'

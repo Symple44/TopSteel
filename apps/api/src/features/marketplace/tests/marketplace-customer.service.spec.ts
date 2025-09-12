@@ -1,19 +1,20 @@
+import 'reflect-metadata'
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { vi } from 'vitest'
-import { User } from '../../auth/entities/user.entity'
+import { User } from '../../../domains/users/entities/user.entity'
 import type { CreateCustomerDto, UpdateCustomerDto } from '../dto/customer.dto'
-import { MarketplaceAddress } from '../entities/marketplace-address.entity'
+import { MarketplaceCustomerAddress } from '../entities/marketplace-customer-address.entity'
 import { MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 import { MarketplaceCustomerService } from '../services/marketplace-customer.service'
 
 describe('MarketplaceCustomerService', () => {
   let service: MarketplaceCustomerService
   let _customerRepository: Repository<MarketplaceCustomer>
-  let _addressRepository: Repository<MarketplaceAddress>
+  let _addressRepository: Repository<MarketplaceCustomerAddress>
   let _userRepository: Repository<User>
   let _eventEmitter: EventEmitter2
 
@@ -51,7 +52,7 @@ describe('MarketplaceCustomerService', () => {
           useValue: mockCustomerRepository,
         },
         {
-          provide: getRepositoryToken(MarketplaceAddress),
+          provide: getRepositoryToken(MarketplaceCustomerAddress),
           useValue: mockAddressRepository,
         },
         {
@@ -69,8 +70,8 @@ describe('MarketplaceCustomerService', () => {
     _customerRepository = module.get<Repository<MarketplaceCustomer>>(
       getRepositoryToken(MarketplaceCustomer)
     )
-    _addressRepository = module.get<Repository<MarketplaceAddress>>(
-      getRepositoryToken(MarketplaceAddress)
+    _addressRepository = module.get<Repository<MarketplaceCustomerAddress>>(
+      getRepositoryToken(MarketplaceCustomerAddress)
     )
     _userRepository = module.get<Repository<User>>(getRepositoryToken(User))
     _eventEmitter = module.get<EventEmitter2>(EventEmitter2)

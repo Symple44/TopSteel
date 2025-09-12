@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { BadRequestException } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getDataSourceToken } from '@nestjs/typeorm'

@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
