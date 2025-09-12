@@ -276,7 +276,16 @@ export function HierarchicalDataTableExample() {
 
   // Gestion de l'édition de cellule
   const handleCellEdit = (item: QuotationItem, columnId: string, value: unknown) => {
-    const updatedData = data.map((d) => (d.id === item.id ? { ...d, [columnId]: value } : d))
+    const updatedData = data.map((d) => {
+      if (d.id === item.id) {
+        // Créer un objet typé correctement
+        const updatedItem: QuotationItem = { ...d }
+        // Mise à jour sécurisée de la propriété
+        ;(updatedItem as Record<string, unknown>)[columnId] = value
+        return updatedItem
+      }
+      return d
+    })
     handleDataChange(updatedData)
   }
 

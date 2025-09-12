@@ -3,6 +3,22 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { HierarchicalDatatableConfig, HierarchicalItem } from './use-hierarchical-reorder'
 
+interface ApiResponse<T = unknown> {
+  ok: boolean
+  json: () => Promise<T>
+}
+
+interface PreferencesData {
+  hierarchyConfig: HierarchicalDatatableConfig['hierarchyConfig']
+  reorderConfig: HierarchicalDatatableConfig['reorderConfig']
+  displayConfig: HierarchicalDatatableConfig['displayConfig']
+  hierarchyFilters: HierarchicalDatatableConfig['hierarchyFilters']
+}
+
+interface OrderData {
+  items: HierarchyOrderItem[]
+}
+
 interface HierarchyOrderItem {
   item_id: string
   parent_id?: string | null
@@ -45,8 +61,8 @@ export function useHierarchicalPreferences(
         apiConfig.loadHierarchyOrder(tableId),
       ])
 
-      if ((preferencesResponse as any).ok) {
-        const preferencesData = await (preferencesResponse as any).json()
+      if ((preferencesResponse as ApiResponse<PreferencesData>).ok) {
+        const preferencesData = await (preferencesResponse as ApiResponse<PreferencesData>).json()
         setConfig({
           hierarchyConfig: preferencesData.hierarchyConfig,
           reorderConfig: preferencesData.reorderConfig,
@@ -57,8 +73,8 @@ export function useHierarchicalPreferences(
         setConfig(getDefaultConfig())
       }
 
-      if ((orderResponse as any).ok) {
-        const orderData = await (orderResponse as any).json()
+      if ((orderResponse as ApiResponse<OrderData>).ok) {
+        const orderData = await (orderResponse as ApiResponse<OrderData>).json()
         setHierarchyOrder(orderData.items || [])
       } else {
         setHierarchyOrder([])
@@ -78,7 +94,7 @@ export function useHierarchicalPreferences(
       try {
         if (apiConfig?.savePreferences) {
           const response = await apiConfig.savePreferences(tableId, newConfig)
-          if ((response as any).ok) {
+          if ((response as { ok: boolean }).ok) {
             setConfig(newConfig)
           } else {
             throw new Error('Erreur lors de la sauvegarde des préférences')
@@ -100,7 +116,7 @@ export function useHierarchicalPreferences(
       try {
         if (apiConfig?.saveHierarchyOrder) {
           const response = await apiConfig.saveHierarchyOrder(tableId, items)
-          if ((response as any).ok) {
+          if ((response as { ok: boolean }).ok) {
             setHierarchyOrder(items)
           } else {
             throw new Error("Erreur lors de la sauvegarde de l'ordre hiérarchique")

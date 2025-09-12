@@ -67,7 +67,7 @@ export interface Card extends Record<string, unknown> {
   image?: string
   labels?: { text: string; color?: string }[]
   meta?: { label: string; value: string }[]
-  originalData: any
+  originalData: Record<string, unknown>
 }
 
 export interface TimelineItem extends Record<string, unknown> {
@@ -77,7 +77,7 @@ export interface TimelineItem extends Record<string, unknown> {
   description?: string
   category?: string
   color?: string
-  originalData: any
+  originalData: Record<string, unknown>
 }
 
 export interface CalendarEvent extends Record<string, unknown> {
@@ -87,7 +87,7 @@ export interface CalendarEvent extends Record<string, unknown> {
   end?: Date
   category?: string
   color?: string
-  originalData: any
+  originalData: Record<string, unknown>
 }
 
 export function useDataViews<T = Record<string, unknown>>(
@@ -160,12 +160,17 @@ export function useDataViews<T = Record<string, unknown>>(
 
   // Transformer une ligne en carte
   const transformToCard = useCallback(
-    (item: T, config: any, columns: ColumnConfig<T>[]): Card => {
+    (
+      item: T,
+      config: ViewSettings['kanban'] | ViewSettings['cards'] | Record<string, unknown> | undefined,
+      columns: ColumnConfig<T>[]
+    ): Card => {
       // Handle different config structures (kanban vs cards vs other views)
-      const titleColumnId = config.cardTitleColumn || config.titleColumn
-      const subtitleColumnId = config.cardSubtitleColumn || config.subtitleColumn
-      const descriptionColumnId = config.cardDescriptionColumn || config.descriptionColumn
-      const imageColumnId = config.cardImageColumn || config.imageColumn
+      const configObj = config as Record<string, unknown>
+      const titleColumnId = (configObj?.cardTitleColumn || configObj?.titleColumn) as string | undefined
+      const subtitleColumnId = (configObj?.cardSubtitleColumn || configObj?.subtitleColumn) as string | undefined
+      const descriptionColumnId = (configObj?.cardDescriptionColumn || configObj?.descriptionColumn) as string | undefined
+      const imageColumnId = (configObj?.cardImageColumn || configObj?.imageColumn) as string | undefined
 
       const titleColumn = columns.find((c) => c.id === titleColumnId)
       const subtitleColumn = subtitleColumnId
@@ -178,8 +183,9 @@ export function useDataViews<T = Record<string, unknown>>(
 
       const title = titleColumn
         ? String(
-            (titleColumn.getValue ? titleColumn.getValue(item) : (item as any)[titleColumn.key]) ||
-              'Sans titre'
+            (titleColumn.getValue
+              ? titleColumn.getValue(item)
+              : (item as Record<string, unknown>)[titleColumn.key]) || 'Sans titre'
           )
         : 'Sans titre'
 
@@ -187,7 +193,7 @@ export function useDataViews<T = Record<string, unknown>>(
         ? String(
             (subtitleColumn.getValue
               ? subtitleColumn.getValue(item)
-              : (item as any)[subtitleColumn.key]) || ''
+              : (item as Record<string, unknown>)[subtitleColumn.key]) || ''
           )
         : undefined
 
@@ -195,26 +201,29 @@ export function useDataViews<T = Record<string, unknown>>(
         ? String(
             (descriptionColumn.getValue
               ? descriptionColumn.getValue(item)
-              : (item as any)[descriptionColumn.key]) || ''
+              : (item as Record<string, unknown>)[descriptionColumn.key]) || ''
           )
         : undefined
 
       const image = imageColumn
         ? String(
-            (imageColumn.getValue ? imageColumn.getValue(item) : (item as any)[imageColumn.key]) ||
-              ''
+            (imageColumn.getValue
+              ? imageColumn.getValue(item)
+              : (item as Record<string, unknown>)[imageColumn.key]) || ''
           )
         : undefined
 
       // Créer les labels à partir des colonnes configurées
       const labels: { text: string; color?: string }[] = []
-      const labelsColumns = config.cardLabelsColumns || config.labelsColumns || []
+      const labelsColumns = ((configObj?.cardLabelsColumns || configObj?.labelsColumns) as string[]) || []
       if (labelsColumns && Array.isArray(labelsColumns)) {
         labelsColumns.forEach((colId: string) => {
           if (colId) {
             const column = columns.find((c) => c.id === colId)
             if (column) {
-              const value = column.getValue ? column.getValue(item) : (item as any)[column.key]
+              const value = column.getValue
+                ? column.getValue(item)
+                : (item as Record<string, unknown>)[column.key]
 
               // Pour les colonnes boolean, toujours afficher avec case cochée/décochée
               if (
@@ -243,13 +252,15 @@ export function useDataViews<T = Record<string, unknown>>(
 
       // Créer les méta-données
       const meta: { label: string; value: string }[] = []
-      const metaColumns = config.metaColumns || []
+      const metaColumns = (configObj?.metaColumns as string[]) || []
       if (metaColumns && Array.isArray(metaColumns)) {
         metaColumns.forEach((colId: string) => {
           if (colId) {
             const column = columns.find((c) => c.id === colId)
             if (column) {
-              const value = column.getValue ? column.getValue(item) : (item as any)[column.key]
+              const value = column.getValue
+                ? column.getValue(item)
+                : (item as Record<string, unknown>)[column.key]
 
               // Pour les colonnes boolean, toujours afficher avec case cochée/décochée
               if (
@@ -277,14 +288,14 @@ export function useDataViews<T = Record<string, unknown>>(
       }
 
       return {
-        id: (item as any)[keyField] || crypto.randomUUID(),
+        id: String((item as Record<string, unknown>)[keyField] || crypto.randomUUID()),
         title,
         subtitle,
         description,
         image,
         labels,
         meta,
-        originalData: item,
+        originalData: item as Record<string, unknown>,
       }
     },
     [keyField]
@@ -303,7 +314,7 @@ export function useDataViews<T = Record<string, unknown>>(
     data.forEach((item) => {
       const value = statusColumn.getValue
         ? statusColumn.getValue(item)
-        : (item as any)[statusColumn.key]
+        : (item as Record<string, unknown>)[statusColumn.key]
       const normalizedValue = value === null || value === undefined ? 'Non défini' : String(value)
       statusValues.add(normalizedValue)
     })
@@ -320,7 +331,7 @@ export function useDataViews<T = Record<string, unknown>>(
     data.forEach((item) => {
       const statusValue = statusColumn.getValue
         ? statusColumn.getValue(item)
-        : (item as any)[statusColumn.key]
+        : (item as Record<string, unknown>)[statusColumn.key]
       const normalizedStatus =
         statusValue === null || statusValue === undefined ? 'Non défini' : String(statusValue)
 
@@ -355,10 +366,10 @@ export function useDataViews<T = Record<string, unknown>>(
       .map((item, index) => {
         const dateValue = dateColumn.getValue
           ? dateColumn.getValue(item)
-          : (item as any)[dateColumn.key]
+          : (item as Record<string, unknown>)[dateColumn.key]
         const titleValue = titleColumn.getValue
           ? titleColumn.getValue(item)
-          : (item as any)[titleColumn.key]
+          : (item as Record<string, unknown>)[titleColumn.key]
 
         let date: Date
         if (dateValue instanceof Date) {
@@ -370,21 +381,21 @@ export function useDataViews<T = Record<string, unknown>>(
         }
 
         return {
-          id: (item as any)[keyField] || String(index),
+          id: (item as Record<string, unknown>)[keyField] || String(index),
           date,
           title: String(titleValue || 'Sans titre'),
           description: config.descriptionColumn
             ? String(
                 (columns.find((c) => c.id === config.descriptionColumn)?.getValue
                   ? columns.find((c) => c.id === config.descriptionColumn)?.getValue?.(item)
-                  : (item as any)[config.descriptionColumn!]) || ''
+                  : (item as Record<string, unknown>)[config.descriptionColumn!]) || ''
               )
             : undefined,
           category: config.categoryColumn
             ? String(
                 (columns.find((c) => c.id === config.categoryColumn)?.getValue
                   ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                  : (item as any)[config.categoryColumn!]) || ''
+                  : (item as Record<string, unknown>)[config.categoryColumn!]) || ''
               )
             : undefined,
           color: getColorForCategory(
@@ -392,7 +403,7 @@ export function useDataViews<T = Record<string, unknown>>(
               ? String(
                   (columns.find((c) => c.id === config.categoryColumn)?.getValue
                     ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                    : (item as any)[config.categoryColumn!]) || ''
+                    : (item as Record<string, unknown>)[config.categoryColumn!]) || ''
                 )
               : undefined
           ),
@@ -416,10 +427,10 @@ export function useDataViews<T = Record<string, unknown>>(
       .map((item, index) => {
         const startDateValue = startDateColumn.getValue
           ? startDateColumn.getValue(item)
-          : (item as any)[startDateColumn.key]
+          : (item as Record<string, unknown>)[startDateColumn.key]
         const titleValue = titleColumn.getValue
           ? titleColumn.getValue(item)
-          : (item as any)[titleColumn.key]
+          : (item as Record<string, unknown>)[titleColumn.key]
 
         let startDate: Date
         if (startDateValue instanceof Date) {
@@ -436,7 +447,7 @@ export function useDataViews<T = Record<string, unknown>>(
           if (endDateColumn) {
             const endDateValue = endDateColumn.getValue
               ? endDateColumn.getValue(item)
-              : (item as any)[endDateColumn.key]
+              : (item as Record<string, unknown>)[endDateColumn.key]
             if (endDateValue instanceof Date) {
               endDate = endDateValue
             } else if (typeof endDateValue === 'string') {
@@ -446,7 +457,7 @@ export function useDataViews<T = Record<string, unknown>>(
         }
 
         return {
-          id: (item as any)[keyField] || String(index),
+          id: (item as Record<string, unknown>)[keyField] || String(index),
           title: String(titleValue || 'Sans titre'),
           start: startDate,
           end: endDate,
@@ -454,7 +465,7 @@ export function useDataViews<T = Record<string, unknown>>(
             ? String(
                 (columns.find((c) => c.id === config.categoryColumn)?.getValue
                   ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                  : (item as any)[config.categoryColumn!]) || ''
+                  : (item as Record<string, unknown>)[config.categoryColumn!]) || ''
               )
             : undefined,
           color: getColorForCategory(
@@ -462,7 +473,7 @@ export function useDataViews<T = Record<string, unknown>>(
               ? String(
                   (columns.find((c) => c.id === config.categoryColumn)?.getValue
                     ? columns.find((c) => c.id === config.categoryColumn)?.getValue?.(item)
-                    : (item as any)[config.categoryColumn!]) || ''
+                    : (item as Record<string, unknown>)[config.categoryColumn!]) || ''
                 )
               : undefined
           ),
