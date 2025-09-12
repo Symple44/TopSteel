@@ -5,8 +5,12 @@
  * Tracks workflow performance metrics and generates reports
  */
 
-const fs = require('node:fs')
-const path = require('node:path')
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 class PerformanceTracker {
   constructor() {
@@ -127,31 +131,28 @@ class PerformanceTracker {
 }
 
 // CLI interface
-if (require.main === module) {
-  const tracker = new PerformanceTracker()
+const tracker = new PerformanceTracker()
+const command = process.argv[2]
 
-  const command = process.argv[2]
+switch (command) {
+  case 'report':
+    const report = tracker.saveReport()
+    console.log(JSON.stringify(report, null, 2))
+    break
 
-  switch (command) {
-    case 'report':
-      const report = tracker.saveReport()
-      console.log(JSON.stringify(report, null, 2))
-      break
+  case 'markdown':
+    console.log(tracker.generateMarkdownSummary())
+    break
 
-    case 'markdown':
-      console.log(tracker.generateMarkdownSummary())
-      break
+  case 'summary':
+    tracker.saveReport() // Save the JSON report
+    const summary = tracker.generateMarkdownSummary()
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY || '/dev/stdout', summary)
+    break
 
-    case 'summary':
-      tracker.saveReport() // Save the JSON report
-      const summary = tracker.generateMarkdownSummary()
-      fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY || '/dev/stdout', summary)
-      break
-
-    default:
-      console.log('Usage: node performance-tracker.js [report|markdown|summary]')
-      process.exit(1)
-  }
+  default:
+    console.log('Usage: node performance-tracker.js [report|markdown|summary]')
+    process.exit(1)
 }
 
-module.exports = PerformanceTracker
+export default PerformanceTracker

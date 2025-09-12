@@ -325,7 +325,7 @@ jobs:
         run: |
           echo "🔍 Waiting for services to be healthy..."
           timeout 60 bash -c 'until pg_isready -h localhost -p 5432 -U test; do echo "Waiting for postgres..."; sleep 2; done'
-          timeout 60 bash -c 'until redis-cli -h localhost -p 6379 ping | grep -q PONG; do echo "Waiting for redis..."; sleep 2; done'
+          timeout 60 bash -c 'until nc -zv localhost 6379 2>/dev/null; do echo "Waiting for redis..."; sleep 2; done'
           echo "✅ All services are healthy"
 
       - name: 🧪 Run tests with coverage
