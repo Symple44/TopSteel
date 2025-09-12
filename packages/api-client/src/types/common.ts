@@ -3,8 +3,6 @@
  * Replaces 'any' types with strict, reusable types
  */
 
-import type { Request } from 'express'
-
 // Base utility types
 export type SafeRecord<K extends string | number | symbol, V> = Record<K, V>
 export type JsonValue =
@@ -16,25 +14,22 @@ export type JsonValue =
   | { [key: string]: JsonValue }
 export type SafeObject = SafeRecord<string, JsonValue>
 
-// Request types
-export interface RequestWithUser extends Request {
-  user: {
-    id: string
-    email: string
-    roles?: string[]
-    permissions?: string[]
-    societeId?: string
-  } & SafeRecord<string, JsonValue>
-  query: SafeRecord<string, string | string[]>
-  body: SafeObject
-  params: SafeRecord<string, string>
+// Request types (for API client, not Express-dependent)
+export interface ApiUser {
+  id: string
+  email: string
+  roles?: string[]
+  permissions?: string[]
+  societeId?: string
+  [key: string]: JsonValue | undefined
 }
 
-export interface AuthenticatedRequest extends RequestWithUser {
-  user: RequestWithUser['user'] & {
-    id: string
-    email: string
-  }
+export interface ApiRequestContext {
+  user?: ApiUser
+  headers?: SafeRecord<string, string>
+  query?: SafeRecord<string, string | string[]>
+  body?: SafeObject
+  params?: SafeRecord<string, string>
 }
 
 // API Response types

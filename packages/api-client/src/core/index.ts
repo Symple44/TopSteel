@@ -5,13 +5,13 @@
 
 // ===== TYPES =====
 export type {
+  ApiRequestContext,
   ApiResponse,
-  AuthenticatedRequest,
+  ApiUser,
   BaseEntity,
   EntityWithRelations,
   JsonValue,
   PaginatedResponse,
-  RequestWithUser,
   SafeObject,
   SafeRecord,
 } from '../types/common'

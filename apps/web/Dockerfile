@@ -23,10 +23,13 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build packages and web app
-RUN pnpm build:packages && \
-    cd apps/web && \
-    pnpm build
+# Build packages first
+RUN pnpm build:packages || (echo "Package build failed" && exit 1)
+
+# Build web app
+WORKDIR /app/apps/web
+RUN pnpm build || (echo "Web build failed" && exit 1)
+WORKDIR /app
 
 # Production stage
 FROM node:22-alpine

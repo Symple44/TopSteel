@@ -23,10 +23,13 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build packages and API
-RUN pnpm build:packages && \
-    cd apps/api && \
-    pnpm build
+# Build packages first
+RUN pnpm build:packages || (echo "Package build failed" && exit 1)
+
+# Build API
+WORKDIR /app/apps/api
+RUN pnpm build || (echo "API build failed" && exit 1)
+WORKDIR /app
 
 # Production stage
 FROM node:22-alpine
