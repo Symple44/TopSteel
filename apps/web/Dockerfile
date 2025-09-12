@@ -44,7 +44,7 @@ COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY --from=builder /app/packages/*/dist ./packages/*/dist
 
 # Copy Next.js configuration
-COPY apps/web/next.config.mjs ./apps/web/
+COPY apps/web/next.config.ts ./apps/web/
 
 # Set environment
 ENV NODE_ENV=production
