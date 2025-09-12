@@ -1,0 +1,17 @@
+node_modules
+dist
+.env*
+*.log
+coverage
+.nyc_output
+.git
+.gitignore
+README.md
+.vscode
+.idea
+test
+tests
+*.spec.ts
+*.test.ts
+.DS_Store
+Thumbs.db

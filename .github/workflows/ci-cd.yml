@@ -420,7 +420,7 @@ jobs:
           path: |
             apps/${{ matrix.app }}/dist
             apps/${{ matrix.app }}/.next
-            apps/${{ matrix.app }}/build
+          if-no-files-found: warn
           retention-days: 7
 
   # 🎭 E2E Tests
@@ -490,6 +490,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+          if-no-files-found: warn
           retention-days: 7
 
   # 🐳 Build Docker Images
