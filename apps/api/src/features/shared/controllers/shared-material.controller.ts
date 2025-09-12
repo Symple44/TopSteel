@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedMaterial } from '../entities/shared-material.entity'
 import type { SharedMaterialService } from '../services/shared-material.service'
@@ -46,7 +47,7 @@ export class SharedMaterialController {
     @Param('id') id: string,
     @Body() materialData: Partial<SharedMaterial>
   ): Promise<SharedMaterial> {
-    return this.sharedMaterialService.update(id, materialData)
+    return this.sharedMaterialService.update(id, materialData as QueryDeepPartialEntity<SharedMaterial>)
   }
 
   @Delete(':id')

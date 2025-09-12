@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { Site } from '../entities/site.entity'
 import type { SitesService } from '../services/sites.service'
@@ -43,7 +44,7 @@ export class SitesController {
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour un site' })
   async update(@Param('id') id: string, @Body() siteData: Partial<Site>): Promise<Site> {
-    return this.sitesService.update(id, siteData)
+    return this.sitesService.update(id, siteData as QueryDeepPartialEntity<Site>)
   }
 
   @Put(':id/set-principal/:societeId')

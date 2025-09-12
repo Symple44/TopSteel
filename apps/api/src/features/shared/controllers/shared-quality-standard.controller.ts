@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedQualityStandard } from '../entities/shared-quality-standard.entity'
 import type { SharedQualityStandardService } from '../services/shared-quality-standard.service'
@@ -42,7 +43,7 @@ export class SharedQualityStandardController {
     @Param('id') id: string,
     @Body() standardData: Partial<SharedQualityStandard>
   ): Promise<SharedQualityStandard> {
-    return this.sharedQualityStandardService.update(id, standardData)
+    return this.sharedQualityStandardService.update(id, standardData as QueryDeepPartialEntity<SharedQualityStandard>)
   }
 
   @Delete(':id')

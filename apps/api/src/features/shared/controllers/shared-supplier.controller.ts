@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedSupplier } from '../entities/shared-supplier.entity'
 import type { SharedSupplierService } from '../services/shared-supplier.service'
@@ -41,7 +42,7 @@ export class SharedSupplierController {
     @Param('id') id: string,
     @Body() supplierData: Partial<SharedSupplier>
   ): Promise<SharedSupplier> {
-    return this.sharedSupplierService.update(id, supplierData)
+    return this.sharedSupplierService.update(id, supplierData as QueryDeepPartialEntity<SharedSupplier>)
   }
 
   @Delete(':id')

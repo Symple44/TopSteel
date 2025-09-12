@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedProcess } from '../entities/shared-process.entity'
 import type { SharedProcessService } from '../services/shared-process.service'
@@ -40,7 +41,7 @@ export class SharedProcessController {
     @Param('id') id: string,
     @Body() processData: Partial<SharedProcess>
   ): Promise<SharedProcess> {
-    return this.sharedProcessService.update(id, processData)
+    return this.sharedProcessService.update(id, processData as QueryDeepPartialEntity<SharedProcess>)
   }
 
   @Delete(':id')

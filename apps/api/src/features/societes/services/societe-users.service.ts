@@ -275,7 +275,7 @@ export class SocieteUsersService {
     if (updates.permissions !== undefined) updateData.permissions = updates.permissions
     if (updates.isActive !== undefined) updateData.actif = updates.isActive
 
-    await this._societeUserRepository.update(societeUserId, updateData)
+    await this._societeUserRepository.update(societeUserId, updateData as QueryDeepPartialEntity<SocieteUser>)
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },
@@ -290,7 +290,7 @@ export class SocieteUsersService {
   }
 
   async updateUserPermissions(societeUserId: string, permissions: string[]): Promise<SocieteUser> {
-    await this._societeUserRepository.update(societeUserId, { permissions })
+    await this._societeUserRepository.update(societeUserId, { permissions } as QueryDeepPartialEntity<SocieteUser>)
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },

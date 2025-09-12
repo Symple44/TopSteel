@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import type { CreateTenantDto } from '../dto/create-tenant.dto'
 import type { Societe } from '../entities/societe.entity'
 import type { SocietesService } from '../services/societes.service'
@@ -99,7 +100,7 @@ export class SocietesController {
   @ApiOperation({ summary: 'Mettre à jour une société' })
   @ApiResponse({ status: 200, description: 'Société mise à jour avec succès' })
   async update(@Param('id') id: string, @Body() societeData: Partial<Societe>): Promise<Societe> {
-    return this.societesService.update(id, societeData)
+    return this.societesService.update(id, societeData as QueryDeepPartialEntity<Societe>)
   }
 
   @Put(':id/activate')
