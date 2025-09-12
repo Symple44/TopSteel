@@ -19,7 +19,6 @@ import {
   GlobalUserRole,
 } from '../../../../domains/auth/core/constants/roles.constants'
 import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
-import type { RateLimitingConfiguration } from '../rate-limiting.config'
 import type { RateLimitConfig, RateLimitResult, UserContext } from '../types/rate-limiting.types'
 
 interface RequestWithUser extends Request {
@@ -43,7 +42,6 @@ export interface RoleRateLimitConfig {
 @Injectable()
 export class RoleBasedRateLimitGuard implements CanActivate {
   private readonly logger = new Logger(RoleBasedRateLimitGuard.name)
-  private config: RateLimitingConfiguration
 
   // Predefined role-based limits for different operation types
   private readonly operationLimits = {
@@ -98,9 +96,7 @@ export class RoleBasedRateLimitGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly rateLimitService: AdvancedRateLimitingService,
     private readonly configService: ConfigService
-  ) {
-    this.config = this.configService.get('rateLimiting') as RateLimitingConfiguration
-  }
+  ) {}
 
   /**
    * Main guard activation method with reduced cognitive complexity (reduced from ~15 to ~5)

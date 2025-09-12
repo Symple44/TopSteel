@@ -22,9 +22,13 @@ const mockCrypto = {
 
 vi.mock('crypto', () => mockCrypto)
 
+interface MockConfigService {
+  get: ReturnType<typeof vi.fn>
+}
+
 describe('SecurityService', () => {
   let service: SecurityService
-  let _configService: any
+  let _configService: MockConfigService
 
   const mockConfigService = {
     get: vi.fn(),
@@ -44,7 +48,7 @@ describe('SecurityService', () => {
     }).compile()
 
     service = module.get<SecurityService>(SecurityService)
-    _configService = module.get<ConfigService>(ConfigService)
+    _configService = module.get<ConfigService>(ConfigService) as unknown as MockConfigService
   })
 
   afterEach(() => {

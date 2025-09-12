@@ -9,12 +9,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LogSanitizerService } from './log-sanitizer.service'
 import { SanitizedLoggingInterceptor } from './sanitized-logging.interceptor'
 
+interface MockRequest {
+  method: string
+  url: string
+  ip: string
+  headers: Record<string, string | undefined>
+  body: Record<string, unknown>
+  query: Record<string, unknown>
+  cookies: Record<string, unknown>
+  user?: { id: string }
+  path?: string
+}
+
 describe('SanitizedLoggingInterceptor', () => {
   let interceptor: SanitizedLoggingInterceptor
   let logSanitizerService: LogSanitizerService
   let mockExecutionContext: ExecutionContext
   let mockCallHandler: CallHandler
-  let mockRequest: any
+  let mockRequest: MockRequest
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
