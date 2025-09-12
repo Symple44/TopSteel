@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { AdjustmentType, PriceRule, PriceRuleChannel } from '@erp/entities'
 import { Test, type TestingModule } from '@nestjs/testing'
-import { getRepositoryToken } from '@nestjs/typeorm'
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm'
 import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
 import { vi } from 'vitest'
 import { Article } from '../../../domains/inventory/entities/article.entity'
@@ -73,26 +73,32 @@ describe('PricingEngineService', () => {
       providers: [
         PricingEngineService,
         {
-          provide: getRepositoryToken(PriceRule),
+          provide: getRepositoryToken(PriceRule, 'tenant'),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Article),
+          provide: getRepositoryToken(Article, 'tenant'),
           useClass: Repository,
         },
         {
-          provide: DataSource,
+          provide: getDataSourceToken('tenant'),
           useValue: {
-            // Mock DataSource methods if needed
+            manager: { 
+              transaction: vi.fn((cb) => cb({
+                findOne: vi.fn(),
+                save: vi.fn(),
+                update: vi.fn()
+              }))
+            }
           },
         },
       ],
     }).compile()
 
     service = module.get<PricingEngineService>(PricingEngineService)
-    priceRuleRepository = module.get<Repository<PriceRule>>(getRepositoryToken(PriceRule))
-    articleRepository = module.get<Repository<Article>>(getRepositoryToken(Article))
-    _dataSource = module.get<DataSource>(DataSource)
+    priceRuleRepository = module.get<Repository<PriceRule>>(getRepositoryToken(PriceRule, 'tenant'))
+    articleRepository = module.get<Repository<Article>>(getRepositoryToken(Article, 'tenant'))
+    _dataSource = module.get<DataSource>(getDataSourceToken('tenant'))
 
     // Setup default mocks
     vi.spyOn(articleRepository, 'createQueryBuilder').mockReturnValue({

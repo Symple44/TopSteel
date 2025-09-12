@@ -3,6 +3,7 @@
  * Comprehensive tests for the rate limiting service functionality
  */
 
+import 'reflect-metadata'
 import { ConfigService } from '@nestjs/config'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { vi } from 'vitest'
@@ -14,13 +15,43 @@ import { rateLimitingConfig } from '../rate-limiting.config'
 const mockRedis = {
   eval: vi.fn(),
   zremrangebyscore: vi.fn(),
+  zrangebyscore: vi.fn(),
   zadd: vi.fn(),
   expire: vi.fn(),
   hgetall: vi.fn(),
   hmset: vi.fn(),
+  hget: vi.fn(),
+  hset: vi.fn(),
   del: vi.fn(),
   keys: vi.fn(),
   zcard: vi.fn(),
+  get: vi.fn(),
+  set: vi.fn(),
+  exists: vi.fn(),
+  ttl: vi.fn(),
+  incr: vi.fn(),
+  incrby: vi.fn(),
+  decr: vi.fn(),
+  decrby: vi.fn(),
+  lpush: vi.fn(),
+  rpush: vi.fn(),
+  lpop: vi.fn(),
+  rpop: vi.fn(),
+  llen: vi.fn(),
+  lrange: vi.fn(),
+  sadd: vi.fn(),
+  srem: vi.fn(),
+  smembers: vi.fn(),
+  sismember: vi.fn(),
+  scard: vi.fn(),
+  flushall: vi.fn(),
+  flushdb: vi.fn(),
+  multi: vi.fn(() => mockRedis),
+  exec: vi.fn(),
+  watch: vi.fn(),
+  unwatch: vi.fn(),
+  quit: vi.fn(),
+  disconnect: vi.fn(),
 }
 
 describe('AdvancedRateLimitingService', () => {
@@ -102,10 +133,11 @@ describe('AdvancedRateLimitingService', () => {
 
       // Verify that the service was called with adjusted limits for admin role
       const _luaScript = mockRedis.eval.mock.calls[0][0]
-      const args = mockRedis.eval.mock.calls[0].slice(2) // Skip script and key count
+      const args = mockRedis.eval.mock.calls[0].slice(1) // Skip script only
 
       // Admin should get 5x multiplier, so 100 * 5 = 500 requests
-      expect(args[2]).toBe('500') // limit argument
+      // Args structure: [keyCount, key, window, limit, ...]
+      expect(args[3]).toBe('500') // limit argument
     })
 
     it('should handle Redis failures gracefully', async () => {
@@ -318,7 +350,9 @@ describe('AdvancedRateLimitingService', () => {
         await service.checkRateLimit('test-id', baseConfig, userContext)
 
         const lastCall = mockRedis.eval.mock.calls[mockRedis.eval.mock.calls.length - 1]
-        const limit = Number.parseInt(lastCall[4], 10) // Fifth argument is the limit
+        // Skip the first parameter (lua script) and get limit argument
+        const args = lastCall.slice(1)
+        const limit = Number.parseInt(args[3], 10) // limit argument in Redis call
         const expectedLimit = Math.ceil(baseConfig.maxRequests * testCase.expectedMultiplier)
 
         expect(limit).toBe(expectedLimit)
@@ -352,7 +386,9 @@ describe('AdvancedRateLimitingService', () => {
       // With 15 violations, should get penalty multiplier of 2
       // So effective limit should be 100 / 2 = 50
       const lastCall = mockRedis.eval.mock.calls[mockRedis.eval.mock.calls.length - 1]
-      const effectiveLimit = Number.parseInt(lastCall[4], 10)
+      // Skip the first parameter (lua script) and get limit argument
+      const args = lastCall.slice(1)
+      const effectiveLimit = Number.parseInt(args[3], 10)
       expect(effectiveLimit).toBe(50) // 100 / 2 (penalty multiplier)
     })
   })

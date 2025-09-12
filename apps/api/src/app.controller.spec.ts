@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import type { MockedObject } from 'vitest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppController } from './app/app.controller'

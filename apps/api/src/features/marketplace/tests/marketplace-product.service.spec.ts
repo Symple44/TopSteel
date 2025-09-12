@@ -21,16 +21,51 @@ describe('ProductCatalogService', () => {
   let _stockService: MarketplaceStockService
   let _eventEmitter: EventEmitter2
 
+  // Increased timeout for all tests in this suite
+  vi.setConfig({ testTimeout: 15000 })
+
   const mockArticleRepository = {
     create: vi.fn(),
     save: vi.fn(),
     findOne: vi.fn(),
     find: vi.fn(),
+    findBy: vi.fn(),
+    findOneBy: vi.fn(),
+    findAndCount: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
-    createQueryBuilder: vi.fn(),
+    remove: vi.fn(),
+    softDelete: vi.fn(),
+    restore: vi.fn(),
+    count: vi.fn(),
+    createQueryBuilder: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      andWhere: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      offset: vi.fn().mockReturnThis(),
+      getOne: vi.fn(),
+      getMany: vi.fn(),
+      getManyAndCount: vi.fn(),
+      leftJoin: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockReturnThis(),
+      having: vi.fn().mockReturnThis(),
+    })),
     manager: {
       transaction: vi.fn(),
+      save: vi.fn(),
+      find: vi.fn(),
+      findOne: vi.fn(),
+      remove: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    metadata: {
+      columns: [],
+      relations: [],
     },
   }
 

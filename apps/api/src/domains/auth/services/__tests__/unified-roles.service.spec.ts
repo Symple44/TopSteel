@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import type { Repository, SelectQueryBuilder } from 'typeorm'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { OptimizedCacheService } from '../../../../infrastructure/cache/redis-optimized.service'
@@ -138,8 +139,16 @@ describe('UnifiedRolesService', () => {
       query: mockQueryBuilder.query,
     }
 
+    const mockUserQueryBuilder = {
+      select: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      withDeleted: vi.fn().mockReturnThis(),
+      getOne: vi.fn().mockResolvedValue(mockUser),
+    }
+
     userRepository = {
       findOne: vi.fn(),
+      createQueryBuilder: vi.fn().mockReturnValue(mockUserQueryBuilder),
     }
 
     cacheService = {
