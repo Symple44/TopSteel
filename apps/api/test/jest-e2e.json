@@ -1,10 +1,12 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "..",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": ["ts-jest", {
+      "tsconfig": "tsconfig.json"
+    }]
   },
   "collectCoverageFrom": [
     "src/**/*.(t|j)s",
@@ -16,15 +18,10 @@
   "coverageDirectory": "./coverage-e2e",
   "coverageReporters": ["text", "lcov", "html"],
   "testTimeout": 30000,
-  "setupFilesAfterEnv": ["<rootDir>/test/setup.ts"],
-  "moduleNameMapping": {
+  "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@erp/types/(.*)$": "<rootDir>/../packages/types/src/$1",
     "^@erp/utils/(.*)$": "<rootDir>/../packages/utils/src/$1"
   },
-  "globals": {
-    "ts-jest": {
-      "tsconfig": "tsconfig.json"
-    }
-  }
+  "preset": "ts-jest"
 }
