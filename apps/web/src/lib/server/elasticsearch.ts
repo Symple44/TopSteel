@@ -4,9 +4,9 @@
  */
 
 // Type imports for better type inference
-type ElasticsearchClient = import('@erp/domains/server').ElasticsearchClient
-type ElasticsearchMigrationService = import('@erp/domains/server').ElasticsearchMigrationService
-type ImageElasticsearchService = import('@erp/domains/server').ImageElasticsearchService
+type ElasticsearchClient = import('@erp/domains').ElasticsearchClient
+type ElasticsearchMigrationService = import('@erp/domains').ElasticsearchMigrationService
+type ImageElasticsearchService = import('@erp/domains').ImageElasticsearchService
 
 // Import from local wrapper to ensure proper server-only isolation
 export async function getElasticsearchClient(): Promise<ElasticsearchClient> {

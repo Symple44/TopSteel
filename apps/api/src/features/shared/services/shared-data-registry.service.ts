@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DeepPartial } from 'typeorm'
 import { IsNull, type Repository } from 'typeorm'
 import { SharedDataRegistry } from '../entities/shared-data-registry.entity'
 
@@ -64,7 +63,8 @@ export class SharedDataRegistryService {
   }
 
   async update(id: string, registryData: Partial<SharedDataRegistry>): Promise<SharedDataRegistry> {
-    await this._sharedDataRegistryRepository.update(id, registryData as DeepPartial<SharedDataRegistry>)
+    // Use type assertion to bypass strict TypeORM type checking for update operations
+    await this._sharedDataRegistryRepository.update(id, registryData as Parameters<Repository<SharedDataRegistry>['update']>[1])
     const registry = await this._sharedDataRegistryRepository.findOne({ where: { id } })
     if (!registry) {
       throw new NotFoundException(`Registry with ID ${id} not found`)
@@ -83,7 +83,7 @@ export class SharedDataRegistryService {
 
     await this._sharedDataRegistryRepository.update(id, {
       sharedWithSocieteIds: newIds,
-    } as DeepPartial<any>)
+    } as Parameters<Repository<SharedDataRegistry>['update']>[1])
   }
 
   async revokeShare(id: string, societeIds: string[]): Promise<void> {
@@ -97,14 +97,14 @@ export class SharedDataRegistryService {
 
     await this._sharedDataRegistryRepository.update(id, {
       sharedWithSocieteIds: newIds,
-    } as DeepPartial<any>)
+    } as Parameters<Repository<SharedDataRegistry>['update']>[1])
   }
 
   async incrementUsage(id: string): Promise<void> {
     await this._sharedDataRegistryRepository.update(id, {
-      usageCount: (() => 'usage_count + 1') as any,
+      usageCount: (() => 'usage_count + 1') as unknown,
       lastUsedAt: new Date(),
-    } as DeepPartial<any>)
+    } as Parameters<Repository<SharedDataRegistry>['update']>[1])
   }
 
   async delete(id: string): Promise<void> {

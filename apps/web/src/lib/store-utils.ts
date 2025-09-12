@@ -160,17 +160,17 @@ export function createBaseActions<TState extends BaseStoreState>(
 
     setError: (error: string | null) => (state: TState) => {
       if (state && 'error' in state) {
-        ;(state as unknown).error = error
+        ;(state as BaseStoreState & { error?: string | null }).error = error
       }
       if (state && 'loading' in state) {
-        ;(state as unknown).loading = false
+        ;(state as BaseStoreState & { loading?: boolean }).loading = false
       }
       state.lastUpdate = Date.now()
     },
 
     clearError: () => (state: TState) => {
       if (state && 'error' in state) {
-        ;(state as unknown).error = null
+        ;(state as BaseStoreState & { error?: string | null }).error = null
       }
       state.lastUpdate = Date.now()
     },

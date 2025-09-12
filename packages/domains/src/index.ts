@@ -8,11 +8,16 @@ export * from './core'
 export * from './cross-cutting'
 // Export conditionnel pour les images (côté serveur uniquement)
 export type * from './image/types'
+// Export du service ImageElasticsearchService
+export { ImageElasticsearchService, imageElasticsearchService } from './image/elasticsearch-service'
 // Re-export notifications with proper naming to avoid conflicts
 export * as Notifications from './notifications'
 export * from './production'
 export * from './sales'
 export * from './search'
+// Export direct des services Elasticsearch pour faciliter l'import  
+export { ElasticsearchClient, elasticsearchClient } from './search/elasticsearch-client'
+export { ElasticsearchMigrationService, migrationService } from './search/migration-service'
 
 // ===== RE-EXPORTS ESSENTIELS =====
 
