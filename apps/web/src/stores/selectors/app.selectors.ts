@@ -195,8 +195,8 @@ export const useFilteredProjets = () => {
         if (currentFilters?.type && projet.type !== currentFilters?.type) {
           return false
         }
-        if (currentFilters?.search) {
-          const searchTerm = currentFilters?.search?.toLowerCase()
+        if (currentFilters?.search && typeof currentFilters.search === 'string') {
+          const searchTerm = currentFilters.search.toLowerCase()
 
           return (
             projet.reference?.toLowerCase().includes(searchTerm) ||

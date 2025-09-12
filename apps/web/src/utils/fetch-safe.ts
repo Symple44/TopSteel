@@ -20,7 +20,7 @@ export async function safeFetch(
     if (typeof window === 'undefined') {
       try {
         const { fetch: undiciFetch } = (await import('undici')) || {}
-        const response = (await undiciFetch(url, fetchOptions as unknown)) as unknown as Response
+        const response = await undiciFetch(url, fetchOptions as Parameters<typeof undiciFetch>[1]) as Response
 
         clearTimeout(timeoutId)
 

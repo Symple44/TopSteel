@@ -206,12 +206,12 @@ const projetService = {
     // Simulation d'appel API
     await new Promise((resolve) => setTimeout(resolve, 300))
 
-    const newProjet: StoreProjet = {
+    const newProjet = {
       ...projetData,
       id: `proj_${Date.now()}`,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    } as StoreProjet
 
     return newProjet
   },

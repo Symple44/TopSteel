@@ -214,8 +214,8 @@ export interface TableActions<T = Record<string, unknown>> {
   onExport?: () => void
 }
 
-// Complete DataTable props interface
-export interface DataTableProps<T = Record<string, unknown>> {
+// Complete table props interface
+export interface CustomDataTableProps<T = Record<string, unknown>> {
   columns: ColumnConfig<T>[]
   data: T[]
   loading?: boolean
