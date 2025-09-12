@@ -21,10 +21,7 @@ declare module '@/lib/ui-components-complete' {
   export { DataTable }
 }
 
-declare module '@/lib/ui-exports' {
-  const DataTable: React.ComponentType<unknown>
-  export { DataTable }
-}
+// Note: @/lib/ui-exports is a real module, not a declaration
 
 // Vite compatibility
 declare module 'vite' {
