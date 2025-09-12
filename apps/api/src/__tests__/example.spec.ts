@@ -1,4 +1,6 @@
 // apps/api/src/__tests__/example.spec.ts
+import { describe, expect, it } from 'vitest'
+
 describe('Example API Test', () => {
   it('should pass', () => {
     expect(true).toBe(true)

@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Repository, SelectQueryBuilder } from 'typeorm'
 import type { User } from '../../../users/entities/user.entity'
+import type { OptimizedCacheService } from '../../../../infrastructure/cache/redis-optimized.service'
 import { GlobalUserRole, SocieteRoleType } from '../../core/constants/roles.constants'
 import { UserSocieteRole } from '../../core/entities/user-societe-role.entity'
 import type { UserSocieteInfo } from '../unified-roles.service'
@@ -18,11 +20,46 @@ import { UnifiedRolesService } from '../unified-roles.service'
  * Error: "this.userRepository.createQueryBuilder is not a function"
  * TODO: Fix mock setup for TypeORM repository methods
  */
-describe.skip('UnifiedRolesService', () => {
+// Types pour les mocks
+interface MockedUserRepository extends Partial<Repository<User>> {
+  findOne: ReturnType<typeof vi.fn>
+}
+
+interface MockedUserSocieteRoleRepository extends Partial<Repository<UserSocieteRole>> {
+  createQueryBuilder: ReturnType<typeof vi.fn>
+  findOne: ReturnType<typeof vi.fn>
+  find: ReturnType<typeof vi.fn>
+  save: ReturnType<typeof vi.fn>
+  update: ReturnType<typeof vi.fn>
+  remove: ReturnType<typeof vi.fn>
+  query: ReturnType<typeof vi.fn>
+}
+
+interface MockedCacheService extends Partial<OptimizedCacheService> {
+  getWithMetrics: ReturnType<typeof vi.fn>
+  setWithGroup: ReturnType<typeof vi.fn>
+  set: ReturnType<typeof vi.fn>
+  invalidateGroup: ReturnType<typeof vi.fn>
+  invalidatePattern: ReturnType<typeof vi.fn>
+}
+
+interface MockedQueryBuilder extends Partial<SelectQueryBuilder<UserSocieteRole>> {
+  createQueryBuilder: ReturnType<typeof vi.fn>
+  leftJoinAndSelect: ReturnType<typeof vi.fn>
+  where: ReturnType<typeof vi.fn>
+  andWhere: ReturnType<typeof vi.fn>
+  orderBy: ReturnType<typeof vi.fn>
+  limit: ReturnType<typeof vi.fn>
+  getMany: ReturnType<typeof vi.fn>
+  getOne: ReturnType<typeof vi.fn>
+  query: ReturnType<typeof vi.fn>
+}
+
+describe('UnifiedRolesService', () => {
   let service: UnifiedRolesService
-  let userSocieteRoleRepository: Record<string, unknown>
-  let userRepository: Record<string, unknown>
-  let cacheService: Record<string, unknown>
+  let userSocieteRoleRepository: MockedUserSocieteRoleRepository
+  let userRepository: MockedUserRepository
+  let cacheService: MockedCacheService
 
   const mockUser = {
     id: 'user-123',
@@ -70,8 +107,8 @@ describe.skip('UnifiedRolesService', () => {
 
   beforeEach(() => {
     // Create mocks
-    const mockQueryBuilder = {
-      createQueryBuilder: vi.fn().mockReturnThis(),
+    const mockQueryBuilder: MockedQueryBuilder = {
+      createQueryBuilder: vi.fn(),
       leftJoinAndSelect: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       andWhere: vi.fn().mockReturnThis(),
@@ -86,13 +123,17 @@ describe.skip('UnifiedRolesService', () => {
       ]),
     }
 
+    // Configure createQueryBuilder to return the mock itself
+    mockQueryBuilder.createQueryBuilder?.mockReturnValue(mockQueryBuilder as any)
+
     userSocieteRoleRepository = {
-      ...mockQueryBuilder,
+      createQueryBuilder: vi.fn().mockReturnValue(mockQueryBuilder),
       findOne: vi.fn(),
       find: vi.fn(),
       save: vi.fn(),
       update: vi.fn(),
       remove: vi.fn(),
+      query: mockQueryBuilder.query,
     }
 
     userRepository = {
@@ -109,9 +150,10 @@ describe.skip('UnifiedRolesService', () => {
 
     // Create service instance with direct dependency injection
     service = new UnifiedRolesService(
-      userSocieteRoleRepository as Record<string, unknown>,
-      userRepository as Record<string, unknown>,
-      cacheService as Record<string, unknown>
+      userSocieteRoleRepository as Repository<UserSocieteRole>,
+      userRepository as Repository<User>,
+      cacheService as OptimizedCacheService,
+      {} as any // permissionCalculator - mock minimal pour les tests
     )
   })
 

@@ -89,7 +89,7 @@ describe('PricingEngineService', () => {
       where: vi.fn().mockReturnThis(),
       andWhere: vi.fn().mockReturnThis(),
       getOne: vi.fn().mockResolvedValue(mockArticle),
-    } as unknown)
+    } as any)
 
     vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
       where: vi.fn().mockReturnThis(),
@@ -97,9 +97,9 @@ describe('PricingEngineService', () => {
       orderBy: vi.fn().mockReturnThis(),
       addOrderBy: vi.fn().mockReturnThis(),
       getMany: vi.fn().mockResolvedValue([mockPriceRule]),
-    } as unknown)
+    } as any)
 
-    vi.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as unknown)
+    vi.spyOn(priceRuleRepository, 'save').mockResolvedValue(mockPriceRule as any)
   })
 
   afterEach(() => {
@@ -119,7 +119,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -158,7 +158,7 @@ describe('PricingEngineService', () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         getOne: vi.fn().mockResolvedValue(articleWithCoeff),
-      } as unknown)
+      } as any)
 
       // No rules to focus on coefficient
       vi.spyOn(priceRuleRepository, 'createQueryBuilder').mockReturnValue({
@@ -167,7 +167,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -188,7 +188,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([fixedAmountRule]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -209,7 +209,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([fixedPriceRule]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -238,7 +238,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([lowPriorityRule, highPriorityRule]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -265,7 +265,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([nonCombinableRule, secondRule]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -278,7 +278,7 @@ describe('PricingEngineService', () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         getOne: vi.fn().mockResolvedValue(null),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -325,7 +325,7 @@ describe('PricingEngineService', () => {
 
   describe('previewRule', () => {
     it('should preview a specific rule', async () => {
-      vi.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as unknown)
+      vi.spyOn(priceRuleRepository, 'findOne').mockResolvedValue(mockPriceRule as any)
 
       const result = await service.previewRule('rule-123', 'article-123', {
         societeId: 'societe-123',
@@ -371,7 +371,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([problematicRule]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -393,7 +393,7 @@ describe('PricingEngineService', () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         getOne: vi.fn().mockResolvedValue(zeroPriceArticle),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 
@@ -414,7 +414,7 @@ describe('PricingEngineService', () => {
         orderBy: vi.fn().mockReturnThis(),
         addOrderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([largeDiscountRule]),
-      } as unknown)
+      } as any)
 
       const result = await service.calculatePrice(mockContext)
 

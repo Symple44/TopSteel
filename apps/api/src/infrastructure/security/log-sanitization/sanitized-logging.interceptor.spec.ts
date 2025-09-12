@@ -14,18 +14,33 @@ interface MockRequest {
   url: string
   ip: string
   headers: Record<string, string | undefined>
-  body: Record<string, unknown>
-  query: Record<string, unknown>
-  cookies: Record<string, unknown>
+  body: Record<string, string | number | boolean | null>
+  query: Record<string, string | number | boolean | null>
+  cookies: Record<string, string>
   user?: { id: string }
   path?: string
+}
+
+interface MockExecutionContext extends ExecutionContext {
+  switchToHttp: () => {
+    getRequest: () => MockRequest
+  }
+}
+
+interface MockCallHandler extends CallHandler {
+  handle: ReturnType<typeof vi.fn>
+}
+
+interface MockLogger {
+  log: ReturnType<typeof vi.fn>
+  error: ReturnType<typeof vi.fn>
 }
 
 describe('SanitizedLoggingInterceptor', () => {
   let interceptor: SanitizedLoggingInterceptor
   let logSanitizerService: LogSanitizerService
-  let mockExecutionContext: ExecutionContext
-  let mockCallHandler: CallHandler
+  let mockExecutionContext: MockExecutionContext
+  let mockCallHandler: MockCallHandler
   let mockRequest: MockRequest
 
   beforeEach(async () => {
@@ -70,12 +85,12 @@ describe('SanitizedLoggingInterceptor', () => {
       switchToHttp: () => ({
         getRequest: () => mockRequest,
       }),
-    } as unknown
+    } as MockExecutionContext
 
     // Mock CallHandler
     mockCallHandler = {
       handle: vi.fn(),
-    } as unknown
+    } as MockCallHandler
 
     // Mock console/logger
     vi.spyOn(console, 'log').mockImplementation()
@@ -99,7 +114,7 @@ describe('SanitizedLoggingInterceptor', () => {
 
     it('should log request and response data', (done) => {
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -125,7 +140,7 @@ describe('SanitizedLoggingInterceptor', () => {
 
     it('should sanitize sensitive data in logs', (done) => {
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -146,7 +161,7 @@ describe('SanitizedLoggingInterceptor', () => {
 
     it('should extract user ID from request.user', (done) => {
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -166,7 +181,7 @@ describe('SanitizedLoggingInterceptor', () => {
         'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzQ1NiJ9.test'
 
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -184,7 +199,7 @@ describe('SanitizedLoggingInterceptor', () => {
       mockRequest.headers.authorization = undefined
 
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -201,7 +216,7 @@ describe('SanitizedLoggingInterceptor', () => {
       mockRequest.headers['x-request-id'] = undefined
 
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -225,7 +240,7 @@ describe('SanitizedLoggingInterceptor', () => {
 
     it('should log error and sanitize sensitive data', (done) => {
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'error'
       )
 
@@ -272,7 +287,7 @@ describe('SanitizedLoggingInterceptor', () => {
       process.env.LOG_MASK_IP_ADDRESSES = 'true'
 
       const _loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -289,7 +304,7 @@ describe('SanitizedLoggingInterceptor', () => {
       process.env.LOG_MASK_IP_ADDRESSES = 'false'
 
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 
@@ -310,7 +325,7 @@ describe('SanitizedLoggingInterceptor', () => {
 
     it('should measure response time accurately', (done) => {
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
       const startTime = Date.now()
@@ -337,7 +352,7 @@ describe('SanitizedLoggingInterceptor', () => {
       ;(mockCallHandler.handle as vi.Mock).mockReturnValue(of(largeData))
 
       const loggerSpy = vi.spyOn(
-        (interceptor as Record<string, unknown>).logger as Record<string, unknown>,
+        (interceptor as any).logger as MockLogger,
         'log'
       )
 

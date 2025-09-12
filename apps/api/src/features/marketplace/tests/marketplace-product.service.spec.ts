@@ -1,22 +1,24 @@
 import 'reflect-metadata'
+import { Article, ArticleStatus, ArticleType, UniteStock } from '@erp/entities'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { vi } from 'vitest'
-import type { CreateProductDto, UpdateProductDto } from '../dto/product.dto'
-import { MarketplaceCategory } from '../entities/marketplace-category.entity'
-import { MarketplaceProduct } from '../entities/marketplace-product.entity'
-import { MarketplaceProductService } from '../services/marketplace-product.service'
+import type { CreateMarketplaceProductDto, UpdateMarketplaceProductDto } from '../admin/product-catalog.service'
+import { ProductCatalogService } from '../admin/product-catalog.service'
+import type { MarketplaceProductAdapter } from '../adapters/marketplace-product.adapter'
+import type { MarketplaceStockService } from '../stock/marketplace-stock.service'
 
-describe('MarketplaceProductService', () => {
-  let service: MarketplaceProductService
-  let _productRepository: Repository<MarketplaceProduct>
-  let _categoryRepository: Repository<MarketplaceCategory>
+describe('ProductCatalogService', () => {
+  let service: ProductCatalogService
+  let _articleRepository: Repository<Article>
+  let _adapter: MarketplaceProductAdapter
+  let _stockService: MarketplaceStockService
   let _eventEmitter: EventEmitter2
 
-  const mockProductRepository = {
+  const mockArticleRepository = {
     create: vi.fn(),
     save: vi.fn(),
     findOne: vi.fn(),
@@ -29,40 +31,59 @@ describe('MarketplaceProductService', () => {
     },
   }
 
-  const mockCategoryRepository = {
-    findOne: vi.fn(),
+  const mockAdapter = {
+    getMarketplaceProducts: vi.fn(),
+    getMarketplaceProductById: vi.fn(),
+    getMarketplaceCategories: vi.fn(),
+    getMarketplaceBrands: vi.fn(),
+  }
+
+  const mockStockService = {
+    updateStock: vi.fn(),
   }
 
   const mockEventEmitter = {
     emit: vi.fn(),
   }
 
+  const mockRedisService = {
+    get: vi.fn(),
+    setex: vi.fn(),
+    del: vi.fn(),
+    keys: vi.fn().mockResolvedValue([]),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        MarketplaceProductService,
+        ProductCatalogService,
         {
-          provide: getRepositoryToken(MarketplaceProduct),
-          useValue: mockProductRepository,
+          provide: getRepositoryToken(Article),
+          useValue: mockArticleRepository,
         },
         {
-          provide: getRepositoryToken(MarketplaceCategory),
-          useValue: mockCategoryRepository,
+          provide: 'MarketplaceProductAdapter',
+          useValue: mockAdapter,
+        },
+        {
+          provide: 'MarketplaceStockService',
+          useValue: mockStockService,
         },
         {
           provide: EventEmitter2,
           useValue: mockEventEmitter,
         },
+        {
+          provide: 'default_IORedisModuleConnectionToken',
+          useValue: mockRedisService,
+        },
       ],
     }).compile()
 
-    service = module.get<MarketplaceProductService>(MarketplaceProductService)
-    _productRepository = module.get<Repository<MarketplaceProduct>>(
-      getRepositoryToken(MarketplaceProduct)
-    )
-    _categoryRepository = module.get<Repository<MarketplaceCategory>>(
-      getRepositoryToken(MarketplaceCategory)
-    )
+    service = module.get<ProductCatalogService>(ProductCatalogService)
+    _articleRepository = module.get<Repository<Article>>(getRepositoryToken(Article))
+    _adapter = module.get<MarketplaceProductAdapter>('MarketplaceProductAdapter')
+    _stockService = module.get<MarketplaceStockService>('MarketplaceStockService')
     _eventEmitter = module.get<EventEmitter2>(EventEmitter2)
   })
 
@@ -70,373 +91,363 @@ describe('MarketplaceProductService', () => {
     vi.clearAllMocks()
   })
 
-  describe('create', () => {
+  describe('createProduct', () => {
     it('should create a new product successfully', async () => {
       const tenantId = 'tenant-123'
-      const createProductDto: CreateProductDto = {
-        name: 'Steel Beam',
+      const createProductDto: CreateMarketplaceProductDto = {
+        designation: 'Steel Beam',
         description: 'High quality steel beam',
-        price: 299.99,
-        categoryId: 'cat-123',
-        sku: 'BEAM-001',
-        stockQuantity: 100,
-        specifications: {
+        reference: 'BEAM-001',
+        prixVenteHT: 299.99,
+        famille: 'Beams',
+        stockPhysique: 100,
+        caracteristiquesTechniques: {
           length: '10m',
           weight: '150kg',
         },
       }
 
-      const mockCategory = { id: 'cat-123', name: 'Beams' }
-      const mockProduct = {
-        id: 'prod-123',
+      const mockArticle = {
+        id: 'article-123',
         ...createProductDto,
-        tenantId,
-        category: mockCategory,
+        type: ArticleType.PRODUIT_FINI,
+        status: ArticleStatus.ACTIF,
+        uniteStock: UniteStock.PIECE,
+        gereEnStock: true,
+        isMarketplaceEnabled: true,
+        stockDisponible: 100,
       }
 
-      mockCategoryRepository.findOne.mockResolvedValue(mockCategory)
-      mockProductRepository.create.mockReturnValue(mockProduct)
-      mockProductRepository.save.mockResolvedValue(mockProduct)
-
-      const result = await service.create(tenantId, createProductDto)
-
-      expect(result).toEqual(mockProduct)
-      expect(mockCategoryRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'cat-123', tenantId },
-      })
-      expect(mockProductRepository.create).toHaveBeenCalledWith({
-        ...createProductDto,
-        tenantId,
-        category: mockCategory,
-      })
-      expect(mockEventEmitter.emit).toHaveBeenCalledWith('product.created', {
-        product: mockProduct,
-      })
-    })
-
-    it('should throw NotFoundException when category does not exist', async () => {
-      const tenantId = 'tenant-123'
-      const createProductDto: CreateProductDto = {
+      const mockMarketplaceView = {
+        id: 'article-123',
         name: 'Steel Beam',
-        description: 'High quality steel beam',
+        sku: 'BEAM-001',
         price: 299.99,
-        categoryId: 'invalid-cat',
-        sku: 'BEAM-001',
+        category: 'Beams',
         stockQuantity: 100,
       }
 
-      mockCategoryRepository.findOne.mockResolvedValue(null)
+      mockArticleRepository.findOne.mockResolvedValue(null) // No existing article
+      mockArticleRepository.create.mockReturnValue(mockArticle)
+      mockArticleRepository.save.mockResolvedValue(mockArticle)
+      mockAdapter.getMarketplaceProductById.mockResolvedValue(mockMarketplaceView)
 
-      await expect(service.create(tenantId, createProductDto)).rejects.toThrow(NotFoundException)
+      const result = await service.createProduct(tenantId, createProductDto)
+
+      expect(result).toEqual(mockMarketplaceView)
+      expect(mockArticleRepository.findOne).toHaveBeenCalledWith({
+        where: { reference: 'BEAM-001' },
+      })
+      expect(mockArticleRepository.create).toHaveBeenCalledWith({
+        ...createProductDto,
+        type: ArticleType.PRODUIT_FINI,
+        status: ArticleStatus.ACTIF,
+        uniteStock: UniteStock.PIECE,
+        gereEnStock: true,
+        isMarketplaceEnabled: true,
+        stockPhysique: 100,
+        stockDisponible: 100,
+      })
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith('marketplace.product.created', {
+        productId: 'article-123',
+        tenantId,
+        sku: 'BEAM-001',
+      })
     })
 
-    it('should validate price is positive', async () => {
+    it('should throw BadRequestException when reference already exists', async () => {
       const tenantId = 'tenant-123'
-      const createProductDto: CreateProductDto = {
-        name: 'Steel Beam',
+      const createProductDto: CreateMarketplaceProductDto = {
+        designation: 'Steel Beam',
         description: 'High quality steel beam',
-        price: -10,
-        categoryId: 'cat-123',
-        sku: 'BEAM-001',
-        stockQuantity: 100,
+        reference: 'BEAM-001',
+        prixVenteHT: 299.99,
+        famille: 'Beams',
+        stockPhysique: 100,
       }
 
-      await expect(service.create(tenantId, createProductDto)).rejects.toThrow(BadRequestException)
+      const existingArticle = { id: 'existing-123', reference: 'BEAM-001' }
+      mockArticleRepository.findOne.mockResolvedValue(existingArticle)
+
+      await expect(service.createProduct(tenantId, createProductDto)).rejects.toThrow(
+        BadRequestException
+      )
     })
+
   })
 
-  describe('findAll', () => {
+  describe('getProducts', () => {
     it('should return paginated products', async () => {
       const tenantId = 'tenant-123'
-      const mockProducts = [
-        { id: '1', name: 'Product 1', price: 100 },
-        { id: '2', name: 'Product 2', price: 200 },
-      ]
-
-      const mockQueryBuilder = {
-        where: vi.fn().mockReturnThis(),
-        leftJoinAndSelect: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockReturnThis(),
-        skip: vi.fn().mockReturnThis(),
-        take: vi.fn().mockReturnThis(),
-        getManyAndCount: vi.fn().mockResolvedValue([mockProducts, 2]),
-      }
-
-      mockProductRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)
-
-      const result = await service.findAll(tenantId, { page: 1, limit: 10 })
-
-      expect(result).toEqual({
-        items: mockProducts,
+      const mockResponse = {
+        products: [
+          { id: '1', name: 'Product 1', price: 100 },
+          { id: '2', name: 'Product 2', price: 200 },
+        ],
         total: 2,
         page: 1,
         pages: 1,
-      })
+        hasMore: false,
+      }
+
+      mockAdapter.getMarketplaceProducts.mockResolvedValue(mockResponse)
+
+      const result = await service.getProducts(tenantId, {}, { field: 'createdAt', direction: 'DESC' }, { page: 1, limit: 10 })
+
+      expect(result).toEqual(mockResponse)
+      expect(mockAdapter.getMarketplaceProducts).toHaveBeenCalledWith(
+        tenantId,
+        {},
+        { field: 'createdAt', direction: 'DESC' },
+        { page: 1, limit: 10 }
+      )
     })
 
     it('should filter products by category', async () => {
       const tenantId = 'tenant-123'
-      const categoryId = 'cat-123'
-      const mockProducts = [{ id: '1', name: 'Product 1', categoryId }]
-
-      const mockQueryBuilder = {
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        leftJoinAndSelect: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockReturnThis(),
-        skip: vi.fn().mockReturnThis(),
-        take: vi.fn().mockReturnThis(),
-        getManyAndCount: vi.fn().mockResolvedValue([mockProducts, 1]),
+      const category = 'Beams'
+      const mockResponse = {
+        products: [{ id: '1', name: 'Product 1', category }],
+        total: 1,
+        page: 1,
+        pages: 1,
+        hasMore: false,
       }
 
-      mockProductRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)
+      mockAdapter.getMarketplaceProducts.mockResolvedValue(mockResponse)
 
-      const result = await service.findAll(tenantId, {
-        page: 1,
-        limit: 10,
-        categoryId,
-      })
+      const result = await service.getProducts(
+        tenantId,
+        { category },
+        { field: 'createdAt', direction: 'DESC' },
+        { page: 1, limit: 10 }
+      )
 
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('product.categoryId = :categoryId', {
-        categoryId,
-      })
-      expect(result.items).toEqual(mockProducts)
+      expect(mockAdapter.getMarketplaceProducts).toHaveBeenCalledWith(
+        tenantId,
+        { category },
+        { field: 'createdAt', direction: 'DESC' },
+        { page: 1, limit: 10 }
+      )
+      expect(result.products).toEqual([{ id: '1', name: 'Product 1', category }])
     })
 
     it('should search products by name', async () => {
       const tenantId = 'tenant-123'
       const search = 'steel'
-      const mockProducts = [
-        { id: '1', name: 'Steel Beam' },
-        { id: '2', name: 'Steel Plate' },
-      ]
-
-      const mockQueryBuilder = {
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        leftJoinAndSelect: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockReturnThis(),
-        skip: vi.fn().mockReturnThis(),
-        take: vi.fn().mockReturnThis(),
-        getManyAndCount: vi.fn().mockResolvedValue([mockProducts, 2]),
+      const mockResponse = {
+        products: [
+          { id: '1', name: 'Steel Beam' },
+          { id: '2', name: 'Steel Plate' },
+        ],
+        total: 2,
+        page: 1,
+        pages: 1,
+        hasMore: false,
       }
 
-      mockProductRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder)
+      mockAdapter.getMarketplaceProducts.mockResolvedValue(mockResponse)
 
-      await service.findAll(tenantId, { page: 1, limit: 10, search })
+      await service.getProducts(
+        tenantId,
+        { search },
+        { field: 'createdAt', direction: 'DESC' },
+        { page: 1, limit: 10 }
+      )
 
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-        '(product.name ILIKE :search OR product.description ILIKE :search)',
-        { search: `%${search}%` }
+      expect(mockAdapter.getMarketplaceProducts).toHaveBeenCalledWith(
+        tenantId,
+        { search },
+        { field: 'createdAt', direction: 'DESC' },
+        { page: 1, limit: 10 }
       )
     })
   })
 
-  describe('findOne', () => {
+  describe('getProductById', () => {
     it('should return a product by id', async () => {
       const tenantId = 'tenant-123'
       const productId = 'prod-123'
       const mockProduct = {
         id: productId,
         name: 'Steel Beam',
-        tenantId,
+        sku: 'BEAM-001',
+        price: 299.99,
       }
 
-      mockProductRepository.findOne.mockResolvedValue(mockProduct)
+      mockAdapter.getMarketplaceProductById.mockResolvedValue(mockProduct)
 
-      const result = await service.findOne(tenantId, productId)
+      const result = await service.getProductById(tenantId, productId)
 
       expect(result).toEqual(mockProduct)
-      expect(mockProductRepository.findOne).toHaveBeenCalledWith({
-        where: { id: productId, tenantId },
-        relations: ['category', 'reviews'],
-      })
+      expect(mockAdapter.getMarketplaceProductById).toHaveBeenCalledWith(tenantId, productId)
     })
 
     it('should throw NotFoundException when product not found', async () => {
       const tenantId = 'tenant-123'
       const productId = 'invalid-id'
 
-      mockProductRepository.findOne.mockResolvedValue(null)
+      mockAdapter.getMarketplaceProductById.mockResolvedValue(null)
 
-      await expect(service.findOne(tenantId, productId)).rejects.toThrow(NotFoundException)
+      await expect(service.getProductById(tenantId, productId)).rejects.toThrow(NotFoundException)
     })
   })
 
-  describe('update', () => {
+  describe('updateProduct', () => {
     it('should update a product successfully', async () => {
       const tenantId = 'tenant-123'
       const productId = 'prod-123'
-      const updateProductDto: UpdateProductDto = {
+      const updateProductDto: UpdateMarketplaceProductDto = {
+        id: productId,
+        designation: 'Updated Steel Beam',
+        prixVenteHT: 349.99,
+      }
+
+      const existingArticle = {
+        id: productId,
+        designation: 'Steel Beam',
+        prixVenteHT: 299.99,
+        reference: 'BEAM-001',
+      }
+
+      const updatedArticle = {
+        ...existingArticle,
+        designation: 'Updated Steel Beam',
+        prixVenteHT: 349.99,
+        updatedAt: new Date(),
+      }
+
+      const mockMarketplaceView = {
+        id: productId,
         name: 'Updated Steel Beam',
+        sku: 'BEAM-001',
         price: 349.99,
       }
 
-      const existingProduct = {
-        id: productId,
-        name: 'Steel Beam',
-        price: 299.99,
+      mockArticleRepository.findOne.mockResolvedValue(existingArticle)
+      mockArticleRepository.save.mockResolvedValue(updatedArticle)
+      mockAdapter.getMarketplaceProductById.mockResolvedValue(mockMarketplaceView)
+
+      const result = await service.updateProduct(tenantId, updateProductDto)
+
+      expect(result).toEqual(mockMarketplaceView)
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith('marketplace.product.updated', {
+        productId,
         tenantId,
-      }
-
-      const updatedProduct = {
-        ...existingProduct,
-        ...updateProductDto,
-      }
-
-      mockProductRepository.findOne.mockResolvedValue(existingProduct)
-      mockProductRepository.save.mockResolvedValue(updatedProduct)
-
-      const result = await service.update(tenantId, productId, updateProductDto)
-
-      expect(result).toEqual(updatedProduct)
-      expect(mockEventEmitter.emit).toHaveBeenCalledWith('product.updated', {
-        product: updatedProduct,
         changes: updateProductDto,
       })
     })
 
-    it('should handle stock updates with validation', async () => {
-      const tenantId = 'tenant-123'
-      const productId = 'prod-123'
-      const updateProductDto: UpdateProductDto = {
-        stockQuantity: -5,
-      }
-
-      const existingProduct = {
-        id: productId,
-        stockQuantity: 10,
-        tenantId,
-      }
-
-      mockProductRepository.findOne.mockResolvedValue(existingProduct)
-
-      await expect(service.update(tenantId, productId, updateProductDto)).rejects.toThrow(
-        BadRequestException
-      )
-    })
   })
 
-  describe('remove', () => {
-    it('should soft delete a product', async () => {
+  describe('deleteProduct', () => {
+    it('should disable marketplace visibility for a product', async () => {
       const tenantId = 'tenant-123'
       const productId = 'prod-123'
-      const mockProduct = {
+      const mockArticle = {
         id: productId,
-        name: 'Steel Beam',
-        tenantId,
+        designation: 'Steel Beam',
+        reference: 'BEAM-001',
+        isMarketplaceEnabled: true,
       }
 
-      mockProductRepository.findOne.mockResolvedValue(mockProduct)
-      mockProductRepository.save.mockResolvedValue({
-        ...mockProduct,
-        deletedAt: new Date(),
+      mockArticleRepository.findOne.mockResolvedValue(mockArticle)
+      mockArticleRepository.save.mockResolvedValue({
+        ...mockArticle,
+        isMarketplaceEnabled: false,
+        updatedAt: new Date(),
       })
 
-      await service.remove(tenantId, productId)
+      await service.deleteProduct(tenantId, productId)
 
-      expect(mockProductRepository.save).toHaveBeenCalledWith(
+      expect(mockArticleRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          deletedAt: expect.any(Date),
+          isMarketplaceEnabled: false,
+          updatedAt: expect.any(Date),
         })
       )
-      expect(mockEventEmitter.emit).toHaveBeenCalledWith('product.deleted', {
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith('marketplace.product.deleted', {
         productId,
+        tenantId,
+        sku: 'BEAM-001',
       })
     })
   })
 
-  describe('updateStock', () => {
-    it('should update stock with pessimistic locking', async () => {
+  describe('updateProductStock', () => {
+    it('should update stock through stock service', async () => {
       const tenantId = 'tenant-123'
       const productId = 'prod-123'
-      const quantity = -5
+      const quantity = 5
+      const reason = 'Inventory adjustment'
 
-      const mockProduct = {
+      const mockArticle = {
         id: productId,
-        stockQuantity: 10,
-        tenantId,
+        designation: 'Steel Beam',
+        reference: 'BEAM-001',
       }
 
-      const mockQueryBuilder = {
-        setLock: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        getOne: vi.fn().mockResolvedValue(mockProduct),
-      }
+      mockArticleRepository.findOne.mockResolvedValue(mockArticle)
+      mockStockService.updateStock.mockResolvedValue(undefined)
 
-      const mockTransactionManager = {
-        createQueryBuilder: vi.fn().mockReturnValue(mockQueryBuilder),
-        save: vi.fn().mockResolvedValue({
-          ...mockProduct,
-          stockQuantity: 5,
-        }),
-      }
+      await service.updateProductStock(tenantId, productId, quantity, reason)
 
-      mockProductRepository.manager.transaction.mockImplementation(async (callback) =>
-        callback(mockTransactionManager)
-      )
-
-      const result = await service.updateStock(tenantId, productId, quantity)
-
-      expect(result.stockQuantity).toBe(5)
-      expect(mockQueryBuilder.setLock).toHaveBeenCalledWith('pessimistic_write')
+      expect(mockArticleRepository.findOne).toHaveBeenCalledWith({
+        where: { id: productId },
+      })
+      expect(mockStockService.updateStock).toHaveBeenCalledWith(productId, quantity, reason)
     })
 
-    it('should throw error when insufficient stock', async () => {
-      const tenantId = 'tenant-123'
-      const productId = 'prod-123'
-      const quantity = -15
-
-      const mockProduct = {
-        id: productId,
-        stockQuantity: 10,
-        tenantId,
-      }
-
-      const mockQueryBuilder = {
-        setLock: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        getOne: vi.fn().mockResolvedValue(mockProduct),
-      }
-
-      const mockTransactionManager = {
-        createQueryBuilder: vi.fn().mockReturnValue(mockQueryBuilder),
-      }
-
-      mockProductRepository.manager.transaction.mockImplementation(async (callback) =>
-        callback(mockTransactionManager)
-      )
-
-      await expect(service.updateStock(tenantId, productId, quantity)).rejects.toThrow(
-        BadRequestException
-      )
-    })
   })
 
-  describe('bulkUpdatePrices', () => {
-    it('should update multiple product prices', async () => {
+  describe('bulkUpdateProducts', () => {
+    it('should update multiple products', async () => {
       const tenantId = 'tenant-123'
-      const updates = [
-        { productId: 'prod-1', price: 199.99 },
-        { productId: 'prod-2', price: 299.99 },
+      const bulkUpdate = {
+        productIds: ['prod-1', 'prod-2'],
+        updates: {
+          famille: 'Updated Category',
+          marque: 'Updated Brand',
+          priceAdjustment: {
+            type: 'percentage' as const,
+            value: 10,
+          },
+        },
+      }
+
+      const mockArticles = [
+        { id: 'prod-1', prixVenteHT: 100, famille: 'Old Category', marque: 'Old Brand' },
+        { id: 'prod-2', prixVenteHT: 200, famille: 'Old Category', marque: 'Old Brand' },
       ]
 
-      const mockProducts = [
-        { id: 'prod-1', price: 150, tenantId },
-        { id: 'prod-2', price: 250, tenantId },
-      ]
+      mockArticleRepository.find.mockResolvedValue(mockArticles)
+      mockArticleRepository.save.mockResolvedValue(mockArticles)
 
-      mockProductRepository.find.mockResolvedValue(mockProducts)
-      mockProductRepository.save.mockResolvedValue(mockProducts)
+      const result = await service.bulkUpdateProducts(tenantId, bulkUpdate)
 
-      await service.bulkUpdatePrices(tenantId, updates)
-
-      expect(mockProductRepository.save).toHaveBeenCalledWith(
+      expect(result).toEqual({ updated: 2 })
+      expect(mockArticleRepository.save).toHaveBeenCalledWith(
         expect.arrayContaining([
-          expect.objectContaining({ id: 'prod-1', price: 199.99 }),
-          expect.objectContaining({ id: 'prod-2', price: 299.99 }),
+          expect.objectContaining({
+            id: 'prod-1',
+            famille: 'Updated Category',
+            marque: 'Updated Brand',
+            prixVenteHT: 110, // 10% increase
+          }),
+          expect.objectContaining({
+            id: 'prod-2',
+            famille: 'Updated Category',
+            marque: 'Updated Brand',
+            prixVenteHT: 220, // 10% increase
+          }),
         ])
       )
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith('marketplace.products.bulk_updated', {
+        productIds: ['prod-1', 'prod-2'],
+        tenantId,
+        updates: bulkUpdate.updates,
+        count: 2,
+      })
     })
   })
 })

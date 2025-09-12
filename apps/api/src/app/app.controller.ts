@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import type { AppService } from './app.service'
+import { AppService } from './app.service'
 
 @Controller()
 @ApiTags('App')
@@ -15,7 +15,7 @@ export class AppController {
 
   @Get('version')
   @ApiOperation({ summary: "Version de l'API" })
-  getVersion(): unknown {
+  getVersion(): { name: string; version: string; description: string; timestamp: string } {
     return this.appService.getVersion()
   }
 }

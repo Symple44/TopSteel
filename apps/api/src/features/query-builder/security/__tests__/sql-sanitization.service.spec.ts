@@ -367,7 +367,7 @@ describe('SqlSanitizationService', () => {
             {
               tableName: 'clients',
               columnName: 'nom',
-              direction: 'ASC; DROP TABLE users;' as unknown,
+              direction: 'ASC; DROP TABLE users;' as 'ASC' | 'DESC',
             },
           ],
         })

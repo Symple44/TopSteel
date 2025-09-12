@@ -1,19 +1,26 @@
-import type { TestingModule } from '@nestjs/testing'
-import { Test } from '@nestjs/testing'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { MockedObject } from 'vitest'
 import { AppController } from './app/app.controller'
-import { AppService } from './app/app.service'
+import type { AppService } from './app/app.service'
 
 describe('AppController', () => {
   let appController: AppController
+  let appService: MockedObject<AppService>
 
-  beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
-    }).compile()
+  beforeEach(() => {
+    // Créer un mock du service avec le bon typage
+    appService = {
+      getHello: vi.fn().mockReturnValue('TopSteel ERP API v1.0.0 - Système de gestion métallurgique'),
+      getVersion: vi.fn().mockReturnValue({
+        name: 'TopSteel ERP API',
+        version: '1.0.0',
+        description: "API de gestion ERP pour l'industrie métallurgique",
+        timestamp: new Date().toISOString(),
+      }),
+    } as MockedObject<AppService>
 
-    appController = app.get<AppController>(AppController)
+    // Créer directement une instance du controller avec le service mocké
+    appController = new AppController(appService)
   })
 
   describe('root', () => {
@@ -21,8 +28,18 @@ describe('AppController', () => {
       const result = appController.getHello()
       expect(result).toBeDefined()
       expect(typeof result).toBe('string')
-      // Vérifier que c'est le bon message TopSteel
       expect(result).toBe('TopSteel ERP API v1.0.0 - Système de gestion métallurgique')
+      expect(appService.getHello).toHaveBeenCalled()
+    })
+
+    it('should return version information', () => {
+      const result = appController.getVersion()
+      expect(result).toBeDefined()
+      expect(result.name).toBe('TopSteel ERP API')
+      expect(result.version).toBe('1.0.0')
+      expect(result.description).toBe("API de gestion ERP pour l'industrie métallurgique")
+      expect(result.timestamp).toBeDefined()
+      expect(appService.getVersion).toHaveBeenCalled()
     })
   })
 })

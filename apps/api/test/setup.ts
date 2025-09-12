@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { config } from 'dotenv'
-import { vi } from 'vitest'
+import { afterAll, beforeAll, vi } from 'vitest'
 
 config({ path: '.env.test' })
 

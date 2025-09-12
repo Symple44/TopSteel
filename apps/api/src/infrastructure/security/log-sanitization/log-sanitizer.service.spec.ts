@@ -200,15 +200,15 @@ describe('LogSanitizerService', () => {
       ]
 
       sensitiveKeys.forEach((key) => {
-        expect((service as unknown).isSensitiveKey(key)).toBe(true)
-        expect((service as unknown).isSensitiveKey(key.toUpperCase())).toBe(true)
+        expect((service as any).isSensitiveKey(key)).toBe(true)
+        expect((service as any).isSensitiveKey(key.toUpperCase())).toBe(true)
       })
     })
 
     it('should not flag non-sensitive keys', () => {
       const normalKeys = ['username', 'email', 'name', 'data', 'id', 'timestamp']
       normalKeys.forEach((key) => {
-        expect((service as unknown).isSensitiveKey(key)).toBe(false)
+        expect((service as any).isSensitiveKey(key)).toBe(false)
       })
     })
   })

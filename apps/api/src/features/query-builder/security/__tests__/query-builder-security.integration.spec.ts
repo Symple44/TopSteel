@@ -3,10 +3,40 @@ import { BadRequestException } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getDataSourceToken } from '@nestjs/typeorm'
 import { vi } from 'vitest'
+import type { DataSource } from 'typeorm'
 import { QueryBuilderExecutorService } from '../../services/query-builder-executor.service'
 import { QueryBuilderPermissionService } from '../../services/query-builder-permission.service'
 import { QueryBuilderSecurityService } from '../query-builder-security.service'
 import { SqlSanitizationService } from '../sql-sanitization.service'
+
+// Types pour les interfaces des query builders et mocks
+interface MockQueryBuilder {
+  id: string
+  name: string
+  mainTable: string
+  isPublic: boolean
+  columns: Array<{
+    tableName: string
+    columnName: string
+    alias: string
+    isVisible: boolean
+    isFilterable: boolean
+    isSortable: boolean
+  }>
+  joins: unknown[]
+  calculatedFields: unknown[]
+  maxRows: number
+}
+
+interface MockDataSource extends Partial<DataSource> {
+  query: ReturnType<typeof vi.fn>
+}
+
+interface MockRepository {
+  findOne: ReturnType<typeof vi.fn>
+  find: ReturnType<typeof vi.fn>
+  createQueryBuilder: ReturnType<typeof vi.fn>
+}
 
 describe('Query Builder Security Integration Tests', () => {
   let executorService: QueryBuilderExecutorService
@@ -14,26 +44,29 @@ describe('Query Builder Security Integration Tests', () => {
   let _sanitizationService: SqlSanitizationService
   let _permissionService: QueryBuilderPermissionService
 
-  const mockTenantDataSource = {
+  const mockTenantDataSource: MockDataSource = {
     query: vi.fn(),
   }
 
-  const mockAuthDataSource = {
+  const mockAuthDataSource: MockDataSource = {
     query: vi.fn(),
   }
 
-  const mockPermissionRepository = {
+  const mockPermissionRepository: MockRepository = {
     findOne: vi.fn(),
     find: vi.fn(),
+    createQueryBuilder: vi.fn(),
   }
 
-  const mockUserRepository = {
+  const mockUserRepository: MockRepository = {
     createQueryBuilder: vi.fn(() => ({
       leftJoin: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       getRawMany: vi.fn().mockResolvedValue([]),
     })),
+    findOne: vi.fn(),
+    find: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -85,7 +118,7 @@ describe('Query Builder Security Integration Tests', () => {
       ]
 
       // Mock user tenant ID lookup
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: 'tenant-123' }])
         }
@@ -103,7 +136,7 @@ describe('Query Builder Security Integration Tests', () => {
       const userId = 'test-user-123'
 
       // Mock user tenant ID lookup
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: 'tenant-123' }])
         }
@@ -140,7 +173,7 @@ describe('Query Builder Security Integration Tests', () => {
       const tenantId = 'tenant-123'
 
       // Mock successful user tenant lookup
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: tenantId }])
         }
@@ -163,14 +196,14 @@ describe('Query Builder Security Integration Tests', () => {
       const _result = await executorService.executeStructuredQuery(structuredQuery, userId)
 
       // Verify that tenant isolation was applied
-      const executedQueries = mockTenantDataSource.query.mock.calls
-      const countQuery = executedQueries.find((call) => call[0].includes('COUNT(*)'))
-      const selectQuery = executedQueries.find((call) => call[0].includes('SELECT clients.nom'))
+      const executedQueries = mockTenantDataSource.query?.mock.calls || []
+      const countQuery = executedQueries.find((call: any) => call[0].includes('COUNT(*)'))
+      const selectQuery = executedQueries.find((call: any) => call[0].includes('SELECT clients.nom'))
 
-      expect(countQuery[0]).toContain('company_id = $1')
-      expect(countQuery[1]).toContain(tenantId)
-      expect(selectQuery[0]).toContain('company_id = $1')
-      expect(selectQuery[1]).toContain(tenantId)
+      expect(countQuery?.[0]).toContain('company_id = $1')
+      expect(countQuery?.[1]).toContain(tenantId)
+      expect(selectQuery?.[0]).toContain('company_id = $1')
+      expect(selectQuery?.[1]).toContain(tenantId)
     })
 
     it('should validate all table and column access', async () => {
@@ -289,7 +322,7 @@ describe('Query Builder Security Integration Tests', () => {
 
       // Test that permission denial prevents execution
       await expect(
-        executorService.executeQuery(mockQueryBuilder as unknown, { page: 1, pageSize: 50 }, userId)
+        executorService.executeQuery(mockQueryBuilder as MockQueryBuilder, { page: 1, pageSize: 50 }, userId)
       ).rejects.toThrow(BadRequestException)
     })
 
@@ -307,7 +340,7 @@ describe('Query Builder Security Integration Tests', () => {
       })
 
       // Mock tenant ID lookup
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: 'tenant-123' }])
         }
@@ -338,7 +371,7 @@ describe('Query Builder Security Integration Tests', () => {
       }
 
       const result = await executorService.executeQuery(
-        mockQueryBuilder as unknown,
+        mockQueryBuilder as MockQueryBuilder,
         { page: 1, pageSize: 50 },
         userId
       )
@@ -356,7 +389,7 @@ describe('Query Builder Security Integration Tests', () => {
       mockUserRepository.createQueryBuilder().getRawMany.mockResolvedValue([])
 
       // Mock tenant ID and query execution
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: 'tenant-123' }])
         }
@@ -387,7 +420,7 @@ describe('Query Builder Security Integration Tests', () => {
       }
 
       const result = await executorService.executeQuery(
-        mockPublicQueryBuilder as unknown,
+        mockPublicQueryBuilder as MockQueryBuilder,
         { page: 1, pageSize: 50 },
         userId
       )
@@ -403,7 +436,7 @@ describe('Query Builder Security Integration Tests', () => {
       const otherTenantId = 'tenant-456'
 
       // Mock tenant lookup to return user's tenant
-      mockTenantDataSource.query.mockImplementation((query: string, params?: unknown[]) => {
+      mockTenantDataSource.query?.mockImplementation((query: string, params?: string[]) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: userTenantId }])
         }
@@ -432,12 +465,12 @@ describe('Query Builder Security Integration Tests', () => {
       await executorService.executeStructuredQuery(structuredQuery, userId)
 
       // Verify that all database queries included tenant filtering
-      const allCalls = mockTenantDataSource.query.mock.calls
+      const allCalls = mockTenantDataSource.query?.mock.calls || []
       const dataQueries = allCalls.filter(
         (call) => call[0].includes('clients') && !call[0].includes('SELECT su.societeId')
       )
 
-      dataQueries.forEach((call) => {
+      dataQueries.forEach((call: any) => {
         expect(call[0]).toContain('company_id = $1')
         expect(call[1]).toContain(userTenantId)
       })
@@ -473,7 +506,7 @@ describe('Query Builder Security Integration Tests', () => {
       const userId = 'test-user-123'
 
       // Mock tenant lookup
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: 'tenant-123' }])
         }
@@ -493,13 +526,13 @@ describe('Query Builder Security Integration Tests', () => {
       await executorService.executeStructuredQuery(largePageSizeQuery, userId)
 
       // Check that the LIMIT was applied correctly
-      const executedQueries = mockTenantDataSource.query.mock.calls
+      const executedQueries = mockTenantDataSource.query?.mock.calls || []
       const selectQuery = executedQueries.find(
-        (call) => call[0].includes('LIMIT') && call[0].includes('clients.nom')
+        (call: any) => call[0].includes('LIMIT') && call[0].includes('clients.nom')
       )
 
       // Should be limited to table's max rows (1000), not the requested 5000
-      expect(selectQuery[1]).toContain(1000)
+      expect(selectQuery?.[1]).toContain(1000)
     })
   })
 
@@ -567,7 +600,7 @@ describe('Query Builder Security Integration Tests', () => {
               name: 'test_calc',
               expression,
               isVisible: true,
-              queryBuilder: null as unknown,
+              queryBuilder: null as any,
               queryBuilderId: 'qb-1',
             },
           ]
@@ -583,7 +616,7 @@ describe('Query Builder Security Integration Tests', () => {
     it('should handle unicode and special characters safely', async () => {
       const userId = 'test-user-123'
 
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: 'tenant-123' }])
         }
@@ -626,7 +659,7 @@ describe('Query Builder Security Integration Tests', () => {
     it('should handle null and undefined values safely', async () => {
       const userId = 'test-user-123'
 
-      mockTenantDataSource.query.mockImplementation((query: string) => {
+      mockTenantDataSource.query?.mockImplementation((query: string) => {
         if (query.includes('SELECT su.societeId')) {
           return Promise.resolve([{ company_id: 'tenant-123' }])
         }

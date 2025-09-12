@@ -6,7 +6,7 @@ export class AppService {
     return 'TopSteel ERP API v1.0.0 - Système de gestion métallurgique'
   }
 
-  getVersion(): unknown {
+  getVersion(): { name: string; version: string; description: string; timestamp: string } {
     return {
       name: 'TopSteel ERP API',
       version: '1.0.0',
