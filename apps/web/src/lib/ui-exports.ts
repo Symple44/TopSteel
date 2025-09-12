@@ -134,8 +134,6 @@ export type {
 // Form components are commented out due to export issues from UI package
 // If needed, these can be imported directly from '@erp/ui' in individual components
 
-// Re-export DataTable - already exported above in the group import
-
 // Type guard functions
 export function isColumnConfig<T = Record<string, unknown>>(obj: unknown): obj is ColumnConfig<T> {
   return typeof obj === 'object' && obj !== null && 'key' in obj && 'title' in obj

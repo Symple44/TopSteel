@@ -164,8 +164,7 @@ export const SelectValue = ({ ...props }) => {
 }
 SelectValue.displayName = 'SelectValue'
 
-// Re-export DataTable and other complex components as-is
-export const DataTable = UIComponents.DataTable
+// DataTable is exported from ui-exports.ts to avoid duplicates
 export type { ColumnConfig } from './ui-exports'
 
 // PageHeader component wrapper

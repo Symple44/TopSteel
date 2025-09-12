@@ -218,7 +218,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           }
 
           set((state) => ({
-            error: error.message || 'Network error',
+            error: error instanceof Error ? error.message : 'Network error',
             isLoading: false,
             loginAttempts: [...state.loginAttempts, attempt],
           }))

@@ -310,8 +310,11 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         timestamp: Date.now(),
         isRead: false,
         isArchived: false,
-        category: notification.category || 'general',
-        priority: notification.priority || 'normal',
+        category: (notification.category as string) || 'general',
+        priority: (notification.priority as 'low' | 'normal' | 'high' | 'urgent') || 'normal',
+        title: notification.title || 'Notification',
+        message: notification.message || '',
+        type: notification.type || 'info',
       }
 
       state?.notifications?.unshift(newNotification)

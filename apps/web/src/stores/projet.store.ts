@@ -76,7 +76,7 @@ const shouldUseCachedProjets = (state: ProjetState, force: boolean): boolean => 
  */
 const executeAsyncAction = async <T>(
   action: () => Promise<T>,
-  set: unknown,
+  set: (fn: (state: ProjetState & ProjetStoreActions) => void) => void,
   useLoadingState: boolean = true
 ): Promise<T> => {
   if (useLoadingState) {
@@ -207,8 +207,8 @@ const projetService = {
     await new Promise((resolve) => setTimeout(resolve, 300))
 
     const newProjet: StoreProjet = {
-      id: `proj_${Date.now()}`,
       ...projetData,
+      id: `proj_${Date.now()}`,
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -431,10 +431,11 @@ export const useProjetStore = create<ProjetState & ProjetStoreActions>()(
         const duplicated: StoreProjet = {
           ...projet,
           id: crypto.randomUUID(),
-          nom: `${(projet as unknown).nom} (Copie)`,
+          reference: `${projet.reference}-COPIE`,
+          description: `${projet.description} (Copie)`,
           createdAt: new Date(),
           updatedAt: new Date(),
-        } as StoreProjet
+        }
 
         set((state: ProjetState & ProjetStoreActions) => {
           state.projets.push(duplicated)
@@ -459,8 +460,9 @@ export const useProjetStore = create<ProjetState & ProjetStoreActions>()(
         set((state: ProjetState & ProjetStoreActions) => {
           const projet = state.projets.find((p) => p.id === projetId)
           if (projet) {
-            // Add isFavorite if not exists (StoreProjet may not have this property in the base interface)
-            ;(projet as unknown).isFavorite = !(projet as unknown).isFavorite
+            // Extend StoreProjet type with isFavorite property
+            const projetWithFavorite = projet as StoreProjet & { isFavorite?: boolean }
+            projetWithFavorite.isFavorite = !projetWithFavorite.isFavorite
           }
         })
       },
@@ -470,7 +472,7 @@ export const useProjetStore = create<ProjetState & ProjetStoreActions>()(
           const projet = state.projets.find((p) => p.id === projetId)
           if (projet) {
             // Use avancement which is the correct property name in the Projet interface
-            ;(projet as unknown).avancement = Math.min(100, Math.max(0, progress))
+            projet.avancement = Math.min(100, Math.max(0, progress))
           }
         })
       },
@@ -528,7 +530,7 @@ export const useProjetStore = create<ProjetState & ProjetStoreActions>()(
 
       setPageSize: (pageSize: number) => {
         set((state: ProjetState & ProjetStoreActions) => {
-          ;(state as unknown).pageSize = pageSize
+          state.pageSize = pageSize
         })
       },
 
