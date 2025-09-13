@@ -9,6 +9,7 @@ import {
 } from 'typeorm'
 // Removed direct import to avoid circular dependency
 // import { PageTemplate } from './page-template.entity'
+import type { PageTemplate } from './page-template.entity'
 import type { SectionContent, SectionStyles } from './types'
 
 @Entity('marketplace_page_sections')
@@ -21,7 +22,7 @@ export class PageSection {
     lazy: true,
   })
   @JoinColumn({ name: 'pageTemplateId' })
-  pageTemplate!: any
+  pageTemplate!: PageTemplate
 
   @Column({ type: 'uuid' })
   pageTemplateId!: string

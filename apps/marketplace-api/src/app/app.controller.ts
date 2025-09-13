@@ -50,10 +50,11 @@ export class AppController {
           societeName: tenantContext.societe.nom,
           databaseName: tenantContext.societe.databaseName,
           marketplaceEnabled: tenantContext.marketplaceEnabled,
-          connectionInitialized: tenantContext.erpTenantConnection.isInitialized,
+          connectionInitialized: tenantContext.erpTenantConnection?.isInitialized || false,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       return {
         success: false,
         tenant: tenant,
@@ -62,7 +63,7 @@ export class AppController {
           isDev,
           shouldUseDemoMode: (tenant === 'demo' || tenant === 'topsteel') && isDev,
         },
-        error: error.message,
+        error: errorMessage,
       }
     }
   }

@@ -155,7 +155,7 @@ export class SectorPricingService {
     )
 
     // Créer la nouvelle assignation
-    const assignment = this.customerSectorRepository.create({
+    const assignmentData = {
       societeId,
       customerId,
       sector,
@@ -167,7 +167,9 @@ export class SectorPricingService {
         automaticAssignment: false,
       },
       metadata: details.metadata || {},
-    })
+      isActive: true,
+    }
+    const assignment = this.customerSectorRepository.create(assignmentData)
 
     return await this.customerSectorRepository.save(assignment)
   }
@@ -217,15 +219,19 @@ export class SectorPricingService {
     coefficientType: CoefficientType
     coefficient: number
     description?: string
-    conditions?: unknown
-    parameters?: unknown
-    metadata?: unknown
+    conditions?: Record<string, unknown>
+    parameters?: Record<string, unknown>
+    metadata?: Record<string, unknown>
   }): Promise<SectorCoefficient> {
-    const coefficient = this.sectorCoefficientRepository.create({
+    const coefficientData = {
       ...data,
+      conditions: data.conditions || {},
+      parameters: data.parameters || {},
+      metadata: data.metadata || {},
       isActive: true,
       priority: 0,
-    })
+    }
+    const coefficient = this.sectorCoefficientRepository.create(coefficientData)
 
     return await this.sectorCoefficientRepository.save(coefficient)
   }

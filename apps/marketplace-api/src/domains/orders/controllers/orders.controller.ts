@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import type { Request } from 'express'
 import type { DataSource } from 'typeorm'
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
+import { PaymentStatus } from '../entities/marketplace-order.entity'
 import type {
   CreateOrderDto,
   OrdersService,
@@ -52,7 +53,7 @@ export class OrdersController {
     return await this.ordersService.createOrder(
       createOrderDto,
       req.tenant.societeId,
-      req.tenant.erpTenantConnection
+      req.tenant.erpTenantConnection || undefined
     )
   }
 
@@ -143,8 +144,8 @@ export class OrdersController {
     @Req() req: TenantRequest,
     @Param('orderId') orderId: string,
     @Body() body: {
-      paymentStatus: string
-      paymentDetails?: any
+      paymentStatus: PaymentStatus
+      paymentDetails?: Record<string, unknown>
     }
   ) {
     // Check admin role

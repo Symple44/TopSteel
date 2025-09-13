@@ -44,7 +44,7 @@ export class TenantResolver {
         }
       } else {
       }
-    } catch {
+    } catch (error: unknown) {
       // Ignore errors when loading real société
     }
 
@@ -106,7 +106,7 @@ export class TenantResolver {
         const connectionConfig = {
           type: 'postgres' as const,
           host: process.env.ERP_DB_HOST || 'localhost',
-          port: parseInt(process.env.ERP_DB_PORT, 10) || 5432,
+          port: parseInt(process.env.ERP_DB_PORT || '5432', 10),
           username: process.env.ERP_DB_USERNAME || 'postgres',
           password: (() => {
             const password = process.env.ERP_DB_PASSWORD
@@ -134,8 +134,9 @@ export class TenantResolver {
         await connection.initialize()
 
         this.tenantConnections.set(databaseName, connection)
-      } catch (error) {
-        throw new Error(`Impossible de se connecter à la base de données ERP: ${error.message}`)
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        throw new Error(`Impossible de se connecter à la base de données ERP: ${errorMessage}`)
       }
     }
 
@@ -185,7 +186,7 @@ export class TenantResolver {
       },
     }
 
-    const config = tenantConfigs[tenantCode] || tenantConfigs.demo
+    const config = tenantConfigs[tenantCode as keyof typeof tenantConfigs] || tenantConfigs.demo
 
     // Créer un tenant de démonstration pour le développement
     const demoSociete = {
@@ -221,7 +222,7 @@ export class TenantResolver {
         try {
           erpTenantConnection = await this.getERPTenantConnection(dbName)
           break
-        } catch (error) {
+        } catch (error: unknown) {
           _lastError = error
         }
       }
@@ -244,7 +245,7 @@ export class TenantResolver {
       }
 
       return tenantContext
-    } catch {
+    } catch (error: unknown) {
       return {
         societeId: demoSociete.id,
         societe: demoSociete,

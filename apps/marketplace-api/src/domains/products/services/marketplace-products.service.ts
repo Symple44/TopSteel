@@ -7,6 +7,7 @@ import type { Cache } from 'cache-manager'
 import { firstValueFrom } from 'rxjs'
 import { type DataSource, In, type Repository } from 'typeorm'
 import { Article, ArticleStatus } from '../../../shared/entities/erp/article.entity'
+import type { PostgreSQLError } from '../../../shared/types/common.types'
 import { MarketplaceProduct } from '../entities/marketplace-product.entity'
 
 export interface ProductFilters {
@@ -161,7 +162,7 @@ export class MarketplaceProductsService {
       await this.cacheManager.set(cacheKey, result, 300) // 5 minutes
 
       return result
-    } catch (_error) {
+    } catch (error: unknown) {
       // Si les tables n'existent pas ou toute autre erreur, retourner des données de démo
       const demoProducts = this.getDemoFeaturedProducts(filters.limit || 20)
       return {
@@ -251,9 +252,9 @@ export class MarketplaceProductsService {
       return Promise.all(
         articles.map((article) => this.enrichArticleWithMarketplaceData(article, customerId))
       )
-    } catch (error) {
+    } catch (error: unknown) {
       // Si les tables n'existent pas ou toute autre erreur, retourner des données de démo
-      if (error.message?.includes("n'existe pas") || error.code === '42P01') {
+      if ((error instanceof Error && error.message?.includes("n'existe pas")) || (error as PostgreSQLError)?.code === '42P01') {
       }
       return this.getDemoFeaturedProducts(limit)
     }
@@ -337,7 +338,7 @@ export class MarketplaceProductsService {
         )
       )
       calculatedPrice = priceResponse.data.finalPrice
-    } catch (_error) {
+    } catch (error: unknown) {
       // Fallback sur le prix de base si l'API échoue
       calculatedPrice = article.prixVenteHT || 0
     }
@@ -354,7 +355,7 @@ export class MarketplaceProductsService {
       calculatedPrice,
       stockDisponible: article.stockDisponible,
       inStock: !article.estEnRupture(),
-      categories: article.marketplaceSettings?.categories || [article.famille].filter(Boolean),
+      categories: article.marketplaceSettings?.categories || (article.famille ? [article.famille] : []),
       tags: article.marketplaceSettings?.tags || [],
       isActive: marketplaceProduct?.isActive ?? true,
       isFeatured: marketplaceProduct?.isFeatured ?? false,
@@ -433,9 +434,9 @@ export class MarketplaceProductsService {
       await this.cacheManager.set(cacheKey, categories, 3600) // 1 heure
 
       return categories
-    } catch (error) {
+    } catch (error: unknown) {
       // Si les tables ERP n'existent pas, retourner des données de démo
-      if (error.message?.includes("n'existe pas") || error.code === '42P01') {
+      if ((error instanceof Error && error.message?.includes("n'existe pas")) || (error as PostgreSQLError)?.code === '42P01') {
         return ['Poutrelles', 'Tôles', 'Tubes', 'Barres', 'Cornières', 'Profilés']
       }
       throw error

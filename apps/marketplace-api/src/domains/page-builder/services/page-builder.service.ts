@@ -29,19 +29,20 @@ export class PageBuilderService {
       throw new BadRequestException(`Un template avec le slug "${createDto.slug}" existe déjà`)
     }
 
-    const template = this.pageTemplateRepository.create({
+    const templateData = {
       name: createDto.name,
       slug: createDto.slug,
       pageType: createDto.pageType,
       status: createDto.status,
       description: createDto.description,
-      metadata: createDto.metadata,
-      settings: createDto.settings,
+      metadata: createDto.metadata as Record<string, unknown> | undefined,
+      settings: createDto.settings as Record<string, unknown> | undefined,
       societeId,
       version: 1,
-    })
+    }
+    const template = this.pageTemplateRepository.create(templateData)
 
-    const savedTemplate = await this.pageTemplateRepository.save(template)
+    const savedTemplate = await this.pageTemplateRepository.save(template) as PageTemplate
 
     // Créer les sections si fournies
     if (createDto.sections && createDto.sections.length > 0) {
@@ -152,7 +153,7 @@ export class PageBuilderService {
   async duplicateTemplate(id: string, newName: string, newSlug: string): Promise<PageTemplate> {
     const originalTemplate = await this.findTemplateById(id)
 
-    const duplicatedTemplate = this.pageTemplateRepository.create({
+    const duplicatedTemplateData = {
       name: newName,
       slug: newSlug,
       pageType: originalTemplate.pageType,
@@ -161,9 +162,10 @@ export class PageBuilderService {
       metadata: originalTemplate.metadata,
       settings: originalTemplate.settings,
       societeId: originalTemplate.societeId,
-      publishedAt: null,
+      publishedAt: undefined, // Use undefined instead of null
       version: 1,
-    })
+    }
+    const duplicatedTemplate = this.pageTemplateRepository.create(duplicatedTemplateData)
 
     const savedTemplate = await this.pageTemplateRepository.save(duplicatedTemplate)
 
@@ -194,11 +196,12 @@ export class PageBuilderService {
     societeId: string | null,
     presetData: Partial<SectionPreset>
   ): Promise<SectionPreset> {
-    const preset = this.sectionPresetRepository.create({
+    const presetData2 = {
       ...presetData,
-      societeId,
+      societeId: societeId || undefined, // Handle null properly
       usageCount: 0,
-    })
+    }
+    const preset = this.sectionPresetRepository.create(presetData2)
 
     return this.sectionPresetRepository.save(preset)
   }

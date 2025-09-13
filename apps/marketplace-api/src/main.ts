@@ -21,7 +21,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: isDevelopment
-      ? (origin, callback) => {
+      ? (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
           // En dev, autoriser localhost et 127.0.0.1 sur tous les ports
           if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
             callback(null, true)

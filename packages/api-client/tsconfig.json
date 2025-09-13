@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "declarationDir": "./dist",
+    "declaration": true,
     "moduleResolution": "bundler",
     "skipLibCheck": true
   },

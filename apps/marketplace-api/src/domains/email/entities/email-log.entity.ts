@@ -6,13 +6,13 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 
 @Index(['expiresAt'])
 export class EmailLog {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id!: string
 
   @Column()
-  recipient: string
+  recipient!: string
 
   @Column()
-  type: string
+  type!: string
 
   @Column({ nullable: true })
   tokenHash?: string
@@ -21,10 +21,10 @@ export class EmailLog {
   expiresAt?: Date
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, unknown>
+  metadata!: Record<string, unknown>
 
   @CreateDateColumn()
-  sentAt: Date
+  sentAt!: Date
 
   @Column({ type: 'timestamp', nullable: true })
   openedAt?: Date
@@ -33,7 +33,7 @@ export class EmailLog {
   clickedAt?: Date
 
   @Column({ default: false })
-  bounced: boolean
+  bounced!: boolean
 
   @Column({ nullable: true })
   bouncedReason?: string

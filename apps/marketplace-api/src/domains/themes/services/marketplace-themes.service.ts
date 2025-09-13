@@ -32,6 +32,7 @@ export interface UpdateThemeDto {
   responsive?: Partial<MarketplaceTheme['responsive']>
   metadata?: Partial<MarketplaceTheme['metadata']>
   isActive?: boolean
+  [key: string]: unknown // Index signature pour compatibilité
 }
 
 export interface ThemePreviewDto {

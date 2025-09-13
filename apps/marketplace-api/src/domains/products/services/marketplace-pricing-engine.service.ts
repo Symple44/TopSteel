@@ -12,6 +12,7 @@ export interface PriceCalculationContext {
   promotionCode?: string
   isFirstOrder?: boolean
   customerSegment?: string
+  [key: string]: unknown // Index signature pour compatibilité
 }
 
 export interface PriceCalculationResult {

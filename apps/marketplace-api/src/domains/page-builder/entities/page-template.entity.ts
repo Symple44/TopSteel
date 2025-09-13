@@ -8,6 +8,7 @@ import {
 } from 'typeorm'
 // Removed direct import to avoid circular dependency
 // import { PageSection } from './page-section.entity'
+import type { PageSection } from './page-section.entity'
 
 export enum PageType {
   HOME = 'home',
@@ -81,7 +82,7 @@ export class PageTemplate {
     cascade: true,
     lazy: true,
   })
-  sections!: any[]
+  sections!: PageSection[]
 
   @Column({ type: 'timestamp', nullable: true })
   publishedAt?: Date

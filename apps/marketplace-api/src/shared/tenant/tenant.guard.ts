@@ -22,7 +22,8 @@ export class TenantGuard implements CanActivate {
       const tenantContext = await this.resolveTenant(tenantId)
       request.tenant = tenantContext
       return true
-    } catch {
+    } catch (error: unknown) {
+      console.error('Failed to resolve tenant:', error instanceof Error ? error.message : String(error))
       return false
     }
   }

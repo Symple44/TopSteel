@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common'
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
 import type { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
+import type { SectionPreset } from '../entities'
 import type { PageBuilderService } from '../services/page-builder.service'
 
 @Controller('page-builder')
@@ -85,7 +86,7 @@ export class PageBuilderController {
   async createSectionPreset(@Request() req: unknown, @Body() presetData: unknown) {
     return this.pageBuilderService.createSectionPreset(
       (req as { tenant: { societeId: string } }).tenant.societeId,
-      presetData
+      presetData as Partial<SectionPreset>
     )
   }
 

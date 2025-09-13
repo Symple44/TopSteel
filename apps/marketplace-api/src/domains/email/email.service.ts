@@ -4,6 +4,7 @@ import type { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import { createTransport, type Transporter } from 'nodemailer'
 import type { Repository } from 'typeorm'
+import type { Address, OrderData, OrderItem } from '../../shared/types/common.types'
 import { EmailLog } from './entities/email-log.entity'
 
 export interface EmailOptions {
@@ -160,14 +161,9 @@ export class EmailService {
    */
   async sendOrderConfirmationEmail(
     email: string,
-    orderData: {
-      orderId: string
-      orderNumber: string
-      totalAmount: number
-      currency: string
-      items: Array<{ name: string; quantity: number; price: number }>
-      shippingAddress?: any
-      billingAddress?: any
+    orderData: Pick<OrderData, 'orderId' | 'orderNumber' | 'totalAmount' | 'currency' | 'items'> & {
+      shippingAddress?: Address
+      billingAddress?: Address
     }
   ): Promise<void> {
     const html = this.getOrderConfirmationTemplate(orderData)
@@ -199,7 +195,7 @@ export class EmailService {
         text: options.text,
         attachments: options.attachments,
       })
-    } catch (_error) {
+    } catch (error: unknown) {
       throw new Error('Failed to send email')
     }
   }
@@ -225,7 +221,7 @@ export class EmailService {
       })
 
       await this.emailLogRepo.save(log)
-    } catch (_error) {}
+    } catch (error: unknown) {}
   }
 
   /**
@@ -406,14 +402,14 @@ export class EmailService {
   /**
    * Template pour la confirmation de commande
    */
-  private getOrderConfirmationTemplate(orderData: any): string {
+  private getOrderConfirmationTemplate(orderData: Pick<OrderData, 'orderId' | 'orderNumber' | 'totalAmount' | 'currency' | 'items'>): string {
     const itemsHtml = orderData.items
       .map(
-        (item: any) => `
+        (item: OrderItem) => `
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.name}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price.toFixed(2)} ${orderData.currency}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.unitPrice.toFixed(2)} ${orderData.currency}</td>
         </tr>
       `
       )

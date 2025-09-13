@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { Societe } from '../../../shared/entities/erp/societe.entity'
+import type { MarketplaceConfiguration } from '../../../shared/types/common.types'
 import type { EmailService } from '../../email/email.service'
 import { MarketplaceTheme } from '../../themes/entities/marketplace-theme.entity'
 import {
@@ -420,8 +421,8 @@ export class StorefrontService {
 
         // Reactivate if previously unsubscribed
         subscription.status = SubscriptionStatus.PENDING
-        subscription.unsubscribedAt = null
-        subscription.unsubscribeReason = null
+        subscription.unsubscribedAt = undefined
+        subscription.unsubscribeReason = undefined
         subscription.firstName = data?.firstName || subscription.firstName
         subscription.lastName = data?.lastName || subscription.lastName
         subscription.preferences = {
@@ -464,7 +465,7 @@ export class StorefrontService {
         success: true,
         message: 'Un email de confirmation a été envoyé à votre adresse',
       }
-    } catch (_error) {
+    } catch (error: unknown) {
       return {
         success: false,
         message: "Une erreur est survenue lors de l'inscription",
@@ -498,7 +499,7 @@ export class StorefrontService {
 
       // Send email to company
       const companyEmail =
-        societe.email || (societe.configuration?.marketplace as any)?.contactEmail
+        societe.email || (societe.configuration?.marketplace as MarketplaceConfiguration)?.contactEmail
       if (companyEmail) {
         await this.sendContactEmailToCompany({
           companyEmail,
@@ -520,7 +521,7 @@ export class StorefrontService {
         message:
           'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
       }
-    } catch (_error) {
+    } catch (error: unknown) {
       return {
         success: false,
         message: "Une erreur est survenue lors de l'envoi du message",

@@ -1,0 +1,2948 @@
+{
+  "total_files_analyzed": 2333,
+  "files_with_any": 284,
+  "total_occurrences": 1713,
+  "patterns": {
+    "type_annotation": 580,
+    "type_assertion": 179,
+    "array_of_any": 369,
+    "generic_assertion": 218,
+    "promise_any": 180,
+    "union_with_any": 13,
+    "record_with_any": 174
+  },
+  "modules": {
+    "unknown": {
+      "files": 284,
+      "occurrences": 1713,
+      "patterns": {
+        "type_annotation": 580,
+        "type_assertion": 179,
+        "array_of_any": 369,
+        "generic_assertion": 218,
+        "promise_any": 180,
+        "union_with_any": 13,
+        "record_with_any": 174
+      }
+    }
+  },
+  "top_files": [
+    {
+      "path": "packages\\ui\\src\\components\\business\\dialogs\\AddTaskDialog\\AddTaskDialog.tsx",
+      "occurrences": 32,
+      "patterns": {
+        "type_assertion": 32
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\web\\src\\lib\\react-19-ui-components.tsx",
+      "occurrences": 30,
+      "patterns": {
+        "generic_assertion": 30
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "packages\\ui\\src\\components\\business\\dialogs\\AddClientDialog\\AddClientDialog.tsx",
+      "occurrences": 28,
+      "patterns": {
+        "type_assertion": 28
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "packages\\ui\\src\\components\\business\\dialogs\\EditUserDialog\\EditUserDialog.tsx",
+      "occurrences": 27,
+      "patterns": {
+        "type_assertion": 27
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\validator.ts",
+      "occurrences": 22,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 4,
+        "array_of_any": 4,
+        "promise_any": 4,
+        "union_with_any": 6
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\web\\.next\\types\\validator.ts",
+      "occurrences": 22,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 4,
+        "array_of_any": 4,
+        "promise_any": 4,
+        "union_with_any": 6
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "packages\\ui\\src\\components\\business\\dialogs\\UserPermissionsDialog\\UserPermissionsDialog.tsx",
+      "occurrences": 19,
+      "patterns": {
+        "type_assertion": 17,
+        "record_with_any": 2
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\web\\src\\lib\\api-client-types.ts",
+      "occurrences": 10,
+      "patterns": {
+        "type_annotation": 10
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\layout.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\account\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\admin\\page-builder\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\admin\\page-builder\\[id]\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\cart\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\checkout\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\products\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\products\\[id]\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\search\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    {
+      "path": "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\[...slug]\\page.ts",
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    }
+  ],
+  "file_details": {
+    "apps\\api\\src\\core\\common\\decorators\\get-user.decorator.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\domains\\auth\\security\\guards\\roles.guard.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\domains\\inventory\\services\\stock-movement.service.ts": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\domains\\partners\\repositories\\partner-interaction.repository.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\features\\marketplace\\auth\\guards\\marketplace-permissions.guard.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\features\\query-builder\\security\\query-builder-security.guard.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\features\\query-builder\\services\\query-builder-permission.service.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\infrastructure\\security\\log-sanitization\\log-sanitizer.service.spec.ts": {
+      "occurrences": 3,
+      "patterns": {
+        "type_assertion": 3
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\scripts\\analyze-menu-structure.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\scripts\\test-auth-system.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\scripts\\test-multi-tenant-login.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\scripts\\test-search-cache.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\api\\src\\__tests__\\auth-super-admin.integration.test.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\customers\\entities\\marketplace-customer.entity.ts": {
+      "occurrences": 3,
+      "patterns": {
+        "type_annotation": 2,
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\email\\email.service.ts": {
+      "occurrences": 4,
+      "patterns": {
+        "type_annotation": 4
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\orders\\controllers\\orders.controller.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\orders\\entities\\marketplace-order-item.entity.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\orders\\entities\\marketplace-order.entity.ts": {
+      "occurrences": 3,
+      "patterns": {
+        "type_annotation": 2,
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\orders\\services\\orders.service.ts": {
+      "occurrences": 6,
+      "patterns": {
+        "type_annotation": 2,
+        "type_assertion": 4
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\page-builder\\entities\\page-section.entity.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\page-builder\\entities\\page-template.entity.ts": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 1,
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\products\\controllers\\products.controller.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\products\\entities\\marketplace-price-rule.entity.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\products\\entities\\marketplace-product.entity.ts": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 1,
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\products\\services\\marketplace-products.service.ts": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-api\\src\\domains\\storefront\\services\\storefront.service.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\vitest.config.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\validator.ts": {
+      "occurrences": 22,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 4,
+        "array_of_any": 4,
+        "promise_any": 4,
+        "union_with_any": 6
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\layout.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\api\\images\\demo\\[filename]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\api\\images\\fallback\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\account\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\admin\\page-builder\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\admin\\page-builder\\[id]\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\cart\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\checkout\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\products\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\products\\[id]\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\search\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\.next\\types\\app\\[tenant]\\[...slug]\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\app\\[tenant]\\admin\\page-builder\\page.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\app\\[tenant]\\admin\\page-builder\\[id]\\page.tsx": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 1,
+        "type_assertion": 6
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\app\\[tenant]\\cart\\cart-client.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\components\\page-builder\\PageRenderer.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\components\\page-builder\\editor\\SectionSettings.tsx": {
+      "occurrences": 6,
+      "patterns": {
+        "type_assertion": 6
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\components\\page-builder\\sections\\index.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\components\\page-builder\\sections\\ProductsGridSection.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\marketplace-storefront\\src\\components\\providers\\query-provider.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\next.config.ts": {
+      "occurrences": 4,
+      "patterns": {
+        "type_annotation": 4
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\vitest.config.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\validator.ts": {
+      "occurrences": 22,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 4,
+        "array_of_any": 4,
+        "promise_any": 4,
+        "union_with_any": 6
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\finance\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\finance\\invoices\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\inventory\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\inventory\\articles\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\inventory\\articles\\[id]\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\inventory\\materials\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\inventory\\stock\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\partners\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\partners\\clients\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\partners\\suppliers\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\projects\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\sales\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\sales\\orders\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(app)\\sales\\quotes\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(auth)\\admin\\pricing\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(auth)\\forgot-password\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(auth)\\login\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(auth)\\register\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\company\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\datatable-test\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\groups\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\menu-config\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\notifications\\rules\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\roles\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\sessions\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\societes\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\admin\\users\\[userId]\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\dashboard\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\planning\\test\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\profile\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\query-builder\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\query-builder\\docs\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\query-builder\\test\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\settings\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\settings\\appearance\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\settings\\notifications\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\settings\\security\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\test-datatable\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\(dashboard)\\test-multi-tenant\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\company\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\backup\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\backups\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\backups\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\backups\\[id]\\download\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\connection-status\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\connections\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\connections\\tenant\\[tenantCode]\\close\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\health\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\health\\tenant\\[tenantCode]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\integrity-report\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\migrations\\run\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\migrations\\status\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\migrations\\tenant\\[tenantCode]\\run\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\migrations\\tenant\\[tenantCode]\\status\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\migrations\\[database]\\[migrationName]\\details\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\optimize\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\restore\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\stats\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\database\\synchronize\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\elasticsearch\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\groups\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\groups\\bulk-assignment\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\marketplace\\modules\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\marketplace\\modules\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\marketplace\\stats\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menu-config\\active\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menu-config\\add-sessions\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menu-config\\tree\\filtered\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menu-raw\\configurations\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menu-raw\\configurations\\active\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menu-raw\\tree\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menus\\configurations\\active\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menus\\menu-types\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\menus\\user-data-view\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\modules\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\permissions\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\roles\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\roles\\[id]\\permissions\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\sessions\\disconnect\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\sessions\\history\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\sessions\\online\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\sessions\\user\\[id]\\history\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\societes\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\societes\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\societes\\[id]\\stats\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\system-parameters\\by-category\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\system-parameters\\public\\company-info\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\system-parameters\\public\\enums\\[category]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\users\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\admin\\users\\bulk-operations\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\current-societe\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\force-logout\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\login\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\login-societe\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\logout\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\mfa\\complete\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\mfa\\methods\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\mfa\\setup\\totp\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\mfa\\status\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\mfa\\verify\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\profile\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\refresh\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\societe-default\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\societes\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\user\\default-company\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\validate\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\auth\\verify\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\config\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\datatable\\hierarchical-preferences\\[tableId]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\datatable\\hierarchy-order\\[tableId]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\health\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\images\\upload\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\images\\[category]\\[variant]\\[filename]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\notifications\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\notifications\\read-all\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\notifications\\rules\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\notifications\\rules\\[id]\\test\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\notifications\\settings\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\notifications\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\notifications\\[id]\\read\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\parameters\\system\\user_roles\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\execute-sql\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\execute-sql-dev\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\schema\\tables\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\schema\\tables\\[tableName]\\columns\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\schema\\tables-dev\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\schema\\tables-dev\\[tableName]\\columns\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\[id]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\query-builder\\[id]\\execute\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\search\\images\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\test-tables\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\translations\\overrides\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\ui-preferences\\reorderable-list\\[componentId]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu\\filtered\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\available-pages\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\custom-menu\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\export\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\import\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\items\\action\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\menu\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\reset\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\selected-pages\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\shortcuts\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\shortcuts\\[key]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\menu-preferences\\templates\\[template]\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\preferences\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\profile\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\user\\settings\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\api\\users\\appearance\\me\\route.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 2,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\backend-error\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\privacy\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\support\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\terms\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\.next\\types\\app\\unauthorized\\page.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 4,
+        "generic_assertion": 1,
+        "array_of_any": 2,
+        "record_with_any": 1,
+        "promise_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\app\\api\\admin\\users\\bulk-operations\\route.ts": {
+      "occurrences": 3,
+      "patterns": {
+        "type_annotation": 3
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\app\\api\\notifications\\route.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\app\\api\\user\\menu-preferences\\available-pages\\route.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\components\\auth\\company-selector.tsx": {
+      "occurrences": 3,
+      "patterns": {
+        "array_of_any": 3
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\components\\partners\\partner-form-dialog.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\components\\partners\\sites-manager.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\components\\query-builder\\column-selector.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\components\\query-builder\\visual-query-builder.tsx": {
+      "occurrences": 4,
+      "patterns": {
+        "type_annotation": 1,
+        "type_assertion": 2,
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\features\\marketplace\\components\\cart\\ShoppingCart.tsx": {
+      "occurrences": 3,
+      "patterns": {
+        "type_annotation": 2,
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\features\\marketplace\\components\\checkout\\steps\\ShippingStep.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\features\\marketplace\\components\\products\\ProductFilters.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\hooks\\use-global-search.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\hooks\\use-materials.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\hooks\\use-notification-settings.ts": {
+      "occurrences": 4,
+      "patterns": {
+        "type_annotation": 4
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\api-client-impl-simple.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\api-client-types-simple.ts": {
+      "occurrences": 9,
+      "patterns": {
+        "type_annotation": 9
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\api-client-types.ts": {
+      "occurrences": 10,
+      "patterns": {
+        "type_annotation": 10
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\auth-helper.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\auth-server.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\datatable-utils.ts": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 2
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\react-19-ui-components.tsx": {
+      "occurrences": 30,
+      "patterns": {
+        "generic_assertion": 30
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\auth\\rbac-api.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\i18n\\translator.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\lib\\monitoring\\sentry.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\services\\auth-service.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\stores\\__tests__.bak\\auth.store.test.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "apps\\web\\src\\test\\setup.ts": {
+      "occurrences": 3,
+      "patterns": {
+        "type_assertion": 3
+      },
+      "module": "unknown"
+    },
+    "packages\\api-client\\src\\core\\http-client.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\api-client\\src\\core\\__tests__\\http-client.test.ts": {
+      "occurrences": 7,
+      "patterns": {
+        "generic_assertion": 7
+      },
+      "module": "unknown"
+    },
+    "packages\\domains\\src\\search\\migration-service.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\types\\src\\react-compatibility.d.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\types\\src\\cross-cutting\\audit.ts": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\types\\src\\cross-cutting\\permissions.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\types\\src\\infrastructure\\api\\filters.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\types\\src\\infrastructure\\stores\\app.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\types\\src\\infrastructure\\stores\\entities.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "union_with_any": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\types\\src\\__tests__\\types.test.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\AddClientDialog\\AddClientDialog.tsx": {
+      "occurrences": 28,
+      "patterns": {
+        "type_assertion": 28
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\AddTaskDialog\\AddTaskDialog.tsx": {
+      "occurrences": 32,
+      "patterns": {
+        "type_assertion": 32
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\BulkMaterialImportDialog\\BulkMaterialImportDialog.tsx": {
+      "occurrences": 3,
+      "patterns": {
+        "type_annotation": 2,
+        "array_of_any": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\ClientSelectorDialog\\ClientSelectorDialog.tsx": {
+      "occurrences": 3,
+      "patterns": {
+        "type_assertion": 3
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\EditUserDialog\\EditUserDialog.tsx": {
+      "occurrences": 27,
+      "patterns": {
+        "type_assertion": 27
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\MaterialSelectorDialog\\MaterialSelectorDialog.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\RoleAssignmentDialog\\RoleAssignmentDialog.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\dialogs\\UserPermissionsDialog\\UserPermissionsDialog.tsx": {
+      "occurrences": 19,
+      "patterns": {
+        "type_assertion": 17,
+        "record_with_any": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\filters\\ClientSearch\\ClientSearch.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\filters\\MaterialSearch\\MaterialSearch.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\forms\\DeadlinePicker\\DeadlinePicker.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\forms\\LocationInput\\LocationInput.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\forms\\WorkingHoursPicker\\WorkingHoursPicker.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\metallurgy\\CostCalculator\\CostCalculator.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\metallurgy\\CuttingOptimizer\\CuttingOptimizer.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\notifications\\DeleteProjectConfirmation\\DeleteProjectConfirmation.tsx": {
+      "occurrences": 3,
+      "patterns": {
+        "type_assertion": 3
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\pricing\\ConditionBuilder\\ConditionBuilder.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\uploads\\ContractUploader\\ContractUploader.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\uploads\\InvoiceDocumentUploader\\InvoiceDocumentUploader.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\uploads\\MaterialPhotoUploader\\MaterialPhotoUploader.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\uploads\\QuoteDocumentUploader\\QuoteDocumentUploader.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\uploads\\SignatureCapture\\SignatureCapture.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\business\\uploads\\TechnicalDrawingUploader\\TechnicalDrawingUploader.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\clipboard-utils.ts": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\formula-engine.ts": {
+      "occurrences": 4,
+      "patterns": {
+        "type_annotation": 4
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\RichTextEditor.tsx": {
+      "occurrences": 7,
+      "patterns": {
+        "type_annotation": 7
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\settings-manager.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\use-color-rules.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\ViewSelector.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_annotation": 1,
+        "type_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\components\\DataTableBody\\index.tsx": {
+      "occurrences": 2,
+      "patterns": {
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\contexts\\DataTableContext.tsx": {
+      "occurrences": 1,
+      "patterns": {
+        "generic_assertion": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\hooks\\useDataExport.ts": {
+      "occurrences": 3,
+      "patterns": {
+        "type_annotation": 1,
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\hooks\\useDataTableState.ts": {
+      "occurrences": 5,
+      "patterns": {
+        "type_annotation": 3,
+        "type_assertion": 2
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\components\\data-display\\datatable\\__benchmarks__\\performance-benchmark.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\types\\common.ts": {
+      "occurrences": 1,
+      "patterns": {
+        "type_annotation": 1
+      },
+      "module": "unknown"
+    },
+    "packages\\ui\\src\\types\\filters.ts": {
+      "occurrences": 3,
+      "patterns": {
+        "type_annotation": 3
+      },
+      "module": "unknown"
+    }
+  }
+}

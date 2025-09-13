@@ -226,9 +226,10 @@ export class ThemesController {
 
     try {
       // Create theme from imported data
+      const { name: _, ...themeWithoutName } = importData.theme
       const importedTheme = await this.themesService.create(tenant.societeId, {
         name: importData.name,
-        ...importData.theme,
+        ...themeWithoutName,
         metadata: {
           ...importData.theme.metadata,
           imported: true,
@@ -240,8 +241,9 @@ export class ThemesController {
         message: 'Thème importé avec succès',
         theme: importedTheme,
       }
-    } catch (error) {
-      if (error.message.includes('existe déjà') && importData.overwrite_existing) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      if (errorMessage.includes('existe déjà') && importData.overwrite_existing) {
         // If overwrite is allowed, delete existing and create new
         const existingThemes = await this.themesService.findAll(tenant.societeId)
         const existingTheme = existingThemes.find((t) => t.name === importData.name)
@@ -249,9 +251,10 @@ export class ThemesController {
         if (existingTheme && !existingTheme.isActive && !existingTheme.isDefault) {
           await this.themesService.delete(existingTheme.id, tenant.societeId)
 
+          const { name: __, ...themeWithoutName2 } = importData.theme
           const importedTheme = await this.themesService.create(tenant.societeId, {
             name: importData.name,
-            ...importData.theme,
+            ...themeWithoutName2,
             metadata: {
               ...importData.theme.metadata,
               imported: true,

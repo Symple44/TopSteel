@@ -7,8 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-// Removed direct import to avoid circular dependency
-// import { MarketplacePriceRule } from './marketplace-price-rule.entity'
+import type { MarketplacePriceRule } from './marketplace-price-rule.entity'
 
 export interface SEOData {
   title?: string
@@ -99,7 +98,7 @@ export class MarketplaceProduct {
 
   // Relations
   @OneToMany('MarketplacePriceRule', 'product', { lazy: true })
-  priceRules!: any[]
+  priceRules!: MarketplacePriceRule[]
 
   // Méthodes utilitaires
   getMainImage(): ProductImages | undefined {

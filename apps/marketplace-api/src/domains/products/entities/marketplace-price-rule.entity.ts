@@ -10,6 +10,7 @@ import {
 } from 'typeorm'
 // Removed direct import to avoid circular dependency
 // import { MarketplaceProduct } from './marketplace-product.entity'
+import type { MarketplaceProduct } from './marketplace-product.entity'
 
 export enum AdjustmentType {
   PERCENTAGE = 'PERCENTAGE',
@@ -89,7 +90,7 @@ export class MarketplacePriceRule {
   // Relations
   @ManyToOne('MarketplaceProduct', 'priceRules', { lazy: true })
   @JoinColumn({ name: 'productId' })
-  product!: any
+  product!: MarketplaceProduct
 
   // Méthodes utilitaires
   isValid(date: Date = new Date()): boolean {
@@ -103,13 +104,15 @@ export class MarketplacePriceRule {
     return true
   }
 
-  canBeApplied(context: unknown): boolean {
+  canBeApplied(context: Record<string, unknown>): boolean {
     if (!this.isValid()) return false
 
     return this.conditions.every((condition) => this.evaluateCondition(condition, context))
   }
 
-  private evaluateCondition(condition: PricingCondition, context: unknown): boolean {
+  private evaluateCondition(condition: PricingCondition, context: Record<string, unknown>): boolean {
+    if (!context || typeof context !== 'object') return false
+
     const contextValue = condition.field ? context[condition.field] : context[condition.type]
 
     switch (condition.operator) {
@@ -120,13 +123,18 @@ export class MarketplacePriceRule {
         return Array.isArray(condition.value) && condition.value.includes(contextValue)
 
       case 'between':
-        return contextValue >= condition.value[0] && contextValue <= condition.value[1]
+        if (!Array.isArray(condition.value) || condition.value.length < 2) return false
+        return typeof contextValue === 'number' &&
+               contextValue >= (condition.value[0] as number) &&
+               contextValue <= (condition.value[1] as number)
 
       case 'greater_than':
-        return contextValue > condition.value
+        return typeof contextValue === 'number' && typeof condition.value === 'number' &&
+               contextValue > condition.value
 
       case 'less_than':
-        return contextValue < condition.value
+        return typeof contextValue === 'number' && typeof condition.value === 'number' &&
+               contextValue < condition.value
 
       case 'contains':
         return String(contextValue).toLowerCase().includes(String(condition.value).toLowerCase())

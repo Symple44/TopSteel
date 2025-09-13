@@ -54,7 +54,9 @@
       "WebSearch",
       "Bash(npx biome format:*)",
       "Bash(gh api:*)",
-      "Bash(xargs gh api:*)"
+      "Bash(xargs gh api:*)",
+      "Bash(docker build:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": [],

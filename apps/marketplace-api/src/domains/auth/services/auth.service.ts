@@ -62,6 +62,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials')
     }
 
+    if (!customer.passwordHash) {
+      throw new UnauthorizedException('Invalid credentials')
+    }
+
     const isPasswordValid = await bcrypt.compare(loginDto.password, customer.passwordHash)
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials')
@@ -134,7 +138,7 @@ export class AuthService {
       }
 
       return this.generateTokens(customer)
-    } catch (_error) {
+    } catch (error: unknown) {
       throw new UnauthorizedException('Invalid refresh token')
     }
   }
@@ -198,8 +202,8 @@ export class AuthService {
     const payload: AuthPayload = {
       customerId: customer.id,
       email: customer.email,
-      firstName: customer.firstName,
-      lastName: customer.lastName,
+      firstName: customer.firstName || '',
+      lastName: customer.lastName || '',
       tenantId: customer.tenantId,
     }
 
@@ -218,8 +222,8 @@ export class AuthService {
       customer: {
         id: customer.id,
         email: customer.email,
-        firstName: customer.firstName,
-        lastName: customer.lastName,
+        firstName: customer.firstName || '',
+        lastName: customer.lastName || '',
         company: customer.company,
       },
     }

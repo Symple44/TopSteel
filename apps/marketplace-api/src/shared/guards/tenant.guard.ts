@@ -28,8 +28,9 @@ export class TenantGuard implements CanActivate {
       request.tenant = tenantContext
 
       return true
-    } catch (error) {
-      throw new UnauthorizedException(`Erreur de résolution tenant: ${error.message}`)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      throw new UnauthorizedException(`Erreur de résolution tenant: ${errorMessage}`)
     }
   }
 

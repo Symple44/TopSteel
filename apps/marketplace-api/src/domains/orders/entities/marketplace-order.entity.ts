@@ -9,9 +9,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-// Removed direct imports to avoid circular dependencies
-// import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
-// import { MarketplaceOrderItem } from './marketplace-order-item.entity'
+import type { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
+import type { MarketplaceOrderItem } from './marketplace-order-item.entity'
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -158,13 +157,13 @@ export class MarketplaceOrder {
     lazy: true,
   })
   @JoinColumn({ name: 'customerId' })
-  customer?: any
+  customer?: MarketplaceCustomer
 
   @OneToMany('MarketplaceOrderItem', 'order', {
     cascade: true,
     lazy: true,
   })
-  items!: any[]
+  items!: MarketplaceOrderItem[]
 
   // Méthodes utilitaires
   isGuest(): boolean {

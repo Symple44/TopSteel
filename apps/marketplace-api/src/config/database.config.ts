@@ -8,7 +8,7 @@ export const databaseConfig = registerAs(
     erpAuth: {
       type: 'postgres',
       host: process.env.ERP_DB_HOST || 'localhost',
-      port: parseInt(process.env.ERP_DB_PORT, 10) || 5432,
+      port: parseInt(process.env.ERP_DB_PORT || '5432', 10),
       username: process.env.ERP_DB_USERNAME || 'postgres',
       password: (() => {
         const password = process.env.ERP_DB_PASSWORD
@@ -34,7 +34,7 @@ export const databaseConfig = registerAs(
     marketplace: {
       type: 'postgres',
       host: process.env.MARKETPLACE_DB_HOST || process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.MARKETPLACE_DB_PORT || process.env.DB_PORT, 10) || 5432,
+      port: parseInt(process.env.MARKETPLACE_DB_PORT || process.env.DB_PORT || '5432', 10),
       username: process.env.MARKETPLACE_DB_USERNAME || process.env.DB_USERNAME || 'postgres',
       password: (() => {
         const password = process.env.MARKETPLACE_DB_PASSWORD || process.env.DB_PASSWORD

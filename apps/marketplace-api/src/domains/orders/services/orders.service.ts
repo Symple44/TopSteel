@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DataSource, Repository } from 'typeorm'
+import { Between, type DataSource, type Repository } from 'typeorm'
 import { Article } from '../../../shared/entities/erp/article.entity'
+import type { Address } from '../../../shared/types/common.types'
 import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
-import { MarketplaceOrder } from '../entities/marketplace-order.entity'
+import { MarketplaceOrder, OrderStatus, PaymentStatus } from '../entities/marketplace-order.entity'
 import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
 
 export interface CreateOrderDto {
@@ -13,18 +14,10 @@ export interface CreateOrderDto {
     quantity: number
     price?: number
   }>
-  shippingAddress: {
-    street: string
-    city: string
-    postalCode: string
-    country: string
+  shippingAddress: Address & {
     additionalInfo?: string
   }
-  billingAddress?: {
-    street: string
-    city: string
-    postalCode: string
-    country: string
+  billingAddress?: Address & {
     additionalInfo?: string
   }
   paymentMethod?: string
@@ -32,7 +25,7 @@ export interface CreateOrderDto {
 }
 
 export interface UpdateOrderStatusDto {
-  status: string
+  status: OrderStatus
   notes?: string
 }
 
@@ -88,7 +81,7 @@ export class OrdersService {
             productName = article.designation
             unitPrice = item.price || article.prixVenteHT || 0
           }
-        } catch (_error) {
+        } catch (error: unknown) {
           // Continue with default values if ERP connection fails
         }
       }
@@ -121,8 +114,8 @@ export class OrdersService {
       societeId: tenantId,
       customerId: createOrderDto.customerId,
       orderNumber,
-      status: 'PENDING' as any,
-      paymentStatus: 'PENDING' as any,
+      status: OrderStatus.PENDING,
+      paymentStatus: PaymentStatus.PENDING,
       subtotalHT: subtotal,
       shippingCostHT: 0, // Calculate based on business rules
       discountAmount: 0,
@@ -141,7 +134,6 @@ export class OrdersService {
       const orderItem = this.orderItemRepository.create({
         ...itemData,
         orderId: savedOrder.id,
-        order: savedOrder,
       })
       await this.orderItemRepository.save(orderItem)
     }
@@ -160,7 +152,7 @@ export class OrdersService {
     tenantId: string,
     customerId?: string
   ): Promise<MarketplaceOrder> {
-    const where: any = {
+    const where: Record<string, string> = {
       id: orderId,
       societeId: tenantId,
     }
@@ -224,14 +216,14 @@ export class OrdersService {
     const order = await this.getOrderById(orderId, tenantId)
 
     // Update status
-    order.status = updateDto.status as any
+    order.status = updateDto.status
 
     // Update specific timestamps based on status
     switch (updateDto.status) {
-      case 'SHIPPED':
+      case OrderStatus.SHIPPED:
         order.shippedAt = new Date()
         break
-      case 'DELIVERED':
+      case OrderStatus.DELIVERED:
         order.deliveredAt = new Date()
         break
     }
@@ -247,12 +239,12 @@ export class OrdersService {
   async updatePaymentStatus(
     orderId: string,
     tenantId: string,
-    paymentStatus: string,
-    paymentDetails?: any
+    paymentStatus: PaymentStatus,
+    paymentDetails?: Record<string, unknown>
   ): Promise<MarketplaceOrder> {
     const order = await this.getOrderById(orderId, tenantId)
 
-    order.paymentStatus = paymentStatus as any
+    order.paymentStatus = paymentStatus
 
     if (paymentDetails) {
       if (!order.paymentData) {
@@ -275,16 +267,16 @@ export class OrdersService {
   ): Promise<MarketplaceOrder> {
     const order = await this.getOrderById(orderId, tenantId, customerId)
 
-    if (order.status === 'CANCELLED') {
+    if (order.status === OrderStatus.CANCELLED) {
       throw new BadRequestException('Order is already cancelled')
     }
 
-    if (['SHIPPED', 'DELIVERED'].includes(order.status)) {
+    if ([OrderStatus.SHIPPED, OrderStatus.DELIVERED].includes(order.status)) {
       throw new BadRequestException('Cannot cancel order that has been shipped or delivered')
     }
 
     return await this.updateOrderStatus(orderId, tenantId, {
-      status: 'CANCELLED',
+      status: OrderStatus.CANCELLED,
       notes: reason || 'Order cancelled by customer',
     })
   }
@@ -310,6 +302,3 @@ export class OrdersService {
     return `ORD-${year}${month}${day}-${sequence}`
   }
 }
-
-// Add the missing import
-import { Between } from 'typeorm'

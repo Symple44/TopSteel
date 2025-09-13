@@ -77,8 +77,8 @@ export class ProductsController {
     return await this.productsService.getProducts(tenant.erpTenantConnection, tenant.societeId, {
       search: query.search,
       categories: query.categories?.split(','),
-      limit: parseInt(query.limit, 10) || 50,
-      offset: parseInt(query.offset, 10) || 0,
+      limit: parseInt(query.limit ?? '50', 10) || 50,
+      offset: parseInt(query.offset ?? '0', 10) || 0,
       sortBy: (query.sortBy as 'name' | 'price' | 'date' | 'popularity') || 'name',
       sortOrder: (query.sortOrder as 'ASC' | 'DESC') || 'ASC',
     })
@@ -139,7 +139,7 @@ export class ProductsController {
             articleId: productId,
             customerId: query.customerId,
             customerGroup: query.customerGroup,
-            quantity: parseInt(query.quantity, 10) || 1,
+            quantity: parseInt(query.quantity ?? '1', 10) || 1,
             promotionCode: query.promotionCode,
             channel: PriceRuleChannel.MARKETPLACE,
           }
@@ -205,7 +205,7 @@ export class ProductsController {
       conditions: body.conditions || [],
       adjustmentType: body.adjustmentType,
       adjustmentValue: body.adjustmentValue,
-      priority: body.priority || 0,
+      priority: body.priority ?? 0,
       validFrom: body.validFrom,
       validUntil: body.validUntil,
       usageLimit: body.usageLimit,
@@ -264,13 +264,15 @@ export class ProductsController {
     }
 
     // Mettre à jour la règle
-    await this.priceRuleRepo.update(ruleId, {
+    const updateData = {
       ...body,
+      conditions: body.conditions ? JSON.parse(JSON.stringify(body.conditions)) : undefined,
       metadata: {
         ...existingRule.metadata,
         notes: `Updated via marketplace admin at ${new Date().toISOString()}`,
       },
-    })
+    }
+    await this.priceRuleRepo.update(ruleId, updateData)
 
     // Invalider le cache du produit
     await this.productsService.invalidateProductCache(productId)
@@ -369,7 +371,7 @@ export class ProductsController {
             description: article.description,
             shortDescription: article.description?.substring(0, 150),
             categories:
-              article.marketplaceSettings?.categories || [article.famille].filter(Boolean),
+              article.marketplaceSettings?.categories || (article.famille ? [article.famille] : []),
             tags: article.marketplaceSettings?.tags || [],
             images: (article.marketplaceSettings?.images || []).map((url, index) => ({
               url,

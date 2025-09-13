@@ -119,19 +119,19 @@ export class NewsletterSubscription {
   generateUnsubscribeToken(): string {
     const crypto = require('node:crypto')
     this.unsubscribeToken = crypto.randomBytes(32).toString('hex')
-    return this.unsubscribeToken
+    return this.unsubscribeToken!
   }
 
   generateConfirmationToken(): string {
     const crypto = require('node:crypto')
     this.confirmationToken = crypto.randomBytes(32).toString('hex')
-    return this.confirmationToken
+    return this.confirmationToken!
   }
 
   confirm(): void {
     this.status = SubscriptionStatus.ACTIVE
     this.confirmedAt = new Date()
-    this.confirmationToken = null
+    this.confirmationToken = undefined
   }
 
   unsubscribe(reason?: string): void {

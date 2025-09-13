@@ -199,14 +199,14 @@ export class StorefrontController {
       priceRange:
         query.minPrice || query.maxPrice
           ? {
-              min: parseFloat(query.minPrice) || 0,
-              max: parseFloat(query.maxPrice) || Number.MAX_VALUE,
+              min: parseFloat(query.minPrice ?? '0') || 0,
+              max: parseFloat(query.maxPrice ?? String(Number.MAX_VALUE)) || Number.MAX_VALUE,
             }
           : undefined,
       inStock: query.inStock === 'true',
       featured: query.featured === 'true',
-      limit: Math.min(parseInt(query.limit, 10) || 20, 100),
-      offset: ((parseInt(query.page, 10) || 1) - 1) * (parseInt(query.limit, 10) || 20),
+      limit: Math.min(parseInt(query.limit ?? '20', 10) || 20, 100),
+      offset: ((parseInt(query.page ?? '1', 10) || 1) - 1) * (parseInt(query.limit ?? '20', 10) || 20),
       sortBy: query.sortBy || 'name',
       sortOrder: query.sortOrder || 'ASC',
     }
@@ -239,7 +239,7 @@ export class StorefrontController {
       return await this.productsService.getFeaturedProducts(
         tenant.erpTenantConnection || null,
         tenant.societeId,
-        parseInt(limit, 10) || 8,
+        parseInt(limit ?? '8', 10) || 8,
         customerId
       )
     } catch (_error) {
@@ -320,8 +320,8 @@ export class StorefrontController {
       throw new Error('Connexion ERP non disponible pour ce tenant')
     }
 
-    const limit = Math.min(parseInt(query.limit, 10) || 20, 100)
-    const offset = ((parseInt(query.page, 10) || 1) - 1) * limit
+    const limit = Math.min(parseInt(query.limit ?? '20', 10) || 20, 100)
+    const offset = ((parseInt(query.page ?? '1', 10) || 1) - 1) * limit
 
     return await this.productsService.getProductsByCategory(
       tenant.erpTenantConnection,
@@ -350,8 +350,8 @@ export class StorefrontController {
       return { products: [], total: 0, hasMore: false }
     }
 
-    const limit = Math.min(parseInt(query.limit, 10) || 20, 100)
-    const offset = ((parseInt(query.page, 10) || 1) - 1) * limit
+    const limit = Math.min(parseInt(query.limit ?? '20', 10) || 20, 100)
+    const offset = ((parseInt(query.page ?? '1', 10) || 1) - 1) * limit
 
     return await this.productsService.searchProducts(
       tenant.erpTenantConnection,

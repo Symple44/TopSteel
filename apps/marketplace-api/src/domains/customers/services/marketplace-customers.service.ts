@@ -414,8 +414,8 @@ export class MarketplaceCustomersService {
     }
 
     customer.passwordHash = await bcrypt.hash(newPassword, 12)
-    customer.resetPasswordToken = null
-    customer.resetPasswordExpires = null
+    customer.resetPasswordToken = undefined
+    customer.resetPasswordExpires = undefined
 
     await this.customerRepo.save(customer)
   }
