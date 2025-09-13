@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import * as compression from 'compression'
 import helmet from 'helmet'
+import { rateLimit } from 'express-rate-limit'
 import { AppModule } from './app/app.module'
 
 async function bootstrap() {
@@ -11,30 +12,49 @@ async function bootstrap() {
   const configService = app.get(ConfigService)
 
   // Security
-  app.use(helmet())
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+  }))
   app.use(compression())
 
-  // CORS - En développement, autoriser toutes les origines localhost et 127.0.0.1
-  const isDevelopment = process.env.NODE_ENV !== 'production'
+  // Rate limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+  app.use('/api', limiter)
+
+  // CORS - Configuration sécurisée pour tous les environnements
   const corsOrigins = configService.get('MARKETPLACE_CORS_ORIGINS')?.split(',') ||
-    configService.get('CORS_ORIGINS')?.split(',') || ['http://localhost:3007']
+    configService.get('CORS_ORIGINS')?.split(',') || [
+      'http://localhost:3000',
+      'http://localhost:3007',
+      'http://localhost:3008'
+    ]
 
   app.enableCors({
-    origin: isDevelopment
-      ? (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-          // En dev, autoriser localhost et 127.0.0.1 sur tous les ports
-          if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-            callback(null, true)
-          } else if (corsOrigins.includes(origin)) {
-            callback(null, true)
-          } else {
-            callback(new Error('Not allowed by CORS'))
-          }
-        }
-      : corsOrigins,
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Toujours vérifier l'origine contre la liste blanche
+      if (!origin || corsOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant'],
+    maxAge: 86400, // Cache preflight for 24 hours
   })
 
   // Global validation pipe
