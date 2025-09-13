@@ -64,7 +64,7 @@
   "sideEffects": false,
   "dependencies": {
     "@types/react": "^18.3.12",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.13"
   },
   "peerDependencies": {
     "react": "^18.3.0"
