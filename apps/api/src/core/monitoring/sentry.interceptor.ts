@@ -4,7 +4,7 @@ import {
   Injectable,
   type NestInterceptor,
 } from '@nestjs/common'
-import type { Transaction } from '@sentry/types'
+import type { Span } from '@sentry/types'
 import type { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
 import type { SentryService } from './sentry.service'
@@ -21,14 +21,10 @@ export class SentryInterceptor implements NestInterceptor {
     const transaction = this.sentryService.startTransaction(
       `${request.method} ${request.route?.path || request.url}`,
       'http.server'
-    ) as Transaction | null
+    ) as Span | null
 
     // Add request metadata
-    if (transaction && 'setHttpStatus' in transaction) {
-      transaction.setHttpStatus(response.statusCode)
-      transaction.setTag('http.method', request.method)
-      transaction.setTag('http.url', request.url)
-
+    if (transaction) {
       // Add user context if available
       if (request.user) {
         this.sentryService.setUser({
@@ -58,10 +54,7 @@ export class SentryInterceptor implements NestInterceptor {
         const responseTime = Date.now() - startTime
 
         // Add response metadata
-        if (transaction && 'setHttpStatus' in transaction) {
-          transaction.setHttpStatus(response.statusCode)
-          transaction.setData('response_time', responseTime)
-
+        if (transaction) {
           // Add performance breadcrumb for slow requests
           if (responseTime > 1000) {
             this.sentryService.addBreadcrumb({
@@ -77,15 +70,14 @@ export class SentryInterceptor implements NestInterceptor {
           }
 
           // Finish the transaction
-          this.sentryService.finishTransaction(transaction)
+          this.sentryService.finishTransaction(transaction as any)
         }
       }),
       catchError((error) => {
         // The error will be caught by the exception filter
         // Just finish the transaction here
-        if (transaction && 'setHttpStatus' in transaction) {
-          transaction.setHttpStatus(error.status || 500)
-          this.sentryService.finishTransaction(transaction)
+        if (transaction) {
+          this.sentryService.finishTransaction(transaction as any)
         }
         throw error
       })
