@@ -33,7 +33,7 @@ env:
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
   FORCE_COLOR: '1'
   NPM_CONFIG_COLOR: 'always'
-  WORKFLOW_START_TIME: ${{ github.event.head_commit.timestamp }}
+  WORKFLOW_START_TIME: ${{ github.event.head_commit.timestamp || github.run_started_at }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -68,12 +68,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📥 Install dependencies
         run: |
           echo "📦 Installing dependencies with frozen lockfile..."
-          pnpm config set store-dir ~/.pnpm-store
           pnpm ci:install
           echo "✅ Dependencies installed successfully"
 
@@ -125,7 +123,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.setup.outputs.node-version }}
-          cache: 'pnpm'
 
       - name: ⚡ Restore cache
         uses: actions/cache/restore@v4
@@ -147,7 +144,6 @@ jobs:
         run: |
           if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/turbo" ]; then
             echo "📦 Installing dependencies with optimized settings..."
-            pnpm config set store-dir ~/.pnpm-store
             pnpm install --frozen-lockfile --prefer-offline
           else
             echo "✅ Dependencies already cached"
@@ -213,7 +209,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.setup.outputs.node-version }}
-          cache: 'pnpm'
 
       - name: ⚡ Restore cache
         uses: actions/cache/restore@v4
@@ -297,7 +292,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.setup.outputs.node-version }}
-          cache: 'pnpm'
 
       - name: ⚡ Restore cache
         uses: actions/cache/restore@v4
@@ -380,7 +374,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.setup.outputs.node-version }}
-          cache: 'pnpm'
 
       - name: ⚡ Restore cache
         uses: actions/cache/restore@v4
@@ -444,7 +437,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.setup.outputs.node-version }}
-          cache: 'pnpm'
 
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v4
