@@ -162,7 +162,7 @@ export class MarketplaceProductsService {
       await this.cacheManager.set(cacheKey, result, 300) // 5 minutes
 
       return result
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       // Si les tables n'existent pas ou toute autre erreur, retourner des données de démo
       const demoProducts = this.getDemoFeaturedProducts(filters.limit || 20)
       return {
@@ -254,7 +254,10 @@ export class MarketplaceProductsService {
       )
     } catch (error: unknown) {
       // Si les tables n'existent pas ou toute autre erreur, retourner des données de démo
-      if ((error instanceof Error && error.message?.includes("n'existe pas")) || (error as PostgreSQLError)?.code === '42P01') {
+      if (
+        (error instanceof Error && error.message?.includes("n'existe pas")) ||
+        (error as PostgreSQLError)?.code === '42P01'
+      ) {
       }
       return this.getDemoFeaturedProducts(limit)
     }
@@ -338,7 +341,7 @@ export class MarketplaceProductsService {
         )
       )
       calculatedPrice = priceResponse.data.finalPrice
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       // Fallback sur le prix de base si l'API échoue
       calculatedPrice = article.prixVenteHT || 0
     }
@@ -355,7 +358,8 @@ export class MarketplaceProductsService {
       calculatedPrice,
       stockDisponible: article.stockDisponible,
       inStock: !article.estEnRupture(),
-      categories: article.marketplaceSettings?.categories || (article.famille ? [article.famille] : []),
+      categories:
+        article.marketplaceSettings?.categories || (article.famille ? [article.famille] : []),
       tags: article.marketplaceSettings?.tags || [],
       isActive: marketplaceProduct?.isActive ?? true,
       isFeatured: marketplaceProduct?.isFeatured ?? false,
@@ -436,7 +440,10 @@ export class MarketplaceProductsService {
       return categories
     } catch (error: unknown) {
       // Si les tables ERP n'existent pas, retourner des données de démo
-      if ((error instanceof Error && error.message?.includes("n'existe pas")) || (error as PostgreSQLError)?.code === '42P01') {
+      if (
+        (error instanceof Error && error.message?.includes("n'existe pas")) ||
+        (error as PostgreSQLError)?.code === '42P01'
+      ) {
         return ['Poutrelles', 'Tôles', 'Tubes', 'Barres', 'Cornières', 'Profilés']
       }
       throw error

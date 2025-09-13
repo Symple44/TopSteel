@@ -359,7 +359,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
                 Suggestions
               </div>
-              {suggestions?.map((suggestion, index) => (
+              {suggestions?.map((suggestion, _index) => (
                 <button
                   key={suggestion}
                   type="button"

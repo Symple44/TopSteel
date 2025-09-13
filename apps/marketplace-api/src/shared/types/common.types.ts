@@ -95,7 +95,7 @@ export enum OrderStatus {
   SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',
   CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED'
+  REFUNDED = 'REFUNDED',
 }
 
 export enum PaymentStatus {
@@ -105,7 +105,7 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED',
   REFUNDED = 'REFUNDED',
-  PARTIALLY_REFUNDED = 'PARTIALLY_REFUNDED'
+  PARTIALLY_REFUNDED = 'PARTIALLY_REFUNDED',
 }
 
 export enum ShippingStatus {
@@ -115,7 +115,7 @@ export enum ShippingStatus {
   IN_TRANSIT = 'IN_TRANSIT',
   DELIVERED = 'DELIVERED',
   RETURNED = 'RETURNED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',
 }
 
 export enum ProductStatus {
@@ -123,12 +123,12 @@ export enum ProductStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   OUT_OF_STOCK = 'OUT_OF_STOCK',
-  DISCONTINUED = 'DISCONTINUED'
+  DISCONTINUED = 'DISCONTINUED',
 }
 
 export enum CustomerStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   SUSPENDED = 'SUSPENDED',
-  DELETED = 'DELETED'
+  DELETED = 'DELETED',
 }

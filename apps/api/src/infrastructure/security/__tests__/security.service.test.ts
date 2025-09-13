@@ -20,7 +20,7 @@ vi.mock('crypto', () => ({
 }))
 
 // Import after mock is defined
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
 import { SecurityService } from '../security.service'
 
 const mockCrypto = vi.mocked(crypto)

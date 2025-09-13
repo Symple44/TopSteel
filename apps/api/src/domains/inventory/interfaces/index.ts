@@ -20,12 +20,6 @@ export type {
   IInventoryStats,
   IInventoryStatsParams,
 } from './inventory-stats.interface'
-// Interfaces des mouvements de stock
-export {
-  StockMovementReason,
-  StockMovementStatus,
-  StockMovementType,
-} from './stock-movement.interface'
 export type {
   ICreateStockMovement,
   IStockMovement,
@@ -34,4 +28,10 @@ export type {
   IStockMovementPagination,
   IStockMovementSortOptions,
   IUpdateStockMovement,
+} from './stock-movement.interface'
+// Interfaces des mouvements de stock
+export {
+  StockMovementReason,
+  StockMovementStatus,
+  StockMovementType,
 } from './stock-movement.interface'

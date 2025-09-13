@@ -20,7 +20,6 @@ import type {
   Material,
   MaterialFilters,
   MaterialStatistics,
-  Notification,
   NotificationFilters,
   Partner,
   PartnerAddress,

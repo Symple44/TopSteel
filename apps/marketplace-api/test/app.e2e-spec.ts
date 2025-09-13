@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication } from '@nestjs/common'
+import type { INestApplication } from '@nestjs/common'
+import { Test, type TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
 
 describe('AppController (e2e)', () => {
@@ -22,8 +22,6 @@ describe('AppController (e2e)', () => {
 
   it('/ (GET) - should return 404 for non-existent route', () => {
     // Basic connectivity test - expecting 404 as no routes are defined
-    return request(app.getHttpServer())
-      .get('/health')
-      .expect(404)
+    return request(app.getHttpServer()).get('/health').expect(404)
   })
 })

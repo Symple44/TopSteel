@@ -81,7 +81,7 @@ export class OrdersService {
             productName = article.designation
             unitPrice = item.price || article.prixVenteHT || 0
           }
-        } catch (error: unknown) {
+        } catch (_error: unknown) {
           // Continue with default values if ERP connection fails
         }
       }

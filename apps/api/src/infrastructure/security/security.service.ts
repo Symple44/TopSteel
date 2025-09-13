@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
+import { Injectable } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
 
 export interface SessionInfo {
   createdAt: number
@@ -9,7 +9,6 @@ export interface SessionInfo {
 
 @Injectable()
 export class SecurityService {
-  private readonly logger = new Logger(SecurityService.name)
   private readonly secretKey: string
 
   constructor(private readonly configService: ConfigService) {

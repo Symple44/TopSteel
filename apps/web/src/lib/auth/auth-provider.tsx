@@ -73,7 +73,7 @@ function isValidAuthTokens(tokens: unknown): tokens is AuthTokens {
   )
 }
 
-function isValidExtendedUser(user: unknown): user is ExtendedUser {
+function _isValidExtendedUser(user: unknown): user is ExtendedUser {
   return (
     typeof user === 'object' &&
     user !== null &&
@@ -88,7 +88,7 @@ function isValidExtendedUser(user: unknown): user is ExtendedUser {
   )
 }
 
-function hasRoleProperty(user: unknown): user is { role: string } {
+function _hasRoleProperty(user: unknown): user is { role: string } {
   return (
     typeof user === 'object' &&
     user !== null &&

@@ -465,7 +465,7 @@ export class StorefrontService {
         success: true,
         message: 'Un email de confirmation a été envoyé à votre adresse',
       }
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       return {
         success: false,
         message: "Une erreur est survenue lors de l'inscription",
@@ -499,7 +499,8 @@ export class StorefrontService {
 
       // Send email to company
       const companyEmail =
-        societe.email || (societe.configuration?.marketplace as MarketplaceConfiguration)?.contactEmail
+        societe.email ||
+        (societe.configuration?.marketplace as MarketplaceConfiguration)?.contactEmail
       if (companyEmail) {
         await this.sendContactEmailToCompany({
           companyEmail,
@@ -521,7 +522,7 @@ export class StorefrontService {
         message:
           'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
       }
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       return {
         success: false,
         message: "Une erreur est survenue lors de l'envoi du message",

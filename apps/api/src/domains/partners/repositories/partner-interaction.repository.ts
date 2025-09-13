@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Between, type FindOptionsWhere, In, LessThan, MoreThan, type Repository, type DeepPartial } from 'typeorm'
+import { Between, type FindOptionsWhere, In, LessThan, MoreThan, type Repository } from 'typeorm'
 import {
   type InteractionDirection,
   type InteractionPriority,

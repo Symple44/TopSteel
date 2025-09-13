@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import * as compression from 'compression'
-import helmet from 'helmet'
 import { rateLimit } from 'express-rate-limit'
+import helmet from 'helmet'
 import { AppModule } from './app/app.module'
 
 async function bootstrap() {
@@ -12,16 +12,18 @@ async function bootstrap() {
   const configService = app.get(ConfigService)
 
   // Security
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", 'data:', 'https:'],
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          scriptSrc: ["'self'"],
+          imgSrc: ["'self'", 'data:', 'https:'],
+        },
       },
-    },
-  }))
+    })
+  )
   app.use(compression())
 
   // Rate limiting
@@ -39,11 +41,14 @@ async function bootstrap() {
     configService.get('CORS_ORIGINS')?.split(',') || [
       'http://localhost:3000',
       'http://localhost:3007',
-      'http://localhost:3008'
+      'http://localhost:3008',
     ]
 
   app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void
+    ) => {
       // Toujours vérifier l'origine contre la liste blanche
       if (!origin || corsOrigins.includes(origin)) {
         callback(null, true)

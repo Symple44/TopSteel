@@ -42,7 +42,7 @@ export class PageBuilderService {
     }
     const template = this.pageTemplateRepository.create(templateData)
 
-    const savedTemplate = await this.pageTemplateRepository.save(template) as PageTemplate
+    const savedTemplate = (await this.pageTemplateRepository.save(template)) as PageTemplate
 
     // Créer les sections si fournies
     if (createDto.sections && createDto.sections.length > 0) {

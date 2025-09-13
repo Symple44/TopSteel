@@ -206,7 +206,8 @@ export class StorefrontController {
       inStock: query.inStock === 'true',
       featured: query.featured === 'true',
       limit: Math.min(parseInt(query.limit ?? '20', 10) || 20, 100),
-      offset: ((parseInt(query.page ?? '1', 10) || 1) - 1) * (parseInt(query.limit ?? '20', 10) || 20),
+      offset:
+        ((parseInt(query.page ?? '1', 10) || 1) - 1) * (parseInt(query.limit ?? '20', 10) || 20),
       sortBy: query.sortBy || 'name',
       sortOrder: query.sortOrder || 'ASC',
     }

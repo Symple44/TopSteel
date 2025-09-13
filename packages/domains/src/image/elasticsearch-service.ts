@@ -134,8 +134,7 @@ export class ImageElasticsearchService {
       })
 
       return response.ok
-    } catch (error) {
-      console.error("Erreur lors de l'indexation de l'image:", error)
+    } catch (_error) {
       return false
     }
   }
@@ -160,8 +159,7 @@ export class ImageElasticsearchService {
       })
 
       return response.ok
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour de l'image:", error)
+    } catch (_error) {
       return false
     }
   }
@@ -183,8 +181,7 @@ export class ImageElasticsearchService {
       })
 
       return response.ok
-    } catch (error) {
-      console.error("Erreur lors de la suppression de l'image:", error)
+    } catch (_error) {
       return false
     }
   }
@@ -232,8 +229,7 @@ export class ImageElasticsearchService {
 
       const result = await response.json()
       return result.hits?.hits?.map((hit: { _source: ImageMetadata }) => hit._source) || []
-    } catch (error) {
-      console.error("Erreur lors de la recherche d'images:", error)
+    } catch (_error) {
       return []
     }
   }
@@ -271,8 +267,7 @@ export class ImageElasticsearchService {
       const result = await response.json()
       const suggestions = result.suggest?.image_suggest?.[0]?.options || []
       return suggestions.map((option: { text: string }) => option.text)
-    } catch (error) {
-      console.error('Erreur lors de la récupération des suggestions:', error)
+    } catch (_error) {
       return []
     }
   }
@@ -296,8 +291,7 @@ export class ImageElasticsearchService {
       })
 
       return response.ok
-    } catch (error) {
-      console.error("Erreur lors de l'indexation en masse:", error)
+    } catch (_error) {
       return false
     }
   }

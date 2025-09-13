@@ -9,9 +9,7 @@
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1"
   },
-  "collectCoverageFrom": [
-    "src/**/*.(t|j)s"
-  ],
+  "collectCoverageFrom": ["src/**/*.(t|j)s"],
   "coverageDirectory": "../coverage-e2e",
   "testTimeout": 30000
 }

@@ -44,7 +44,7 @@ export class TenantResolver {
         }
       } else {
       }
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       // Ignore errors when loading real société
     }
 
@@ -245,7 +245,7 @@ export class TenantResolver {
       }
 
       return tenantContext
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       return {
         societeId: demoSociete.id,
         societe: demoSociete,

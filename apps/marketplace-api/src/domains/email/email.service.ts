@@ -195,7 +195,7 @@ export class EmailService {
         text: options.text,
         attachments: options.attachments,
       })
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       throw new Error('Failed to send email')
     }
   }
@@ -221,7 +221,7 @@ export class EmailService {
       })
 
       await this.emailLogRepo.save(log)
-    } catch (error: unknown) {}
+    } catch (_error: unknown) {}
   }
 
   /**
@@ -402,7 +402,9 @@ export class EmailService {
   /**
    * Template pour la confirmation de commande
    */
-  private getOrderConfirmationTemplate(orderData: Pick<OrderData, 'orderId' | 'orderNumber' | 'totalAmount' | 'currency' | 'items'>): string {
+  private getOrderConfirmationTemplate(
+    orderData: Pick<OrderData, 'orderId' | 'orderNumber' | 'totalAmount' | 'currency' | 'items'>
+  ): string {
     const itemsHtml = orderData.items
       .map(
         (item: OrderItem) => `

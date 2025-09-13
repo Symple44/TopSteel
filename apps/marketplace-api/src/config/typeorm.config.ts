@@ -11,9 +11,7 @@ export const AppDataSource = new DataSource({
   type: 'postgres',
   host: configService.get('MARKETPLACE_DB_HOST') || configService.get('DB_HOST') || 'localhost',
   port: parseInt(
-    configService.get('MARKETPLACE_DB_PORT') ||
-    configService.get('DB_PORT') ||
-    '5432',
+    configService.get('MARKETPLACE_DB_PORT') || configService.get('DB_PORT') || '5432',
     10
   ),
   username:

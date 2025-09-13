@@ -88,7 +88,6 @@ class PerformanceTracker {
     const reportPath = path.join(process.cwd(), 'performance-report.json')
 
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2))
-    console.log('Performance report saved to:', reportPath)
     return report
   }
 
@@ -135,23 +134,22 @@ const tracker = new PerformanceTracker()
 const command = process.argv[2]
 
 switch (command) {
-  case 'report':
-    const report = tracker.saveReport()
-    console.log(JSON.stringify(report, null, 2))
+  case 'report': {
+    const _report = tracker.saveReport()
     break
+  }
 
   case 'markdown':
-    console.log(tracker.generateMarkdownSummary())
     break
 
-  case 'summary':
+  case 'summary': {
     tracker.saveReport() // Save the JSON report
     const summary = tracker.generateMarkdownSummary()
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY || '/dev/stdout', summary)
     break
+  }
 
   default:
-    console.log('Usage: node performance-tracker.js [report|markdown|summary]')
     process.exit(1)
 }
 

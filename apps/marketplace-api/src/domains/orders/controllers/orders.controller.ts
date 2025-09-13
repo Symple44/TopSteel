@@ -14,7 +14,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import type { Request } from 'express'
 import type { DataSource } from 'typeorm'
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import { PaymentStatus } from '../entities/marketplace-order.entity'
+import type { PaymentStatus } from '../entities/marketplace-order.entity'
 import type {
   CreateOrderDto,
   OrdersService,

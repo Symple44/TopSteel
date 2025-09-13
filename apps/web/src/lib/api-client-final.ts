@@ -15,7 +15,6 @@ interface HTTPRequestConfig extends RequestConfig {
 // Import proper types from @erp/types instead of redefining them
 import type {
   Article,
-  ArticleFilters,
   Contact,
   CreateArticleDto,
   CreateContactDto,
@@ -25,7 +24,6 @@ import type {
   CreatePartnerGroupDto,
   CreatePartnerSiteDto,
   Material,
-  MaterialFilters,
   Partner,
   PartnerAddress,
   PartnerGroup,
@@ -67,7 +65,7 @@ interface ExportParams {
 }
 
 // File upload response
-interface UploadResponse {
+export interface UploadResponse {
   id: string
   filename: string
   mimetype: string
@@ -529,7 +527,7 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
   public readonly projects: ProjectsAPI
   public readonly notifications: NotificationsAPI
 
-  constructor(baseURL: string, options?: { timeout?: number }) {
+  constructor(baseURL: string, _options?: { timeout?: number }) {
     super(baseURL)
 
     this.partners = new PartnersAPIImpl(this)
@@ -568,31 +566,31 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
           .filter(([_, value]) => value !== undefined && value !== null)
           .map(([key, value]) => [key, String(value)])
       ).toString()
-      finalEndpoint = `${endpoint}${queryString ? '?' + queryString : ''}`
+      finalEndpoint = `${endpoint}${queryString ? `?${queryString}` : ''}`
     }
 
     // Remove params from config to avoid conflicts
-    const { params, ...restConfig } = config
+    const { params: _params, ...restConfig } = config
     return super.get<T>(finalEndpoint, restConfig)
   }
 
   async post<T>(endpoint: string, data?: unknown, config: HTTPRequestConfig = {}): Promise<T> {
-    const { params, ...restConfig } = config
+    const { params: _params, ...restConfig } = config
     return super.post<T>(endpoint, data, restConfig)
   }
 
   async put<T>(endpoint: string, data?: unknown, config: HTTPRequestConfig = {}): Promise<T> {
-    const { params, ...restConfig } = config
+    const { params: _params, ...restConfig } = config
     return super.put<T>(endpoint, data, restConfig)
   }
 
   async patch<T>(endpoint: string, data?: unknown, config: HTTPRequestConfig = {}): Promise<T> {
-    const { params, ...restConfig } = config
+    const { params: _params, ...restConfig } = config
     return super.patch<T>(endpoint, data, restConfig)
   }
 
   async delete<T>(endpoint: string, config: HTTPRequestConfig = {}): Promise<T> {
-    const { params, ...restConfig } = config
+    const { params: _params, ...restConfig } = config
     return super.delete<T>(endpoint, restConfig)
   }
 
@@ -615,33 +613,7 @@ export class APIClientFinal extends APIClientEnhanced implements IAPIClientFinal
 
       // Store in sessionStorage by default
       sessionStorage?.setItem('topsteel_auth_tokens', JSON.stringify(authData))
-    } catch (error) {
-      console.error('Failed to store auth token:', error)
-    }
-  }
-
-  private getAuthTokenOverride(): string | null {
-    // Custom token retrieval logic for APIClientFinal
-    if (typeof window === 'undefined') return null
-
-    try {
-      // Chercher d'abord dans localStorage (remember me)
-      let authData = localStorage?.getItem('topsteel_auth_tokens')
-
-      // Si pas dans localStorage, chercher dans sessionStorage
-      if (!authData) {
-        authData = sessionStorage?.getItem('topsteel_auth_tokens')
-      }
-
-      if (!authData) return null
-
-      const sessionData = JSON.parse(authData)
-      const accessToken = sessionData?.tokens?.accessToken
-
-      return accessToken || null
-    } catch {
-      return null
-    }
+    } catch (_error) {}
   }
 }
 

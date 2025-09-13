@@ -15,7 +15,7 @@ export class SentryInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest()
-    const response = context.switchToHttp().getResponse()
+    const _response = context.switchToHttp().getResponse()
 
     // Start a transaction for this request
     const transaction = this.sentryService.startTransaction(

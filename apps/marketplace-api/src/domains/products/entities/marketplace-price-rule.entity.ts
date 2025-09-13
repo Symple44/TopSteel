@@ -110,7 +110,10 @@ export class MarketplacePriceRule {
     return this.conditions.every((condition) => this.evaluateCondition(condition, context))
   }
 
-  private evaluateCondition(condition: PricingCondition, context: Record<string, unknown>): boolean {
+  private evaluateCondition(
+    condition: PricingCondition,
+    context: Record<string, unknown>
+  ): boolean {
     if (!context || typeof context !== 'object') return false
 
     const contextValue = condition.field ? context[condition.field] : context[condition.type]
@@ -124,17 +127,25 @@ export class MarketplacePriceRule {
 
       case 'between':
         if (!Array.isArray(condition.value) || condition.value.length < 2) return false
-        return typeof contextValue === 'number' &&
-               contextValue >= (condition.value[0] as number) &&
-               contextValue <= (condition.value[1] as number)
+        return (
+          typeof contextValue === 'number' &&
+          contextValue >= (condition.value[0] as number) &&
+          contextValue <= (condition.value[1] as number)
+        )
 
       case 'greater_than':
-        return typeof contextValue === 'number' && typeof condition.value === 'number' &&
-               contextValue > condition.value
+        return (
+          typeof contextValue === 'number' &&
+          typeof condition.value === 'number' &&
+          contextValue > condition.value
+        )
 
       case 'less_than':
-        return typeof contextValue === 'number' && typeof condition.value === 'number' &&
-               contextValue < condition.value
+        return (
+          typeof contextValue === 'number' &&
+          typeof condition.value === 'number' &&
+          contextValue < condition.value
+        )
 
       case 'contains':
         return String(contextValue).toLowerCase().includes(String(condition.value).toLowerCase())
