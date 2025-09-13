@@ -70,14 +70,14 @@ export class SentryInterceptor implements NestInterceptor {
           }
 
           // Finish the transaction
-          this.sentryService.finishTransaction(transaction as any)
+          this.sentryService.finishTransaction(transaction)
         }
       }),
       catchError((error) => {
         // The error will be caught by the exception filter
         // Just finish the transaction here
         if (transaction) {
-          this.sentryService.finishTransaction(transaction as any)
+          this.sentryService.finishTransaction(transaction)
         }
         throw error
       })

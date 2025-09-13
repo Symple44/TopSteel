@@ -49,8 +49,8 @@ jobs:
     
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
-      node-version: ${{ env.NODE_VERSION }}
-      pnpm-version: ${{ env.PNPM_VERSION }}
+      node-version: '22.14.0'
+      pnpm-version: '10.13.1'
       matrix-apps: ${{ steps.matrix.outputs.apps }}
       
     steps:
