@@ -7,6 +7,39 @@ import { PageBuilderEditor } from '@/components/page-builder'
 import type { BaseSection } from '@/components/page-builder/sections'
 import { marketplaceApi } from '@/lib/api/client'
 
+interface PageTemplate {
+  id: string
+  name: string
+  slug: string
+  pageType: string
+  status: string
+  description?: string
+  sections?: BaseSection[]
+  metadata?: {
+    title?: string
+    description?: string
+    keywords?: string[]
+    ogImage?: string
+    canonical?: string
+  }
+  settings?: {
+    layout?: 'full-width' | 'boxed' | 'sidebar-left' | 'sidebar-right'
+    showHeader?: boolean
+    showFooter?: boolean
+    showBreadcrumbs?: boolean
+    customClass?: string
+    backgroundColor?: string
+    backgroundImage?: string
+  }
+  version: number
+  createdAt: string
+  updatedAt: string
+  publishedAt?: string
+  scheduledAt?: string
+  createdBy?: string
+  updatedBy?: string
+}
+
 interface PageProps {
   params: Promise<{ id: string }>
 }
@@ -16,23 +49,23 @@ export default function PageEditorPage({ params }: PageProps) {
   const queryClient = useQueryClient()
   const { id } = React.use(params)
 
-  const { data: template, isLoading } = useQuery({
+  const { data: template, isLoading } = useQuery<PageTemplate | null>({
     queryKey: ['pageTemplate', id],
     queryFn: async () => {
       if (id === 'new') return null
       const response = await marketplaceApi.get(`/page-builder/templates/${id}`)
-      return (response as { data: unknown }).data
+      return (response as { data: PageTemplate }).data
     },
   })
 
-  const saveMutation = useMutation({
+  const saveMutation = useMutation<PageTemplate, Error, BaseSection[]>({
     mutationFn: async (sections: BaseSection[]) => {
       const templateData = {
-        name: (template as any)?.name || 'Nouvelle page',
-        slug: (template as any)?.slug || 'nouvelle-page',
-        pageType: (template as any)?.pageType || 'custom',
-        status: (template as any)?.status || 'draft',
-        description: (template as any)?.description || '',
+        name: template?.name || 'Nouvelle page',
+        slug: template?.slug || 'nouvelle-page',
+        pageType: template?.pageType || 'custom',
+        status: template?.status || 'draft',
+        description: template?.description || '',
         sections: sections.map((section) => ({
           type: section.type,
           name: section.name,
@@ -45,13 +78,13 @@ export default function PageEditorPage({ params }: PageProps) {
 
       if (id === 'new') {
         const response = await marketplaceApi.post('/page-builder/templates', templateData)
-        return (response as { data: unknown }).data
+        return (response as { data: PageTemplate }).data
       } else {
         const response = await marketplaceApi.put(`/page-builder/templates/${id}`, templateData)
-        return (response as { data: unknown }).data
+        return (response as { data: PageTemplate }).data
       }
     },
-    onSuccess: (savedTemplate: any) => {
+    onSuccess: (savedTemplate: PageTemplate) => {
       queryClient.invalidateQueries({ queryKey: ['pageTemplates'] })
       queryClient.invalidateQueries({ queryKey: ['pageTemplate', id] })
 
@@ -75,7 +108,7 @@ export default function PageEditorPage({ params }: PageProps) {
 
   return (
     <PageBuilderEditor
-      initialSections={(template as any)?.sections || []}
+      initialSections={template?.sections || []}
       onSave={handleSave}
       templateId={id === 'new' ? undefined : id}
     />

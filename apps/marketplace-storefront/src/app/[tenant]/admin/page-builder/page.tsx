@@ -6,6 +6,18 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { marketplaceApi } from '@/lib/api/client'
 
+interface PageTemplate {
+  id: string
+  name: string
+  slug: string
+  pageType: string
+  status: string
+  description?: string
+  sections?: unknown[]
+  version: string
+  updatedAt: string
+}
+
 export default function PageBuilderListPage() {
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -13,20 +25,19 @@ export default function PageBuilderListPage() {
     data: templates,
     isLoading,
     refetch,
-  } = useQuery({
+  } = useQuery<PageTemplate[]>({
     queryKey: ['pageTemplates'],
     queryFn: async () => {
       const response = await marketplaceApi.get('/page-builder/templates')
-      return (response as { data: unknown }).data
+      return (response as { data: PageTemplate[] }).data
     },
   })
 
   const filteredTemplates =
-    (templates as any)?.filter((template: unknown) => {
-      const t = template as { name: string; slug: string }
+    templates?.filter((template: PageTemplate) => {
       return (
-        t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.slug.toLowerCase().includes(searchTerm.toLowerCase())
+        template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        template.slug.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }) || []
 
@@ -39,14 +50,13 @@ export default function PageBuilderListPage() {
     }
   }
 
-  const handleDuplicate = async (template: unknown) => {
-    const t = template as { name: string; slug: string; id: string }
-    const newName = prompt('Nom du nouveau template:', `${t.name} (copie)`)
-    const newSlug = prompt('Slug du nouveau template:', `${t.slug}-copy`)
+  const handleDuplicate = async (template: PageTemplate) => {
+    const newName = prompt('Nom du nouveau template:', `${template.name} (copie)`)
+    const newSlug = prompt('Slug du nouveau template:', `${template.slug}-copy`)
 
     if (newName && newSlug) {
       try {
-        await marketplaceApi.post(`/page-builder/templates/${t.id}/duplicate`, {
+        await marketplaceApi.post(`/page-builder/templates/${template.id}/duplicate`, {
           name: newName,
           slug: newSlug,
         })
@@ -124,59 +134,48 @@ export default function PageBuilderListPage() {
         </div>
       ) : (
         <div className="grid gap-4">
-          {filteredTemplates.map((template: unknown) => {
-            const t = template as {
-              id: string
-              name: string
-              slug: string
-              status: string
-              description?: string
-              pageType: string
-              sections?: unknown[]
-              version: string
-              updatedAt: string
-            }
+          {filteredTemplates.map((template: PageTemplate) => {
             return (
               <div
-                key={t.id}
+                key={template.id}
                 className="bg-white border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-semibold">{t.name}</h3>
+                      <h3 className="text-xl font-semibold">{template.name}</h3>
                       <span
                         className={`px-2 py-1 text-xs rounded-full ${
-                          t.status === 'published'
+                          template.status === 'published'
                             ? 'bg-green-100 text-green-800'
-                            : t.status === 'draft'
+                            : template.status === 'draft'
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-gray-100 text-gray-800'
                         }`}
                       >
-                        {t.status === 'published'
+                        {template.status === 'published'
                           ? 'Publié'
-                          : t.status === 'draft'
+                          : template.status === 'draft'
                             ? 'Brouillon'
-                            : t.status}
+                            : template.status}
                       </span>
                     </div>
 
-                    <p className="text-gray-600 mb-2">Slug: /{t.slug}</p>
+                    <p className="text-gray-600 mb-2">Slug: /{template.slug}</p>
 
-                    {t.description && <p className="text-gray-600 mb-2">{t.description}</p>}
+                    {template.description && <p className="text-gray-600 mb-2">{template.description}</p>}
 
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>Type: {t.pageType}</span>
-                      <span>Sections: {t.sections?.length || 0}</span>
-                      <span>Version: {t.version}</span>
-                      <span>Modifié: {new Date(t.updatedAt).toLocaleDateString()}</span>
+                      <span>Type: {template.pageType}</span>
+                      <span>Sections: {template.sections?.length || 0}</span>
+                      <span>Version: {template.version}</span>
+                      <span>Modifié: {new Date(template.updatedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/${t.slug}`}
+                      href={`/${template.slug}`}
                       target="_blank"
                       className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"
                       title="Prévisualiser"
@@ -185,7 +184,7 @@ export default function PageBuilderListPage() {
                     </Link>
 
                     <Link
-                      href={`/admin/page-builder/${t.id}`}
+                      href={`/admin/page-builder/${template.id}`}
                       className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded"
                       title="Éditer"
                     >
@@ -201,10 +200,10 @@ export default function PageBuilderListPage() {
                       <Copy className="w-4 h-4" />
                     </button>
 
-                    {t.status === 'draft' && (
+                    {template.status === 'draft' && (
                       <button
                         type="button"
-                        onClick={() => handlePublish(t.id)}
+                        onClick={() => handlePublish(template.id)}
                         className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
                       >
                         Publier
@@ -213,7 +212,7 @@ export default function PageBuilderListPage() {
 
                     <button
                       type="button"
-                      onClick={() => handleDelete(t.id)}
+                      onClick={() => handleDelete(template.id)}
                       className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"
                       title="Supprimer"
                     >

@@ -508,9 +508,7 @@ export class ProductsController {
           seoDescription: settings.seoDescription,
           categories: settings.categories,
           tags: settings.tags,
-          isVisible: settings.isVisible,
-          isFeatured: settings.isFeatured,
-        } as any,
+        },
       })
     }
 
