@@ -126,7 +126,14 @@ async function analyzeMenuStructure() {
       ORDER BY route
     `)
 
-    const routesByCategory = new Map<string, any[]>()
+    interface RouteItem {
+      title: string
+      programId: string
+      route: string
+      type: string
+    }
+
+    const routesByCategory = new Map<string, RouteItem[]>()
 
     for (const item of allRoutes) {
       const category = item.route.split('/')[1] || 'root'

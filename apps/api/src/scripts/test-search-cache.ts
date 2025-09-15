@@ -24,7 +24,7 @@ interface TestResult {
   testName: string
   success: boolean
   duration: number
-  details?: any
+  details?: unknown
   error?: string
 }
 

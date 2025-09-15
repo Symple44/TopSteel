@@ -120,29 +120,30 @@ export default function CartClient({ tenant }: CartClientProps) {
   )
 }
 
+interface CartItem {
+  product: {
+    id: string
+    designation: string
+    reference: string
+    categories: string[]
+    images: Array<{ url: string; isMain?: boolean }>
+    stockDisponible?: number
+  }
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
+
 interface CartItemCardProps {
-  item: unknown
+  item: CartItem
   tenant: string
   onUpdateQuantity: (quantity: number) => void
   onRemove: () => void
 }
 
 function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCardProps) {
-  const cartItem = item as {
-    product: {
-      id: string
-      designation: string
-      reference: string
-      categories: string[]
-      images: Array<{ url: string; isMain?: boolean }>
-      stockDisponible?: number
-    }
-    quantity: number
-    unitPrice: number
-    totalPrice: number
-  }
-  const { product, quantity, unitPrice, totalPrice } = cartItem
-  const mainImage = product.images.find((img: any) => img.isMain) || product.images[0]
+  const { product, quantity, unitPrice, totalPrice } = item
+  const mainImage = product.images.find((img) => img.isMain) || product.images[0]
 
   return (
     <div className="flex gap-6 p-6 border rounded-lg bg-background">

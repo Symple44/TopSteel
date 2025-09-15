@@ -11,10 +11,27 @@ import * as jwt from 'jsonwebtoken'
 import { TestAuthHelper } from './utils/test-auth-helper'
 import { TestDataGenerator } from './utils/test-data-generator'
 
+interface MockUser {
+  id: string
+  email: string
+  nom: string
+  prenom: string
+  role: string
+  actif: boolean
+}
+
+interface MockSociete {
+  id: string
+  nom: string
+  code: string
+  role: string
+  permissions: string[]
+}
+
 // Simuler l'API d'authentification
 class MockAuthAPI {
-  private users = new Map<string, any>()
-  private userSocietes = new Map<string, any[]>()
+  private users = new Map<string, MockUser>()
+  private userSocietes = new Map<string, MockSociete[]>()
 
   constructor() {
     // Initialiser avec des données de test

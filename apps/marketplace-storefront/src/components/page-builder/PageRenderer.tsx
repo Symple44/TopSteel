@@ -4,6 +4,11 @@ import { useQuery } from '@tanstack/react-query'
 import { marketplaceApi } from '@/lib/api/client'
 import { type BaseSection, SectionRenderer } from './sections'
 
+interface PageTemplate {
+  sections?: BaseSection[]
+  [key: string]: unknown
+}
+
 interface PageRendererProps {
   templateId?: string
   slug?: string
@@ -43,7 +48,7 @@ export function PageRenderer({
     )
   }
 
-  const sections = providedSections || (template as any)?.sections || []
+  const sections = providedSections || (template as PageTemplate)?.sections || []
   const visibleSections = sections
     .filter((section: BaseSection) => section.isVisible)
     .sort((a: BaseSection, b: BaseSection) => a.order - b.order)

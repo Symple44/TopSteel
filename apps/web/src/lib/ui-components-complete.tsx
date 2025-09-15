@@ -33,9 +33,6 @@ export {
   type ColumnConfig,
   // Utility
   cn,
-  // Data Display - DataTable
-  // @ts-expect-error - Temporary TypeScript fix
-  DataTable,
   // Dialog Components
   Dialog,
   DialogContent,

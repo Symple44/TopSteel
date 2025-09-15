@@ -350,44 +350,53 @@ export const useDashboardData = () =>
     }
   }, 'dashboard-data')
 
+// Interface pour les statistiques des projets
+interface ProjectStats {
+  total: number
+  parStatut: Record<string, number>
+  parPriorite: Record<string, number>
+  montantTotal: number
+  avancementMoyen: number
+}
+
 /**
  * Sélecteur pour les statistiques des projets
  */
 export const useProjectsStats = () =>
   selectors?.useMemoized(
-    (state: AppState) => {
+    (state: AppState): ProjectStats => {
       const projets = state.projets || []
 
-      const stats = {
+      const stats: ProjectStats = {
         total: projets.length,
-        parStatut: {} as Record<string, number>,
-        parPriorite: {} as Record<string, number>,
+        parStatut: {},
+        parPriorite: {},
         montantTotal: 0,
         avancementMoyen: 0,
       }
 
       for (const projet of projets) {
         // Compter par statut
-        // @ts-expect-error - Temporary TypeScript fix
-        stats?.parStatut[projet.statut] = (stats?.parStatut[projet.statut] || 0) + 1
+        const currentStatutCount = stats.parStatut[projet.statut] || 0
+        stats.parStatut[projet.statut] = currentStatutCount + 1
 
         // Compter par priorité
-        // @ts-expect-error - Temporary TypeScript fix
-        stats?.parPriorite[projet.priorite] = (stats?.parPriorite[projet.priorite] || 0) + 1
+        const currentPrioriteCount = stats.parPriorite[projet.priorite] || 0
+        stats.parPriorite[projet.priorite] = currentPrioriteCount + 1
 
         // Calculer montant total
-        if (projet.montantTTC && stats) {
+        if (projet.montantTTC) {
           stats.montantTotal += projet.montantTTC
         }
 
         // Calculer avancement moyen
-        if (projet.avancement !== undefined && stats) {
+        if (projet.avancement !== undefined) {
           stats.avancementMoyen += projet.avancement
         }
       }
 
       // Finaliser l'avancement moyen
-      if (projets?.length > 0 && stats) {
+      if (projets.length > 0) {
         stats.avancementMoyen = stats.avancementMoyen / projets.length
       }
 

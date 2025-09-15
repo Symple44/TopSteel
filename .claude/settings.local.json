@@ -56,7 +56,9 @@
       "Bash(gh api:*)",
       "Bash(xargs gh api:*)",
       "Bash(docker build:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": [],

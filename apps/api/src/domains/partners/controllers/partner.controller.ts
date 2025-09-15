@@ -20,6 +20,7 @@ import type {
   BusinessContext,
   BusinessOperation,
 } from '../../core/interfaces/business-service.interface'
+import type { PartnerInteraction } from '../entities/partner-interaction.entity'
 import type {
   CreateContactDto,
   CreatePartnerAddressDto,
@@ -758,7 +759,7 @@ export class PartnerController {
     @Param('partnerId') partnerId: string,
     @Body() createDto: Record<string, unknown>,
     @CurrentUser() user: ExtendedUser
-  ): Promise<Record<string, unknown>> {
+  ): Promise<PartnerInteraction> {
     const context = this.getContext(user)
     return await this.partnerService.createInteraction(partnerId, createDto, context)
   }
@@ -779,7 +780,7 @@ export class PartnerController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string
   ): Promise<{
-    items: Record<string, unknown>[]
+    items: PartnerInteraction[]
     total: number
     hasMore: boolean
   }> {
@@ -805,7 +806,7 @@ export class PartnerController {
     @Param('interactionId') interactionId: string,
     @Body() updateDto: Record<string, unknown>,
     @CurrentUser() user: ExtendedUser
-  ): Promise<Record<string, unknown>> {
+  ): Promise<PartnerInteraction> {
     const context = this.getContext(user)
     return await this.partnerService.updateInteraction(interactionId, updateDto, context)
   }
@@ -837,7 +838,7 @@ export class PartnerController {
     description: 'Recherche avancée dans les interactions partenaires',
   })
   async searchInteractions(@Body() searchCriteria: Record<string, unknown>): Promise<{
-    items: Record<string, unknown>[]
+    items: PartnerInteraction[]
     total: number
     aggregations: Record<string, unknown>
   }> {

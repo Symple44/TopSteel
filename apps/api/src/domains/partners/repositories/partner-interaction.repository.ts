@@ -181,8 +181,13 @@ export class PartnerInteractionRepository {
   }
 
   async update(id: string, data: Partial<PartnerInteraction>): Promise<PartnerInteraction> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.repository.update(id, data as any)
+    // Use save method instead of update to avoid TypeORM type issues
+    const existing = await this.findById(id)
+    if (!existing) {
+      throw new Error(`Interaction ${id} not found`)
+    }
+    const merged = this.repository.merge(existing, data)
+    await this.repository.save(merged)
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Interaction ${id} not found`)

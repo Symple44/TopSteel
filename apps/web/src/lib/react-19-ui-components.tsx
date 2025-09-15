@@ -7,6 +7,18 @@ import * as UIComponents from '@erp/ui'
 import type { ReactNode } from 'react'
 import * as React from 'react'
 import { forwardRef } from 'react'
+import type {
+  BadgeProps as UIBadgeProps,
+  ButtonProps as UIButtonProps,
+  CardProps as UICardProps,
+  CardHeaderProps as UICardHeaderProps,
+  CardTitleProps as UICardTitleProps,
+  CardDescriptionProps as UICardDescriptionProps,
+  CardContentProps as UICardContentProps,
+  CardFooterProps as UICardFooterProps,
+  InputProps as UIInputProps,
+  TextareaProps as UITextareaProps,
+} from '@erp/ui'
 
 // Base component props that include children
 interface BaseComponentProps {
@@ -21,7 +33,9 @@ export interface BadgeProps extends BaseComponentProps {
 
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
   ({ children, variant = 'default', className, ...props }, ref) => {
-    const Component = UIComponents.Badge as React.ComponentType<any>
+    const Component = UIComponents.Badge as React.ForwardRefExoticComponent<
+      UIBadgeProps & React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, variant, className, ...props }, children)
   }
 )
@@ -55,7 +69,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
     className,
     ...rest
   } = props || {}
-  const Component = UIComponents.Button as React.ComponentType<any>
+  const Component = UIComponents.Button as React.ForwardRefExoticComponent<
+    UIButtonProps & React.RefAttributes<HTMLButtonElement>
+  >
   return React.createElement(
     Component,
     {
@@ -86,14 +102,18 @@ export interface CardDescriptionProps extends BaseComponentProps {}
 export interface CardFooterProps extends BaseComponentProps {}
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(({ children, ...props }, ref) => {
-  const Component = UIComponents.Card as React.ComponentType<any>
+  const Component = UIComponents.Card as React.ForwardRefExoticComponent<
+    UICardProps & React.RefAttributes<HTMLDivElement>
+  >
   return React.createElement(Component, { ref, ...props }, children)
 })
 Card.displayName = 'Card'
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.CardContent as React.ComponentType<any>
+    const Component = UIComponents.CardContent as React.ForwardRefExoticComponent<
+      UICardContentProps & React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -101,7 +121,9 @@ CardContent.displayName = 'CardContent'
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.CardHeader as React.ComponentType<any>
+    const Component = UIComponents.CardHeader as React.ForwardRefExoticComponent<
+      UICardHeaderProps & React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -109,7 +131,9 @@ CardHeader.displayName = 'CardHeader'
 
 export const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.CardTitle as React.ComponentType<any>
+    const Component = UIComponents.CardTitle as React.ForwardRefExoticComponent<
+      UICardTitleProps & React.RefAttributes<HTMLHeadingElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -128,15 +152,20 @@ export interface SelectItemProps extends BaseComponentProps {
   value: string
 }
 
-export const Select = ({ children, ...props }: SelectProps) => {
-  const Component = UIComponents.Select as React.ComponentType<any>
+export const Select: React.FC<SelectProps> = ({ children, ...props }) => {
+  const Component = UIComponents.Select as React.FC<
+    React.ComponentPropsWithoutRef<typeof UIComponents.Select>
+  >
   return React.createElement(Component, props, children)
 }
 Select.displayName = 'Select'
 
 export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.SelectTrigger as React.ComponentType<any>
+    const Component = UIComponents.SelectTrigger as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.SelectTrigger> &
+        React.RefAttributes<HTMLButtonElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -144,7 +173,10 @@ SelectTrigger.displayName = 'SelectTrigger'
 
 export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.SelectContent as React.ComponentType<any>
+    const Component = UIComponents.SelectContent as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.SelectContent> &
+        React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -152,14 +184,19 @@ SelectContent.displayName = 'SelectContent'
 
 export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
   ({ children, value, ...props }, ref) => {
-    const Component = UIComponents.SelectItem as React.ComponentType<any>
+    const Component = UIComponents.SelectItem as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.SelectItem> &
+        React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, value, ...props }, children)
   }
 )
 SelectItem.displayName = 'SelectItem'
 
 export const SelectValue = ({ ...props }) => {
-  const Component = UIComponents.SelectValue as React.ComponentType<any>
+  const Component = UIComponents.SelectValue as React.FC<
+    React.ComponentPropsWithoutRef<typeof UIComponents.SelectValue>
+  >
   return React.createElement(Component, props)
 }
 SelectValue.displayName = 'SelectValue'
@@ -181,7 +218,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   className,
   ...props
 }) => {
-  const Component = UIComponents.PageHeader as React.ComponentType<any>
+  const Component = UIComponents.PageHeader as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof UIComponents.PageHeader> &
+      React.RefAttributes<HTMLDivElement>
+  >
   return React.createElement(Component, {
     title,
     description,
@@ -198,7 +238,10 @@ export interface LabelProps extends BaseComponentProps {
 }
 
 export const Label: React.FC<LabelProps> = ({ children, htmlFor, className, ...props }) => {
-  const Component = UIComponents.Label as React.ComponentType<any>
+  const Component = UIComponents.Label as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof UIComponents.Label> &
+      React.RefAttributes<HTMLLabelElement>
+  >
   return React.createElement(Component, { htmlFor, className, ...props }, children)
 }
 
@@ -215,14 +258,19 @@ export interface DialogDescriptionProps extends BaseComponentProps {}
 export interface DialogFooterProps extends BaseComponentProps {}
 
 export const Dialog = ({ children, ...props }: DialogProps) => {
-  const Component = UIComponents.Dialog as React.ComponentType<any>
+  const Component = UIComponents.Dialog as React.FC<
+    React.ComponentPropsWithoutRef<typeof UIComponents.Dialog>
+  >
   return React.createElement(Component, props, children)
 }
 Dialog.displayName = 'Dialog'
 
 export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogContent as React.ComponentType<any>
+    const Component = UIComponents.DialogContent as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.DialogContent> &
+        React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -230,7 +278,9 @@ DialogContent.displayName = 'DialogContent'
 
 export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogHeader as React.ComponentType<any>
+    const Component = UIComponents.DialogHeader as React.ForwardRefExoticComponent<
+      React.HTMLAttributes<HTMLDivElement> & React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -238,7 +288,10 @@ DialogHeader.displayName = 'DialogHeader'
 
 export const DialogTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogTitle as React.ComponentType<any>
+    const Component = UIComponents.DialogTitle as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.DialogTitle> &
+        React.RefAttributes<HTMLHeadingElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -246,7 +299,10 @@ DialogTitle.displayName = 'DialogTitle'
 
 export const DialogDescription = forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogDescription as React.ComponentType<any>
+    const Component = UIComponents.DialogDescription as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.DialogDescription> &
+        React.RefAttributes<HTMLParagraphElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -254,7 +310,9 @@ DialogDescription.displayName = 'DialogDescription'
 
 export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.DialogFooter as React.ComponentType<any>
+    const Component = UIComponents.DialogFooter as React.ForwardRefExoticComponent<
+      React.HTMLAttributes<HTMLDivElement> & React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -291,7 +349,9 @@ export const Input: React.FC<InputProps> = ({
   disabled,
   ...props
 }) => {
-  const Component = UIComponents.Input as React.ComponentType<any>
+  const Component = UIComponents.Input as React.ForwardRefExoticComponent<
+    UIInputProps & React.RefAttributes<HTMLInputElement>
+  >
   return React.createElement(
     Component,
     {
@@ -316,7 +376,10 @@ export const Input: React.FC<InputProps> = ({
 // Separator component
 export const Separator = forwardRef<HTMLDivElement, BaseComponentProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.Separator as React.ComponentType<any>
+    const Component = UIComponents.Separator as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.Separator> &
+        React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -331,14 +394,18 @@ export interface AlertDescriptionProps extends BaseComponentProps {}
 export interface AlertTitleProps extends BaseComponentProps {}
 
 export const Alert = forwardRef<HTMLDivElement, AlertProps>(({ children, ...props }, ref) => {
-  const Component = UIComponents.Alert as React.ComponentType<any>
+  const Component = UIComponents.Alert as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof UIComponents.Alert> & React.RefAttributes<HTMLDivElement>
+  >
   return React.createElement(Component, { ref, ...props }, children)
 })
 Alert.displayName = 'Alert'
 
 export const AlertDescription = forwardRef<HTMLParagraphElement, AlertDescriptionProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.AlertDescription as React.ComponentType<any>
+    const Component = UIComponents.AlertDescription as React.ForwardRefExoticComponent<
+      React.HTMLAttributes<HTMLDivElement> & React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -346,7 +413,9 @@ AlertDescription.displayName = 'AlertDescription'
 
 export const AlertTitle = forwardRef<HTMLHeadingElement, AlertTitleProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.AlertTitle as React.ComponentType<any>
+    const Component = UIComponents.AlertTitle as React.ForwardRefExoticComponent<
+      React.HTMLAttributes<HTMLHeadingElement> & React.RefAttributes<HTMLHeadingElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -362,7 +431,9 @@ export interface TextareaProps extends BaseComponentProps {
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ children, ...props }, ref) => {
-    const Component = UIComponents.Textarea as React.ComponentType<any>
+    const Component = UIComponents.Textarea as React.ForwardRefExoticComponent<
+      UITextareaProps & React.RefAttributes<HTMLTextAreaElement>
+    >
     return React.createElement(Component, { ref, ...props }, children)
   }
 )
@@ -376,7 +447,10 @@ export interface ProgressProps extends BaseComponentProps {
 
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   ({ children, value, max, className, ...props }, ref) => {
-    const Component = UIComponents.Progress as React.ComponentType<any>
+    const Component = UIComponents.Progress as React.ForwardRefExoticComponent<
+      React.ComponentPropsWithoutRef<typeof UIComponents.Progress> &
+        React.RefAttributes<HTMLDivElement>
+    >
     return React.createElement(Component, { ref, value, max, className, ...props }, children)
   }
 )
@@ -404,11 +478,12 @@ export interface TabsContentProps extends BaseComponentProps {
 
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>((props, ref) => {
   const { children, value, onValueChange, defaultValue, className, ...rest } = props || {}
-  const Component = UIComponents.Tabs as React.ComponentType<any>
+  const Component = UIComponents.Tabs as React.FC<
+    React.ComponentPropsWithoutRef<typeof UIComponents.Tabs>
+  >
   return React.createElement(
     Component,
     {
-      ref,
       value,
       onValueChange,
       defaultValue,
@@ -422,21 +497,30 @@ Tabs.displayName = 'Tabs'
 
 export const TabsList = forwardRef<HTMLDivElement, TabsListProps>((props, ref) => {
   const { children, className, ...rest } = props || {}
-  const Component = UIComponents.TabsList as React.ComponentType<any>
+  const Component = UIComponents.TabsList as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof UIComponents.TabsList> &
+      React.RefAttributes<HTMLDivElement>
+  >
   return React.createElement(Component, { ref, className, ...rest }, children)
 })
 TabsList.displayName = 'TabsList'
 
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>((props, ref) => {
   const { children, value, className, disabled, ...rest } = props || {}
-  const Component = UIComponents.TabsTrigger as React.ComponentType<any>
+  const Component = UIComponents.TabsTrigger as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof UIComponents.TabsTrigger> &
+      React.RefAttributes<HTMLButtonElement>
+  >
   return React.createElement(Component, { ref, value, disabled, className, ...rest }, children)
 })
 TabsTrigger.displayName = 'TabsTrigger'
 
 export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>((props, ref) => {
   const { children, value, className, ...rest } = props || {}
-  const Component = UIComponents.TabsContent as React.ComponentType<any>
+  const Component = UIComponents.TabsContent as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof UIComponents.TabsContent> &
+      React.RefAttributes<HTMLDivElement>
+  >
   return React.createElement(Component, { ref, value, className, ...rest }, children)
 })
 TabsContent.displayName = 'TabsContent'

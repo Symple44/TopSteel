@@ -29,8 +29,8 @@ export function initSentry() {
     integrations: [
       Sentry?.browserTracingIntegration({
         // Set sampling rate for performance monitoring
-        // @ts-expect-error - Sentry API compatibility
-        tracingOrigins: ['localhost', process?.env?.NEXT_PUBLIC_APP_URL || '', /^\//],
+        // Note: tracingOrigins has been removed in newer Sentry versions
+        // Origin tracking is now handled automatically
       }),
       Sentry?.replayIntegration({
         // Mask all text content
@@ -122,7 +122,8 @@ export function captureMessage(message: string, level: Sentry.SeverityLevel = 'i
 
 export function setUser(user: { id: string; username?: string; [key: string]: any } | null) {
   if (user) {
-    const { email: _email, ...safeUser } = user || ({} as unknown)
+    // Remove sensitive data like email before sending to Sentry
+    const { email, ...safeUser } = user as { email?: string; [key: string]: any }
     Sentry?.setUser(safeUser)
   } else {
     Sentry?.setUser(null)

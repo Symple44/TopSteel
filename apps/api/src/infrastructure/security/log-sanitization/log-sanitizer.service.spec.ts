@@ -200,42 +200,48 @@ describe('LogSanitizerService', () => {
       ]
 
       sensitiveKeys.forEach((key) => {
-        expect((service as any).isSensitiveKey(key)).toBe(true)
-        expect((service as any).isSensitiveKey(key.toUpperCase())).toBe(true)
+        expect(
+          (service as unknown as { isSensitiveKey: (key: string) => boolean }).isSensitiveKey(key)
+        ).toBe(true)
+        expect(
+          (service as unknown as { isSensitiveKey: (key: string) => boolean }).isSensitiveKey(
+            key.toUpperCase()
+          )
+        ).toBe(true)
       })
     })
 
     it('should not flag non-sensitive keys', () => {
       const normalKeys = ['username', 'email', 'name', 'data', 'id', 'timestamp']
       normalKeys.forEach((key) => {
-        expect((service as any).isSensitiveKey(key)).toBe(false)
+        expect(
+          (service as unknown as { isSensitiveKey: (key: string) => boolean }).isSensitiveKey(key)
+        ).toBe(false)
       })
     })
   })
 
   describe('temporaryBypass', () => {
     it('should temporarily disable sanitization in production', () => {
-      const originalConsoleWarn = console.warn
-      console.warn = vi.fn()
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       service.temporaryBypass(1000, 'Testing bypass functionality')
 
       // Vérifier que la sanitisation est désactivée
       expect(process.env.LOG_SANITIZATION_ENABLED).toBe('false')
 
-      console.warn = originalConsoleWarn
+      consoleWarnSpy.mockRestore()
     })
 
     it('should ignore bypass request in development', () => {
       process.env.NODE_ENV = 'development'
-      const originalConsoleWarn = console.warn
-      console.warn = vi.fn()
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       service.temporaryBypass(1000, 'Should be ignored')
 
       expect(process.env.LOG_SANITIZATION_ENABLED).toBe('true')
 
-      console.warn = originalConsoleWarn
+      consoleWarnSpy.mockRestore()
     })
   })
 

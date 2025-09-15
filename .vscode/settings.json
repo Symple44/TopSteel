@@ -34,5 +34,7 @@
       "database": "erp_topsteel",
       "username": "postgres"
     }
-  ]
+  ],
+  "jest.enable": false,
+  "jest.autoRun": "off"
 }

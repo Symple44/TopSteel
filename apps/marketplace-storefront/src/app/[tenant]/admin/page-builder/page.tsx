@@ -163,7 +163,9 @@ export default function PageBuilderListPage() {
 
                     <p className="text-gray-600 mb-2">Slug: /{template.slug}</p>
 
-                    {template.description && <p className="text-gray-600 mb-2">{template.description}</p>}
+                    {template.description && (
+                      <p className="text-gray-600 mb-2">{template.description}</p>
+                    )}
 
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span>Type: {template.pageType}</span>

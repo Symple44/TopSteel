@@ -196,7 +196,7 @@ class AuthSystemTester {
     expectedStatuses: number[]
   ) {
     const url = path.startsWith('http') ? path : `${API_URL}${path}`
-    const headers: any = {}
+    const headers: Record<string, string> = {}
 
     if (withAuth) {
       headers.Authorization = `Bearer ${this.token}`
