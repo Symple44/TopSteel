@@ -20,7 +20,6 @@ import type {
   BusinessContext,
   BusinessOperation,
 } from '../../core/interfaces/business-service.interface'
-import type { PartnerInteraction } from '../entities/partner-interaction.entity'
 import type {
   CreateContactDto,
   CreatePartnerAddressDto,
@@ -38,6 +37,7 @@ import type { Contact } from '../entities/contact.entity'
 import type { Partner } from '../entities/partner.entity'
 import type { PartnerAddress } from '../entities/partner-address.entity'
 import type { PartnerGroup } from '../entities/partner-group.entity'
+import type { PartnerInteraction } from '../entities/partner-interaction.entity'
 import type { PartnerSite } from '../entities/partner-site.entity'
 import type { PartnerService, PartnerStatistics } from '../services/partner.service'
 import type { PartnerParametersInitService } from '../services/partner-parameters-init.service'

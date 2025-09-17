@@ -49,6 +49,7 @@ import type {
 import type { ClientNotification } from '@/types/notifications'
 import { APIClientEnhanced } from './api-client-enhanced'
 import type {
+  APIMetrics,
   ArticlesAPI,
   FilesAPI,
   IAPIClient,
@@ -57,6 +58,7 @@ import type {
   PartnersAPI,
   ProjectsAPI,
   ReportsAPI,
+  RequestConfig,
   SearchAPI,
   SettingsAPI,
   UsersAPI,
@@ -221,7 +223,7 @@ class PartnersAPIImpl implements PartnersAPI {
 
   async exportPartners(
     format: 'CSV' | 'EXCEL' | 'PDF',
-    filters?: Record<string, unknown>
+    filters?: PartnerFilters
   ): Promise<{
     url: string
     filename: string
@@ -233,7 +235,7 @@ class PartnersAPIImpl implements PartnersAPI {
   }
 
   async importPartners(
-    data: Record<string, unknown>[],
+    data: Record<string, string | number | boolean | null>[],
     options?: {
       skipErrors?: boolean
       dryRun?: boolean
@@ -241,9 +243,9 @@ class PartnersAPIImpl implements PartnersAPI {
   ): Promise<{
     imported: number
     errors: number
-    details: unknown[]
+    details: Array<{ row: number; field: string; error: string }>
   }> {
-    return this.client.post<{ imported: number; errors: number; details: unknown[] }>(
+    return this.client.post<{ imported: number; errors: number; details: Array<{ row: number; field: string; error: string }> }>(
       '/partners/import',
       {
         data,
@@ -312,7 +314,7 @@ class MaterialsAPIImpl implements MaterialsAPI {
 
   async exportMaterials(
     format: 'CSV' | 'EXCEL' | 'PDF',
-    filters?: Record<string, unknown>
+    filters?: MaterialFilters
   ): Promise<FileUploadResponse> {
     return this.client.post<FileUploadResponse>('/materials/export', { format, filters })
   }
@@ -494,13 +496,13 @@ class SearchAPIImpl implements SearchAPI {
   async globalSearch(
     query: string,
     options?: {
-      types?: string[]
+      types?: Array<'partner' | 'material' | 'article' | 'project' | 'user'>
       limit?: number
       offset?: number
     }
   ): Promise<{
     results: Array<{
-      type: string
+      type: 'partner' | 'material' | 'article' | 'project' | 'user'
       id: string
       title: string
       description?: string
@@ -517,7 +519,7 @@ class SearchAPIImpl implements SearchAPI {
 
     return this.client.get<{
       results: Array<{
-        type: string
+        type: 'partner' | 'material' | 'article' | 'project' | 'user'
         id: string
         title: string
         description?: string
@@ -586,16 +588,16 @@ class FilesAPIImpl implements FilesAPI {
 class SettingsAPIImpl implements SettingsAPI {
   constructor(private client: APIClientEnhanced) {}
 
-  async getSettings(category?: string): Promise<Record<string, unknown>> {
+  async getSettings(category?: string): Promise<Record<string, string | number | boolean>> {
     const endpoint = category ? `/settings?category=${category}` : '/settings'
-    return this.client.get<Record<string, unknown>>(endpoint)
+    return this.client.get<Record<string, string | number | boolean>>(endpoint)
   }
 
-  async updateSetting(key: string, value: unknown): Promise<void> {
+  async updateSetting(key: string, value: string | number | boolean): Promise<void> {
     return this.client.patch<void>('/settings', { [key]: value })
   }
 
-  async updateSettings(settings: Record<string, unknown>): Promise<void> {
+  async updateSettings(settings: Record<string, string | number | boolean>): Promise<void> {
     return this.client.put<void>('/settings', settings)
   }
 
@@ -604,11 +606,11 @@ class SettingsAPIImpl implements SettingsAPI {
     return this.client.post<void>(endpoint)
   }
 
-  async getUserPreferences(): Promise<Record<string, unknown>> {
-    return this.client.get<Record<string, unknown>>('/user/preferences')
+  async getUserPreferences(): Promise<Record<string, string | number | boolean>> {
+    return this.client.get<Record<string, string | number | boolean>>('/user/preferences')
   }
 
-  async updateUserPreference(key: string, value: unknown): Promise<void> {
+  async updateUserPreference(key: string, value: string | number | boolean): Promise<void> {
     return this.client.patch<void>('/user/preferences', { [key]: value })
   }
 
@@ -621,8 +623,8 @@ class ReportsAPIImpl implements ReportsAPI {
   constructor(private client: APIClientEnhanced) {}
 
   async generateReport(
-    type: string,
-    params?: Record<string, unknown>
+    type: 'partners' | 'materials' | 'articles' | 'projects' | 'sales' | 'inventory',
+    params?: Record<string, string | number | boolean | Date>
   ): Promise<{
     id: string
     status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
@@ -656,17 +658,17 @@ class ReportsAPIImpl implements ReportsAPI {
   async listReports(): Promise<
     Array<{
       id: string
-      type: string
+      type: 'partners' | 'materials' | 'articles' | 'projects' | 'sales' | 'inventory'
       created: string
-      status: string
+      status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
     }>
   > {
     return this.client.get<
       Array<{
         id: string
-        type: string
+        type: 'partners' | 'materials' | 'articles' | 'projects' | 'sales' | 'inventory'
         created: string
-        status: string
+        status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
       }>
     >('/reports')
   }

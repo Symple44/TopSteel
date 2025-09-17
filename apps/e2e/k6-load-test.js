@@ -3,8 +3,13 @@ import { check, group, sleep } from 'k6'
 import http from 'k6/http'
 import { Counter, Gauge, Rate, Trend } from 'k6/metrics'
 
+// Global K6 environment variables declaration
+/* global __ENV */
+
 // Configuration
+// biome-ignore lint/correctness/noUndeclaredVariables: __ENV is a global K6 variable
 const BASE_URL = __ENV.BASE_URL || 'http://localhost:3001'
+// biome-ignore lint/correctness/noUndeclaredVariables: __ENV is a global K6 variable
 const TENANT_ID = __ENV.TENANT_ID || 'test-tenant'
 
 // Custom metrics

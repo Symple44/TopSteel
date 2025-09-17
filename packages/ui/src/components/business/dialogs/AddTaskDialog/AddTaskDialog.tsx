@@ -27,19 +27,19 @@ import { Textarea } from '../../../primitives/textarea/Textarea'
 // Validation schema for task creation
 const taskFormSchema = z.object({
   title: z.string().min(1, 'Le titre est requis'),
-  description: z.string().optional(),
+  description: z.string().default(''),
   projectId: z.string().min(1, 'Le projet est requis'),
   // Task scheduling
   startDate: z.string().min(1, 'La date de début est requise'),
   dueDate: z.string().min(1, "La date d'échéance est requise"),
-  estimatedHours: z.number().min(0).optional(),
+  estimatedHours: z.number().min(0).default(0),
   // Priority and status
   priority: z.enum(['low', 'medium', 'high', 'critical']),
   status: z.enum(['not_started', 'in_progress', 'completed', 'cancelled']).default('not_started'),
   // Assignment
-  assigneeId: z.string().optional(),
-  assignees: z.array(z.string()).optional(),
-  department: z.string().optional(),
+  assigneeId: z.string().default(''),
+  assignees: z.array(z.string()).default([]),
+  department: z.string().default(''),
   // Steel manufacturing specific
   taskType: z.enum([
     'production',
@@ -56,9 +56,9 @@ const taskFormSchema = z.object({
     'documentation',
   ]),
   // Dependencies
-  dependencies: z.array(z.string()).optional(),
-  blockedBy: z.array(z.string()).optional(),
-  blocking: z.array(z.string()).optional(),
+  dependencies: z.array(z.string()).default([]),
+  blockedBy: z.array(z.string()).default([]),
+  blocking: z.array(z.string()).default([]),
   // Materials and resources
   requiredMaterials: z
     .array(
@@ -68,9 +68,9 @@ const taskFormSchema = z.object({
         unit: z.string(),
       })
     )
-    .optional(),
-  requiredTools: z.array(z.string()).optional(),
-  location: z.string().optional(),
+    .default([]),
+  requiredTools: z.array(z.string()).default([]),
+  location: z.string().default(''),
   // Quality requirements
   qualityChecks: z
     .array(
@@ -80,38 +80,38 @@ const taskFormSchema = z.object({
         required: z.boolean().default(false),
       })
     )
-    .optional(),
+    .default([]),
   // Safety requirements
-  safetyRequirements: z.array(z.string()).optional(),
+  safetyRequirements: z.array(z.string()).default([]),
   requiresSafetyBriefing: z.boolean().default(false),
   // Progress tracking
   milestones: z
     .array(
       z.object({
         name: z.string(),
-        description: z.string().optional(),
+        description: z.string().default(''),
         targetDate: z.string(),
         completed: z.boolean().default(false),
       })
     )
-    .optional(),
+    .default([]),
   // Budget and cost
-  budgetAllocated: z.number().min(0).optional(),
-  costCenter: z.string().optional(),
+  budgetAllocated: z.number().min(0).default(0),
+  costCenter: z.string().default(''),
   // Notifications and reminders
   sendNotifications: z.boolean().default(true),
-  reminderDays: z.number().min(0).optional(),
+  reminderDays: z.number().min(0).default(1),
   // Documentation
-  attachments: z.array(z.string()).optional(),
-  notes: z.string().optional(),
+  attachments: z.array(z.string()).default([]),
+  notes: z.string().default(''),
   // Approval workflow
   requiresApproval: z.boolean().default(false),
-  approver: z.string().optional(),
+  approver: z.string().default(''),
   // Recurring task
   isRecurring: z.boolean().default(false),
-  recurrencePattern: z.enum(['daily', 'weekly', 'monthly', 'yearly']).optional(),
-  recurrenceInterval: z.number().min(1).optional(),
-  recurrenceEndDate: z.string().optional(),
+  recurrencePattern: z.enum(['daily', 'weekly', 'monthly', 'yearly']).default('weekly'),
+  recurrenceInterval: z.number().min(1).default(1),
+  recurrenceEndDate: z.string().default(''),
 })
 type TaskFormData = z.infer<typeof taskFormSchema>
 interface AddTaskDialogProps {
@@ -270,12 +270,12 @@ export function AddTaskDialog({
           ))}
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             {/* Basic Information Tab */}
             {selectedTab === 'basic' && (
               <div className="space-y-4">
                 <FormField
-                  control={form.control as any}
+                  control={form.control}
                   name="title"
                   render={({ field }) => (
                     <FormItem>
@@ -288,7 +288,7 @@ export function AddTaskDialog({
                   )}
                 />
                 <FormField
-                  control={form.control as any}
+                  control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
@@ -306,7 +306,7 @@ export function AddTaskDialog({
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="projectId"
                     render={({ field }) => (
                       <FormItem>
@@ -330,7 +330,7 @@ export function AddTaskDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="taskType"
                     render={({ field }) => (
                       <FormItem>
@@ -356,7 +356,7 @@ export function AddTaskDialog({
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="priority"
                     render={({ field }) => (
                       <FormItem>
@@ -380,7 +380,7 @@ export function AddTaskDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="status"
                     render={({ field }) => (
                       <FormItem>
@@ -404,7 +404,7 @@ export function AddTaskDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="estimatedHours"
                     render={({ field }) => (
                       <FormItem>
@@ -425,7 +425,7 @@ export function AddTaskDialog({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
@@ -438,7 +438,7 @@ export function AddTaskDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="dueDate"
                     render={({ field }) => (
                       <FormItem>
@@ -453,7 +453,7 @@ export function AddTaskDialog({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="assigneeId"
                     render={({ field }) => (
                       <FormItem>
@@ -477,7 +477,7 @@ export function AddTaskDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="department"
                     render={({ field }) => (
                       <FormItem>
@@ -507,7 +507,7 @@ export function AddTaskDialog({
             {selectedTab === 'advanced' && (
               <div className="space-y-4">
                 <FormField
-                  control={form.control as any}
+                  control={form.control}
                   name="location"
                   render={({ field }) => (
                     <FormItem>
@@ -521,7 +521,7 @@ export function AddTaskDialog({
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="budgetAllocated"
                     render={({ field }) => (
                       <FormItem>
@@ -540,7 +540,7 @@ export function AddTaskDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="costCenter"
                     render={({ field }) => (
                       <FormItem>
@@ -555,7 +555,7 @@ export function AddTaskDialog({
                 </div>
                 <div className="space-y-3">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="requiresApproval"
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2">
@@ -568,7 +568,7 @@ export function AddTaskDialog({
                   />
                   {requiresApproval && (
                     <FormField
-                      control={form.control as any}
+                      control={form.control}
                       name="approver"
                       render={({ field }) => (
                         <FormItem>
@@ -599,7 +599,7 @@ export function AddTaskDialog({
                 </div>
                 <div className="space-y-3">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="isRecurring"
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2">
@@ -613,7 +613,7 @@ export function AddTaskDialog({
                   {isRecurring && (
                     <div className="grid grid-cols-3 gap-4">
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name="recurrencePattern"
                         render={({ field }) => (
                           <FormItem>
@@ -637,7 +637,7 @@ export function AddTaskDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name="recurrenceInterval"
                         render={({ field }) => (
                           <FormItem>
@@ -655,7 +655,7 @@ export function AddTaskDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name="recurrenceEndDate"
                         render={({ field }) => (
                           <FormItem>
@@ -671,7 +671,7 @@ export function AddTaskDialog({
                   )}
                 </div>
                 <FormField
-                  control={form.control as any}
+                  control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
@@ -706,7 +706,7 @@ export function AddTaskDialog({
                       className="grid grid-cols-4 gap-4 items-end p-3 border rounded"
                     >
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`requiredMaterials.${index}.materialId`}
                         render={({ field }) => (
                           <FormItem>
@@ -731,7 +731,7 @@ export function AddTaskDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`requiredMaterials.${index}.quantity`}
                         render={({ field }) => (
                           <FormItem>
@@ -750,7 +750,7 @@ export function AddTaskDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`requiredMaterials.${index}.unit`}
                         render={({ field }) => (
                           <FormItem>
@@ -797,7 +797,7 @@ export function AddTaskDialog({
                       className="grid grid-cols-3 gap-4 items-end p-3 border rounded"
                     >
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`milestones.${index}.name`}
                         render={({ field }) => (
                           <FormItem>
@@ -810,7 +810,7 @@ export function AddTaskDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`milestones.${index}.targetDate`}
                         render={({ field }) => (
                           <FormItem>
@@ -861,7 +861,7 @@ export function AddTaskDialog({
                       className="grid grid-cols-4 gap-4 items-end p-3 border rounded"
                     >
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`qualityChecks.${index}.checkType`}
                         render={({ field }) => (
                           <FormItem>
@@ -874,7 +874,7 @@ export function AddTaskDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`qualityChecks.${index}.description`}
                         render={({ field }) => (
                           <FormItem>
@@ -887,7 +887,7 @@ export function AddTaskDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name={`qualityChecks.${index}.required`}
                         render={({ field }) => (
                           <FormItem className="flex items-center space-x-2">
@@ -912,7 +912,7 @@ export function AddTaskDialog({
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Exigences de sécurité</h3>
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="requiresSafetyBriefing"
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2">

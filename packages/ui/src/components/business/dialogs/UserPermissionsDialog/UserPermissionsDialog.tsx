@@ -442,12 +442,25 @@ const permissionsSchema = z.object({
     reports: z.array(z.string()).default([]),
     administration: z.array(z.string()).default([]),
   }),
-  effectiveDate: z.string().optional(),
-  expirationDate: z.string().optional(),
-  reason: z.string().optional(),
+  effectiveDate: z.string().default(''),
+  expirationDate: z.string().default(''),
+  reason: z.string().default(''),
   temporaryAccess: z.boolean().default(false),
 })
 type PermissionsFormData = z.infer<typeof permissionsSchema>
+
+// Types pour les structures de permissions détaillées
+type PermissionDetail = {
+  label: string
+  description: string
+}
+
+type ModulePermissions = {
+  label: string
+  permissions: Record<string, PermissionDetail>
+}
+
+type DetailedPermissions = Record<string, ModulePermissions>
 interface UserData {
   id: string
   firstName: string
@@ -474,7 +487,7 @@ export function UserPermissionsDialog({
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
-  const form = useForm({
+  const form = useForm<PermissionsFormData>({
     resolver: zodResolver(permissionsSchema) as any,
     defaultValues: {
       userId: '',
@@ -512,13 +525,13 @@ export function UserPermissionsDialog({
           administration: currentPermissions.administration || [],
         },
         temporaryAccess: false,
-      } as any)
+      })
     }
   }, [userData, currentPermissions, open, form])
   const applyTemplate = (templateKey: string) => {
     const template = ROLE_TEMPLATES[templateKey as keyof typeof ROLE_TEMPLATES]
     if (template) {
-      form.setValue('permissions', template.permissions as any)
+      form.setValue('permissions', template.permissions as PermissionsFormData['permissions'])
       setSelectedTemplate(templateKey)
     }
   }
@@ -530,7 +543,7 @@ export function UserPermissionsDialog({
       },
       {} as Record<string, string[]>
     )
-    form.setValue('permissions', emptyPermissions as any)
+    form.setValue('permissions', emptyPermissions as PermissionsFormData['permissions'])
     setSelectedTemplate('')
   }
   const copyFromCurrentRole = () => {
@@ -569,31 +582,31 @@ export function UserPermissionsDialog({
     const permissions = form.getValues('permissions')
     return Object.values(permissions).reduce((total, modulePerms) => total + modulePerms.length, 0)
   }
-  const filterPermissions = (permissions: Record<string, any>) => {
+  const filterPermissions = (permissions: DetailedPermissions) => {
     if (!searchTerm) return permissions
     return Object.entries(permissions).reduce(
       (acc, [key, permData]) => {
-        const matchingPerms = Object.entries((permData as any).permissions).filter(
-          ([_permKey, permValue]: [string, any]) =>
+        const matchingPerms = Object.entries(permData.permissions).filter(
+          ([_permKey, permValue]: [string, PermissionDetail]) =>
             permValue.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
             permValue.description.toLowerCase().includes(searchTerm.toLowerCase())
         )
         if (
           matchingPerms.length > 0 ||
-          (permData as any).label.toLowerCase().includes(searchTerm.toLowerCase())
+          permData.label.toLowerCase().includes(searchTerm.toLowerCase())
         ) {
           acc[key] = {
-            ...(permData as any),
+            ...permData,
             permissions: Object.fromEntries(
               matchingPerms.length > 0
                 ? matchingPerms
-                : Object.entries((permData as any).permissions)
+                : Object.entries(permData.permissions)
             ),
           }
         }
         return acc
       },
-      {} as Record<string, any>
+      {} as DetailedPermissions
     )
   }
   if (!userData) {
@@ -622,7 +635,7 @@ export function UserPermissionsDialog({
         </DialogHeader>
         <ScrollArea className="max-h-[75vh] pr-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               {error && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
@@ -741,20 +754,20 @@ export function UserPermissionsDialog({
                     ([moduleKey, moduleData]) => (
                       <div key={moduleKey} className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-base">{(moduleData as any).label}</h4>
+                          <h4 className="font-medium text-base">{moduleData.label}</h4>
                           <Badge variant="outline">
                             {form.watch(
                               `permissions.${moduleKey as keyof PermissionsFormData['permissions']}`
                             )?.length || 0}{' '}
-                            / {Object.keys((moduleData as any).permissions).length}
+                            / {Object.keys(moduleData.permissions).length}
                           </Badge>
                         </div>
                         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                          {Object.entries((moduleData as any).permissions).map(
-                            ([permKey, permData]: [string, any]) => (
+                          {Object.entries(moduleData.permissions).map(
+                            ([permKey, permData]: [string, PermissionDetail]) => (
                               <FormField
                                 key={`${moduleKey}-${permKey}`}
-                                control={form.control as any}
+                                control={form.control}
                                 name={`permissions.${moduleKey as keyof PermissionsFormData['permissions']}`}
                                 render={({ field }) => (
                                   <FormItem className="flex items-start space-x-3 p-3 border rounded-lg">
@@ -803,7 +816,7 @@ export function UserPermissionsDialog({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="temporaryAccess"
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
@@ -824,7 +837,7 @@ export function UserPermissionsDialog({
                   {watchTemporaryAccess && (
                     <div className="grid gap-4 md:grid-cols-2 pl-6 border-l-2">
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name="effectiveDate"
                         render={({ field }) => (
                           <FormItem>
@@ -837,7 +850,7 @@ export function UserPermissionsDialog({
                         )}
                       />
                       <FormField
-                        control={form.control as any}
+                        control={form.control}
                         name="expirationDate"
                         render={({ field }) => (
                           <FormItem>
@@ -852,7 +865,7 @@ export function UserPermissionsDialog({
                     </div>
                   )}
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="reason"
                     render={({ field }) => (
                       <FormItem>

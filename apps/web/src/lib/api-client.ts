@@ -12,6 +12,7 @@
 
 import { callBackendApi, callClientApi } from '@/utils/backend-api'
 import { csrfManager } from './csrf'
+import type { APIMetrics } from './api-client-types'
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -38,13 +39,6 @@ interface APIErrorDetails {
   details?: unknown
   timestamp: number
   requestId?: string
-}
-
-interface APIMetrics {
-  requests: number
-  errors: number
-  cacheHits: number
-  avgResponseTime: number
 }
 
 /**
@@ -121,10 +115,13 @@ export class APIClient {
   protected cache = new Map<string, CacheEntry>()
   protected rateLimiter = createRateLimiter(100, 60000) // 100 req/min
   protected metrics: APIMetrics = {
-    requests: 0,
-    errors: 0,
+    totalRequests: 0,
+    successfulRequests: 0,
+    failedRequests: 0,
+    averageResponseTime: 0,
     cacheHits: 0,
-    avgResponseTime: 0,
+    cacheMisses: 0,
+    lastRequestTime: undefined,
   }
 
   constructor(baseURL: string) {
@@ -158,13 +155,20 @@ export class APIClient {
   private getCachedData<T>(key: string): T | null {
     const entry = this?.cache?.get(key)
 
-    if (!entry) return null
+    if (!entry) {
+      if (this?.metrics) {
+        this.metrics.cacheMisses++
+      }
+      return null
+    }
 
     const now = Date.now()
 
     if (now - entry?.timestamp > entry?.ttl) {
       this?.cache?.delete(key)
-
+      if (this?.metrics) {
+        this.metrics.cacheMisses++
+      }
       return null
     }
 
@@ -259,7 +263,7 @@ export class APIClient {
    */
   private handleError(error: unknown, _endpoint: string): never {
     if (this?.metrics) {
-      this.metrics.errors++
+      this.metrics.failedRequests++
     }
 
     const errorDetails: APIErrorDetails = {
@@ -311,7 +315,8 @@ export class APIClient {
     const startTime = Date.now()
 
     if (this?.metrics) {
-      this.metrics.requests++
+      this.metrics.totalRequests++
+      this.metrics.lastRequestTime = new Date()
     }
 
     try {
@@ -376,7 +381,8 @@ export class APIClient {
       const responseTime = Date.now() - startTime
 
       if (this.metrics) {
-        this.metrics.avgResponseTime = (this.metrics.avgResponseTime + responseTime) / 2
+        this.metrics.averageResponseTime = (this.metrics.averageResponseTime + responseTime) / 2
+        this.metrics.successfulRequests++
       }
 
       return result
@@ -523,10 +529,13 @@ export class APIClient {
    */
   resetMetrics(): void {
     this.metrics = {
-      requests: 0,
-      errors: 0,
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      averageResponseTime: 0,
       cacheHits: 0,
-      avgResponseTime: 0,
+      cacheMisses: 0,
+      lastRequestTime: undefined,
     }
   }
 

@@ -3,22 +3,20 @@
  * This file provides React 19 compatible wrappers for UI components
  */
 
+import type {
+  BadgeProps as UIBadgeProps,
+  ButtonProps as UIButtonProps,
+  CardContentProps as UICardContentProps,
+  CardHeaderProps as UICardHeaderProps,
+  CardProps as UICardProps,
+  CardTitleProps as UICardTitleProps,
+  InputProps as UIInputProps,
+  TextareaProps as UITextareaProps,
+} from '@erp/ui'
 import * as UIComponents from '@erp/ui'
 import type { ReactNode } from 'react'
 import * as React from 'react'
 import { forwardRef } from 'react'
-import type {
-  BadgeProps as UIBadgeProps,
-  ButtonProps as UIButtonProps,
-  CardProps as UICardProps,
-  CardHeaderProps as UICardHeaderProps,
-  CardTitleProps as UICardTitleProps,
-  CardDescriptionProps as UICardDescriptionProps,
-  CardContentProps as UICardContentProps,
-  CardFooterProps as UICardFooterProps,
-  InputProps as UIInputProps,
-  TextareaProps as UITextareaProps,
-} from '@erp/ui'
 
 // Base component props that include children
 interface BaseComponentProps {
@@ -476,7 +474,7 @@ export interface TabsContentProps extends BaseComponentProps {
   value: string
 }
 
-export const Tabs = forwardRef<HTMLDivElement, TabsProps>((props, ref) => {
+export const Tabs = forwardRef<HTMLDivElement, TabsProps>((props, _ref) => {
   const { children, value, onValueChange, defaultValue, className, ...rest } = props || {}
   const Component = UIComponents.Tabs as React.FC<
     React.ComponentPropsWithoutRef<typeof UIComponents.Tabs>

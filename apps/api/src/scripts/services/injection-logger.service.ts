@@ -167,7 +167,7 @@ export class InjectionLoggerService implements InjectionLogger {
   }
 
   logMemoryUsage(): void {
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (process?.memoryUsage) {
       const memory = process.memoryUsage()
       this.debug('Memory usage:', {
         rss: `${Math.round(memory.rss / 1024 / 1024)}MB`,

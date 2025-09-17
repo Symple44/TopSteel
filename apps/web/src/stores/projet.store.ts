@@ -4,7 +4,7 @@
  * Fichier: apps/web/src/stores/projet.store.ts
  */
 
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import type {
   InitialState,
   ProjetState,

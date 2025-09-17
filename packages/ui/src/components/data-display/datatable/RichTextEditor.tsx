@@ -56,7 +56,7 @@ const sanitizeHtml = (html: string): string => {
     ALLOWED_ATTR: ['class', 'style'],
     ALLOW_DATA_ATTR: false,
     FORBID_TAGS: ['script', 'iframe'],
-  }) as unknown as string
+  })
 }
 
 interface RichTextEditorProps {
@@ -652,7 +652,7 @@ export function RichTextEditor({
 
                 {/* Taille de police */}
                 <select
-                  onChange={(e: any) => setFontSize(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFontSize(e.target.value)}
                   className="px-2 py-1 border rounded text-sm"
                   title="Taille de police"
                 >
@@ -752,10 +752,10 @@ export function RichTextEditor({
                     type="url"
                     placeholder="https://example.com"
                     value={linkData.url}
-                    onChange={(e: any) =>
-                      setLinkData((prev: any) => ({ ...prev, url: e.target.value }))
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setLinkData((prev) => ({ ...prev, url: e.target.value }))
                     }
-                    onKeyDown={(e: any) => {
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                       if (e.key === 'Enter' && linkData.url.trim()) {
                         handleInsertLink()
                       }
@@ -777,10 +777,10 @@ export function RichTextEditor({
                     id={ids.linkText}
                     placeholder="Texte du lien (optionnel)"
                     value={linkData.text}
-                    onChange={(e: any) =>
-                      setLinkData((prev: any) => ({ ...prev, text: e.target.value }))
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setLinkData((prev) => ({ ...prev, text: e.target.value }))
                     }
-                    onKeyDown={(e: any) => {
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                       if (e.key === 'Enter' && linkData.url.trim()) {
                         handleInsertLink()
                       }

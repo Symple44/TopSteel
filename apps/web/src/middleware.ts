@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { areTokensExpired, getTokensFromCookies } from './lib/auth/cookie-auth'

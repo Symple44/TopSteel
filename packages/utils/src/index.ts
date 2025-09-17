@@ -56,7 +56,7 @@ export function safeLog(..._args: unknown[]) {
  */
 export function generateId(): string {
   // Try crypto.randomUUID (modern browser)
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+  if (window?.crypto?.randomUUID) {
     try {
       return window.crypto.randomUUID().slice(0, 12)
     } catch {

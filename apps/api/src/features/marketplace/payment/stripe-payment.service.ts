@@ -67,7 +67,7 @@ export class StripePaymentService {
     }
 
     this.stripe = new Stripe(apiKey, {
-      apiVersion: '2025-07-30.basil',
+      apiVersion: '2025-08-27.basil',
       typescript: true,
       telemetry: false, // Disable telemetry for security
     })

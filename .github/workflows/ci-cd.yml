@@ -231,7 +231,7 @@ jobs:
       - name: 🔒 Run security audit
         run: |
           echo "🔒 Running security audit..."
-          pnpm audit --audit-level moderate || echo "⚠️ Security vulnerabilities found - review required"
+          pnpm audit || echo "⚠️ Security vulnerabilities found - review required"
           echo "✅ Security audit completed"
 
       - name: 🧪 Validate environment setup

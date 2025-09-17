@@ -48,6 +48,26 @@ import type {
 } from '@/types/api-types'
 import type { ClientNotification } from '@/types/notifications'
 
+// HTTP Request configuration interface
+export interface RequestConfig {
+  params?: Record<string, string | number | boolean>
+  headers?: Record<string, string>
+  timeout?: number
+  retry?: boolean | number
+  signal?: AbortSignal
+}
+
+// API Metrics interface
+export interface APIMetrics {
+  totalRequests: number
+  successfulRequests: number
+  failedRequests: number
+  averageResponseTime: number
+  cacheHits: number
+  cacheMisses: number
+  lastRequestTime?: Date
+}
+
 // Partners API interface
 export interface PartnersAPI {
   // Basic CRUD
@@ -94,13 +114,13 @@ export interface PartnersAPI {
   // Import/Export
   exportPartners(
     format: 'CSV' | 'EXCEL' | 'PDF',
-    filters?: Record<string, unknown>
+    filters?: PartnerFilters
   ): Promise<{
     url: string
     filename: string
   }>
   importPartners(
-    data: Record<string, unknown>[],
+    data: Record<string, string | number | boolean | null>[],
     options?: {
       skipErrors?: boolean
       dryRun?: boolean
@@ -108,7 +128,7 @@ export interface PartnersAPI {
   ): Promise<{
     imported: number
     errors: number
-    details: unknown[]
+    details: Array<{ row: number; field: string; error: string }>
   }>
 }
 
@@ -128,7 +148,7 @@ export interface MaterialsAPI {
   // Import/Export
   exportMaterials(
     format: 'CSV' | 'EXCEL' | 'PDF',
-    filters?: Record<string, unknown>
+    filters?: MaterialFilters
   ): Promise<FileUploadResponse>
   importMaterials(data: FormData): Promise<BatchOperationResponse<Material>>
 }
@@ -201,13 +221,13 @@ export interface SearchAPI {
   globalSearch(
     query: string,
     options?: {
-      types?: string[]
+      types?: Array<'partner' | 'material' | 'article' | 'project' | 'user'>
       limit?: number
       offset?: number
     }
   ): Promise<{
     results: Array<{
-      type: string
+      type: 'partner' | 'material' | 'article' | 'project' | 'user'
       id: string
       title: string
       description?: string
@@ -241,22 +261,22 @@ export interface FilesAPI {
 
 // Settings API interface
 export interface SettingsAPI {
-  getSettings(category?: string): Promise<Record<string, unknown>>
-  updateSetting(key: string, value: any): Promise<void>
-  updateSettings(settings: Record<string, unknown>): Promise<void>
+  getSettings(category?: string): Promise<Record<string, string | number | boolean>>
+  updateSetting(key: string, value: string | number | boolean): Promise<void>
+  updateSettings(settings: Record<string, string | number | boolean>): Promise<void>
   resetSettings(category?: string): Promise<void>
 
   // User preferences
-  getUserPreferences(): Promise<Record<string, unknown>>
-  updateUserPreference(key: string, value: any): Promise<void>
+  getUserPreferences(): Promise<Record<string, string | number | boolean>>
+  updateUserPreference(key: string, value: string | number | boolean): Promise<void>
   resetUserPreferences(): Promise<void>
 }
 
 // Reports API interface
 export interface ReportsAPI {
   generateReport(
-    type: string,
-    params?: Record<string, unknown>
+    type: 'partners' | 'materials' | 'articles' | 'projects' | 'sales' | 'inventory',
+    params?: Record<string, string | number | boolean | Date>
   ): Promise<{
     id: string
     status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
@@ -274,9 +294,9 @@ export interface ReportsAPI {
   listReports(): Promise<
     Array<{
       id: string
-      type: string
+      type: 'partners' | 'materials' | 'articles' | 'projects' | 'sales' | 'inventory'
       created: string
-      status: string
+      status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
     }>
   >
 }
@@ -296,17 +316,17 @@ export interface IAPIClient {
   reports: ReportsAPI
 
   // Generic HTTP methods (from base APIClient)
-  get<T>(endpoint: string, config?: any): Promise<T>
-  post<T>(endpoint: string, data?: unknown, config?: any): Promise<T>
-  put<T>(endpoint: string, data?: unknown, config?: any): Promise<T>
-  patch<T>(endpoint: string, data?: unknown, config?: any): Promise<T>
-  delete<T>(endpoint: string, config?: any): Promise<T>
-  upload<T>(endpoint: string, formData: FormData, config?: any): Promise<T>
+  get<T>(endpoint: string, config?: RequestConfig): Promise<T>
+  post<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
+  put<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
+  patch<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T>
+  delete<T>(endpoint: string, config?: RequestConfig): Promise<T>
+  upload<T>(endpoint: string, formData: FormData, config?: RequestConfig): Promise<T>
 
   // Utility methods
-  request<T>(endpoint: string, config?: any): Promise<T>
+  request<T>(endpoint: string, config?: RequestConfig): Promise<T>
   invalidateCache(pattern?: string): void
-  getMetrics(): any
+  getMetrics(): APIMetrics
   resetMetrics(): void
   createContextKey(domain: string, resource?: string, id?: string | number): string[]
 

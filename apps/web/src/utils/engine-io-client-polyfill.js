@@ -18,7 +18,7 @@ export function installTimerFunctions(obj, opts) {
 
 // Next tick polyfill
 export function nextTick(fn) {
-  if (typeof window !== 'undefined' && window.queueMicrotask) {
+  if (window?.queueMicrotask) {
     window.queueMicrotask(fn)
   } else {
     setTimeout(fn, 0)

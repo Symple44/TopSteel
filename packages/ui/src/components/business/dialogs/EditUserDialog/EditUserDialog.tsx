@@ -84,18 +84,18 @@ const editUserSchema = z
     firstName: z.string().min(1, 'Le prénom est requis'),
     lastName: z.string().min(1, 'Le nom est requis'),
     email: z.string().email('Email invalide').min(1, "L'email est requis"),
-    phone: z.string().optional(),
-    position: z.string().optional(),
+    phone: z.string().default(''),
+    position: z.string().default(''),
     // Account Information
     username: z.string().min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères"),
     resetPassword: z.boolean().default(false),
-    newPassword: z.string().optional(),
+    newPassword: z.string().default(''),
     mustChangePassword: z.boolean().default(false),
     // Role and Department
     role: z.enum(USER_ROLES),
     department: z.enum(DEPARTMENTS),
-    manager: z.string().optional(),
-    team: z.string().optional(),
+    manager: z.string().default(''),
+    team: z.string().default(''),
     // Permissions
     permissions: z
       .object({
@@ -123,22 +123,22 @@ const editUserSchema = z
         administration: [],
       }),
     // Work Information
-    startDate: z.string().optional(),
-    endDate: z.string().optional(),
+    startDate: z.string().default(''),
+    endDate: z.string().default(''),
     contractType: z.enum(['full_time', 'part_time', 'contractor', 'intern']),
-    hourlyRate: z.number().min(0).optional(),
+    hourlyRate: z.number().min(0).default(0),
     // Status Information
     isActive: z.boolean(),
     canAccessMobileApp: z.boolean(),
     maxSessionDuration: z.number().min(1).max(24),
-    lastLoginAt: z.string().optional(),
+    lastLoginAt: z.string().default(''),
     // Additional Information
-    notes: z.string().optional(),
+    notes: z.string().default(''),
   })
   .refine(
     (data) => {
       // If reset password is enabled, new password is required
-      if (data.resetPassword && (!data.newPassword || data.newPassword.length < 6)) {
+      if (data.resetPassword && data.newPassword.length < 6) {
         return false
       }
       // End date must be after start date if both are provided
@@ -259,11 +259,13 @@ export function EditUserDialog({
         resetPassword: false,
         newPassword: '',
         mustChangePassword: false,
-        role: (userData.role as any) || 'employee',
-        department: (userData.department as any) || 'administration',
+        role: (userData.role as (typeof USER_ROLES)[number]) || 'employee',
+        department: (userData.department as (typeof DEPARTMENTS)[number]) || 'administration',
         manager: userData.manager || '',
         team: userData.team || '',
-        contractType: (userData.contractType as any) || 'full_time',
+        contractType:
+          (userData.contractType as 'full_time' | 'part_time' | 'contractor' | 'intern') ||
+          'full_time',
         hourlyRate: userData.hourlyRate,
         isActive: userData.isActive,
         canAccessMobileApp: userData.canAccessMobileApp,
@@ -332,7 +334,7 @@ export function EditUserDialog({
       setError(null)
       // Remove new password if reset is not requested
       if (!data.resetPassword) {
-        data.newPassword = undefined
+        data.newPassword = ''
       }
       await onSubmit?.(data)
       onOpenChange(false)
@@ -424,7 +426,7 @@ export function EditUserDialog({
         </DialogHeader>
         <ScrollArea className="max-h-[75vh] pr-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               {error && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
@@ -472,7 +474,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
@@ -485,7 +487,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
@@ -498,7 +500,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
@@ -511,7 +513,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
@@ -524,7 +526,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="position"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
@@ -548,7 +550,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="username"
                     render={({ field }) => (
                       <FormItem className="max-w-md">
@@ -564,7 +566,7 @@ export function EditUserDialog({
                   <Separator />
                   <div className="space-y-4">
                     <FormField
-                      control={form.control as any}
+                      control={form.control}
                       name="resetPassword"
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
@@ -585,7 +587,7 @@ export function EditUserDialog({
                     {watchResetPassword && (
                       <div className="grid gap-4 md:grid-cols-2 pl-6 border-l-2">
                         <FormField
-                          control={form.control as any}
+                          control={form.control}
                           name="newPassword"
                           render={({ field }) => (
                             <FormItem>
@@ -617,7 +619,7 @@ export function EditUserDialog({
                           )}
                         />
                         <FormField
-                          control={form.control as any}
+                          control={form.control}
                           name="mustChangePassword"
                           render={({ field }) => (
                             <FormItem className="flex items-center space-x-2 space-y-0">
@@ -634,7 +636,7 @@ export function EditUserDialog({
                     )}
                   </div>
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="maxSessionDuration"
                     render={({ field }) => (
                       <FormItem className="max-w-xs">
@@ -664,7 +666,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="role"
                     render={({ field }) => (
                       <FormItem>
@@ -697,7 +699,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="department"
                     render={({ field }) => (
                       <FormItem>
@@ -722,7 +724,7 @@ export function EditUserDialog({
                   />
                   {availableManagers.length > 0 && (
                     <FormField
-                      control={form.control as any}
+                      control={form.control}
                       name="manager"
                       render={({ field }) => (
                         <FormItem>
@@ -749,7 +751,7 @@ export function EditUserDialog({
                   )}
                   {availableTeams.length > 0 && (
                     <FormField
-                      control={form.control as any}
+                      control={form.control}
                       name="team"
                       render={({ field }) => (
                         <FormItem>
@@ -794,7 +796,7 @@ export function EditUserDialog({
                         {permissions.map((permission) => (
                           <FormField
                             key={`${category}-${permission}`}
-                            control={form.control as any}
+                            control={form.control}
                             name={`permissions.${category as keyof EditUserFormData['permissions']}`}
                             render={({ field }) => (
                               <FormItem className="flex items-center space-x-2">
@@ -832,7 +834,7 @@ export function EditUserDialog({
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
@@ -845,7 +847,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="endDate"
                     render={({ field }) => (
                       <FormItem>
@@ -861,7 +863,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="contractType"
                     render={({ field }) => (
                       <FormItem>
@@ -884,7 +886,7 @@ export function EditUserDialog({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="hourlyRate"
                     render={({ field }) => (
                       <FormItem>
@@ -917,7 +919,7 @@ export function EditUserDialog({
                 <CardContent className="space-y-4">
                   <div className="flex gap-6">
                     <FormField
-                      control={form.control as any}
+                      control={form.control}
                       name="isActive"
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
@@ -929,7 +931,7 @@ export function EditUserDialog({
                       )}
                     />
                     <FormField
-                      control={form.control as any}
+                      control={form.control}
                       name="canAccessMobileApp"
                       render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 space-y-0">
@@ -944,7 +946,7 @@ export function EditUserDialog({
                     />
                   </div>
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name="notes"
                     render={({ field }) => (
                       <FormItem>

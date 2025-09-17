@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { CsrfModule } from './security/csrf'
 import { EnhancedThrottlerGuard } from './security/guards/enhanced-throttler.guard'
 import { LogSanitizationModule } from './security/log-sanitization'
-import { RateLimitingModule } from './security/rate-limiting/rate-limiting.module'
+import { createRateLimitingModuleForRoot } from './security/rate-limiting/rate-limiting.module'
 
 /**
  * Infrastructure Module
@@ -28,7 +28,7 @@ import { RateLimitingModule } from './security/rate-limiting/rate-limiting.modul
     LogSanitizationModule,
 
     // Advanced Rate Limiting with comprehensive features
-    RateLimitingModule.forRoot({
+    createRateLimitingModuleForRoot({
       enableMonitoring: process.env.NODE_ENV === 'production',
       enableProgressivePenalties: process.env.NODE_ENV === 'production',
     }),
@@ -68,7 +68,6 @@ import { RateLimitingModule } from './security/rate-limiting/rate-limiting.modul
     EnhancedThrottlerGuard,
     CsrfModule,
     LogSanitizationModule,
-    RateLimitingModule,
   ],
 })
 export class InfrastructureModule {}

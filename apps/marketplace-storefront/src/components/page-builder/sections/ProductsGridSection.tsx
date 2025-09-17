@@ -5,6 +5,15 @@ import { ProductCard } from '@/components/product/product-card'
 import { marketplaceApi } from '@/lib/api/client'
 import { SectionWrapper } from './SectionWrapper'
 import type { SectionProps } from './types'
+import type { Product } from '@/lib/api/storefront'
+
+// Type pour les paramètres de requête API
+interface ProductQueryParams {
+  limit?: number
+  categoryId?: string
+  featured?: boolean
+  sort?: string
+}
 
 export interface ProductsGridContent {
   title?: string
@@ -31,8 +40,8 @@ export function ProductsGridSection({
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', content.source, content.categoryId, content.limit],
-    queryFn: async () => {
-      const params: Record<string, unknown> = {
+    queryFn: async (): Promise<Product[]> => {
+      const params: ProductQueryParams = {
         limit: content.limit || 12,
       }
 
@@ -47,7 +56,7 @@ export function ProductsGridSection({
       }
 
       const response = await marketplaceApi.get('/products', { params })
-      return (response as { data: { data: unknown[] } }).data.data
+      return (response as { data: { data: Product[] } }).data.data
     },
   })
 
@@ -86,10 +95,9 @@ export function ProductsGridSection({
         <div
           className={`grid ${gridColumns.mobile} ${gridColumns.tablet} ${gridColumns.desktop} gap-6`}
         >
-          {products?.map((product: unknown) => {
-            const p = product as { id: string }
-            return <ProductCard key={p.id} product={product as any} tenant={tenant || 'demo'} />
-          })}
+          {products?.map((product: Product) => (
+            <ProductCard key={product.id} product={product} tenant={tenant || 'demo'} />
+          ))}
         </div>
       )}
     </SectionWrapper>

@@ -1,4 +1,5 @@
 // apps/web/src/lib/api.ts - Client API pour Zustand stores
+// @ts-ignore - Build order issue
 import { ERPApiClient } from '@erp/api-client'
 import {
   type Projet,

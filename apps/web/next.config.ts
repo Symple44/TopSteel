@@ -504,11 +504,11 @@ const nextConfig: NextConfig = {
         const originalExternals = config.externals
         config.externals = async (
           ...args: [
-            context: any,
+            context: { request?: string; getResolve?: () => unknown },
             request: string | undefined,
             callback?: (
               err?: Error | null,
-              result?: string | boolean | string[] | { [key: string]: any }
+              result?: string | boolean | string[] | Record<string, unknown>
             ) => void,
           ]
         ) => {
@@ -529,11 +529,11 @@ const nextConfig: NextConfig = {
         config.externals.push(
           (
             ...args: [
-              context: any,
+              context: { request?: string; getResolve?: () => unknown },
               request: string | undefined,
               callback?: (
                 err?: Error | null,
-                result?: string | boolean | string[] | { [key: string]: any }
+                result?: string | boolean | string[] | Record<string, unknown>
               ) => void,
             ]
           ) => {

@@ -4,6 +4,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useState } from 'react'
 
+// Type pour les erreurs avec structure connue
+interface APIError {
+  response?: {
+    status?: number
+    data?: unknown
+  }
+  message?: string
+  code?: string
+}
+
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -14,10 +24,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             gcTime: 5 * 60 * 1000, // 5 minutes
             retry: (failureCount, error: unknown) => {
               // Ne pas retry si c'est une erreur 404 ou tenant non trouvé
-              if (
-                (error as any)?.response?.status === 404 ||
-                (error as any)?.message === 'TENANT_NOT_FOUND'
-              ) {
+              const apiError = error as APIError
+              if (apiError?.response?.status === 404 || apiError?.message === 'TENANT_NOT_FOUND') {
                 return false
               }
               return failureCount < 3

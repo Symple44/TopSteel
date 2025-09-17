@@ -21,6 +21,7 @@ import { rateLimitingConfig } from './rate-limiting.config'
 import { ProgressivePenaltyService } from './services/progressive-penalty.service'
 import { RateLimitingMonitoringService } from './services/rate-limiting-monitoring.service'
 
+// Core module definition
 @Global()
 @Module({
   imports: [ConfigModule.forFeature(rateLimitingConfig), RedisModule, ScheduleModule.forRoot()],
@@ -49,72 +50,73 @@ import { RateLimitingMonitoringService } from './services/rate-limiting-monitori
     CombinedRateLimitGuard,
   ],
 })
-export class RateLimitingModule {
-  /**
-   * Configure rate limiting with custom settings
-   */
-  static forRoot(options?: {
-    enableMonitoring?: boolean
-    enableProgressivePenalties?: boolean
-    customConfig?: Record<string, unknown>
-  }) {
-    return {
-      module: RateLimitingModule,
-      imports: [
-        ConfigModule.forFeature(() => ({
-          rateLimiting: {
-            ...rateLimitingConfig(),
-            monitoring: {
-              ...rateLimitingConfig().monitoring,
-              enabled: options?.enableMonitoring ?? rateLimitingConfig().monitoring.enabled,
-            },
-            penalties: {
-              ...rateLimitingConfig().penalties,
-              enabled:
-                options?.enableProgressivePenalties ?? rateLimitingConfig().penalties.enabled,
-            },
-            ...options?.customConfig,
+export class RateLimitingModule {}
+
+/**
+ * Configure rate limiting with custom settings
+ */
+export function createRateLimitingModuleForRoot(options?: {
+  enableMonitoring?: boolean
+  enableProgressivePenalties?: boolean
+  customConfig?: Record<string, unknown>
+}) {
+  return {
+    module: RateLimitingModule,
+    imports: [
+      ConfigModule.forFeature(() => ({
+        rateLimiting: {
+          ...rateLimitingConfig(),
+          monitoring: {
+            ...rateLimitingConfig().monitoring,
+            enabled: options?.enableMonitoring ?? rateLimitingConfig().monitoring.enabled,
           },
-        })),
-        RedisModule,
-        ScheduleModule.forRoot(),
-      ],
-      providers: [
-        AdvancedRateLimitingService,
-        ProgressivePenaltyService,
-        RateLimitingMonitoringService,
-        AdvancedRateLimitGuard,
-        UserRateLimitGuard,
-        RoleBasedRateLimitGuard,
-        CombinedRateLimitGuard,
-      ],
-      exports: [
-        AdvancedRateLimitingService,
-        ProgressivePenaltyService,
-        RateLimitingMonitoringService,
-        AdvancedRateLimitGuard,
-        UserRateLimitGuard,
-        RoleBasedRateLimitGuard,
-        CombinedRateLimitGuard,
-      ],
-    }
+          penalties: {
+            ...rateLimitingConfig().penalties,
+            enabled: options?.enableProgressivePenalties ?? rateLimitingConfig().penalties.enabled,
+          },
+          ...options?.customConfig,
+        },
+      })),
+      RedisModule,
+      ScheduleModule.forRoot(),
+    ],
+    providers: [
+      AdvancedRateLimitingService,
+      ProgressivePenaltyService,
+      RateLimitingMonitoringService,
+      AdvancedRateLimitGuard,
+      UserRateLimitGuard,
+      RoleBasedRateLimitGuard,
+      CombinedRateLimitGuard,
+    ],
+    exports: [
+      AdvancedRateLimitingService,
+      ProgressivePenaltyService,
+      RateLimitingMonitoringService,
+      AdvancedRateLimitGuard,
+      UserRateLimitGuard,
+      RoleBasedRateLimitGuard,
+      CombinedRateLimitGuard,
+    ],
   }
+}
 
-  /**
-   * Configure rate limiting for feature modules
-   */
-  static forFeature(guards: ('advanced' | 'user' | 'role' | 'combined')[] = ['advanced']) {
-    const guardProviders = []
+/**
+ * Configure rate limiting for feature modules
+ */
+export function createRateLimitingModuleForFeature(
+  guards: ('advanced' | 'user' | 'role' | 'combined')[] = ['advanced']
+) {
+  const guardProviders = []
 
-    if (guards.includes('advanced')) guardProviders.push(AdvancedRateLimitGuard)
-    if (guards.includes('user')) guardProviders.push(UserRateLimitGuard)
-    if (guards.includes('role')) guardProviders.push(RoleBasedRateLimitGuard)
-    if (guards.includes('combined')) guardProviders.push(CombinedRateLimitGuard)
+  if (guards.includes('advanced')) guardProviders.push(AdvancedRateLimitGuard)
+  if (guards.includes('user')) guardProviders.push(UserRateLimitGuard)
+  if (guards.includes('role')) guardProviders.push(RoleBasedRateLimitGuard)
+  if (guards.includes('combined')) guardProviders.push(CombinedRateLimitGuard)
 
-    return {
-      module: RateLimitingModule,
-      providers: guardProviders,
-      exports: guardProviders,
-    }
+  return {
+    module: RateLimitingModule,
+    providers: guardProviders,
+    exports: guardProviders,
   }
 }

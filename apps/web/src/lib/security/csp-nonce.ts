@@ -57,7 +57,7 @@ export function useCSPNonce(): string | undefined {
  * Note: This should only be used as a fallback. Server-generated nonces are preferred.
  */
 export function generateClientNonce(): string {
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+  if (crypto?.getRandomValues) {
     const array = new Uint8Array(16)
     crypto?.getRandomValues(array)
     return btoa(String?.fromCharCode?.apply(null, Array.from(array)))
