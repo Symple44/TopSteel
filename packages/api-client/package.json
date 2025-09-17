@@ -63,7 +63,7 @@
     "@erp/domains": "workspace:*",
     "@erp/entities": "workspace:*",
     "@erp/utils": "workspace:*",
-    "axios": "^1.11.0",
+    "axios": "^1.12.2",
     "zod": "^4.0.15"
   },
   "devDependencies": {
