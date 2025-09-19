@@ -39,7 +39,7 @@ jobs:
           version: 10.13.1
       
       - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22.14.0'
 
@@ -176,7 +176,7 @@ jobs:
           version: 10.13.1
       
       - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22.14.0'
       
