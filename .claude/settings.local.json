@@ -58,7 +58,8 @@
       "Bash(docker build:*)",
       "Bash(python:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": [],

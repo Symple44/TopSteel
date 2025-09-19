@@ -66,7 +66,7 @@ jobs:
       - uses: actions/labeler@v5
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          configuration-path: .github/labeler.yml
+          configuration-path: .github/pr-labeler.yml
 
   # Vérification des commits conventionnels
   commitlint:
@@ -81,7 +81,7 @@ jobs:
       - name: Check commits
         uses: wagoid/commitlint-github-action@v6
         with:
-          configFile: .commitlintrc.json
+          configFile: commitlint.config.js
 
   # Analyse des fichiers modifiés
   changed-files:

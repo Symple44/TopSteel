@@ -1,0 +1,50 @@
+# Configuration du PR Labeler
+# Associe automatiquement des labels aux PRs selon les fichiers modifiés
+
+# Frontend
+frontend:
+  - apps/web/**/*
+  - apps/marketplace-storefront/**/*
+  - packages/ui/**/*
+
+# Backend
+backend:
+  - apps/api/**/*
+  - apps/marketplace-api/**/*
+
+# Documentation
+documentation:
+  - '*.md'
+  - docs/**/*
+
+# Configuration
+config:
+  - .github/**/*
+  - '*.json'
+  - '*.yml'
+  - '*.yaml'
+
+# Tests
+tests:
+  - '**/*.test.ts'
+  - '**/*.spec.ts'
+  - apps/e2e/**/*
+
+# Dependencies
+dependencies:
+  - package.json
+  - pnpm-lock.yaml
+  - '**/package.json'
+
+# Security
+security:
+  - .github/workflows/security.yml
+  - scripts/security/**/*
+  - '**/*security*'
+
+# Infrastructure
+infrastructure:
+  - docker/**/*
+  - '**/Dockerfile'
+  - docker-compose*.yml
+  - .github/workflows/**/*
