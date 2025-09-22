@@ -16,7 +16,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "typeorm": "^0.3.25"
+    "typeorm": "^0.3.27"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
