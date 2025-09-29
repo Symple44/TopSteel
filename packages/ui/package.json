@@ -41,9 +41,9 @@
     "@radix-ui/react-visually-hidden": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "dompurify": "^3.2.6",
-    "isomorphic-dompurify": "^2.26.0",
-    "lucide-react": "^0.539.0",
+    "dompurify": "^3.2.7",
+    "isomorphic-dompurify": "^2.28.0",
+    "lucide-react": "^0.544.0",
     "next-themes": "^0.4.6",
     "tailwind-merge": "^3.3.1"
   },
@@ -215,7 +215,7 @@
     "ts-jest": "^29.4.1",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",
-    "vite": "7.1.5",
+    "vite": "7.1.7",
     "vite-bundle-analyzer": "^1.2.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"

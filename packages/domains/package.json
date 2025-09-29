@@ -80,8 +80,8 @@
     "color-name": "^2.0.0",
     "color-string": "^2.0.1",
     "debug": "^4.4.1",
-    "detect-libc": "^2.0.4",
-    "flatbuffers": "^25.2.10",
+    "detect-libc": "^2.1.1",
+    "flatbuffers": "^25.9.23",
     "hpagent": "^1.2.0",
     "is-arrayish": "^0.3.2",
     "ms": "^2.1.3",
@@ -92,7 +92,7 @@
     "undici": "^7.13.0"
   },
   "optionalDependencies": {
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.4"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
