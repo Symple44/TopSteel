@@ -11,7 +11,9 @@ export default defineConfig({
     'lib/index': 'src/lib/index.ts',
   },
   format: ['esm', 'cjs'],
-  dts: false, // Disabled - will use tsc instead
+  dts: {
+    resolve: true,
+  },
   clean: true,
   sourcemap: true,
   minify: process.env.NODE_ENV === 'production',
@@ -20,8 +22,8 @@ export default defineConfig({
   target: 'es2022',
   platform: 'neutral',
 
-  // Configuration TypeScript optimisée
-  tsconfig: './tsconfig.json',
+  // Configuration TypeScript optimisée - use build config for DTS
+  tsconfig: './tsconfig.build.json',
 
   // Dossier de sortie
   outDir: 'dist',

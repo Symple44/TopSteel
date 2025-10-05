@@ -21,7 +21,6 @@
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "noEmit": false,
-    "emitDeclarationOnly": true,
 
     "outDir": "./dist",
     "rootDir": "./src"

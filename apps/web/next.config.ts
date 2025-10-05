@@ -221,6 +221,13 @@ const nextConfig: NextConfig = {
       },
     }
 
+    // Handle node: protocol imports
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+        resource.request = resource.request.replace(/^node:/, '')
+      })
+    )
+
     // Cache optimizations to reduce .next folder size
     if (!dev) {
       // Re-enable filesystem cache for better performance
@@ -422,6 +429,10 @@ const nextConfig: NextConfig = {
       fs: false,
       path: false,
       os: false,
+      crypto: false,
+      stream: false,
+      buffer: false,
+      util: false,
       debug: path.resolve(__dirname, './src/utils/debug-polyfill.js'),
       'socket.io-parser': path.resolve(__dirname, './src/utils/socket-io-parser-polyfill.js'),
       'engine.io-client': path.resolve(__dirname, './src/utils/engine-io-client-polyfill.js'),
