@@ -22,7 +22,7 @@
     "@erp/config": "workspace:*",
     "@testing-library/jest-dom": "^6.7.0",
     "@vitest/ui": "^3.2.4",
-    "happy-dom": "^18.0.1",
+    "happy-dom": "^20.0.7",
     "tsup": "^8.5.0",
     "typescript": "5.9.2",
     "vitest": "^3.2.4"
