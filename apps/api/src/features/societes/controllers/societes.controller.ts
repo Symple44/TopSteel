@@ -3,11 +3,9 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import type { CreateTenantDto } from '../dto/create-tenant.dto'
 import type { Societe } from '../entities/societe.entity'
-import type { SocietesService } from '../services/societes.service'
-import type {
-  TenantProvisioningResult,
-  TenantProvisioningService,
-} from '../services/tenant-provisioning.service'
+import { SocietesService } from '../services/societes.service'
+import { TenantProvisioningService } from '../services/tenant-provisioning.service'
+import type { TenantProvisioningResult } from '../services/tenant-provisioning.service'
 
 @ApiTags('Sociétés')
 @Controller('societes')

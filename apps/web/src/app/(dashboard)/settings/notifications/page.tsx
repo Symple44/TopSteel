@@ -101,18 +101,18 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Mail className="h-6 w-6 mr-3 text-blue-600" />
-                {t('settingsEnhanced?.notifications?.sections.email')}
+                {t('settingsEnhanced.notifications.sections.email')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries({
-                newMessages: t('settingsEnhanced?.notifications?.emailTypes.newMessages'),
-                systemAlerts: t('settingsEnhanced?.notifications?.emailTypes.systemAlerts'),
-                taskReminders: t('settingsEnhanced?.notifications?.emailTypes.taskReminders'),
+                newMessages: t('settingsEnhanced.notifications.emailTypes.newMessages'),
+                systemAlerts: t('settingsEnhanced.notifications.emailTypes.systemAlerts'),
+                taskReminders: t('settingsEnhanced.notifications.emailTypes.taskReminders'),
                 weeklyReports: 'Rapports hebdomadaires',
                 securityAlerts: 'Alertes de sécurité',
                 maintenanceNotice: t(
-                  'settingsEnhanced?.notifications?.emailTypes.maintenanceNotifications'
+                  'settingsEnhanced.notifications.emailTypes.maintenanceNotifications'
                 ),
               }).map(([key, label]) => (
                 <div key={key} className="flex items-center justify-between py-2">
@@ -136,13 +136,13 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Smartphone className="h-6 w-6 mr-3 text-green-600" />
-                {t('settingsEnhanced?.notifications?.sections.push')}
+                {t('settingsEnhanced.notifications.sections.push')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between py-2">
                 <span className="text-slate-700">
-                  {t('settingsEnhanced?.notifications?.descriptions.pushNotifications')}
+                  {t('settingsEnhanced.notifications.descriptions.pushNotifications')}
                 </span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -161,7 +161,7 @@ export default function NotificationsSettingsPage() {
                 <>
                   <div className="flex items-center justify-between py-2">
                     <span className="text-slate-700">
-                      {t('settingsEnhanced?.notifications?.descriptions.soundNotifications')}
+                      {t('settingsEnhanced.notifications.descriptions.soundNotifications')}
                     </span>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -178,7 +178,7 @@ export default function NotificationsSettingsPage() {
 
                   <div className="space-y-3">
                     <h4 className="font-medium text-slate-700">
-                      {t('settingsEnhanced?.notifications?.sections.categories')} :
+                      {t('settingsEnhanced.notifications.sections.categories')} :
                     </h4>
                     {Object.entries({
                       urgent: 'Notifications urgentes',
@@ -213,7 +213,7 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Clock className="h-6 w-6 mr-3 text-purple-600" />
-                {t('settingsEnhanced?.notifications?.sections.silent')}
+                {t('settingsEnhanced.notifications.sections.silent')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">

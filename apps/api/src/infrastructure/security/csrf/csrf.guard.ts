@@ -6,9 +6,9 @@ import {
   Logger,
   SetMetadata,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
+import { Reflector } from '@nestjs/core'
 import type { Request } from 'express'
-import type { CsrfService } from './csrf.service'
+import { CsrfService } from './csrf.service'
 
 // Décorateur pour désactiver la protection CSRF sur des routes spécifiques
 export const SkipCsrf = () => SetMetadata('skipCsrf', true)

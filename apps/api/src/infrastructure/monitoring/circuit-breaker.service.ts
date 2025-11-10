@@ -1,7 +1,7 @@
 // apps/api/src/common/services/circuit-breaker.service.ts
 import { Injectable, Logger } from '@nestjs/common'
 import CircuitBreaker from 'opossum'
-import type { MetricsService } from './metrics.service'
+import { MetricsService } from './metrics.service'
 
 export interface CircuitBreakerOptions {
   timeout?: number

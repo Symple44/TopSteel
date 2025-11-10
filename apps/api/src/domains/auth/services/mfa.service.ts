@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type { MFAMethod, WebAuthnAuthenticationResponse } from '../../../types/auth/webauthn.types'
 import { User } from '../../users/entities/user.entity'
 import { GlobalUserRole } from '../core/constants/roles.constants'
 import { MFASession } from '../core/entities/mfa-session.entity'
 import { UserMFA } from '../core/entities/user-mfa.entity'
-import type { GeolocationService } from './geolocation.service'
-import type { SMSService } from './sms.service'
-import type { TOTPService } from './totp.service'
-import type { WebAuthnService } from './webauthn.service'
+import { GeolocationService } from './geolocation.service'
+import { SMSService } from './sms.service'
+import { TOTPService } from './totp.service'
+import { WebAuthnService } from './webauthn.service'
 
 interface MFASetupResult {
   success: boolean

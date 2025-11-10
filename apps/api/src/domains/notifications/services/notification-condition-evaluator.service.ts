@@ -1,8 +1,8 @@
-import type { HttpService } from '@nestjs/axios'
+import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { firstValueFrom } from 'rxjs'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { ConditionType, NotificationCondition } from '../entities/notification-condition.entity'
 import type { RuleExecutionContext } from '../types/notification-types'
 

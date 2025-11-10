@@ -23,11 +23,8 @@ import {
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import type {
-  PriceCalculationResult,
-  PricingContext,
-  PricingEngineService,
-} from '../services/pricing-engine.service'
+import { PricingEngineService } from '../services/pricing-engine.service'
+import type { PriceCalculationResult, PricingContext } from '../services/pricing-engine.service'
 import type { AuthenticatedUser } from '../types/auth.types'
 
 // DTOs

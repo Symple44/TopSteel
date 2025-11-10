@@ -29,7 +29,7 @@ import {
 } from '../../core/interfaces/business-service.interface'
 import type { User } from '../../users/entities/user.entity'
 import type { CreateMaterialDto } from '../dto/create-material.dto'
-import type { InventoryFiltersDto, MaterialFiltersDto } from '../dto/material-filters.dto'
+import { InventoryFiltersDto, MaterialFiltersDto } from '../dto/material-filters.dto'
 import type { UpdateMaterialDto } from '../dto/update-material.dto'
 import type { Material, MaterialType } from '../entities/material.entity'
 import type {
@@ -37,11 +37,8 @@ import type {
   MaterialCompatibilityAnalysis,
   MaterialStockAlert,
 } from '../repositories/material.repository'
-import type {
-  MaterialService,
-  MaterialStatistics,
-  MaterialStockValorisation,
-} from '../services/material.service'
+import { MaterialService } from '../services/material.service'
+import type { MaterialStatistics, MaterialStockValorisation } from '../services/material.service'
 
 /**
  * Contrôleur REST pour la gestion des matériaux industriels

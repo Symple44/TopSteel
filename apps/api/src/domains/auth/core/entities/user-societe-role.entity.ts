@@ -71,9 +71,6 @@ export class UserSocieteRole {
   @UpdateDateColumn()
   updatedAt!: Date
 
-  @Column({ name: 'deleted_at', nullable: true, type: 'timestamp' })
-  deletedAt?: Date
-
   // Relations
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })

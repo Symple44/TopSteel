@@ -34,7 +34,7 @@ export {
   createLogger,
   dbLogger,
   type LoggerConfig,
-  LogLevel,
+  type LogLevelValue,
   logger,
   webLogger,
 } from './logger'

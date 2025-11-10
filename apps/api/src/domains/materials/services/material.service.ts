@@ -12,7 +12,7 @@ import {
   MaterialType,
   StorageMethod,
 } from '../entities/material.entity'
-import type { IMaterialRepository } from '../repositories/material.repository'
+import { IMaterialRepository } from '../repositories/material.repository'
 import type {
   MaterialAdvancedFilters,
   MaterialCompatibilityAnalysis,

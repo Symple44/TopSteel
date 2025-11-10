@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { Repository } from 'typeorm'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { AuditLog } from '../core/entities/audit-log.entity'
 
 /**

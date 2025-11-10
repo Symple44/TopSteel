@@ -1,6 +1,6 @@
 import { PriceRule } from '@erp/entities'
 import { Injectable } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { DataSource, type DataSourceOptions } from 'typeorm'
 import { Group } from '../../../domains/auth/core/entities/group.entity'
@@ -109,7 +109,7 @@ export class MultiTenantDatabaseConfig {
         MenuItemPermission,
         MenuItemRole,
       ],
-      synchronize: false, // Toujours false en production
+      synchronize: false, // Migrations déjà exécutées
       logging: this.configService.get('DB_LOGGING', false),
       migrations: ['src/core/database/migrations/auth/*{.ts,.js}'],
       migrationsRun: false,
@@ -128,7 +128,7 @@ export class MultiTenantDatabaseConfig {
       password: this.configService.get('DB_PASSWORD', 'postgres'),
       database: this.configService.get('DB_SHARED_NAME', 'erp_topsteel_shared'),
       entities: SharedEntities,
-      synchronize: false,
+      synchronize: false, // Migrations déjà exécutées
       logging: this.configService.get('DB_LOGGING', false),
       migrations: ['src/core/database/migrations/shared/*{.ts,.js}'],
       migrationsRun: false,

@@ -11,7 +11,7 @@ export enum SiteType {
 
 @Entity('sites')
 export class Site extends CommonEntity {
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'societe_id' })
   @Index()
   societeId!: string
 
@@ -19,7 +19,7 @@ export class Site extends CommonEntity {
     () => Societe,
     (societe) => societe.sites
   )
-  @JoinColumn({ name: 'societeId' })
+  @JoinColumn({ name: 'societe_id' })
   societe!: Societe
 
   @Column({ type: 'varchar', length: 255 })
@@ -37,7 +37,7 @@ export class Site extends CommonEntity {
   })
   type!: SiteType
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'is_principal' })
   isPrincipal!: boolean // Site principal de la société
 
   @Column({ type: 'boolean', default: true })

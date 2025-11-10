@@ -6,7 +6,7 @@
  *
  * Note: Pino is not installed, this is a stub implementation
  */
-import type { LogSanitizerService } from './log-sanitizer.service'
+import { LogSanitizerService } from './log-sanitizer.service'
 
 /**
  * Crée une configuration Pino avec sanitisation (stub)

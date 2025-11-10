@@ -5,9 +5,9 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
-import type { QueryBuilderPermissionService } from '../services/query-builder-permission.service'
-import type { QueryBuilderSecurityService } from './query-builder-security.service'
+import { Reflector } from '@nestjs/core'
+import { QueryBuilderPermissionService } from '../services/query-builder-permission.service'
+import { QueryBuilderSecurityService } from './query-builder-security.service'
 
 /**
  * Security levels for query builder operations

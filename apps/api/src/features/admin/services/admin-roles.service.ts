@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../../domains/auth/core/entities/role-permission.entity'

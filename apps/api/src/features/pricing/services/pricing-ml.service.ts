@@ -1,7 +1,7 @@
 import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { SalesHistory } from '../entities/sales-history.entity'
 
 // Types TensorFlow.js

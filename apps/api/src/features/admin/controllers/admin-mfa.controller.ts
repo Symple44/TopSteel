@@ -22,8 +22,8 @@ import type { MFASession } from '../../../domains/auth/core/entities/mfa-session
 import type { UserMFA } from '../../../domains/auth/core/entities/user-mfa.entity'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
-import type { MFAService } from '../../../domains/auth/services/mfa.service'
+import { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
+import { MFAService } from '../../../domains/auth/services/mfa.service'
 import type { MFASecurityStats, MFAStatusData } from '../interfaces/mfa-admin.interfaces'
 
 @Controller('admin/mfa')

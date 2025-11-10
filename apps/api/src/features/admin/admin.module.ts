@@ -17,6 +17,7 @@ import { UsersModule } from '../../domains/users/users.module'
 import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 // Import du MenuModule pour accéder à PageSyncService
 import { MenuModule } from '../menu/menu.module'
+import { DiscoveredPage } from '../menu/entities/discovered-page.entity'
 // Import du module societes
 import { SocietesModule } from '../societes/societes.module'
 import { AdminMFAController } from './controllers/admin-mfa.controller'
@@ -45,7 +46,7 @@ import { SystemParametersService } from './system-parameters.service'
     MenuModule,
     SocietesModule,
     AuthModule,
-    TypeOrmModule.forFeature([SystemParameter], 'auth'),
+    TypeOrmModule.forFeature([SystemParameter, DiscoveredPage], 'auth'),
     // TypeOrmModule.forFeature([
     // Toutes les entités de menu causent des problèmes TypeScript
     // Utilisation de requêtes SQL brutes via MenuRawService

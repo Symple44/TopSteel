@@ -5,7 +5,7 @@ import type {
   ISocieteRepository,
   ISocieteUserRepository,
 } from '../interfaces/societe-repository.interface'
-import type { IUserRepository } from '../interfaces/user-repository.interface'
+import { IUserRepository } from '../interfaces/user-repository.interface'
 import {
   SOCIETE_REPOSITORY_TOKEN,
   SOCIETE_USER_REPOSITORY_TOKEN,

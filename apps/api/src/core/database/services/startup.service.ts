@@ -1,9 +1,9 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { DatabaseHealthService } from './health.service'
-import type { MigrationService } from './migration.service'
-import type { MigrationLoaderService } from './migration-loader.service'
-import type { SeederService } from './seeder.service'
+import { ConfigService } from '@nestjs/config'
+import { DatabaseHealthService } from './health.service'
+import { MigrationService } from './migration.service'
+import { MigrationLoaderService } from './migration-loader.service'
+import { SeederService } from './seeder.service'
 
 @Injectable()
 export class DatabaseStartupService implements OnModuleInit {
@@ -114,13 +114,14 @@ export class DatabaseStartupService implements OnModuleInit {
    * Gère les seeds
    */
   private async handleSeeds(): Promise<void> {
-    const autoRunSeeds = this.configService.get<boolean>('AUTO_RUN_SEEDS', this.isDevelopment)
+    // Temporarily disabled to fix startup issues
+    const autoRunSeeds = false // this.configService.get<boolean>('AUTO_RUN_SEEDS', this.isDevelopment)
 
     if (autoRunSeeds) {
       this.logger.log("🌱 Vérification des données d'initialisation...")
       await this.seederService.runSeeds()
     } else {
-      this.logger.log('⏭️  Seeds désactivés')
+      this.logger.log('⏭️  Seeds désactivés (utilisez create-test-data.js pour créer les données)')
     }
   }
 

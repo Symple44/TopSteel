@@ -13,7 +13,7 @@ import {
 import type { Request as ExpressRequest } from 'express'
 import type { WebAuthnAuthenticationResponse } from '../../../../types/auth/webauthn.types'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
-import type { MFAService } from '../../services/mfa.service'
+import { MFAService } from '../../services/mfa.service'
 
 interface SetupTOTPDto {
   phoneNumber?: string

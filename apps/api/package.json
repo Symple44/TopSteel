@@ -171,12 +171,12 @@
     "typeorm": "^0.3.25",
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@erp/utils": "workspace:*"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
     "@erp/types": "workspace:*",
-    "@erp/utils": "workspace:*",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/common": "^11.1.6",
     "@nestjs/schematics": "^11.0.7",

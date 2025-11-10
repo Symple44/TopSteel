@@ -8,7 +8,7 @@ import {
   QueryBuilderAdminAccess,
   QueryBuilderSecurityGuard,
 } from '../security/query-builder-security.guard'
-import type { QueryBuilderExecutorService } from '../services/query-builder-executor.service'
+import { QueryBuilderExecutorService } from '../services/query-builder-executor.service'
 
 // Removed - using ExecuteRawSqlDto from dto instead
 

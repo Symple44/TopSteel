@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import type { Redis } from 'ioredis'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import type { RateLimitingConfiguration } from '../rate-limiting.config'

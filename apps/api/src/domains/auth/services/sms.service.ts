@@ -1,9 +1,9 @@
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns'
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Auth } from '@vonage/auth'
-import { Vonage } from '@vonage/server-sdk'
+// import { Auth } from '@vonage/auth'
+// import { Vonage } from '@vonage/server-sdk'
 import * as Twilio from 'twilio'
 import { Between, type Repository } from 'typeorm'
 import { SMSLog } from '../entities/sms-log.entity'
@@ -52,12 +52,12 @@ export class SMSService {
   private readonly logger = new Logger(SMSService.name)
   private readonly config: SMSProviderConfig
   private twilioClient?: Twilio.Twilio
-  private vonageClient?: Vonage
+  // private vonageClient?: Vonage
   private snsClient?: SNSClient
 
   constructor(
     private readonly configService: ConfigService,
-    @InjectRepository(SMSLog)
+    @InjectRepository(SMSLog, 'auth')
     private readonly smsLogRepository: Repository<SMSLog>
   ) {
     this.config = {
@@ -91,15 +91,17 @@ export class SMSService {
           break
 
         case 'vonage':
-          if (this.config.apiKey && this.config.apiSecret) {
-            this.vonageClient = new Vonage(
-              new Auth({
-                apiKey: this.config.apiKey,
-                apiSecret: this.config.apiSecret,
-              })
-            )
-            this.logger.log('Vonage client initialized successfully')
-          }
+          // Vonage temporarily disabled due to dependency issues
+          this.logger.warn('Vonage SMS provider is currently disabled')
+          // if (this.config.apiKey && this.config.apiSecret) {
+          //   this.vonageClient = new Vonage(
+          //     new Auth({
+          //       apiKey: this.config.apiKey,
+          //       apiSecret: this.config.apiSecret,
+          //     })
+          //   )
+          //   this.logger.log('Vonage client initialized successfully')
+          // }
           break
 
         case 'aws-sns':
@@ -187,7 +189,9 @@ export class SMSService {
           response = await this.sendViaTwilio(request)
           break
         case 'vonage':
-          response = await this.sendViaVonage(request)
+          // Vonage temporarily disabled
+          this.logger.warn('Vonage provider is disabled, using mock instead')
+          response = await this.sendViaMock(request)
           break
         case 'aws-sns':
           response = await this.sendViaAWSSNS(request)
@@ -318,46 +322,47 @@ export class SMSService {
 
   /**
    * Envoi via Vonage (anciennement Nexmo)
+   * Temporarily disabled due to dependency issues
    */
-  private async sendViaVonage(request: SendSMSRequest): Promise<SendSMSResponse> {
-    if (!this.vonageClient) {
-      this.logger.error('Vonage client not initialized')
-      return {
-        success: false,
-        error: 'Vonage client not configured properly',
-      }
-    }
+  // private async sendViaVonage(request: SendSMSRequest): Promise<SendSMSResponse> {
+  //   if (!this.vonageClient) {
+  //     this.logger.error('Vonage client not initialized')
+  //     return {
+  //       success: false,
+  //       error: 'Vonage client not configured properly',
+  //     }
+  //   }
 
-    try {
-      const response = await this.vonageClient.sms.send({
-        from: this.config.senderId || 'TopSteel',
-        to: request.phoneNumber.replace('+', ''),
-        text: request.message,
-      })
+  //   try {
+  //     const response = await this.vonageClient.sms.send({
+  //       from: this.config.senderId || 'TopSteel',
+  //       to: request.phoneNumber.replace('+', ''),
+  //       text: request.message,
+  //     })
 
-      const messageData = response.messages?.[0]
+  //     const messageData = response.messages?.[0]
 
-      if (messageData?.status === '0') {
-        this.logger.log(`Vonage SMS sent successfully: ${messageData.messageId}`)
+  //     if (messageData?.status === '0') {
+  //       this.logger.log(`Vonage SMS sent successfully: ${messageData.messageId}`)
 
-        return {
-          success: true,
-          messageId: messageData.messageId,
-          status: 'sent',
-          cost: messageData.messagePrice ? parseFloat(messageData.messagePrice) : undefined,
-          segmentCount: 1,
-        }
-      } else {
-        throw new Error(messageData?.errorText || 'Unknown Vonage error')
-      }
-    } catch (error) {
-      this.logger.error('Vonage SMS sending failed:', error)
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Vonage sending failed',
-      }
-    }
-  }
+  //       return {
+  //         success: true,
+  //         messageId: messageData.messageId,
+  //         status: 'sent',
+  //         cost: messageData.messagePrice ? parseFloat(messageData.messagePrice) : undefined,
+  //         segmentCount: 1,
+  //       }
+  //     } else {
+  //       throw new Error(messageData?.errorText || 'Unknown Vonage error')
+  //     }
+  //   } catch (error) {
+  //     this.logger.error('Vonage SMS sending failed:', error)
+  //     return {
+  //       success: false,
+  //       error: error instanceof Error ? error.message : 'Vonage sending failed',
+  //     }
+  //   }
+  // }
 
   /**
    * Envoi via AWS SNS

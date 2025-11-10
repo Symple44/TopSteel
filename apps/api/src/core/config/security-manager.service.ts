@@ -1,8 +1,8 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { JwtRotationService } from './jwt-rotation.service'
-import type { SecretValidatorService } from './secret-validator.service'
-import type { SecretVaultService } from './secret-vault.service'
+import { ConfigService } from '@nestjs/config'
+import { JwtRotationService } from './jwt-rotation.service'
+import { SecretValidatorService } from './secret-validator.service'
+import { SecretVaultService } from './secret-vault.service'
 
 export interface SecurityStatus {
   overall: 'SECURE' | 'WARNING' | 'CRITICAL'

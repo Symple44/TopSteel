@@ -3,7 +3,7 @@ import { UnitConversionService } from '@erp/utils'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import * as mathjs from 'mathjs'
-import type { DataSource, Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 import type {
   AppliedRuleInfo,
   BreakdownContext,

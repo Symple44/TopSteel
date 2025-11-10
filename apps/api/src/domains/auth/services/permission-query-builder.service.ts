@@ -6,7 +6,7 @@ import {
   type SelectQueryBuilder,
   type WhereExpressionBuilder,
 } from 'typeorm'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type {
   PermissionData,
   UserSocieteRole as UserSocieteRoleType,

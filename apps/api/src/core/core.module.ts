@@ -32,8 +32,6 @@ import { IntegrityService } from './health/integrity.service'
 import { SystemHealthService } from './health/system-health-simple.service'
 // Redis
 import { RedisModule } from './redis/redis.module'
-// Services
-import { DatabaseStartupService } from './services/database-startup.service'
 
 /**
  * Core Module
@@ -53,6 +51,7 @@ import { DatabaseStartupService } from './services/database-startup.service'
     // Configuration globale
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env', '../../.env'], // Cherche d'abord dans apps/api, puis à la racine
       load: [appConfig, databaseConfig, jwtConfig, redisConfig],
       expandVariables: true,
     }),
@@ -79,7 +78,6 @@ import { DatabaseStartupService } from './services/database-startup.service'
   providers: [
     // Health services
     IntegrityService,
-    DatabaseStartupService,
     SystemHealthService,
 
     // Monitoring services
@@ -101,7 +99,6 @@ import { DatabaseStartupService } from './services/database-startup.service'
     ConfigModule,
     DatabaseMultiTenantModule,
     RedisModule,
-    DatabaseStartupService,
     MetricsService,
     MetricsSafeInterceptor,
     CircuitBreakerService,

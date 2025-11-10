@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
-import type { Repository } from 'typeorm'
-import type { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
+import { Repository } from 'typeorm'
+import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
 import { User, UserRole as UserRoleEnum } from '../../../domains/users/entities/user.entity'
 import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
 import { NotificationSettings } from '../../notifications/entities/notification-settings.entity'
-import type { Societe } from '../entities/societe.entity'
+import { Societe } from '../entities/societe.entity'
 import { SocieteUser, UserSocieteRole } from '../entities/societe-user.entity'
 
 export interface DefaultUserConfig {

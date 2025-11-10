@@ -1,10 +1,10 @@
 import { ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
-import type { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
-import { type Societe, SocieteStatus } from '../entities/societe.entity'
-import type { SocietesService } from './societes.service'
-import type { TenantInitializationService } from './tenant-initialization.service'
+import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
+import { Societe, SocieteStatus } from '../entities/societe.entity'
+import { SocietesService } from './societes.service'
+import { TenantInitializationService } from './tenant-initialization.service'
 
 export interface TenantProvisioningResult {
   success: boolean

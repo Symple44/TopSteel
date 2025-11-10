@@ -15,9 +15,9 @@ import { getErrorMessage } from '../../../core/common/utils'
 import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import type { CachedGlobalSearchService } from '../services/cached-global-search.service'
-import type { CacheStatistics, SearchCacheService } from '../services/search-cache.service'
-import type { SearchCacheInvalidationService } from '../services/search-cache-invalidation.service'
+import { CachedGlobalSearchService } from '../services/cached-global-search.service'
+import { CacheStatistics, SearchCacheService } from '../services/search-cache.service'
+import { SearchCacheInvalidationService } from '../services/search-cache-invalidation.service'
 
 @ApiTags('Search Cache Management')
 @Controller('api/search/cache')

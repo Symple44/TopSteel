@@ -1,4 +1,15 @@
-import DOMPurify from 'isomorphic-dompurify'
+// Use client-side DOMPurify only to avoid jsdom dependencies
+const getDOMPurify = () => {
+  if (typeof window === 'undefined') return null
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const dompurify = require('dompurify')
+    return dompurify.default || dompurify
+  } catch {
+    return null
+  }
+}
+
 import React from 'react'
 import type { ColumnConfig } from './types'
 
@@ -327,7 +338,10 @@ export class RenderUtils {
         return React.createElement('div', {
           contentEditable: true,
           dangerouslySetInnerHTML: {
-            __html: DOMPurify.sanitize((value as string) || '', {
+            __html: (() => {
+              const DOMPurify = getDOMPurify()
+              if (!DOMPurify) return (value as string) || ''
+              return DOMPurify.sanitize((value as string) || '', {
               ALLOWED_TAGS: [
                 'p',
                 'br',
@@ -351,7 +365,8 @@ export class RenderUtils {
               ALLOWED_ATTR: ['class', 'style'],
               ALLOW_DATA_ATTR: false,
               FORBID_TAGS: ['script', 'iframe'],
-            }) as unknown as string,
+            }) as unknown as string
+            })(),
           },
           onBlur: (e: React.FocusEvent<HTMLDivElement>) => handleChange(e.target.innerHTML),
           className:

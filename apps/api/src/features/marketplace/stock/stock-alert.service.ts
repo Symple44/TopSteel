@@ -1,13 +1,13 @@
 import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { OnEvent } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
-import type { EmailService } from '../../../core/email/email.service'
+import { EmailService } from '../../../core/email/email.service'
 import type { StockAlert } from '../../../domains/inventory/repositories/article.repository'
 
 interface StockAlertEvent {

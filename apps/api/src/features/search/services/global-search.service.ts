@@ -1,14 +1,14 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import type {
   ISearchStrategy,
   SearchOptions,
   SearchResponse,
 } from '../interfaces/search.interfaces'
 import type { SearchDocument, SearchStatistics } from '../types/search-types'
-import type { ElasticsearchSearchService } from './elasticsearch-search.service'
-import type { PostgreSQLSearchService } from './postgresql-search.service'
-import type { SearchIndexingOperationsService } from './search-indexing-operations.service'
+import { ElasticsearchSearchService } from './elasticsearch-search.service'
+import { PostgreSQLSearchService } from './postgresql-search.service'
+import { SearchIndexingOperationsService } from './search-indexing-operations.service'
 
 // Re-export interfaces for backwards compatibility
 export type {

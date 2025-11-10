@@ -5,7 +5,7 @@
  * tous les logs avant écriture pour protéger les données sensibles.
  */
 import * as winston from 'winston'
-import type { LogSanitizerService } from './log-sanitizer.service'
+import { LogSanitizerService } from './log-sanitizer.service'
 
 /**
  * Crée un formatter Winston qui sanitise les logs en production

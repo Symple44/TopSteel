@@ -52,72 +52,72 @@ export default function AdminPage() {
 
   const adminModules = [
     {
-      title: t('modules?.generalConfig?.title'),
-      description: t('modules?.generalConfig?.description'),
+      title: t('modules.generalConfig.title'),
+      description: t('modules.generalConfig.description'),
       icon: Settings,
       href: '/admin/admin',
       color: 'from-slate-500 to-gray-600',
       permissions: ['ADMIN'],
     },
     {
-      title: t('modules?.users?.title'),
-      description: t('modules?.users?.description'),
+      title: t('modules.users.title'),
+      description: t('modules.users.description'),
       icon: Users,
       href: '/admin/users',
       color: 'from-blue-500 to-indigo-600',
       permissions: ['ADMIN', 'USER_MANAGEMENT'],
     },
     {
-      title: t('modules?.roles?.title'),
-      description: t('modules?.roles?.description'),
+      title: t('modules.roles.title'),
+      description: t('modules.roles.description'),
       icon: Shield,
       href: '/admin/roles',
       color: 'from-purple-500 to-pink-600',
       permissions: ['ADMIN', 'ROLE_MANAGEMENT'],
     },
     {
-      title: t('modules?.sessions?.title'),
-      description: t('modules?.sessions?.description'),
+      title: t('modules.sessions.title'),
+      description: t('modules.sessions.description'),
       icon: UserCog,
       href: '/admin/sessions',
       color: 'from-green-500 to-teal-600',
       permissions: ['ADMIN', 'SESSION_MANAGEMENT'],
     },
     {
-      title: t('modules?.company?.title'),
-      description: t('modules?.company?.description'),
+      title: t('modules.company.title'),
+      description: t('modules.company.description'),
       icon: Building2,
       href: '/admin/company',
       color: 'from-orange-500 to-red-600',
       permissions: ['ADMIN', 'COMPANY_MANAGEMENT'],
     },
     {
-      title: t('modules?.menuConfig?.title'),
-      description: t('modules?.menuConfig?.description'),
+      title: t('modules.menuConfig.title'),
+      description: t('modules.menuConfig.description'),
       icon: Menu,
       href: '/admin/menu-config',
       color: 'from-cyan-500 to-blue-600',
       permissions: ['ADMIN', 'MENU_MANAGEMENT'],
     },
     {
-      title: t('modules?.database?.title'),
-      description: t('modules?.database?.description'),
+      title: t('modules.database.title'),
+      description: t('modules.database.description'),
       icon: Database,
       href: '/admin/database',
       color: 'from-red-500 to-pink-600',
       permissions: ['ADMIN', 'DATABASE_MANAGEMENT'],
     },
     {
-      title: t('modules?.notifications?.title'),
-      description: t('modules?.notifications?.description'),
+      title: t('modules.notifications.title'),
+      description: t('modules.notifications.description'),
       icon: Bell,
       href: '/admin/notifications/rules',
       color: 'from-yellow-500 to-orange-600',
       permissions: ['ADMIN', 'NOTIFICATION_MANAGEMENT'],
     },
     {
-      title: t('modules?.translations?.title'),
-      description: t('modules?.translations?.description'),
+      title: t('modules.translations.title'),
+      description: t('modules.translations.description'),
       icon: Globe,
       href: '/admin/translations',
       color: 'from-emerald-500 to-green-600',
@@ -194,9 +194,9 @@ export default function AdminPage() {
           <div className="text-center py-16">
             <div className="text-slate-400 text-6xl mb-4">🔒</div>
             <h2 className="text-2xl font-bold text-slate-600 mb-2">
-              {t('modules?.noModules?.title')}
+              {t('modules.noModules.title')}
             </h2>
-            <p className="text-slate-500">{t('modules?.noModules?.description')}</p>
+            <p className="text-slate-500">{t('modules.noModules.description')}</p>
           </div>
         )}
       </div>

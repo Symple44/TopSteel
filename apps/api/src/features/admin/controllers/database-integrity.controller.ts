@@ -1,12 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import type { DatabaseBackupService } from '../services/database-backup.service'
-import type { DatabaseEnumFixService } from '../services/database-enum-fix.service'
-import type {
-  DatabaseIntegrityReport,
-  DatabaseIntegrityService,
-} from '../services/database-integrity.service'
-import type { DatabaseStatsService } from '../services/database-stats.service'
+import { DatabaseBackupService } from '../services/database-backup.service'
+import { DatabaseEnumFixService } from '../services/database-enum-fix.service'
+import { DatabaseIntegrityService } from '../services/database-integrity.service'
+import type { DatabaseIntegrityReport } from '../services/database-integrity.service'
+import { DatabaseStatsService } from '../services/database-stats.service'
 
 // Interface for database stats - compatible with service return type
 interface DatabaseStats {

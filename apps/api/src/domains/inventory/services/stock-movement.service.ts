@@ -1,8 +1,8 @@
 import { Article } from '@erp/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DataSource, QueryRunner, Repository } from 'typeorm'
+import { DataSource, QueryRunner, Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils/error.utils'
 import { StockMovement } from '../entities/stock-movement.entity'
 import {
@@ -12,7 +12,7 @@ import {
   StockMovementStatus,
   StockMovementType,
 } from '../interfaces/stock-movement.interface'
-import type { StockMovementRepository } from '../repositories/stock-movement.repository'
+import { StockMovementRepository } from '../repositories/stock-movement.repository'
 
 /**
  * Service de gestion des mouvements de stock

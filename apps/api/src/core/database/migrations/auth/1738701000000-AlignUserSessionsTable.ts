@@ -4,15 +4,21 @@ export class AlignUserSessionsTable1738701000000 implements MigrationInterface {
   name = 'AlignUserSessionsTable1738701000000'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // 1. Sauvegarder les données existantes si nécessaire
-    const existingSessions = await queryRunner.query(`SELECT * FROM user_sessions`)
+    // 1. Check if table exists first
+    const tableExists = await queryRunner.hasTable('user_sessions')
 
-    if (existingSessions.length > 0) {
-      // Créer une table temporaire pour sauvegarder les données
-      await queryRunner.query(`
-        CREATE TABLE user_sessions_backup AS 
-        SELECT * FROM user_sessions
-      `)
+    let existingSessions = []
+    if (tableExists) {
+      // Sauvegarder les données existantes si nécessaire
+      existingSessions = await queryRunner.query(`SELECT * FROM user_sessions`)
+
+      if (existingSessions.length > 0) {
+        // Créer une table temporaire pour sauvegarder les données
+        await queryRunner.query(`
+          CREATE TABLE user_sessions_backup AS
+          SELECT * FROM user_sessions
+        `)
+      }
     }
 
     // 2. Supprimer les index existants
@@ -28,9 +34,9 @@ export class AlignUserSessionsTable1738701000000 implements MigrationInterface {
       CREATE TABLE user_sessions (
         id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
         "userId" UUID NOT NULL,
-        "sessionId" VARCHAR(255) NOT NULL UNIQUE,
-        "accessToken" VARCHAR(255) NOT NULL,
-        "refreshToken" VARCHAR(255),
+        "sessionId" VARCHAR(500) NOT NULL UNIQUE,
+        "accessToken" TEXT NOT NULL,
+        "refreshToken" TEXT,
         "loginTime" TIMESTAMP NOT NULL,
         "logoutTime" TIMESTAMP,
         "lastActivity" TIMESTAMP NOT NULL,

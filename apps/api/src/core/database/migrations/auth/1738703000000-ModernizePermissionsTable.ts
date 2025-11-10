@@ -92,9 +92,10 @@ export class ModernizePermissionsTable1738703000000 implements MigrationInterfac
     await queryRunner.query(
       `CREATE INDEX IF NOT EXISTS "IDX_permissions_isActive" ON permissions ("isActive")`
     )
-    await queryRunner.query(
-      `CREATE INDEX IF NOT EXISTS "IDX_permissions_societe_id" ON permissions (societe_id)`
-    )
+    // Removed: societe_id column doesn't exist
+    // await queryRunner.query(
+    //   `CREATE INDEX IF NOT EXISTS "IDX_permissions_societe_id" ON permissions (societe_id)`
+    // )
     await queryRunner.query(
       `CREATE INDEX IF NOT EXISTS "IDX_permissions_deleted_at" ON permissions (deleted_at)`
     )
@@ -161,7 +162,7 @@ export class ModernizePermissionsTable1738703000000 implements MigrationInterfac
     await queryRunner.query(`DROP INDEX IF EXISTS "IDX_permissions_resource"`)
     await queryRunner.query(`DROP INDEX IF EXISTS "IDX_permissions_scope"`)
     await queryRunner.query(`DROP INDEX IF EXISTS "IDX_permissions_isActive"`)
-    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_permissions_societe_id"`)
+    // await queryRunner.query(`DROP INDEX IF EXISTS "IDX_permissions_societe_id"`)
     await queryRunner.query(`DROP INDEX IF EXISTS "IDX_permissions_deleted_at"`)
 
     // 4. Supprimer les colonnes ajoutées (dans l'ordre inverse)

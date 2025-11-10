@@ -2,6 +2,11 @@ import { Global, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { MultiTenantDatabaseConfig } from './config/multi-tenant-database.config'
+import { DatabaseStartupService } from './services/startup.service'
+import { MigrationService } from './services/migration.service'
+import { SeederService } from './services/seeder.service'
+import { DatabaseHealthService } from './services/health.service'
+import { MigrationLoaderService } from './services/migration-loader.service'
 
 @Global()
 @Module({
@@ -46,7 +51,21 @@ import { MultiTenantDatabaseConfig } from './config/multi-tenant-database.config
       },
       inject: [ConfigService],
     },
+    // Services de migration et initialisation
+    DatabaseHealthService,
+    MigrationService,
+    SeederService,
+    MigrationLoaderService,
+    DatabaseStartupService,
   ],
-  exports: [MultiTenantDatabaseConfig, TypeOrmModule],
+  exports: [
+    MultiTenantDatabaseConfig,
+    TypeOrmModule,
+    DatabaseHealthService,
+    MigrationService,
+    SeederService,
+    MigrationLoaderService,
+    DatabaseStartupService,
+  ],
 })
 export class DatabaseMultiTenantModule {}

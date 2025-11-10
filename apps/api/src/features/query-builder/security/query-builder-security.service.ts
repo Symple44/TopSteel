@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+import { DataSource } from 'typeorm'
 
 /**
  * Allowed tables with their security configuration

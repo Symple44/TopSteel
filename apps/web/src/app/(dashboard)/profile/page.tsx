@@ -201,7 +201,7 @@ export default function ProfilePage() {
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast?.error(t('errors?.passwords?.mismatch'))
+      toast?.error(t('errors.passwords.mismatch'))
       return
     }
 
@@ -216,14 +216,14 @@ export default function ProfilePage() {
         confirmPassword: '',
       })
     } catch (_error) {
-      toast?.error(t('errors?.passwords?.updateFailed'))
+      toast?.error(t('errors.passwords.updateFailed'))
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleReset = async () => {
-    if (window.confirm(t('errors?.reset?.confirmText'))) {
+    if (window.confirm(t('errors.reset.confirmText'))) {
       if (user) {
         const extendedUser = user as ExtendedUser
         setProfileData({
@@ -241,7 +241,7 @@ export default function ProfilePage() {
           role: extendedUser.role || '',
           permissions: extendedUser.permissions || [],
         })
-        toast?.success(t('errors?.reset?.success'))
+        toast?.success(t('errors.reset.success'))
       }
     }
   }

@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, Logger, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { getErrorMessage } from '../../../core/common/utils'
-import type { MenuSyncService } from '../services/menu-sync.service'
+import { MenuSyncService } from '../services/menu-sync.service'
 
 @ApiTags('Admin - Menu Sync')
 @Controller('admin/menu-sync')

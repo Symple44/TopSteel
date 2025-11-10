@@ -70,3 +70,20 @@ export const startActiveSpan = (...args) => {
   }
   return createUniversalMock()
 }
+
+// DiagLogLevel enum - THIS IS THE CRITICAL PART
+export const DiagLogLevel = {
+  NONE: 0,
+  ERROR: 30,
+  WARN: 50,
+  INFO: 60,
+  DEBUG: 70,
+  VERBOSE: 80,
+  ALL: 9999,
+}
+
+// DiagAPI exports
+export const diag = createUniversalMock()
+export const DiagAPI = createUniversalMock()
+export const DiagConsoleLogger = createUniversalMock()
+export const DiagLogFunction = createUniversalMock()

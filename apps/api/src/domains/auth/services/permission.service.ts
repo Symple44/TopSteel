@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
-import type { TopSteelLogger } from '../../../core/common/logger/structured-logger.service'
-import type { RedisService } from '../../../core/common/services/redis.service'
+import { Repository } from 'typeorm'
+import { TopSteelLogger } from '../../../core/common/logger/structured-logger.service'
+import { RedisService } from '../../../core/common/services/redis.service'
 import { User } from '../../users/entities/user.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 

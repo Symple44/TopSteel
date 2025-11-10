@@ -33,13 +33,11 @@ import {
   QueryBuilderSecurityGuard,
   QueryBuilderWriteAccess,
 } from '../security/query-builder-security.guard'
-import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
-import type { QueryBuilderService } from '../services/query-builder.service'
-import type {
-  QueryBuilderExecutorService,
-  QueryExecutionParams,
-} from '../services/query-builder-executor.service'
-import type { SchemaIntrospectionService } from '../services/schema-introspection.service'
+import { QueryBuilderSecurityService } from '../security/query-builder-security.service'
+import { QueryBuilderService } from '../services/query-builder.service'
+import { QueryBuilderExecutorService } from '../services/query-builder-executor.service'
+import type { QueryExecutionParams } from '../services/query-builder-executor.service'
+import { SchemaIntrospectionService } from '../services/schema-introspection.service'
 
 @Controller('query-builder')
 @UseGuards(JwtAuthGuard, QueryBuilderSecurityGuard)

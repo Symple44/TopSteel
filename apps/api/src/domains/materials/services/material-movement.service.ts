@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Between, type DataSource, In, type QueryRunner, type Repository } from 'typeorm'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+import { Between, DataSource, In, type QueryRunner, type Repository } from 'typeorm'
 import { Material, MaterialShape } from '../entities/material.entity'
 import { MaterialMovement } from '../entities/material-movement.entity'
 import {
@@ -27,6 +27,7 @@ export class MaterialMovementService {
     private readonly materialRepository: Repository<Material>,
     @InjectRepository(MaterialMovement, 'tenant')
     private readonly movementRepository: Repository<MaterialMovement>,
+    @InjectDataSource('tenant')
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2
   ) {}

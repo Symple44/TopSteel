@@ -70,6 +70,24 @@ export class LoggingInterceptor implements NestInterceptor {
     return undefined
   }
 
+  private safeStringify(obj: unknown): string {
+    try {
+      // Utiliser JSON.stringify avec un replacer pour gérer les références circulaires
+      const seen = new WeakSet()
+      return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            return '[Circular]'
+          }
+          seen.add(value)
+        }
+        return value
+      })
+    } catch (error) {
+      return '[Unable to stringify]'
+    }
+  }
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest()
     const { method, url, headers, body: _body } = request
@@ -96,7 +114,7 @@ export class LoggingInterceptor implements NestInterceptor {
           ...logData,
           responseTime,
           status: 'success',
-          responseSize: JSON.stringify(data).length,
+          responseSize: this.safeStringify(data).length,
         })
       }),
       catchError((error) => {

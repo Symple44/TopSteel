@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { Repository } from 'typeorm'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { User } from '../../users/entities/user.entity'
 import {
   canManageUser,
@@ -16,7 +16,7 @@ import {
   USER_MANAGEMENT_ROLES,
 } from '../core/constants/roles.constants'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
-import type { PermissionCalculatorService } from './permission-calculator.service'
+import { PermissionCalculatorService } from './permission-calculator.service'
 
 export interface UserSocieteInfo {
   id: string
@@ -88,12 +88,10 @@ export class UnifiedRolesService {
     // OPTIMIZED: Single query with joins to avoid N+1
     const userSocieteRoles = await this.userSocieteRoleRepository
       .createQueryBuilder('usr')
-      .withDeleted() // Include soft deleted records to handle them properly
       .leftJoinAndSelect('usr.societe', 'societe')
       .leftJoinAndSelect('usr.role', 'role')
       .where('usr.userId = :userId', { userId })
       .andWhere('usr.isActive = :isActive', { isActive: true })
-      .andWhere('usr.deletedAt IS NULL') // Explicitly filter out soft deleted records
       .getMany()
 
     // Calculate effective permissions for each societe role
@@ -127,13 +125,11 @@ export class UnifiedRolesService {
     // OPTIMIZED: Single query with joins
     const userSocieteRole = await this.userSocieteRoleRepository
       .createQueryBuilder('usr')
-      .withDeleted() // Include soft deleted records to handle them properly
       .leftJoinAndSelect('usr.societe', 'societe')
       .leftJoinAndSelect('usr.role', 'role')
       .where('usr.userId = :userId', { userId })
       .andWhere('usr.societeId = :societeId', { societeId })
       .andWhere('usr.isActive = :isActive', { isActive: true })
-      .andWhere('usr.deletedAt IS NULL') // Explicitly filter out soft deleted records
       .getOne()
 
     let result: UserSocieteInfo | null = null

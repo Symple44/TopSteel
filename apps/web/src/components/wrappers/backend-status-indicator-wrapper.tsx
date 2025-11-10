@@ -18,12 +18,12 @@ export function BackendStatusIndicatorWrapper({
   const { t } = useTranslation('common')
 
   const translations = {
-    online: t('backend?.status?.online'),
-    offline: t('backend?.status?.offline'),
-    error: t('backend?.status?.error'),
-    checking: t('backend?.status?.checking'),
-    retry: t('backend?.status?.retry'),
-    available: t('backend?.status?.available'),
+    online: t('backend.status.online'),
+    offline: t('backend.status.offline'),
+    error: t('backend.status.error'),
+    checking: t('backend.status.checking'),
+    retry: t('backend.status.retry'),
+    available: t('backend.status.available'),
   }
 
   return (

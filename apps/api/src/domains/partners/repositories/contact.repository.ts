@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { Contact, ContactStatus } from '../entities/contact.entity'
-import type { IContactRepository } from '../services/partner.service'
+import { IContactRepository } from '../services/partner.service'
 
 @Injectable()
 export class ContactRepository implements IContactRepository {

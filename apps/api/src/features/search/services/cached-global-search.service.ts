@@ -6,8 +6,8 @@ import type {
   SearchResponse,
 } from '../interfaces/search.interfaces'
 import type { SearchDocument, SearchStatistics } from '../types/search-types'
-import type { GlobalSearchService } from './global-search.service'
-import type { SearchCacheService } from './search-cache.service'
+import { GlobalSearchService } from './global-search.service'
+import { SearchCacheService } from './search-cache.service'
 
 /**
  * Cached wrapper for GlobalSearchService using decorator pattern

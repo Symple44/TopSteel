@@ -3,36 +3,39 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import type { Request } from 'express'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import type { Site } from '../../features/societes/entities/site.entity'
 import { UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
-import type { LicenseManagementService } from '../../features/societes/services/license-management.service'
-import type { SocieteUsersService } from '../../features/societes/services/societe-users.service'
-import type { SocietesService } from '../../features/societes/services/societes.service'
+import { LicenseManagementService } from '../../features/societes/services/license-management.service'
+import { SocieteUsersService } from '../../features/societes/services/societe-users.service'
+import { SocietesService } from '../../features/societes/services/societes.service'
 import type { User } from '../users/entities/user.entity'
-import type { UsersService } from '../users/users.service'
+import { UsersService } from '../users/users.service'
 import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
 import { UserSession } from './core/entities/user-session.entity'
 import type { LoginDto } from './external/dto/login.dto'
 import type { RegisterDto } from './external/dto/register.dto'
 import type { JwtPayload, MultiTenantJwtPayload } from './interfaces/jwt-payload.interface'
-import type { AuthPerformanceService } from './services/auth-performance.service'
-import type { GeolocationService } from './services/geolocation.service'
-import type { MFAService } from './services/mfa.service'
-import type { SessionRedisService } from './services/session-redis.service'
-import type { UnifiedRolesService } from './services/unified-roles.service'
-import type { UserSocieteRolesService } from './services/user-societe-roles.service'
+import { AuthPerformanceService } from './services/auth-performance.service'
+import { GeolocationService } from './services/geolocation.service'
+import { MFAService } from './services/mfa.service'
+import { SessionRedisService } from './services/session-redis.service'
+import { UnifiedRolesService } from './services/unified-roles.service'
+import { UserSocieteRolesService } from './services/user-societe-roles.service'
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name)
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -104,17 +107,25 @@ export class AuthService {
       'getUserSocietes',
       async () => {
         try {
+          this.logger.debug(`[DEBUG getUserSocietes] Getting societes for user: ${userId}`)
+
           // Utiliser le service unifié pour récupérer les rôles
           const userSocieteInfos = await this.unifiedRolesService.getUserSocieteRoles(userId)
+          this.logger.debug(`[DEBUG getUserSocietes] userSocieteInfos count: ${userSocieteInfos.length}`)
 
           // Si l'utilisateur est SUPER_ADMIN et n'a pas de rôles spécifiques, récupérer toutes les sociétés
           const user = await this.usersService.findById(userId)
+          this.logger.debug(`[DEBUG getUserSocietes] User role: ${user?.role}`)
+
           if (user?.role === GlobalUserRole.SUPER_ADMIN && userSocieteInfos.length === 0) {
-            return await this.getSuperAdminAllSocietes(userId)
+            this.logger.debug('[DEBUG getUserSocietes] User is SUPER_ADMIN with no specific roles, fetching all societes')
+            const allSocietes = await this.getSuperAdminAllSocietes(userId)
+            this.logger.debug(`[DEBUG getUserSocietes] Returning ${allSocietes.length} societes for SUPER_ADMIN`)
+            return allSocietes
           }
 
           // OPTIMIZED: Use société data from the joined query
-          return userSocieteInfos.map((info) => ({
+          const result = userSocieteInfos.map((info) => ({
             id: info.societeId,
             nom: info.societe?.nom || 'Société inconnue',
             code: info.societe?.code || info.societeId,
@@ -128,7 +139,10 @@ export class AuthService {
                 code: site.code,
               })) || [],
           }))
-        } catch {
+          this.logger.debug(`[DEBUG getUserSocietes] Returning ${result.length} societes from userSocieteInfos`)
+          return result
+        } catch (error) {
+          this.logger.error('[DEBUG getUserSocietes] Error caught, falling back to legacy:', error)
           // Fallback sur l'ancienne méthode si nécessaire
           return await this.getUserSocietesLegacy(userId)
         }
@@ -141,8 +155,19 @@ export class AuthService {
    * Récupérer toutes les sociétés pour un SUPER_ADMIN
    */
   private async getSuperAdminAllSocietes(_userId: string) {
+    this.logger.debug('[DEBUG getSuperAdminAllSocietes] Calling societesService.findActive()')
     const allSocietes = await this.societesService.findActive()
-    return allSocietes.map((societe) => ({
+    this.logger.debug(`[DEBUG getSuperAdminAllSocietes] findActive() returned ${allSocietes.length} societes`)
+
+    if (allSocietes.length > 0) {
+      this.logger.debug(`[DEBUG getSuperAdminAllSocietes] First societe: ${JSON.stringify({
+        id: allSocietes[0].id,
+        nom: allSocietes[0].nom,
+        code: allSocietes[0].code
+      })}`)
+    }
+
+    const result = allSocietes.map((societe) => ({
       id: societe.id,
       nom: societe.nom,
       code: societe.code,
@@ -156,6 +181,9 @@ export class AuthService {
           code: site.code,
         })) || [],
     }))
+
+    this.logger.debug(`[DEBUG getSuperAdminAllSocietes] Mapped to ${result.length} societes`)
+    return result
   }
 
   /**

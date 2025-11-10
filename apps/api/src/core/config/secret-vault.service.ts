@@ -1,9 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { SecretManager } from './secret-manager'
-import type { SecretValidatorService } from './secret-validator.service'
+import { SecretValidatorService } from './secret-validator.service'
 
 export interface VaultEntry {
   value: string

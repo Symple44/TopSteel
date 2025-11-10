@@ -22,7 +22,7 @@ import type {
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
 import type { ParameterCategory } from './entitites/system-parameter.entity'
-import type { SystemParametersService } from './system-parameters.service'
+import { SystemParametersService } from './system-parameters.service'
 
 @Controller('admin/system-parameters')
 @ApiTags('🔧 System Parameters')

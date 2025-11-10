@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { RedisService } from '../../../core/common/services/redis.service'
+import { ConfigService } from '@nestjs/config'
+import { RedisService } from '../../../core/common/services/redis.service'
 import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import type { SearchOptions, SearchResponse } from '../interfaces/search.interfaces'
 

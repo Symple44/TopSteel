@@ -78,7 +78,7 @@ export class AuthService {
     const response = await callClientApi('auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ login: identifier, password }),
+      body: JSON.stringify({ email: identifier, password }),
     })
 
     if (!response?.ok) {

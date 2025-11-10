@@ -1,6 +1,6 @@
 import { Test, type TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { vi } from 'vitest'
 import { ParameterApplication } from '../entities/parameter-application.entity'
 import { ParameterClient } from '../entities/parameter-client.entity'

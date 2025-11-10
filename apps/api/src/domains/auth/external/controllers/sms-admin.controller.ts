@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
-import type { SMSService } from '../../services/sms.service'
+import { SMSService } from '../../services/sms.service'
 
 /**
  * DTO pour tester l'envoi SMS

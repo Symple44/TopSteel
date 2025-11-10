@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
 import { SalesHistory } from '../../../features/pricing/entities/sales-history.entity'
 import { BusinessService } from '../../core/base/business-service'
@@ -77,8 +77,8 @@ import {
   type PartnerInteraction,
 } from '../entities/partner-interaction.entity'
 import type { PartnerSite } from '../entities/partner-site.entity'
-import type { IPartnerRepository, PartnerAdvancedFilters } from '../repositories/partner.repository'
-import type { PartnerInteractionRepository } from '../repositories/partner-interaction.repository'
+import { IPartnerRepository, PartnerAdvancedFilters } from '../repositories/partner.repository'
+import { PartnerInteractionRepository } from '../repositories/partner-interaction.repository'
 
 /**
  * Service métier pour la gestion des partenaires (clients/fournisseurs)
@@ -97,9 +97,9 @@ export class PartnerService extends BusinessService<Partner> {
     @Inject('IPartnerAddressRepository')
     private readonly addressRepository: IPartnerAddressRepository,
     private readonly interactionRepository: PartnerInteractionRepository,
-    @InjectRepository(MarketplaceOrder)
+    @InjectRepository(MarketplaceOrder, 'tenant')
     private readonly marketplaceOrderRepository: Repository<MarketplaceOrder>,
-    @InjectRepository(SalesHistory)
+    @InjectRepository(SalesHistory, 'tenant')
     private readonly salesHistoryRepository: Repository<SalesHistory>
   ) {
     super(partnerRepository, 'PartnerService')

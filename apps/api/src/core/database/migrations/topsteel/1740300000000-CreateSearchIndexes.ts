@@ -1,7 +1,7 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm'
 
-export class CreateSearchIndexes20250811 implements MigrationInterface {
-  name = 'CreateSearchIndexes20250811'
+export class CreateSearchIndexes1740300000000 implements MigrationInterface {
+  name = 'CreateSearchIndexes1740300000000'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // ========== Extensions PostgreSQL ==========

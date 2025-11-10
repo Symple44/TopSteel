@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
 

@@ -1,6 +1,6 @@
 import * as crypto from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import * as QRCode from 'qrcode'
 import * as speakeasy from 'speakeasy'
 

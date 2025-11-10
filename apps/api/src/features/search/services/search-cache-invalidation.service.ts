@@ -1,7 +1,7 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import { type EventEmitter2, OnEvent } from '@nestjs/event-emitter'
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { hasStack } from '../../../core/common/utils'
-import type { SearchCacheService } from './search-cache.service'
+import { SearchCacheService } from './search-cache.service'
 
 // Events that trigger cache invalidation
 export interface CacheInvalidationEvent {

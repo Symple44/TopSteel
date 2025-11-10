@@ -1,10 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common'
 import { GetUser } from '../../../core/common/decorators/get-user.decorator'
 import { AuthGuard } from '../../../infrastructure/security/guards/auth.guard'
-import type {
-  ReorderableListConfig,
-  UIPreferencesReorderableListService,
-} from '../services/ui-preferences-reorderable-list.service'
+import { UIPreferencesReorderableListService } from '../services/ui-preferences-reorderable-list.service'
+import type { ReorderableListConfig } from '../services/ui-preferences-reorderable-list.service'
 
 @Controller('api/ui-preferences/reorderable-list')
 @UseGuards(AuthGuard)

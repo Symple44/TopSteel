@@ -11,8 +11,8 @@
  */
 
 import { callBackendApi, callClientApi } from '@/utils/backend-api'
-import { csrfManager } from './csrf'
 import type { APIMetrics } from './api-client-types'
+import { csrfManager } from './csrf'
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'

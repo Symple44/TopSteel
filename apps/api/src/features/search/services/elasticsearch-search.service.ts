@@ -1,6 +1,6 @@
 import { Client, type ClientOptions } from '@elastic/elasticsearch'
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { getErrorMessage, toError } from '../../../core/common/utils'
 import { getElasticsearchMapping } from '../config/searchable-entities.config'
 import type {
@@ -13,7 +13,7 @@ import type {
   ElasticsearchSearchResponse,
   SearchDocument,
 } from '../types/search-types'
-import type { SearchResultFormatterService } from './search-result-formatter.service'
+import { SearchResultFormatterService } from './search-result-formatter.service'
 
 // Interface for Elasticsearch errors
 interface ElasticsearchError {

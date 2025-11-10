@@ -4,7 +4,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
 import {
-  type DataSource,
+  DataSource,
   type FindManyOptions,
   type FindOneOptions,
   In,
@@ -12,7 +12,7 @@ import {
   Not,
   type Repository,
 } from 'typeorm'
-import type { IPriceRuleRepository } from './price-rule.repository.interface'
+import { IPriceRuleRepository } from './price-rule.repository.interface'
 
 /**
  * Repository pour la gestion des règles de prix

@@ -1,4 +1,4 @@
-import type { IBusinessRepository } from '../../core/interfaces/business-service.interface'
+import { IBusinessRepository } from '../../core/interfaces/business-service.interface'
 import type { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
 import type { ArticleSearchCriteria, ArticleStatistics } from '../services/article.service'
 

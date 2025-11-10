@@ -18,7 +18,7 @@ import {
   SectorCoefficient,
   SectorType,
 } from '../entities/sector-coefficient.entity'
-import type { PricingResult, SectorPricingService } from '../services/sector-pricing.service'
+import { PricingResult, SectorPricingService } from '../services/sector-pricing.service'
 
 // DTOs
 export class CreateSectorCoefficientDto {

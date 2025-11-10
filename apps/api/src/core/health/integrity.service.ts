@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, Optional } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
-import type { SessionRedisService } from '../../domains/auth/services/session-redis.service'
+import { SessionRedisService } from '../../domains/auth/services/session-redis.service'
 
 @Injectable()
 export class IntegrityService {
@@ -11,7 +11,7 @@ export class IntegrityService {
   constructor(
     @InjectDataSource('auth')
     private readonly _dataSource: DataSource,
-    private readonly sessionRedisService: SessionRedisService
+    @Optional() private readonly sessionRedisService?: SessionRedisService
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -73,8 +73,11 @@ export class IntegrityService {
 
     try {
       // Essayer Redis d'abord (mais ne pas s'arrêter si c'est 0)
-      activeFromRedis = await this.sessionRedisService.getActiveUsersCount()
-      this.logger.debug(`Utilisateurs actifs depuis Redis: ${activeFromRedis}`)
+      if (this.sessionRedisService) {
+        const count = await this.sessionRedisService.getActiveUsersCount()
+        activeFromRedis = count ?? 0
+        this.logger.debug(`Utilisateurs actifs depuis Redis: ${activeFromRedis}`)
+      }
     } catch (error) {
       this.logger.debug('Redis non disponible pour le comptage utilisateurs', error)
     }

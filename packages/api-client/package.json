@@ -7,39 +7,39 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./clients": {
-      "require": "./dist/clients/index.cjs",
       "types": "./dist/clients/index.d.ts",
-      "import": "./dist/clients/index.js"
+      "import": "./dist/clients/index.js",
+      "require": "./dist/clients/index.cjs"
     },
     "./projects": {
-      "require": "./dist/projects/index.cjs",
       "types": "./dist/projects/index.d.ts",
-      "import": "./dist/projects/index.js"
+      "import": "./dist/projects/index.js",
+      "require": "./dist/projects/index.cjs"
     },
     "./quotes": {
-      "require": "./dist/quotes/index.cjs",
       "types": "./dist/quotes/index.d.ts",
-      "import": "./dist/quotes/index.js"
+      "import": "./dist/quotes/index.js",
+      "require": "./dist/quotes/index.cjs"
     },
     "./inventory": {
-      "require": "./dist/inventory/index.cjs",
       "types": "./dist/inventory/index.d.ts",
-      "import": "./dist/inventory/index.js"
+      "import": "./dist/inventory/index.js",
+      "require": "./dist/inventory/index.cjs"
     },
     "./auth": {
-      "require": "./dist/auth/index.cjs",
       "types": "./dist/auth/index.d.ts",
-      "import": "./dist/auth/index.js"
+      "import": "./dist/auth/index.js",
+      "require": "./dist/auth/index.cjs"
     },
     "./core": {
-      "require": "./dist/core/index.cjs",
       "types": "./dist/core/index.d.ts",
-      "import": "./dist/core/index.js"
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.cjs"
     }
   },
   "files": [
@@ -48,7 +48,7 @@
   ],
   "scripts": {
     "build": "tsup && tsc --project tsconfig.build.json --emitDeclarationOnly && tsc",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "dev": "tsup --watch",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
     "test": "jest",

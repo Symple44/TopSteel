@@ -1,7 +1,7 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
-import type { DatabaseSyncService } from '../database/database-sync.service'
+import { DatabaseSyncService } from '../database/database-sync.service'
 import { DatabaseInitBaseService } from './database-init/database-init-base.service'
 
 @Injectable()

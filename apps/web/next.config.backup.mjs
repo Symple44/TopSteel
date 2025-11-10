@@ -1,10 +1,10 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { NextConfig } from 'next'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   typescript: {
     // TypeScript strict mode is enabled in tsconfig.base.json
     // Build errors must be fixed for production builds
@@ -14,8 +14,9 @@ const nextConfig: NextConfig = {
     // Re-enabled ESLint checks - configuration has been fixed
     ignoreDuringBuilds: false,
   },
-  // Transpile workspace packages for Next.js 15 (excluding domains which has server dependencies)
-  transpilePackages: ['@erp/api-client', '@erp/ui', '@erp/utils', '@erp/types'],
+  // Transpile workspace packages for Next.js 14
+  // Required for proper module resolution in monorepo with dist files
+  transpilePackages: ['@erp/types', '@erp/ui', '@erp/api-client', '@erp/utils'],
 
   // Image optimization configuration
   images: {
@@ -129,17 +130,9 @@ const nextConfig: NextConfig = {
 
   // Disable experimental features that might cause issues
   experimental: {
-    // Next.js 15 with React 19 support
-    reactCompiler: false, // Disable React Compiler for now
-    // Fix for params readonly issue in Next.js 15
-    staleTimes: {
-      dynamic: 0,
-      static: 0,
-    },
+    // Next.js 14 does not have reactCompiler
+    // Fix for params readonly issue
     // Re-enable component caching for better performance
-    // cacheComponents: true, // Disabled - requires Next.js canary
-    // Disable static optimization that causes params readonly issues
-    ppr: false,
     // Bundle optimization packages with automatic tree-shaking
     optimizePackageImports: [
       '@radix-ui/react-icons',
@@ -151,10 +144,6 @@ const nextConfig: NextConfig = {
       'date-fns',
       'lodash-es',
     ],
-    // Cache optimizations
-    webVitalsAttribution: ['CLS', 'LCP'],
-    // Memory usage optimization
-    memoryBasedWorkersCount: true,
     // Optimize CSS
     optimizeCss: true,
     // Modern builds
@@ -206,11 +195,12 @@ const nextConfig: NextConfig = {
   ],
 
   webpack: (config, { isServer, dev, webpack }) => {
-    // Add resolution for @erp/ui subpaths
+    // Add resolution for @erp packages to use dist files
     config.resolve = {
       ...config.resolve,
       alias: {
         ...config.resolve.alias,
+        // @erp/ui subpaths
         '@erp/ui/data-display': path.resolve(__dirname, '../../packages/ui/dist/data-display'),
         '@erp/ui/layout': path.resolve(__dirname, '../../packages/ui/dist/layout'),
         '@erp/ui/navigation': path.resolve(__dirname, '../../packages/ui/dist/navigation'),
@@ -218,6 +208,10 @@ const nextConfig: NextConfig = {
         '@erp/ui/feedback': path.resolve(__dirname, '../../packages/ui/dist/feedback'),
         '@erp/ui/business': path.resolve(__dirname, '../../packages/ui/dist/business'),
         '@erp/ui': path.resolve(__dirname, '../../packages/ui/dist'),
+        // @erp/types - use compiled dist files
+        '@erp/types': path.resolve(__dirname, '../../packages/types/dist/index.js'),
+        // @erp/domains - use compiled dist files
+        '@erp/domains': path.resolve(__dirname, '../../packages/domains/dist/index.js'),
       },
     }
 
@@ -235,7 +229,7 @@ const nextConfig: NextConfig = {
         type: 'filesystem',
         cacheDirectory: path.join(__dirname, '.next/cache'),
         buildDependencies: {
-          config: [__filename],
+          config: [fileURLToPath(import.meta.url)],
         },
       }
 
@@ -284,7 +278,7 @@ const nextConfig: NextConfig = {
             },
             // Charts and visualization
             charts: {
-              test: /[\\/]node_modules[\\/](recharts|d3|chart\\.js|@univerjs)[\\/]/,
+              test: /[\\/]node_modules[\\/](recharts|d3|chart\.js|@univerjs)[\\/]/,
               name: 'charts',
               chunks: 'all',
               priority: 20,
@@ -358,7 +352,7 @@ const nextConfig: NextConfig = {
 
     // Suppress remaining Sharp warnings during build
     config.ignoreWarnings = [
-      /Module not found: Can't resolve '@img\/.*'/,
+      /Module not found: Can't resolve '@img\/.'/,
       /Critical dependency: the request of a dependency is an expression/,
       // Suppress common warnings to reduce build output
       /export .* was not found in/,
@@ -414,6 +408,19 @@ const nextConfig: NextConfig = {
         '../../node_modules/@radix-ui/react-context'
       ),
       '@radix-ui/react-slot': path.resolve(__dirname, '../../node_modules/@radix-ui/react-slot'),
+      // Re-apply OpenTelemetry polyfill AFTER all other aliases
+      '@opentelemetry/api': enableTelemetry ? '@opentelemetry/api' : otelPolyfill,
+    }
+
+    // Use NormalModuleReplacementPlugin to forcefully replace OpenTelemetry modules
+    // This is more powerful than aliases and works even for bundled modules
+    if (!enableTelemetry) {
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /@opentelemetry\/api/,
+          path.resolve(__dirname, './src/utils/otel-polyfill-universal.js')
+        )
+      )
     }
 
     // Handle ESM modules properly
@@ -455,6 +462,17 @@ const nextConfig: NextConfig = {
         '@elastic/elasticsearch': false,
         '@elastic/transport': false,
         sharp: false,
+        // Exclude Univer and its dependencies from client bundle
+        '@univerjs/core': false,
+        '@univerjs/sheets': false,
+        '@wendellhu/redi': false,
+        // Exclude jsdom and its dependencies from client bundle
+        jsdom: false,
+        'tough-cookie': false,
+        'html-encoding-sniffer': false,
+        'whatwg-url': false,
+        'whatwg-encoding': false,
+        'isomorphic-dompurify': path.resolve(__dirname, './src/utils/dompurify-client-polyfill.js'),
         // Exclure les modules d'images qui utilisent sharp
         '@erp/domains/image': false,
         '@erp/domains/image/service': false,
@@ -513,16 +531,7 @@ const nextConfig: NextConfig = {
       config.externals = config.externals || []
       if (typeof config.externals === 'function') {
         const originalExternals = config.externals
-        config.externals = async (
-          ...args: [
-            context: { request?: string; getResolve?: () => unknown },
-            request: string | undefined,
-            callback?: (
-              err?: Error | null,
-              result?: string | boolean | string[] | Record<string, unknown>
-            ) => void,
-          ]
-        ) => {
+        config.externals = async (...args) => {
           const isExternal = await originalExternals(...args)
           if (isExternal) return isExternal
 
@@ -537,28 +546,17 @@ const nextConfig: NextConfig = {
           return false
         }
       } else {
-        config.externals.push(
-          (
-            ...args: [
-              context: { request?: string; getResolve?: () => unknown },
-              request: string | undefined,
-              callback?: (
-                err?: Error | null,
-                result?: string | boolean | string[] | Record<string, unknown>
-              ) => void,
-            ]
-          ) => {
-            const [, request] = args
-            // Ensure request is a string before calling string methods
-            const requestStr = typeof request === 'string' ? request : String(request || '')
-            if (
-              clientExternals.some((ext) => requestStr === ext || requestStr.startsWith(`${ext}/`))
-            ) {
-              return requestStr
-            }
-            return false
+        config.externals.push((...args) => {
+          const [, request] = args
+          // Ensure request is a string before calling string methods
+          const requestStr = typeof request === 'string' ? request : String(request || '')
+          if (
+            clientExternals.some((ext) => requestStr === ext || requestStr.startsWith(`${ext}/`))
+          ) {
+            return requestStr
           }
-        )
+          return false
+        })
       }
     }
 

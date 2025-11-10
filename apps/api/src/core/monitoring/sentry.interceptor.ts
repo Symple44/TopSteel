@@ -7,7 +7,7 @@ import {
 import type { Span } from '@sentry/types'
 import type { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
-import type { SentryService } from './sentry.service'
+import { SentryService } from './sentry.service'
 
 @Injectable()
 export class SentryInterceptor implements NestInterceptor {

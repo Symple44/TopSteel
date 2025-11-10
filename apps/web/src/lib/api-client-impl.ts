@@ -245,13 +245,14 @@ class PartnersAPIImpl implements PartnersAPI {
     errors: number
     details: Array<{ row: number; field: string; error: string }>
   }> {
-    return this.client.post<{ imported: number; errors: number; details: Array<{ row: number; field: string; error: string }> }>(
-      '/partners/import',
-      {
-        data,
-        options,
-      }
-    )
+    return this.client.post<{
+      imported: number
+      errors: number
+      details: Array<{ row: number; field: string; error: string }>
+    }>('/partners/import', {
+      data,
+      options,
+    })
   }
 }
 

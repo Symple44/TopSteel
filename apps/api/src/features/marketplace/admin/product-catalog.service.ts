@@ -1,6 +1,6 @@
 import { Article, ArticleStatus, ArticleType, UniteStock } from '@erp/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
@@ -13,7 +13,7 @@ import type {
   ProductListResponse,
   ProductSortOptions,
 } from '../adapters/marketplace-product.adapter'
-import type { MarketplaceStockService } from '../stock/marketplace-stock.service'
+import { MarketplaceStockService } from '../stock/marketplace-stock.service'
 
 // Re-export types from adapter
 export {

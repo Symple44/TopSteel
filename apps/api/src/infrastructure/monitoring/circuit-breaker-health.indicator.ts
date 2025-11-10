@@ -1,7 +1,7 @@
 // apps/api/src/health/circuit-breaker-health.indicator.ts
 import { Injectable } from '@nestjs/common'
 import { HealthCheckError, HealthIndicator, type HealthIndicatorResult } from '@nestjs/terminus'
-import type { CircuitBreakerService } from './circuit-breaker.service'
+import { CircuitBreakerService } from './circuit-breaker.service'
 
 @Injectable()
 export class CircuitBreakerHealthIndicator extends HealthIndicator {

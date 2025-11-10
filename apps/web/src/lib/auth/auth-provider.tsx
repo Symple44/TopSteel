@@ -264,6 +264,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
               const newTokens = await AuthService?.refreshTokens(tokens?.refreshToken)
               authStorage?.updateTokens(newTokens)
 
+              // SUPER_ADMIN n'a pas besoin de sélection de société
+              const isSuperAdmin = user.role === 'SUPER_ADMIN'
               setAuthState({
                 isLoading: false,
                 isAuthenticated: true,
@@ -271,7 +273,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 tokens: newTokens,
                 mfa: { required: false },
                 company: company || null,
-                requiresCompanySelection: !company,
+                requiresCompanySelection: !company && !isSuperAdmin,
                 mounted: true,
               })
             } catch (_refreshError) {
@@ -287,6 +289,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const isValid = await AuthService?.validateTokens(tokens)
 
             if (isValid) {
+              // SUPER_ADMIN n'a pas besoin de sélection de société
+              const isSuperAdmin = user.role === 'SUPER_ADMIN'
               setAuthState({
                 isLoading: false,
                 isAuthenticated: true,
@@ -294,7 +298,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 tokens,
                 mfa: { required: false },
                 company: company || null,
-                requiresCompanySelection: !company,
+                requiresCompanySelection: !company && !isSuperAdmin,
                 mounted: true,
               })
             } else {
@@ -465,21 +469,55 @@ export function AuthProvider({ children }: AuthProviderProps) {
             }
           } catch (_error) {}
 
-          // Pas de société par défaut ou erreur - forcer la sélection (tokens déjà sauvegardés)
+          // Pas de société par défaut ou erreur
+          // SUPER_ADMIN peut accéder sans société, autres utilisateurs doivent sélectionner
+          const isSuperAdmin = user.role === 'SUPER_ADMIN'
+          console.log(
+            '[AuthProvider] No default company. User role:',
+            user.role,
+            'isSuperAdmin:',
+            isSuperAdmin
+          )
 
-          const newState = {
-            isLoading: false,
-            isAuthenticated: true,
-            user,
-            tokens,
-            mfa: { required: false },
-            company: null,
-            requiresCompanySelection: true,
-            mounted: true,
+          if (isSuperAdmin) {
+            // SUPER_ADMIN: Rediriger directement vers le dashboard sans société
+            console.log('[AuthProvider] SUPER_ADMIN detected, redirecting to dashboard...')
+            const newState = {
+              isLoading: false,
+              isAuthenticated: true,
+              user,
+              tokens,
+              mfa: { required: false },
+              company: null,
+              requiresCompanySelection: false,
+              mounted: true,
+            }
+
+            setAuthState(newState)
+            broadcastAuthEvent('USER_LOGIN', { user, tokens, company: null })
+
+            // Rediriger immédiatement vers le dashboard
+            if (typeof window !== 'undefined') {
+              console.log('[AuthProvider] Redirecting to /dashboard...')
+              window.location.href = '/dashboard'
+            }
+          } else {
+            console.log('[AuthProvider] Regular user, showing company selector...')
+            // Utilisateur standard: Forcer la sélection de société
+            const newState = {
+              isLoading: false,
+              isAuthenticated: true,
+              user,
+              tokens,
+              mfa: { required: false },
+              company: null,
+              requiresCompanySelection: true,
+              mounted: true,
+            }
+
+            setAuthState((prev) => ({ ...prev, ...newState }))
+            broadcastAuthEvent('USER_LOGIN', { user, tokens, company: null })
           }
-
-          setAuthState((prev) => ({ ...prev, ...newState }))
-          broadcastAuthEvent('USER_LOGIN', { user, tokens, company: null })
         }
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }))

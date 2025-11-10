@@ -1,7 +1,7 @@
 import { Injectable, Logger, type NestMiddleware } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import type { NextFunction, Request, Response } from 'express'
-import type { CSPNonceService } from './csp-nonce.service'
+import { CSPNonceService } from './csp-nonce.service'
 
 export interface CSPConfig {
   enabled: boolean

@@ -41,29 +41,29 @@ export default function SettingsPage() {
 
   const settingsModules = [
     {
-      title: t('modules?.menu?.title'),
-      description: t('modules?.menu?.description'),
+      title: t('modules.menu.title'),
+      description: t('modules.menu.description'),
       icon: Menu,
       href: '/settings/menu',
       color: 'from-purple-500 to-pink-600',
     },
     {
-      title: t('modules?.security?.title'),
-      description: t('modules?.security?.description'),
+      title: t('modules.security.title'),
+      description: t('modules.security.description'),
       icon: Shield,
       href: '/settings/security',
       color: 'from-green-500 to-teal-600',
     },
     {
-      title: t('modules?.notifications?.title'),
-      description: t('modules?.notifications?.description'),
+      title: t('modules.notifications.title'),
+      description: t('modules.notifications.description'),
       icon: Bell,
       href: '/settings/notifications',
       color: 'from-yellow-500 to-orange-600',
     },
     {
-      title: t('modules?.appearance?.title'),
-      description: t('modules?.appearance?.description'),
+      title: t('modules.appearance.title'),
+      description: t('modules.appearance.description'),
       icon: Palette,
       href: '/settings/appearance',
       color: 'from-indigo-500 to-purple-600',

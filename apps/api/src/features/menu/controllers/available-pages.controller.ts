@@ -6,9 +6,9 @@ import {
   SocieteRoleType,
 } from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
-import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import type { User } from '../../../domains/users/entities/user.entity'
-import type { PageSyncService } from '../services/page-sync.service'
+import { PageSyncService } from '../services/page-sync.service'
 
 @Controller('user/available-pages')
 @ApiTags('📋 User - Available Pages')

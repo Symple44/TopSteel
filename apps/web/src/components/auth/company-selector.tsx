@@ -191,25 +191,25 @@ const getFallbackRoles = (language: string = 'fr'): RoleData[] => {
   // Créer un translator simple pour le fallback
   const fallbackTranslator = (key: string) => {
     const translations: Record<string, Record<string, string>> = {
-      'roles?.owner': {
+      'roles.owner': {
         fr: 'Propriétaire',
         en: 'Owner',
         es: 'Propietario',
       },
-      'roles?.super_admin': {
+      'roles.super_admin': {
         fr: 'Super Administrateur',
         en: 'Super Administrator',
         es: 'Super Administrador',
       },
-      'roles?.admin': { fr: 'Administrateur', en: 'Administrator', es: 'Administrador' },
-      'roles?.manager': { fr: 'Manager', en: 'Manager', es: 'Gerente' },
-      'roles?.commercial': { fr: 'Commercial', en: 'Sales Representative', es: 'Comercial' },
-      'roles?.technician': { fr: 'Technicien', en: 'Technician', es: 'Técnico' },
-      'roles?.accountant': { fr: 'Comptable', en: 'Accountant', es: 'Contador' },
-      'roles?.operator': { fr: 'Opérateur', en: 'Operator', es: 'Operador' },
-      'roles?.user': { fr: 'Utilisateur', en: 'User', es: 'Usuario' },
-      'roles?.viewer': { fr: 'Observateur', en: 'Viewer', es: 'Observador' },
-      'roles?.guest': { fr: 'Invité', en: 'Guest', es: 'Invitado' },
+      'roles.admin': { fr: 'Administrateur', en: 'Administrator', es: 'Administrador' },
+      'roles.manager': { fr: 'Manager', en: 'Manager', es: 'Gerente' },
+      'roles.commercial': { fr: 'Commercial', en: 'Sales Representative', es: 'Comercial' },
+      'roles.technician': { fr: 'Technicien', en: 'Technician', es: 'Técnico' },
+      'roles.accountant': { fr: 'Comptable', en: 'Accountant', es: 'Contador' },
+      'roles.operator': { fr: 'Opérateur', en: 'Operator', es: 'Operador' },
+      'roles.user': { fr: 'Utilisateur', en: 'User', es: 'Usuario' },
+      'roles.viewer': { fr: 'Observateur', en: 'Viewer', es: 'Observador' },
+      'roles.guest': { fr: 'Invité', en: 'Guest', es: 'Invitado' },
     }
     return translations[key]?.[language] || key
   }
@@ -403,9 +403,13 @@ export default function CompanySelector({
   const ids = useFormFieldIds(['saveAsDefault'])
 
   const loadCompanies = useCallback(async () => {
+    console.log('[CompanySelector DEBUG] ===== loadCompanies CALLED =====')
+    console.log('[CompanySelector DEBUG] Timestamp:', new Date().toISOString())
     try {
       setLoading(true)
       const data = await authService?.getUserCompanies()
+      console.log('[CompanySelector DEBUG] API Response:', data)
+      console.log('[CompanySelector DEBUG] Response type:', typeof data, 'isArray:', Array.isArray(data))
 
       // S'assurer que data est un tableau
       let companiesArray: Company[] = []
@@ -418,6 +422,8 @@ export default function CompanySelector({
         companiesArray = Array.isArray(potentialArray) ? (potentialArray as Company[]) : []
       }
 
+      console.log('[CompanySelector DEBUG] Final companiesArray:', companiesArray)
+      console.log('[CompanySelector DEBUG] Companies count:', companiesArray.length)
       setCompanies(companiesArray)
 
       // Sélectionner automatiquement la société par défaut s'il y en a une
@@ -438,21 +444,23 @@ export default function CompanySelector({
   }, [t])
 
   useEffect(() => {
+    console.log('[CompanySelector DEBUG] ===== useEffect FIRED =====')
+    console.log('[CompanySelector DEBUG] This should ONLY appear ONCE per component mount')
+    console.log('[CompanySelector DEBUG] Timestamp:', new Date().toISOString())
+
     // Charger les sociétés une seule fois au montage
     loadCompanies()
 
     // Détecter le nombre d'onglets ouverts
     const count = getApproximateTabCount()
     setTabCount(count)
+    console.log('[CompanySelector DEBUG] Tab count detected:', count)
 
     // Précharger les rôles depuis l'API des paramètres
     // Ne plus vider le cache systématiquement, utiliser le cache persistant
     loadRolesFromParameters('fr', false).catch((_error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    // Charger les sociétés une seule fois au montage
-    loadCompanies,
-  ]) // Retirer loadCompanies des dépendances pour éviter la boucle
+  }, []) // Tableau vide pour exécuter une seule fois au montage
 
   const handleSelectCompany = async () => {
     if (!selectedCompanyId) {
@@ -776,3 +784,4 @@ export default function CompanySelector({
     </Dialog>
   )
 }
+// Cache bust timestamp: 1762778986

@@ -39,7 +39,9 @@ export function DashboardContent({
     return 'mx-auto max-w-7xl' // Largeur limitée (comportement actuel)
   }
 
-  if (requiresCompanySelection || !company) {
+  // Afficher seulement les enfants (sans layout) si la sélection de société est requise
+  // Les SUPER_ADMIN peuvent accéder au layout même sans société (company peut être null)
+  if (requiresCompanySelection) {
     return children
   }
 

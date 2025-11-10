@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { PartnerSite, SiteStatus } from '../entities/partner-site.entity'
-import type { IPartnerSiteRepository } from '../services/partner.service'
+import { IPartnerSiteRepository } from '../services/partner.service'
 
 @Injectable()
 export class PartnerSiteRepository implements IPartnerSiteRepository {

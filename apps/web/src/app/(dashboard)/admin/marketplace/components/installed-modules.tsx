@@ -139,17 +139,17 @@ const MOCK_INSTALLED_MODULES: InstalledModule[] = [
 
 const getStatusConfig = (t: (key: string) => string) => ({
   ACTIVE: {
-    label: t('marketplace?.installedModules?.status.active'),
+    label: t('marketplace.installedModules.status.active'),
     color: 'bg-green-500',
     variant: 'default' as const,
   },
   INACTIVE: {
-    label: t('marketplace?.installedModules?.status.inactive'),
+    label: t('marketplace.installedModules.status.inactive'),
     color: 'bg-gray-500',
     variant: 'secondary' as const,
   },
   ERROR: {
-    label: t('marketplace?.installedModules?.status.error'),
+    label: t('marketplace.installedModules.status.error'),
     color: 'bg-red-500',
     variant: 'destructive' as const,
   },
@@ -168,15 +168,15 @@ export function InstalledModules() {
           toast({
             title:
               newStatus === 'ACTIVE'
-                ? t('marketplace?.installedModules?.moduleActivated')
-                : t('marketplace?.installedModules?.moduleDeactivated'),
+                ? t('marketplace.installedModules.moduleActivated')
+                : t('marketplace.installedModules.moduleDeactivated'),
             description:
               newStatus === 'ACTIVE'
-                ? t('marketplace?.installedModules?.moduleActivatedDesc').replace(
+                ? t('marketplace.installedModules.moduleActivatedDesc').replace(
                     '{name}',
                     module.displayName
                   )
-                : t('marketplace?.installedModules?.moduleDeactivatedDesc').replace(
+                : t('marketplace.installedModules.moduleDeactivatedDesc').replace(
                     '{name}',
                     module.displayName
                   ),
@@ -193,8 +193,8 @@ export function InstalledModules() {
     if (module) {
       setModules((prev) => prev?.filter((m) => m.id !== moduleId))
       toast({
-        title: t('marketplace?.installedModules?.moduleUninstalled'),
-        description: t('marketplace?.installedModules?.moduleUninstalledDesc').replace(
+        title: t('marketplace.installedModules.moduleUninstalled'),
+        description: t('marketplace.installedModules.moduleUninstalledDesc').replace(
           '{name}',
           module.displayName
         ),
@@ -207,8 +207,8 @@ export function InstalledModules() {
     const module = modules?.find((m) => m.id === moduleId)
     if (module) {
       toast({
-        title: t('marketplace?.installedModules?.updateStarted'),
-        description: t('marketplace?.installedModules?.updateInProgress').replace(
+        title: t('marketplace.installedModules.updateStarted'),
+        description: t('marketplace.installedModules.updateInProgress').replace(
           '{name}',
           module.displayName
         ),
@@ -240,7 +240,7 @@ export function InstalledModules() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('marketplace?.installedModules?.activeModules')}
+              {t('marketplace.installedModules.activeModules')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -253,7 +253,7 @@ export function InstalledModules() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('marketplace?.installedModules?.dailyActiveUsers')}
+              {t('marketplace.installedModules.dailyActiveUsers')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -266,7 +266,7 @@ export function InstalledModules() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('marketplace?.installedModules?.monthlyUsage')}
+              {t('marketplace.installedModules.monthlyUsage')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -292,7 +292,7 @@ export function InstalledModules() {
                   </div>
                   <CardDescription>
                     {module.description} • v{module.version}{' '}
-                    {t('marketplace?.installedModules?.by')} {module.publisher}
+                    {t('marketplace.installedModules.by')} {module.publisher}
                   </CardDescription>
                 </div>
 
@@ -305,24 +305,24 @@ export function InstalledModules() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => setSelectedModule(module)}>
                       <Settings className="mr-2 h-4 w-4" />
-                      {t('marketplace?.installedModules?.actions.configure')}
+                      {t('marketplace.installedModules.actions.configure')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleToggleStatus(module.id)}>
                       <Power className="mr-2 h-4 w-4" />
                       {module.status === 'ACTIVE'
-                        ? t('marketplace?.installedModules?.actions.deactivate')
-                        : t('marketplace?.installedModules?.actions.activate')}
+                        ? t('marketplace.installedModules.actions.deactivate')
+                        : t('marketplace.installedModules.actions.activate')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleUpdate(module.id)}>
                       <RefreshCw className="mr-2 h-4 w-4" />
-                      {t('marketplace?.installedModules?.actions.update')}
+                      {t('marketplace.installedModules.actions.update')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => handleUninstall(module.id)}
                       className="text-red-600"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      {t('marketplace?.installedModules?.actions.uninstall')}
+                      {t('marketplace.installedModules.actions.uninstall')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -333,14 +333,14 @@ export function InstalledModules() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium">
-                    {t('marketplace?.installedModules?.installedOn')}
+                    {t('marketplace.installedModules.installedOn')}
                   </p>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     {formatDate(module.installedAt)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {t('marketplace?.installedModules?.daysAgo').replace(
+                    {t('marketplace.installedModules.daysAgo').replace(
                       '{days}',
                       getDaysSince(module.installedAt).toString()
                     )}
@@ -349,14 +349,14 @@ export function InstalledModules() {
 
                 <div className="space-y-1">
                   <p className="text-sm font-medium">
-                    {t('marketplace?.installedModules?.lastUsed')}
+                    {t('marketplace.installedModules.lastUsed')}
                   </p>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Activity className="h-3 w-3" />
                     {formatDate(module.lastUsedAt)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {t('marketplace?.installedModules?.daysAgo').replace(
+                    {t('marketplace.installedModules.daysAgo').replace(
                       '{days}',
                       getDaysSince(module.lastUsedAt).toString()
                     )}
@@ -365,19 +365,19 @@ export function InstalledModules() {
 
                 <div className="space-y-1">
                   <p className="text-sm font-medium">
-                    {t('marketplace?.installedModules?.activeUsers')}
+                    {t('marketplace.installedModules.activeUsers')}
                   </p>
                   <p className="text-lg font-semibold">{module?.usageStats?.dailyActiveUsers}</p>
                   <p className="text-xs text-muted-foreground">
-                    {t('marketplace?.installedModules?.perDay')}
+                    {t('marketplace.installedModules.perDay')}
                   </p>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">{t('marketplace?.installedModules?.usage')}</p>
+                  <p className="text-sm font-medium">{t('marketplace.installedModules.usage')}</p>
                   <p className="text-lg font-semibold">{module?.usageStats?.monthlyUsage}</p>
                   <p className="text-xs text-muted-foreground">
-                    {t('marketplace?.installedModules?.actionsThisMonth')}
+                    {t('marketplace.installedModules.actionsThisMonth')}
                   </p>
                 </div>
               </div>
@@ -385,7 +385,7 @@ export function InstalledModules() {
               {module.status === 'ERROR' && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-sm text-red-800">
-                    ⚠️ {t('marketplace?.installedModules?.moduleHasIssues')}
+                    ⚠️ {t('marketplace.installedModules.moduleHasIssues')}
                   </p>
                 </div>
               )}
@@ -397,7 +397,7 @@ export function InstalledModules() {
       {modules.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            {t('marketplace?.installedModules?.noModulesInstalled')}.
+            {t('marketplace.installedModules.noModulesInstalled')}.
           </p>
           <Button
             type="button"
@@ -406,7 +406,7 @@ export function InstalledModules() {
               window.location.href = '#catalog'
             }}
           >
-            {t('marketplace?.installedModules?.browse')}
+            {t('marketplace.installedModules.browse')}
           </Button>
         </div>
       )}
@@ -419,7 +419,7 @@ export function InstalledModules() {
               {t('marketplace.installedModules.configuration')} - {selectedModule?.displayName}
             </DialogTitle>
             <DialogDescription>
-              {t('marketplace?.installedModules?.configurationDesc')}
+              {t('marketplace.installedModules.configurationDesc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -427,14 +427,14 @@ export function InstalledModules() {
             <div className="space-y-4">
               <div>
                 <h4 className="font-medium mb-2">
-                  {t('marketplace?.installedModules?.mostUsedFeatures')}
+                  {t('marketplace.installedModules.mostUsedFeatures')}
                 </h4>
                 <div className="space-y-2">
                   {selectedModule?.usageStats?.features?.map((feature) => (
                     <div key={feature.name} className="flex items-center justify-between text-sm">
                       <span>{feature.name}</span>
                       <span className="font-medium">
-                        {feature.usage} {t('marketplace?.installedModules?.usages')}
+                        {feature.usage} {t('marketplace.installedModules.usages')}
                       </span>
                     </div>
                   ))}
@@ -443,11 +443,11 @@ export function InstalledModules() {
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setSelectedModule(null)}>
-                  {t('marketplace?.installedModules?.close')}
+                  {t('marketplace.installedModules.close')}
                 </Button>
                 <Button type="button">
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  {t('marketplace?.installedModules?.openModule')}
+                  {t('marketplace.installedModules.openModule')}
                 </Button>
               </div>
             </div>

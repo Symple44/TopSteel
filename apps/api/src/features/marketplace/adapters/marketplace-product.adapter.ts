@@ -1,7 +1,7 @@
 import { Article, ArticleStatus } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository, SelectQueryBuilder } from 'typeorm'
+import { Repository, SelectQueryBuilder } from 'typeorm'
 
 export interface MarketplaceProductView {
   id: string

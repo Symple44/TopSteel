@@ -6,7 +6,7 @@ import {
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
+import { Reflector } from '@nestjs/core'
 import {
   GlobalUserRole,
   isGlobalRoleHigherOrEqual,
@@ -14,7 +14,7 @@ import {
   SocieteRoleType,
   SYSTEM_ADMIN_ROLES,
 } from '../../core/constants/roles.constants'
-import type { UnifiedRolesService } from '../../services/unified-roles.service'
+import { UnifiedRolesService } from '../../services/unified-roles.service'
 
 export interface RoleRequirement {
   // Rôles globaux requis

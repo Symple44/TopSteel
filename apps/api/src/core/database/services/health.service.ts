@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 
 export interface DatabaseStats {
@@ -44,7 +45,7 @@ export interface DatabaseHealth {
 export class DatabaseHealthService {
   private readonly logger = new Logger(DatabaseHealthService.name)
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource('auth') private readonly dataSource: DataSource) {}
 
   /**
    * Vérifie la santé complète de la base de données

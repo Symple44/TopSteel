@@ -3,9 +3,9 @@ import { Process, Processor } from '@nestjs/bull'
 import { Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Job } from 'bull'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { getErrorMessage, hasStack } from '../../../core/common/utils'
-import type { MarketplaceSyncService } from '../../../domains/marketplace/services/marketplace-sync.service'
+import { MarketplaceSyncService } from '../../../domains/marketplace/services/marketplace-sync.service'
 
 interface SyncArticleJob {
   articleId: string

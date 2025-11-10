@@ -1,4 +1,4 @@
-import type { IBusinessRepository } from '../../core/interfaces/business-service.interface'
+import { IBusinessRepository } from '../../core/interfaces/business-service.interface'
 import type {
   Material,
   MaterialShape,

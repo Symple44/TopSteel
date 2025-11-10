@@ -8,6 +8,8 @@ import { ParametersModule } from '../../features/parameters/parameters.module'
 import { Societe } from '../../features/societes/entities/societe.entity'
 import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
 import { SocietesModule } from '../../features/societes/societes.module'
+import { TopSteelLogger } from '../../core/common/logger/structured-logger.service'
+import { RedisService } from '../../core/common/services/redis.service'
 import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { UsersModule } from '../users/users.module'
 import { AuthController } from './auth.controller'
@@ -121,6 +123,8 @@ import { WebAuthnService } from './services/webauthn.service'
     EnhancedTenantGuard,
     ResourceOwnershipGuard,
     CombinedSecurityGuard,
+    TopSteelLogger, // Service de logging structuré
+    RedisService, // Service de cache Redis de base
     OptimizedCacheService, // Service de cache REDIS
     UserSocieteRolesService, // Service pour la nouvelle structure de rôles
     UnifiedRolesService, // Service unifié pour la gestion des rôles

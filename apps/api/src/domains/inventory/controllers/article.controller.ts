@@ -19,9 +19,9 @@ import type { BusinessContext } from '../../core/interfaces/business-service.int
 import type { User } from '../../users/entities/user.entity'
 import type { CreateArticleDto, UpdateArticleDto } from '../dto'
 import type { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
+import { ArticleService } from '../services/article.service'
 import type {
   ArticleSearchCriteria,
-  ArticleService,
   ArticleStatistics,
   StockValorisation,
 } from '../services/article.service'

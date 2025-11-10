@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { User } from '../../../domains/users/entities/user.entity'
 import { type PermissionType, QueryBuilderPermission } from '../entities'
 

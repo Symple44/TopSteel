@@ -9,7 +9,7 @@ export class CreateInitialTables1737178800000 implements MigrationInterface {
 
     // Table users
     await queryRunner.query(`
-            CREATE TABLE "users" (
+            CREATE TABLE IF NOT EXISTS "users" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "nom" character varying(255) NOT NULL,
                 "prenom" character varying(255) NOT NULL,
@@ -33,7 +33,7 @@ export class CreateInitialTables1737178800000 implements MigrationInterface {
 
     // Table system_parameters
     await queryRunner.query(`
-            CREATE TABLE "system_parameters" (
+            CREATE TABLE IF NOT EXISTS "system_parameters" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "key" character varying(255) NOT NULL,
                 "value" text NOT NULL,
@@ -51,7 +51,7 @@ export class CreateInitialTables1737178800000 implements MigrationInterface {
 
     // Table system_settings
     await queryRunner.query(`
-            CREATE TABLE "system_settings" (
+            CREATE TABLE IF NOT EXISTS "system_settings" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "key" character varying(255) NOT NULL,
                 "value" text NOT NULL,
@@ -69,7 +69,7 @@ export class CreateInitialTables1737178800000 implements MigrationInterface {
 
     // Table clients
     await queryRunner.query(`
-            CREATE TABLE "clients" (
+            CREATE TABLE IF NOT EXISTS "clients" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "nom" character varying(255) NOT NULL,
                 "prenom" character varying(255),
@@ -96,7 +96,7 @@ export class CreateInitialTables1737178800000 implements MigrationInterface {
 
     // Table projets
     await queryRunner.query(`
-            CREATE TABLE "projets" (
+            CREATE TABLE IF NOT EXISTS "projets" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "nom" character varying(255) NOT NULL,
                 "description" text,
@@ -113,14 +113,26 @@ export class CreateInitialTables1737178800000 implements MigrationInterface {
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP,
-                CONSTRAINT "PK_projets" PRIMARY KEY ("id"),
-                CONSTRAINT "FK_projets_client" FOREIGN KEY ("client_id") REFERENCES "clients"("id") ON DELETE CASCADE
+                CONSTRAINT "PK_projets" PRIMARY KEY ("id")
             )
+        `)
+
+    // Ajouter la contrainte de clé étrangère seulement si elle n'existe pas déjà
+    await queryRunner.query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM pg_constraint WHERE conname = 'FK_projets_client'
+                ) THEN
+                    ALTER TABLE "projets" ADD CONSTRAINT "FK_projets_client"
+                    FOREIGN KEY ("client_id") REFERENCES "clients"("id") ON DELETE CASCADE;
+                END IF;
+            END $$;
         `)
 
     // Table user_menu_preferences_admin
     await queryRunner.query(`
-            CREATE TABLE "user_menu_preferences_admin" (
+            CREATE TABLE IF NOT EXISTS "user_menu_preferences_admin" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "userId" uuid NOT NULL,
                 "menuId" character varying(255) NOT NULL,
@@ -138,7 +150,7 @@ export class CreateInitialTables1737178800000 implements MigrationInterface {
 
     // Index sur user_menu_preferences_admin avec nom explicite
     await queryRunner.query(`
-            CREATE INDEX "user_menu_preferences_admin_userId_unique" ON "user_menu_preferences_admin" ("userId")
+            CREATE INDEX IF NOT EXISTS "user_menu_preferences_admin_userId_unique" ON "user_menu_preferences_admin" ("userId")
         `)
   }
 

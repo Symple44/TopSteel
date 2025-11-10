@@ -33,8 +33,8 @@ try {
     // En production: dist/main.js -> ../../../../
     rootDir = join(__dirname, '../../../../')
   } else {
-    // En développement: src/main.ts -> ../../../
-    rootDir = join(__dirname, '../../../')
+    // En développement: src/app/main.ts -> ../.. (pour aller à apps/api)
+    rootDir = join(__dirname, '../..')
   }
 
   // Normaliser le chemin pour Windows
@@ -363,3 +363,6 @@ async function bootstrap() {
 bootstrap().catch(() => {
   process.exit(1)
 })
+
+
+

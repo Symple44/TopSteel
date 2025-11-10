@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedMaterial } from '../entities/shared-material.entity'
-import type { SharedMaterialService } from '../services/shared-material.service'
+import { SharedMaterialService } from '../services/shared-material.service'
 
 @ApiTags('Shared Materials')
 @Controller('shared/materials')

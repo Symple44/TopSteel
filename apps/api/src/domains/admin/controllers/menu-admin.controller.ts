@@ -31,7 +31,7 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { Roles } from '../../auth/decorators/roles.decorator'
 import {
   Action,
@@ -41,8 +41,8 @@ import {
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem } from '../entities/menu-item.entity'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
-import type { MenuSyncOptions, MenuSyncService } from '../services/menu-sync.service'
-import type { PageDiscoveryService } from '../services/page-discovery.service'
+import { MenuSyncOptions, MenuSyncService } from '../services/menu-sync.service'
+import { PageDiscoveryService } from '../services/page-discovery.service'
 
 @ApiTags('Admin - Menu Management')
 @ApiBearerAuth()

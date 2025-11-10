@@ -2,10 +2,10 @@ import { Controller, Get, Logger, Req, Res } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
 import { SkipCsrf } from './csrf.guard'
-import type { CsrfService } from './csrf.service'
+import { CsrfService } from './csrf.service'
 
 @ApiTags('🔐 CSRF')
-@Controller('api/csrf')
+@Controller('csrf')
 export class CsrfController {
   private readonly logger = new Logger(CsrfController.name)
 
@@ -52,14 +52,14 @@ export class CsrfController {
 
       this.logger.debug('🔐 Token CSRF généré via endpoint')
 
-      return res.json({
+      res.json({
         token: tokens.token,
         headerName: config.headerName,
         cookieName: config.cookieName,
       })
     } catch (error) {
       this.logger.error('❌ Erreur lors de la génération du token CSRF:', error)
-      return res.status(500).json({
+      res.status(500).json({
         message: 'Erreur lors de la génération du token CSRF',
         error: 'CSRF_TOKEN_GENERATION_ERROR',
       })
@@ -103,7 +103,7 @@ export class CsrfController {
 
       this.logger.debug('📋 Configuration CSRF demandée')
 
-      return res.json({
+      res.json({
         cookieName: config.cookieName,
         headerName: config.headerName,
         valueName: config.valueName,
@@ -111,7 +111,7 @@ export class CsrfController {
       })
     } catch (error) {
       this.logger.error('❌ Erreur lors de la récupération de la configuration CSRF:', error)
-      return res.status(500).json({
+      res.status(500).json({
         message: 'Erreur lors de la récupération de la configuration',
         error: 'CSRF_CONFIG_ERROR',
       })

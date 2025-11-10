@@ -1,4 +1,4 @@
-import type { Provider } from '@nestjs/common'
+import { Provider } from '@nestjs/common'
 import {
   SocieteAuthRepositoryService,
   SocieteUserAuthRepositoryService,
@@ -8,7 +8,7 @@ import type {
   ISocieteRepository,
   ISocieteUserRepository,
 } from '../interfaces/societe-repository.interface'
-import type { IUserRepository } from '../interfaces/user-repository.interface'
+import { IUserRepository } from '../interfaces/user-repository.interface'
 
 // Tokens pour l'injection de dépendance
 export const USER_REPOSITORY_TOKEN = Symbol('USER_REPOSITORY_TOKEN')

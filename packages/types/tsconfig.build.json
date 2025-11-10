@@ -37,6 +37,7 @@
     "src/cross-cutting/audit.ts",
     "src/cross-cutting/auth.ts",
     "src/cross-cutting/notifications.ts",
+    "src/cross-cutting/notifications-namespace.ts",
     "src/cross-cutting/permissions.ts",
     "src/infrastructure/index.ts",
     "src/infrastructure/api/index.ts",

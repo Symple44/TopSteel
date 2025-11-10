@@ -2,8 +2,8 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import type { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
 // Interface for performance metrics - compatible with AggregatedMetrics
 interface PerformanceMetrics {

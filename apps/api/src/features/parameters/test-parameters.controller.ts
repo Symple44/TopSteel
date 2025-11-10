@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import type { ParameterService } from './services/parameter.service'
+import { ParameterService } from './services/parameter.service'
 
 @Controller('test-parameters')
 @ApiTags('🧪 Test Parameters')

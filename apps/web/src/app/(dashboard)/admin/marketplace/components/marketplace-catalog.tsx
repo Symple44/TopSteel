@@ -76,13 +76,13 @@ export function MarketplaceCatalog() {
 
   const getCategoryLabel = (category: string) => {
     const categoryLabels = {
-      HR: t('marketplace?.categories?.hr'),
-      PROCUREMENT: t('marketplace?.categories?.procurement'),
-      ANALYTICS: t('marketplace?.categories?.analytics'),
-      INTEGRATION: t('marketplace?.categories?.integration'),
-      QUALITY: t('marketplace?.categories?.quality'),
-      MAINTENANCE: t('marketplace?.categories?.maintenance'),
-      FINANCE: t('marketplace?.categories?.finance'),
+      HR: t('marketplace.categories.hr'),
+      PROCUREMENT: t('marketplace.categories.procurement'),
+      ANALYTICS: t('marketplace.categories.analytics'),
+      INTEGRATION: t('marketplace.categories.integration'),
+      QUALITY: t('marketplace.categories.quality'),
+      MAINTENANCE: t('marketplace.categories.maintenance'),
+      FINANCE: t('marketplace.categories.finance'),
     }
     return categoryLabels[category as keyof typeof categoryLabels] || category
   }
@@ -138,22 +138,22 @@ export function MarketplaceCatalog() {
   const formatPrice = (pricing: MarketplaceModule['pricing']) => {
     switch (pricing.type) {
       case 'FREE':
-        return t('marketplace?.installedModules?.pricing.free')
+        return t('marketplace.installedModules.pricing.free')
       case 'ONE_TIME':
-        return `${pricing.amount}${pricing.currency} (${t('marketplace?.installedModules?.pricing.oneTime')})`
+        return `${pricing.amount}${pricing.currency} (${t('marketplace.installedModules.pricing.oneTime')})`
       case 'SUBSCRIPTION': {
         const period =
           pricing.period === 'YEAR'
-            ? t('marketplace?.installedModules?.pricing.year')
-            : t('marketplace?.installedModules?.pricing.month')
+            ? t('marketplace.installedModules.pricing.year')
+            : t('marketplace.installedModules.pricing.month')
         return `${pricing.amount}${pricing.currency}/${period}`
       }
       case 'COMMISSION':
-        return t('marketplace?.installedModules?.pricing.commission')
+        return t('marketplace.installedModules.pricing.commission')
       case 'USAGE_BASED':
-        return t('marketplace?.installedModules?.pricing.usageBased')
+        return t('marketplace.installedModules.pricing.usageBased')
       default:
-        return t('marketplace?.installedModules?.pricing.onRequest')
+        return t('marketplace.installedModules.pricing.onRequest')
     }
   }
 

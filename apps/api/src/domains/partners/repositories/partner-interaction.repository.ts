@@ -43,7 +43,7 @@ export interface InteractionStats {
 @Injectable()
 export class PartnerInteractionRepository {
   constructor(
-    @InjectRepository(PartnerInteraction)
+    @InjectRepository(PartnerInteraction, 'tenant')
     private repository: Repository<PartnerInteraction>
   ) {}
 

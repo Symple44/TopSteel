@@ -1,4 +1,3 @@
-import crypto from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { areTokensExpired, getTokensFromCookies } from './lib/auth/cookie-auth'
@@ -33,6 +32,8 @@ const PUBLIC_API_ROUTES = [
   '/api/auth/validate',
   '/api/health',
   '/api/config',
+  '/api/csrf/token',
+  '/api/csrf/config',
 ] as const
 
 // Routes API protégées (toutes les autres routes API sauf les publiques)
@@ -266,62 +267,60 @@ function addSecurityHeaders(response: NextResponse, _request: NextRequest): Next
   const isDevelopment = process?.env?.NODE_ENV === 'development'
 
   // Generate cryptographically secure nonce for inline scripts/styles
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  // Use Web Crypto API (compatible with Edge Runtime)
+  const nonce = crypto.randomUUID()
   response?.headers?.set('X-CSP-Nonce', nonce)
   response?.headers?.set('X-Nonce', nonce) // Legacy support
 
-  // Enhanced CSP with proper nonce support
-  const cspDirectives = [
-    "default-src 'self'",
-
-    // Script sources - strict nonce-only in production
-    isDevelopment
-      ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://vercel.live`
-      : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-
-    // Style sources - nonce-based with safe fallbacks
-    isDevelopment
-      ? `style-src 'self' 'nonce-${nonce}' https://fonts?.googleapis?.com`
-      : `style-src 'self' 'nonce-${nonce}'`,
-
-    // Image sources - allow data: and https: for flexibility
-    "img-src 'self' data: blob: https:",
-
-    // Font sources
-    "font-src 'self' https://fonts?.gstatic?.com data:",
-
-    // Connect sources - API endpoints
-    `connect-src 'self' ${isDevelopment ? 'ws://localhost:* http://localhost:*' : ''} https: wss:`.trim(),
-
-    // Frame and object restrictions
-    "frame-src 'none'",
-    "frame-ancestors 'none'",
-    "object-src 'none'",
-
-    // Media and worker sources
-    "media-src 'self'",
-    "worker-src 'self' blob:",
-
-    // Base and form restrictions
-    "base-uri 'self'",
-    "form-action 'self'",
-
-    // Manifest and child sources
-    "manifest-src 'self'",
-    "child-src 'none'",
-  ]
+  // Enhanced CSP - very permissive in dev, strict in production
+  const cspDirectives = isDevelopment
+    ? [
+        "default-src 'self'",
+        // Very permissive for development - allows inline styles/scripts
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live`,
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+        "img-src 'self' data: blob: https:",
+        "font-src 'self' https://fonts.gstatic.com data:",
+        "connect-src 'self' ws://localhost:* http://localhost:* https: wss:",
+        "frame-src 'none'",
+        "frame-ancestors 'none'",
+        "object-src 'none'",
+        "media-src 'self'",
+        "worker-src 'self' blob:",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "manifest-src 'self'",
+        "child-src 'none'",
+      ]
+    : [
+        "default-src 'self'",
+        // Strict nonce-based CSP for production
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+        `style-src 'self' 'nonce-${nonce}'`,
+        "img-src 'self' data: blob: https:",
+        "font-src 'self' https://fonts.gstatic.com data:",
+        "connect-src 'self' https: wss:",
+        "frame-src 'none'",
+        "frame-ancestors 'none'",
+        "object-src 'none'",
+        "media-src 'self'",
+        "worker-src 'self' blob:",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "manifest-src 'self'",
+        "child-src 'none'",
+      ]
 
   // Add upgrade-insecure-requests in production
   if (!isDevelopment) {
     cspDirectives?.push('upgrade-insecure-requests')
   }
 
-  // Add CSP violation reporting
-  const reportUri = isDevelopment
-    ? 'http://localhost:3002/api/security/csp-violations'
-    : 'https://api?.topsteel?.fr/api/security/csp-violations'
-
-  cspDirectives?.push(`report-uri ${reportUri}`)
+  // Add CSP violation reporting (disabled in development to avoid backend connection errors)
+  if (!isDevelopment) {
+    const reportUri = 'https://api.topsteel.fr/api/security/csp-violations'
+    cspDirectives?.push(`report-uri ${reportUri}`)
+  }
 
   const csp = cspDirectives?.join('; ')
   response?.headers?.set('Content-Security-Policy', csp)
@@ -334,7 +333,7 @@ function addSecurityHeaders(response: NextResponse, _request: NextRequest): Next
     )
   }
 
-  // Permissions Policy
+  // Permissions Policy (removed 'speaker' as it's not a valid feature)
   const permissionsPolicy = [
     'camera=()',
     'microphone=()',
@@ -343,7 +342,6 @@ function addSecurityHeaders(response: NextResponse, _request: NextRequest): Next
     'usb=()',
     'magnetometer=()',
     'gyroscope=()',
-    'speaker=()',
     'fullscreen=(self)',
   ].join(', ')
   response?.headers?.set('Permissions-Policy', permissionsPolicy)

@@ -196,11 +196,11 @@ export function useBackendStatus() {
             : 'bg-gray-500',
     statusText:
       health.status === 'online'
-        ? t('backend?.status?.online')
+        ? t('backend.status.online')
         : health.status === 'offline'
-          ? t('backend?.status?.offline')
+          ? t('backend.status.offline')
           : health.status === 'error'
-            ? t('backend?.status?.error')
-            : t('backend?.status?.checking'),
+            ? t('backend.status.error')
+            : t('backend.status.checking'),
   }
 }

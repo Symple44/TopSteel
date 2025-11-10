@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
+import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource, EntityManager } from 'typeorm'
 
 @Injectable()
@@ -8,7 +9,7 @@ export class SeederService {
   private readonly isDevelopment: boolean
 
   constructor(
-    private readonly dataSource: DataSource,
+    @InjectDataSource('auth') private readonly dataSource: DataSource,
     private readonly configService: ConfigService
   ) {
     this.isDevelopment = this.configService.get('NODE_ENV') === 'development'
@@ -20,6 +21,10 @@ export class SeederService {
   async runSeeds(): Promise<void> {
     try {
       this.logger.log("🌱 Vérification des données d'initialisation...")
+
+      // TOUJOURS vérifier et créer la société si nécessaire
+      // (même si les autres seeds ont déjà été exécutés)
+      await this.ensureDefaultSociete()
 
       // Vérifier si les seeds ont déjà été exécutés
       const seedsStatus = await this.checkSeedsStatus()
@@ -35,6 +40,7 @@ export class SeederService {
       await this.dataSource.transaction(async (manager) => {
         await this.seedSystemParameters(manager)
         await this.seedDefaultUsers(manager)
+        // La société est déjà créée par ensureDefaultSociete()
         await this.seedMenuConfiguration(manager)
         await this.markSeedsAsCompleted(manager)
       })
@@ -98,33 +104,40 @@ export class SeederService {
   private async seedSystemParameters(manager: EntityManager): Promise<void> {
     this.logger.log('📋 Initialisation des paramètres système...')
 
+    // Vérifier si des paramètres existent déjà
+    const existingParams = await manager.query('SELECT COUNT(*) as count FROM parameters_system')
+    if (parseInt(existingParams[0].count, 10) > 0) {
+      this.logger.log('📋 Paramètres système déjà présents, passage')
+      return
+    }
+
     const systemParameters = [
       {
         key: 'app_name',
         value: 'TopSteel ERP',
         description: "Nom de l'application",
-        type: 'string',
+        type: 'STRING',
         category: 'general',
       },
       {
         key: 'app_version',
         value: '1.0.0',
         description: "Version de l'application",
-        type: 'string',
+        type: 'STRING',
         category: 'general',
       },
       {
         key: 'maintenance_mode',
         value: 'false',
         description: 'Mode maintenance',
-        type: 'boolean',
+        type: 'BOOLEAN',
         category: 'system',
       },
       {
         key: 'max_file_size',
         value: '10485760',
         description: 'Taille max des fichiers (bytes)',
-        type: 'number',
+        type: 'NUMBER',
         category: 'files',
       },
     ]
@@ -132,11 +145,10 @@ export class SeederService {
     for (const param of systemParameters) {
       await manager.query(
         `
-        INSERT INTO system_parameters (key, value, description, type, category, "created_at", "updated_at")
-        VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        ON CONFLICT (key) DO NOTHING
+        INSERT INTO parameters_system ("group", key, value, description, type, scope, "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `,
-        [param.key, param.value, param.description, param.type, param.category]
+        [param.category, param.key, param.value, param.description, param.type, 'SYSTEM']
       )
     }
   }
@@ -192,10 +204,83 @@ export class SeederService {
   }
 
   /**
+   * S'assure qu'une société par défaut existe (exécuté à chaque démarrage)
+   */
+  private async ensureDefaultSociete(): Promise<void> {
+    try {
+      // Vérifier si des sociétés existent déjà
+      const societeCount = await this.dataSource.query('SELECT COUNT(*) as count FROM societes')
+
+      if (parseInt(societeCount[0].count, 10) > 0) {
+        // Des sociétés existent déjà, rien à faire
+        return
+      }
+
+      this.logger.log('🏢 Aucune société trouvée, création de la société par défaut...')
+
+      // Créer la société par défaut
+      const societeResult = await this.dataSource.query(
+        `
+        INSERT INTO societes (
+          nom, code, email, telephone, adresse,
+          status, plan, database_name, siret,
+          created_at, updated_at, configuration
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $10)
+        RETURNING id
+      `,
+        [
+          'TopSteel',
+          'TS',
+          'contact@topsteel.tech',
+          '+33 1 23 45 67 89',
+          '1 Avenue de la Métallurgie, 75001 Paris, France',
+          'ACTIVE',
+          'PROFESSIONAL',
+          'erp_topsteel_societe_topsteel',
+          '12345678901234',
+          '{}',
+        ]
+      )
+
+      const societeId = societeResult[0].id
+
+      // Créer un site par défaut pour cette société
+      await this.dataSource.query(
+        `
+        INSERT INTO sites (
+          societe_id, nom, code, adresse,
+          actif, type, created_at, updated_at, configuration
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $7)
+      `,
+        [
+          societeId,
+          'Siège Social',
+          'HQ',
+          '1 Avenue de la Métallurgie, 75001 Paris, France',
+          true,
+          'PRODUCTION',
+          '{}',
+        ]
+      )
+
+      this.logger.log('✅ Société par défaut créée: TopSteel (code: TS)')
+      this.logger.log('✅ Site par défaut créé: Siège Social (code: HQ)')
+    } catch (error) {
+      this.logger.error('❌ Erreur lors de la création de la société par défaut:', error)
+      // Ne pas faire échouer le démarrage pour cette erreur
+      this.logger.warn('⚠️  Continuez le démarrage malgré l\'erreur de création de société')
+    }
+  }
+
+  /**
    * Seed de la configuration des menus (temporairement désactivé)
    */
   private async seedMenuConfiguration(manager: EntityManager): Promise<void> {
     this.logger.log('🎛️  Initialisation de la configuration des menus...')
+    this.logger.warn('⚠️  Configuration des menus désactivée temporairement')
+    return
 
     try {
       // Vérifier si les tables existent
@@ -207,8 +292,8 @@ export class SeederService {
 
       // Vérifier si une configuration par défaut existe déjà
       const existingConfig = await manager.query(`
-        SELECT id FROM menu_configurations 
-        WHERE name = 'Configuration par défaut' AND is_system = true
+        SELECT id FROM menu_configurations
+        WHERE name = 'Configuration par défaut' AND issystem = true
         LIMIT 1
       `)
 
@@ -226,8 +311,8 @@ export class SeederService {
       // Activer cette configuration
       await manager.query(
         `
-        UPDATE menu_configurations 
-        SET is_active = true 
+        UPDATE menu_configurations
+        SET isactive = true
         WHERE id = $1
       `,
         [configId]
@@ -263,15 +348,17 @@ export class SeederService {
    * Crée la configuration de menu par défaut
    */
   private async createDefaultMenuConfiguration(manager: EntityManager): Promise<string> {
+    // Check if createdby and updatedby accept string or UUID
+    // For now, set to NULL since 'system' string might not be valid UUID
     const result = await manager.query(
       `
       INSERT INTO menu_configurations (
-        id, name, description, is_system, is_active, 
-        created_by, updated_by, created_at, updated_at
+        id, name, description, issystem, isactive,
+        createdby, updatedby, createdat, updatedat
       )
       VALUES (
         gen_random_uuid(), $1, $2, true, false,
-        'system', 'system', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        NULL, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       RETURNING id
     `,

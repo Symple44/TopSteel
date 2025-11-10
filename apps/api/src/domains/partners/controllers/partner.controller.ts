@@ -31,7 +31,7 @@ import type {
   UpdatePartnerSiteDto,
 } from '../dto'
 import type { CreatePartnerDto } from '../dto/create-partner.dto'
-import type { PartnerFiltersDto } from '../dto/partner-filters.dto'
+import { PartnerFiltersDto } from '../dto/partner-filters.dto'
 import type { UpdatePartnerDto } from '../dto/update-partner.dto'
 import type { Contact } from '../entities/contact.entity'
 import type { Partner } from '../entities/partner.entity'
@@ -39,8 +39,8 @@ import type { PartnerAddress } from '../entities/partner-address.entity'
 import type { PartnerGroup } from '../entities/partner-group.entity'
 import type { PartnerInteraction } from '../entities/partner-interaction.entity'
 import type { PartnerSite } from '../entities/partner-site.entity'
-import type { PartnerService, PartnerStatistics } from '../services/partner.service'
-import type { PartnerParametersInitService } from '../services/partner-parameters-init.service'
+import { PartnerService, PartnerStatistics } from '../services/partner.service'
+import { PartnerParametersInitService } from '../services/partner-parameters-init.service'
 
 /**
  * Contrôleur REST pour la gestion des partenaires (clients/fournisseurs)

@@ -21,11 +21,8 @@ import type {
   SearchByTypeQueryDto,
   SuggestionsDto,
 } from '../dto'
-import type {
-  GlobalSearchService,
-  SearchOptions,
-  SearchResponse,
-} from '../services/global-search.service'
+import { GlobalSearchService } from '../services/global-search.service'
+import type { SearchOptions, SearchResponse } from '../services/global-search.service'
 import type { AuthenticatedRequest, SearchStatistics } from '../types/search-types'
 
 @Controller('search')

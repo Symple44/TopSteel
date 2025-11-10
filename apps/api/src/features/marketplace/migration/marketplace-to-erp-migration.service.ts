@@ -1,7 +1,7 @@
 import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DataSource, QueryRunner, Repository } from 'typeorm'
+import { DataSource, QueryRunner, Repository } from 'typeorm'
 import { IsNull } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import {

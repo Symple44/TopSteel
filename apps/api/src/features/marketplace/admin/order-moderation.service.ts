@@ -1,6 +1,6 @@
 import { Article } from '@erp/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'

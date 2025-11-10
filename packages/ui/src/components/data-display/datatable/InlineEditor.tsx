@@ -1,6 +1,17 @@
 'use client'
 
-import DOMPurify from 'isomorphic-dompurify'
+// Use client-side DOMPurify only to avoid jsdom dependencies
+const getDOMPurify = () => {
+  if (typeof window === 'undefined') return null
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const dompurify = require('dompurify')
+    return dompurify.default || dompurify
+  } catch {
+    return null
+  }
+}
+
 import { AlertTriangle, Calculator, Check, X } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -300,7 +311,10 @@ export function InlineEditor<T = Record<string, unknown>>({
             // Using dangerouslySetInnerHTML is necessary for inline rich text editing
             // Content is sanitized with DOMPurify to prevent XSS vulnerabilities
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize((value as string) || '', {
+              __html: (() => {
+                const DOMPurify = getDOMPurify()
+                if (!DOMPurify) return (value as string) || ''
+                return DOMPurify.sanitize((value as string) || '', {
                 ALLOWED_TAGS: [
                   'p',
                   'br',
@@ -324,7 +338,8 @@ export function InlineEditor<T = Record<string, unknown>>({
                 ALLOWED_ATTR: ['class', 'style'],
                 ALLOW_DATA_ATTR: false,
                 FORBID_TAGS: ['script', 'iframe'],
-              }),
+              })
+              })(),
             }}
             onInput={(e) => {
               const target = e.target as HTMLDivElement

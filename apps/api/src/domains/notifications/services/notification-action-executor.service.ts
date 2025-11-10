@@ -1,4 +1,4 @@
-import type { HttpService } from '@nestjs/axios'
+import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import type { AxiosResponse } from 'axios'
 import { firstValueFrom } from 'rxjs'

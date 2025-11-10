@@ -3,7 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedProcess } from '../entities/shared-process.entity'
-import type { SharedProcessService } from '../services/shared-process.service'
+import { SharedProcessService } from '../services/shared-process.service'
 
 @ApiTags('Shared Processes')
 @Controller('shared/processes')

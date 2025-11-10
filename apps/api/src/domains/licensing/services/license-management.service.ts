@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Between, LessThanOrEqual, type Repository } from 'typeorm'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { BillingCycle, License, LicenseStatus, LicenseType } from '../entities/license.entity'
 import { ActivationStatus, LicenseActivation } from '../entities/license-activation.entity'
 import {
@@ -16,7 +16,7 @@ import {
   LicenseUsage,
   type UsageMetricType,
 } from '../entities/license-usage.entity'
-import type { LicenseValidationService } from './license-validation.service'
+import { LicenseValidationService } from './license-validation.service'
 
 /**
  * License creation options

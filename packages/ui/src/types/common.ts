@@ -1,4 +1,3 @@
-import type { Request } from 'express'
 import type React from 'react'
 
 // packages/ui/src/types/common.ts
@@ -38,8 +37,18 @@ export type JsonValue =
   | { [key: string]: JsonValue }
 export type SafeObject = SafeRecord<string, JsonValue>
 
+// Base Request type (not using express to avoid server dependency in UI package)
+export interface BaseRequest {
+  query: SafeRecord<string, string | string[]>
+  body: SafeObject
+  params: SafeRecord<string, string>
+  headers: SafeRecord<string, string | string[] | undefined>
+  method?: string
+  url?: string
+}
+
 // Request types to replace @Req() req: any
-export interface RequestWithUser extends Request {
+export interface RequestWithUser extends BaseRequest {
   user: {
     id: string
     email: string

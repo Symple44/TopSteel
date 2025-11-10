@@ -64,8 +64,8 @@ export const rateLimitingConfig = registerAs('rateLimiting', (): RateLimitingCon
   const isProduction = process.env.NODE_ENV === 'production'
 
   // Base multipliers for development vs production
-  const baseMultiplier = isDevelopment ? 10 : 1
-  const strictMultiplier = isDevelopment ? 5 : 1
+  const baseMultiplier = isDevelopment ? 100 : 1  // Augmenté à 100x en développement
+  const strictMultiplier = isDevelopment ? 50 : 1  // Augmenté à 50x en développement
 
   return {
     // Global defaults

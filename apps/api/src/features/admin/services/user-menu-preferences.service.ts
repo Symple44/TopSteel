@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { UserMenuItemPreference } from '../entities/user-menu-item-preference.entity'
 import { UserMenuPreferences } from '../entities/user-menu-preferences.entity'
-import type { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
+import { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
 
 // Interface for UserMenuItemPreference data
 interface UserMenuItemPreferenceData {

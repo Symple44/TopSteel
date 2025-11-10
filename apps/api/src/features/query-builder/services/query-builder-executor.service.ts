@@ -3,9 +3,9 @@ import { InjectDataSource } from '@nestjs/typeorm'
 import * as mathjs from 'mathjs'
 import type { DataSource } from 'typeorm'
 import type { QueryBuilder } from '../entities'
-import type { QueryBuilderSecurityService } from '../security/query-builder-security.service'
-import type { FilterCondition, SqlSanitizationService } from '../security/sql-sanitization.service'
-import type { QueryBuilderPermissionService } from './query-builder-permission.service'
+import { QueryBuilderSecurityService } from '../security/query-builder-security.service'
+import { FilterCondition, SqlSanitizationService } from '../security/sql-sanitization.service'
+import { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 export interface QueryExecutionParams {
   page?: number

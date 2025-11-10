@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import { MenuConfigurationSimple } from '../entities/menu-configuration-simple.entity'
 

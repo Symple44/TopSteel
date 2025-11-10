@@ -81,7 +81,7 @@ export function TranslationAdmin() {
       setEntries(loadedEntries)
       setStats(calculateTranslationStats(loadedEntries))
     } catch (_error) {
-      toast?.error(t('modules?.translations?.loadError'))
+      toast?.error(t('modules.translations.loadError'))
     } finally {
       setLoading(false)
     }
@@ -138,7 +138,7 @@ export function TranslationAdmin() {
 
     const success = await saveTranslation(editingEntry)
     if (success) {
-      toast?.success(t('modules?.translations?.saveSuccess'))
+      toast?.success(t('modules.translations.saveSuccess'))
 
       // Mettre à jour la liste
       setEntries((prev) => prev?.map((e) => (e.id === editingEntry.id ? editingEntry : e)))
@@ -150,7 +150,7 @@ export function TranslationAdmin() {
       // Déclencher un événement pour recharger les traductions
       window.dispatchEvent(new Event('translation-updated'))
     } else {
-      toast?.error(t('modules?.translations?.saveError'))
+      toast?.error(t('modules.translations.saveError'))
     }
   }
 
@@ -170,10 +170,10 @@ export function TranslationAdmin() {
         // Recalculer les stats de manière débouncée
         debouncedStatsUpdate()
       } else {
-        toast?.error(t('modules?.translations?.saveError'))
+        toast?.error(t('modules.translations.saveError'))
       }
     } catch (_error) {
-      toast?.error(t('modules?.translations?.saveError'))
+      toast?.error(t('modules.translations.saveError'))
     }
   }
 
@@ -320,7 +320,7 @@ export function TranslationAdmin() {
         </div>
       </div>
 
-      {/* {t('modules?.translations?.statistics')} */}
+      {/* {t('modules.translations.statistics')} */}
       {memoizedStats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
@@ -358,12 +358,12 @@ export function TranslationAdmin() {
         </div>
       )}
 
-      {/* {t('modules?.translations?.actions')} globales */}
+      {/* {t('modules.translations.actions')} globales */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Globe className="h-5 w-5" />
-            {t('modules?.translations?.quickActions')}
+            {t('modules.translations.quickActions')}
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -3,7 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedQualityStandard } from '../entities/shared-quality-standard.entity'
-import type { SharedQualityStandardService } from '../services/shared-quality-standard.service'
+import { SharedQualityStandardService } from '../services/shared-quality-standard.service'
 
 @ApiTags('Shared Quality Standards')
 @Controller('shared/quality-standards')

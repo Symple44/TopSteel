@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { MetadataScanner, ModulesContainer, Reflector } from '@nestjs/core'
+import { MetadataScanner, ModulesContainer, Reflector } from '@nestjs/core'
 import type { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper'
 
 /**

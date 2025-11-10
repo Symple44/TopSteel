@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { In, type Repository } from 'typeorm'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem } from '../entities/menu-item.entity'
 import { MenuItemAction } from '../entities/menu-item-action.entity'
-import type { DiscoveredPage, PageDiscoveryService } from './page-discovery.service'
+import { DiscoveredPage, PageDiscoveryService } from './page-discovery.service'
 
 /**
  * Sync options for menu synchronization

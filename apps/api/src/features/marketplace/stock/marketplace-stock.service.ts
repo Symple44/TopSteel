@@ -1,10 +1,10 @@
 import { Article } from '@erp/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
-import type { DataSource, Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 import { MarketplaceOrder } from '../entities/marketplace-order.entity'
 import { MarketplaceOrderItem } from '../entities/marketplace-order-item.entity'
 

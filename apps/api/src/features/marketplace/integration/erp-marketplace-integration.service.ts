@@ -1,6 +1,6 @@
 import { Article } from '@erp/entities'
 import { Injectable, Logger } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, Not, type Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'

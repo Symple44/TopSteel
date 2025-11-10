@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
+import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 
 export interface MigrationResult {
@@ -24,7 +25,7 @@ export class MigrationService {
   private readonly isProduction: boolean
 
   constructor(
-    private readonly dataSource: DataSource,
+    @InjectDataSource('auth') private readonly dataSource: DataSource,
     private readonly configService: ConfigService
   ) {
     this.isProduction = this.configService.get('NODE_ENV') === 'production'

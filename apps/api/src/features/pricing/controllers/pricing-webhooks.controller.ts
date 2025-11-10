@@ -29,7 +29,7 @@ import { getErrorMessage } from '../../../core/common/utils'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
 import { SkipCsrf } from '../../../infrastructure/security/csrf'
-import type { PricingWebhooksService } from '../services/pricing-webhooks.service'
+import { PricingWebhooksService } from '../services/pricing-webhooks.service'
 import type { AuthenticatedUser } from '../types/auth.types'
 import { WebhookEventType } from '../types/webhook.types'
 

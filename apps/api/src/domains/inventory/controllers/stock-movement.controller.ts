@@ -35,7 +35,7 @@ import {
   StockMovementStatus,
   StockMovementType,
 } from '../interfaces/stock-movement.interface'
-import type { StockMovementService } from '../services/stock-movement.service'
+import { StockMovementService } from '../services/stock-movement.service'
 
 /**
  * DTO pour créer un mouvement de stock

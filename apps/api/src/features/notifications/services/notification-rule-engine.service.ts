@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import {
   EventStatus,
@@ -15,7 +15,7 @@ import {
   type RecipientType,
   TriggerType,
 } from '../entities'
-import type { NotificationRuleService } from './notification-rule.service'
+import { NotificationRuleService } from './notification-rule.service'
 
 @Injectable()
 export class NotificationRuleEngineService {

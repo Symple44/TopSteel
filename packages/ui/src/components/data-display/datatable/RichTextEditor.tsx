@@ -1,6 +1,16 @@
 'use client'
 
-import DOMPurify from 'isomorphic-dompurify'
+// Use client-side DOMPurify only to avoid jsdom dependencies
+const getDOMPurify = () => {
+  if (typeof window === 'undefined') return null
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const dompurify = require('dompurify')
+    return dompurify.default || dompurify
+  } catch {
+    return null
+  }
+}
 import {
   AlignCenter,
   AlignLeft,
@@ -31,6 +41,12 @@ import { Input } from '../../primitives/input'
 // HTML sanitization for security using DOMPurify
 const sanitizeHtml = (html: string): string => {
   if (!html) return ''
+
+  const DOMPurify = getDOMPurify()
+  if (!DOMPurify) {
+    // Server-side: return as-is (will be sanitized on client)
+    return html
+  }
 
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [

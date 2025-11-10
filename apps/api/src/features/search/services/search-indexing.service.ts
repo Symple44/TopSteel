@@ -13,7 +13,7 @@ import type {
   UserRecord,
 } from '../types/search-types'
 import { convertToSearchDocument } from '../utils/search-document-converter'
-import type { SearchIndexingOperationsService } from './search-indexing-operations.service'
+import { SearchIndexingOperationsService } from './search-indexing-operations.service'
 
 /**
  * Service d'indexation automatique pour la recherche

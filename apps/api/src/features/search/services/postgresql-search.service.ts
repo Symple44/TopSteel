@@ -13,7 +13,7 @@ import type {
   SearchResult,
 } from '../interfaces/search.interfaces'
 import type { AnyDatabaseRecord, SearchDocument } from '../types/search-types'
-import type { SearchResultFormatterService } from './search-result-formatter.service'
+import { SearchResultFormatterService } from './search-result-formatter.service'
 
 @Injectable()
 export class PostgreSQLSearchService implements IPostgreSQLSearchService {

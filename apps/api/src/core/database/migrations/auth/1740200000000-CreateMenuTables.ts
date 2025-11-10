@@ -1,6 +1,6 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm'
 
-export class CreateMenuTables20250812 implements MigrationInterface {
+export class CreateMenuTables1740200000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Créer la table menu_configurations
     await queryRunner.query(`

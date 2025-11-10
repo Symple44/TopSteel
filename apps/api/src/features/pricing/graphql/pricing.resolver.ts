@@ -4,9 +4,9 @@ import { Args, Float, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GraphQLJSONObject } from 'graphql-type-json'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import type { PricingAnalyticsService } from '../services/pricing-analytics.service'
-import type { PricingEngineService } from '../services/pricing-engine.service'
-import type { MLPricingContext, PricingMLService } from '../services/pricing-ml.service'
+import { PricingAnalyticsService } from '../services/pricing-analytics.service'
+import { PricingEngineService } from '../services/pricing-engine.service'
+import { MLPricingContext, PricingMLService } from '../services/pricing-ml.service'
 
 // Type definitions
 interface AuthenticatedUser {

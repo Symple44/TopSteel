@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 // import { doubleCsrf } from 'csrf-csrf' // Simplified implementation for now
 import type { Request, Response } from 'express'
 

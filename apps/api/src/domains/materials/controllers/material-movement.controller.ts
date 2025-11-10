@@ -51,7 +51,7 @@ import {
   MaterialMovementStatus,
   MaterialMovementType,
 } from '../interfaces/material-movement.interface'
-import type { MaterialMovementService } from '../services/material-movement.service'
+import { MaterialMovementService } from '../services/material-movement.service'
 
 /**
  * DTO pour les informations de traçabilité

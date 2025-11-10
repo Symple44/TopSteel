@@ -31,9 +31,9 @@ import { Roles } from '../../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../../domains/auth/security/guards/roles.guard'
 // Services
-import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
-import type { ProgressivePenaltyService } from '../services/progressive-penalty.service'
-import type { RateLimitingMonitoringService } from '../services/rate-limiting-monitoring.service'
+import { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
+import { ProgressivePenaltyService } from '../services/progressive-penalty.service'
+import { RateLimitingMonitoringService } from '../services/rate-limiting-monitoring.service'
 import type { AlertData, RateLimitMetrics } from '../types/rate-limiting.types'
 
 class RateLimitMetricsDto {

@@ -7,7 +7,7 @@ import { EnhancedTenantGuard } from '../../../domains/auth/security/guards/enhan
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
 import type { User } from '../../../domains/users/entities/user.entity'
-import type { PricingEngineService } from '../services/pricing-engine.service'
+import { PricingEngineService } from '../services/pricing-engine.service'
 
 export interface QuoteLineItem {
   articleId?: string

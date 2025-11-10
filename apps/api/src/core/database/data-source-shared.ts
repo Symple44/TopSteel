@@ -16,7 +16,7 @@ export const sharedDataSourceOptions: DataSourceOptions = {
   password: configService.get('DB_PASSWORD', 'postgres'),
   database: configService.get('DB_SHARED_NAME', 'erp_topsteel_shared'),
   entities: ['src/modules/shared/entities/shared-*.entity{.ts,.js}'],
-  migrations: ['src/database/migrations/shared/*{.ts,.js}'],
+  migrations: ['src/core/database/migrations/shared/*{.ts,.js}'],
   migrationsRun: false,
   synchronize: false,
   logging: configService.get('NODE_ENV') === 'development',

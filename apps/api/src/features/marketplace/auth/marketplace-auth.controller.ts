@@ -28,7 +28,7 @@ import {
 } from './dto/marketplace-auth.dto'
 import { MarketplaceAuthGuard } from './guards/marketplace-auth.guard'
 import type { MarketplaceCustomerJwtPayload } from './interfaces/marketplace-customer.interface'
-import type { MarketplaceAuthService } from './marketplace-auth.service'
+import { MarketplaceAuthService } from './marketplace-auth.service'
 
 @ApiTags('Marketplace Authentication')
 @Controller('marketplace/auth')

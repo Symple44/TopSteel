@@ -2,10 +2,10 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 import { SEARCHABLE_ENTITIES, type SearchableEntity } from '../config/searchable-entities.config'
-import type { ISearchIndexingService } from '../interfaces/search.interfaces'
+import { ISearchIndexingService } from '../interfaces/search.interfaces'
 import type { IndexingBatchResult, IndexingDocument, SearchDocument } from '../types/search-types'
-import type { ElasticsearchSearchService } from './elasticsearch-search.service'
-import type { SearchResultFormatterService } from './search-result-formatter.service'
+import { ElasticsearchSearchService } from './elasticsearch-search.service'
+import { SearchResultFormatterService } from './search-result-formatter.service'
 
 @Injectable()
 export class SearchIndexingOperationsService implements ISearchIndexingService {

@@ -3,7 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { Site } from '../entities/site.entity'
-import type { SitesService } from '../services/sites.service'
+import { SitesService } from '../services/sites.service'
 
 @ApiTags('Sites')
 @Controller('sites')

@@ -12,7 +12,7 @@ import {
 import type { Request } from 'express'
 import { getErrorMessage, hasStack } from '../../../core/common/utils'
 import { SkipCsrf } from '../../../infrastructure/security/csrf'
-import type { StripePaymentService } from './stripe-payment.service'
+import { StripePaymentService } from './stripe-payment.service'
 
 @Controller('webhooks/stripe/marketplace')
 export class MarketplaceWebhookController {

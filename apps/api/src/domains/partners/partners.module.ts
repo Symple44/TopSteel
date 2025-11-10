@@ -1,15 +1,19 @@
 import { Module, type OnModuleInit } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { MarketplaceOrder } from '../../features/marketplace/entities/marketplace-order.entity'
 import { ParameterSystem } from '../../features/parameters/entities/parameter-system.entity'
+import { SalesHistory } from '../../features/pricing/entities/sales-history.entity'
 import { PartnerController } from './controllers/partner.controller'
 import { Contact } from './entities/contact.entity'
 import { Partner } from './entities/partner.entity'
 import { PartnerAddress } from './entities/partner-address.entity'
 import { PartnerGroup } from './entities/partner-group.entity'
+import { PartnerInteraction } from './entities/partner-interaction.entity'
 import { PartnerSite } from './entities/partner-site.entity'
 import { ContactRepository } from './repositories/contact.repository'
 import { PartnerAddressRepository } from './repositories/partner-address.repository'
 import { PartnerGroupRepository } from './repositories/partner-group.repository'
+import { PartnerInteractionRepository } from './repositories/partner-interaction.repository'
 import { PartnerRepositoryImpl } from './repositories/partner-repository.impl'
 import { PartnerSiteRepository } from './repositories/partner-site.repository'
 import { PartnerService } from './services/partner.service'
@@ -21,7 +25,16 @@ import { PartnerParametersInitService } from './services/partner-parameters-init
 @Module({
   imports: [
     TypeOrmModule.forFeature(
-      [Partner, PartnerGroup, Contact, PartnerSite, PartnerAddress],
+      [
+        Partner,
+        PartnerGroup,
+        Contact,
+        PartnerSite,
+        PartnerAddress,
+        PartnerInteraction,
+        MarketplaceOrder,
+        SalesHistory,
+      ],
       'tenant'
     ),
     TypeOrmModule.forFeature([ParameterSystem], 'auth'),
@@ -35,6 +48,7 @@ import { PartnerParametersInitService } from './services/partner-parameters-init
     ContactRepository,
     PartnerSiteRepository,
     PartnerAddressRepository,
+    PartnerInteractionRepository,
     {
       provide: 'IPartnerRepository',
       useClass: PartnerRepositoryImpl,

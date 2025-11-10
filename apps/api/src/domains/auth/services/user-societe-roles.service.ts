@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
-import type { Permission, PermissionService } from './permission.service'
-import type { PermissionCalculatorService } from './permission-calculator.service'
+import { Permission, PermissionService } from './permission.service'
+import { PermissionCalculatorService } from './permission-calculator.service'
 
 export interface UserSocieteRoleWithPermissions {
   userId: string

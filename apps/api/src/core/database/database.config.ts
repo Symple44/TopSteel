@@ -1,4 +1,4 @@
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 
 export const createDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
@@ -22,7 +22,9 @@ export const createDatabaseConfig = (configService: ConfigService): TypeOrmModul
     migrationsTableName: 'migrations',
 
     // Configuration de sécurité
-    synchronize: false, // JAMAIS true en production
+    synchronize: isDevelopment
+      ? configService.get<boolean>('DATABASE_SYNCHRONIZE', false)
+      : false, // JAMAIS true en production
     dropSchema: false, // JAMAIS true en production
 
     // Gestion des migrations par environnement

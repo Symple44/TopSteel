@@ -1,12 +1,12 @@
 import { Controller, Get, Logger, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { DiscoveredPage } from '../../menu/entities/discovered-page.entity'
-import type { PageSyncService } from '../../menu/services/page-sync.service'
+import { PageSyncService } from '../../menu/services/page-sync.service'
 
 @Controller('admin/page-sync')
 @ApiTags('🔧 Admin - Page Synchronization')

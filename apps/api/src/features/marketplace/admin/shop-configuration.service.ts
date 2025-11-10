@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import type { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import type { Redis } from 'ioredis'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { MarketplaceShopConfiguration } from '../entities/marketplace-shop-configuration.entity'
 
 export interface ShopConfiguration {

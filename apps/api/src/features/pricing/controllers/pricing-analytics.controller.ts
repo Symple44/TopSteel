@@ -4,7 +4,7 @@ import { CurrentUser } from '../../../core/common/decorators/current-user.decora
 import { Roles } from '../../../core/common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import type { PricingAnalyticsService } from '../services/pricing-analytics.service'
+import { PricingAnalyticsService } from '../services/pricing-analytics.service'
 import type { AuthenticatedUser } from '../types/auth.types'
 
 @ApiTags('Pricing Analytics')

@@ -6,11 +6,11 @@ import {
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
-import { AuditEventType, type AuditService, AuditSeverity } from '../../services/audit.service'
-import type { EnhancedRolesGuard } from './enhanced-roles.guard'
-import type { EnhancedTenantGuard } from './enhanced-tenant.guard'
-import type { ResourceOwnershipGuard } from './resource-ownership.guard'
+import { Reflector } from '@nestjs/core'
+import { AuditEventType, AuditService, AuditSeverity } from '../../services/audit.service'
+import { EnhancedRolesGuard } from './enhanced-roles.guard'
+import { EnhancedTenantGuard } from './enhanced-tenant.guard'
+import { ResourceOwnershipGuard } from './resource-ownership.guard'
 
 /**
  * Guard combiné qui orchestre tous les contrôles de sécurité

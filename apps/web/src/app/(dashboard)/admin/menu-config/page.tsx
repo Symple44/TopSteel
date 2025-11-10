@@ -414,7 +414,7 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setFormData((prev) => ({ ...prev, name: e?.target?.value }))
           }
-          placeholder={t('menuConfig?.form?.namePlaceholder')}
+          placeholder={t('menuConfig.form.namePlaceholder')}
           required
         />
       </div>
@@ -427,15 +427,15 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setFormData((prev) => ({ ...prev, description: e?.target?.value }))
           }
-          placeholder={t('menuConfig?.form?.descriptionPlaceholder')}
+          placeholder={t('menuConfig.form.descriptionPlaceholder')}
         />
       </div>
 
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
-          {t('menuConfig?.form?.cancel')}
+          {t('menuConfig.form.cancel')}
         </Button>
-        <Button type="submit">{t('menuConfig?.form?.create')}</Button>
+        <Button type="submit">{t('menuConfig.form.create')}</Button>
       </div>
     </form>
   )
@@ -457,13 +457,13 @@ function MenuConfigEditor({
       <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          {t('menuConfig?.editor?.advancedEditorSoon')}
+          {t('menuConfig.editor.advancedEditorSoon')}
           {t('menuConfig.editor.exportImportInfo')}
         </AlertDescription>
       </Alert>
 
       <div className="flex justify-end">
-        <Button onClick={onSave}>{t('menuConfig?.editor?.close')}</Button>
+        <Button onClick={onSave}>{t('menuConfig.editor.close')}</Button>
       </div>
     </div>
   )
@@ -497,7 +497,7 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
   }, [config, loadMenuTree])
 
   if (loading) {
-    return <div className="text-center py-8">{t('menuConfig?.preview?.loadingPreview')}</div>
+    return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
   }
 
   const renderMenuItem = (item: MenuItem, depth: number = 0) => (
@@ -521,12 +521,12 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
     <div className="space-y-4">
       <div className="bg-gray-50 rounded-lg p-4 border">
         <h3 className="font-medium mb-3">
-          {t('menuConfig?.preview?.menuStructure', { fallback: 'Structure du menu' })}
+          {t('menuConfig.preview.menuStructure', { fallback: 'Structure du menu' })}
         </h3>
         {menuTree.length > 0 ? (
           <div className="space-y-1">{menuTree?.map((item) => renderMenuItem(item))}</div>
         ) : (
-          <p className="text-muted-foreground">{t('menuConfig?.preview?.noItems')}</p>
+          <p className="text-muted-foreground">{t('menuConfig.preview.noItems')}</p>
         )}
       </div>
     </div>
@@ -557,7 +557,7 @@ function MenuPreview() {
   }, [loadCurrentMenu])
 
   if (loading) {
-    return <div className="text-center py-8">{t('menuConfig?.preview?.loadingPreview')}</div>
+    return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
   }
 
   const renderMenuItem = (item: MenuItem, depth: number = 0) => (
@@ -586,12 +586,12 @@ function MenuPreview() {
     <Card>
       <CardHeader>
         <CardTitle>
-          {t('menuConfig?.preview?.currentNavigationMenu', {
+          {t('menuConfig.preview.currentNavigationMenu', {
             fallback: 'Menu de navigation actuel',
           })}
         </CardTitle>
         <CardDescription>
-          {t('menuConfig?.preview?.userMenuPreview', {
+          {t('menuConfig.preview.userMenuPreview', {
             fallback: "Aperçu du menu tel qu'il apparaît pour votre utilisateur",
           })}
         </CardDescription>
@@ -605,7 +605,7 @@ function MenuPreview() {
           <div className="text-center py-8 text-muted-foreground">
             <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>
-              {t('menuConfig?.preview?.noMenuConfigured', {
+              {t('menuConfig.preview.noMenuConfigured', {
                 fallback: 'Aucun menu configuré ou accessible',
               })}
             </p>

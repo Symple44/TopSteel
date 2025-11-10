@@ -14,7 +14,7 @@ import {
   type UpdateLicenseDto,
 } from '../dto/license.dto'
 import type { SocieteLicense } from '../entities/societe-license.entity'
-import type { LicenseManagementService } from '../services/license-management.service'
+import { LicenseManagementService } from '../services/license-management.service'
 
 @ApiTags('License Management')
 @ApiBearerAuth()

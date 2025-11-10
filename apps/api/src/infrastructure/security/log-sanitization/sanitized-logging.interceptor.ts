@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common'
 import type { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
-import type { LogSanitizerService } from './log-sanitizer.service'
+import { LogSanitizerService } from './log-sanitizer.service'
 
 interface AuthenticatedRequest {
   user?: {

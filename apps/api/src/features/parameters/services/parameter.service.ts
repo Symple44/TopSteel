@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { ParameterApplication } from '../entities/parameter-application.entity'
 import { ParameterClient } from '../entities/parameter-client.entity'
 import { ParameterScope, ParameterSystem, ParameterType } from '../entities/parameter-system.entity'

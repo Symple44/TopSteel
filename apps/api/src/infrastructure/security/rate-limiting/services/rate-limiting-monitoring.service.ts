@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import type { Redis } from 'ioredis'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { User } from '../../domains/users/entities/user.entity'
 import { DatabaseCoreModule } from '../database-core/database-core.module'
 import { QueryBuilderController } from './controllers/query-builder.controller'
 import { SqlExecutorController } from './controllers/sql-executor.controller'
@@ -29,6 +30,7 @@ import { SchemaIntrospectionService } from './services/schema-introspection.serv
         QueryBuilderJoin,
         QueryBuilderCalculatedField,
         QueryBuilderPermission,
+        User, // Nécessaire pour QueryBuilderPermissionService
       ],
       'auth' // Les entités QueryBuilder sont dans la base auth
     ),

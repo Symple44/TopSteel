@@ -121,6 +121,26 @@ export const fr = {
     pageNotFound: 'Page non trouvée',
     pageNotFoundMessage: "La page que vous recherchez n'existe pas ou a été déplacée.",
     backHome: "Retour à l'accueil",
+
+    // Companies (ajouté pour corriger l'affichage)
+    companies: {
+      select: 'Sélectionner une société',
+      loading: 'Chargement des sociétés...',
+      loadingError: 'Impossible de charger les sociétés disponibles',
+      none: 'Aucune société disponible',
+      notFound: 'Société non trouvée',
+      contactAdmin: 'Contactez votre administrateur pour obtenir les accès nécessaires.',
+      connectedTo: 'Connecté à {{name}}',
+      cannotConnect: 'Impossible de se connecter à cette société',
+      syncError: 'Erreur de synchronisation, veuillez vous reconnecter',
+      changeAffects: 'Changement sur {{count}} onglet(s)',
+      changeAffectsMultiple: 'Affectera tous les onglets ouverts ({{count}} détecté(s)).',
+      setAsDefault: 'Définir comme société par défaut',
+      chooseSociety: 'Choisissez la société sur laquelle vous souhaitez travailler.',
+      code: 'Code',
+      role: 'Rôle',
+      active: '✓ ACTIF',
+    },
   },
 
   translation: {

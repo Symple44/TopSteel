@@ -25,23 +25,23 @@ export class SocieteUsersService {
       .leftJoinAndSelect('societe.sites', 'sites')
       .select([
         'su.id',
-        'su.userId',
-        'su.societeId',
+        'su.user_id',
+        'su.societe_id',
         'su.role',
         'su.actif',
-        'su.isDefault',
+        'su.is_default',
         'su.permissions',
-        'su.restrictedPermissions',
+        'su.restricted_permissions',
         'societe.id',
         'societe.nom',
         'societe.code',
         'sites.id',
         'sites.nom',
         'sites.code',
-        'sites.isPrincipal',
+        'sites.is_principal',
       ])
-      .where('su.userId = :userId', { userId })
-      .andWhere('su.deletedAt IS NULL')
+      .where('su.user_id = :userId', { userId })
+      .andWhere('su.deleted_at IS NULL')
       .getMany()
   }
 

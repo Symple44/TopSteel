@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 import { CreateInitialTables1737178800000 } from '../migrations/1737178800000-CreateInitialTables'
 
@@ -6,7 +7,7 @@ import { CreateInitialTables1737178800000 } from '../migrations/1737178800000-Cr
 export class MigrationLoaderService {
   private readonly logger = new Logger(MigrationLoaderService.name)
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource('auth') private readonly dataSource: DataSource) {}
 
   /**
    * Force l'exécution des migrations avec les classes directement importées

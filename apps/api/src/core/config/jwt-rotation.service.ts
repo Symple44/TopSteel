@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import type { NotificationService } from './notification/notification.service'
+import { NotificationService } from './notification/notification.service'
 import { SecretManager } from './secret-manager'
-import type { SecretVaultService } from './secret-vault.service'
+import { SecretVaultService } from './secret-vault.service'
 
 export interface JwtRotationConfig {
   enabled: boolean

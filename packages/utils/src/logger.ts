@@ -1,78 +1,66 @@
 /**
  * Centralized logger utility for the entire application
- * Uses console in development and can be extended with Winston/Pino in production
+ * Minimal implementation to avoid build issues
  */
 
-export enum LogLevel {
-  ERROR = 0,
-  WARN = 1,
-  INFO = 2,
-  DEBUG = 3,
-}
+export type LogLevelValue = 0 | 1 | 2 | 3
 
 export interface LoggerConfig {
-  level: LogLevel
+  level: LogLevelValue
   prefix?: string
   isDevelopment?: boolean
 }
 
 class Logger {
-  private level: LogLevel
+  private level: LogLevelValue
   private prefix: string
   private isDevelopment: boolean
 
   constructor(config: LoggerConfig) {
-    this.level = config.level ?? LogLevel.INFO
+    this.level = config.level ?? 2
     this.prefix = config.prefix ?? ''
     this.isDevelopment = config.isDevelopment ?? process.env.NODE_ENV === 'development'
   }
 
-  private shouldLog(level: LogLevel): boolean {
+  private shouldLog(level: LogLevelValue): boolean {
     return level <= this.level
   }
 
   error(_message: string, ..._args: unknown[]): void {
-    if (this.shouldLog(LogLevel.ERROR)) {
-      if (this.isDevelopment) {
-      } else {
-      }
+    if (this.shouldLog(0)) {
+      // No-op for now
     }
   }
 
   warn(_message: string, ..._args: unknown[]): void {
-    if (this.shouldLog(LogLevel.WARN)) {
-      if (this.isDevelopment) {
-      } else {
-      }
+    if (this.shouldLog(1)) {
+      // No-op for now
     }
   }
 
   info(_message: string, ..._args: unknown[]): void {
-    if (this.shouldLog(LogLevel.INFO)) {
-      if (this.isDevelopment) {
-      } else {
-      }
+    if (this.shouldLog(2)) {
+      // No-op for now
     }
   }
 
   debug(_message: string, ..._args: unknown[]): void {
-    if (this.shouldLog(LogLevel.DEBUG) && this.isDevelopment) {
+    if (this.shouldLog(3) && this.isDevelopment) {
+      // No-op for now
     }
   }
 
   log(message: string, ...args: unknown[]): void {
-    // Alias for info
     this.info(message, ...args)
   }
 }
 
-// Factory function to create logger instances
 export function createLogger(prefix?: string): Logger {
   const level = process.env.LOG_LEVEL
-    ? (parseInt(process.env.LOG_LEVEL, 10) as LogLevel)
+    ? (parseInt(process.env.LOG_LEVEL, 10) as LogLevelValue)
     : process.env.NODE_ENV === 'production'
-      ? LogLevel.WARN
-      : LogLevel.DEBUG
+      ? 1
+      : 3
 
   return new Logger({
     level,
@@ -81,10 +69,7 @@ export function createLogger(prefix?: string): Logger {
   })
 }
 
-// Default logger instance
 export const logger = createLogger()
-
-// Specialized loggers
 export const apiLogger = createLogger('API')
 export const dbLogger = createLogger('DB')
 export const authLogger = createLogger('AUTH')

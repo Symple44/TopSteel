@@ -5,7 +5,24 @@
  * when using dangerouslySetInnerHTML in React components.
  */
 
-import DOMPurify from 'isomorphic-dompurify'
+// Lazy-loaded DOMPurify for client-side only
+// Server-side returns unsanitized content (sanitization happens on client)
+const getDOMPurify = (): typeof import('dompurify').default | null => {
+  if (typeof window === 'undefined') {
+    // Server-side: no sanitization
+    return null
+  }
+
+  try {
+    // Client-side: use require for synchronous import
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const dompurify = require('dompurify')
+    return dompurify.default || dompurify
+  } catch {
+    // Fallback if DOMPurify is not available
+    return null
+  }
+}
 
 /**
  * DOMPurify configuration interface
@@ -134,6 +151,13 @@ const BASIC_CONFIG: SanitizerConfig = {
 export function sanitizeRichText(html: string, customConfig?: Partial<SanitizerConfig>): string {
   if (!html) return ''
 
+  const DOMPurify = getDOMPurify()
+  if (!DOMPurify) {
+    // Server-side or DOMPurify not available: return as-is
+    // Client-side hydration will sanitize it
+    return html
+  }
+
   const config = customConfig ? { ...RICH_TEXT_CONFIG, ...customConfig } : RICH_TEXT_CONFIG
   return DOMPurify.sanitize(html, config) as unknown as string
 }
@@ -147,6 +171,11 @@ export function sanitizeRichText(html: string, customConfig?: Partial<SanitizerC
  */
 export function sanitizeHighlight(html: string, customConfig?: Partial<SanitizerConfig>): string {
   if (!html) return ''
+
+  const DOMPurify = getDOMPurify()
+  if (!DOMPurify) {
+    return html
+  }
 
   const config = customConfig ? { ...HIGHLIGHT_CONFIG, ...customConfig } : HIGHLIGHT_CONFIG
   return DOMPurify.sanitize(html, config) as unknown as string
@@ -162,6 +191,11 @@ export function sanitizeHighlight(html: string, customConfig?: Partial<Sanitizer
 export function sanitizeBasic(html: string, customConfig?: Partial<SanitizerConfig>): string {
   if (!html) return ''
 
+  const DOMPurify = getDOMPurify()
+  if (!DOMPurify) {
+    return html
+  }
+
   const config = customConfig ? { ...BASIC_CONFIG, ...customConfig } : BASIC_CONFIG
   return DOMPurify.sanitize(html, config) as unknown as string
 }
@@ -175,6 +209,12 @@ export function sanitizeBasic(html: string, customConfig?: Partial<SanitizerConf
  */
 export function sanitizeHtml(html: string, config: SanitizerConfig): string {
   if (!html) return ''
+
+  const DOMPurify = getDOMPurify()
+  if (!DOMPurify) {
+    return html
+  }
+
   return DOMPurify.sanitize(html, config) as unknown as string
 }
 

@@ -49,7 +49,7 @@ import { CurrentUser } from '../../../core/common/decorators/current-user.decora
 import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import type { IPriceRuleRepository } from '../repositories/price-rule.repository.interface'
+import { IPriceRuleRepository } from '../repositories/price-rule.repository.interface'
 import type { AuthenticatedUser } from '../types/auth.types'
 
 // DTOs

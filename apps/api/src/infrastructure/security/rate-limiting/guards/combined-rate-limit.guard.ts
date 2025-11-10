@@ -11,11 +11,11 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { Reflector } from '@nestjs/core'
+import { ConfigService } from '@nestjs/config'
+import { Reflector } from '@nestjs/core'
 import type { Request, Response } from 'express'
 import type { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
-import type { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
+import { AdvancedRateLimitingService } from '../advanced-rate-limiting.service'
 import {
   RATE_LIMIT_BYPASS_KEY,
   RATE_LIMIT_KEY,

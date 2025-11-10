@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { AddressStatus, type AddressType, PartnerAddress } from '../entities/partner-address.entity'
-import type { IPartnerAddressRepository } from '../services/partner.service'
+import { IPartnerAddressRepository } from '../services/partner.service'
 
 @Injectable()
 export class PartnerAddressRepository implements IPartnerAddressRepository {

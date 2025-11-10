@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DeepPartial, Repository } from 'typeorm'
+import { DeepPartial, Repository } from 'typeorm'
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
 import {
@@ -9,7 +9,7 @@ import {
   QueryBuilderColumn,
   QueryBuilderJoin,
 } from '../entities'
-import type { QueryBuilderPermissionService } from './query-builder-permission.service'
+import { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 // Interface for format field
 export interface FieldFormat {

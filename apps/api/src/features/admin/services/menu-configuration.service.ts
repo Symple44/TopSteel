@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem, MenuItemType } from '../entities/menu-item.entity'
 import { MenuItemPermission } from '../entities/menu-item-permission.entity'

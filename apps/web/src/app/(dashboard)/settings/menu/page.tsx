@@ -203,7 +203,7 @@ const _getAvailableIcons = () => {
 
 const getIconsByCategory = (t: TranslationFunction) => {
   return {
-    [t('settings?.menu?.iconCategories.navigation')]: [
+    [t('settings.menu.iconCategories.navigation')]: [
       'Home',
       'LayoutDashboard',
       'FolderOpen',
@@ -211,14 +211,14 @@ const getIconsByCategory = (t: TranslationFunction) => {
       'Search',
       'Eye',
     ],
-    [t('settings?.menu?.iconCategories.security')]: ['Shield', 'Users', 'User', 'Key', 'Lock'],
-    [t('settings?.menu?.iconCategories.enterprise')]: [
+    [t('settings.menu.iconCategories.security')]: ['Shield', 'Users', 'User', 'Key', 'Lock'],
+    [t('settings.menu.iconCategories.enterprise')]: [
       'Building',
       'Building2',
       'Globe',
       'Briefcase',
     ],
-    [t('settings?.menu?.iconCategories.data')]: [
+    [t('settings.menu.iconCategories.data')]: [
       'Database',
       'BarChart3',
       'PieChart',
@@ -226,16 +226,16 @@ const getIconsByCategory = (t: TranslationFunction) => {
       'TrendingUp',
       'FileText',
     ],
-    [t('settings?.menu?.iconCategories.production')]: ['Package', 'Wrench', 'Truck'],
-    [t('settings?.menu?.iconCategories.communication')]: ['Mail', 'Phone', 'Calendar', 'Bell'],
-    [t('settings?.menu?.iconCategories.actions')]: [
+    [t('settings.menu.iconCategories.production')]: ['Package', 'Wrench', 'Truck'],
+    [t('settings.menu.iconCategories.communication')]: ['Mail', 'Phone', 'Calendar', 'Bell'],
+    [t('settings.menu.iconCategories.actions')]: [
       'Download',
       'Upload',
       'CheckCircle',
       'AlertTriangle',
       'RefreshCw',
     ],
-    [t('settings?.menu?.iconCategories.finance')]: [
+    [t('settings.menu.iconCategories.finance')]: [
       'CreditCard',
       'Monitor',
       'ExternalLink',
@@ -253,21 +253,21 @@ const getIconComponent = (
 
 const getAvailableColors = (t: TranslationFunction) => {
   return {
-    [t('settings?.menu?.colors.blue')]: '#3b82f6',
-    [t('settings?.menu?.colors.green')]: '#10b981',
-    [t('settings?.menu?.colors.orange')]: '#f97316',
-    [t('settings?.menu?.colors.red')]: '#ef4444',
-    [t('settings?.menu?.colors.purple')]: '#8b5cf6',
-    [t('settings?.menu?.colors.pink')]: '#ec4899',
-    [t('settings?.menu?.colors.yellow')]: '#eab308',
-    [t('settings?.menu?.colors.cyan')]: '#06b6d4',
-    [t('settings?.menu?.colors.gray')]: '#6b7280',
-    [t('settings?.menu?.colors.slate')]: '#475569',
-    [t('settings?.menu?.colors.zinc')]: '#52525b',
-    [t('settings?.menu?.colors.indigo')]: '#6366f1',
-    [t('settings?.menu?.colors.emerald')]: '#059669',
-    [t('settings?.menu?.colors.lime')]: '#65a30d',
-    [t('settings?.menu?.colors.amber')]: '#d97706',
+    [t('settings.menu.colors.blue')]: '#3b82f6',
+    [t('settings.menu.colors.green')]: '#10b981',
+    [t('settings.menu.colors.orange')]: '#f97316',
+    [t('settings.menu.colors.red')]: '#ef4444',
+    [t('settings.menu.colors.purple')]: '#8b5cf6',
+    [t('settings.menu.colors.pink')]: '#ec4899',
+    [t('settings.menu.colors.yellow')]: '#eab308',
+    [t('settings.menu.colors.cyan')]: '#06b6d4',
+    [t('settings.menu.colors.gray')]: '#6b7280',
+    [t('settings.menu.colors.slate')]: '#475569',
+    [t('settings.menu.colors.zinc')]: '#52525b',
+    [t('settings.menu.colors.indigo')]: '#6366f1',
+    [t('settings.menu.colors.emerald')]: '#059669',
+    [t('settings.menu.colors.lime')]: '#65a30d',
+    [t('settings.menu.colors.amber')]: '#d97706',
   }
 }
 
@@ -751,13 +751,13 @@ function StandardMenuItemDisplay({
 const getTypeLabel = (type: string, t: TranslationFunction) => {
   switch (type) {
     case 'M':
-      return t('menu?.elementTypes?.folder')
+      return t('menu.elementTypes.folder')
     case 'P':
-      return t('menu?.elementTypes?.program')
+      return t('menu.elementTypes.program')
     case 'L':
-      return t('menu?.elementTypes?.link')
+      return t('menu.elementTypes.link')
     case 'D':
-      return t('menu?.elementTypes?.dataView')
+      return t('menu.elementTypes.dataView')
     default:
       return type
   }

@@ -116,7 +116,7 @@ export function MenuConfigurationEditor({
   const addMenuItem = () => {
     const newItem: MenuItem = {
       id: `menu-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: t('menuConfig?.editor?.newMenuItem'),
+      title: t('menuConfig.editor.newMenuItem'),
       type: 'P',
       icon: 'Play',
       orderIndex: menuItems.length,
@@ -160,26 +160,26 @@ export function MenuConfigurationEditor({
         <CardHeader>
           <CardTitle>
             {configuration
-              ? t('menuConfig?.editor?.editConfiguration')
-              : t('menuConfig?.editor?.newConfiguration')}
+              ? t('menuConfig.editor.editConfiguration')
+              : t('menuConfig.editor.newConfiguration')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor={fieldIds.name}>{t('menuConfig?.editor?.configurationName')}</Label>
+              <Label htmlFor={fieldIds.name}>{t('menuConfig.editor.configurationName')}</Label>
               <Input
                 id={fieldIds.name}
                 value={formData.name}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({ ...formData, name: e?.target?.value })
                 }
-                placeholder={t('menuConfig?.editor?.configurationNamePlaceholder')}
+                placeholder={t('menuConfig.editor.configurationNamePlaceholder')}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor={fieldIds.description}>
-                {t('menuConfig?.editor?.configurationDescription')}
+                {t('menuConfig.editor.configurationDescription')}
               </Label>
               <Textarea
                 id={fieldIds.description}
@@ -187,7 +187,7 @@ export function MenuConfigurationEditor({
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setFormData({ ...formData, description: e?.target?.value })
                 }
-                placeholder={t('menuConfig?.editor?.configurationDescriptionPlaceholder')}
+                placeholder={t('menuConfig.editor.configurationDescriptionPlaceholder')}
                 rows={3}
               />
             </div>
@@ -198,9 +198,9 @@ export function MenuConfigurationEditor({
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>{t('menuConfig?.editor?.menuItems')}</CardTitle>
+            <CardTitle>{t('menuConfig.editor.menuItems')}</CardTitle>
             <Button type="button" onClick={addMenuItem} size="sm">
-              {t('menuConfig?.editor?.addMenuItem')}
+              {t('menuConfig.editor.addMenuItem')}
             </Button>
           </div>
         </CardHeader>
@@ -209,13 +209,13 @@ export function MenuConfigurationEditor({
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
               <p className="text-muted-foreground mt-2">
-                {t('menuConfig?.editor?.loadingRightsData')}
+                {t('menuConfig.editor.loadingRightsData')}
               </p>
             </div>
           ) : menuItems.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>{t('menuConfig?.editor?.noMenuItems')}</p>
-              <p className="text-sm">{t('menuConfig?.editor?.addFirstMenuItem')}</p>
+              <p>{t('menuConfig.editor.noMenuItems')}</p>
+              <p className="text-sm">{t('menuConfig.editor.addFirstMenuItem')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -243,11 +243,11 @@ export function MenuConfigurationEditor({
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>
           <X className="h-4 w-4 mr-2" />
-          {t('menuConfig?.editor?.cancel')}
+          {t('menuConfig.editor.cancel')}
         </Button>
         <Button type="button" onClick={handleSave} disabled={saving || !formData.name}>
           <Save className="h-4 w-4 mr-2" />
-          {saving ? t('menuConfig?.editor?.saving') : t('menuConfig?.editor?.save')}
+          {saving ? t('menuConfig.editor.saving') : t('menuConfig.editor.save')}
         </Button>
       </div>
     </div>

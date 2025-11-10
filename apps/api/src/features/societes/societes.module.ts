@@ -7,6 +7,7 @@ import { UserSession } from '../../domains/auth/core/entities/user-session.entit
 // Entités utilisées par TenantInitializationService
 import { User } from '../../domains/users/entities/user.entity'
 import { UserSettings } from '../../domains/users/entities/user-settings.entity'
+import { Notifications } from '../notifications/entities/notifications.entity'
 import { NotificationSettings } from '../notifications/entities/notification-settings.entity'
 import { SitesController } from './controllers/sites.controller'
 import { SocieteUsersController } from './controllers/societe-users.controller'
@@ -45,6 +46,7 @@ import { TenantProvisioningService } from './services/tenant-provisioning.servic
         User,
         UserSettings,
         UserSession,
+        Notifications,
         NotificationSettings,
       ],
       'auth'

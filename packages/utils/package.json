@@ -35,43 +35,42 @@
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
   },
-  "type": "module",
   "sideEffects": false,
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     },
     "./format": {
-      "require": "./dist/format/index.cjs",
       "types": "./dist/format/index.d.ts",
-      "import": "./dist/format/index.js"
+      "import": "./dist/format/index.mjs",
+      "require": "./dist/format/index.js"
     },
     "./validation": {
-      "require": "./dist/validation/index.cjs",
       "types": "./dist/validation/index.d.ts",
-      "import": "./dist/validation/index.js"
+      "import": "./dist/validation/index.mjs",
+      "require": "./dist/validation/index.js"
     },
     "./calculation": {
-      "require": "./dist/calculation/index.cjs",
       "types": "./dist/calculation/index.d.ts",
-      "import": "./dist/calculation/index.js"
+      "import": "./dist/calculation/index.mjs",
+      "require": "./dist/calculation/index.js"
     },
     "./helpers": {
-      "require": "./dist/helpers/index.cjs",
       "types": "./dist/helpers/index.d.ts",
-      "import": "./dist/helpers/index.js"
+      "import": "./dist/helpers/index.mjs",
+      "require": "./dist/helpers/index.js"
     },
     "./constants": {
-      "require": "./dist/constants/index.cjs",
       "types": "./dist/constants/index.d.ts",
-      "import": "./dist/constants/index.js"
+      "import": "./dist/constants/index.mjs",
+      "require": "./dist/constants/index.js"
     },
     "./lib": {
-      "require": "./dist/lib/index.cjs",
       "types": "./dist/lib/index.d.ts",
-      "import": "./dist/lib/index.js"
+      "import": "./dist/lib/index.mjs",
+      "require": "./dist/lib/index.js"
     }
   }
 }

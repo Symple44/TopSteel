@@ -1,6 +1,6 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import {
   type ApiRouteDefinition,
@@ -12,7 +12,7 @@ import {
   type PermissionDefinition,
 } from '../entities/marketplace-module.entity'
 // Import des modules réels - Supprimés pour optimiser le debug
-import type { CreateModuleDto, MarketplaceService, UpdateModuleDto } from './marketplace.service'
+import { CreateModuleDto, MarketplaceService, UpdateModuleDto } from './marketplace.service'
 
 export interface ModuleInfo {
   moduleKey: string

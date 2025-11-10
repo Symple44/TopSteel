@@ -1,5 +1,5 @@
 import { Injectable, Logger, Optional } from '@nestjs/common'
-import type { DatabaseHealthService } from '../../features/database-core/services/database-health.service'
+import { DatabaseHealthService } from '../../features/database-core/services/database-health.service'
 
 export interface SystemDatabaseHealth {
   auth: { status: 'healthy' | 'unhealthy' }

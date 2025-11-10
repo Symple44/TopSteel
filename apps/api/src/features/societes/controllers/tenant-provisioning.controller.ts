@@ -1,7 +1,7 @@
 import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Societe } from '../entities/societe.entity'
-import type { TenantProvisioningService } from '../services/tenant-provisioning.service'
+import { TenantProvisioningService } from '../services/tenant-provisioning.service'
 
 @ApiTags('Provisioning')
 @Controller('provisioning')

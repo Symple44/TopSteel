@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { type QueryBuilderSecurityService, QueryOperator } from './query-builder-security.service'
+import { QueryBuilderSecurityService, QueryOperator } from './query-builder-security.service'
 
 /**
  * SQL Query components for safe construction

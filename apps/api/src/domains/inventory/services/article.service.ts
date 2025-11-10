@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import type { BusinessContext } from '../../core/interfaces/business-service.interface'
 import { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
 

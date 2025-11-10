@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { Group } from '../core/entities/group.entity'
 import { Role } from '../core/entities/role.entity'
 import { UserGroup } from '../core/entities/user-group.entity'

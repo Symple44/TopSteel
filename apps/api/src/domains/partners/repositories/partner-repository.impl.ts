@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { In } from 'typeorm'
 import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
 import { SalesHistory } from '../../../features/pricing/entities/sales-history.entity'
@@ -22,9 +22,9 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   constructor(
     @InjectRepository(Partner, 'tenant')
     private readonly repository: Repository<Partner>,
-    @InjectRepository(MarketplaceOrder)
+    @InjectRepository(MarketplaceOrder, 'tenant')
     private readonly marketplaceOrderRepository: Repository<MarketplaceOrder>,
-    @InjectRepository(SalesHistory) readonly _salesHistoryRepository: Repository<SalesHistory>
+    @InjectRepository(SalesHistory, 'tenant') readonly _salesHistoryRepository: Repository<SalesHistory>
   ) {}
 
   async findById(id: string): Promise<Partner | null> {

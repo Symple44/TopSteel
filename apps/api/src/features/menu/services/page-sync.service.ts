@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import type { DeepPartial, Repository } from 'typeorm'
+import { DeepPartial, Repository } from 'typeorm'
 import {
   type DiscoveredPage as DiscoveredPageInterface,
   pageDiscoveryService,

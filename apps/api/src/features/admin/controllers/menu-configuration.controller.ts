@@ -16,7 +16,7 @@ import {
 } from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import type { User } from '../../../domains/users/entities/user.entity'
 import type {
   CreateMenuConfigDto,

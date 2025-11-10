@@ -5,34 +5,34 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./core": {
-      "require": "./dist/core/index.cjs",
       "types": "./dist/core/index.d.ts",
-      "import": "./dist/core/index.js"
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.cjs"
     },
     "./cross-cutting": {
-      "require": "./dist/cross-cutting/index.cjs",
       "types": "./dist/cross-cutting/index.d.ts",
-      "import": "./dist/cross-cutting/index.js"
+      "import": "./dist/cross-cutting/index.js",
+      "require": "./dist/cross-cutting/index.cjs"
     },
     "./infrastructure": {
-      "require": "./dist/infrastructure/index.cjs",
       "types": "./dist/infrastructure/index.d.ts",
-      "import": "./dist/infrastructure/index.js"
+      "import": "./dist/infrastructure/index.js",
+      "require": "./dist/infrastructure/index.cjs"
     },
     "./partners": {
-      "require": "./dist/partners/index.cjs",
       "types": "./dist/partners/index.d.ts",
-      "import": "./dist/partners/index.js"
+      "import": "./dist/partners/index.js",
+      "require": "./dist/partners/index.cjs"
     },
     "./ui": {
-      "require": "./dist/ui/index.cjs",
       "types": "./dist/ui/index.d.ts",
-      "import": "./dist/ui/index.js"
+      "import": "./dist/ui/index.js",
+      "require": "./dist/ui/index.cjs"
     }
   },
   "files": [

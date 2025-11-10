@@ -118,7 +118,7 @@ export default function SecuritySettingsPage() {
         setMFAMethods(methodsData?.data)
       }
     } catch {
-      toast?.error(t('security?.mfa?.loadError'))
+      toast?.error(t('security.mfa.loadError'))
     } finally {
       setLoading(false)
     }
@@ -140,10 +140,10 @@ export default function SecuritySettingsPage() {
         setTotpSetup(data?.data)
         setSetupDialog({ open: true, type: 'totp' })
       } else {
-        toast?.error(t('security?.mfa?.totp.configError'))
+        toast?.error(t('security.mfa.totp.configError'))
       }
     } catch {
-      toast?.error(t('security?.mfa?.configError'))
+      toast?.error(t('security.mfa.configError'))
     }
   }
 
@@ -161,16 +161,16 @@ export default function SecuritySettingsPage() {
 
       const data = await response?.json()
       if (data?.success) {
-        toast?.success(t('security?.mfa?.totp.success'))
+        toast?.success(t('security.mfa.totp.success'))
         setSetupDialog({ open: false, type: null })
         setTotpSetup(null)
         setVerificationCode('')
         loadMFAData()
       } else {
-        toast?.error(t('security?.mfa?.totp.invalidCode'))
+        toast?.error(t('security.mfa.totp.invalidCode'))
       }
     } catch {
-      toast?.error(t('security?.mfa?.verificationError'))
+      toast?.error(t('security.mfa.verificationError'))
     }
   }
 
@@ -191,10 +191,10 @@ export default function SecuritySettingsPage() {
         // Trigger WebAuthn registration
         await startWebAuthnRegistration(data?.data?.options)
       } else {
-        toast?.error(t('security?.mfa?.webauthn.configError'))
+        toast?.error(t('security.mfa.webauthn.configError'))
       }
     } catch {
-      toast?.error(t('security?.mfa?.webauthn.notSupportedError'))
+      toast?.error(t('security.mfa.webauthn.notSupportedError'))
     }
   }
 
@@ -202,7 +202,7 @@ export default function SecuritySettingsPage() {
     try {
       // Check WebAuthn support
       if (!window?.navigator?.credentials || !window.PublicKeyCredential) {
-        toast?.error(t('security?.mfa?.webauthn.notSupported'))
+        toast?.error(t('security.mfa.webauthn.notSupported'))
         return
       }
 
@@ -212,7 +212,7 @@ export default function SecuritySettingsPage() {
       })) as PublicKeyCredential
 
       if (!credential) {
-        toast?.error(t('security?.mfa?.webauthn.registrationFailed'))
+        toast?.error(t('security.mfa.webauthn.registrationFailed'))
         return
       }
 
@@ -242,7 +242,7 @@ export default function SecuritySettingsPage() {
       // Verify registration
       await verifyWebAuthnRegistration(response)
     } catch {
-      toast?.error(t('security?.mfa?.webauthn.registrationError'))
+      toast?.error(t('security.mfa.webauthn.registrationError'))
     }
   }
 
@@ -261,16 +261,16 @@ export default function SecuritySettingsPage() {
 
       const verifyData = await verifyResponse?.json()
       if (verifyData?.success) {
-        toast?.success(t('security?.mfa?.webauthn.success'))
+        toast?.success(t('security.mfa.webauthn.success'))
         setSetupDialog({ open: false, type: null })
         setWebauthnSetup(null)
         setDeviceName('')
         loadMFAData()
       } else {
-        toast?.error(t('security?.mfa?.webauthn.verificationError'))
+        toast?.error(t('security.mfa.webauthn.verificationError'))
       }
     } catch {
-      toast?.error(t('security?.mfa?.verificationError'))
+      toast?.error(t('security.mfa.verificationError'))
     }
   }
 
@@ -286,10 +286,10 @@ export default function SecuritySettingsPage() {
         toast?.success(`${type?.toUpperCase()} ${ts('security.disabled')}`)
         loadMFAData()
       } else {
-        toast?.error(t('security?.mfa?.disableError'))
+        toast?.error(t('security.mfa.disableError'))
       }
     } catch {
-      toast?.error(t('security?.mfa?.configError'))
+      toast?.error(t('security.mfa.configError'))
     }
   }
 
@@ -302,10 +302,10 @@ export default function SecuritySettingsPage() {
         setBackupCodes(data?.data?.codes)
         setShowBackupCodes(true)
       } else {
-        toast?.error(t('security?.mfa?.codesNotAvailable'))
+        toast?.error(t('security.mfa.codesNotAvailable'))
       }
     } catch {
-      toast?.error(t('security?.mfa?.codesError'))
+      toast?.error(t('security.mfa.codesError'))
     }
   }
 
@@ -402,11 +402,11 @@ export default function SecuritySettingsPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="totp" className="flex items-center gap-2">
             <Smartphone className="w-4 h-4" />
-            {ts('settingsEnhanced?.security?.mfaTypes.totp')}
+            {ts('settingsEnhanced.security.mfaTypes.totp')}
           </TabsTrigger>
           <TabsTrigger value="webauthn" className="flex items-center gap-2">
             <Key className="w-4 h-4" />
-            {ts('settingsEnhanced?.security?.mfaTypes.webauthn')}
+            {ts('settingsEnhanced.security.mfaTypes.webauthn')}
           </TabsTrigger>
         </TabsList>
 
@@ -416,7 +416,7 @@ export default function SecuritySettingsPage() {
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Smartphone className="w-5 h-5" />
-                  {ts('settingsEnhanced?.security?.mfaTypes.totp')}
+                  {ts('settingsEnhanced.security.mfaTypes.totp')}
                 </span>
                 {mfaStats?.methods.totp.enabled && (
                   <Badge variant="outline" className="text-green-600">
@@ -710,7 +710,7 @@ export default function SecuritySettingsPage() {
               onClick={() => {
                 const codesText = backupCodes?.join('\n')
                 navigator?.clipboard?.writeText(codesText)
-                toast?.success(t('security?.mfa?.codesCopied'))
+                toast?.success(t('security.mfa.codesCopied'))
               }}
             >
               <Download className="w-4 h-4 mr-2" />
