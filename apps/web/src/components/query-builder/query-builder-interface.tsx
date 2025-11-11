@@ -3,9 +3,9 @@
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { Play, Save, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { useToast } from '@/hooks/use-toast'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { cn } from '@/lib/utils'
+import { useToast } from '../../hooks/use-toast'
+import { useTranslation } from '../../lib/i18n/hooks'
+import { cn } from '../../lib/utils'
 import type {
   DatabaseTable,
   LegacyColumn,
@@ -15,9 +15,9 @@ import type {
   QueryBuilderInterfaceProps,
   QueryBuilderJoin,
   QueryExecutionResult,
-} from '@/types/query-builder.types'
-import { fromLegacyColumn, toLegacyColumn } from '@/types/query-builder.types'
-import { callClientApi } from '@/utils/backend-api'
+} from '../../types/query-builder.types'
+import { fromLegacyColumn, toLegacyColumn } from '../../types/query-builder.types'
+import { callClientApi } from '../../utils/backend-api'
 import { CalculatedFieldsEditor } from './calculated-fields-editor'
 import { ColumnSelector } from './column-selector'
 import { DataTablePreview } from './datatable-preview'

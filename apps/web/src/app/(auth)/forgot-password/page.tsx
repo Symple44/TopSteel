@@ -5,8 +5,8 @@ import { ArrowLeft, CheckCircle, Mail, Shield } from 'lucide-react'
 import Link from 'next/link'
 import type { FC } from 'react'
 import { useId, useState } from 'react'
-import { toast } from '@/hooks/use-toast'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { toast } from '../../../hooks/use-toast'
+import { useTranslation } from '../../../lib/i18n/hooks'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'

@@ -6,8 +6,8 @@ import { Button } from '@erp/ui'
 import { AlertTriangle, RefreshCw, Server, Wifi } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useBackendHealth } from '@/hooks/use-backend-health'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useBackendHealth } from '../../hooks/use-backend-health'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 export default function BackendErrorPage() {
   const router = useRouter()

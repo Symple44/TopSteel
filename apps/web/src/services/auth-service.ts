@@ -2,8 +2,8 @@
  * Service d'authentification - Logique métier séparée du Context
  */
 
-import type { AuthTokens, Company, MFAState, User } from '@/types/auth'
-import { callClientApi } from '@/utils/backend-api'
+import type { AuthTokens, Company, MFAState, User } from '../types/auth'
+import { callClientApi } from '../utils/backend-api'
 
 // Clés de stockage - doivent correspondre à auth-storage?.ts
 export const STORAGE_KEYS = {
@@ -325,7 +325,7 @@ export class AuthService {
   async getUserCompanies(): Promise<Company[]> {
     try {
       // Utiliser authStorage pour récupérer la session (comme fait par auth-provider)
-      const { authStorage } = (await import('@/lib/auth/auth-storage')) || {}
+      const { authStorage } = (await import('../lib/auth/auth-storage')) || {}
       const session = authStorage?.getStoredSession()
 
       if (!session?.tokens?.accessToken) {

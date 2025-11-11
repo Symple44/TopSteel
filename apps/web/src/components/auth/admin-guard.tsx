@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useEffect } from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { type Permission, type Role, usePermissions } from '@/hooks/use-permissions'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useAuth } from '../../hooks/use-auth'
+import { type Permission, type Role, usePermissions } from '../../hooks/use-permissions'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface AdminGuardProps {
   children: ReactNode

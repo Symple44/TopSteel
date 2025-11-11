@@ -8,7 +8,7 @@ import {
   getTemplateById,
   predefinedTemplates,
   type Template,
-} from '@/lib/templates/predefined-templates'
+} from '../lib/templates/predefined-templates'
 import { useAppearanceSettings } from './use-appearance-settings'
 
 interface UseTemplatesReturn {

@@ -18,9 +18,9 @@ import {
 import { Building, Calendar, Mail, Phone, Shield } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { AdminGuard } from '@/components/auth/admin-guard'
-import { useTranslation } from '@/lib/i18n/hooks'
-import type { User } from '@/types/auth'
+import { AdminGuard } from '../../../../components/auth/admin-guard'
+import { useTranslation } from '../../../../lib/i18n/hooks'
+import type { User } from '../../../../types/auth'
 import { UsersDataTable } from './users-datatable'
 export default function UsersManagementPage() {
   const router = useRouter()

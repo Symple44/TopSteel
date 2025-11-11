@@ -1,7 +1,7 @@
 'use client'
 
-import { CodeViewerDialog } from '@erp/ui/components/primitives/code-viewer-dialog'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { CodeViewerDialog } from '@erp/ui'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface CodeViewerDialogWrapperProps {
   isOpen: boolean

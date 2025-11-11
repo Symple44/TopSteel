@@ -6,8 +6,8 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, useFormFieldId
 import { Building2, Save } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { ImageUploadWrapper as ImageUpload } from '@/components/wrappers'
-import { useTranslation } from '@/lib/i18n'
+import { ImageUploadWrapper as ImageUpload } from '../../../../components/wrappers'
+import { useTranslation } from '../../../../lib/i18n'
 
 export default function CompanySettingsPage() {
   const { t } = useTranslation('admin')

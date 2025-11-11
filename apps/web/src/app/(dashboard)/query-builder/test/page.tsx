@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { Database, Package, Table, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../../../utils/backend-api'
 
 export default function QueryBuilderTestPage() {
   const router = useRouter()

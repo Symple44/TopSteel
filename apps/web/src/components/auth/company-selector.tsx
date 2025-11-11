@@ -13,11 +13,11 @@ import {
 import { AlertTriangle, Building2, Check, Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { getApproximateTabCount } from '@/lib/tab-detection'
-import { authService } from '@/services/auth-service'
-import { callClientApi } from '@/utils/backend-api'
+import { useAuth } from '../../hooks/use-auth'
+import { useTranslation } from '../../lib/i18n/hooks'
+import { getApproximateTabCount } from '../../lib/tab-detection'
+import { authService } from '../../services/auth-service'
+import { callClientApi } from '../../utils/backend-api'
 
 // Interface pour les données de rôle
 interface RoleData {

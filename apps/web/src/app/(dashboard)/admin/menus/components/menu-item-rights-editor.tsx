@@ -30,8 +30,8 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
-import type { Group, MenuItem, Permission, Role } from '@/types/menu'
+import { cn } from '../../../../../lib/utils'
+import type { Group, MenuItem, Permission, Role } from '../../../../../types/menu'
 
 interface MenuItemRightsEditorProps {
   item: MenuItem

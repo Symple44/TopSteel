@@ -28,8 +28,8 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useTranslation } from '@/lib/i18n'
-import { callClientApi } from '@/utils/backend-api'
+import { useTranslation } from '../../lib/i18n'
+import { callClientApi } from '../../utils/backend-api'
 
 interface ElasticsearchStatus {
   connected: boolean

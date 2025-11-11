@@ -31,8 +31,8 @@ import {
 } from '@erp/ui'
 import { Edit, Eye, Lock, Plus, Settings, Shield, Trash2, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { GroupManagementPanel } from '@/components/admin/group-management-panel'
-import { PermissionHide } from '@/components/auth/permission-guard'
+import { GroupManagementPanel } from '../../components/admin/group-management-panel'
+import { PermissionHide } from '../../components/auth/permission-guard'
 import {
   ACCESS_LEVEL_COLORS,
   ACCESS_LEVEL_LABELS,
@@ -41,8 +41,8 @@ import {
   MODULE_CATEGORY_LABELS,
   type Module,
   type Role,
-} from '@/types/permissions'
-import { callClientApi } from '@/utils/backend-api'
+} from '../../types/permissions'
+import { callClientApi } from '../../utils/backend-api'
 
 interface RoleWithStats extends Role {
   userCount?: number

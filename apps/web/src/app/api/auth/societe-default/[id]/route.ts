@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { callBackendFromApi } from '@/utils/backend-api'
+import { callBackendFromApi } from '../../../../../utils/backend-api'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

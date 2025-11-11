@@ -36,6 +36,7 @@
       "@erp/utils/*": ["./packages/utils/src/*"],
       "@erp/domains": ["./packages/domains/src"],
       "@erp/domains/*": ["./packages/domains/src/*"],
+      "@erp/domains/server": ["./packages/domains/src/server.ts"],
       "@erp/api-client": ["./packages/api-client/src"],
       "@erp/api-client/*": ["./packages/api-client/src/*"],
       "@erp/config": ["./packages/config"],

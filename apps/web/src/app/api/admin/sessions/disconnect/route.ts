@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { verifyAuthHelper } from '@/lib/auth-helper'
+import { verifyAuthHelper } from '../../../../../lib/auth-helper'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const { sessionId, userId, reason } = body || {}
 
     // Importer callBackendFromApi
-    const { callBackendFromApi } = (await import('@/utils/backend-api')) || {}
+    const { callBackendFromApi } = (await import('../../../../../utils/backend-api')) || {}
 
     const endpoint = sessionId
       ? 'auth/sessions/disconnect-session'

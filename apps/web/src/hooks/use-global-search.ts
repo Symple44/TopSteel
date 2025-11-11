@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useDebounce } from '@/hooks/use-debounce'
-import { fetchTyped, postTyped } from '@/lib/api-typed'
+import { useAuth } from '../hooks/use-auth'
+import { useDebounce } from '../hooks/use-debounce'
+import { fetchTyped, postTyped } from '../lib/api-typed'
 
 export interface SearchResult {
   type: string

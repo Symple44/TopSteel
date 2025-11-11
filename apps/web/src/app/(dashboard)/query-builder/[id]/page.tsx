@@ -5,8 +5,8 @@ export const dynamic = 'force-dynamic'
 import { Loader2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { QueryBuilderInterface } from '@/components/query-builder/query-builder-interface'
-import { callClientApi } from '@/utils/backend-api'
+import { QueryBuilderInterface } from '../../../../components/query-builder/query-builder-interface'
+import { callClientApi } from '../../../../utils/backend-api'
 
 export default function QueryBuilderDetailPage() {
   const params = useParams()

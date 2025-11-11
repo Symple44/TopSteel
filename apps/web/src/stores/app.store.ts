@@ -13,7 +13,7 @@ import type {
   StoreCreator,
   StoreUser,
 } from '@erp/types'
-import { StoreUtils } from '@/lib/store-utils'
+import { StoreUtils } from '../lib/store-utils'
 
 // ===== ÉTAT INITIAL STRICTEMENT TYPÉ =====
 

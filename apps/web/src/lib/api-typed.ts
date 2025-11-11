@@ -3,7 +3,7 @@
  * Ensures all API responses are properly typed
  */
 
-import type { ApiResponse } from '@/types/api-types'
+import type { ApiResponse } from '../types/api-types'
 import type { RequestConfig } from './api-client'
 import { apiClient } from './api-client-instance'
 import { extractData, extractError } from './api-response-handler'

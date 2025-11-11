@@ -4,8 +4,8 @@ import { Badge, Button, Card, Input } from '@erp/ui'
 import { Edit, GripVertical, Plus, RotateCcw, Save, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useSystemParameters } from '@/hooks/use-system-parameters'
-import { useTranslation } from '@/lib/i18n'
+import { useSystemParameters } from '../../hooks/use-system-parameters'
+import { useTranslation } from '../../lib/i18n'
 
 interface ListItem {
   id: string

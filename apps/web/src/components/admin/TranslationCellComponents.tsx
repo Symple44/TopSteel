@@ -3,8 +3,8 @@
 import { Badge } from '@erp/ui'
 import { Clock, Tag } from 'lucide-react'
 import React from 'react'
-import type { TranslationEntry } from '@/lib/i18n/types'
-import { sanitizeHtml } from '@/lib/security/security-enhanced'
+import type { TranslationEntry } from '../../lib/i18n/types'
+import { sanitizeHtml } from '../../lib/security/security-enhanced'
 
 export const NamespaceCell = React?.memo(({ value }: { value: string }) => (
   <Badge variant="secondary" className="text-xs">

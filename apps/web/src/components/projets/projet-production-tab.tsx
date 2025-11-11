@@ -26,7 +26,7 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
-import { formatDate } from '@/lib/utils'
+import { formatDate } from '../../lib/utils'
 
 interface ProjetProductionTabProps {
   projet: StoreProjet

@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../utils/backend-api'
 
 export interface NotificationSettings {
   email: boolean

@@ -25,7 +25,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useState } from 'react'
-import { CodeViewerDialogWrapper as CodeViewerDialog } from '@/components/wrappers'
+import { CodeViewerDialogWrapper as CodeViewerDialog } from '../../components/wrappers'
 
 interface _MigrationFile {
   name: string
@@ -339,7 +339,7 @@ export function MigrationStatusCard({
         title="Détails de la migration"
         subtitle={selectedMigration || ''}
         onLoadDetails={async () => {
-          const { callClientApi } = (await import('@/utils/backend-api')) || {}
+          const { callClientApi } = (await import('../../utils/backend-api')) || {}
           const response = await callClientApi(
             `admin/database/migrations/${database}/${selectedMigration}/details`
           )

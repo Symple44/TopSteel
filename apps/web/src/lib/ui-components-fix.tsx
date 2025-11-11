@@ -19,7 +19,7 @@ import {
   TabsContent as UITabsContent,
   TabsList as UITabsList,
   TabsTrigger as UITabsTrigger,
-} from '@/lib/ui-exports'
+} from '../lib/ui-exports'
 
 // Common props interface for all UI components
 interface BaseUIProps {

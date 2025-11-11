@@ -11,9 +11,9 @@ import { Button, Card, CardContent, CardHeader, CardTitle, useUniqueId } from '@
 import { ArrowLeft, Bell, Check, Clock, Mail, Smartphone } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useNotificationSettings } from '@/hooks/use-notification-settings'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useAuth } from '../../../../hooks/use-auth'
+import { useNotificationSettings } from '../../../../hooks/use-notification-settings'
+import { useTranslation } from '../../../../lib/i18n/hooks'
 
 export default function NotificationsSettingsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()

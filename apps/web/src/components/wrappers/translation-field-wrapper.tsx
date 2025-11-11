@@ -1,8 +1,8 @@
 'use client'
 
 import { TranslationField } from '@erp/ui'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { translator } from '@/lib/i18n/translator'
+import { useTranslation } from '../../lib/i18n/hooks'
+import { translator } from '../../lib/i18n/translator'
 
 // Translation value can be a string or an object with language keys
 type TranslationValue = string | Record<string, string>

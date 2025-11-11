@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import '@/styles/datatable-demo.css'
+import '../../../../styles/datatable-demo.css'
 import {
   Badge,
   Button,
@@ -30,7 +30,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react'
-// import { DropdownTest } from '@/components/ui/dropdown-test'
+// import { DropdownTest } from '../../../../components/ui/dropdown-test'
 export default function DataTableTestPage() {
   const features = [
     {

@@ -22,11 +22,11 @@ import {
   TabsTrigger,
   useUniqueId,
 } from '@erp/ui'
-import type { ColumnConfig, SelectionState } from '@erp/ui/components/data-display/datatable/types'
+import type { ColumnConfig, SelectionState } from '@erp/ui'
 import { Activity, Calculator, Download, Plus, TrendingDown, Upload } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
-// import { useApiClient } from '@/lib/api-client-enhanced' // Commented out - doesn't exist
+// import { useApiClient } from '../../../../lib/api-client-enhanced' // Commented out - doesn't exist
 // Temporary replacement
 const useApiClient = () => ({
   get: async (_url: string) => ({ data: { rules: [], total: 0 } }),
@@ -36,11 +36,11 @@ const useApiClient = () => ({
 })
 
 import { toast } from 'sonner'
-import { deleteTyped, fetchTyped, postTyped } from '@/lib/api-typed'
+import { deleteTyped, fetchTyped, postTyped } from '../../../../lib/api-typed'
 
 // Comment out the problematic imports for now to fix build
 // import type { PriceRule, PriceRuleChannel, AdjustmentType } from '@erp/entities'
-// import type { PriceCalculationRequest as SimulationContext, PriceCalculationResult as SimulationResult } from '@/lib/api-client'
+// import type { PriceCalculationRequest as SimulationContext, PriceCalculationResult as SimulationResult } from '../../../../lib/api-client'
 
 // Temporary types to fix build
 type PriceRule = {

@@ -112,6 +112,7 @@ export {
 export {
   Button,
   Checkbox,
+  CodeViewerDialog,
   Dialog,
   DialogContent,
   DialogDescription,

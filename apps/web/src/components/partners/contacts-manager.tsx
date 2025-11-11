@@ -45,7 +45,7 @@ import {
   useDeleteContact,
   usePartnerContacts,
   useUpdateContact,
-} from '@/hooks/use-partner-details'
+} from '../../hooks/use-partner-details'
 
 const contactSchema = z?.object({
   civilite: z?.string().optional(),

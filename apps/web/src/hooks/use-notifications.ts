@@ -2,7 +2,7 @@ import {
   type NotificationsContextType,
   type NotificationsState,
   useNotifications,
-} from '@/components/providers/notifications-provider'
+} from '../components/providers/notifications-provider'
 
 // Ré-exporter le hook depuis le provider
 export { useNotifications }

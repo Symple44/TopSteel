@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import type { Permission } from '@/hooks/use-permissions'
+import type { Permission } from '../../hooks/use-permissions'
 
 interface AuthProviderProps {
   children: React.ReactNode

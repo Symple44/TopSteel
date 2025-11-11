@@ -3,7 +3,7 @@
  * Fichier: apps/web/src/lib/templates/predefined-templates.ts
  */
 
-import type { AppearanceSettings } from '@/hooks/use-appearance-settings'
+import type { AppearanceSettings } from '../../hooks/use-appearance-settings'
 
 export interface Template {
   id: string

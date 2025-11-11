@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useConnection } from '@/contexts/connection-context'
-import { apiClientEnhanced } from '@/lib/api-client-enhanced'
+import { useConnection } from '../contexts/connection-context'
+import { apiClientEnhanced } from '../lib/api-client-enhanced'
 
 /**
  * Hook pour synchroniser l'état de connexion avec le client API

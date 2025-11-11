@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useTranslation } from '../../../lib/i18n/hooks'
 
 export default function QueryBuilderPage() {
   const router = useRouter()

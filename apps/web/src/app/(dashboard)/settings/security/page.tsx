@@ -37,8 +37,8 @@ import {
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { callClientApi } from '@/utils/backend-api'
+import { useTranslation } from '../../../../lib/i18n/hooks'
+import { callClientApi } from '../../../../utils/backend-api'
 
 interface MFAMethod {
   id: string

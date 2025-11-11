@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useToast } from '@/hooks/use-toast'
-import { syncChecker } from '@/lib/sync-checker'
+import { useToast } from '../hooks/use-toast'
+import { syncChecker } from '../lib/sync-checker'
 
 export function useSyncNotifications() {
   const { toast } = useToast()

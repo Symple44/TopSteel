@@ -31,9 +31,9 @@ import {
   X,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useNotifications } from '@/components/providers/notifications-provider'
-import { cn } from '@/lib/utils'
-import type { ClientNotification as Notification } from '@/types/notifications'
+import { useNotifications } from '../../components/providers/notifications-provider'
+import { cn } from '../../lib/utils'
+import type { ClientNotification as Notification } from '../../types/notifications'
 
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   system: Database,

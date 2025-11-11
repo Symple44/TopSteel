@@ -18,9 +18,9 @@ import {
 } from '@erp/ui'
 import { Copy, Package2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { type Article, ArticleStatus, useDupliquerArticle } from '@/hooks/use-articles'
-import { sanitizeInput } from '@/lib/security-utils'
-import { cn } from '@/lib/utils'
+import { type Article, ArticleStatus, useDupliquerArticle } from '../../hooks/use-articles'
+import { sanitizeInput } from '../../lib/security-utils'
+import { cn } from '../../lib/utils'
 
 interface DuplicateArticleDialogProps {
   open: boolean

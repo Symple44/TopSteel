@@ -21,9 +21,9 @@ import {
 } from '@erp/ui'
 import { Building, MapPin, Save, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { toast } from '@/hooks/use-toast'
-import { apiClient } from '@/lib/api-client'
-import { postTyped } from '@/lib/api-typed'
+import { toast } from '../../../../../hooks/use-toast'
+import { apiClient } from '../../../../../lib/api-client'
+import { postTyped } from '../../../../../lib/api-typed'
 
 interface CompanyAccess extends Record<string, unknown> {
   id: string

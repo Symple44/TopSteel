@@ -27,11 +27,11 @@ import {
 } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { ArticleFormDialog } from '@/components/articles/article-form-dialog'
-import { DuplicateArticleDialog } from '@/components/articles/duplicate-article-dialog'
-import { InventoryDialog } from '@/components/articles/inventory-dialog'
-import { ArticleStatus, ArticleType, useArticle } from '@/hooks/use-articles'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { ArticleFormDialog } from '../../../../../components/articles/article-form-dialog'
+import { DuplicateArticleDialog } from '../../../../../components/articles/duplicate-article-dialog'
+import { InventoryDialog } from '../../../../../components/articles/inventory-dialog'
+import { ArticleStatus, ArticleType, useArticle } from '../../../../../hooks/use-articles'
+import { formatCurrency, formatDate } from '../../../../../lib/utils'
 
 const articleTypeLabels = {
   [ArticleType.MATIERE_PREMIERE]: 'Matière première',

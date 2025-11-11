@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
-import { useAuth } from '@/hooks/use-auth'
+import { useAuth } from '../../hooks/use-auth'
 
 interface AuthProviderProps {
   children: React.ReactNode

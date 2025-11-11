@@ -6,7 +6,7 @@
 
 import { ProjetStatut } from '@erp/domains/core'
 import type { AppState, StoreProjet } from '@erp/types'
-import { createMemoizedSelector, createOptimizedSelectors } from '@/lib/optimized-selectors'
+import { createMemoizedSelector, createOptimizedSelectors } from '../../lib/optimized-selectors'
 import { useAppStore } from '../app.store'
 
 // ===== CRÉATION DES SÉLECTEURS OPTIMISÉS TYPÉS =====

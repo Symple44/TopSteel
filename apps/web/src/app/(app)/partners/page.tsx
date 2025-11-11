@@ -21,13 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
-import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
+import type { ColumnConfig } from '@erp/ui'
 import { Briefcase, Building2, Download, Plus, Upload, Users } from 'lucide-react'
 import { useState } from 'react'
-import { PartnerDetailDialog } from '@/components/partners/partner-detail-dialog'
-import { PartnerFormDialog } from '@/components/partners/partner-form-dialog'
-import { useDeletePartner, usePartnerStatistics, usePartners } from '@/hooks/use-partners'
-import { formatCurrency } from '@/lib/utils'
+import { PartnerDetailDialog } from '../../../components/partners/partner-detail-dialog'
+import { PartnerFormDialog } from '../../../components/partners/partner-form-dialog'
+import { useDeletePartner, usePartnerStatistics, usePartners } from '../../../hooks/use-partners'
+import { formatCurrency } from '../../../lib/utils'
 
 export default function PartnersPage() {
   const [filters, setFilters] = useState<PartnerFilters>({})

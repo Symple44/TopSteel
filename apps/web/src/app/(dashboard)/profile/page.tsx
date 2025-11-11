@@ -30,10 +30,10 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { ImageUploadWrapper as ImageUpload } from '@/components/wrappers'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n'
-import { callClientApi } from '@/utils/backend-api'
+import { ImageUploadWrapper as ImageUpload } from '../../../components/wrappers'
+import { useAuth } from '../../../hooks/use-auth'
+import { useTranslation } from '../../../lib/i18n'
+import { callClientApi } from '../../../utils/backend-api'
 
 interface ExtendedUser {
   id?: string

@@ -2,12 +2,12 @@
 
 import type { ReactNode } from 'react'
 import { useState } from 'react'
-import CompanySelector from '@/components/auth/company-selector'
-import { Header } from '@/components/layout/header'
-import { Sidebar } from '@/components/layout/sidebar'
-import { AutoBreadcrumbWrapper } from '@/components/wrappers'
-import { useApiConnection } from '@/hooks/use-api-connection'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
+import CompanySelector from '../../components/auth/company-selector'
+import { Header } from '../../components/layout/header'
+import { Sidebar } from '../../components/layout/sidebar'
+import { AutoBreadcrumbWrapper } from '../../components/wrappers'
+import { useApiConnection } from '../../hooks/use-api-connection'
+import { useAppearanceSettings } from '../../hooks/use-appearance-settings'
 
 interface DashboardContentProps {
   children: ReactNode

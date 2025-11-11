@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
-import { callBackendFromApi } from '@/utils/backend-api'
+import { callBackendFromApi } from '../../../../../utils/backend-api'
 
 // Force dynamic pour éviter les problèmes de cache
 export const dynamic = 'force-dynamic'

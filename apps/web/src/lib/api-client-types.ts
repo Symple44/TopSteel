@@ -45,8 +45,8 @@ import type {
   BatchOperationResponse,
   FileUploadResponse,
   PaginatedResponse,
-} from '@/types/api-types'
-import type { ClientNotification } from '@/types/notifications'
+} from '../types/api-types'
+import type { ClientNotification } from '../types/notifications'
 
 // HTTP Request configuration interface
 export interface RequestConfig {

@@ -4,15 +4,15 @@ import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 // import { io, type Socket } from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '../../hooks/use-auth'
+import { useToast } from '../../hooks/use-toast'
 import type {
   ClientNotification as Notification,
   NotificationProviderSettings,
   NotificationsContextType,
   NotificationsState,
-} from '@/types/notifications'
-import { callClientApi } from '@/utils/backend-api'
+} from '../../types/notifications'
+import { callClientApi } from '../../utils/backend-api'
 
 // ===== TYPES ET INTERFACES =====
 // Les types sont importés de @/types/notifications

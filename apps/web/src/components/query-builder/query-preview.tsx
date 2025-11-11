@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, ScrollArea } from '@erp/ui'
 import { Code } from 'lucide-react'
-import type { QueryBuilderData, QueryBuilderJoin } from '@/types/query-builder.types'
+import type { QueryBuilderData, QueryBuilderJoin } from '../../types/query-builder.types'
 
 interface QueryPreviewProps {
   queryBuilder: QueryBuilderData

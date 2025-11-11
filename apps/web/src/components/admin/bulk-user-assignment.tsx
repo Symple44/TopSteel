@@ -36,7 +36,7 @@ import {
 } from '@erp/ui'
 import { ArrowRight, Building, Calendar, Check, Filter, Mail, Search, UserPlus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../utils/backend-api'
 
 interface User {
   id: string

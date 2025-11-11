@@ -10,7 +10,7 @@
  * - Authentication automatique
  */
 
-import { callBackendApi, callClientApi } from '@/utils/backend-api'
+import { callBackendApi, callClientApi } from '../utils/backend-api'
 import type { APIMetrics } from './api-client-types'
 import { csrfManager } from './csrf'
 

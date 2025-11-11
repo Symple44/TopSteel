@@ -30,7 +30,7 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate } from '../../lib/utils'
 
 interface ProjetDevisTabProps {
   projet: StoreProjet

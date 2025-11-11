@@ -3,8 +3,8 @@
 import type { PriceRule } from '@erp/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useApiClient } from '@/lib/api-client-enhanced'
-import { deleteTyped, fetchTyped, postTyped, putTyped } from '@/lib/api-typed'
+import { useApiClient } from '../lib/api-client-enhanced'
+import { deleteTyped, fetchTyped, postTyped, putTyped } from '../lib/api-typed'
 
 export interface UsePriceRulesOptions {
   channel?: string

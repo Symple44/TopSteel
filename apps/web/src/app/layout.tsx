@@ -6,9 +6,9 @@ export const revalidate = 0
 
 import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
-import { getCSPNonce } from '@/lib/security/csp-nonce'
+import { getCSPNonce } from '../lib/security/csp-nonce'
 import { Providers } from './providers'
-// import { logStartupInfo } from '@/lib/startup-logger'
+// import { logStartupInfo } from '../lib/startup-logger'
 
 // Tests désactivés pour réduire les logs
 // import '../utils/fetch-test'

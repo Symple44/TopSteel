@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { translator } from '@/lib/i18n/translator'
+import { translator } from '../../lib/i18n/translator'
 
 interface TranslationOverrideProviderProps {
   children: React.ReactNode

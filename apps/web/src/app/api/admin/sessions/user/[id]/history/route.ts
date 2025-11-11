@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { verifyAuthHelper } from '@/lib/auth-helper'
+import { verifyAuthHelper } from '../../../../../../../lib/auth-helper'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const limit = searchParams?.get('limit') || '50'
 
     // Importer callBackendFromApi
-    const { callBackendFromApi } = (await import('@/utils/backend-api')) || {}
+    const { callBackendFromApi } = (await import('../../../../../../../utils/backend-api')) || {}
 
     const apiResponse = await callBackendFromApi(
       request,

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client-instance'
-import { deleteTyped, fetchTyped, postTyped } from '@/lib/api-typed'
+import { apiClient } from '../lib/api-client-instance'
+import { deleteTyped, fetchTyped, postTyped } from '../lib/api-typed'
 
 // Types pour les articles (similaires aux matériaux)
 export interface Article extends Record<string, unknown> {

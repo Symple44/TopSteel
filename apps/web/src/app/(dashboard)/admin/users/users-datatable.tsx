@@ -14,10 +14,10 @@ import {
   Users,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { BulkProfileManagement } from '@/components/admin/bulk-profile-management'
-import { useTranslation } from '@/lib/i18n/hooks'
-import type { User } from '@/types/auth'
-import { callClientApi } from '@/utils/backend-api'
+import { BulkProfileManagement } from '../../../../components/admin/bulk-profile-management'
+import { useTranslation } from '../../../../lib/i18n/hooks'
+import type { User } from '../../../../types/auth'
+import { callClientApi } from '../../../../utils/backend-api'
 
 // We'll need to move this function inside the component to access translations
 const formatDate = (date: string | Date | null | undefined, t: (key: string) => string) => {

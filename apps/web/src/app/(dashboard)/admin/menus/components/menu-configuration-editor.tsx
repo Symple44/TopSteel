@@ -13,10 +13,10 @@ import {
 } from '@erp/ui'
 import { Save, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { apiClient } from '@/lib/api-client'
-import { postTyped, putTyped } from '@/lib/api-typed'
-import { useTranslation } from '@/lib/i18n/hooks'
-import type { Group, MenuConfiguration, MenuItem, Permission, Role } from '@/types/menu'
+import { apiClient } from '../../../../../lib/api-client'
+import { postTyped, putTyped } from '../../../../../lib/api-typed'
+import { useTranslation } from '../../../../../lib/i18n/hooks'
+import type { Group, MenuConfiguration, MenuItem, Permission, Role } from '../../../../../types/menu'
 import { MenuItemEditor } from './menu-item-editor'
 
 interface MenuType {

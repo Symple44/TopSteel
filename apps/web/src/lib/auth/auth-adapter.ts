@@ -4,7 +4,7 @@ import type {
   Company as ExistingCompany,
   MFAState as ExistingMFAState,
   User as ExistingUser,
-} from '@/types/auth'
+} from '../../types/auth'
 import type { MFAState as AuthMFAState, AuthTokens, User } from './auth-types'
 import type {
   Company,

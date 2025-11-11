@@ -16,7 +16,7 @@ declare module 'next/headers' {
 }
 
 // Fix for ui-components conflicts - single declaration to avoid duplicates
-declare module '@/lib/ui-components-complete' {
+declare module '../lib/ui-components-complete' {
   const DataTable: React.ComponentType<unknown>
   export { DataTable }
 }

@@ -2,8 +2,8 @@
 
 import { Badge, Card, CardContent } from '@erp/ui'
 import { BarChart3, ChevronRight, ExternalLink, EyeOff, Folder, Play } from 'lucide-react'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { cn } from '@/lib/utils'
+import { useTranslation } from '../../../../../lib/i18n/hooks'
+import { cn } from '../../../../../lib/utils'
 
 interface MenuItem {
   id: string

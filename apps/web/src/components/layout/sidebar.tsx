@@ -50,12 +50,12 @@ import {
 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
-import { ErpInfoModalWrapper as ErpInfoModal } from '@/components/wrappers'
-import { useBackendStatus } from '@/hooks/use-backend-health'
-import { useDynamicMenu } from '@/hooks/use-dynamic-menu'
-import { useTranslation } from '@/lib/i18n'
-import { cn } from '@/lib/utils'
-import { getTranslatedTitle } from '@/utils/menu-translations'
+import { ErpInfoModalWrapper as ErpInfoModal } from '../../components/wrappers'
+import { useBackendStatus } from '../../hooks/use-backend-health'
+import { useDynamicMenu } from '../../hooks/use-dynamic-menu'
+import { useTranslation } from '../../lib/i18n'
+import { cn } from '../../lib/utils'
+import { getTranslatedTitle } from '../../utils/menu-translations'
 
 interface SidebarProps {
   isCollapsed?: boolean

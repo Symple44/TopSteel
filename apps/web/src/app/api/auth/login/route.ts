@@ -3,7 +3,7 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server'
-import { saveTokensInCookies, saveUserInfoInCookie } from '@/lib/auth/cookie-auth'
+import { saveTokensInCookies, saveUserInfoInCookie } from '../../../../lib/auth/cookie-auth'
 
 const API_URL = process?.env?.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
 

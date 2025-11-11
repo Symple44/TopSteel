@@ -3,8 +3,8 @@
 import { AlertTriangle, Loader2, Server } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useBackendHealth } from '@/hooks/use-backend-health'
-import { useStartupLogger } from '@/lib/startup-logger'
+import { useBackendHealth } from '../../hooks/use-backend-health'
+import { useStartupLogger } from '../../lib/startup-logger'
 
 interface AppInitializerProps {
   children: React.ReactNode

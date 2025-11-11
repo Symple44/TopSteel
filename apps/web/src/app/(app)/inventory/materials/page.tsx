@@ -16,13 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
-import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
+import type { ColumnConfig } from '@erp/ui'
 import { AlertCircle, Download, Package2, Plus, TrendingUp, Upload } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-import { useDebounce } from '@/hooks/use-debounce'
-import { useMaterialStatistics, useMaterials } from '@/hooks/use-materials'
-import { sanitizeSearchQuery } from '@/lib/security-utils'
-import { formatCurrency } from '@/lib/utils'
+import { useDebounce } from '../../../../hooks/use-debounce'
+import { useMaterialStatistics, useMaterials } from '../../../../hooks/use-materials'
+import { sanitizeSearchQuery } from '../../../../lib/security-utils'
+import { formatCurrency } from '../../../../lib/utils'
 
 interface MaterialFiltersLocal {
   type?: string

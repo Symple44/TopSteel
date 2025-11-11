@@ -5,8 +5,8 @@
 
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { translator } from '@/lib/i18n/translator'
-import { callClientApi } from '@/utils/backend-api'
+import { translator } from '../lib/i18n/translator'
+import { callClientApi } from '../utils/backend-api'
 
 export interface AppearanceSettings {
   theme: 'light' | 'dark' | 'vibrant' | 'system'

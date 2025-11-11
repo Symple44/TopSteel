@@ -1,6 +1,6 @@
 'use client'
 
-import { useCompanyInfo } from '@/hooks/use-company-info'
+import { useCompanyInfo } from '../../hooks/use-company-info'
 
 interface CompanyLogoWrapperProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'

@@ -1,6 +1,6 @@
 // Debug spécifique pour les préférences de menu
 
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../utils/backend-api'
 
 export async function debugMenuPreferences() {
   const menuEndpoints = [

@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { type NextRequest, NextResponse } from 'next/server'
-import { en } from '@/lib/i18n/translations/en'
-import { es } from '@/lib/i18n/translations/es'
-import { fr } from '@/lib/i18n/translations/fr'
+import { en } from '../../../../lib/i18n/translations/en'
+import { es } from '../../../../lib/i18n/translations/es'
+import { fr } from '../../../../lib/i18n/translations/fr'
 
 // Fonction pour vérifier l'authentification basique
 function verifyAuth(request: NextRequest): {

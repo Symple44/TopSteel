@@ -3,12 +3,12 @@
 import { Card } from '@erp/ui'
 import { Building2, ListChecks, Plug, Search, Settings, Shield, Workflow } from 'lucide-react'
 import { useState } from 'react'
-import { AuthenticationSettings } from '@/components/admin/authentication-settings'
-import { CompanySettings } from '@/components/admin/company-settings'
-import { ElasticsearchAdmin } from '@/components/admin/elasticsearch-admin'
-import { UnitsAndListsSettings } from '@/components/admin/units-lists-settings'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
-import { useTranslation } from '@/lib/i18n'
+import { AuthenticationSettings } from '../../../../components/admin/authentication-settings'
+import { CompanySettings } from '../../../../components/admin/company-settings'
+import { ElasticsearchAdmin } from '../../../../components/admin/elasticsearch-admin'
+import { UnitsAndListsSettings } from '../../../../components/admin/units-lists-settings'
+import { useAppearanceSettings } from '../../../../hooks/use-appearance-settings'
+import { useTranslation } from '../../../../lib/i18n'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'

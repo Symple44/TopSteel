@@ -20,8 +20,8 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
-import { useNotifications } from '@/components/providers/notifications-provider'
-import { useTranslation } from '@/lib/i18n'
+import { useNotifications } from '../../components/providers/notifications-provider'
+import { useTranslation } from '../../lib/i18n'
 
 export function NotificationSettings() {
   const { state, actions } = useNotifications()

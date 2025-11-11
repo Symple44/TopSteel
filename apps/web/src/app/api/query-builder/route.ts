@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { callBackendFromApi } from '@/utils/backend-api'
+import { callBackendFromApi } from '../../../utils/backend-api'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {

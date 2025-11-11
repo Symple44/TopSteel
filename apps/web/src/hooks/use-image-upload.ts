@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../utils/backend-api'
 
 export interface UseImageUploadOptions {
   onSuccess?: (result: { url: string; filename: string; size: number }) => void

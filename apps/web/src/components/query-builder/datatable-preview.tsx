@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@erp/ui'
-import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
+import type { ColumnConfig } from '@erp/ui'
 import { Download, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type {
@@ -21,7 +21,7 @@ import type {
   PreviewDataRow,
   QueryBuilderCalculatedField,
   QueryBuilderColumn,
-} from '@/types/query-builder.types'
+} from '../../types/query-builder.types'
 
 // Convert query builder data types to DataTable types
 const getDataTableType = (dataType: string): PreviewColumn['type'] => {

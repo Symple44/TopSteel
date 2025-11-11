@@ -1,5 +1,5 @@
 // API calls pour RBAC - Interface avec le backend
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../utils/backend-api'
 import type { AuditLog, Permission, Role, UserSocieteRole } from './rbac-types'
 
 /**

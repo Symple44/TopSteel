@@ -4,8 +4,8 @@ import { Avatar, Button, Input, Label, useFormFieldIds } from '@erp/ui'
 import { RotateCcw, Save, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { useSystemParameters } from '@/hooks/use-system-parameters'
-import { useTranslation } from '@/lib/i18n'
+import { useSystemParameters } from '../../hooks/use-system-parameters'
+import { useTranslation } from '../../lib/i18n'
 
 export function CompanySettings() {
   const ids = useFormFieldIds([

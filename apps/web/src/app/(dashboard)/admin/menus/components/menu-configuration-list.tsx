@@ -9,9 +9,9 @@ import {
   DropdownMenuTrigger,
 } from '@erp/ui'
 import { Download, Edit, MoreVertical, Play, Trash2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '../../../../../lib/utils'
 
-import type { MenuConfiguration } from '@/types/menu'
+import type { MenuConfiguration } from '../../../../../types/menu'
 
 interface MenuConfigurationListProps {
   configurations: MenuConfiguration[]

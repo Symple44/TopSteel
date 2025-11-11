@@ -27,8 +27,8 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
-import type { Group, MenuItem, MenuType, Permission, Role } from '@/types/menu'
+import { cn } from '../../../../../lib/utils'
+import type { Group, MenuItem, MenuType, Permission, Role } from '../../../../../types/menu'
 import { MenuItemRightsEditor } from './menu-item-rights-editor'
 
 interface MenuItemEditorProps {

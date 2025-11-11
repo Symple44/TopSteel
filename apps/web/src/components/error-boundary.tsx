@@ -4,7 +4,7 @@ import { Button } from '@erp/ui'
 import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react'
 import type { ErrorInfo, ReactNode } from 'react'
 import React, { Component } from 'react'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../utils/backend-api'
 
 interface WindowWithGtag extends Window {
   gtag?: (

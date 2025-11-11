@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
-import { ConnectionLostDialogWrapper as ConnectionLostDialog } from '@/components/wrappers'
-import { apiClientEnhanced } from '@/lib/api-client-enhanced'
+import { ConnectionLostDialogWrapper as ConnectionLostDialog } from '../components/wrappers'
+import { apiClientEnhanced } from '../lib/api-client-enhanced'
 
 interface ConnectionContextType {
   isConnected: boolean

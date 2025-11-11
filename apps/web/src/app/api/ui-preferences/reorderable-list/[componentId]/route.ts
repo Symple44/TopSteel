@@ -1,7 +1,7 @@
 import type { ReorderableListConfig } from '@erp/ui'
 import { type NextRequest, NextResponse } from 'next/server'
-import { getAuthenticatedUser } from '@/lib/auth/jwt-utils-server'
-import { UIPreferencesService } from '@/lib/services/ui-preferences.service'
+import { getAuthenticatedUser } from '../../../../../lib/auth/jwt-utils-server'
+import { UIPreferencesService } from '../../../../../lib/services/ui-preferences.service'
 
 // GET - Récupérer la configuration d'un composant
 export async function GET(

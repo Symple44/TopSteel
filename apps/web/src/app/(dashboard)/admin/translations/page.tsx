@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { TranslationAdmin } from '@/components/admin/translation-admin'
-import { AdminGuard } from '@/components/auth/admin-guard'
+import { TranslationAdmin } from '../../../../components/admin/translation-admin'
+import { AdminGuard } from '../../../../components/auth/admin-guard'
 
 export default function TranslationsAdminPage() {
   return (

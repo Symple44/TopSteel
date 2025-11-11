@@ -1,5 +1,5 @@
 // import { BackendHealthService } from './backend-health' // Module not found
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../utils/backend-api'
 
 export async function logStartupInfo() {
   const _apiUrl = process?.env?.NEXT_PUBLIC_API_URL || 'Non configurée'

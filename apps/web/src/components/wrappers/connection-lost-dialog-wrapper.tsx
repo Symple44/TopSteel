@@ -2,7 +2,7 @@
 
 import { ConnectionLostDialog } from '@erp/ui'
 import { useRouter } from 'next/navigation'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface ConnectionLostDialogWrapperProps {
   isOpen: boolean

@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { GroupManagementPanel } from '@/components/admin/group-management-panel'
-import { AdminGuard } from '@/components/auth/admin-guard'
+import { GroupManagementPanel } from '../../../../components/admin/group-management-panel'
+import { AdminGuard } from '../../../../components/auth/admin-guard'
 
 export default function GroupManagementPage() {
   return (

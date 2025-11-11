@@ -1,7 +1,7 @@
 // Main API clients and utilities
 
 // Type utilities
-export type { WebAppConfig } from '@/types'
+export type { WebAppConfig } from '../types'
 export {
   APIError,
   type APIErrorDetails,

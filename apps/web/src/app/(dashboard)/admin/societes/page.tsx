@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { SocietesManagementPanel } from '@/components/admin/societes-management-panel'
-import { AdminGuard } from '@/components/auth/admin-guard'
+import { SocietesManagementPanel } from '../../../../components/admin/societes-management-panel'
+import { AdminGuard } from '../../../../components/auth/admin-guard'
 
 export default function SocietesManagementPage() {
   return (

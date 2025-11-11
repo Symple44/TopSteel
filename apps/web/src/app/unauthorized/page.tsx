@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 import { Button } from '@erp/ui'
 import { Shield } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 export default function UnauthorizedPage() {
   const router = useRouter()

@@ -1,7 +1,7 @@
 import type { Material, MaterialFilters, MaterialStatistics } from '@erp/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@/lib/api-client-instance'
-import { deleteTyped, fetchTyped, postTyped } from '@/lib/api-typed'
+import { apiClient } from '../lib/api-client-instance'
+import { deleteTyped, fetchTyped, postTyped } from '../lib/api-typed'
 
 const MATERIALS_KEY = 'materials'
 const MATERIALS_STATS_KEY = 'materials-statistics'

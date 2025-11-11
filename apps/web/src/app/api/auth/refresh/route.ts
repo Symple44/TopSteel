@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { areTokensExpired, getTokensFromCookies, saveTokensInCookies } from '@/lib/auth/cookie-auth'
-import { callBackendFromApi } from '@/utils/backend-api'
+import { areTokensExpired, getTokensFromCookies, saveTokensInCookies } from '../../../../lib/auth/cookie-auth'
+import { callBackendFromApi } from '../../../../utils/backend-api'
 
 export async function POST(req: NextRequest) {
   try {

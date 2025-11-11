@@ -1,5 +1,5 @@
 import type { ReorderableListConfig } from '@erp/ui'
-import { callBackendApi } from '@/utils/backend-api'
+import { callBackendApi } from '../../utils/backend-api'
 
 /**
  * Service pour gérer les préférences UI des utilisateurs

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { verifyAuthHelper } from '@/lib/auth-helper'
+import { verifyAuthHelper } from '../../../../../lib/auth-helper'
 
 // Types pour les préférences hiérarchiques
 interface HierarchicalConfig {

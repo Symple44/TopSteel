@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { verifyAuthHelper } from '@/lib/auth-helper'
-import { callBackendFromApi } from '@/utils/backend-api'
+import { verifyAuthHelper } from '../../../../../lib/auth-helper'
+import { callBackendFromApi } from '../../../../../utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {

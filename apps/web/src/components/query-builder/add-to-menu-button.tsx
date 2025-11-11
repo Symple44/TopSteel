@@ -20,8 +20,8 @@ import {
 } from '@erp/ui'
 import { Menu, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from '@/hooks/use-toast'
-import { postTyped } from '@/lib/api-typed'
+import { toast } from '../../hooks/use-toast'
+import { postTyped } from '../../lib/api-typed'
 
 interface AddToMenuButtonProps {
   queryBuilderId: string

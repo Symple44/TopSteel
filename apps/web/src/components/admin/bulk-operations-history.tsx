@@ -93,7 +93,7 @@ export function BulkOperationsHistory({ userId, limit = 20 }: BulkOperationsHist
   const loadHistory = useCallback(async () => {
     try {
       setLoading(true)
-      const { callClientApi } = (await import('@/utils/backend-api')) || {}
+      const { callClientApi } = (await import('../../utils/backend-api')) || {}
       const endpoint = userId
         ? `admin/users/${userId}/bulk-operations-history?limit=${limit}`
         : `admin/users/bulk-operations?limit=${limit}`

@@ -2,7 +2,7 @@
 
 import { Wifi, WifiOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
 
 export default function SyncIndicator() {
   const [isOnline, setIsOnline] = useState(true)

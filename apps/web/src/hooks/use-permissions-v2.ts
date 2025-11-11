@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AccessLevel, Role, RolePermission } from '@/types/permissions'
-import { callClientApi } from '@/utils/backend-api'
+import type { AccessLevel, Role, RolePermission } from '../types/permissions'
+import { callClientApi } from '../utils/backend-api'
 import { useAuth } from './use-auth'
 
 // Cache pour éviter les appels API répétés

@@ -6,7 +6,7 @@
 
 import type { Projet, ProjetFilters } from '@erp/domains'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useProjetStore } from '@/stores/projet.store'
+import { useProjetStore } from '../stores/projet.store'
 
 export const useProjets = (autoFetch = true) => {
   const [mounted, setMounted] = useState(false)

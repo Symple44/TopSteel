@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { callBackendFromApi, callHealthApi } from '@/utils/backend-api'
+import { callBackendFromApi, callHealthApi } from '../../../utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {

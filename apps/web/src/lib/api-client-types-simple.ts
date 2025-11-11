@@ -30,7 +30,7 @@ import type {
   BatchOperationResponse,
   FileUploadResponse,
   PaginatedResponse,
-} from '@/types/api-types'
+} from '../types/api-types'
 
 // Basic entity types for APIs that may not be fully defined yet
 interface BasicUser {

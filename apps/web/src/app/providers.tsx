@@ -6,9 +6,9 @@ import { QueryClient } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import { useEffect } from 'react'
 import { Toaster } from 'sonner'
-import { NotificationsProvider } from '@/components/providers/notifications-provider'
-import { csrfManager } from '@/lib/csrf'
-import { I18nProvider } from '@/lib/i18n'
+import { NotificationsProvider } from '../components/providers/notifications-provider'
+import { csrfManager } from '../lib/csrf'
+import { I18nProvider } from '../lib/i18n'
 
 const ThemeProvider = dynamic(() => import('next-themes').then((mod) => mod.ThemeProvider), {
   ssr: false,
@@ -19,7 +19,7 @@ const QueryClientProvider = dynamic(
   { ssr: false }
 )
 
-import { AuthProvider } from '@/lib/auth'
+import { AuthProvider } from '../lib/auth'
 
 // Configuration React Query
 const queryClient = new QueryClient({

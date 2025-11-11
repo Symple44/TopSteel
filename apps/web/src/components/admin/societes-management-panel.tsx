@@ -27,7 +27,7 @@ import {
 } from '@erp/ui'
 import { Building, Database, Edit, Eye, MapPin, Plus, Shield, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../utils/backend-api'
 
 interface Societe {
   id: string

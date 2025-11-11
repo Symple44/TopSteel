@@ -452,7 +452,7 @@ export async function fetchClients(
       ...serializeClientsFilters(filters),
     })
 
-    const { callClientApi } = (await import('@/utils/backend-api')) || {}
+    const { callClientApi } = (await import('../utils/backend-api')) || {}
     const response = await callClientApi(`clients?${queryParams}`, {
       signal,
     })
@@ -494,7 +494,7 @@ export async function fetchClient(id: string, signal?: AbortSignal): Promise<Cli
   }
 
   try {
-    const { callClientApi } = (await import('@/utils/backend-api')) || {}
+    const { callClientApi } = (await import('../utils/backend-api')) || {}
     const response = await callClientApi(`clients/${id}`, {
       signal,
     })
@@ -523,7 +523,7 @@ export async function createClient(
   const startTime = performance?.now()
 
   try {
-    const { callClientApi } = (await import('@/utils/backend-api')) || {}
+    const { callClientApi } = (await import('../utils/backend-api')) || {}
     const response = await callClientApi('clients', {
       method: 'POST',
       signal,
@@ -558,7 +558,7 @@ export async function updateClient(
   const startTime = performance?.now()
 
   try {
-    const { callClientApi } = (await import('@/utils/backend-api')) || {}
+    const { callClientApi } = (await import('../utils/backend-api')) || {}
     const response = await callClientApi(`clients/${id}`, {
       method: 'PATCH',
       signal,
@@ -589,7 +589,7 @@ export async function deleteClient(id: string, signal?: AbortSignal): Promise<vo
   const startTime = performance?.now()
 
   try {
-    const { callClientApi } = (await import('@/utils/backend-api')) || {}
+    const { callClientApi } = (await import('../utils/backend-api')) || {}
     const response = await callClientApi(`clients/${id}`, {
       method: 'DELETE',
       signal,

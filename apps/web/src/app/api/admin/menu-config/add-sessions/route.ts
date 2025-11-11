@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { verifyAuthHelper } from '@/lib/auth-helper'
+import { verifyAuthHelper } from '../../../../../lib/auth-helper'
 
 export async function POST(request: NextRequest) {
   try {

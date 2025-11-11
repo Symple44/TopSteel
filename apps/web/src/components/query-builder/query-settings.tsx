@@ -17,7 +17,7 @@ import {
   Textarea,
 } from '@erp/ui'
 import { Database, FileSpreadsheet, Settings2, Shield } from 'lucide-react'
-import type { QuerySettingsProps } from '@/types/query-builder.types'
+import type { QuerySettingsProps } from '../../types/query-builder.types'
 
 export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps) {
   const handleSettingChange = (key: string, value: unknown) => {

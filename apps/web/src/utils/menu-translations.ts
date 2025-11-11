@@ -1,4 +1,4 @@
-import { translator } from '@/lib/i18n/translator'
+import { translator } from '../lib/i18n/translator'
 
 export interface TranslatableMenuItem {
   title: string

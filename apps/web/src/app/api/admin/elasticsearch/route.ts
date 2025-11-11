@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { getElasticsearchClient, getMigrationService } from '@/lib/server/elasticsearch'
+import { getElasticsearchClient, getMigrationService } from '../../../../lib/server/elasticsearch'
 
 export const runtime = 'nodejs'
 

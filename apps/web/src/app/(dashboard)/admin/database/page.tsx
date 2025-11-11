@@ -28,14 +28,14 @@ import {
   WifiOff,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { ConnectionManagementPanel } from '@/components/admin/connection-management-panel'
-import { DatabaseMonitoringCard } from '@/components/admin/database-monitoring-card'
-import { MigrationStatusCard } from '@/components/admin/migration-status-card'
-import { PerformanceMetricsChart } from '@/components/admin/performance-metrics-chart'
-import { SystemAlertsPanel } from '@/components/admin/system-alerts-panel'
-import { useToastShortcuts } from '@/hooks/use-toast'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { callClientApi } from '@/utils/backend-api'
+import { ConnectionManagementPanel } from '../../../../components/admin/connection-management-panel'
+import { DatabaseMonitoringCard } from '../../../../components/admin/database-monitoring-card'
+import { MigrationStatusCard } from '../../../../components/admin/migration-status-card'
+import { PerformanceMetricsChart } from '../../../../components/admin/performance-metrics-chart'
+import { SystemAlertsPanel } from '../../../../components/admin/system-alerts-panel'
+import { useToastShortcuts } from '../../../../hooks/use-toast'
+import { useTranslation } from '../../../../lib/i18n/hooks'
+import { callClientApi } from '../../../../utils/backend-api'
 
 // Types pour la nouvelle architecture multi-tenant
 interface DatabaseHealthStatus {

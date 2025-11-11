@@ -44,10 +44,10 @@ import {
   Users,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { AdminGuard } from '@/components/auth/admin-guard'
-import { PermissionHide } from '@/components/auth/permission-guard'
-import type { Role } from '@/hooks/use-permissions'
-import { callClientApi } from '@/utils/backend-api'
+import { AdminGuard } from '../../../../components/auth/admin-guard'
+import { PermissionHide } from '../../../../components/auth/permission-guard'
+import type { Role } from '../../../../hooks/use-permissions'
+import { callClientApi } from '../../../../utils/backend-api'
 
 // Fonction utilitaire pour formater les dates
 const formatDateTime = (date: string | Date) => {

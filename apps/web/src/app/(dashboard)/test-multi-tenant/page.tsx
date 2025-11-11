@@ -21,7 +21,7 @@ import {
 } from '@erp/ui'
 import { Database, Lock, ShieldAlert, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../../utils/backend-api'
 
 export default function TestMultiTenantPage() {
   const [sqlQuery, setSqlQuery] = useState('SELECT * FROM clients LIMIT 10')

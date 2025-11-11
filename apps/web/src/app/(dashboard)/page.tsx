@@ -20,10 +20,10 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
-import { CompanyLogoWrapper as CompanyLogo } from '@/components/wrappers'
-import { useAuth } from '@/hooks/use-auth'
-import { useCompanyInfo } from '@/hooks/use-company-info'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { CompanyLogoWrapper as CompanyLogo } from '../../components/wrappers'
+import { useAuth } from '../../hooks/use-auth'
+import { useCompanyInfo } from '../../hooks/use-company-info'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 export default function HomePage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()

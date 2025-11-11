@@ -5,9 +5,9 @@ import { AlertCircle, Building, LogOut, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { getTabId } from '@/lib/tab-id'
+import { useAuth } from '../../hooks/use-auth'
+import { useTranslation } from '../../lib/i18n/hooks'
+import { getTabId } from '../../lib/tab-id'
 
 interface TabSyncNotificationProps {
   // Optionnel : permettre de désactiver les notifications

@@ -24,9 +24,9 @@ import {
   ArticleType,
   useCreateArticle,
   useUpdateArticle,
-} from '@/hooks/use-articles'
-import { sanitizeInput } from '@/lib/security-utils'
-import { cn } from '@/lib/utils'
+} from '../../hooks/use-articles'
+import { sanitizeInput } from '../../lib/security-utils'
+import { cn } from '../../lib/utils'
 
 interface ArticleFormDialogProps {
   open: boolean

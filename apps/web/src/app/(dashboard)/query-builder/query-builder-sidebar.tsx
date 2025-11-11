@@ -4,8 +4,8 @@ import { Badge, Button, Input, ScrollArea } from '@erp/ui'
 import { Database, Lock, Plus, Search, Unlock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
-import { callClientApi } from '@/utils/backend-api'
+import { cn } from '../../../lib/utils'
+import { callClientApi } from '../../../utils/backend-api'
 
 interface QueryBuilder {
   id: string

@@ -19,11 +19,11 @@ import {
 import { ArrowLeft, Building, Calendar, Mail, Phone, RefreshCw, Shield, Users } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { BulkOperationsHistory } from '@/components/admin/bulk-operations-history'
-import { AdminGuard } from '@/components/auth/admin-guard'
-import { toast } from '@/hooks/use-toast'
-import { apiClient } from '@/lib/api-client'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { BulkOperationsHistory } from '../../../../../components/admin/bulk-operations-history'
+import { AdminGuard } from '../../../../../components/auth/admin-guard'
+import { toast } from '../../../../../hooks/use-toast'
+import { apiClient } from '../../../../../lib/api-client'
+import { useTranslation } from '../../../../../lib/i18n/hooks'
 import { UserCompaniesDataTable } from './user-companies-datatable'
 
 interface UserDetails {

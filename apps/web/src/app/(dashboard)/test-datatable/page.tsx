@@ -9,7 +9,7 @@ import {
   CardTitle,
   DataTable,
 } from '@erp/ui'
-import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
+import type { ColumnConfig } from '@erp/ui'
 import { Edit, Eye, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 

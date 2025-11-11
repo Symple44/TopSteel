@@ -23,9 +23,9 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useNotifications } from '@/components/providers/notifications-provider'
-import { cn } from '@/lib/utils'
-import type { ClientNotification as Notification } from '@/types/notifications'
+import { useNotifications } from '../../components/providers/notifications-provider'
+import { cn } from '../../lib/utils'
+import type { ClientNotification as Notification } from '../../types/notifications'
 
 interface NotificationDashboardV2Props {
   isOpen: boolean

@@ -5,8 +5,8 @@
 
 'use client'
 
-import { CompanyLogoWrapper } from '@/components/wrappers/company-logo-wrapper'
-import { useTranslation } from '@/lib/i18n'
+import { CompanyLogoWrapper } from '../components/wrappers/company-logo-wrapper'
+import { useTranslation } from '../lib/i18n'
 
 export default function Loading() {
   const { t } = useTranslation()

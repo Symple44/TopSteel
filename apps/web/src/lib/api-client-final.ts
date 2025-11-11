@@ -38,7 +38,7 @@ import type {
 } from '@erp/types'
 
 // Import PaginatedResponse from existing types
-import type { PaginatedResponse } from '@/types/api-types'
+import type { PaginatedResponse } from '../types/api-types'
 
 // ========================= TYPE DEFINITIONS =========================
 

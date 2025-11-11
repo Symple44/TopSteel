@@ -34,7 +34,7 @@ import { Building2, CreditCard, FileText, MapPin, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { useCreatePartner, usePartnerGroups, useUpdatePartner } from '@/hooks/use-partners'
+import { useCreatePartner, usePartnerGroups, useUpdatePartner } from '../../hooks/use-partners'
 
 const partnerSchema = z.object({
   code: z.string().optional(),

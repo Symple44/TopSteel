@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import type { PageCategory } from '@/hooks/use-available-pages'
+import type { PageCategory } from '../hooks/use-available-pages'
 
 export interface DiscoveredPage {
   id: string

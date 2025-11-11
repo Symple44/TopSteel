@@ -14,7 +14,7 @@ import type {
 } from '@erp/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { type APIClientInterface, APIError, apiClient } from '@/lib/api-client-instance'
+import { type APIClientInterface, APIError, apiClient } from '../lib/api-client-instance'
 
 // Type the apiClient properly
 const typedApiClient = apiClient as APIClientInterface

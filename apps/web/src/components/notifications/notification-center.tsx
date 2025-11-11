@@ -14,10 +14,10 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useNotifications } from '@/components/providers/notifications-provider'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { cn } from '@/lib/utils'
-import type { ClientNotification as Notification } from '@/types/notifications'
+import { useNotifications } from '../../components/providers/notifications-provider'
+import { useTranslation } from '../../lib/i18n/hooks'
+import { cn } from '../../lib/utils'
+import type { ClientNotification as Notification } from '../../types/notifications'
 import { NotificationDashboardV2 } from './notification-dashboard-v2'
 
 export function NotificationCenter() {

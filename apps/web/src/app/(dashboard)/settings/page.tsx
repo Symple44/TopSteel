@@ -11,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { ArrowRight, Bell, Menu, Palette, Settings, Shield, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useAuth } from '../../../hooks/use-auth'
+import { useTranslation } from '../../../lib/i18n/hooks'
 
 export default function SettingsPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth()

@@ -93,12 +93,12 @@ import {
 } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
-import { TranslationFieldWrapper } from '@/components/wrappers/translation-field-wrapper'
-import { fetchTyped, postTyped } from '@/lib/api-typed'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { translator } from '@/lib/i18n/translator'
-import type { TranslationFunction } from '@/lib/i18n/types'
-import { getTranslatedTitle, type TranslatableMenuItem } from '@/utils/menu-translations'
+import { TranslationFieldWrapper } from '../../../../components/wrappers/translation-field-wrapper'
+import { fetchTyped, postTyped } from '../../../../lib/api-typed'
+import { useTranslation } from '../../../../lib/i18n/hooks'
+import { translator } from '../../../../lib/i18n/translator'
+import type { TranslationFunction } from '../../../../lib/i18n/types'
+import { getTranslatedTitle, type TranslatableMenuItem } from '../../../../utils/menu-translations'
 
 interface MenuItemConfig {
   id: string

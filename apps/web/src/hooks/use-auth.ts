@@ -1,11 +1,11 @@
 // Hook d'authentification principal - Interface simple et propre
 
 // Réexport des types pour compatibilité
-export type { AuthContextType, AuthState, AuthTokens, Company, User } from '@/lib/auth'
-export { useAuth } from '@/lib/auth'
+export type { AuthContextType, AuthState, AuthTokens, Company, User } from '../lib/auth'
+export { useAuth } from '../lib/auth'
 
 // Hooks de commodité pour des cas d'usage spécifiques
-import { useAuth } from '@/lib/auth'
+import { useAuth } from '../lib/auth'
 
 /**
  * Hook pour récupérer uniquement l'utilisateur actuel

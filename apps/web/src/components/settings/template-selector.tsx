@@ -16,15 +16,15 @@ import {
 } from '@erp/ui'
 import { Building2, Check, Eye, Layout, Search, Users, Zap } from 'lucide-react'
 import React, { useState } from 'react'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
-import { useTemplates } from '@/hooks/use-templates'
+import { useAppearanceSettings } from '../../hooks/use-appearance-settings'
+import { useTemplates } from '../../hooks/use-templates'
 import {
   predefinedTemplates,
   searchTemplates,
   type Template,
   templateCategories,
-} from '@/lib/templates/predefined-templates'
-import { cn } from '@/lib/utils'
+} from '../../lib/templates/predefined-templates'
+import { cn } from '../../lib/utils'
 
 interface TemplateSelectorProps {
   className?: string

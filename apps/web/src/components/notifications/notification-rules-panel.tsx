@@ -45,7 +45,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { PermissionHide } from '@/components/auth/permission-guard'
+import { PermissionHide } from '../../components/auth/permission-guard'
 
 // Types pour les règles de notification
 interface NotificationRule {

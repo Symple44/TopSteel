@@ -51,8 +51,8 @@ import {
   useDeletePartnerAddress,
   usePartnerAddresses,
   useUpdatePartnerAddress,
-} from '@/hooks/use-partner-details'
-import { formatDate } from '@/lib/utils'
+} from '../../hooks/use-partner-details'
+import { formatDate } from '../../lib/utils'
 
 const addressSchema = z?.object({
   libelle: z?.string().min(1, 'Le libellé est requis'),

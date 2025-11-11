@@ -8,8 +8,8 @@ import type {
 } from '@erp/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { type APIClientInterface, apiClient } from '@/lib/api-client-instance'
-import type { PaginatedResponse } from '@/types/api-types'
+import { type APIClientInterface, apiClient } from '../lib/api-client-instance'
+import type { PaginatedResponse } from '../types/api-types'
 
 // Type the apiClient properly
 const typedApiClient = apiClient as APIClientInterface

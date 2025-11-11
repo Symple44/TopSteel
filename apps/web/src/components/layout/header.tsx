@@ -4,12 +4,12 @@ import { Button } from '@erp/ui'
 import { Building, Building2, ChevronDown, LogOut, Search, Settings, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import SyncIndicator from '@/components/auth/sync-indicator'
-import { NotificationCenter } from '@/components/notifications/notification-center'
-import { CommandPalette } from '@/components/search/command-palette'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n'
-import { getApproximateTabCount } from '@/lib/tab-detection'
+import SyncIndicator from '../../components/auth/sync-indicator'
+import { NotificationCenter } from '../../components/notifications/notification-center'
+import { CommandPalette } from '../../components/search/command-palette'
+import { useAuth } from '../../hooks/use-auth'
+import { useTranslation } from '../../lib/i18n'
+import { getApproximateTabCount } from '../../lib/tab-detection'
 
 interface HeaderProps {
   onToggleSidebar?: () => void

@@ -1,5 +1,5 @@
 import { FileText } from 'lucide-react'
-import { UnderConstruction } from '@/components/ui/under-construction'
+import { UnderConstruction } from '../../../../components/ui/under-construction'
 
 export default function QuotesPage() {
   return (

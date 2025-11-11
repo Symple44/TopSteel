@@ -29,7 +29,7 @@ import type {
   BatchOperationResponse,
   FileUploadResponse,
   PaginatedResponse,
-} from '@/types/api-types'
+} from '../types/api-types'
 import { APIClientEnhanced } from './api-client-enhanced'
 import type {
   ArticlesAPI,

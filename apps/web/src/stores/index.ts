@@ -6,7 +6,7 @@
  */
 
 // Import des stores pour les helpers
-import { StoreMonitor } from '@/lib/store-utils'
+import { StoreMonitor } from '../lib/store-utils'
 import { useAppStore } from './app.store'
 import { useAuthStore } from './auth.store'
 import { useProjetStore } from './projet.store'
@@ -91,7 +91,7 @@ export {
   useAuth,
   useCurrentUser,
   useIsAuthenticated,
-} from '@/hooks/use-auth'
+} from '../hooks/use-auth'
 
 // ===== HOOKS NOTIFICATIONS =====
 export {
@@ -102,25 +102,25 @@ export {
   useNotificationsSettings,
   useNotificationsState,
   useNotificationsStats,
-} from '@/hooks/use-notifications'
+} from '../hooks/use-notifications'
 // ===== HOOKS UI =====
 export {
   useSidebar,
   useToasts,
   useUI,
-} from '@/hooks/use-ui'
+} from '../hooks/use-ui'
 export {
   createMemoizedSelector,
   createOptimizedSelectors,
   SelectorStrategy,
   selectorDebugUtils,
   useOptimizedSelector,
-} from '@/lib/optimized-selectors'
+} from '../lib/optimized-selectors'
 // ===== UTILITAIRES =====
 export {
   StoreMonitor,
   StoreUtils,
-} from '@/lib/store-utils'
+} from '../lib/store-utils'
 // ===== TYPES SPÉCIFIQUES AUTH (locaux) =====
 export type {
   LoginAttempt,

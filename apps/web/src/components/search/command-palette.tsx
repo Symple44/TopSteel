@@ -26,8 +26,8 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { type SearchResult, useGlobalSearch } from '@/hooks/use-global-search'
-import { cn } from '@/lib/utils'
+import { type SearchResult, useGlobalSearch } from '../../hooks/use-global-search'
+import { cn } from '../../lib/utils'
 
 // Mapping des types vers les icônes
 const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {

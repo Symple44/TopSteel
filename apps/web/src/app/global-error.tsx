@@ -1,7 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useTranslation } from '../lib/i18n/hooks'
 // import { Button } from '@erp/ui'
 /**
  * Page Global Error - TopSteel ERP

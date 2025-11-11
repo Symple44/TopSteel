@@ -5,10 +5,10 @@ import { Building2, Eye, EyeOff, Lock, Mail, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useId } from 'react'
-import CompanySelector from '@/components/auth/company-selector'
-import { useAuth } from '@/hooks/use-auth'
-import { toast } from '@/hooks/use-toast'
-import { useTranslation } from '@/lib/i18n/hooks'
+import CompanySelector from '../../../components/auth/company-selector'
+import { useAuth } from '../../../hooks/use-auth'
+import { toast } from '../../../hooks/use-toast'
+import { useTranslation } from '../../../lib/i18n/hooks'
 
 // Composant login client-only pour éviter l'erreur params Next.js 15
 export default function LoginClientPage() {

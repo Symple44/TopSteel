@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { fetchBackend } from '@/lib/auth-server'
+import { fetchBackend } from '../../../../lib/auth-server'
 
 // GET - Récupérer tous les rôles
 export async function GET(request: NextRequest) {

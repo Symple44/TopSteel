@@ -45,9 +45,9 @@ import {
   Zap,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
-import type { MenuItem } from '@/types/menu'
-import { callClientApi } from '@/utils/backend-api'
+import { useTranslation } from '../../../../lib/i18n/hooks'
+import type { MenuItem } from '../../../../types/menu'
+import { callClientApi } from '../../../../utils/backend-api'
 
 // Fonction utilitaire pour formater les dates
 const formatDate = (date: string | Date) => {

@@ -1,8 +1,8 @@
 'use client'
 
 import { ImageUpload } from '@erp/ui'
-import { useTranslation } from '@/lib/i18n'
-import { callClientApi } from '@/utils/backend-api'
+import { useTranslation } from '../../lib/i18n'
+import { callClientApi } from '../../utils/backend-api'
 
 interface ImageUploadWrapperProps {
   category: 'avatar' | 'logo' | 'document'

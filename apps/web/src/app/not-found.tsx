@@ -8,7 +8,7 @@
 // Disable static generation due to client-side hooks
 export const dynamic = 'force-dynamic'
 
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useTranslation } from '../lib/i18n/hooks'
 
 export default function NotFound() {
   const { t } = useTranslation('common')

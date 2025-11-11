@@ -50,8 +50,8 @@ import {
   UsersIcon,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { PermissionHide } from '@/components/auth/permission-guard'
-import { callClientApi } from '@/utils/backend-api'
+import { PermissionHide } from '../../components/auth/permission-guard'
+import { callClientApi } from '../../utils/backend-api'
 import { BulkUserAssignment } from './bulk-user-assignment'
 
 // Fonction utilitaire pour formater les dates

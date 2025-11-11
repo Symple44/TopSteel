@@ -60,7 +60,7 @@ import {
   useDeletePartnerSite,
   usePartnerSites,
   useUpdatePartnerSite,
-} from '@/hooks/use-partner-details'
+} from '../../hooks/use-partner-details'
 
 const siteSchema = z?.object({
   code: z?.string().min(1, 'Le code est requis'),

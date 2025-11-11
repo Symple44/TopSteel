@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { fetchTyped } from '@/lib/api-typed'
-import { translator } from '@/lib/i18n/translator'
+import { fetchTyped } from '../lib/api-typed'
+import { translator } from '../lib/i18n/translator'
 import { useMenuMode } from './use-menu-mode'
 import { usePermissions } from './use-permissions-v2'
 

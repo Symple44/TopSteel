@@ -6,7 +6,7 @@
 'use client'
 
 import { type ReactNode, useEffect } from 'react'
-import { useCurrentAppearanceSettings } from '@/hooks/use-appearance-settings'
+import { useCurrentAppearanceSettings } from '../../hooks/use-appearance-settings'
 
 interface AppearanceProviderProps {
   children: ReactNode

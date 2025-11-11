@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@erp/ui'
 import { Download, Edit, Eye, MoreHorizontal } from 'lucide-react'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate } from '../../lib/utils'
 
 // Données mock pour la démo
 const mockDevis = [

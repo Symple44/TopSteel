@@ -35,8 +35,8 @@ import type React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
-import { useLanguage } from '@/lib/i18n'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useLanguage } from '../../lib/i18n'
+import { useTranslation } from '../../lib/i18n/hooks'
 import {
   bulkImportTranslations,
   calculateTranslationStats,
@@ -44,9 +44,9 @@ import {
   importFromExcel,
   loadTranslationsWithOverrides,
   saveTranslation,
-} from '@/lib/i18n/translation-utils'
-import type { TranslationEntry, TranslationStats } from '@/lib/i18n/types'
-import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
+} from '../../lib/i18n/translation-utils'
+import type { TranslationEntry, TranslationStats } from '../../lib/i18n/types'
+import { SUPPORTED_LANGUAGES } from '../../lib/i18n/types'
 import { TranslationDataTable } from './TranslationDataTable'
 
 export function TranslationAdmin() {

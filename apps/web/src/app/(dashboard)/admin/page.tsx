@@ -22,8 +22,8 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useAuth } from '../../../hooks/use-auth'
+import { useTranslation } from '../../../lib/i18n/hooks'
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth()

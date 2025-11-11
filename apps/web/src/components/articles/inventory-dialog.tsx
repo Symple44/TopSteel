@@ -14,9 +14,9 @@ import {
 } from '@erp/ui'
 import { AlertCircle, Package2, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { type Article, useEffectuerInventaire } from '@/hooks/use-articles'
-import { sanitizeInput } from '@/lib/security-utils'
-import { cn, formatCurrency } from '@/lib/utils'
+import { type Article, useEffectuerInventaire } from '../../hooks/use-articles'
+import { sanitizeInput } from '../../lib/security-utils'
+import { cn, formatCurrency } from '../../lib/utils'
 
 interface InventoryDialogProps {
   open: boolean

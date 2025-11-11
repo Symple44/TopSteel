@@ -25,7 +25,7 @@ export interface Role {
   permissions: Permission[]
 }
 
-// import type { AccessLevel, Permission, Role } from '@/hooks/use-permissions'
+// import type { AccessLevel, Permission, Role } from '../hooks/use-permissions'
 import type { AuthTokens, Company, User } from './auth'
 
 // Enhanced Security Context Types

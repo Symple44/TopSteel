@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable } from '@erp/ui'
-import type { ColumnConfig } from '@erp/ui/components/data-display/datatable/types'
+import type { ColumnConfig } from '@erp/ui'
 import {
   AlertCircle,
   Copy,
@@ -16,9 +16,9 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
-import { ArticleFormDialog } from '@/components/articles/article-form-dialog'
-import { DuplicateArticleDialog } from '@/components/articles/duplicate-article-dialog'
-import { InventoryDialog } from '@/components/articles/inventory-dialog'
+import { ArticleFormDialog } from '../../../../components/articles/article-form-dialog'
+import { DuplicateArticleDialog } from '../../../../components/articles/duplicate-article-dialog'
+import { InventoryDialog } from '../../../../components/articles/inventory-dialog'
 import {
   type Article,
   type ArticleFilters,
@@ -27,8 +27,8 @@ import {
   useArticleStatistics,
   useArticles,
   useDeleteArticle,
-} from '@/hooks/use-articles'
-import { cn, formatCurrency } from '@/lib/utils'
+} from '../../../../hooks/use-articles'
+import { cn, formatCurrency } from '../../../../lib/utils'
 
 export default function ArticlesPage() {
   const router = useRouter()

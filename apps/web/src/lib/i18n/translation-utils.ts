@@ -35,7 +35,7 @@ const loadUniverComponents = async (): Promise<boolean> => {
 // Promise to track Univer loading status
 let univerLoadingPromise: Promise<boolean> | null = null
 
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../utils/backend-api'
 import { en } from './translations/en'
 import { es } from './translations/es'
 import { fr } from './translations/fr'

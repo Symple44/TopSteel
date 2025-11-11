@@ -2,7 +2,7 @@
 
 import { AutoBreadcrumb, type AutoBreadcrumbProps } from '@erp/ui'
 import { usePathname } from 'next/navigation'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface AutoBreadcrumbWrapperProps
   extends Omit<AutoBreadcrumbProps, 'pathname' | 'translateSegment'> {

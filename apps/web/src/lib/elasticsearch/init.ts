@@ -1,4 +1,4 @@
-import { getElasticsearchClient, getMigrationService } from '@/lib/server/elasticsearch'
+import { getElasticsearchClient, getMigrationService } from '../../lib/server/elasticsearch'
 
 let initializationPromise: Promise<boolean> | null = null
 

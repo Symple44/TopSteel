@@ -4,7 +4,7 @@
  * Fichier: apps/web/src/lib/business-metrics.ts
  */
 
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../utils/backend-api'
 
 // ===== TYPES =====
 interface BusinessEvent {

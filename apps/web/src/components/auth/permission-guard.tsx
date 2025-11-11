@@ -1,7 +1,7 @@
 'use client'
 
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
-import { type Permission, type Role, usePermissions } from '@/hooks/use-permissions'
+import { type Permission, type Role, usePermissions } from '../../hooks/use-permissions'
 
 interface PermissionGuardProps {
   /** Permission(s) requise(s) pour afficher le composant */

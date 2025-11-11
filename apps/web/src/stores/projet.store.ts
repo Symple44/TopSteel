@@ -18,7 +18,7 @@ import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { StoreUtils } from '@/lib/store-utils'
+import { StoreUtils } from '../lib/store-utils'
 
 // ===== ÉTAT INITIAL =====
 

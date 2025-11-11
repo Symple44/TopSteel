@@ -53,7 +53,7 @@ import {
   X,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../utils/backend-api'
 
 interface User {
   id: string

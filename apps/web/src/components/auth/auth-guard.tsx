@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { CompanyLogoWrapper } from '@/components/wrappers/company-logo-wrapper'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n'
+import { CompanyLogoWrapper } from '../../components/wrappers/company-logo-wrapper'
+import { useAuth } from '../../hooks/use-auth'
+import { useTranslation } from '../../lib/i18n'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -53,11 +53,11 @@ export function AuthGuard({ children, requireAuth = true, redirectTo = '/login' 
 
 // Ancien AuthGuard pour compatibilité (désactivé)
 /*
-import { useAuth } from '@/hooks/use-auth'
+import { useAuth } from '../../hooks/use-auth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { useTranslation } from '../../lib/i18n/hooks'
 import CompanySelector from './company-selector'
 
 interface AuthGuardProps {

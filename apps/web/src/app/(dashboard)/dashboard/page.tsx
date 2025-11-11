@@ -18,9 +18,9 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
-import { CompanyLogoWrapper as CompanyLogo } from '@/components/wrappers'
-import { useAuth } from '@/hooks/use-auth'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { CompanyLogoWrapper as CompanyLogo } from '../../../components/wrappers'
+import { useAuth } from '../../../hooks/use-auth'
+import { useTranslation } from '../../../lib/i18n/hooks'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'

@@ -31,8 +31,8 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import type { QueryBuilderColumn } from '@/types/query-builder.types'
-import { callClientApi } from '@/utils/backend-api'
+import type { QueryBuilderColumn } from '../../types/query-builder.types'
+import { callClientApi } from '../../utils/backend-api'
 import { DataTablePreview } from './datatable-preview'
 
 interface Table {

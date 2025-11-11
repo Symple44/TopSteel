@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { SYSTEM_MODULES, SYSTEM_PERMISSIONS } from '@/types/permissions'
+import { SYSTEM_MODULES, SYSTEM_PERMISSIONS } from '../../../../types/permissions'
 
 // GET - Récupérer tous les modules avec leurs permissions
 export async function GET(request: NextRequest) {

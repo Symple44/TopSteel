@@ -78,7 +78,7 @@ export function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTestDialog
   const loadSampleData = async () => {
     setLoadingSample(true)
     try {
-      const { callClientApi } = (await import('@/utils/backend-api')) || {}
+      const { callClientApi } = (await import('../../utils/backend-api')) || {}
       const response = await callClientApi(`notifications/rules/${ruleId}/test`)
       if (response?.ok) {
         const data = await response?.json()
@@ -110,7 +110,7 @@ export function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTestDialog
     try {
       const parsedData = JSON.parse(testData)
 
-      const { callClientApi } = (await import('@/utils/backend-api')) || {}
+      const { callClientApi } = (await import('../../utils/backend-api')) || {}
       const response = await callClientApi(`notifications/rules/${ruleId}/test`, {
         method: 'POST',
         body: JSON.stringify({ testData: parsedData }),

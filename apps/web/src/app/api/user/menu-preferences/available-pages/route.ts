@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { pageDiscoveryService } from '@/services/page-discovery.service'
+import { pageDiscoveryService } from '../../../../../services/page-discovery.service'
 
 interface PageConfig {
   permissions?: string[]

@@ -3,7 +3,7 @@
  * Charge et applique les modifications de traduction depuis l'API
  */
 
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../../utils/backend-api'
 import type { Translations } from './types'
 
 export interface TranslationOverride {

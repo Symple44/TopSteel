@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { callClientApi } from '@/utils/backend-api'
+import { callClientApi } from '../utils/backend-api'
 
 export function useSelectedPages() {
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set())

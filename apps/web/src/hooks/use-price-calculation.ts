@@ -2,7 +2,7 @@
 
 import type { SimulationContext, SimulationResult } from '@erp/ui'
 import { useCallback, useState } from 'react'
-import { postTyped } from '@/lib/api-typed'
+import { postTyped } from '../lib/api-typed'
 
 export interface PriceCalculationDetailedResult extends SimulationResult {
   breakdown?: {

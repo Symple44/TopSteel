@@ -19,8 +19,8 @@ import { AlertTriangle, ArrowLeft, Key, Shield, Smartphone, Timer } from 'lucide
 import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { callClientApi } from '@/utils/backend-api'
+import { useTranslation } from '../../lib/i18n/hooks'
+import { callClientApi } from '../../utils/backend-api'
 
 interface MFAVerificationProps {
   userId: string

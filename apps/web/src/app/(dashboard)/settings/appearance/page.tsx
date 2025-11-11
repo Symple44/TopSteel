@@ -25,11 +25,11 @@ import {
   Type,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { TemplateSelector } from '@/components/settings/template-selector'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
-import { useAuth } from '@/hooks/use-auth'
-import { useToastShortcuts } from '@/hooks/use-toast'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { TemplateSelector } from '../../../../components/settings/template-selector'
+import { useAppearanceSettings } from '../../../../hooks/use-appearance-settings'
+import { useAuth } from '../../../../hooks/use-auth'
+import { useToastShortcuts } from '../../../../hooks/use-toast'
+import { useTranslation } from '../../../../lib/i18n/hooks'
 
 export default function AppearanceSettingsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()

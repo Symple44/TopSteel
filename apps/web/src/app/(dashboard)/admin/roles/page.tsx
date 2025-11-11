@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { RoleManagementPanel } from '@/components/admin/role-management-panel'
-import { AdminGuard } from '@/components/auth/admin-guard'
+import { RoleManagementPanel } from '../../../../components/admin/role-management-panel'
+import { AdminGuard } from '../../../../components/auth/admin-guard'
 
 export default function RoleManagementPage() {
   return (

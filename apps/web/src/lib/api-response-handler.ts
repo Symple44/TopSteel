@@ -3,7 +3,7 @@
  * Provides type-safe handling of API responses
  */
 
-import type { ApiError, ApiResponse } from '@/types/api-types'
+import type { ApiError, ApiResponse } from '../types/api-types'
 
 // Type guards for unknown responses
 interface ResponseWithData {
