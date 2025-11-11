@@ -25,25 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": false,
-    "assumeChangesOnlyAffectDirectDependencies": true,
-    "baseUrl": ".",
-    "paths": {
-      "@erp/ui": ["./packages/ui/src"],
-      "@erp/ui/*": ["./packages/ui/src/*"],
-      "@erp/types": ["./packages/types/src"],
-      "@erp/types/*": ["./packages/types/src/*"],
-      "@erp/utils": ["./packages/utils/src"],
-      "@erp/utils/*": ["./packages/utils/src/*"],
-      "@erp/domains": ["./packages/domains/src"],
-      "@erp/domains/*": ["./packages/domains/src/*"],
-      "@erp/domains/server": ["./packages/domains/src/server.ts"],
-      "@erp/api-client": ["./packages/api-client/src"],
-      "@erp/api-client/*": ["./packages/api-client/src/*"],
-      "@erp/config": ["./packages/config"],
-      "@erp/config/*": ["./packages/config/*"],
-      "@erp/entities": ["./packages/entities/src"],
-      "@erp/entities/*": ["./packages/entities/src/*"]
-    }
+    "assumeChangesOnlyAffectDirectDependencies": true
   },
   "exclude": [
     "node_modules",

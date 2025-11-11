@@ -10,6 +10,8 @@ export * from './cross-cutting'
 export { ImageElasticsearchService, imageElasticsearchService } from './image/elasticsearch-service'
 // Export conditionnel pour les images (côté serveur uniquement)
 export type * from './image/types'
+// ⚠️ SERVER-ONLY: ImageService requires Node.js (Sharp dependency)
+export { ImageService } from './image/service'
 // Re-export notifications with proper naming to avoid conflicts
 export * as Notifications from './notifications'
 export * from './production'

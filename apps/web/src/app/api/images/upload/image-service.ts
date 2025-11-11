@@ -2,17 +2,17 @@
 import 'server-only'
 
 // Import the ImageService type
-type ImageService = import('@erp/domains/server').ImageService
+type ImageService = import('@erp/domains').ImageService
 
 let imageService: ImageService | null = null
 
 export async function getImageService(): Promise<ImageService> {
   if (!imageService) {
     try {
-      const domainsServer = await import('@erp/domains/server')
-      const ImageService = domainsServer?.ImageService
+      const domains = await import('@erp/domains')
+      const ImageService = domains?.ImageService
       if (!ImageService) {
-        throw new Error('ImageService is not exported from @erp/domains/server')
+        throw new Error('ImageService is not exported from @erp/domains')
       }
       imageService = new ImageService()
     } catch (_error) {

@@ -1,6 +1,7 @@
 /**
- * Server-only wrapper for @erp/domains/server
+ * Server-only wrapper for @erp/domains
  * This file ensures the module is only loaded on the server
+ * ⚠️ ImageService requires Node.js (Sharp dependency)
  */
 import 'server-only'
 
@@ -10,4 +11,4 @@ export {
   ImageService,
   imageElasticsearchService,
   migrationService,
-} from '@erp/domains/server'
+} from '@erp/domains'
