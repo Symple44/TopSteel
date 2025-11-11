@@ -350,7 +350,7 @@ export class PricingResolver {
         articleId,
         societeId: user?.societeId || '',
         quantity: 1,
-        channel: PriceRuleChannel.MARKETPLACE,
+        channel: PriceRuleChannel.ERP,
       })
 
       const competitors = competitorPrices[articleId] || []

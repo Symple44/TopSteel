@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { In } from 'typeorm'
-import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
 import { SalesHistory } from '../../../features/pricing/entities/sales-history.entity'
 import type { ISpecification } from '../../core/interfaces/business-service.interface'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
@@ -22,8 +20,6 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   constructor(
     @InjectRepository(Partner, 'tenant')
     private readonly repository: Repository<Partner>,
-    @InjectRepository(MarketplaceOrder, 'tenant')
-    private readonly marketplaceOrderRepository: Repository<MarketplaceOrder>,
     @InjectRepository(SalesHistory, 'tenant') readonly _salesHistoryRepository: Repository<SalesHistory>
   ) {}
 
@@ -151,28 +147,14 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   }
 
   // Méthodes manquantes de IPartnerRepository
-  async hasActiveOrders(partnerId: string): Promise<boolean> {
-    // Vérifier les commandes marketplace actives
-    const activeOrder = await this.marketplaceOrderRepository.findOne({
-      where: {
-        customerId: partnerId,
-        status: In(['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED']),
-      },
-    })
-
-    return !!activeOrder
+  async hasActiveOrders(_partnerId: string): Promise<boolean> {
+    // TODO: Implémenter avec les commandes de vente réelles
+    return false
   }
 
-  async hasUnpaidInvoices(partnerId: string): Promise<boolean> {
-    // Vérifier les commandes marketplace non payées
-    const unpaidOrder = await this.marketplaceOrderRepository.findOne({
-      where: {
-        customerId: partnerId,
-        paymentStatus: In(['PENDING', 'FAILED', 'CANCELLED']),
-      },
-    })
-
-    return !!unpaidOrder
+  async hasUnpaidInvoices(_partnerId: string): Promise<boolean> {
+    // TODO: Implémenter avec les factures réelles
+    return false
   }
 
   async findWithFilters(
@@ -246,36 +228,13 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     }
 
     // Filtres spéciaux
+    // TODO: Réimplémenter hasOrders et hasUnpaidInvoices avec les vraies commandes/factures
     if (filters.hasOrders !== undefined) {
-      if (filters.hasOrders) {
-        query.andWhere(`EXISTS (
-          SELECT 1 FROM marketplace_orders mo 
-          WHERE mo.customer_id = partner.id 
-          AND mo.status IN ('PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED')
-        )`)
-      } else {
-        query.andWhere(`NOT EXISTS (
-          SELECT 1 FROM marketplace_orders mo 
-          WHERE mo.customer_id = partner.id 
-          AND mo.status IN ('PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED')
-        )`)
-      }
+      // Temporairement désactivé - à réimplémenter avec les vraies commandes
     }
 
     if (filters.hasUnpaidInvoices !== undefined) {
-      if (filters.hasUnpaidInvoices) {
-        query.andWhere(`EXISTS (
-          SELECT 1 FROM marketplace_orders mo 
-          WHERE mo.customer_id = partner.id 
-          AND mo.payment_status IN ('PENDING', 'FAILED', 'CANCELLED')
-        )`)
-      } else {
-        query.andWhere(`NOT EXISTS (
-          SELECT 1 FROM marketplace_orders mo 
-          WHERE mo.customer_id = partner.id 
-          AND mo.payment_status IN ('PENDING', 'FAILED', 'CANCELLED')
-        )`)
-      }
+      // Temporairement désactivé - à réimplémenter avec les vraies factures
     }
 
     if (filters.isPreferredSupplier === true) {
@@ -523,30 +482,22 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   }
 
   async getTopClients(limit: number): Promise<Array<Partner & { chiffreAffaires: number }>> {
-    // Calculer le chiffre d'affaires réel depuis l'historique des ventes et les commandes marketplace
+    // Calculer le chiffre d'affaires réel depuis l'historique des ventes uniquement
     const query = `
-      SELECT 
+      SELECT
         p.*,
-        COALESCE(sales_revenue.total, 0) + COALESCE(marketplace_revenue.total, 0) as "chiffreAffaires"
+        COALESCE(sales_revenue.total, 0) as "chiffreAffaires"
       FROM partners p
       LEFT JOIN (
-        SELECT 
+        SELECT
           "customerId",
           SUM(revenue) as total
-        FROM sales_history 
+        FROM sales_history
         WHERE "customerId" IS NOT NULL
         GROUP BY "customerId"
       ) sales_revenue ON sales_revenue."customerId" = p.id
-      LEFT JOIN (
-        SELECT 
-          customer_id,
-          SUM(total) as total
-        FROM marketplace_orders 
-        WHERE payment_status = 'PAID'
-        GROUP BY customer_id
-      ) marketplace_revenue ON marketplace_revenue.customer_id = p.id
       WHERE p.type = 'CLIENT'
-      ORDER BY (COALESCE(sales_revenue.total, 0) + COALESCE(marketplace_revenue.total, 0)) DESC
+      ORDER BY COALESCE(sales_revenue.total, 0) DESC
       LIMIT $1
     `
 

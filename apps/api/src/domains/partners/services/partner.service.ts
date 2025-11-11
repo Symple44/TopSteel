@@ -1,7 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { MarketplaceOrder } from '../../../features/marketplace/entities/marketplace-order.entity'
 import { SalesHistory } from '../../../features/pricing/entities/sales-history.entity'
 import { BusinessService } from '../../core/base/business-service'
 import {
@@ -97,8 +96,6 @@ export class PartnerService extends BusinessService<Partner> {
     @Inject('IPartnerAddressRepository')
     private readonly addressRepository: IPartnerAddressRepository,
     private readonly interactionRepository: PartnerInteractionRepository,
-    @InjectRepository(MarketplaceOrder, 'tenant')
-    private readonly marketplaceOrderRepository: Repository<MarketplaceOrder>,
     @InjectRepository(SalesHistory, 'tenant')
     private readonly salesHistoryRepository: Repository<SalesHistory>
   ) {
@@ -1002,7 +999,7 @@ export class PartnerService extends BusinessService<Partner> {
   }> {
     const partners = await this.partnerRepository.findAll()
 
-    // Calculer la performance réelle basée sur les commandes et l'historique des ventes
+    // Calculer la performance réelle basée sur l'historique des ventes uniquement
     const performancePromises = partners.map(async (partner) => {
       // Revenus des ventes directes
       const salesRevenue = await this.salesHistoryRepository
@@ -1013,18 +1010,7 @@ export class PartnerService extends BusinessService<Partner> {
         .andWhere(endDate ? 'sales.date <= :endDate' : '1=1', { endDate })
         .getRawOne()
 
-      // Revenus marketplace
-      const marketplaceRevenue = await this.marketplaceOrderRepository
-        .createQueryBuilder('orders')
-        .select('SUM(orders.total)', 'total')
-        .where('orders.customerId = :partnerId', { partnerId: partner.id })
-        .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
-        .andWhere(startDate ? 'orders.createdAt >= :startDate' : '1=1', { startDate })
-        .andWhere(endDate ? 'orders.createdAt <= :endDate' : '1=1', { endDate })
-        .getRawOne()
-
-      const totalRevenue =
-        (Number(salesRevenue?.total) || 0) + (Number(marketplaceRevenue?.total) || 0)
+      const totalRevenue = Number(salesRevenue?.total) || 0
       const performance = totalRevenue
 
       return Object.assign(partner, { performance })
@@ -1630,7 +1616,7 @@ export class PartnerService extends BusinessService<Partner> {
     const start = startDate || new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) // 1 an par défaut
     const end = endDate || new Date()
 
-    // Revenus par mois des ventes directes
+    // Revenus par mois des ventes directes uniquement
     const salesTrends = await this.salesHistoryRepository
       .createQueryBuilder('sales')
       .select([`DATE_TRUNC('month', sales.date) as periode`, 'SUM(sales.revenue) as valeur'])
@@ -1639,32 +1625,9 @@ export class PartnerService extends BusinessService<Partner> {
       .orderBy('periode')
       .getRawMany()
 
-    // Revenus par mois marketplace
-    const marketplaceTrends = await this.marketplaceOrderRepository
-      .createQueryBuilder('orders')
-      .select([`DATE_TRUNC('month', orders.createdAt) as periode`, 'SUM(orders.total) as valeur'])
-      .where('orders.createdAt BETWEEN :start AND :end', { start, end })
-      .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
-      .groupBy(`DATE_TRUNC('month', orders.createdAt)`)
-      .orderBy('periode')
-      .getRawMany()
-
-    // Fusionner les deux sources
-    const trendsMap = new Map<string, number>()
-
-    salesTrends.forEach((trend) => {
-      const periode = trend.periode.toISOString().substring(0, 7) // YYYY-MM
-      trendsMap.set(periode, (trendsMap.get(periode) || 0) + Number(trend.valeur))
-    })
-
-    marketplaceTrends.forEach((trend) => {
-      const periode = trend.periode.toISOString().substring(0, 7)
-      trendsMap.set(periode, (trendsMap.get(periode) || 0) + Number(trend.valeur))
-    })
-
-    return Array.from(trendsMap.entries()).map(([periode, valeur]) => ({
-      periode,
-      valeur,
+    return salesTrends.map((trend) => ({
+      periode: trend.periode.toISOString().substring(0, 7), // YYYY-MM
+      valeur: Number(trend.valeur),
     }))
   }
 
@@ -1677,13 +1640,7 @@ export class PartnerService extends BusinessService<Partner> {
       .select('SUM(sales.revenue)', 'total')
       .getRawOne()
 
-    const marketplaceTotal = await this.marketplaceOrderRepository
-      .createQueryBuilder('orders')
-      .select('SUM(orders.total)', 'total')
-      .where('orders.paymentStatus = :status', { status: 'PAID' })
-      .getRawOne()
-
-    return (Number(salesTotal?.total) || 0) + (Number(marketplaceTotal?.total) || 0)
+    return Number(salesTotal?.total) || 0
   }
 
   /**
@@ -1714,21 +1671,7 @@ export class PartnerService extends BusinessService<Partner> {
       .select('AVG(sales.revenue)', 'avg')
       .getRawOne()
 
-    const marketplaceAvg = await this.marketplaceOrderRepository
-      .createQueryBuilder('orders')
-      .select('AVG(orders.total)', 'avg')
-      .where('orders.paymentStatus = :status', { status: 'PAID' })
-      .getRawOne()
-
-    const salesAvgValue = Number(salesAvg?.avg) || 0
-    const marketplaceAvgValue = Number(marketplaceAvg?.avg) || 0
-
-    // Moyenne pondérée ou simple moyenne des deux sources
-    return salesAvgValue > 0 && marketplaceAvgValue > 0
-      ? (salesAvgValue + marketplaceAvgValue) / 2
-      : salesAvgValue > 0
-        ? salesAvgValue
-        : marketplaceAvgValue
+    return Number(salesAvg?.avg) || 0
   }
 
   /**
@@ -1741,7 +1684,7 @@ export class PartnerService extends BusinessService<Partner> {
     const lastYear = new Date(currentYear - 1, 0, 1)
     const endLastYear = new Date(currentYear - 1, 11, 31, 23, 59, 59)
 
-    // Revenus de l'historique des ventes
+    // Revenus de l'historique des ventes uniquement
     const salesCurrentYear = await this.salesHistoryRepository
       .createQueryBuilder('sales')
       .select('SUM(sales.revenue)', 'total')
@@ -1759,24 +1702,10 @@ export class PartnerService extends BusinessService<Partner> {
       .andWhere('sales.date BETWEEN :start AND :end', { start: lastYear, end: endLastYear })
       .getRawOne()
 
-    // Revenus marketplace
-    const marketplaceCurrentYear = await this.marketplaceOrderRepository
-      .createQueryBuilder('orders')
-      .select('SUM(orders.total)', 'total')
-      .addSelect('COUNT(*)', 'count')
-      .addSelect('AVG(orders.total)', 'average')
-      .addSelect('MAX(orders.createdAt)', 'lastOrder')
-      .where('orders.customerId = :partnerId', { partnerId })
-      .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
-      .andWhere('orders.createdAt BETWEEN :start AND :end', { start: startOfYear, end: endOfYear })
-      .getRawOne()
-
-    // Revenus totaux
-    const montantAffairesAnnee =
-      (Number(salesCurrentYear?.total) || 0) + (Number(marketplaceCurrentYear?.total) || 0)
+    // Revenus totaux basés uniquement sur l'historique des ventes
+    const montantAffairesAnnee = Number(salesCurrentYear?.total) || 0
     const montantAffairesAnneePrecedente = Number(salesLastYear?.total) || 0
-    const nombreCommandesAnnee =
-      (Number(salesCurrentYear?.count) || 0) + (Number(marketplaceCurrentYear?.count) || 0)
+    const nombreCommandesAnnee = Number(salesCurrentYear?.count) || 0
 
     // Calculs
     const montantMoyenCommande =
@@ -1788,18 +1717,9 @@ export class PartnerService extends BusinessService<Partner> {
           100
         : 0
 
-    const derniereCommandeSales = salesCurrentYear?.lastOrder
+    const derniereCommande = salesCurrentYear?.lastOrder
       ? new Date(salesCurrentYear.lastOrder)
       : null
-    const derniereCommandeMarketplace = marketplaceCurrentYear?.lastOrder
-      ? new Date(marketplaceCurrentYear.lastOrder)
-      : null
-    const derniereCommande =
-      derniereCommandeSales && derniereCommandeMarketplace
-        ? derniereCommandeSales > derniereCommandeMarketplace
-          ? derniereCommandeSales
-          : derniereCommandeMarketplace
-        : derniereCommandeSales || derniereCommandeMarketplace
 
     // Fréquence de commande (jours entre commandes)
     const daysSinceFirstOrder = derniereCommande
@@ -1885,11 +1805,10 @@ export class PartnerService extends BusinessService<Partner> {
           }, 0) / reclamationsResolues.length
         : 0
 
-    // Taux de conformité basé sur les réclamations
-    const totalCommandes = await this.marketplaceOrderRepository
-      .createQueryBuilder('orders')
-      .where('orders.customerId = :partnerId', { partnerId })
-      .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
+    // Taux de conformité basé sur les réclamations par rapport aux ventes
+    const totalCommandes = await this.salesHistoryRepository
+      .createQueryBuilder('sales')
+      .where('sales.customerId = :partnerId', { partnerId })
       .getCount()
 
     const tauxConformite =
@@ -1941,18 +1860,18 @@ export class PartnerService extends BusinessService<Partner> {
     }
 
     // Activité récente
-    const recentOrders = await this.marketplaceOrderRepository
-      .createQueryBuilder('orders')
-      .where('orders.customerId = :partnerId', { partnerId })
-      .andWhere('orders.createdAt > :date', {
+    const recentSales = await this.salesHistoryRepository
+      .createQueryBuilder('sales')
+      .where('sales.customerId = :partnerId', { partnerId })
+      .andWhere('sales.date > :date', {
         date: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
       })
       .getCount()
 
-    if (recentOrders === 0) {
+    if (recentSales === 0) {
       facteurs.push('Aucune activité récente (90 jours)')
       score -= 20
-    } else if (recentOrders > 10) {
+    } else if (recentSales > 10) {
       facteurs.push('Activité commerciale soutenue')
       score += 10
     }
@@ -1978,24 +1897,23 @@ export class PartnerService extends BusinessService<Partner> {
   private async identifyOpportunities(partnerId: string): Promise<string[]> {
     const opportunites: string[] = []
 
-    // Analyser l'historique des commandes
-    const recentOrders = await this.marketplaceOrderRepository
-      .createQueryBuilder('orders')
-      .where('orders.customerId = :partnerId', { partnerId })
-      .andWhere('orders.createdAt > :date', {
+    // Analyser l'historique des ventes
+    const recentSales = await this.salesHistoryRepository
+      .createQueryBuilder('sales')
+      .where('sales.customerId = :partnerId', { partnerId })
+      .andWhere('sales.date > :date', {
         date: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
       })
-      .andWhere('orders.paymentStatus = :status', { status: 'PAID' })
       .getMany()
 
-    const totalRevenue = recentOrders.reduce((sum, order) => sum + Number(order.total), 0)
-    const averageOrderValue = recentOrders.length > 0 ? totalRevenue / recentOrders.length : 0
+    const totalRevenue = recentSales.reduce((sum, sale) => sum + Number(sale.revenue), 0)
+    const averageOrderValue = recentSales.length > 0 ? totalRevenue / recentSales.length : 0
 
     if (averageOrderValue > 10000) {
       opportunites.push('Client à fort potentiel - proposer des services premium')
     }
 
-    if (recentOrders.length > 5) {
+    if (recentSales.length > 5) {
       opportunites.push('Client régulier - opportunité de contrat cadre')
     }
 

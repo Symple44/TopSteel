@@ -1,6 +1,5 @@
 import { Module, type OnModuleInit } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { MarketplaceOrder } from '../../features/marketplace/entities/marketplace-order.entity'
 import { ParameterSystem } from '../../features/parameters/entities/parameter-system.entity'
 import { SalesHistory } from '../../features/pricing/entities/sales-history.entity'
 import { PartnerController } from './controllers/partner.controller'
@@ -32,7 +31,6 @@ import { PartnerParametersInitService } from './services/partner-parameters-init
         PartnerSite,
         PartnerAddress,
         PartnerInteraction,
-        MarketplaceOrder,
         SalesHistory,
       ],
       'tenant'

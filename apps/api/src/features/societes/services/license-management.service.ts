@@ -522,7 +522,6 @@ export class LicenseManagementService {
         currentStorageGB: 0,
         allowConcurrentSessions: true,
         features: {
-          marketplace: false,
           advancedReporting: false,
           apiAccess: false,
           customIntegrations: false,

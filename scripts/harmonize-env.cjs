@@ -34,8 +34,6 @@ const VARIABLE_MAPPINGS = {
   WS_PORT: 'SERVICE_WEBSOCKET_PORT',
   AUTH_SERVICE_PORT: 'SERVICE_AUTH_PORT',
   NOTIFICATION_SERVICE_PORT: 'SERVICE_NOTIFICATION_PORT',
-  MARKETPLACE_API_PORT: 'SERVICE_MARKETPLACE_API_PORT',
-  MARKETPLACE_WEB_PORT: 'SERVICE_MARKETPLACE_WEB_PORT',
 
   // CORS & Security
   CORS_ORIGIN: 'SECURITY_CORS_ORIGINS',
@@ -120,7 +118,6 @@ class EnvHarmonizer {
       '.env.example',
       'apps/api/.env.local',
       'apps/web/.env.local',
-      'apps/marketplace-api/.env.local',
     ]
 
     envFiles.forEach((file) => {

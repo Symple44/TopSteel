@@ -45,12 +45,12 @@ async function setupDefaultPricingRules() {
 
     const rulesToCreate = []
 
-    // 1. Règle marketplace par défaut - Marge de 15% sur tous les articles
-    const marketplaceDefaultRule = priceRuleRepo.create({
+    // 1. Règle de marge par défaut - Marge de 15% sur tous les articles
+    const defaultMarginRule = priceRuleRepo.create({
       societeId,
-      ruleName: 'Marge Marketplace Standard',
-      description: 'Applique une marge de 15% sur tous les articles vendus sur le marketplace',
-      channel: PriceRuleChannel.MARKETPLACE,
+      ruleName: 'Marge Standard',
+      description: 'Applique une marge de 15% sur tous les articles',
+      channel: PriceRuleChannel.ALL,
       adjustmentType: AdjustmentType.PERCENTAGE,
       adjustmentValue: 15, // +15% de marge
       conditions: [], // Pas de condition - s'applique à tous
@@ -59,11 +59,11 @@ async function setupDefaultPricingRules() {
       isActive: true,
       metadata: {
         createdBy: 'system',
-        notes: 'Règle par défaut pour le marketplace',
-        tags: ['marketplace', 'default'],
+        notes: 'Règle de marge par défaut',
+        tags: ['default', 'margin'],
       },
     })
-    rulesToCreate.push(marketplaceDefaultRule)
+    rulesToCreate.push(defaultMarginRule)
 
     // 2. Règle pour les profilés IPE - Prix au kg
     const ipeWeightRule = priceRuleRepo.create({
@@ -173,7 +173,7 @@ async function setupDefaultPricingRules() {
       societeId,
       ruleName: 'Prix Promotionnel HEA200',
       description: 'Prix promotionnel fixe pour HEA200',
-      channel: PriceRuleChannel.MARKETPLACE,
+      channel: PriceRuleChannel.ALL,
       adjustmentType: AdjustmentType.FIXED_PRICE,
       adjustmentValue: 89.99, // Prix fixe à 89.99€
       conditions: [

@@ -159,13 +159,6 @@ export const rateLimitingConfig = registerAs('rateLimiting', (): RateLimitingCon
         bypassForRoles: [GlobalUserRole.SUPER_ADMIN],
       },
 
-      // Marketplace endpoints
-      '/marketplace/orders': {
-        windowSizeMs: 60 * 1000, // 1 minute
-        maxRequests: 30 * baseMultiplier,
-        ipMaxRequests: 15 * baseMultiplier,
-      },
-
       // Webhook endpoints - special handling
       '/webhooks': {
         windowSizeMs: 60 * 1000, // 1 minute

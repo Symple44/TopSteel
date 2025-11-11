@@ -8,8 +8,6 @@ export * from './auth/webauthn.types'
 // Entités
 export * from './entities/societe.types'
 export * from './entities/user.types'
-// Marketplace
-export * from './marketplace/marketplace.types'
 
 // Notifications
 export * from './notifications/notification.types'

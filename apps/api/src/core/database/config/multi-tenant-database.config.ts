@@ -29,10 +29,6 @@ import { MenuItem } from '../../../features/admin/entities/menu-item.entity'
 import { MenuItemPermission } from '../../../features/admin/entities/menu-item-permission.entity'
 import { MenuItemRole } from '../../../features/admin/entities/menu-item-role.entity'
 // Entités métier (bases sociétés) - Supprimées pour optimiser
-// Entités marketplace
-import { MarketplaceModule as MarketplaceModuleEntity } from '../../../features/marketplace/entities/marketplace-module.entity'
-import { ModuleInstallation } from '../../../features/marketplace/entities/module-installation.entity'
-import { ModuleRating } from '../../../features/marketplace/entities/module-rating.entity'
 import { UserMenuPreference } from '../../../features/menu/entities/user-menu-preference.entity'
 import { Notifications } from '../../../features/notifications/entities/notifications.entity'
 import { ParameterApplication } from '../../../features/parameters/entities/parameter-application.entity'
@@ -97,8 +93,6 @@ export class MultiTenantDatabaseConfig {
         UserSession,
         UserMFA,
         MFASession,
-        // Entités marketplace (seulement catalogue global)
-        MarketplaceModuleEntity,
         // Entités de paramètres
         ParameterSystem,
         ParameterApplication,
@@ -156,9 +150,6 @@ export class MultiTenantDatabaseConfig {
         Article,
         Material,
         Notifications,
-        // Entités marketplace spécifiques au tenant
-        ModuleInstallation,
-        ModuleRating,
         // Entités pricing
         PriceRule,
         PricingLog,

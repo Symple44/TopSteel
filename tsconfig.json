@@ -10,8 +10,6 @@
     { "path": "./packages/ui" },
     { "path": "./packages/api-client" },
     { "path": "./apps/api" },
-    { "path": "./apps/web" },
-    { "path": "./apps/marketplace-api" },
-    { "path": "./apps/marketplace-storefront" }
+    { "path": "./apps/web" }
   ]
 }
