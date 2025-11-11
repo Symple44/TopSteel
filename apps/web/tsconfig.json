@@ -3,6 +3,7 @@
   "compilerOptions": {
     "composite": false,
     "tsBuildInfoFile": "./.tsbuildinfo",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
