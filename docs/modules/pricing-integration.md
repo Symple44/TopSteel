@@ -6,7 +6,7 @@
 
 ## 📋 Vue d'Ensemble
 
-Le système de pricing TopSteel est un moteur de tarification avancé qui supporte des règles complexes, multi-canaux, avec intégration marketplace native.
+Le système de pricing TopSteel est un moteur de tarification avancé qui supporte des règles complexes et multi-canaux.
 
 ## 🏗️ Architecture du Système
 
@@ -17,13 +17,9 @@ PricingEngineService (Core)
 ├── Calcul de base
 ├── Règles par priorité
 ├── Support multi-canal
-└── Cache Redis
-
-MarketplacePricingIntegrationService (Marketplace)
-├── Enrichissement marketplace
 ├── Calcul TVA/TTC
 ├── Promotions
-└── Frais de port
+└── Cache Redis
 
 SectorPricingService (Sectoriel)
 ├── Coefficients BTP
@@ -107,44 +103,11 @@ export class MyService {
 }
 ```
 
-### 2. Calcul Marketplace
-
-```typescript
-import { MarketplacePricingIntegrationService } from '@features/marketplace/pricing/marketplace-pricing-integration.service';
-
-@Injectable()
-export class MarketplaceService {
-  constructor(
-    private readonly marketplacePricing: MarketplacePricingIntegrationService
-  ) {}
-
-  async getMarketplacePrice(articleId: string, customerId?: string) {
-    const result = await this.marketplacePricing.calculateMarketplacePrice(
-      articleId,
-      'tenant-uuid',
-      {
-        quantity: 1,
-        customerId,
-        promotionCode: 'SUMMER2024',
-        channel: 'WEB'
-      }
-    );
-
-    return {
-      displayPrice: result.displayPrice,    // Prix TTC
-      originalPrice: result.originalPrice,  // Prix barré
-      savings: result.savings,              // Économies
-      taxAmount: result.taxAmount          // TVA
-    };
-  }
-}
-```
-
-### 3. Calcul en Masse (Panier)
+### 2. Calcul en Masse (Panier)
 
 ```typescript
 async calculateCartPrices(items: CartItem[], customerId: string) {
-  const prices = await this.marketplacePricing.calculateBulkPrices(
+  const prices = await this.pricingEngine.calculateBulkPrices(
     items.map(item => ({
       articleId: item.articleId,
       quantity: item.quantity,
@@ -231,7 +194,7 @@ POST /api/pricing/calculate
   "articleId": "uuid",
   "quantity": 10,
   "customerId": "uuid",
-  "channel": "MARKETPLACE"
+  "channel": "ERP"
 }
 
 # Prévisualisation règle
@@ -244,14 +207,11 @@ PUT    /api/pricing/rules/:id
 DELETE /api/pricing/rules/:id
 ```
 
-### Endpoints Marketplace Pricing
+### Endpoints Supplémentaires
 
 ```http
-# Prix article unique
-GET /marketplace/pricing/article/:articleId?quantity=10&customerId=uuid
-
 # Prix en masse (panier)
-POST /marketplace/pricing/bulk
+POST /api/pricing/bulk
 {
   "items": [
     { "articleId": "uuid1", "quantity": 5 },
@@ -260,15 +220,8 @@ POST /marketplace/pricing/bulk
   "customerId": "uuid"
 }
 
-# Frais de port
-POST /marketplace/pricing/shipping
-{
-  "items": [...],
-  "destinationPostalCode": "75001"
-}
-
 # Application promotion
-POST /marketplace/pricing/promotion/apply
+POST /api/pricing/promotion/apply
 {
   "code": "SUMMER2024",
   "currentPrice": 100,
@@ -326,7 +279,7 @@ Le système utilise Redis pour mettre en cache les calculs :
 
 ```typescript
 // Clé de cache
-marketplace-price:tenantId:articleId:quantity:customerId:promotionCode
+price:tenantId:articleId:quantity:customerId:promotionCode
 
 // TTL par défaut : 5 minutes
 ```
@@ -359,7 +312,7 @@ describe('PricingEngineService', () => {
       articleId: 'test-article',
       quantity: 100,
       societeId: 'test-tenant',
-      channel: PriceRuleChannel.MARKETPLACE
+      channel: PriceRuleChannel.ERP
     };
 
     const result = await service.calculatePrice(context);
@@ -374,15 +327,18 @@ describe('PricingEngineService', () => {
 ### Test d'Intégration
 
 ```typescript
-it('should calculate marketplace price with TVA', async () => {
-  const price = await marketplacePricing.calculateMarketplacePrice(
+it('should calculate price with TVA', async () => {
+  const context: PricingContext = {
     articleId,
-    tenantId,
-    { quantity: 1 }
-  );
+    quantity: 1,
+    societeId: tenantId,
+    channel: PriceRuleChannel.ERP
+  };
 
-  expect(price.displayPrice).toBe(price.finalPrice * 1.20); // 20% TVA
-  expect(price.taxAmount).toBe(price.finalPrice * 0.20);
+  const result = await pricingEngine.calculatePrice(context);
+  const priceWithTVA = result.finalPrice * 1.20; // 20% TVA
+
+  expect(priceWithTVA).toBeGreaterThan(result.finalPrice);
 });
 ```
 

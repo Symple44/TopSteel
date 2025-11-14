@@ -44,7 +44,6 @@ graph TB
 
     subgraph "Application Tier"
         API[Main API<br/>NestJS]
-        MARKETPLACE[Marketplace API<br/>NestJS]
         WORKER[Background Workers<br/>Bull Queue]
     end
 
@@ -64,18 +63,14 @@ graph TB
     WEB --> NGINX
     MOBILE --> NGINX
     API_CLIENT --> NGINX
-    
+
     NGINX --> API
-    NGINX --> MARKETPLACE
-    
+
     API --> POSTGRES
     API --> REDIS
     API --> ELASTIC
     API --> FILES
-    
-    MARKETPLACE --> POSTGRES
-    MARKETPLACE --> REDIS
-    
+
     WORKER --> POSTGRES
     WORKER --> REDIS
     
@@ -97,16 +92,14 @@ TopSteel/
 │   │   │   ├── infrastructure/    # Cross-cutting concerns
 │   │   │   └── shared/            # Shared utilities
 │   │   └── test/                  # E2E tests
-│   ├── web/                       # Next.js Web Application
-│   │   ├── src/
-│   │   │   ├── app/              # Next.js App Router
-│   │   │   ├── components/       # React components
-│   │   │   ├── hooks/            # Custom hooks
-│   │   │   ├── lib/              # Utility libraries
-│   │   │   └── stores/           # State management
-│   │   └── public/               # Static assets
-│   ├── marketplace-api/          # Marketplace NestJS API
-│   └── marketplace-storefront/   # Marketplace Next.js Frontend
+│   └── web/                       # Next.js Web Application
+│       ├── src/
+│       │   ├── app/              # Next.js App Router
+│       │   ├── components/       # React components
+│       │   ├── hooks/            # Custom hooks
+│       │   ├── lib/              # Utility libraries
+│       │   └── stores/           # State management
+│       └── public/               # Static assets
 ├── packages/                      # Shared packages
 │   ├── ui/                       # Shared UI components
 │   ├── types/                    # TypeScript type definitions
@@ -177,11 +170,10 @@ graph TD
     PartnersModule,       // Partner/customer management
     InventoryModule,      // Inventory management
     OrdersModule,         // Order processing
-    
+
     // Features
     QueryBuilderModule,   // Dynamic query building
     NotificationsModule,  // Notification system
-    MarketplaceModule,    // Marketplace integration
   ],
 })
 export class AppModule {}

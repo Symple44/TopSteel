@@ -58,18 +58,10 @@
       "Bash(python:*)",
       "mcp__ide__getDiagnostics",
       "Bash(dir:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
-    "ask": [],
-    "additionalDirectories": [
-      "D:\\d\\GitHub\\TopSteel\\packages",
-      "D:\\d\\GitHub\\TopSteel\\apps",
-      "D:\\d\\GitHub\\TopSteel\\packages\\ui\\src",
-      "D:\\D\\GitHub\\TopSteel\\apps",
-      "D:\\D\\GitHub",
-      "D:\\d\\GitHub",
-      "D:\\d D:\\GitHub"
-    ]
+    "ask": []
   }
 }

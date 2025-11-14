@@ -109,8 +109,8 @@ export default function NotificationsSettingsPage() {
                 newMessages: t('settingsEnhanced.notifications.emailTypes.newMessages'),
                 systemAlerts: t('settingsEnhanced.notifications.emailTypes.systemAlerts'),
                 taskReminders: t('settingsEnhanced.notifications.emailTypes.taskReminders'),
-                weeklyReports: 'Rapports hebdomadaires',
-                securityAlerts: 'Alertes de sécurité',
+                weeklyReports: t('settingsEnhanced.notifications.emailTypes.weeklyReports'),
+                securityAlerts: t('settingsEnhanced.notifications.emailTypes.securityAlerts'),
                 maintenanceNotice: t(
                   'settingsEnhanced.notifications.emailTypes.maintenanceNotifications'
                 ),
@@ -181,9 +181,9 @@ export default function NotificationsSettingsPage() {
                       {t('settingsEnhanced.notifications.sections.categories')} :
                     </h4>
                     {Object.entries({
-                      urgent: 'Notifications urgentes',
-                      normal: 'Notifications normales',
-                      quiet: 'Notifications discrètes',
+                      urgent: t('settingsEnhanced.notifications.categoryTypes.urgent'),
+                      normal: t('settingsEnhanced.notifications.categoryTypes.normal'),
+                      quiet: t('settingsEnhanced.notifications.categoryTypes.quiet'),
                     }).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between py-1 pl-4">
                         <span className="text-slate-600 text-sm">{label}</span>
@@ -218,7 +218,7 @@ export default function NotificationsSettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between py-2">
-                <span className="text-slate-700">Activer le mode silencieux</span>
+                <span className="text-slate-700">{t('settingsEnhanced.notifications.silentMode.enable')}</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
