@@ -1,0 +1,977 @@
+// Prisma Schema - TopSteel Infrastructure
+// Migration TypeORM → Prisma
+// 45 entités infrastructure (Auth + Shared + Tenant)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTH DATABASE MODELS
+// ============================================
+
+// User (entité centrale)
+model User {
+  id                String              @id @default(uuid())
+  username          String              @unique @db.VarChar(255)
+  email             String              @unique @db.VarChar(255)
+  passwordHash      String              @map("password_hash") @db.VarChar(255)
+  firstName         String?             @map("first_name") @db.VarChar(100)
+  lastName          String?             @map("last_name") @db.VarChar(100)
+  isActive          Boolean             @default(true) @map("is_active")
+  isEmailVerified   Boolean             @default(false) @map("is_email_verified")
+  emailVerifiedAt   DateTime?           @map("email_verified_at")
+  lastLoginAt       DateTime?           @map("last_login_at")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  deletedAt         DateTime?           @map("deleted_at")
+
+  // Relations
+  sessions          UserSession[]
+  mfaSettings       UserMfa[]
+  mfaSessions       MfaSession[]
+  roles             UserRole[]
+  groups            UserGroup[]
+  societeRoles      UserSocieteRole[]
+  settings          UserSettings?
+  societes          SocieteUser[]
+  auditLogs         AuditLog[]         @relation("PerformedBy")
+  systemSettings    SystemSetting[]
+  queryBuilders     QueryBuilder[]
+  queryBuilderPerms QueryBuilderPermission[]
+  forcedLogouts     UserSession[]      @relation("ForcedLogout")
+
+  @@index([email])
+  @@index([username])
+  @@index([isActive])
+  @@map("users")
+}
+
+// UserSession
+model UserSession {
+  id                 String    @id @default(uuid())
+  userId             String    @map("user_id")
+  sessionId          String    @unique @map("session_id") @db.VarChar(255)
+  accessToken        String    @map("access_token") @db.VarChar(255)
+  refreshToken       String?   @map("refresh_token") @db.VarChar(255)
+  loginTime          DateTime  @map("login_time")
+  logoutTime         DateTime? @map("logout_time")
+  lastActivity       DateTime  @map("last_activity")
+  ipAddress          String?   @map("ip_address") @db.VarChar(50)
+  userAgent          String?   @map("user_agent") @db.Text
+  deviceInfo         Json?     @map("device_info")
+  location           Json?     @map("location")
+  isActive           Boolean   @default(true) @map("is_active")
+  isIdle             Boolean   @default(false) @map("is_idle")
+  status             String    @default("active") @db.VarChar(50)
+  warningCount       Int       @default(0) @map("warning_count")
+  forcedLogoutBy     String?   @map("forced_logout_by")
+  forcedLogoutReason String?   @map("forced_logout_reason") @db.Text
+  metadata           Json?     @map("metadata")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  forcedLogoutByUser User?     @relation("ForcedLogout", fields: [forcedLogoutBy], references: [id])
+
+  @@index([userId, status, lastActivity])
+  @@index([userId, isActive])
+  @@index([status, lastActivity])
+  @@index([ipAddress, createdAt])
+  @@map("user_sessions")
+}
+
+// UserMfa
+model UserMfa {
+  id                  String    @id @default(uuid())
+  userId              String    @map("user_id")
+  type                String    @db.VarChar(50)
+  isEnabled           Boolean   @default(false) @map("is_enabled")
+  isVerified          Boolean   @default(false) @map("is_verified")
+  secret              String?   @db.VarChar(255)
+  backupCodes         String?   @map("backup_codes") @db.VarChar(255)
+  phoneNumber         String?   @map("phone_number") @db.VarChar(50)
+  email               String?   @db.VarChar(255)
+  webauthnCredentials Json?     @map("webauthn_credentials")
+  metadata            Json?     @map("metadata")
+  lastUsedAt          DateTime? @map("last_used_at")
+  verifiedAt          DateTime? @map("verified_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([isEnabled])
+  @@index([isVerified])
+  @@index([lastUsedAt])
+  @@map("user_mfa")
+}
+
+// MfaSession
+model MfaSession {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  mfaType    String    @map("mfa_type") @db.VarChar(50)
+  challenge  String    @db.VarChar(255)
+  verified   Boolean   @default(false)
+  expiresAt  DateTime  @map("expires_at")
+  verifiedAt DateTime? @map("verified_at")
+  ipAddress  String?   @map("ip_address") @db.VarChar(50)
+  userAgent  String?   @map("user_agent") @db.Text
+  metadata   Json?     @map("metadata")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([verified])
+  @@map("mfa_sessions")
+}
+
+// Role
+model Role {
+  id                String                     @id @default(uuid())
+  name              String                     @unique @db.VarChar(100)
+  label             String                     @db.VarChar(255)
+  description       String?                    @db.Text
+  level             Int                        @default(0)
+  isSystem          Boolean                    @default(false) @map("is_system")
+  isActive          Boolean                    @default(true) @map("is_active")
+  societeId         String?                    @map("societe_id")
+  parentId          String?                    @map("parent_id")
+  metadata          Json?                      @map("metadata")
+  createdAt         DateTime                   @default(now()) @map("created_at")
+  updatedAt         DateTime                   @updatedAt @map("updated_at")
+
+  permissions       RolePermission[]
+  users             UserRole[]
+  societeUsers      UserSocieteRole[]
+  societe           Societe?                   @relation(fields: [societeId], references: [id])
+  parent            Role?                      @relation("RoleHierarchy", fields: [parentId], references: [id])
+  children          Role[]                     @relation("RoleHierarchy")
+  menuItems         MenuItemRole[]
+  queryBuilderPerms QueryBuilderPermission[]
+
+  @@index([name])
+  @@index([societeId])
+  @@index([isActive])
+  @@index([isSystem])
+  @@map("roles")
+}
+
+// Permission
+model Permission {
+  id          String               @id @default(uuid())
+  name        String               @unique @db.VarChar(100)
+  label       String               @db.VarChar(255)
+  description String?              @db.Text
+  module      String               @db.VarChar(100)
+  action      String               @db.VarChar(100)
+  resource    String?              @db.VarChar(100)
+  societeId   String?              @map("societe_id")
+  isActive    Boolean              @default(true) @map("is_active")
+  metadata    Json?                @map("metadata")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  roles       RolePermission[]
+  societe     Societe?             @relation(fields: [societeId], references: [id])
+  menuItems   MenuItemPermission[]
+
+  @@index([name])
+  @@index([module])
+  @@index([societeId])
+  @@index([isActive])
+  @@map("permissions")
+}
+
+// RolePermission
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// UserRole
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+// Group
+model Group {
+  id          String      @id @default(uuid())
+  name        String      @unique @db.VarChar(100)
+  label       String      @db.VarChar(255)
+  description String?     @db.Text
+  isActive    Boolean     @default(true) @map("is_active")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  users       UserGroup[]
+
+  @@index([name])
+  @@index([isActive])
+  @@map("groups")
+}
+
+// UserGroup
+model UserGroup {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  groupId   String   @map("group_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+  @@index([userId])
+  @@index([groupId])
+  @@map("user_groups")
+}
+
+// Module
+model Module {
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(100)
+  label       String   @db.VarChar(255)
+  description String?  @db.Text
+  icon        String?  @db.VarChar(50)
+  order       Int      @default(0)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
+  @@index([order])
+  @@map("modules")
+}
+
+// UserSocieteRole
+model UserSocieteRole {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  societeId     String    @map("societe_id")
+  roleId        String    @map("role_id")
+  permissions   Json?     @map("permissions")
+  isActive      Boolean   @default(true) @map("is_active")
+  activatedAt   DateTime? @map("activated_at")
+  deactivatedAt DateTime? @map("deactivated_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  societe       Societe   @relation(fields: [societeId], references: [id], onDelete: Cascade)
+  role          Role      @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, societeId, roleId])
+  @@index([userId])
+  @@index([societeId])
+  @@index([roleId])
+  @@index([isActive])
+  @@map("user_societe_roles")
+}
+
+// AuditLog
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?  @map("user_id")
+  action      String   @db.VarChar(100)
+  resource    String   @db.VarChar(100)
+  resourceId  String?  @map("resource_id")
+  description String?  @db.Text
+  ipAddress   String?  @map("ip_address") @db.VarChar(50)
+  userAgent   String?  @map("user_agent") @db.Text
+  changes     Json?    @map("changes")
+  metadata    Json?    @map("metadata")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User?    @relation("PerformedBy", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// SmsLog
+model SmsLog {
+  id           String    @id @default(uuid())
+  phoneNumber  String    @map("phone_number") @db.VarChar(50)
+  message      String    @db.Text
+  status       String    @db.VarChar(50)
+  provider     String?   @db.VarChar(50)
+  errorMessage String?   @map("error_message") @db.Text
+  sentAt       DateTime? @map("sent_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([phoneNumber])
+  @@index([status])
+  @@index([createdAt])
+  @@map("sms_logs")
+}
+
+// UserSettings
+model UserSettings {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  profile     Json?    @map("profile")
+  company     Json?    @map("company")
+  preferences Json?    @map("preferences")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+// ============================================
+// SHARED DATABASE MODELS (Sociétés)
+// ============================================
+
+// Societe
+model Societe {
+  id               String              @id @default(uuid())
+  code             String              @unique @db.VarChar(50)
+  name             String              @db.VarChar(255)
+  legalName        String?             @map("legal_name") @db.VarChar(255)
+  siret            String?             @db.VarChar(50)
+  address          String?             @db.Text
+  city             String?             @db.VarChar(100)
+  postalCode       String?             @map("postal_code") @db.VarChar(20)
+  country          String?             @db.VarChar(100)
+  phone            String?             @db.VarChar(50)
+  email            String?             @db.VarChar(255)
+  website          String?             @db.VarChar(255)
+  isActive         Boolean             @default(true) @map("is_active")
+  databaseName     String              @map("database_name") @db.VarChar(100)
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+  deletedAt        DateTime?           @map("deleted_at")
+
+  license          SocieteLicense?
+  users            SocieteUser[]
+  sites            Site[]
+  userSocieteRoles UserSocieteRole[]
+  roles            Role[]
+  permissions      Permission[]
+
+  @@index([code])
+  @@index([isActive])
+  @@map("societes")
+}
+
+// SocieteLicense
+model SocieteLicense {
+  id           String    @id @default(uuid())
+  societeId    String    @unique @map("societe_id")
+  type         String    @db.VarChar(50)
+  status       String    @db.VarChar(50)
+  maxUsers     Int       @map("max_users")
+  features     Json      @map("features")
+  restrictions Json?     @map("restrictions")
+  billing      Json?     @map("billing")
+  startDate    DateTime  @map("start_date")
+  endDate      DateTime? @map("end_date")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  societe      Societe   @relation(fields: [societeId], references: [id], onDelete: Cascade)
+
+  @@index([societeId])
+  @@index([status])
+  @@map("societe_licenses")
+}
+
+// SocieteUser
+model SocieteUser {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  societeId   String    @map("societe_id")
+  permissions Json?     @map("permissions")
+  preferences Json?     @map("preferences")
+  isActive    Boolean   @default(true) @map("is_active")
+  joinedAt    DateTime  @default(now()) @map("joined_at")
+  leftAt      DateTime? @map("left_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  societe     Societe   @relation(fields: [societeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, societeId])
+  @@index([userId])
+  @@index([societeId])
+  @@index([isActive])
+  @@map("societe_users")
+}
+
+// Site
+model Site {
+  id            String   @id @default(uuid())
+  societeId     String   @map("societe_id")
+  name          String   @db.VarChar(255)
+  code          String   @db.VarChar(50)
+  address       String?  @db.Text
+  city          String?  @db.VarChar(100)
+  postalCode    String?  @map("postal_code") @db.VarChar(20)
+  country       String?  @db.VarChar(100)
+  phone         String?  @db.VarChar(50)
+  email         String?  @db.VarChar(255)
+  isActive      Boolean  @default(true) @map("is_active")
+  configuration Json?    @map("configuration")
+  metadata      Json?    @map("metadata")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  societe       Societe  @relation(fields: [societeId], references: [id], onDelete: Cascade)
+
+  @@unique([societeId, code])
+  @@index([societeId])
+  @@index([code])
+  @@index([isActive])
+  @@map("sites")
+}
+
+// ============================================
+// TENANT DATABASE MODELS (Infrastructure)
+// ============================================
+
+// SystemSetting
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique @db.VarChar(255)
+  value       String   @db.Text
+  type        String   @db.VarChar(50)
+  category    String   @db.VarChar(100)
+  description String?  @db.Text
+  isPublic    Boolean  @default(false) @map("is_public")
+  updatedBy   String?  @map("updated_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  updatedByUser User? @relation(fields: [updatedBy], references: [id])
+
+  @@index([key])
+  @@index([category])
+  @@map("system_settings")
+}
+
+// SystemParameter
+model SystemParameter {
+  id          String   @id @default(uuid())
+  key         String   @unique @db.VarChar(255)
+  value       String   @db.Text
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([key])
+  @@map("system_parameters")
+}
+
+// MenuConfiguration
+model MenuConfiguration {
+  id          String     @id @default(uuid())
+  name        String     @unique @db.VarChar(255)
+  description String?    @db.Text
+  isActive    Boolean    @default(true) @map("is_active")
+  isDefault   Boolean    @default(false) @map("is_default")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  menuItems   MenuItem[]
+
+  @@index([isActive])
+  @@index([isDefault])
+  @@map("menu_configurations")
+}
+
+// MenuItem
+model MenuItem {
+  id                  String               @id @default(uuid())
+  menuConfigurationId String               @map("menu_configuration_id")
+  parentId            String?              @map("parent_id")
+  label               String               @db.VarChar(255)
+  icon                String?              @db.VarChar(100)
+  path                String?              @db.VarChar(500)
+  order               Int                  @default(0)
+  isActive            Boolean              @default(true) @map("is_active")
+  isVisible           Boolean              @default(true) @map("is_visible")
+  metadata            Json?                @map("metadata")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+
+  menuConfiguration   MenuConfiguration    @relation(fields: [menuConfigurationId], references: [id], onDelete: Cascade)
+  parent              MenuItem?            @relation("MenuItemHierarchy", fields: [parentId], references: [id])
+  children            MenuItem[]           @relation("MenuItemHierarchy")
+  roles               MenuItemRole[]
+  permissions         MenuItemPermission[]
+
+  @@index([menuConfigurationId])
+  @@index([parentId])
+  @@index([order])
+  @@map("menu_items")
+}
+
+// MenuItemRole
+model MenuItemRole {
+  id         String   @id @default(uuid())
+  menuItemId String   @map("menu_item_id")
+  roleId     String   @map("role_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([menuItemId, roleId])
+  @@index([menuItemId])
+  @@index([roleId])
+  @@map("menu_item_roles")
+}
+
+// MenuItemPermission
+model MenuItemPermission {
+  id           String     @id @default(uuid())
+  menuItemId   String     @map("menu_item_id")
+  permissionId String     @map("permission_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  menuItem     MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([menuItemId, permissionId])
+  @@index([menuItemId])
+  @@index([permissionId])
+  @@map("menu_item_permissions")
+}
+
+// UserMenuPreferences
+model UserMenuPreferences {
+  id           String                   @id @default(uuid())
+  userId       String                   @map("user_id")
+  theme        String?                  @db.VarChar(50)
+  layout       String?                  @db.VarChar(50)
+  customColors Json?                    @map("custom_colors")
+  shortcuts    Json?                    @map("shortcuts")
+  createdAt    DateTime                 @default(now()) @map("created_at")
+  updatedAt    DateTime                 @updatedAt @map("updated_at")
+
+  items        UserMenuItemPreference[]
+
+  @@unique([userId])
+  @@map("user_menu_preferences")
+}
+
+// UserMenuItemPreference
+model UserMenuItemPreference {
+  id                    String              @id @default(uuid())
+  userMenuPreferencesId String              @map("user_menu_preferences_id")
+  menuItemId            String              @map("menu_item_id")
+  isVisible             Boolean             @default(true) @map("is_visible")
+  order                 Int?                @map("order")
+  customLabel           String?             @map("custom_label") @db.VarChar(255)
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+
+  preferences           UserMenuPreferences @relation(fields: [userMenuPreferencesId], references: [id], onDelete: Cascade)
+
+  @@unique([userMenuPreferencesId, menuItemId])
+  @@index([userMenuPreferencesId])
+  @@map("user_menu_item_preferences")
+}
+
+// MenuConfigurationSimple
+model MenuConfigurationSimple {
+  id        String   @id @default(uuid())
+  name      String   @unique @db.VarChar(255)
+  config    Json     @map("config")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("menu_configurations_simple")
+}
+
+// UserMenuPreference (menu dynamique)
+model UserMenuPreference {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  menuData    Json     @map("menu_data")
+  preferences Json?    @map("preferences")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId])
+  @@map("user_menu_preference")
+}
+
+// DiscoveredPage
+model DiscoveredPage {
+  id          String   @id @default(uuid())
+  path        String   @unique @db.VarChar(500)
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  category    String?  @db.VarChar(100)
+  icon        String?  @db.VarChar(100)
+  isActive    Boolean  @default(true) @map("is_active")
+  metadata    Json?    @map("metadata")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([path])
+  @@index([category])
+  @@map("discovered_pages")
+}
+
+// ParameterSystem
+model ParameterSystem {
+  id           String   @id @default(uuid())
+  code         String   @unique @db.VarChar(100)
+  label        String   @db.VarChar(255)
+  description  String?  @db.Text
+  type         String   @db.VarChar(50)
+  value        String?  @db.Text
+  defaultValue String?  @map("default_value") @db.Text
+  category     String   @db.VarChar(100)
+  isRequired   Boolean  @default(false) @map("is_required")
+  isEditable   Boolean  @default(true) @map("is_editable")
+  validation   String?  @db.Text
+  metadata     Json?    @map("metadata")
+  arrayValues  Json?    @map("array_values")
+  objectValues Json?    @map("object_values")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([code])
+  @@index([category])
+  @@map("parameter_system")
+}
+
+// ParameterApplication
+model ParameterApplication {
+  id            String   @id @default(uuid())
+  code          String   @unique @db.VarChar(100)
+  label         String   @db.VarChar(255)
+  description   String?  @db.Text
+  type          String   @db.VarChar(50)
+  value         String?  @db.Text
+  defaultValue  String?  @map("default_value") @db.Text
+  category      String   @db.VarChar(100)
+  isActive      Boolean  @default(true) @map("is_active")
+  businessRules Json?    @map("business_rules")
+  metadata      Json?    @map("metadata")
+  arrayValues   Json?    @map("array_values")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([code])
+  @@index([category])
+  @@map("parameter_application")
+}
+
+// ParameterClient
+model ParameterClient {
+  id                 String   @id @default(uuid())
+  code               String   @unique @db.VarChar(100)
+  label              String   @db.VarChar(255)
+  description        String?  @db.Text
+  type               String   @db.VarChar(50)
+  value              String?  @db.Text
+  defaultValue       String?  @map("default_value") @db.Text
+  category           String   @db.VarChar(100)
+  isVisible          Boolean  @default(true) @map("is_visible")
+  isEditable         Boolean  @default(true) @map("is_editable")
+  constraints        Json?    @map("constraints")
+  metadata           Json?    @map("metadata")
+  arrayValues        Json?    @map("array_values")
+  objectValues       Json?    @map("object_values")
+  customTranslations Json?    @map("custom_translations")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([code])
+  @@index([category])
+  @@map("parameter_client")
+}
+
+// Notification
+model Notification {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  type        String    @db.VarChar(50)
+  title       String    @db.VarChar(255)
+  message     String    @db.Text
+  category    String?   @db.VarChar(100)
+  priority    String?   @db.VarChar(50)
+  data        Json?     @map("data")
+  actionUrl   String?   @map("action_url") @db.VarChar(500)
+  actionLabel String?   @map("action_label") @db.VarChar(100)
+  readAt      DateTime? @map("read_at")
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  reads       NotificationRead[]
+  executions  NotificationRuleExecution[]
+
+  @@index([userId])
+  @@index([type])
+  @@index([category])
+  @@index([priority])
+  @@index([readAt])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// NotificationEvent
+model NotificationEvent {
+  id                String    @id @default(uuid())
+  type              String    @db.VarChar(100)
+  source            String    @db.VarChar(100)
+  data              Json      @map("data")
+  processed         Boolean   @default(false)
+  processedAt       DateTime? @map("processed_at")
+  processingDetails Json?     @map("processing_details")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@index([type])
+  @@index([source])
+  @@index([processed])
+  @@index([createdAt])
+  @@map("notification_events")
+}
+
+// NotificationTemplate
+model NotificationTemplate {
+  id          String   @id @default(uuid())
+  code        String   @unique @db.VarChar(100)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  type        String   @db.VarChar(50)
+  template    String   @db.Text
+  variables   Json?    @map("variables")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([code])
+  @@index([type])
+  @@map("notification_templates")
+}
+
+// NotificationSettings
+model NotificationSettings {
+  id         String   @id @default(uuid())
+  userId     String   @unique @map("user_id")
+  categories Json?    @map("categories")
+  priorities Json?    @map("priorities")
+  schedules  Json?    @map("schedules")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("notification_settings")
+}
+
+// NotificationRule
+model NotificationRule {
+  id            String                      @id @default(uuid())
+  name          String                      @db.VarChar(255)
+  description   String?                     @db.Text
+  type          String                      @db.VarChar(50)
+  enabled       Boolean                     @default(true)
+  isActive      Boolean                     @default(true) @map("is_active")
+  trigger       Json                        @map("trigger")
+  conditions    Json?                       @map("conditions")
+  actions       Json?                       @map("actions")
+  notification  Json?                       @map("notification")
+  lastTriggered String?                     @map("last_triggered")
+  triggerCount  Int                         @default(0) @map("trigger_count")
+  createdAt     DateTime                    @default(now()) @map("created_at")
+  updatedAt     DateTime                    @updatedAt @map("updated_at")
+
+  executions    NotificationRuleExecution[]
+
+  @@index([type])
+  @@index([enabled])
+  @@index([isActive])
+  @@map("notification_rules")
+}
+
+// NotificationRuleExecution
+model NotificationRuleExecution {
+  id             String        @id @default(uuid())
+  ruleId         String        @map("rule_id")
+  notificationId String?       @map("notification_id")
+  triggered      Boolean       @default(false)
+  success        Boolean       @default(false)
+  errorMessage   String?       @map("error_message") @db.Text
+  executionTime  Int?          @map("execution_time")
+  data           Json?         @map("data")
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  rule           NotificationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  notification   Notification?    @relation(fields: [notificationId], references: [id])
+
+  @@index([ruleId])
+  @@index([notificationId])
+  @@index([triggered])
+  @@index([createdAt])
+  @@map("notification_rule_executions")
+}
+
+// NotificationRead
+model NotificationRead {
+  id             String       @id @default(uuid())
+  notificationId String       @map("notification_id")
+  userId         String       @map("user_id")
+  readAt         DateTime     @default(now()) @map("read_at")
+
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@unique([notificationId, userId])
+  @@index([notificationId])
+  @@index([userId])
+  @@map("notification_reads")
+}
+
+// QueryBuilder
+model QueryBuilder {
+  id               String                       @id @default(uuid())
+  name             String                       @db.VarChar(255)
+  description      String?                      @db.Text
+  type             String                       @db.VarChar(50)
+  baseTable        String                       @map("base_table") @db.VarChar(255)
+  createdBy        String                       @map("created_by")
+  isPublic         Boolean                      @default(false) @map("is_public")
+  isActive         Boolean                      @default(true) @map("is_active")
+  settings         Json?                        @map("settings")
+  layout           Json?                        @map("layout")
+  createdAt        DateTime                     @default(now()) @map("created_at")
+  updatedAt        DateTime                     @updatedAt @map("updated_at")
+
+  creator          User                         @relation(fields: [createdBy], references: [id])
+  columns          QueryBuilderColumn[]
+  joins            QueryBuilderJoin[]
+  calculatedFields QueryBuilderCalculatedField[]
+  permissions      QueryBuilderPermission[]
+
+  @@index([createdBy])
+  @@index([isPublic])
+  @@index([isActive])
+  @@map("query_builders")
+}
+
+// QueryBuilderColumn
+model QueryBuilderColumn {
+  id             String       @id @default(uuid())
+  queryBuilderId String       @map("query_builder_id")
+  columnName     String       @map("column_name") @db.VarChar(255)
+  alias          String?      @db.VarChar(255)
+  dataType       String?      @map("data_type") @db.VarChar(50)
+  format         Json?        @map("format")
+  aggregation    Json?        @map("aggregation")
+  order          Int          @default(0)
+  isVisible      Boolean      @default(true) @map("is_visible")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+
+  @@index([queryBuilderId])
+  @@index([order])
+  @@map("query_builder_columns")
+}
+
+// QueryBuilderJoin
+model QueryBuilderJoin {
+  id             String       @id @default(uuid())
+  queryBuilderId String       @map("query_builder_id")
+  joinTable      String       @map("join_table") @db.VarChar(255)
+  joinType       String       @map("join_type") @db.VarChar(50)
+  condition      String       @db.Text
+  order          Int          @default(0)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+
+  @@index([queryBuilderId])
+  @@map("query_builder_joins")
+}
+
+// QueryBuilderCalculatedField
+model QueryBuilderCalculatedField {
+  id             String       @id @default(uuid())
+  queryBuilderId String       @map("query_builder_id")
+  name           String       @db.VarChar(255)
+  expression     String       @db.Text
+  dataType       String       @map("data_type") @db.VarChar(50)
+  format         Json?        @map("format")
+  dependencies   Json?        @map("dependencies")
+  order          Int          @default(0)
+  isVisible      Boolean      @default(true) @map("is_visible")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+
+  @@index([queryBuilderId])
+  @@map("query_builder_calculated_fields")
+}
+
+// QueryBuilderPermission
+model QueryBuilderPermission {
+  id             String       @id @default(uuid())
+  queryBuilderId String       @map("query_builder_id")
+  userId         String?      @map("user_id")
+  roleId         String?      @map("role_id")
+  canView        Boolean      @default(true) @map("can_view")
+  canEdit        Boolean      @default(false) @map("can_edit")
+  canDelete      Boolean      @default(false) @map("can_delete")
+  canShare       Boolean      @default(false) @map("can_share")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           Role?        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([queryBuilderId, userId])
+  @@unique([queryBuilderId, roleId])
+  @@index([queryBuilderId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("query_builder_permissions")
+}
