@@ -5,15 +5,19 @@ import { PrismaModule } from '../../../core/database/prisma/prisma.module'
 import { AuthPrismaService } from './auth-prisma.service'
 import { AuthPrismaController } from './auth-prisma.controller'
 import { MfaPrismaService } from './mfa-prisma.service'
+import { TenantPrismaService } from './tenant-prisma.service'
+import { TenantGuard } from './guards/tenant.guard'
 
 /**
- * AuthPrismaModule - POC Phase 1.2/1.3/1.4/1.5
+ * AuthPrismaModule - POC Phase 1.2/1.3/1.4/1.5/1.6
  *
  * Module pour l'authentification avec Prisma
  *
  * Provides:
  * - AuthPrismaService pour opérations auth avec Prisma
  * - MfaPrismaService pour MFA/TOTP avec Prisma
+ * - TenantPrismaService pour multi-tenant DB-level isolation
+ * - TenantGuard pour validation tenant access
  * - AuthPrismaController pour endpoint /auth-prisma/login
  *
  * Utilisé pour:
@@ -21,6 +25,7 @@ import { MfaPrismaService } from './mfa-prisma.service'
  * - Tests de performance Prisma vs TypeORM
  * - Endpoint /auth-prisma/login pour tests parallèles avec /auth/login
  * - MFA TOTP support avec QR codes
+ * - Multi-tenant DB-level isolation
  */
 @Module({
   imports: [
@@ -38,7 +43,17 @@ import { MfaPrismaService } from './mfa-prisma.service'
     }),
   ],
   controllers: [AuthPrismaController],
-  providers: [AuthPrismaService, MfaPrismaService],
-  exports: [AuthPrismaService, MfaPrismaService],
+  providers: [
+    AuthPrismaService,
+    MfaPrismaService,
+    TenantPrismaService,
+    TenantGuard,
+  ],
+  exports: [
+    AuthPrismaService,
+    MfaPrismaService,
+    TenantPrismaService,
+    TenantGuard,
+  ],
 })
 export class AuthPrismaModule {}

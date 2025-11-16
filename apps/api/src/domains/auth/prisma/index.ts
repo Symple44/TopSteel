@@ -1,3 +1,6 @@
 export { AuthPrismaService } from './auth-prisma.service'
 export { AuthPrismaModule } from './auth-prisma.module'
 export { MfaPrismaService } from './mfa-prisma.service'
+export { TenantPrismaService } from './tenant-prisma.service'
+export { TenantGuard } from './guards/tenant.guard'
+export { TenantId } from './decorators/tenant.decorator'
