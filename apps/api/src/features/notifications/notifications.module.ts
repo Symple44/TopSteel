@@ -4,9 +4,13 @@ import { Notifications } from './entities/notifications.entity'
 import { NotificationsController } from './notifications.controller'
 import { NotificationsGateway } from './notifications.gateway'
 import { NotificationsService } from './notifications.service'
+import { NotificationsPrismaModule } from '../../domains/notifications/prisma/notifications-prisma.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Notifications], 'auth')],
+  imports: [
+    NotificationsPrismaModule, // Prisma-based notification services
+    TypeOrmModule.forFeature([Notifications], 'auth'),
+  ],
   controllers: [NotificationsController],
   providers: [NotificationsService, NotificationsGateway],
   exports: [NotificationsService, NotificationsGateway],

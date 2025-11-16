@@ -30,11 +30,13 @@ import { SocieteUsersService } from './services/societe-users.service'
 import { SocietesService } from './services/societes.service'
 import { TenantInitializationService } from './services/tenant-initialization.service'
 import { TenantProvisioningService } from './services/tenant-provisioning.service'
+import { SocietesPrismaModule } from '../../domains/societes/prisma/societes-prisma.module'
 
 @Module({
   imports: [
     ConfigModule,
     DatabaseMultiTenantModule, // Pour avoir accès à MultiTenantDatabaseConfig
+    SocietesPrismaModule, // Prisma-based societes services
 
     // Repositories pour la base AUTH
     TypeOrmModule.forFeature(

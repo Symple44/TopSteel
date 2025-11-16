@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 // Entities existantes
 import { SystemParameter } from './entitites/system-parameter.entity'
+import { AdminPrismaModule } from '../../domains/admin/prisma/admin-prisma.module'
 
 // import { UserMenuPreferences } from './entities/user-menu-preferences.entity'
 // import { UserMenuItemPreference } from './entities/user-menu-item-preference.entity'
@@ -46,6 +47,7 @@ import { SystemParametersService } from './system-parameters.service'
     MenuModule,
     SocietesModule,
     AuthModule,
+    AdminPrismaModule, // Prisma-based admin services (menu, parameters, settings)
     TypeOrmModule.forFeature([SystemParameter, DiscoveredPage], 'auth'),
     // TypeOrmModule.forFeature([
     // Toutes les entités de menu causent des problèmes TypeScript
