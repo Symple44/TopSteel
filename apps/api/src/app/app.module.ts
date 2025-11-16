@@ -10,6 +10,7 @@ import { CoreModule } from '../core/core.module'
 import { SecurityModule } from '../core/security/security.module'
 // Domain modules
 import { AuthModule } from '../domains/auth/auth.module'
+import { AuthPrismaModule } from '../domains/auth/prisma/auth-prisma.module'
 import { RoleAuthModule } from '../domains/auth/role-auth.module'
 import { BusinessModule } from '../domains/business.module'
 import { UsersModule } from '../domains/users/users.module'
@@ -50,6 +51,7 @@ import { AppService } from './app.service'
 
     // Authentication & Authorization
     AuthModule,
+    AuthPrismaModule, // POC Phase 1.4 - Prisma login endpoint
     RoleAuthModule,
 
     // Core business domains
