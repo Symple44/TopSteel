@@ -26,6 +26,7 @@ import { redisConfig } from './config/redis.config'
 import { throttlerAsyncConfig } from './config/throttler.config'
 // Database
 import { DatabaseMultiTenantModule } from './database/database-multi-tenant.module'
+import { PrismaModule } from './database/prisma/prisma.module'
 // Health
 import { HealthController } from './health/health.controller'
 import { IntegrityService } from './health/integrity.service'
@@ -58,6 +59,7 @@ import { RedisModule } from './redis/redis.module'
 
     // Database
     DatabaseMultiTenantModule,
+    PrismaModule,
 
     // Scheduling
     ScheduleModule.forRoot(),
@@ -98,6 +100,7 @@ import { RedisModule } from './redis/redis.module'
   exports: [
     ConfigModule,
     DatabaseMultiTenantModule,
+    PrismaModule,
     RedisModule,
     MetricsService,
     MetricsSafeInterceptor,
