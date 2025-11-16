@@ -7,9 +7,10 @@ import { NotificationSettingsPrismaService } from './notification-settings-prism
 import { NotificationRulePrismaService } from './notification-rule-prisma.service'
 import { NotificationRuleExecutionPrismaService } from './notification-rule-execution-prisma.service'
 import { NotificationReadPrismaService } from './notification-read-prisma.service'
+import { NotificationsPrismaController } from './notifications-prisma.controller'
 
 /**
- * NotificationsPrismaModule - Phase 2.5 (Complete - 7/7 entities)
+ * NotificationsPrismaModule - Phase 2.5 + Phase 5.6-5.7 (Complete - 7/7 entities + 1 controller)
  *
  * Module pour gestion des notifications avec Prisma
  *
@@ -21,9 +22,11 @@ import { NotificationReadPrismaService } from './notification-read-prisma.servic
  * - NotificationRulePrismaService pour règles automatiques
  * - NotificationRuleExecutionPrismaService pour historique d'exécution
  * - NotificationReadPrismaService pour tracking de lecture
+ * - NotificationsPrismaController pour endpoints REST (Phase 5.6-5.7)
  */
 @Module({
   imports: [PrismaModule],
+  controllers: [NotificationsPrismaController],
   providers: [
     NotificationPrismaService,
     NotificationEventPrismaService,

@@ -484,4 +484,190 @@ export class NotificationPrismaService {
     if (!notification || !notification.expiresAt) return false
     return notification.expiresAt < new Date()
   }
+
+  /**
+   * Récupérer toutes les notifications avec pagination et filtres
+   * Pour NotificationsController
+   */
+  async findAll(query: {
+    page?: number
+    limit?: number
+    search?: string
+    type?: string
+    sortBy?: string
+    sortOrder?: 'ASC' | 'DESC'
+  }): Promise<{
+    data: Notification[]
+    meta: {
+      page: number
+      limit: number
+      total: number
+      totalPages: number
+      hasNext: boolean
+      hasPrev: boolean
+    }
+  }> {
+    const { page = 1, limit = 10, search, type, sortBy = 'createdAt', sortOrder = 'DESC' } = query
+
+    this.logger.debug(
+      `Finding all notifications: page=${page}, limit=${limit}, search=${search}, type=${type}`
+    )
+
+    try {
+      const skip = (page - 1) * limit
+
+      // Construire les conditions de filtrage
+      const where: {
+        type?: string
+        OR?: Array<{
+          title?: { contains: string; mode: 'insensitive' }
+          message?: { contains: string; mode: 'insensitive' }
+        }>
+      } = {}
+
+      // Filtre par type
+      if (type) {
+        where.type = type
+      }
+
+      // Recherche dans title et message
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' as const } },
+          { message: { contains: search, mode: 'insensitive' as const } },
+        ]
+      }
+
+      // Exécuter la requête avec pagination
+      const [data, total] = await Promise.all([
+        this.prisma.notification.findMany({
+          where,
+          orderBy: { [sortBy]: sortOrder.toLowerCase() as 'asc' | 'desc' },
+          skip,
+          take: limit,
+        }),
+        this.prisma.notification.count({ where }),
+      ])
+
+      const totalPages = Math.ceil(total / limit)
+
+      this.logger.debug(`Found ${data.length} notifications out of ${total} total`)
+
+      return {
+        data,
+        meta: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+        },
+      }
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error finding all notifications: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Récupérer les statistiques des notifications
+   * Pour NotificationsController
+   * Note: Version simplifiée sans isArchived (champ manquant dans Prisma)
+   */
+  async getStats(): Promise<{
+    total: number
+    read: number
+    unread: number
+    expired: number
+  }> {
+    this.logger.debug('Getting notification statistics')
+
+    try {
+      const now = new Date()
+
+      const [total, read, expired] = await Promise.all([
+        this.prisma.notification.count(),
+        this.prisma.notification.count({
+          where: { readAt: { not: null } },
+        }),
+        this.prisma.notification.count({
+          where: {
+            expiresAt: { not: null, lt: now },
+          },
+        }),
+      ])
+
+      const unread = total - read
+
+      const stats = {
+        total,
+        read,
+        unread,
+        expired,
+      }
+
+      this.logger.debug('Notification stats calculated', stats)
+      return stats
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error getting notification stats: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Créer une notification (wrapper pour createNotification)
+   * Compatible avec NotificationsController
+   */
+  async create(data: {
+    userId: string
+    type: string
+    title: string
+    message: string
+    category?: string
+    priority?: string
+    actionUrl?: string
+    actionLabel?: string
+    expiresAt?: Date
+  }): Promise<Notification> {
+    return this.createNotification(data)
+  }
+
+  /**
+   * Récupérer une notification par ID (wrapper pour getNotificationById)
+   * Compatible avec NotificationsController
+   */
+  async findOne(id: string): Promise<Notification | null> {
+    return this.getNotificationById(id)
+  }
+
+  /**
+   * Mettre à jour une notification (wrapper pour updateNotification)
+   * Compatible avec NotificationsController
+   */
+  async update(
+    id: string,
+    data: {
+      title?: string
+      message?: string
+      category?: string
+      priority?: string
+      actionUrl?: string
+      actionLabel?: string
+      expiresAt?: Date
+    }
+  ): Promise<Notification> {
+    return this.updateNotification(id, data)
+  }
+
+  /**
+   * Supprimer une notification (wrapper pour deleteNotification)
+   * Compatible avec NotificationsController
+   * Note: Suppression réelle, pas soft delete (isArchived manquant dans Prisma)
+   */
+  async remove(id: string): Promise<void> {
+    return this.deleteNotification(id)
+  }
 }
