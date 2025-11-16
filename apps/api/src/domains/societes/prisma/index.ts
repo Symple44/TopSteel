@@ -1,0 +1,6 @@
+export { SocietePrismaService } from './societe-prisma.service'
+export { SocieteLicensePrismaService } from './societe-license-prisma.service'
+export { SocieteUserPrismaService } from './societe-user-prisma.service'
+export { UserSocieteRolePrismaService } from './user-societe-role-prisma.service'
+export { SitePrismaService } from './site-prisma.service'
+export { SocietesPrismaModule } from './societes-prisma.module'

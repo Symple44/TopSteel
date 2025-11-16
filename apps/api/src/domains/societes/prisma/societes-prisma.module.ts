@@ -1,0 +1,44 @@
+import { Module } from '@nestjs/common'
+import { PrismaModule } from '../../../core/database/prisma/prisma.module'
+import { SocietePrismaService } from './societe-prisma.service'
+import { SocieteLicensePrismaService } from './societe-license-prisma.service'
+import { SocieteUserPrismaService } from './societe-user-prisma.service'
+import { UserSocieteRolePrismaService } from './user-societe-role-prisma.service'
+import { SitePrismaService } from './site-prisma.service'
+
+/**
+ * SocietesPrismaModule - Phase 2.2
+ *
+ * Module pour gestion des sociétés avec Prisma
+ *
+ * Provides:
+ * - SocietePrismaService pour gestion sociétés
+ * - SocieteLicensePrismaService pour gestion licences
+ * - SocieteUserPrismaService pour associations user-societe
+ * - UserSocieteRolePrismaService pour rôles user-societe-role
+ * - SitePrismaService pour sites/localisations
+ *
+ * Utilisé pour:
+ * - Gestion multi-sociétés
+ * - Licences et restrictions
+ * - Memberships et rôles
+ * - Sites et localisations
+ */
+@Module({
+  imports: [PrismaModule],
+  providers: [
+    SocietePrismaService,
+    SocieteLicensePrismaService,
+    SocieteUserPrismaService,
+    UserSocieteRolePrismaService,
+    SitePrismaService,
+  ],
+  exports: [
+    SocietePrismaService,
+    SocieteLicensePrismaService,
+    SocieteUserPrismaService,
+    UserSocieteRolePrismaService,
+    SitePrismaService,
+  ],
+})
+export class SocietesPrismaModule {}
