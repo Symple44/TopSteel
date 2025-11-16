@@ -6,26 +6,35 @@ import { AuthPrismaService } from './auth-prisma.service'
 import { AuthPrismaController } from './auth-prisma.controller'
 import { MfaPrismaService } from './mfa-prisma.service'
 import { TenantPrismaService } from './tenant-prisma.service'
+import { UserSettingsPrismaService } from './user-settings-prisma.service'
+import { GroupsPrismaService } from './groups-prisma.service'
+import { AuditLogPrismaService } from './audit-log-prisma.service'
+import { SmsLogPrismaService } from './sms-log-prisma.service'
+import { ModulePrismaService } from './module-prisma.service'
 import { TenantGuard } from './guards/tenant.guard'
 
 /**
- * AuthPrismaModule - POC Phase 1.2/1.3/1.4/1.5/1.6
+ * AuthPrismaModule - Phase 1 + Phase 2.1
  *
- * Module pour l'authentification avec Prisma
+ * Module complet pour l'authentification avec Prisma
  *
  * Provides:
  * - AuthPrismaService pour opérations auth avec Prisma
  * - MfaPrismaService pour MFA/TOTP avec Prisma
  * - TenantPrismaService pour multi-tenant DB-level isolation
+ * - UserSettingsPrismaService pour préférences utilisateur
+ * - GroupsPrismaService pour gestion des groupes
+ * - AuditLogPrismaService pour logs d'audit
+ * - SmsLogPrismaService pour logs SMS
+ * - ModulePrismaService pour modules fonctionnels
  * - TenantGuard pour validation tenant access
  * - AuthPrismaController pour endpoint /auth-prisma/login
  *
  * Utilisé pour:
- * - POC validation migration TypeORM → Prisma
- * - Tests de performance Prisma vs TypeORM
- * - Endpoint /auth-prisma/login pour tests parallèles avec /auth/login
+ * - Authentification et autorisation
  * - MFA TOTP support avec QR codes
  * - Multi-tenant DB-level isolation
+ * - Gestion complète auth domain
  */
 @Module({
   imports: [
@@ -47,12 +56,22 @@ import { TenantGuard } from './guards/tenant.guard'
     AuthPrismaService,
     MfaPrismaService,
     TenantPrismaService,
+    UserSettingsPrismaService,
+    GroupsPrismaService,
+    AuditLogPrismaService,
+    SmsLogPrismaService,
+    ModulePrismaService,
     TenantGuard,
   ],
   exports: [
     AuthPrismaService,
     MfaPrismaService,
     TenantPrismaService,
+    UserSettingsPrismaService,
+    GroupsPrismaService,
+    AuditLogPrismaService,
+    SmsLogPrismaService,
+    ModulePrismaService,
     TenantGuard,
   ],
 })

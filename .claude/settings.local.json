@@ -59,7 +59,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(dir:*)",
       "Bash(npx tsx:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npx prisma generate:*)"
     ],
     "deny": [],
     "ask": []
