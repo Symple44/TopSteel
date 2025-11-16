@@ -52,12 +52,14 @@ import { TOTPService } from './services/totp.service'
 import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'
 import { WebAuthnService } from './services/webauthn.service'
+import { AuthPrismaModule } from './prisma/auth-prisma.module'
 
 @Module({
   imports: [
     ConfigModule,
     DatabaseCoreModule,
     ParametersModule,
+    AuthPrismaModule, // Prisma-based auth services
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -135,6 +137,7 @@ import { WebAuthnService } from './services/webauthn.service'
     AuditService, // Service d'audit et de traçabilité
   ],
   exports: [
+    // TypeORM Services (Legacy - being migrated)
     AuthService,
     AuthCoreService, // Export du service principal
     JwtUtilsService,
@@ -158,6 +161,10 @@ import { WebAuthnService } from './services/webauthn.service'
     RoleFormattingService,
     AuthPerformanceService,
     AuditService,
+    // Prisma Services - exported via AuthPrismaModule:
+    // AuthPrismaService, MfaPrismaService, TenantPrismaService,
+    // UserSettingsPrismaService, GroupsPrismaService, AuditLogPrismaService,
+    // SmsLogPrismaService, ModulePrismaService
   ],
 })
 export class AuthModule {}
