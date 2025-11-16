@@ -4,20 +4,23 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PrismaModule } from '../../../core/database/prisma/prisma.module'
 import { AuthPrismaService } from './auth-prisma.service'
 import { AuthPrismaController } from './auth-prisma.controller'
+import { MfaPrismaService } from './mfa-prisma.service'
 
 /**
- * AuthPrismaModule - POC Phase 1.2/1.3/1.4
+ * AuthPrismaModule - POC Phase 1.2/1.3/1.4/1.5
  *
  * Module pour l'authentification avec Prisma
  *
  * Provides:
  * - AuthPrismaService pour opérations auth avec Prisma
+ * - MfaPrismaService pour MFA/TOTP avec Prisma
  * - AuthPrismaController pour endpoint /auth-prisma/login
  *
  * Utilisé pour:
  * - POC validation migration TypeORM → Prisma
  * - Tests de performance Prisma vs TypeORM
  * - Endpoint /auth-prisma/login pour tests parallèles avec /auth/login
+ * - MFA TOTP support avec QR codes
  */
 @Module({
   imports: [
@@ -35,7 +38,7 @@ import { AuthPrismaController } from './auth-prisma.controller'
     }),
   ],
   controllers: [AuthPrismaController],
-  providers: [AuthPrismaService],
-  exports: [AuthPrismaService],
+  providers: [AuthPrismaService, MfaPrismaService],
+  exports: [AuthPrismaService, MfaPrismaService],
 })
 export class AuthPrismaModule {}
