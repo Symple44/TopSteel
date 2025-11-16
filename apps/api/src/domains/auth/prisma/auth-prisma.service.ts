@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
+import { Prisma } from '@prisma/client'
 import type { User, UserSession, Role, Permission, RolePermission } from '@prisma/client'
 
 /**
@@ -641,4 +642,355 @@ export class AuthPrismaService {
       return false
     }
   }
+
+  /**
+   * Obtenir toutes les sessions actives (Admin)
+   */
+  async getAllActiveSessions(): Promise<UserSession[]> {
+    this.logger.debug('Getting all active sessions')
+
+    try {
+      return await this.prisma.userSession.findMany({
+        where: { status: 'active' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              username: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        orderBy: { loginTime: 'desc' },
+      })
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error getting active sessions: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Obtenir l'historique des connexions avec pagination (Admin)
+   */
+  async getConnectionHistory(
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<{ sessions: UserSession[]; total: number }> {
+    this.logger.debug(`Getting connection history: limit=${limit}, offset=${offset}`)
+
+    try {
+      const [sessions, total] = await Promise.all([
+        this.prisma.userSession.findMany({
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+          orderBy: { loginTime: 'desc' },
+          take: limit,
+          skip: offset,
+        }),
+        this.prisma.userSession.count(),
+      ])
+
+      this.logger.debug(`Found ${sessions.length} sessions out of ${total} total`)
+      return { sessions, total }
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error getting connection history: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Obtenir l'historique des connexions d'un utilisateur spécifique (Admin)
+   */
+  async getUserConnectionHistory(userId: string, limit: number = 50): Promise<UserSession[]> {
+    this.logger.debug(`Getting connection history for user: ${userId}`)
+
+    try {
+      return await this.prisma.userSession.findMany({
+        where: { userId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              username: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        orderBy: { loginTime: 'desc' },
+        take: limit,
+      })
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error getting user connection history: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Compter les sessions actives
+   */
+  async countActiveSessions(): Promise<number> {
+    this.logger.debug('Counting active sessions')
+
+    try {
+      return await this.prisma.userSession.count({
+        where: { status: 'active' },
+      })
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error counting active sessions: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Compter les sessions par statut
+   */
+  async countSessionsByStatus(): Promise<Record<string, number>> {
+    this.logger.debug('Counting sessions by status')
+
+    try {
+      const sessions = await this.prisma.userSession.groupBy({
+        by: ['status'],
+        _count: true,
+      })
+
+      const result: Record<string, number> = {}
+      sessions.forEach((item) => {
+        result[item.status] = item._count
+      })
+
+      return result
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error counting sessions by status: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Forcer la déconnexion d'un utilisateur (Admin)
+   * Invalide toutes les sessions actives de l'utilisateur
+   */
+  async forceLogoutUser(
+    userId: string,
+    adminUserId: string,
+    reason: string = 'Déconnexion administrative'
+  ): Promise<UserSession[]> {
+    this.logger.debug(`Forcing logout for user: ${userId} by admin: ${adminUserId}`)
+
+    try {
+      // Récupérer toutes les sessions actives
+      const activeSessions = await this.prisma.userSession.findMany({
+        where: {
+          userId,
+          status: 'active',
+        },
+      })
+
+      // Marquer toutes comme 'forced_logout'
+      await this.prisma.userSession.updateMany({
+        where: {
+          userId,
+          status: 'active',
+        },
+        data: {
+          status: 'forced_logout',
+          isActive: false,
+          logoutTime: new Date(),
+          forcedLogoutBy: adminUserId,
+          forcedLogoutReason: reason,
+        },
+      })
+
+      this.logger.log(`Forced logout ${activeSessions.length} sessions for user ${userId}`)
+      return activeSessions
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error forcing logout for user: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Forcer la déconnexion d'une session spécifique (Admin)
+   */
+  async forceLogoutSession(
+    sessionId: string,
+    adminUserId: string,
+    reason: string = 'Déconnexion administrative'
+  ): Promise<boolean> {
+    this.logger.debug(`Forcing logout for session: ${sessionId} by admin: ${adminUserId}`)
+
+    try {
+      const session = await this.prisma.userSession.findUnique({
+        where: { id: sessionId },
+      })
+
+      if (!session || session.status !== 'active') {
+        this.logger.warn(`Session ${sessionId} not found or not active`)
+        return false
+      }
+
+      await this.prisma.userSession.update({
+        where: { id: sessionId },
+        data: {
+          status: 'forced_logout',
+          isActive: false,
+          logoutTime: new Date(),
+          forcedLogoutBy: adminUserId,
+          forcedLogoutReason: reason,
+        },
+      })
+
+      this.logger.log(`Forced logout session ${sessionId}`)
+      return true
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error forcing logout for session: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Obtenir les statistiques des sessions (Admin)
+   */
+  async getSessionStats(): Promise<{
+    totalSessions: number
+    activeSessions: number
+    expiredSessions: number
+    forcedLogouts: number
+    normalLogouts: number
+    averageSessionDuration: number
+    todayLogins: number
+    thisWeekLogins: number
+    thisMonthLogins: number
+  }> {
+    this.logger.debug('Getting session statistics')
+
+    try {
+      const now = new Date()
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+
+      const [
+        totalSessions,
+        activeSessions,
+        expiredSessions,
+        forcedLogouts,
+        normalLogouts,
+        todayLogins,
+        thisWeekLogins,
+        thisMonthLogins,
+        allSessions,
+      ] = await Promise.all([
+        this.prisma.userSession.count(),
+        this.prisma.userSession.count({ where: { status: 'active' } }),
+        this.prisma.userSession.count({ where: { status: 'expired' } }),
+        this.prisma.userSession.count({ where: { status: 'forced_logout' } }),
+        this.prisma.userSession.count({ where: { status: 'logged_out' } }),
+        this.prisma.userSession.count({ where: { loginTime: { gte: todayStart } } }),
+        this.prisma.userSession.count({ where: { loginTime: { gte: weekStart } } }),
+        this.prisma.userSession.count({ where: { loginTime: { gte: monthStart } } }),
+        this.prisma.userSession.findMany({
+          where: {
+            logoutTime: { not: null },
+          },
+          select: {
+            loginTime: true,
+            logoutTime: true,
+          },
+        }),
+      ])
+
+      // Calculer la durée moyenne des sessions (en minutes)
+      let averageSessionDuration = 0
+      if (allSessions.length > 0) {
+        const totalDuration = allSessions.reduce((sum, session) => {
+          if (session.logoutTime) {
+            const duration = session.logoutTime.getTime() - session.loginTime.getTime()
+            return sum + duration
+          }
+          return sum
+        }, 0)
+        averageSessionDuration = Math.round(totalDuration / allSessions.length / 1000 / 60) // en minutes
+      }
+
+      const stats = {
+        totalSessions,
+        activeSessions,
+        expiredSessions,
+        forcedLogouts,
+        normalLogouts,
+        averageSessionDuration,
+        todayLogins,
+        thisWeekLogins,
+        thisMonthLogins,
+      }
+
+      this.logger.debug('Session stats calculated', stats)
+      return stats
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error getting session stats: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
+  /**
+   * Nettoyer les sessions expirées
+   */
+  async cleanupExpiredSessions(): Promise<{
+    redisCleanedCount: number
+    databaseCleanedCount: number
+  }> {
+    this.logger.debug('Cleaning up expired sessions')
+
+    try {
+      const now = new Date()
+      const expirationThreshold = new Date(now.getTime() - 24 * 60 * 60 * 1000) // 24 heures
+
+      // Marquer les sessions inactives depuis plus de 24h comme expirées
+      const result = await this.prisma.userSession.updateMany({
+        where: {
+          status: 'active',
+          lastActivity: { lt: expirationThreshold },
+        },
+        data: {
+          status: 'expired',
+          isActive: false,
+          logoutTime: now,
+          forcedLogoutReason: 'Session expirée automatiquement (inactivité)',
+        },
+      })
+
+      this.logger.log(`Cleaned up ${result.count} expired sessions`)
+
+      return {
+        redisCleanedCount: 0, // Redis cleanup would be handled by RedisService
+        databaseCleanedCount: result.count,
+      }
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error cleaning up expired sessions: ${err.message}`, err.stack)
+      throw error
+    }
+  }
+
 }
