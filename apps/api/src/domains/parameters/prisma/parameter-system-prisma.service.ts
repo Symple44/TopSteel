@@ -516,4 +516,120 @@ export class ParameterSystemPrismaService {
       errors,
     }
   }
+
+  /**
+   * Récupérer les rôles utilisateur (pour ParametersController)
+   * Utilise le champ "category" qui correspond au "group" de TypeORM
+   */
+  async getUserRoles(language: string = 'fr'): Promise<
+    Array<{
+      key: string
+      value: string
+      icon: string
+      color: string
+      order: number
+      isDefault?: boolean
+      isSuperAdmin?: boolean
+    }>
+  > {
+    this.logger.debug(`Getting user roles for language: ${language}`)
+
+    try {
+      // Récupérer les rôles depuis la table parameter_system où category = 'user_roles'
+      const roles = await this.prisma.parameterSystem.findMany({
+        where: {
+          category: 'user_roles',
+        },
+        orderBy: { code: 'asc' },
+      })
+
+      this.logger.debug(`Found ${roles.length} user roles in database`)
+
+      // Si aucun rôle trouvé, retourner un fallback
+      if (roles.length === 0) {
+        this.logger.warn('No user roles found in database, returning fallback roles')
+        return this.getFallbackUserRoles(language)
+      }
+
+      // Mapper les rôles au format attendu par le contrôleur
+      const mappedRoles = roles.map((role) => {
+        const metadata = role.metadata as {
+          icon?: string
+          color?: string
+          order?: number
+          [key: string]: unknown
+        } | null
+
+        // Essayer de récupérer le label traduit depuis arrayValues ou objectValues
+        let translatedValue = role.label
+        if (role.objectValues) {
+          const objValues = role.objectValues as { [key: string]: string } | null
+          translatedValue = objValues?.[language] || role.label
+        }
+
+        return {
+          key: role.code,
+          value: translatedValue,
+          icon: metadata?.icon || '👤',
+          color: metadata?.color || 'blue',
+          order: (metadata?.order as number) || 999,
+          isDefault: role.code === 'USER',
+          isSuperAdmin: role.code === 'SUPER_ADMIN',
+        }
+      })
+
+      // Trier par ordre
+      return mappedRoles.sort((a, b) => a.order - b.order)
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error getting user roles: ${err.message}`, err.stack)
+
+      // Retourner le fallback en cas d'erreur
+      this.logger.warn('Returning fallback roles due to error')
+      return this.getFallbackUserRoles(language)
+    }
+  }
+
+  /**
+   * Rôles de fallback hardcodés
+   */
+  private getFallbackUserRoles(_language: string = 'fr'): Array<{
+    key: string
+    value: string
+    icon: string
+    color: string
+    order: number
+    isDefault?: boolean
+    isSuperAdmin?: boolean
+  }> {
+    return [
+      {
+        key: 'SUPER_ADMIN',
+        value: 'Super Administrateur',
+        icon: '👑',
+        color: 'destructive',
+        order: 1,
+        isDefault: false,
+        isSuperAdmin: true,
+      },
+      {
+        key: 'ADMIN',
+        value: 'Administrateur',
+        icon: '🔧',
+        color: 'orange',
+        order: 2,
+        isDefault: false,
+        isSuperAdmin: false,
+      },
+      {
+        key: 'USER',
+        value: 'Utilisateur',
+        icon: '👤',
+        color: 'blue',
+        order: 8,
+        isDefault: true,
+        isSuperAdmin: false,
+      },
+    ]
+  }
 }

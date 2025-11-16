@@ -3,9 +3,10 @@ import { PrismaModule } from '../../../core/database/prisma/prisma.module'
 import { ParameterSystemPrismaService } from './parameter-system-prisma.service'
 import { ParameterApplicationPrismaService } from './parameter-application-prisma.service'
 import { ParameterClientPrismaService } from './parameter-client-prisma.service'
+import { ParametersPrismaController } from './parameters-prisma.controller'
 
 /**
- * ParametersPrismaModule - Phase 2.4 (Complete - 3/3 entities)
+ * ParametersPrismaModule - Phase 2.4 + Phase 5.3 (Complete - 3/3 entities + 1 controller)
  *
  * Module pour gestion des paramètres avec Prisma
  *
@@ -13,9 +14,11 @@ import { ParameterClientPrismaService } from './parameter-client-prisma.service'
  * - ParameterSystemPrismaService pour paramètres système (non-modifiables)
  * - ParameterApplicationPrismaService pour paramètres application (business logic)
  * - ParameterClientPrismaService pour paramètres client (UI/UX utilisateur final)
+ * - ParametersPrismaController pour endpoints REST (Phase 5.3)
  */
 @Module({
   imports: [PrismaModule],
+  controllers: [ParametersPrismaController],
   providers: [ParameterSystemPrismaService, ParameterApplicationPrismaService, ParameterClientPrismaService],
   exports: [ParameterSystemPrismaService, ParameterApplicationPrismaService, ParameterClientPrismaService],
 })
