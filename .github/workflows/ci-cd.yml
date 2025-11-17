@@ -407,7 +407,7 @@ jobs:
           NODE_ENV: production
 
       - name: 📤 Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-${{ matrix.app }}-${{ github.run_number }}
           path: |
@@ -475,7 +475,7 @@ jobs:
           API_URL: http://localhost:3001
 
       - name: 📤 Upload Playwright report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: playwright-report-${{ github.run_number }}
@@ -625,7 +625,7 @@ jobs:
           echo "| 🏗️ Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: 📤 Upload performance report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: performance-report-${{ github.run_number }}
