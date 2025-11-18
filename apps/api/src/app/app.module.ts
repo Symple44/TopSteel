@@ -14,6 +14,7 @@ import { AuthPrismaModule } from '../domains/auth/prisma/auth-prisma.module'
 import { RoleAuthModule } from '../domains/auth/role-auth.module'
 import { BusinessModule } from '../domains/business.module'
 import { UsersModule } from '../domains/users/users.module'
+import { UsersPrismaModule } from '../domains/users/prisma/users-prisma.module'
 // Feature modules
 import { FeaturesModule } from '../features/features.module'
 import { InfrastructureModule } from '../infrastructure/infrastructure.module'
@@ -51,12 +52,13 @@ import { AppService } from './app.service'
 
     // Authentication & Authorization
     AuthModule,
-    AuthPrismaModule, // POC Phase 1.4 - Prisma login endpoint
+    AuthPrismaModule, // Phase 1-7: Prisma auth (login, roles, sessions)
     RoleAuthModule,
 
     // Core business domains
     BusinessModule,
     UsersModule,
+    UsersPrismaModule, // Phase 6-7: Prisma users management
 
     // Application features
     FeaturesModule,
