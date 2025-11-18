@@ -11,6 +11,7 @@ import { GroupsPrismaService } from './groups-prisma.service'
 import { AuditLogPrismaService } from './audit-log-prisma.service'
 import { SmsLogPrismaService } from './sms-log-prisma.service'
 import { ModulePrismaService } from './module-prisma.service'
+import { RolePrismaService } from './role-prisma.service'
 import { TenantGuard } from './guards/tenant.guard'
 
 /**
@@ -27,6 +28,7 @@ import { TenantGuard } from './guards/tenant.guard'
  * - AuditLogPrismaService pour logs d'audit
  * - SmsLogPrismaService pour logs SMS
  * - ModulePrismaService pour modules fonctionnels
+ * - RolePrismaService pour gestion des rôles (Phase 6.2)
  * - TenantGuard pour validation tenant access
  * - AuthPrismaController pour endpoint /auth-prisma/login
  *
@@ -61,6 +63,7 @@ import { TenantGuard } from './guards/tenant.guard'
     AuditLogPrismaService,
     SmsLogPrismaService,
     ModulePrismaService,
+    RolePrismaService,
     TenantGuard,
   ],
   exports: [
@@ -72,6 +75,7 @@ import { TenantGuard } from './guards/tenant.guard'
     AuditLogPrismaService,
     SmsLogPrismaService,
     ModulePrismaService,
+    RolePrismaService,
     TenantGuard,
   ],
 })
