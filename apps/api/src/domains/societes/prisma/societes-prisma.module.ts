@@ -5,11 +5,15 @@ import { SocieteLicensePrismaService } from './societe-license-prisma.service'
 import { SocieteUserPrismaService } from './societe-user-prisma.service'
 import { UserSocieteRolePrismaService } from './user-societe-role-prisma.service'
 import { SitePrismaService } from './site-prisma.service'
+import { SocietesPrismaController } from './societes-prisma.controller'
 
 /**
- * SocietesPrismaModule - Phase 2.2
+ * SocietesPrismaModule - Phase 2.2 + 8.1
  *
- * Module pour gestion des sociétés avec Prisma
+ * Module pour gestion des sociétés avec Prisma (Infrastructure Multi-Tenant)
+ *
+ * Controllers:
+ * - SocietesPrismaController: Endpoints REST /societes-prisma (Phase 8.1)
  *
  * Provides:
  * - SocietePrismaService pour gestion sociétés
@@ -19,13 +23,14 @@ import { SitePrismaService } from './site-prisma.service'
  * - SitePrismaService pour sites/localisations
  *
  * Utilisé pour:
- * - Gestion multi-sociétés
+ * - Gestion multi-sociétés (Infrastructure)
  * - Licences et restrictions
  * - Memberships et rôles
  * - Sites et localisations
  */
 @Module({
   imports: [PrismaModule],
+  controllers: [SocietesPrismaController],
   providers: [
     SocietePrismaService,
     SocieteLicensePrismaService,
