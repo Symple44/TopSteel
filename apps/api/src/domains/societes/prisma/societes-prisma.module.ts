@@ -6,6 +6,7 @@ import { SocieteUserPrismaService } from './societe-user-prisma.service'
 import { UserSocieteRolePrismaService } from './user-societe-role-prisma.service'
 import { SitePrismaService } from './site-prisma.service'
 import { SocietesPrismaController } from './societes-prisma.controller'
+import { SocieteLicensesPrismaController } from './societe-licenses-prisma.controller'
 
 /**
  * SocietesPrismaModule - Phase 2.2 + 8.1
@@ -30,7 +31,7 @@ import { SocietesPrismaController } from './societes-prisma.controller'
  */
 @Module({
   imports: [PrismaModule],
-  controllers: [SocietesPrismaController],
+  controllers: [SocietesPrismaController, SocieteLicensesPrismaController],
   providers: [
     SocietePrismaService,
     SocieteLicensePrismaService,
