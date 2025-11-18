@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PrismaModule } from '../../../core/database/prisma/prisma.module'
 import { AuthPrismaService } from './auth-prisma.service'
 import { AuthPrismaController } from './auth-prisma.controller'
+import { RolesPrismaController } from './roles-prisma.controller'
 import { MfaPrismaService } from './mfa-prisma.service'
 import { TenantPrismaService } from './tenant-prisma.service'
 import { UserSettingsPrismaService } from './user-settings-prisma.service'
@@ -55,7 +56,7 @@ import { TenantGuard } from './guards/tenant.guard'
       }),
     }),
   ],
-  controllers: [AuthPrismaController],
+  controllers: [AuthPrismaController, RolesPrismaController],
   providers: [
     AuthPrismaService,
     MfaPrismaService,
