@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '../../../core/database/prisma/prisma.service'
-import type { Module } from '@prisma/client'
+import type { Module, Prisma } from '@prisma/client'
 
 /**
  * ModulePrismaService - Phase 2.1
@@ -117,9 +117,15 @@ export class ModulePrismaService {
     this.logger.log(`Updating module: ${id}`)
 
     try {
+      // Convert metadata if present
+      const updateData: any = { ...data }
+      if ('metadata' in data && data.metadata !== undefined) {
+        updateData.metadata = data.metadata as Prisma.InputJsonValue
+      }
+
       const module = await this.prisma.module.update({
         where: { id },
-        data,
+        data: updateData,
       })
 
       this.logger.log(`Module updated: ${id}`)

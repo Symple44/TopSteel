@@ -285,7 +285,17 @@ export class SocieteUsersPrismaController {
   })
   @ApiResponse({ status: 200, description: 'Permissions mises à jour avec succès' })
   async updatePermissions(@Param('id') id: string, @Body('permissions') permissions: Record<string, any>) {
-    const societeUser = await this.societeUserPrismaService.updatePermissions(id, permissions)
+    // Récupérer l'association pour obtenir userId et societeId
+    const association = await this.societeUserPrismaService.getSocieteUserById(id)
+    if (!association) {
+      return { success: false, message: 'Association non trouvée', statusCode: 404 }
+    }
+
+    const societeUser = await this.societeUserPrismaService.updatePermissions(
+      association.userId,
+      association.societeId,
+      permissions
+    )
 
     return {
       success: true,
@@ -311,7 +321,17 @@ export class SocieteUsersPrismaController {
   })
   @ApiResponse({ status: 200, description: 'Préférences mises à jour avec succès' })
   async updatePreferences(@Param('id') id: string, @Body('preferences') preferences: Record<string, any>) {
-    const societeUser = await this.societeUserPrismaService.updatePreferences(id, preferences)
+    // Récupérer l'association pour obtenir userId et societeId
+    const association = await this.societeUserPrismaService.getSocieteUserById(id)
+    if (!association) {
+      return { success: false, message: 'Association non trouvée', statusCode: 404 }
+    }
+
+    const societeUser = await this.societeUserPrismaService.updatePreferences(
+      association.userId,
+      association.societeId,
+      preferences
+    )
 
     return {
       success: true,

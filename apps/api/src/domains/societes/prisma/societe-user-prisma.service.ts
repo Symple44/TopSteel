@@ -32,15 +32,25 @@ export class SocieteUserPrismaService {
     this.logger.log(`Adding user ${data.userId} to societe ${data.societeId}`)
 
     try {
+      const createData: any = {
+        userId: data.userId,
+        societeId: data.societeId,
+      }
+
+      if (data.permissions) {
+        createData.permissions = data.permissions as Prisma.InputJsonValue
+      }
+
+      if (data.preferences) {
+        createData.preferences = data.preferences as Prisma.InputJsonValue
+      }
+
+      if (data.isActive !== undefined) {
+        createData.isActive = data.isActive
+      }
+
       const societeUser = await this.prisma.societeUser.create({
-        data: {
-          userId: data.userId,
-          societeId: data.societeId,
-          permissions: data.permissions ? (data.permissions as Prisma.InputJsonValue) : undefined,
-          preferences: data.preferences ? (data.preferences as Prisma.InputJsonValue) : undefined,
-          isActive: data.isActive !== undefined ? data.isActive : true,
-          joinedAt: new Date(),
-        },
+        data: createData,
       })
 
       this.logger.log(`User added to societe successfully`)

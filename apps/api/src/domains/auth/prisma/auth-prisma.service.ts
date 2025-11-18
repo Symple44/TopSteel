@@ -71,6 +71,10 @@ export class AuthPrismaService {
           createdAt: true,
           updatedAt: true,
           deletedAt: true,
+          acronyme: true,
+          version: true,
+          refreshToken: true,
+          metadata: true,
           passwordHash: false,
         },
       })

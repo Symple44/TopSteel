@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '../../../core/database/prisma/prisma.service'
-import type { MenuConfiguration } from '@prisma/client'
+import type { MenuConfiguration, Prisma } from '@prisma/client'
 
 /**
  * MenuConfigurationPrismaService - Phase 2.3
@@ -199,9 +199,15 @@ export class MenuConfigurationPrismaService {
         })
       }
 
+      // Convert metadata if present
+      const updateData: any = { ...data }
+      if ('metadata' in data && data.metadata !== undefined) {
+        updateData.metadata = data.metadata as Prisma.InputJsonValue
+      }
+
       const menuConfig = await this.prisma.menuConfiguration.update({
         where: { id },
-        data,
+        data: updateData,
       })
 
       this.logger.log(`Menu configuration updated: ${id}`)
