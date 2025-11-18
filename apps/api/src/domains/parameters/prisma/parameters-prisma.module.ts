@@ -3,7 +3,6 @@ import { PrismaModule } from '../../../core/database/prisma/prisma.module'
 import { ParameterSystemPrismaService } from './parameter-system-prisma.service'
 import { ParameterApplicationPrismaService } from './parameter-application-prisma.service'
 import { ParameterClientPrismaService } from './parameter-client-prisma.service'
-import { ParametersPrismaController } from './parameters-prisma.controller'
 
 /**
  * ParametersPrismaModule - Phase 2.4 + Phase 5.3 (Complete - 3/3 entities + 1 controller)
@@ -18,7 +17,7 @@ import { ParametersPrismaController } from './parameters-prisma.controller'
  */
 @Module({
   imports: [PrismaModule],
-  controllers: [ParametersPrismaController],
+  controllers: [], // Controllers removed - deprecated -prisma controllers
   providers: [ParameterSystemPrismaService, ParameterApplicationPrismaService, ParameterClientPrismaService],
   exports: [ParameterSystemPrismaService, ParameterApplicationPrismaService, ParameterClientPrismaService],
 })

@@ -12,16 +12,23 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import type { AccessLevel } from '../../core/entities/permission.entity'
-import { Roles } from '../../decorators/roles.decorator'
-import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
-import { RolesGuard } from '../../security/guards/roles.guard'
-import { CreateRoleDto, RoleService, UpdateRoleDto } from '../../services/role.service'
+import type { AccessLevel } from '../core/entities/permission.entity'
+import { Roles } from '../decorators/roles.decorator'
+import { JwtAuthGuard } from '../security/guards/jwt-auth.guard'
+import { RolesGuard } from '../security/guards/roles.guard'
+import { CreateRoleDto, RoleService, UpdateRoleDto } from '../services/role.service'
 
-@ApiTags('Roles')
-@Controller('admin/roles')
+/**
+ * @deprecated This controller uses TypeORM and is kept for backward compatibility only.
+ * Use RolesController (Prisma-based) at /roles/* endpoints instead.
+ * This legacy controller will be removed in v3.0.0.
+ *
+ * Migration: Replace /admin/roles-legacy/* with /roles/* in your API calls.
+ */
+@ApiTags('🔐 Roles (Legacy - Deprecated)')
+@Controller('admin/roles-legacy')
 @UseGuards(JwtAuthGuard, RolesGuard)
-export class RoleController {
+export class RoleLegacyController {
   constructor(private readonly roleService: RoleService) {}
 
   @Get()

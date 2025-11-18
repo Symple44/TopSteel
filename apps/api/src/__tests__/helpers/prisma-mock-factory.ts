@@ -94,10 +94,10 @@ export function createMockPrismaService(): MockPrismaService {
     $executeRawUnsafe: vi.fn(),
     $queryRaw: vi.fn(),
     $queryRawUnsafe: vi.fn(),
-    $transaction: vi.fn((callback) => {
+    $transaction: vi.fn(function (this: any, callback: any) {
       // Mock transaction: execute callback with same mock
       if (typeof callback === 'function') {
-        return callback(this as any)
+        return callback(this)
       }
       return Promise.resolve([])
     }),

@@ -5,10 +5,6 @@ import { SocieteLicensePrismaService } from './societe-license-prisma.service'
 import { SocieteUserPrismaService } from './societe-user-prisma.service'
 import { UserSocieteRolePrismaService } from './user-societe-role-prisma.service'
 import { SitePrismaService } from './site-prisma.service'
-import { SocietesPrismaController } from './societes-prisma.controller'
-import { SocieteLicensesPrismaController } from './societe-licenses-prisma.controller'
-import { SocieteUsersPrismaController } from './societe-users-prisma.controller'
-import { SitesPrismaController } from './sites-prisma.controller'
 
 /**
  * SocietesPrismaModule - Phase 2.2 + 8.1
@@ -32,12 +28,13 @@ import { SitesPrismaController } from './sites-prisma.controller'
  * - Sites et localisations
  */
 @Module({
-  imports: [PrismaModule],
+  imports: [
+    PrismaModule,
+    // forwardRef(() => AuthModule), // Removed - controllers moved to parent module
+  ],
   controllers: [
-    SocietesPrismaController,
-    SocieteLicensesPrismaController,
-    SocieteUsersPrismaController,
-    SitesPrismaController,
+    // Controllers removed - deprecated -prisma controllers
+    // New controllers without -prisma suffix should be imported by parent SocietesModule
   ],
   providers: [
     SocietePrismaService,

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common'
 import { PrismaModule } from '../../../core/database/prisma/prisma.module'
 import { UserPrismaService } from './user-prisma.service'
-import { UsersPrismaController } from './users-prisma.controller'
 
 /**
  * UsersPrismaModule - Phase 6.1 + 7.1
@@ -19,7 +18,7 @@ import { UsersPrismaController } from './users-prisma.controller'
  */
 @Module({
   imports: [PrismaModule],
-  controllers: [UsersPrismaController],
+  controllers: [], // Controllers removed - deprecated -prisma controllers
   providers: [UserPrismaService],
   exports: [UserPrismaService],
 })

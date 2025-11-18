@@ -12,14 +12,21 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common'
-import { AuthService } from '../../auth.service'
-import { Roles } from '../../decorators/roles.decorator'
-import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
-import { RolesGuard } from '../../security/guards/roles.guard'
+import { AuthService } from '../auth.service'
+import { Roles } from '../decorators/roles.decorator'
+import { JwtAuthGuard } from '../security/guards/jwt-auth.guard'
+import { RolesGuard } from '../security/guards/roles.guard'
 
-@Controller('auth/sessions')
+/**
+ * @deprecated This controller uses TypeORM and is kept for backward compatibility only.
+ * Use SessionsController (Prisma-based) at /sessions/* endpoints instead.
+ * This legacy controller will be removed in v3.0.0.
+ *
+ * Migration: Replace /auth/sessions-legacy/* with /sessions/* in your API calls.
+ */
+@Controller('auth/sessions-legacy')
 @UseGuards(JwtAuthGuard, RolesGuard)
-export class SessionsController {
+export class SessionsLegacyController {
   constructor(private readonly authService: AuthService) {}
 
   /**

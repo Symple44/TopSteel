@@ -1,261 +1,173 @@
 import {
   Body,
   Controller,
-  Get,
+  Post,
   HttpCode,
   HttpStatus,
-  Param,
-  Post,
+  UnauthorizedException,
   Req,
-  UseGuards,
+  Logger,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
 import type { Request } from 'express'
-import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
-import { Public } from '../../core/common/decorators/public.decorator'
-import { ThrottleAuth } from '../../core/common/decorators/throttle-config.decorator'
-import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
-import { SkipCsrf } from '../../infrastructure/security/csrf'
-import type { User } from '../users/entities/user.entity'
-import { AuthService } from './auth.service'
-import { Roles } from './decorators/roles.decorator'
-import type { ChangePasswordDto } from './external/dto/change-password.dto'
-import { type LoginDto, RefreshTokenDto, type RegisterDto } from './external/dto/login.dto'
-import { JwtAuthGuard } from './security/guards/jwt-auth.guard'
-import { RolesGuard } from './security/guards/roles.guard'
-import { SessionInvalidationService } from './services/session-invalidation.service'
+import { v4 as uuidv4 } from 'uuid'
+import { AuthPrismaService } from './prisma/auth-prisma.service'
+import { LoginPrismaDto, LoginPrismaResponseDto } from './prisma/dto/login-prisma.dto'
 
+/**
+ * AuthController - Prisma-based Authentication
+ *
+ * Primary authentication controller using Prisma ORM
+ *
+ * Endpoints:
+ * - POST /auth/login - User authentication
+ *
+ * @see /auth-legacy/* for deprecated TypeORM endpoints
+ */
 @ApiTags('🔐 Auth')
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name)
+
   constructor(
-    private readonly authService: AuthService,
-    private readonly sessionInvalidationService: SessionInvalidationService,
-    private readonly cacheService: OptimizedCacheService
+    private readonly authPrismaService: AuthPrismaService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService
   ) {}
 
-  @Public()
-  @SkipCsrf()
-  @ThrottleAuth()
+  /**
+   * User Login
+   * @param loginDto - Email and password
+   * @param request - Express Request for IP/UserAgent tracking
+   * @returns JWT tokens and user data
+   */
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Connexion utilisateur',
-    description:
-      'Authentifie un utilisateur avec email et mot de passe. Peut retourner requiresMFA=true si MFA est activé.',
+    summary: 'User authentication',
+    description: 'Authenticate user with email and password, create session and return JWT tokens',
   })
   @ApiResponse({
     status: 200,
-    description: 'Connexion réussie ou MFA requis',
-  })
-  async login(@Body() loginDto: LoginDto, @Req() request: Request) {
-    // Utiliser les données brutes si le DTO est vide mais que request.body a des données
-    const actualData = loginDto?.login || loginDto?.password ? loginDto : request.body
-
-    return this.authService.login(actualData)
-  }
-
-  @Public()
-  @ThrottleAuth()
-  @Post('login-mfa')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Connexion avec MFA',
-    description: 'Complète la connexion après vérification MFA',
+    description: 'Authentication successful',
+    type: LoginPrismaResponseDto,
   })
   @ApiResponse({
-    status: 200,
-    description: 'Connexion MFA réussie',
+    status: 401,
+    description: 'Invalid credentials or inactive account',
   })
-  async loginWithMFA(@Body() body: { userId: string; mfaSessionToken: string }) {
-    return this.authService.loginWithMFA(body.userId, body.mfaSessionToken)
-  }
-
-  @Public()
-  @Post('register')
-  @ApiOperation({
-    summary: 'Inscription utilisateur',
-    description: 'Créer un nouveau compte utilisateur',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Utilisateur créé avec succès',
-  })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto)
-  }
-
-  @Public()
-  @SkipCsrf()
-  @Post('refresh')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Rafraîchir le token',
-    description: "Obtenir un nouveau token d'accès",
-  })
-  @ApiBody({ type: RefreshTokenDto })
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshToken(refreshTokenDto.refreshToken)
-  }
-
-  @SkipCsrf()
-  @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({
-    summary: 'Déconnexion',
-    description: "Invalider le token de l'utilisateur",
-  })
-  async logout(@CurrentUser() user: User) {
-    await this.authService.logout(user.id)
-    return { message: 'Logout successful' }
-  }
-
-  @Get('profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({
-    summary: 'Profil utilisateur',
-    description: 'Récupérer les informations du profil',
-  })
-  async getProfile(@CurrentUser() user: User) {
-    return this.authService.getProfile(user.id)
-  }
-
-  @Post('change-password')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Changer le mot de passe',
-    description: "Modifier le mot de passe de l'utilisateur connecté",
-  })
-  async changePassword(@CurrentUser() user: User, @Body() changePasswordDto: ChangePasswordDto) {
-    await this.authService.changePassword(
-      user.id,
-      changePasswordDto.currentPassword,
-      changePasswordDto.newPassword
-    )
-    return { message: 'Password changed successfully' }
-  }
-
-  @Get('verify')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({
-    summary: 'Vérifier le token',
-    description: 'Vérifier la validité du token et retourner le profil',
-  })
-  async verify(@CurrentUser() user: User) {
-    return this.authService.getProfile(user.id)
-  }
-
-  @Get('societes')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({
-    summary: 'Récupérer les sociétés disponibles',
-    description: "Obtenir la liste des sociétés auxquelles l'utilisateur a accès",
-  })
-  async getUserSocietes(@CurrentUser() user: User) {
-    const cacheKey = `auth:societes:${user.id}`
-
-    // Vérifier le cache d'abord
-    const cachedResult = await this.cacheService.get(cacheKey)
-    if (cachedResult) {
-      return cachedResult
-    }
-    const result = await this.authService.getUserSocietes(user.id)
-
-    // Mettre en cache pour 5 minutes (300 secondes)
-    await this.cacheService.set(cacheKey, result, 300)
-
-    return result
-  }
-
-  @Post('societes/cache/invalidate')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Invalider le cache des sociétés',
-    description: 'Force la recharge des sociétés depuis la base de données',
-  })
-  async invalidateSocietesCache(@CurrentUser() user: User) {
-    const cacheKey = `auth:societes:${user.id}`
-    await this.cacheService.delete(cacheKey)
-    return { message: 'Cache invalidated successfully' }
-  }
-
-  @ThrottleAuth()
-  @Post('login-societe/:societeId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Se connecter à une société spécifique',
-    description: 'Établir la session avec une société et obtenir un token multi-tenant',
-  })
-  async loginWithSociete(
-    @CurrentUser() user: User,
-    @Param('societeId') societeId: string,
-    @Body() body: { siteId?: string },
+  async login(
+    @Body() loginDto: LoginPrismaDto,
     @Req() request: Request
-  ) {
-    return this.authService.loginWithSociete(user.id, societeId, body.siteId, request)
-  }
+  ): Promise<LoginPrismaResponseDto> {
+    this.logger.log(`Login attempt: ${loginDto.email}`)
 
-  @Post('societe-default/:societeId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Définir une société par défaut',
-    description: "Définir une société comme société par défaut pour l'utilisateur",
-  })
-  async setDefaultSociete(@CurrentUser() user: User, @Param('societeId') societeId: string) {
-    return this.authService.setDefaultSociete(user.id, societeId)
-  }
+    // 1. Find user by email
+    const user = await this.authPrismaService.findUserByEmail(loginDto.email)
 
-  @Post('user/default-company')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Définir une société par défaut (nouvelle API)',
-    description: "Définir une société comme société par défaut pour l'utilisateur connecté",
-  })
-  async setUserDefaultCompany(@CurrentUser() user: User, @Body() body: { companyId: string }) {
-    return this.authService.setDefaultSociete(user.id, body.companyId)
-  }
+    if (!user) {
+      this.logger.warn(`User not found: ${loginDto.email}`)
+      throw new UnauthorizedException('Invalid credentials')
+    }
 
-  @Get('user/default-company')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({
-    summary: 'Récupérer la société par défaut',
-    description: "Récupérer la société par défaut de l'utilisateur connecté",
-  })
-  async getUserDefaultCompany(@CurrentUser() user: User) {
-    return this.authService.getDefaultSociete(user.id)
-  }
+    // 2. Validate password
+    const isPasswordValid = await this.authPrismaService.validatePassword(
+      user,
+      loginDto.password
+    )
 
-  @Post('admin/invalidate-all-sessions')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Invalider toutes les sessions',
-    description: 'Invalider toutes les sessions actives (réservé aux administrateurs)',
-  })
-  async invalidateAllSessions(@CurrentUser() user: User) {
-    const affectedUsers = await this.sessionInvalidationService.forceInvalidateAllSessions()
+    if (!isPasswordValid) {
+      this.logger.warn(`Invalid password for user: ${loginDto.email}`)
+      throw new UnauthorizedException('Invalid credentials')
+    }
+
+    // 3. Check if user is active
+    if (!user.isActive) {
+      this.logger.warn(`Inactive user attempted login: ${loginDto.email}`)
+      throw new UnauthorizedException('Account is inactive')
+    }
+
+    // 4. Generate JWT tokens
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      username: user.username,
+    }
+
+    const jwtSecret = this.configService.get<string>('jwt.secret')
+    const jwtExpiresIn = this.configService.get<string>('jwt.expiresIn') || '1h'
+    const jwtRefreshExpiresIn =
+      this.configService.get<string>('jwt.refreshExpiresIn') || '7d'
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: jwtSecret,
+      expiresIn: jwtExpiresIn,
+    })
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: jwtSecret,
+      expiresIn: jwtRefreshExpiresIn,
+    })
+
+    // 5. Create session
+    const sessionId = uuidv4()
+    const ipAddress = request.ip || request.socket.remoteAddress
+    const userAgent = request.headers['user-agent']
+
+    await this.authPrismaService.createSession({
+      userId: user.id,
+      sessionId,
+      accessToken,
+      refreshToken,
+      ipAddress,
+      userAgent,
+    })
+
+    // 6. Update last login timestamp
+    await this.authPrismaService.updateLastLogin(user.id)
+
+    this.logger.log(`Login successful: ${user.email}`)
+
+    // 7. Return response
     return {
-      message: 'Toutes les sessions ont été invalidées',
-      affectedUsers,
-      invalidatedBy: user.email,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+      accessToken,
+      refreshToken,
+      sessionId,
+      expiresIn: this.parseExpiresIn(jwtExpiresIn),
+    }
+  }
+
+  /**
+   * Parse expiration time to seconds
+   * @private
+   */
+  private parseExpiresIn(expiresIn: string): number {
+    const match = expiresIn.match(/^(\d+)([smhd])$/)
+    if (!match) return 3600 // Default 1 hour
+
+    const value = parseInt(match[1], 10)
+    const unit = match[2]
+
+    switch (unit) {
+      case 's':
+        return value
+      case 'm':
+        return value * 60
+      case 'h':
+        return value * 3600
+      case 'd':
+        return value * 86400
+      default:
+        return 3600
     }
   }
 }

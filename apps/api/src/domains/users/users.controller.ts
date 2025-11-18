@@ -1,223 +1,286 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
   Post,
+  Put,
+  Delete,
+  Param,
+  Body,
   Query,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
-import { Roles } from '../../core/common/decorators/roles.decorator'
-import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
-import { JwtAuthGuard } from '../auth/security/guards/jwt-auth.guard'
-import { RolesGuard } from '../auth/security/guards/roles.guard'
 import {
-  GetAppearanceSettingsResponseDto,
-  type UpdateAppearanceSettingsDto,
-} from './dto/appearance-settings.dto'
-import type { CreateUserDto } from './dto/create-user.dto'
-import {
-  GetNotificationSettingsResponseDto,
-  type UpdateNotificationSettingsDto,
-} from './dto/notification-settings.dto'
-import type { UpdateUserDto } from './dto/update-user.dto'
-import type { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
-import type { UserQueryDto } from './dto/user-query.dto'
-import { UserRole } from './entities/user.entity'
-import { UsersService } from './users.service'
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger'
+import { UserPrismaService } from './prisma/user-prisma.service'
+import { CombinedSecurityGuard } from '../auth/security/guards/combined-security.guard'
+import { Prisma } from '@prisma/client'
 
-// Interface for authenticated user
-interface AuthenticatedUser {
-  id: string
-  email?: string
-  roles?: string[]
-  [key: string]: unknown
+// DTOs
+interface CreateUserDto {
+  email: string
+  password: string
+  username: string
+  firstName?: string
+  lastName?: string
+  isActive?: boolean
 }
 
+interface UpdateUserDto {
+  email?: string
+  password?: string
+  username?: string
+  firstName?: string
+  lastName?: string
+  isActive?: boolean
+}
+
+interface UpdateUserSettingsDto {
+  profile?: Prisma.InputJsonValue
+  company?: Prisma.InputJsonValue
+  preferences?: Prisma.InputJsonValue
+}
+
+interface UserQueryDto {
+  page?: number
+  limit?: number
+  includeDeleted?: boolean
+}
+
+/**
+ * UsersController - Prisma-based User Management
+ *
+ * Primary user management controller using Prisma ORM
+ * Route: /users
+ *
+ * Endpoints:
+ * - GET    /users          List users (pagination)
+ * - GET    /users/stats    User statistics
+ * - GET    /users/:id      User details
+ * - POST   /users          Create user
+ * - PUT    /users/:id      Update user
+ * - DELETE /users/:id      Delete user (soft)
+ * - GET    /users/:id/settings    Get user settings
+ * - PUT    /users/:id/settings    Update user settings
+ *
+ * @see /users-legacy/* for deprecated TypeORM endpoints
+ */
 @Controller('users')
-@ApiTags('👤 Users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiTags('👥 Users')
+@UseGuards(CombinedSecurityGuard)
 @ApiBearerAuth('JWT-auth')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly cacheService: OptimizedCacheService
-  ) {}
+  constructor(private readonly userPrismaService: UserPrismaService) {}
 
-  @Post()
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
-  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès' })
-  async create(@Body() createDto: CreateUserDto) {
-    return this.usersService.create(createDto)
-  }
-
+  /**
+   * GET /users
+   * List users with pagination
+   */
   @Get()
-  @ApiOperation({ summary: 'Lister les utilisateurs avec pagination' })
+  @ApiOperation({ summary: 'List users with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'includeDeleted', required: false, type: Boolean })
+  @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
   async findAll(@Query() query: UserQueryDto) {
-    return this.usersService.findAll(query)
+    const page = query.page || 1
+    const limit = query.limit || 10
+    const skip = (page - 1) * limit
+
+    const result = await this.userPrismaService.findAll({
+      skip,
+      take: limit,
+      includeDeleted: query.includeDeleted || false,
+    })
+
+    return {
+      success: true,
+      data: result.users,
+      meta: {
+        total: result.total,
+        page,
+        limit,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    }
   }
 
+  /**
+   * GET /users/stats
+   * User statistics
+   */
   @Get('stats')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Statistiques des utilisateurs' })
+  @ApiOperation({ summary: 'User statistics' })
+  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
   async getStats() {
-    return this.usersService.getStats()
-  }
+    const stats = await this.userPrismaService.getStats()
 
-  // Endpoints pour les paramètres utilisateur (DOIVENT être avant :id)
-  @Get('settings/me')
-  @ApiOperation({ summary: 'Récupérer mes paramètres utilisateur' })
-  @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
-  async getMySettings(@CurrentUser() user: AuthenticatedUser) {
-    return this.usersService.getUserSettings(user.id)
-  }
-
-  @Patch('settings/me')
-  @ApiOperation({ summary: 'Mettre à jour mes paramètres utilisateur' })
-  @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
-  async updateMySettings(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() updateDto: UpdateUserSettingsDto
-  ) {
-    return this.usersService.updateUserSettings(user.id, updateDto)
-  }
-
-  // Endpoints spécialisés pour les préférences d'apparence (DOIVENT être avant :id)
-  @Get('appearance/me')
-  @ApiOperation({ summary: "Récupérer mes préférences d'apparence" })
-  @ApiResponse({
-    status: 200,
-    description: "Préférences d'apparence récupérées avec succès",
-    type: GetAppearanceSettingsResponseDto,
-  })
-  async getMyAppearanceSettings(
-    @CurrentUser() user: AuthenticatedUser
-  ): Promise<GetAppearanceSettingsResponseDto> {
-    const cacheKey = `user:appearance:${user.id}`
-
-    // Vérifier le cache d'abord
-    const cachedResult = await this.cacheService.get<GetAppearanceSettingsResponseDto>(cacheKey)
-    if (cachedResult) {
-      return cachedResult
+    return {
+      success: true,
+      data: stats,
     }
-
-    const settings = await this.usersService.getUserSettings(user.id)
-    if (!settings?.preferences?.appearance) {
-      throw new Error("Paramètres d'apparence non trouvés")
-    }
-
-    const result = new GetAppearanceSettingsResponseDto(settings.preferences.appearance)
-
-    // Mettre en cache pour 10 minutes (600 secondes)
-    await this.cacheService.set(cacheKey, result, 600)
-
-    return result
   }
 
-  @Patch('appearance/me')
-  @ApiOperation({ summary: "Mettre à jour mes préférences d'apparence" })
-  @ApiResponse({
-    status: 200,
-    description: "Préférences d'apparence mises à jour avec succès",
-    type: GetAppearanceSettingsResponseDto,
-  })
-  async updateMyAppearanceSettings(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() updateDto: UpdateAppearanceSettingsDto
-  ): Promise<GetAppearanceSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
-      preferences: { appearance: updateDto },
-    })
-
-    // Invalider le cache après la mise à jour
-    const cacheKey = `user:appearance:${user.id}`
-    await this.cacheService.invalidatePattern(cacheKey)
-
-    const result = new GetAppearanceSettingsResponseDto(updatedSettings.preferences.appearance)
-
-    // Remettre en cache la nouvelle valeur
-    await this.cacheService.set(cacheKey, result, 600)
-
-    return result
-  }
-
-  // Endpoints spécialisés pour les notifications (DOIVENT être avant :id)
-  @Get('notifications/me')
-  @ApiOperation({ summary: 'Récupérer mes préférences de notification' })
-  @ApiResponse({
-    status: 200,
-    description: 'Préférences de notification récupérées avec succès',
-    type: GetNotificationSettingsResponseDto,
-  })
-  async getMyNotificationSettings(
-    @CurrentUser() user: AuthenticatedUser
-  ): Promise<GetNotificationSettingsResponseDto> {
-    const settings = await this.usersService.getUserSettings(user.id)
-    return new GetNotificationSettingsResponseDto(settings.preferences.notifications)
-  }
-
-  @Patch('notifications/me')
-  @ApiOperation({ summary: 'Mettre à jour mes préférences de notification' })
-  @ApiResponse({
-    status: 200,
-    description: 'Préférences de notification mises à jour avec succès',
-    type: GetNotificationSettingsResponseDto,
-  })
-  async updateMyNotificationSettings(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() updateDto: UpdateNotificationSettingsDto
-  ): Promise<GetNotificationSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
-      preferences: { notifications: updateDto },
-    })
-    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications)
-  }
-
-  // Endpoints avec paramètre ID (DOIVENT être APRÈS les endpoints spécifiques)
+  /**
+   * GET /users/:id
+   * Get user by ID
+   */
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id)
+    const user = await this.userPrismaService.findOne(id, true)
+
+    if (!user) {
+      return {
+        success: false,
+        message: 'User not found',
+        statusCode: 404,
+      }
+    }
+
+    // Exclude passwordHash from response
+    const { passwordHash: _, ...userWithoutPassword } = user as any
+
+    return {
+      success: true,
+      data: userWithoutPassword,
+    }
   }
 
-  @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
-  async update(@Param('id') id: string, @Body() updateDto: UpdateUserDto) {
-    return this.usersService.update(id, updateDto)
+  /**
+   * POST /users
+   * Create a new user
+   */
+  @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 8 },
+        username: { type: 'string' },
+        firstName: { type: 'string' },
+        lastName: { type: 'string' },
+        isActive: { type: 'boolean', default: true },
+      },
+      required: ['email', 'password', 'username'],
+    },
+  })
+  @ApiResponse({ status: 201, description: 'User created successfully' })
+  @ApiResponse({ status: 409, description: 'Email or username already exists' })
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createUserDto: CreateUserDto) {
+    const user = await this.userPrismaService.create(createUserDto)
+
+    return {
+      success: true,
+      data: user,
+      message: 'User created successfully',
+      statusCode: 201,
+    }
   }
 
+  /**
+   * PUT /users/:id
+   * Update a user
+   */
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a user' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 8 },
+        username: { type: 'string' },
+        firstName: { type: 'string' },
+        lastName: { type: 'string' },
+        isActive: { type: 'boolean' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const user = await this.userPrismaService.update(id, updateUserDto)
+
+    return {
+      success: true,
+      data: user,
+      message: 'User updated successfully',
+    }
+  }
+
+  /**
+   * DELETE /users/:id
+   * Delete a user (soft delete)
+   */
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @ApiOperation({ summary: 'Delete a user - soft delete' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async remove(@Param('id') id: string) {
-    return this.usersService.remove(id)
+    await this.userPrismaService.remove(id)
+
+    return {
+      success: true,
+      message: 'User deleted successfully',
+    }
   }
 
+  /**
+   * GET /users/:id/settings
+   * Get user settings
+   */
   @Get(':id/settings')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: "Récupérer les paramètres d'un utilisateur (Admin/Manager)" })
-  @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
+  @ApiOperation({ summary: 'Get user settings' })
+  @ApiResponse({ status: 200, description: 'Settings retrieved successfully' })
   async getUserSettings(@Param('id') id: string) {
-    return this.usersService.getUserSettings(id)
+    const settings = await this.userPrismaService.getUserSettings(id)
+
+    return {
+      success: true,
+      data: settings,
+    }
   }
 
-  @Patch(':id/settings')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: "Mettre à jour les paramètres d'un utilisateur (Admin/Manager)" })
-  @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
-  async updateUserSettings(@Param('id') id: string, @Body() updateDto: UpdateUserSettingsDto) {
-    return this.usersService.updateUserSettings(id, updateDto)
+  /**
+   * PUT /users/:id/settings
+   * Update user settings
+   */
+  @Put(':id/settings')
+  @ApiOperation({ summary: 'Update user settings' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        profile: { type: 'object' },
+        company: { type: 'object' },
+        preferences: { type: 'object' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Settings updated successfully' })
+  async updateUserSettings(
+    @Param('id') id: string,
+    @Body() updateSettingsDto: UpdateUserSettingsDto
+  ) {
+    const settings = await this.userPrismaService.updateUserSettings(id, updateSettingsDto)
+
+    return {
+      success: true,
+      data: settings,
+      message: 'Settings updated successfully',
+    }
   }
 }

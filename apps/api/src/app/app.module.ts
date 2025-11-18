@@ -15,6 +15,7 @@ import { RoleAuthModule } from '../domains/auth/role-auth.module'
 import { BusinessModule } from '../domains/business.module'
 import { UsersModule } from '../domains/users/users.module'
 import { UsersPrismaModule } from '../domains/users/prisma/users-prisma.module'
+import { ApiControllersModule } from '../domains/api-controllers.module'
 // Feature modules
 import { FeaturesModule } from '../features/features.module'
 import { InfrastructureModule } from '../infrastructure/infrastructure.module'
@@ -59,6 +60,9 @@ import { AppService } from './app.service'
     BusinessModule,
     UsersModule,
     UsersPrismaModule, // Phase 6-7: Prisma users management
+
+    // Phase 9: API Controllers with standard routes (no -prisma suffix)
+    ApiControllersModule, // Wires new Prisma controllers: /users, /auth, /societes, etc.
 
     // Application features
     FeaturesModule,

@@ -7,7 +7,6 @@ import { NotificationSettingsPrismaService } from './notification-settings-prism
 import { NotificationRulePrismaService } from './notification-rule-prisma.service'
 import { NotificationRuleExecutionPrismaService } from './notification-rule-execution-prisma.service'
 import { NotificationReadPrismaService } from './notification-read-prisma.service'
-import { NotificationsPrismaController } from './notifications-prisma.controller'
 
 /**
  * NotificationsPrismaModule - Phase 2.5 + Phase 5.6-5.7 (Complete - 7/7 entities + 1 controller)
@@ -26,7 +25,7 @@ import { NotificationsPrismaController } from './notifications-prisma.controller
  */
 @Module({
   imports: [PrismaModule],
-  controllers: [NotificationsPrismaController],
+  controllers: [], // Controllers removed - deprecated -prisma controllers
   providers: [
     NotificationPrismaService,
     NotificationEventPrismaService,
