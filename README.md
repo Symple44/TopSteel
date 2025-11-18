@@ -123,12 +123,44 @@ TopSteel/
 └── docs/                    # Documentation
 ```
 
+## 🗄️ Base de données & ORM
+
+### Prisma ORM (Principal)
+
+Le projet utilise **Prisma** comme ORM principal pour la gestion de la base de données :
+
+- **Type-safe queries** : Typage complet des requêtes SQL
+- **Multi-tenant** : Support natif de la multi-tenancy avec 2+ bases configurées
+- **Migrations automatiques** : Gestion simple des schémas via `prisma migrate`
+- **Performance optimale** : Query optimization et connection pooling
+
+#### Modules migrés vers Prisma ✅
+
+Les modules suivants utilisent **Prisma exclusivement** :
+
+- **Auth** : Authentification, Rôles, Sessions (`/api/auth`, `/api/roles`, `/api/sessions`)
+- **Users** : Gestion des utilisateurs (`/api/users`)
+- **Societes** : Entreprises, Sites, Licences (`/api/societes`, `/api/sites`)
+- **Notifications** : Système de notifications temps réel (`/api/notifications`)
+- **Parameters** : Paramètres système/application/client (`/api/parameters`)
+- **Admin** : Configuration des menus et préférences utilisateur
+
+#### Architecture hybride
+
+Certains modules utilisent encore **TypeORM** et seront migrés progressivement :
+- Partners (CRM), Materials, Inventory, Pricing, Search, etc.
+
+Pour plus de détails sur la migration Prisma, consultez :
+- [Résumé complet de la migration](./docs/PRISMA_MIGRATION_COMPLETE_SUMMARY.md)
+- [Analyse post-migration TypeORM](./docs/POST_MIGRATION_TYPEORM_ANALYSIS.md)
+
 ## 📚 Documentation
 
 - [Architecture Technique](./docs/ARCHITECTURE.md)
 - [Documentation API](./docs/API.md)
 - [Guide de Déploiement](./docs/deployment/)
 - [Monitoring](./docs/MONITORING.md)
+- [Migration Prisma](./docs/PRISMA_MIGRATION_COMPLETE_SUMMARY.md)
 
 ## 🛠️ Scripts
 
@@ -147,9 +179,11 @@ pnpm test             # Tests unitaires
 pnpm lint             # Linting
 pnpm typecheck        # Vérification types
 
-# Base de données
-pnpm db:migrate       # Migrations
+# Base de données (Prisma)
+pnpm db:migrate       # Migrations Prisma
 pnpm db:seed          # Données de test
+pnpm prisma:generate  # Générer le client Prisma
+pnpm prisma:studio    # Interface Prisma Studio
 ```
 
 ## 📋 Roadmap

@@ -5,5 +5,4 @@ export { NotificationSettingsPrismaService } from './notification-settings-prism
 export { NotificationRulePrismaService } from './notification-rule-prisma.service'
 export { NotificationRuleExecutionPrismaService } from './notification-rule-execution-prisma.service'
 export { NotificationReadPrismaService } from './notification-read-prisma.service'
-export { NotificationsPrismaController } from './notifications-prisma.controller'
 export { NotificationsPrismaModule } from './notifications-prisma.module'

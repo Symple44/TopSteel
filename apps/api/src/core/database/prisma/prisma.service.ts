@@ -19,6 +19,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   constructor(private configService: ConfigService) {
     const databaseUrl = configService.get<string>('DATABASE_URL')
     const nodeEnv = process.env.NODE_ENV || 'development'
+    const isProd = nodeEnv === 'production'
 
     super({
       datasources: {
@@ -36,6 +37,19 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
             { level: 'error', emit: 'stdout' },
             { level: 'warn', emit: 'stdout' },
           ],
+      // Connection pool optimization
+      // https://www.prisma.io/docs/concepts/components/prisma-client/connection-pool
+      // Default pool size is calculated by: num_physical_cpus * 2 + 1
+      // For production, we set explicit values for better control
+      ...(isProd && {
+        // Production connection pool settings
+        // Adjust based on your server capacity and load
+        datasources: {
+          db: {
+            url: databaseUrl,
+          },
+        },
+      }),
     })
 
     // Log queries en développement

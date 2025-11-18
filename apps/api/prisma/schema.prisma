@@ -3,12 +3,17 @@
 // 45 entités infrastructure (Auth + Shared + Tenant)
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Connection pool optimization
+  directUrl = env("DATABASE_URL_DIRECT") // For migrations
+  shadowDatabaseUrl = env("DATABASE_URL_SHADOW") // For shadow database in dev
 }
 
 // ============================================
