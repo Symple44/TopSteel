@@ -386,6 +386,7 @@ model Societe {
   deletedAt        DateTime?           @map("deleted_at")
 
   license          SocieteLicense?
+  licenses         License[]
   users            SocieteUser[]
   sites            Site[]
   userSocieteRoles UserSocieteRole[]
@@ -978,4 +979,218 @@ model QueryBuilderPermission {
   @@index([userId])
   @@index([roleId])
   @@map("query_builder_permissions")
+}
+// ============================================
+// LICENSING DOMAIN MODELS
+// ============================================
+
+// Enums for Licensing
+enum LicenseType {
+  TRIAL
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+  CUSTOM
+}
+
+enum LicenseStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+  REVOKED
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  SEMI_ANNUAL
+  ANNUAL
+  PERPETUAL
+}
+
+enum FeatureCategory {
+  CORE
+  INVENTORY
+  PRODUCTION
+  SALES
+  FINANCE
+  REPORTING
+  INTEGRATION
+  CUSTOMIZATION
+  SECURITY
+  SUPPORT
+}
+
+enum ActivationStatus {
+  PENDING
+  ACTIVE
+  DEACTIVATED
+  BLOCKED
+}
+
+enum UsageMetricType {
+  USERS
+  TRANSACTIONS
+  STORAGE
+  API_CALLS
+  MODULES
+  SITES
+  DOCUMENTS
+  EMAILS
+  SMS
+  CUSTOM
+}
+
+// License (main entity)
+model License {
+  id                 String                @id @default(uuid())
+  licenseKey         String                @unique @map("license_key") @db.VarChar(255)
+  societeId          String                @map("societe_id")
+  customerName       String                @map("customer_name") @db.VarChar(255)
+  customerEmail      String                @map("customer_email") @db.VarChar(255)
+  type               LicenseType           @default(BASIC)
+  status             LicenseStatus         @default(PENDING)
+  billingCycle       BillingCycle          @default(ANNUAL) @map("billing_cycle")
+  startsAt           DateTime              @map("starts_at")
+  expiresAt          DateTime?             @map("expires_at")
+  lastRenewalAt      DateTime?             @map("last_renewal_at")
+  nextRenewalAt      DateTime?             @map("next_renewal_at")
+  maxUsers           Int                   @default(1) @map("max_users")
+  maxSites           Int                   @default(1) @map("max_sites")
+  maxTransactions    Int                   @default(-1) @map("max_transactions")
+  maxStorage         Int                   @default(-1) @map("max_storage")
+  maxApiCalls        Int                   @default(1) @map("max_api_calls")
+  allowCustomModules Boolean               @default(false) @map("allow_custom_modules")
+  allowApiAccess     Boolean               @default(false) @map("allow_api_access")
+  allowWhiteLabel    Boolean               @default(false) @map("allow_white_label")
+  autoRenew          Boolean               @default(true) @map("auto_renew")
+  price              Decimal?              @db.Decimal(10, 2)
+  currency           String                @default("EUR") @db.VarChar(3)
+  restrictions       Json                  @default("{}")
+  metadata           Json                  @default("{}")
+  notes              String?               @db.Text
+  signature          String?               @db.VarChar(500)
+  activatedAt        DateTime?             @map("activated_at")
+  activatedBy        String?               @map("activated_by")
+  suspendedAt        DateTime?             @map("suspended_at")
+  suspendedReason    String?               @map("suspended_reason") @db.VarChar(500)
+  revokedAt          DateTime?             @map("revoked_at")
+  revokedReason      String?               @map("revoked_reason") @db.VarChar(500)
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+  createdBy          String?               @map("created_by")
+  updatedBy          String?               @map("updated_by")
+
+  // Relations
+  societe            Societe               @relation(fields: [societeId], references: [id])
+  features           LicenseFeature[]
+  activations        LicenseActivation[]
+  usage              LicenseUsage[]
+
+  @@index([licenseKey])
+  @@index([societeId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([type])
+  @@index([societeId, status])
+  @@index([status, expiresAt])
+  @@index([customerEmail])
+  @@index([billingCycle, nextRenewalAt])
+  @@index([activatedAt])
+  @@index([suspendedAt])
+  @@index([createdBy])
+  @@map("licenses")
+}
+
+// LicenseFeature
+model LicenseFeature {
+  id            String           @id @default(uuid())
+  licenseId     String           @map("license_id")
+  featureCode   String           @map("feature_code") @db.VarChar(100)
+  featureName   String           @map("feature_name") @db.VarChar(255)
+  description   String?          @db.Text
+  category      FeatureCategory  @default(CORE)
+  isEnabled     Boolean          @default(true) @map("is_enabled")
+  limit         Int?
+  used          Int              @default(0)
+  enabledAt     DateTime?        @map("enabled_at")
+  disabledAt    DateTime?        @map("disabled_at")
+  expiresAt     DateTime?        @map("expires_at")
+  configuration Json             @default("{}")
+  metadata      Json             @default("{}")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  license       License          @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@unique([licenseId, featureCode])
+  @@index([licenseId])
+  @@index([featureCode])
+  @@index([category])
+  @@map("license_features")
+}
+
+// LicenseActivation
+model LicenseActivation {
+  id                   String             @id @default(uuid())
+  licenseId            String             @map("license_id")
+  activationKey        String             @unique @map("activation_key") @db.VarChar(255)
+  machineId            String             @map("machine_id") @db.VarChar(255)
+  machineName          String?            @map("machine_name") @db.VarChar(255)
+  osType               String?            @map("os_type") @db.VarChar(100)
+  osVersion            String?            @map("os_version") @db.VarChar(100)
+  hostname             String?            @db.VarChar(255)
+  ipAddress            String?            @map("ip_address") @db.Inet
+  macAddress           String?            @map("mac_address") @db.VarChar(17)
+  status               ActivationStatus   @default(PENDING)
+  activatedAt          DateTime           @map("activated_at")
+  lastSeenAt           DateTime?          @map("last_seen_at")
+  deactivatedAt        DateTime?          @map("deactivated_at")
+  deactivationReason   String?            @map("deactivation_reason") @db.VarChar(500)
+  heartbeatCount       Int                @default(0) @map("heartbeat_count")
+  maxHeartbeatInterval Int?               @map("max_heartbeat_interval")
+  hardwareInfo         Json?              @map("hardware_info")
+  softwareInfo         Json?              @map("software_info")
+  metadata             Json               @default("{}")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  license              License            @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@index([licenseId, machineId])
+  @@index([activationKey])
+  @@index([status])
+  @@index([machineId])
+  @@map("license_activations")
+}
+
+// LicenseUsage
+model LicenseUsage {
+  id         String           @id @default(uuid())
+  licenseId  String           @map("license_id")
+  metricType UsageMetricType  @map("metric_type")
+  metricName String?          @map("metric_name") @db.VarChar(100)
+  value      Int
+  limit      Int?
+  percentage Decimal?         @db.Decimal(5, 2)
+  recordedAt DateTime         @map("recorded_at")
+  date       DateTime         @db.Date
+  hour       Int?
+  week       Int?
+  month      Int?
+  year       Int?
+  breakdown  Json?
+  metadata   Json             @default("{}")
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  license    License          @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@index([licenseId, recordedAt])
+  @@index([licenseId, metricType])
+  @@index([recordedAt])
+  @@map("license_usage")
 }
