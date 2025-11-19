@@ -11,9 +11,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // Connection pool optimization
-  // directUrl = env("DATABASE_URL_DIRECT") // For migrations
-  // shadowDatabaseUrl = env("DATABASE_URL_SHADOW") // For shadow database in dev
 }
 
 // ============================================

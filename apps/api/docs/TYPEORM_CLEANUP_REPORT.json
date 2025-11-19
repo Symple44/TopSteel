@@ -1,0 +1,265 @@
+{
+  "timestamp": "2025-11-19T13:56:20.480Z",
+  "statistics": {
+    "prismaModels": 49,
+    "typeormEntities": 63,
+    "duplicates": 48,
+    "uncertain": 5,
+    "missing": 8
+  },
+  "duplicates": [
+    {
+      "name": "AuditLog",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\audit-log.entity.ts"
+    },
+    {
+      "name": "DiscoveredPage",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\entities\\discovered-page.entity.ts"
+    },
+    {
+      "name": "Group",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\group.entity.ts"
+    },
+    {
+      "name": "MenuConfiguration",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-configuration.entity.ts"
+    },
+    {
+      "name": "MenuConfiguration",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-configuration.entity.ts"
+    },
+    {
+      "name": "MenuConfigurationSimple",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-configuration-simple.entity.ts"
+    },
+    {
+      "name": "MenuItem",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-item.entity.ts"
+    },
+    {
+      "name": "MenuItem",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-item.entity.ts"
+    },
+    {
+      "name": "MenuItemPermission",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-item-permission.entity.ts"
+    },
+    {
+      "name": "MenuItemRole",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-item-role.entity.ts"
+    },
+    {
+      "name": "MfaSession",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\mfa-session.entity.ts"
+    },
+    {
+      "name": "Module",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\module.entity.ts"
+    },
+    {
+      "name": "NotificationEvent",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-event.entity.ts"
+    },
+    {
+      "name": "NotificationRead",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-read.entity.ts"
+    },
+    {
+      "name": "NotificationRule",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-rule.entity.ts"
+    },
+    {
+      "name": "NotificationRule",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-rule.entity.ts"
+    },
+    {
+      "name": "NotificationRuleExecution",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-rule-execution.entity.ts"
+    },
+    {
+      "name": "NotificationSettings",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-settings.entity.ts"
+    },
+    {
+      "name": "NotificationTemplate",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-template.entity.ts"
+    },
+    {
+      "name": "ParameterApplication",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-application.entity.ts"
+    },
+    {
+      "name": "ParameterClient",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-client.entity.ts"
+    },
+    {
+      "name": "ParameterSystem",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-system.entity.ts"
+    },
+    {
+      "name": "Permission",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\permission.entity.ts"
+    },
+    {
+      "name": "QueryBuilder",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\entities\\query-builder.entity.ts"
+    },
+    {
+      "name": "QueryBuilderCalculatedField",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\entities\\query-builder-calculated-field.entity.ts"
+    },
+    {
+      "name": "QueryBuilderColumn",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\entities\\query-builder-column.entity.ts"
+    },
+    {
+      "name": "QueryBuilderJoin",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\entities\\query-builder-join.entity.ts"
+    },
+    {
+      "name": "QueryBuilderPermission",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\entities\\query-builder-permission.entity.ts"
+    },
+    {
+      "name": "Role",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\role.entity.ts"
+    },
+    {
+      "name": "RolePermission",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\role-permission.entity.ts"
+    },
+    {
+      "name": "Site",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\site.entity.ts"
+    },
+    {
+      "name": "SmsLog",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\entities\\sms-log.entity.ts"
+    },
+    {
+      "name": "Societe",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe.entity.ts"
+    },
+    {
+      "name": "SocieteLicense",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe-license.entity.ts"
+    },
+    {
+      "name": "SocieteUser",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe-user.entity.ts"
+    },
+    {
+      "name": "SystemParameter",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entitites\\system-parameter.entity.ts"
+    },
+    {
+      "name": "SystemSetting",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entitites\\system-setting.entity.ts"
+    },
+    {
+      "name": "User",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\entities\\user.entity.ts"
+    },
+    {
+      "name": "UserGroup",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-group.entity.ts"
+    },
+    {
+      "name": "UserMenuItemPreference",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\user-menu-item-preference.entity.ts"
+    },
+    {
+      "name": "UserMenuPreference",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\user-menu-preference.entity.ts"
+    },
+    {
+      "name": "UserMenuPreference",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\entities\\user-menu-preference.entity.ts"
+    },
+    {
+      "name": "UserMenuPreferences",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\user-menu-preferences.entity.ts"
+    },
+    {
+      "name": "UserMfa",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-mfa.entity.ts"
+    },
+    {
+      "name": "UserRole",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-role.entity.ts"
+    },
+    {
+      "name": "UserSession",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-session.entity.ts"
+    },
+    {
+      "name": "UserSettings",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\entities\\user-settings.entity.ts"
+    },
+    {
+      "name": "UserSocieteRole",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-societe-role.entity.ts"
+    }
+  ],
+  "uncertain": [
+    {
+      "name": "MenuItemAction",
+      "possibleMatch": "MenuItem",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-item-action.entity.ts"
+    },
+    {
+      "name": "NotificationAction",
+      "possibleMatch": "Notification",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-action.entity.ts"
+    },
+    {
+      "name": "NotificationCondition",
+      "possibleMatch": "Notification",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-condition.entity.ts"
+    },
+    {
+      "name": "NotificationExecution",
+      "possibleMatch": "Notification",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-execution.entity.ts"
+    },
+    {
+      "name": "Notifications",
+      "possibleMatch": "Notification",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notifications.entity.ts"
+    }
+  ],
+  "missing": [
+    {
+      "name": "DatatableHierarchicalPreferences",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\api\\entities\\datatable-hierarchical-preferences.entity.ts"
+    },
+    {
+      "name": "DatatableHierarchyOrder",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\api\\entities\\datatable-hierarchy-order.entity.ts"
+    },
+    {
+      "name": "SharedDataRegistry",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-data-registry.entity.ts"
+    },
+    {
+      "name": "SharedMaterial",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-material.entity.ts"
+    },
+    {
+      "name": "SharedProcess",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-process.entity.ts"
+    },
+    {
+      "name": "SharedQualityStandard",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-quality-standard.entity.ts"
+    },
+    {
+      "name": "SharedSupplier",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-supplier.entity.ts"
+    },
+    {
+      "name": "UiPreferencesReorderableList",
+      "file": "C:\\GitHub\\TopSteel\\apps\\api\\src\\api\\entities\\ui-preferences-reorderable-list.entity.ts"
+    }
+  ]
+}
