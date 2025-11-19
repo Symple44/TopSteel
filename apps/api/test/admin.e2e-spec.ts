@@ -14,22 +14,50 @@ describe('Admin Domain (e2e)', () => {
   let testMenuItemId: string
 
   beforeAll(async () => {
+    // Use simplified TestAppModule to avoid compilation errors
+    const { TestAppModule } = await import('./test-app.module')
+    const { CombinedSecurityGuard } = await import(
+      '../src/domains/auth/security/guards/combined-security.guard'
+    )
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        // Import full app module here when ready
-      ],
-    }).compile()
+      imports: [TestAppModule],
+    })
+      .overrideGuard(CombinedSecurityGuard)
+      .useValue({
+        canActivate: (context: any) => {
+          // Allow requests with Authorization header, reject those without
+          const request = context.switchToHttp().getRequest()
+          const authHeader = request.headers.authorization
+          if (!authHeader) {
+            const { UnauthorizedException } = require('@nestjs/common')
+            throw new UnauthorizedException('No authorization token provided')
+          }
+          return true
+        },
+      })
+      .compile()
 
     app = moduleFixture.createNestApplication()
     prisma = moduleFixture.get<PrismaService>(PrismaService)
+
+    // Enable validation
+    const { ValidationPipe } = await import('@nestjs/common')
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: false,
+        transform: true,
+      })
+    )
 
     await app.init()
 
     // Setup: Create admin user with proper roles
     const adminRole = await prisma.role.create({
       data: {
-        name: 'Admin',
-        code: 'ADMIN',
+        name: 'admin_e2e',
+        label: 'Admin',
         description: 'Administrator role for testing',
         isSystem: true,
       },
@@ -37,12 +65,13 @@ describe('Admin Domain (e2e)', () => {
 
     const adminUser = await prisma.user.create({
       data: {
+        username: 'admin-e2e',
         email: 'admin@topsteel.com',
         firstName: 'Admin',
         lastName: 'User',
-        password: '$2b$10$hashedAdminPassword',
+        passwordHash: '$2b$10$hashedAdminPassword',
         isActive: true,
-        emailVerified: true,
+        isEmailVerified: true,
       },
     })
     adminUserId = adminUser.id

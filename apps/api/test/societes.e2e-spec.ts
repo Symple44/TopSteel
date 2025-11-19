@@ -15,26 +15,55 @@ describe('Societes (Tenants) Domain (e2e)', () => {
   let testUserSocieteId: string
 
   beforeAll(async () => {
+    // Use simplified TestAppModule to avoid compilation errors
+    const { TestAppModule } = await import('./test-app.module')
+    const { CombinedSecurityGuard } = await import(
+      '../src/domains/auth/security/guards/combined-security.guard'
+    )
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        // Import full app module here when ready
-      ],
-    }).compile()
+      imports: [TestAppModule],
+    })
+      .overrideGuard(CombinedSecurityGuard)
+      .useValue({
+        canActivate: (context: any) => {
+          // Allow requests with Authorization header, reject those without
+          const request = context.switchToHttp().getRequest()
+          const authHeader = request.headers.authorization
+          if (!authHeader) {
+            const { UnauthorizedException } = require('@nestjs/common')
+            throw new UnauthorizedException('No authorization token provided')
+          }
+          return true
+        },
+      })
+      .compile()
 
     app = moduleFixture.createNestApplication()
     prisma = moduleFixture.get<PrismaService>(PrismaService)
+
+    // Enable validation
+    const { ValidationPipe } = await import('@nestjs/common')
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: false,
+        transform: true,
+      })
+    )
 
     await app.init()
 
     // Setup: Create super admin user
     const superAdmin = await prisma.user.create({
       data: {
+        username: 'superadmin-e2e',
         email: 'superadmin@topsteel.com',
         firstName: 'Super',
         lastName: 'Admin',
-        password: '$2b$10$hashedSuperAdminPassword',
+        passwordHash: '$2b$10$hashedSuperAdminPassword',
         isActive: true,
-        emailVerified: true,
+        isEmailVerified: true,
       },
     })
     superAdminUserId = superAdmin.id
@@ -205,12 +234,13 @@ describe('Societes (Tenants) Domain (e2e)', () => {
       // Create regular user for association tests
       const regularUser = await prisma.user.create({
         data: {
+          username: 'regular-e2e',
           email: 'regular@topsteel.com',
           firstName: 'Regular',
           lastName: 'User',
-          password: '$2b$10$hashedPassword',
+          passwordHash: '$2b$10$hashedPassword',
           isActive: true,
-          emailVerified: true,
+          isEmailVerified: true,
         },
       })
       regularUserId = regularUser.id
@@ -299,6 +329,7 @@ describe('Societes (Tenants) Domain (e2e)', () => {
         data: {
           code: 'OTHER_SOCIETE',
           name: 'Other Societe',
+          databaseName: 'other_societe_e2e_db',
           isActive: true,
         },
       })
@@ -307,24 +338,26 @@ describe('Societes (Tenants) Domain (e2e)', () => {
       // Create users for each tenant
       const tenant1User = await prisma.user.create({
         data: {
+          username: 'tenant1-e2e',
           email: 'tenant1@topsteel.com',
           firstName: 'Tenant1',
           lastName: 'User',
-          password: '$2b$10$hashed',
+          passwordHash: '$2b$10$hashed',
           isActive: true,
-          emailVerified: true,
+          isEmailVerified: true,
         },
       })
       tenant1UserId = tenant1User.id
 
       const tenant2User = await prisma.user.create({
         data: {
+          username: 'tenant2-e2e',
           email: 'tenant2@topsteel.com',
           firstName: 'Tenant2',
           lastName: 'User',
-          password: '$2b$10$hashed',
+          passwordHash: '$2b$10$hashed',
           isActive: true,
-          emailVerified: true,
+          isEmailVerified: true,
         },
       })
       tenant2UserId = tenant2User.id
