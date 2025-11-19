@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { User } from '../../domains/users/entities/user.entity'
+
 import { DatabaseCoreModule } from '../database-core/database-core.module'
 import { QueryBuilderController } from './controllers/query-builder.controller'
 import { SqlExecutorController } from './controllers/sql-executor.controller'
@@ -19,7 +19,7 @@ import { QueryBuilderService } from './services/query-builder.service'
 import { QueryBuilderExecutorService } from './services/query-builder-executor.service'
 import { QueryBuilderPermissionService } from './services/query-builder-permission.service'
 import { SchemaIntrospectionService } from './services/schema-introspection.service'
-import { User } from '@prisma/client'
+import { User } from '../../domains/users/entities/user.entity'
 
 
 @Module({

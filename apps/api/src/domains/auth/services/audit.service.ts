@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { AuditLog } from '../core/entities/audit-log.entity'
-import { AuditLog } from '@prisma/client'
+
 
 /**
  * Types d'événements d'audit

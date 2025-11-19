@@ -31,7 +31,7 @@ import { MFAService } from './services/mfa.service'
 import { SessionRedisService } from './services/session-redis.service'
 import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'
-import { SocieteUser, UserSession } from '@prisma/client'
+import { SocieteUser } from '@prisma/client'
 
 @Injectable()
 export class AuthService {

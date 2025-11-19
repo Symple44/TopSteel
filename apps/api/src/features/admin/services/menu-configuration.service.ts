@@ -10,7 +10,7 @@ import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem, MenuItemType } from '../entities/menu-item.entity'
 import { MenuItemPermission } from '../entities/menu-item-permission.entity'
 import { MenuItemRole } from '../entities/menu-item-role.entity'
-import { MenuConfiguration, MenuItem, MenuItemPermission, MenuItemRole } from '@prisma/client'
+
 
 
 // Interfaces for relations

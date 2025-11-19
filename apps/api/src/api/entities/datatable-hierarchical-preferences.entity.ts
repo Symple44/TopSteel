@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { User } from '../../domains/users/entities/user.entity'
-import { User } from '@prisma/client'
+
 
 
 export interface HierarchyConfig {

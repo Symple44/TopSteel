@@ -2,20 +2,26 @@ import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Group } from './core/entities/group.entity'
+
 import { Module as ModuleEntity } from './core/entities/module.entity'
-import { Permission } from './core/entities/permission.entity'
+
 // Entities
-import { Role } from './core/entities/role.entity'
-import { RolePermission } from './core/entities/role-permission.entity'
-import { UserGroup } from './core/entities/user-group.entity'
-import { UserRole } from './core/entities/user-role.entity'
+
+
+
+
 import { GroupController } from './external/controllers/group.controller'
 import { ModuleController } from './external/controllers/module.controller'
 import { GroupService } from './services/group.service'
 // Services
 import { RoleService } from './services/role.service'
-import { Group, Module, Permission, Role, RolePermission, UserGroup, UserRole } from '@prisma/client'
+import { Group } from '../../domains/auth/core/entities/group.entity'
+import { Module } from '../../domains/auth/core/entities/module.entity'
+import { Permission } from '../../domains/auth/core/entities/permission.entity'
+import { Role } from '../../domains/auth/core/entities/role.entity'
+import { RolePermission } from '../../domains/auth/core/entities/role-permission.entity'
+import { UserGroup } from '../../domains/auth/core/entities/user-group.entity'
+import { UserRole } from '../../domains/auth/core/entities/user-role.entity'
 
 
 // Guards & Strategies (à créer si nécessaire)

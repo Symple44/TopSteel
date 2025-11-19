@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
-import { UserMenuPreference } from '@prisma/client'
+
 
 @Injectable()
 export class UserMenuPreferenceService {

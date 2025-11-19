@@ -8,7 +8,7 @@ import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 import type { IPermission, IRolePermission } from '../types/entities.types'
-import { Permission, Role, RolePermission, UserSocieteRole } from '@prisma/client'
+
 
 
 /**

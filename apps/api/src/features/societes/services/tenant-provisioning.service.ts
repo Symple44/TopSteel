@@ -2,7 +2,7 @@ import { ConflictException, Injectable, InternalServerErrorException, Logger } f
 import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
 import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
-import { Societe, SocieteStatus } from '../entities/societe.entity'
+
 import { SocietesService } from './societes.service'
 import { TenantInitializationService } from './tenant-initialization.service'
 import { Societe } from '@prisma/client'

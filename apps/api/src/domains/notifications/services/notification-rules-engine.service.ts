@@ -19,7 +19,7 @@ import type {
 import type { RuleExecutionContext, RuleExecutionResult } from '../types/notification-types'
 import type { NotificationActionExecutor } from './notification-action-executor.service'
 import type { NotificationConditionEvaluator } from './notification-condition-evaluator.service'
-import { NotificationRule } from '@prisma/client'
+
 import type {
   NotificationDeliveryOptions,
   NotificationDeliveryService,

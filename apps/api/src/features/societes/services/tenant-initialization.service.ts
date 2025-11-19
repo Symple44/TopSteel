@@ -8,7 +8,7 @@ import { UserSettings } from '../../../domains/users/entities/user-settings.enti
 import { NotificationSettings } from '../../notifications/entities/notification-settings.entity'
 import { Societe } from '../entities/societe.entity'
 import { SocieteUser, UserSocieteRole } from '../entities/societe-user.entity'
-import { NotificationSettings, Societe, SocieteUser, User, UserSettings } from '@prisma/client'
+
 
 
 export interface DefaultUserConfig {

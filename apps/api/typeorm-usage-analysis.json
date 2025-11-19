@@ -1,0 +1,2929 @@
+{
+  "critical": [
+    {
+      "entity": "user.entity",
+      "usageCount": 68,
+      "files": [
+        "api\\entities\\datatable-hierarchical-preferences.entity.ts",
+        "api\\entities\\datatable-hierarchy-order.entity.ts",
+        "api\\entities\\ui-preferences-reorderable-list.entity.ts",
+        "core\\database\\database.module.ts",
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\auth.service.ts",
+        "domains\\auth\\services\\mfa.service.ts",
+        "domains\\auth\\services\\permission-query-builder.service.ts",
+        "domains\\auth\\services\\permission.service.ts",
+        "domains\\auth\\services\\session-invalidation.service.ts",
+        "domains\\auth\\services\\unified-roles.service.ts",
+        "domains\\notifications\\notifications.controller.ts",
+        "domains\\users\\dto\\create-user.dto.ts",
+        "domains\\users\\dto\\user-query.dto.ts",
+        "domains\\users\\services\\user-auth-repository.service.ts",
+        "domains\\users\\users.module.ts",
+        "domains\\users\\users.service.ts",
+        "domains\\users\\__tests__\\users.service.test.ts",
+        "features\\admin\\system-parameters.controller.ts",
+        "features\\database-core\\database-core.module.ts",
+        "features\\notifications\\notifications.controller.ts",
+        "features\\query-builder\\query-builder.module.ts",
+        "features\\query-builder\\services\\query-builder-permission.service.ts",
+        "features\\societes\\services\\license-management.service.ts",
+        "features\\societes\\services\\societe-auth-repository.service.ts",
+        "features\\societes\\services\\societe-users.service.ts",
+        "features\\societes\\services\\tenant-initialization.service.ts",
+        "features\\societes\\societes.module.ts",
+        "infrastructure\\security\\guards\\tenant.guard.ts"
+      ],
+      "reasons": [
+        "Imported in api\\entities\\datatable-hierarchical-preferences.entity.ts",
+        "Used with decorators (Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn) in api\\entities\\datatable-hierarchical-preferences.entity.ts",
+        "Imported in api\\entities\\datatable-hierarchy-order.entity.ts",
+        "Used with decorators (Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn) in api\\entities\\datatable-hierarchy-order.entity.ts",
+        "Imported in api\\entities\\ui-preferences-reorderable-list.entity.ts",
+        "Used with decorators (Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn) in api\\entities\\ui-preferences-reorderable-list.entity.ts",
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\auth.service.ts",
+        "Imported in domains\\auth\\services\\mfa.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\mfa.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\permission-query-builder.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\permission-query-builder.service.ts (connection: default)",
+        "Imported in domains\\auth\\services\\permission.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\permission.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\session-invalidation.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\session-invalidation.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\unified-roles.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\unified-roles.service.ts (connection: auth)",
+        "Imported in domains\\notifications\\notifications.controller.ts",
+        "Imported in domains\\users\\dto\\create-user.dto.ts",
+        "Imported in domains\\users\\dto\\user-query.dto.ts",
+        "Imported in domains\\users\\services\\user-auth-repository.service.ts",
+        "Injected via @InjectRepository in domains\\users\\services\\user-auth-repository.service.ts (connection: auth)",
+        "Imported in domains\\users\\users.module.ts",
+        "Imported in domains\\users\\users.service.ts",
+        "Injected via @InjectRepository in domains\\users\\users.service.ts (connection: auth)",
+        "Imported in domains\\users\\__tests__\\users.service.test.ts",
+        "Imported in features\\admin\\system-parameters.controller.ts",
+        "Imported in features\\database-core\\database-core.module.ts",
+        "Imported in features\\notifications\\notifications.controller.ts",
+        "Imported in features\\query-builder\\query-builder.module.ts",
+        "Imported in features\\query-builder\\services\\query-builder-permission.service.ts",
+        "Injected via @InjectRepository in features\\query-builder\\services\\query-builder-permission.service.ts (connection: auth)",
+        "Imported in features\\societes\\services\\license-management.service.ts",
+        "Injected via @InjectRepository in features\\societes\\services\\license-management.service.ts (connection: auth)",
+        "Imported in features\\societes\\services\\societe-auth-repository.service.ts",
+        "Imported in features\\societes\\services\\societe-users.service.ts",
+        "Imported in features\\societes\\services\\tenant-initialization.service.ts",
+        "Injected via @InjectRepository in features\\societes\\services\\tenant-initialization.service.ts (connection: auth)",
+        "Imported in features\\societes\\societes.module.ts",
+        "Imported in infrastructure\\security\\guards\\tenant.guard.ts"
+      ]
+    },
+    {
+      "entity": "role.entity",
+      "usageCount": 35,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\role-auth.module.ts",
+        "domains\\auth\\services\\group.service.ts",
+        "domains\\auth\\services\\permission-calculator.service.ts",
+        "domains\\auth\\services\\permission-query-builder.service.ts",
+        "domains\\auth\\services\\permission.service.ts",
+        "domains\\auth\\services\\role.service.ts",
+        "domains\\auth\\services\\unified-roles.service.ts",
+        "domains\\auth\\services\\user-societe-roles.service.ts",
+        "features\\admin\\admin.module.ts",
+        "features\\admin\\menu-sync.module.ts",
+        "features\\admin\\services\\admin-roles.service.ts",
+        "features\\admin\\services\\menu-configuration.service.ts",
+        "features\\admin\\services\\menu-sync.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\role-auth.module.ts",
+        "Imported in domains\\auth\\services\\group.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\group.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\permission-calculator.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\permission-calculator.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\permission-query-builder.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\permission-query-builder.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\permission.service.ts",
+        "Imported in domains\\auth\\services\\role.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\role.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\unified-roles.service.ts",
+        "Imported in domains\\auth\\services\\user-societe-roles.service.ts",
+        "Imported in features\\admin\\admin.module.ts",
+        "Imported in features\\admin\\menu-sync.module.ts",
+        "Imported in features\\admin\\services\\admin-roles.service.ts",
+        "Injected via @InjectRepository in features\\admin\\services\\admin-roles.service.ts (connection: auth)",
+        "Imported in features\\admin\\services\\menu-configuration.service.ts",
+        "Imported in features\\admin\\services\\menu-sync.service.ts"
+      ]
+    },
+    {
+      "entity": "permission.entity",
+      "usageCount": 21,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\role-auth.module.ts",
+        "domains\\auth\\services\\permission-calculator.service.ts",
+        "domains\\auth\\services\\permission-query-builder.service.ts",
+        "domains\\auth\\services\\role.service.ts",
+        "features\\admin\\admin.module.ts",
+        "features\\admin\\menu-sync.module.ts",
+        "features\\admin\\services\\admin-roles.service.ts",
+        "features\\admin\\services\\menu-configuration.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\role-auth.module.ts",
+        "Imported in domains\\auth\\services\\permission-calculator.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\permission-calculator.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\permission-query-builder.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\permission-query-builder.service.ts (connection: auth)",
+        "Imported in domains\\auth\\services\\role.service.ts",
+        "Imported in features\\admin\\admin.module.ts",
+        "Imported in features\\admin\\menu-sync.module.ts",
+        "Imported in features\\admin\\services\\admin-roles.service.ts",
+        "Imported in features\\admin\\services\\menu-configuration.service.ts"
+      ]
+    },
+    {
+      "entity": "societe.entity",
+      "usageCount": 19,
+      "files": [
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\core\\services\\auth-core.service.ts",
+        "features\\database-core\\database-core.module.ts",
+        "features\\societes\\dto\\create-tenant.dto.ts",
+        "features\\societes\\services\\license-management.service.ts",
+        "features\\societes\\services\\societe-auth-repository.service.ts",
+        "features\\societes\\services\\societes.service.ts",
+        "features\\societes\\services\\tenant-initialization.service.ts",
+        "features\\societes\\services\\tenant-provisioning.service.ts",
+        "features\\societes\\societes.module.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\core\\services\\auth-core.service.ts",
+        "Imported in features\\database-core\\database-core.module.ts",
+        "Imported in features\\societes\\dto\\create-tenant.dto.ts",
+        "Imported in features\\societes\\services\\license-management.service.ts",
+        "Injected via @InjectRepository in features\\societes\\services\\license-management.service.ts (connection: auth)",
+        "Imported in features\\societes\\services\\societe-auth-repository.service.ts",
+        "Injected via @InjectRepository in features\\societes\\services\\societe-auth-repository.service.ts (connection: auth)",
+        "Imported in features\\societes\\services\\societes.service.ts",
+        "Injected via @InjectRepository in features\\societes\\services\\societes.service.ts (connection: auth)",
+        "Imported in features\\societes\\services\\tenant-initialization.service.ts",
+        "Imported in features\\societes\\services\\tenant-provisioning.service.ts",
+        "Imported in features\\societes\\societes.module.ts"
+      ]
+    },
+    {
+      "entity": "menu-item.entity",
+      "usageCount": 18,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\admin\\controllers\\menu-admin.controller.ts",
+        "domains\\admin\\entities\\menu-item-action.entity.ts",
+        "features\\admin\\controllers\\admin-menus.controller.ts",
+        "features\\admin\\menu-sync.module.ts",
+        "features\\admin\\services\\menu-configuration.service.ts",
+        "features\\admin\\services\\menu-sync.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\admin\\controllers\\menu-admin.controller.ts",
+        "Imported in domains\\admin\\entities\\menu-item-action.entity.ts",
+        "Used with decorators (Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn) in domains\\admin\\entities\\menu-item-action.entity.ts",
+        "Imported in features\\admin\\controllers\\admin-menus.controller.ts",
+        "Imported in features\\admin\\menu-sync.module.ts",
+        "Imported in features\\admin\\services\\menu-configuration.service.ts",
+        "Imported in features\\admin\\services\\menu-sync.service.ts"
+      ]
+    },
+    {
+      "entity": "menu-configuration.entity",
+      "usageCount": 10,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\admin\\controllers\\menu-admin.controller.ts",
+        "features\\admin\\menu-sync.module.ts",
+        "features\\admin\\services\\menu-configuration.service.ts",
+        "features\\admin\\services\\menu-sync.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\admin\\controllers\\menu-admin.controller.ts",
+        "Imported in features\\admin\\menu-sync.module.ts",
+        "Imported in features\\admin\\services\\menu-configuration.service.ts",
+        "Imported in features\\admin\\services\\menu-sync.service.ts"
+      ]
+    },
+    {
+      "entity": "user-menu-preference.entity",
+      "usageCount": 10,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\admin\\controllers\\menu-admin.controller.ts",
+        "features\\database-core\\database-core.module.ts",
+        "features\\menu\\menu.module.ts",
+        "features\\menu\\services\\user-menu-preference.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\admin\\controllers\\menu-admin.controller.ts",
+        "Imported in features\\database-core\\database-core.module.ts",
+        "Imported in features\\menu\\menu.module.ts",
+        "Imported in features\\menu\\services\\user-menu-preference.service.ts"
+      ]
+    },
+    {
+      "entity": "notification-rule.entity",
+      "usageCount": 8,
+      "files": [
+        "domains\\notifications\\entities\\notification-condition.entity.ts",
+        "domains\\notifications\\services\\notification-rules-engine.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\notifications\\entities\\notification-condition.entity.ts",
+        "Used with decorators (Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn) in domains\\notifications\\entities\\notification-condition.entity.ts",
+        "Imported in domains\\notifications\\services\\notification-rules-engine.service.ts"
+      ]
+    },
+    {
+      "entity": "societe-user.entity",
+      "usageCount": 8,
+      "files": [
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\auth.service.ts",
+        "features\\database-core\\database-core.module.ts",
+        "features\\societes\\services\\societe-auth-repository.service.ts",
+        "features\\societes\\services\\societe-users.service.ts",
+        "features\\societes\\services\\tenant-initialization.service.ts",
+        "features\\societes\\societes.module.ts",
+        "infrastructure\\security\\guards\\tenant.guard.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\auth.service.ts",
+        "Imported in features\\database-core\\database-core.module.ts",
+        "Imported in features\\societes\\services\\societe-auth-repository.service.ts",
+        "Imported in features\\societes\\services\\societe-users.service.ts",
+        "Imported in features\\societes\\services\\tenant-initialization.service.ts",
+        "Imported in features\\societes\\societes.module.ts",
+        "Imported in infrastructure\\security\\guards\\tenant.guard.ts"
+      ]
+    },
+    {
+      "entity": "group.entity",
+      "usageCount": 7,
+      "files": [
+        "domains\\auth\\role-auth.module.ts",
+        "domains\\auth\\services\\group.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\role-auth.module.ts",
+        "Imported in domains\\auth\\services\\group.service.ts",
+        "Injected via @InjectRepository in domains\\auth\\services\\group.service.ts (connection: auth)"
+      ]
+    },
+    {
+      "entity": "role-permission.entity",
+      "usageCount": 7,
+      "files": [
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\role-auth.module.ts",
+        "domains\\auth\\services\\permission-calculator.service.ts",
+        "domains\\auth\\services\\permission-query-builder.service.ts",
+        "domains\\auth\\services\\role.service.ts",
+        "features\\admin\\admin.module.ts",
+        "features\\admin\\services\\admin-roles.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\role-auth.module.ts",
+        "Imported in domains\\auth\\services\\permission-calculator.service.ts",
+        "Imported in domains\\auth\\services\\permission-query-builder.service.ts",
+        "Imported in domains\\auth\\services\\role.service.ts",
+        "Imported in features\\admin\\admin.module.ts",
+        "Imported in features\\admin\\services\\admin-roles.service.ts"
+      ]
+    },
+    {
+      "entity": "user-session.entity",
+      "usageCount": 6,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\auth.service.ts",
+        "domains\\auth\\__tests__\\auth.service.test.ts",
+        "features\\societes\\services\\license-management.service.ts",
+        "features\\societes\\societes.module.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\auth.service.ts",
+        "Imported in domains\\auth\\__tests__\\auth.service.test.ts",
+        "Imported in features\\societes\\services\\license-management.service.ts",
+        "Imported in features\\societes\\societes.module.ts"
+      ]
+    },
+    {
+      "entity": "user-societe-role.entity",
+      "usageCount": 6,
+      "files": [
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\services\\permission-calculator.service.ts",
+        "domains\\auth\\services\\permission-query-builder.service.ts",
+        "domains\\auth\\services\\permission.service.ts",
+        "domains\\auth\\services\\unified-roles.service.ts",
+        "domains\\auth\\services\\user-societe-roles.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\services\\permission-calculator.service.ts",
+        "Imported in domains\\auth\\services\\permission-query-builder.service.ts",
+        "Imported in domains\\auth\\services\\permission.service.ts",
+        "Imported in domains\\auth\\services\\unified-roles.service.ts",
+        "Imported in domains\\auth\\services\\user-societe-roles.service.ts"
+      ]
+    },
+    {
+      "entity": "module.entity",
+      "usageCount": 5,
+      "files": [
+        "domains\\auth\\external\\controllers\\module.controller.ts",
+        "domains\\auth\\role-auth.module.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\external\\controllers\\module.controller.ts",
+        "Injected via @InjectRepository in domains\\auth\\external\\controllers\\module.controller.ts (connection: auth)",
+        "Imported in domains\\auth\\role-auth.module.ts"
+      ]
+    },
+    {
+      "entity": "user-settings.entity",
+      "usageCount": 5,
+      "files": [
+        "domains\\users\\users.module.ts",
+        "domains\\users\\users.service.ts",
+        "domains\\users\\__tests__\\users.service.test.ts",
+        "features\\societes\\services\\tenant-initialization.service.ts",
+        "features\\societes\\societes.module.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\users\\users.module.ts",
+        "Imported in domains\\users\\users.service.ts",
+        "Imported in domains\\users\\__tests__\\users.service.test.ts",
+        "Imported in features\\societes\\services\\tenant-initialization.service.ts",
+        "Imported in features\\societes\\societes.module.ts"
+      ]
+    },
+    {
+      "entity": "discovered-page.entity",
+      "usageCount": 5,
+      "files": [
+        "features\\admin\\admin.module.ts",
+        "features\\admin\\controllers\\page-sync.controller.ts",
+        "features\\database-core\\database-core.module.ts",
+        "features\\menu\\menu.module.ts",
+        "features\\menu\\services\\page-sync.service.ts"
+      ],
+      "reasons": [
+        "Imported in features\\admin\\admin.module.ts",
+        "Imported in features\\admin\\controllers\\page-sync.controller.ts",
+        "Imported in features\\database-core\\database-core.module.ts",
+        "Imported in features\\menu\\menu.module.ts",
+        "Imported in features\\menu\\services\\page-sync.service.ts"
+      ]
+    },
+    {
+      "entity": "parameter-application.entity",
+      "usageCount": 5,
+      "files": [
+        "core\\scripts\\init-parameters-data.ts",
+        "features\\parameters\\dto\\parameter-application.dto.ts",
+        "features\\parameters\\parameters.module.ts",
+        "features\\parameters\\services\\parameter.service.test.ts",
+        "features\\parameters\\services\\parameter.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\scripts\\init-parameters-data.ts",
+        "Imported in features\\parameters\\dto\\parameter-application.dto.ts",
+        "Imported in features\\parameters\\parameters.module.ts",
+        "Imported in features\\parameters\\services\\parameter.service.test.ts",
+        "Imported in features\\parameters\\services\\parameter.service.ts"
+      ]
+    },
+    {
+      "entity": "parameter-client.entity",
+      "usageCount": 5,
+      "files": [
+        "features\\parameters\\dto\\parameter-client.dto.ts",
+        "features\\parameters\\parameters.module.ts",
+        "features\\parameters\\services\\parameter.service.test.ts",
+        "features\\parameters\\services\\parameter.service.ts",
+        "scripts\\init-partner-parameters.ts"
+      ],
+      "reasons": [
+        "Imported in features\\parameters\\dto\\parameter-client.dto.ts",
+        "Imported in features\\parameters\\parameters.module.ts",
+        "Imported in features\\parameters\\services\\parameter.service.test.ts",
+        "Imported in features\\parameters\\services\\parameter.service.ts",
+        "Imported in scripts\\init-partner-parameters.ts"
+      ]
+    },
+    {
+      "entity": "parameter-system.entity",
+      "usageCount": 5,
+      "files": [
+        "core\\scripts\\init-parameters-data.ts",
+        "features\\parameters\\dto\\parameter-system.dto.ts",
+        "features\\parameters\\parameters.module.ts",
+        "features\\parameters\\services\\parameter.service.test.ts",
+        "features\\parameters\\services\\parameter.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\scripts\\init-parameters-data.ts",
+        "Imported in features\\parameters\\dto\\parameter-system.dto.ts",
+        "Imported in features\\parameters\\parameters.module.ts",
+        "Imported in features\\parameters\\services\\parameter.service.test.ts",
+        "Imported in features\\parameters\\services\\parameter.service.ts"
+      ]
+    },
+    {
+      "entity": "site.entity",
+      "usageCount": 5,
+      "files": [
+        "features\\societes\\services\\sites.service.ts",
+        "features\\societes\\societes.module.ts"
+      ],
+      "reasons": [
+        "Imported in features\\societes\\services\\sites.service.ts",
+        "Injected via @InjectRepository in features\\societes\\services\\sites.service.ts (connection: auth)",
+        "Imported in features\\societes\\societes.module.ts"
+      ]
+    },
+    {
+      "entity": "menu-item-role.entity",
+      "usageCount": 4,
+      "files": [
+        "core\\database\\database.module.ts",
+        "features\\admin\\menu-sync.module.ts",
+        "features\\admin\\services\\menu-configuration.service.ts",
+        "features\\admin\\services\\menu-sync.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in features\\admin\\menu-sync.module.ts",
+        "Imported in features\\admin\\services\\menu-configuration.service.ts",
+        "Imported in features\\admin\\services\\menu-sync.service.ts"
+      ]
+    },
+    {
+      "entity": "system-parameter.entity",
+      "usageCount": 4,
+      "files": [
+        "core\\database\\database.module.ts",
+        "features\\admin\\admin.module.ts",
+        "features\\admin\\dto\\system-parameter.dto.ts",
+        "features\\admin\\system-parameters.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in features\\admin\\admin.module.ts",
+        "Imported in features\\admin\\dto\\system-parameter.dto.ts",
+        "Imported in features\\admin\\system-parameters.service.ts"
+      ]
+    },
+    {
+      "entity": "mfa-session.entity",
+      "usageCount": 3,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\services\\mfa.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\services\\mfa.service.ts"
+      ]
+    },
+    {
+      "entity": "user-mfa.entity",
+      "usageCount": 3,
+      "files": [
+        "core\\database\\database.module.ts",
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\services\\mfa.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\services\\mfa.service.ts"
+      ]
+    },
+    {
+      "entity": "menu-item-permission.entity",
+      "usageCount": 3,
+      "files": [
+        "core\\database\\database.module.ts",
+        "features\\admin\\menu-sync.module.ts",
+        "features\\admin\\services\\menu-configuration.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in features\\admin\\menu-sync.module.ts",
+        "Imported in features\\admin\\services\\menu-configuration.service.ts"
+      ]
+    },
+    {
+      "entity": "user-menu-item-preference.entity",
+      "usageCount": 3,
+      "files": [
+        "core\\database\\database.module.ts",
+        "features\\admin\\admin.module.ts",
+        "features\\admin\\services\\user-menu-preferences.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in features\\admin\\admin.module.ts",
+        "Imported in features\\admin\\services\\user-menu-preferences.service.ts"
+      ]
+    },
+    {
+      "entity": "user-menu-preferences.entity",
+      "usageCount": 3,
+      "files": [
+        "core\\database\\database.module.ts",
+        "features\\admin\\admin.module.ts",
+        "features\\admin\\services\\user-menu-preferences.service.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts",
+        "Imported in features\\admin\\admin.module.ts",
+        "Imported in features\\admin\\services\\user-menu-preferences.service.ts"
+      ]
+    },
+    {
+      "entity": "societe-license.entity",
+      "usageCount": 3,
+      "files": [
+        "features\\societes\\dto\\license.dto.ts",
+        "features\\societes\\services\\license-management.service.ts",
+        "features\\societes\\societes.module.ts"
+      ],
+      "reasons": [
+        "Imported in features\\societes\\dto\\license.dto.ts",
+        "Imported in features\\societes\\services\\license-management.service.ts",
+        "Imported in features\\societes\\societes.module.ts"
+      ]
+    },
+    {
+      "entity": "audit-log.entity",
+      "usageCount": 2,
+      "files": [
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\services\\audit.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\services\\audit.service.ts"
+      ]
+    },
+    {
+      "entity": "user-group.entity",
+      "usageCount": 2,
+      "files": [
+        "domains\\auth\\role-auth.module.ts",
+        "domains\\auth\\services\\group.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\role-auth.module.ts",
+        "Imported in domains\\auth\\services\\group.service.ts"
+      ]
+    },
+    {
+      "entity": "user-role.entity",
+      "usageCount": 2,
+      "files": [
+        "domains\\auth\\role-auth.module.ts",
+        "domains\\auth\\services\\role.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\role-auth.module.ts",
+        "Imported in domains\\auth\\services\\role.service.ts"
+      ]
+    },
+    {
+      "entity": "sms-log.entity",
+      "usageCount": 2,
+      "files": [
+        "domains\\auth\\auth.module.ts",
+        "domains\\auth\\services\\sms.service.ts"
+      ],
+      "reasons": [
+        "Imported in domains\\auth\\auth.module.ts",
+        "Imported in domains\\auth\\services\\sms.service.ts"
+      ]
+    },
+    {
+      "entity": "notification-settings.entity",
+      "usageCount": 2,
+      "files": [
+        "features\\societes\\services\\tenant-initialization.service.ts",
+        "features\\societes\\societes.module.ts"
+      ],
+      "reasons": [
+        "Imported in features\\societes\\services\\tenant-initialization.service.ts",
+        "Imported in features\\societes\\societes.module.ts"
+      ]
+    },
+    {
+      "entity": "menu-configuration-simple.entity",
+      "usageCount": 1,
+      "files": [
+        "features\\admin\\controllers\\menu-test.controller.ts"
+      ],
+      "reasons": [
+        "Imported in features\\admin\\controllers\\menu-test.controller.ts"
+      ]
+    },
+    {
+      "entity": "system-setting.entity",
+      "usageCount": 1,
+      "files": [
+        "core\\database\\database.module.ts"
+      ],
+      "reasons": [
+        "Imported in core\\database\\database.module.ts"
+      ]
+    }
+  ],
+  "canRemove": [
+    "    ✅ Base entities (2): base.entity, multi-tenant.entity.ts",
+    "notification-event.entity",
+    "notification-read.entity",
+    "notification-rule-execution.entity",
+    "notification-template.entity",
+    "query-builder-calculated-field.entity",
+    "query-builder-column.entity",
+    "query-builder-join.entity",
+    "query-builder-permission.entity",
+    "query-builder.entity"
+  ],
+  "summary": {
+    "totalFilesScanned": 632,
+    "decoratorUsages": 72,
+    "moduleUsages": 0,
+    "repositoryInjections": 94,
+    "criticalEntities": 35,
+    "unusedEntities": 10
+  },
+  "details": {
+    "api\\entities\\datatable-hierarchical-preferences.entity.ts": {
+      "path": "api\\entities\\datatable-hierarchical-preferences.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "ManyToOne",
+        "JoinColumn",
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../domains/users/entities/user.entity"
+        }
+      ]
+    },
+    "api\\entities\\datatable-hierarchy-order.entity.ts": {
+      "path": "api\\entities\\datatable-hierarchy-order.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "ManyToOne",
+        "JoinColumn",
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../domains/users/entities/user.entity"
+        },
+        {
+          "items": " DatatableHierarchicalPreferences ",
+          "from": "./datatable-hierarchical-preferences.entity"
+        }
+      ]
+    },
+    "api\\entities\\ui-preferences-reorderable-list.entity.ts": {
+      "path": "api\\entities\\ui-preferences-reorderable-list.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "ManyToOne",
+        "JoinColumn",
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../domains/users/entities/user.entity"
+        }
+      ]
+    },
+    "core\\common\\base\\base.entity.ts": {
+      "path": "core\\common\\base\\base.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn",
+        "DeleteDateColumn",
+        "VersionColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": []
+    },
+    "core\\database\\database.module.ts": {
+      "path": "core\\database\\database.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UiPreferencesReorderableList ",
+          "from": "../../api/entities/ui-preferences-reorderable-list.entity"
+        },
+        {
+          "items": " MFASession ",
+          "from": "../../domains/auth/core/entities/mfa-session.entity"
+        },
+        {
+          "items": " UserMFA ",
+          "from": "../../domains/auth/core/entities/user-mfa.entity"
+        },
+        {
+          "items": " UserSession ",
+          "from": "../../domains/auth/core/entities/user-session.entity"
+        },
+        {
+          "items": " User ",
+          "from": "../../domains/users/entities/user.entity"
+        },
+        {
+          "items": " MenuConfiguration ",
+          "from": "../../features/admin/entities/menu-configuration.entity"
+        },
+        {
+          "items": " MenuItem ",
+          "from": "../../features/admin/entities/menu-item.entity"
+        },
+        {
+          "items": " MenuItemPermission ",
+          "from": "../../features/admin/entities/menu-item-permission.entity"
+        },
+        {
+          "items": " MenuItemRole ",
+          "from": "../../features/admin/entities/menu-item-role.entity"
+        },
+        {
+          "items": " UserMenuItemPreference ",
+          "from": "../../features/admin/entities/user-menu-item-preference.entity"
+        },
+        {
+          "items": " UserMenuPreferences ",
+          "from": "../../features/admin/entities/user-menu-preferences.entity"
+        },
+        {
+          "items": " SystemParameter ",
+          "from": "../../features/admin/entitites/system-parameter.entity"
+        },
+        {
+          "items": " SystemSetting ",
+          "from": "../../features/admin/entitites/system-setting.entity"
+        },
+        {
+          "items": " UserMenuPreference ",
+          "from": "../../features/menu/entities/user-menu-preference.entity"
+        },
+        {
+          "items": " Notifications ",
+          "from": "../../features/notifications/entities/notifications.entity"
+        }
+      ]
+    },
+    "core\\database\\entities\\base\\multi-tenant.entity.ts": {
+      "path": "core\\database\\entities\\base\\multi-tenant.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn",
+        "DeleteDateColumn",
+        "VersionColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": []
+    },
+    "core\\scripts\\init-parameters-data.ts": {
+      "path": "core\\scripts\\init-parameters-data.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": "\r\n  ApplicationParameterScope,\r\n  ApplicationParameterType,\r\n",
+          "from": "../../features/parameters/entities/parameter-application.entity"
+        },
+        {
+          "items": "\r\n  ParameterScope,\r\n  ParameterType,\r\n",
+          "from": "../../features/parameters/entities/parameter-system.entity"
+        }
+      ]
+    },
+    "domains\\admin\\controllers\\menu-admin.controller.ts": {
+      "path": "domains\\admin\\controllers\\menu-admin.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "MenuConfiguration",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItem",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserMenuPreference",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " MenuConfiguration ",
+          "from": "../entities/menu-configuration.entity"
+        },
+        {
+          "items": " MenuItem ",
+          "from": "../entities/menu-item.entity"
+        },
+        {
+          "items": " UserMenuPreference ",
+          "from": "../entities/user-menu-preference.entity"
+        }
+      ]
+    },
+    "domains\\admin\\entities\\menu-item-action.entity.ts": {
+      "path": "domains\\admin\\entities\\menu-item-action.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "ManyToOne",
+        "JoinColumn",
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " MenuItem ",
+          "from": "./menu-item.entity"
+        }
+      ]
+    },
+    "domains\\admin\\services\\menu-sync.service.ts": {
+      "path": "domains\\admin\\services\\menu-sync.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "MenuConfiguration",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItem",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItemAction",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " MenuItemAction ",
+          "from": "../entities/menu-item-action.entity"
+        }
+      ]
+    },
+    "domains\\auth\\auth.module.ts": {
+      "path": "domains\\auth\\auth.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " Societe ",
+          "from": "../../features/societes/entities/societe.entity"
+        },
+        {
+          "items": " SocieteUser ",
+          "from": "../../features/societes/entities/societe-user.entity"
+        },
+        {
+          "items": " AuditLog ",
+          "from": "./core/entities/audit-log.entity"
+        },
+        {
+          "items": " MFASession ",
+          "from": "./core/entities/mfa-session.entity"
+        },
+        {
+          "items": " Permission ",
+          "from": "./core/entities/permission.entity"
+        },
+        {
+          "items": " Role ",
+          "from": "./core/entities/role.entity"
+        },
+        {
+          "items": " RolePermission ",
+          "from": "./core/entities/role-permission.entity"
+        },
+        {
+          "items": " UserMFA ",
+          "from": "./core/entities/user-mfa.entity"
+        },
+        {
+          "items": " UserSession ",
+          "from": "./core/entities/user-session.entity"
+        },
+        {
+          "items": " UserSocieteRole ",
+          "from": "./core/entities/user-societe-role.entity"
+        },
+        {
+          "items": " SMSLog ",
+          "from": "./entities/sms-log.entity"
+        }
+      ]
+    },
+    "domains\\auth\\auth.service.ts": {
+      "path": "domains\\auth\\auth.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserSession",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " UserSocieteRole ",
+          "from": "../../features/societes/entities/societe-user.entity"
+        },
+        {
+          "items": " UserSession ",
+          "from": "./core/entities/user-session.entity"
+        }
+      ]
+    },
+    "domains\\auth\\core\\services\\auth-core.service.ts": {
+      "path": "domains\\auth\\core\\services\\auth-core.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " SocieteStatus ",
+          "from": "../../../../features/societes/entities/societe.entity"
+        }
+      ]
+    },
+    "domains\\auth\\external\\controllers\\module.controller.ts": {
+      "path": "domains\\auth\\external\\controllers\\module.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Module",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Module, ModuleCategory ",
+          "from": "../../core/entities/module.entity"
+        }
+      ]
+    },
+    "domains\\auth\\role-auth.module.ts": {
+      "path": "domains\\auth\\role-auth.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " Group ",
+          "from": "./core/entities/group.entity"
+        },
+        {
+          "items": " Module as ModuleEntity ",
+          "from": "./core/entities/module.entity"
+        },
+        {
+          "items": " Permission ",
+          "from": "./core/entities/permission.entity"
+        },
+        {
+          "items": " Role ",
+          "from": "./core/entities/role.entity"
+        },
+        {
+          "items": " RolePermission ",
+          "from": "./core/entities/role-permission.entity"
+        },
+        {
+          "items": " UserGroup ",
+          "from": "./core/entities/user-group.entity"
+        },
+        {
+          "items": " UserRole ",
+          "from": "./core/entities/user-role.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\audit.service.ts": {
+      "path": "domains\\auth\\services\\audit.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "AuditLog",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " AuditLog ",
+          "from": "../core/entities/audit-log.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\group.service.ts": {
+      "path": "domains\\auth\\services\\group.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Group",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserGroup",
+          "connection": "auth"
+        },
+        {
+          "entity": "Role",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Group ",
+          "from": "../core/entities/group.entity"
+        },
+        {
+          "items": " Role ",
+          "from": "../core/entities/role.entity"
+        },
+        {
+          "items": " UserGroup ",
+          "from": "../core/entities/user-group.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\mfa.service.ts": {
+      "path": "domains\\auth\\services\\mfa.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserMFA",
+          "connection": "auth"
+        },
+        {
+          "entity": "MFASession",
+          "connection": "auth"
+        },
+        {
+          "entity": "User",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../users/entities/user.entity"
+        },
+        {
+          "items": " MFASession ",
+          "from": "../core/entities/mfa-session.entity"
+        },
+        {
+          "items": " UserMFA ",
+          "from": "../core/entities/user-mfa.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\permission-calculator.service.ts": {
+      "path": "domains\\auth\\services\\permission-calculator.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserSocieteRole",
+          "connection": "auth"
+        },
+        {
+          "entity": "Role",
+          "connection": "auth"
+        },
+        {
+          "entity": "Permission",
+          "connection": "auth"
+        },
+        {
+          "entity": "RolePermission",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Permission ",
+          "from": "../core/entities/permission.entity"
+        },
+        {
+          "items": " Role ",
+          "from": "../core/entities/role.entity"
+        },
+        {
+          "items": " RolePermission ",
+          "from": "../core/entities/role-permission.entity"
+        },
+        {
+          "items": " UserSocieteRole ",
+          "from": "../core/entities/user-societe-role.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\permission-query-builder.service.ts": {
+      "path": "domains\\auth\\services\\permission-query-builder.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "User",
+          "connection": "default"
+        },
+        {
+          "entity": "Permission",
+          "connection": "auth"
+        },
+        {
+          "entity": "Role",
+          "connection": "auth"
+        },
+        {
+          "entity": "RolePermission",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserSocieteRole",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../users/entities/user.entity"
+        },
+        {
+          "items": " Permission ",
+          "from": "../core/entities/permission.entity"
+        },
+        {
+          "items": " Role ",
+          "from": "../core/entities/role.entity"
+        },
+        {
+          "items": " RolePermission ",
+          "from": "../core/entities/role-permission.entity"
+        },
+        {
+          "items": " UserSocieteRole ",
+          "from": "../core/entities/user-societe-role.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\permission.service.ts": {
+      "path": "domains\\auth\\services\\permission.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserSocieteRole",
+          "connection": "auth"
+        },
+        {
+          "entity": "User",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../users/entities/user.entity"
+        },
+        {
+          "items": " UserSocieteRole ",
+          "from": "../core/entities/user-societe-role.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\role.service.ts": {
+      "path": "domains\\auth\\services\\role.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Role",
+          "connection": "auth"
+        },
+        {
+          "entity": "RolePermission",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserRole",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Role ",
+          "from": "../core/entities/role.entity"
+        },
+        {
+          "items": " RolePermission ",
+          "from": "../core/entities/role-permission.entity"
+        },
+        {
+          "items": " UserRole ",
+          "from": "../core/entities/user-role.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\session-invalidation.service.ts": {
+      "path": "domains\\auth\\services\\session-invalidation.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "User",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../users/entities/user.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\sms.service.ts": {
+      "path": "domains\\auth\\services\\sms.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SMSLog",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " SMSLog ",
+          "from": "../entities/sms-log.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\unified-roles.service.ts": {
+      "path": "domains\\auth\\services\\unified-roles.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserSocieteRole",
+          "connection": "auth"
+        },
+        {
+          "entity": "User",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../users/entities/user.entity"
+        },
+        {
+          "items": " UserSocieteRole ",
+          "from": "../core/entities/user-societe-role.entity"
+        }
+      ]
+    },
+    "domains\\auth\\services\\user-societe-roles.service.ts": {
+      "path": "domains\\auth\\services\\user-societe-roles.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserSocieteRole",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " UserSocieteRole ",
+          "from": "../core/entities/user-societe-role.entity"
+        }
+      ]
+    },
+    "domains\\auth\\__tests__\\auth.service.test.ts": {
+      "path": "domains\\auth\\__tests__\\auth.service.test.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UserSession ",
+          "from": "../core/entities/user-session.entity"
+        }
+      ]
+    },
+    "domains\\core\\base\\business-entity.ts": {
+      "path": "domains\\core\\base\\business-entity.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " CommonEntity ",
+          "from": "../../../core/database/entities/base/multi-tenant.entity"
+        }
+      ]
+    },
+    "domains\\notifications\\entities\\notification-action.entity.ts": {
+      "path": "domains\\notifications\\entities\\notification-action.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "ManyToOne",
+        "JoinColumn",
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": []
+    },
+    "domains\\notifications\\entities\\notification-condition.entity.ts": {
+      "path": "domains\\notifications\\entities\\notification-condition.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "ManyToOne",
+        "JoinColumn",
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn",
+        "UpdateDateColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " NotificationRule ",
+          "from": "./notification-rule.entity"
+        }
+      ]
+    },
+    "domains\\notifications\\entities\\notification-execution.entity.ts": {
+      "path": "domains\\notifications\\entities\\notification-execution.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "ManyToOne",
+        "JoinColumn",
+        "PrimaryGeneratedColumn",
+        "Column",
+        "CreateDateColumn"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": []
+    },
+    "domains\\notifications\\notifications.controller.ts": {
+      "path": "domains\\notifications\\notifications.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UserRole ",
+          "from": "../users/entities/user.entity"
+        }
+      ]
+    },
+    "domains\\notifications\\services\\notification-action-executor.service.ts": {
+      "path": "domains\\notifications\\services\\notification-action-executor.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " ActionType, type NotificationAction ",
+          "from": "../entities/notification-action.entity"
+        }
+      ]
+    },
+    "domains\\notifications\\services\\notification-condition-evaluator.service.ts": {
+      "path": "domains\\notifications\\services\\notification-condition-evaluator.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "NotificationCondition",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " ConditionType, NotificationCondition ",
+          "from": "../entities/notification-condition.entity"
+        }
+      ]
+    },
+    "domains\\notifications\\services\\notification-rules-engine.service.ts": {
+      "path": "domains\\notifications\\services\\notification-rules-engine.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "NotificationRule",
+          "connection": "auth"
+        },
+        {
+          "entity": "NotificationCondition",
+          "connection": "auth"
+        },
+        {
+          "entity": "NotificationAction",
+          "connection": "auth"
+        },
+        {
+          "entity": "NotificationExecution",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " ActionType, NotificationAction ",
+          "from": "../entities/notification-action.entity"
+        },
+        {
+          "items": " NotificationCondition ",
+          "from": "../entities/notification-condition.entity"
+        },
+        {
+          "items": " ExecutionStatus, NotificationExecution ",
+          "from": "../entities/notification-execution.entity"
+        },
+        {
+          "items": " NotificationRule, RuleStatus, RuleType ",
+          "from": "../entities/notification-rule.entity"
+        }
+      ]
+    },
+    "domains\\users\\dto\\create-user.dto.ts": {
+      "path": "domains\\users\\dto\\create-user.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UserRole ",
+          "from": "../entities/user.entity"
+        }
+      ]
+    },
+    "domains\\users\\dto\\user-query.dto.ts": {
+      "path": "domains\\users\\dto\\user-query.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UserRole ",
+          "from": "../entities/user.entity"
+        }
+      ]
+    },
+    "domains\\users\\services\\user-auth-repository.service.ts": {
+      "path": "domains\\users\\services\\user-auth-repository.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "User",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../entities/user.entity"
+        }
+      ]
+    },
+    "domains\\users\\users.module.ts": {
+      "path": "domains\\users\\users.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "./entities/user.entity"
+        },
+        {
+          "items": " UserSettings ",
+          "from": "./entities/user-settings.entity"
+        }
+      ]
+    },
+    "domains\\users\\users.service.ts": {
+      "path": "domains\\users\\users.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "User",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserSettings",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User, UserRole ",
+          "from": "./entities/user.entity"
+        },
+        {
+          "items": " UserSettings ",
+          "from": "./entities/user-settings.entity"
+        }
+      ]
+    },
+    "domains\\users\\__tests__\\users.service.test.ts": {
+      "path": "domains\\users\\__tests__\\users.service.test.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../entities/user.entity"
+        },
+        {
+          "items": " UserSettings ",
+          "from": "../entities/user-settings.entity"
+        }
+      ]
+    },
+    "features\\admin\\admin.module.ts": {
+      "path": "features\\admin\\admin.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " SystemParameter ",
+          "from": "./entitites/system-parameter.entity"
+        },
+        {
+          "items": " UserMenuPreferences ",
+          "from": "./entities/user-menu-preferences.entity"
+        },
+        {
+          "items": " UserMenuItemPreference ",
+          "from": "./entities/user-menu-item-preference.entity"
+        },
+        {
+          "items": " Permission ",
+          "from": "../../domains/auth/core/entities/permission.entity"
+        },
+        {
+          "items": " Role ",
+          "from": "../../domains/auth/core/entities/role.entity"
+        },
+        {
+          "items": " RolePermission ",
+          "from": "../../domains/auth/core/entities/role-permission.entity"
+        },
+        {
+          "items": " DiscoveredPage ",
+          "from": "../menu/entities/discovered-page.entity"
+        }
+      ]
+    },
+    "features\\admin\\controllers\\admin-menus.controller.ts": {
+      "path": "features\\admin\\controllers\\admin-menus.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " MenuItemType ",
+          "from": "../entities/menu-item.entity"
+        }
+      ]
+    },
+    "features\\admin\\controllers\\menu-test.controller.ts": {
+      "path": "features\\admin\\controllers\\menu-test.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "MenuConfigurationSimple",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " MenuConfigurationSimple ",
+          "from": "../entities/menu-configuration-simple.entity"
+        }
+      ]
+    },
+    "features\\admin\\controllers\\page-sync.controller.ts": {
+      "path": "features\\admin\\controllers\\page-sync.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "DiscoveredPage",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " DiscoveredPage ",
+          "from": "../../menu/entities/discovered-page.entity"
+        }
+      ]
+    },
+    "features\\admin\\dto\\system-parameter.dto.ts": {
+      "path": "features\\admin\\dto\\system-parameter.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " ParameterCategory, ParameterType ",
+          "from": "../entitites/system-parameter.entity"
+        }
+      ]
+    },
+    "features\\admin\\menu-sync.module.ts": {
+      "path": "features\\admin\\menu-sync.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " MenuConfiguration ",
+          "from": "./entities/menu-configuration.entity"
+        },
+        {
+          "items": " MenuItem ",
+          "from": "./entities/menu-item.entity"
+        },
+        {
+          "items": " MenuItemPermission ",
+          "from": "./entities/menu-item-permission.entity"
+        },
+        {
+          "items": " MenuItemRole ",
+          "from": "./entities/menu-item-role.entity"
+        }
+      ]
+    },
+    "features\\admin\\services\\admin-roles.service.ts": {
+      "path": "features\\admin\\services\\admin-roles.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Role",
+          "connection": "auth"
+        },
+        {
+          "entity": "RolePermission",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Role ",
+          "from": "../../../domains/auth/core/entities/role.entity"
+        },
+        {
+          "items": " RolePermission ",
+          "from": "../../../domains/auth/core/entities/role-permission.entity"
+        }
+      ]
+    },
+    "features\\admin\\services\\menu-configuration.service.ts": {
+      "path": "features\\admin\\services\\menu-configuration.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "MenuConfiguration",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItem",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItemPermission",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItemRole",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " MenuConfiguration ",
+          "from": "../entities/menu-configuration.entity"
+        },
+        {
+          "items": " MenuItem, MenuItemType ",
+          "from": "../entities/menu-item.entity"
+        },
+        {
+          "items": " MenuItemPermission ",
+          "from": "../entities/menu-item-permission.entity"
+        },
+        {
+          "items": " MenuItemRole ",
+          "from": "../entities/menu-item-role.entity"
+        }
+      ]
+    },
+    "features\\admin\\services\\menu-sync.service.ts": {
+      "path": "features\\admin\\services\\menu-sync.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "MenuConfiguration",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItem",
+          "connection": "auth"
+        },
+        {
+          "entity": "MenuItemRole",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " MenuConfiguration ",
+          "from": "../entities/menu-configuration.entity"
+        },
+        {
+          "items": " MenuItem ",
+          "from": "../entities/menu-item.entity"
+        },
+        {
+          "items": " MenuItemRole ",
+          "from": "../entities/menu-item-role.entity"
+        }
+      ]
+    },
+    "features\\admin\\services\\user-menu-preferences.service.ts": {
+      "path": "features\\admin\\services\\user-menu-preferences.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserMenuPreferences",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserMenuItemPreference",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " UserMenuItemPreference ",
+          "from": "../entities/user-menu-item-preference.entity"
+        },
+        {
+          "items": " UserMenuPreferences ",
+          "from": "../entities/user-menu-preferences.entity"
+        }
+      ]
+    },
+    "features\\admin\\system-parameters.controller.ts": {
+      "path": "features\\admin\\system-parameters.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UserRole ",
+          "from": "../../domains/users/entities/user.entity"
+        }
+      ]
+    },
+    "features\\admin\\system-parameters.service.ts": {
+      "path": "features\\admin\\system-parameters.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SystemParameter",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": "\r\n  type ParameterCategory,\r\n  type ParameterType,\r\n",
+          "from": "./entitites/system-parameter.entity"
+        }
+      ]
+    },
+    "features\\database-core\\database-core.module.ts": {
+      "path": "features\\database-core\\database-core.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../domains/users/entities/user.entity"
+        },
+        {
+          "items": " DiscoveredPage ",
+          "from": "../menu/entities/discovered-page.entity"
+        },
+        {
+          "items": " UserMenuPreference ",
+          "from": "../menu/entities/user-menu-preference.entity"
+        },
+        {
+          "items": " Societe ",
+          "from": "../societes/entities/societe.entity"
+        },
+        {
+          "items": " SocieteUser ",
+          "from": "../societes/entities/societe-user.entity"
+        }
+      ]
+    },
+    "features\\menu\\menu.module.ts": {
+      "path": "features\\menu\\menu.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " DiscoveredPage ",
+          "from": "./entities/discovered-page.entity"
+        },
+        {
+          "items": " UserMenuPreference ",
+          "from": "./entities/user-menu-preference.entity"
+        }
+      ]
+    },
+    "features\\menu\\services\\page-sync.service.ts": {
+      "path": "features\\menu\\services\\page-sync.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "DiscoveredPage",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " DiscoveredPage ",
+          "from": "../entities/discovered-page.entity"
+        }
+      ]
+    },
+    "features\\menu\\services\\user-menu-preference.service.ts": {
+      "path": "features\\menu\\services\\user-menu-preference.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UserMenuPreference",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " UserMenuPreference ",
+          "from": "../entities/user-menu-preference.entity"
+        }
+      ]
+    },
+    "features\\notifications\\dto\\create-notification.dto.ts": {
+      "path": "features\\notifications\\dto\\create-notification.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " NotificationType ",
+          "from": "../entities/notifications.entity"
+        }
+      ]
+    },
+    "features\\notifications\\dto\\create-notifications.dto.ts": {
+      "path": "features\\notifications\\dto\\create-notifications.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " NotificationType ",
+          "from": "../entities/notifications.entity"
+        }
+      ]
+    },
+    "features\\notifications\\dto\\notifications-query.dto.ts": {
+      "path": "features\\notifications\\dto\\notifications-query.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " NotificationType ",
+          "from": "../entities/notifications.entity"
+        }
+      ]
+    },
+    "features\\notifications\\entities\\notifications.entity.ts": {
+      "path": "features\\notifications\\entities\\notifications.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "Column"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " CommonEntity ",
+          "from": "../../../core/database/entities/base/multi-tenant.entity"
+        }
+      ]
+    },
+    "features\\notifications\\notifications.controller.ts": {
+      "path": "features\\notifications\\notifications.controller.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UserRole ",
+          "from": "../../domains/users/entities/user.entity"
+        }
+      ]
+    },
+    "features\\notifications\\notifications.module.ts": {
+      "path": "features\\notifications\\notifications.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " Notifications ",
+          "from": "./entities/notifications.entity"
+        }
+      ]
+    },
+    "features\\notifications\\notifications.service.ts": {
+      "path": "features\\notifications\\notifications.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Notifications",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Notifications ",
+          "from": "./entities/notifications.entity"
+        }
+      ]
+    },
+    "features\\notifications\\services\\notification-rule-engine.service.ts": {
+      "path": "features\\notifications\\services\\notification-rule-engine.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "NotificationRule",
+          "connection": "shared"
+        },
+        {
+          "entity": "Notifications",
+          "connection": "auth"
+        }
+      ],
+      "imports": []
+    },
+    "features\\notifications\\services\\notification-rule.service.ts": {
+      "path": "features\\notifications\\services\\notification-rule.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "NotificationRule",
+          "connection": "default"
+        },
+        {
+          "entity": "NotificationRuleExecution",
+          "connection": "default"
+        },
+        {
+          "entity": "NotificationEvent",
+          "connection": "default"
+        }
+      ],
+      "imports": []
+    },
+    "features\\parameters\\dto\\parameter-application.dto.ts": {
+      "path": "features\\parameters\\dto\\parameter-application.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": "\r\n  ApplicationParameterScope,\r\n  ApplicationParameterType,\r\n",
+          "from": "../entities/parameter-application.entity"
+        }
+      ]
+    },
+    "features\\parameters\\dto\\parameter-client.dto.ts": {
+      "path": "features\\parameters\\dto\\parameter-client.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": "\r\n  ClientParameterAccess,\r\n  ClientParameterScope,\r\n  ClientParameterType,\r\n",
+          "from": "../entities/parameter-client.entity"
+        }
+      ]
+    },
+    "features\\parameters\\dto\\parameter-system.dto.ts": {
+      "path": "features\\parameters\\dto\\parameter-system.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " ParameterScope, ParameterType ",
+          "from": "../entities/parameter-system.entity"
+        }
+      ]
+    },
+    "features\\parameters\\parameters.module.ts": {
+      "path": "features\\parameters\\parameters.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " ParameterApplication ",
+          "from": "./entities/parameter-application.entity"
+        },
+        {
+          "items": " ParameterClient ",
+          "from": "./entities/parameter-client.entity"
+        },
+        {
+          "items": " ParameterSystem ",
+          "from": "./entities/parameter-system.entity"
+        }
+      ]
+    },
+    "features\\parameters\\services\\parameter.service.test.ts": {
+      "path": "features\\parameters\\services\\parameter.service.test.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " ParameterApplication ",
+          "from": "../entities/parameter-application.entity"
+        },
+        {
+          "items": " ParameterClient ",
+          "from": "../entities/parameter-client.entity"
+        },
+        {
+          "items": " ParameterScope, ParameterSystem, ParameterType ",
+          "from": "../entities/parameter-system.entity"
+        }
+      ]
+    },
+    "features\\parameters\\services\\parameter.service.ts": {
+      "path": "features\\parameters\\services\\parameter.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "ParameterSystem",
+          "connection": "auth"
+        },
+        {
+          "entity": "ParameterApplication",
+          "connection": "auth"
+        },
+        {
+          "entity": "ParameterClient",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " ParameterApplication ",
+          "from": "../entities/parameter-application.entity"
+        },
+        {
+          "items": " ParameterClient ",
+          "from": "../entities/parameter-client.entity"
+        },
+        {
+          "items": " ParameterScope, ParameterSystem, ParameterType ",
+          "from": "../entities/parameter-system.entity"
+        }
+      ]
+    },
+    "features\\query-builder\\query-builder.module.ts": {
+      "path": "features\\query-builder\\query-builder.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../domains/users/entities/user.entity"
+        }
+      ]
+    },
+    "features\\query-builder\\services\\query-builder-permission.service.ts": {
+      "path": "features\\query-builder\\services\\query-builder-permission.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "QueryBuilderPermission",
+          "connection": "auth"
+        },
+        {
+          "entity": "User",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User ",
+          "from": "../../../domains/users/entities/user.entity"
+        }
+      ]
+    },
+    "features\\query-builder\\services\\query-builder.service.ts": {
+      "path": "features\\query-builder\\services\\query-builder.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "QueryBuilder",
+          "connection": "auth"
+        },
+        {
+          "entity": "QueryBuilderColumn",
+          "connection": "auth"
+        },
+        {
+          "entity": "QueryBuilderJoin",
+          "connection": "auth"
+        },
+        {
+          "entity": "QueryBuilderCalculatedField",
+          "connection": "auth"
+        }
+      ],
+      "imports": []
+    },
+    "features\\shared\\entities\\index.ts": {
+      "path": "features\\shared\\entities\\index.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " SharedMaterial ",
+          "from": "./shared-material.entity"
+        },
+        {
+          "items": " SharedProcess ",
+          "from": "./shared-process.entity"
+        },
+        {
+          "items": " SharedQualityStandard ",
+          "from": "./shared-quality-standard.entity"
+        },
+        {
+          "items": " SharedSupplier ",
+          "from": "./shared-supplier.entity"
+        }
+      ]
+    },
+    "features\\shared\\entities\\shared-data-registry.entity.ts": {
+      "path": "features\\shared\\entities\\shared-data-registry.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "Column"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " BaseAuditEntity ",
+          "from": "../../../core/database/entities/base/multi-tenant.entity"
+        }
+      ]
+    },
+    "features\\shared\\entities\\shared-material.entity.ts": {
+      "path": "features\\shared\\entities\\shared-material.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "Column"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " BaseAuditEntity ",
+          "from": "../../../core/database/entities/base/multi-tenant.entity"
+        }
+      ]
+    },
+    "features\\shared\\entities\\shared-process.entity.ts": {
+      "path": "features\\shared\\entities\\shared-process.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "Column"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " BaseAuditEntity ",
+          "from": "../../../core/database/entities/base/multi-tenant.entity"
+        }
+      ]
+    },
+    "features\\shared\\entities\\shared-quality-standard.entity.ts": {
+      "path": "features\\shared\\entities\\shared-quality-standard.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "Column"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " BaseAuditEntity ",
+          "from": "../../../core/database/entities/base/multi-tenant.entity"
+        }
+      ]
+    },
+    "features\\shared\\entities\\shared-supplier.entity.ts": {
+      "path": "features\\shared\\entities\\shared-supplier.entity.ts",
+      "hasDecorators": true,
+      "decoratorsFound": [
+        "Entity",
+        "Column"
+      ],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " BaseAuditEntity ",
+          "from": "../../../core/database/entities/base/multi-tenant.entity"
+        }
+      ]
+    },
+    "features\\shared\\services\\shared-data-registry.service.ts": {
+      "path": "features\\shared\\services\\shared-data-registry.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SharedDataRegistry",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " SharedDataRegistry ",
+          "from": "../entities/shared-data-registry.entity"
+        }
+      ]
+    },
+    "features\\shared\\services\\shared-material.service.ts": {
+      "path": "features\\shared\\services\\shared-material.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SharedMaterial",
+          "connection": "shared"
+        }
+      ],
+      "imports": [
+        {
+          "items": " type MaterialType, SharedMaterial ",
+          "from": "../entities/shared-material.entity"
+        }
+      ]
+    },
+    "features\\shared\\services\\shared-process.service.ts": {
+      "path": "features\\shared\\services\\shared-process.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SharedProcess",
+          "connection": "shared"
+        }
+      ],
+      "imports": [
+        {
+          "items": " type ProcessType, SharedProcess ",
+          "from": "../entities/shared-process.entity"
+        }
+      ]
+    },
+    "features\\shared\\services\\shared-quality-standard.service.ts": {
+      "path": "features\\shared\\services\\shared-quality-standard.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SharedQualityStandard",
+          "connection": "shared"
+        }
+      ],
+      "imports": [
+        {
+          "items": "\r\n  type QualityStandardType,\r\n  SharedQualityStandard,\r\n",
+          "from": "../entities/shared-quality-standard.entity"
+        }
+      ]
+    },
+    "features\\shared\\services\\shared-supplier.service.ts": {
+      "path": "features\\shared\\services\\shared-supplier.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SharedSupplier",
+          "connection": "shared"
+        }
+      ],
+      "imports": [
+        {
+          "items": " SharedSupplier, type SupplierType ",
+          "from": "../entities/shared-supplier.entity"
+        }
+      ]
+    },
+    "features\\shared\\shared.module.ts": {
+      "path": "features\\shared\\shared.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " SharedDataRegistry ",
+          "from": "./entities/shared-data-registry.entity"
+        },
+        {
+          "items": " SharedMaterial ",
+          "from": "./entities/shared-material.entity"
+        },
+        {
+          "items": " SharedProcess ",
+          "from": "./entities/shared-process.entity"
+        },
+        {
+          "items": " SharedQualityStandard ",
+          "from": "./entities/shared-quality-standard.entity"
+        },
+        {
+          "items": " SharedSupplier ",
+          "from": "./entities/shared-supplier.entity"
+        }
+      ]
+    },
+    "features\\societes\\dto\\create-tenant.dto.ts": {
+      "path": "features\\societes\\dto\\create-tenant.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " SocietePlan ",
+          "from": "../entities/societe.entity"
+        }
+      ]
+    },
+    "features\\societes\\dto\\license.dto.ts": {
+      "path": "features\\societes\\dto\\license.dto.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " LicenseStatus, LicenseType ",
+          "from": "../entities/societe-license.entity"
+        }
+      ]
+    },
+    "features\\societes\\services\\license-management.service.ts": {
+      "path": "features\\societes\\services\\license-management.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SocieteLicense",
+          "connection": "auth"
+        },
+        {
+          "entity": "Societe",
+          "connection": "auth"
+        },
+        {
+          "entity": "User",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserSession",
+          "connection": "auth"
+        },
+        {
+          "entity": "Notifications",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " UserSession ",
+          "from": "../../../domains/auth/core/entities/user-session.entity"
+        },
+        {
+          "items": " User ",
+          "from": "../../../domains/users/entities/user.entity"
+        },
+        {
+          "items": "\r\n  NotificationCategory,\r\n  NotificationPriority,\r\n  Notifications,\r\n  NotificationType,\r\n  RecipientType,\r\n",
+          "from": "../../../features/notifications/entities/notifications.entity"
+        },
+        {
+          "items": " Societe ",
+          "from": "../entities/societe.entity"
+        },
+        {
+          "items": " LicenseStatus, LicenseType, SocieteLicense ",
+          "from": "../entities/societe-license.entity"
+        }
+      ]
+    },
+    "features\\societes\\services\\sites.service.ts": {
+      "path": "features\\societes\\services\\sites.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Site",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Site ",
+          "from": "../entities/site.entity"
+        }
+      ]
+    },
+    "features\\societes\\services\\societe-auth-repository.service.ts": {
+      "path": "features\\societes\\services\\societe-auth-repository.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Societe",
+          "connection": "auth"
+        },
+        {
+          "entity": "SocieteUser",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Societe, SocieteStatus ",
+          "from": "../entities/societe.entity"
+        },
+        {
+          "items": " SocieteUser ",
+          "from": "../entities/societe-user.entity"
+        }
+      ]
+    },
+    "features\\societes\\services\\societe-users.service.ts": {
+      "path": "features\\societes\\services\\societe-users.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SocieteUser",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " SocieteUser, type UserSocieteRole ",
+          "from": "../entities/societe-user.entity"
+        }
+      ]
+    },
+    "features\\societes\\services\\societes.service.ts": {
+      "path": "features\\societes\\services\\societes.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "Societe",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " Societe, SocieteStatus ",
+          "from": "../entities/societe.entity"
+        }
+      ]
+    },
+    "features\\societes\\services\\tenant-initialization.service.ts": {
+      "path": "features\\societes\\services\\tenant-initialization.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "User",
+          "connection": "auth"
+        },
+        {
+          "entity": "UserSettings",
+          "connection": "auth"
+        },
+        {
+          "entity": "NotificationSettings",
+          "connection": "auth"
+        },
+        {
+          "entity": "SocieteUser",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " User, UserRole as UserRoleEnum ",
+          "from": "../../../domains/users/entities/user.entity"
+        },
+        {
+          "items": " UserSettings ",
+          "from": "../../../domains/users/entities/user-settings.entity"
+        },
+        {
+          "items": " NotificationSettings ",
+          "from": "../../notifications/entities/notification-settings.entity"
+        },
+        {
+          "items": " Societe ",
+          "from": "../entities/societe.entity"
+        },
+        {
+          "items": " SocieteUser, UserSocieteRole ",
+          "from": "../entities/societe-user.entity"
+        }
+      ]
+    },
+    "features\\societes\\services\\tenant-provisioning.service.ts": {
+      "path": "features\\societes\\services\\tenant-provisioning.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " Societe, SocieteStatus ",
+          "from": "../entities/societe.entity"
+        }
+      ]
+    },
+    "features\\societes\\societes.module.ts": {
+      "path": "features\\societes\\societes.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UserSession ",
+          "from": "../../domains/auth/core/entities/user-session.entity"
+        },
+        {
+          "items": " User ",
+          "from": "../../domains/users/entities/user.entity"
+        },
+        {
+          "items": " UserSettings ",
+          "from": "../../domains/users/entities/user-settings.entity"
+        },
+        {
+          "items": " Notifications ",
+          "from": "../notifications/entities/notifications.entity"
+        },
+        {
+          "items": " NotificationSettings ",
+          "from": "../notifications/entities/notification-settings.entity"
+        },
+        {
+          "items": " Site ",
+          "from": "./entities/site.entity"
+        },
+        {
+          "items": " Societe ",
+          "from": "./entities/societe.entity"
+        },
+        {
+          "items": " SocieteLicense ",
+          "from": "./entities/societe-license.entity"
+        },
+        {
+          "items": " SocieteUser ",
+          "from": "./entities/societe-user.entity"
+        }
+      ]
+    },
+    "features\\ui-preferences\\services\\ui-preferences-reorderable-list.service.ts": {
+      "path": "features\\ui-preferences\\services\\ui-preferences-reorderable-list.service.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "UiPreferencesReorderableList",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " UiPreferencesReorderableList ",
+          "from": "../../../api/entities/ui-preferences-reorderable-list.entity"
+        }
+      ]
+    },
+    "features\\ui-preferences\\ui-preferences.module.ts": {
+      "path": "features\\ui-preferences\\ui-preferences.module.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " UiPreferencesReorderableList ",
+          "from": "../../api/entities/ui-preferences-reorderable-list.entity"
+        }
+      ]
+    },
+    "infrastructure\\security\\guards\\tenant.guard.ts": {
+      "path": "infrastructure\\security\\guards\\tenant.guard.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [
+        {
+          "entity": "SocieteUser",
+          "connection": "auth"
+        }
+      ],
+      "imports": [
+        {
+          "items": " SocieteUser ",
+          "from": "../../../features/societes/entities/societe-user.entity"
+        }
+      ]
+    },
+    "scripts\\init-partner-parameters.ts": {
+      "path": "scripts\\init-partner-parameters.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": "\r\n  ClientParameterAccess,\r\n  ClientParameterScope,\r\n  ClientParameterType,\r\n  ParameterClient,\r\n",
+          "from": "../features/parameters/entities/parameter-client.entity"
+        }
+      ]
+    },
+    "scripts\\init-sector-pricing-data.ts": {
+      "path": "scripts\\init-sector-pricing-data.ts",
+      "hasDecorators": false,
+      "decoratorsFound": [],
+      "entitiesInModule": [],
+      "repositoryInjections": [],
+      "imports": [
+        {
+          "items": " BTPIndex, BTPIndexType ",
+          "from": "../modules/pricing/entities/btp-index.entity"
+        },
+        {
+          "items": " CustomerSectorAssignment ",
+          "from": "../modules/pricing/entities/customer-sector-assignment.entity"
+        },
+        {
+          "items": "\r\n  CoefficientType,\r\n  SectorCoefficient,\r\n  SectorType,\r\n",
+          "from": "../modules/pricing/entities/sector-coefficient.entity"
+        }
+      ]
+    }
+  }
+}

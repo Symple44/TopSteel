@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../../domains/auth/core/entities/role-permission.entity'
-import { Role, RolePermission } from '@prisma/client'
+
 
 
 // Interface for Permission entity properties

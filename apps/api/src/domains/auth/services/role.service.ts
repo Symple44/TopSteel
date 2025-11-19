@@ -9,7 +9,7 @@ import { Repository } from 'typeorm'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserRole } from '../core/entities/user-role.entity'
-import { Role, RolePermission, UserRole } from '@prisma/client'
+
 
 // Types déjà définis dans le service
 

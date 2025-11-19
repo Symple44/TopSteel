@@ -7,7 +7,7 @@ import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/com
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { DiscoveredPage } from '../../menu/entities/discovered-page.entity'
 import { PageSyncService } from '../../menu/services/page-sync.service'
-import { DiscoveredPage } from '@prisma/client'
+
 
 
 @Controller('admin/page-sync')

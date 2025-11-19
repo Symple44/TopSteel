@@ -45,4 +45,4 @@ export class UserAuthRepositoryService implements IUserRepository {
     return count > 0
   }
 }
-import { User } from '@prisma/client'
+

@@ -12,7 +12,7 @@ import { GeolocationService } from './geolocation.service'
 import { SMSService } from './sms.service'
 import { TOTPService } from './totp.service'
 import { WebAuthnService } from './webauthn.service'
-import { MfaSession, User, UserMfa } from '@prisma/client'
+import { MfaSession, UserMfa } from '@prisma/client'
 
 interface MFASetupResult {
   success: boolean

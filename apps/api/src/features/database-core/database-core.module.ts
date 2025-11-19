@@ -1,11 +1,11 @@
 import { Global, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { User } from '../../domains/users/entities/user.entity'
-import { DiscoveredPage } from '../menu/entities/discovered-page.entity'
-import { UserMenuPreference } from '../menu/entities/user-menu-preference.entity'
-import { Societe } from '../societes/entities/societe.entity'
-import { SocieteUser } from '../societes/entities/societe-user.entity'
+
+
+
+
+
 import { DatabaseAdminController } from './controllers/database-admin.controller'
 import { DatabaseHealthSimpleService } from './services/database-health-simple.service'
 import { MigrationManagerService } from './services/migration-manager.service'
@@ -37,4 +37,8 @@ import { TenantConnectionSimpleService } from './services/tenant-connection-simp
   ],
 })
 export class DatabaseCoreModule {}
-import { DiscoveredPage, Societe, SocieteUser, User, UserMenuPreference } from '@prisma/client'
+import { DiscoveredPage } from '../../features/menu/entities/discovered-page.entity'
+import { Societe } from '../../features/societes/entities/societe.entity'
+import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
+import { User } from '../../domains/users/entities/user.entity'
+import { UserMenuPreference } from '../../domains/admin/entities/user-menu-preference.entity'

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 import { MenuConfigurationSimple } from '../entities/menu-configuration-simple.entity'
-import { MenuConfigurationSimple } from '@prisma/client'
+
 
 
 @Controller('admin/menu-test')

@@ -8,7 +8,7 @@ import type { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
 import type { UserQueryDto } from './dto/user-query.dto'
 import { User, UserRole } from './entities/user.entity'
 import { UserSettings } from './entities/user-settings.entity'
-import { User, UserSettings } from '@prisma/client'
+
 
 
 @Injectable()

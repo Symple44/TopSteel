@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
 import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
-import { SocieteUser } from '@prisma/client'
+
 
 
 @Injectable()

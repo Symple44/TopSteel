@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { ParameterApplication } from '../entities/parameter-application.entity'
 import { ParameterClient } from '../entities/parameter-client.entity'
 import { ParameterScope, ParameterSystem, ParameterType } from '../entities/parameter-system.entity'
-import { ParameterApplication, ParameterClient, ParameterSystem } from '@prisma/client'
+
 
 
 type ParameterEntity = ParameterSystem | ParameterApplication | ParameterClient

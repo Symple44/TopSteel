@@ -6,7 +6,7 @@ import { Module, ModuleCategory } from '../../core/entities/module.entity'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
-import { Module } from '@prisma/client'
+
 
 
 @ApiTags('Modules')

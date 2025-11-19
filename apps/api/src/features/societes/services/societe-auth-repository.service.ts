@@ -7,7 +7,7 @@ import type {
 } from '../../../domains/auth/core/interfaces/societe-repository.interface'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 import { SocieteUser } from '../entities/societe-user.entity'
-import { Societe, SocieteUser } from '@prisma/client'
+
 
 
 /**

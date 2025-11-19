@@ -43,7 +43,7 @@ import { MenuItem } from '../entities/menu-item.entity'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
 import { MenuSyncOptions, MenuSyncService } from '../services/menu-sync.service'
 import { PageDiscoveryService } from '../services/page-discovery.service'
-import { MenuConfiguration, MenuItem, UserMenuPreference } from '@prisma/client'
+
 
 
 @ApiTags('Admin - Menu Management')

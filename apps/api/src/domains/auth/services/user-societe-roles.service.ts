@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 import { Permission, PermissionService } from './permission.service'
 import { PermissionCalculatorService } from './permission-calculator.service'
-import { UserSocieteRole } from '@prisma/client'
+
 
 
 export interface UserSocieteRoleWithPermissions {

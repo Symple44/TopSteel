@@ -5,8 +5,8 @@ import { PassportModule } from '@nestjs/passport'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { DatabaseCoreModule } from '../../features/database-core/database-core.module'
 import { ParametersModule } from '../../features/parameters/parameters.module'
-import { Societe } from '../../features/societes/entities/societe.entity'
-import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
+
+
 import { SocietesModule } from '../../features/societes/societes.module'
 import { TopSteelLogger } from '../../core/common/logger/structured-logger.service'
 import { RedisService } from '../../core/common/services/redis.service'
@@ -14,14 +14,14 @@ import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimize
 import { UsersModule } from '../users/users.module'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
-import { AuditLog } from './core/entities/audit-log.entity'
+
 import { MFASession } from './core/entities/mfa-session.entity'
-import { Permission } from './core/entities/permission.entity'
-import { Role } from './core/entities/role.entity'
-import { RolePermission } from './core/entities/role-permission.entity'
+
+
+
 import { UserMFA } from './core/entities/user-mfa.entity'
-import { UserSession } from './core/entities/user-session.entity'
-import { UserSocieteRole } from './core/entities/user-societe-role.entity'
+
+
 import { AuthRepositoryProviders } from './core/providers/auth-repository.providers'
 import { AuthCoreService } from './core/services/auth-core.service'
 import { SMSLog } from './entities/sms-log.entity'
@@ -48,7 +48,17 @@ import { SessionInvalidationService } from './services/session-invalidation.serv
 import { SessionRedisService } from './services/session-redis.service'
 import { SMSService } from './services/sms.service'
 import { TOTPService } from './services/totp.service'
-import { AuditLog, MfaSession, Permission, Role, RolePermission, SmsLog, Societe, SocieteUser, UserMfa, UserSession, UserSocieteRole } from '@prisma/client'
+import { AuditLog } from '../../domains/auth/core/entities/audit-log.entity'
+import { MfaSession } from '../../domains/auth/core/entities/mfa-session.entity'
+import { Permission } from '../../domains/auth/core/entities/permission.entity'
+import { Role } from '../../domains/auth/core/entities/role.entity'
+import { RolePermission } from '../../domains/auth/core/entities/role-permission.entity'
+import { SmsLog } from '../../domains/auth/entities/sms-log.entity'
+import { Societe } from '../../features/societes/entities/societe.entity'
+import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
+import { UserMfa } from '../../domains/auth/core/entities/user-mfa.entity'
+import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
+import { UserSocieteRole } from '../../domains/auth/core/entities/user-societe-role.entity'
 
 import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'

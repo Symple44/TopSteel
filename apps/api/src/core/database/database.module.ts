@@ -6,26 +6,38 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { UiPreferencesReorderableList } from '../../api/entities/ui-preferences-reorderable-list.entity'
 import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
 import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
-import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
-import { User } from '../../domains/users/entities/user.entity'
+
+
 // Entités admin (entities)
-import { MenuConfiguration } from '../../features/admin/entities/menu-configuration.entity'
-import { MenuItem } from '../../features/admin/entities/menu-item.entity'
-import { MenuItemPermission } from '../../features/admin/entities/menu-item-permission.entity'
-import { MenuItemRole } from '../../features/admin/entities/menu-item-role.entity'
-import { UserMenuItemPreference } from '../../features/admin/entities/user-menu-item-preference.entity'
-import { UserMenuPreferences } from '../../features/admin/entities/user-menu-preferences.entity'
-import { SystemParameter } from '../../features/admin/entitites/system-parameter.entity'
+
+
+
+
+
+
+
 // Import explicite de TOUTES les entités pour debugging
 // Entités admin (entitites)
-import { SystemSetting } from '../../features/admin/entitites/system-setting.entity'
+
 // Entités métier supprimées pour optimiser le debug
-import { UserMenuPreference } from '../../features/menu/entities/user-menu-preference.entity'
+
 import { Notifications } from '../../features/notifications/entities/notifications.entity'
 import { DatabaseCleanupService } from './database-cleanup.service'
 import { DatabasePreSyncService } from './database-pre-sync.service'
 import { DatabaseSyncService } from './database-sync.service'
-import { MenuConfiguration, MenuItem, MenuItemPermission, MenuItemRole, MfaSession, SystemParameter, SystemSetting, User, UserMenuItemPreference, UserMenuPreference, UserMenuPreferences, UserMfa, UserSession } from '@prisma/client'
+import { MenuConfiguration } from '../../domains/admin/entities/menu-configuration.entity'
+import { MenuItem } from '../../domains/admin/entities/menu-item.entity'
+import { MenuItemPermission } from '../../features/admin/entities/menu-item-permission.entity'
+import { MenuItemRole } from '../../features/admin/entities/menu-item-role.entity'
+import { MfaSession } from '../../domains/auth/core/entities/mfa-session.entity'
+import { SystemParameter } from '../../features/admin/entitites/system-parameter.entity'
+import { SystemSetting } from '../../features/admin/entitites/system-setting.entity'
+import { User } from '../../domains/users/entities/user.entity'
+import { UserMenuItemPreference } from '../../features/admin/entities/user-menu-item-preference.entity'
+import { UserMenuPreference } from '../../domains/admin/entities/user-menu-preference.entity'
+import { UserMenuPreferences } from '../../features/admin/entities/user-menu-preferences.entity'
+import { UserMfa } from '../../domains/auth/core/entities/user-mfa.entity'
+import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
 
 
 @Module({
