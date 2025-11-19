@@ -191,34 +191,39 @@ export class UserPrismaService {
     this.logger.debug(`Finding user: ${id}`)
 
     try {
-      if (includeRelations) {
-        return await this.prisma.user.findUnique({
-          where: { id },
-          include: {
-            roles: {
-              include: {
-                role: true,
+      const user = includeRelations
+        ? await this.prisma.user.findUnique({
+            where: { id },
+            include: {
+              roles: {
+                include: {
+                  role: true,
+                },
               },
-            },
-            groups: {
-              include: {
-                group: true,
+              groups: {
+                include: {
+                  group: true,
+                },
               },
-            },
-            societeRoles: {
-              include: {
-                societe: true,
-                role: true,
+              societeRoles: {
+                include: {
+                  societe: true,
+                  role: true,
+                },
               },
+              settings: true,
             },
-            settings: true,
-          },
-        })
+          })
+        : await this.prisma.user.findUnique({
+            where: { id },
+          })
+
+      // Return null if user is soft-deleted
+      if (user && user.deletedAt) {
+        return null
       }
 
-      return await this.prisma.user.findUnique({
-        where: { id },
-      })
+      return user
     } catch (error) {
       const err = error as Error
       this.logger.error(`Error finding user: ${err.message}`, err.stack)

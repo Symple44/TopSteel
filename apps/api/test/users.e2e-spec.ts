@@ -102,6 +102,13 @@ describe('Users Domain (e2e)', () => {
   describe('User CRUD Operations', () => {
     let createdUserId: string
 
+    afterAll(async () => {
+      // Cleanup: Delete created user
+      if (createdUserId) {
+        await prisma.user.delete({ where: { id: createdUserId } }).catch(() => {})
+      }
+    })
+
     it('POST /users - should create new user', async () => {
       const response = await request(app.getHttpServer())
         .post('/users')
