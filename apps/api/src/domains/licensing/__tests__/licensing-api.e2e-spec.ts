@@ -1,13 +1,27 @@
+/// <reference types="jest" />
+
 import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import * as request from 'supertest'
+import { INestApplication, ValidationPipe, ExecutionContext } from '@nestjs/common'
+import request from 'supertest'
 import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { LicensingPrismaModule } from '../prisma/licensing-prisma.module'
 import { LicensesController } from '../controllers/licenses.controller'
 import { LicenseFeaturesController } from '../controllers/license-features.controller'
 import { LicenseStatusController } from '../controllers/license-status.controller'
-import { AuthModule } from '../../auth/auth.module'
+import { LicenseActivationsController } from '../controllers/license-activations.controller'
+import { LicenseUsageController } from '../controllers/license-usage.controller'
+import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
+import { RolesGuard } from '../../auth/security/guards/roles.guard'
 import { LicenseType, BillingCycle, LicenseStatus } from '@prisma/client'
+
+// Mock guards to bypass authentication in tests
+const mockJwtAuthGuard = {
+  canActivate: (context: ExecutionContext) => true,
+}
+
+const mockRolesGuard = {
+  canActivate: (context: ExecutionContext) => true,
+}
 
 /**
  * Licensing API E2E Tests
@@ -30,14 +44,20 @@ describe('Licensing API (E2E)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         LicensingPrismaModule,
-        AuthModule, // For guards
       ],
       controllers: [
         LicensesController,
         LicenseFeaturesController,
         LicenseStatusController,
+        LicenseActivationsController,
+        LicenseUsageController,
       ],
-    }).compile()
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue(mockJwtAuthGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockRolesGuard)
+      .compile()
 
     app = moduleFixture.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -48,14 +68,15 @@ describe('Licensing API (E2E)', () => {
     // Setup: Create test societe for licenses
     const testSociete = await prisma.societe.create({
       data: {
-        nom: 'Test Company for Licensing',
-        email: 'licensing-test@example.com',
-        telephone: '1234567890',
-        adresse: '123 Test St',
-        codePostal: '12345',
-        ville: 'TestCity',
-        pays: 'TestCountry',
-        actif: true,
+        code: 'TEST-LIC',
+        name: 'Test Company for Licensing',
+        legalName: 'Test Company LLC',
+        databaseName: 'topsteel_test_lic',
+        siret: '12345678901234',
+        address: '123 Test St',
+        city: 'TestCity',
+        postalCode: '12345',
+        country: 'TestCountry',
       },
     })
     testSocieteId = testSociete.id
