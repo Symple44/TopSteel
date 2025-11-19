@@ -1,0 +1,1824 @@
+{
+  "domains": {
+    "domains/admin": {
+      "name": "domains/admin",
+      "status": "HYBRID ⚠️",
+      "files": {
+        "total": 20,
+        "entities": 4,
+        "services": 13,
+        "controllers": 1,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "menu-configuration",
+          "menu-item-action",
+          "menu-item",
+          "user-menu-preference"
+        ],
+        "decoratorCount": 12,
+        "repositoryInjections": 6,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\controllers\\menu-admin.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-configuration.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-item-action.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-item.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\user-menu-preference.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\services\\menu-sync.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "MenuConfiguration",
+          "MenuItem"
+        ],
+        "serviceUsages": 110,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\admin-prisma.module.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\discovered-page-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\index.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-configuration-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-configuration-simple-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-item-permission-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-item-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-item-role-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\system-parameter-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\system-setting-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\user-menu-item-preference-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\user-menu-preference-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\user-menu-preferences-prisma.service.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 53,
+      "complexity": "VERY_HIGH",
+      "estimatedTime": "2-4 jours"
+    },
+    "domains/auth": {
+      "name": "domains/auth",
+      "status": "HYBRID ⚠️",
+      "files": {
+        "total": 96,
+        "entities": 13,
+        "services": 35,
+        "controllers": 11,
+        "modules": 3,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "audit-log",
+          "group",
+          "mfa-session",
+          "module",
+          "permission",
+          "role-permission",
+          "role",
+          "user-group",
+          "user-mfa",
+          "user-role",
+          "user-session",
+          "user-societe-role",
+          "sms-log"
+        ],
+        "decoratorCount": 36,
+        "repositoryInjections": 28,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\audit-log.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\group.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\mfa-session.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\module.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\permission.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\role-permission.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\role.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-group.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-mfa.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-role.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-session.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-societe-role.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\entities\\sms-log.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\external\\controllers\\module.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\audit.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\group.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\mfa.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\permission-calculator.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\permission-query-builder.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\permission.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\role.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\session-invalidation.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\sms.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\unified-roles.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\user-societe-roles.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "SocieteUser",
+          "Societe",
+          "Prisma",
+          "Role",
+          "UserSession",
+          "PrismaClient",
+          "MfaSession",
+          "UserMfa",
+          "SmsLog"
+        ],
+        "serviceUsages": 247,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.controller.spec.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.module.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\audit-log-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\auth-prisma.module.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\auth-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\groups-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\guards\\tenant.guard.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\index.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\mfa-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\module-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\role-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\session-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\sms-log-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\tenant-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\user-settings-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\__tests__\\auth-prisma.service.spec.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\__tests__\\role-prisma.service.spec.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\roles.controller.spec.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\roles.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\sessions.controller.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 203,
+      "complexity": "VERY_HIGH",
+      "estimatedTime": "2-4 jours"
+    },
+    "domains/core": {
+      "name": "domains/core",
+      "status": "NO ORM 🤷",
+      "files": {
+        "total": 3,
+        "entities": 0,
+        "services": 0,
+        "controllers": 0,
+        "modules": 0,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 0,
+        "moduleRegistrations": 0,
+        "files": []
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 0,
+      "complexity": "COMPLETED",
+      "estimatedTime": "0h"
+    },
+    "domains/licensing": {
+      "name": "domains/licensing",
+      "status": "COMPLETED ✅",
+      "files": {
+        "total": 15,
+        "entities": 0,
+        "services": 1,
+        "controllers": 5,
+        "modules": 2,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 0,
+        "moduleRegistrations": 0,
+        "files": []
+      },
+      "prisma": {
+        "models": [
+          "UsageMetricType",
+          "BillingCycle",
+          "LicenseType",
+          "FeatureCategory",
+          "License",
+          "LicenseFeature",
+          "LicenseActivation",
+          "LicenseUsage",
+          "LicenseStatus",
+          "ActivationStatus",
+          "Prisma"
+        ],
+        "serviceUsages": 22,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-activations.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-features.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-status.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-usage.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\licenses.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\prisma\\license-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\prisma\\licensing-prisma.module.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\__tests__\\licensing-api.e2e-spec.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 0,
+      "complexity": "COMPLETED",
+      "estimatedTime": "0h"
+    },
+    "domains/notifications": {
+      "name": "domains/notifications",
+      "status": "HYBRID ⚠️",
+      "files": {
+        "total": 22,
+        "entities": 4,
+        "services": 12,
+        "controllers": 1,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "notification-action",
+          "notification-condition",
+          "notification-execution",
+          "notification-rule"
+        ],
+        "decoratorCount": 11,
+        "repositoryInjections": 5,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-action.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-condition.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-execution.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-rule.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\services\\notification-condition-evaluator.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\services\\notification-rules-engine.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "User"
+        ],
+        "serviceUsages": 72,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\notifications.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\index.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-event-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-read-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-rule-execution-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-rule-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-settings-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-template-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notifications-prisma.module.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 48,
+      "complexity": "HIGH",
+      "estimatedTime": "1-2 jours"
+    },
+    "domains/parameters": {
+      "name": "domains/parameters",
+      "status": "COMPLETED ✅",
+      "files": {
+        "total": 6,
+        "entities": 0,
+        "services": 3,
+        "controllers": 1,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 0,
+        "moduleRegistrations": 0,
+        "files": []
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 33,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\parameters.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\index.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameter-application-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameter-client-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameter-system-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameters-prisma.module.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 0,
+      "complexity": "COMPLETED",
+      "estimatedTime": "0h"
+    },
+    "domains/query-builder": {
+      "name": "domains/query-builder",
+      "status": "COMPLETED ✅",
+      "files": {
+        "total": 7,
+        "entities": 0,
+        "services": 5,
+        "controllers": 0,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 0,
+        "moduleRegistrations": 0,
+        "files": []
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 50,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\index.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-calculated-field-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-column-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-join-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-permission-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-prisma.module.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-prisma.service.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 0,
+      "complexity": "COMPLETED",
+      "estimatedTime": "0h"
+    },
+    "domains/societes": {
+      "name": "domains/societes",
+      "status": "COMPLETED ✅",
+      "files": {
+        "total": 12,
+        "entities": 0,
+        "services": 6,
+        "controllers": 4,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 0,
+        "moduleRegistrations": 0,
+        "files": []
+      },
+      "prisma": {
+        "models": [
+          "Prisma"
+        ],
+        "serviceUsages": 126,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\index.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\site-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societe-license-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societe-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societe-user-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societes-prisma.module.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\user-societe-role-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\__tests__\\societe-prisma.service.spec.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\sites.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\societe-licenses.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\societe-users.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\societes.controller.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 0,
+      "complexity": "COMPLETED",
+      "estimatedTime": "0h"
+    },
+    "domains/users": {
+      "name": "domains/users",
+      "status": "HYBRID ⚠️",
+      "files": {
+        "total": 17,
+        "entities": 2,
+        "services": 5,
+        "controllers": 1,
+        "modules": 2,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "user-settings",
+          "user"
+        ],
+        "decoratorCount": 3,
+        "repositoryInjections": 3,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\entities\\user-settings.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\entities\\user.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\services\\user-auth-repository.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\users.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "User",
+          "Prisma"
+        ],
+        "serviceUsages": 30,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\prisma\\user-prisma.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\prisma\\users-prisma.module.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\prisma\\__tests__\\user-prisma.service.spec.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\users.controller.ts"
+        ]
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 18,
+      "complexity": "MEDIUM",
+      "estimatedTime": "3-6h"
+    },
+    "features/admin": {
+      "name": "features/admin",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 36,
+        "entities": 7,
+        "services": 11,
+        "controllers": 13,
+        "modules": 2,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "menu-configuration-simple",
+          "menu-item-permission",
+          "menu-item-role",
+          "user-menu-item-preference",
+          "user-menu-preferences",
+          "system-parameter",
+          "system-setting"
+        ],
+        "decoratorCount": 16,
+        "repositoryInjections": 14,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\controllers\\menu-test.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\controllers\\page-sync.controller.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-configuration-simple.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-item-permission.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-item-role.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\user-menu-item-preference.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\user-menu-preferences.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entitites\\system-parameter.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entitites\\system-setting.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\admin-roles.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\menu-configuration.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\menu-sync.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\user-menu-preferences.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\system-parameters.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "MenuItem",
+          "SystemParameter",
+          "User"
+        ],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 102,
+      "complexity": "VERY_HIGH",
+      "estimatedTime": "2-4 jours"
+    },
+    "features/database-core": {
+      "name": "features/database-core",
+      "status": "NO ORM 🤷",
+      "files": {
+        "total": 8,
+        "entities": 0,
+        "services": 6,
+        "controllers": 1,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 0,
+        "moduleRegistrations": 0,
+        "files": []
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 0,
+      "complexity": "COMPLETED",
+      "estimatedTime": "0h"
+    },
+    "features/menu": {
+      "name": "features/menu",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 6,
+        "entities": 1,
+        "services": 2,
+        "controllers": 2,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "discovered-page"
+        ],
+        "decoratorCount": 1,
+        "repositoryInjections": 2,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\entities\\discovered-page.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\services\\page-sync.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\services\\user-menu-preference.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 12,
+      "complexity": "MEDIUM",
+      "estimatedTime": "3-6h"
+    },
+    "features/notifications": {
+      "name": "features/notifications",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 13,
+        "entities": 2,
+        "services": 3,
+        "controllers": 1,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "notification-settings",
+          "notifications"
+        ],
+        "decoratorCount": 2,
+        "repositoryInjections": 6,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-settings.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notifications.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\notifications.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\services\\notification-rule-engine.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\services\\notification-rule.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "User"
+        ],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 30,
+      "complexity": "MEDIUM",
+      "estimatedTime": "3-6h"
+    },
+    "features/parameters": {
+      "name": "features/parameters",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 11,
+        "entities": 3,
+        "services": 2,
+        "controllers": 2,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "parameter-application",
+          "parameter-client",
+          "parameter-system"
+        ],
+        "decoratorCount": 3,
+        "repositoryInjections": 3,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-application.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-client.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-system.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\services\\parameter.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "ParameterApplication",
+          "ParameterClient",
+          "ParameterSystem"
+        ],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 27,
+      "complexity": "MEDIUM",
+      "estimatedTime": "3-6h"
+    },
+    "features/query-builder": {
+      "name": "features/query-builder",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 17,
+        "entities": 0,
+        "services": 9,
+        "controllers": 2,
+        "modules": 1,
+        "tests": 1
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 6,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\services\\query-builder-permission.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\services\\query-builder.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 1,
+        "e2e": 0,
+        "hasTests": true
+      },
+      "complexityScore": 18,
+      "complexity": "MEDIUM",
+      "estimatedTime": "3-6h"
+    },
+    "features/search": {
+      "name": "features/search",
+      "status": "NO ORM 🤷",
+      "files": {
+        "total": 25,
+        "entities": 0,
+        "services": 10,
+        "controllers": 2,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 0,
+        "moduleRegistrations": 0,
+        "files": []
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 0,
+      "complexity": "COMPLETED",
+      "estimatedTime": "0h"
+    },
+    "features/shared": {
+      "name": "features/shared",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 16,
+        "entities": 5,
+        "services": 5,
+        "controllers": 4,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "shared-data-registry",
+          "shared-material",
+          "shared-process",
+          "shared-quality-standard",
+          "shared-supplier"
+        ],
+        "decoratorCount": 5,
+        "repositoryInjections": 5,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-data-registry.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-material.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-process.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-quality-standard.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-supplier.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-data-registry.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-material.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-process.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-quality-standard.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-supplier.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 45,
+      "complexity": "HIGH",
+      "estimatedTime": "1-2 jours"
+    },
+    "features/societes": {
+      "name": "features/societes",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 19,
+        "entities": 4,
+        "services": 7,
+        "controllers": 5,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [
+          "site",
+          "societe-license",
+          "societe-user",
+          "societe"
+        ],
+        "decoratorCount": 10,
+        "repositoryInjections": 14,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\site.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe-license.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe-user.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe.entity.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\license-management.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\sites.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\societe-auth-repository.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\societe-users.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\societes.service.ts",
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\tenant-initialization.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [
+          "Societe",
+          "SocieteLicense"
+        ],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 78,
+      "complexity": "VERY_HIGH",
+      "estimatedTime": "2-4 jours"
+    },
+    "features/ui-preferences": {
+      "name": "features/ui-preferences",
+      "status": "TYPEORM ONLY ⚠️",
+      "files": {
+        "total": 3,
+        "entities": 0,
+        "services": 1,
+        "controllers": 1,
+        "modules": 1,
+        "tests": 0
+      },
+      "typeorm": {
+        "entities": [],
+        "decoratorCount": 0,
+        "repositoryInjections": 1,
+        "moduleRegistrations": 0,
+        "files": [
+          "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\ui-preferences\\services\\ui-preferences-reorderable-list.service.ts"
+        ]
+      },
+      "prisma": {
+        "models": [],
+        "serviceUsages": 0,
+        "files": []
+      },
+      "tests": {
+        "unit": 0,
+        "e2e": 0,
+        "hasTests": false
+      },
+      "complexityScore": 3,
+      "complexity": "EASY",
+      "estimatedTime": "1-2h"
+    }
+  },
+  "summary": {
+    "totalDomains": 19,
+    "easyDomains": 1,
+    "mediumDomains": 5,
+    "highDomains": 2,
+    "veryHighDomains": 4,
+    "completedDomains": 7
+  },
+  "roadmap": {
+    "completed": [
+      {
+        "name": "domains/core",
+        "status": "NO ORM 🤷",
+        "files": {
+          "total": 3,
+          "entities": 0,
+          "services": 0,
+          "controllers": 0,
+          "modules": 0,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 0,
+          "moduleRegistrations": 0,
+          "files": []
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 0,
+        "complexity": "COMPLETED",
+        "estimatedTime": "0h"
+      },
+      {
+        "name": "domains/licensing",
+        "status": "COMPLETED ✅",
+        "files": {
+          "total": 15,
+          "entities": 0,
+          "services": 1,
+          "controllers": 5,
+          "modules": 2,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 0,
+          "moduleRegistrations": 0,
+          "files": []
+        },
+        "prisma": {
+          "models": [
+            "UsageMetricType",
+            "BillingCycle",
+            "LicenseType",
+            "FeatureCategory",
+            "License",
+            "LicenseFeature",
+            "LicenseActivation",
+            "LicenseUsage",
+            "LicenseStatus",
+            "ActivationStatus",
+            "Prisma"
+          ],
+          "serviceUsages": 22,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-activations.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-features.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-status.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\license-usage.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\controllers\\licenses.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\prisma\\license-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\prisma\\licensing-prisma.module.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\licensing\\__tests__\\licensing-api.e2e-spec.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 0,
+        "complexity": "COMPLETED",
+        "estimatedTime": "0h"
+      },
+      {
+        "name": "domains/parameters",
+        "status": "COMPLETED ✅",
+        "files": {
+          "total": 6,
+          "entities": 0,
+          "services": 3,
+          "controllers": 1,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 0,
+          "moduleRegistrations": 0,
+          "files": []
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 33,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\parameters.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\index.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameter-application-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameter-client-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameter-system-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\parameters\\prisma\\parameters-prisma.module.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 0,
+        "complexity": "COMPLETED",
+        "estimatedTime": "0h"
+      },
+      {
+        "name": "domains/query-builder",
+        "status": "COMPLETED ✅",
+        "files": {
+          "total": 7,
+          "entities": 0,
+          "services": 5,
+          "controllers": 0,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 0,
+          "moduleRegistrations": 0,
+          "files": []
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 50,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\index.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-calculated-field-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-column-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-join-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-permission-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-prisma.module.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\query-builder\\prisma\\query-builder-prisma.service.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 0,
+        "complexity": "COMPLETED",
+        "estimatedTime": "0h"
+      },
+      {
+        "name": "domains/societes",
+        "status": "COMPLETED ✅",
+        "files": {
+          "total": 12,
+          "entities": 0,
+          "services": 6,
+          "controllers": 4,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 0,
+          "moduleRegistrations": 0,
+          "files": []
+        },
+        "prisma": {
+          "models": [
+            "Prisma"
+          ],
+          "serviceUsages": 126,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\index.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\site-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societe-license-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societe-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societe-user-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\societes-prisma.module.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\user-societe-role-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\prisma\\__tests__\\societe-prisma.service.spec.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\sites.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\societe-licenses.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\societe-users.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\societes\\societes.controller.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 0,
+        "complexity": "COMPLETED",
+        "estimatedTime": "0h"
+      },
+      {
+        "name": "features/database-core",
+        "status": "NO ORM 🤷",
+        "files": {
+          "total": 8,
+          "entities": 0,
+          "services": 6,
+          "controllers": 1,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 0,
+          "moduleRegistrations": 0,
+          "files": []
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 0,
+        "complexity": "COMPLETED",
+        "estimatedTime": "0h"
+      },
+      {
+        "name": "features/search",
+        "status": "NO ORM 🤷",
+        "files": {
+          "total": 25,
+          "entities": 0,
+          "services": 10,
+          "controllers": 2,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 0,
+          "moduleRegistrations": 0,
+          "files": []
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 0,
+        "complexity": "COMPLETED",
+        "estimatedTime": "0h"
+      }
+    ],
+    "easy": [
+      {
+        "name": "features/ui-preferences",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 3,
+          "entities": 0,
+          "services": 1,
+          "controllers": 1,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 1,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\ui-preferences\\services\\ui-preferences-reorderable-list.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 3,
+        "complexity": "EASY",
+        "estimatedTime": "1-2h"
+      }
+    ],
+    "medium": [
+      {
+        "name": "features/menu",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 6,
+          "entities": 1,
+          "services": 2,
+          "controllers": 2,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "discovered-page"
+          ],
+          "decoratorCount": 1,
+          "repositoryInjections": 2,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\entities\\discovered-page.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\services\\page-sync.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\menu\\services\\user-menu-preference.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 12,
+        "complexity": "MEDIUM",
+        "estimatedTime": "3-6h"
+      },
+      {
+        "name": "domains/users",
+        "status": "HYBRID ⚠️",
+        "files": {
+          "total": 17,
+          "entities": 2,
+          "services": 5,
+          "controllers": 1,
+          "modules": 2,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "user-settings",
+            "user"
+          ],
+          "decoratorCount": 3,
+          "repositoryInjections": 3,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\entities\\user-settings.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\entities\\user.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\services\\user-auth-repository.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\users.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "User",
+            "Prisma"
+          ],
+          "serviceUsages": 30,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\prisma\\user-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\prisma\\users-prisma.module.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\prisma\\__tests__\\user-prisma.service.spec.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\users\\users.controller.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 18,
+        "complexity": "MEDIUM",
+        "estimatedTime": "3-6h"
+      },
+      {
+        "name": "features/query-builder",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 17,
+          "entities": 0,
+          "services": 9,
+          "controllers": 2,
+          "modules": 1,
+          "tests": 1
+        },
+        "typeorm": {
+          "entities": [],
+          "decoratorCount": 0,
+          "repositoryInjections": 6,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\services\\query-builder-permission.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\query-builder\\services\\query-builder.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 1,
+          "e2e": 0,
+          "hasTests": true
+        },
+        "complexityScore": 18,
+        "complexity": "MEDIUM",
+        "estimatedTime": "3-6h"
+      },
+      {
+        "name": "features/parameters",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 11,
+          "entities": 3,
+          "services": 2,
+          "controllers": 2,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "parameter-application",
+            "parameter-client",
+            "parameter-system"
+          ],
+          "decoratorCount": 3,
+          "repositoryInjections": 3,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-application.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-client.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\entities\\parameter-system.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\parameters\\services\\parameter.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "ParameterApplication",
+            "ParameterClient",
+            "ParameterSystem"
+          ],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 27,
+        "complexity": "MEDIUM",
+        "estimatedTime": "3-6h"
+      },
+      {
+        "name": "features/notifications",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 13,
+          "entities": 2,
+          "services": 3,
+          "controllers": 1,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "notification-settings",
+            "notifications"
+          ],
+          "decoratorCount": 2,
+          "repositoryInjections": 6,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notification-settings.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\entities\\notifications.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\notifications.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\services\\notification-rule-engine.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\notifications\\services\\notification-rule.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "User"
+          ],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 30,
+        "complexity": "MEDIUM",
+        "estimatedTime": "3-6h"
+      }
+    ],
+    "high": [
+      {
+        "name": "features/shared",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 16,
+          "entities": 5,
+          "services": 5,
+          "controllers": 4,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "shared-data-registry",
+            "shared-material",
+            "shared-process",
+            "shared-quality-standard",
+            "shared-supplier"
+          ],
+          "decoratorCount": 5,
+          "repositoryInjections": 5,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-data-registry.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-material.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-process.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-quality-standard.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\entities\\shared-supplier.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-data-registry.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-material.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-process.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-quality-standard.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\shared\\services\\shared-supplier.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 45,
+        "complexity": "HIGH",
+        "estimatedTime": "1-2 jours"
+      },
+      {
+        "name": "domains/notifications",
+        "status": "HYBRID ⚠️",
+        "files": {
+          "total": 22,
+          "entities": 4,
+          "services": 12,
+          "controllers": 1,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "notification-action",
+            "notification-condition",
+            "notification-execution",
+            "notification-rule"
+          ],
+          "decoratorCount": 11,
+          "repositoryInjections": 5,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-action.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-condition.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-execution.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\entities\\notification-rule.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\services\\notification-condition-evaluator.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\services\\notification-rules-engine.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "User"
+          ],
+          "serviceUsages": 72,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\notifications.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\index.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-event-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-read-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-rule-execution-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-rule-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-settings-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notification-template-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\notifications\\prisma\\notifications-prisma.module.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 48,
+        "complexity": "HIGH",
+        "estimatedTime": "1-2 jours"
+      }
+    ],
+    "veryHigh": [
+      {
+        "name": "domains/admin",
+        "status": "HYBRID ⚠️",
+        "files": {
+          "total": 20,
+          "entities": 4,
+          "services": 13,
+          "controllers": 1,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "menu-configuration",
+            "menu-item-action",
+            "menu-item",
+            "user-menu-preference"
+          ],
+          "decoratorCount": 12,
+          "repositoryInjections": 6,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\controllers\\menu-admin.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-configuration.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-item-action.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\menu-item.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\entities\\user-menu-preference.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\services\\menu-sync.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "MenuConfiguration",
+            "MenuItem"
+          ],
+          "serviceUsages": 110,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\admin-prisma.module.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\discovered-page-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\index.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-configuration-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-configuration-simple-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-item-permission-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-item-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\menu-item-role-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\system-parameter-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\system-setting-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\user-menu-item-preference-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\user-menu-preference-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\admin\\prisma\\user-menu-preferences-prisma.service.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 53,
+        "complexity": "VERY_HIGH",
+        "estimatedTime": "2-4 jours"
+      },
+      {
+        "name": "features/societes",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 19,
+          "entities": 4,
+          "services": 7,
+          "controllers": 5,
+          "modules": 1,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "site",
+            "societe-license",
+            "societe-user",
+            "societe"
+          ],
+          "decoratorCount": 10,
+          "repositoryInjections": 14,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\site.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe-license.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe-user.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\entities\\societe.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\license-management.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\sites.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\societe-auth-repository.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\societe-users.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\societes.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\societes\\services\\tenant-initialization.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "Societe",
+            "SocieteLicense"
+          ],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 78,
+        "complexity": "VERY_HIGH",
+        "estimatedTime": "2-4 jours"
+      },
+      {
+        "name": "features/admin",
+        "status": "TYPEORM ONLY ⚠️",
+        "files": {
+          "total": 36,
+          "entities": 7,
+          "services": 11,
+          "controllers": 13,
+          "modules": 2,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "menu-configuration-simple",
+            "menu-item-permission",
+            "menu-item-role",
+            "user-menu-item-preference",
+            "user-menu-preferences",
+            "system-parameter",
+            "system-setting"
+          ],
+          "decoratorCount": 16,
+          "repositoryInjections": 14,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\controllers\\menu-test.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\controllers\\page-sync.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-configuration-simple.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-item-permission.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\menu-item-role.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\user-menu-item-preference.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entities\\user-menu-preferences.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entitites\\system-parameter.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\entitites\\system-setting.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\admin-roles.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\menu-configuration.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\menu-sync.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\services\\user-menu-preferences.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\features\\admin\\system-parameters.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "MenuItem",
+            "SystemParameter",
+            "User"
+          ],
+          "serviceUsages": 0,
+          "files": []
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 102,
+        "complexity": "VERY_HIGH",
+        "estimatedTime": "2-4 jours"
+      },
+      {
+        "name": "domains/auth",
+        "status": "HYBRID ⚠️",
+        "files": {
+          "total": 96,
+          "entities": 13,
+          "services": 35,
+          "controllers": 11,
+          "modules": 3,
+          "tests": 0
+        },
+        "typeorm": {
+          "entities": [
+            "audit-log",
+            "group",
+            "mfa-session",
+            "module",
+            "permission",
+            "role-permission",
+            "role",
+            "user-group",
+            "user-mfa",
+            "user-role",
+            "user-session",
+            "user-societe-role",
+            "sms-log"
+          ],
+          "decoratorCount": 36,
+          "repositoryInjections": 28,
+          "moduleRegistrations": 0,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\audit-log.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\group.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\mfa-session.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\module.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\permission.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\role-permission.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\role.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-group.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-mfa.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-role.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-session.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\core\\entities\\user-societe-role.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\entities\\sms-log.entity.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\external\\controllers\\module.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\audit.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\group.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\mfa.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\permission-calculator.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\permission-query-builder.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\permission.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\role.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\session-invalidation.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\sms.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\unified-roles.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\services\\user-societe-roles.service.ts"
+          ]
+        },
+        "prisma": {
+          "models": [
+            "SocieteUser",
+            "Societe",
+            "Prisma",
+            "Role",
+            "UserSession",
+            "PrismaClient",
+            "MfaSession",
+            "UserMfa",
+            "SmsLog"
+          ],
+          "serviceUsages": 247,
+          "files": [
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.controller.spec.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\auth.module.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\audit-log-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\auth-prisma.module.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\auth-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\groups-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\guards\\tenant.guard.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\index.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\mfa-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\module-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\role-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\session-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\sms-log-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\tenant-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\user-settings-prisma.service.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\__tests__\\auth-prisma.service.spec.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\prisma\\__tests__\\role-prisma.service.spec.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\roles.controller.spec.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\roles.controller.ts",
+            "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\sessions.controller.ts"
+          ]
+        },
+        "tests": {
+          "unit": 0,
+          "e2e": 0,
+          "hasTests": false
+        },
+        "complexityScore": 203,
+        "complexity": "VERY_HIGH",
+        "estimatedTime": "2-4 jours"
+      }
+    ]
+  }
+}
