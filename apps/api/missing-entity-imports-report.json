@@ -1,0 +1,18 @@
+[
+  {
+    "filePath": "C:\\GitHub\\TopSteel\\apps\\api\\src\\domains\\auth\\role-auth.module.ts",
+    "usedEntities": [
+      "Role",
+      "Permission",
+      "RolePermission",
+      "UserRole",
+      "Group",
+      "UserGroup",
+      "ModuleEntity"
+    ],
+    "missingImports": [
+      "ModuleEntity"
+    ],
+    "hasMissingImports": true
+  }
+]

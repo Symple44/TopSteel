@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Param,
   Body,
@@ -192,10 +193,10 @@ export class UsersController {
   }
 
   /**
-   * PUT /users/:id
-   * Update a user
+   * PATCH /users/:id
+   * Update a user (partial update)
    */
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Update a user' })
   @ApiBody({
     schema: {
@@ -256,10 +257,10 @@ export class UsersController {
   }
 
   /**
-   * PUT /users/:id/settings
-   * Update user settings
+   * PATCH /users/:id/settings
+   * Update user settings (partial update)
    */
-  @Put(':id/settings')
+  @Patch(':id/settings')
   @ApiOperation({ summary: 'Update user settings' })
   @ApiBody({
     schema: {
@@ -268,6 +269,9 @@ export class UsersController {
         profile: { type: 'object' },
         company: { type: 'object' },
         preferences: { type: 'object' },
+        language: { type: 'string' },
+        timezone: { type: 'string' },
+        theme: { type: 'string' },
       },
     },
   })

@@ -180,7 +180,8 @@ describe('Users Domain (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(response.body).toHaveProperty('userId', testUserId)
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data).toHaveProperty('userId', testUserId)
     })
 
     it('PATCH /users/:id/settings - should update user settings', async () => {
@@ -194,9 +195,10 @@ describe('Users Domain (e2e)', () => {
         })
         .expect(200)
 
-      expect(response.body.language).toBe('fr')
-      expect(response.body.timezone).toBe('Europe/Paris')
-      expect(response.body.theme).toBe('dark')
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data.language).toBe('fr')
+      expect(response.body.data.timezone).toBe('Europe/Paris')
+      expect(response.body.data.theme).toBe('dark')
     })
   })
 

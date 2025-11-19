@@ -6,13 +6,18 @@ async function cleanup() {
   console.log('🧹 Cleaning up test data...')
 
   try {
-    // Delete test users
+    // Delete test users (specific test emails only)
     const deleted = await prisma.user.deleteMany({
       where: {
         OR: [
           { username: 'testuser' },
+          { username: 'newuser' },
+          { username: 'invalidemail' },
+          { username: 'weakpass' },
+          { username: 'duplicateuser' },
           { email: 'test-user@topsteel.com' },
           { email: 'new-user@topsteel.com' },
+          { email: 'test@topsteel.com' },
         ],
       },
     })
