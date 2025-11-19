@@ -1,6 +1,6 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString, IsUUID } from 'class-validator'
-import {
 import { ParameterClient } from '@prisma/client'
+import {
   ClientParameterAccess,
   ClientParameterScope,
   ClientParameterType,

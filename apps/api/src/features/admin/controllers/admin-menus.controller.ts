@@ -14,8 +14,8 @@ import {
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import type { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItemType } from '../entities/menu-item.entity'
-import type {
 import { MenuItem } from '@prisma/client'
+import type {
   CreateMenuConfigDto,
   MenuConfigurationService,
   UpdateMenuConfigDto,

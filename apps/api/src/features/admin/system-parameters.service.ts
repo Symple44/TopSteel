@@ -6,11 +6,10 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import {
 import { SystemParameter } from '@prisma/client'
+import {
   type ParameterCategory,
   type ParameterType,
-  SystemParameter,
 } from './entitites/system-parameter.entity'
 
 @Injectable()

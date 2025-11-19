@@ -1,7 +1,6 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
-import {
 import { ParameterApplication } from '@prisma/client'
-
+import {
   ApplicationParameterScope,
   ApplicationParameterType,
 } from '../entities/parameter-application.entity'
