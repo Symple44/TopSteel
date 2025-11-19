@@ -11,6 +11,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common'
 import {
   ApiTags,
@@ -20,38 +21,87 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger'
+import { IsEmail, IsString, IsOptional, IsBoolean, MinLength, Matches } from 'class-validator'
 import { UserPrismaService } from './prisma/user-prisma.service'
 import { CombinedSecurityGuard } from '../auth/security/guards/combined-security.guard'
 import { Prisma } from '@prisma/client'
 
-// DTOs
-interface CreateUserDto {
+// DTOs with validation
+class CreateUserDto {
+  @IsEmail({}, { message: 'Invalid email format' })
   email: string
+
+  @IsString()
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)/, {
+    message: 'Password must contain at least one letter and one number'
+  })
   password: string
+
+  @IsString()
+  @MinLength(3)
   username: string
+
+  @IsOptional()
+  @IsString()
   firstName?: string
+
+  @IsOptional()
+  @IsString()
   lastName?: string
+
+  @IsOptional()
+  @IsBoolean()
   isActive?: boolean
 }
 
-interface UpdateUserDto {
+class UpdateUserDto {
+  @IsOptional()
+  @IsEmail()
   email?: string
+
+  @IsOptional()
+  @IsString()
+  @MinLength(8)
   password?: string
+
+  @IsOptional()
+  @IsString()
   username?: string
+
+  @IsOptional()
+  @IsString()
   firstName?: string
+
+  @IsOptional()
+  @IsString()
   lastName?: string
+
+  @IsOptional()
+  @IsBoolean()
   isActive?: boolean
 }
 
-interface UpdateUserSettingsDto {
+class UpdateUserSettingsDto {
+  @IsOptional()
   profile?: Prisma.InputJsonValue
+
+  @IsOptional()
   company?: Prisma.InputJsonValue
+
+  @IsOptional()
   preferences?: Prisma.InputJsonValue
 }
 
-interface UserQueryDto {
+class UserQueryDto {
+  @IsOptional()
   page?: number
+
+  @IsOptional()
   limit?: number
+
+  @IsOptional()
+  @IsBoolean()
   includeDeleted?: boolean
 }
 
@@ -142,11 +192,7 @@ export class UsersController {
     const user = await this.userPrismaService.findOne(id, true)
 
     if (!user) {
-      return {
-        success: false,
-        message: 'User not found',
-        statusCode: 404,
-      }
+      throw new NotFoundException('User not found')
     }
 
     // Exclude passwordHash from response

@@ -22,11 +22,32 @@ describe('Users Domain (e2e)', () => {
       imports: [TestAppModule],
     })
       .overrideGuard(CombinedSecurityGuard)
-      .useValue({ canActivate: () => true }) // Bypass auth for testing
+      .useValue({
+        canActivate: (context: any) => {
+          // Allow requests with Authorization header, reject those without
+          const request = context.switchToHttp().getRequest()
+          const authHeader = request.headers.authorization
+          if (!authHeader) {
+            const { UnauthorizedException } = require('@nestjs/common')
+            throw new UnauthorizedException('No authorization token provided')
+          }
+          return true
+        },
+      })
       .compile()
 
     app = moduleFixture.createNestApplication()
     prisma = moduleFixture.get<PrismaService>(PrismaService)
+
+    // Enable validation
+    const { ValidationPipe } = await import('@nestjs/common')
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: false,
+        transform: true,
+      })
+    )
 
     await app.init()
 
@@ -196,16 +217,18 @@ describe('Users Domain (e2e)', () => {
         .patch(`/users/${testUserId}/settings`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          language: 'fr',
-          timezone: 'Europe/Paris',
-          theme: 'dark',
+          preferences: {
+            language: 'fr',
+            timezone: 'Europe/Paris',
+            theme: 'dark',
+          },
         })
         .expect(200)
 
       expect(response.body).toHaveProperty('data')
-      expect(response.body.data.language).toBe('fr')
-      expect(response.body.data.timezone).toBe('Europe/Paris')
-      expect(response.body.data.theme).toBe('dark')
+      expect(response.body.data.preferences).toHaveProperty('language', 'fr')
+      expect(response.body.data.preferences).toHaveProperty('timezone', 'Europe/Paris')
+      expect(response.body.data.preferences).toHaveProperty('theme', 'dark')
     })
   })
 
