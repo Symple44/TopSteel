@@ -480,7 +480,7 @@ export class LicensePrismaService {
           isEnabled: data.isEnabled ?? true,
           limit: data.limit,
           expiresAt: data.expiresAt,
-          configuration: data.configuration || {},
+          configuration: (data.configuration || {}) as Prisma.InputJsonValue,
           enabledAt: data.isEnabled !== false ? new Date() : undefined,
         },
       })
