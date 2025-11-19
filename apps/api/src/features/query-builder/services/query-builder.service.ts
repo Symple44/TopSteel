@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { DeepPartial, Repository } from 'typeorm'
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
+// @ts-expect-error - entities module needs to be created or migrated to Prisma
 import {
   QueryBuilder,
   QueryBuilderCalculatedField,

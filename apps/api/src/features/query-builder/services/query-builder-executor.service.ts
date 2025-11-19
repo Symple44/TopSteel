@@ -166,8 +166,8 @@ export class QueryBuilderExecutorService {
   } {
     // Convert columns to structured format
     const selectColumns = queryBuilder.columns
-      .filter((col) => col.isVisible)
-      .map((col) => ({
+      .filter((col: any) => col.isVisible)
+      .map((col: any) => ({
         tableName: col.tableName,
         columnName: col.columnName,
         alias: col.alias,
@@ -175,7 +175,7 @@ export class QueryBuilderExecutorService {
       }))
 
     // Convert joins to structured format
-    const joins = queryBuilder.joins.map((join, index) => ({
+    const joins = queryBuilder.joins.map((join: any, index: number) => ({
       type: join.joinType.toUpperCase() as 'INNER' | 'LEFT' | 'RIGHT',
       fromTable: join.fromTable,
       fromColumn: join.fromColumn,
@@ -188,7 +188,7 @@ export class QueryBuilderExecutorService {
     // Convert legacy filters to structured format
     const filters: FilterCondition[] = []
     Object.entries(params.filters || {}).forEach(([columnAlias, filterValue]) => {
-      const column = queryBuilder.columns.find((col) => col.alias === columnAlias)
+      const column = queryBuilder.columns.find((col: any) => col.alias === columnAlias)
       if (column?.isFilterable) {
         // Determine operator based on value type
         let operator: string = '='
@@ -242,7 +242,7 @@ export class QueryBuilderExecutorService {
       tableAlias?: string
     }> = []
     if (params.sortBy) {
-      const column = queryBuilder.columns.find((col) => col.alias === params.sortBy)
+      const column = queryBuilder.columns.find((col: any) => col.alias === params.sortBy)
       if (column?.isSortable) {
         sorts.push({
           tableName: column.tableName,
@@ -300,7 +300,7 @@ export class QueryBuilderExecutorService {
       return 't0'
     }
 
-    const joinIndex = queryBuilder.joins.findIndex((join) => join.toTable === tableName)
+    const joinIndex = queryBuilder.joins.findIndex((join: any) => join.toTable === tableName)
     if (joinIndex !== -1) {
       return queryBuilder.joins[joinIndex].alias || `t${joinIndex + 1}`
     }

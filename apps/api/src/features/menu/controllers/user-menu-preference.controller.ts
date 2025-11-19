@@ -4,7 +4,7 @@ import type { Request as ExpressRequest } from 'express'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
-import type { UserMenuPreference } from '../entities/user-menu-preference.entity'
+import type { UserMenuPreference } from '../../../domains/admin/entities/user-menu-preference.entity'
 import { UserMenuPreferenceService } from '../services/user-menu-preference.service'
 
 @ApiTags('User Menu Preferences')

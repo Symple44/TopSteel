@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { DatabaseCoreModule } from '../database-core/database-core.module'
 import { QueryBuilderController } from './controllers/query-builder.controller'
 import { SqlExecutorController } from './controllers/sql-executor.controller'
+// @ts-expect-error - entities module needs to be created or migrated to Prisma
 import {
   QueryBuilder,
   QueryBuilderCalculatedField,

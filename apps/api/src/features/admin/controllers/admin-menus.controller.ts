@@ -12,8 +12,8 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import type { MenuConfiguration } from '../entities/menu-configuration.entity'
-import { MenuItemType } from '../entities/menu-item.entity'
+import type { MenuConfiguration } from '../../../domains/admin/entities/menu-configuration.entity'
+import { MenuItemType } from '../../../domains/admin/entities/menu-item.entity'
 import { MenuItem } from '@prisma/client'
 import type {
   CreateMenuConfigDto,

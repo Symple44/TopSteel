@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+// @ts-expect-error - entities module needs to be created or migrated to Prisma
 import {
   ConditionOperator,
   EventStatus,
