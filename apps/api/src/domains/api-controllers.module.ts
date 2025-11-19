@@ -5,6 +5,7 @@ import { UsersPrismaModule } from './users/prisma/users-prisma.module'
 import { SocietesPrismaModule } from './societes/prisma/societes-prisma.module'
 import { NotificationsPrismaModule } from './notifications/prisma/notifications-prisma.module'
 import { ParametersPrismaModule } from './parameters/prisma/parameters-prisma.module'
+import { LicensingPrismaModule } from './licensing/prisma/licensing-prisma.module'
 
 // Import new Prisma controllers (without -prisma suffix)
 import { UsersController } from './users/users.controller'
@@ -17,6 +18,9 @@ import { SocieteLicensesController } from './societes/societe-licenses.controlle
 import { SocieteUsersController } from './societes/societe-users.controller'
 import { NotificationsController } from './notifications/notifications.controller'
 import { ParametersController } from './parameters/parameters.controller'
+import { LicensesController } from './licensing/controllers/licenses.controller'
+import { LicenseFeaturesController } from './licensing/controllers/license-features.controller'
+import { LicenseStatusController } from './licensing/controllers/license-status.controller'
 
 /**
  * ApiControllersModule - Phase 9
@@ -38,6 +42,9 @@ import { ParametersController } from './parameters/parameters.controller'
  * - /societe-users (SocieteUsersController)
  * - /notifications (NotificationsController)
  * - /parameters (ParametersController)
+ * - /api/licensing/licenses (LicensesController)
+ * - /api/licensing/licenses/:id/features (LicenseFeaturesController)
+ * - /api/licensing/licenses/:id/... (LicenseStatusController)
  *
  * Note: Ce module évite les dépendances circulaires car il n'est pas importé par AuthModule
  */
@@ -49,6 +56,7 @@ import { ParametersController } from './parameters/parameters.controller'
     SocietesPrismaModule, // Provides Societe services
     NotificationsPrismaModule, // Provides Notification services
     ParametersPrismaModule, // Provides Parameter services
+    LicensingPrismaModule, // Provides LicensePrismaService
   ],
   controllers: [
     // Core Auth & Users
@@ -66,6 +74,11 @@ import { ParametersController } from './parameters/parameters.controller'
     // Features
     NotificationsController, // /notifications/* - Notification management
     ParametersController, // /parameters/* - Parameter management
+
+    // Licensing (Prisma)
+    LicensesController, // /api/licensing/licenses/* - License CRUD
+    LicenseFeaturesController, // /api/licensing/licenses/:id/features/* - Features management
+    LicenseStatusController, // /api/licensing/licenses/:id/activate|suspend|revoke|renew
   ],
 })
 export class ApiControllersModule {}
