@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -72,7 +73,11 @@ export class LicensesController {
   @ApiResponse({ status: 200, description: 'License trouvée' })
   @ApiResponse({ status: 404, description: 'License non trouvée' })
   async findOne(@Param('id') id: string) {
-    return await this.licenseService.findById(id)
+    const license = await this.licenseService.findById(id)
+    if (!license) {
+      throw new NotFoundException(`License with ID ${id} not found`)
+    }
+    return license
   }
 
   /**

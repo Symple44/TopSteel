@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, HttpCode, Param, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GlobalUserRole } from '../../auth/core/constants/roles.constants'
 import { Roles } from '../../auth/decorators/roles.decorator'
@@ -30,6 +30,7 @@ export class LicenseStatusController {
    * Activer une license
    */
   @Post(':id/activate')
+  @HttpCode(200)
   @Roles(GlobalUserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Activer une license' })
   @ApiResponse({ status: 200, description: 'License activée' })
@@ -42,6 +43,7 @@ export class LicenseStatusController {
    * Suspendre une license
    */
   @Post(':id/suspend')
+  @HttpCode(200)
   @Roles(GlobalUserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Suspendre une license' })
   @ApiResponse({ status: 200, description: 'License suspendue' })
@@ -54,6 +56,7 @@ export class LicenseStatusController {
    * Révoquer une license
    */
   @Post(':id/revoke')
+  @HttpCode(200)
   @Roles(GlobalUserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Révoquer une license' })
   @ApiResponse({ status: 200, description: 'License révoquée' })
@@ -66,6 +69,7 @@ export class LicenseStatusController {
    * Renouveler une license
    */
   @Post(':id/renew')
+  @HttpCode(200)
   @Roles(GlobalUserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Renouveler une license' })
   @ApiResponse({ status: 200, description: 'License renouvelée' })
@@ -84,6 +88,7 @@ export class LicenseStatusController {
    * Valider une license par sa clé
    */
   @Post('validate')
+  @HttpCode(200)
   @Roles(GlobalUserRole.SUPER_ADMIN, GlobalUserRole.ADMIN, GlobalUserRole.USER)
   @ApiOperation({ summary: 'Valider une license par sa clé' })
   @ApiResponse({ status: 200, description: 'Résultat de la validation' })

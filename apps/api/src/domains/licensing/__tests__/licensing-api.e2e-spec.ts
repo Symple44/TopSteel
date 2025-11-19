@@ -274,8 +274,8 @@ describe('Licensing API (E2E)', () => {
         .send({ expiresAt: futureDate, price: 1500 })
         .expect(200)
 
-      expect(response.body.price).toBe(1500)
-      expect(response.body.lastRenewalDate).toBeDefined()
+      expect(Number(response.body.price)).toBe(1500) // Prisma Decimal returns string
+      expect(response.body.lastRenewalAt).toBeDefined() // Prisma field name
     })
   })
 
