@@ -58,9 +58,9 @@ export class TenantProvisioningService {
       this.logger.log(`📋 Création de l'enregistrement société...`)
       societe = await this.societesService.create({
         ...societeData,
-        status: SocieteStatus.INACTIVE, // Temporairement inactif pendant le provisioning
+        isActive: false, // Temporairement inactif pendant le provisioning
         databaseName,
-      })
+      }) as Societe
 
       // 3. Créer la base de données physique
       this.logger.log(`🗄️ Création de la base de données: ${databaseName}`)

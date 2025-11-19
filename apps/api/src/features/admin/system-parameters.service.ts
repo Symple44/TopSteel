@@ -6,8 +6,8 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import { SystemParameter } from '@prisma/client'
 import {
+  SystemParameter,
   type ParameterCategory,
   type ParameterType,
 } from './entitites/system-parameter.entity'
