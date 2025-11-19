@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { DeepPartial, Repository } from 'typeorm'
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
-// @ts-expect-error - entities module needs to be created or migrated to Prisma
 import {
   QueryBuilder,
   QueryBuilderCalculatedField,
@@ -211,7 +210,7 @@ export class QueryBuilderService {
 
     // Duplicate columns
     if (original.columns && original.columns.length > 0) {
-      const columns = original.columns.map((col) => {
+      const columns = original.columns.map((col: any) => {
         const { id: _id, ...columnData } = col
         return this._columnRepository.create({
           ...columnData,
@@ -223,7 +222,7 @@ export class QueryBuilderService {
 
     // Duplicate joins
     if (original.joins && original.joins.length > 0) {
-      const joins = original.joins.map((join) => {
+      const joins = original.joins.map((join: any) => {
         const { id: _id, ...joinData } = join
         return this._joinRepository.create({
           ...joinData,
@@ -235,7 +234,7 @@ export class QueryBuilderService {
 
     // Duplicate calculated fields
     if (original.calculatedFields && original.calculatedFields.length > 0) {
-      const fields = original.calculatedFields.map((field) => {
+      const fields = original.calculatedFields.map((field: any) => {
         const { id: _id, ...fieldData } = field
 
         return this._calculatedFieldRepository.create({

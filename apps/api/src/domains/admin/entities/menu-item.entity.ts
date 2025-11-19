@@ -30,6 +30,18 @@ type MenuItemAction = {
   // Other MenuItemAction properties would be here
 }
 
+// Export MenuItemType enum for use in services
+export enum MenuItemType {
+  LINK = 'link',
+  DIVIDER = 'divider',
+  HEADER = 'header',
+  GROUP = 'group',
+  COLLAPSIBLE = 'collapsible',
+  FOLDER = 'folder',
+  PROGRAM = 'program',
+  DATA_VIEW = 'data_view',
+}
+
 /**
  * Menu item entity with hierarchical structure
  */
@@ -86,10 +98,10 @@ export class MenuItem {
 
   @Column({
     type: 'enum',
-    enum: ['link', 'divider', 'header', 'group', 'collapsible'],
-    default: 'link',
+    enum: MenuItemType,
+    default: MenuItemType.LINK,
   })
-  type!: 'link' | 'divider' | 'header' | 'group' | 'collapsible'
+  type!: MenuItemType
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   badge?: string
@@ -171,14 +183,14 @@ export class MenuItem {
    * Check if item is a parent/group
    */
   isParent(): boolean {
-    return this.type === 'group' || this.type === 'collapsible'
+    return this.type === MenuItemType.GROUP || this.type === MenuItemType.COLLAPSIBLE
   }
 
   /**
    * Check if item is navigable
    */
   isNavigable(): boolean {
-    return this.type === 'link' && (!!this.route || !!this.externalUrl)
+    return this.type === MenuItemType.LINK && (!!this.route || !!this.externalUrl)
   }
 
   /**

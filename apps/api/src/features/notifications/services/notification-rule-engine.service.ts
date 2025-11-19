@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
-// @ts-expect-error - entities module needs to be created or migrated to Prisma
 import {
   EventStatus,
   ExecutionResult,
