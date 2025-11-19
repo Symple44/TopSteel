@@ -9,6 +9,8 @@ import { Repository } from 'typeorm'
 import { Group } from '../core/entities/group.entity'
 import { Role } from '../core/entities/role.entity'
 import { UserGroup } from '../core/entities/user-group.entity'
+import { Group, Role, UserGroup } from '@prisma/client'
+
 
 export interface CreateGroupDto {
   name: string
@@ -255,4 +257,4 @@ export class GroupService {
     return Array.from(allRoles.values())
   }
 }
-import { Group, Role, UserGroup } from '@prisma/client'
+

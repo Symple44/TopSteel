@@ -15,6 +15,7 @@ import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.gua
 import type { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItemType } from '../entities/menu-item.entity'
 import type {
+import { MenuItem } from '@prisma/client'
   CreateMenuConfigDto,
   MenuConfigurationService,
   UpdateMenuConfigDto,
@@ -63,7 +64,7 @@ export class AdminMenusController {
     @Request() req: Record<string, unknown>
   ): Promise<MenuConfiguration> {
     const userId =
-import { MenuItem } from '@prisma/client'
+
       (req.user as { id?: string; sub?: string; email?: string })?.sub ||
       (req.user as { id?: string; sub?: string; email?: string })?.id ||
       'system'

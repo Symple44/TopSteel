@@ -4,6 +4,7 @@ import { Repository } from 'typeorm'
 import { UserMenuItemPreference } from '../entities/user-menu-item-preference.entity'
 import { UserMenuPreferences } from '../entities/user-menu-preferences.entity'
 import { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
+import { UserMenuItemPreference, UserMenuPreferences } from '@prisma/client'
 
 // Interface for UserMenuItemPreference data
 interface UserMenuItemPreferenceData {
@@ -203,7 +204,7 @@ export class UserMenuPreferencesService {
 
   async addShortcut(
     userId: string,
-import { UserMenuItemPreference, UserMenuPreferences } from '@prisma/client'
+
     shortcut: { key: string; href: string; title: string }
   ): Promise<void> {
     const preferences = await this.getUserPreferences(userId)

@@ -12,6 +12,7 @@ import { GeolocationService } from './geolocation.service'
 import { SMSService } from './sms.service'
 import { TOTPService } from './totp.service'
 import { WebAuthnService } from './webauthn.service'
+import { MfaSession, User, UserMfa } from '@prisma/client'
 
 interface MFASetupResult {
   success: boolean
@@ -333,7 +334,7 @@ export class MFAService {
     userId: string,
     mfaId: string,
     verificationCode: string
-import { MfaSession, User, UserMfa } from '@prisma/client'
+
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const mfaRecord = await this.userMFARepository.findOne({

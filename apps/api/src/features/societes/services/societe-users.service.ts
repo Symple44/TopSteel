@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { SocieteUser, type UserSocieteRole } from '../entities/societe-user.entity'
+import { SocieteUser } from '@prisma/client'
+
 
 @Injectable()
 export class SocieteUsersService {
@@ -323,4 +325,4 @@ export class SocieteUsersService {
     }
   }
 }
-import { SocieteUser } from '@prisma/client'
+

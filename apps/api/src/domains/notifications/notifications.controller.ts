@@ -18,6 +18,8 @@ import { JwtAuthGuard } from '../auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/security/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
 import { NotificationPrismaService } from './prisma/notification-prisma.service'
+import { User } from '@prisma/client'
+
 
 /**
  * NotificationsController
@@ -191,4 +193,4 @@ export class NotificationsController {
     return this.notificationService.remove(id)
   }
 }
-import { User } from '@prisma/client'
+

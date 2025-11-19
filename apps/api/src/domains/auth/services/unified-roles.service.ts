@@ -17,6 +17,8 @@ import {
 } from '../core/constants/roles.constants'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 import { PermissionCalculatorService } from './permission-calculator.service'
+import { User, UserSocieteRole } from '@prisma/client'
+
 
 export interface UserSocieteInfo {
   id: string
@@ -651,4 +653,4 @@ export class UnifiedRolesService {
     return saved
   }
 }
-import { User, UserSocieteRole } from '@prisma/client'
+

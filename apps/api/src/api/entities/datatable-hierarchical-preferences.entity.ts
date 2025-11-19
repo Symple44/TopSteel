@@ -10,6 +10,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { User } from '../../domains/users/entities/user.entity'
+import { User } from '@prisma/client'
+
 
 export interface HierarchyConfig {
   parentField: string
@@ -124,4 +126,4 @@ export class DatatableHierarchicalPreferences {
   @JoinColumn({ name: 'user_id' })
   user!: User
 }
-import { User } from '@prisma/client'
+

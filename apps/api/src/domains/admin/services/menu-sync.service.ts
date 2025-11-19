@@ -2,10 +2,11 @@ import { Injectable, Logger } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { InjectRepository } from '@nestjs/typeorm'
 import { In, type Repository } from 'typeorm'
-import { MenuConfiguration, MenuItem } from '@prisma/client'
+
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { MenuItemAction } from '../entities/menu-item-action.entity'
 import { DiscoveredPage, PageDiscoveryService } from './page-discovery.service'
+import { MenuConfiguration, MenuItem } from '@prisma/client'
 
 /**
  * Sync options for menu synchronization
@@ -586,7 +587,7 @@ export class MenuSyncService {
    * Preview sync changes
    */
   async previewSync(options: MenuSyncOptions = {}): Promise<{
-import { MenuConfiguration, MenuItem } from '@prisma/client'
+
     toCreate: Array<{ path: string; label: string; module: string }>
     toUpdate: Array<{ path: string; changes: string[] }>
     toRemove: Array<{ path: string; label: string }>

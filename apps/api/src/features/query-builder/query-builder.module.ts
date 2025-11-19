@@ -19,6 +19,8 @@ import { QueryBuilderService } from './services/query-builder.service'
 import { QueryBuilderExecutorService } from './services/query-builder-executor.service'
 import { QueryBuilderPermissionService } from './services/query-builder-permission.service'
 import { SchemaIntrospectionService } from './services/schema-introspection.service'
+import { User } from '@prisma/client'
+
 
 @Module({
   imports: [
@@ -54,4 +56,4 @@ import { SchemaIntrospectionService } from './services/schema-introspection.serv
   ],
 })
 export class QueryBuilderModule {}
-import { User } from '@prisma/client'
+

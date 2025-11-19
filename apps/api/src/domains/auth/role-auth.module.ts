@@ -15,6 +15,8 @@ import { ModuleController } from './external/controllers/module.controller'
 import { GroupService } from './services/group.service'
 // Services
 import { RoleService } from './services/role.service'
+import { Group, Module, Permission, Role, RolePermission, UserGroup, UserRole } from '@prisma/client'
+
 
 // Guards & Strategies (à créer si nécessaire)
 // import { JwtAuthGuard } from './guards/jwt-auth.guard'
@@ -60,4 +62,4 @@ import { RoleService } from './services/role.service'
   exports: [RoleService, TypeOrmModule],
 })
 export class RoleAuthModule {}
-import { Group, Module, Permission, Role, RolePermission, UserGroup, UserRole } from '@prisma/client'
+

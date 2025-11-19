@@ -1,5 +1,7 @@
 import { IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
 import { ParameterCategory, ParameterType } from '../entitites/system-parameter.entity'
+import { SystemParameter } from '@prisma/client'
+
 
 export class CreateSystemParameterDto {
   @IsString()
@@ -69,4 +71,4 @@ export class SystemParameterQueryDto {
   @IsOptional()
   search?: string
 }
-import { SystemParameter } from '@prisma/client'
+

@@ -5,6 +5,8 @@ import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-t
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 import { SocietesService } from './societes.service'
 import { TenantInitializationService } from './tenant-initialization.service'
+import { Societe } from '@prisma/client'
+
 
 export interface TenantProvisioningResult {
   success: boolean
@@ -274,4 +276,4 @@ export class TenantProvisioningService {
     }
   }
 }
-import { Societe } from '@prisma/client'
+

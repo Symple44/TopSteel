@@ -6,6 +6,8 @@ import {
   pageDiscoveryService,
 } from '../../../core/services/page-discovery.service'
 import { DiscoveredPage } from '../entities/discovered-page.entity'
+import { DiscoveredPage } from '@prisma/client'
+
 
 export interface PageSyncResult {
   discovered: number
@@ -317,4 +319,4 @@ export class PageSyncService {
     return icons[categoryId] || 'Circle'
   }
 }
-import { DiscoveredPage } from '@prisma/client'
+

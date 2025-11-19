@@ -1,5 +1,6 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString, IsUUID } from 'class-validator'
 import {
+import { ParameterClient } from '@prisma/client'
   ClientParameterAccess,
   ClientParameterScope,
   ClientParameterType,
@@ -205,7 +206,7 @@ export class CreateUserPreferencesDto {
   dashboardWidgets?: Array<{
     id: string
     type: string
-import { ParameterClient } from '@prisma/client'
+
     position: { x: number; y: number }
     size: { width: number; height: number }
     config: Record<string, unknown>

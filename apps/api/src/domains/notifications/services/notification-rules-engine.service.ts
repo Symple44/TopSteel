@@ -20,6 +20,8 @@ import type { RuleExecutionContext, RuleExecutionResult } from '../types/notific
 import type { NotificationActionExecutor } from './notification-action-executor.service'
 import type { NotificationConditionEvaluator } from './notification-condition-evaluator.service'
 import type {
+import { NotificationRule } from '@prisma/client'
+
   NotificationDeliveryOptions,
   NotificationDeliveryService,
 } from './notification-delivery.service'
@@ -694,4 +696,4 @@ export class NotificationRulesEngineService {
     }, 1000) // Check every second
   }
 }
-import { NotificationRule } from '@prisma/client'
+

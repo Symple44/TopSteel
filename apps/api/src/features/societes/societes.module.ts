@@ -31,6 +31,8 @@ import { SocietesService } from './services/societes.service'
 import { TenantInitializationService } from './services/tenant-initialization.service'
 import { TenantProvisioningService } from './services/tenant-provisioning.service'
 import { SocietesPrismaModule } from '../../domains/societes/prisma/societes-prisma.module'
+import { NotificationSettings, Site, Societe, SocieteLicense, SocieteUser, User, UserSession, UserSettings } from '@prisma/client'
+
 
 @Module({
   imports: [
@@ -83,4 +85,4 @@ import { SocietesPrismaModule } from '../../domains/societes/prisma/societes-pri
   ],
 })
 export class SocietesModule {}
-import { NotificationSettings, Site, Societe, SocieteLicense, SocieteUser, User, UserSession, UserSettings } from '@prisma/client'
+

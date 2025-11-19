@@ -10,6 +10,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { User } from '../../domains/users/entities/user.entity'
+import { User } from '@prisma/client'
+
 
 export interface ReorderableListPreferences {
   defaultExpanded: boolean
@@ -86,4 +88,4 @@ export class UiPreferencesReorderableList {
   @JoinColumn({ name: 'user_id' })
   user!: User
 }
-import { User } from '@prisma/client'
+

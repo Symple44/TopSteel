@@ -11,6 +11,8 @@ import {
 } from 'typeorm'
 import { User } from '../../domains/users/entities/user.entity'
 import { DatatableHierarchicalPreferences } from './datatable-hierarchical-preferences.entity'
+import { User } from '@prisma/client'
+
 
 @Entity('datatable_hierarchy_order')
 @Unique(['user_id', 'table_id', 'item_id'])
@@ -62,4 +64,4 @@ export class DatatableHierarchyOrder {
   ])
   preferences!: DatatableHierarchicalPreferences
 }
-import { User } from '@prisma/client'
+

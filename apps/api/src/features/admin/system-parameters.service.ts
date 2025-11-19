@@ -7,6 +7,7 @@ import type {
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
 import {
+import { SystemParameter } from '@prisma/client'
   type ParameterCategory,
   type ParameterType,
   SystemParameter,
@@ -149,7 +150,7 @@ export class SystemParametersService {
   }
 
   // Méthode pour mettre à jour plusieurs paramètres en une fois
-import { SystemParameter } from '@prisma/client'
+
   async updateMultiple(updates: Array<{ key: string; value: string }>): Promise<SystemParameter[]> {
     const results: SystemParameter[] = []
 

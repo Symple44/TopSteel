@@ -21,6 +21,8 @@ import type { CreateNotificationsDto } from './dto/create-notifications.dto'
 import type { NotificationsQueryDto } from './dto/notifications-query.dto'
 import type { UpdateNotificationsDto } from './dto/update-notifications.dto'
 import { NotificationsService } from './notifications.service'
+import { User } from '@prisma/client'
+
 
 @Controller('notifications')
 @ApiTags('🔔 Notifications')
@@ -74,4 +76,4 @@ export class NotificationsController {
     return this.notificationsService.remove(id)
   }
 }
-import { User } from '@prisma/client'
+

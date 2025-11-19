@@ -6,6 +6,7 @@ import type {
   ISocieteUserRepository,
 } from '../interfaces/societe-repository.interface'
 import { IUserRepository } from '../interfaces/user-repository.interface'
+import { Societe } from '@prisma/client'
 import {
   SOCIETE_REPOSITORY_TOKEN,
   SOCIETE_USER_REPOSITORY_TOKEN,
@@ -96,4 +97,4 @@ export class AuthCoreService {
     return await this.societeRepository.findActiveSocietes()
   }
 }
-import { Societe } from '@prisma/client'
+

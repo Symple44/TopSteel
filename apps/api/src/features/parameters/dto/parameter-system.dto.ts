@@ -1,5 +1,7 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
 import { ParameterScope, ParameterType } from '../entities/parameter-system.entity'
+import { ParameterSystem } from '@prisma/client'
+
 
 export class CreateParameterSystemDto {
   @IsString()
@@ -162,4 +164,4 @@ export class CreateEnumParameterDto {
   @IsOptional()
   globalTranslations?: Record<string, Record<string, string>>
 }
-import { ParameterSystem } from '@prisma/client'
+

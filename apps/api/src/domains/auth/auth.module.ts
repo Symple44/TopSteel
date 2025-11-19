@@ -48,6 +48,8 @@ import { SessionInvalidationService } from './services/session-invalidation.serv
 import { SessionRedisService } from './services/session-redis.service'
 import { SMSService } from './services/sms.service'
 import { TOTPService } from './services/totp.service'
+import { AuditLog, MfaSession, Permission, Role, RolePermission, SmsLog, Societe, SocieteUser, UserMfa, UserSession, UserSocieteRole } from '@prisma/client'
+
 import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'
 import { WebAuthnService } from './services/webauthn.service'
@@ -167,4 +169,4 @@ import { AuthPrismaModule } from './prisma/auth-prisma.module'
   ],
 })
 export class AuthModule {}
-import { AuditLog, MfaSession, Permission, Role, RolePermission, SmsLog, Societe, SocieteUser, UserMfa, UserSession, UserSocieteRole } from '@prisma/client'
+

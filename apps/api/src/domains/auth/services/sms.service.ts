@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import * as Twilio from 'twilio'
 import { Between, type Repository } from 'typeorm'
 import { SMSLog } from '../entities/sms-log.entity'
+import { SmsLog } from '@prisma/client'
+
 
 /**
  * Configuration pour le fournisseur SMS
@@ -572,4 +574,4 @@ export class SMSService {
     }
   }
 }
-import { SmsLog } from '@prisma/client'
+

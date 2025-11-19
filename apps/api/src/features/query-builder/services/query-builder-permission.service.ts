@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { User } from '../../../domains/users/entities/user.entity'
 import { type PermissionType, QueryBuilderPermission } from '../entities'
+import { User } from '@prisma/client'
 
 @Injectable()
 export class QueryBuilderPermissionService {
@@ -126,7 +127,7 @@ export class QueryBuilderPermissionService {
   async getUserRolePermissions(
     queryBuilderId: string,
     userId: string
-import { User } from '@prisma/client'
+
   ): Promise<Array<{ roleId: string; roleName: string; permissions: PermissionType[] }>> {
     const userRoles = await this.userRepository
       .createQueryBuilder('user')

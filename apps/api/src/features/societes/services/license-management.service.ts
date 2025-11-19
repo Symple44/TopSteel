@@ -15,6 +15,8 @@ import {
 } from '../../../features/notifications/entities/notifications.entity'
 import { Societe } from '../entities/societe.entity'
 import { LicenseStatus, LicenseType, SocieteLicense } from '../entities/societe-license.entity'
+import { Societe, SocieteLicense, User, UserSession } from '@prisma/client'
+
 
 export interface LicenseCheckResult {
   isValid: boolean
@@ -764,4 +766,4 @@ export class LicenseManagementService {
     this.logger.error(`Notification de suspension créée pour ${societe.nom}: ${reason}`)
   }
 }
-import { Societe, SocieteLicense, User, UserSession } from '@prisma/client'
+

@@ -5,6 +5,7 @@ import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem } from '../entities/menu-item.entity'
 import { MenuItemRole } from '../entities/menu-item-role.entity'
 import { MenuConfigurationService } from './menu-configuration.service'
+import { MenuConfiguration, MenuItem, MenuItemRole } from '@prisma/client'
 
 interface SidebarNavItem {
   title: string
@@ -220,7 +221,7 @@ export class MenuSyncService {
     parentId?: string,
     orderOffset = 0
   ): Promise<void> {
-import { MenuConfiguration, MenuItem, MenuItemRole } from '@prisma/client'
+
     for (let i = 0; i < items.length; i++) {
       const sidebarItem = items[i]
       const orderIndex = (i + 1) * 10 + orderOffset

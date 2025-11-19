@@ -25,6 +25,8 @@ import { Notifications } from '../../features/notifications/entities/notificatio
 import { DatabaseCleanupService } from './database-cleanup.service'
 import { DatabasePreSyncService } from './database-pre-sync.service'
 import { DatabaseSyncService } from './database-sync.service'
+import { MenuConfiguration, MenuItem, MenuItemPermission, MenuItemRole, MfaSession, SystemParameter, SystemSetting, User, UserMenuItemPreference, UserMenuPreference, UserMenuPreferences, UserMfa, UserSession } from '@prisma/client'
+
 
 @Module({
   imports: [
@@ -113,4 +115,4 @@ import { DatabaseSyncService } from './database-sync.service'
   exports: [DatabaseCleanupService, DatabaseSyncService, DatabasePreSyncService],
 })
 export class DatabaseModule {}
-import { MenuConfiguration, MenuItem, MenuItemPermission, MenuItemRole, MfaSession, SystemParameter, SystemSetting, User, UserMenuItemPreference, UserMenuPreference, UserMenuPreferences, UserMfa, UserSession } from '@prisma/client'
+

@@ -10,6 +10,8 @@ import {
   MinLength,
 } from 'class-validator'
 import { UserRole } from '../entities/user.entity'
+import { User } from '@prisma/client'
+
 
 export class CreateUserDto {
   @ApiProperty({ example: 'Dupont', minLength: 2, maxLength: 255 })
@@ -56,4 +58,4 @@ export class CreateUserDto {
   @IsOptional()
   metadata?: Record<string, unknown>
 }
-import { User } from '@prisma/client'
+

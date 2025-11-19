@@ -40,6 +40,8 @@ import { MenuRawService } from './services/menu-raw.service'
 import { SystemParametersController } from './system-parameters.controller'
 // Services
 import { SystemParametersService } from './system-parameters.service'
+import { DiscoveredPage, Permission, Role, RolePermission, SystemParameter, UserMenuItemPreference, UserMenuPreferences } from '@prisma/client'
+
 
 @Module({
   imports: [
@@ -94,4 +96,4 @@ import { SystemParametersService } from './system-parameters.service'
   ],
 })
 export class AdminModule {}
-import { DiscoveredPage, Permission, Role, RolePermission, SystemParameter, UserMenuItemPreference, UserMenuPreferences } from '@prisma/client'
+

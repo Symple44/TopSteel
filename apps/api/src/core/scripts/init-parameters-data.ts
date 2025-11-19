@@ -2,11 +2,10 @@ import type { DataSource } from 'typeorm'
 import {
   ApplicationParameterScope,
   ApplicationParameterType,
-  ParameterApplication,
 } from '../../features/parameters/entities/parameter-application.entity'
+import { ParameterApplication, ParameterSystem } from '@prisma/client'
 import {
   ParameterScope,
-  ParameterSystem,
   ParameterType,
 } from '../../features/parameters/entities/parameter-system.entity'
 
@@ -444,4 +443,4 @@ if (require.main === module) {
     }
   })
 }
-import { ParameterApplication, ParameterSystem } from '@prisma/client'
+

@@ -2,6 +2,8 @@ import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, Not, type Repository } from 'typeorm'
 import { User } from '../../users/entities/user.entity'
+import { User } from '@prisma/client'
+
 
 @Injectable()
 export class SessionInvalidationService implements OnModuleInit {
@@ -81,4 +83,4 @@ export class SessionInvalidationService implements OnModuleInit {
     }
   }
 }
-import { User } from '@prisma/client'
+

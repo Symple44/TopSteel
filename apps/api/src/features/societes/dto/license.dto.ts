@@ -14,6 +14,8 @@ import {
   Min,
 } from 'class-validator'
 import { LicenseStatus, LicenseType } from '../entities/societe-license.entity'
+import { SocieteLicense } from '@prisma/client'
+
 
 export class CreateLicenseDto {
   @ApiProperty({ enum: LicenseType, default: LicenseType.BASIC })
@@ -344,4 +346,4 @@ export class LicenseUsageStatsDto {
   @ApiPropertyOptional()
   restrictions?: Record<string, number>
 }
-import { SocieteLicense } from '@prisma/client'
+

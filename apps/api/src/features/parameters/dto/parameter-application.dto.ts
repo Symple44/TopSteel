@@ -1,5 +1,7 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
 import {
+import { ParameterApplication } from '@prisma/client'
+
   ApplicationParameterScope,
   ApplicationParameterType,
 } from '../entities/parameter-application.entity'
@@ -209,4 +211,4 @@ export class CreateCategoryParameterDto {
   @IsOptional()
   globalTranslations?: Record<string, Record<string, string>>
 }
-import { ParameterApplication } from '@prisma/client'
+

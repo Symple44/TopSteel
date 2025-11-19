@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { AuditLog } from '../core/entities/audit-log.entity'
+import { AuditLog } from '@prisma/client'
 
 /**
  * Types d'événements d'audit
@@ -120,7 +121,7 @@ export interface AuditStatistics {
   bySeverity: Record<string, number>
   failureRate: number
   avgDuration: number
-import { AuditLog } from '@prisma/client'
+
   topUsers: Array<{ userId: string; count: number }>
   topResources: Array<{ resource: string; count: number }>
   suspiciousActivities: number

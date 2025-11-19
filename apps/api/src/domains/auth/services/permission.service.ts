@@ -5,6 +5,8 @@ import { TopSteelLogger } from '../../../core/common/logger/structured-logger.se
 import { RedisService } from '../../../core/common/services/redis.service'
 import { User } from '../../users/entities/user.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
+import { User, UserSocieteRole } from '@prisma/client'
+
 
 /**
  * Définition des permissions système
@@ -450,4 +452,4 @@ export class PermissionService {
     return summary
   }
 }
-import { User, UserSocieteRole } from '@prisma/client'
+

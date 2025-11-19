@@ -10,6 +10,8 @@ import {
   Min,
 } from 'class-validator'
 import { SocietePlan } from '../entities/societe.entity'
+import { Societe } from '@prisma/client'
+
 
 export class CreateTenantDto {
   @ApiProperty({ description: 'Nom de la société', example: 'Métallurgie ACME' })
@@ -118,4 +120,4 @@ export class CreateTenantDto {
     timezone?: string
   }
 }
-import { Societe } from '@prisma/client'
+

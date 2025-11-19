@@ -7,6 +7,8 @@ import type {
 } from '../../../domains/auth/core/interfaces/societe-repository.interface'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 import { SocieteUser } from '../entities/societe-user.entity'
+import { Societe, SocieteUser } from '@prisma/client'
+
 
 /**
  * Implémentation du repository société pour l'authentification
@@ -106,4 +108,4 @@ export class SocieteUserAuthRepositoryService implements ISocieteUserRepository 
     await this.societeUserRepository.update({ userId, societeId }, { isDefault: true })
   }
 }
-import { Societe, SocieteUser } from '@prisma/client'
+
