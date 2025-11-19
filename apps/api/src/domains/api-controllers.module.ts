@@ -21,6 +21,8 @@ import { ParametersController } from './parameters/parameters.controller'
 import { LicensesController } from './licensing/controllers/licenses.controller'
 import { LicenseFeaturesController } from './licensing/controllers/license-features.controller'
 import { LicenseStatusController } from './licensing/controllers/license-status.controller'
+import { LicenseActivationsController } from './licensing/controllers/license-activations.controller'
+import { LicenseUsageController } from './licensing/controllers/license-usage.controller'
 
 /**
  * ApiControllersModule - Phase 9
@@ -45,6 +47,8 @@ import { LicenseStatusController } from './licensing/controllers/license-status.
  * - /api/licensing/licenses (LicensesController)
  * - /api/licensing/licenses/:id/features (LicenseFeaturesController)
  * - /api/licensing/licenses/:id/... (LicenseStatusController)
+ * - /api/licensing/licenses/:id/activations (LicenseActivationsController)
+ * - /api/licensing/licenses/:id/usage (LicenseUsageController)
  *
  * Note: Ce module évite les dépendances circulaires car il n'est pas importé par AuthModule
  */
@@ -79,6 +83,8 @@ import { LicenseStatusController } from './licensing/controllers/license-status.
     LicensesController, // /api/licensing/licenses/* - License CRUD
     LicenseFeaturesController, // /api/licensing/licenses/:id/features/* - Features management
     LicenseStatusController, // /api/licensing/licenses/:id/activate|suspend|revoke|renew
+    LicenseActivationsController, // /api/licensing/licenses/:id/activations/* - Activations tracking
+    LicenseUsageController, // /api/licensing/licenses/:id/usage/* - Usage analytics
   ],
 })
 export class ApiControllersModule {}
