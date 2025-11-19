@@ -2,11 +2,12 @@ import type { DataSource } from 'typeorm'
 import {
   ApplicationParameterScope,
   ApplicationParameterType,
+  ParameterApplication,
 } from '../../features/parameters/entities/parameter-application.entity'
-import { ParameterApplication, ParameterSystem } from '@prisma/client'
 import {
   ParameterScope,
   ParameterType,
+  ParameterSystem,
 } from '../../features/parameters/entities/parameter-system.entity'
 
 /**

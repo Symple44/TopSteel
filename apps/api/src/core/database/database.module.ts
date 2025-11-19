@@ -4,8 +4,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 // Entités API (entitites)
 import { UiPreferencesReorderableList } from '../../api/entities/ui-preferences-reorderable-list.entity'
-import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
-import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
 
 
 // Entités admin (entities)
@@ -29,14 +27,14 @@ import { MenuConfiguration } from '../../domains/admin/entities/menu-configurati
 import { MenuItem } from '../../domains/admin/entities/menu-item.entity'
 import { MenuItemPermission } from '../../features/admin/entities/menu-item-permission.entity'
 import { MenuItemRole } from '../../features/admin/entities/menu-item-role.entity'
-import { MfaSession } from '../../domains/auth/core/entities/mfa-session.entity'
+import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
 import { SystemParameter } from '../../features/admin/entitites/system-parameter.entity'
 import { SystemSetting } from '../../features/admin/entitites/system-setting.entity'
 import { User } from '../../domains/users/entities/user.entity'
 import { UserMenuItemPreference } from '../../features/admin/entities/user-menu-item-preference.entity'
 import { UserMenuPreference } from '../../domains/admin/entities/user-menu-preference.entity'
 import { UserMenuPreferences } from '../../features/admin/entities/user-menu-preferences.entity'
-import { UserMfa } from '../../domains/auth/core/entities/user-mfa.entity'
+import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
 import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
 
 

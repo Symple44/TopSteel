@@ -19,19 +19,19 @@ datasource db {
 
 // User (entité centrale)
 model User {
-  id                String              @id @default(uuid())
-  username          String              @unique @db.VarChar(255)
-  email             String              @unique @db.VarChar(255)
-  passwordHash      String              @map("password_hash") @db.VarChar(255)
-  firstName         String?             @map("first_name") @db.VarChar(100)
-  lastName          String?             @map("last_name") @db.VarChar(100)
-  isActive          Boolean             @default(true) @map("is_active")
-  isEmailVerified   Boolean             @default(false) @map("is_email_verified")
-  emailVerifiedAt   DateTime?           @map("email_verified_at")
-  lastLoginAt       DateTime?           @map("last_login_at")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  deletedAt         DateTime?           @map("deleted_at")
+  id              String    @id @default(uuid())
+  username        String    @unique @db.VarChar(255)
+  email           String    @unique @db.VarChar(255)
+  passwordHash    String    @map("password_hash") @db.VarChar(255)
+  firstName       String?   @map("first_name") @db.VarChar(100)
+  lastName        String?   @map("last_name") @db.VarChar(100)
+  isActive        Boolean   @default(true) @map("is_active")
+  isEmailVerified Boolean   @default(false) @map("is_email_verified")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  lastLoginAt     DateTime? @map("last_login_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
 
   // Relations
   sessions          UserSession[]
@@ -42,11 +42,11 @@ model User {
   societeRoles      UserSocieteRole[]
   settings          UserSettings?
   societes          SocieteUser[]
-  auditLogs         AuditLog[]         @relation("PerformedBy")
+  auditLogs         AuditLog[]               @relation("PerformedBy")
   systemSettings    SystemSetting[]
   queryBuilders     QueryBuilder[]
   queryBuilderPerms QueryBuilderPermission[]
-  forcedLogouts     UserSession[]      @relation("ForcedLogout")
+  forcedLogouts     UserSession[]            @relation("ForcedLogout")
 
   @@index([email])
   @@index([username])
@@ -78,8 +78,8 @@ model UserSession {
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  forcedLogoutByUser User?     @relation("ForcedLogout", fields: [forcedLogoutBy], references: [id])
+  user               User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  forcedLogoutByUser User? @relation("ForcedLogout", fields: [forcedLogoutBy], references: [id])
 
   @@index([userId, status, lastActivity])
   @@index([userId, isActive])
@@ -106,7 +106,7 @@ model UserMfa {
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime  @updatedAt @map("updated_at")
 
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([type])
@@ -131,7 +131,7 @@ model MfaSession {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
@@ -141,25 +141,25 @@ model MfaSession {
 
 // Role
 model Role {
-  id                String                     @id @default(uuid())
-  name              String                     @unique @db.VarChar(100)
-  label             String                     @db.VarChar(255)
-  description       String?                    @db.Text
-  level             Int                        @default(0)
-  isSystem          Boolean                    @default(false) @map("is_system")
-  isActive          Boolean                    @default(true) @map("is_active")
-  societeId         String?                    @map("societe_id")
-  parentId          String?                    @map("parent_id")
-  metadata          Json?                      @map("metadata")
-  createdAt         DateTime                   @default(now()) @map("created_at")
-  updatedAt         DateTime                   @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(100)
+  label       String   @db.VarChar(255)
+  description String?  @db.Text
+  level       Int      @default(0)
+  isSystem    Boolean  @default(false) @map("is_system")
+  isActive    Boolean  @default(true) @map("is_active")
+  societeId   String?  @map("societe_id")
+  parentId    String?  @map("parent_id")
+  metadata    Json?    @map("metadata")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   permissions       RolePermission[]
   users             UserRole[]
   societeUsers      UserSocieteRole[]
-  societe           Societe?                   @relation(fields: [societeId], references: [id])
-  parent            Role?                      @relation("RoleHierarchy", fields: [parentId], references: [id])
-  children          Role[]                     @relation("RoleHierarchy")
+  societe           Societe?                 @relation(fields: [societeId], references: [id])
+  parent            Role?                    @relation("RoleHierarchy", fields: [parentId], references: [id])
+  children          Role[]                   @relation("RoleHierarchy")
   menuItems         MenuItemRole[]
   queryBuilderPerms QueryBuilderPermission[]
 
@@ -172,22 +172,22 @@ model Role {
 
 // Permission
 model Permission {
-  id          String               @id @default(uuid())
-  name        String               @unique @db.VarChar(100)
-  label       String               @db.VarChar(255)
-  description String?              @db.Text
-  module      String               @db.VarChar(100)
-  action      String               @db.VarChar(100)
-  resource    String?              @db.VarChar(100)
-  societeId   String?              @map("societe_id")
-  isActive    Boolean              @default(true) @map("is_active")
-  metadata    Json?                @map("metadata")
-  createdAt   DateTime             @default(now()) @map("created_at")
-  updatedAt   DateTime             @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(100)
+  label       String   @db.VarChar(255)
+  description String?  @db.Text
+  module      String   @db.VarChar(100)
+  action      String   @db.VarChar(100)
+  resource    String?  @db.VarChar(100)
+  societeId   String?  @map("societe_id")
+  isActive    Boolean  @default(true) @map("is_active")
+  metadata    Json?    @map("metadata")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  roles       RolePermission[]
-  societe     Societe?             @relation(fields: [societeId], references: [id])
-  menuItems   MenuItemPermission[]
+  roles     RolePermission[]
+  societe   Societe?             @relation(fields: [societeId], references: [id])
+  menuItems MenuItemPermission[]
 
   @@index([name])
   @@index([module])
@@ -198,13 +198,13 @@ model Permission {
 
 // RolePermission
 model RolePermission {
-  id           String     @id @default(uuid())
-  roleId       String     @map("role_id")
-  permissionId String     @map("permission_id")
-  createdAt    DateTime   @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  roleId       String   @map("role_id")
+  permissionId String   @map("permission_id")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
   @@index([roleId])
@@ -219,8 +219,8 @@ model UserRole {
   roleId    String   @map("role_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, roleId])
   @@index([userId])
@@ -230,15 +230,15 @@ model UserRole {
 
 // Group
 model Group {
-  id          String      @id @default(uuid())
-  name        String      @unique @db.VarChar(100)
-  label       String      @db.VarChar(255)
-  description String?     @db.Text
-  isActive    Boolean     @default(true) @map("is_active")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(100)
+  label       String   @db.VarChar(255)
+  description String?  @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  users       UserGroup[]
+  users UserGroup[]
 
   @@index([name])
   @@index([isActive])
@@ -252,8 +252,8 @@ model UserGroup {
   groupId   String   @map("group_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@unique([userId, groupId])
   @@index([userId])
@@ -291,9 +291,9 @@ model UserSocieteRole {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  societe       Societe   @relation(fields: [societeId], references: [id], onDelete: Cascade)
-  role          Role      @relation(fields: [roleId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  societe Societe @relation(fields: [societeId], references: [id], onDelete: Cascade)
+  role    Role    @relation(fields: [roleId], references: [id])
 
   @@unique([userId, societeId, roleId])
   @@index([userId])
@@ -317,7 +317,7 @@ model AuditLog {
   metadata    Json?    @map("metadata")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  user        User?    @relation("PerformedBy", fields: [userId], references: [id])
+  user User? @relation("PerformedBy", fields: [userId], references: [id])
 
   @@index([userId])
   @@index([action])
@@ -353,7 +353,7 @@ model UserSettings {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
 }
@@ -364,23 +364,23 @@ model UserSettings {
 
 // Societe
 model Societe {
-  id               String              @id @default(uuid())
-  code             String              @unique @db.VarChar(50)
-  name             String              @db.VarChar(255)
-  legalName        String?             @map("legal_name") @db.VarChar(255)
-  siret            String?             @db.VarChar(50)
-  address          String?             @db.Text
-  city             String?             @db.VarChar(100)
-  postalCode       String?             @map("postal_code") @db.VarChar(20)
-  country          String?             @db.VarChar(100)
-  phone            String?             @db.VarChar(50)
-  email            String?             @db.VarChar(255)
-  website          String?             @db.VarChar(255)
-  isActive         Boolean             @default(true) @map("is_active")
-  databaseName     String              @map("database_name") @db.VarChar(100)
-  createdAt        DateTime            @default(now()) @map("created_at")
-  updatedAt        DateTime            @updatedAt @map("updated_at")
-  deletedAt        DateTime?           @map("deleted_at")
+  id           String    @id @default(uuid())
+  code         String    @unique @db.VarChar(50)
+  name         String    @db.VarChar(255)
+  legalName    String?   @map("legal_name") @db.VarChar(255)
+  siret        String?   @db.VarChar(50)
+  address      String?   @db.Text
+  city         String?   @db.VarChar(100)
+  postalCode   String?   @map("postal_code") @db.VarChar(20)
+  country      String?   @db.VarChar(100)
+  phone        String?   @db.VarChar(50)
+  email        String?   @db.VarChar(255)
+  website      String?   @db.VarChar(255)
+  isActive     Boolean   @default(true) @map("is_active")
+  databaseName String    @map("database_name") @db.VarChar(100)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
 
   license          SocieteLicense?
   licenses         License[]
@@ -410,7 +410,7 @@ model SocieteLicense {
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  societe      Societe   @relation(fields: [societeId], references: [id], onDelete: Cascade)
+  societe Societe @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([societeId])
   @@index([status])
@@ -430,8 +430,8 @@ model SocieteUser {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  societe     Societe   @relation(fields: [societeId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  societe Societe @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, societeId])
   @@index([userId])
@@ -458,7 +458,7 @@ model Site {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  societe       Societe  @relation(fields: [societeId], references: [id], onDelete: Cascade)
+  societe Societe @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@unique([societeId, code])
   @@index([societeId])
@@ -506,15 +506,15 @@ model SystemParameter {
 
 // MenuConfiguration
 model MenuConfiguration {
-  id          String     @id @default(uuid())
-  name        String     @unique @db.VarChar(255)
-  description String?    @db.Text
-  isActive    Boolean    @default(true) @map("is_active")
-  isDefault   Boolean    @default(false) @map("is_default")
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(255)
+  description String?  @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  menuItems   MenuItem[]
+  menuItems MenuItem[]
 
   @@index([isActive])
   @@index([isDefault])
@@ -523,24 +523,24 @@ model MenuConfiguration {
 
 // MenuItem
 model MenuItem {
-  id                  String               @id @default(uuid())
-  menuConfigurationId String               @map("menu_configuration_id")
-  parentId            String?              @map("parent_id")
-  label               String               @db.VarChar(255)
-  icon                String?              @db.VarChar(100)
-  path                String?              @db.VarChar(500)
-  order               Int                  @default(0)
-  isActive            Boolean              @default(true) @map("is_active")
-  isVisible           Boolean              @default(true) @map("is_visible")
-  metadata            Json?                @map("metadata")
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
+  id                  String   @id @default(uuid())
+  menuConfigurationId String   @map("menu_configuration_id")
+  parentId            String?  @map("parent_id")
+  label               String   @db.VarChar(255)
+  icon                String?  @db.VarChar(100)
+  path                String?  @db.VarChar(500)
+  order               Int      @default(0)
+  isActive            Boolean  @default(true) @map("is_active")
+  isVisible           Boolean  @default(true) @map("is_visible")
+  metadata            Json?    @map("metadata")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
-  menuConfiguration   MenuConfiguration    @relation(fields: [menuConfigurationId], references: [id], onDelete: Cascade)
-  parent              MenuItem?            @relation("MenuItemHierarchy", fields: [parentId], references: [id])
-  children            MenuItem[]           @relation("MenuItemHierarchy")
-  roles               MenuItemRole[]
-  permissions         MenuItemPermission[]
+  menuConfiguration MenuConfiguration    @relation(fields: [menuConfigurationId], references: [id], onDelete: Cascade)
+  parent            MenuItem?            @relation("MenuItemHierarchy", fields: [parentId], references: [id])
+  children          MenuItem[]           @relation("MenuItemHierarchy")
+  roles             MenuItemRole[]
+  permissions       MenuItemPermission[]
 
   @@index([menuConfigurationId])
   @@index([parentId])
@@ -555,8 +555,8 @@ model MenuItemRole {
   roleId     String   @map("role_id")
   createdAt  DateTime @default(now()) @map("created_at")
 
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
-  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  role     Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([menuItemId, roleId])
   @@index([menuItemId])
@@ -566,13 +566,13 @@ model MenuItemRole {
 
 // MenuItemPermission
 model MenuItemPermission {
-  id           String     @id @default(uuid())
-  menuItemId   String     @map("menu_item_id")
-  permissionId String     @map("permission_id")
-  createdAt    DateTime   @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  menuItemId   String   @map("menu_item_id")
+  permissionId String   @map("permission_id")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  menuItem     MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([menuItemId, permissionId])
   @@index([menuItemId])
@@ -582,16 +582,16 @@ model MenuItemPermission {
 
 // UserMenuPreferences
 model UserMenuPreferences {
-  id           String                   @id @default(uuid())
-  userId       String                   @map("user_id")
-  theme        String?                  @db.VarChar(50)
-  layout       String?                  @db.VarChar(50)
-  customColors Json?                    @map("custom_colors")
-  shortcuts    Json?                    @map("shortcuts")
-  createdAt    DateTime                 @default(now()) @map("created_at")
-  updatedAt    DateTime                 @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  theme        String?  @db.VarChar(50)
+  layout       String?  @db.VarChar(50)
+  customColors Json?    @map("custom_colors")
+  shortcuts    Json?    @map("shortcuts")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  items        UserMenuItemPreference[]
+  items UserMenuItemPreference[]
 
   @@unique([userId])
   @@map("user_menu_preferences")
@@ -599,16 +599,16 @@ model UserMenuPreferences {
 
 // UserMenuItemPreference
 model UserMenuItemPreference {
-  id                    String              @id @default(uuid())
-  userMenuPreferencesId String              @map("user_menu_preferences_id")
-  menuItemId            String              @map("menu_item_id")
-  isVisible             Boolean             @default(true) @map("is_visible")
-  order                 Int?                @map("order")
-  customLabel           String?             @map("custom_label") @db.VarChar(255)
-  createdAt             DateTime            @default(now()) @map("created_at")
-  updatedAt             DateTime            @updatedAt @map("updated_at")
+  id                    String   @id @default(uuid())
+  userMenuPreferencesId String   @map("user_menu_preferences_id")
+  menuItemId            String   @map("menu_item_id")
+  isVisible             Boolean  @default(true) @map("is_visible")
+  order                 Int?     @map("order")
+  customLabel           String?  @map("custom_label") @db.VarChar(255)
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
 
-  preferences           UserMenuPreferences @relation(fields: [userMenuPreferencesId], references: [id], onDelete: Cascade)
+  preferences UserMenuPreferences @relation(fields: [userMenuPreferencesId], references: [id], onDelete: Cascade)
 
   @@unique([userMenuPreferencesId, menuItemId])
   @@index([userMenuPreferencesId])
@@ -746,8 +746,8 @@ model Notification {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  reads       NotificationRead[]
-  executions  NotificationRuleExecution[]
+  reads      NotificationRead[]
+  executions NotificationRuleExecution[]
 
   @@index([userId])
   @@index([type])
@@ -809,22 +809,22 @@ model NotificationSettings {
 
 // NotificationRule
 model NotificationRule {
-  id            String                      @id @default(uuid())
-  name          String                      @db.VarChar(255)
-  description   String?                     @db.Text
-  type          String                      @db.VarChar(50)
-  enabled       Boolean                     @default(true)
-  isActive      Boolean                     @default(true) @map("is_active")
-  trigger       Json                        @map("trigger")
-  conditions    Json?                       @map("conditions")
-  actions       Json?                       @map("actions")
-  notification  Json?                       @map("notification")
-  lastTriggered String?                     @map("last_triggered")
-  triggerCount  Int                         @default(0) @map("trigger_count")
-  createdAt     DateTime                    @default(now()) @map("created_at")
-  updatedAt     DateTime                    @updatedAt @map("updated_at")
+  id            String   @id @default(uuid())
+  name          String   @db.VarChar(255)
+  description   String?  @db.Text
+  type          String   @db.VarChar(50)
+  enabled       Boolean  @default(true)
+  isActive      Boolean  @default(true) @map("is_active")
+  trigger       Json     @map("trigger")
+  conditions    Json?    @map("conditions")
+  actions       Json?    @map("actions")
+  notification  Json?    @map("notification")
+  lastTriggered String?  @map("last_triggered")
+  triggerCount  Int      @default(0) @map("trigger_count")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
-  executions    NotificationRuleExecution[]
+  executions NotificationRuleExecution[]
 
   @@index([type])
   @@index([enabled])
@@ -834,18 +834,18 @@ model NotificationRule {
 
 // NotificationRuleExecution
 model NotificationRuleExecution {
-  id             String        @id @default(uuid())
-  ruleId         String        @map("rule_id")
-  notificationId String?       @map("notification_id")
-  triggered      Boolean       @default(false)
-  success        Boolean       @default(false)
-  errorMessage   String?       @map("error_message") @db.Text
-  executionTime  Int?          @map("execution_time")
-  data           Json?         @map("data")
-  createdAt      DateTime      @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  ruleId         String   @map("rule_id")
+  notificationId String?  @map("notification_id")
+  triggered      Boolean  @default(false)
+  success        Boolean  @default(false)
+  errorMessage   String?  @map("error_message") @db.Text
+  executionTime  Int?     @map("execution_time")
+  data           Json?    @map("data")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  rule           NotificationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-  notification   Notification?    @relation(fields: [notificationId], references: [id])
+  rule         NotificationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  notification Notification?    @relation(fields: [notificationId], references: [id])
 
   @@index([ruleId])
   @@index([notificationId])
@@ -856,12 +856,12 @@ model NotificationRuleExecution {
 
 // NotificationRead
 model NotificationRead {
-  id             String       @id @default(uuid())
-  notificationId String       @map("notification_id")
-  userId         String       @map("user_id")
-  readAt         DateTime     @default(now()) @map("read_at")
+  id             String   @id @default(uuid())
+  notificationId String   @map("notification_id")
+  userId         String   @map("user_id")
+  readAt         DateTime @default(now()) @map("read_at")
 
-  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
 
   @@unique([notificationId, userId])
   @@index([notificationId])
@@ -871,20 +871,20 @@ model NotificationRead {
 
 // QueryBuilder
 model QueryBuilder {
-  id               String                       @id @default(uuid())
-  name             String                       @db.VarChar(255)
-  description      String?                      @db.Text
-  type             String                       @db.VarChar(50)
-  baseTable        String                       @map("base_table") @db.VarChar(255)
-  createdBy        String                       @map("created_by")
-  isPublic         Boolean                      @default(false) @map("is_public")
-  isActive         Boolean                      @default(true) @map("is_active")
-  settings         Json?                        @map("settings")
-  layout           Json?                        @map("layout")
-  createdAt        DateTime                     @default(now()) @map("created_at")
-  updatedAt        DateTime                     @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  type        String   @db.VarChar(50)
+  baseTable   String   @map("base_table") @db.VarChar(255)
+  createdBy   String   @map("created_by")
+  isPublic    Boolean  @default(false) @map("is_public")
+  isActive    Boolean  @default(true) @map("is_active")
+  settings    Json?    @map("settings")
+  layout      Json?    @map("layout")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  creator          User                         @relation(fields: [createdBy], references: [id])
+  creator          User                          @relation(fields: [createdBy], references: [id])
   columns          QueryBuilderColumn[]
   joins            QueryBuilderJoin[]
   calculatedFields QueryBuilderCalculatedField[]
@@ -898,19 +898,19 @@ model QueryBuilder {
 
 // QueryBuilderColumn
 model QueryBuilderColumn {
-  id             String       @id @default(uuid())
-  queryBuilderId String       @map("query_builder_id")
-  columnName     String       @map("column_name") @db.VarChar(255)
-  alias          String?      @db.VarChar(255)
-  dataType       String?      @map("data_type") @db.VarChar(50)
-  format         Json?        @map("format")
-  aggregation    Json?        @map("aggregation")
-  order          Int          @default(0)
-  isVisible      Boolean      @default(true) @map("is_visible")
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  queryBuilderId String   @map("query_builder_id")
+  columnName     String   @map("column_name") @db.VarChar(255)
+  alias          String?  @db.VarChar(255)
+  dataType       String?  @map("data_type") @db.VarChar(50)
+  format         Json?    @map("format")
+  aggregation    Json?    @map("aggregation")
+  order          Int      @default(0)
+  isVisible      Boolean  @default(true) @map("is_visible")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+  queryBuilder QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
 
   @@index([queryBuilderId])
   @@index([order])
@@ -919,16 +919,16 @@ model QueryBuilderColumn {
 
 // QueryBuilderJoin
 model QueryBuilderJoin {
-  id             String       @id @default(uuid())
-  queryBuilderId String       @map("query_builder_id")
-  joinTable      String       @map("join_table") @db.VarChar(255)
-  joinType       String       @map("join_type") @db.VarChar(50)
-  condition      String       @db.Text
-  order          Int          @default(0)
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  queryBuilderId String   @map("query_builder_id")
+  joinTable      String   @map("join_table") @db.VarChar(255)
+  joinType       String   @map("join_type") @db.VarChar(50)
+  condition      String   @db.Text
+  order          Int      @default(0)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+  queryBuilder QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
 
   @@index([queryBuilderId])
   @@map("query_builder_joins")
@@ -936,19 +936,19 @@ model QueryBuilderJoin {
 
 // QueryBuilderCalculatedField
 model QueryBuilderCalculatedField {
-  id             String       @id @default(uuid())
-  queryBuilderId String       @map("query_builder_id")
-  name           String       @db.VarChar(255)
-  expression     String       @db.Text
-  dataType       String       @map("data_type") @db.VarChar(50)
-  format         Json?        @map("format")
-  dependencies   Json?        @map("dependencies")
-  order          Int          @default(0)
-  isVisible      Boolean      @default(true) @map("is_visible")
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  queryBuilderId String   @map("query_builder_id")
+  name           String   @db.VarChar(255)
+  expression     String   @db.Text
+  dataType       String   @map("data_type") @db.VarChar(50)
+  format         Json?    @map("format")
+  dependencies   Json?    @map("dependencies")
+  order          Int      @default(0)
+  isVisible      Boolean  @default(true) @map("is_visible")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+  queryBuilder QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
 
   @@index([queryBuilderId])
   @@map("query_builder_calculated_fields")
@@ -956,19 +956,19 @@ model QueryBuilderCalculatedField {
 
 // QueryBuilderPermission
 model QueryBuilderPermission {
-  id             String       @id @default(uuid())
-  queryBuilderId String       @map("query_builder_id")
-  userId         String?      @map("user_id")
-  roleId         String?      @map("role_id")
-  canView        Boolean      @default(true) @map("can_view")
-  canEdit        Boolean      @default(false) @map("can_edit")
-  canDelete      Boolean      @default(false) @map("can_delete")
-  canShare       Boolean      @default(false) @map("can_share")
-  createdAt      DateTime     @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  queryBuilderId String   @map("query_builder_id")
+  userId         String?  @map("user_id")
+  roleId         String?  @map("role_id")
+  canView        Boolean  @default(true) @map("can_view")
+  canEdit        Boolean  @default(false) @map("can_edit")
+  canDelete      Boolean  @default(false) @map("can_delete")
+  canShare       Boolean  @default(false) @map("can_share")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  queryBuilder   QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
-  user           User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role           Role?        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  queryBuilder QueryBuilder @relation(fields: [queryBuilderId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         Role?        @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([queryBuilderId, userId])
   @@unique([queryBuilderId, roleId])
@@ -977,6 +977,7 @@ model QueryBuilderPermission {
   @@index([roleId])
   @@map("query_builder_permissions")
 }
+
 // ============================================
 // LICENSING DOMAIN MODELS
 // ============================================
@@ -1041,49 +1042,49 @@ enum UsageMetricType {
 
 // License (main entity)
 model License {
-  id                 String                @id @default(uuid())
-  licenseKey         String                @unique @map("license_key") @db.VarChar(255)
-  societeId          String                @map("societe_id")
-  customerName       String                @map("customer_name") @db.VarChar(255)
-  customerEmail      String                @map("customer_email") @db.VarChar(255)
-  type               LicenseType           @default(BASIC)
-  status             LicenseStatus         @default(PENDING)
-  billingCycle       BillingCycle          @default(ANNUAL) @map("billing_cycle")
-  startsAt           DateTime              @map("starts_at")
-  expiresAt          DateTime?             @map("expires_at")
-  lastRenewalAt      DateTime?             @map("last_renewal_at")
-  nextRenewalAt      DateTime?             @map("next_renewal_at")
-  maxUsers           Int                   @default(1) @map("max_users")
-  maxSites           Int                   @default(1) @map("max_sites")
-  maxTransactions    Int                   @default(-1) @map("max_transactions")
-  maxStorage         Int                   @default(-1) @map("max_storage")
-  maxApiCalls        Int                   @default(1) @map("max_api_calls")
-  allowCustomModules Boolean               @default(false) @map("allow_custom_modules")
-  allowApiAccess     Boolean               @default(false) @map("allow_api_access")
-  allowWhiteLabel    Boolean               @default(false) @map("allow_white_label")
-  autoRenew          Boolean               @default(true) @map("auto_renew")
-  price              Decimal?              @db.Decimal(10, 2)
-  currency           String                @default("EUR") @db.VarChar(3)
-  restrictions       Json                  @default("{}")
-  metadata           Json                  @default("{}")
-  notes              String?               @db.Text
-  signature          String?               @db.VarChar(500)
-  activatedAt        DateTime?             @map("activated_at")
-  activatedBy        String?               @map("activated_by")
-  suspendedAt        DateTime?             @map("suspended_at")
-  suspendedReason    String?               @map("suspended_reason") @db.VarChar(500)
-  revokedAt          DateTime?             @map("revoked_at")
-  revokedReason      String?               @map("revoked_reason") @db.VarChar(500)
-  createdAt          DateTime              @default(now()) @map("created_at")
-  updatedAt          DateTime              @updatedAt @map("updated_at")
-  createdBy          String?               @map("created_by")
-  updatedBy          String?               @map("updated_by")
+  id                 String        @id @default(uuid())
+  licenseKey         String        @unique @map("license_key") @db.VarChar(255)
+  societeId          String        @map("societe_id")
+  customerName       String        @map("customer_name") @db.VarChar(255)
+  customerEmail      String        @map("customer_email") @db.VarChar(255)
+  type               LicenseType   @default(BASIC)
+  status             LicenseStatus @default(PENDING)
+  billingCycle       BillingCycle  @default(ANNUAL) @map("billing_cycle")
+  startsAt           DateTime      @map("starts_at")
+  expiresAt          DateTime?     @map("expires_at")
+  lastRenewalAt      DateTime?     @map("last_renewal_at")
+  nextRenewalAt      DateTime?     @map("next_renewal_at")
+  maxUsers           Int           @default(1) @map("max_users")
+  maxSites           Int           @default(1) @map("max_sites")
+  maxTransactions    Int           @default(-1) @map("max_transactions")
+  maxStorage         Int           @default(-1) @map("max_storage")
+  maxApiCalls        Int           @default(1) @map("max_api_calls")
+  allowCustomModules Boolean       @default(false) @map("allow_custom_modules")
+  allowApiAccess     Boolean       @default(false) @map("allow_api_access")
+  allowWhiteLabel    Boolean       @default(false) @map("allow_white_label")
+  autoRenew          Boolean       @default(true) @map("auto_renew")
+  price              Decimal?      @db.Decimal(10, 2)
+  currency           String        @default("EUR") @db.VarChar(3)
+  restrictions       Json          @default("{}")
+  metadata           Json          @default("{}")
+  notes              String?       @db.Text
+  signature          String?       @db.VarChar(500)
+  activatedAt        DateTime?     @map("activated_at")
+  activatedBy        String?       @map("activated_by")
+  suspendedAt        DateTime?     @map("suspended_at")
+  suspendedReason    String?       @map("suspended_reason") @db.VarChar(500)
+  revokedAt          DateTime?     @map("revoked_at")
+  revokedReason      String?       @map("revoked_reason") @db.VarChar(500)
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+  createdBy          String?       @map("created_by")
+  updatedBy          String?       @map("updated_by")
 
   // Relations
-  societe            Societe               @relation(fields: [societeId], references: [id])
-  features           LicenseFeature[]
-  activations        LicenseActivation[]
-  usage              LicenseUsage[]
+  societe     Societe             @relation(fields: [societeId], references: [id])
+  features    LicenseFeature[]
+  activations LicenseActivation[]
+  usage       LicenseUsage[]
 
   @@index([licenseKey])
   @@index([societeId])
@@ -1102,25 +1103,25 @@ model License {
 
 // LicenseFeature
 model LicenseFeature {
-  id            String           @id @default(uuid())
-  licenseId     String           @map("license_id")
-  featureCode   String           @map("feature_code") @db.VarChar(100)
-  featureName   String           @map("feature_name") @db.VarChar(255)
-  description   String?          @db.Text
-  category      FeatureCategory  @default(CORE)
-  isEnabled     Boolean          @default(true) @map("is_enabled")
+  id            String          @id @default(uuid())
+  licenseId     String          @map("license_id")
+  featureCode   String          @map("feature_code") @db.VarChar(100)
+  featureName   String          @map("feature_name") @db.VarChar(255)
+  description   String?         @db.Text
+  category      FeatureCategory @default(CORE)
+  isEnabled     Boolean         @default(true) @map("is_enabled")
   limit         Int?
-  used          Int              @default(0)
-  enabledAt     DateTime?        @map("enabled_at")
-  disabledAt    DateTime?        @map("disabled_at")
-  expiresAt     DateTime?        @map("expires_at")
-  configuration Json             @default("{}")
-  metadata      Json             @default("{}")
-  createdAt     DateTime         @default(now()) @map("created_at")
-  updatedAt     DateTime         @updatedAt @map("updated_at")
+  used          Int             @default(0)
+  enabledAt     DateTime?       @map("enabled_at")
+  disabledAt    DateTime?       @map("disabled_at")
+  expiresAt     DateTime?       @map("expires_at")
+  configuration Json            @default("{}")
+  metadata      Json            @default("{}")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
 
   // Relations
-  license       License          @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  license License @relation(fields: [licenseId], references: [id], onDelete: Cascade)
 
   @@unique([licenseId, featureCode])
   @@index([licenseId])
@@ -1131,31 +1132,31 @@ model LicenseFeature {
 
 // LicenseActivation
 model LicenseActivation {
-  id                   String             @id @default(uuid())
-  licenseId            String             @map("license_id")
-  activationKey        String             @unique @map("activation_key") @db.VarChar(255)
-  machineId            String             @map("machine_id") @db.VarChar(255)
-  machineName          String?            @map("machine_name") @db.VarChar(255)
-  osType               String?            @map("os_type") @db.VarChar(100)
-  osVersion            String?            @map("os_version") @db.VarChar(100)
-  hostname             String?            @db.VarChar(255)
-  ipAddress            String?            @map("ip_address") @db.Inet
-  macAddress           String?            @map("mac_address") @db.VarChar(17)
-  status               ActivationStatus   @default(PENDING)
-  activatedAt          DateTime           @map("activated_at")
-  lastSeenAt           DateTime?          @map("last_seen_at")
-  deactivatedAt        DateTime?          @map("deactivated_at")
-  deactivationReason   String?            @map("deactivation_reason") @db.VarChar(500)
-  heartbeatCount       Int                @default(0) @map("heartbeat_count")
-  maxHeartbeatInterval Int?               @map("max_heartbeat_interval")
-  hardwareInfo         Json?              @map("hardware_info")
-  softwareInfo         Json?              @map("software_info")
-  metadata             Json               @default("{}")
-  createdAt            DateTime           @default(now()) @map("created_at")
-  updatedAt            DateTime           @updatedAt @map("updated_at")
+  id                   String           @id @default(uuid())
+  licenseId            String           @map("license_id")
+  activationKey        String           @unique @map("activation_key") @db.VarChar(255)
+  machineId            String           @map("machine_id") @db.VarChar(255)
+  machineName          String?          @map("machine_name") @db.VarChar(255)
+  osType               String?          @map("os_type") @db.VarChar(100)
+  osVersion            String?          @map("os_version") @db.VarChar(100)
+  hostname             String?          @db.VarChar(255)
+  ipAddress            String?          @map("ip_address") @db.Inet
+  macAddress           String?          @map("mac_address") @db.VarChar(17)
+  status               ActivationStatus @default(PENDING)
+  activatedAt          DateTime         @map("activated_at")
+  lastSeenAt           DateTime?        @map("last_seen_at")
+  deactivatedAt        DateTime?        @map("deactivated_at")
+  deactivationReason   String?          @map("deactivation_reason") @db.VarChar(500)
+  heartbeatCount       Int              @default(0) @map("heartbeat_count")
+  maxHeartbeatInterval Int?             @map("max_heartbeat_interval")
+  hardwareInfo         Json?            @map("hardware_info")
+  softwareInfo         Json?            @map("software_info")
+  metadata             Json             @default("{}")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
 
   // Relations
-  license              License            @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  license License @relation(fields: [licenseId], references: [id], onDelete: Cascade)
 
   @@index([licenseId, machineId])
   @@index([activationKey])
@@ -1166,25 +1167,25 @@ model LicenseActivation {
 
 // LicenseUsage
 model LicenseUsage {
-  id         String           @id @default(uuid())
-  licenseId  String           @map("license_id")
-  metricType UsageMetricType  @map("metric_type")
-  metricName String?          @map("metric_name") @db.VarChar(100)
+  id         String          @id @default(uuid())
+  licenseId  String          @map("license_id")
+  metricType UsageMetricType @map("metric_type")
+  metricName String?         @map("metric_name") @db.VarChar(100)
   value      Int
   limit      Int?
-  percentage Decimal?         @db.Decimal(5, 2)
-  recordedAt DateTime         @map("recorded_at")
-  date       DateTime         @db.Date
+  percentage Decimal?        @db.Decimal(5, 2)
+  recordedAt DateTime        @map("recorded_at")
+  date       DateTime        @db.Date
   hour       Int?
   week       Int?
   month      Int?
   year       Int?
   breakdown  Json?
-  metadata   Json             @default("{}")
-  createdAt  DateTime         @default(now()) @map("created_at")
+  metadata   Json            @default("{}")
+  createdAt  DateTime        @default(now()) @map("created_at")
 
   // Relations
-  license    License          @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  license License @relation(fields: [licenseId], references: [id], onDelete: Cascade)
 
   @@index([licenseId, recordedAt])
   @@index([licenseId, metricType])

@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 // Controller
 import { DatabaseController } from './controllers/database.controller'
-import { createSimpleDatabaseConfig } from './database.config.simple'
+import { createDatabaseConfig } from './database.config'
 import { DatabaseHealthService } from './services/health.service'
 // Services
 import { MigrationService } from './services/migration.service'
@@ -27,7 +27,7 @@ import { DatabaseStartupService } from './services/startup.service'
     ConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: createSimpleDatabaseConfig,
+      useFactory: createDatabaseConfig,
       inject: [ConfigService],
     }),
   ],
