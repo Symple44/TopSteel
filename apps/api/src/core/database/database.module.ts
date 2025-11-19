@@ -22,10 +22,6 @@ import { SystemSetting } from '../../features/admin/entitites/system-setting.ent
 // Entités métier supprimées pour optimiser le debug
 import { UserMenuPreference } from '../../features/menu/entities/user-menu-preference.entity'
 import { Notifications } from '../../features/notifications/entities/notifications.entity'
-import { BTPIndex } from '../../modules/pricing/entities/btp-index.entity'
-import { CustomerSectorAssignment } from '../../modules/pricing/entities/customer-sector-assignment.entity'
-// Entités pricing
-import { SectorCoefficient } from '../../modules/pricing/entities/sector-coefficient.entity'
 import { DatabaseCleanupService } from './database-cleanup.service'
 import { DatabasePreSyncService } from './database-pre-sync.service'
 import { DatabaseSyncService } from './database-sync.service'
@@ -80,11 +76,6 @@ import { DatabaseSyncService } from './database-sync.service'
           User,
           UserMenuPreference,
           Notifications,
-
-          // Entités pricing
-          SectorCoefficient,
-          CustomerSectorAssignment,
-          BTPIndex,
         ]
 
         return {

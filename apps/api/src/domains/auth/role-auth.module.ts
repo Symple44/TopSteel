@@ -12,8 +12,6 @@ import { UserGroup } from './core/entities/user-group.entity'
 import { UserRole } from './core/entities/user-role.entity'
 import { GroupController } from './external/controllers/group.controller'
 import { ModuleController } from './external/controllers/module.controller'
-// Controllers
-import { RoleLegacyController } from './legacy/role-legacy.controller'
 import { GroupService } from './services/group.service'
 // Services
 import { RoleService } from './services/role.service'
@@ -51,7 +49,7 @@ import { RoleService } from './services/role.service'
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
     }),
   ],
-  controllers: [RoleLegacyController, GroupController, ModuleController],
+  controllers: [GroupController, ModuleController],
   providers: [
     RoleService,
     GroupService,

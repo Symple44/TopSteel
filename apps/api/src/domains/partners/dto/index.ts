@@ -1,7 +1,0 @@
-export * from './contact.dto'
-export * from './create-partner.dto'
-export * from './partner-address.dto'
-export * from './partner-filters.dto'
-export * from './partner-group.dto'
-export * from './partner-site.dto'
-export * from './update-partner.dto'

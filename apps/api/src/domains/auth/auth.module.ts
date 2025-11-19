@@ -26,7 +26,6 @@ import { AuthRepositoryProviders } from './core/providers/auth-repository.provid
 import { AuthCoreService } from './core/services/auth-core.service'
 import { SMSLog } from './entities/sms-log.entity'
 import { MFAController } from './external/controllers/mfa.controller'
-import { SessionsLegacyController } from './legacy/sessions-legacy.controller'
 import { SMSAdminController } from './external/controllers/sms-admin.controller'
 import { CombinedSecurityGuard } from './security/guards/combined-security.guard'
 import { EnhancedRolesGuard } from './security/guards/enhanced-roles.guard'
@@ -103,7 +102,7 @@ import { AuthPrismaModule } from './prisma/auth-prisma.module'
     UsersModule,
     SocietesModule,
   ],
-  controllers: [AuthController, SessionsLegacyController, MFAController, SMSAdminController],
+  controllers: [AuthController, MFAController, SMSAdminController],
   providers: [
     AuthService,
     AuthCoreService, // Service principal

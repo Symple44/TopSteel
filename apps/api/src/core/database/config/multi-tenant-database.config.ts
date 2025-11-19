@@ -14,13 +14,6 @@ import { UserMFA } from '../../../domains/auth/core/entities/user-mfa.entity'
 import { UserRole } from '../../../domains/auth/core/entities/user-role.entity'
 import { UserSession } from '../../../domains/auth/core/entities/user-session.entity'
 import { UserSocieteRole } from '../../../domains/auth/core/entities/user-societe-role.entity'
-import { Article } from '../../../domains/inventory/entities/article.entity'
-import { Material } from '../../../domains/materials/entities/material.entity'
-import { Contact } from '../../../domains/partners/entities/contact.entity'
-import { Partner } from '../../../domains/partners/entities/partner.entity'
-import { PartnerAddress } from '../../../domains/partners/entities/partner-address.entity'
-import { PartnerGroup } from '../../../domains/partners/entities/partner-group.entity'
-import { PartnerSite } from '../../../domains/partners/entities/partner-site.entity'
 import { User } from '../../../domains/users/entities/user.entity'
 import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
 // Entités de menu (dans AUTH)
@@ -35,13 +28,6 @@ import { ParameterApplication } from '../../../features/parameters/entities/para
 import { ParameterClient } from '../../../features/parameters/entities/parameter-client.entity'
 // Entités de paramètres (dans AUTH)
 import { ParameterSystem } from '../../../features/parameters/entities/parameter-system.entity'
-import {
-  PricingLog,
-  SalesHistory,
-  WebhookDelivery,
-  WebhookEvent,
-  WebhookSubscription,
-} from '../../../features/pricing/entities'
 // Entités partagées (base shared)
 import { SharedEntities } from '../../../features/shared/entities'
 import { SharedDataRegistry } from '../../../features/shared/entities/shared-data-registry.entity'
@@ -50,10 +36,6 @@ import { Site } from '../../../features/societes/entities/site.entity'
 import { Societe } from '../../../features/societes/entities/societe.entity'
 import { SocieteLicense } from '../../../features/societes/entities/societe-license.entity'
 import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
-import { BTPIndex } from '../../../modules/pricing/entities/btp-index.entity'
-import { CustomerSectorAssignment } from '../../../modules/pricing/entities/customer-sector-assignment.entity'
-// Entités pricing
-import { SectorCoefficient } from '../../../modules/pricing/entities/sector-coefficient.entity'
 
 @Injectable()
 export class MultiTenantDatabaseConfig {
@@ -141,25 +123,9 @@ export class MultiTenantDatabaseConfig {
       password: this.configService.get('DB_PASSWORD', 'postgres'),
       database: `erp_topsteel_${societeCode.toLowerCase()}`,
       entities: [
-        // Entités métier spécifiques à la société
-        Partner,
-        PartnerGroup,
-        Contact,
-        PartnerSite,
-        PartnerAddress,
-        Article,
-        Material,
+        // Entités métier spécifiques à la société (infrastructure uniquement)
         Notifications,
-        // Entités pricing
         PriceRule,
-        PricingLog,
-        WebhookSubscription,
-        WebhookEvent,
-        WebhookDelivery,
-        SalesHistory,
-        SectorCoefficient,
-        CustomerSectorAssignment,
-        BTPIndex,
       ],
       synchronize: false,
       logging: this.configService.get('DB_LOGGING', false),

@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common'
-import { InventoryModule } from './inventory/inventory.module'
-import { MaterialsModule } from './materials/materials.module'
-import { PartnersModule } from './partners/partners.module'
 
 /**
  * Module central pour tous les domaines métier
+ *
+ * ⚠️ CLEANUP: Domaines métier retirés vers applications dédiées
+ * - Partners → Supprimé (branche cleanup/remove-business-logic)
+ * - Inventory → Supprimé (branche cleanup/remove-business-logic)
+ * - Materials → Supprimé (branche cleanup/remove-business-logic)
+ *
+ * TopSteel = Infrastructure uniquement (Auth, Users, Societes, Licensing, etc.)
  */
 @Module({
-  imports: [PartnersModule, InventoryModule, MaterialsModule],
-  exports: [PartnersModule, InventoryModule, MaterialsModule],
+  imports: [],
+  exports: [],
 })
 export class BusinessModule {}

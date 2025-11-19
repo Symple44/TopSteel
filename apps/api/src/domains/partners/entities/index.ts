@@ -1,5 +1,0 @@
-export * from './contact.entity'
-export * from './partner.entity'
-export * from './partner-address.entity'
-export * from './partner-group.entity'
-export * from './partner-site.entity'

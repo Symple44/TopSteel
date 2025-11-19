@@ -6,8 +6,7 @@ import { MenuSyncModule } from './admin/menu-sync.module'
 import { DatabaseCoreModule } from './database-core/database-core.module'
 import { MenuModule } from './menu/menu.module'
 import { ParametersModule } from './parameters/parameters.module'
-// Business features
-import { PricingUnifiedModule } from './pricing/pricing-unified.module'
+// Infrastructure features
 import { QueryBuilderModule } from './query-builder/query-builder.module'
 import { SearchModule } from './search/search.module'
 import { SharedModule } from './shared/shared.module'
@@ -45,10 +44,7 @@ import { UIPreferencesModule } from './ui-preferences/ui-preferences.module'
     SocietesModule,
     SharedModule,
 
-    // Business features
-    PricingUnifiedModule,
-
-    // Tools
+    // Infrastructure features
     QueryBuilderModule,
     SearchModule,
 
@@ -66,7 +62,6 @@ import { UIPreferencesModule } from './ui-preferences/ui-preferences.module'
     UIPreferencesModule,
     SocietesModule,
     SharedModule,
-    PricingUnifiedModule,
     QueryBuilderModule,
     SearchModule,
   ],
