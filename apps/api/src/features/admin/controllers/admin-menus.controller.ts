@@ -63,6 +63,7 @@ export class AdminMenusController {
     @Request() req: Record<string, unknown>
   ): Promise<MenuConfiguration> {
     const userId =
+import { MenuItem } from '@prisma/client'
       (req.user as { id?: string; sub?: string; email?: string })?.sub ||
       (req.user as { id?: string; sub?: string; email?: string })?.id ||
       'system'

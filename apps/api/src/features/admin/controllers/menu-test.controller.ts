@@ -51,3 +51,4 @@ export class MenuTestController {
     }
   }
 }
+import { MenuConfigurationSimple } from '@prisma/client'

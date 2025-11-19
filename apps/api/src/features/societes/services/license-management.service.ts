@@ -764,3 +764,4 @@ export class LicenseManagementService {
     this.logger.error(`Notification de suspension créée pour ${societe.nom}: ${reason}`)
   }
 }
+import { Societe, SocieteLicense, User, UserSession } from '@prisma/client'

@@ -124,3 +124,4 @@ export class DatatableHierarchicalPreferences {
   @JoinColumn({ name: 'user_id' })
   user!: User
 }
+import { User } from '@prisma/client'

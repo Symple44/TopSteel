@@ -13,3 +13,4 @@ import { UsersService } from './users.service'
   exports: [UsersService, UserAuthRepositoryService, TypeOrmModule],
 })
 export class UsersModule {}
+import { User, UserSettings } from '@prisma/client'

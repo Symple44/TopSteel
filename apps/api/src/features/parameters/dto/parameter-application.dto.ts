@@ -209,3 +209,4 @@ export class CreateCategoryParameterDto {
   @IsOptional()
   globalTranslations?: Record<string, Record<string, string>>
 }
+import { ParameterApplication } from '@prisma/client'

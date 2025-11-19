@@ -694,3 +694,4 @@ export class NotificationRulesEngineService {
     }, 1000) // Check every second
   }
 }
+import { NotificationRule } from '@prisma/client'

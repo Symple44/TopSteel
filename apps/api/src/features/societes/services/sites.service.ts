@@ -99,3 +99,4 @@ export class SitesService {
     return site
   }
 }
+import { Site } from '@prisma/client'

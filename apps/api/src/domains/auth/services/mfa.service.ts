@@ -333,6 +333,7 @@ export class MFAService {
     userId: string,
     mfaId: string,
     verificationCode: string
+import { MfaSession, User, UserMfa } from '@prisma/client'
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const mfaRecord = await this.userMFARepository.findOne({

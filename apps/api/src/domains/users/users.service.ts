@@ -388,3 +388,4 @@ export class UsersService {
     return this._userSettingsRepository.save(defaultSettings)
   }
 }
+import { User, UserSettings } from '@prisma/client'

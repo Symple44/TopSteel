@@ -60,3 +60,4 @@ import { RoleService } from './services/role.service'
   exports: [RoleService, TypeOrmModule],
 })
 export class RoleAuthModule {}
+import { Group, Module, Permission, Role, RolePermission, UserGroup, UserRole } from '@prisma/client'

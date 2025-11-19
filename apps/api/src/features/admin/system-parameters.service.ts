@@ -149,6 +149,7 @@ export class SystemParametersService {
   }
 
   // Méthode pour mettre à jour plusieurs paramètres en une fois
+import { SystemParameter } from '@prisma/client'
   async updateMultiple(updates: Array<{ key: string; value: string }>): Promise<SystemParameter[]> {
     const results: SystemParameter[] = []
 

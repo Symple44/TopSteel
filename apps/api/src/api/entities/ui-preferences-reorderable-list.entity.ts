@@ -86,3 +86,4 @@ export class UiPreferencesReorderableList {
   @JoinColumn({ name: 'user_id' })
   user!: User
 }
+import { User } from '@prisma/client'

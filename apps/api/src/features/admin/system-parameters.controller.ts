@@ -78,6 +78,7 @@ export class SystemParametersController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Mettre à jour plusieurs paramètres en une fois' })
   @ApiResponse({ status: 200, description: 'Paramètres mis à jour avec succès' })
+import { User } from '@prisma/client'
   async updateMultiple(@Body() updates: Array<{ key: string; value: string }>) {
     return this.systemParametersService.updateMultiple(updates)
   }

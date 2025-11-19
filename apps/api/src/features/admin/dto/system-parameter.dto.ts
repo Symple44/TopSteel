@@ -69,3 +69,4 @@ export class SystemParameterQueryDto {
   @IsOptional()
   search?: string
 }
+import { SystemParameter } from '@prisma/client'

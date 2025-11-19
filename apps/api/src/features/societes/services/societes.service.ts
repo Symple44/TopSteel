@@ -122,3 +122,4 @@ export class SocietesService {
     }
   }
 }
+import { Societe } from '@prisma/client'

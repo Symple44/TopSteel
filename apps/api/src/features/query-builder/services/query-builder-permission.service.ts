@@ -126,6 +126,7 @@ export class QueryBuilderPermissionService {
   async getUserRolePermissions(
     queryBuilderId: string,
     userId: string
+import { User } from '@prisma/client'
   ): Promise<Array<{ roleId: string; roleName: string; permissions: PermissionType[] }>> {
     const userRoles = await this.userRepository
       .createQueryBuilder('user')

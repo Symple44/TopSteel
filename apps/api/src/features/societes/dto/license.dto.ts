@@ -344,3 +344,4 @@ export class LicenseUsageStatsDto {
   @ApiPropertyOptional()
   restrictions?: Record<string, number>
 }
+import { SocieteLicense } from '@prisma/client'

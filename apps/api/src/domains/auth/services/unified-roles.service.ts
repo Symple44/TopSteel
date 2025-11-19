@@ -651,3 +651,4 @@ export class UnifiedRolesService {
     return saved
   }
 }
+import { User, UserSocieteRole } from '@prisma/client'

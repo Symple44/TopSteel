@@ -74,3 +74,4 @@ export class NotificationsController {
     return this.notificationsService.remove(id)
   }
 }
+import { User } from '@prisma/client'

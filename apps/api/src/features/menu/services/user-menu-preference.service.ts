@@ -375,6 +375,7 @@ export class UserMenuPreferenceService {
                   )
 
                   if (Object.keys(itemTranslations).length > 0) {
+import { UserMenuPreference } from '@prisma/client'
                     ;(
                       item as MenuItemDto & { titleTranslations?: Record<string, string> }
                     ).titleTranslations = itemTranslations

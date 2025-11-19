@@ -162,3 +162,4 @@ export class CreateEnumParameterDto {
   @IsOptional()
   globalTranslations?: Record<string, Record<string, string>>
 }
+import { ParameterSystem } from '@prisma/client'

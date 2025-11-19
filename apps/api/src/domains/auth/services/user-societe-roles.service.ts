@@ -439,3 +439,4 @@ export class UserSocieteRolesService {
     return await this.permissionCalculator.calculateUserPermissions(userId, societeId, siteId)
   }
 }
+import { UserSocieteRole } from '@prisma/client'

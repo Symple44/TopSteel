@@ -94,3 +94,4 @@ import { SystemParametersService } from './system-parameters.service'
   ],
 })
 export class AdminModule {}
+import { DiscoveredPage, Permission, Role, RolePermission, SystemParameter, UserMenuItemPreference, UserMenuPreferences } from '@prisma/client'

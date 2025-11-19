@@ -323,3 +323,4 @@ export class SocieteUsersService {
     }
   }
 }
+import { SocieteUser } from '@prisma/client'

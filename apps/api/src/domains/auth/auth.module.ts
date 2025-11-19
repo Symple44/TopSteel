@@ -167,3 +167,4 @@ import { AuthPrismaModule } from './prisma/auth-prisma.module'
   ],
 })
 export class AuthModule {}
+import { AuditLog, MfaSession, Permission, Role, RolePermission, SmsLog, Societe, SocieteUser, UserMfa, UserSession, UserSocieteRole } from '@prisma/client'

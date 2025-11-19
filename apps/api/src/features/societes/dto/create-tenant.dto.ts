@@ -118,3 +118,4 @@ export class CreateTenantDto {
     timezone?: string
   }
 }
+import { Societe } from '@prisma/client'

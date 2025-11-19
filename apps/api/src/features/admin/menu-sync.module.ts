@@ -21,3 +21,4 @@ import { MenuSyncService } from './services/menu-sync.service'
   exports: [MenuSyncService, MenuConfigurationService],
 })
 export class MenuSyncModule {}
+import { MenuConfiguration, MenuItem, MenuItemPermission, MenuItemRole } from '@prisma/client'

@@ -54,3 +54,4 @@ import { SchemaIntrospectionService } from './services/schema-introspection.serv
   ],
 })
 export class QueryBuilderModule {}
+import { User } from '@prisma/client'

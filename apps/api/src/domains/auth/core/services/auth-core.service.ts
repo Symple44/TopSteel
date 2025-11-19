@@ -96,3 +96,4 @@ export class AuthCoreService {
     return await this.societeRepository.findActiveSocietes()
   }
 }
+import { Societe } from '@prisma/client'

@@ -120,6 +120,7 @@ export interface AuditStatistics {
   bySeverity: Record<string, number>
   failureRate: number
   avgDuration: number
+import { AuditLog } from '@prisma/client'
   topUsers: Array<{ userId: string; count: number }>
   topResources: Array<{ resource: string; count: number }>
   suspiciousActivities: number

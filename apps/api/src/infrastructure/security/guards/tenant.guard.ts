@@ -130,3 +130,4 @@ export class TenantGuard implements CanActivate {
     return rolePermissionsMap[role] || []
   }
 }
+import { SocieteUser } from '@prisma/client'

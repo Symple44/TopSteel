@@ -116,3 +116,4 @@ export class PageSyncController {
     }
   }
 }
+import { DiscoveredPage } from '@prisma/client'

@@ -83,3 +83,4 @@ import { SocietesPrismaModule } from '../../domains/societes/prisma/societes-pri
   ],
 })
 export class SocietesModule {}
+import { NotificationSettings, Site, Societe, SocieteLicense, SocieteUser, User, UserSession, UserSettings } from '@prisma/client'

@@ -625,3 +625,4 @@ export class ParameterService {
     return result
   }
 }
+import { ParameterApplication, ParameterClient, ParameterSystem } from '@prisma/client'

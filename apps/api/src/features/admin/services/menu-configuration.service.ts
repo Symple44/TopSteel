@@ -607,3 +607,4 @@ export class MenuConfigurationService {
     )
   }
 }
+import { MenuConfiguration, MenuItem, MenuItemPermission, MenuItemRole } from '@prisma/client'

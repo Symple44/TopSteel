@@ -571,3 +571,4 @@ export class PermissionCalculatorService {
     return summary
   }
 }
+import { Permission, Role, RolePermission, UserSocieteRole } from '@prisma/client'

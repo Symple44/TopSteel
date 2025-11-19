@@ -87,6 +87,7 @@ export interface PermissionQueryResult {
     description?: string
     category?: string
     scope: PermissionScope
+import { Permission, Role, RolePermission, User, UserSocieteRole } from '@prisma/client'
     users?: Array<{ id: string; email: string; name: string }>
     roles?: Array<{ id: string; code: string; name: string }>
     societes?: Array<{ id: string; name: string }>

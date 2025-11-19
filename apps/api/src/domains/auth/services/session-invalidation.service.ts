@@ -81,3 +81,4 @@ export class SessionInvalidationService implements OnModuleInit {
     }
   }
 }
+import { User } from '@prisma/client'

@@ -113,3 +113,4 @@ import { DatabaseSyncService } from './database-sync.service'
   exports: [DatabaseCleanupService, DatabaseSyncService, DatabasePreSyncService],
 })
 export class DatabaseModule {}
+import { MenuConfiguration, MenuItem, MenuItemPermission, MenuItemRole, MfaSession, SystemParameter, SystemSetting, User, UserMenuItemPreference, UserMenuPreference, UserMenuPreferences, UserMfa, UserSession } from '@prisma/client'

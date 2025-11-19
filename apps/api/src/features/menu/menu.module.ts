@@ -19,3 +19,4 @@ import { UserMenuPreferenceService } from './services/user-menu-preference.servi
   exports: [UserMenuPreferenceService, PageSyncService],
 })
 export class MenuModule {}
+import { DiscoveredPage, UserMenuPreference } from '@prisma/client'

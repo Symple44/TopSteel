@@ -255,3 +255,4 @@ export class GroupService {
     return Array.from(allRoles.values())
   }
 }
+import { Group, Role, UserGroup } from '@prisma/client'

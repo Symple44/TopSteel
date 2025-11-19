@@ -120,3 +120,4 @@ export class ModuleController {
     return colors[category] || 'bg-gray-100 text-gray-800'
   }
 }
+import { Module } from '@prisma/client'

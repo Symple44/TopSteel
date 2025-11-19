@@ -317,3 +317,4 @@ export class PageSyncService {
     return icons[categoryId] || 'Circle'
   }
 }
+import { DiscoveredPage } from '@prisma/client'

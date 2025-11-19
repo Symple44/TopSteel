@@ -106,3 +106,4 @@ export class SocieteUserAuthRepositoryService implements ISocieteUserRepository 
     await this.societeUserRepository.update({ userId, societeId }, { isDefault: true })
   }
 }
+import { Societe, SocieteUser } from '@prisma/client'

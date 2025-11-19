@@ -274,3 +274,4 @@ export class TenantProvisioningService {
     }
   }
 }
+import { Societe } from '@prisma/client'

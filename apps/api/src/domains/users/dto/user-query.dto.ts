@@ -16,3 +16,4 @@ export class UserQueryDto extends BaseQueryDto {
   @IsEnum(UserRole)
   role?: UserRole
 }
+import { User } from '@prisma/client'

@@ -450,3 +450,4 @@ export class PermissionService {
     return summary
   }
 }
+import { User, UserSocieteRole } from '@prisma/client'

@@ -62,3 +62,4 @@ export class DatatableHierarchyOrder {
   ])
   preferences!: DatatableHierarchicalPreferences
 }
+import { User } from '@prisma/client'

@@ -390,3 +390,4 @@ export class TenantInitializationService {
     }
   }
 }
+import { NotificationSettings, Societe, SocieteUser, User, UserSettings } from '@prisma/client'

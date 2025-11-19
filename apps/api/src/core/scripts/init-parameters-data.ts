@@ -444,3 +444,4 @@ if (require.main === module) {
     }
   })
 }
+import { ParameterApplication, ParameterSystem } from '@prisma/client'

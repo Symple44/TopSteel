@@ -18,3 +18,4 @@ import { ParametersPrismaModule } from '../../domains/parameters/prisma/paramete
   exports: [ParameterService],
 })
 export class ParametersModule {}
+import { ParameterApplication, ParameterClient, ParameterSystem } from '@prisma/client'

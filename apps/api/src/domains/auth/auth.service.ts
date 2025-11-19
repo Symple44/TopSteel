@@ -1014,6 +1014,7 @@ export class AuthService {
   async setDefaultSociete(
     userId: string,
     societeId: string
+import { SocieteUser, UserSession } from '@prisma/client'
   ): Promise<{ success: boolean; message: string }> {
     try {
       // Utiliser le nouveau service si disponible

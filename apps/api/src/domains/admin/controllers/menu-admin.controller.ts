@@ -595,3 +595,4 @@ export class MenuAdminController {
     }
   }
 }
+import { MenuConfiguration, MenuItem, UserMenuPreference } from '@prisma/client'

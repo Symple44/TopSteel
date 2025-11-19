@@ -37,3 +37,4 @@ import { TenantConnectionSimpleService } from './services/tenant-connection-simp
   ],
 })
 export class DatabaseCoreModule {}
+import { DiscoveredPage, Societe, SocieteUser, User, UserMenuPreference } from '@prisma/client'

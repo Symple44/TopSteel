@@ -220,6 +220,7 @@ export class MenuSyncService {
     parentId?: string,
     orderOffset = 0
   ): Promise<void> {
+import { MenuConfiguration, MenuItem, MenuItemRole } from '@prisma/client'
     for (let i = 0; i < items.length; i++) {
       const sidebarItem = items[i]
       const orderIndex = (i + 1) * 10 + orderOffset

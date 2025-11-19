@@ -1,0 +1,1195 @@
+{
+  "timestamp": "2025-11-19T14:06:35.702Z",
+  "statistics": {
+    "totalErrors": 245,
+    "uniqueFiles": 90,
+    "toDelete": 6,
+    "toUpdate": 84
+  },
+  "categories": {
+    "databaseConfig": [
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/group.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/mfa-session.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/module.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/permission.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/role.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/user-group.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/user-mfa.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/user-role.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/user-session.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/auth/core/entities/user-societe-role.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../domains/users/entities/user-settings.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/admin/entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/admin/entities/menu-item.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/admin/entities/menu-item-permission.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/admin/entities/menu-item-role.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/menu/entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/parameters/entities/parameter-application.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/parameters/entities/parameter-client.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/parameters/entities/parameter-system.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/societes/entities/site.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/societes/entities/societe.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/societes/entities/societe-license.entity"
+      },
+      {
+        "file": "src/core/database/config/multi-tenant-database.config.ts",
+        "missingModule": "../../../features/societes/entities/societe-user.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/group.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/mfa-session.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/module.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/permission.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/role.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/user-group.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/user-mfa.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/user-role.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/auth/core/entities/user-session.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../domains/users/entities/user-settings.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/admin/entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/admin/entities/menu-item.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/admin/entities/menu-item-permission.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/admin/entities/menu-item-role.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/menu/entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/query-builder/entities/query-builder.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/query-builder/entities/query-builder-calculated-field.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/query-builder/entities/query-builder-column.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/query-builder/entities/query-builder-join.entity"
+      },
+      {
+        "file": "src/core/database/database.config.simple.ts",
+        "missingModule": "../../features/query-builder/entities/query-builder-permission.entity"
+      }
+    ],
+    "controllers": [
+      {
+        "file": "src/domains/admin/controllers/menu-admin.controller.ts",
+        "missingModule": "../entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/domains/admin/controllers/menu-admin.controller.ts",
+        "missingModule": "../entities/menu-item.entity"
+      },
+      {
+        "file": "src/domains/admin/controllers/menu-admin.controller.ts",
+        "missingModule": "../entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/domains/auth/external/controllers/module.controller.ts",
+        "missingModule": "../../core/entities/module.entity"
+      },
+      {
+        "file": "src/domains/notifications/notifications.controller.ts",
+        "missingModule": "../users/entities/user.entity"
+      },
+      {
+        "file": "src/features/admin/controllers/admin-menus.controller.ts",
+        "missingModule": "../entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/features/admin/controllers/admin-menus.controller.ts",
+        "missingModule": "../entities/menu-item.entity"
+      },
+      {
+        "file": "src/features/admin/controllers/admin-mfa.controller.ts",
+        "missingModule": "../../../domains/auth/core/entities/mfa-session.entity"
+      },
+      {
+        "file": "src/features/admin/controllers/admin-mfa.controller.ts",
+        "missingModule": "../../../domains/auth/core/entities/user-mfa.entity"
+      },
+      {
+        "file": "src/features/admin/controllers/menu-configuration.controller.ts",
+        "missingModule": "../../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/admin/controllers/menu-test.controller.ts",
+        "missingModule": "../entities/menu-configuration-simple.entity"
+      },
+      {
+        "file": "src/features/admin/controllers/page-sync.controller.ts",
+        "missingModule": "../../menu/entities/discovered-page.entity"
+      },
+      {
+        "file": "src/features/admin/system-parameters.controller.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/admin/system-parameters.controller.ts",
+        "missingModule": "./entitites/system-parameter.entity"
+      },
+      {
+        "file": "src/features/menu/controllers/available-pages.controller.ts",
+        "missingModule": "../../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/menu/controllers/user-menu-preference.controller.ts",
+        "missingModule": "../entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/features/notifications/notifications.controller.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/societes/controllers/license-management.controller.ts",
+        "missingModule": "../entities/societe-license.entity"
+      },
+      {
+        "file": "src/features/societes/controllers/sites.controller.ts",
+        "missingModule": "../entities/site.entity"
+      },
+      {
+        "file": "src/features/societes/controllers/societes.controller.ts",
+        "missingModule": "../entities/societe.entity"
+      },
+      {
+        "file": "src/features/societes/controllers/tenant-provisioning.controller.ts",
+        "missingModule": "../entities/societe.entity"
+      }
+    ],
+    "services": [
+      {
+        "file": "src/domains/admin/services/menu-sync.service.ts",
+        "missingModule": "../entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/domains/admin/services/menu-sync.service.ts",
+        "missingModule": "../entities/menu-item.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.service.ts",
+        "missingModule": "../../features/societes/entities/site.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.service.ts",
+        "missingModule": "../../features/societes/entities/societe-user.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.service.ts",
+        "missingModule": "../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.service.ts",
+        "missingModule": "./core/entities/user-session.entity"
+      },
+      {
+        "file": "src/domains/auth/core/services/auth-core.service.ts",
+        "missingModule": "../../../../features/societes/entities/societe.entity"
+      },
+      {
+        "file": "src/domains/auth/services/audit.service.ts",
+        "missingModule": "../core/entities/audit-log.entity"
+      },
+      {
+        "file": "src/domains/auth/services/group.service.ts",
+        "missingModule": "../core/entities/group.entity"
+      },
+      {
+        "file": "src/domains/auth/services/group.service.ts",
+        "missingModule": "../core/entities/role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/group.service.ts",
+        "missingModule": "../core/entities/user-group.entity"
+      },
+      {
+        "file": "src/domains/auth/services/mfa.service.ts",
+        "missingModule": "../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/services/mfa.service.ts",
+        "missingModule": "../core/entities/mfa-session.entity"
+      },
+      {
+        "file": "src/domains/auth/services/mfa.service.ts",
+        "missingModule": "../core/entities/user-mfa.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-calculator.service.ts",
+        "missingModule": "../core/entities/permission.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-calculator.service.ts",
+        "missingModule": "../core/entities/role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-calculator.service.ts",
+        "missingModule": "../core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-calculator.service.ts",
+        "missingModule": "../core/entities/user-societe-role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-query-builder.service.ts",
+        "missingModule": "../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-query-builder.service.ts",
+        "missingModule": "../core/entities/permission.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-query-builder.service.ts",
+        "missingModule": "../core/entities/role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-query-builder.service.ts",
+        "missingModule": "../core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission-query-builder.service.ts",
+        "missingModule": "../core/entities/user-societe-role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission.service.ts",
+        "missingModule": "../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/services/permission.service.ts",
+        "missingModule": "../core/entities/user-societe-role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/role.service.ts",
+        "missingModule": "../core/entities/role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/role.service.ts",
+        "missingModule": "../core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/domains/auth/services/role.service.ts",
+        "missingModule": "../core/entities/user-role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/session-invalidation.service.ts",
+        "missingModule": "../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/services/sms.service.ts",
+        "missingModule": "../entities/sms-log.entity"
+      },
+      {
+        "file": "src/domains/auth/services/unified-roles.service.ts",
+        "missingModule": "../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/services/unified-roles.service.ts",
+        "missingModule": "../core/entities/user-societe-role.entity"
+      },
+      {
+        "file": "src/domains/auth/services/user-societe-roles.service.ts",
+        "missingModule": "../core/entities/user-societe-role.entity"
+      },
+      {
+        "file": "src/domains/notifications/services/notification-rules-engine.service.ts",
+        "missingModule": "../entities/notification-rule.entity"
+      },
+      {
+        "file": "src/domains/users/services/user-auth-repository.service.ts",
+        "missingModule": "../entities/user.entity"
+      },
+      {
+        "file": "src/domains/users/users.service.ts",
+        "missingModule": "./entities/user.entity"
+      },
+      {
+        "file": "src/domains/users/users.service.ts",
+        "missingModule": "./entities/user-settings.entity"
+      },
+      {
+        "file": "src/features/admin/services/admin-roles.service.ts",
+        "missingModule": "../../../domains/auth/core/entities/role.entity"
+      },
+      {
+        "file": "src/features/admin/services/admin-roles.service.ts",
+        "missingModule": "../../../domains/auth/core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/features/admin/services/menu-configuration.service.ts",
+        "missingModule": "../entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/features/admin/services/menu-configuration.service.ts",
+        "missingModule": "../entities/menu-item.entity"
+      },
+      {
+        "file": "src/features/admin/services/menu-configuration.service.ts",
+        "missingModule": "../entities/menu-item-permission.entity"
+      },
+      {
+        "file": "src/features/admin/services/menu-configuration.service.ts",
+        "missingModule": "../entities/menu-item-role.entity"
+      },
+      {
+        "file": "src/features/admin/services/menu-sync.service.ts",
+        "missingModule": "../entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/features/admin/services/menu-sync.service.ts",
+        "missingModule": "../entities/menu-item.entity"
+      },
+      {
+        "file": "src/features/admin/services/menu-sync.service.ts",
+        "missingModule": "../entities/menu-item-role.entity"
+      },
+      {
+        "file": "src/features/admin/services/user-menu-preferences.service.ts",
+        "missingModule": "../entities/user-menu-item-preference.entity"
+      },
+      {
+        "file": "src/features/admin/services/user-menu-preferences.service.ts",
+        "missingModule": "../entities/user-menu-preferences.entity"
+      },
+      {
+        "file": "src/features/admin/system-parameters.service.ts",
+        "missingModule": "./entitites/system-parameter.entity"
+      },
+      {
+        "file": "src/features/menu/services/page-sync.service.ts",
+        "missingModule": "../entities/discovered-page.entity"
+      },
+      {
+        "file": "src/features/menu/services/user-menu-preference.service.ts",
+        "missingModule": "../entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/features/parameters/services/parameter.service.ts",
+        "missingModule": "../entities/parameter-application.entity"
+      },
+      {
+        "file": "src/features/parameters/services/parameter.service.ts",
+        "missingModule": "../entities/parameter-client.entity"
+      },
+      {
+        "file": "src/features/parameters/services/parameter.service.ts",
+        "missingModule": "../entities/parameter-system.entity"
+      },
+      {
+        "file": "src/features/query-builder/services/query-builder-permission.service.ts",
+        "missingModule": "../../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/societes/services/license-management.service.ts",
+        "missingModule": "../../../domains/auth/core/entities/user-session.entity"
+      },
+      {
+        "file": "src/features/societes/services/license-management.service.ts",
+        "missingModule": "../../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/societes/services/license-management.service.ts",
+        "missingModule": "../entities/societe.entity"
+      },
+      {
+        "file": "src/features/societes/services/license-management.service.ts",
+        "missingModule": "../entities/societe-license.entity"
+      },
+      {
+        "file": "src/features/societes/services/sites.service.ts",
+        "missingModule": "../entities/site.entity"
+      },
+      {
+        "file": "src/features/societes/services/societe-auth-repository.service.ts",
+        "missingModule": "../entities/societe.entity"
+      },
+      {
+        "file": "src/features/societes/services/societe-auth-repository.service.ts",
+        "missingModule": "../entities/societe-user.entity"
+      },
+      {
+        "file": "src/features/societes/services/societe-users.service.ts",
+        "missingModule": "../entities/societe-user.entity"
+      },
+      {
+        "file": "src/features/societes/services/societes.service.ts",
+        "missingModule": "../entities/societe.entity"
+      },
+      {
+        "file": "src/features/societes/services/tenant-initialization.service.ts",
+        "missingModule": "../../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/societes/services/tenant-initialization.service.ts",
+        "missingModule": "../../../domains/users/entities/user-settings.entity"
+      },
+      {
+        "file": "src/features/societes/services/tenant-initialization.service.ts",
+        "missingModule": "../../notifications/entities/notification-settings.entity"
+      },
+      {
+        "file": "src/features/societes/services/tenant-initialization.service.ts",
+        "missingModule": "../entities/societe.entity"
+      },
+      {
+        "file": "src/features/societes/services/tenant-initialization.service.ts",
+        "missingModule": "../entities/societe-user.entity"
+      },
+      {
+        "file": "src/features/societes/services/tenant-provisioning.service.ts",
+        "missingModule": "../entities/societe.entity"
+      }
+    ],
+    "decorators": [
+      {
+        "file": "src/core/common/decorators/current-user.decorator.ts",
+        "missingModule": "../../../domains/users/entities/user.entity"
+      }
+    ],
+    "modules": [
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../domains/auth/core/entities/mfa-session.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../domains/auth/core/entities/user-mfa.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../domains/auth/core/entities/user-session.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entities/menu-item.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entities/menu-item-permission.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entities/menu-item-role.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entities/user-menu-item-preference.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entities/user-menu-preferences.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entitites/system-parameter.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/admin/entitites/system-setting.entity"
+      },
+      {
+        "file": "src/core/database/database.module.ts",
+        "missingModule": "../../features/menu/entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "../../features/societes/entities/societe.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "../../features/societes/entities/societe-user.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/audit-log.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/mfa-session.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/permission.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/role.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/user-mfa.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/user-session.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./core/entities/user-societe-role.entity"
+      },
+      {
+        "file": "src/domains/auth/auth.module.ts",
+        "missingModule": "./entities/sms-log.entity"
+      },
+      {
+        "file": "src/domains/auth/role-auth.module.ts",
+        "missingModule": "./core/entities/group.entity"
+      },
+      {
+        "file": "src/domains/auth/role-auth.module.ts",
+        "missingModule": "./core/entities/module.entity"
+      },
+      {
+        "file": "src/domains/auth/role-auth.module.ts",
+        "missingModule": "./core/entities/permission.entity"
+      },
+      {
+        "file": "src/domains/auth/role-auth.module.ts",
+        "missingModule": "./core/entities/role.entity"
+      },
+      {
+        "file": "src/domains/auth/role-auth.module.ts",
+        "missingModule": "./core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/domains/auth/role-auth.module.ts",
+        "missingModule": "./core/entities/user-group.entity"
+      },
+      {
+        "file": "src/domains/auth/role-auth.module.ts",
+        "missingModule": "./core/entities/user-role.entity"
+      },
+      {
+        "file": "src/domains/users/users.module.ts",
+        "missingModule": "./entities/user.entity"
+      },
+      {
+        "file": "src/domains/users/users.module.ts",
+        "missingModule": "./entities/user-settings.entity"
+      },
+      {
+        "file": "src/features/admin/admin.module.ts",
+        "missingModule": "./entitites/system-parameter.entity"
+      },
+      {
+        "file": "src/features/admin/admin.module.ts",
+        "missingModule": "../../domains/auth/core/entities/permission.entity"
+      },
+      {
+        "file": "src/features/admin/admin.module.ts",
+        "missingModule": "../../domains/auth/core/entities/role.entity"
+      },
+      {
+        "file": "src/features/admin/admin.module.ts",
+        "missingModule": "../../domains/auth/core/entities/role-permission.entity"
+      },
+      {
+        "file": "src/features/admin/admin.module.ts",
+        "missingModule": "../menu/entities/discovered-page.entity"
+      },
+      {
+        "file": "src/features/admin/menu-sync.module.ts",
+        "missingModule": "./entities/menu-configuration.entity"
+      },
+      {
+        "file": "src/features/admin/menu-sync.module.ts",
+        "missingModule": "./entities/menu-item.entity"
+      },
+      {
+        "file": "src/features/admin/menu-sync.module.ts",
+        "missingModule": "./entities/menu-item-permission.entity"
+      },
+      {
+        "file": "src/features/admin/menu-sync.module.ts",
+        "missingModule": "./entities/menu-item-role.entity"
+      },
+      {
+        "file": "src/features/database-core/database-core.module.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/database-core/database-core.module.ts",
+        "missingModule": "../menu/entities/discovered-page.entity"
+      },
+      {
+        "file": "src/features/database-core/database-core.module.ts",
+        "missingModule": "../menu/entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/features/database-core/database-core.module.ts",
+        "missingModule": "../societes/entities/societe.entity"
+      },
+      {
+        "file": "src/features/database-core/database-core.module.ts",
+        "missingModule": "../societes/entities/societe-user.entity"
+      },
+      {
+        "file": "src/features/menu/menu.module.ts",
+        "missingModule": "./entities/discovered-page.entity"
+      },
+      {
+        "file": "src/features/menu/menu.module.ts",
+        "missingModule": "./entities/user-menu-preference.entity"
+      },
+      {
+        "file": "src/features/parameters/parameters.module.ts",
+        "missingModule": "./entities/parameter-application.entity"
+      },
+      {
+        "file": "src/features/parameters/parameters.module.ts",
+        "missingModule": "./entities/parameter-client.entity"
+      },
+      {
+        "file": "src/features/parameters/parameters.module.ts",
+        "missingModule": "./entities/parameter-system.entity"
+      },
+      {
+        "file": "src/features/query-builder/query-builder.module.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "../../domains/auth/core/entities/user-session.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "../../domains/users/entities/user-settings.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "../notifications/entities/notification-settings.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "./entities/site.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "./entities/societe.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "./entities/societe-license.entity"
+      },
+      {
+        "file": "src/features/societes/societes.module.ts",
+        "missingModule": "./entities/societe-user.entity"
+      }
+    ],
+    "indexes": [
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./group.entity"
+      },
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./module.entity"
+      },
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./permission.entity"
+      },
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./role.entity"
+      },
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./role-permission.entity"
+      },
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./user-group.entity"
+      },
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./user-role.entity"
+      },
+      {
+        "file": "src/domains/auth/core/entities/index.ts",
+        "missingModule": "./user-societe-role.entity"
+      },
+      {
+        "file": "src/features/menu/entities/index.ts",
+        "missingModule": "./user-menu-preference.entity"
+      },
+      {
+        "file": "src/features/notifications/entities/index.ts",
+        "missingModule": "./notification-event.entity"
+      },
+      {
+        "file": "src/features/notifications/entities/index.ts",
+        "missingModule": "./notification-read.entity"
+      },
+      {
+        "file": "src/features/notifications/entities/index.ts",
+        "missingModule": "./notification-rule.entity"
+      },
+      {
+        "file": "src/features/notifications/entities/index.ts",
+        "missingModule": "./notification-rule-execution.entity"
+      },
+      {
+        "file": "src/features/notifications/entities/index.ts",
+        "missingModule": "./notification-settings.entity"
+      },
+      {
+        "file": "src/features/notifications/entities/index.ts",
+        "missingModule": "./notification-template.entity"
+      },
+      {
+        "file": "src/features/query-builder/entities/index.ts",
+        "missingModule": "./query-builder.entity"
+      },
+      {
+        "file": "src/features/query-builder/entities/index.ts",
+        "missingModule": "./query-builder-calculated-field.entity"
+      },
+      {
+        "file": "src/features/query-builder/entities/index.ts",
+        "missingModule": "./query-builder-column.entity"
+      },
+      {
+        "file": "src/features/query-builder/entities/index.ts",
+        "missingModule": "./query-builder-join.entity"
+      },
+      {
+        "file": "src/features/query-builder/entities/index.ts",
+        "missingModule": "./query-builder-permission.entity"
+      }
+    ],
+    "scripts": [
+      {
+        "file": "src/core/scripts/init-parameters-data.ts",
+        "missingModule": "../../features/parameters/entities/parameter-application.entity"
+      },
+      {
+        "file": "src/core/scripts/init-parameters-data.ts",
+        "missingModule": "../../features/parameters/entities/parameter-system.entity"
+      }
+    ],
+    "other": [
+      {
+        "file": "src/api/entities/datatable-hierarchical-preferences.entity.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/api/entities/datatable-hierarchy-order.entity.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/api/entities/ui-preferences-reorderable-list.entity.ts",
+        "missingModule": "../../domains/users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/core/interfaces/societe-repository.interface.ts",
+        "missingModule": "../../../../features/societes/entities/societe.entity"
+      },
+      {
+        "file": "src/domains/auth/core/interfaces/societe-repository.interface.ts",
+        "missingModule": "../../../../features/societes/entities/societe-user.entity"
+      },
+      {
+        "file": "src/domains/auth/core/interfaces/user-repository.interface.ts",
+        "missingModule": "../../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/security/guards/jwt-auth.guard.ts",
+        "missingModule": "../../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/security/guards/roles.guard.ts",
+        "missingModule": "../../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/auth/security/strategies/local.strategy.ts",
+        "missingModule": "../../../users/entities/user.entity"
+      },
+      {
+        "file": "src/domains/notifications/entities/notification-action.entity.ts",
+        "missingModule": "./notification-rule.entity"
+      },
+      {
+        "file": "src/domains/notifications/entities/notification-execution.entity.ts",
+        "missingModule": "./notification-rule.entity"
+      },
+      {
+        "file": "src/domains/notifications/types/notification-types.ts",
+        "missingModule": "../entities/notification-rule.entity"
+      },
+      {
+        "file": "src/domains/users/dto/create-user.dto.ts",
+        "missingModule": "../entities/user.entity"
+      },
+      {
+        "file": "src/domains/users/dto/get-user-settings.dto.ts",
+        "missingModule": "../entities/user-settings.entity"
+      },
+      {
+        "file": "src/domains/users/dto/notification-settings.dto.ts",
+        "missingModule": "../entities/user-settings.entity"
+      },
+      {
+        "file": "src/domains/users/dto/user-query.dto.ts",
+        "missingModule": "../entities/user.entity"
+      },
+      {
+        "file": "src/features/admin/dto/system-parameter.dto.ts",
+        "missingModule": "../entitites/system-parameter.entity"
+      },
+      {
+        "file": "src/features/parameters/dto/parameter-application.dto.ts",
+        "missingModule": "../entities/parameter-application.entity"
+      },
+      {
+        "file": "src/features/parameters/dto/parameter-client.dto.ts",
+        "missingModule": "../entities/parameter-client.entity"
+      },
+      {
+        "file": "src/features/parameters/dto/parameter-system.dto.ts",
+        "missingModule": "../entities/parameter-system.entity"
+      },
+      {
+        "file": "src/features/societes/dto/create-tenant.dto.ts",
+        "missingModule": "../entities/societe.entity"
+      },
+      {
+        "file": "src/features/societes/dto/license.dto.ts",
+        "missingModule": "../entities/societe-license.entity"
+      },
+      {
+        "file": "src/infrastructure/security/guards/tenant.guard.ts",
+        "missingModule": "../../../features/societes/entities/societe-user.entity"
+      }
+    ]
+  },
+  "actionPlan": {
+    "toDelete": [
+      "src/core/database/config/multi-tenant-database.config.ts",
+      "src/core/database/database.config.simple.ts",
+      "src/domains/auth/core/entities/index.ts",
+      "src/features/menu/entities/index.ts",
+      "src/features/notifications/entities/index.ts",
+      "src/features/query-builder/entities/index.ts"
+    ],
+    "toUpdate": [
+      "src/core/database/database.module.ts",
+      "src/domains/auth/auth.module.ts",
+      "src/domains/auth/role-auth.module.ts",
+      "src/domains/users/users.module.ts",
+      "src/features/admin/admin.module.ts",
+      "src/features/admin/menu-sync.module.ts",
+      "src/features/database-core/database-core.module.ts",
+      "src/features/menu/menu.module.ts",
+      "src/features/parameters/parameters.module.ts",
+      "src/features/query-builder/query-builder.module.ts",
+      "src/features/societes/societes.module.ts",
+      "src/domains/admin/controllers/menu-admin.controller.ts",
+      "src/domains/auth/external/controllers/module.controller.ts",
+      "src/domains/notifications/notifications.controller.ts",
+      "src/features/admin/controllers/admin-menus.controller.ts",
+      "src/features/admin/controllers/admin-mfa.controller.ts",
+      "src/features/admin/controllers/menu-configuration.controller.ts",
+      "src/features/admin/controllers/menu-test.controller.ts",
+      "src/features/admin/controllers/page-sync.controller.ts",
+      "src/features/admin/system-parameters.controller.ts",
+      "src/features/menu/controllers/available-pages.controller.ts",
+      "src/features/menu/controllers/user-menu-preference.controller.ts",
+      "src/features/notifications/notifications.controller.ts",
+      "src/features/societes/controllers/license-management.controller.ts",
+      "src/features/societes/controllers/sites.controller.ts",
+      "src/features/societes/controllers/societes.controller.ts",
+      "src/features/societes/controllers/tenant-provisioning.controller.ts",
+      "src/domains/admin/services/menu-sync.service.ts",
+      "src/domains/auth/auth.service.ts",
+      "src/domains/auth/core/services/auth-core.service.ts",
+      "src/domains/auth/services/audit.service.ts",
+      "src/domains/auth/services/group.service.ts",
+      "src/domains/auth/services/mfa.service.ts",
+      "src/domains/auth/services/permission-calculator.service.ts",
+      "src/domains/auth/services/permission-query-builder.service.ts",
+      "src/domains/auth/services/permission.service.ts",
+      "src/domains/auth/services/role.service.ts",
+      "src/domains/auth/services/session-invalidation.service.ts",
+      "src/domains/auth/services/sms.service.ts",
+      "src/domains/auth/services/unified-roles.service.ts",
+      "src/domains/auth/services/user-societe-roles.service.ts",
+      "src/domains/notifications/services/notification-rules-engine.service.ts",
+      "src/domains/users/services/user-auth-repository.service.ts",
+      "src/domains/users/users.service.ts",
+      "src/features/admin/services/admin-roles.service.ts",
+      "src/features/admin/services/menu-configuration.service.ts",
+      "src/features/admin/services/menu-sync.service.ts",
+      "src/features/admin/services/user-menu-preferences.service.ts",
+      "src/features/admin/system-parameters.service.ts",
+      "src/features/menu/services/page-sync.service.ts",
+      "src/features/menu/services/user-menu-preference.service.ts",
+      "src/features/parameters/services/parameter.service.ts",
+      "src/features/query-builder/services/query-builder-permission.service.ts",
+      "src/features/societes/services/license-management.service.ts",
+      "src/features/societes/services/sites.service.ts",
+      "src/features/societes/services/societe-auth-repository.service.ts",
+      "src/features/societes/services/societe-users.service.ts",
+      "src/features/societes/services/societes.service.ts",
+      "src/features/societes/services/tenant-initialization.service.ts",
+      "src/features/societes/services/tenant-provisioning.service.ts",
+      "src/core/common/decorators/current-user.decorator.ts",
+      "src/core/scripts/init-parameters-data.ts",
+      "src/api/entities/datatable-hierarchical-preferences.entity.ts",
+      "src/api/entities/datatable-hierarchy-order.entity.ts",
+      "src/api/entities/ui-preferences-reorderable-list.entity.ts",
+      "src/domains/auth/core/interfaces/societe-repository.interface.ts",
+      "src/domains/auth/core/interfaces/user-repository.interface.ts",
+      "src/domains/auth/security/guards/jwt-auth.guard.ts",
+      "src/domains/auth/security/guards/roles.guard.ts",
+      "src/domains/auth/security/strategies/local.strategy.ts",
+      "src/domains/notifications/entities/notification-action.entity.ts",
+      "src/domains/notifications/entities/notification-execution.entity.ts",
+      "src/domains/notifications/types/notification-types.ts",
+      "src/domains/users/dto/create-user.dto.ts",
+      "src/domains/users/dto/get-user-settings.dto.ts",
+      "src/domains/users/dto/notification-settings.dto.ts",
+      "src/domains/users/dto/user-query.dto.ts",
+      "src/features/admin/dto/system-parameter.dto.ts",
+      "src/features/parameters/dto/parameter-application.dto.ts",
+      "src/features/parameters/dto/parameter-client.dto.ts",
+      "src/features/parameters/dto/parameter-system.dto.ts",
+      "src/features/societes/dto/create-tenant.dto.ts",
+      "src/features/societes/dto/license.dto.ts",
+      "src/infrastructure/security/guards/tenant.guard.ts"
+    ]
+  },
+  "allFiles": [
+    "src/api/entities/datatable-hierarchical-preferences.entity.ts",
+    "src/api/entities/datatable-hierarchy-order.entity.ts",
+    "src/api/entities/ui-preferences-reorderable-list.entity.ts",
+    "src/core/common/decorators/current-user.decorator.ts",
+    "src/core/database/config/multi-tenant-database.config.ts",
+    "src/core/database/database.config.simple.ts",
+    "src/core/database/database.module.ts",
+    "src/core/scripts/init-parameters-data.ts",
+    "src/domains/admin/controllers/menu-admin.controller.ts",
+    "src/domains/admin/services/menu-sync.service.ts",
+    "src/domains/auth/auth.module.ts",
+    "src/domains/auth/auth.service.ts",
+    "src/domains/auth/core/entities/index.ts",
+    "src/domains/auth/core/interfaces/societe-repository.interface.ts",
+    "src/domains/auth/core/interfaces/user-repository.interface.ts",
+    "src/domains/auth/core/services/auth-core.service.ts",
+    "src/domains/auth/external/controllers/module.controller.ts",
+    "src/domains/auth/role-auth.module.ts",
+    "src/domains/auth/security/guards/jwt-auth.guard.ts",
+    "src/domains/auth/security/guards/roles.guard.ts",
+    "src/domains/auth/security/strategies/local.strategy.ts",
+    "src/domains/auth/services/audit.service.ts",
+    "src/domains/auth/services/group.service.ts",
+    "src/domains/auth/services/mfa.service.ts",
+    "src/domains/auth/services/permission-calculator.service.ts",
+    "src/domains/auth/services/permission-query-builder.service.ts",
+    "src/domains/auth/services/permission.service.ts",
+    "src/domains/auth/services/role.service.ts",
+    "src/domains/auth/services/session-invalidation.service.ts",
+    "src/domains/auth/services/sms.service.ts",
+    "src/domains/auth/services/unified-roles.service.ts",
+    "src/domains/auth/services/user-societe-roles.service.ts",
+    "src/domains/notifications/entities/notification-action.entity.ts",
+    "src/domains/notifications/entities/notification-execution.entity.ts",
+    "src/domains/notifications/notifications.controller.ts",
+    "src/domains/notifications/services/notification-rules-engine.service.ts",
+    "src/domains/notifications/types/notification-types.ts",
+    "src/domains/users/dto/create-user.dto.ts",
+    "src/domains/users/dto/get-user-settings.dto.ts",
+    "src/domains/users/dto/notification-settings.dto.ts",
+    "src/domains/users/dto/user-query.dto.ts",
+    "src/domains/users/services/user-auth-repository.service.ts",
+    "src/domains/users/users.module.ts",
+    "src/domains/users/users.service.ts",
+    "src/features/admin/admin.module.ts",
+    "src/features/admin/controllers/admin-menus.controller.ts",
+    "src/features/admin/controllers/admin-mfa.controller.ts",
+    "src/features/admin/controllers/menu-configuration.controller.ts",
+    "src/features/admin/controllers/menu-test.controller.ts",
+    "src/features/admin/controllers/page-sync.controller.ts",
+    "src/features/admin/dto/system-parameter.dto.ts",
+    "src/features/admin/menu-sync.module.ts",
+    "src/features/admin/services/admin-roles.service.ts",
+    "src/features/admin/services/menu-configuration.service.ts",
+    "src/features/admin/services/menu-sync.service.ts",
+    "src/features/admin/services/user-menu-preferences.service.ts",
+    "src/features/admin/system-parameters.controller.ts",
+    "src/features/admin/system-parameters.service.ts",
+    "src/features/database-core/database-core.module.ts",
+    "src/features/menu/controllers/available-pages.controller.ts",
+    "src/features/menu/controllers/user-menu-preference.controller.ts",
+    "src/features/menu/entities/index.ts",
+    "src/features/menu/menu.module.ts",
+    "src/features/menu/services/page-sync.service.ts",
+    "src/features/menu/services/user-menu-preference.service.ts",
+    "src/features/notifications/entities/index.ts",
+    "src/features/notifications/notifications.controller.ts",
+    "src/features/parameters/dto/parameter-application.dto.ts",
+    "src/features/parameters/dto/parameter-client.dto.ts",
+    "src/features/parameters/dto/parameter-system.dto.ts",
+    "src/features/parameters/parameters.module.ts",
+    "src/features/parameters/services/parameter.service.ts",
+    "src/features/query-builder/entities/index.ts",
+    "src/features/query-builder/query-builder.module.ts",
+    "src/features/query-builder/services/query-builder-permission.service.ts",
+    "src/features/societes/controllers/license-management.controller.ts",
+    "src/features/societes/controllers/sites.controller.ts",
+    "src/features/societes/controllers/societes.controller.ts",
+    "src/features/societes/controllers/tenant-provisioning.controller.ts",
+    "src/features/societes/dto/create-tenant.dto.ts",
+    "src/features/societes/dto/license.dto.ts",
+    "src/features/societes/services/license-management.service.ts",
+    "src/features/societes/services/sites.service.ts",
+    "src/features/societes/services/societe-auth-repository.service.ts",
+    "src/features/societes/services/societe-users.service.ts",
+    "src/features/societes/services/societes.service.ts",
+    "src/features/societes/services/tenant-initialization.service.ts",
+    "src/features/societes/services/tenant-provisioning.service.ts",
+    "src/features/societes/societes.module.ts",
+    "src/infrastructure/security/guards/tenant.guard.ts"
+  ]
+}

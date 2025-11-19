@@ -110,3 +110,4 @@ export class AdminRolesService {
     }
   }
 }
+import { Role, RolePermission } from '@prisma/client'

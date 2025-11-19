@@ -56,3 +56,4 @@ export class CreateUserDto {
   @IsOptional()
   metadata?: Record<string, unknown>
 }
+import { User } from '@prisma/client'
