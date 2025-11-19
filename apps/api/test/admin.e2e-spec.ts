@@ -3,7 +3,7 @@
 import type { INestApplication } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import request from 'supertest'
-import { PrismaService } from '../src/core/database/prisma.service'
+import { PrismaService } from '../src/core/database/prisma/prisma.service'
 
 describe('Admin Domain (e2e)', () => {
   let app: INestApplication

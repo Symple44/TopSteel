@@ -3,7 +3,7 @@
 import type { INestApplication } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import request from 'supertest'
-import { PrismaService } from '../src/core/database/prisma.service'
+import { PrismaService } from '../src/core/database/prisma/prisma.service'
 
 describe('Users Domain (e2e)', () => {
   let app: INestApplication
@@ -12,11 +12,11 @@ describe('Users Domain (e2e)', () => {
   let testUserId: string
 
   beforeAll(async () => {
+    // Import AppModule for full E2E testing
+    const { AppModule } = await import('../src/app/app.module')
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        // Import full app module here when ready
-        // For now, this is a template
-      ],
+      imports: [AppModule],
     }).compile()
 
     app = moduleFixture.createNestApplication()
@@ -24,15 +24,21 @@ describe('Users Domain (e2e)', () => {
 
     await app.init()
 
-    // Setup: Create test user for authentication
+    // Setup: Create test user for authentication with bcrypt hashed password
+    // Password: TestPassword123!
+    // Using bcrypt to hash (10 rounds)
+    const bcrypt = require('bcrypt')
+    const hashedPassword = await bcrypt.hash('TestPassword123!', 10)
+
     const testUser = await prisma.user.create({
       data: {
+        username: 'testuser',
         email: 'test-user@topsteel.com',
         firstName: 'Test',
         lastName: 'User',
-        password: '$2b$10$hashedPasswordHere', // Hashed password
+        passwordHash: hashedPassword,
         isActive: true,
-        emailVerified: true,
+        isEmailVerified: true,
       },
     })
     testUserId = testUser.id

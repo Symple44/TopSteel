@@ -14,17 +14,8 @@ import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimize
 import { UsersModule } from '../users/users.module'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
-
-import { MFASession } from './core/entities/mfa-session.entity'
-
-
-
-import { UserMFA } from './core/entities/user-mfa.entity'
-
-
 import { AuthRepositoryProviders } from './core/providers/auth-repository.providers'
 import { AuthCoreService } from './core/services/auth-core.service'
-import { SMSLog } from './entities/sms-log.entity'
 import { MFAController } from './external/controllers/mfa.controller'
 import { SMSAdminController } from './external/controllers/sms-admin.controller'
 import { CombinedSecurityGuard } from './security/guards/combined-security.guard'
@@ -49,14 +40,14 @@ import { SessionRedisService } from './services/session-redis.service'
 import { SMSService } from './services/sms.service'
 import { TOTPService } from './services/totp.service'
 import { AuditLog } from '../../domains/auth/core/entities/audit-log.entity'
-import { MfaSession } from '../../domains/auth/core/entities/mfa-session.entity'
+import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
 import { Permission } from '../../domains/auth/core/entities/permission.entity'
 import { Role } from '../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../domains/auth/core/entities/role-permission.entity'
-import { SmsLog } from '../../domains/auth/entities/sms-log.entity'
+import { SMSLog } from '../../domains/auth/entities/sms-log.entity'
 import { Societe } from '../../features/societes/entities/societe.entity'
 import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
-import { UserMfa } from '../../domains/auth/core/entities/user-mfa.entity'
+import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
 import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
 import { UserSocieteRole } from '../../domains/auth/core/entities/user-societe-role.entity'
 
