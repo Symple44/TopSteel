@@ -166,4 +166,43 @@ export class MultiTenantDatabaseConfig {
 
     return `postgresql://${username}:${password}@${host}:${port}/${database}`
   }
+
+  /**
+   * Get or create a tenant-specific database connection
+   * @param tenantCode - Unique identifier for the tenant
+   * @returns TypeORM DataSource for the tenant
+   */
+  async getTenantConnection(tenantCode: string): Promise<any> {
+    // This is a placeholder implementation
+    // In a real multi-tenant setup, you would:
+    // 1. Check if connection exists in a connection pool
+    // 2. Create new connection if needed
+    // 3. Return the DataSource
+
+    const { DataSource } = require('typeorm')
+    const config = this.getTenantDatabaseConfig(tenantCode)
+
+    const dataSource = new DataSource(config)
+
+    if (!dataSource.isInitialized) {
+      await dataSource.initialize()
+    }
+
+    return dataSource
+  }
+
+  /**
+   * Close a tenant-specific database connection
+   * @param tenantCode - Unique identifier for the tenant
+   */
+  async closeTenantConnection(tenantCode: string): Promise<void> {
+    // This is a placeholder implementation
+    // In a real multi-tenant setup, you would:
+    // 1. Find the connection in the pool
+    // 2. Close it gracefully
+    // 3. Remove from pool
+
+    // For now, just log (actual implementation would manage connection pool)
+    console.log(`Closing tenant connection for: ${tenantCode}`)
+  }
 }

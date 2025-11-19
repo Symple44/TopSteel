@@ -90,8 +90,9 @@ export class UsersController {
   @ApiQuery({ name: 'includeDeleted', required: false, type: Boolean })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
   async findAll(@Query() query: UserQueryDto) {
-    const page = query.page || 1
-    const limit = query.limit || 10
+    // Parse query params to numbers (they come as strings from HTTP)
+    const page = parseInt(String(query.page || 1), 10)
+    const limit = parseInt(String(query.limit || 10), 10)
     const skip = (page - 1) * limit
 
     const result = await this.userPrismaService.findAll({

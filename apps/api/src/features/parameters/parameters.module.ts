@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-
-
-
+import { ParameterApplication } from '../../features/parameters/entities/parameter-application.entity'
+import { ParameterClient } from '../../features/parameters/entities/parameter-client.entity'
+import { ParameterSystem } from '../../features/parameters/entities/parameter-system.entity'
 import { ParametersController } from './parameters.controller'
 import { ParameterService } from './services/parameter.service'
 import { TestParametersController } from './test-parameters.controller'
@@ -18,6 +18,3 @@ import { ParametersPrismaModule } from '../../domains/parameters/prisma/paramete
   exports: [ParameterService],
 })
 export class ParametersModule {}
-import { ParameterApplication } from '../../features/parameters/entities/parameter-application.entity'
-import { ParameterClient } from '../../features/parameters/entities/parameter-client.entity'
-import { ParameterSystem } from '../../features/parameters/entities/parameter-system.entity'

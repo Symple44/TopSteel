@@ -2,7 +2,7 @@ import { ConflictException, Injectable, InternalServerErrorException, Logger } f
 import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
 import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
-
+import { SocieteStatus } from '../../../types/entities/societe.types'
 import { SocietesService } from './societes.service'
 import { TenantInitializationService } from './tenant-initialization.service'
 import { Societe } from '@prisma/client'
@@ -31,10 +31,10 @@ export class TenantProvisioningService {
    */
   async createTenantWithDatabase(societeData: Partial<Societe>): Promise<TenantProvisioningResult> {
     const startTime = Date.now()
-    this.logger.log(`🚀 Démarrage du provisioning pour la société: ${societeData.nom}`)
+    this.logger.log(`🚀 Démarrage du provisioning pour la société: ${societeData.name}`)
 
     // Validation des données requises
-    if (!societeData.code || !societeData.nom) {
+    if (!societeData.code || !societeData.name) {
       throw new ConflictException('Le code et le nom de la société sont requis')
     }
 
@@ -85,7 +85,7 @@ export class TenantProvisioningService {
       return {
         success: true,
         databaseName,
-        message: `Société "${societe.nom}" créée avec succès avec sa base de données dédiée`,
+        message: `Société "${societe.name}" créée avec succès avec sa base de données dédiée`,
       }
     } catch (error) {
       this.logger.error(`❌ Erreur lors du provisioning:`, (error as Error).message)

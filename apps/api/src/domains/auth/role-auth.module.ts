@@ -16,7 +16,6 @@ import { GroupService } from './services/group.service'
 // Services
 import { RoleService } from './services/role.service'
 import { Group } from '../../domains/auth/core/entities/group.entity'
-import { Module } from '../../domains/auth/core/entities/module.entity'
 import { Permission } from '../../domains/auth/core/entities/permission.entity'
 import { Role } from '../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../domains/auth/core/entities/role-permission.entity'

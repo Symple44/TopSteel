@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
-
-
+import { User } from '../../domains/users/entities/user.entity'
+import { UserSettings } from '../../domains/users/entities/user-settings.entity'
 import { UserAuthRepositoryService } from './services/user-auth-repository.service'
 import { UsersService } from './users.service'
 
@@ -13,5 +13,3 @@ import { UsersService } from './users.service'
   exports: [UsersService, UserAuthRepositoryService, TypeOrmModule],
 })
 export class UsersModule {}
-import { User } from '../../domains/users/entities/user.entity'
-import { UserSettings } from '../../domains/users/entities/user-settings.entity'
