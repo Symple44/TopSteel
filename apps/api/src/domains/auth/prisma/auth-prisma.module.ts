@@ -13,8 +13,8 @@ import { ModulePrismaService } from './module-prisma.service'
 import { RolePrismaService } from './role-prisma.service'
 import { SessionPrismaService } from './session-prisma.service'
 import { PermissionPrismaService } from './permission-prisma.service'
-// import { UserSocieteRolesPrismaService } from './user-societe-roles-prisma.service'
-// import { UnifiedRolesPrismaService } from './unified-roles-prisma.service'
+import { UserSocieteRolesPrismaService } from './user-societe-roles-prisma.service'
+import { UnifiedRolesPrismaService } from './unified-roles-prisma.service'
 import { TenantGuard } from './guards/tenant.guard'
 
 /**
@@ -88,8 +88,8 @@ import { TenantGuard } from './guards/tenant.guard'
     RolePrismaService,
     SessionPrismaService,
     PermissionPrismaService,
-    // UserSocieteRolesPrismaService,
-    // UnifiedRolesPrismaService,
+    UserSocieteRolesPrismaService,
+    UnifiedRolesPrismaService,
     TenantGuard,
   ],
 })
