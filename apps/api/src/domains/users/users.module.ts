@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { PrismaModule } from '../../core/database/prisma/prisma.module'
 import { UsersPrismaService } from './users-prisma.service'
-import { UserAuthPrismaRepositoryService } from './services/user-auth-prisma-repository.service'
+// import { UserAuthPrismaRepositoryService } from './services/user-auth-prisma-repository.service'
 import { UsersService } from './users.service'
 import { UserAuthRepositoryService } from './services/user-auth-repository.service'
 
@@ -11,25 +11,25 @@ import { UserAuthRepositoryService } from './services/user-auth-repository.servi
   controllers: [],
   providers: [
     UsersPrismaService,
-    UserAuthPrismaRepositoryService,
+    // UserAuthPrismaRepositoryService,
 
     // Alias: UsersService → UsersPrismaService
     {
       provide: UsersService,
       useExisting: UsersPrismaService,
     },
-    {
-      provide: UserAuthRepositoryService,
-      useExisting: UserAuthPrismaRepositoryService,
-    },
+    // {
+    //   provide: UserAuthRepositoryService,
+    //   useExisting: UserAuthPrismaRepositoryService,
+    // },
 
     OptimizedCacheService,
   ],
   exports: [
     UsersPrismaService,
-    UserAuthPrismaRepositoryService,
+    // UserAuthPrismaRepositoryService,
     UsersService,
-    UserAuthRepositoryService,
+    // UserAuthRepositoryService,
   ],
 })
 export class UsersModule {}

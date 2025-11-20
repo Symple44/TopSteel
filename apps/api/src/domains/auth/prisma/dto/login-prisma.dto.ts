@@ -20,9 +20,9 @@ export class LoginPrismaResponseDto {
   user: {
     id: string
     email: string
-    username: string
-    firstName: string | null
-    lastName: string | null
+    nom: string | null
+    prenom: string | null
+    role: string
   }
 
   accessToken: string

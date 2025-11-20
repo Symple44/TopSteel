@@ -25,7 +25,7 @@ export class UsersPrismaService {
         prenom: createUserDto.prenom,
         role: createUserDto.role || UserRole.OPERATEUR,
         actif: createUserDto.actif !== undefined ? createUserDto.actif : true,
-        acronyme: createUserDto.acronyme || null,
+        // acronyme: createUserDto.acronyme || null,
         metadata: createUserDto.metadata as any,
       },
     })
@@ -129,7 +129,7 @@ export class UsersPrismaService {
         prenom: updateUserDto.prenom,
         role: updateUserDto.role,
         actif: updateUserDto.actif,
-        acronyme: updateUserDto.acronyme || undefined,
+        // acronyme: updateUserDto.acronyme || undefined,
         metadata: updateUserDto.metadata as any,
       },
     })

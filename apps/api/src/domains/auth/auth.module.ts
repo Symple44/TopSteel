@@ -69,8 +69,8 @@ import { SessionPrismaService } from './prisma/session-prisma.service'
 import { SmsLogPrismaService } from './prisma/sms-log-prisma.service'
 import { RolePrismaService } from './prisma/role-prisma.service'
 import { GroupsPrismaService } from './prisma/groups-prisma.service'
-import { UnifiedRolesPrismaService } from './prisma/unified-roles-prisma.service'
-import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prisma.service'
+// import { UnifiedRolesPrismaService } from './prisma/unified-roles-prisma.service'
+// import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prisma.service'
 
 @Module({
   imports: [
@@ -202,16 +202,16 @@ import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prism
     },
 
     // UnifiedRolesService → UnifiedRolesPrismaService
-    {
-      provide: UnifiedRolesService,
-      useExisting: UnifiedRolesPrismaService,
-    },
+    // {
+    //   provide: UnifiedRolesService,
+    //   useExisting: UnifiedRolesPrismaService,
+    // },
 
     // UserSocieteRolesService → UserSocieteRolesPrismaService
-    {
-      provide: UserSocieteRolesService,
-      useExisting: UserSocieteRolesPrismaService,
-    },
+    // {
+    //   provide: UserSocieteRolesService,
+    //   useExisting: UserSocieteRolesPrismaService,
+    // },
   ],
   exports: [
     // TypeORM Services (Legacy - being migrated)

@@ -8,7 +8,7 @@ import { ParametersPrismaModule } from './parameters/prisma/parameters-prisma.mo
 import { LicensingPrismaModule } from './licensing/prisma/licensing-prisma.module'
 
 // Import new Prisma controllers (without -prisma suffix)
-import { UsersController } from './users/users.controller'
+// import { UsersController } from './users/users.controller' // REMOVED - Controller deleted
 import { AuthController } from './auth/auth.controller'
 import { RolesController } from './auth/roles.controller'
 import { SessionsController } from './auth/sessions.controller'
@@ -65,7 +65,7 @@ import { LicenseUsageController } from './licensing/controllers/license-usage.co
   controllers: [
     // Core Auth & Users
     AuthController, // /auth/* - Authentication endpoints
-    UsersController, // /users/* - User management
+    // UsersController, // /users/* - User management // REMOVED - Controller deleted
     RolesController, // /roles/* - Role management
     SessionsController, // /sessions/* - Session management
 
