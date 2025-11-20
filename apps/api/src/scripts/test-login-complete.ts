@@ -8,8 +8,8 @@ async function testLoginComplete() {
   console.log('🔐 Test complet de connexion admin...\n')
 
   const credentials = {
-    email: 'admin@topsteel.tech',
-    password: 'TopSteel44!'
+    email: 'admin@topsteel.fr',
+    password: 'admin123'
   }
 
   try {
@@ -69,8 +69,8 @@ async function testLoginComplete() {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
 
       console.log('📝 Identifiants de connexion:')
-      console.log('   Email:       admin@topsteel.tech')
-      console.log('   Mot de passe: TopSteel44!')
+      console.log('   Email:       admin@topsteel.fr')
+      console.log('   Mot de passe: admin123')
       console.log('\n✨ Vous pouvez maintenant vous connecter à l\'application!\n')
 
       return true

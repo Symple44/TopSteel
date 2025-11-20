@@ -289,7 +289,7 @@ Les services sont maintenant accessibles :
 
 Utilisez les identifiants créés lors de l'installation :
 - **Email** : admin@topsteel.fr
-- **Mot de passe** : TopSteel44!
+- **Mot de passe** : admin123
 
 ### 2. Configuration initiale
 

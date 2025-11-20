@@ -345,10 +345,10 @@ export default function LoginClientPage() {
                   </div>
                   <div className="text-foreground/90 space-y-1">
                     <p>
-                      <strong>{t('email')}:</strong> admin@topsteel.tech
+                      <strong>{t('email')}:</strong> admin@topsteel.fr
                     </p>
                     <p>
-                      <strong>{t('password')}:</strong> TopSteel44!
+                      <strong>{t('password')}:</strong> admin123
                     </p>
                   </div>
                 </div>

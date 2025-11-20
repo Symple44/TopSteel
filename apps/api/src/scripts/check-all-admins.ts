@@ -36,7 +36,7 @@ async function checkAllAdmins() {
       FROM users 
       WHERE LOWER(REPLACE(email, ' ', '')) = LOWER(REPLACE($1, ' ', ''))
     `,
-      ['admin@topsteel.tech']
+      ['admin@topsteel.fr']
     )
 
     if (variations.length > 0) {

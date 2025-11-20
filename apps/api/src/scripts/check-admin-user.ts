@@ -12,13 +12,13 @@ async function checkAdminUser() {
     const result = await dataSource.query(`
       SELECT id, email, password, role, actif, nom, prenom, acronyme
       FROM users 
-      WHERE email = 'admin@topsteel.tech'
+      WHERE email = 'admin@topsteel.fr'
     `)
 
     if (result.length === 0) {
     } else {
       const user = result[0]
-      const passwords = ['TopSteel44!', 'admin123', 'Admin123!', 'admin']
+      const passwords = ['admin123', 'admin123', 'Admin123!', 'admin']
 
       for (const pwd of passwords) {
         try {

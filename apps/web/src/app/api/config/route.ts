@@ -13,8 +13,8 @@ export async function GET() {
     },
     auth: {
       credentials: {
-        email: 'admin@topsteel.tech',
-        password: 'TopSteel44!',
+        email: 'admin@topsteel.fr',
+        password: 'admin123',
         role: 'ADMIN',
       },
     },

@@ -1,28 +1,28 @@
 import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Logger,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards,
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Logger,
+    NotFoundException,
+    Param,
+    Post,
+    Put,
+    Query,
+    UseGuards,
 } from '@nestjs/common'
 import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
+    ApiBearerAuth,
+    ApiBody,
+    ApiOperation,
+    ApiQuery,
+    ApiResponse,
+    ApiTags,
 } from '@nestjs/swagger'
 import {
-  GlobalUserRole,
-  SocieteRoleType,
+    GlobalUserRole,
+    SocieteRoleType,
 } from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
@@ -367,7 +367,7 @@ export class AdminUsersController {
 
     // Protection : empêcher la suppression des utilisateurs système
     if (
-      existingUser.email === 'admin@topsteel.tech' ||
+      existingUser.email === 'admin@topsteel.fr' ||
       existingUser.email === 'test@topsteel.com'
     ) {
       throw new BadRequestException('Impossible de supprimer un utilisateur système')

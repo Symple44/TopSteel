@@ -14,7 +14,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 const API_URL = process.env.API_URL || 'http://localhost:3002'
 const SUPER_ADMIN_USER = {
-  email: process.env.TEST_ADMIN_EMAIL || 'admin@topsteel.tech',
+  email: process.env.TEST_ADMIN_EMAIL || 'admin@topsteel.fr',
   password: process.env.TEST_ADMIN_PASSWORD || '',
 }
 

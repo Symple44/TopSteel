@@ -7,7 +7,7 @@
       "es": "Guardar (modificado)"
     },
     "updatedAt": "2025-01-21T10:00:00.000Z",
-    "updatedBy": "admin@topsteel.tech"
+    "updatedBy": "admin@topsteel.fr"
   },
   "dashboard.welcome": {
     "id": "dashboard.welcome",
@@ -17,7 +17,7 @@
       "es": "Bienvenido a TopSteel ERP (Versión personalizada)"
     },
     "updatedAt": "2025-01-21T10:00:00.000Z",
-    "updatedBy": "admin@topsteel.tech"
+    "updatedBy": "admin@topsteel.fr"
   },
   "admin.advanced.comingSoon": {
     "id": "admin.advanced.comingSoon",
@@ -33,7 +33,7 @@
     "createdAt": "2025-07-28T20:55:51.946Z",
     "updatedAt": "2025-07-28T20:56:03.501Z",
     "isModified": true,
-    "updatedBy": "admin@topsteel.tech"
+    "updatedBy": "admin@topsteel.fr"
   },
   "admin.advanced.title": {
     "id": "admin.advanced.title",
@@ -49,7 +49,7 @@
     "createdAt": "2025-07-28T09:55:50.637Z",
     "updatedAt": "2025-07-28T09:56:41.809Z",
     "isModified": true,
-    "updatedBy": "admin@topsteel.tech"
+    "updatedBy": "admin@topsteel.fr"
   },
   "admin.authentication.methods": {
     "id": "admin.authentication.methods",
@@ -65,7 +65,7 @@
     "createdAt": "2025-07-28T16:52:37.738Z",
     "updatedAt": "2025-07-28T16:53:45.648Z",
     "isModified": true,
-    "updatedBy": "admin@topsteel.tech"
+    "updatedBy": "admin@topsteel.fr"
   },
   "actions.disconnect": {
     "id": "actions.disconnect",
@@ -81,6 +81,6 @@
     "createdAt": "2025-08-05T14:35:08.203Z",
     "updatedAt": "2025-08-05T14:35:26.069Z",
     "isModified": true,
-    "updatedBy": "admin@topsteel.tech"
+    "updatedBy": "admin@topsteel.fr"
   }
 }

@@ -497,7 +497,7 @@ export class AdminUserCreator {
 
 // Utilisation
 const creator = new AdminUserCreator();
-await creator.createSuperAdmin('admin@topsteel.fr', 'TopSteel44!');
+await creator.createSuperAdmin('admin@topsteel.fr', 'admin123');
 ```
 
 ### Reset de mot de passe

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         users: [
           {
             id: '1',
-            email: 'admin@topsteel.tech',
+            email: 'admin@topsteel.fr',
             firstName: 'Admin',
             lastName: 'System',
             globalRole: {

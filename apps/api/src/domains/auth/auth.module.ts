@@ -12,6 +12,7 @@ import { TopSteelLogger } from '../../core/common/logger/structured-logger.servi
 import { RedisService } from '../../core/common/services/redis.service'
 import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { UsersModule } from '../users/users.module'
+import { UserAuthPrismaRepositoryService } from '../users/services/user-auth-prisma-repository.service'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { AuthRepositoryProviders } from './core/providers/auth-repository.providers'
@@ -126,6 +127,7 @@ import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prism
     // Core Auth Services
     AuthService,
     AuthCoreService,
+    UserAuthPrismaRepositoryService,
     ...AuthRepositoryProviders,
 
     // Strategies

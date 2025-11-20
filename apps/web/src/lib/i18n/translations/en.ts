@@ -228,7 +228,7 @@ export const en = {
     accessManagementSpace: 'Access your management space',
     selectMethod: 'Select a method',
     emailOrAcronym: 'Email or Acronym',
-    emailOrAcronymPlaceholder: 'admin@topsteel.tech or TOP',
+    emailOrAcronymPlaceholder: 'admin@topsteel.fr or TOP',
     useEmailOrAcronym: 'Use your email or acronym to login',
     loggingIn: 'Logging in...',
     demoAccount: 'Demo Account',

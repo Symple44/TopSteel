@@ -190,11 +190,11 @@ export class SeederService {
       VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       ON CONFLICT (email) DO NOTHING
     `,
-      ['Admin', 'System', 'admin@topsteel.tech', hashedPassword, 'SUPER_ADMIN', true, 'TOP']
+      ['Admin', 'System', 'admin@topsteel.fr', hashedPassword, 'SUPER_ADMIN', true, 'TOP']
     )
 
     if (process.env.NODE_ENV === 'development') {
-      this.logger.log('👥 Utilisateur admin créé: admin@topsteel.tech (acronyme: TOP)')
+      this.logger.log('👥 Utilisateur admin créé: admin@topsteel.fr (acronyme: TOP)')
       this.logger.warn('⚠️  Mode développement - Changez le mot de passe admin!')
     } else {
       this.logger.log('👥 Utilisateur admin créé avec succès')

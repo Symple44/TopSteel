@@ -278,13 +278,13 @@ datasource tenantDb {
 # apps/api/.env
 
 # Auth Database (13 entités)
-DATABASE_AUTH_URL="postgresql://postgres:TopSteel44!@localhost:5432/topsteel_auth?schema=public"
+DATABASE_AUTH_URL="postgresql://postgres:admin123@localhost:5432/topsteel_auth?schema=public"
 
 # Shared Database (4 entités societes)
-DATABASE_SHARED_URL="postgresql://postgres:TopSteel44!@localhost:5432/topsteel_shared?schema=public"
+DATABASE_SHARED_URL="postgresql://postgres:admin123@localhost:5432/topsteel_shared?schema=public"
 
 # Tenant Database Template (27 entités)
-DATABASE_TENANT_URL="postgresql://postgres:TopSteel44!@localhost:5432/topsteel_tenant_001?schema=public"
+DATABASE_TENANT_URL="postgresql://postgres:admin123@localhost:5432/topsteel_tenant_001?schema=public"
 ```
 
 ### Jour 3: Introspection TypeORM → Prisma (8h)

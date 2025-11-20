@@ -26,7 +26,7 @@ async function checkAdmin() {
       FROM users 
       WHERE email = $1
     `,
-      ['admin@topsteel.tech']
+      ['admin@topsteel.fr']
     )
 
     if (result.length === 0) {
@@ -36,7 +36,7 @@ async function checkAdmin() {
       // Available emails found
     } else {
       const user = result[0]
-      const passwords = ['TopSteel44!', 'admin123', 'Admin123!', 'admin', 'password']
+      const passwords = ['admin123', 'admin123', 'Admin123!', 'admin', 'password']
 
       for (const pwd of passwords) {
         try {

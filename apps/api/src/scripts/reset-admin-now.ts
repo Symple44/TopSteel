@@ -20,8 +20,8 @@ async function resetAdminPassword() {
     await dataSource.initialize()
     console.log('✅ Connecté!')
 
-    const newPassword = 'TopSteel44!'
-    const email = 'admin@topsteel.tech'
+    const newPassword = 'admin123'
+    const email = 'admin@topsteel.fr'
 
     console.log(`📧 Réinitialisation du mot de passe pour ${email}...`)
 

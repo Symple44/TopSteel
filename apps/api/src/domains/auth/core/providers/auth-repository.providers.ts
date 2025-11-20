@@ -3,7 +3,7 @@ import {
   SocieteAuthRepositoryService,
   SocieteUserAuthRepositoryService,
 } from '../../../../features/societes/services/societe-auth-repository.service'
-import { UserAuthRepositoryService } from '../../../users/services/user-auth-repository.service'
+import { UserAuthPrismaRepositoryService } from '../../../users/services/user-auth-prisma-repository.service'
 import type {
   ISocieteRepository,
   ISocieteUserRepository,
@@ -21,7 +21,7 @@ export const SOCIETE_USER_REPOSITORY_TOKEN = Symbol('SOCIETE_USER_REPOSITORY_TOK
 export const AuthRepositoryProviders: Provider[] = [
   {
     provide: USER_REPOSITORY_TOKEN,
-    useClass: UserAuthRepositoryService,
+    useClass: UserAuthPrismaRepositoryService,
   },
   {
     provide: SOCIETE_REPOSITORY_TOKEN,

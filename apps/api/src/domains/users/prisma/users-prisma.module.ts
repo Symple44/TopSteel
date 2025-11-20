@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { PrismaModule } from '../../../core/database/prisma/prisma.module'
-// import { UserPrismaService } from './user-prisma.service' // REMOVED - File deleted
+import { UsersPrismaService } from '../users-prisma.service'
 
 /**
  * UsersPrismaModule - Phase 6.1 + 7.1
@@ -11,15 +11,15 @@ import { PrismaModule } from '../../../core/database/prisma/prisma.module'
  * - UsersPrismaController: Endpoints REST /users-prisma (Phase 7.1)
  *
  * Provides:
- * - UserPrismaService: CRUD utilisateurs avec Prisma
+ * - UsersPrismaService: CRUD utilisateurs avec Prisma
  *
  * Exports:
- * - UserPrismaService: Pour utilisation dans autres modules
+ * - UsersPrismaService: Pour utilisation dans autres modules
  */
 @Module({
   imports: [PrismaModule],
   controllers: [], // Controllers removed - deprecated -prisma controllers
-  providers: [/* UserPrismaService */], // Service removed - file deleted
-  exports: [/* UserPrismaService */], // Service removed - file deleted
+  providers: [UsersPrismaService],
+  exports: [UsersPrismaService],
 })
 export class UsersPrismaModule {}

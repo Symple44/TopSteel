@@ -195,8 +195,8 @@ export const INIT_DATA = {
   defaultAdmin: {
     nom: 'Admin',
     prenom: 'System',
-    email: 'admin@topsteel.tech',
-    password: 'TopSteel44!',
+    email: 'admin@topsteel.fr',
+    password: 'admin123',
     role: 'SUPER_ADMIN',
     userSettings: {
       theme: 'light',

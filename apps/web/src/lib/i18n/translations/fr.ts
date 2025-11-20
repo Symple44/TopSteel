@@ -255,7 +255,7 @@ export const fr = {
     accessManagementSpace: 'Accédez à votre espace de gestion',
     selectMethod: 'Sélectionner une méthode',
     emailOrAcronym: 'Email ou Acronyme',
-    emailOrAcronymPlaceholder: 'admin@topsteel.tech ou TOP',
+    emailOrAcronymPlaceholder: 'admin@topsteel.fr ou TOP',
     useEmailOrAcronym: 'Utilisez votre email ou votre acronyme pour vous connecter',
     loggingIn: 'Connexion...',
     demoAccount: 'Compte de démonstration',

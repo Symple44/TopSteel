@@ -66,7 +66,7 @@ export async function verifyAuthServer(request: NextRequest): Promise<AuthResult
       isValid: true,
       user: {
         id: 'mock-user-id',
-        email: 'admin@topsteel.tech',
+        email: 'admin@topsteel.fr',
         roles: ['ADMIN', 'SUPER_ADMIN'],
       },
     }

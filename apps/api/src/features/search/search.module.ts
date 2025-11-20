@@ -19,7 +19,7 @@ import { SearchResultFormatterService } from './services/search-result-formatter
 @Module({
   imports: [
     ConfigModule,
-    EventEmitterModule,
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forFeature([], 'default'), // Base auth
     TypeOrmModule.forFeature([], 'tenant'), // Base tenant
     RedisModule.forRoot(), // Import Redis module for caching

@@ -28,8 +28,8 @@ async function testGlobalSearch() {
     // 1. Login pour obtenir le token
     console.log('🔐 Authentification...')
     const loginResponse = await axios.post(`${API_URL}/auth/login`, {
-      login: 'admin@topsteel.tech',
-      password: 'TopSteel44!',
+      login: 'admin@topsteel.fr',
+      password: 'admin123',
     })
 
     const { accessToken } = loginResponse.data.data

@@ -37,7 +37,7 @@ async function resetAdminPassword() {
       WHERE email = $2
       RETURNING id, email
     `,
-      [hashedPassword, 'admin@topsteel.tech']
+      [hashedPassword, 'admin@topsteel.fr']
     )
 
     if (result.length > 0) {
@@ -46,7 +46,7 @@ async function resetAdminPassword() {
         `
         SELECT password FROM users WHERE email = $1
       `,
-        ['admin@topsteel.tech']
+        ['admin@topsteel.fr']
       )
 
       await bcrypt.compare(newPassword, checkResult[0].password)

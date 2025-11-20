@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         maxRows: 1000,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        createdBy: 'admin@topsteel.tech',
+        createdBy: 'admin@topsteel.fr',
         columns: ['id', 'email', 'nom', 'prenom', 'created_at'],
         query:
           'SELECT id, email, nom, prenom, created_at FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY',
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         maxRows: 500,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        createdBy: 'admin@topsteel.tech',
+        createdBy: 'admin@topsteel.fr',
         columns: ['id', 'name', 'is_active', 'created_at'],
         query:
           'SELECT id, name, is_active, created_at FROM menu_configurations ORDER BY created_at DESC',

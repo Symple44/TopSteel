@@ -4,7 +4,7 @@
  * Script de réinitialisation des utilisateurs ADMIN et TEST
  *
  * Ce script réinitialise les utilisateurs standards du système :
- * - admin@topsteel.tech (SUPER_ADMIN)
+ * - admin@topsteel.fr (SUPER_ADMIN)
  * - test@topsteel.com (ADMIN)
  */
 
@@ -29,7 +29,7 @@ class AdminTestUsersResetter {
   private authDataSource: DataSource
   private standardUsers: StandardUser[] = [
     {
-      email: 'admin@topsteel.tech',
+      email: 'admin@topsteel.fr',
       nom: 'Administrateur',
       prenom: 'Système',
       role: 'SUPER_ADMIN',
@@ -228,7 +228,7 @@ class AdminTestUsersResetter {
 // Script d'aide pour afficher l'utilisation
 function showUsage(): void {
   console.log('Usage: npx ts-node reset-admin-test-users.ts [--help]')
-  console.log('Resets admin@topsteel.tech and test@topsteel.com users')
+  console.log('Resets admin@topsteel.fr and test@topsteel.com users')
 }
 
 // Exécution du script

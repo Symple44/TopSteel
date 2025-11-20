@@ -152,8 +152,8 @@ const systemParameters = [
 ```typescript
 // Création automatique au premier démarrage
 {
-  email: 'admin@topsteel.tech',
-  password: 'TopSteel44!',  // À changer immédiatement
+  email: 'admin@topsteel.fr',
+  password: 'admin123',  // À changer immédiatement
   role: 'SUPER_ADMIN',
   firstName: 'Admin',
   lastName: 'System',

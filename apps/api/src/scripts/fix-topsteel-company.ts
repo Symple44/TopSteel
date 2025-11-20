@@ -1,5 +1,5 @@
-import { join } from 'node:path'
 import { config } from 'dotenv'
+import { join } from 'node:path'
 import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
@@ -22,7 +22,7 @@ async function fixTopSteelCompany() {
     // Chercher l'utilisateur admin
     const adminUser = await dataSource.query(`
       SELECT id, email, nom, prenom FROM users 
-      WHERE email = 'admin@topsteel.tech'
+      WHERE email = 'admin@topsteel.fr'
     `)
 
     if (adminUser.length === 0) {
