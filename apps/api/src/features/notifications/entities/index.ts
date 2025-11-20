@@ -82,9 +82,11 @@ export class NotificationRule {
   trigger!: any
   conditions!: any[]
   notification!: any
+  isActive?: boolean
+  lastModified?: Date
 
   canExecute(): boolean {
-    return true
+    return this.isActive !== false
   }
 
   incrementTriggerCount(): void {
@@ -96,6 +98,7 @@ export class NotificationRuleExecution {
   id!: string
   ruleId!: string
   status!: ExecutionStatus
+  executedAt?: Date
 
   static createSkipped(
     ruleId: string,
@@ -142,4 +145,20 @@ export class Notifications {
   id!: string
 }
 
-export type ConditionOperator = string
+export enum ConditionOperator {
+  EQUALS = 'EQUALS',
+  NOT_EQUALS = 'NOT_EQUALS',
+  CONTAINS = 'CONTAINS',
+  NOT_CONTAINS = 'NOT_CONTAINS',
+  STARTS_WITH = 'STARTS_WITH',
+  ENDS_WITH = 'ENDS_WITH',
+  GREATER_THAN = 'GREATER_THAN',
+  LESS_THAN = 'LESS_THAN',
+  GREATER_EQUAL = 'GREATER_EQUAL',
+  LESS_EQUAL = 'LESS_EQUAL',
+  IN = 'IN',
+  NOT_IN = 'NOT_IN',
+  IS_NULL = 'IS_NULL',
+  IS_NOT_NULL = 'IS_NOT_NULL',
+  REGEX = 'REGEX',
+}
