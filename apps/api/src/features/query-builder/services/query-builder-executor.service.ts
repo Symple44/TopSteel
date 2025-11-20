@@ -66,7 +66,7 @@ export class QueryBuilderExecutorService {
       // Build secure query using sanitization service
       const sanitizedQuery = this.sanitizationService.buildSafeSelectQuery({
         selectColumns: structuredParams.selectColumns,
-        fromTable: queryBuilder.mainTable,
+        fromTable: queryBuilder.mainTable || '',
         joins: structuredParams.joins,
         filters: structuredParams.filters,
         sorts: structuredParams.sorts,
@@ -102,7 +102,7 @@ export class QueryBuilderExecutorService {
       >[]
 
       // Apply calculated fields
-      const processedData = this.processCalculatedFields(data, queryBuilder.calculatedFields)
+      const processedData = this.processCalculatedFields(data, queryBuilder.calculatedFields || [])
 
       this.logger.log('Query executed successfully', {
         userId,
@@ -164,7 +164,7 @@ export class QueryBuilderExecutorService {
     offset: number
   } {
     // Convert columns to structured format
-    const selectColumns = queryBuilder.columns
+    const selectColumns = (queryBuilder.columns || [])
       .filter((col: any) => col.isVisible)
       .map((col: any) => ({
         tableName: col.tableName,
@@ -174,7 +174,7 @@ export class QueryBuilderExecutorService {
       }))
 
     // Convert joins to structured format
-    const joins = queryBuilder.joins.map((join: any, index: number) => ({
+    const joins = (queryBuilder.joins || []).map((join: any, index: number) => ({
       type: join.joinType.toUpperCase() as 'INNER' | 'LEFT' | 'RIGHT',
       fromTable: join.fromTable,
       fromColumn: join.fromColumn,
@@ -187,7 +187,7 @@ export class QueryBuilderExecutorService {
     // Convert legacy filters to structured format
     const filters: FilterCondition[] = []
     Object.entries(params.filters || {}).forEach(([columnAlias, filterValue]) => {
-      const column = queryBuilder.columns.find((col: any) => col.alias === columnAlias)
+      const column = (queryBuilder.columns || []).find((col: any) => col.alias === columnAlias)
       if (column?.isFilterable) {
         // Determine operator based on value type
         let operator: string = '='
@@ -224,11 +224,11 @@ export class QueryBuilderExecutorService {
         }
 
         filters.push({
-          tableName: column.tableName,
-          columnName: column.columnName,
+          tableName: column.tableName || '',
+          columnName: column.columnName || '',
           operator,
           value,
-          tableAlias: this.getTableAlias(column.tableName, queryBuilder),
+          tableAlias: this.getTableAlias(column.tableName || '', queryBuilder),
         })
       }
     })
@@ -241,13 +241,13 @@ export class QueryBuilderExecutorService {
       tableAlias?: string
     }> = []
     if (params.sortBy) {
-      const column = queryBuilder.columns.find((col: any) => col.alias === params.sortBy)
+      const column = (queryBuilder.columns || []).find((col: any) => col.alias === params.sortBy)
       if (column?.isSortable) {
         sorts.push({
-          tableName: column.tableName,
-          columnName: column.columnName,
+          tableName: column.tableName || '',
+          columnName: column.columnName || '',
           direction: params.sortOrder || 'ASC',
-          tableAlias: this.getTableAlias(column.tableName, queryBuilder),
+          tableAlias: this.getTableAlias(column.tableName || '', queryBuilder),
         })
       }
     }
@@ -299,9 +299,10 @@ export class QueryBuilderExecutorService {
       return 't0'
     }
 
-    const joinIndex = queryBuilder.joins.findIndex((join: any) => join.toTable === tableName)
+    const joins = queryBuilder.joins || []
+    const joinIndex = joins.findIndex((join: any) => join.toTable === tableName)
     if (joinIndex !== -1) {
-      return queryBuilder.joins[joinIndex].alias || `t${joinIndex + 1}`
+      return joins[joinIndex].alias || `t${joinIndex + 1}`
     }
 
     return 't0' // Default to main table alias
