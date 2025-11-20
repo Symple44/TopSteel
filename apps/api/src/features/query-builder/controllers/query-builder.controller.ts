@@ -278,14 +278,14 @@ export class QueryBuilderController {
       const queryBuilder = await this.queryBuilderService.findOne(id, req.user.id)
 
       // Validate all tables/columns referenced in the query builder
-      this.securityService.validateTable(queryBuilder.mainTable)
+      this.securityService.validateTable(queryBuilder.mainTable || '')
 
-      for (const column of queryBuilder.columns) {
-        this.securityService.validateColumn(column.tableName, column.columnName, 'select')
+      for (const column of queryBuilder.columns || []) {
+        this.securityService.validateColumn(column.tableName || '', column.columnName || '', 'select')
       }
 
-      for (const join of queryBuilder.joins) {
-        this.securityService.validateJoin(join.fromTable, join.toTable)
+      for (const join of queryBuilder.joins || []) {
+        this.securityService.validateJoin(join.fromTable || '', join.toTable || '')
       }
 
       // Transform filters array to Record format for compatibility

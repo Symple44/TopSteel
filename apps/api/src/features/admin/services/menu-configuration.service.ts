@@ -155,9 +155,10 @@ export class MenuConfigurationService {
     // Créer la configuration
     const config = MenuConfiguration.createCustom(
       createDto.name,
-      createDto.description || '',
-      createdBy
+      createDto.description || createDto.name,
+      'main'
     )
+    config.createdBy = createdBy
 
     const savedConfig = await this._configRepository.save(config)
 
@@ -249,8 +250,8 @@ export class MenuConfigurationService {
     }
 
     // Construire l'arbre de menu
-    const items = config.items.filter((item) => !item.parentId) as MenuItemData[]
-    return this.buildMenuTree(items, config.items as MenuItemData[])
+    const items = config.items.filter((item) => !(item as any).parentId) as unknown as MenuItemData[]
+    return this.buildMenuTree(items, config.items as unknown as MenuItemData[])
   }
 
   private buildMenuTree(rootItems: MenuItemData[], allItems: MenuItemData[]): MenuTreeNode[] {

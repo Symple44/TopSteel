@@ -255,7 +255,7 @@ export class MenuSyncService {
       }
 
       menuItem.orderIndex = orderIndex
-      menuItem.createdBy = undefined // Service système, pas d'utilisateur spécifique
+      // menuItem.createdBy = undefined // Service système, pas d'utilisateur spécifique (property doesn't exist in entity)
 
       // Sauvegarder l'item
       const savedItem = await this.itemRepository.save(menuItem)

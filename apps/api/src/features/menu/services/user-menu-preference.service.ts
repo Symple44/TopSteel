@@ -337,8 +337,8 @@ export class UserMenuPreferenceService {
         titleTranslationsKeys: customMenuPreference?.titleTranslations
           ? Object.keys(customMenuPreference.titleTranslations)
           : [],
-        customLabelPreview: customMenuPreference?.customLabel?.substring(0, 100),
-        customLabelLength: customMenuPreference?.customLabel?.length,
+        customLabelPreview: (customMenuPreference?.customLabel as string)?.substring(0, 100),
+        customLabelLength: (customMenuPreference?.customLabel as string)?.length,
         customLabelType: typeof customMenuPreference?.customLabel,
       })
 
@@ -349,7 +349,7 @@ export class UserMenuPreferenceService {
 
       try {
         this.logger.log(`🔧 Tentative de parsing JSON pour ${userId}`)
-        const menuData = JSON.parse(customMenuPreference.customLabel)
+        const menuData = JSON.parse(customMenuPreference.customLabel as string)
         this.logger.log(`✅ JSON parsé avec succès:`, {
           type: menuData.type,
           hasMenuItems: Array.isArray(menuData.menuItems),
@@ -403,8 +403,8 @@ export class UserMenuPreferenceService {
       } catch (parseError) {
         this.logger.error(`❌ Erreur de parsing du menu personnalisé pour ${userId}:`, {
           error: parseError instanceof Error ? parseError.message : String(parseError),
-          customLabelStart: customMenuPreference.customLabel?.substring(0, 200),
-          customLabelEnd: customMenuPreference.customLabel?.substring(-200),
+          customLabelStart: (customMenuPreference.customLabel as string)?.substring(0, 200),
+          customLabelEnd: (customMenuPreference.customLabel as string)?.substring(-200),
         })
         return []
       }
