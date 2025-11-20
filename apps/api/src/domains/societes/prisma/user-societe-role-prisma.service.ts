@@ -159,10 +159,10 @@ export class UserSocieteRolePrismaService {
             select: {
               id: true,
               email: true,
-              username: true,
-              firstName: true,
-              lastName: true,
-              isActive: true,
+              nom: true,
+              prenom: true,
+              role: true,
+              actif: true,
             },
           },
           role: {

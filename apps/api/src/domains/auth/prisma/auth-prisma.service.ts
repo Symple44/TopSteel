@@ -39,39 +39,37 @@ export class AuthPrismaService {
   async createUser(data: {
     email: string
     password: string
-    username: string
-    firstName?: string
-    lastName?: string
-    isActive?: boolean
-  }): Promise<Omit<User, 'passwordHash'>> {
+    nom?: string
+    prenom?: string
+    role?: string
+    actif?: boolean
+  }): Promise<Omit<User, 'password'>> {
     this.logger.log(`Creating user: ${data.email}`)
 
-    const passwordHash = await bcrypt.hash(data.password, this.BCRYPT_SALT_ROUNDS)
+    const hashedPassword = await bcrypt.hash(data.password, this.BCRYPT_SALT_ROUNDS)
 
     try {
       const user = await this.prisma.user.create({
         data: {
           email: data.email,
-          username: data.username,
-          passwordHash,
-          firstName: data.firstName || null,
-          lastName: data.lastName || null,
-          isActive: data.isActive !== undefined ? data.isActive : true,
+          password: hashedPassword,
+          nom: data.nom || null,
+          prenom: data.prenom || null,
+          role: data.role || 'USER',
+          actif: data.actif !== undefined ? data.actif : true,
         },
         select: {
           id: true,
           email: true,
-          username: true,
-          firstName: true,
-          lastName: true,
-          isActive: true,
-          isEmailVerified: true,
-          emailVerifiedAt: true,
-          lastLoginAt: true,
+          nom: true,
+          prenom: true,
+          role: true,
+          actif: true,
+          dernier_login: true,
           createdAt: true,
           updatedAt: true,
           deletedAt: true,
-          passwordHash: false,
+          password: false,
         },
       })
 
@@ -148,7 +146,7 @@ export class AuthPrismaService {
     this.logger.debug(`Validating password for user: ${user.id}`)
 
     try {
-      const isValid = await bcrypt.compare(password, user.passwordHash)
+      const isValid = await bcrypt.compare(password, user.password)
       this.logger.debug(`Password validation result: ${isValid}`)
       return isValid
     } catch (error) {
@@ -584,7 +582,7 @@ export class AuthPrismaService {
       const user = await this.prisma.user.update({
         where: { id: userId },
         data: {
-          lastLoginAt: new Date(),
+          dernier_login: new Date(),
         },
       })
 
@@ -657,9 +655,9 @@ export class AuthPrismaService {
             select: {
               id: true,
               email: true,
-              username: true,
-              firstName: true,
-              lastName: true,
+              nom: true,
+              prenom: true,
+              role: true,
             },
           },
         },
@@ -689,9 +687,9 @@ export class AuthPrismaService {
               select: {
                 id: true,
                 email: true,
-                username: true,
-                firstName: true,
-                lastName: true,
+                nom: true,
+                prenom: true,
+                role: true,
               },
             },
           },
@@ -725,9 +723,9 @@ export class AuthPrismaService {
             select: {
               id: true,
               email: true,
-              username: true,
-              firstName: true,
-              lastName: true,
+              nom: true,
+              prenom: true,
+              role: true,
             },
           },
         },

@@ -12,6 +12,9 @@ import { SmsLogPrismaService } from './sms-log-prisma.service'
 import { ModulePrismaService } from './module-prisma.service'
 import { RolePrismaService } from './role-prisma.service'
 import { SessionPrismaService } from './session-prisma.service'
+import { PermissionPrismaService } from './permission-prisma.service'
+import { UserSocieteRolesPrismaService } from './user-societe-roles-prisma.service'
+import { UnifiedRolesPrismaService } from './unified-roles-prisma.service'
 import { TenantGuard } from './guards/tenant.guard'
 
 /**
@@ -30,8 +33,10 @@ import { TenantGuard } from './guards/tenant.guard'
  * - ModulePrismaService pour modules fonctionnels
  * - RolePrismaService pour gestion des rôles (Phase 6.2)
  * - SessionPrismaService pour gestion des sessions (Phase 6.3)
+ * - PermissionPrismaService pour gestion des permissions RBAC
+ * - UserSocieteRolesPrismaService pour rôles utilisateur-société
+ * - UnifiedRolesPrismaService pour rôles unifiés (global + société)
  * - TenantGuard pour validation tenant access
- * - AuthPrismaController pour endpoint /auth-prisma/login
  *
  * Utilisé pour:
  * - Authentification et autorisation
@@ -66,6 +71,9 @@ import { TenantGuard } from './guards/tenant.guard'
     ModulePrismaService,
     RolePrismaService,
     SessionPrismaService,
+    PermissionPrismaService,
+    UserSocieteRolesPrismaService,
+    UnifiedRolesPrismaService,
     TenantGuard,
   ],
   exports: [
@@ -79,6 +87,9 @@ import { TenantGuard } from './guards/tenant.guard'
     ModulePrismaService,
     RolePrismaService,
     SessionPrismaService,
+    PermissionPrismaService,
+    UserSocieteRolesPrismaService,
+    UnifiedRolesPrismaService,
     TenantGuard,
   ],
 })

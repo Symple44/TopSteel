@@ -94,8 +94,8 @@ export class QueryBuilderPrismaService {
             select: {
               id: true,
               email: true,
-              firstName: true,
-              lastName: true,
+              nom: true,
+              prenom: true,
             },
           },
           columns: {

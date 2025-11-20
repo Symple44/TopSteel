@@ -27,17 +27,22 @@ import { TenantGuard } from './security/guards/tenant.guard'
 import { JwtStrategy } from './security/strategies/jwt.strategy'
 import { JwtEnhancedStrategy } from './security/strategies/jwt-enhanced.strategy'
 import { LocalStrategy } from './security/strategies/local.strategy'
+// Legacy TypeORM Services (being aliased to Prisma)
 import { AuditService } from './services/audit.service'
+import { MFAService } from './services/mfa.service'
+import { PermissionService } from './services/permission.service'
+import { SessionInvalidationService } from './services/session-invalidation.service'
+import { SMSService } from './services/sms.service'
+import { RoleService } from './services/role.service'
+import { GroupService } from './services/group.service'
+
+// Utility Services (no TypeORM - keep as is)
 import { AuthPerformanceService } from './services/auth-performance.service'
 import { GeolocationService } from './services/geolocation.service'
 import { JwtUtilsService } from './services/jwt-utils.service'
-import { MFAService } from './services/mfa.service'
-import { PermissionService } from './services/permission.service'
 import { PermissionCalculatorService } from './services/permission-calculator.service'
 import { RoleFormattingService } from './services/role-formatting.service'
-import { SessionInvalidationService } from './services/session-invalidation.service'
 import { SessionRedisService } from './services/session-redis.service'
-import { SMSService } from './services/sms.service'
 import { TOTPService } from './services/totp.service'
 import { AuditLog } from '../../domains/auth/core/entities/audit-log.entity'
 import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
@@ -55,6 +60,17 @@ import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'
 import { WebAuthnService } from './services/webauthn.service'
 import { AuthPrismaModule } from './prisma/auth-prisma.module'
+
+// Prisma Services for aliasing
+import { AuditLogPrismaService } from './prisma/audit-log-prisma.service'
+import { MfaPrismaService } from './prisma/mfa-prisma.service'
+import { PermissionPrismaService } from './prisma/permission-prisma.service'
+import { SessionPrismaService } from './prisma/session-prisma.service'
+import { SmsLogPrismaService } from './prisma/sms-log-prisma.service'
+import { RolePrismaService } from './prisma/role-prisma.service'
+import { GroupsPrismaService } from './prisma/groups-prisma.service'
+import { UnifiedRolesPrismaService } from './prisma/unified-roles-prisma.service'
+import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prisma.service'
 
 @Module({
   imports: [
@@ -107,36 +123,95 @@ import { AuthPrismaModule } from './prisma/auth-prisma.module'
   ],
   controllers: [AuthController, MFAController, SMSAdminController],
   providers: [
+    // Core Auth Services
     AuthService,
-    AuthCoreService, // Service principal
-    ...AuthRepositoryProviders, // Providers pour injection d'interfaces
+    AuthCoreService,
+    ...AuthRepositoryProviders,
+
+    // Strategies
     LocalStrategy,
     JwtStrategy,
     JwtEnhancedStrategy,
+
+    // Utility Services (no TypeORM - keep as is)
     JwtUtilsService,
-    SessionInvalidationService,
     SessionRedisService,
     GeolocationService,
     TOTPService,
     WebAuthnService,
-    SMSService,
-    MFAService,
+    PermissionCalculatorService,
+    RoleFormattingService,
+    AuthPerformanceService,
+
+    // Guards
     RolesGuard,
     TenantGuard,
     EnhancedRolesGuard,
     EnhancedTenantGuard,
     ResourceOwnershipGuard,
     CombinedSecurityGuard,
-    TopSteelLogger, // Service de logging structuré
-    RedisService, // Service de cache Redis de base
-    OptimizedCacheService, // Service de cache REDIS
-    UserSocieteRolesService, // Service pour la nouvelle structure de rôles
-    UnifiedRolesService, // Service unifié pour la gestion des rôles
-    PermissionCalculatorService, // Service de calcul des permissions
-    PermissionService, // Service de gestion des permissions
-    RoleFormattingService, // Service de formatage des rôles
-    AuthPerformanceService, // Service de monitoring des performances
-    AuditService, // Service d'audit et de traçabilité
+
+    // Infrastructure
+    TopSteelLogger,
+    RedisService,
+    OptimizedCacheService,
+
+    // ===== PRISMA SERVICES WITH ALIASING =====
+    // Pattern: Ancien nom TypeORM → Nouveau service Prisma
+
+    // AuditService → AuditLogPrismaService
+    {
+      provide: AuditService,
+      useExisting: AuditLogPrismaService,
+    },
+
+    // MFAService → MfaPrismaService
+    {
+      provide: MFAService,
+      useExisting: MfaPrismaService,
+    },
+
+    // PermissionService → PermissionPrismaService
+    {
+      provide: PermissionService,
+      useExisting: PermissionPrismaService,
+    },
+
+    // SessionInvalidationService → SessionPrismaService
+    {
+      provide: SessionInvalidationService,
+      useExisting: SessionPrismaService,
+    },
+
+    // SMSService → SmsLogPrismaService
+    {
+      provide: SMSService,
+      useExisting: SmsLogPrismaService,
+    },
+
+    // RoleService → RolePrismaService
+    {
+      provide: RoleService,
+      useExisting: RolePrismaService,
+    },
+
+    // GroupService → GroupsPrismaService
+    {
+      provide: GroupService,
+      useExisting: GroupsPrismaService,
+    },
+
+    // UnifiedRolesService → UnifiedRolesPrismaService
+    {
+      provide: UnifiedRolesService,
+      useExisting: UnifiedRolesPrismaService,
+    },
+
+    // UserSocieteRolesService → UserSocieteRolesPrismaService
+    {
+      provide: UserSocieteRolesService,
+      useExisting: UserSocieteRolesPrismaService,
+    },
   ],
   exports: [
     // TypeORM Services (Legacy - being migrated)

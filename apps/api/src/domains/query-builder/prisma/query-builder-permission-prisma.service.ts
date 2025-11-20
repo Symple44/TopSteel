@@ -90,8 +90,8 @@ export class QueryBuilderPermissionPrismaService {
             select: {
               id: true,
               email: true,
-              firstName: true,
-              lastName: true,
+              nom: true,
+              prenom: true,
             },
           },
           role: {

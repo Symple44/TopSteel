@@ -84,7 +84,7 @@ export class AuthController {
     }
 
     // 3. Check if user is active
-    if (!user.isActive) {
+    if (!user.actif) {
       this.logger.warn(`Inactive user attempted login: ${loginDto.email}`)
       throw new UnauthorizedException('Account is inactive')
     }
@@ -93,7 +93,7 @@ export class AuthController {
     const payload = {
       sub: user.id,
       email: user.email,
-      username: user.username,
+      role: user.role,
     }
 
     const jwtSecret = this.configService.get<string>('jwt.secret')
@@ -135,9 +135,9 @@ export class AuthController {
       user: {
         id: user.id,
         email: user.email,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        nom: user.nom,
+        prenom: user.prenom,
+        role: user.role,
       },
       accessToken,
       refreshToken,

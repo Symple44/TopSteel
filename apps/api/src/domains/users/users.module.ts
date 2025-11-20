@@ -1,15 +1,35 @@
 import { Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
-import { User } from '../../domains/users/entities/user.entity'
-import { UserSettings } from '../../domains/users/entities/user-settings.entity'
-import { UserAuthRepositoryService } from './services/user-auth-repository.service'
+import { PrismaModule } from '../../core/database/prisma/prisma.module'
+import { UsersPrismaService } from './users-prisma.service'
+import { UserAuthPrismaRepositoryService } from './services/user-auth-prisma-repository.service'
 import { UsersService } from './users.service'
+import { UserAuthRepositoryService } from './services/user-auth-repository.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserSettings], 'auth')],
-  controllers: [], // Controller removed - new Prisma controller should be imported elsewhere
-  providers: [UsersService, OptimizedCacheService, UserAuthRepositoryService],
-  exports: [UsersService, UserAuthRepositoryService, TypeOrmModule],
+  imports: [PrismaModule],
+  controllers: [],
+  providers: [
+    UsersPrismaService,
+    UserAuthPrismaRepositoryService,
+
+    // Alias: UsersService → UsersPrismaService
+    {
+      provide: UsersService,
+      useExisting: UsersPrismaService,
+    },
+    {
+      provide: UserAuthRepositoryService,
+      useExisting: UserAuthPrismaRepositoryService,
+    },
+
+    OptimizedCacheService,
+  ],
+  exports: [
+    UsersPrismaService,
+    UserAuthPrismaRepositoryService,
+    UsersService,
+    UserAuthRepositoryService,
+  ],
 })
 export class UsersModule {}

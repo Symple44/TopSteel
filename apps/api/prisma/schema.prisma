@@ -17,21 +17,23 @@ datasource db {
 // AUTH DATABASE MODELS
 // ============================================
 
-// User (entité centrale)
+// User (entité centrale - alignée avec colonnes TypeORM existantes)
 model User {
-  id              String    @id @default(uuid())
-  username        String    @unique @db.VarChar(255)
-  email           String    @unique @db.VarChar(255)
-  passwordHash    String    @map("password_hash") @db.VarChar(255)
-  firstName       String?   @map("first_name") @db.VarChar(100)
-  lastName        String?   @map("last_name") @db.VarChar(100)
-  isActive        Boolean   @default(true) @map("is_active")
-  isEmailVerified Boolean   @default(false) @map("is_email_verified")
-  emailVerifiedAt DateTime? @map("email_verified_at")
-  lastLoginAt     DateTime? @map("last_login_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  deletedAt       DateTime? @map("deleted_at")
+  id            String    @id @default(uuid())
+  email         String    @unique @db.VarChar(255)
+  password      String    @db.VarChar(255)
+  nom           String?   @db.VarChar(255)
+  prenom        String?   @db.VarChar(255)
+  role          String    @db.VarChar(50)
+  actif         Boolean   @default(true)
+  acronyme      String?   @unique @db.VarChar(255)
+  dernier_login DateTime?
+  version       Int       @default(1)
+  deletedAt     DateTime? @map("deleted_at")
+  refreshToken  String?   @db.VarChar(255)
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
   sessions          UserSession[]
@@ -49,8 +51,12 @@ model User {
   forcedLogouts     UserSession[]            @relation("ForcedLogout")
 
   @@index([email])
-  @@index([username])
-  @@index([isActive])
+  @@index([role])
+  @@index([actif])
+  @@index([acronyme])
+  @@index([dernier_login])
+  @@index([createdAt])
+  @@index([role, actif, createdAt])
   @@map("users")
 }
 
@@ -343,15 +349,16 @@ model SmsLog {
   @@map("sms_logs")
 }
 
-// UserSettings
+// UserSettings (alignée avec TypeORM)
 model UserSettings {
   id          String   @id @default(uuid())
-  userId      String   @unique @map("user_id")
-  profile     Json?    @map("profile")
-  company     Json?    @map("company")
-  preferences Json?    @map("preferences")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  userId      String   @unique
+  profile     Json?
+  company     Json?
+  preferences Json?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
