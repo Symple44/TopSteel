@@ -6,10 +6,15 @@ export type PermissionType = 'view' | 'edit' | 'delete' | 'share' | 'export' | '
 export class QueryBuilder {
   id!: string
   name!: string
+  description?: string
+  database?: string
   createdById!: string
   isPublic!: boolean
   mainTable?: string
   maxRows?: number
+  settings?: any
+  layout?: any
+  updatedAt?: Date
   columns?: QueryBuilderColumn[]
   joins?: QueryBuilderJoin[]
   calculatedFields?: QueryBuilderCalculatedField[]
@@ -28,6 +33,8 @@ export class QueryBuilderJoin {
   id!: string
   queryBuilderId!: string
   alias?: string
+  fromTable?: string
+  toTable?: string
 }
 
 export class QueryBuilderCalculatedField {

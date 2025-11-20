@@ -8,8 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { MenuConfiguration } from '../../../domains/admin/entities/menu-configuration.entity'
 import { MenuItem, MenuItemType } from '../../../domains/admin/entities/menu-item.entity'
-import { MenuItemPermission } from './entities/menu-item-permission.entity'
-import { MenuItemRole } from './entities/menu-item-role.entity'
+import { MenuItemPermission } from '../entities/menu-item-permission.entity'
+import { MenuItemRole } from '../entities/menu-item-role.entity'
 
 
 

@@ -41,6 +41,9 @@ export class NotificationEvent {
   event!: string
   data!: Record<string, unknown>
   status!: EventStatus
+  occurredAt?: Date
+  processingError?: string
+  processingDetails?: any
 
   static create(
     type: TriggerType,
