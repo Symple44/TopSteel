@@ -1,13 +1,15 @@
 // Temporary stub file to resolve module imports
 // TODO: Properly migrate or create these entities
 
-export type PermissionType = 'view' | 'edit' | 'delete' | 'share' | 'export'
+export type PermissionType = 'view' | 'edit' | 'delete' | 'share' | 'export' | 'execute'
 
 export class QueryBuilder {
   id!: string
   name!: string
   createdById!: string
   isPublic!: boolean
+  mainTable?: string
+  maxRows?: number
   columns?: QueryBuilderColumn[]
   joins?: QueryBuilderJoin[]
   calculatedFields?: QueryBuilderCalculatedField[]
@@ -16,16 +18,26 @@ export class QueryBuilder {
 export class QueryBuilderColumn {
   id!: string
   queryBuilderId!: string
+  tableName?: string
+  columnName?: string
+  isFilterable?: boolean
+  isSortable?: boolean
 }
 
 export class QueryBuilderJoin {
   id!: string
   queryBuilderId!: string
+  alias?: string
 }
 
 export class QueryBuilderCalculatedField {
   id!: string
   queryBuilderId!: string
+  name?: string
+  expression?: string
+  isVisible?: boolean
+  dataType?: string
+  format?: string
 }
 
 export class QueryBuilderPermission {

@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import * as mathjs from 'mathjs'
 import type { DataSource } from 'typeorm'
-// @ts-expect-error - entities module needs to be created
 import type { QueryBuilder } from '../entities'
 import { QueryBuilderSecurityService } from '../security/query-builder-security.service'
 import { FilterCondition, SqlSanitizationService } from '../security/sql-sanitization.service'
