@@ -58,6 +58,11 @@ export class MenuItem {
   @Column({ type: 'uuid' })
   menuId!: string
 
+  // Alias for backward compatibility
+  get configId(): string {
+    return this.menuId
+  }
+
   @Column({ type: 'uuid', nullable: true })
   parentId?: string
 
@@ -66,6 +71,11 @@ export class MenuItem {
 
   @Column({ type: 'varchar', length: 255 })
   label!: string
+
+  // Alias for backward compatibility
+  get title(): string {
+    return this.label
+  }
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   labelKey?: string
@@ -320,5 +330,67 @@ export class MenuItem {
       metadata: this.metadata,
       children: this.children?.map((child) => child.toJSON()),
     }
+  }
+
+  // Static factory methods for backward compatibility
+  static create(
+    menuId: string,
+    title: string,
+    type: MenuItemType,
+    href?: string,
+    icon?: string,
+    parentId?: string
+  ): MenuItem {
+    const item = new MenuItem()
+    item.menuId = menuId
+    item.label = title
+    item.code = title.toLowerCase().replace(/\s+/g, '_')
+    item.type = type
+    item.route = href
+    item.icon = icon
+    item.parentId = parentId
+    return item
+  }
+
+  static createFolder(menuId: string, title: string, icon?: string, parentId?: string): MenuItem {
+    const item = MenuItem.create(menuId, title, MenuItemType.FOLDER, undefined, icon, parentId)
+    item.type = MenuItemType.GROUP
+    return item
+  }
+
+  static createProgram(
+    menuId: string,
+    title: string,
+    programId: string,
+    icon?: string,
+    parentId?: string
+  ): MenuItem {
+    const item = MenuItem.create(menuId, title, MenuItemType.PROGRAM, programId, icon, parentId)
+    item.route = programId
+    return item
+  }
+
+  static createLink(
+    menuId: string,
+    title: string,
+    url: string,
+    icon?: string,
+    parentId?: string
+  ): MenuItem {
+    const item = MenuItem.create(menuId, title, MenuItemType.LINK, undefined, icon, parentId)
+    item.externalUrl = url
+    return item
+  }
+
+  static createDataView(
+    menuId: string,
+    title: string,
+    queryBuilderId: string,
+    icon?: string,
+    parentId?: string
+  ): MenuItem {
+    const item = MenuItem.create(menuId, title, MenuItemType.DATA_VIEW, undefined, icon, parentId)
+    item.metadata = { queryBuilderId }
+    return item
   }
 }

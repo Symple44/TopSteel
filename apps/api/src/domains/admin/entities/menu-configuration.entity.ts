@@ -67,6 +67,9 @@ export class MenuConfiguration {
   @Column({ type: 'boolean', default: false })
   isDefault!: boolean
 
+  @Column({ type: 'boolean', default: false })
+  isSystem!: boolean
+
   @Column({ type: 'uuid', nullable: true })
   societeId?: string
 
@@ -199,6 +202,7 @@ export class MenuConfiguration {
       position: this.position,
       isActive: this.isActive,
       isDefault: this.isDefault,
+      isSystem: this.isSystem,
       scope: this.getScope(),
       societeId: this.societeId,
       roleType: this.roleType,
@@ -207,5 +211,36 @@ export class MenuConfiguration {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     }
+  }
+
+  // Static factory methods
+  static createCustom(
+    code: string,
+    name: string,
+    type: 'main' | 'sidebar' | 'toolbar' | 'context' | 'mobile' = 'main'
+  ): MenuConfiguration {
+    const config = new MenuConfiguration()
+    config.code = code
+    config.name = name
+    config.type = type
+    config.isSystem = false
+    config.isActive = true
+    config.isDefault = false
+    return config
+  }
+
+  static createSystem(
+    code: string,
+    name: string,
+    type: 'main' | 'sidebar' | 'toolbar' | 'context' | 'mobile' = 'main'
+  ): MenuConfiguration {
+    const config = new MenuConfiguration()
+    config.code = code
+    config.name = name
+    config.type = type
+    config.isSystem = true
+    config.isActive = true
+    config.isDefault = false
+    return config
   }
 }
