@@ -162,7 +162,7 @@ export class QueryBuilderService {
           ...field,
           queryBuilderId: id,
         }))
-        const fields = this._calculatedFieldRepository.create(fieldsData)
+        const fields = this._calculatedFieldRepository.create(fieldsData as any)
         await this._calculatedFieldRepository.save(fields)
       }
     }
@@ -174,7 +174,7 @@ export class QueryBuilderService {
       calculatedFields: _calculatedFields,
       ...mainUpdate
     } = updateDto
-    await this._queryBuilderRepository.update(id, mainUpdate as QueryBuilderUpdateData)
+    await this._queryBuilderRepository.update(id, mainUpdate as any)
 
     return this.findOne(id, userId)
   }

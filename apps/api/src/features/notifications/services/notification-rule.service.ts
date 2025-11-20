@@ -43,9 +43,9 @@ export class NotificationRuleService {
       isActive: ruleData.isActive ?? true,
       triggerCount: 0,
       conditions: ruleData.conditions || [],
-    })
+    } as any)
 
-    return await this._ruleRepository.save(rule)
+    return await this._ruleRepository.save(rule as any)
   }
 
   async updateRule(id: string, updates: Partial<NotificationRule>): Promise<NotificationRule> {

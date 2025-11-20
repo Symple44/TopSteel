@@ -102,7 +102,7 @@ export class QueryBuilderExecutorService {
       >[]
 
       // Apply calculated fields
-      const processedData = this.processCalculatedFields(data, queryBuilder.calculatedFields || [])
+      const processedData = this.processCalculatedFields(data, (queryBuilder.calculatedFields || []) as any)
 
       this.logger.log('Query executed successfully', {
         userId,

@@ -58,9 +58,9 @@ export class TenantProvisioningService {
       this.logger.log(`📋 Création de l'enregistrement société...`)
       societe = await this.societesService.create({
         ...societeData,
-        isActive: false, // Temporairement inactif pendant le provisioning
+        // isActive: false, // Field doesn't exist in Societe entity
         databaseName,
-      }) as Societe
+      } as any) as unknown as Societe
 
       // 3. Créer la base de données physique
       this.logger.log(`🗄️ Création de la base de données: ${databaseName}`)
@@ -73,7 +73,7 @@ export class TenantProvisioningService {
 
       // 5. Initialiser les données par défaut
       this.logger.log(`🔧 Initialisation des données par défaut...`)
-      await this.tenantInitService.initializeTenantData(societe)
+      await this.tenantInitService.initializeTenantData(societe as any)
 
       // 6. Activer la société
       this.logger.log(`✅ Activation de la société...`)

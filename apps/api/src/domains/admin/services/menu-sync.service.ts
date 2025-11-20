@@ -472,9 +472,9 @@ export class MenuSyncService {
         controller: page.controller,
         handler: page.handler,
       },
-    })
+    } as any)
 
-    return await this.menuItemRepository.save(menuItem)
+    return await this.menuItemRepository.save(menuItem as any)
   }
 
   /**

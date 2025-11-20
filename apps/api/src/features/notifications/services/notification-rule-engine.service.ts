@@ -250,8 +250,8 @@ export class NotificationRuleEngineService {
         isArchived: false,
       }
 
-      const notification = this._notificationRepository.create(notificationData)
-      return await this._notificationRepository.save(notification)
+      const notification = this._notificationRepository.create(notificationData as any)
+      return await this._notificationRepository.save(notification as any)
     } catch (error) {
       this.logger.error(`Error creating notification from rule ${rule.id}:`, error)
       throw new Error(
