@@ -72,8 +72,8 @@ import { TenantGuard } from './guards/tenant.guard'
     RolePrismaService,
     SessionPrismaService,
     PermissionPrismaService,
-    // UserSocieteRolesPrismaService,
-    // UnifiedRolesPrismaService,
+    UserSocieteRolesPrismaService,
+    UnifiedRolesPrismaService,
     TenantGuard,
   ],
   exports: [
