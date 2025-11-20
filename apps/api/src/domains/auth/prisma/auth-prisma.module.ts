@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PrismaModule } from '../../../core/database/prisma/prisma.module'
+import { RedisService } from '../../../core/common/services/redis.service'
 import { AuthPrismaService } from './auth-prisma.service'
 import { MfaPrismaService } from './mfa-prisma.service'
 import { TenantPrismaService } from './tenant-prisma.service'
@@ -61,6 +62,7 @@ import { TenantGuard } from './guards/tenant.guard'
   ],
   controllers: [], // Controllers removed - deprecated -prisma controllers
   providers: [
+    RedisService,
     AuthPrismaService,
     MfaPrismaService,
     TenantPrismaService,
