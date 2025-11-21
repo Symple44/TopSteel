@@ -31,10 +31,7 @@
   "exclude": [
     "node_modules",
     ".next",
-    "out",
-    "src/app/api/admin/permissions/route.ts",
-    "src/components/lazy/lazy-imports.tsx",
-    "src/stores/index.ts"
+    "out"
   ],
   "references": [
     {
