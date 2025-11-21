@@ -2,6 +2,18 @@ import type { ColumnConfig, SelectionState } from '@erp/ui'
 import { usePersistedTableSettings } from '@erp/ui'
 import { useCallback, useMemo, useState } from 'react'
 
+/**
+ * Configuration options for the useDataTable hook.
+ *
+ * @template T - The type of data items in the table
+ *
+ * @property {string} [tableId] - Unique identifier for the table (required for persistence)
+ * @property {string} [userId] - User identifier for user-specific settings persistence
+ * @property {T[]} [initialData] - Initial data to populate the table with
+ * @property {ColumnConfig<T>[]} columns - Column configuration for the table
+ * @property {keyof T | string} keyField - The field to use as unique identifier for rows
+ * @property {boolean} [autoSave=true] - Whether to automatically save settings changes
+ */
 interface UseDataTableOptions<T> {
   tableId?: string
   userId?: string
@@ -12,7 +24,92 @@ interface UseDataTableOptions<T> {
 }
 
 /**
- * Hook personnalisé pour simplifier l'utilisation du DataTable
+ * Custom hook to simplify DataTable usage with built-in state management.
+ *
+ * This hook provides a complete solution for managing table data, including:
+ * - Data state management (add, edit, delete, bulk operations)
+ * - Row selection state (single, multiple, select all)
+ * - Persisted settings (column visibility, sorting, filters)
+ * - Loading states
+ * - Ready-to-use handlers for common table operations
+ *
+ * The hook returns a comprehensive object with all necessary state and handlers,
+ * plus a pre-configured `tableConfig` object that can be spread directly into
+ * the DataTable component.
+ *
+ * @template T - The type of data items in the table (defaults to Record<string, unknown>)
+ *
+ * @param {UseDataTableOptions<T>} options - Configuration options
+ * @param {string} [options.tableId] - Unique ID for table (enables persistence)
+ * @param {string} [options.userId] - User ID for user-specific settings
+ * @param {T[]} [options.initialData=[]] - Initial data array
+ * @param {ColumnConfig<T>[]} options.columns - Column definitions
+ * @param {keyof T | string} options.keyField - Field to use as unique row identifier
+ * @param {boolean} [options.autoSave=true] - Auto-save settings on change
+ *
+ * @returns {Object} Table state and handlers:
+ *   - data: Current table data array
+ *   - setData: Function to update data
+ *   - loading: Loading state flag
+ *   - setLoading: Function to update loading state
+ *   - selection: Current selection state
+ *   - selectedData: Array of selected data items
+ *   - settings: Persisted table settings
+ *   - resetSettings: Reset settings to default
+ *   - exportSettings: Export current settings
+ *   - importSettings: Import settings from file
+ *   - handleCellEdit: Handler for cell edit events
+ *   - handleRowAdd: Handler for adding new rows
+ *   - handleRowsDelete: Handler for deleting rows
+ *   - handleRowUpdate: Handler for updating a single row
+ *   - handleBulkUpdate: Handler for updating multiple rows
+ *   - clearSelection: Clear all row selections
+ *   - selectAll: Select all rows
+ *   - toggleRowSelection: Toggle selection for a single row
+ *   - tableConfig: Pre-configured object to spread into DataTable
+ *
+ * @example
+ * ```tsx
+ * interface Product {
+ *   id: string
+ *   name: string
+ *   price: number
+ *   stock: number
+ * }
+ *
+ * function ProductTable() {
+ *   const columns: ColumnConfig<Product>[] = [
+ *     { key: 'name', title: 'Product Name', editable: true },
+ *     { key: 'price', title: 'Price', type: 'number' },
+ *     { key: 'stock', title: 'Stock', type: 'number' }
+ *   ]
+ *
+ *   const {
+ *     data,
+ *     loading,
+ *     selectedData,
+ *     handleBulkUpdate,
+ *     tableConfig
+ *   } = useDataTable<Product>({
+ *     tableId: 'products-table',
+ *     userId: currentUser.id,
+ *     initialData: products,
+ *     columns,
+ *     keyField: 'id',
+ *   })
+ *
+ *   const handleBulkDiscount = () => {
+ *     handleBulkUpdate({ price: selectedData[0].price * 0.9 })
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <button onClick={handleBulkDiscount}>Apply 10% Discount</button>
+ *       <DataTable {...tableConfig} />
+ *     </div>
+ *   )
+ * }
+ * ```
  */
 export function useDataTable<T = Record<string, unknown>>({
   tableId,

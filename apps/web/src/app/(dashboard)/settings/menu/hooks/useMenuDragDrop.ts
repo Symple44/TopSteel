@@ -4,6 +4,54 @@ import type { DragEndEvent } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import type { MenuItemConfig, UserMenuItem } from '../types/menu.types'
 
+/**
+ * Custom hook for managing drag-and-drop interactions in the menu editor.
+ *
+ * This hook handles all drag-and-drop logic for the menu customization interface:
+ * - Dragging items from standard menu to user menu
+ * - Reordering items within user menu
+ * - Dropping items into folders
+ * - Managing drag state and visual feedback
+ *
+ * It works with @dnd-kit for sortable items and native HTML5 drag-and-drop
+ * for cross-panel dragging.
+ *
+ * @param {UserMenuItem[]} userMenu - Current user menu state
+ * @param {Function} setUserMenu - Function to update user menu
+ * @param {Function} setDraggedStandardItem - Function to track dragged standard item
+ *
+ * @returns {Object} Drag-and-drop handlers:
+ *   - handleDragEnd: Handler for @dnd-kit drag end events (reordering)
+ *   - handleStandardItemDragStart: Handler for starting drag from standard menu
+ *   - handleDropInFolder: Handler for dropping item into a folder
+ *   - handleUserMenuDrop: Handler for dropping item into user menu root
+ *   - handleUserMenuDragOver: Handler to allow drop (preventDefault)
+ *
+ * @example
+ * ```tsx
+ * function MenuEditor() {
+ *   const [userMenu, setUserMenu] = useState([])
+ *   const [draggedItem, setDraggedItem] = useState(null)
+ *
+ *   const {
+ *     handleDragEnd,
+ *     handleStandardItemDragStart,
+ *     handleUserMenuDrop,
+ *     handleUserMenuDragOver
+ *   } = useMenuDragDrop(userMenu, setUserMenu, setDraggedItem)
+ *
+ *   return (
+ *     <DndContext onDragEnd={handleDragEnd}>
+ *       <StandardMenu onDragStart={handleStandardItemDragStart} />
+ *       <UserMenu
+ *         onDrop={handleUserMenuDrop}
+ *         onDragOver={handleUserMenuDragOver}
+ *       />
+ *     </DndContext>
+ *   )
+ * }
+ * ```
+ */
 export function useMenuDragDrop(
   userMenu: UserMenuItem[],
   setUserMenu: (menu: UserMenuItem[]) => void,

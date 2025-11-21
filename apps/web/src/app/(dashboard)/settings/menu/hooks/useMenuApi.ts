@@ -3,6 +3,63 @@ import { fetchTyped, postTyped } from '../../../../../lib/api-typed'
 import { mapMenuItemRecursively } from '../utils/menu-transformers'
 import type { MenuItemConfig, UserMenuItem } from '../types/menu.types'
 
+/**
+ * Custom hook for managing menu API operations.
+ *
+ * This hook handles all server communication for the menu editor:
+ * - Loading standard menu from system configuration
+ * - Loading user's custom menu preferences
+ * - Saving user menu changes
+ * - Broadcasting menu updates via custom events
+ *
+ * The hook automatically loads both standard and user menus on mount.
+ * When saving, it dispatches a 'menuPreferencesChanged' event that other
+ * components (like the sidebar) can listen to for real-time updates.
+ *
+ * @param {Function} setStandardMenu - Function to update standard menu state
+ * @param {Function} setUserMenu - Function to update user menu state
+ * @param {Function} setLoading - Function to update loading state
+ * @param {Function} setSaving - Function to update saving state
+ *
+ * @returns {Object} API operation functions:
+ *   - loadStandardMenu: Async function to reload standard menu
+ *   - loadUserMenu: Async function to reload user menu
+ *   - saveUserMenu: Async function to save user menu changes
+ *
+ * @example
+ * ```tsx
+ * function MenuEditor() {
+ *   const [standardMenu, setStandardMenu] = useState([])
+ *   const [userMenu, setUserMenu] = useState([])
+ *   const [loading, setLoading] = useState(true)
+ *   const [saving, setSaving] = useState(false)
+ *
+ *   const { saveUserMenu, loadUserMenu } = useMenuApi(
+ *     setStandardMenu,
+ *     setUserMenu,
+ *     setLoading,
+ *     setSaving
+ *   )
+ *
+ *   const handleSave = async () => {
+ *     await saveUserMenu(userMenu)
+ *     toast.success('Menu saved!')
+ *   }
+ *
+ *   const handleReset = async () => {
+ *     await loadUserMenu()
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <button onClick={handleSave}>Save</button>
+ *       <button onClick={handleReset}>Reset</button>
+ *       {/* Menu editor UI *\/}
+ *     </div>
+ *   )
+ * }
+ * ```
+ */
 export function useMenuApi(
   setStandardMenu: (menu: MenuItemConfig[]) => void,
   setUserMenu: (menu: UserMenuItem[]) => void,
