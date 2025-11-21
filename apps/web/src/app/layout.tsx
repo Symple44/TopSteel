@@ -8,6 +8,7 @@ import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
 import { getCSPNonce } from '../lib/security/csp-nonce'
 import { Providers } from './providers'
+import { GlobalErrorBoundary } from '../components/global-error-boundary'
 // import { logStartupInfo } from '../lib/startup-logger'
 
 // Tests désactivés pour réduire les logs
@@ -90,7 +91,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="font-inter antialiased bg-background text-foreground"
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        <GlobalErrorBoundary>
+          <Providers>{children}</Providers>
+        </GlobalErrorBoundary>
       </body>
     </html>
   )

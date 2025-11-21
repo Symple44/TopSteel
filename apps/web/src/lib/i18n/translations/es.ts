@@ -1154,4 +1154,65 @@ export const es = {
       loadError: 'Error al cargar las reglas',
     },
   },
+
+  // Error handling messages
+  errors: {
+    network: {
+      title: 'Error de Conexión',
+      message: 'No se puede conectar al servidor. Verifique su conexión a internet.',
+      action: 'Verificar Conexión',
+    },
+    validation: {
+      title: 'Datos Inválidos',
+      message: 'Por favor corrija los campos resaltados e intente nuevamente.',
+      action: 'Corregir Campos',
+    },
+    auth: {
+      title: 'Autenticación Requerida',
+      message: 'Su sesión ha expirado. Por favor inicie sesión nuevamente.',
+      action: 'Iniciar Sesión',
+    },
+    authorization: {
+      title: 'Acceso Denegado',
+      message: 'No tiene los permisos necesarios para acceder a este recurso.',
+      action: 'Contactar Administrador',
+    },
+    notFound: {
+      title: 'Recurso No Encontrado',
+      message: 'El recurso solicitado no existe o ha sido eliminado.',
+      action: 'Ir al Inicio',
+    },
+    conflict: {
+      title: 'Conflicto Detectado',
+      message: 'Este recurso ya existe o ha sido modificado por otro usuario.',
+      action: 'Actualizar y Reintentar',
+    },
+    rateLimit: {
+      title: 'Demasiadas Solicitudes',
+      message: 'Ha realizado demasiados intentos. Por favor espere {{retryAfter}} segundos.',
+      action: 'Esperar',
+    },
+    server: {
+      title: 'Error del Servidor',
+      message: 'El servidor está experimentando problemas. Por favor intente más tarde.',
+      action: 'Intentar Más Tarde',
+    },
+    unexpected: {
+      title: 'Error Inesperado',
+      message: 'Ocurrió un error inesperado. Nuestro equipo ha sido notificado.',
+      action: 'Recargar Página',
+    },
+    boundary: {
+      title: '¡Oops! Ocurrió un Error',
+      description: 'Algo salió mal en la aplicación.',
+      technicalDetails: 'Detalles Técnicos',
+      errorLabel: 'Error:',
+      componentLabel: 'Componente:',
+      errorId: 'ID de Error:',
+      retry: 'Reintentar',
+      home: 'Inicio',
+      report: 'Reportar',
+      automaticRetries: 'Reintentos Automáticos:',
+    },
+  },
 }

@@ -1662,4 +1662,65 @@ export const en = {
     menuMode: 'Menu mode',
     searchPlaceholder: 'Search in menu...',
   },
+
+  // Error handling messages
+  errors: {
+    network: {
+      title: 'Connection Error',
+      message: 'Unable to connect to the server. Please check your internet connection.',
+      action: 'Check Connection',
+    },
+    validation: {
+      title: 'Invalid Data',
+      message: 'Please correct the highlighted fields and try again.',
+      action: 'Correct Fields',
+    },
+    auth: {
+      title: 'Authentication Required',
+      message: 'Your session has expired. Please log in again.',
+      action: 'Log In',
+    },
+    authorization: {
+      title: 'Access Denied',
+      message: 'You do not have the required permissions to access this resource.',
+      action: 'Contact Administrator',
+    },
+    notFound: {
+      title: 'Resource Not Found',
+      message: 'The requested resource does not exist or has been deleted.',
+      action: 'Go Home',
+    },
+    conflict: {
+      title: 'Conflict Detected',
+      message: 'This resource already exists or has been modified by another user.',
+      action: 'Refresh and Retry',
+    },
+    rateLimit: {
+      title: 'Too Many Requests',
+      message: 'You have made too many attempts. Please wait {{retryAfter}} seconds.',
+      action: 'Wait',
+    },
+    server: {
+      title: 'Server Error',
+      message: 'The server is experiencing issues. Please try again later.',
+      action: 'Try Again Later',
+    },
+    unexpected: {
+      title: 'Unexpected Error',
+      message: 'An unexpected error occurred. Our team has been notified.',
+      action: 'Reload Page',
+    },
+    boundary: {
+      title: 'Oops! An Error Occurred',
+      description: 'Something went wrong in the application.',
+      technicalDetails: 'Technical Details',
+      errorLabel: 'Error:',
+      componentLabel: 'Component:',
+      errorId: 'Error ID:',
+      retry: 'Retry',
+      home: 'Home',
+      report: 'Report',
+      automaticRetries: 'Automatic Retries:',
+    },
+  },
 }

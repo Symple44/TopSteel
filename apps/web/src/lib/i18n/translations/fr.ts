@@ -1858,4 +1858,65 @@ export const fr = {
       loadError: 'Erreur lors du chargement des règles',
     },
   },
+
+  // Error handling messages
+  errors: {
+    network: {
+      title: 'Erreur de connexion',
+      message: 'Impossible de se connecter au serveur. Veuillez vérifier votre connexion internet.',
+      action: 'Vérifier la connexion',
+    },
+    validation: {
+      title: 'Données invalides',
+      message: 'Veuillez corriger les champs en surbrillance et réessayer.',
+      action: 'Corriger les champs',
+    },
+    auth: {
+      title: 'Authentification requise',
+      message: 'Votre session a expiré. Veuillez vous reconnecter.',
+      action: 'Se reconnecter',
+    },
+    authorization: {
+      title: 'Accès refusé',
+      message: "Vous n'avez pas les permissions nécessaires pour accéder à cette ressource.",
+      action: "Contacter l'administrateur",
+    },
+    notFound: {
+      title: 'Ressource introuvable',
+      message: "La ressource demandée n'existe pas ou a été supprimée.",
+      action: "Retour à l'accueil",
+    },
+    conflict: {
+      title: 'Conflit détecté',
+      message: 'Cette ressource existe déjà ou a été modifiée par un autre utilisateur.',
+      action: 'Actualiser et réessayer',
+    },
+    rateLimit: {
+      title: 'Trop de requêtes',
+      message: 'Vous avez effectué trop de tentatives. Veuillez patienter {{retryAfter}} secondes.',
+      action: 'Patienter',
+    },
+    server: {
+      title: 'Erreur serveur',
+      message: 'Le serveur rencontre des difficultés. Veuillez réessayer ultérieurement.',
+      action: 'Réessayer plus tard',
+    },
+    unexpected: {
+      title: 'Erreur inattendue',
+      message: "Une erreur inattendue s'est produite. Nos équipes ont été notifiées.",
+      action: 'Recharger la page',
+    },
+    boundary: {
+      title: "Oups ! Une erreur s'est produite",
+      description: "Quelque chose s'est mal passé dans l'application.",
+      technicalDetails: 'Détails techniques',
+      errorLabel: 'Erreur :',
+      componentLabel: 'Composant :',
+      errorId: "ID d'erreur :",
+      retry: 'Réessayer',
+      home: 'Accueil',
+      report: 'Signaler',
+      automaticRetries: 'Tentatives automatiques :',
+    },
+  },
 }
