@@ -41,9 +41,6 @@ export async function POST(request: NextRequest) {
     // Joindre les cookies dédupliqués
     const cookieHeader = Array.from(cookieMap.values()).join('; ')
 
-    console.log('[Login Route] CSRF Token:', csrfToken?.substring(0, 20) + '...')
-    console.log('[Login Route] Cookies to send:', cookieHeader)
-
     // Appeler l'API backend pour l'authentification
     const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
@@ -56,23 +53,19 @@ export async function POST(request: NextRequest) {
     })
 
     if (!loginResponse?.ok) {
-      console.log('[Login Route] Backend returned error status:', loginResponse.status)
       let errorMessage = 'Authentication failed'
       try {
         const error = await loginResponse?.json()
         errorMessage = error.message || error.error || errorMessage
-        console.log('[Login Route] Backend error:', error)
       } catch (e) {
         // Si le backend ne retourne pas de JSON valide
         const textError = await loginResponse?.text()
-        console.log('[Login Route] Backend returned non-JSON error:', textError)
         errorMessage = textError || errorMessage
       }
       return NextResponse?.json({ error: errorMessage }, { status: loginResponse.status })
     }
 
     const response_data = await loginResponse?.json()
-    console.log('[Login Route] Backend success response:', JSON.stringify(response_data, null, 2))
 
     // Le backend retourne { data: { user, accessToken, ... } }
     const { user, accessToken, refreshToken, expiresIn } = response_data?.data || {}

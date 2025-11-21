@@ -403,13 +403,9 @@ export default function CompanySelector({
   const ids = useFormFieldIds(['saveAsDefault'])
 
   const loadCompanies = useCallback(async () => {
-    console.log('[CompanySelector DEBUG] ===== loadCompanies CALLED =====')
-    console.log('[CompanySelector DEBUG] Timestamp:', new Date().toISOString())
     try {
       setLoading(true)
       const data = await authService?.getUserCompanies()
-      console.log('[CompanySelector DEBUG] API Response:', data)
-      console.log('[CompanySelector DEBUG] Response type:', typeof data, 'isArray:', Array.isArray(data))
 
       // S'assurer que data est un tableau
       let companiesArray: Company[] = []
@@ -422,8 +418,6 @@ export default function CompanySelector({
         companiesArray = Array.isArray(potentialArray) ? (potentialArray as Company[]) : []
       }
 
-      console.log('[CompanySelector DEBUG] Final companiesArray:', companiesArray)
-      console.log('[CompanySelector DEBUG] Companies count:', companiesArray.length)
       setCompanies(companiesArray)
 
       // Sélectionner automatiquement la société par défaut s'il y en a une
@@ -444,17 +438,12 @@ export default function CompanySelector({
   }, [t])
 
   useEffect(() => {
-    console.log('[CompanySelector DEBUG] ===== useEffect FIRED =====')
-    console.log('[CompanySelector DEBUG] This should ONLY appear ONCE per component mount')
-    console.log('[CompanySelector DEBUG] Timestamp:', new Date().toISOString())
-
     // Charger les sociétés une seule fois au montage
     loadCompanies()
 
     // Détecter le nombre d'onglets ouverts
     const count = getApproximateTabCount()
     setTabCount(count)
-    console.log('[CompanySelector DEBUG] Tab count detected:', count)
 
     // Précharger les rôles depuis l'API des paramètres
     // Ne plus vider le cache systématiquement, utiliser le cache persistant

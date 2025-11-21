@@ -472,16 +472,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           // Pas de société par défaut ou erreur
           // SUPER_ADMIN peut accéder sans société, autres utilisateurs doivent sélectionner
           const isSuperAdmin = user.role === 'SUPER_ADMIN'
-          console.log(
-            '[AuthProvider] No default company. User role:',
-            user.role,
-            'isSuperAdmin:',
-            isSuperAdmin
-          )
 
           if (isSuperAdmin) {
             // SUPER_ADMIN: Rediriger directement vers le dashboard sans société
-            console.log('[AuthProvider] SUPER_ADMIN detected, redirecting to dashboard...')
             const newState = {
               isLoading: false,
               isAuthenticated: true,
@@ -498,11 +491,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
             // Rediriger immédiatement vers le dashboard
             if (typeof window !== 'undefined') {
-              console.log('[AuthProvider] Redirecting to /dashboard...')
               window.location.href = '/dashboard'
             }
           } else {
-            console.log('[AuthProvider] Regular user, showing company selector...')
             // Utilisateur standard: Forcer la sélection de société
             const newState = {
               isLoading: false,
