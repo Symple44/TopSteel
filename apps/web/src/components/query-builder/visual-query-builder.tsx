@@ -31,6 +31,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslation } from '../../lib/i18n/hooks'
 import type { QueryBuilderColumn } from '../../types/query-builder.types'
 import { callClientApi } from '../../utils/backend-api'
 import { DataTablePreview } from './datatable-preview'
@@ -69,6 +70,7 @@ interface VisualQueryBuilderProps {
 }
 
 export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryBuilderProps) {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [availableTables, setAvailableTables] = useState<Table[]>([])
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
@@ -243,7 +245,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
    */
   const validateQueryExecution = (sql: string): boolean => {
     if (!sql) {
-      toast.error('Veuillez sélectionner au moins une table et une colonne')
+      toast.error(t('messages.selectTableColumn'))
       return false
     }
     return true
@@ -277,7 +279,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
       ? result
       : (result as any)?.data || (result as any)?.rows || []
     setPreviewData(data)
-    toast.success(`Requête exécutée avec succès (${data.length} résultats)`)
+    toast.success(t('messages.querySuccess', { count: data.length }))
   }
 
   /**
@@ -285,9 +287,9 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
    */
   const handleQueryError = (error: unknown) => {
     if (error instanceof Error) {
-      toast.error(`Erreur lors de l'exécution: ${error.message}`)
+      toast.error(t('messages.executionError', { message: error.message }))
     } else {
-      toast.error("Erreur lors de l'exécution de la requête")
+      toast.error(t('messages.queryExecutionError'))
     }
   }
 
@@ -340,7 +342,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     setLoading(true)
     try {
       await saveQueryRequest(queryData)
-      toast.success('Requête sauvegardée avec succès')
+      toast.success(t('messages.querySaved'))
     } catch (error) {
       handleSaveError(error)
     } finally {
@@ -353,7 +355,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
    */
   const validateQuerySave = (): boolean => {
     if (!queryName?.trim()) {
-      toast.error('Veuillez donner un nom à votre requête')
+      toast.error(t('messages.queryNameRequired'))
       return false
     }
     return true
@@ -400,9 +402,9 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
    */
   const handleSaveError = (error: unknown) => {
     if (error instanceof Error) {
-      toast.error(`Erreur lors de la sauvegarde: ${error.message}`)
+      toast.error(t('messages.saveError', { message: error.message }))
     } else {
-      toast.error('Erreur lors de la sauvegarde')
+      toast.error(t('messages.saveErrorGeneric'))
     }
   }
 
@@ -438,7 +440,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
             </Button>
             <Button type="button" onClick={saveQuery} disabled={loading}>
               <Save className="h-4 w-4 mr-2" />
-              Sauvegarder
+              {t('actions.save')}
             </Button>
           </div>
         </div>
@@ -656,7 +658,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                           onChange={(e) => setSortBy(e.target.value)}
                           className="w-full text-sm border rounded px-2 py-1 mt-1"
                         >
-                          <option value="">Aucun tri</option>
+                          <option value="">{t('filters.noSort')}</option>
                           {selectedColumns?.map((col) => (
                             <option key={col.column} value={col.column}>
                               {col.column}

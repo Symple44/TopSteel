@@ -15,6 +15,7 @@ import {
 import { AlertCircle, Package2, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { type Article, useEffectuerInventaire } from '../../hooks/use-articles'
+import { useTranslation } from '../../lib/i18n/hooks'
 import { sanitizeInput } from '../../lib/security-utils'
 import { cn, formatCurrency } from '../../lib/utils'
 
@@ -35,6 +36,7 @@ const defaultFormData: FormData = {
 }
 
 export function InventoryDialog({ open, onOpenChange, article }: InventoryDialogProps) {
+  const { t } = useTranslation()
   const ids = useFormFieldIds(['stockPhysiqueReel', 'commentaire'])
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -264,7 +266,7 @@ export function InventoryDialog({ open, onOpenChange, article }: InventoryDialog
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Annuler
+                {t('actions.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Enregistrement...' : "Confirmer l'inventaire"}

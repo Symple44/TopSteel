@@ -25,6 +25,7 @@ import {
   useCreateArticle,
   useUpdateArticle,
 } from '../../hooks/use-articles'
+import { useTranslation } from '../../lib/i18n/hooks'
 import { sanitizeInput } from '../../lib/security-utils'
 import { cn } from '../../lib/utils'
 
@@ -104,6 +105,7 @@ const defaultFormData: FormData = {
 }
 
 export function ArticleFormDialog({ open, onOpenChange, article, mode }: ArticleFormDialogProps) {
+  const { t } = useTranslation()
   const ids = useFormFieldIds([
     'reference',
     'designation',
@@ -762,7 +764,7 @@ export function ArticleFormDialog({ open, onOpenChange, article, mode }: Article
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting

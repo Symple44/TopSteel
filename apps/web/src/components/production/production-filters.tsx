@@ -16,6 +16,7 @@ import {
 } from '@erp/ui'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface ProductionFiltersProps {
   onFiltersChange?: (filters: ProductionFilters) => void
@@ -32,6 +33,7 @@ interface ProductionFilters {
 }
 
 export function ProductionFilters({ onFiltersChange, onReset }: ProductionFiltersProps) {
+  const { t } = useTranslation()
   const [filters, setFilters] = useState<ProductionFilters>({})
 
   // ✅ Handler unique et cohérent
@@ -75,7 +77,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Rechercher par numéro, description..."
+              placeholder={t('search.byNumberDesc')}
               value={filters.search || ''}
               onChange={handleInputChange('search')}
               className="pl-10"
@@ -97,7 +99,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
               <SelectContent>
                 <SelectItem value="">Tous les statuts</SelectItem>
                 <SelectItem value="PLANIFIE">📋 Planifié</SelectItem>
-                <SelectItem value="EN_COURS">⚙️ En cours</SelectItem>
+                <SelectItem value="EN_COURS">⚙️ {t('status.inProgress')}</SelectItem>
                 <SelectItem value="EN_ATTENTE">⏸️ En attente</SelectItem>
                 <SelectItem value="TERMINE">✅ Terminé</SelectItem>
                 <SelectItem value="ANNULE">❌ Annulé</SelectItem>
@@ -188,6 +190,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
 
 // ✅ BONUS: Version avec validation de dates
 export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: ProductionFiltersProps) {
+  const { t } = useTranslation()
   const [filters, setFilters] = useState<ProductionFilters>({})
   const [dateError, setDateError] = useState<string>('')
 
@@ -249,7 +252,7 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Rechercher par numéro d'ordre, description, projet..."
+              placeholder={t('search.byOrderNumber')}
               value={filters.search || ''}
               onChange={handleInputChange('search')}
               className="pl-10"
@@ -271,7 +274,7 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
               <SelectContent>
                 <SelectItem value="">Tous les statuts</SelectItem>
                 <SelectItem value="PLANIFIE">📋 Planifié</SelectItem>
-                <SelectItem value="EN_COURS">⚙️ En cours</SelectItem>
+                <SelectItem value="EN_COURS">⚙️ {t('status.inProgress')}</SelectItem>
                 <SelectItem value="EN_ATTENTE">⏸️ En attente</SelectItem>
                 <SelectItem value="TERMINE">✅ Terminé</SelectItem>
                 <SelectItem value="ANNULE">❌ Annulé</SelectItem>

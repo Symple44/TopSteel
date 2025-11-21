@@ -25,12 +25,14 @@ import {
   templateCategories,
 } from '../../lib/templates/predefined-templates'
 import { cn } from '../../lib/utils'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface TemplateSelectorProps {
   className?: string
 }
 
 export function TemplateSelector({ className }: TemplateSelectorProps) {
+  const { t } = useTranslation()
   const { settings: _settings } = useAppearanceSettings()
   const { currentTemplate: _currentTemplate, isTemplateApplied, applyTemplate } = useTemplates()
   const [searchQuery, setSearchQuery] = useState('')
@@ -102,7 +104,7 @@ export function TemplateSelector({ className }: TemplateSelectorProps) {
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher un template..."
+            placeholder={t('search.template')}
             value={searchQuery}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
             className="pl-10"

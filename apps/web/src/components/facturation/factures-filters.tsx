@@ -11,18 +11,20 @@ import {
   SelectValue,
 } from '@erp/ui'
 import { Filter, Search, X } from 'lucide-react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface FacturesFiltersProps {
   onFiltersChange?: (filters: unknown) => void
 }
 
 export function FacturesFilters({ onFiltersChange: _onFiltersChange }: FacturesFiltersProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex-1">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input placeholder="Rechercher par référence, client..." className="pl-10" />
+          <Input placeholder={t('search.byRefClient')} className="pl-10" />
         </div>
       </div>
 

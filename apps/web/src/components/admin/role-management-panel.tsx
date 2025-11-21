@@ -33,6 +33,7 @@ import { Edit, Eye, Lock, Plus, Settings, Shield, Trash2, Users } from 'lucide-r
 import { useCallback, useEffect, useState } from 'react'
 import { GroupManagementPanel } from '../../components/admin/group-management-panel'
 import { PermissionHide } from '../../components/auth/permission-guard'
+import { useTranslation } from '../../lib/i18n/hooks'
 import {
   ACCESS_LEVEL_COLORS,
   ACCESS_LEVEL_LABELS,
@@ -300,6 +301,7 @@ export function RoleManagementPanel() {
 
 // Composant pour créer/éditer un rôle
 function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () => void }) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     name: role?.name || '',
     description: role?.description || '',
@@ -368,9 +370,9 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
 
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
-          Annuler
+          {t('actions.cancel')}
         </Button>
-        <Button type="submit">{role ? 'Modifier' : 'Créer'}</Button>
+        <Button type="submit">{role ? t('actions.edit') : t('actions.create')}</Button>
       </div>
     </form>
   )

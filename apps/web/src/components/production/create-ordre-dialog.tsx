@@ -16,6 +16,7 @@ import {
   useFormFieldIds,
 } from '@erp/ui'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface CreateOrdreDialogProps {
   open: boolean
@@ -24,6 +25,7 @@ interface CreateOrdreDialogProps {
 }
 
 export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
+  const { t } = useTranslation()
   const ids = useFormFieldIds(['numero', 'description', 'dateDebut', 'dateFin', 'projet'])
   const [formData, setFormData] = useState({
     numero: '',
@@ -160,9 +162,9 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
-            <Button type="submit">Créer l'ordre</Button>
+            <Button type="submit">{t('actions.createOrder')}</Button>
           </div>
         </form>
       </DialogContent>
@@ -353,9 +355,9 @@ export function CreateOrdreDialogAdvanced({
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
-            <Button type="submit">Créer l'ordre</Button>
+            <Button type="submit">{t('actions.createOrder')}</Button>
           </div>
         </form>
       </DialogContent>

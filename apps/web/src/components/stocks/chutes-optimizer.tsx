@@ -4,6 +4,7 @@
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@erp/ui'
 import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface Chute {
   id: string
@@ -37,6 +38,7 @@ interface ChutesOptimizerProps {
 }
 
 export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimizerProps) {
+  const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedChute, setSelectedChute] = useState<Chute | null>(null)
   const [optimizationResults, setOptimizationResults] = useState<
@@ -97,7 +99,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Rechercher par matériau, dimensions..."
+                  placeholder={t('search.byMaterialDim')}
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

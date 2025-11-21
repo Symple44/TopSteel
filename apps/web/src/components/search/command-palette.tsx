@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { type SearchResult, useGlobalSearch } from '../../hooks/use-global-search'
 import { cn } from '../../lib/utils'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 // Mapping des types vers les icônes
 const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -93,7 +94,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter()
-  // const { t } = useTranslation('common') // Unused for now
+  const { t } = useTranslation()
   const [selectedTab, setSelectedTab] = useState<string | null>(null)
 
   const {
@@ -200,7 +201,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               type="text"
               value={query}
               onChange={(e) => setQuery(e?.target?.value)}
-              placeholder="Rechercher clients, articles, projets..."
+              placeholder={t('search.global')}
               className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground text-base"
               autoFocus
             />

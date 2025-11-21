@@ -18,6 +18,7 @@ import {
 } from '@erp/ui'
 import { AlertCircle, Package } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface AddMaterialDialogProps {
   open: boolean
@@ -54,6 +55,7 @@ interface FormData {
 }
 
 export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialDialogProps) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState<FormData>({
     reference: '',
     designation: '',
@@ -452,7 +454,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
               className="flex-1"
               disabled={loading || Object.keys(errors).some((key) => errors[key])}
             >
-              {loading ? 'Ajout en cours...' : 'Ajouter le matériau'}
+              {loading ? 'Ajout en cours...' : t('actions.addMaterial')}
             </Button>
           </div>
         </form>

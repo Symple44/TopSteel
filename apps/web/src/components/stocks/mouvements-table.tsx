@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, Input } from '@erp/ui'
 import { ArrowLeft, ArrowRight, Calendar, Package, RotateCcw, Search, User } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface Mouvement {
   id: string
@@ -33,6 +34,7 @@ export function MouvementsTable({
   onSearch,
   onFilter,
 }: MouvementsTableProps) {
+  const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
   const [,] = useState('')
 
@@ -171,7 +173,7 @@ export function MouvementsTable({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Rechercher par matériau, référence, utilisateur..."
+              placeholder={t('search.byMaterialRef')}
               className="pl-10"
               value={searchQuery}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e?.target?.value)}

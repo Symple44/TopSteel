@@ -364,6 +364,7 @@ export const es = {
     timeout: 'Tiempo de espera agotado',
     tryAgain: 'Intentar de nuevo',
     contactSupport: 'Contactar soporte',
+    websocket: 'No se puede crear conexión WebSocket',
 
     // Páginas de error
     title: 'Error',
@@ -615,6 +616,47 @@ export const es = {
     active: 'Activo',
     inactive: 'Inactivo',
     pending: 'Pendiente',
+    inProgress: 'En Curso',
+    system: 'Sistema',
+  },
+
+  // Warehouse namespace
+  warehouse: {
+    main: 'Almacén principal',
+  },
+
+  // Address namespace
+  address: {
+    main: 'Dirección principal',
+    additionalInfo: 'Información adicional',
+  },
+
+  // Filters namespace
+  filters: {
+    noSort: 'Sin ordenar',
+  },
+
+  // Menu namespace
+  menu: {
+    untitled: 'Sin título',
+    hidden: 'Oculto',
+    title: 'Título',
+    type: 'Tipo',
+    icon: 'Icono',
+    order: 'Orden',
+    visible: 'Visible',
+  },
+
+  // Messages namespace (from query builder)
+  messages: {
+    selectTableColumn: 'Por favor seleccione al menos una tabla y una columna',
+    querySuccess: 'Consulta ejecutada correctamente ({{count}} resultados)',
+    executionError: 'Error de ejecución: {{message}}',
+    queryExecutionError: 'Error al ejecutar consulta',
+    queryNameRequired: 'Por favor proporcione un nombre para su consulta',
+    querySaved: 'Consulta guardada correctamente',
+    saveError: 'Error al guardar: {{message}}',
+    saveErrorGeneric: 'Error al guardar',
   },
 
   system: {
@@ -862,6 +904,29 @@ export const es = {
     processing: 'Procesando...',
     validating: 'Validando...',
     authenticating: 'Autenticando...',
+    cancel: 'Cancelar',
+    save: 'Guardar',
+    edit: 'Editar',
+    create: 'Crear',
+    createOrder: 'Crear Orden',
+    addToMenu: 'Añadir al Menú',
+    addMaterial: 'Añadir Material',
+    saveChanges: 'Guardar Cambios',
+    createMaterial: 'Crear nuevo material',
+  },
+
+  // Search namespace
+  search: {
+    template: 'Buscar plantilla...',
+    global: 'Buscar clientes, artículos, proyectos...',
+    byNumberDesc: 'Buscar por número, descripción...',
+    byOrderNumber: 'Buscar por número de orden, descripción, proyecto...',
+    byRefClient: 'Buscar por referencia, cliente...',
+    byMaterialRef: 'Buscar por material, referencia, usuario...',
+    byNameEmail: 'Buscar por nombre o email...',
+    byMaterialDim: 'Buscar por material, dimensiones...',
+    byNameAuthor: 'Buscar por nombre o autor...',
+    scrap: 'Buscar un desperdicio...',
   },
 
   // Status indicators

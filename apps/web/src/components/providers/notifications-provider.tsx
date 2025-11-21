@@ -13,6 +13,7 @@ import type {
   NotificationsState,
 } from '../../types/notifications'
 import { callClientApi } from '../../utils/backend-api'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 // ===== TYPES ET INTERFACES =====
 // Les types sont importés de @/types/notifications
@@ -160,6 +161,7 @@ export function useNotifications(): NotificationsContextType {
 
 export function NotificationsProvider({ children }: NotificationsProviderProps) {
   const [state, dispatch] = useReducer(notificationsReducer, initialState)
+  const { t } = useTranslation()
 
   // Safe check for auth context
   // biome-ignore lint/correctness/useHookAtTopLevel: These hooks need to be called conditionally due to provider hierarchy
@@ -433,10 +435,10 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
     } catch (error) {
       console.error('[NotificationsProvider] Erreur création WebSocket:', error)
-      dispatch({ type: 'SET_ERROR', payload: 'Impossible de créer la connexion WebSocket' })
+      dispatch({ type: 'SET_ERROR', payload: t('errors.websocket') })
     }
     */
-  }, [user])
+  }, [user, t])
 
   // ===== EFFECTS =====
 

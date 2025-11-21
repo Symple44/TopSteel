@@ -18,6 +18,7 @@ const SelectValue = UI.SelectValue
 
 import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface ProjetDocumentsTabProps {
   projet?: Projet
@@ -82,6 +83,7 @@ export function ProjetDocumentsTab({
   projet: _projet,
   projetId: _projetId,
 }: ProjetDocumentsTabProps) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('tous')
   const [selectedType, setSelectedType] = useState<string>('tous')
@@ -159,7 +161,7 @@ export function ProjetDocumentsTab({
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Rechercher par nom ou auteur..."
+                  placeholder={t('search.byNameAuthor')}
                   value={searchTerm}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setSearchTerm(e?.target?.value)
@@ -303,7 +305,7 @@ export function ProjetDocumentsTab({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(document)}
-                        title="Modifier"
+                        title={t('actions.edit')}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

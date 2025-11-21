@@ -332,7 +332,7 @@ export function AddressesManager({
                     <FormItem>
                       <FormLabel>Libellé</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Adresse principale" />
+                        <Input {...field} placeholder={t('address.main')} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -686,7 +686,7 @@ export function AddressesManager({
                     <FormItem>
                       <FormLabel>Notes</FormLabel>
                       <FormControl>
-                        <Textarea {...field} placeholder="Informations complémentaires" rows={3} />
+                        <Textarea {...field} placeholder={t('address.additionalInfo')} rows={3} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

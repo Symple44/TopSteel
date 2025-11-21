@@ -30,6 +30,7 @@ import { useState } from 'react'
 import { cn } from '../../../../../lib/utils'
 import type { Group, MenuItem, MenuType, Permission, Role } from '../../../../../types/menu'
 import { MenuItemRightsEditor } from './menu-item-rights-editor'
+import { useTranslation } from '../../../../../lib/i18n/hooks'
 
 interface MenuItemEditorProps {
   item: MenuItem
@@ -58,6 +59,7 @@ export function MenuItemEditor({
   availableRoles = [],
   availablePermissions = [],
 }: MenuItemEditorProps) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(true)
 
   const currentType = menuTypes?.find((t) => t.value === item.type)
@@ -168,13 +170,13 @@ export function MenuItemEditor({
                 <GripVertical className="h-4 w-4" />
               </Button>
               {getTypeIcon(item.type)}
-              <span className="font-medium">{item.title || 'Sans titre'}</span>
+              <span className="font-medium">{item.title || t('menu.untitled')}</span>
               <Badge variant="outline" className="text-xs">
                 {currentType?.label}
               </Badge>
               {!item.isVisible && (
                 <Badge variant="secondary" className="text-xs">
-                  Masqué
+                  {t('menu.hidden')}
                 </Badge>
               )}
             </div>
@@ -201,7 +203,7 @@ export function MenuItemEditor({
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Titre</Label>
+                <Label>{t('menu.title')}</Label>
                 <Input
                   value={item.title}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -212,7 +214,7 @@ export function MenuItemEditor({
               </div>
 
               <div className="space-y-2">
-                <Label>Type</Label>
+                <Label>{t('menu.type')}</Label>
                 <Select value={item.type} onValueChange={handleTypeChange}>
                   <SelectTrigger>
                     <SelectValue />
@@ -236,7 +238,7 @@ export function MenuItemEditor({
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Icône</Label>
+                <Label>{t('menu.icon')}</Label>
                 <Input
                   value={item.icon || ''}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -247,7 +249,7 @@ export function MenuItemEditor({
               </div>
 
               <div className="space-y-2">
-                <Label>Ordre</Label>
+                <Label>{t('menu.order')}</Label>
                 <Input
                   type="number"
                   value={item.orderIndex}
@@ -258,13 +260,13 @@ export function MenuItemEditor({
               </div>
 
               <div className="space-y-2">
-                <Label>Visible</Label>
+                <Label>{t('menu.visible')}</Label>
                 <div className="flex items-center space-x-2 pt-2">
                   <Switch
                     checked={item.isVisible}
                     onCheckedChange={(checked) => handleFieldChange('isVisible', checked)}
                   />
-                  <span className="text-sm">{item.isVisible ? 'Visible' : 'Masqué'}</span>
+                  <span className="text-sm">{item.isVisible ? t('menu.visible') : t('menu.hidden')}</span>
                 </div>
               </div>
             </div>

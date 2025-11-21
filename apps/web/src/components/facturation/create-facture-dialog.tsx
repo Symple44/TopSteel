@@ -19,6 +19,7 @@ import {
 } from '@erp/ui'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface CreateFactureDialogProps {
   open?: boolean
@@ -27,6 +28,7 @@ interface CreateFactureDialogProps {
 }
 
 export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -147,10 +149,10 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
           </div>
           <div className="flex justify-end space-x-2">
             <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Création...' : 'Créer'}
+              {loading ? 'Création...' : t('actions.create')}
             </Button>
           </div>
         </form>

@@ -3,6 +3,7 @@
 
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 import { AlertTriangle, CheckCircle, Clock, Edit, Eye, Pause, Play } from 'lucide-react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface ProductionTableProps {
   ordres: OrdreFabrication[]
@@ -25,10 +26,11 @@ interface OrdreFabrication {
 }
 
 const StatusBadge = ({ statut }: { statut: string }) => {
+  const { t } = useTranslation()
   const config = {
     EN_ATTENTE: { label: 'En attente', variant: 'secondary' as const, icon: Clock },
     PLANIFIE: { label: 'Planifié', variant: 'default' as const, icon: Clock },
-    EN_COURS: { label: 'En cours', variant: 'default' as const, icon: Play },
+    EN_COURS: { label: t('status.inProgress'), variant: 'default' as const, icon: Play },
     TERMINE: { label: 'Terminé', variant: 'default' as const, icon: CheckCircle },
     PAUSE: { label: 'Pause', variant: 'secondary' as const, icon: Pause },
     ANNULE: { label: 'Annulé', variant: 'destructive' as const, icon: AlertTriangle },

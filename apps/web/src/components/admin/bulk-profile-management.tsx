@@ -54,6 +54,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '../../utils/backend-api'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface User {
   id: string
@@ -160,6 +161,7 @@ const BULK_OPERATIONS: BulkOperation[] = [
 ]
 
 export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfileManagementProps) {
+  const { t } = useTranslation()
   const [users, setUsers] = useState<User[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [groups, setGroups] = useState<Group[]>([])
@@ -409,7 +411,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">Tous</SelectItem>
-                          <SelectItem value="active">Actifs</SelectItem>
+                          <SelectItem value="active">{t('status.active')}</SelectItem>
                           <SelectItem value="inactive">Inactifs</SelectItem>
                         </SelectContent>
                       </Select>

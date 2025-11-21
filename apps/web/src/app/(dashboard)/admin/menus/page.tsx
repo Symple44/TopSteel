@@ -23,6 +23,7 @@ import type { MenuConfiguration, MenuItem } from '../../../../types/menu'
 import { MenuConfigurationEditor } from './components/menu-configuration-editor'
 import { MenuConfigurationList } from './components/menu-configuration-list'
 import { MenuPreview } from './components/menu-preview'
+import { useTranslation } from '../../../../lib/i18n/hooks'
 
 // API version with optional fields that we need to convert
 interface ApiMenuConfiguration {
@@ -93,6 +94,7 @@ interface MenuType {
 }
 
 export default function MenuAdminPage() {
+  const { t } = useTranslation()
   const [configurations, setConfigurations] = useState<MenuConfiguration[]>([])
   const [_activeConfig, setActiveConfig] = useState<MenuConfiguration | null>(null)
   const [selectedConfig, setSelectedConfig] = useState<MenuConfiguration | null>(null)
@@ -293,8 +295,8 @@ export default function MenuAdminPage() {
                         <div>
                           <CardTitle className="flex items-center gap-2">
                             {selectedConfig.name}
-                            {selectedConfig.isActive && <Badge variant="default">Active</Badge>}
-                            {selectedConfig.isSystem && <Badge variant="secondary">Système</Badge>}
+                            {selectedConfig.isActive && <Badge variant="default">{t('status.active')}</Badge>}
+                            {selectedConfig.isSystem && <Badge variant="secondary">{t('status.system')}</Badge>}
                           </CardTitle>
                           <CardDescription>{selectedConfig.description}</CardDescription>
                         </div>

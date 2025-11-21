@@ -55,6 +55,7 @@ import {
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useTranslation } from '../../lib/i18n/hooks'
 import {
   useCreatePartnerSite,
   useDeletePartnerSite,
@@ -112,6 +113,7 @@ interface SitesManagerProps {
 }
 
 export function SitesManager({ partnerId, sites: initialSites }: SitesManagerProps) {
+  const { t } = useTranslation()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingSite, setEditingSite] = useState<PartnerSite | null>(null)
   const [activeTab, setActiveTab] = useState('general')
@@ -377,7 +379,7 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                         <FormItem>
                           <FormLabel>Nom</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Dépôt principal" />
+                            <Input {...field} placeholder={t('warehouse.main')} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -876,8 +878,8 @@ export function SitesManager({ partnerId, sites: initialSites }: SitesManagerPro
                   {createSite?.isPending || updateSite?.isPending
                     ? 'Enregistrement...'
                     : editingSite
-                      ? 'Modifier'
-                      : 'Créer'}
+                      ? t('actions.edit')
+                      : t('actions.create')}
                 </Button>
               </DialogFooter>
             </form>

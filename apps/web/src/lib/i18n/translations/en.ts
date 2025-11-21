@@ -803,6 +803,7 @@ export const en = {
     timeout: 'Request timeout',
     tryAgain: 'Try again',
     contactSupport: 'Contact support',
+    websocket: 'Unable to create WebSocket connection',
 
     // Error pages
     title: 'Error',
@@ -1236,6 +1237,47 @@ export const en = {
     active: 'Active',
     inactive: 'Inactive',
     pending: 'Pending',
+    inProgress: 'In Progress',
+    system: 'System',
+  },
+
+  // Warehouse namespace
+  warehouse: {
+    main: 'Main warehouse',
+  },
+
+  // Address namespace
+  address: {
+    main: 'Main address',
+    additionalInfo: 'Additional information',
+  },
+
+  // Filters namespace
+  filters: {
+    noSort: 'No sorting',
+  },
+
+  // Menu namespace
+  menu: {
+    untitled: 'Untitled',
+    hidden: 'Hidden',
+    title: 'Title',
+    type: 'Type',
+    icon: 'Icon',
+    order: 'Order',
+    visible: 'Visible',
+  },
+
+  // Messages namespace (from query builder)
+  messages: {
+    selectTableColumn: 'Please select at least one table and one column',
+    querySuccess: 'Query executed successfully ({{count}} results)',
+    executionError: 'Execution error: {{message}}',
+    queryExecutionError: 'Query execution error',
+    queryNameRequired: 'Please provide a name for your query',
+    querySaved: 'Query saved successfully',
+    saveError: 'Save error: {{message}}',
+    saveErrorGeneric: 'Save error',
   },
 
   system: {
@@ -1544,6 +1586,29 @@ export const en = {
     processing: 'Processing...',
     validating: 'Validating...',
     authenticating: 'Authenticating...',
+    cancel: 'Cancel',
+    save: 'Save',
+    edit: 'Edit',
+    create: 'Create',
+    createOrder: 'Create Order',
+    addToMenu: 'Add to Menu',
+    addMaterial: 'Add Material',
+    saveChanges: 'Save Changes',
+    createMaterial: 'Create new material',
+  },
+
+  // Search namespace
+  search: {
+    template: 'Search for a template...',
+    global: 'Search clients, articles, projects...',
+    byNumberDesc: 'Search by number, description...',
+    byOrderNumber: 'Search by order number, description, project...',
+    byRefClient: 'Search by reference, client...',
+    byMaterialRef: 'Search by material, reference, user...',
+    byNameEmail: 'Search by name or email...',
+    byMaterialDim: 'Search by material, dimensions...',
+    byNameAuthor: 'Search by name or author...',
+    scrap: 'Search for a scrap...',
   },
 
   // Status indicators

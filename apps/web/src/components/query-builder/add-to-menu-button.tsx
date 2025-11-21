@@ -22,6 +22,7 @@ import { Menu, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from '../../hooks/use-toast'
 import { postTyped } from '../../lib/api-typed'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface AddToMenuButtonProps {
   queryBuilderId: string
@@ -45,6 +46,7 @@ export function AddToMenuButton({
   queryBuilderName,
   onAddedToMenu,
 }: AddToMenuButtonProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -109,7 +111,7 @@ export function AddToMenuButton({
       <DialogTrigger asChild>
         <Button type="button" variant="outline" size="sm">
           <Menu className="h-4 w-4 mr-2" />
-          Ajouter au Menu
+          {t('actions.addToMenu')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

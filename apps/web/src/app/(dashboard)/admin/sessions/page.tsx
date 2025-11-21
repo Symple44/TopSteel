@@ -48,6 +48,7 @@ import { AdminGuard } from '../../../../components/auth/admin-guard'
 import { PermissionHide } from '../../../../components/auth/permission-guard'
 import type { Role } from '../../../../hooks/use-permissions'
 import { callClientApi } from '../../../../utils/backend-api'
+import { useTranslation } from '../../../../lib/i18n/hooks'
 
 // Fonction utilitaire pour formater les dates
 const formatDateTime = (date: string | Date) => {
@@ -135,6 +136,7 @@ export default function SessionsManagementPage() {
 }
 
 function SessionsManagementContent() {
+  const { t } = useTranslation()
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([])
   const [connectionHistory, setConnectionHistory] = useState<ConnectionHistory[]>([])
   const [loading, setLoading] = useState(true)
@@ -343,7 +345,7 @@ function SessionsManagementContent() {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
-                      placeholder="Rechercher par nom ou email..."
+                      placeholder={t('search.byNameEmail')}
                       value={searchTerm}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setSearchTerm(e?.target?.value)
@@ -565,7 +567,7 @@ function SessionsManagementContent() {
                         <span className="text-sm">{formatDateTime(session.logoutTime)}</span>
                       ) : (
                         <Badge variant="default" className="bg-green-100 text-green-800">
-                          En cours
+                          {t('status.inProgress')}
                         </Badge>
                       )}
                     </TableCell>

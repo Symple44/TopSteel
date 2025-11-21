@@ -1,6 +1,7 @@
 import { Button, Input } from '@erp/ui'
 import { Edit, Eye, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface Chute {
   id: string
@@ -34,6 +35,7 @@ interface ChutesTableProps {
 }
 
 export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: ChutesTableProps) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +92,7 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Rechercher une chute..."
+          placeholder={t('search.scrap')}
           value={searchTerm}
           onChange={handleSearchChange}
           className="pl-10"

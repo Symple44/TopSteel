@@ -23,6 +23,7 @@ import { useDebounce } from '../../../../hooks/use-debounce'
 import { useMaterialStatistics, useMaterials } from '../../../../hooks/use-materials'
 import { sanitizeSearchQuery } from '../../../../lib/security-utils'
 import { formatCurrency } from '../../../../lib/utils'
+import { useTranslation } from '../../../../lib/i18n/hooks'
 
 interface MaterialFiltersLocal {
   type?: string
@@ -32,6 +33,7 @@ interface MaterialFiltersLocal {
 }
 
 export default function MaterialsPage() {
+  const { t } = useTranslation()
   const [filters, setFilters] = useState<MaterialFiltersLocal>({})
   const [searchInput, setSearchInput] = useState('')
   const [formMode, _setFormMode] = useState<'create' | 'edit'>('create')
@@ -188,9 +190,9 @@ export default function MaterialsPage() {
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Exporter
           </Button>
-          <Button type="button" aria-label="Créer un nouveau matériau" onClick={handleCreate}>
+          <Button type="button" aria-label={t('actions.createMaterial')} onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
-            Nouveau matériau
+            {t('actions.createMaterial')}
           </Button>
         </div>
       </div>

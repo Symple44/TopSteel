@@ -4,6 +4,7 @@
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { BarChart3, Calendar, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface GanttTask {
   id: string
@@ -35,6 +36,7 @@ export function PlanningGantt({
   onTaskClick,
   onTaskUpdate: _onTaskUpdate,
 }: PlanningGanttProps) {
+  const { t } = useTranslation()
   const [zoomLevel, setZoomLevel] = useState(1)
   const [viewMode, setViewMode] = useState<'days' | 'weeks' | 'months'>('weeks')
 
@@ -284,7 +286,7 @@ export function PlanningGantt({
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-blue-500 rounded" />
-            <span>En cours</span>
+            <span>{t('status.inProgress')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded" />

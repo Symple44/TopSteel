@@ -927,6 +927,7 @@ export const fr = {
     timeout: "Délai d'attente dépassé",
     tryAgain: 'Réessayer',
     contactSupport: 'Contacter le support',
+    websocket: 'Impossible de créer la connexion WebSocket',
 
     // Pages d'erreur
     title: 'Erreur',
@@ -1425,6 +1426,47 @@ export const fr = {
     active: 'Actif',
     inactive: 'Inactif',
     pending: 'En attente',
+    inProgress: 'En cours',
+    system: 'Système',
+  },
+
+  // Warehouse namespace
+  warehouse: {
+    main: 'Dépôt principal',
+  },
+
+  // Address namespace
+  address: {
+    main: 'Adresse principale',
+    additionalInfo: 'Informations complémentaires',
+  },
+
+  // Filters namespace
+  filters: {
+    noSort: 'Aucun tri',
+  },
+
+  // Menu namespace
+  menu: {
+    untitled: 'Sans titre',
+    hidden: 'Masqué',
+    title: 'Titre',
+    type: 'Type',
+    icon: 'Icône',
+    order: 'Ordre',
+    visible: 'Visible',
+  },
+
+  // Messages namespace (from query builder)
+  messages: {
+    selectTableColumn: 'Veuillez sélectionner au moins une table et une colonne',
+    querySuccess: 'Requête exécutée avec succès ({{count}} résultats)',
+    executionError: "Erreur lors de l'exécution: {{message}}",
+    queryExecutionError: "Erreur lors de l'exécution de la requête",
+    queryNameRequired: 'Veuillez donner un nom à votre requête',
+    querySaved: 'Requête sauvegardée avec succès',
+    saveError: 'Erreur lors de la sauvegarde: {{message}}',
+    saveErrorGeneric: 'Erreur lors de la sauvegarde',
   },
 
   system: {
@@ -1644,6 +1686,29 @@ export const fr = {
     processing: 'Traitement en cours...',
     validating: 'Validation...',
     authenticating: 'Authentification...',
+    cancel: 'Annuler',
+    save: 'Sauvegarder',
+    edit: 'Modifier',
+    create: 'Créer',
+    createOrder: "Créer l'ordre",
+    addToMenu: 'Ajouter au Menu',
+    addMaterial: 'Ajouter le matériau',
+    saveChanges: 'Sauvegarder les modifications',
+    createMaterial: 'Créer un nouveau matériau',
+  },
+
+  // Search namespace
+  search: {
+    template: 'Rechercher un template...',
+    global: 'Rechercher clients, articles, projets...',
+    byNumberDesc: 'Rechercher par numéro, description...',
+    byOrderNumber: "Rechercher par numéro d'ordre, description, projet...",
+    byRefClient: 'Rechercher par référence, client...',
+    byMaterialRef: 'Rechercher par matériau, référence, utilisateur...',
+    byNameEmail: 'Rechercher par nom ou email...',
+    byMaterialDim: 'Rechercher par matériau, dimensions...',
+    byNameAuthor: 'Rechercher par nom ou auteur...',
+    scrap: 'Rechercher une chute...',
   },
 
   // Status indicators

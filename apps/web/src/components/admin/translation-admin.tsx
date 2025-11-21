@@ -546,7 +546,7 @@ export function TranslationAdmin() {
               </Button>
               <Button type="button" onClick={handleSave}>
                 <Save className="h-4 w-4 mr-2" />
-                Sauvegarder
+                {t('actions.save')}
               </Button>
             </div>
           </div>

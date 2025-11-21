@@ -51,6 +51,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { PermissionHide } from '../../components/auth/permission-guard'
+import { useTranslation } from '../../lib/i18n/hooks'
 import { callClientApi } from '../../utils/backend-api'
 import { BulkUserAssignment } from './bulk-user-assignment'
 
@@ -484,6 +485,7 @@ function GroupForm({
   roles: Role[]
   onSave: () => void
 }) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     name: group?.name || '',
     description: group?.description || '',
@@ -607,9 +609,9 @@ function GroupForm({
 
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
-          Annuler
+          {t('actions.cancel')}
         </Button>
-        <Button type="submit">{group ? 'Modifier' : 'Créer'}</Button>
+        <Button type="submit">{group ? t('actions.edit') : t('actions.create')}</Button>
       </div>
     </form>
   )
@@ -629,6 +631,7 @@ function GroupDetails({
   allRoles: Role[]
   onRefresh: () => void
 }) {
+  const { t } = useTranslation()
   const [selectedRoles, setSelectedRoles] = useState<string[]>(roles?.map((r) => r.id))
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
 
@@ -775,7 +778,7 @@ function GroupDetails({
             <h3 className="text-lg font-medium">Rôles du groupe</h3>
             <PermissionHide permission={undefined} roles={['SUPER_ADMIN']}>
               <Button size="sm" onClick={handleUpdateRoles}>
-                Sauvegarder les modifications
+                {t('actions.saveChanges')}
               </Button>
             </PermissionHide>
           </div>
