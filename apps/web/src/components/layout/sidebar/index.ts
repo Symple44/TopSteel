@@ -1,0 +1,10 @@
+// apps/web/src/components/layout/sidebar/index.ts
+export { SidebarFooter } from './components/SidebarFooter'
+export { SidebarHeader } from './components/SidebarHeader'
+export { SidebarMenuSwitch } from './components/SidebarMenuSwitch'
+export { NavItem } from './components/NavItem'
+export { iconMap } from './constants/icon-map'
+export { getNavigation } from './constants/navigation'
+export { isActive, isParentActive } from './utils/active-state'
+export { convertDynamicToNavItem } from './utils/menu-converter'
+export type { NavItem as NavItemType, DynamicMenuItem } from './types'
