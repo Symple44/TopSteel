@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import type { QueryBuilderPermission } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 
 /**
  * QueryBuilderPermissionPrismaService - Phase 2.6
@@ -376,5 +376,51 @@ export class QueryBuilderPermissionPrismaService {
       this.logger.error(`Error counting permissions: ${err.message}`, err.stack)
       throw error
     }
+  }
+  /**
+   * Get permission for a specific user and query builder
+   * Wrapper method for backward compatibility
+   */
+  async getQueryBuilderPermissionForUser(
+    queryBuilderId: string,
+    userId: string
+  ): Promise<QueryBuilderPermission | null> {
+    this.logger.debug(`Getting permission for user ${userId} on query builder
+${queryBuilderId}`)
+
+    try {
+      return await this.prisma.queryBuilderPermission.findFirst({
+        where: {
+          queryBuilderId,
+          userId,
+        },
+      })
+    } catch (error) {
+      const err = error as Error
+      this.logger.error(`Error getting user permission: ${err.message}`, err.stack)       
+      throw error
+    }
+  }
+
+  /**
+   * Alias for updatePermission
+   */
+  async updateQueryBuilderPermission(
+    id: string,
+    data: {
+      canView?: boolean
+      canEdit?: boolean
+      canDelete?: boolean
+      canShare?: boolean
+    }
+  ): Promise<QueryBuilderPermission> {
+    return this.updatePermission(id, data)
+  }
+
+  /**
+   * Alias for getUserPermissions
+   */
+  async getQueryBuilderPermissionsByUser(userId: string) {
+    return this.getUserPermissions(userId)
   }
 }

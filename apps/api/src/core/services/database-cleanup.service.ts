@@ -1,6 +1,5 @@
+import { PrismaService } from '../../core/database/prisma/prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
 
 interface DatabaseIndex {
   indexname: string
@@ -13,8 +12,7 @@ export class DatabaseCleanupService {
   private readonly logger = new Logger(DatabaseCleanupService.name)
 
   constructor(
-    @InjectDataSource()
-    private readonly _dataSource: DataSource
+    private readonly prisma: PrismaService
   ) {}
 
   async cleanupDuplicateIndexes(): Promise<void> {
@@ -22,8 +20,8 @@ export class DatabaseCleanupService {
       this.logger.log('Recherche des index en double...')
 
       // Récupérer tous les index de la base de données
-      const indexes = await this._dataSource.query(`
-        SELECT 
+      const indexes = await this.prisma.$queryRawUnsafe<Array<DatabaseIndex>>(`
+        SELECT
           schemaname,
           tablename,
           indexname,
@@ -88,11 +86,11 @@ export class DatabaseCleanupService {
 
   async dropIndexIfExists(indexName: string): Promise<boolean> {
     try {
-      const result = await this._dataSource.query(
+      const result = await this.prisma.$queryRawUnsafe<Array<{ exists: boolean }>>(
         `
         SELECT EXISTS (
-          SELECT 1 FROM pg_indexes 
-          WHERE schemaname = 'public' 
+          SELECT 1 FROM pg_indexes
+          WHERE schemaname = 'public'
           AND indexname = $1
         );
       `,
@@ -100,7 +98,7 @@ export class DatabaseCleanupService {
       )
 
       if (result[0]?.exists) {
-        await this._dataSource.query(`DROP INDEX IF EXISTS ${indexName}`)
+        await this.prisma.$queryRawUnsafe(`DROP INDEX IF EXISTS ${indexName}`)
         this.logger.log(`Index ${indexName} supprimé`)
         return true
       }
@@ -115,11 +113,11 @@ export class DatabaseCleanupService {
   async safeCreateIndex(tableName: string, indexName: string, columns: string[]): Promise<void> {
     try {
       // Vérifier si l'index existe déjà
-      const exists = await this._dataSource.query(
+      const exists = await this.prisma.$queryRawUnsafe<Array<{ exists: boolean }>>(
         `
         SELECT EXISTS (
-          SELECT 1 FROM pg_indexes 
-          WHERE schemaname = 'public' 
+          SELECT 1 FROM pg_indexes
+          WHERE schemaname = 'public'
           AND tablename = $1
           AND indexname = $2
         );
@@ -131,7 +129,7 @@ export class DatabaseCleanupService {
         this.logger.log(`Index ${indexName} existe déjà sur ${tableName}`)
       } else {
         const columnList = columns.join(', ')
-        await this._dataSource.query(`
+        await this.prisma.$queryRawUnsafe(`
           CREATE INDEX ${indexName} ON ${tableName} (${columnList})
         `)
         this.logger.log(`Index ${indexName} créé sur ${tableName}`)

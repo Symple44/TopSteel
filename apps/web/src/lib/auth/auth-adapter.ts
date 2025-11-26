@@ -13,6 +13,8 @@ import type {
   PermissionAction,
   UserSocieteRole,
 } from './rbac-types'
+// Type guards centralisés - évite la duplication
+import { hasProperty, safeGet } from '../type-guards'
 
 interface UserSocieteRoleInput {
   id?: string
@@ -31,17 +33,6 @@ interface ExtendedUserSocieteRoleInput extends UserSocieteRoleInput {
   expiresAt?: string
   createdAt?: string
   updatedAt?: string
-}
-
-function hasProperty<T extends Record<string, unknown>>(obj: unknown, prop: string): obj is T {
-  return typeof obj === 'object' && obj !== null && prop in obj
-}
-
-function safeGet<T>(obj: unknown, prop: string, defaultValue: T): T {
-  if (hasProperty(obj, prop)) {
-    return (obj[prop] as T) ?? defaultValue
-  }
-  return defaultValue
 }
 
 /**

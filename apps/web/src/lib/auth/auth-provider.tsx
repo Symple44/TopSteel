@@ -15,7 +15,14 @@ import type {
   Company,
   User,
 } from './auth-types'
-import type { ExtendedUser } from './rbac-types'
+// Type guards centralisés - évite la duplication
+import {
+  hasIsActiveProperty,
+  hasSocieteRoles,
+  isValidAuthTokens,
+  isValidCompany,
+  isValidUser,
+} from '../type-guards'
 
 // État par défaut
 const defaultAuthState: AuthState = {
@@ -31,88 +38,6 @@ const defaultAuthState: AuthState = {
 
 interface AuthProviderProps {
   children: React.ReactNode
-}
-
-// Type guards pour valider les types unknown
-function isValidUser(user: unknown): user is User {
-  return (
-    typeof user === 'object' &&
-    user !== null &&
-    'id' in user &&
-    'email' in user &&
-    'nom' in user &&
-    'prenom' in user &&
-    'role' in user &&
-    'isActive' in user &&
-    typeof (user as User).id === 'string' &&
-    typeof (user as User).email === 'string'
-  )
-}
-
-function isValidCompany(company: unknown): company is Company {
-  return (
-    typeof company === 'object' &&
-    company !== null &&
-    'id' in company &&
-    'nom' in company &&
-    'code' in company &&
-    typeof (company as Company).id === 'string' &&
-    typeof (company as Company).nom === 'string' &&
-    typeof (company as Company).code === 'string'
-  )
-}
-
-function isValidAuthTokens(tokens: unknown): tokens is AuthTokens {
-  return (
-    typeof tokens === 'object' &&
-    tokens !== null &&
-    'accessToken' in tokens &&
-    'refreshToken' in tokens &&
-    typeof (tokens as AuthTokens).accessToken === 'string' &&
-    typeof (tokens as AuthTokens).refreshToken === 'string'
-  )
-}
-
-function _isValidExtendedUser(user: unknown): user is ExtendedUser {
-  return (
-    typeof user === 'object' &&
-    user !== null &&
-    'id' in user &&
-    'email' in user &&
-    'firstName' in user &&
-    'lastName' in user &&
-    'societeRoles' in user &&
-    typeof (user as ExtendedUser).id === 'string' &&
-    typeof (user as ExtendedUser).email === 'string' &&
-    Array.isArray((user as ExtendedUser).societeRoles)
-  )
-}
-
-function _hasRoleProperty(user: unknown): user is { role: string } {
-  return (
-    typeof user === 'object' &&
-    user !== null &&
-    'role' in user &&
-    typeof (user as { role: string }).role === 'string'
-  )
-}
-
-function hasSocieteRoles(user: unknown): user is { societeRoles: unknown[] } {
-  return (
-    typeof user === 'object' &&
-    user !== null &&
-    'societeRoles' in user &&
-    Array.isArray((user as { societeRoles: unknown[] }).societeRoles)
-  )
-}
-
-function hasIsActiveProperty(company: unknown): company is { isActive: boolean } {
-  return (
-    typeof company === 'object' &&
-    company !== null &&
-    'isActive' in company &&
-    typeof (company as { isActive: boolean }).isActive === 'boolean'
-  )
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {

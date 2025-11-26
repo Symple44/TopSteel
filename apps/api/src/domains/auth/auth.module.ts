@@ -1,18 +1,19 @@
+import { DatabaseModule } from '../../core/database/database.module'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
-import { TypeOrmModule } from '@nestjs/typeorm'
+
 import { DatabaseCoreModule } from '../../features/database-core/database-core.module'
 import { ParametersModule } from '../../features/parameters/parameters.module'
-
+import { EmailModule } from '../../core/email/email.module'
 
 import { SocietesModule } from '../../features/societes/societes.module'
 import { TopSteelLogger } from '../../core/common/logger/structured-logger.service'
 import { RedisService } from '../../core/common/services/redis.service'
 import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { UsersModule } from '../users/users.module'
-import { UserAuthPrismaRepositoryService } from '../users/services/user-auth-prisma-repository.service'
+// import { UserAuthPrismaRepositoryService } from '../users/services/user-auth-prisma-repository.service' // DISABLED: TypeORM dependency
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { AuthRepositoryProviders } from './core/providers/auth-repository.providers'
@@ -45,17 +46,6 @@ import { PermissionCalculatorService } from './services/permission-calculator.se
 import { RoleFormattingService } from './services/role-formatting.service'
 import { SessionRedisService } from './services/session-redis.service'
 import { TOTPService } from './services/totp.service'
-import { AuditLog } from '../../domains/auth/core/entities/audit-log.entity'
-import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
-import { Permission } from '../../domains/auth/core/entities/permission.entity'
-import { Role } from '../../domains/auth/core/entities/role.entity'
-import { RolePermission } from '../../domains/auth/core/entities/role-permission.entity'
-import { SMSLog } from '../../domains/auth/entities/sms-log.entity'
-import { Societe } from '../../features/societes/entities/societe.entity'
-import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
-import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
-import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
-import { UserSocieteRole } from '../../domains/auth/core/entities/user-societe-role.entity'
 
 import { UnifiedRolesService } from './services/unified-roles.service'
 import { UserSocieteRolesService } from './services/user-societe-roles.service'
@@ -75,6 +65,7 @@ import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prism
 
 @Module({
   imports: [
+    DatabaseModule,
     ConfigModule,
     DatabaseCoreModule,
     ParametersModule,
@@ -102,32 +93,33 @@ import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prism
       },
       inject: [ConfigService],
     }),
-    // Repositories pour les entités auth avec connexion 'auth'
-    TypeOrmModule.forFeature(
-      [
-        UserSession,
-        UserMFA,
-        MFASession,
-        UserSocieteRole,
-        Role,
-        Permission,
-        RolePermission,
-        Societe,
-        SocieteUser,
-        AuditLog,
-        SMSLog,
-      ],
-      'auth'
-    ),
+    // TypeORM repositories disabled - using Prisma services (aliased below)
+    // TypeOrmModule.forFeature(
+    //   [
+    //     UserSession,
+    //     UserMFA,
+    //     MFASession,
+    //     UserSocieteRole,
+    //     Role,
+    //     Permission,
+    //     RolePermission,
+    //     Societe,
+    //     SocieteUser,
+    //     AuditLog,
+    //     SMSLog,
+    //   ],
+    //   'auth'
+    // ),
     UsersModule,
     SocietesModule,
+    EmailModule,
   ],
   controllers: [AuthController, MFAController, SMSAdminController],
   providers: [
     // Core Auth Services
     AuthService,
     AuthCoreService,
-    UserAuthPrismaRepositoryService,
+    // UserAuthPrismaRepositoryService, // DISABLED: TypeORM dependency
     ...AuthRepositoryProviders,
 
     // Strategies
@@ -213,8 +205,7 @@ import { UserSocieteRolesPrismaService } from './prisma/user-societe-roles-prism
     {
       provide: UserSocieteRolesService,
       useExisting: UserSocieteRolesPrismaService,
-    },
-  ],
+    }],
   exports: [
     // TypeORM Services (Legacy - being migrated)
     AuthService,

@@ -1,22 +1,24 @@
+import { PrismaService } from '../../../../core/database/prisma/prisma.service'
 import { Controller, Get, HttpStatus, Query, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Module, ModuleCategory } from '../../core/entities/module.entity'
+
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
 
-
+// Define ModuleCategory enum
+export enum ModuleCategory {
+  CORE = 'CORE',
+  BUSINESS = 'BUSINESS',
+  ADMIN = 'ADMIN',
+  REPORTS = 'REPORTS',
+}
 
 @ApiTags('Modules')
 @Controller('admin/modules')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ModuleController {
-  constructor(
-    @InjectRepository(Module, 'auth')
-    private readonly _moduleRepository: Repository<Module>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   @Get()
   @Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER')
@@ -29,35 +31,32 @@ export class ModuleController {
     @Query('category') category?: ModuleCategory
   ) {
     try {
-      const queryBuilder = this._moduleRepository
-        .createQueryBuilder('module')
-        .where('module.isActive = :isActive', { isActive: true })
-        .orderBy('module.category', 'ASC')
-        .addOrderBy('module.sortOrder', 'ASC')
-        .addOrderBy('module.name', 'ASC')
-
+      // Build where clause
+      const where: any = { isActive: true }
       if (category) {
-        queryBuilder.andWhere('module.category = :category', { category })
+        where.category = category
       }
 
-      if (includePermissions === 'true') {
-        queryBuilder.leftJoinAndSelect('module.permissions', 'permissions')
-      }
+      // Fetch modules (permissions relation removed in simplified schema)
+      const modules = await this.prisma.module.findMany({
+        where,
+        orderBy: [{ label: 'asc' }, { name: 'asc' }],
+      })
 
-      const modules = await queryBuilder.getMany()
-
-      // Calculer les métadonnées
-      const totalByCategory = await this._moduleRepository
-        .createQueryBuilder('module')
-        .select('module.category, COUNT(*) as count')
-        .where('module.isActive = :isActive', { isActive: true })
-        .groupBy('module.category')
-        .getRawMany()
+      // Calculate metadata using raw query for GROUP BY
+      const totalByCategory = await this.prisma.$queryRaw<
+        Array<{ category: string; count: bigint }>
+      >`
+        SELECT category, COUNT(*) as count
+        FROM modules
+        WHERE "is_active" = true
+        GROUP BY category
+      `
 
       const categoryStats = totalByCategory.reduce((acc, item) => {
-        acc[item.module_category] = parseInt(item.count, 10)
+        acc[item.category] = Number(item.count)
         return acc
-      }, {})
+      }, {} as Record<string, number>)
 
       return {
         success: true,
@@ -122,4 +121,3 @@ export class ModuleController {
     return colors[category] || 'bg-gray-100 text-gray-800'
   }
 }
-

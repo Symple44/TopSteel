@@ -25,6 +25,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
+import { Public } from '../../../../core/multi-tenant'
 import { GlobalUserRole } from '../../../../domains/auth/core/constants/roles.constants'
 import { Roles } from '../../../../domains/auth/decorators/roles.decorator'
 // Guards
@@ -78,6 +79,7 @@ class CreateBanDto {
 @ApiTags('Rate Limiting Administration')
 @ApiBearerAuth()
 @Controller('admin/rate-limiting')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(GlobalUserRole.SUPER_ADMIN, GlobalUserRole.ADMIN)
 export class RateLimitingAdminController {

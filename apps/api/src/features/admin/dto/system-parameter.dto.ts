@@ -1,6 +1,26 @@
 import { IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
-import { ParameterCategory, ParameterType } from '../entitites/system-parameter.entity'
 import { SystemParameter } from '@prisma/client'
+
+/**
+ * Parameter types for system configuration
+ */
+export enum ParameterType {
+  STRING = 'STRING',
+  NUMBER = 'NUMBER',
+  BOOLEAN = 'BOOLEAN',
+  JSON = 'JSON',
+}
+
+/**
+ * Parameter categories for system configuration
+ */
+export enum ParameterCategory {
+  SYSTEM = 'SYSTEM',
+  APPLICATION = 'APPLICATION',
+  SECURITY = 'SECURITY',
+  INTEGRATION = 'INTEGRATION',
+  FEATURE = 'FEATURE',
+}
 
 
 export class CreateSystemParameterDto {

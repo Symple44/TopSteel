@@ -1,5 +1,7 @@
-import { Controller, Get, Param, Post, Request } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../../core/multi-tenant'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { DatabaseHealthSimpleService } from '../services/database-health-simple.service'
 import { MigrationManagerService } from '../services/migration-manager.service'
 import { TenantConnectionSimpleService } from '../services/tenant-connection-simple.service'
@@ -7,9 +9,9 @@ import type { ConnectionsResponse } from '../services/tenant-connection-simple.s
 
 @ApiTags('Database Admin')
 @Controller('admin/database')
-// @UseGuards(JwtAuthGuard, RolesGuard) // Désactivé pour debug
-// @Roles('SUPER_ADMIN')
-// @ApiBearerAuth()
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class DatabaseAdminController {
   constructor(
     private databaseHealthService: DatabaseHealthSimpleService,

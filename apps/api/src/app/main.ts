@@ -148,11 +148,15 @@ async function bootstrap() {
   const configService = app.get(ConfigService)
   const port = configService.get<number>('app.port', 3002)
   const env = configService.get<string>('app.env', 'development')
-  const corsOrigin =
+  const corsOriginRaw =
     configService.get<string>('app.cors.origin') ||
+    process.env.CORS_ORIGIN ||
     process.env.FRONTEND_URL ||
     process.env.API_CORS_ORIGIN ||
-    'http://127.0.0.1:3005'
+    'http://localhost:3005,http://127.0.0.1:3005'
+
+  // Parse comma-separated origins into array
+  const corsOrigin = corsOriginRaw.split(',').map((o) => o.trim())
 
   // ============================================================================
   // SÉCURITÉ ET MIDDLEWARE
@@ -184,10 +188,10 @@ async function bootstrap() {
 
   // Configuration CORS
   app.enableCors({
-    origin: env === 'development' ? [corsOrigin, 'null'] : corsOrigin, // Permettre 'null' en développement pour les fichiers locaux
+    origin: env === 'development' ? [...corsOrigin, 'null'] : corsOrigin,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cookie', 'X-CSRF-Token'],
   })
 
   // ============================================================================
@@ -342,7 +346,7 @@ async function bootstrap() {
   logger.log('🏭 ===============================================')
   logger.log(`🚀 Serveur démarré: ${process.env.API_URL || `http://127.0.0.1:${portForLogs}`}`)
   logger.log(`🌟 Environnement: ${env}`)
-  logger.log(`🔗 CORS Origin: ${corsOrigin}`)
+  logger.log(`🔗 CORS Origins: ${corsOrigin.join(', ')}`)
   logger.log('')
   logger.log('📍 URLs API disponibles:')
   logger.log('   • /api/auth            → Authentification')

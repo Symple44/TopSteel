@@ -1,17 +1,14 @@
 /**
- * Instance du client API avec gestion de connexion et types complets
- *
- * Ce fichier exporte l'instance typée du client API
- * avec toutes les méthodes domaine-spécifiques
+ * API Client Instance - Socle
  */
+import { apiClient } from './api-client'
 
-import type { IAPIClientFinal } from './api-client-final'
-import { apiClientFinal } from './api-client-final'
+export interface APIClientInterface {
+  get: <T>(url: string) => Promise<T>
+  post: <T>(url: string, data?: unknown) => Promise<T>
+  put: <T>(url: string, data?: unknown) => Promise<T>
+  patch: <T>(url: string, data?: unknown) => Promise<T>
+  delete: <T>(url: string) => Promise<T>
+}
 
-// Export de l'instance typée
-export const apiClient: IAPIClientFinal = apiClientFinal
-
-// Re-export des types et classes nécessaires
-export type { APIErrorDetails, APIMetrics, RequestConfig } from './api-client'
-export { APIError } from './api-client'
-export type { IAPIClientFinal as APIClientInterface } from './api-client-final'
+export { apiClient }

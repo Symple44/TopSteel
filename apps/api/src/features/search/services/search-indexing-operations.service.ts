@@ -1,6 +1,6 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+
 import { SEARCHABLE_ENTITIES, type SearchableEntity } from '../config/searchable-entities.config'
 import { ISearchIndexingService } from '../interfaces/search.interfaces'
 import type { IndexingBatchResult, IndexingDocument, SearchDocument } from '../types/search-types'
@@ -12,10 +12,9 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
   private readonly logger = new Logger(SearchIndexingOperationsService.name)
 
   constructor(
-    @InjectDataSource('auth') private readonly dataSource: DataSource,
-    @InjectDataSource('tenant') private readonly tenantDataSource: DataSource,
     private readonly elasticsearchService: ElasticsearchSearchService,
-    private readonly formatter: SearchResultFormatterService
+    private readonly formatter: SearchResultFormatterService,
+    private readonly prisma: PrismaService
   ) {}
 
   async indexDocument(type: string, id: string, document: SearchDocument): Promise<void> {
@@ -76,14 +75,8 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
   }
 
   async reindexEntity(entity: SearchableEntity, tenantId?: string): Promise<number> {
-    // Determine which datasource to use
-    const ds =
-      entity.database === 'tenant' && this.tenantDataSource
-        ? this.tenantDataSource
-        : this.dataSource
-
     // Check if table exists before reindexing
-    const tableExists = await this.checkTableExists(ds, entity.tableName)
+    const tableExists = await this.checkTableExists(entity.tableName)
     if (!tableExists) {
       this.logger.warn(
         `Table ${entity.tableName} does not exist, skipping reindex for ${entity.type}`
@@ -113,7 +106,8 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
       LIMIT 1000
     `
 
-    const records = await ds.query(query)
+    // Use Prisma's $queryRawUnsafe for raw SQL
+    const records = await this.prisma.$queryRawUnsafe<any[]>(query)
 
     // Index each record
     for (const record of records) {
@@ -146,12 +140,12 @@ export class SearchIndexingOperationsService implements ISearchIndexingService {
     return records.length
   }
 
-  private async checkTableExists(dataSource: DataSource, tableName: string): Promise<boolean> {
+  private async checkTableExists(tableName: string): Promise<boolean> {
     try {
-      const result = await dataSource.query(
+      const result = await this.prisma.$queryRawUnsafe<Array<{ exists: boolean }>>(
         `SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_schema = 'public' 
+          SELECT FROM information_schema.tables
+          WHERE table_schema = 'public'
           AND table_name = $1
         )`,
         [tableName]

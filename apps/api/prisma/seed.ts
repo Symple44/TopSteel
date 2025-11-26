@@ -3,66 +3,52 @@ import * as bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
 
-async function main() {
-  console.log('🌱 Starting seed...')
+/**
+ * Seed Script - Development/Test Data Only
+ *
+ * Essential system data (roles, permissions) are in the Prisma migration:
+ * - migrations/20250126000000_essential_base_data/migration.sql
+ *
+ * This seed creates test data for development:
+ * - Test users (admin, test)
+ * - Test societe
+ * - User-societe-role associations
+ * - Menu configuration (requires societe_id)
+ * - System parameters (requires societe_id)
+ * - Notification templates (requires societe_id)
+ */
 
-  // Clean existing data (optional - comment out if you want to keep data)
-  console.log('🧹 Cleaning existing data...')
+async function main() {
+  console.log('🌱 Starting seed (dev/test data)...')
+
+  // Clean existing test data (preserves system roles/permissions from migration)
+  console.log('🧹 Cleaning existing test data...')
+  await prisma.notificationTemplate.deleteMany()
+  await prisma.menuItem.deleteMany()
+  await prisma.menuConfiguration.deleteMany()
+  await prisma.parameterSystem.deleteMany()
   await prisma.userSocieteRole.deleteMany()
   await prisma.societeUser.deleteMany()
   await prisma.userSession.deleteMany()
   await prisma.userMfa.deleteMany()
   await prisma.userSettings.deleteMany()
-  await prisma.role.deleteMany()
   await prisma.societe.deleteMany()
   await prisma.user.deleteMany()
 
-  // Create Roles
-  console.log('👥 Creating roles...')
-  const roles = await Promise.all([
-    prisma.role.create({
-      data: {
-        name: 'OWNER',
-        label: 'Propriétaire',
-        description: 'Propriétaire de la société',
-        level: 100,
-        isSystem: true,
-        isActive: true,
-      },
-    }),
-    prisma.role.create({
-      data: {
-        name: 'ADMIN',
-        label: 'Administrateur',
-        description: 'Administrateur de la société',
-        level: 90,
-        isSystem: true,
-        isActive: true,
-      },
-    }),
-    prisma.role.create({
-      data: {
-        name: 'MANAGER',
-        label: 'Manager',
-        description: 'Manager',
-        level: 80,
-        isSystem: true,
-        isActive: true,
-      },
-    }),
-    prisma.role.create({
-      data: {
-        name: 'USER',
-        label: 'Utilisateur',
-        description: 'Utilisateur standard',
-        level: 30,
-        isSystem: true,
-        isActive: true,
-      },
-    }),
-  ])
+  // Fetch existing roles from migration
+  console.log('👥 Fetching system roles from migration...')
+  const roles = await prisma.role.findMany({
+    where: {
+      isSystem: true,
+    },
+  })
 
-  console.log(`✅ Created ${roles.length} roles`)
+  if (roles.length === 0) {
+    console.error('❌ No system roles found! Run the migration first: npx prisma migrate deploy')
+    process.exit(1)
+  }
+
+  console.log(`✅ Found ${roles.length} system roles`)
 
   // Hash password
   const hashedPassword = await bcrypt.hash('admin123', 10)
@@ -225,15 +211,196 @@ async function main() {
 
   console.log(`✅ Created user settings for admin`)
 
+  // ============================================
+  // PARAMÈTRES SYSTÈME PAR DÉFAUT
+  // ============================================
+  console.log('⚙️ Creating system parameters...')
+
+  const systemParams = [
+    {
+      code: 'APP_NAME',
+      label: 'Nom de l\'application',
+      description: 'Nom affiché dans l\'interface',
+      type: 'string',
+      value: 'TopSteel ERP',
+      defaultValue: 'TopSteel ERP',
+      category: 'general',
+      isRequired: true,
+      isEditable: true,
+      societeId: societe.id,
+    },
+    {
+      code: 'SESSION_TIMEOUT',
+      label: 'Timeout session (minutes)',
+      description: 'Durée d\'inactivité avant déconnexion',
+      type: 'number',
+      value: '30',
+      defaultValue: '30',
+      category: 'security',
+      isRequired: true,
+      isEditable: true,
+      societeId: societe.id,
+    },
+  ]
+
+  for (const param of systemParams) {
+    await prisma.parameterSystem.create({ data: param })
+  }
+  console.log(`✅ Created ${systemParams.length} system parameters`)
+
+  // ============================================
+  // CONFIGURATION MENU PAR DÉFAUT
+  // ============================================
+  console.log('📋 Creating menu configuration...')
+
+  const menuConfig = await prisma.menuConfiguration.create({
+    data: {
+      name: 'DEFAULT_MENU',
+      description: 'Configuration menu par défaut',
+      isActive: true,
+      isDefault: true,
+      societeId: societe.id,
+    },
+  })
+
+  // Create root menu items first
+  const rootMenuItems = [
+    {
+      label: 'Tableau de bord',
+      icon: 'LayoutDashboard',
+      path: '/dashboard',
+      order: 1,
+      isActive: true,
+      isVisible: true,
+      menuConfigurationId: menuConfig.id,
+    },
+    {
+      label: 'Administration',
+      icon: 'Shield',
+      path: '/admin',
+      order: 2,
+      isActive: true,
+      isVisible: true,
+      menuConfigurationId: menuConfig.id,
+    },
+    {
+      label: 'Paramètres',
+      icon: 'Settings',
+      path: '/settings',
+      order: 3,
+      isActive: true,
+      isVisible: true,
+      menuConfigurationId: menuConfig.id,
+    },
+    {
+      label: 'Profil',
+      icon: 'User',
+      path: '/profile',
+      order: 4,
+      isActive: true,
+      isVisible: true,
+      menuConfigurationId: menuConfig.id,
+    },
+  ]
+
+  const createdRootItems: Record<string, { id: string }> = {}
+  for (const item of rootMenuItems) {
+    const created = await prisma.menuItem.create({ data: item })
+    createdRootItems[item.path] = created
+  }
+
+  // Create admin sub-menu items
+  const adminSubItems = [
+    { label: 'Utilisateurs', icon: 'Users', path: '/admin/users', order: 1 },
+    { label: 'Rôles', icon: 'ShieldCheck', path: '/admin/roles', order: 2 },
+    { label: 'Groupes', icon: 'UsersRound', path: '/admin/groups', order: 3 },
+    { label: 'Sociétés', icon: 'Building2', path: '/admin/societes', order: 4 },
+    { label: 'Entreprise', icon: 'Building', path: '/admin/company', order: 5 },
+    { label: 'Base de données', icon: 'Database', path: '/admin/database', order: 6 },
+    { label: 'Configuration menus', icon: 'Menu', path: '/admin/menu-config', order: 7 },
+    { label: 'Sessions', icon: 'Clock', path: '/admin/sessions', order: 8 },
+    { label: 'Traductions', icon: 'Languages', path: '/admin/translations', order: 9 },
+  ]
+
+  for (const item of adminSubItems) {
+    await prisma.menuItem.create({
+      data: {
+        ...item,
+        parentId: createdRootItems['/admin'].id,
+        isActive: true,
+        isVisible: true,
+        menuConfigurationId: menuConfig.id,
+      },
+    })
+  }
+
+  // Create settings sub-menu items
+  const settingsSubItems = [
+    { label: 'Personnalisation menu', icon: 'LayoutList', path: '/settings/menu', order: 1 },
+    { label: 'Sécurité', icon: 'Lock', path: '/settings/security', order: 2 },
+    { label: 'Notifications', icon: 'Bell', path: '/settings/notifications', order: 3 },
+    { label: 'Apparence', icon: 'Palette', path: '/settings/appearance', order: 4 },
+  ]
+
+  for (const item of settingsSubItems) {
+    await prisma.menuItem.create({
+      data: {
+        ...item,
+        parentId: createdRootItems['/settings'].id,
+        isActive: true,
+        isVisible: true,
+        menuConfigurationId: menuConfig.id,
+      },
+    })
+  }
+
+  const totalMenuItems = rootMenuItems.length + adminSubItems.length + settingsSubItems.length
+  console.log(`✅ Created ${totalMenuItems} menu items (hierarchical structure)`)
+
+  // ============================================
+  // TEMPLATES NOTIFICATION PAR DÉFAUT
+  // ============================================
+  console.log('📧 Creating notification templates...')
+
+  const notificationTemplates = [
+    {
+      code: 'WELCOME_USER',
+      name: 'Bienvenue utilisateur',
+      description: 'Email envoyé lors de la création d\'un compte',
+      type: 'email',
+      template: 'Bienvenue {{user.prenom}} {{user.nom}} sur TopSteel ERP !',
+      isActive: true,
+      societeId: societe.id,
+    },
+    {
+      code: 'PASSWORD_RESET',
+      name: 'Réinitialisation mot de passe',
+      description: 'Email de réinitialisation de mot de passe',
+      type: 'email',
+      template: 'Votre lien de réinitialisation: {{resetLink}}',
+      isActive: true,
+      societeId: societe.id,
+    },
+  ]
+
+  for (const template of notificationTemplates) {
+    await prisma.notificationTemplate.create({ data: template })
+  }
+  console.log(`✅ Created ${notificationTemplates.length} notification templates`)
+
   console.log('\n🎉 Seed completed successfully!')
-  console.log('\n📋 Summary:')
-  console.log(`   - Users: 2 (admin@topsteel.fr, test@topsteel.fr)`)
+  console.log('\n📋 Summary (Dev/Test Data):')
+  console.log(`   - Test users: 2 (admin@topsteel.fr, test@topsteel.fr)`)
   console.log(`   - Password: admin123`)
-  console.log(`   - Roles: ${roles.length}`)
-  console.log(`   - Societes: 1 (${societe.name})`)
-  console.log('\n🔐 Login credentials:')
+  console.log(`   - System roles (from migration): ${roles.length}`)
+  console.log(`   - Test societe: 1 (${societe.name})`)
+  console.log(`   - System params: ${systemParams.length}`)
+  console.log(`   - Menu items: ${totalMenuItems} (with hierarchy)`)
+  console.log(`   - Notification templates: ${notificationTemplates.length}`)
+  console.log('\n🔐 Test login credentials:')
   console.log(`   Email: admin@topsteel.fr`)
   console.log(`   Password: admin123`)
+  console.log('\n📝 Note: System roles and permissions are managed by Prisma migrations')
 }
 
 main()

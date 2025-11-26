@@ -1,6 +1,6 @@
 // apps/api/src/common/decorators/current-user.decorator.ts
 import { createParamDecorator, type ExecutionContext } from '@nestjs/common'
-import type { User } from '../../../domains/users/entities/user.entity'
+import type { User } from '@prisma/client'
 
 export const CurrentUser = createParamDecorator(
   (data: keyof User | undefined, ctx: ExecutionContext): User | User[keyof User] => {

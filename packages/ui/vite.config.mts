@@ -64,18 +64,6 @@ export default defineConfig(({ mode }) => {
           'feedback/index': resolve(__dirname, 'src/components/feedback/index.ts'),
           'navigation/index': resolve(__dirname, 'src/components/navigation/index.ts'),
           'business/index': resolve(__dirname, 'src/components/business/index.ts'),
-          'business/dialogs': resolve(__dirname, 'src/components/business/dialogs/index.ts'),
-          'business/displays': resolve(__dirname, 'src/components/business/displays/index.ts'),
-          'business/filters': resolve(__dirname, 'src/components/business/filters/index.ts'),
-          'business/forms': resolve(__dirname, 'src/components/business/forms/index.ts'),
-          'business/metallurgy': resolve(__dirname, 'src/components/business/metallurgy/index.ts'),
-          'business/notifications': resolve(
-            __dirname,
-            'src/components/business/notifications/index.ts'
-          ),
-          'business/pricing': resolve(__dirname, 'src/components/business/pricing/index.ts'),
-          'business/tables': resolve(__dirname, 'src/components/business/tables/index.ts'),
-          'business/workflows': resolve(__dirname, 'src/components/business/workflows/index.ts'),
           'theme/index': resolve(__dirname, 'src/components/theme/index.ts'),
         },
         formats: isDev ? ['es'] : ['es', 'cjs'], // Only build ES modules in dev

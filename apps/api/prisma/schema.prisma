@@ -19,21 +19,23 @@ datasource db {
 
 // User (entité centrale - alignée avec colonnes TypeORM existantes)
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique @db.VarChar(255)
-  password      String    @db.VarChar(255)
-  nom           String?   @db.VarChar(255)
-  prenom        String?   @db.VarChar(255)
-  role          String    @db.VarChar(50)
-  actif         Boolean   @default(true)
-  acronyme      String?   @unique @db.VarChar(255)
-  dernier_login DateTime?
-  version       Int       @default(1)
-  deletedAt     DateTime? @map("deleted_at")
-  refreshToken  String?   @db.VarChar(255)
-  metadata      Json?
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  id                   String    @id @default(uuid())
+  email                String    @unique @db.VarChar(255)
+  password             String    @db.VarChar(255)
+  nom                  String?   @db.VarChar(255)
+  prenom               String?   @db.VarChar(255)
+  role                 String    @db.VarChar(50)
+  actif                Boolean   @default(true)
+  acronyme             String?   @unique @db.VarChar(255)
+  dernier_login        DateTime?
+  version              Int       @default(1)
+  deletedAt            DateTime? @map("deleted_at")
+  refreshToken         String?   @db.VarChar(255)
+  resetPasswordToken   String?   @map("reset_password_token") @db.VarChar(255)
+  resetPasswordExpires DateTime? @map("reset_password_expires")
+  metadata             Json?
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
 
   // Relations
   sessions          UserSession[]
@@ -44,11 +46,12 @@ model User {
   societeRoles      UserSocieteRole[]
   settings          UserSettings?
   societes          SocieteUser[]
-  auditLogs         AuditLog[]               @relation("PerformedBy")
+  auditLogs         AuditLog[]                     @relation("PerformedBy")
   systemSettings    SystemSetting[]
   queryBuilders     QueryBuilder[]
   queryBuilderPerms QueryBuilderPermission[]
-  forcedLogouts     UserSession[]            @relation("ForcedLogout")
+  forcedLogouts     UserSession[]                  @relation("ForcedLogout")
+  uiPreferences     UiPreferencesReorderableList[]
 
   @@index([email])
   @@index([role])
@@ -313,6 +316,7 @@ model UserSocieteRole {
 model AuditLog {
   id          String   @id @default(uuid())
   userId      String?  @map("user_id")
+  societeId   String?  @map("societe_id")
   action      String   @db.VarChar(100)
   resource    String   @db.VarChar(100)
   resourceId  String?  @map("resource_id")
@@ -323,9 +327,12 @@ model AuditLog {
   metadata    Json?    @map("metadata")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  user User? @relation("PerformedBy", fields: [userId], references: [id])
+  user    User?    @relation("PerformedBy", fields: [userId], references: [id])
+  societe Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([societeId])
+  @@index([societeId, createdAt])
   @@index([action])
   @@index([resource])
   @@index([createdAt])
@@ -396,6 +403,23 @@ model Societe {
   userSocieteRoles UserSocieteRole[]
   roles            Role[]
   permissions      Permission[]
+
+  // Multi-tenant relations
+  systemSettings        SystemSetting[]
+  systemParameters      SystemParameter[]
+  menuConfigurations    MenuConfiguration[]
+  menuConfigSimples     MenuConfigurationSimple[]
+  userMenuPrefs         UserMenuPreferences[]
+  userMenuPreferences   UserMenuPreference[]
+  parameterSystems      ParameterSystem[]
+  parameterApps         ParameterApplication[]
+  parameterClients      ParameterClient[]
+  notifications         Notification[]
+  notificationEvents    NotificationEvent[]
+  notificationTemplates NotificationTemplate[]
+  notificationRules     NotificationRule[]
+  queryBuilders         QueryBuilder[]
+  auditLogs             AuditLog[]
 
   @@index([code])
   @@index([isActive])
@@ -482,6 +506,7 @@ model Site {
 model SystemSetting {
   id          String   @id @default(uuid())
   key         String   @unique @db.VarChar(255)
+  societeId   String?  @map("societe_id")
   value       String   @db.Text
   type        String   @db.VarChar(50)
   category    String   @db.VarChar(100)
@@ -491,23 +516,35 @@ model SystemSetting {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  updatedByUser User? @relation(fields: [updatedBy], references: [id])
+  updatedByUser User?    @relation(fields: [updatedBy], references: [id])
+  societe       Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([key])
+  @@index([societeId])
+  @@index([societeId, category])
   @@index([category])
   @@map("system_settings")
 }
 
 // SystemParameter
 model SystemParameter {
-  id          String   @id @default(uuid())
-  key         String   @unique @db.VarChar(255)
-  value       String   @db.Text
-  description String?  @db.Text
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  key          String   @unique @db.VarChar(255)
+  societeId    String?  @map("societe_id")
+  value        String   @db.Text
+  description  String?  @db.Text
+  category     String?  @db.VarChar(100)
+  type         String?  @default("STRING") @db.VarChar(50)
+  defaultValue String?  @map("default_value") @db.Text
+  isEditable   Boolean  @default(true) @map("is_editable")
+  isSecret     Boolean  @default(false) @map("is_secret")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  societe      Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([key])
+  @@index([societeId])
+  @@index([category])
   @@map("system_parameters")
 }
 
@@ -515,6 +552,7 @@ model SystemParameter {
 model MenuConfiguration {
   id          String   @id @default(uuid())
   name        String   @unique @db.VarChar(255)
+  societeId   String?  @map("societe_id")
   description String?  @db.Text
   isActive    Boolean  @default(true) @map("is_active")
   isDefault   Boolean  @default(false) @map("is_default")
@@ -522,8 +560,11 @@ model MenuConfiguration {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   menuItems MenuItem[]
+  societe   Societe?   @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([isActive])
+  @@index([societeId])
+  @@index([societeId, isActive])
   @@index([isDefault])
   @@map("menu_configurations")
 }
@@ -591,6 +632,7 @@ model MenuItemPermission {
 model UserMenuPreferences {
   id           String   @id @default(uuid())
   userId       String   @map("user_id")
+  societeId    String?  @map("societe_id")
   theme        String?  @db.VarChar(50)
   layout       String?  @db.VarChar(50)
   customColors Json?    @map("custom_colors")
@@ -598,7 +640,8 @@ model UserMenuPreferences {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  items UserMenuItemPreference[]
+  items   UserMenuItemPreference[]
+  societe Societe?                 @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
   @@map("user_menu_preferences")
@@ -626,11 +669,15 @@ model UserMenuItemPreference {
 model MenuConfigurationSimple {
   id        String   @id @default(uuid())
   name      String   @unique @db.VarChar(255)
+  societeId String?  @map("societe_id")
   config    Json     @map("config")
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  societe Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
+
+  @@index([societeId])
   @@map("menu_configurations_simple")
 }
 
@@ -638,12 +685,16 @@ model MenuConfigurationSimple {
 model UserMenuPreference {
   id          String   @id @default(uuid())
   userId      String   @map("user_id")
+  societeId   String?  @map("societe_id")
   menuData    Json     @map("menu_data")
   preferences Json?    @map("preferences")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  societe Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
+
   @@unique([userId])
+  @@index([societeId, userId])
   @@map("user_menu_preference")
 }
 
@@ -669,6 +720,7 @@ model DiscoveredPage {
 model ParameterSystem {
   id           String   @id @default(uuid())
   code         String   @unique @db.VarChar(100)
+  societeId    String?  @map("societe_id")
   label        String   @db.VarChar(255)
   description  String?  @db.Text
   type         String   @db.VarChar(50)
@@ -683,8 +735,11 @@ model ParameterSystem {
   objectValues Json?    @map("object_values")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+  societe      Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([code])
+  @@index([societeId])
+  @@index([societeId, category])
   @@index([category])
   @@map("parameter_system")
 }
@@ -693,6 +748,7 @@ model ParameterSystem {
 model ParameterApplication {
   id            String   @id @default(uuid())
   code          String   @unique @db.VarChar(100)
+  societeId     String?  @map("societe_id")
   label         String   @db.VarChar(255)
   description   String?  @db.Text
   type          String   @db.VarChar(50)
@@ -705,8 +761,11 @@ model ParameterApplication {
   arrayValues   Json?    @map("array_values")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
+  societe       Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([code])
+  @@index([societeId])
+  @@index([societeId, category])
   @@index([category])
   @@map("parameter_application")
 }
@@ -715,6 +774,7 @@ model ParameterApplication {
 model ParameterClient {
   id                 String   @id @default(uuid())
   code               String   @unique @db.VarChar(100)
+  societeId          String?  @map("societe_id")
   label              String   @db.VarChar(255)
   description        String?  @db.Text
   type               String   @db.VarChar(50)
@@ -730,8 +790,11 @@ model ParameterClient {
   customTranslations Json?    @map("custom_translations")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
+  societe            Societe? @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([code])
+  @@index([societeId])
+  @@index([societeId, category])
   @@index([category])
   @@map("parameter_client")
 }
@@ -739,6 +802,7 @@ model ParameterClient {
 // Notification
 model Notification {
   id          String    @id @default(uuid())
+  societeId   String    @map("societe_id")
   userId      String    @map("user_id")
   type        String    @db.VarChar(50)
   title       String    @db.VarChar(255)
@@ -754,9 +818,13 @@ model Notification {
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
   reads      NotificationRead[]
+  societe    Societe                     @relation(fields: [societeId], references: [id], onDelete: Cascade)
   executions NotificationRuleExecution[]
 
   @@index([userId])
+  @@index([societeId])
+  @@index([societeId, userId])
+  @@index([societeId, type])
   @@index([type])
   @@index([category])
   @@index([priority])
@@ -768,6 +836,7 @@ model Notification {
 // NotificationEvent
 model NotificationEvent {
   id                String    @id @default(uuid())
+  societeId         String    @map("societe_id")
   type              String    @db.VarChar(100)
   source            String    @db.VarChar(100)
   data              Json      @map("data")
@@ -775,8 +844,11 @@ model NotificationEvent {
   processedAt       DateTime? @map("processed_at")
   processingDetails Json?     @map("processing_details")
   createdAt         DateTime  @default(now()) @map("created_at")
+  societe           Societe   @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([type])
+  @@index([societeId])
+  @@index([societeId, type])
   @@index([source])
   @@index([processed])
   @@index([createdAt])
@@ -786,6 +858,7 @@ model NotificationEvent {
 // NotificationTemplate
 model NotificationTemplate {
   id          String   @id @default(uuid())
+  societeId   String   @map("societe_id")
   code        String   @unique @db.VarChar(100)
   name        String   @db.VarChar(255)
   description String?  @db.Text
@@ -795,8 +868,11 @@ model NotificationTemplate {
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+  societe     Societe  @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([code])
+  @@index([societeId])
+  @@index([societeId, code])
   @@index([type])
   @@map("notification_templates")
 }
@@ -817,6 +893,7 @@ model NotificationSettings {
 // NotificationRule
 model NotificationRule {
   id            String   @id @default(uuid())
+  societeId     String   @map("societe_id")
   name          String   @db.VarChar(255)
   description   String?  @db.Text
   type          String   @db.VarChar(50)
@@ -832,8 +909,11 @@ model NotificationRule {
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   executions NotificationRuleExecution[]
+  societe    Societe                     @relation(fields: [societeId], references: [id], onDelete: Cascade)
 
   @@index([type])
+  @@index([societeId])
+  @@index([societeId, type])
   @@index([enabled])
   @@index([isActive])
   @@map("notification_rules")
@@ -879,6 +959,7 @@ model NotificationRead {
 // QueryBuilder
 model QueryBuilder {
   id          String   @id @default(uuid())
+  societeId   String   @map("societe_id")
   name        String   @db.VarChar(255)
   description String?  @db.Text
   type        String   @db.VarChar(50)
@@ -892,12 +973,15 @@ model QueryBuilder {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   creator          User                          @relation(fields: [createdBy], references: [id])
+  societe          Societe                       @relation(fields: [societeId], references: [id], onDelete: Cascade)
   columns          QueryBuilderColumn[]
   joins            QueryBuilderJoin[]
   calculatedFields QueryBuilderCalculatedField[]
   permissions      QueryBuilderPermission[]
 
   @@index([createdBy])
+  @@index([societeId])
+  @@index([societeId, createdBy])
   @@index([isPublic])
   @@index([isActive])
   @@map("query_builders")
@@ -1198,4 +1282,45 @@ model LicenseUsage {
   @@index([licenseId, metricType])
   @@index([recordedAt])
   @@map("license_usage")
+}
+
+// ============================================
+// UI PREFERENCES
+// ============================================
+
+// UiPreferencesReorderableList - Préférences UI pour listes réordonnables
+model UiPreferencesReorderableList {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  componentId String   @map("component_id")
+  theme       String   @default("default") @db.VarChar(50)
+  preferences Json     @default("{}")
+  layout      Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, componentId])
+  @@index([userId])
+  @@index([componentId])
+  @@map("ui_preferences_reorderable_list")
+}
+
+// UserMenuItemPreferenceSimple - Stores individual menu item preferences
+model UserMenuItemPreferenceSimple {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  menuId            String   @map("menu_id")
+  isVisible         Boolean  @default(true) @map("is_visible")
+  order             Int?     @map("order")
+  customLabel       String?  @map("custom_label") @db.Text
+  titleTranslations Json?    @map("title_translations")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, menuId])
+  @@index([userId])
+  @@map("user_menu_item_preference_simple")
 }

@@ -1,11 +1,14 @@
+import type { Prisma, DiscoveredPage } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { DeepPartial, Repository } from 'typeorm'
+
+// Type helper for partial updates
+type DeepPartial<T> = Partial<T>
+
 import {
   type DiscoveredPage as DiscoveredPageInterface,
   pageDiscoveryService,
 } from '../../../core/services/page-discovery.service'
-import { DiscoveredPage } from '../entities/discovered-page.entity'
 
 
 
@@ -18,8 +21,7 @@ export interface PageSyncResult {
 @Injectable()
 export class PageSyncService {
   constructor(
-    @InjectRepository(DiscoveredPage, 'auth')
-    private readonly _discoveredPageRepository: Repository<DiscoveredPage>
+    private readonly prisma: PrismaService
   ) {}
 
   /**
@@ -63,47 +65,52 @@ export class PageSyncService {
    */
   private async syncSinglePage(page: DiscoveredPageInterface): Promise<void> {
     // Vérifier si la page existe déjà
-    const existingPage = await this._discoveredPageRepository.findOne({
-      where: { pageId: page.id },
+    const existingPage = await this.prisma.discoveredPage.findFirst({
+      where: { id: page.id },
     })
 
     if (existingPage) {
-      // Mettre à jour les informations existantes
-      await this._discoveredPageRepository.update(existingPage.id, {
-        title: page.title,
-        href: page.href,
-        description: page.description,
-        icon: page.icon,
-        category: page.category,
-        subcategory: page.subcategory,
-        requiredPermissions: page.permissions ? page.permissions.join(',') : undefined,
-        requiredRoles: page.roles ? page.roles.join(',') : undefined,
-        moduleId: page.moduleId,
-        isEnabled: page.isEnabled,
-        isVisible: page.isVisible,
+      // Mettre à jour les informations existantes avec Prisma
+      await this.prisma.discoveredPage.update({
+        where: { id: existingPage.id },
+        data: {
+          title: page.title,
+          path: (page as any).href,
+          description: page.description,
+          icon: page.icon,
+          category: page.category,
+          isActive: (page as any).isActive !== false,
+          metadata: {
+            subcategory: page.subcategory,
+            requiredPermissions: page.permissions ? page.permissions.join(',') : undefined,
+            requiredRoles: page.roles ? page.roles.join(',') : undefined,
+            moduleId: page.moduleId,
+            isVisible: page.isVisible,
+          },
+        },
       })
     } else {
-      // Créer une nouvelle entrée avec les permissions les plus élevées
-      const pageData: DeepPartial<DiscoveredPage> = {
-        id: page.id,
-        title: page.title,
-        href: page.href,
-        description: page.description,
-        icon: page.icon,
-        category: page.category,
-        subcategory: page.subcategory,
-        requiredPermissions: page.permissions ? page.permissions.join(',') : undefined,
-        requiredRoles: page.roles ? page.roles.join(',') : undefined,
-        moduleId: page.moduleId,
-        isVisible: true,
-        isEnabled: true,
-        defaultOrder: 0,
-        // Accorder l'accès au niveau le plus élevé par défaut
-        defaultAccessLevel: 'ADMIN',
-      }
-
-      const newPage = this._discoveredPageRepository.create(pageData)
-      await this._discoveredPageRepository.save(newPage)
+      // Créer une nouvelle entrée avec Prisma
+      await this.prisma.discoveredPage.create({
+        data: {
+          id: page.id,
+          title: page.title,
+          path: (page as any).href,
+          description: page.description,
+          icon: page.icon,
+          category: page.category,
+          isActive: true,
+          metadata: {
+            subcategory: page.subcategory,
+            requiredPermissions: page.permissions ? page.permissions.join(',') : undefined,
+            requiredRoles: page.roles ? page.roles.join(',') : undefined,
+            moduleId: page.moduleId,
+            isVisible: true,
+            defaultOrder: 0,
+            defaultAccessLevel: 'ADMIN',
+          },
+        },
+      })
     }
   }
 
@@ -115,23 +122,25 @@ export class PageSyncService {
     userRole: string,
     userPermissions: string[]
   ): Promise<DiscoveredPage[]> {
-    const allPages = await this._discoveredPageRepository.find({
-      where: { isEnabled: true },
+    const allPages = await this.prisma.discoveredPage.findMany({
+      where: { isActive: true },
     })
 
-    const authorizedPages = allPages.filter((page) => {
+    const authorizedPages = allPages.filter((page: any) => {
+      const metadata = page.metadata as any || {}
+
       // Vérifier les rôles requis
-      if (page.requiredRoles) {
-        const requiredRoles = page.requiredRoles.split(',').map((r) => r.trim())
+      if (metadata.requiredRoles) {
+        const requiredRoles = metadata.requiredRoles.split(',').map((r: string) => r.trim())
         if (!requiredRoles.includes(userRole)) {
           return false
         }
       }
 
       // Vérifier les permissions requises
-      if (page.requiredPermissions) {
-        const requiredPermissions = page.requiredPermissions.split(',').map((p) => p.trim())
-        const hasPermission = requiredPermissions.some((permission) =>
+      if (metadata.requiredPermissions) {
+        const requiredPermissions = metadata.requiredPermissions.split(',').map((p: string) => p.trim())
+        const hasPermission = requiredPermissions.some((permission: string) =>
           userPermissions.includes(permission)
         )
         if (!hasPermission) {
@@ -169,7 +178,7 @@ export class PageSyncService {
         permissions: string[]
         roles: string[]
         moduleId: string | null
-        isEnabled: boolean
+        isActive: boolean
         isVisible: boolean
       }[]
     }[]
@@ -195,7 +204,7 @@ export class PageSyncService {
           permissions: string[]
           roles: string[]
           moduleId: string | null
-          isEnabled: boolean
+          isActive: boolean
           isVisible: boolean
         }[]
       }
@@ -216,20 +225,22 @@ export class PageSyncService {
 
       const category = categoryMap.get(categoryId)
       if (!category) continue
+      const pageAny = page as any
+      const metadata = pageAny.metadata as any || {}
       category.pages.push({
-        id: page.pageId,
-        title: page.title,
-        href: page.href,
-        description: page.description || null,
-        icon: page.icon || null,
-        category: page.category,
-        subcategory: page.subcategory || null,
-        permissions: page.requiredPermissions ? page.requiredPermissions.split(',') : [],
-        roles: page.requiredRoles ? page.requiredRoles.split(',') : [],
-        moduleId: page.moduleId || null,
-        isEnabled: page.isEnabled,
-        isVisible: page.isVisible,
-      })
+        id: pageAny.id,
+        title: pageAny.title,
+        href: pageAny.path || pageAny.href,
+        description: pageAny.description || null,
+        icon: pageAny.icon || null,
+        category: pageAny.category,
+        subcategory: metadata.subcategory || null,
+        permissions: metadata.requiredPermissions ? metadata.requiredPermissions.split(',') : [],
+        roles: metadata.requiredRoles ? metadata.requiredRoles.split(',') : [],
+        moduleId: metadata.moduleId || null,
+        isActive: pageAny.isActive || true,
+        isVisible: metadata.isVisible !== false,
+      } as any)
     }
 
     return Array.from(categoryMap.values())

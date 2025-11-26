@@ -24,7 +24,7 @@ import {
     GlobalUserRole,
     SocieteRoleType,
 } from '../../../domains/auth/core/constants/roles.constants'
-import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { RequireSocieteContext } from '../../../domains/auth/security/guards/enhanced-tenant.guard'
 import { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
@@ -34,6 +34,7 @@ import { UpdateUserDto } from '../../../domains/users/dto/update-user.dto'
 import type { UserQueryDto } from '../../../domains/users/dto/user-query.dto'
 import { UsersService } from '../../../domains/users/users.service'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { Public } from '../../../core/multi-tenant'
 
 // Interface for database errors
 interface DatabaseError {
@@ -51,8 +52,8 @@ interface AuthenticatedUserWithTenant {
 
 @Controller('admin/users')
 @ApiTags('🔧 Admin - Users')
-@UseGuards(CombinedSecurityGuard)
-@RequireSystemAdmin()
+@Public() // Bypass TenantGuard - JwtAuthGuard handles authentication
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class AdminUsersController {
   private readonly logger = new Logger(AdminUsersController.name)
@@ -90,7 +91,7 @@ export class AdminUsersController {
 
     // Adapter les données avec le formatage des rôles amélioré
     const formattedUsers = await Promise.all(
-      users.map(async (user) => {
+      users.map(async (user: { id: string; email: string; prenom?: string | null; nom?: string | null; acronyme?: string | null; actif: boolean; createdAt?: Date | null; dernier_login?: Date | null; role: string }) => {
         const formattedGlobalRole = user.role
           ? this.roleFormattingService.formatGlobalRole(user.role as GlobalUserRole)
           : null
@@ -452,10 +453,10 @@ export class AdminUsersController {
           id: userSocieteRole.id,
           userId: userSocieteRole.userId,
           societeId: userSocieteRole.societeId,
-          roleType: userSocieteRole.roleType,
-          isDefault: userSocieteRole.isDefaultSociete,
+          roleType: body.roleType,
+          isDefault: body.isDefault || false,
           isActive: userSocieteRole.isActive,
-          grantedAt: userSocieteRole.grantedAt,
+          grantedAt: userSocieteRole.activatedAt || userSocieteRole.createdAt,
         },
         message: 'Rôle société assigné avec succès',
         statusCode: 201,

@@ -3,9 +3,38 @@
 import * as React from 'react'
 import type { CardVariants } from '../../../lib/design-system'
 import { cardVariants } from '../../../lib/design-system'
+import {
+  getInteractiveA11yProps,
+  getInteractiveClassName,
+} from '../../../lib/interactive-element'
 import { cn } from '../../../lib/utils'
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement>, CardVariants {}
+// ============================================
+// TYPES
+// ============================================
+
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    CardVariants {}
+
+export interface CardHeaderProps
+  extends React.HTMLAttributes<HTMLDivElement> {}
+
+export interface CardTitleProps
+  extends React.HTMLAttributes<HTMLHeadingElement> {}
+
+export interface CardDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {}
+
+export interface CardContentProps
+  extends React.HTMLAttributes<HTMLDivElement> {}
+
+export interface CardFooterProps
+  extends React.HTMLAttributes<HTMLDivElement> {}
+
+// ============================================
+// CARD COMPONENT
+// ============================================
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   (
@@ -14,50 +43,28 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       variant = 'default',
       padding = 'default',
       children,
-      style,
       onClick,
-      onMouseEnter,
-      onMouseLeave,
-      onFocus,
-      onBlur,
-      id,
       role,
       ...props
     },
     ref
   ) => {
-    // Add cursor pointer and proper accessibility attributes when interactive
-    const isInteractive = Boolean(onClick)
-    const interactiveClasses = isInteractive
-      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
-      : ''
-
-    const finalClassName = cn(cardVariants({ variant, padding }), interactiveClasses, className)
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        // Create a synthetic mouse event from keyboard event
-        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
-        onClick(syntheticEvent)
-      }
-    }
+    const interactiveProps = getInteractiveA11yProps(onClick, role)
+    const finalClassName = cn(
+      cardVariants({ variant, padding }),
+      getInteractiveClassName({
+        onClick,
+        baseClassName: '',
+        className,
+      })
+    )
 
     return (
-      // biome-ignore lint/a11y/noStaticElementInteractions: Card implements proper keyboard navigation and ARIA attributes
       <div
         ref={ref}
         className={finalClassName}
-        style={style}
         onClick={onClick}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyDown={isInteractive ? handleKeyDown : undefined}
-        id={id}
-        role={role || (isInteractive ? 'button' : undefined)}
-        tabIndex={isInteractive ? 0 : undefined}
+        {...interactiveProps}
         {...props}
       >
         {children}
@@ -67,52 +74,25 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 )
 Card.displayName = 'Card'
 
-const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
-  (
-    {
-      className,
-      children,
-      onClick,
-      onMouseEnter,
-      onMouseLeave,
-      onFocus,
-      onBlur,
-      id,
-      role,
-      ...props
-    },
-    ref
-  ) => {
-    const isInteractive = Boolean(onClick)
-    const baseClassName = 'flex flex-col space-y-1.5 px-6 py-6'
-    const interactiveClasses = isInteractive
-      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
-      : ''
-    const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
+// ============================================
+// CARD HEADER
+// ============================================
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        // Create a synthetic mouse event from keyboard event
-        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
-        onClick(syntheticEvent)
-      }
-    }
+const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
+  ({ className, children, onClick, role, ...props }, ref) => {
+    const interactiveProps = getInteractiveA11yProps(onClick, role)
+    const finalClassName = getInteractiveClassName({
+      onClick,
+      baseClassName: 'flex flex-col space-y-1.5 px-6 py-6',
+      className,
+    })
 
     return (
-      // biome-ignore lint/a11y/noStaticElementInteractions: CardHeader implements proper keyboard navigation and ARIA attributes
       <div
         ref={ref}
         className={finalClassName}
         onClick={onClick}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyDown={isInteractive ? handleKeyDown : undefined}
-        id={id}
-        role={role || (isInteractive ? 'button' : undefined)}
-        tabIndex={isInteractive ? 0 : undefined}
+        {...interactiveProps}
         {...props}
       >
         {children}
@@ -122,11 +102,13 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
 )
 CardHeader.displayName = 'CardHeader'
 
+// ============================================
+// CARD TITLE
+// ============================================
+
 const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
-  (
-    { className, children, onClick, onMouseEnter, onMouseLeave, onFocus, onBlur, id, role },
-    ref
-  ) => {
+  ({ className, children, onClick, role, ...props }, ref) => {
+    const interactiveProps = getInteractiveA11yProps(onClick, role)
     const baseClassName = 'text-2xl font-semibold leading-none tracking-tight'
     const finalClassName = [baseClassName, className].filter(Boolean).join(' ')
 
@@ -135,23 +117,8 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
         ref={ref}
         className={finalClassName}
         onClick={onClick}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            const syntheticEvent = new MouseEvent('click', {
-              bubbles: true,
-              cancelable: true,
-              view: window,
-            })
-            e.currentTarget.dispatchEvent(syntheticEvent)
-          }
-        }}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        id={id}
-        role={role}
+        {...interactiveProps}
+        {...props}
       >
         {children}
       </h3>
@@ -160,11 +127,13 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
 )
 CardTitle.displayName = 'CardTitle'
 
+// ============================================
+// CARD DESCRIPTION
+// ============================================
+
 const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
-  (
-    { className, children, onClick, onMouseEnter, onMouseLeave, onFocus, onBlur, id, role },
-    ref
-  ) => {
+  ({ className, children, onClick, role, ...props }, ref) => {
+    const interactiveProps = getInteractiveA11yProps(onClick, role)
     const baseClassName = 'text-sm text-muted-foreground'
     const finalClassName = [baseClassName, className].filter(Boolean).join(' ')
 
@@ -173,23 +142,8 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionPr
         ref={ref}
         className={finalClassName}
         onClick={onClick}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            const syntheticEvent = new MouseEvent('click', {
-              bubbles: true,
-              cancelable: true,
-              view: window,
-            })
-            e.currentTarget.dispatchEvent(syntheticEvent)
-          }
-        }}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        id={id}
-        role={role}
+        {...interactiveProps}
+        {...props}
       >
         {children}
       </p>
@@ -198,52 +152,25 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionPr
 )
 CardDescription.displayName = 'CardDescription'
 
-const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
-  (
-    {
-      className,
-      children,
-      onClick,
-      onMouseEnter,
-      onMouseLeave,
-      onFocus,
-      onBlur,
-      id,
-      role,
-      ...props
-    },
-    ref
-  ) => {
-    const isInteractive = Boolean(onClick)
-    const baseClassName = 'px-6 pb-6'
-    const interactiveClasses = isInteractive
-      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
-      : ''
-    const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
+// ============================================
+// CARD CONTENT
+// ============================================
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        // Create a synthetic mouse event from keyboard event
-        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
-        onClick(syntheticEvent)
-      }
-    }
+const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
+  ({ className, children, onClick, role, ...props }, ref) => {
+    const interactiveProps = getInteractiveA11yProps(onClick, role)
+    const finalClassName = getInteractiveClassName({
+      onClick,
+      baseClassName: 'px-6 pb-6',
+      className,
+    })
 
     return (
-      // biome-ignore lint/a11y/noStaticElementInteractions: CardContent implements proper keyboard navigation and ARIA attributes
       <div
         ref={ref}
         className={finalClassName}
         onClick={onClick}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyDown={isInteractive ? handleKeyDown : undefined}
-        id={id}
-        role={role || (isInteractive ? 'button' : undefined)}
-        tabIndex={isInteractive ? 0 : undefined}
+        {...interactiveProps}
         {...props}
       >
         {children}
@@ -253,52 +180,25 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
 )
 CardContent.displayName = 'CardContent'
 
-const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
-  (
-    {
-      className,
-      children,
-      onClick,
-      onMouseEnter,
-      onMouseLeave,
-      onFocus,
-      onBlur,
-      id,
-      role,
-      ...props
-    },
-    ref
-  ) => {
-    const isInteractive = Boolean(onClick)
-    const baseClassName = 'flex items-center px-6 pb-6'
-    const interactiveClasses = isInteractive
-      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
-      : ''
-    const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
+// ============================================
+// CARD FOOTER
+// ============================================
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        // Create a synthetic mouse event from keyboard event
-        const syntheticEvent = e as unknown as React.MouseEvent<HTMLDivElement>
-        onClick(syntheticEvent)
-      }
-    }
+const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
+  ({ className, children, onClick, role, ...props }, ref) => {
+    const interactiveProps = getInteractiveA11yProps(onClick, role)
+    const finalClassName = getInteractiveClassName({
+      onClick,
+      baseClassName: 'flex items-center px-6 pb-6',
+      className,
+    })
 
     return (
-      // biome-ignore lint/a11y/noStaticElementInteractions: CardFooter implements proper keyboard navigation and ARIA attributes
       <div
         ref={ref}
         className={finalClassName}
         onClick={onClick}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyDown={isInteractive ? handleKeyDown : undefined}
-        id={id}
-        role={role || (isInteractive ? 'button' : undefined)}
-        tabIndex={isInteractive ? 0 : undefined}
+        {...interactiveProps}
         {...props}
       >
         {children}
@@ -308,12 +208,9 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
 )
 CardFooter.displayName = 'CardFooter'
 
-// Define individual component prop types
-export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
-export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
-export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
-export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
-export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+// ============================================
+// EXPORTS
+// ============================================
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export type { CardVariants }

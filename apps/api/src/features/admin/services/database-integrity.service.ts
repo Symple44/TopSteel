@@ -1,6 +1,5 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
 import { getErrorMessage } from '../../../core/common/utils'
 
 export interface TableInfo {
@@ -29,10 +28,7 @@ export interface DatabaseIntegrityReport {
 export class DatabaseIntegrityService {
   private readonly logger = new Logger(DatabaseIntegrityService.name)
 
-  constructor(
-    @InjectDataSource('auth')
-    private readonly _dataSource: DataSource
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Tables attendues dans le système (basées sur les entités)
@@ -99,15 +95,15 @@ export class DatabaseIntegrityService {
   async getActualTables(): Promise<string[]> {
     try {
       const query = `
-        SELECT table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'public' 
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
         AND table_type = 'BASE TABLE'
         ORDER BY table_name
       `
 
-      const result = await this._dataSource.query(query)
-      return result.map((row: Record<string, unknown>) => row.table_name)
+      const result = await this.prisma.$queryRawUnsafe<Array<{ table_name: string }>>(query)
+      return result.map((row) => row.table_name)
     } catch (error) {
       this.logger.error('Erreur lors de la récupération des tables:', error)
       return []
@@ -120,15 +116,18 @@ export class DatabaseIntegrityService {
   async getTableColumns(tableName: string): Promise<string[]> {
     try {
       const query = `
-        SELECT column_name 
-        FROM information_schema.columns 
-        WHERE table_schema = 'public' 
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
         AND table_name = $1
         ORDER BY ordinal_position
       `
 
-      const result = await this._dataSource.query(query, [tableName])
-      return result.map((row: Record<string, unknown>) => row.column_name)
+      const result = await this.prisma.$queryRawUnsafe<Array<{ column_name: string }>>(
+        query,
+        tableName
+      )
+      return result.map((row) => row.column_name)
     } catch (error) {
       this.logger.error(`Erreur lors de la récupération des colonnes pour ${tableName}:`, error)
       return []
@@ -202,6 +201,11 @@ export class DatabaseIntegrityService {
 
   /**
    * Force la synchronisation de la base de données
+   * NOTE: Cette méthode était basée sur TypeORM's synchronize().
+   * Avec Prisma, utilisez plutôt:
+   * - `prisma migrate dev` pour le développement
+   * - `prisma migrate deploy` pour la production
+   * - `prisma db push` pour synchroniser sans migrations
    */
   async synchronizeDatabase(): Promise<{
     success: boolean
@@ -214,50 +218,30 @@ export class DatabaseIntegrityService {
       // Nettoyer les index problématiques avant la synchronisation
       await this.cleanupProblematicIndexes()
 
-      // Activer la synchronisation temporairement
-      await this._dataSource.synchronize(false) // false = ne pas supprimer les données existantes
+      // NOTE: Prisma ne supporte pas la synchronisation automatique comme TypeORM
+      // Utilisez les migrations Prisma à la place
+      this.logger.warn(
+        'La synchronisation automatique n\'est pas disponible avec Prisma. Utilisez "prisma db push" ou les migrations Prisma.'
+      )
 
       // Initialiser les paramètres système par défaut
       await this.initializeSystemDefaults()
 
-      this.logger.log('Synchronisation terminée avec succès')
+      this.logger.log('Initialisation terminée avec succès')
 
       return {
         success: true,
-        message: 'Base de données synchronisée avec succès et paramètres système initialisés',
+        message:
+          'Paramètres système initialisés. Pour synchroniser le schéma, utilisez "prisma db push" ou les migrations Prisma.',
       }
     } catch (error) {
       this.logger.error('Erreur lors de la synchronisation:', error)
 
-      // Si c'est une erreur d'index, essayer de la résoudre
       const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
-      if (errorMessage.includes('existe déjà') || errorMessage.includes('already exists')) {
-        this.logger.log("Tentative de résolution des conflits d'index...")
-
-        try {
-          // Extraire le nom de l'index de l'erreur
-          const indexMatch = errorMessage.match(/«\s*([^»]+)\s*»|"([^"]+)"/)
-          if (indexMatch) {
-            const indexName = indexMatch[1] || indexMatch[2]
-            await this.dropIndexIfExists(indexName)
-
-            // Réessayer la synchronisation
-            await this._dataSource.synchronize(false)
-            await this.initializeSystemDefaults()
-
-            return {
-              success: true,
-              message: "Base de données synchronisée après résolution des conflits d'index",
-            }
-          }
-        } catch (retryError) {
-          this.logger.error('Erreur lors de la tentative de résolution:', retryError)
-        }
-      }
 
       return {
         success: false,
-        message: 'Erreur lors de la synchronisation',
+        message: "Erreur lors de l'initialisation",
         details: { error: errorMessage },
       }
     }
@@ -285,7 +269,7 @@ export class DatabaseIntegrityService {
    */
   private async dropIndexIfExists(indexName: string): Promise<void> {
     try {
-      await this._dataSource.query(`DROP INDEX IF EXISTS "${indexName}"`)
+      await this.prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "${indexName}"`)
       this.logger.log(`Index ${indexName} supprimé s'il existait`)
     } catch (error) {
       this.logger.error(`Erreur lors de la suppression de l'index ${indexName}:`, error)
@@ -316,31 +300,33 @@ export class DatabaseIntegrityService {
   private async ensureEnumsExist(): Promise<void> {
     try {
       // Vérifier et créer l'enum notifications_type_enum
-      const notifTypeEnumExists = await this._dataSource.query(`
+      const notifTypeEnumExists = await this.prisma.$queryRawUnsafe<Array<{ exists: boolean }>>(`
         SELECT EXISTS (
           SELECT 1 FROM pg_type WHERE typname = 'notifications_type_enum'
-        );
+        ) as exists;
       `)
 
       if (notifTypeEnumExists[0]?.exists) {
         // Vérifier si 'info' existe dans l'enum
-        const enumValues = await this._dataSource.query(`
-          SELECT enumlabel 
-          FROM pg_enum 
+        const enumValues = await this.prisma.$queryRawUnsafe<Array<{ enumlabel: string }>>(`
+          SELECT enumlabel
+          FROM pg_enum
           WHERE enumtypid = (
-            SELECT oid 
-            FROM pg_type 
+            SELECT oid
+            FROM pg_type
             WHERE typname = 'notifications_type_enum'
           )
         `)
 
-        const hasInfo = enumValues.some((row: Record<string, unknown>) => row.enumlabel === 'info')
+        const hasInfo = enumValues.some((row) => row.enumlabel === 'info')
         if (!hasInfo) {
-          await this._dataSource.query(`ALTER TYPE notifications_type_enum ADD VALUE 'info'`)
+          await this.prisma.$executeRawUnsafe(
+            `ALTER TYPE notifications_type_enum ADD VALUE 'info'`
+          )
           this.logger.log('Valeur "info" ajoutée à l\'enum notifications_type_enum')
         }
       } else {
-        await this._dataSource.query(`
+        await this.prisma.$executeRawUnsafe(`
           CREATE TYPE notifications_type_enum AS ENUM ('info', 'warning', 'error', 'success');
         `)
         this.logger.log('Enum notifications_type_enum créé')
@@ -357,11 +343,13 @@ export class DatabaseIntegrityService {
   private async createDefaultSystemParameters(): Promise<void> {
     try {
       // Vérifier si des paramètres système existent déjà
-      const existingParams = await this._dataSource.query(`
+      const existingParams = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>(`
         SELECT COUNT(*) as count FROM system_parameters
       `)
 
-      if (existingParams[0]?.count > 0) {
+      const count = Number(existingParams[0]?.count) || 0
+
+      if (count > 0) {
         this.logger.log("Paramètres système déjà présents, pas d'initialisation nécessaire")
         return
       }
@@ -399,12 +387,17 @@ export class DatabaseIntegrityService {
       ]
 
       for (const param of defaultParams) {
-        await this._dataSource.query(
+        await this.prisma.$executeRawUnsafe(
           `
           INSERT INTO system_parameters (key, value, description, type, category, created_at, updated_at)
           VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+          ON CONFLICT (key) DO NOTHING
         `,
-          [param.key, param.value, param.description, param.type, param.category]
+          param.key,
+          param.value,
+          param.description,
+          param.type,
+          param.category
         )
       }
 
@@ -424,7 +417,9 @@ export class DatabaseIntegrityService {
     error?: string
   }> {
     try {
-      const result = await this._dataSource.query('SELECT version()')
+      const result = await this.prisma.$queryRawUnsafe<Array<{ version: string }>>(
+        'SELECT version() as version'
+      )
       const version = result[0]?.version || 'Unknown'
 
       return {

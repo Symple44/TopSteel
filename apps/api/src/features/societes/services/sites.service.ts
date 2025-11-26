@@ -1,104 +1,152 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { IsNull, type Repository } from 'typeorm'
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { Site } from '../entities/site.entity'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { Site, Prisma } from '@prisma/client'
 
-
-
+/**
+ * Service de gestion des sites
+ * Migrated from TypeORM to Prisma
+ */
 @Injectable()
 export class SitesService {
-  constructor(
-    @InjectRepository(Site, 'auth')
-    private _siteRepository: Repository<Site>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Récupère tous les sites actifs
+   */
   async findAll(): Promise<Site[]> {
-    return this._siteRepository.find({
-      where: { deletedAt: IsNull() },
-      relations: ['societe'],
+    return this.prisma.site.findMany({
+      where: { isActive: true },
+      include: { societe: true },
     })
   }
 
+  /**
+   * Récupère tous les sites d'une société
+   */
   async findBySociete(societeId: string): Promise<Site[]> {
-    return this._siteRepository.find({
+    return this.prisma.site.findMany({
       where: {
         societeId,
-        deletedAt: IsNull(),
+        isActive: true,
       },
-      relations: ['societe'],
+      include: { societe: true },
     })
   }
 
+  /**
+   * Trouve un site par son ID
+   */
   async findById(id: string): Promise<Site | null> {
-    return this._siteRepository.findOne({
-      where: { id, deletedAt: IsNull() },
-      relations: ['societe'],
+    return this.prisma.site.findUnique({
+      where: { id },
+      include: { societe: true },
     })
   }
 
+  /**
+   * Trouve le site principal d'une société
+   * Note: Uses metadata field to track principal status
+   */
   async findPrincipal(societeId: string): Promise<Site | null> {
-    return this._siteRepository.findOne({
+    const sites = await this.prisma.site.findMany({
       where: {
         societeId,
-        isPrincipal: true,
-        deletedAt: IsNull(),
+        isActive: true,
       },
-      relations: ['societe'],
+      include: { societe: true },
+    })
+
+    // Check metadata for isPrincipal flag
+    return sites.find(s => (s.metadata as any)?.isPrincipal === true) || sites[0] || null
+  }
+
+  /**
+   * Crée un nouveau site
+   */
+  async create(siteData: Prisma.SiteCreateInput): Promise<Site> {
+    return this.prisma.site.create({
+      data: siteData,
+      include: { societe: true },
     })
   }
 
-  async create(siteData: Partial<Site>): Promise<Site> {
-    const site = this._siteRepository.create(siteData)
-    return this._siteRepository.save(site)
-  }
-
-  async update(id: string, siteData: QueryDeepPartialEntity<Site>): Promise<Site> {
-    await this._siteRepository.update(id, siteData)
-    const site = await this._siteRepository.findOne({
+  /**
+   * Met à jour un site
+   */
+  async update(id: string, siteData: Prisma.SiteUpdateInput): Promise<Site> {
+    const site = await this.prisma.site.update({
       where: { id },
-      relations: ['societe'],
+      data: siteData,
+      include: { societe: true },
     })
+
     if (!site) {
       throw new NotFoundException(`Site with ID ${id} not found`)
     }
+
     return site
   }
 
+  /**
+   * Supprime un site (soft delete via isActive)
+   */
   async delete(id: string): Promise<void> {
-    await this._siteRepository.softDelete(id)
+    await this.prisma.site.update({
+      where: { id },
+      data: { isActive: false },
+    })
   }
 
+  /**
+   * Définit un site comme principal pour sa société
+   * Note: Uses metadata field to track principal status
+   */
   async setPrincipal(id: string, societeId: string): Promise<Site> {
-    // D'abord, retirer le statut principal des autres sites
-    await this._siteRepository.update({ societeId }, { isPrincipal: false })
+    // Get all sites for the societe
+    const sites = await this.prisma.site.findMany({
+      where: { societeId },
+    })
 
-    // Puis définir le nouveau site principal
-    await this._siteRepository.update(id, { isPrincipal: true })
+    // Update all sites to remove isPrincipal flag from metadata
+    for (const site of sites) {
+      const metadata = (site.metadata as any) || {}
+      if (site.id === id) {
+        metadata.isPrincipal = true
+      } else {
+        metadata.isPrincipal = false
+      }
+      await this.prisma.site.update({
+        where: { id: site.id },
+        data: { metadata: metadata as any },
+      })
+    }
 
-    const site = await this.findById(id)
+    // Return the newly principal site
+    const site = await this.prisma.site.findUnique({
+      where: { id },
+      include: { societe: true },
+    })
+
     if (!site) {
       throw new NotFoundException(`Site with ID ${id} not found`)
     }
+
     return site
   }
 
-  async activate(id: string): Promise<Site> {
-    await this._siteRepository.update(id, { actif: true })
-    const site = await this.findById(id)
-    if (!site) {
-      throw new NotFoundException(`Site with ID ${id} not found`)
-    }
-    return site
-  }
+  /**
+   * Vérifie si un code de site existe déjà pour une société
+   */
+  async codeExists(code: string, societeId: string, excludeId?: string): Promise<boolean> {
+    const count = await this.prisma.site.count({
+      where: {
+        code,
+        societeId,
+        isActive: true,
+        ...(excludeId && { id: { not: excludeId } }),
+      },
+    })
 
-  async deactivate(id: string): Promise<Site> {
-    await this._siteRepository.update(id, { actif: false })
-    const site = await this.findById(id)
-    if (!site) {
-      throw new NotFoundException(`Site with ID ${id} not found`)
-    }
-    return site
+    return count > 0
   }
 }
-

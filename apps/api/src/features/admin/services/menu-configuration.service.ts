@@ -4,21 +4,23 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { MenuConfiguration } from '../../../domains/admin/entities/menu-configuration.entity'
-import { MenuItem, MenuItemType } from '../../../domains/admin/entities/menu-item.entity'
-import { MenuItemPermission } from '../entities/menu-item-permission.entity'
-import { MenuItemRole } from '../entities/menu-item-role.entity'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { MenuConfiguration, MenuItem } from '@prisma/client'
 
-
+// Enum for MenuItemType - keeping for backward compatibility
+// Note: Prisma schema doesn't have this enum, items are differentiated by presence of path, etc.
+export enum MenuItemType {
+  FOLDER = 'FOLDER',
+  PROGRAM = 'PROGRAM',
+  LINK = 'LINK',
+  DATA_VIEW = 'DATA_VIEW',
+}
 
 // Interfaces for relations
 interface MenuItemPermissionData {
   id: string
   menuItemId: string
   permissionId: string
-  isRequired?: boolean
   createdAt: Date
 }
 
@@ -29,33 +31,25 @@ interface MenuItemRoleData {
   createdAt: Date
 }
 
-// Import interface from entity file
-interface MenuItemData {
-  id: string
-  configId: string
-  parentId?: string
-  title: string
-  orderIndex: number
-  isVisible: boolean
-  type: MenuItemType
-  programId?: string
-  externalUrl?: string
-  queryBuilderId?: string
-  metadata?: Record<string, unknown>
+// Extended MenuItem interface with relations for internal use
+interface MenuItemData extends MenuItem {
   // Relations
   permissions?: MenuItemPermissionData[]
   roles?: MenuItemRoleData[]
   children?: MenuItemData[]
-  // Virtual properties for compatibility
+  // Virtual properties for compatibility with frontend
+  title?: string // alias for label
   titleKey?: string
-  href?: string
-  icon?: string
-  gradient?: string
-  badge?: string
-  moduleId?: string
-  target?: string
-  // Method
-  getDepth?(): number
+  href?: string // alias for path
+  gradient?: string // from metadata
+  badge?: string // from metadata
+  type?: MenuItemType // computed from metadata or path presence
+  programId?: string // from metadata or path
+  externalUrl?: string // from metadata
+  queryBuilderId?: string // from metadata
+  moduleId?: string // from metadata
+  target?: string // from metadata
+  orderIndex?: number // alias for order
 }
 
 export interface MenuItemDto {
@@ -100,36 +94,43 @@ export interface MenuTreeNode extends MenuItemDto {
 
 @Injectable()
 export class MenuConfigurationService {
-  constructor(
-    @InjectRepository(MenuConfiguration, 'auth')
-    private readonly _configRepository: Repository<MenuConfiguration>,
-    @InjectRepository(MenuItem, 'auth')
-    private readonly _itemRepository: Repository<MenuItem>,
-    @InjectRepository(MenuItemPermission, 'auth')
-    private readonly _permissionRepository: Repository<MenuItemPermission>,
-    @InjectRepository(MenuItemRole, 'auth')
-    private readonly _roleRepository: Repository<MenuItemRole>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   // ===== GESTION DES CONFIGURATIONS =====
 
-  async findAllConfigurations(): Promise<MenuConfiguration[]> {
-    return await this._configRepository.find({
-      order: { isSystem: 'DESC', name: 'ASC' },
+  async findAllConfigurations(): Promise<any[]> {
+    return await this.prisma.menuConfiguration.findMany({
+      orderBy: [{ name: 'asc' }],
     })
   }
 
-  async findActiveConfiguration(): Promise<MenuConfiguration | null> {
-    return await this._configRepository.findOne({
+  async findActiveConfiguration(): Promise<any | null> {
+    return await this.prisma.menuConfiguration.findFirst({
       where: { isActive: true },
-      relations: ['items', 'items.children', 'items.permissions', 'items.roles'],
+      include: {
+        menuItems: {
+          include: {
+            children: true,
+            permissions: true,
+            roles: true,
+          },
+        },
+      },
     })
   }
 
-  async findConfigurationById(id: string): Promise<MenuConfiguration> {
-    const config = await this._configRepository.findOne({
+  async findConfigurationById(id: string): Promise<any> {
+    const config = await this.prisma.menuConfiguration.findFirst({
       where: { id },
-      relations: ['items', 'items.children', 'items.permissions', 'items.roles'],
+      include: {
+        menuItems: {
+          include: {
+            children: true,
+            permissions: true,
+            roles: true,
+          },
+        },
+      },
     })
 
     if (!config) {
@@ -139,12 +140,9 @@ export class MenuConfigurationService {
     return config
   }
 
-  async createConfiguration(
-    createDto: CreateMenuConfigDto,
-    createdBy: string
-  ): Promise<MenuConfiguration> {
+  async createConfiguration(createDto: CreateMenuConfigDto, createdBy: string): Promise<any> {
     // Vérifier l'unicité du nom
-    const existingConfig = await this._configRepository.findOne({
+    const existingConfig = await this.prisma.menuConfiguration.findFirst({
       where: { name: createDto.name },
     })
 
@@ -153,37 +151,33 @@ export class MenuConfigurationService {
     }
 
     // Créer la configuration
-    const config = MenuConfiguration.createCustom(
-      createDto.name,
-      createDto.description || createDto.name,
-      'main'
-    )
-    config.createdBy = createdBy
-
-    const savedConfig = await this._configRepository.save(config)
+    const config = await this.prisma.menuConfiguration.create({
+      data: {
+        name: createDto.name,
+        description: createDto.description || createDto.name,
+        isActive: false,
+        isDefault: false,
+      },
+    })
 
     // Créer les items de menu
     if (createDto.items && createDto.items.length > 0) {
-      await this.createMenuItems(savedConfig.id, createDto.items)
+      await this.createMenuItems(config.id, createDto.items)
     }
 
-    return await this.findConfigurationById(savedConfig.id)
+    return await this.findConfigurationById(config.id)
   }
 
   async updateConfiguration(
     id: string,
     updateDto: UpdateMenuConfigDto,
     updatedBy: string
-  ): Promise<MenuConfiguration> {
+  ): Promise<any> {
     const config = await this.findConfigurationById(id)
-
-    if (config.isSystem && updateDto.name) {
-      throw new ForbiddenException("Impossible de modifier le nom d'une configuration système")
-    }
 
     // Vérifier l'unicité du nom si modifié
     if (updateDto.name && updateDto.name !== config.name) {
-      const existingConfig = await this._configRepository.findOne({
+      const existingConfig = await this.prisma.menuConfiguration.findFirst({
         where: { name: updateDto.name },
       })
 
@@ -193,11 +187,15 @@ export class MenuConfigurationService {
     }
 
     // Mettre à jour la configuration
-    Object.assign(config, updateDto)
-    config.updatedBy = updatedBy
-    config.updatedAt = new Date()
-
-    await this._configRepository.save(config)
+    await this.prisma.menuConfiguration.update({
+      where: { id },
+      data: {
+        ...(updateDto.name && { name: updateDto.name }),
+        ...(updateDto.description && { description: updateDto.description }),
+        ...(updateDto.isActive !== undefined && { isActive: updateDto.isActive }),
+        updatedAt: new Date(),
+      },
+    })
 
     // Mettre à jour les items si fournis
     if (updateDto.items) {
@@ -210,34 +208,31 @@ export class MenuConfigurationService {
   async deleteConfiguration(id: string): Promise<void> {
     const config = await this.findConfigurationById(id)
 
-    if (config.isSystem) {
-      throw new ForbiddenException('Impossible de supprimer une configuration système')
-    }
-
     if (config.isActive) {
       throw new ForbiddenException('Impossible de supprimer la configuration active')
     }
 
-    await this._configRepository.delete(id)
+    await this.prisma.menuConfiguration.delete({ where: { id } })
   }
 
   async activateConfiguration(id: string): Promise<void> {
     // Désactiver toutes les autres configurations
-    await this._configRepository
-      .createQueryBuilder()
-      .update(MenuConfiguration)
-      .set({ isActive: false })
-      .where('isActive = :isActive', { isActive: true })
-      .execute()
+    await this.prisma.menuConfiguration.updateMany({
+      where: { isActive: true },
+      data: { isActive: false },
+    })
 
     // Activer la configuration sélectionnée
-    await this._configRepository.update(id, { isActive: true })
+    await this.prisma.menuConfiguration.update({
+      where: { id },
+      data: { isActive: true },
+    })
   }
 
   // ===== GESTION DES ITEMS DE MENU =====
 
   async getMenuTree(configId?: string): Promise<MenuTreeNode[]> {
-    let config: MenuConfiguration | null
+    let config: any | null
 
     if (configId) {
       config = await this.findConfigurationById(configId)
@@ -250,38 +245,53 @@ export class MenuConfigurationService {
     }
 
     // Construire l'arbre de menu
-    const items = config.items.filter((item) => !(item as any).parentId) as unknown as MenuItemData[]
-    return this.buildMenuTree(items, config.items as unknown as MenuItemData[])
+    const items = (config.menuItems || []).filter(
+      (item: any) => !item.parentId
+    ) as unknown as MenuItemData[]
+    return this.buildMenuTree(items, (config.menuItems || []) as unknown as MenuItemData[])
   }
 
   private buildMenuTree(rootItems: MenuItemData[], allItems: MenuItemData[]): MenuTreeNode[] {
     return rootItems
-      .sort((a, b) => a.orderIndex - b.orderIndex)
-      .map((item) => {
+      .sort((a, b) => a.order - b.order)
+      .map((item): MenuTreeNode => {
         const children = allItems.filter((child) => child.parentId === item.id)
+        const metadata = (item.metadata as Record<string, any>) || {}
+
         return {
           id: item.id,
-          parentId: item.parentId,
-          title: item.title,
-          titleKey: item.titleKey,
-          href: item.href,
-          icon: item.icon,
-          gradient: item.gradient,
-          badge: item.badge,
-          orderIndex: item.orderIndex,
+          parentId: item.parentId || undefined,
+          title: item.label,
+          titleKey: metadata.titleKey as string | undefined,
+          href: item.path || undefined,
+          icon: item.icon || undefined,
+          gradient: metadata.gradient as string | undefined,
+          badge: metadata.badge as string | undefined,
+          orderIndex: item.order,
           isVisible: item.isVisible,
-          moduleId: item.moduleId,
-          target: item.target,
-          type: item.type,
-          programId: item.programId,
-          externalUrl: item.externalUrl,
-          queryBuilderId: item.queryBuilderId,
+          moduleId: metadata.moduleId as string | undefined,
+          target: metadata.target as string | undefined,
+          type: (metadata.type as MenuItemType) || (item.path ? MenuItemType.PROGRAM : MenuItemType.FOLDER),
+          programId: (metadata.programId as string | undefined) || item.path || undefined,
+          externalUrl: metadata.externalUrl as string | undefined,
+          queryBuilderId: metadata.queryBuilderId as string | undefined,
           permissions: item.permissions?.map((p) => p.permissionId) || [],
           roles: item.roles?.map((r) => r.roleId) || [],
           children: this.buildMenuTree(children, allItems),
-          depth: item.getDepth?.() || 0,
+          depth: this.calculateDepth(item, allItems),
         }
       })
+  }
+
+  private calculateDepth(item: MenuItemData, allItems: MenuItemData[]): number {
+    let depth = 0
+    let currentId: string | null | undefined = item.parentId
+    while (currentId) {
+      depth++
+      const parent = allItems.find(i => i.id === currentId)
+      currentId = parent?.parentId || null
+    }
+    return depth
   }
 
   private async createMenuItems(
@@ -290,80 +300,62 @@ export class MenuConfigurationService {
     parentId?: string
   ): Promise<void> {
     for (const itemDto of items) {
-      // Créer l'item selon son type
-      let item: MenuItem
-
-      switch (itemDto.type) {
-        case MenuItemType.FOLDER:
-          item = MenuItem.createFolder(
-            configId,
-            itemDto.title,
-            itemDto.icon,
-            parentId || itemDto.parentId
-          )
-          break
-        case MenuItemType.PROGRAM:
-          item = MenuItem.createProgram(
-            configId,
-            itemDto.title,
-            itemDto.programId || itemDto.href || '',
-            itemDto.icon,
-            parentId || itemDto.parentId
-          )
-          break
-        case MenuItemType.LINK:
-          item = MenuItem.createLink(
-            configId,
-            itemDto.title,
-            itemDto.externalUrl || '',
-            itemDto.icon,
-            parentId || itemDto.parentId
-          )
-          break
-        case MenuItemType.DATA_VIEW:
-          item = MenuItem.createDataView(
-            configId,
-            itemDto.title,
-            itemDto.queryBuilderId || '',
-            itemDto.icon,
-            parentId || itemDto.parentId
-          )
-          break
-        default:
-          item = MenuItem.create(
-            configId,
-            itemDto.title,
-            itemDto.type,
-            itemDto.href,
-            itemDto.icon,
-            parentId || itemDto.parentId
-          )
-      }
-
-      Object.assign(item, {
+      // Préparer les métadonnées avec les propriétés étendues
+      const metadata: Record<string, any> = {
+        type: itemDto.type,
         titleKey: itemDto.titleKey,
         gradient: itemDto.gradient,
         badge: itemDto.badge,
-        orderIndex: itemDto.orderIndex,
-        isVisible: itemDto.isVisible,
         moduleId: itemDto.moduleId,
         target: itemDto.target,
-      })
+      }
 
-      const savedItem = await this._itemRepository.save(item)
+      // Ajouter les champs spécifiques au type dans les métadonnées
+      switch (itemDto.type) {
+        case MenuItemType.PROGRAM:
+          metadata.programId = itemDto.programId || itemDto.href
+          break
+        case MenuItemType.LINK:
+          metadata.externalUrl = itemDto.externalUrl
+          break
+        case MenuItemType.DATA_VIEW:
+          metadata.queryBuilderId = itemDto.queryBuilderId
+          break
+      }
+
+      // Créer l'item avec le schéma Prisma
+      const itemData = {
+        menuConfigurationId: configId,
+        label: itemDto.title,
+        icon: itemDto.icon || null,
+        path: itemDto.href || itemDto.programId || null,
+        order: itemDto.orderIndex,
+        isVisible: itemDto.isVisible,
+        isActive: true,
+        parentId: parentId || itemDto.parentId || null,
+        metadata,
+      }
+
+      const savedItem = await this.prisma.menuItem.create({ data: itemData })
 
       // Créer les permissions
-      if (itemDto.permissions) {
-        const permissions = itemDto.permissions.map((permissionId) =>
-          MenuItemPermission.create(savedItem.id, permissionId)
-        )
-        await this._permissionRepository.save(permissions)
+      if (itemDto.permissions && itemDto.permissions.length > 0) {
+        await this.prisma.menuItemPermission.createMany({
+          data: itemDto.permissions.map((permissionId) => ({
+            menuItemId: savedItem.id,
+            permissionId,
+          })),
+        })
       }
 
       // Créer les rôles
-      if (itemDto.roles) {
-        const roles = itemDto.roles.map((roleId) => MenuItemRole.create(savedItem.id, roleId))
-        await this._roleRepository.save(roles)
+      if (itemDto.roles && itemDto.roles.length > 0) {
+        await this.prisma.menuItemRole.createMany({
+          data: itemDto.roles.map((roleId) => ({
+            menuItemId: savedItem.id,
+            roleId,
+          })),
+        })
       }
 
       // Créer les enfants de manière récursive
@@ -374,8 +366,10 @@ export class MenuConfigurationService {
   }
 
   private async updateMenuItems(configId: string, items: MenuItemDto[]): Promise<void> {
-    // Supprimer tous les items existants
-    await this._itemRepository.delete({ configId })
+    // Supprimer tous les items existants de cette config
+    await this.prisma.menuItem.deleteMany({
+      where: { menuConfigurationId: configId },
+    })
 
     // Recréer les items
     await this.createMenuItems(configId, items)
@@ -447,7 +441,7 @@ export class MenuConfigurationService {
 
   // ===== TEMPLATES ET UTILITAIRES =====
 
-  async createDefaultConfiguration(): Promise<MenuConfiguration> {
+  async createDefaultConfiguration(): Promise<any> {
     const defaultItems: MenuItemDto[] = [
       {
         title: 'Tableau de bord',
@@ -553,10 +547,7 @@ export class MenuConfigurationService {
     }
   }
 
-  async importConfiguration(
-    data: Record<string, unknown>,
-    createdBy: string
-  ): Promise<MenuConfiguration> {
+  async importConfiguration(data: Record<string, unknown>, createdBy: string): Promise<any> {
     return await this.createConfiguration(
       {
         name: data.name as string,
@@ -575,9 +566,22 @@ export class MenuConfigurationService {
     title: string,
     icon?: string,
     parentId?: string
-  ): Promise<MenuItem> {
-    const item = MenuItem.createDataView(configId, title, queryBuilderId, icon, parentId)
-    return await this._itemRepository.save(item)
+  ): Promise<any> {
+    return await this.prisma.menuItem.create({
+      data: {
+        menuConfigurationId: configId,
+        label: title,
+        icon: icon || null,
+        parentId: parentId || null,
+        order: 999,
+        isVisible: true,
+        isActive: true,
+        metadata: {
+          type: MenuItemType.DATA_VIEW,
+          queryBuilderId,
+        },
+      },
+    })
   }
 
   async addUserDataViewToMenu(
@@ -585,10 +589,10 @@ export class MenuConfigurationService {
     queryBuilderId: string,
     title: string,
     icon?: string
-  ): Promise<MenuItem> {
+  ): Promise<any> {
     // Rechercher ou créer une configuration personnelle pour l'utilisateur
-    let userConfig = await this._configRepository.findOne({
-      where: { createdBy: userId, name: `Menus personnels - ${userId}` },
+    let userConfig = await this.prisma.menuConfiguration.findFirst({
+      where: { name: `Menus personnels - ${userId}` },
     })
 
     if (!userConfig) {
@@ -602,6 +606,10 @@ export class MenuConfigurationService {
       )
     }
 
+    if (!userConfig) {
+      throw new Error('Failed to create user configuration')
+    }
+
     return await this.createDataViewMenuItem(
       userConfig.id,
       queryBuilderId,
@@ -610,4 +618,3 @@ export class MenuConfigurationService {
     )
   }
 }
-

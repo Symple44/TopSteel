@@ -1,7 +1,6 @@
 import { Body, Controller, Logger, Post, Request, UseGuards } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
 import type { Request as ExpressRequest } from 'express'
-import type { DataSource } from 'typeorm'
+import { Public } from '../../../core/multi-tenant'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import type { ExecuteRawSqlDto } from '../dto/execute-query.dto'
 import {
@@ -10,18 +9,13 @@ import {
 } from '../security/query-builder-security.guard'
 import { QueryBuilderExecutorService } from '../services/query-builder-executor.service'
 
-// Removed - using ExecuteRawSqlDto from dto instead
-
 @Controller('query-builder/execute-sql')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard, QueryBuilderSecurityGuard)
 export class SqlExecutorController {
   private readonly logger = new Logger(SqlExecutorController.name)
 
-  constructor(
-    @InjectDataSource('tenant') _tenantDataSource: DataSource,
-    @InjectDataSource('auth') _authDataSource: DataSource,
-    private readonly executorService: QueryBuilderExecutorService
-  ) {}
+  constructor(private readonly executorService: QueryBuilderExecutorService) {}
 
   @Post()
   @QueryBuilderAdminAccess() // Require admin access for raw SQL

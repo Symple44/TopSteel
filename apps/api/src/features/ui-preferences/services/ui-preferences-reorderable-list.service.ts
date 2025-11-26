@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { UiPreferencesReorderableList } from '../../../api/entities/ui-preferences-reorderable-list.entity'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 
 export interface ReorderableListPreferences {
   defaultExpanded: boolean
@@ -32,22 +30,25 @@ export interface ReorderableListConfig {
   updatedAt?: Date
 }
 
+/**
+ * UIPreferencesReorderableListService - Clean Prisma implementation
+ * Gère les préférences UI pour les composants de liste réordonnables
+ */
 @Injectable()
 export class UIPreferencesReorderableListService {
-  constructor(
-    @InjectRepository(UiPreferencesReorderableList, 'auth')
-    private readonly repository: Repository<UiPreferencesReorderableList>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Récupère la configuration d'un composant pour un utilisateur
    */
   async getConfig(userId: string, componentId: string): Promise<ReorderableListConfig | null> {
     try {
-      const preference = await this.repository.findOne({
+      const preference = await this.prisma.uiPreferencesReorderableList.findUnique({
         where: {
-          user_id: userId,
-          component_id: componentId,
+          userId_componentId: {
+            userId,
+            componentId,
+          },
         },
       })
 
@@ -57,13 +58,13 @@ export class UIPreferencesReorderableListService {
 
       return {
         id: preference.id,
-        userId: preference.user_id,
-        componentId: preference.component_id,
-        theme: preference.theme,
-        preferences: preference.preferences,
-        layout: preference.layout,
-        createdAt: preference.created_at,
-        updatedAt: preference.updated_at,
+        userId: preference.userId,
+        componentId: preference.componentId,
+        theme: preference.theme as ReorderableListTheme,
+        preferences: preference.preferences as unknown as ReorderableListPreferences,
+        layout: preference.layout as unknown as ReorderableListLayout,
+        createdAt: preference.createdAt,
+        updatedAt: preference.updatedAt,
       }
     } catch (_error) {
       return null
@@ -78,61 +79,52 @@ export class UIPreferencesReorderableListService {
     componentId: string,
     config: Partial<ReorderableListConfig>
   ): Promise<ReorderableListConfig> {
-    try {
-      const existingPreference = await this.repository.findOne({
-        where: {
-          user_id: userId,
-          component_id: componentId,
+    const defaultPreferences: ReorderableListPreferences = {
+      defaultExpanded: true,
+      showLevelIndicators: true,
+      showConnectionLines: true,
+      enableAnimations: true,
+      compactMode: false,
+      customColors: {},
+    }
+
+    const defaultLayout: ReorderableListLayout = {
+      maxDepth: 10,
+      allowNesting: true,
+      dragHandlePosition: 'left',
+      expandButtonPosition: 'left',
+    }
+
+    const preference = await this.prisma.uiPreferencesReorderableList.upsert({
+      where: {
+        userId_componentId: {
+          userId,
+          componentId,
         },
-      })
+      },
+      update: {
+        theme: config.theme || 'default',
+        preferences: (config.preferences || defaultPreferences) as any,
+        layout: (config.layout || defaultLayout) as any,
+      },
+      create: {
+        userId,
+        componentId,
+        theme: config.theme || 'default',
+        preferences: (config.preferences || defaultPreferences) as any,
+        layout: (config.layout || defaultLayout) as any,
+      },
+    })
 
-      let preference: UiPreferencesReorderableList
-
-      if (existingPreference) {
-        // Update existing
-        Object.assign(existingPreference, {
-          theme: config.theme || existingPreference.theme,
-          preferences: config.preferences || existingPreference.preferences,
-          layout: config.layout || existingPreference.layout,
-          updated_at: new Date(),
-        })
-        preference = await this.repository.save(existingPreference)
-      } else {
-        // Create new
-        const newPreference = this.repository.create({
-          user_id: userId,
-          component_id: componentId,
-          theme: config.theme || 'default',
-          preferences: config.preferences || {
-            defaultExpanded: true,
-            showLevelIndicators: true,
-            showConnectionLines: true,
-            enableAnimations: true,
-            compactMode: false,
-            customColors: {},
-          },
-          layout: config.layout || {
-            maxDepth: 10,
-            allowNesting: true,
-            dragHandlePosition: 'left',
-            expandButtonPosition: 'left',
-          },
-        })
-        preference = await this.repository.save(newPreference)
-      }
-
-      return {
-        id: preference.id,
-        userId: preference.user_id,
-        componentId: preference.component_id,
-        theme: preference.theme,
-        preferences: preference.preferences,
-        layout: preference.layout,
-        createdAt: preference.created_at,
-        updatedAt: preference.updated_at,
-      }
-    } catch (_error) {
-      throw new Error('Failed to save UI preference')
+    return {
+      id: preference.id,
+      userId: preference.userId,
+      componentId: preference.componentId,
+      theme: preference.theme as ReorderableListTheme,
+      preferences: preference.preferences as unknown as ReorderableListPreferences,
+      layout: preference.layout as unknown as ReorderableListLayout,
+      createdAt: preference.createdAt,
+      updatedAt: preference.updatedAt,
     }
   }
 
@@ -141,13 +133,17 @@ export class UIPreferencesReorderableListService {
    */
   async deleteConfig(userId: string, componentId: string): Promise<boolean> {
     try {
-      const result = await this.repository.delete({
-        user_id: userId,
-        component_id: componentId,
+      await this.prisma.uiPreferencesReorderableList.delete({
+        where: {
+          userId_componentId: {
+            userId,
+            componentId,
+          },
+        },
       })
-      return result.affected ? result.affected > 0 : false
+      return true
     } catch (_error) {
-      throw new Error('Failed to delete UI preference')
+      return false
     }
   }
 
@@ -156,20 +152,20 @@ export class UIPreferencesReorderableListService {
    */
   async getAllUserConfigs(userId: string): Promise<ReorderableListConfig[]> {
     try {
-      const preferences = await this.repository.find({
-        where: { user_id: userId },
-        order: { updated_at: 'DESC' },
+      const preferences = await this.prisma.uiPreferencesReorderableList.findMany({
+        where: { userId },
+        orderBy: { updatedAt: 'desc' },
       })
 
       return preferences.map((pref) => ({
         id: pref.id,
-        userId: pref.user_id,
-        componentId: pref.component_id,
-        theme: pref.theme,
-        preferences: pref.preferences,
-        layout: pref.layout,
-        createdAt: pref.created_at,
-        updatedAt: pref.updated_at,
+        userId: pref.userId,
+        componentId: pref.componentId,
+        theme: pref.theme as ReorderableListTheme,
+        preferences: pref.preferences as unknown as ReorderableListPreferences,
+        layout: pref.layout as unknown as ReorderableListLayout,
+        createdAt: pref.createdAt,
+        updatedAt: pref.updatedAt,
       }))
     } catch (_error) {
       return []
@@ -204,8 +200,10 @@ export class UIPreferencesReorderableListService {
    */
   async deleteAllUserConfigs(userId: string): Promise<number> {
     try {
-      const result = await this.repository.delete({ user_id: userId })
-      return result.affected || 0
+      const result = await this.prisma.uiPreferencesReorderableList.deleteMany({
+        where: { userId },
+      })
+      return result.count
     } catch (_error) {
       throw new Error('Failed to delete all UI preferences')
     }

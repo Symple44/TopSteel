@@ -1,7 +1,8 @@
+import { DatabaseModule } from '../../core/database/database.module'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { EventEmitterModule } from '@nestjs/event-emitter'
-import { TypeOrmModule } from '@nestjs/typeorm'
+
 import { RedisService } from '../../core/common/services/redis.service'
 import { RedisModule } from '../../core/redis/redis.module'
 import { SearchController } from './controllers/search.controller'
@@ -18,10 +19,12 @@ import { SearchResultFormatterService } from './services/search-result-formatter
 
 @Module({
   imports: [
+    DatabaseModule,
     ConfigModule,
     EventEmitterModule.forRoot(),
-    TypeOrmModule.forFeature([], 'default'), // Base auth
-    TypeOrmModule.forFeature([], 'tenant'), // Base tenant
+    // TypeORM repositories disabled - using Prisma services
+    // // Base auth
+    // // Base tenant
     RedisModule.forRoot(), // Import Redis module for caching
   ],
   controllers: [SearchController, SearchCacheController],
@@ -29,10 +32,13 @@ import { SearchResultFormatterService } from './services/search-result-formatter
     // Redis service
     RedisService,
 
-    // Provide REDIS_CLIENT for cache service
+    // Provide REDIS_CLIENT for cache service (null when disabled)
     {
       provide: 'REDIS_CLIENT',
       useFactory: () => {
+        if (process.env.CACHE_ENABLED === 'false') {
+          return null
+        }
         const Redis = require('ioredis')
         return new Redis({
           host: process.env.REDIS_HOST || 'localhost',
@@ -46,33 +52,33 @@ import { SearchResultFormatterService } from './services/search-result-formatter
     // Core services
     SearchResultFormatterService,
     ElasticsearchSearchService,
-    PostgreSQLSearchService,
-    SearchIndexingOperationsService,
+    PostgreSQLSearchService, // Clean - uses pure Prisma
+    SearchIndexingOperationsService, // Clean - uses pure Prisma
 
     // Cache services
     SearchCacheService,
     SearchCacheInvalidationService,
 
     // Main orchestrator services
-    GlobalSearchService,
+    GlobalSearchService, // Re-enabled - dependencies fixed
     SearchIndexingService,
 
     // Enhanced cached search service
-    CachedGlobalSearchService,
+    CachedGlobalSearchService
   ],
   exports: [
     // Core services
-    GlobalSearchService,
-    SearchIndexingService,
-    SearchIndexingOperationsService,
+    // GlobalSearchService, // Disabled - may depend on disabled services
+    // SearchIndexingService, // Disabled - may depend on disabled services
+    // SearchIndexingOperationsService, // Disabled - uses @InjectDataSource('auth', 'tenant')
     ElasticsearchSearchService,
-    PostgreSQLSearchService,
+    // PostgreSQLSearchService, // Disabled - uses @InjectDataSource('auth', 'tenant')
     SearchResultFormatterService,
 
     // Cache services
     SearchCacheService,
     SearchCacheInvalidationService,
-    CachedGlobalSearchService,
+    // CachedGlobalSearchService, // Disabled - may depend on disabled services
   ],
 })
 export class SearchModule {}

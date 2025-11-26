@@ -1,92 +1,103 @@
+/**
+ * QueryBuilderService - Refactored to use Prisma services
+ * Clean implementation using QueryBuilderPrismaService
+ */
+
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { DeepPartial, Repository } from 'typeorm'
+import type { QueryBuilder } from '@prisma/client'
+import { QueryBuilderCalculatedFieldPrismaService } from '../../../domains/query-builder/prisma/query-builder-calculated-field-prisma.service'
+import { QueryBuilderColumnPrismaService } from '../../../domains/query-builder/prisma/query-builder-column-prisma.service'
+import { QueryBuilderJoinPrismaService } from '../../../domains/query-builder/prisma/query-builder-join-prisma.service'
+import { QueryBuilderPrismaService } from '../../../domains/query-builder/prisma/query-builder-prisma.service'
 import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
-import {
-  QueryBuilder,
-  QueryBuilderCalculatedField,
-  QueryBuilderColumn,
-  QueryBuilderJoin,
-} from '../entities'
 import { QueryBuilderPermissionService } from './query-builder-permission.service'
-
-// Interface for format field
-export interface FieldFormat {
-  type?: 'date' | 'number' | 'currency' | 'percentage' | 'boolean' | 'custom'
-  pattern?: string
-  prefix?: string
-  suffix?: string
-  decimals?: number
-}
-
-// Interface for aggregation field
-export interface FieldAggregation {
-  enabled?: boolean
-  type?: 'sum' | 'avg' | 'count' | 'min' | 'max'
-}
-
-// Interface for update data
-interface QueryBuilderUpdateData {
-  name?: string
-  description?: string
-  database?: string
-  mainTable?: string
-  isPublic?: boolean
-  maxRows?: number
-  settings?: {
-    enablePagination?: boolean
-    pageSize?: number
-    enableSorting?: boolean
-    enableFiltering?: boolean
-    enableExport?: boolean
-    exportFormats?: string[]
-  }
-  layout?: Record<string, unknown>
-}
 
 @Injectable()
 export class QueryBuilderService {
   constructor(
-    @InjectRepository(QueryBuilder, 'auth')
-    private _queryBuilderRepository: Repository<QueryBuilder>,
-    @InjectRepository(QueryBuilderColumn, 'auth')
-    private _columnRepository: Repository<QueryBuilderColumn>,
-    @InjectRepository(QueryBuilderJoin, 'auth')
-    private _joinRepository: Repository<QueryBuilderJoin>,
-    @InjectRepository(QueryBuilderCalculatedField, 'auth')
-    private _calculatedFieldRepository: Repository<QueryBuilderCalculatedField>,
+    private readonly queryBuilderPrisma: QueryBuilderPrismaService,
+    private readonly columnPrisma: QueryBuilderColumnPrismaService,
+    private readonly joinPrisma: QueryBuilderJoinPrismaService,
+    private readonly calculatedFieldPrisma: QueryBuilderCalculatedFieldPrismaService,
     private readonly permissionService: QueryBuilderPermissionService
   ) {}
 
-  async create(createDto: CreateQueryBuilderDto, userId: string): Promise<QueryBuilder> {
-    const queryData = {
-      ...createDto,
-      createdById: userId,
-    } as DeepPartial<QueryBuilder>
+  async create(createDto: CreateQueryBuilderDto, userId: string, societeId: string): Promise<QueryBuilder> {
+    const queryBuilder = await this.queryBuilderPrisma.createQueryBuilder({
+      name: createDto.name,
+      description: createDto.description,
+      type: createDto.database || 'standard',
+      baseTable: createDto.mainTable,
+      createdBy: userId,
+      societeId,
+      isPublic: createDto.isPublic ?? false,
+      isActive: true,
+      settings: createDto.settings as unknown as Record<string, any>,
+      layout: createDto.layout as unknown as Record<string, any>,
+    })
+    
+    // Create columns if provided
+    if (createDto.columns && createDto.columns.length > 0) {
+      for (const col of createDto.columns) {
+        await this.columnPrisma.createColumn({
+          queryBuilderId: queryBuilder.id,
+          tableName: col.tableName,
+          columnName: col.columnName,
+          alias: col.alias,
+          dataType: col.dataType,
+          order: col.displayOrder,
+          isVisible: col.isVisible,
+          width: col.width,
+          format: col.format,
+          aggregation: col.aggregation,
+        })
+      }
+    }
 
-    const queryBuilder = this._queryBuilderRepository.create(queryData)
-    const saved = await this._queryBuilderRepository.save(queryBuilder)
-    const savedEntity = Array.isArray(saved) ? saved[0] : saved
+    // Create joins if provided
+    if (createDto.joins && createDto.joins.length > 0) {
+      for (const join of createDto.joins) {
+        await this.joinPrisma.createJoin({
+          queryBuilderId: queryBuilder.id,
+          joinType: join.joinType,
+          sourceTable: join.fromTable,
+          targetTable: join.toTable,
+          sourceColumn: join.fromColumn,
+          targetColumn: join.toColumn,
+          order: join.order,
+        })
+      }
+    }
 
-    // Add default permission for creator
+    // Create calculated fields if provided
+    if (createDto.calculatedFields && createDto.calculatedFields.length > 0) {
+      for (const field of createDto.calculatedFields) {
+        await this.calculatedFieldPrisma.createCalculatedField({
+          queryBuilderId: queryBuilder.id,
+          name: field.name,
+          expression: field.expression,
+          dataType: field.dataType,
+          order: field.displayOrder,
+          isVisible: field.isVisible,
+          format: field.format,
+        })
+      }
+    }
+    
     await this.permissionService.addPermission({
-      queryBuilderId: savedEntity.id,
+      queryBuilderId: queryBuilder.id,
       userId,
       permissionType: 'edit',
       isAllowed: true,
     })
 
-    return savedEntity
+    return queryBuilder
   }
 
   async findAll(userId: string): Promise<QueryBuilder[]> {
-    const queryBuilders = await this._queryBuilderRepository.find({
-      relations: ['createdBy'],
-      order: { updatedAt: 'DESC' },
-    })
+    const queryBuilders = await this.queryBuilderPrisma.getAllQueryBuilders(false)
 
-    // Filter based on permissions
     const allowedQueryBuilders: QueryBuilder[] = []
     for (const qb of queryBuilders) {
       const canView = await this.permissionService.checkPermission(qb.id, userId, 'view')
@@ -98,11 +109,8 @@ export class QueryBuilderService {
     return allowedQueryBuilders
   }
 
-  async findOne(id: string, userId: string): Promise<QueryBuilder> {
-    const queryBuilder = await this._queryBuilderRepository.findOne({
-      where: { id },
-      relations: ['columns', 'joins', 'calculatedFields', 'createdBy'],
-    })
+  async findOne(id: string, userId: string): Promise<any> {
+    const queryBuilder = await this.queryBuilderPrisma.getQueryBuilderWithRelations(id)
 
     if (!queryBuilder) {
       throw new NotFoundException('Query Builder not found')
@@ -116,135 +124,131 @@ export class QueryBuilderService {
     return queryBuilder
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateQueryBuilderDto,
-    userId: string
-  ): Promise<QueryBuilder> {
-    const _queryBuilder = await this.findOne(id, userId)
+  async update(id: string, updateDto: UpdateQueryBuilderDto, userId: string): Promise<QueryBuilder> {
+    await this.findOne(id, userId)
 
     const canEdit = await this.permissionService.checkPermission(id, userId, 'edit')
     if (!canEdit) {
       throw new ForbiddenException('You do not have permission to edit this Query Builder')
     }
 
-    // Update columns if provided
+    const updated = await this.queryBuilderPrisma.updateQueryBuilder(id, {
+      name: updateDto.name,
+      description: updateDto.description,
+      type: updateDto.database,
+      baseTable: updateDto.mainTable,
+      isPublic: updateDto.isPublic,
+      isActive: true,
+      settings: updateDto.settings as unknown as Record<string, any>,
+      layout: updateDto.layout as unknown as Record<string, any>,
+    })
+
     if (updateDto.columns) {
-      await this._columnRepository.delete({ queryBuilderId: id })
+      await this.columnPrisma.deleteByQueryBuilderId(id)
       if (updateDto.columns.length > 0) {
-        const columnsData = updateDto.columns.map((col) => ({
-          ...col,
-          queryBuilderId: id,
-        }))
-        const columns = this._columnRepository.create(columnsData)
-        await this._columnRepository.save(columns)
+        for (const col of updateDto.columns) {
+          await this.columnPrisma.createColumn({
+            queryBuilderId: id,
+            tableName: col.tableName,
+            columnName: col.columnName,
+            alias: col.alias || col.columnName,
+            dataType: col.dataType || 'string',
+            isVisible: col.isVisible ?? true,
+            order: col.displayOrder ?? 0,
+            width: col.width,
+            format: col.format,
+            aggregation: col.aggregation,
+          })
+        }
       }
     }
 
-    // Update joins if provided
     if (updateDto.joins) {
-      await this._joinRepository.delete({ queryBuilderId: id })
+      await this.joinPrisma.deleteByQueryBuilderId(id)
       if (updateDto.joins.length > 0) {
-        const joinsData = updateDto.joins.map((join) => ({
-          ...join,
-          queryBuilderId: id,
-        }))
-        const joins = this._joinRepository.create(joinsData)
-        await this._joinRepository.save(joins)
+        for (const join of updateDto.joins) {
+          await this.joinPrisma.createJoin({
+            queryBuilderId: id,
+            joinType: join.joinType || 'INNER',
+            sourceTable: join.fromTable,
+            targetTable: join.toTable,
+            sourceColumn: join.fromColumn,
+            targetColumn: join.toColumn,
+            order: join.order ?? 0,
+          })
+        }
       }
     }
 
-    // Update calculated fields if provided
     if (updateDto.calculatedFields) {
-      await this._calculatedFieldRepository.delete({ queryBuilderId: id })
+      await this.calculatedFieldPrisma.deleteByQueryBuilderId(id)
       if (updateDto.calculatedFields.length > 0) {
-        const fieldsData = updateDto.calculatedFields.map((field) => ({
-          ...field,
-          queryBuilderId: id,
-        }))
-        const fields = this._calculatedFieldRepository.create(fieldsData as any)
-        await this._calculatedFieldRepository.save(fields)
+        for (const field of updateDto.calculatedFields) {
+          await this.calculatedFieldPrisma.createCalculatedField({
+            queryBuilderId: id,
+            name: field.name,
+            expression: field.expression,
+            dataType: field.dataType || 'string',
+            isVisible: field.isVisible ?? true,
+            order: field.displayOrder ?? 0,
+          })
+        }
       }
     }
 
-    // Update main query builder
-    const {
-      columns: _columns,
-      joins: _joins,
-      calculatedFields: _calculatedFields,
-      ...mainUpdate
-    } = updateDto
-    await this._queryBuilderRepository.update(id, mainUpdate as any)
-
-    return this.findOne(id, userId)
+    return updated
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const queryBuilder = await this.findOne(id, userId)
+    await this.findOne(id, userId)
 
     const canDelete = await this.permissionService.checkPermission(id, userId, 'delete')
-    if (!canDelete && queryBuilder.createdById !== userId) {
+    if (!canDelete) {
       throw new ForbiddenException('You do not have permission to delete this Query Builder')
     }
 
-    await this._queryBuilderRepository.remove(queryBuilder)
+    await this.queryBuilderPrisma.deleteQueryBuilder(id)
   }
 
-  async duplicate(id: string, userId: string): Promise<QueryBuilder> {
+  async duplicate(id: string, newName: string, userId: string): Promise<QueryBuilder> {
     const original = await this.findOne(id, userId)
 
-    const duplicate = this._queryBuilderRepository.create({
-      name: `${original.name} (Copy)`,
-      description: original.description,
-      database: original.database,
-      mainTable: original.mainTable,
-      isPublic: false,
-      maxRows: original.maxRows,
-      settings: original.settings,
-      layout: original.layout,
-      createdById: userId,
+    const canView = await this.permissionService.checkPermission(id, userId, 'view')
+    if (!canView && !original.isPublic) {
+      throw new ForbiddenException('You do not have permission to duplicate this Query Builder')
+    }
+
+    const duplicate = await this.queryBuilderPrisma.duplicateQueryBuilder(id, newName, userId)
+
+    await this.permissionService.addPermission({
+      queryBuilderId: duplicate.id,
+      userId,
+      permissionType: 'edit',
+      isAllowed: true,
     })
 
-    const saved = await this._queryBuilderRepository.save(duplicate)
-    const savedEntity = Array.isArray(saved) ? saved[0] : saved
+    return duplicate
+  }
 
-    // Duplicate columns
-    if (original.columns && original.columns.length > 0) {
-      const columns = original.columns.map((col: any) => {
-        const { id: _id, ...columnData } = col
-        return this._columnRepository.create({
-          ...columnData,
-          queryBuilderId: savedEntity.id,
-        } as DeepPartial<QueryBuilderColumn>)
-      })
-      await this._columnRepository.save(columns)
+  async getUserQueryBuilders(userId: string): Promise<QueryBuilder[]> {
+    return this.queryBuilderPrisma.getUserQueryBuilders(userId, false)
+  }
+
+  async getPublicQueryBuilders(): Promise<QueryBuilder[]> {
+    return this.queryBuilderPrisma.getPublicQueryBuilders(false)
+  }
+
+  async searchQueryBuilders(searchTerm: string, userId: string): Promise<QueryBuilder[]> {
+    const results = await this.queryBuilderPrisma.searchQueryBuilders(searchTerm)
+
+    const allowedResults: QueryBuilder[] = []
+    for (const qb of results) {
+      const canView = await this.permissionService.checkPermission(qb.id, userId, 'view')
+      if (canView || qb.isPublic) {
+        allowedResults.push(qb)
+      }
     }
 
-    // Duplicate joins
-    if (original.joins && original.joins.length > 0) {
-      const joins = original.joins.map((join: any) => {
-        const { id: _id, ...joinData } = join
-        return this._joinRepository.create({
-          ...joinData,
-          queryBuilderId: savedEntity.id,
-        } as DeepPartial<QueryBuilderJoin>)
-      })
-      await this._joinRepository.save(joins)
-    }
-
-    // Duplicate calculated fields
-    if (original.calculatedFields && original.calculatedFields.length > 0) {
-      const fields = original.calculatedFields.map((field: any) => {
-        const { id: _id, ...fieldData } = field
-
-        return this._calculatedFieldRepository.create({
-          ...fieldData,
-          queryBuilderId: savedEntity.id,
-        } as DeepPartial<QueryBuilderCalculatedField>)
-      })
-      await this._calculatedFieldRepository.save(fields)
-    }
-
-    return this.findOne(savedEntity.id, userId)
+    return allowedResults
   }
 }

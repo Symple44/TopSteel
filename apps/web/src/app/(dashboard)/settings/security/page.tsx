@@ -118,11 +118,11 @@ export default function SecuritySettingsPage() {
         setMFAMethods(methodsData?.data)
       }
     } catch {
-      toast?.error(t('security.mfa.loadError'))
+      toast?.error('Erreur lors du chargement MFA')
     } finally {
       setLoading(false)
     }
-  }, [t])
+  }, []) // Removed t dependency to prevent infinite loop
 
   useEffect(() => {
     loadMFAData()

@@ -38,7 +38,7 @@ export class SessionRedisService {
   private readonly redisEnabled: boolean
 
   constructor(private configService: ConfigService) {
-    this.redisEnabled = this.configService.get<string>('REDIS_ENABLED') === 'true'
+    this.redisEnabled = this.configService.get<string>('REDIS_ENABLED') === 'true' && this.configService.get<string>('CACHE_ENABLED') !== 'false'
 
     if (!this.redisEnabled) {
       this.logger.log('Redis is disabled, SessionRedisService will operate in fallback mode')

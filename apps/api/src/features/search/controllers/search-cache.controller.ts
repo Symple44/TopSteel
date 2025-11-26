@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../../core/multi-tenant'
 import { getErrorMessage } from '../../../core/common/utils'
 import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
@@ -21,6 +22,7 @@ import { SearchCacheInvalidationService } from '../services/search-cache-invalid
 
 @ApiTags('Search Cache Management')
 @Controller('api/search/cache')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SearchCacheController {
   constructor(

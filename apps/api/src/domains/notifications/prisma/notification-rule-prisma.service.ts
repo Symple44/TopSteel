@@ -31,6 +31,7 @@ export class NotificationRulePrismaService {
    */
   async createNotificationRule(data: {
     name: string
+    societeId: string
     description?: string
     type: string
     enabled?: boolean
@@ -46,6 +47,7 @@ export class NotificationRulePrismaService {
       const rule = await this.prisma.notificationRule.create({
         data: {
           name: data.name,
+          societeId: data.societeId,
           description: data.description || null,
           type: data.type,
           enabled: data.enabled !== undefined ? data.enabled : true,

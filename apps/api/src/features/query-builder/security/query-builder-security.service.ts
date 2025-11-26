@@ -1,6 +1,4 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
 
 /**
  * Allowed tables with their security configuration
@@ -516,7 +514,7 @@ export class QueryBuilderSecurityService {
     ],
   ])
 
-  constructor(@InjectDataSource('tenant') readonly _dataSource: DataSource) {
+  constructor() {
     this.logger.log(`Initialized with ${this.allowedTables.size} whitelisted tables`)
   }
 

@@ -94,12 +94,7 @@ interface Role {
   description: string
 }
 
-const GROUP_TYPE_LABELS = {
-  DEPARTMENT: 'Département',
-  TEAM: 'Équipe',
-  PROJECT: 'Projet',
-  CUSTOM: 'Personnalisé',
-}
+// Note: GROUP_TYPE_LABELS moved to use translations via t('groups.types.XXX')
 
 const GROUP_TYPE_ICONS = {
   DEPARTMENT: Building,
@@ -116,6 +111,7 @@ const GROUP_TYPE_COLORS = {
 }
 
 export function GroupManagementPanel() {
+  const { t } = useTranslation('admin')
   const [groups, setGroups] = useState<Group[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
@@ -176,7 +172,7 @@ export function GroupManagementPanel() {
   }
 
   const handleDeleteGroup = async (groupId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')) {
+    if (!confirm(t('groups.deleteConfirm'))) {
       return
     }
 
@@ -217,7 +213,7 @@ export function GroupManagementPanel() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
-          <p className="mt-4 text-gray-600">Chargement des groupes...</p>
+          <p className="mt-4 text-gray-600">{t('groups.loading')}</p>
         </div>
       </div>
     )
@@ -228,16 +224,16 @@ export function GroupManagementPanel() {
       {/* En-tête */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold">Gestion des Groupes</h1>
+          <h1 className="text-3xl font-bold">{t('groups.title')}</h1>
           <p className="text-muted-foreground mt-2">
-            Organisez vos utilisateurs en groupes avec des rôles partagés
+            {t('groups.description')}
           </p>
         </div>
         <div className="flex gap-2">
           <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
             <Button variant="outline" onClick={() => openBulkAssignment()}>
               <UsersIcon className="h-4 w-4 mr-2" />
-              Assignation en masse
+              {t('groups.bulkAssignment')}
             </Button>
           </PermissionHide>
           <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
@@ -245,12 +241,12 @@ export function GroupManagementPanel() {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Nouveau groupe
+                  {t('groups.newGroup')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Créer un nouveau groupe</DialogTitle>
+                  <DialogTitle>{t('groups.createGroup')}</DialogTitle>
                 </DialogHeader>
                 <GroupForm
                   roles={roles}
@@ -267,15 +263,15 @@ export function GroupManagementPanel() {
 
       {/* Statistiques */}
       <div className="grid gap-4 md:grid-cols-4">
-        {Object.entries(GROUP_TYPE_LABELS).map(([type, label]) => {
-          const Icon = GROUP_TYPE_ICONS[type as keyof typeof GROUP_TYPE_ICONS]
+        {(['DEPARTMENT', 'TEAM', 'PROJECT', 'CUSTOM'] as const).map((type) => {
+          const Icon = GROUP_TYPE_ICONS[type]
           const count = groupsByType[type]?.length ?? 0
           return (
             <Card key={type}>
               <CardContent className="p-6">
                 <div className="flex items-center space-x-2">
                   <Icon className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-sm font-medium text-muted-foreground">{label}</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground">{t(`groups.types.${type}`)}</h3>
                 </div>
                 <p className="text-2xl font-bold mt-2">{count}</p>
               </CardContent>
@@ -286,8 +282,8 @@ export function GroupManagementPanel() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="groups">Tous les groupes ({groups.length})</TabsTrigger>
-          <TabsTrigger value="by-type">Par type</TabsTrigger>
+          <TabsTrigger value="groups">{t('groups.tabs.all')} ({groups.length})</TabsTrigger>
+          <TabsTrigger value="by-type">{t('groups.tabs.byType')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="groups" className="space-y-4">
@@ -314,7 +310,7 @@ export function GroupManagementPanel() {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Badge className={GROUP_TYPE_COLORS[type as keyof typeof GROUP_TYPE_COLORS]}>
-                    {GROUP_TYPE_LABELS[type as keyof typeof GROUP_TYPE_LABELS]}
+                    {t(`groups.types.${type}`)}
                   </Badge>
                   <span className="text-lg">({typeGroups.length})</span>
                 </CardTitle>
@@ -345,7 +341,7 @@ export function GroupManagementPanel() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Modifier le groupe: {selectedGroup?.name}</DialogTitle>
+            <DialogTitle>{t('groups.editGroup')}: {selectedGroup?.name}</DialogTitle>
           </DialogHeader>
           <GroupForm
             group={selectedGroup}
@@ -362,7 +358,7 @@ export function GroupManagementPanel() {
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Détails du groupe: {selectedGroup?.name}</DialogTitle>
+            <DialogTitle>{t('groups.detailsTitle')}: {selectedGroup?.name}</DialogTitle>
           </DialogHeader>
           <GroupDetails
             group={selectedGroup}
@@ -404,7 +400,8 @@ function GroupCard({
   onViewDetails: () => void
   onBulkAssignment: () => void
 }) {
-  const Icon = GROUP_TYPE_ICONS[group.type]
+  const { t } = useTranslation('admin')
+  const Icon = GROUP_TYPE_ICONS[group.type] || Settings // Fallback to Settings icon
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -412,48 +409,48 @@ function GroupCard({
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
             <div
-              className={`p-2 rounded-lg ${GROUP_TYPE_COLORS?.[group.type]?.replace('text-', 'bg-').replace('-800', '-100')}`}
+              className={`p-2 rounded-lg ${GROUP_TYPE_COLORS?.[group.type]?.replace('text-', 'bg-').replace('-800', '-100') || 'bg-gray-100'}`}
             >
               <Icon
-                className={`h-6 w-6 ${GROUP_TYPE_COLORS?.[group.type]?.replace('bg-', 'text-').replace('-100', '-600')}`}
+                className={`h-6 w-6 ${GROUP_TYPE_COLORS?.[group.type]?.replace('bg-', 'text-').replace('-100', '-600') || 'text-gray-600'}`}
               />
             </div>
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
                 <h3 className="font-semibold text-lg">{group.name}</h3>
-                <Badge className={GROUP_TYPE_COLORS[group.type]}>
-                  {GROUP_TYPE_LABELS[group.type]}
+                <Badge className={GROUP_TYPE_COLORS[group.type] || 'bg-gray-100 text-gray-800'}>
+                  {group.type ? (t(`groups.types.${group.type}`) || group.type) : t('groups.types.CUSTOM')}
                 </Badge>
                 <Badge variant={group.isActive ? 'default' : 'secondary'}>
-                  {group.isActive ? 'Actif' : 'Inactif'}
+                  {group.isActive ? t('groups.active') : t('groups.inactive')}
                 </Badge>
               </div>
               <p className="text-muted-foreground mb-3">{group.description}</p>
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <Users className="h-4 w-4" />
-                  <span>{group.userCount} membres</span>
+                  <span>{group.userCount} {t('groups.members')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Shield className="h-4 w-4" />
-                  <span>{group.roleCount} rôles</span>
+                  <span>{group.roleCount} {t('groups.rolesCount')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <span>Créé le {formatDate(group.createdAt)}</span>
+                  <span>{t('groups.createdOn')} {formatDate(group.createdAt)}</span>
                 </div>
               </div>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm" onClick={onViewDetails}>
-              Détails
+              {t('groups.details')}
             </Button>
             <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={onBulkAssignment}
-                title="Assignation en masse pour ce groupe"
+                title={t('groups.bulkAssignmentTooltip')}
               >
                 <UsersIcon className="h-4 w-4" />
               </Button>
@@ -485,7 +482,7 @@ function GroupForm({
   roles: Role[]
   onSave: () => void
 }) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('admin')
   const [formData, setFormData] = useState({
     name: group?.name || '',
     description: group?.description || '',
@@ -517,33 +514,33 @@ function GroupForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor={fieldIds.name}>Nom du groupe</Label>
+        <Label htmlFor={fieldIds.name}>{t('groups.form.name')}</Label>
         <Input
           id={fieldIds.name}
           value={formData.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setFormData((prev) => ({ ...prev, name: e?.target?.value }))
           }
-          placeholder="Ex: Équipe commerciale..."
+          placeholder={t('groups.form.namePlaceholder')}
           required
         />
       </div>
 
       <div>
-        <Label htmlFor={fieldIds.description}>Description</Label>
+        <Label htmlFor={fieldIds.description}>{t('groups.form.description')}</Label>
         <Textarea
           id={fieldIds.description}
           value={formData.description}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setFormData((prev) => ({ ...prev, description: e?.target?.value }))
           }
-          placeholder="Décrivez le rôle et les responsabilités de ce groupe..."
+          placeholder={t('groups.form.descriptionPlaceholder')}
           required
         />
       </div>
 
       <div>
-        <Label htmlFor={fieldIds.type}>Type de groupe</Label>
+        <Label htmlFor={fieldIds.type}>{t('groups.form.type')}</Label>
         <Select
           value={formData.type}
           onValueChange={(value: string) =>
@@ -554,9 +551,9 @@ function GroupForm({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(GROUP_TYPE_LABELS).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label}
+            {(['DEPARTMENT', 'TEAM', 'PROJECT', 'CUSTOM'] as const).map((type) => (
+              <SelectItem key={type} value={type}>
+                {t(`groups.types.${type}`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -565,9 +562,9 @@ function GroupForm({
 
       {!group && (
         <div>
-          <Label>Rôles par défaut</Label>
+          <Label>{t('groups.form.defaultRoles')}</Label>
           <p className="text-sm text-muted-foreground mb-2">
-            Sélectionnez les rôles qui seront automatiquement attribués aux membres du groupe
+            {t('groups.form.defaultRolesDescription')}
           </p>
           <div className="space-y-2 border rounded-lg p-3 max-h-48 overflow-y-auto">
             {roles?.map((role) => (
@@ -604,14 +601,14 @@ function GroupForm({
             setFormData((prev) => ({ ...prev, isActive: checked }))
           }
         />
-        <Label htmlFor={fieldIds.isActive}>Groupe actif</Label>
+        <Label htmlFor={fieldIds.isActive}>{t('groups.form.isActive')}</Label>
       </div>
 
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
-          {t('actions.cancel')}
+          {t('common.cancel')}
         </Button>
-        <Button type="submit">{group ? t('actions.edit') : t('actions.create')}</Button>
+        <Button type="submit">{group ? t('common.save') : t('common.create')}</Button>
       </div>
     </form>
   )
@@ -631,7 +628,7 @@ function GroupDetails({
   allRoles: Role[]
   onRefresh: () => void
 }) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('admin')
   const [selectedRoles, setSelectedRoles] = useState<string[]>(roles?.map((r) => r.id))
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
 
@@ -666,28 +663,28 @@ function GroupDetails({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Informations du groupe</CardTitle>
+          <CardTitle>{t('groups.info.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Type</p>
-              <Badge className={GROUP_TYPE_COLORS[group.type]}>
-                {GROUP_TYPE_LABELS[group.type]}
+              <p className="text-sm text-muted-foreground">{t('groups.info.type')}</p>
+              <Badge className={GROUP_TYPE_COLORS[group.type] || 'bg-gray-100 text-gray-800'}>
+                {group.type ? (t(`groups.types.${group.type}`) || group.type) : t('groups.types.CUSTOM')}
               </Badge>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Statut</p>
+              <p className="text-sm text-muted-foreground">{t('groups.info.status')}</p>
               <Badge variant={group.isActive ? 'default' : 'secondary'}>
-                {group.isActive ? 'Actif' : 'Inactif'}
+                {group.isActive ? t('groups.active') : t('groups.inactive')}
               </Badge>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Créé le</p>
+              <p className="text-sm text-muted-foreground">{t('groups.info.createdAt')}</p>
               <p>{formatDate(group.createdAt)}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Modifié le</p>
+              <p className="text-sm text-muted-foreground">{t('groups.info.updatedAt')}</p>
               <p>{formatDate(group.updatedAt)}</p>
             </div>
           </div>
@@ -696,23 +693,23 @@ function GroupDetails({
 
       <Tabs defaultValue="members">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="members">Membres ({users.length})</TabsTrigger>
-          <TabsTrigger value="roles">Rôles ({roles.length})</TabsTrigger>
+          <TabsTrigger value="members">{t('groups.tabs.members')} ({users.length})</TabsTrigger>
+          <TabsTrigger value="roles">{t('groups.tabs.roles')} ({roles.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Membres du groupe</h3>
+            <h3 className="text-lg font-medium">{t('groups.membersSection.title')}</h3>
             <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
               <DialogTrigger asChild>
                 <Button size="sm">
                   <UserPlus className="h-4 w-4 mr-2" />
-                  Ajouter un membre
+                  {t('groups.membersSection.addMember')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Ajouter un membre au groupe</DialogTitle>
+                  <DialogTitle>{t('groups.membersSection.addMemberTitle')}</DialogTitle>
                 </DialogHeader>
                 {/* Formulaire d'ajout d'utilisateur */}
               </DialogContent>
@@ -723,10 +720,10 @@ function GroupDetails({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Utilisateur</TableHead>
-                  <TableHead>Ajouté le</TableHead>
-                  <TableHead>Ajouté par</TableHead>
-                  <TableHead>Expire le</TableHead>
+                  <TableHead>{t('groups.membersSection.user')}</TableHead>
+                  <TableHead>{t('groups.membersSection.addedAt')}</TableHead>
+                  <TableHead>{t('groups.membersSection.addedBy')}</TableHead>
+                  <TableHead>{t('groups.membersSection.expiresAt')}</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
@@ -767,7 +764,7 @@ function GroupDetails({
             </Table>
             {users.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
-                Aucun membre dans ce groupe
+                {t('groups.membersSection.noMembers')}
               </div>
             )}
           </Card>
@@ -775,10 +772,10 @@ function GroupDetails({
 
         <TabsContent value="roles" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Rôles du groupe</h3>
+            <h3 className="text-lg font-medium">{t('groups.rolesSection.title')}</h3>
             <PermissionHide permission={undefined} roles={['SUPER_ADMIN']}>
               <Button size="sm" onClick={handleUpdateRoles}>
-                {t('actions.saveChanges')}
+                {t('common.save')}
               </Button>
             </PermissionHide>
           </div>

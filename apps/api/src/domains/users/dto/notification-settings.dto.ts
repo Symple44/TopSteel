@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsBoolean, IsOptional, IsString } from 'class-validator'
-import type { NotificationSettings } from '../entities/user-settings.entity'
+
+// NotificationSettings type (previously from entity)
+type NotificationSettings = Record<string, unknown>
 
 export class NotificationEmailTypesUpdateDto {
   @ApiProperty({ description: 'Notifications pour nouveaux messages', required: false })

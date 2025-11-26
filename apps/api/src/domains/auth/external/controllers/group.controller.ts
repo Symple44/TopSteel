@@ -10,14 +10,19 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import type { Request as ExpressRequest } from 'express'
+import { Public } from '../../../../core/multi-tenant'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
 import { CreateGroupDto, GroupService, UpdateGroupDto } from '../../services/group.service'
 
+@ApiTags('🔧 Admin - Groups')
 @Controller('admin/groups')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth('JWT-auth')
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
@@ -81,8 +86,7 @@ export class GroupController {
     const userGroup = await this.groupService.addUserToGroup(
       body.userId,
       id,
-      req.user.id,
-      body.expiresAt
+      req.user.id
     )
     return { success: true, data: userGroup }
   }
@@ -94,18 +98,18 @@ export class GroupController {
     return { success: true }
   }
 
-  // Gestion des rôles du groupe
-  @Get(':id/roles')
-  @Roles('SUPER_ADMIN', 'ADMIN')
-  async getGroupRoles(@Param('id') id: string) {
-    const roles = await this.groupService.getGroupRoles(id)
-    return { success: true, data: roles }
-  }
+  // NOTE: Group roles management removed - simplified schema
+  // @Get(':id/roles')
+  // @Roles('SUPER_ADMIN', 'ADMIN')
+  // async getGroupRoles(@Param('id') id: string) {
+  //   const roles = await this.groupService.getGroupRoles(id)
+  //   return { success: true, data: roles }
+  // }
 
-  @Put(':id/roles')
-  @Roles('SUPER_ADMIN')
-  async updateGroupRoles(@Param('id') id: string, @Body() body: { roleIds: string[] }) {
-    await this.groupService.updateGroupRoles(id, body.roleIds)
-    return { success: true }
-  }
+  // @Put(':id/roles')
+  // @Roles('SUPER_ADMIN')
+  // async updateGroupRoles(@Param('id') id: string, @Body() body: { roleIds: string[] }) {
+  //   await this.groupService.updateGroupRoles(id, body.roleIds)
+  //   return { success: true }
+  // }
 }

@@ -1,23 +1,13 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { exec } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { promisify } from 'node:util'
-import { Injectable } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+import { Injectable, Logger } from '@nestjs/common'
+
 import { getErrorMessage } from '../../../core/common/utils'
 
 const execAsync = promisify(exec)
-
-// Interface for PostgreSQL connection options
-interface PostgreSQLConnectionOptions {
-  host?: string
-  port?: number
-  username?: string
-  database?: string
-  password?: string
-  type: 'postgres'
-}
 
 interface BackupInfo {
   id: string
@@ -29,12 +19,50 @@ interface BackupInfo {
   filePath?: string
 }
 
+/**
+ * Service de backup de base de données
+ * Migré de TypeORM vers Prisma - utilise les variables d'environnement pour la connexion
+ */
 @Injectable()
 export class DatabaseBackupService {
+  private readonly logger = new Logger(DatabaseBackupService.name)
   private readonly backupDir = path.join(process.cwd(), 'backups')
 
-  constructor(@InjectDataSource('auth') private _dataSource: DataSource) {
+  constructor(private readonly prisma: PrismaService) {
     this.ensureBackupDir()
+  }
+
+  /**
+   * Parse DATABASE_URL pour extraire les informations de connexion
+   */
+  private getConnectionInfo(): {
+    host: string
+    port: number
+    username: string
+    password: string
+    database: string
+  } {
+    const databaseUrl = process.env.DATABASE_URL
+
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL environment variable is not set')
+    }
+
+    // Parse postgresql://user:password@host:port/database
+    const regex = /postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+?)(\?.*)?$/
+    const match = databaseUrl.match(regex)
+
+    if (!match) {
+      throw new Error('Invalid DATABASE_URL format')
+    }
+
+    return {
+      username: match[1],
+      password: decodeURIComponent(match[2]),
+      host: match[3],
+      port: parseInt(match[4], 10),
+      database: match[5],
+    }
   }
 
   private ensureBackupDir() {
@@ -82,20 +110,15 @@ export class DatabaseBackupService {
       const filename = `backup_${backupType}_${timestamp}.sql${options.compress ? '.gz' : ''}`
       const filePath = path.join(this.backupDir, filename)
 
-      // Récupérer les informations de connexion
-      const connectionOptions = this._dataSource.options
+      // Récupérer les informations de connexion depuis DATABASE_URL
+      const connInfo = this.getConnectionInfo()
 
-      if (connectionOptions.type !== 'postgres') {
-        throw new Error('Ce service ne supporte que PostgreSQL')
-      }
-
-      const pgOptions = connectionOptions as PostgreSQLConnectionOptions
       const pgDumpCommand = [
         'pg_dump',
-        `-h ${pgOptions.host || 'localhost'}`,
-        `-p ${pgOptions.port || 5432}`,
-        `-U ${pgOptions.username || 'postgres'}`,
-        `-d ${pgOptions.database || 'topsteel'}`,
+        `-h ${connInfo.host}`,
+        `-p ${connInfo.port}`,
+        `-U ${connInfo.username}`,
+        `-d ${connInfo.database}`,
         '--no-password',
         '--verbose',
         '--clean',
@@ -114,9 +137,10 @@ export class DatabaseBackupService {
       // Configurer les variables d'environnement
       const env = {
         ...process.env,
-        PGPASSWORD: pgOptions.password as string,
+        PGPASSWORD: connInfo.password,
       }
 
+      this.logger.log(`Creating backup: ${filename}`)
       await execAsync(command, { env: env as Record<string, string> })
 
       // Vérifier que le fichier a été créé
@@ -125,6 +149,7 @@ export class DatabaseBackupService {
       }
 
       const stats = fs.statSync(filePath)
+      this.logger.log(`Backup created successfully: ${this.formatBytes(stats.size)}`)
 
       return {
         success: true,
@@ -137,6 +162,7 @@ export class DatabaseBackupService {
         },
       }
     } catch (error) {
+      this.logger.error('Backup creation failed:', error)
       return {
         success: false,
         message: `Erreur lors de la création de la sauvegarde: ${error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'}`,
@@ -156,37 +182,32 @@ export class DatabaseBackupService {
         }
       }
 
-      const connectionOptions = this._dataSource.options
-
-      if (connectionOptions.type !== 'postgres') {
-        return {
-          success: false,
-          message: 'Ce service ne supporte que PostgreSQL',
-        }
-      }
-
-      const pgOptions = connectionOptions as PostgreSQLConnectionOptions
+      // Récupérer les informations de connexion depuis DATABASE_URL
+      const connInfo = this.getConnectionInfo()
       const isCompressed = backup.filename.endsWith('.gz')
 
       let command: string
       if (isCompressed) {
-        command = `gunzip -c "${backup.filePath}" | psql -h ${pgOptions.host || 'localhost'} -p ${pgOptions.port || 5432} -U ${pgOptions.username || 'postgres'} -d ${pgOptions.database || 'topsteel'}`
+        command = `gunzip -c "${backup.filePath}" | psql -h ${connInfo.host} -p ${connInfo.port} -U ${connInfo.username} -d ${connInfo.database}`
       } else {
-        command = `psql -h ${pgOptions.host || 'localhost'} -p ${pgOptions.port || 5432} -U ${pgOptions.username || 'postgres'} -d ${pgOptions.database || 'topsteel'} -f "${backup.filePath}"`
+        command = `psql -h ${connInfo.host} -p ${connInfo.port} -U ${connInfo.username} -d ${connInfo.database} -f "${backup.filePath}"`
       }
 
       const env = {
         ...process.env,
-        PGPASSWORD: pgOptions.password as string,
+        PGPASSWORD: connInfo.password,
       }
 
+      this.logger.log(`Restoring backup: ${backup.filename}`)
       await execAsync(command, { env: env as Record<string, string> })
+      this.logger.log('Backup restored successfully')
 
       return {
         success: true,
         message: 'Base de données restaurée avec succès',
       }
     } catch (error) {
+      this.logger.error('Backup restoration failed:', error)
       return {
         success: false,
         message: `Erreur lors de la restauration: ${error instanceof Error ? getErrorMessage(error) : 'Erreur inconnue'}`,

@@ -1,7 +1,16 @@
 // apps/api/src/modules/notifications/dto/create-notification.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
-import { NotificationType } from '../entities/notifications.entity' // ✅ AJOUTÉ : Import de l'enum
+
+// Import from shared types
+export enum NotificationType {
+  INFO = 'INFO',
+  SUCCESS = 'SUCCESS',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+  SYSTEM = 'SYSTEM',
+  REMINDER = 'REMINDER',
+}
 
 export class CreateNotificationDto {
   @ApiProperty({

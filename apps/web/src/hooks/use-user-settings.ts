@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { apiClient } from '../lib/api-client-instance'
+import { apiClient } from '../lib/api-client'
 
 // Types pour les paramètres utilisateur
 interface UserSettings {

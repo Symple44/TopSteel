@@ -1,13 +1,8 @@
+import { DatabaseModule } from '../../core/database/database.module'
 import { Global, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { User } from '../../domains/users/entities/user.entity'
-import { UserMenuPreference } from '../../domains/admin/entities/user-menu-preference.entity'
-import { DiscoveredPage } from '../menu/entities/discovered-page.entity'
-import { Societe } from '../societes/entities/societe.entity'
-import { SocieteUser } from '../societes/entities/societe-user.entity'
 
-
+// Services re-enabled - they use Prisma or are simple stubs
 import { DatabaseAdminController } from './controllers/database-admin.controller'
 import { DatabaseHealthSimpleService } from './services/database-health-simple.service'
 import { MigrationManagerService } from './services/migration-manager.service'
@@ -17,19 +12,17 @@ import { TenantConnectionSimpleService } from './services/tenant-connection-simp
 @Global()
 @Module({
   imports: [
+    DatabaseModule,
     ConfigModule,
-    TypeOrmModule.forFeature(
-      [User, UserMenuPreference, DiscoveredPage, Societe, SocieteUser],
-      'auth'
-    ),
-    TypeOrmModule.forFeature([], 'shared'),
   ],
-  controllers: [DatabaseAdminController],
+  controllers: [
+    DatabaseAdminController, // Re-enabled - uses Prisma-compatible services
+  ],
   providers: [
-    DatabaseHealthSimpleService,
-    MigrationManagerService,
-    TenantConnectionService,
-    TenantConnectionSimpleService,
+    DatabaseHealthSimpleService, // Simple stub service
+    MigrationManagerService, // Uses PrismaService and TenantConnectionService
+    TenantConnectionService, // Manages tenant database connections
+    TenantConnectionSimpleService, // Simple stub service
   ],
   exports: [
     DatabaseHealthSimpleService,

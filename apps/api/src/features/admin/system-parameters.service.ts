@@ -1,26 +1,20 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { PrismaService } from '../../core/database/prisma/prisma.service'
 import type {
   CreateSystemParameterDto,
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
+  ParameterCategory,
+  ParameterType,
 } from './dto/system-parameter.dto'
-import {
-  SystemParameter,
-  type ParameterCategory,
-  type ParameterType,
-} from './entitites/system-parameter.entity'
+import type { SystemParameter } from '@prisma/client'
 
 @Injectable()
 export class SystemParametersService {
-  constructor(
-    @InjectRepository(SystemParameter, 'auth')
-    private readonly _systemParameterRepository: Repository<SystemParameter>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createDto: CreateSystemParameterDto): Promise<SystemParameter> {
-    const existingParameter = await this._systemParameterRepository.findOne({
+    const existingParameter = await this.prisma.systemParameter.findFirst({
       where: { key: createDto.key },
     })
 
@@ -28,32 +22,36 @@ export class SystemParametersService {
       throw new ConflictException(`Parameter with key '${createDto.key}' already exists`)
     }
 
-    const parameter = this._systemParameterRepository.create(createDto)
-    return this._systemParameterRepository.save(parameter)
+    return this.prisma.systemParameter.create({
+      data: createDto,
+    })
   }
 
   async findAll(query?: SystemParameterQueryDto): Promise<SystemParameter[]> {
-    const queryBuilder = this._systemParameterRepository
-      .createQueryBuilder('parameter')
-      .orderBy('parameter.category', 'ASC')
-      .addOrderBy('parameter.key', 'ASC')
+    const where: any = {}
 
     if (query?.category) {
-      queryBuilder.andWhere('parameter.category = :category', { category: query.category })
+      where.category = query.category
     }
 
     if (query?.search) {
-      queryBuilder.andWhere(
-        '(parameter.key ILIKE :search OR parameter.description ILIKE :search)',
-        { search: `%${query.search}%` }
-      )
+      where.OR = [
+        { key: { contains: query.search, mode: 'insensitive' } },
+        { description: { contains: query.search, mode: 'insensitive' } },
+      ]
     }
 
-    return queryBuilder.getMany()
+    return this.prisma.systemParameter.findMany({
+      where,
+      orderBy: [
+        { category: 'asc' },
+        { key: 'asc' },
+      ],
+    })
   }
 
   async findByKey(key: string): Promise<SystemParameter> {
-    const parameter = await this._systemParameterRepository.findOne({
+    const parameter = await this.prisma.systemParameter.findFirst({
       where: { key },
     })
 
@@ -65,9 +63,9 @@ export class SystemParametersService {
   }
 
   async findByCategory(category: ParameterCategory): Promise<SystemParameter[]> {
-    return this._systemParameterRepository.find({
+    return this.prisma.systemParameter.findMany({
       where: { category },
-      order: { key: 'ASC' },
+      orderBy: { key: 'asc' },
     })
   }
 
@@ -78,8 +76,10 @@ export class SystemParametersService {
       throw new ConflictException(`Parameter '${key}' is not editable`)
     }
 
-    Object.assign(parameter, updateDto)
-    return this._systemParameterRepository.save(parameter)
+    return this.prisma.systemParameter.update({
+      where: { id: parameter.id },
+      data: updateDto,
+    })
   }
 
   async remove(key: string): Promise<void> {
@@ -89,7 +89,9 @@ export class SystemParametersService {
       throw new ConflictException(`Parameter '${key}' cannot be deleted`)
     }
 
-    await this._systemParameterRepository.remove(parameter)
+    await this.prisma.systemParameter.delete({
+      where: { id: parameter.id },
+    })
   }
 
   // Méthodes utilitaires pour récupérer des valeurs typées
@@ -138,10 +140,11 @@ export class SystemParametersService {
 
     return parameters.reduce(
       (acc, param) => {
-        if (!acc[param.category]) {
-          acc[param.category] = []
+        const category = param.category || 'GENERAL'
+        if (!acc[category]) {
+          acc[category] = []
         }
-        acc[param.category].push(param)
+        acc[category].push(param)
         return acc
       },
       {} as Record<string, SystemParameter[]>
@@ -149,7 +152,6 @@ export class SystemParametersService {
   }
 
   // Méthode pour mettre à jour plusieurs paramètres en une fois
-
   async updateMultiple(updates: Array<{ key: string; value: string }>): Promise<SystemParameter[]> {
     const results: SystemParameter[] = []
 
@@ -172,7 +174,9 @@ export class SystemParametersService {
             isSecret: this.isSecretKey(update.key),
           })
           results.push(newParameter)
-        } catch (_createError) {}
+        } catch (_createError) {
+          // Ignore creation errors
+        }
       }
     }
 

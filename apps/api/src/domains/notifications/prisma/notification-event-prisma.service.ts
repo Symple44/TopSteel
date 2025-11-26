@@ -30,6 +30,7 @@ export class NotificationEventPrismaService {
   async createNotificationEvent(data: {
     type: string
     source: string
+    societeId: string
     data: Record<string, any>
   }): Promise<NotificationEvent> {
     this.logger.log(`Creating notification event: ${data.type} from ${data.source}`)
@@ -39,6 +40,7 @@ export class NotificationEventPrismaService {
         data: {
           type: data.type,
           source: data.source,
+          societeId: data.societeId,
           data: data.data as Prisma.InputJsonValue,
         },
       })

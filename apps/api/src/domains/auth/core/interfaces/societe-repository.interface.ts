@@ -1,5 +1,5 @@
-import type { Societe } from '../../../../features/societes/entities/societe.entity'
-import type { SocieteUser } from '../../../../features/societes/entities/societe-user.entity'
+// FIXED: Using Prisma types instead of deleted TypeORM entities
+import type { Societe, SocieteUser } from '@prisma/client'
 
 /**
  * Interface d'abstraction pour les opérations société
@@ -28,8 +28,9 @@ export interface ISocieteRepository {
 export interface ISocieteUserRepository {
   /**
    * Trouve les relations société-utilisateur pour un utilisateur
+   * Includes the societe relation
    */
-  findByUserId(userId: string): Promise<SocieteUser[]>
+  findByUserId(userId: string): Promise<Array<SocieteUser & { societe: Societe }>>
 
   /**
    * Trouve une relation spécifique utilisateur-société

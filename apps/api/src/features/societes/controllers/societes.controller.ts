@@ -1,8 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Optional, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
+import type { Societe, Prisma } from '@prisma/client'
 import type { CreateTenantDto } from '../dto/create-tenant.dto'
-import type { Societe } from '../entities/societe.entity'
 import { SocietesService } from '../services/societes.service'
 import { TenantProvisioningService } from '../services/tenant-provisioning.service'
 import type { TenantProvisioningResult } from '../services/tenant-provisioning.service'
@@ -13,7 +12,7 @@ import type { TenantProvisioningResult } from '../services/tenant-provisioning.s
 export class SocietesController {
   constructor(
     private readonly societesService: SocietesService,
-    private readonly tenantProvisioningService: TenantProvisioningService
+    @Optional() private readonly tenantProvisioningService?: TenantProvisioningService
   ) {}
 
   @Get('test-simple')
@@ -64,7 +63,7 @@ export class SocietesController {
   @ApiOperation({ summary: 'Créer une nouvelle société (sans base de données)' })
   @ApiResponse({ status: 201, description: 'Société créée avec succès' })
   async create(@Body() societeData: Partial<Societe>): Promise<Societe> {
-    return this.societesService.create(societeData)
+    return this.societesService.create(societeData as any)
   }
 
   @Post('provision-tenant')
@@ -91,6 +90,9 @@ export class SocietesController {
   async provisionTenant(
     @Body() createTenantDto: CreateTenantDto
   ): Promise<TenantProvisioningResult> {
+    if (!this.tenantProvisioningService) {
+      return { success: false, databaseName: '', message: 'Tenant provisioning service not available', error: 'Service disabled' }
+    }
     return this.tenantProvisioningService.createTenantWithDatabase(createTenantDto)
   }
 
@@ -98,7 +100,7 @@ export class SocietesController {
   @ApiOperation({ summary: 'Mettre à jour une société' })
   @ApiResponse({ status: 200, description: 'Société mise à jour avec succès' })
   async update(@Param('id') id: string, @Body() societeData: Partial<Societe>): Promise<Societe> {
-    return this.societesService.update(id, societeData as QueryDeepPartialEntity<Societe>)
+    return this.societesService.update(id, societeData)
   }
 
   @Put(':id/activate')
@@ -143,6 +145,9 @@ export class SocietesController {
   })
   @ApiResponse({ status: 404, description: 'Société non trouvée' })
   async destroyTenant(@Param('id') id: string): Promise<TenantProvisioningResult> {
+    if (!this.tenantProvisioningService) {
+      return { success: false, databaseName: '', message: 'Tenant provisioning service not available', error: 'Service disabled' }
+    }
     return this.tenantProvisioningService.deleteTenantWithDatabase(id)
   }
 }

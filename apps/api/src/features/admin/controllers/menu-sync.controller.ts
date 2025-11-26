@@ -1,10 +1,15 @@
-import { Controller, Get, HttpStatus, Logger, Post } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Controller, Get, HttpStatus, Logger, Post, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { getErrorMessage } from '../../../core/common/utils'
 import { MenuSyncService } from '../services/menu-sync.service'
+import { Public } from '../../../core/multi-tenant'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 
 @ApiTags('Admin - Menu Sync')
 @Controller('admin/menu-sync')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class MenuSyncController {
   private readonly logger = new Logger(MenuSyncController.name)
 
@@ -38,9 +43,9 @@ export class MenuSyncController {
       this.logger.log('Démarrage de la synchronisation manuelle du menu')
       const configuration = await this.menuSyncService.syncMenuFromSidebar()
 
-      const itemsCount = await this.menuSyncService.itemRepository.count({
-        where: { configId: configuration.id },
-      })
+      // Get system config to count items
+      const systemConfig = await this.menuSyncService.getSystemConfig()
+      const itemsCount = systemConfig?.items?.length || 0
 
       return {
         success: true,
@@ -79,10 +84,7 @@ export class MenuSyncController {
       const needsSync = await this.menuSyncService.needsSync()
 
       // Récupérer la configuration système pour obtenir la date de dernière sync
-      const systemConfig = await this.menuSyncService.configRepository.findOne({
-        where: { name: 'Configuration Système Auto-Sync', isSystem: true },
-        relations: ['items'],
-      })
+      const systemConfig = await this.menuSyncService.getSystemConfig()
 
       const currentItemsCount = systemConfig?.items?.length || 0
       const sidebarNavigation = this.menuSyncService.getSidebarNavigationStructure()
@@ -146,9 +148,7 @@ export class MenuSyncController {
       const syncResult = await this.menuSyncService.autoSync()
 
       if (syncResult) {
-        const systemConfig = await this.menuSyncService.configRepository.findOne({
-          where: { name: 'Configuration Système Auto-Sync', isSystem: true },
-        })
+        const systemConfig = await this.menuSyncService.getSystemConfig()
 
         return {
           success: true,

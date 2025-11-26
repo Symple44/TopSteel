@@ -1,127 +1,177 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { IsNull, type Repository } from 'typeorm'
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { Societe, SocieteStatus } from '../entities/societe.entity'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { Societe, Prisma } from '@prisma/client'
 
-
-
+/**
+ * Service de gestion des sociétés
+ * Migrated from TypeORM to Prisma
+ */
 @Injectable()
 export class SocietesService {
-  constructor(
-    @InjectRepository(Societe, 'auth')
-    private _societeRepository: Repository<Societe>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Récupère toutes les sociétés non supprimées
+   */
   async findAll(): Promise<Societe[]> {
-    return this._societeRepository.find({
-      where: { deletedAt: IsNull() },
-      relations: ['sites'],
+    return this.prisma.societe.findMany({
+      where: { deletedAt: null },
+      include: { sites: true },
     })
   }
 
+  /**
+   * Trouve une société par son ID
+   */
   async findById(id: string): Promise<Societe | null> {
-    return this._societeRepository.findOne({
-      where: { id, deletedAt: IsNull() },
-    })
-  }
-
-  async findByCode(code: string): Promise<Societe | null> {
-    return this._societeRepository.findOne({
-      where: { code, deletedAt: IsNull() },
-      relations: ['sites'],
-    })
-  }
-
-  async findActive(): Promise<Societe[]> {
-    return this._societeRepository.find({
-      where: {
-        status: SocieteStatus.ACTIVE,
-        deletedAt: IsNull(),
-      },
-      relations: ['sites'],
-    })
-  }
-
-  async create(societeData: Partial<Societe>): Promise<Societe> {
-    // Générer le nom de la base de données
-    if (!societeData.databaseName && societeData.code) {
-      societeData.databaseName = `erp_topsteel_${societeData.code.toLowerCase()}`
-    }
-
-    const societe = this._societeRepository.create(societeData)
-    return this._societeRepository.save(societe)
-  }
-
-  async update(id: string, societeData: QueryDeepPartialEntity<Societe>): Promise<Societe> {
-    await this._societeRepository.update(id, societeData)
-    const societe = await this._societeRepository.findOne({
+    const societe = await this.prisma.societe.findUnique({
       where: { id },
-      relations: ['sites'],
     })
-    if (!societe) {
-      throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)
+
+    // Retourne null si la société est supprimée
+    if (societe?.deletedAt) {
+      return null
     }
+
     return societe
   }
 
+  /**
+   * Trouve une société par son code
+   */
+  async findByCode(code: string): Promise<Societe | null> {
+    return this.prisma.societe.findFirst({
+      where: {
+        code,
+        deletedAt: null,
+      },
+      include: { sites: true },
+    })
+  }
+
+  /**
+   * Récupère toutes les sociétés actives (isActive = true)
+   */
+  async findActive(): Promise<Societe[]> {
+    return this.prisma.societe.findMany({
+      where: {
+        isActive: true,
+        deletedAt: null,
+      },
+      include: { sites: true },
+    })
+  }
+
+  /**
+   * Crée une nouvelle société
+   */
+  async create(societeData: Prisma.SocieteCreateInput): Promise<Societe> {
+    // Générer le nom de la base de données si non fourni
+    const databaseName =
+      societeData.databaseName ||
+      `erp_topsteel_${(typeof societeData === 'object' && 'code' in societeData ? societeData.code : '').toLowerCase()}`
+
+    return this.prisma.societe.create({
+      data: {
+        ...societeData,
+        databaseName,
+      },
+      include: { sites: true },
+    })
+  }
+
+  /**
+   * Met à jour une société
+   */
+  async update(id: string, societeData: Prisma.SocieteUpdateInput): Promise<Societe> {
+    const societe = await this.prisma.societe.update({
+      where: { id },
+      data: societeData,
+      include: { sites: true },
+    })
+
+    if (!societe) {
+      throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)
+    }
+
+    return societe
+  }
+
+  /**
+   * Supprime une société (soft delete)
+   */
   async delete(id: string): Promise<void> {
-    await this._societeRepository.softDelete(id)
+    await this.prisma.societe.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    })
   }
 
+  /**
+   * Active une société
+   * Note: Le schéma Prisma n'a pas de champ 'status' ou 'dateActivation'
+   * Cette méthode active simplement le flag isActive
+   */
   async activate(id: string): Promise<Societe> {
-    await this._societeRepository.update(id, {
-      status: SocieteStatus.ACTIVE,
-      dateActivation: new Date(),
+    const societe = await this.prisma.societe.update({
+      where: { id },
+      data: {
+        isActive: true,
+        updatedAt: new Date(),
+      },
     })
-    const societe = await this.findById(id)
+
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)
     }
+
     return societe
   }
 
+  /**
+   * Suspend une société
+   * Note: Le schéma Prisma n'a pas de champ 'status'
+   * Cette méthode désactive simplement le flag isActive
+   */
   async suspend(id: string): Promise<Societe> {
-    await this._societeRepository.update(id, {
-      status: SocieteStatus.SUSPENDED,
+    const societe = await this.prisma.societe.update({
+      where: { id },
+      data: {
+        isActive: false,
+      },
     })
-    const societe = await this.findById(id)
+
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)
     }
+
     return societe
   }
 
+  /**
+   * Récupère les statistiques des sociétés
+   * Note: Le schéma Prisma n'a pas de champ 'status', donc on se base sur isActive
+   */
   async getStatistics(): Promise<{
     total: number
     active: number
-    trial: number
     inactive: number
   }> {
-    const total = await this._societeRepository.count({
-      where: { deletedAt: IsNull() },
+    const total = await this.prisma.societe.count({
+      where: { deletedAt: null },
     })
 
-    const active = await this._societeRepository.count({
+    const active = await this.prisma.societe.count({
       where: {
-        status: SocieteStatus.ACTIVE,
-        deletedAt: IsNull(),
-      },
-    })
-
-    const trial = await this._societeRepository.count({
-      where: {
-        status: SocieteStatus.TRIAL,
-        deletedAt: IsNull(),
+        isActive: true,
+        deletedAt: null,
       },
     })
 
     return {
       total,
       active,
-      trial,
-      inactive: total - active - trial,
+      inactive: total - active,
     }
   }
 }
-

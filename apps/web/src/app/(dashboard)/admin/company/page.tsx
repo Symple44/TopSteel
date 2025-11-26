@@ -3,15 +3,17 @@
 export const dynamic = 'force-dynamic'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, useFormFieldIds } from '@erp/ui'
-import { Building2, Save } from 'lucide-react'
-import { useState } from 'react'
+import { Building2, Save, Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { ImageUploadWrapper as ImageUpload } from '../../../../components/wrappers'
 import { useTranslation } from '../../../../lib/i18n'
+import { callClientApi } from '../../../../utils/backend-api'
 
 export default function CompanySettingsPage() {
   const { t } = useTranslation('admin')
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingData, setIsLoadingData] = useState(true)
 
   // Generate unique IDs for form fields
   const fieldIds = useFormFieldIds([
@@ -28,29 +30,64 @@ export default function CompanySettingsPage() {
   ])
 
   const [companyData, setCompanyData] = useState({
-    name: 'TopSteel',
-    siret: '12345678901234',
-    vat: 'FR12345678901',
-    address: "123 Rue de l'Industrie",
-    city: 'Paris',
-    postalCode: '75001',
-    country: 'France',
-    phone: '+33 1 23 45 67 89',
-    email: 'contact@topsteel.tech',
-    website: 'https://topsteel.tech',
+    name: '',
+    siret: '',
+    vat: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    country: '',
+    phone: '',
+    email: '',
+    website: '',
   })
+
+  // Load company data on mount
+  useEffect(() => {
+    const loadCompanyData = async () => {
+      try {
+        const response = await callClientApi('admin/company')
+        if (response.ok) {
+          const result = await response.json()
+          if (result?.data) {
+            setCompanyData(result.data)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading company data:', error)
+        toast?.error(t('settingsLoadError') || 'Erreur lors du chargement')
+      } finally {
+        setIsLoadingData(false)
+      }
+    }
+    loadCompanyData()
+  }, [t])
 
   const handleSave = async () => {
     setIsLoading(true)
     try {
-      // Simulation d'un appel API
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast?.success(t('saveSuccess'))
+      const response = await callClientApi('admin/company', {
+        method: 'PUT',
+        body: JSON.stringify(companyData),
+      })
+      if (response.ok) {
+        toast?.success(t('saveSuccess'))
+      } else {
+        throw new Error('Failed to save')
+      }
     } catch (_error) {
       toast?.error(t('saveError'))
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (isLoadingData) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
 
   const handleLogoUpload = (_imageUrl: string) => {

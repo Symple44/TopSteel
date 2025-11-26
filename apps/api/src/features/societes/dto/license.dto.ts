@@ -13,8 +13,7 @@ import {
   Max,
   Min,
 } from 'class-validator'
-import { LicenseStatus, LicenseType } from '../entities/societe-license.entity'
-import { SocieteLicense } from '@prisma/client'
+import { LicenseStatus, LicenseType } from '@prisma/client'
 
 
 export class CreateLicenseDto {

@@ -104,7 +104,7 @@ export const envValidationSchema = z.object({
 
   // CORS
   CORS_ORIGIN: stringNonEmpty.default('http://localhost:3000,http://localhost:3001'),
-  CORS_CREDENTIALS: booleanSchema.default('true'),
+  CORS_CREDENTIALS: booleanSchema.default(true),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().default(900000),
@@ -112,8 +112,8 @@ export const envValidationSchema = z.object({
 
   // SMS Configuration - Conditional validation based on provider
   SMS_PROVIDER: smsProviderSchema,
-  SMS_LOG_ENABLED: booleanSchema.default('true'),
-  SMS_DRY_RUN: booleanSchema.default('false'),
+  SMS_LOG_ENABLED: booleanSchema.default(true),
+  SMS_DRY_RUN: booleanSchema.default(false),
   SMS_RATE_LIMIT_PER_HOUR: z.coerce.number().int().default(100),
   SMS_RATE_LIMIT_PER_DAY: z.coerce.number().int().default(1000),
 
@@ -139,7 +139,7 @@ export const envValidationSchema = z.object({
   // Email Configuration
   SMTP_HOST: stringNonEmpty.optional(),
   SMTP_PORT: portSchema.optional(),
-  SMTP_SECURE: booleanSchema.default('false'),
+  SMTP_SECURE: booleanSchema.default(false),
   SMTP_USER: emailSchema.optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
@@ -164,13 +164,13 @@ export const envValidationSchema = z.object({
 
   // Monitoring - Optional
   SENTRY_DSN: urlSchema.optional(),
-  SENTRY_ENABLED: booleanSchema.default('false'),
+  SENTRY_ENABLED: booleanSchema.default(false),
   SENTRY_ENVIRONMENT: stringNonEmpty.optional(),
   SENTRY_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(1.0),
   SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0.1),
   SENTRY_PROFILES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0.1),
-  SENTRY_DEBUG: booleanSchema.default('false'),
-  SENTRY_ATTACH_STACKTRACE: booleanSchema.default('true'),
+  SENTRY_DEBUG: booleanSchema.default(false),
+  SENTRY_ATTACH_STACKTRACE: booleanSchema.default(true),
 
   // DataDog
   DATADOG_API_KEY: z.string().optional(),
@@ -184,24 +184,24 @@ export const envValidationSchema = z.object({
   NEW_RELIC_APP_NAME: stringNonEmpty.default('TopSteel ERP'),
 
   // Feature Flags
-  FEATURE_SMS_ENABLED: booleanSchema.default('true'),
-  FEATURE_EMAIL_ENABLED: booleanSchema.default('true'),
-  FEATURE_ELASTICSEARCH_ENABLED: booleanSchema.default('false'),
-  FEATURE_REDIS_CACHE_ENABLED: booleanSchema.default('true'),
-  FEATURE_MONITORING_ENABLED: booleanSchema.default('false'),
-  FEATURE_AI_ASSISTANT_ENABLED: booleanSchema.default('false'),
+  FEATURE_SMS_ENABLED: booleanSchema.default(true),
+  FEATURE_EMAIL_ENABLED: booleanSchema.default(true),
+  FEATURE_ELASTICSEARCH_ENABLED: booleanSchema.default(false),
+  FEATURE_REDIS_CACHE_ENABLED: booleanSchema.default(true),
+  FEATURE_MONITORING_ENABLED: booleanSchema.default(false),
+  FEATURE_AI_ASSISTANT_ENABLED: booleanSchema.default(false),
 
   // Development Tools
-  DEBUG: booleanSchema.default('false'),
+  DEBUG: booleanSchema.default(false),
   LOG_LEVEL: logLevelSchema.default('info'),
-  ENABLE_SWAGGER: booleanSchema.default('true'),
-  ENABLE_GRAPHQL_PLAYGROUND: booleanSchema.default('true'),
+  ENABLE_SWAGGER: booleanSchema.default(true),
+  ENABLE_GRAPHQL_PLAYGROUND: booleanSchema.default(true),
 
   // Backup & Maintenance
-  BACKUP_ENABLED: booleanSchema.default('false'),
+  BACKUP_ENABLED: booleanSchema.default(false),
   BACKUP_SCHEDULE: stringNonEmpty.default('0 2 * * *'),
   BACKUP_RETENTION_DAYS: z.coerce.number().int().default(30),
-  MAINTENANCE_MODE: booleanSchema.default('false'),
+  MAINTENANCE_MODE: booleanSchema.default(false),
   MAINTENANCE_MESSAGE: stringNonEmpty.default('System under maintenance. Please try again later.'),
 })
 

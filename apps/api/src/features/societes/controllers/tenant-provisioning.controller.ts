@@ -1,6 +1,6 @@
 import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import type { Societe } from '../entities/societe.entity'
+import type { Societe } from '@prisma/client'
 import { TenantProvisioningService } from '../services/tenant-provisioning.service'
 
 @ApiTags('Provisioning')

@@ -11,6 +11,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
+import { Public } from '../../../core/multi-tenant'
 import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
@@ -26,6 +27,7 @@ import type { SearchOptions, SearchResponse } from '../services/global-search.se
 import type { AuthenticatedRequest, SearchStatistics } from '../types/search-types'
 
 @Controller('search')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }))
 export class SearchController {

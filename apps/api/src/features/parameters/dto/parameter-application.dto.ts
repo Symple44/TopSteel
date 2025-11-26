@@ -1,9 +1,25 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
-import { ParameterApplication } from '@prisma/client'
-import {
-  ApplicationParameterScope,
-  ApplicationParameterType,
-} from '../entities/parameter-application.entity'
+
+// Local enum definitions
+export enum ApplicationParameterType {
+  STRING = 'STRING',
+  NUMBER = 'NUMBER',
+  BOOLEAN = 'BOOLEAN',
+  JSON = 'JSON',
+  ARRAY = 'ARRAY',
+  DATE = 'DATE',
+  FORMULA = 'FORMULA',
+  TEMPLATE = 'TEMPLATE',
+}
+
+export enum ApplicationParameterScope {
+  WORKFLOW = 'WORKFLOW',
+  BUSINESS_RULE = 'BUSINESS_RULE',
+  PRICING = 'PRICING',
+  INVENTORY = 'INVENTORY',
+  SALES = 'SALES',
+  FINANCE = 'FINANCE',
+}
 
 export class CreateParameterApplicationDto {
   @IsString()

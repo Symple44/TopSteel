@@ -1,9 +1,6 @@
+import type { MenuConfiguration, MenuItem } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { MenuConfiguration } from '../../../domains/admin/entities/menu-configuration.entity'
-import { MenuItem } from '../../../domains/admin/entities/menu-item.entity'
-import { MenuItemRole } from '../entities/menu-item-role.entity'
 import { MenuConfigurationService } from './menu-configuration.service'
 
 
@@ -22,12 +19,7 @@ export class MenuSyncService {
   private readonly logger = new Logger(MenuSyncService.name)
 
   constructor(
-    @InjectRepository(MenuConfiguration, 'auth')
-    public readonly configRepository: Repository<MenuConfiguration>,
-    @InjectRepository(MenuItem, 'auth')
-    public readonly itemRepository: Repository<MenuItem>,
-    @InjectRepository(MenuItemRole, 'auth')
-    public readonly roleRepository: Repository<MenuItemRole>,
+    private readonly prisma: PrismaService,
     private readonly menuConfigService: MenuConfigurationService
   ) {}
 
@@ -45,7 +37,7 @@ export class MenuSyncService {
       const systemConfig = await this.findOrCreateSystemConfig()
 
       // Supprimer les anciens items pour une synchro complète
-      await this.itemRepository.delete({ configId: systemConfig.id })
+      await this.prisma.menuItem.deleteMany({ where: { menuConfigurationId: systemConfig.id } })
 
       // Créer les nouveaux items depuis le sidebar
       await this.createMenuItemsFromSidebar(systemConfig.id, sidebarNavigation)
@@ -192,20 +184,44 @@ export class MenuSyncService {
   }
 
   /**
+   * Obtient la configuration système
+   */
+  async getSystemConfig(): Promise<(MenuConfiguration & { items?: MenuItem[] }) | null> {
+    const config = await this.prisma.menuConfiguration.findFirst({
+      where: { name: 'Configuration Système Auto-Sync' },
+    })
+
+    if (!config) {
+      return null
+    }
+
+    const items = await this.prisma.menuItem.findMany({
+      where: { menuConfigurationId: config.id },
+    })
+
+    return {
+      ...config,
+      items,
+    }
+  }
+
+  /**
    * Trouve ou crée la configuration système
    */
   private async findOrCreateSystemConfig(): Promise<MenuConfiguration> {
-    let systemConfig = await this.configRepository.findOne({
-      where: { name: 'Configuration Système Auto-Sync', isSystem: true },
+    let systemConfig = await this.prisma.menuConfiguration.findFirst({
+      where: { name: 'Configuration Système Auto-Sync' },
     })
 
     if (!systemConfig) {
-      systemConfig = MenuConfiguration.createSystem(
-        'Configuration Système Auto-Sync',
-        'Configuration de menu synchronisée automatiquement depuis le sidebar'
-      )
-      systemConfig.createdBy = undefined // Service système, pas d'utilisateur spécifique
-      systemConfig = await this.configRepository.save(systemConfig)
+      systemConfig = await this.prisma.menuConfiguration.create({
+        data: {
+          name: 'Configuration Système Auto-Sync',
+          description: 'Configuration de menu synchronisée automatiquement depuis le sidebar',
+          isActive: false,
+          isDefault: false,
+        },
+      })
       this.logger.log(`Configuration système créée: ${systemConfig.id}`)
     }
 
@@ -221,51 +237,41 @@ export class MenuSyncService {
     parentId?: string,
     orderOffset = 0
   ): Promise<void> {
-
     for (let i = 0; i < items.length; i++) {
       const sidebarItem = items[i]
       const orderIndex = (i + 1) * 10 + orderOffset
 
-      // Créer l'item selon s'il a des enfants ou non
-      let menuItem: MenuItem
-
-      if (sidebarItem.children && sidebarItem.children.length > 0) {
-        // Item parent (dossier)
-        menuItem = MenuItem.createFolder(configId, sidebarItem.title, sidebarItem.icon, parentId)
-      } else if (sidebarItem.href) {
-        // Item avec lien (programme)
-        menuItem = MenuItem.createProgram(
-          configId,
-          sidebarItem.title,
-          sidebarItem.href,
-          sidebarItem.icon,
-          parentId
-        )
-      } else {
-        // Item par défaut (dossier sans lien)
-        menuItem = MenuItem.createFolder(configId, sidebarItem.title, sidebarItem.icon, parentId)
-      }
-
-      // Mettre les propriétés virtuelles dans metadata pour les conserver
-      menuItem.metadata = {
-        gradient: sidebarItem.gradient,
-        badge: sidebarItem.badge,
+      // Créer l'item de menu
+      const menuItemData = {
+        menuConfigurationId: configId,
+        label: sidebarItem.title,
         icon: sidebarItem.icon,
-        originalTitle: sidebarItem.title,
+        path: sidebarItem.href || null,
+        parentId: parentId || null,
+        order: orderIndex,
+        isActive: true,
+        isVisible: true,
+        metadata: {
+          gradient: sidebarItem.gradient,
+          badge: sidebarItem.badge,
+          icon: sidebarItem.icon,
+          originalTitle: sidebarItem.title,
+        },
       }
-
-      menuItem.orderIndex = orderIndex
-      // menuItem.createdBy = undefined // Service système, pas d'utilisateur spécifique (property doesn't exist in entity)
 
       // Sauvegarder l'item
-      const savedItem = await this.itemRepository.save(menuItem)
-      this.logger.debug(`Item créé: ${savedItem.title} (${savedItem.id})`)
+      const savedItem = await this.prisma.menuItem.create({ data: menuItemData })
+      this.logger.debug(`Item créé: ${savedItem.label} (${savedItem.id})`)
 
       // Créer les rôles si spécifiés
       if (sidebarItem.roles && sidebarItem.roles.length > 0) {
-        const roles = sidebarItem.roles.map((roleId) => MenuItemRole.create(savedItem.id, roleId))
-        await this.roleRepository.save(roles)
-        this.logger.debug(`Rôles ajoutés pour ${savedItem.title}: ${sidebarItem.roles.join(', ')}`)
+        await this.prisma.menuItemRole.createMany({
+          data: sidebarItem.roles.map((roleId) => ({
+            menuItemId: savedItem.id,
+            roleId,
+          })),
+        })
+        this.logger.debug(`Rôles ajoutés pour ${savedItem.label}: ${sidebarItem.roles.join(', ')}`)
       }
 
       // Créer les enfants de manière récursive
@@ -298,9 +304,9 @@ export class MenuSyncService {
    */
   async needsSync(): Promise<boolean> {
     try {
-      const systemConfig = await this.configRepository.findOne({
-        where: { name: 'Configuration Système Auto-Sync', isSystem: true },
-        relations: ['items'],
+      const systemConfig = await this.prisma.menuConfiguration.findFirst({
+        where: { name: 'Configuration Système Auto-Sync' },
+        include: { menuItems: true },
       })
 
       if (!systemConfig) {
@@ -309,7 +315,7 @@ export class MenuSyncService {
 
       const sidebarNavigation = this.getSidebarNavigationStructure()
       const expectedItemsCount = this.countTotalItems(sidebarNavigation)
-      const actualItemsCount = systemConfig.items?.length || 0
+      const actualItemsCount = systemConfig.menuItems?.length || 0
 
       // Simple vérification du nombre d'items pour détecter les changements
       return expectedItemsCount !== actualItemsCount

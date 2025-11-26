@@ -13,19 +13,20 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../core/multi-tenant'
 import { Roles } from '../../core/common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../domains/auth/security/guards/roles.guard'
-import { UserRole } from '../../domains/users/entities/user.entity'
+import { UserRole } from '../../domains/auth/core/constants/roles.constants'
 import type { CreateNotificationsDto } from './dto/create-notifications.dto'
 import type { NotificationsQueryDto } from './dto/notifications-query.dto'
 import type { UpdateNotificationsDto } from './dto/update-notifications.dto'
 import { NotificationsService } from './notifications.service'
-import { User } from '@prisma/client'
 
 
 @Controller('notifications')
 @ApiTags('🔔 Notifications')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class NotificationsController {

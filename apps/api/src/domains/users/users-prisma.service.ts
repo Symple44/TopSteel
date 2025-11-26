@@ -5,7 +5,6 @@ import { GetUserSettingsResponseDto } from './dto/get-user-settings.dto'
 import type { UpdateUserDto } from './dto/update-user.dto'
 import type { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
 import type { UserQueryDto } from './dto/user-query.dto'
-import { UserRole } from './entities/user.entity'
 
 @Injectable()
 export class UsersPrismaService {
@@ -23,7 +22,7 @@ export class UsersPrismaService {
         password: createUserDto.password,
         nom: createUserDto.nom,
         prenom: createUserDto.prenom,
-        role: createUserDto.role || UserRole.OPERATEUR,
+        role: createUserDto.role || 'OPERATEUR',
         actif: createUserDto.actif !== undefined ? createUserDto.actif : true,
         // acronyme: createUserDto.acronyme || null,
         metadata: createUserDto.metadata as any,
@@ -167,9 +166,9 @@ export class UsersPrismaService {
       this.prisma.user.count(),
       this.prisma.user.count({ where: { actif: true } }),
       this.prisma.user.count({ where: { actif: false } }),
-      this.prisma.user.count({ where: { role: UserRole.ADMIN } }),
-      this.prisma.user.count({ where: { role: UserRole.MANAGER } }),
-      this.prisma.user.count({ where: { role: UserRole.OPERATEUR } }),
+      this.prisma.user.count({ where: { role: 'ADMIN' } }),
+      this.prisma.user.count({ where: { role: 'MANAGER' } }),
+      this.prisma.user.count({ where: { role: 'OPERATEUR' } }),
     ])
 
     return {

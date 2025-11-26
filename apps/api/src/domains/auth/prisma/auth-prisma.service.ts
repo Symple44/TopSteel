@@ -69,6 +69,8 @@ export class AuthPrismaService {
           dernier_login: true,
           version: true,
           refreshToken: true,
+          resetPasswordToken: true,
+          resetPasswordExpires: true,
           metadata: true,
           createdAt: true,
           updatedAt: true,

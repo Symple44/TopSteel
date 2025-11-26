@@ -239,20 +239,33 @@ export class AuthService {
    */
   static async validateTokens(tokens: AuthTokens): Promise<boolean> {
     try {
+      console.log('[AuthService.validateTokens] Starting validation...')
+      console.log('[AuthService.validateTokens] Token exists:', !!tokens?.accessToken)
+      console.log('[AuthService.validateTokens] Token preview:', tokens?.accessToken?.substring(0, 20))
+      console.log('[AuthService.validateTokens] expiresAt:', tokens?.expiresAt)
+
       // Vérifier d'abord l'expiration locale
       if (tokens?.expiresAt) {
         const now = Date.now()
         const buffer = 5 * 60 * 1000 // 5 minutes buffer
-        if (now >= tokens?.expiresAt - buffer) return false
+        const isExpired = now >= tokens?.expiresAt - buffer
+        console.log('[AuthService.validateTokens] Local expiration check:', { now, expiresAt: tokens.expiresAt, buffer, isExpired })
+        if (isExpired) {
+          console.log('[AuthService.validateTokens] Token expired locally, returning false')
+          return false
+        }
       }
 
+      console.log('[AuthService.validateTokens] Calling /api/auth/verify...')
       const response = await callClientApi('auth/verify', {
         headers: {
           Authorization: `Bearer ${tokens?.accessToken}`,
         },
       })
+      console.log('[AuthService.validateTokens] Response status:', response?.status, response?.ok)
       return response?.ok
-    } catch {
+    } catch (error) {
+      console.error('[AuthService.validateTokens] Error:', error)
       return false
     }
   }

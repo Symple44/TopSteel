@@ -187,11 +187,14 @@ export function useDynamicMenu() {
       // MAIS sans les préférences utilisateur personnalisées
       const response = await fetchTyped<MenuConfigResponse>('/admin/menu-raw/configurations/active')
 
-      if (response.success && response.data) {
+      // La réponse de fetchTyped enveloppe les données dans response.data
+      const apiResponse = (response as any).data || response
+
+      if (apiResponse.success && apiResponse.data) {
         // Utiliser le menuTree de la configuration active
-        const menuItems = Array.isArray(response.data.menuTree) ? response.data.menuTree : []
+        const menuItems = Array.isArray(apiResponse.data.menuTree) ? apiResponse.data.menuTree : []
         setStandardMenu(menuItems)
-        setMenuConfig(response.data.configuration)
+        setMenuConfig(apiResponse.data.configuration)
       } else {
         setStandardMenu([])
       }

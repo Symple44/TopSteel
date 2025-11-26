@@ -23,7 +23,7 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
   tableId,
   userId,
 
-  // Fonctionnalités
+  // Fonctionnalites
   sortable = true,
   filterable = true,
   searchable = true,
@@ -31,6 +31,10 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
   editable = false,
   exportable = false,
   pagination = false,
+  searchDebounceMs = 300,
+  virtualize,
+  virtualizeThreshold = 100,
+  estimatedRowHeight = 48,
 
   // Apparence
   title,
@@ -57,7 +61,7 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
   settings,
   onSettingsChange,
 }: DataTableProps<T>) {
-  // Utiliser le hook principal pour gérer tout l'état
+  // Utiliser le hook principal pour gerer tout l'etat
   const tableState = useDataTableState({
     data,
     columns,
@@ -68,6 +72,7 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
     selectable,
     exportable,
     pagination,
+    searchDebounceMs,
     settings,
     onSettingsChange,
     onSelectionChange,
@@ -173,7 +178,7 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
               </tr>
             </thead>
 
-            {/* Corps du tableau */}
+            {/* Corps du tableau (avec virtualisation si necessaire) */}
             <DataTableBody
               onRowClick={onRowClick}
               onRowDoubleClick={onRowDoubleClick}
@@ -184,6 +189,9 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
               keyField={String(keyField)}
               loading={loading}
               emptyMessage={emptyMessage}
+              virtualize={virtualize}
+              virtualizeThreshold={virtualizeThreshold}
+              estimatedRowHeight={estimatedRowHeight}
             />
           </table>
         </div>

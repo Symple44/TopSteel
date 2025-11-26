@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
+import { SkipLink } from '@erp/ui'
 import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
 import { getCSPNonce } from '../lib/security/csp-nonce'
@@ -91,8 +92,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="font-inter antialiased bg-background text-foreground"
         suppressHydrationWarning
       >
+        {/* Skip Link pour navigation au clavier - accessible avec Tab */}
+        <SkipLink targetId="main-content" label="Aller au contenu principal" />
+
         <GlobalErrorBoundary>
-          <Providers>{children}</Providers>
+          <Providers>
+            <main id="main-content" tabIndex={-1} className="outline-none">
+              {children}
+            </main>
+          </Providers>
         </GlobalErrorBoundary>
       </body>
     </html>

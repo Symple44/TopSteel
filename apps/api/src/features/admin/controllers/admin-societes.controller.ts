@@ -12,6 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
+import { Public } from '../../../core/multi-tenant'
 import {
   ApiBearerAuth,
   ApiBody,
@@ -20,6 +21,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
+import type { Societe, Site } from '@prisma/client'
 import { SocieteRoleType } from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
@@ -43,6 +45,9 @@ import type {
   UpdateUserRoleResponse,
 } from '../interfaces/admin-societes.interfaces'
 
+// Type for Societe with sites included
+type SocieteWithSites = Societe & { sites?: Site[] }
+
 interface SocieteQueryDto {
   page?: number
   limit?: number
@@ -53,6 +58,7 @@ interface SocieteQueryDto {
 
 @Controller('admin/societes')
 @ApiTags('🔧 Admin - Sociétés')
+@Public() // Bypass global TenantGuard - CombinedSecurityGuard handles JWT auth
 @UseGuards(CombinedSecurityGuard)
 @RequireSystemAdmin()
 @ApiBearerAuth('JWT-auth')
@@ -74,12 +80,12 @@ export class AdminSocietesController {
   @ApiResponse({ status: 200, description: 'Liste des sociétés récupérée avec succès' })
   async findAllSocietes(@Query() query: SocieteQueryDto) {
     try {
-      // Récupérer les sociétés selon les filtres
-      let societes: SocieteData[]
+      // Récupérer les sociétés selon les filtres - type from Prisma
+      let societes: SocieteWithSites[]
       if (query.status === 'ALL') {
-        societes = await this.societesService.findAll()
+        societes = await this.societesService.findAll() as SocieteWithSites[]
       } else {
-        societes = await this.societesService.findActive()
+        societes = await this.societesService.findActive() as SocieteWithSites[]
       }
 
       // Appliquer la recherche si fournie
@@ -87,7 +93,7 @@ export class AdminSocietesController {
         const searchTerm = query.search.toLowerCase()
         societes = societes.filter(
           (societe) =>
-            societe.nom.toLowerCase().includes(searchTerm) ||
+            societe.name.toLowerCase().includes(searchTerm) ||
             societe.code.toLowerCase().includes(searchTerm)
         )
       }
@@ -101,7 +107,7 @@ export class AdminSocietesController {
 
       // Formatter les données avec les utilisateurs si demandé
       const formattedSocietes = await Promise.all(
-        paginatedSocietes.map(async (societe: SocieteData) => {
+        paginatedSocietes.map(async (societe) => {
           let users: FormattedUserForSociete[] = []
           let userCount = 0
 
@@ -161,20 +167,19 @@ export class AdminSocietesController {
 
           return {
             id: societe.id,
-            nom: societe.nom,
+            nom: societe.name, // Map Prisma 'name' to interface 'nom'
             code: societe.code,
-            status: (societe.status || 'ACTIVE') as 'ACTIVE' | 'INACTIVE',
+            status: (societe.isActive ? 'ACTIVE' : 'INACTIVE') as 'ACTIVE' | 'INACTIVE',
             createdAt: societe.createdAt,
             updatedAt: societe.updatedAt,
             userCount,
             users: query.includeUsers ? users : undefined,
-            sites:
-              societe.sites?.map((site: SiteData) => ({
-                id: site.id,
-                nom: site.nom,
-                code: site.code,
-                isPrincipal: site.isPrincipal,
-              })) || [],
+            sites: societe.sites?.map((site: Site) => ({
+              id: site.id,
+              nom: site.name,
+              code: site.code,
+              isPrincipal: false, // Not in Prisma schema
+            })) || [],
           } as SocieteWithUserInfo
         })
       )
@@ -200,7 +205,7 @@ export class AdminSocietesController {
   @ApiResponse({ status: 200, description: 'Détails de la société récupérés avec succès' })
   @ApiResponse({ status: 404, description: 'Société non trouvée' })
   async findSocieteById(@Param('id') id: string) {
-    const societe = await this.societesService.findById(id)
+    const societe = await this.societesService.findById(id) as SocieteWithSites | null
 
     if (!societe) {
       throw new NotFoundException('Société non trouvée')
@@ -233,7 +238,7 @@ export class AdminSocietesController {
           isDefault: userRoleInSociete.isDefaultSociete,
           isActive: userRoleInSociete.isActive,
           grantedAt: userRoleInSociete.grantedAt,
-          expiresAt: userRoleInSociete.expiresAt,
+          expiresAt: userRoleInSociete.expiresAt || undefined,
           additionalPermissions: userRoleInSociete.additionalPermissions,
           restrictedPermissions: userRoleInSociete.restrictedPermissions,
         })
@@ -244,20 +249,19 @@ export class AdminSocietesController {
       success: true,
       data: {
         id: societe.id,
-        nom: societe.nom,
+        nom: societe.name, // Map Prisma 'name' to interface 'nom'
         code: societe.code,
-        status: societe.status || 'ACTIVE',
+        status: societe.isActive ? 'ACTIVE' : 'INACTIVE',
         databaseName: societe.databaseName,
         createdAt: societe.createdAt,
         updatedAt: societe.updatedAt,
         users: usersWithAccess,
-        sites:
-          societe.sites?.map((site: SiteData) => ({
-            id: site.id,
-            nom: site.nom,
-            code: site.code,
-            isPrincipal: site.isPrincipal,
-          })) || [],
+        sites: societe.sites?.map((site: Site) => ({
+          id: site.id,
+          nom: site.name,
+          code: site.code,
+          isPrincipal: false, // Not in Prisma schema
+        })) || [],
       },
     }
   }
@@ -323,11 +327,10 @@ export class AdminSocietesController {
           id: userSocieteRole.id,
           userId: userSocieteRole.userId,
           societeId: userSocieteRole.societeId,
-          roleType:
-            userSocieteRole.roleType as import('../../../domains/auth/core/constants/roles.constants').SocieteRoleType,
-          isDefault: userSocieteRole.isDefaultSociete,
+          roleType: body.roleType,
+          isDefault: body.isDefault || false,
           isActive: userSocieteRole.isActive,
-          grantedAt: userSocieteRole.grantedAt,
+          grantedAt: userSocieteRole.activatedAt || userSocieteRole.createdAt,
           grantedBy: currentUser.id,
         },
         message: 'Utilisateur ajouté à la société avec succès',
@@ -404,7 +407,7 @@ export class AdminSocietesController {
           isDefault: body.isDefault !== undefined ? body.isDefault : existingRole.isDefaultSociete,
           additionalPermissions: body.additionalPermissions || existingRole.additionalPermissions,
           restrictedPermissions: body.restrictedPermissions || existingRole.restrictedPermissions,
-          expiresAt: body.expiresAt || existingRole.expiresAt,
+          expiresAt: body.expiresAt || existingRole.expiresAt || undefined,
         }
       )
 
@@ -414,11 +417,10 @@ export class AdminSocietesController {
           id: updatedRole.id,
           userId: updatedRole.userId,
           societeId: updatedRole.societeId,
-          roleType:
-            updatedRole.roleType as import('../../../domains/auth/core/constants/roles.constants').SocieteRoleType,
-          isDefault: updatedRole.isDefaultSociete,
+          roleType: body.roleType,
+          isDefault: body.isDefault !== undefined ? body.isDefault : (existingRole.isDefaultSociete || false),
           isActive: updatedRole.isActive,
-          grantedAt: updatedRole.grantedAt,
+          grantedAt: updatedRole.activatedAt || updatedRole.createdAt,
         },
         message: "Rôle de l'utilisateur modifié avec succès",
         statusCode: 200,
@@ -433,7 +435,7 @@ export class AdminSocietesController {
   @ApiResponse({ status: 200, description: 'Statistiques récupérées avec succès' })
   @ApiResponse({ status: 404, description: 'Société non trouvée' })
   async getSocieteStats(@Param('id') id: string): Promise<SocieteStatsResponse> {
-    const societe = await this.societesService.findById(id)
+    const societe = await this.societesService.findById(id) as SocieteWithSites | null
     if (!societe) {
       throw new NotFoundException('Société non trouvée')
     }
@@ -464,7 +466,7 @@ export class AdminSocietesController {
       success: true,
       data: {
         societeId: societe.id,
-        societeName: societe.nom,
+        societeName: societe.name, // Map Prisma 'name' to expected 'nom'
         totalUsers,
         activeUsers,
         inactiveUsers: totalUsers - activeUsers,

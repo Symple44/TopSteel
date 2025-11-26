@@ -1,13 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
-import type { Site } from '../entities/site.entity'
+import type { Site, Prisma } from '@prisma/client'
+// import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator' // Removed - TypeORM decorator
 import { SitesService } from '../services/sites.service'
 
 @ApiTags('Sites')
 @Controller('sites')
-@CommonDatabase()
+// @CommonDatabase() // Removed - TypeORM decorator
 export class SitesController {
   constructor(private readonly sitesService: SitesService) {}
 
@@ -38,13 +37,13 @@ export class SitesController {
   @Post()
   @ApiOperation({ summary: 'Créer un nouveau site' })
   async create(@Body() siteData: Partial<Site>): Promise<Site> {
-    return this.sitesService.create(siteData)
+    return this.sitesService.create(siteData as any)
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour un site' })
   async update(@Param('id') id: string, @Body() siteData: Partial<Site>): Promise<Site> {
-    return this.sitesService.update(id, siteData as QueryDeepPartialEntity<Site>)
+    return this.sitesService.update(id, siteData as any)
   }
 
   @Put(':id/set-principal/:societeId')
@@ -56,17 +55,17 @@ export class SitesController {
     return this.sitesService.setPrincipal(id, societeId)
   }
 
-  @Put(':id/activate')
-  @ApiOperation({ summary: 'Activer un site' })
-  async activate(@Param('id') id: string): Promise<Site> {
-    return this.sitesService.activate(id)
-  }
+  // @Put(':id/activate')
+  // @ApiOperation({ summary: 'Activer un site' })
+  // async activate(@Param('id') id: string): Promise<Site> {
+  //   return this.sitesService.activate(id)
+  // }
 
-  @Put(':id/deactivate')
-  @ApiOperation({ summary: 'Désactiver un site' })
-  async deactivate(@Param('id') id: string): Promise<Site> {
-    return this.sitesService.deactivate(id)
-  }
+  // @Put(':id/deactivate')
+  // @ApiOperation({ summary: 'Désactiver un site' })
+  // async deactivate(@Param('id') id: string): Promise<Site> {
+  //   return this.sitesService.deactivate(id)
+  // }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un site' })

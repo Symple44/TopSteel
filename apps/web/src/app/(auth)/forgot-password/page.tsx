@@ -45,8 +45,17 @@ const ForgotPasswordPage: FC = () => {
     setIsLoading(true)
 
     try {
-      // Simuler un appel API pour la récupération de mot de passe
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Une erreur est survenue')
+      }
 
       setIsEmailSent(true)
       toast({
@@ -54,10 +63,10 @@ const ForgotPasswordPage: FC = () => {
         description: t('emailSentToast'),
         variant: 'success',
       })
-    } catch (_error) {
+    } catch (error) {
       toast({
         title: t('common.error') || 'Erreur',
-        description: t('common.tryAgain') || 'Une erreur est survenue. Veuillez réessayer.',
+        description: error instanceof Error ? error.message : t('common.tryAgain') || 'Une erreur est survenue. Veuillez réessayer.',
         variant: 'destructive',
       })
     } finally {

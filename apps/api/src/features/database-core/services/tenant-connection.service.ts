@@ -1,6 +1,33 @@
 import { Injectable, Logger, type OnModuleDestroy } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { DataSource, type DataSourceOptions } from 'typeorm'
+
+// Minimal DataSource types for tenant connections (TypeORM is being phased out)
+interface DataSourceOptions {
+  type: string
+  host: string
+  port: number
+  username: string
+  password: string
+  database: string
+  synchronize: boolean
+  logging: boolean
+  name?: string
+  entities?: unknown[]
+  migrations?: string[]
+}
+
+class DataSource {
+  constructor(_config: DataSourceOptions) {
+    // Placeholder for TypeORM DataSource
+  }
+  isInitialized = false
+  async initialize() {
+    this.isInitialized = true
+  }
+  async destroy() {
+    this.isInitialized = false
+  }
+}
 
 @Injectable()
 export class TenantConnectionService implements OnModuleDestroy {

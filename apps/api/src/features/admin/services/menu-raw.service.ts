@@ -1,46 +1,38 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
 
 export interface MenuConfigurationData {
   id: string
   name: string
-  description?: string
+  description?: string | null
   isActive: boolean
-  isSystem: boolean
-  metadata?: Record<string, unknown>
+  isDefault: boolean
+  societeId?: string | null
   createdAt: Date
   updatedAt: Date
-  createdBy?: string
-  updatedBy?: string
 }
 
 export interface MenuItemData {
   id: string
-  configId: string
-  parentId?: string
-  title: string
-  type: 'M' | 'P' | 'L' | 'D'
-  programId?: string
-  externalUrl?: string
-  queryBuilderId?: string
-  orderIndex: number
+  menuConfigurationId: string
+  parentId: string | null
+  label: string
+  icon: string | null
+  path: string | null
+  order: number
+  isActive: boolean
   isVisible: boolean
-  metadata?: Record<string, unknown>
+  metadata: unknown
   createdAt: Date
   updatedAt: Date
-  createdBy?: string
-  updatedBy?: string
 }
 
 export interface MenuTreeNode {
   id: string
-  parentId?: string
+  parentId?: string | null
   title: string
-  type: 'M' | 'P' | 'L' | 'D'
-  programId?: string
-  externalUrl?: string
-  queryBuilderId?: string
+  icon?: string | null
+  href?: string | null
   orderIndex: number
   isVisible: boolean
   children: MenuTreeNode[]
@@ -49,101 +41,38 @@ export interface MenuTreeNode {
 
 @Injectable()
 export class MenuRawService {
-  constructor(
-    @InjectDataSource('auth')
-    private readonly _dataSource: DataSource
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAllConfigurations(): Promise<MenuConfigurationData[]> {
-    const result = await this._dataSource.query(`
-      SELECT 
-        id, 
-        name, 
-        description, 
-        isactive as "isActive", 
-        issystem as "isSystem", 
-        metadata, 
-        createdat as "createdAt", 
-        updatedat as "updatedAt", 
-        createdby as "createdBy", 
-        updatedby as "updatedBy"
-      FROM menu_configurations 
-      ORDER BY issystem DESC, name ASC
-    `)
-    return result
+    const configs = await this.prisma.menuConfiguration.findMany({
+      orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
+    })
+    return configs
   }
 
   async findActiveConfiguration(): Promise<MenuConfigurationData | null> {
-    const result = await this._dataSource.query(`
-      SELECT 
-        id, 
-        name, 
-        description, 
-        isactive as "isActive", 
-        issystem as "isSystem", 
-        metadata, 
-        createdat as "createdAt", 
-        updatedat as "updatedAt", 
-        createdby as "createdBy", 
-        updatedby as "updatedBy"
-      FROM menu_configurations 
-      WHERE isactive = true 
-      LIMIT 1
-    `)
-    return result[0] || null
+    const config = await this.prisma.menuConfiguration.findFirst({
+      where: { isActive: true },
+      orderBy: { isDefault: 'desc' },
+    })
+    return config
   }
 
   async findMenuItemsByConfigId(configId: string): Promise<MenuItemData[]> {
-    const result = await this._dataSource.query(
-      `
-      SELECT 
-        id,
-        "configId",
-        "parentId",
-        title,
-        type,
-        "programId",
-        "externalUrl",
-        "queryBuilderId",
-        "orderIndex",
-        "isVisible",
-        metadata,
-        "createdAt",
-        "updatedAt",
-        "createdBy",
-        "updatedBy"
-      FROM menu_items 
-      WHERE "configId" = $1 
-      ORDER BY "orderIndex", "parentId" NULLS FIRST
-    `,
-      [configId]
-    )
-    return result
+    const items = await this.prisma.menuItem.findMany({
+      where: { menuConfigurationId: configId },
+      orderBy: [{ order: 'asc' }, { parentId: 'asc' }],
+    })
+    return items
   }
 
   async getMenuTree(configId?: string): Promise<MenuTreeNode[]> {
     let config: MenuConfigurationData | null
 
     if (configId) {
-      const result = await this._dataSource.query(
-        `
-        SELECT 
-          id, 
-          name, 
-          description, 
-          isactive as "isActive", 
-          issystem as "isSystem", 
-          metadata, 
-          createdat as "createdAt", 
-          updatedat as "updatedAt", 
-          createdby as "createdBy", 
-          updatedby as "updatedBy"
-        FROM menu_configurations 
-        WHERE id = $1
-      `,
-        [configId]
-      )
-      config = result[0] || null
+      config = await this.prisma.menuConfiguration.findUnique({
+        where: { id: configId },
+      })
     } else {
       config = await this.findActiveConfiguration()
     }
@@ -164,18 +93,16 @@ export class MenuRawService {
     depth: number
   ): MenuTreeNode[] {
     return parentItems
-      .sort((a, b) => a.orderIndex - b.orderIndex)
+      .sort((a, b) => a.order - b.order)
       .map((item) => {
         const children = allItems.filter((child) => child.parentId === item.id)
         return {
           id: item.id,
           parentId: item.parentId,
-          title: item.title,
-          type: item.type,
-          programId: item.programId,
-          externalUrl: item.externalUrl,
-          queryBuilderId: item.queryBuilderId,
-          orderIndex: item.orderIndex,
+          title: item.label,
+          icon: item.icon,
+          href: item.path,
+          orderIndex: item.order,
           isVisible: item.isVisible,
           children: this.buildMenuTree(children, allItems, depth + 1),
           depth,
@@ -194,19 +121,19 @@ export class MenuRawService {
 
   private filterMenuByPermissions(
     items: MenuTreeNode[],
-    userRoles: string[],
-    userPermissions: string[]
+    _userRoles: string[],
+    _userPermissions: string[]
   ): MenuTreeNode[] {
     return items
       .filter((item) => item.isVisible)
       .map((item) => ({
         ...item,
-        children: this.filterMenuByPermissions(item.children, userRoles, userPermissions),
+        children: this.filterMenuByPermissions(item.children, _userRoles, _userPermissions),
       }))
       .filter(
         (item) =>
           // Garder les éléments qui ont des enfants ou qui sont des liens directs
-          item.children.length > 0 || item.programId || item.externalUrl || item.queryBuilderId
+          item.children.length > 0 || item.href
       )
   }
 }

@@ -2,7 +2,7 @@
  * Centralized error handler with classification, user messages, and recovery strategies
  */
 
-import type { TFunction } from 'i18next'
+type TFunction = (key: string, options?: Record<string, unknown>) => string
 import { logger } from './logger'
 import {
   AppError,

@@ -105,9 +105,10 @@ export function useToastShortcuts() {
   return {
     /**
      * Toast de succès avec style vert
+     * Durée standardisée à 5 secondes pour une meilleure lisibilité
      */
     success: useCallback(
-      (title: string, description?: string, duration = 4000) => {
+      (title: string, description?: string, duration = 5000) => {
         toast({
           title,
           description,
@@ -120,9 +121,10 @@ export function useToastShortcuts() {
 
     /**
      * Toast d'erreur avec style rouge
+     * Durée standardisée à 5 secondes pour une meilleure lisibilité
      */
     error: useCallback(
-      (title: string, description?: string, duration = 6000) => {
+      (title: string, description?: string, duration = 5000) => {
         toast({
           title,
           description,
@@ -135,6 +137,7 @@ export function useToastShortcuts() {
 
     /**
      * Toast d'avertissement avec style orange
+     * Durée standardisée à 5 secondes
      */
     warning: useCallback(
       (title: string, description?: string, duration = 5000) => {
@@ -150,9 +153,10 @@ export function useToastShortcuts() {
 
     /**
      * Toast d'information avec style bleu
+     * Durée standardisée à 5 secondes pour une meilleure lisibilité
      */
     info: useCallback(
-      (title: string, description?: string, duration = 4000) => {
+      (title: string, description?: string, duration = 5000) => {
         toast({
           title,
           description,
@@ -180,6 +184,7 @@ export function useToastShortcuts() {
 
     /**
      * Toast avec action personnalisée
+     * Durée légèrement plus longue (6s) pour permettre l'interaction
      */
     withAction: useCallback(
       (
@@ -187,7 +192,7 @@ export function useToastShortcuts() {
         description: string,
         action: React.ReactNode,
         variant: Toast['variant'] = 'default',
-        duration = 8000
+        duration = 6000
       ) => {
         toast({
           title,

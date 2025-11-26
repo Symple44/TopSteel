@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AdvancedFilterGroup, ColumnConfig, FilterConfig } from '../types'
 import { applyAdvancedFilter, filterDataByColumns, filterDataBySearch } from '../utils/filterUtils'
 
@@ -9,12 +9,16 @@ export interface UseDataFilteringProps<T> {
   columns: ColumnConfig<T>[]
   initialFilters?: FilterConfig[]
   searchable?: boolean
+  /** Delai de debounce pour la recherche en ms (defaut: 300) */
+  searchDebounceMs?: number
 }
 
 export interface UseDataFilteringReturn<T> {
   filteredData: T[]
   filters: FilterConfig[]
   searchTerm: string
+  /** Valeur debouncee de searchTerm utilisee pour le filtrage */
+  debouncedSearchTerm: string
   advancedFilters: AdvancedFilterGroup | null
   setFilters: (filters: FilterConfig[]) => void
   setSearchTerm: (term: string) => void
@@ -24,21 +28,60 @@ export interface UseDataFilteringReturn<T> {
   clearFilters: () => void
   updateFilter: (field: string, value: unknown, operator?: string) => void
   isFiltered: boolean
+  /** Indique si une recherche est en cours de debounce */
+  isSearchPending: boolean
 }
 
 /**
- * Hook pour gérer le filtrage des données d'une DataTable
+ * Hook pour gerer le filtrage des donnees d'une DataTable
+ * Inclut un debounce automatique sur la recherche pour optimiser les performances
  */
 export function useDataFiltering<T>({
   data,
   columns,
   initialFilters = [],
   searchable = true,
+  searchDebounceMs = 300,
 }: UseDataFilteringProps<T>): UseDataFilteringReturn<T> {
-  // État des filtres
+  // Etat des filtres
   const [filters, setFilters] = useState<FilterConfig[]>(initialFilters)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTermInternal] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterGroup | null>(null)
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Mise a jour du terme de recherche avec debounce
+  const setSearchTerm = useCallback(
+    (term: string) => {
+      setSearchTermInternal(term)
+
+      // Annuler le timer precedent
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current)
+      }
+
+      // Si le terme est vide, mettre a jour immediatement
+      if (!term) {
+        setDebouncedSearchTerm('')
+        return
+      }
+
+      // Sinon, debouncer la mise a jour
+      searchTimerRef.current = setTimeout(() => {
+        setDebouncedSearchTerm(term)
+      }, searchDebounceMs)
+    },
+    [searchDebounceMs]
+  )
+
+  // Cleanup du timer au demontage
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current)
+      }
+    }
+  }, [])
 
   // Ajout d'un filtre
   const addFilter = useCallback((filter: FilterConfig) => {
@@ -61,7 +104,12 @@ export function useDataFiltering<T>({
   // Effacement de tous les filtres
   const clearFilters = useCallback(() => {
     setFilters([])
-    setSearchTerm('')
+    // Annuler le timer de debounce
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current)
+    }
+    setSearchTermInternal('')
+    setDebouncedSearchTerm('')
     setAdvancedFilters(null)
   }, [])
 
@@ -153,7 +201,7 @@ export function useDataFiltering<T>({
     [columns]
   )
 
-  // Calcul des données filtrées
+  // Calcul des donnees filtrees (utilise debouncedSearchTerm pour les performances)
   const filteredData = useMemo(() => {
     let result = [...data]
 
@@ -162,28 +210,40 @@ export function useDataFiltering<T>({
       result = filterDataByColumns(result, filters, columns)
     }
 
-    // 2. Appliquer la recherche globale
-    if (searchable && searchTerm) {
-      result = filterDataBySearch(result, searchTerm, columns)
+    // 2. Appliquer la recherche globale (avec valeur debouncee)
+    if (searchable && debouncedSearchTerm) {
+      result = filterDataBySearch(result, debouncedSearchTerm, columns)
     }
 
-    // 3. Appliquer les filtres avancés
+    // 3. Appliquer les filtres avances
     if (advancedFilters) {
       result = result.filter((row) => applyAdvancedFiltersToRow(row, advancedFilters))
     }
 
     return result
-  }, [data, filters, searchTerm, advancedFilters, columns, searchable, applyAdvancedFiltersToRow])
+  }, [
+    data,
+    filters,
+    debouncedSearchTerm,
+    advancedFilters,
+    columns,
+    searchable,
+    applyAdvancedFiltersToRow,
+  ])
 
   // Indicateur si des filtres sont actifs
   const isFiltered = useMemo(() => {
     return filters.length > 0 || searchTerm !== '' || advancedFilters !== null
   }, [filters, searchTerm, advancedFilters])
 
+  // Indicateur si une recherche est en attente de debounce
+  const isSearchPending = searchTerm !== debouncedSearchTerm
+
   return {
     filteredData,
     filters,
     searchTerm,
+    debouncedSearchTerm,
     advancedFilters,
     setFilters,
     setSearchTerm,
@@ -193,5 +253,6 @@ export function useDataFiltering<T>({
     clearFilters,
     updateFilter,
     isFiltered,
+    isSearchPending,
   }
 }

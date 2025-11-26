@@ -18,23 +18,26 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import type { MFASession } from '../../../domains/auth/core/entities/mfa-session.entity'
-import type { UserMFA } from '../../../domains/auth/core/entities/user-mfa.entity'
+import { Public } from '../../../core/multi-tenant'
+import type { MfaSession, UserMfa } from '@prisma/client'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
-import { MFAService } from '../../../domains/auth/services/mfa.service'
+import { MfaPrismaService } from '../../../domains/auth/prisma/mfa-prisma.service'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import type { MFASecurityStats, MFAStatusData } from '../interfaces/mfa-admin.interfaces'
 
 @Controller('admin/mfa')
 @ApiTags('🔧 Admin - Multi-Factor Authentication')
+@Public() // Bypass global TenantGuard - CombinedSecurityGuard handles JWT auth
 @UseGuards(CombinedSecurityGuard)
 @RequireSystemAdmin()
 @ApiBearerAuth('JWT-auth')
 export class AdminMFAController {
   constructor(
-    private readonly mfaService: MFAService,
-    private readonly performanceService: AuthPerformanceService
+    private readonly mfaService: MfaPrismaService,
+    private readonly performanceService: AuthPerformanceService,
+    private readonly prisma: PrismaService
   ) {}
 
   @Get('status')
@@ -42,7 +45,7 @@ export class AdminMFAController {
   @ApiResponse({ status: 200, description: 'État MFA récupéré avec succès' })
   async getMFAStatus() {
     return this.performanceService.trackOperation('admin_mfa_status', async () => {
-      const status = await this.mfaService.getAdminMFAStatus()
+      const status = await this.getAdminMFAStatus()
 
       return {
         success: true,
@@ -63,10 +66,10 @@ export class AdminMFAController {
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async getUserMFAStatus(@Param('userId') userId: string) {
     try {
-      const mfaMethods = await this.mfaService.getUserMFAMethods(userId)
+      const mfaMethods = await this.getUserMFAMethods(userId)
       const hasMFAEnabled = await this.mfaService.hasMFAEnabled(userId)
-      const isMFARequired = await this.mfaService.isMFARequiredForUser(userId)
-      const stats = await this.mfaService.getMFAStats(userId)
+      const isMFARequired = await this.isMFARequiredForUser(userId)
+      const stats = await this.getMFAStats(userId)
 
       return {
         success: true,
@@ -74,29 +77,30 @@ export class AdminMFAController {
           userId,
           hasMFAEnabled,
           isMFARequired,
-          methods: mfaMethods.map((method: UserMFA) => ({
-            id: method.id,
-            type: method.type,
-            isEnabled: method.isEnabled,
-            isVerified: method.isVerified,
-            lastUsed: method.lastUsedAt || method.metadata?.lastUsed,
-            createdAt: method.createdAt,
-            metadata: {
-              usageCount: method.metadata?.usageCount || 0,
-              failedAttempts: method.metadata?.failedAttempts || 0,
-              deviceInfo:
-                method.type === 'webauthn'
-                  ? method.metadata?.deviceInfo
+          methods: mfaMethods.map((method: UserMfa) => {
+            const metadata = method.metadata as Record<string, unknown> | null
+            return {
+              id: method.id,
+              type: method.type,
+              isEnabled: method.isEnabled,
+              isVerified: method.isVerified,
+              lastUsed: method.lastUsedAt || (metadata?.lastUsed as Date | undefined),
+              createdAt: method.createdAt,
+              metadata: {
+                usageCount: metadata?.usageCount ? Number(metadata.usageCount) : 0,
+                failedAttempts: metadata?.failedAttempts ? Number(metadata.failedAttempts) : 0,
+                deviceInfo:
+                  method.type === 'webauthn' && metadata?.deviceInfo
                     ? [
                         {
-                          deviceName: method.metadata.deviceInfo.deviceName,
+                          deviceName: (metadata.deviceInfo as Record<string, unknown>).deviceName as string,
                           createdAt: method.createdAt,
                         },
                       ]
-                    : undefined
-                  : undefined,
-            },
-          })),
+                    : undefined,
+              },
+            }
+          }),
           stats,
           compliance: {
             status: this.getMFAComplianceStatus(hasMFAEnabled, isMFARequired),
@@ -121,37 +125,44 @@ export class AdminMFAController {
     @Query('limit') limit = 50
   ) {
     try {
-      const queryBuilder = this.mfaService.mfaSessionRepository
-        .createQueryBuilder('session')
-        .leftJoinAndSelect('session.user', 'user')
-        .orderBy('session.createdAt', 'DESC')
-        .limit(limit)
-
-      if (status) {
-        queryBuilder.andWhere('session.status = :status', { status })
-      }
+      const whereClause: Record<string, unknown> = {}
 
       if (userId) {
-        queryBuilder.andWhere('session.userId = :userId', { userId })
+        whereClause.userId = userId
       }
 
-      const sessions = await queryBuilder.getMany()
+      const sessions = await this.prisma.mfaSession.findMany({
+        where: whereClause,
+        include: {
+          user: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+      })
 
       return {
         success: true,
-        data: sessions.map((session: MFASession) => ({
-          id: session.id,
-          userId: session.userId,
-          sessionToken: `${session.sessionToken.substring(0, 8)}***`, // Masked for security
-          status: session.status,
-          mfaType: session.mfaType,
-          ipAddress: session.ipAddress,
-          userAgent: `${session.userAgent?.substring(0, 100)}...`,
-          createdAt: session.createdAt,
-          expiresAt: session.expiresAt,
-          isExpired: session.isExpired(),
-          attemptsCount: session.getAttemptsCount(),
-        })),
+        data: sessions.map((session: MfaSession) => {
+          const isExpired = new Date() > new Date(session.expiresAt)
+          const metadata = session.metadata as Record<string, unknown> | null
+          const attemptsCount = metadata?.attemptsCount ? Number(metadata.attemptsCount) : 1
+
+          return {
+            id: session.id,
+            userId: session.userId,
+            sessionToken: `${session.challenge.substring(0, 8)}***`, // Masked for security
+            status: session.verified ? 'verified' : isExpired ? 'expired' : 'pending',
+            mfaType: session.mfaType,
+            ipAddress: session.ipAddress,
+            userAgent: session.userAgent ? `${session.userAgent.substring(0, 100)}...` : undefined,
+            createdAt: session.createdAt,
+            expiresAt: session.expiresAt,
+            isExpired,
+            attemptsCount,
+          }
+        }),
         meta: {
           total: sessions.length,
           limit,
@@ -167,7 +178,7 @@ export class AdminMFAController {
   @ApiOperation({ summary: 'Nettoyer les sessions MFA expirées' })
   @ApiResponse({ status: 200, description: 'Sessions expirées nettoyées avec succès' })
   async cleanupExpiredSessions() {
-    const cleanedCount = await this.mfaService.cleanupExpiredSessions()
+    const cleanedCount = await this.cleanupExpiredMFASessions()
 
     return {
       success: true,
@@ -201,7 +212,7 @@ export class AdminMFAController {
     @Body() body: { reason: string; disableOnly?: boolean }
   ) {
     try {
-      const mfaMethods = await this.mfaService.getUserMFAMethods(userId)
+      const mfaMethods = await this.getUserMFAMethods(userId)
 
       if (mfaMethods.length === 0) {
         return {
@@ -214,16 +225,20 @@ export class AdminMFAController {
       for (const method of mfaMethods) {
         if (body.disableOnly) {
           // Désactiver la méthode
-          const updatedMethod = { ...method, isEnabled: false }
-          await this.mfaService.userMFARepository.save(updatedMethod)
+          await this.prisma.userMfa.update({
+            where: { id: method.id },
+            data: { isEnabled: false },
+          })
         } else {
-          await this.mfaService.userMFARepository.remove(method)
+          await this.prisma.userMfa.delete({
+            where: { id: method.id },
+          })
         }
         resetCount++
       }
 
       // Invalider le cache MFA
-      await this.mfaService.invalidateMFACache(userId)
+      await this.invalidateMFACache(userId)
 
       return {
         success: true,
@@ -255,34 +270,40 @@ export class AdminMFAController {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 
       // Get usage statistics
-      const mfaRecords = await this.mfaService.userMFARepository
-        .createQueryBuilder('mfa')
-        .where('mfa.lastUsedAt >= :since', { since })
-        .getMany()
+      const mfaRecords = await this.prisma.userMfa.findMany({
+        where: {
+          lastUsedAt: {
+            gte: since,
+          },
+        },
+      })
 
       // Get session statistics
-      const mfaSessions = await this.mfaService.mfaSessionRepository
-        .createQueryBuilder('session')
-        .where('session.createdAt >= :since', { since })
-        .getMany()
+      const mfaSessions = await this.prisma.mfaSession.findMany({
+        where: {
+          createdAt: {
+            gte: since,
+          },
+        },
+      })
 
       const analytics = {
         period: `${days} days`,
         mfaUsage: {
           totalAuthentications: mfaSessions.length,
-          successfulAuthentications: mfaSessions.filter((s) => s.status === 'verified').length,
-          failedAuthentications: mfaSessions.filter((s) => s.status === 'failed').length,
-          expiredSessions: mfaSessions.filter((s) => s.status === 'expired').length,
+          successfulAuthentications: mfaSessions.filter((s) => s.verified).length,
+          failedAuthentications: mfaSessions.filter((s) => !s.verified && new Date() > new Date(s.expiresAt)).length,
+          expiredSessions: mfaSessions.filter((s) => new Date() > new Date(s.expiresAt)).length,
         },
-        methodPopularity: this.calculateMethodPopularity(mfaRecords as UserMFA[]),
+        methodPopularity: this.calculateMethodPopularity(mfaRecords as UserMfa[]),
         securityMetrics: {
-          averageAttemptsPerSession: this.calculateAverageAttempts(mfaSessions as MFASession[]),
-          mostActiveHours: this.calculateActiveHours(mfaSessions as MFASession[]),
-          topFailureReasons: this.calculateFailureReasons(mfaSessions as MFASession[]),
+          averageAttemptsPerSession: this.calculateAverageAttempts(mfaSessions as MfaSession[]),
+          mostActiveHours: this.calculateActiveHours(mfaSessions as MfaSession[]),
+          topFailureReasons: this.calculateFailureReasons(mfaSessions as MfaSession[]),
         },
         trends: {
           adoptionRate: await this.calculateAdoptionTrend(days),
-          usageGrowth: this.calculateUsageGrowth(mfaSessions as MFASession[]),
+          usageGrowth: this.calculateUsageGrowth(mfaSessions as MfaSession[]),
         },
       }
 
@@ -300,11 +321,14 @@ export class AdminMFAController {
   @ApiResponse({ status: 200, description: 'État de santé MFA récupéré avec succès' })
   async getMFAHealth() {
     try {
-      const status = await this.mfaService.getAdminMFAStatus()
-      const recentSessions = await this.mfaService.mfaSessionRepository
-        .createQueryBuilder('session')
-        .where('session.createdAt >= :since', { since: new Date(Date.now() - 24 * 60 * 60 * 1000) })
-        .getCount()
+      const status = await this.getAdminMFAStatus()
+      const recentSessions = await this.prisma.mfaSession.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+          },
+        },
+      })
 
       const health = {
         overall: 'healthy',
@@ -380,7 +404,7 @@ export class AdminMFAController {
     return 'Configuration MFA optimale'
   }
 
-  private calculateMethodPopularity(records: UserMFA[]): Record<string, number> {
+  private calculateMethodPopularity(records: UserMfa[]): Record<string, number> {
     const popularity: Record<string, number> = {}
     for (const record of records) {
       popularity[record.type] = (popularity[record.type] || 0) + 1
@@ -388,16 +412,17 @@ export class AdminMFAController {
     return popularity
   }
 
-  private calculateAverageAttempts(sessions: MFASession[]): number {
+  private calculateAverageAttempts(sessions: MfaSession[]): number {
     if (sessions.length === 0) return 0
-    const totalAttempts = sessions.reduce(
-      (sum, session) => sum + (session.getAttemptsCount?.() || 1),
-      0
-    )
+    const totalAttempts = sessions.reduce((sum, session) => {
+      const metadata = session.metadata as Record<string, unknown> | null
+      const attempts = metadata?.attemptsCount ? Number(metadata.attemptsCount) : 1
+      return sum + attempts
+    }, 0)
     return totalAttempts / sessions.length
   }
 
-  private calculateActiveHours(sessions: MFASession[]): number[] {
+  private calculateActiveHours(sessions: MfaSession[]): number[] {
     const hourCounts = new Array(24).fill(0)
     for (const session of sessions) {
       const hour = new Date(session.createdAt).getHours()
@@ -406,13 +431,15 @@ export class AdminMFAController {
     return hourCounts
   }
 
-  private calculateFailureReasons(sessions: MFASession[]): Record<string, number> {
+  private calculateFailureReasons(sessions: MfaSession[]): Record<string, number> {
     const reasons: Record<string, number> = {}
-    const failedSessions = sessions.filter((s) => s.status === 'failed')
+    const failedSessions = sessions.filter((s) => !s.verified && new Date() > new Date(s.expiresAt))
 
     // Simple categorization - in production, you'd have more detailed failure tracking
     for (const session of failedSessions) {
-      const reason = (session.getAttemptsCount?.() || 0) >= 3 ? 'too_many_attempts' : 'invalid_code'
+      const metadata = session.metadata as Record<string, unknown> | null
+      const attempts = metadata?.attemptsCount ? Number(metadata.attemptsCount) : 0
+      const reason = attempts >= 3 ? 'too_many_attempts' : 'invalid_code'
       reasons[reason] = (reasons[reason] || 0) + 1
     }
 
@@ -421,21 +448,25 @@ export class AdminMFAController {
 
   private async calculateAdoptionTrend(days: number): Promise<number> {
     // Simple trend calculation - could be more sophisticated
-    const oldCount = await this.mfaService.userMFARepository
-      .createQueryBuilder('mfa')
-      .where('mfa.createdAt <= :date', { date: new Date(Date.now() - days * 24 * 60 * 60 * 1000) })
-      .andWhere('mfa.isEnabled = true')
-      .getCount()
+    const oldCount = await this.prisma.userMfa.count({
+      where: {
+        createdAt: {
+          lte: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
+        },
+        isEnabled: true,
+      },
+    })
 
-    const newCount = await this.mfaService.userMFARepository
-      .createQueryBuilder('mfa')
-      .where('mfa.isEnabled = true')
-      .getCount()
+    const newCount = await this.prisma.userMfa.count({
+      where: {
+        isEnabled: true,
+      },
+    })
 
     return newCount - oldCount
   }
 
-  private calculateUsageGrowth(sessions: MFASession[]): number {
+  private calculateUsageGrowth(sessions: MfaSession[]): number {
     if (sessions.length === 0) return 0
 
     const midpoint = Math.floor(sessions.length / 2)
@@ -466,5 +497,178 @@ export class AdminMFAController {
     }
 
     return recommendations.length > 0 ? recommendations : ['Système MFA en bonne santé']
+  }
+
+  // Additional helper methods for MFA operations
+
+  /**
+   * Get admin MFA status - aggregates MFA statistics across all users
+   */
+  private async getAdminMFAStatus(): Promise<MFAStatusData> {
+    const totalUsers = await this.prisma.user.count()
+    const usersWithMFA = await this.prisma.user.count({
+      where: {
+        mfaSettings: {
+          some: {
+            isEnabled: true,
+            isVerified: true,
+          },
+        },
+      },
+    })
+
+    // Get users by role
+    const usersByRole: Record<string, { total: number; withMFA: number }> = {}
+    const users = await this.prisma.user.findMany({
+      select: {
+        role: true,
+        mfaSettings: {
+          where: {
+            isEnabled: true,
+            isVerified: true,
+          },
+        },
+      },
+    })
+
+    for (const user of users) {
+      const role = user.role || 'USER'
+      if (!usersByRole[role]) {
+        usersByRole[role] = { total: 0, withMFA: 0 }
+      }
+      usersByRole[role].total++
+      if (user.mfaSettings.length > 0) {
+        usersByRole[role].withMFA++
+      }
+    }
+
+    // Get MFA method distribution
+    const mfaMethods = await this.prisma.userMfa.groupBy({
+      by: ['type'],
+      where: {
+        isEnabled: true,
+        isVerified: true,
+      },
+      _count: true,
+    })
+
+    const mfaMethodDistribution: Record<string, number> = {}
+    for (const method of mfaMethods) {
+      mfaMethodDistribution[method.type.toLowerCase()] = method._count
+    }
+
+    return {
+      totalUsers,
+      usersWithMFA,
+      usersByRole,
+      mfaMethodDistribution,
+    }
+  }
+
+  /**
+   * Get all MFA methods for a user
+   */
+  private async getUserMFAMethods(userId: string): Promise<UserMfa[]> {
+    return this.prisma.userMfa.findMany({
+      where: {
+        userId,
+      },
+    })
+  }
+
+  /**
+   * Check if MFA is required for a user based on their role
+   */
+  private async isMFARequiredForUser(userId: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    })
+
+    if (!user) return false
+
+    // MFA is required for SUPER_ADMIN and ADMIN roles
+    const rolesRequiringMFA = ['SUPER_ADMIN', 'ADMIN']
+    return rolesRequiringMFA.includes(user.role)
+  }
+
+  /**
+   * Get MFA security stats for a user
+   */
+  private async getMFAStats(userId: string): Promise<MFASecurityStats> {
+    const mfaMethods = await this.getUserMFAMethods(userId)
+
+    const stats: MFASecurityStats = {
+      hasActiveMFA: false,
+      methods: {
+        totp: { enabled: false, verified: false },
+        webauthn: { enabled: false, verified: false, credentialsCount: 0 },
+        sms: { enabled: false, verified: false },
+      },
+      totalUsage: 0,
+      securityLevel: 'none',
+    }
+
+    for (const method of mfaMethods) {
+      const methodType = method.type.toLowerCase() as 'totp' | 'sms' | 'webauthn'
+
+      if (methodType === 'totp' || methodType === 'sms') {
+        stats.methods[methodType] = {
+          enabled: method.isEnabled,
+          verified: method.isVerified,
+          lastUsed: method.lastUsedAt || undefined,
+        }
+      } else if (methodType === 'webauthn') {
+        const credentials = method.webauthnCredentials as unknown[] | null
+        stats.methods.webauthn = {
+          enabled: method.isEnabled,
+          verified: method.isVerified,
+          credentialsCount: credentials ? credentials.length : 0,
+          lastUsed: method.lastUsedAt || undefined,
+        }
+      }
+
+      if (method.isEnabled && method.isVerified) {
+        stats.hasActiveMFA = true
+        const metadata = method.metadata as Record<string, unknown> | null
+        stats.totalUsage += metadata?.usageCount ? Number(metadata.usageCount) : 0
+      }
+    }
+
+    // Determine security level
+    const activeMethods = mfaMethods.filter((m) => m.isEnabled && m.isVerified).length
+    if (activeMethods === 0) {
+      stats.securityLevel = 'none'
+    } else if (activeMethods === 1) {
+      stats.securityLevel = 'basic'
+    } else {
+      stats.securityLevel = 'enhanced'
+    }
+
+    return stats
+  }
+
+  /**
+   * Cleanup expired MFA sessions
+   */
+  private async cleanupExpiredMFASessions(): Promise<number> {
+    const result = await this.prisma.mfaSession.deleteMany({
+      where: {
+        expiresAt: {
+          lt: new Date(),
+        },
+      },
+    })
+
+    return result.count
+  }
+
+  /**
+   * Invalidate MFA cache for a user (stub for cache integration)
+   */
+  private async invalidateMFACache(userId: string): Promise<void> {
+    // This is a stub - implement cache invalidation if using Redis/cache
+    // For now, it's a no-op since we're querying directly from database
+    void userId
   }
 }

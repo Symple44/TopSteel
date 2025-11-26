@@ -1,10 +1,45 @@
 import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
 import { firstValueFrom } from 'rxjs'
-import { Repository } from 'typeorm'
-import { ConditionType, NotificationCondition } from '../entities/notification-condition.entity'
 import type { RuleExecutionContext } from '../types/notification-types'
+
+/**
+ * Condition types enum - replaces deleted TypeORM entity
+ */
+export enum ConditionType {
+  FIELD = 'FIELD',
+  EXPRESSION = 'EXPRESSION',
+  QUERY = 'QUERY',
+  API = 'API',
+  AGGREGATE = 'AGGREGATE',
+  TIME = 'TIME',
+  COUNT = 'COUNT',
+}
+
+/**
+ * Notification condition interface - replaces deleted TypeORM entity
+ */
+export interface NotificationCondition {
+  name: string
+  type: ConditionType
+  operator?: string
+  value?: unknown
+  query?: string
+  apiUrl?: string
+  apiMethod?: 'GET' | 'POST'
+  apiHeaders?: Record<string, unknown>
+  apiBody?: Record<string, unknown>
+  apiResponsePath?: string
+  aggregateFunction?: string
+  aggregateField?: string
+  timeUnit?: 'minutes' | 'hours' | 'days' | 'weeks' | 'months'
+  timeValue?: number
+  timeReference?: 'now' | 'event_time' | 'field_value'
+  countEntity?: string
+  countFilters?: Record<string, unknown>
+  evaluateField(data: Record<string, unknown>): boolean
+  evaluateExpression(context: Record<string, unknown>): boolean
+}
 
 /**
  * Notification condition evaluator service
@@ -13,11 +48,7 @@ import type { RuleExecutionContext } from '../types/notification-types'
 export class NotificationConditionEvaluator {
   private readonly logger = new Logger(NotificationConditionEvaluator.name)
 
-  constructor(
-    private readonly httpService: HttpService,
-    @InjectRepository(NotificationCondition, 'auth')
-    readonly _conditionRepository: Repository<NotificationCondition>
-  ) {}
+  constructor(private readonly httpService: HttpService) {}
 
   /**
    * Evaluate a condition
@@ -280,13 +311,33 @@ export class NotificationConditionEvaluator {
       return !!value
     }
 
-    // Create a temporary condition to evaluate the value
-    const tempCondition = new NotificationCondition()
-    Object.assign(tempCondition, condition)
-    tempCondition.fieldPath = 'value'
-    tempCondition.type = ConditionType.FIELD
+    // Simple evaluation logic
+    const operator = condition.operator
+    const targetValue = condition.value
 
-    const tempData = { value }
-    return tempCondition.evaluateField(tempData)
+    switch (operator) {
+      case 'eq':
+      case '==':
+      case '===':
+        return value === targetValue
+      case 'ne':
+      case '!=':
+      case '!==':
+        return value !== targetValue
+      case 'gt':
+      case '>':
+        return (value as number) > (targetValue as number)
+      case 'gte':
+      case '>=':
+        return (value as number) >= (targetValue as number)
+      case 'lt':
+      case '<':
+        return (value as number) < (targetValue as number)
+      case 'lte':
+      case '<=':
+        return (value as number) <= (targetValue as number)
+      default:
+        return !!value
+    }
   }
 }

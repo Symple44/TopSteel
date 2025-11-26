@@ -1,28 +1,25 @@
+/**
+ * Service migré de TypeORM vers Prisma
+ * Migration complète vers Prisma Client - Schema simplifié
+ */
+
 import {
   ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Group } from '../core/entities/group.entity'
-import { Role } from '../core/entities/role.entity'
-import { UserGroup } from '../core/entities/user-group.entity'
-
-
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { Group, UserGroup } from '@prisma/client'
 
 export interface CreateGroupDto {
   name: string
   description: string
-  type: 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'CUSTOM'
-  roleIds?: string[]
 }
 
 export interface UpdateGroupDto {
   name?: string
   description?: string
-  type?: 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'CUSTOM'
   isActive?: boolean
 }
 
@@ -30,48 +27,36 @@ export interface GroupWithStats {
   id: string
   name: string
   description: string
-  type: string
   isActive: boolean
   userCount: number
-  roleCount: number
   createdAt: Date
   updatedAt: Date
 }
 
 @Injectable()
 export class GroupService {
-  constructor(
-    @InjectRepository(Group, 'auth')
-    private readonly _groupRepository: Repository<Group>,
-    @InjectRepository(UserGroup, 'auth')
-    private readonly _userGroupRepository: Repository<UserGroup>,
-    @InjectRepository(Role, 'auth')
-    private readonly _roleRepository: Repository<Role>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   // ===== GESTION DES GROUPES =====
 
   async findAllGroups(): Promise<GroupWithStats[]> {
-    const groups = await this._groupRepository.find({
-      relations: ['roles'],
-      order: { type: 'ASC', name: 'ASC' },
+    const groups = await this.prisma.group.findMany({
+      orderBy: [{ name: 'asc' }],
     })
 
     // Calculer les statistiques pour chaque groupe
     const groupsWithStats = await Promise.all(
       groups.map(async (group) => {
-        const userCount = await this._userGroupRepository.count({
-          where: { groupId: group.id, isActive: true },
+        const userCount = await this.prisma.userGroup.count({
+          where: { groupId: group.id },
         })
 
         return {
           id: group.id,
           name: group.name,
-          description: group.description,
-          type: group.type || 'CUSTOM',
+          description: group.description || '',
           isActive: group.isActive,
           userCount,
-          roleCount: group.roles?.length || 0,
           createdAt: group.createdAt,
           updatedAt: group.updatedAt,
         }
@@ -82,16 +67,16 @@ export class GroupService {
   }
 
   async findGroupById(id: string, includeUsers: boolean = false): Promise<Group> {
-    const queryBuilder = this._groupRepository
-      .createQueryBuilder('group')
-      .leftJoinAndSelect('group.roles', 'roles')
-      .where('group.id = :id', { id })
-
-    if (includeUsers) {
-      queryBuilder.leftJoinAndSelect('group.userGroups', 'userGroups')
-    }
-
-    const group = await queryBuilder.getOne()
+    const group = await this.prisma.group.findUnique({
+      where: { id },
+      include: includeUsers
+        ? {
+            users: {
+              include: { user: true },
+            },
+          }
+        : undefined,
+    })
 
     if (!group) {
       throw new NotFoundException(`Groupe avec l'ID ${id} non trouvé`)
@@ -100,9 +85,9 @@ export class GroupService {
     return group
   }
 
-  async createGroup(createGroupDto: CreateGroupDto, createdBy: string): Promise<Group> {
+  async createGroup(createGroupDto: CreateGroupDto, _createdBy: string): Promise<Group> {
     // Vérifier l'unicité du nom
-    const existingGroup = await this._groupRepository.findOne({
+    const existingGroup = await this.prisma.group.findFirst({
       where: { name: createGroupDto.name },
     })
 
@@ -111,31 +96,24 @@ export class GroupService {
     }
 
     // Créer le groupe
-    const group = Group.create(
-      createGroupDto.name,
-      createGroupDto.description,
-      createGroupDto.type,
-      createdBy
-    )
-
-    const savedGroup = await this._groupRepository.save(group)
-
-    // Associer les rôles si spécifiés
-    if (createGroupDto.roleIds && createGroupDto.roleIds.length > 0) {
-      const roles = await this._roleRepository.findByIds(createGroupDto.roleIds)
-      savedGroup.roles = roles
-      await this._groupRepository.save(savedGroup)
-    }
+    const savedGroup = await this.prisma.group.create({
+      data: {
+        name: createGroupDto.name,
+        label: createGroupDto.name,
+        description: createGroupDto.description,
+        isActive: true,
+      },
+    })
 
     return savedGroup
   }
 
-  async updateGroup(id: string, updateGroupDto: UpdateGroupDto, updatedBy: string): Promise<Group> {
+  async updateGroup(id: string, updateGroupDto: UpdateGroupDto, _updatedBy: string): Promise<Group> {
     const group = await this.findGroupById(id)
 
     // Vérifier l'unicité du nom si modifié
     if (updateGroupDto.name && updateGroupDto.name !== group.name) {
-      const existingGroup = await this._groupRepository.findOne({
+      const existingGroup = await this.prisma.group.findFirst({
         where: { name: updateGroupDto.name },
       })
 
@@ -145,19 +123,23 @@ export class GroupService {
     }
 
     // Mettre à jour
-    Object.assign(group, updateGroupDto)
-    group.updatedBy = updatedBy
-    group.updatedAt = new Date()
-
-    return await this._groupRepository.save(group)
+    return await this.prisma.group.update({
+      where: { id },
+      data: {
+        name: updateGroupDto.name,
+        label: updateGroupDto.name || group.label,
+        description: updateGroupDto.description,
+        isActive: updateGroupDto.isActive,
+      },
+    })
   }
 
   async deleteGroup(id: string): Promise<void> {
     const group = await this.findGroupById(id)
 
     // Vérifier s'il y a des utilisateurs assignés
-    const userCount = await this._userGroupRepository.count({
-      where: { groupId: id, isActive: true },
+    const userCount = await this.prisma.userGroup.count({
+      where: { groupId: id },
     })
 
     if (userCount > 0) {
@@ -166,7 +148,10 @@ export class GroupService {
       )
     }
 
-    await this._groupRepository.delete(id)
+    // Supprimer le groupe
+    await this.prisma.group.delete({
+      where: { id },
+    })
   }
 
   // ===== GESTION DES MEMBRES =====
@@ -174,87 +159,58 @@ export class GroupService {
   async addUserToGroup(
     userId: string,
     groupId: string,
-    assignedBy: string,
-    expiresAt?: Date
+    _assignedBy: string
   ): Promise<UserGroup> {
-    const _group = await this.findGroupById(groupId)
+    await this.findGroupById(groupId)
 
-    // Vérifier s'il n'y a pas déjà une assignation active
-    const existingUserGroup = await this._userGroupRepository.findOne({
-      where: { userId, groupId, isActive: true },
+    // Vérifier s'il n'y a pas déjà une assignation
+    const existingUserGroup = await this.prisma.userGroup.findFirst({
+      where: { userId, groupId },
     })
 
     if (existingUserGroup) {
       throw new ConflictException("L'utilisateur fait déjà partie de ce groupe")
     }
 
-    const userGroup = UserGroup.assign(userId, groupId, assignedBy, expiresAt)
-    return await this._userGroupRepository.save(userGroup)
+    // Créer l'assignation
+    return await this.prisma.userGroup.create({
+      data: {
+        userId,
+        groupId,
+      },
+    })
   }
 
   async removeUserFromGroup(userId: string, groupId: string): Promise<void> {
-    const userGroup = await this._userGroupRepository.findOne({
-      where: { userId, groupId, isActive: true },
+    const userGroup = await this.prisma.userGroup.findFirst({
+      where: { userId, groupId },
     })
 
     if (!userGroup) {
       throw new NotFoundException('Utilisateur non trouvé dans ce groupe')
     }
 
-    userGroup.isActive = false
-    await this._userGroupRepository.save(userGroup)
+    // Supprimer l'assignation
+    await this.prisma.userGroup.delete({
+      where: { id: userGroup.id },
+    })
   }
 
   async getUserGroups(userId: string): Promise<Group[]> {
-    const userGroups = await this._userGroupRepository.find({
-      where: { userId, isActive: true },
-      relations: ['group', 'group.roles'],
+    const userGroups = await this.prisma.userGroup.findMany({
+      where: { userId },
+      include: { group: true },
     })
 
-    return userGroups.filter((ug) => ug.isValid()).map((ug) => ug.group as Group)
+    return userGroups.map((ug) => ug.group).filter((group): group is Group => group !== null)
   }
 
-  async getGroupUsers(groupId: string): Promise<unknown[]> {
-    const userGroups = await this._userGroupRepository.find({
-      where: { groupId, isActive: true },
+  async getGroupUsers(groupId: string): Promise<UserGroup[]> {
+    const userGroups = await this.prisma.userGroup.findMany({
+      where: { groupId },
+      include: { user: true },
     })
 
-    return userGroups.filter((ug) => ug.isValid())
-  }
-
-  // ===== GESTION DES RÔLES DE GROUPE =====
-
-  async updateGroupRoles(groupId: string, roleIds: string[]): Promise<void> {
-    const group = await this.findGroupById(groupId)
-
-    const roles = await this._roleRepository.findByIds(roleIds)
-    group.roles = roles as Role[]
-
-    await this._groupRepository.save(group)
-  }
-
-  async getGroupRoles(groupId: string): Promise<Role[]> {
-    const group = await this.findGroupById(groupId)
-    return (group.roles as Role[]) || []
-  }
-
-  // ===== PERMISSIONS HÉRITÉES =====
-
-  async getUserPermissionsFromGroups(userId: string): Promise<unknown[]> {
-    const userGroups = await this.getUserGroups(userId)
-
-    // Collecter tous les rôles des groupes de l'utilisateur
-    const allRoles = new Map<string, Role>()
-
-    for (const group of userGroups) {
-      if (group.roles) {
-        for (const role of group.roles as Role[]) {
-          allRoles.set(role.id, role)
-        }
-      }
-    }
-
-    return Array.from(allRoles.values())
+    return userGroups
   }
 }
-

@@ -9,8 +9,14 @@ import {
   Max,
   Min,
 } from 'class-validator'
-import { SocietePlan } from '../entities/societe.entity'
-import { Societe } from '@prisma/client'
+import type { Societe } from '@prisma/client'
+
+// Define SocietePlan enum locally (not in database model)
+export enum SocietePlan {
+  STARTER = 'STARTER',
+  PROFESSIONAL = 'PROFESSIONAL',
+  ENTERPRISE = 'ENTERPRISE',
+}
 
 
 export class CreateTenantDto {

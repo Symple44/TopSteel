@@ -1,12 +1,5 @@
 import { Injectable, Logger, Optional } from '@nestjs/common'
-import { DatabaseHealthService } from '../../features/database-core/services/database-health.service'
-
-export interface SystemDatabaseHealth {
-  auth: { status: 'healthy' | 'unhealthy' }
-  shared: { status: 'healthy' | 'unhealthy' }
-  tenant: { status: 'healthy' | 'unhealthy' }
-  overallStatus: 'healthy' | 'degraded' | 'unhealthy'
-}
+import { DatabaseHealthService, type SystemDatabaseHealth } from '../../features/database-core/services/database-health.service'
 
 export interface SystemHealth {
   status: 'healthy' | 'degraded' | 'unhealthy'
@@ -28,7 +21,7 @@ export class SystemHealthService {
         return {
           status: dbHealth.overallStatus,
           timestamp: new Date().toISOString(),
-          message: `System ${dbHealth.overallStatus} - Databases: AUTH=${dbHealth.auth.status}, SHARED=${dbHealth.shared.status}, TENANT=${dbHealth.tenant.status}`,
+          message: `System ${dbHealth.overallStatus} - Database: ${dbHealth.database.status}`,
           databases: dbHealth,
         }
       }

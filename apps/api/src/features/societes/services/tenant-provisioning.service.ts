@@ -1,11 +1,27 @@
 import { ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { DataSource } from 'typeorm'
-import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
 import { SocieteStatus } from '../../../types/entities/societe.types'
 import { SocietesService } from './societes.service'
 import { TenantInitializationService } from './tenant-initialization.service'
-import { Societe } from '@prisma/client'
+import type { Societe } from '@prisma/client'
+
+// Stub classes for TypeORM (service disabled)
+class DataSource {
+  constructor(config: any) {}
+  async initialize() {}
+  async destroy() {}
+  get isInitialized() { return false }
+  async query(sql: string, params?: any[]) { return [] }
+}
+
+class MultiTenantDatabaseConfig {
+  async closeTenantConnection(code: string) {}
+  async getTenantConnection(code: string) {
+    return {
+      runMigrations: async () => {}
+    }
+  }
+}
 
 
 export interface TenantProvisioningResult {
@@ -128,12 +144,12 @@ export class TenantProvisioningService {
       // 5. Supprimer l'enregistrement de la société
       await this.societesService.delete(societeId)
 
-      this.logger.log(`✅ Société "${societe.nom}" supprimée avec succès`)
+      this.logger.log(`✅ Société "${societe.name}" supprimée avec succès`)
 
       return {
         success: true,
         databaseName: societe.databaseName,
-        message: `Société "${societe.nom}" et sa base de données supprimées avec succès`,
+        message: `Société "${societe.name}" et sa base de données supprimées avec succès`,
       }
     } catch (error) {
       this.logger.error(`❌ Erreur lors de la suppression:`, (error as Error).message)

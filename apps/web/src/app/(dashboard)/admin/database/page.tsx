@@ -111,11 +111,11 @@ export default function DatabaseManagementPage() {
         setConnections(connectionsData)
       }
     } catch (_err) {
-      error(tDb('database.loadError'), tDb('database.loadErrorMessage'))
+      error('Erreur de chargement', 'Impossible de charger les données')
     } finally {
       setLoading(false)
     }
-  }, [error, tDb])
+  }, [error])
 
   const loadTenantData = useCallback(async (tenantCode: string) => {
     try {

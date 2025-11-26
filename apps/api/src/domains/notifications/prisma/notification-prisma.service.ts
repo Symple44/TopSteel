@@ -31,6 +31,7 @@ export class NotificationPrismaService {
    */
   async createNotification(data: {
     userId: string
+    societeId: string
     type: string
     title: string
     message: string
@@ -47,6 +48,7 @@ export class NotificationPrismaService {
       const notification = await this.prisma.notification.create({
         data: {
           userId: data.userId,
+          societeId: data.societeId,
           type: data.type,
           title: data.title,
           message: data.message,
@@ -623,6 +625,7 @@ export class NotificationPrismaService {
    */
   async create(data: {
     userId: string
+    societeId?: string
     type: string
     title: string
     message: string
@@ -632,7 +635,10 @@ export class NotificationPrismaService {
     actionLabel?: string
     expiresAt?: Date
   }): Promise<Notification> {
-    return this.createNotification(data)
+    return this.createNotification({
+      ...data,
+      societeId: data.societeId || '' // Default empty societeId if not provided
+    })
   }
 
   /**

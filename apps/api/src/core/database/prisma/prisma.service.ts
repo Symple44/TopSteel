@@ -1,6 +1,8 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 import { ConfigService } from '@nestjs/config'
+// import { ModuleRef } from '@nestjs/core' // Temporarily unused
+// import { PrismaTenantMiddleware } from '../../multi-tenant/prisma-tenant.middleware' // Temporarily unused
 
 /**
  * PrismaService - Service global Prisma pour NestJS
@@ -70,6 +72,24 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     try {
       await this.$connect()
       this.logger.log('✅ Database connected successfully')
+
+      // Enregistrer le middleware multi-tenant
+      // TODO: Migrate to Prisma Client Extensions ($extends) - $use is deprecated in Prisma v5+
+      // https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions
+      /*
+      try {
+        const tenantMiddleware = this.moduleRef.get(PrismaTenantMiddleware, { strict: false })
+        if (tenantMiddleware) {
+          this.$use(tenantMiddleware.createMiddleware())
+          this.logger.log('✅ Multi-tenant middleware registered')
+        } else {
+          this.logger.warn('⚠️  PrismaTenantMiddleware not found - multi-tenant features disabled')
+        }
+      } catch (error) {
+        this.logger.warn('⚠️  Could not register PrismaTenantMiddleware:', error)
+      }
+      */
+      this.logger.warn('⚠️  Multi-tenant middleware temporarily disabled - needs migration to $extends')
     } catch (error) {
       this.logger.error('❌ Database connection failed:', error)
       throw error

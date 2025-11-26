@@ -1,7 +1,6 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
 import * as mathjs from 'mathjs'
-import type { DataSource } from 'typeorm'
 import type { QueryBuilder } from '../entities'
 import { QueryBuilderSecurityService } from '../security/query-builder-security.service'
 import { FilterCondition, SqlSanitizationService } from '../security/sql-sanitization.service'
@@ -28,8 +27,7 @@ export class QueryBuilderExecutorService {
   private readonly logger = new Logger(QueryBuilderExecutorService.name)
 
   constructor(
-    @InjectDataSource('tenant')
-    private _dataSource: DataSource,
+    private readonly prisma: PrismaService,
     private readonly permissionService: QueryBuilderPermissionService,
     private readonly securityService: QueryBuilderSecurityService,
     private readonly sanitizationService: SqlSanitizationService
@@ -88,21 +86,25 @@ export class QueryBuilderExecutorService {
         parameterCount: sanitizedQuery.parameters.length,
       })
 
-      // Execute count query
-      const countResult = (await this._dataSource.query(
+      // Execute count query (remove LIMIT and OFFSET params)
+      const countParams = sanitizedQuery.parameters.slice(0, -2)
+      const countResult = await this.prisma.$queryRawUnsafe<Array<{ total: bigint }>>(
         countQuery,
-        sanitizedQuery.parameters.slice(0, -2)
-      )) as Array<{ total: string }> // Remove LIMIT and OFFSET params
-      const total = parseInt(countResult[0].total, 10)
+        ...countParams
+      )
+      const total = Number(countResult[0]?.total || 0)
 
       // Execute main query
-      const data = (await this._dataSource.query(mainQuery, sanitizedQuery.parameters)) as Record<
-        string,
-        unknown
-      >[]
+      const data = await this.prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(
+        mainQuery,
+        ...sanitizedQuery.parameters
+      )
 
       // Apply calculated fields
-      const processedData = this.processCalculatedFields(data, (queryBuilder.calculatedFields || []) as any)
+      const processedData = this.processCalculatedFields(
+        data,
+        (queryBuilder.calculatedFields || []) as any
+      )
 
       this.logger.log('Query executed successfully', {
         userId,
@@ -276,14 +278,14 @@ export class QueryBuilderExecutorService {
     try {
       // This should integrate with your user/tenant service
       // For now, we'll implement a basic query to get the user's company
-      const result = (await this._dataSource.query(
-        `SELECT su.societeId as company_id 
-         FROM users u 
-         JOIN societe_users su ON u.id = su.userId 
+      const result = await this.prisma.$queryRawUnsafe<Array<{ company_id: string }>>(
+        `SELECT su.societeId as company_id
+         FROM users u
+         JOIN societe_users su ON u.id = su.userId
          WHERE u.id = $1 AND su.isDefault = true AND su.actif = true
          LIMIT 1`,
-        [userId]
-      )) as Array<{ company_id: string }>
+        userId
+      )
 
       return result?.[0]?.company_id || undefined
     } catch (error) {
@@ -291,8 +293,6 @@ export class QueryBuilderExecutorService {
       return undefined
     }
   }
-
-  // Removed - now handled by SqlSanitizationService
 
   private getTableAlias(tableName: string, queryBuilder: QueryBuilder): string {
     if (tableName === queryBuilder.mainTable) {
@@ -464,7 +464,7 @@ export class QueryBuilderExecutorService {
       // Execute with proper limits and parameterization
       const limitedSql = `${sql} LIMIT ${Math.min(limit, 1000)}`
 
-      const result = (await this._dataSource.query(limitedSql)) as Record<string, unknown>[]
+      const result = await this.prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(limitedSql)
 
       this.logger.log('Raw SQL execution successful', {
         userId,

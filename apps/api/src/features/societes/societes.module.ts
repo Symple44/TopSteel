@@ -1,95 +1,63 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
-// Module multi-tenant est nécessaire pour MultiTenantDatabaseConfig
-import { DatabaseMultiTenantModule } from '../../core/database/database-multi-tenant.module'
 
-// Entités utilisées par TenantInitializationService
-
-
-import { Notifications } from '../notifications/entities/notifications.entity'
-
-import { SitesController } from './controllers/sites.controller'
-import { SocieteUsersController } from './controllers/societe-users.controller'
 // Controllers
 import { SocietesController } from './controllers/societes.controller'
-import { TenantProvisioningController } from './controllers/tenant-provisioning.controller'
+import { SitesController } from './controllers/sites.controller'
+import { SocieteUsersController } from './controllers/societe-users.controller'
+// import { TenantProvisioningController } from './controllers/tenant-provisioning.controller' // Disabled - depends on TenantProvisioningService (TypeORM)
 
-// Entités
-
-
-
-import { LicenseManagementService } from './services/license-management.service'
+// Services (migrated to Prisma)
+import { SocietesService } from './services/societes.service'
 import { SitesService } from './services/sites.service'
+import { SocieteUsersService } from './services/societe-users.service'
 import {
   SocieteAuthRepositoryService,
   SocieteUserAuthRepositoryService,
 } from './services/societe-auth-repository.service'
-import { SocieteUsersService } from './services/societe-users.service'
-// Services
-import { SocietesService } from './services/societes.service'
-import { TenantInitializationService } from './services/tenant-initialization.service'
-import { TenantProvisioningService } from './services/tenant-provisioning.service'
+// import { TenantProvisioningService } from './services/tenant-provisioning.service'
+// import { TenantInitializationService } from './services/tenant-initialization.service'
+// import { LicenseManagementService } from './services/license-management.service'
+
+// Prisma modules
 import { SocietesPrismaModule } from '../../domains/societes/prisma/societes-prisma.module'
-import { NotificationSettings } from '../../features/notifications/entities/notification-settings.entity'
-import { Site } from '../../features/societes/entities/site.entity'
-import { Societe } from '../../features/societes/entities/societe.entity'
-import { SocieteLicense } from '../../features/societes/entities/societe-license.entity'
-import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
-import { User } from '../../domains/users/entities/user.entity'
-import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
-import { UserSettings } from '../../domains/users/entities/user-settings.entity'
+import { DatabaseModule } from '../../core/database/database.module'
 
-
+/**
+ * Module de gestion des sociétés
+ * Migrated from TypeORM to Prisma
+ */
 @Module({
   imports: [
     ConfigModule,
-    DatabaseMultiTenantModule, // Pour avoir accès à MultiTenantDatabaseConfig
+    DatabaseModule, // Provides PrismaService
     SocietesPrismaModule, // Prisma-based societes services
-
-    // Repositories pour la base AUTH
-    TypeOrmModule.forFeature(
-      [
-        Societe,
-        Site,
-        SocieteUser,
-        SocieteLicense,
-        User,
-        UserSettings,
-        UserSession,
-        Notifications,
-        NotificationSettings,
-      ],
-      'auth'
-    ),
   ],
   controllers: [
     SocietesController,
     SitesController,
     SocieteUsersController,
-    TenantProvisioningController,
+    // TenantProvisioningController, // Disabled - depends on TenantProvisioningService (TypeORM)
   ],
   providers: [
+    // Services convertis vers Prisma
     SocietesService,
     SitesService,
     SocieteUsersService,
-    TenantProvisioningService,
-    TenantInitializationService,
-    LicenseManagementService,
-    // MultiTenantDatabaseConfig est déjà fourni par DatabaseMultiTenantModule
     SocieteAuthRepositoryService,
     SocieteUserAuthRepositoryService,
+
+    // Services à convertir plus tard
+    // TenantProvisioningService, // TODO: Dépend de DataSource TypeORM
+    // TenantInitializationService, // TODO: Dépend de @InjectRepository
+    // LicenseManagementService, // TODO: Dépend de @InjectRepository
   ],
   exports: [
     SocietesService,
     SitesService,
     SocieteUsersService,
-    TenantProvisioningService,
-    TenantInitializationService,
-    LicenseManagementService,
     SocieteAuthRepositoryService,
     SocieteUserAuthRepositoryService,
   ],
 })
 export class SocietesModule {}
-

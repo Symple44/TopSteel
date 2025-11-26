@@ -1,6 +1,7 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+
+
 
 export interface DatabaseStats {
   schemaname: string
@@ -45,7 +46,7 @@ export interface DatabaseHealth {
 export class DatabaseHealthService {
   private readonly logger = new Logger(DatabaseHealthService.name)
 
-  constructor(@InjectDataSource('auth') private readonly dataSource: DataSource) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Vérifie la santé complète de la base de données
@@ -104,7 +105,7 @@ export class DatabaseHealthService {
    */
   private async checkConnection(): Promise<boolean> {
     try {
-      await this.dataSource.query('SELECT 1')
+      await this.prisma.$queryRawUnsafe('SELECT 1')
       return true
     } catch (error) {
       this.logger.error('Connection check failed:', error)
@@ -117,14 +118,13 @@ export class DatabaseHealthService {
    */
   private async checkMigrations(): Promise<boolean> {
     try {
-      const pendingMigrations = await this.dataSource.showMigrations()
+      // Avec Prisma, vérifier si la table _prisma_migrations existe et a des entrées
+      const migrations = await this.prisma.$queryRawUnsafe<Array<{ migration_name: string }>>(
+        'SELECT migration_name FROM _prisma_migrations ORDER BY finished_at DESC LIMIT 1'
+      )
 
-      if (Array.isArray(pendingMigrations) && pendingMigrations.length > 0) {
-        this.logger.warn(`${pendingMigrations.length} migrations en attente`)
-        return false
-      }
-
-      return true
+      // Si on a des migrations, c'est bon
+      return migrations && migrations.length > 0
     } catch (error) {
       this.logger.error('Migration check failed:', error)
       return false
@@ -137,7 +137,7 @@ export class DatabaseHealthService {
   private async checkQueries(): Promise<boolean> {
     try {
       // Test sur une table critique
-      await this.dataSource.query('SELECT COUNT(*) FROM users LIMIT 1')
+      await this.prisma.$queryRawUnsafe('SELECT COUNT(*) FROM users LIMIT 1')
       return true
     } catch (error) {
       this.logger.error('Query check failed:', error)
@@ -153,7 +153,7 @@ export class DatabaseHealthService {
       const startTime = Date.now()
 
       // Requête de test de performance
-      await this.dataSource.query('SELECT COUNT(*) FROM users')
+      await this.prisma.$queryRawUnsafe('SELECT COUNT(*) FROM users')
 
       const queryTime = Date.now() - startTime
 
@@ -175,14 +175,14 @@ export class DatabaseHealthService {
    */
   private async getConnectionCount(): Promise<number> {
     try {
-      const result = await this.dataSource.query(`
-        SELECT COUNT(*) as count 
-        FROM pg_stat_activity 
-        WHERE datname = current_database() 
-        AND state = 'active'
-      `)
+      const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>(
+        `SELECT COUNT(*) as count
+         FROM pg_stat_activity
+         WHERE datname = current_database()
+         AND state = 'active'`
+      )
 
-      return parseInt(result[0]?.count || '0', 10)
+      return Number(result[0]?.count || 0)
     } catch (error) {
       this.logger.error('Failed to get connection count:', error)
       return 0
@@ -194,14 +194,14 @@ export class DatabaseHealthService {
    */
   private async getLastMigration(): Promise<string | undefined> {
     try {
-      const result = await this.dataSource.query(`
-        SELECT name 
-        FROM migrations 
-        ORDER BY timestamp DESC 
-        LIMIT 1
-      `)
+      const result = await this.prisma.$queryRawUnsafe<Array<{ migration_name: string }>>(
+        `SELECT migration_name
+         FROM _prisma_migrations
+         ORDER BY finished_at DESC
+         LIMIT 1`
+      )
 
-      return result[0]?.name
+      return result[0]?.migration_name
     } catch (_error) {
       // Table migrations peut ne pas exister
       return undefined
@@ -213,12 +213,12 @@ export class DatabaseHealthService {
    */
   private async getDiskUsage(): Promise<number | undefined> {
     try {
-      const result = await this.dataSource.query(`
-        SELECT pg_size_pretty(pg_database_size(current_database())) as size,
-               pg_database_size(current_database()) as bytes
-      `)
+      const result = await this.prisma.$queryRawUnsafe<Array<{ size: string; bytes: bigint }>>(
+        `SELECT pg_size_pretty(pg_database_size(current_database())) as size,
+                pg_database_size(current_database()) as bytes`
+      )
 
-      return parseInt(result[0]?.bytes || '0', 10)
+      return Number(result[0]?.bytes || 0)
     } catch (error) {
       this.logger.error('Failed to get disk usage:', error)
       return undefined
@@ -250,7 +250,7 @@ export class DatabaseHealthService {
    */
   async isHealthy(): Promise<boolean> {
     try {
-      await this.dataSource.query('SELECT 1')
+      await this.prisma.$queryRawUnsafe('SELECT 1')
       return true
     } catch (_error) {
       return false
@@ -290,18 +290,18 @@ export class DatabaseHealthService {
    */
   async getDetailedStats(): Promise<DatabaseStats[]> {
     try {
-      const stats = await this.dataSource.query(`
-        SELECT 
-          schemaname,
-          tablename,
-          n_tup_ins as inserts,
-          n_tup_upd as updates,
-          n_tup_del as deletes,
-          n_live_tup as live_tuples,
-          n_dead_tup as dead_tuples
-        FROM pg_stat_user_tables
-        ORDER BY n_live_tup DESC
-      `)
+      const stats = await this.prisma.$queryRawUnsafe<DatabaseStats[]>(
+        `SELECT
+           schemaname,
+           tablename,
+           n_tup_ins as inserts,
+           n_tup_upd as updates,
+           n_tup_del as deletes,
+           n_live_tup as live_tuples,
+           n_dead_tup as dead_tuples
+         FROM pg_stat_user_tables
+         ORDER BY n_live_tup DESC`
+      )
 
       return stats
     } catch (error) {

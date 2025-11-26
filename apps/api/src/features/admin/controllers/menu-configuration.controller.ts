@@ -8,6 +8,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
+import { Public } from '../../../core/multi-tenant'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { getErrorMessage } from '../../../core/common/utils'
 import {
@@ -17,7 +18,7 @@ import {
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
-import type { User } from '../../../domains/users/entities/user.entity'
+import type { User } from '@prisma/client'
 import type {
   CreateMenuConfigDto,
   MenuConfigurationService,
@@ -26,6 +27,7 @@ import type {
 
 @ApiTags('🔧 Admin - Menu Configuration')
 @Controller('admin/menu-config')
+@Public() // Bypass global TenantGuard - CombinedSecurityGuard handles JWT auth
 @UseGuards(CombinedSecurityGuard)
 @RequireSystemAdmin()
 @ApiBearerAuth('JWT-auth')

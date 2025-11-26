@@ -1,25 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { UserMenuItemPreferenceSimple } from '@prisma/client'
 import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
-import { UserMenuPreference } from '../../../domains/admin/entities/user-menu-preference.entity'
-
 
 @Injectable()
 export class UserMenuPreferenceService {
   private readonly logger = new Logger(UserMenuPreferenceService.name)
 
-  constructor(
-    @InjectRepository(UserMenuPreference, 'auth')
-    private readonly _userMenuPreferenceRepository: Repository<UserMenuPreference>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Récupère les préférences d'un utilisateur, les crée si elles n'existent pas
    */
-  async findOrCreateByUserId(userId: string): Promise<UserMenuPreference[]> {
-    let preferences = await this._userMenuPreferenceRepository.find({
+  async findOrCreateByUserId(userId: string): Promise<UserMenuItemPreferenceSimple[]> {
+    let preferences = await this.prisma.userMenuItemPreferenceSimple.findMany({
       where: { userId },
+      orderBy: { order: 'asc' },
     })
 
     if (!preferences.length) {
@@ -100,18 +96,21 @@ export class UserMenuPreferenceService {
         { menuId: 'roles', isVisible: false, order: 101, customLabel: 'Rôles (legacy)' },
       ]
 
-      preferences = await Promise.all(
-        defaultMenus.map(async (menu) => {
-          const preference = this._userMenuPreferenceRepository.create({
-            userId,
-            menuId: menu.menuId,
-            isVisible: menu.isVisible,
-            order: menu.order,
-            customLabel: menu.customLabel,
-          })
-          return await this._userMenuPreferenceRepository.save(preference)
-        })
-      )
+      // Create all default preferences
+      await this.prisma.userMenuItemPreferenceSimple.createMany({
+        data: defaultMenus.map((menu) => ({
+          userId,
+          menuId: menu.menuId,
+          isVisible: menu.isVisible,
+          order: menu.order,
+          customLabel: menu.customLabel,
+        })),
+      })
+
+      preferences = await this.prisma.userMenuItemPreferenceSimple.findMany({
+        where: { userId },
+        orderBy: { order: 'asc' },
+      })
 
       this.logger.log(
         `Préférences créées pour l'utilisateur ${userId} avec ${preferences.length} menus`
@@ -128,22 +127,25 @@ export class UserMenuPreferenceService {
     userId: string,
     menuId: string,
     isVisible: boolean
-  ): Promise<UserMenuPreference> {
-    const preferences = await this.findOrCreateByUserId(userId)
-    let preference = preferences.find((p) => p.menuId === menuId)
-
-    if (preference) {
-      preference.isVisible = isVisible
-    } else {
-      preference = this._userMenuPreferenceRepository.create({
+  ): Promise<UserMenuItemPreferenceSimple> {
+    const updated = await this.prisma.userMenuItemPreferenceSimple.upsert({
+      where: {
+        userId_menuId: {
+          userId,
+          menuId,
+        },
+      },
+      update: {
+        isVisible,
+      },
+      create: {
         userId,
         menuId,
         isVisible,
-        order: preferences.length + 1,
-      })
-    }
+        order: 999, // Will be reordered later if needed
+      },
+    })
 
-    const updated = await this._userMenuPreferenceRepository.save(preference)
     this.logger.log(
       `Visibilité du menu ${menuId} mise à jour pour l'utilisateur ${userId}: ${isVisible}`
     )
@@ -158,22 +160,25 @@ export class UserMenuPreferenceService {
     userId: string,
     menuId: string,
     order: number
-  ): Promise<UserMenuPreference> {
-    const preferences = await this.findOrCreateByUserId(userId)
-    let preference = preferences.find((p) => p.menuId === menuId)
-
-    if (preference) {
-      preference.order = order
-    } else {
-      preference = this._userMenuPreferenceRepository.create({
+  ): Promise<UserMenuItemPreferenceSimple> {
+    const updated = await this.prisma.userMenuItemPreferenceSimple.upsert({
+      where: {
+        userId_menuId: {
+          userId,
+          menuId,
+        },
+      },
+      update: {
+        order,
+      },
+      create: {
         userId,
         menuId,
         isVisible: true,
         order,
-      })
-    }
+      },
+    })
 
-    const updated = await this._userMenuPreferenceRepository.save(preference)
     this.logger.log(`Ordre du menu ${menuId} mis à jour pour l'utilisateur ${userId}: ${order}`)
 
     return updated
@@ -182,25 +187,51 @@ export class UserMenuPreferenceService {
   /**
    * Ajoute ou retire une page des sélections
    */
-  async togglePage(userId: string, pageId: string): Promise<UserMenuPreference> {
-    const preferences = await this.findOrCreateByUserId(userId)
-    let preference = preferences.find((p) => p.menuId === pageId)
+  async togglePage(userId: string, pageId: string): Promise<UserMenuItemPreferenceSimple> {
+    // First, try to find existing preference
+    const existing = await this.prisma.userMenuItemPreferenceSimple.findUnique({
+      where: {
+        userId_menuId: {
+          userId,
+          menuId: pageId,
+        },
+      },
+    })
 
-    if (preference) {
-      preference.isVisible = !preference.isVisible
-    } else {
-      preference = this._userMenuPreferenceRepository.create({
-        userId,
-        menuId: pageId,
-        isVisible: true,
-        order: preferences.length + 1,
+    if (existing) {
+      // Toggle the existing preference
+      return await this.prisma.userMenuItemPreferenceSimple.update({
+        where: {
+          userId_menuId: {
+            userId,
+            menuId: pageId,
+          },
+        },
+        data: {
+          isVisible: !existing.isVisible,
+        },
       })
+    } else {
+      // Create new preference with isVisible = true
+      const preferences = await this.prisma.userMenuItemPreferenceSimple.findMany({
+        where: { userId },
+      })
+
+      const updated = await this.prisma.userMenuItemPreferenceSimple.create({
+        data: {
+          userId,
+          menuId: pageId,
+          isVisible: true,
+          order: preferences.length + 1,
+        },
+      })
+
+      this.logger.log(
+        `Page ${pageId} basculée pour l'utilisateur ${userId}: ${updated.isVisible}`
+      )
+
+      return updated
     }
-
-    const updated = await this._userMenuPreferenceRepository.save(preference)
-    this.logger.log(`Page ${pageId} basculée pour l'utilisateur ${userId}: ${preference.isVisible}`)
-
-    return updated
   }
 
   /**
@@ -210,23 +241,29 @@ export class UserMenuPreferenceService {
     userId: string,
     pageId: string,
     customLabel: string
-  ): Promise<UserMenuPreference> {
-    const preferences = await this.findOrCreateByUserId(userId)
-    let preference = preferences.find((p) => p.menuId === pageId)
+  ): Promise<UserMenuItemPreferenceSimple> {
+    const preferences = await this.prisma.userMenuItemPreferenceSimple.findMany({
+      where: { userId },
+    })
 
-    if (preference) {
-      preference.customLabel = customLabel
-    } else {
-      preference = this._userMenuPreferenceRepository.create({
+    return await this.prisma.userMenuItemPreferenceSimple.upsert({
+      where: {
+        userId_menuId: {
+          userId,
+          menuId: pageId,
+        },
+      },
+      update: {
+        customLabel,
+      },
+      create: {
         userId,
         menuId: pageId,
         isVisible: true,
         order: preferences.length + 1,
         customLabel,
-      })
-    }
-
-    return await this._userMenuPreferenceRepository.save(preference)
+      },
+    })
   }
 
   /**
@@ -241,32 +278,10 @@ export class UserMenuPreferenceService {
     savedAt: string
   }> {
     try {
-      // Trouver ou créer une préférence spéciale pour stocker le menu complet
-      let customMenuPreference = await this._userMenuPreferenceRepository.findOne({
-        where: { userId, menuId: '__custom_menu__' },
-      })
+      // Extract and prepare translations if they exist
+      const translationsMap: Record<string, string> = {}
 
-      if (!customMenuPreference) {
-        customMenuPreference = this._userMenuPreferenceRepository.create({
-          userId,
-          menuId: '__custom_menu__',
-          isVisible: true,
-          order: 0,
-          customLabel: 'Menu personnalisé complet',
-        })
-      }
-
-      // Stocker les données du menu dans les métadonnées
-      customMenuPreference.customLabel = JSON.stringify({
-        type: 'custom_menu_data',
-        menuItems: menuItems,
-        savedAt: new Date().toISOString(),
-      })
-
-      // Extraire et sauvegarder les traductions individuellement si le champ existe
       if (menuItems && Array.isArray(menuItems)) {
-        const translationsMap: Record<string, string> = {}
-
         // Parcourir récursivement les éléments pour extraire les traductions
         const extractTranslations = (items: MenuItemDto[]) => {
           items.forEach((item) => {
@@ -296,14 +311,38 @@ export class UserMenuPreferenceService {
           translationsKeys: Object.keys(translationsMap),
           sampleTranslations: Object.fromEntries(Object.entries(translationsMap).slice(0, 3)),
         })
-
-        // Stocker les traductions dans le champ titleTranslations s'il existe
-        if (Object.keys(translationsMap).length > 0) {
-          customMenuPreference.titleTranslations = translationsMap
-        }
       }
 
-      const _result = await this._userMenuPreferenceRepository.save(customMenuPreference)
+      // Create or update the special __custom_menu__ preference with menu data
+      await this.prisma.userMenuItemPreferenceSimple.upsert({
+        where: {
+          userId_menuId: {
+            userId,
+            menuId: '__custom_menu__',
+          },
+        },
+        update: {
+          customLabel: JSON.stringify({
+            type: 'custom_menu_data',
+            menuItems: menuItems,
+            savedAt: new Date().toISOString(),
+          }),
+          titleTranslations: Object.keys(translationsMap).length > 0 ? translationsMap : undefined,
+        },
+        create: {
+          userId,
+          menuId: '__custom_menu__',
+          isVisible: true,
+          order: 0,
+          customLabel: JSON.stringify({
+            type: 'custom_menu_data',
+            menuItems: menuItems,
+            savedAt: new Date().toISOString(),
+          }),
+          titleTranslations: Object.keys(translationsMap).length > 0 ? translationsMap : undefined,
+        },
+      })
+
       this.logger.log(
         `Menu personnalisé sauvegardé pour l'utilisateur ${userId} avec ${menuItems.length} éléments`
       )
@@ -326,17 +365,24 @@ export class UserMenuPreferenceService {
     try {
       this.logger.log(`🔍 Début récupération menu personnalisé pour utilisateur ${userId}`)
 
-      const customMenuPreference = await this._userMenuPreferenceRepository.findOne({
-        where: { userId, menuId: '__custom_menu__' },
+      const customMenuPreference = await this.prisma.userMenuItemPreferenceSimple.findUnique({
+        where: {
+          userId_menuId: {
+            userId,
+            menuId: '__custom_menu__',
+          },
+        },
       })
 
       this.logger.log(`📥 Résultat requête DB:`, {
         found: !!customMenuPreference,
         hasCustomLabel: !!customMenuPreference?.customLabel,
         hasTitleTranslations: !!customMenuPreference?.titleTranslations,
-        titleTranslationsKeys: customMenuPreference?.titleTranslations
-          ? Object.keys(customMenuPreference.titleTranslations)
-          : [],
+        titleTranslationsKeys:
+          customMenuPreference?.titleTranslations &&
+          typeof customMenuPreference.titleTranslations === 'object'
+            ? Object.keys(customMenuPreference.titleTranslations as Record<string, unknown>)
+            : [],
         customLabelPreview: (customMenuPreference?.customLabel as string)?.substring(0, 100),
         customLabelLength: (customMenuPreference?.customLabel as string)?.length,
         customLabelType: typeof customMenuPreference?.customLabel,
@@ -360,26 +406,26 @@ export class UserMenuPreferenceService {
           let menuItems = menuData.menuItems
 
           // Réappliquer les traductions si elles existent
-          if (customMenuPreference.titleTranslations) {
+          if (
+            customMenuPreference.titleTranslations &&
+            typeof customMenuPreference.titleTranslations === 'object'
+          ) {
+            const translations = customMenuPreference.titleTranslations as Record<string, string>
+
             const applyTranslations = (items: MenuItemDto[]): MenuItemDto[] => {
               return items.map((item) => {
                 if (item.id) {
                   // Reconstituer les traductions pour cet élément
                   const itemTranslations: Record<string, string> = {}
-                  Object.entries(customMenuPreference.titleTranslations || {}).forEach(
-                    ([key, value]) => {
-                      if (key.startsWith(`${item.id}_`)) {
-                        const lang = key.substring(`${item.id}_`.length)
-                        itemTranslations[lang] = value
-                      }
+                  Object.entries(translations).forEach(([key, value]) => {
+                    if (key.startsWith(`${item.id}_`)) {
+                      const lang = key.substring(`${item.id}_`.length)
+                      itemTranslations[lang] = value
                     }
-                  )
+                  })
 
                   if (Object.keys(itemTranslations).length > 0) {
-
-                    ;(
-                      item as MenuItemDto & { titleTranslations?: Record<string, string> }
-                    ).titleTranslations = itemTranslations
+                    ;(item as MenuItemDto & { titleTranslations?: Record<string, string> }).titleTranslations = itemTranslations
                   }
                 }
 
@@ -422,9 +468,11 @@ export class UserMenuPreferenceService {
   /**
    * Réinitialise les préférences
    */
-  async resetPreferences(userId: string): Promise<UserMenuPreference[]> {
+  async resetPreferences(userId: string): Promise<UserMenuItemPreferenceSimple[]> {
     // Supprimer toutes les préférences existantes
-    await this._userMenuPreferenceRepository.delete({ userId })
+    await this.prisma.userMenuItemPreferenceSimple.deleteMany({
+      where: { userId },
+    })
 
     // Recréer les préférences par défaut
     const preferences = await this.findOrCreateByUserId(userId)

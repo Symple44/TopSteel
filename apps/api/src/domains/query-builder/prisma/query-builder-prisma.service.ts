@@ -32,6 +32,7 @@ export class QueryBuilderPrismaService {
     type: string
     baseTable: string
     createdBy: string
+    societeId: string
     isPublic?: boolean
     isActive?: boolean
     settings?: Record<string, any>
@@ -47,6 +48,7 @@ export class QueryBuilderPrismaService {
           type: data.type,
           baseTable: data.baseTable,
           createdBy: data.createdBy,
+          societeId: data.societeId,
           isPublic: data.isPublic !== undefined ? data.isPublic : false,
           isActive: data.isActive !== undefined ? data.isActive : true,
           settings: data.settings ? (data.settings as Prisma.InputJsonValue) : undefined,
@@ -334,6 +336,7 @@ export class QueryBuilderPrismaService {
         description: original.description || undefined,
         type: original.type,
         baseTable: original.baseTable,
+        societeId: original.societeId,
         createdBy: userId,
         isPublic: false, // Les duplicatas sont privés par défaut
         isActive: true,

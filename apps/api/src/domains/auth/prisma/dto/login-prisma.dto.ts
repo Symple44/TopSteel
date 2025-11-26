@@ -23,6 +23,7 @@ export class LoginPrismaResponseDto {
     nom: string | null
     prenom: string | null
     role: string
+    isActive: boolean
   }
 
   accessToken: string

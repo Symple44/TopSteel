@@ -1,8 +1,8 @@
 import * as crypto from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { authenticator } from 'otplib'
 import * as QRCode from 'qrcode'
-import * as speakeasy from 'speakeasy'
 
 @Injectable()
 export class TOTPService {
@@ -11,6 +11,13 @@ export class TOTPService {
   private readonly encryptionKey: string
 
   constructor(private configService: ConfigService) {
+    // Configuration otplib
+    authenticator.options = {
+      window: 1,
+      digits: 6,
+      step: 30,
+    }
+
     // Clé de chiffrement pour les secrets TOTP
     this.encryptionKey =
       this.configService.get<string>('MFA_ENCRYPTION_KEY') || this.generateDefaultKey()
@@ -32,17 +39,14 @@ export class TOTPService {
     ascii: string
   } {
     try {
-      const secret = speakeasy.generateSecret({
-        name: 'TopSteel ERP',
-        issuer: 'TopSteel',
-        length: 32,
-      })
+      const secret = authenticator.generateSecret(32)
+      const hexValue = Buffer.from(secret, 'base64').toString('hex')
 
       return {
-        secret: secret.base32,
-        base32: secret.base32,
-        hex: secret.hex,
-        ascii: secret.ascii,
+        secret: secret,
+        base32: secret,
+        hex: hexValue,
+        ascii: Buffer.from(secret, 'base64').toString('ascii'),
       }
     } catch (error) {
       this.logger.error('Erreur lors de la génération du secret TOTP:', error)
@@ -59,15 +63,7 @@ export class TOTPService {
     issuer: string = 'TopSteel ERP'
   ): Promise<string> {
     try {
-      const otpauthUrl = speakeasy.otpauthURL({
-        secret,
-        label: userEmail,
-        issuer,
-        algorithm: 'sha1',
-        period: 30,
-        digits: 6,
-      })
-
+      const otpauthUrl = authenticator.keyuri(userEmail, issuer, secret)
       const qrCodeDataURL = await QRCode.toDataURL(otpauthUrl)
       return qrCodeDataURL
     } catch (error) {
@@ -81,13 +77,14 @@ export class TOTPService {
    */
   verifyToken(token: string, secret: string, window: number = 1): boolean {
     try {
-      const verified = speakeasy.totp.verify({
-        secret,
-        token,
-        window, // Tolérance de ±30 secondes par défaut
-        algorithm: 'sha1',
-        digits: 6,
-      })
+      // Temporairement définir la fenêtre pour cette vérification
+      const originalWindow = authenticator.options.window
+      authenticator.options = { ...authenticator.options, window }
+
+      const verified = authenticator.verify({ token, secret })
+
+      // Restaurer la fenêtre originale
+      authenticator.options = { ...authenticator.options, window: originalWindow }
 
       return verified
     } catch (error) {
@@ -101,11 +98,7 @@ export class TOTPService {
    */
   generateToken(secret: string): string {
     try {
-      return speakeasy.totp({
-        secret,
-        algorithm: 'sha1',
-        digits: 6,
-      })
+      return authenticator.generate(secret)
     } catch (error) {
       this.logger.error('Erreur lors de la génération du token TOTP:', error)
       throw new Error('Impossible de générer le token TOTP')

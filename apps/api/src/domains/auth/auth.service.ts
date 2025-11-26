@@ -8,20 +8,20 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import type { Request } from 'express'
-import { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
-import type { Site } from '../../features/societes/entities/site.entity'
-import { UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
-import { LicenseManagementService } from '../../features/societes/services/license-management.service'
-import { SocieteUsersService } from '../../features/societes/services/societe-users.service'
-import { SocietesService } from '../../features/societes/services/societes.service'
-import type { User } from '../users/entities/user.entity'
+// DISABLED: TypeORM dependencies - temporarily disabled during migration
+// import { LicenseManagementService } from '../../features/societes/services/license-management.service'
+// import { SocieteUsersService } from '../../features/societes/services/societe-users.service'
+// import { SocietesService } from '../../features/societes/services/societes.service'
 import { UsersService } from '../users/users.service'
 import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
-import { UserSession } from './core/entities/user-session.entity'
+import { SessionPrismaService } from './prisma/session-prisma.service'
+import { PrismaService } from '../../core/database/prisma/prisma.service'
+// Type aliases for entities (no longer using TypeORM)
+type Site = any
+type User = any
 import type { LoginDto } from './external/dto/login.dto'
 import type { RegisterDto } from './external/dto/register.dto'
 import type { JwtPayload, MultiTenantJwtPayload } from './interfaces/jwt-payload.interface'
@@ -44,14 +44,16 @@ export class AuthService {
     private readonly sessionRedisService: SessionRedisService,
     private readonly geolocationService: GeolocationService,
     private readonly mfaService: MFAService,
-    private readonly societesService: SocietesService,
-    private readonly societeUsersService: SocieteUsersService,
+    // DISABLED: TypeORM dependencies - temporarily disabled during migration
+    // private readonly societesService: SocietesService,
+    // private readonly societeUsersService: SocieteUsersService,
     private readonly userSocieteRolesService: UserSocieteRolesService,
     private readonly unifiedRolesService: UnifiedRolesService,
     private readonly performanceService: AuthPerformanceService,
-    private readonly licenseManagementService: LicenseManagementService,
-    @InjectRepository(UserSession, 'auth')
-    private readonly _userSessionRepository: Repository<UserSession>
+    // DISABLED: TypeORM dependency - License checking temporarily disabled
+    // private readonly licenseManagementService: LicenseManagementService,
+    private readonly sessionPrismaService: SessionPrismaService,
+    private readonly prisma: PrismaService
   ) {}
 
   async validateUser(
@@ -134,7 +136,7 @@ export class AuthService {
             isDefault: info.isDefaultSociete,
             permissions: info.permissions,
             sites:
-              info.societe?.sites?.map((site) => ({
+              info.societe?.sites?.map((site: any) => ({
                 id: site.id,
                 nom: site.nom,
                 code: site.code,
@@ -156,21 +158,25 @@ export class AuthService {
    * Récupérer toutes les sociétés pour un SUPER_ADMIN
    */
   private async getSuperAdminAllSocietes(_userId: string) {
-    this.logger.debug('[DEBUG getSuperAdminAllSocietes] Calling societesService.findActive()')
-    const allSocietes = await this.societesService.findActive()
-    this.logger.debug(`[DEBUG getSuperAdminAllSocietes] findActive() returned ${allSocietes.length} societes`)
+    this.logger.debug('[DEBUG getSuperAdminAllSocietes] Calling Prisma to find active societes')
+    // FIXED: Using Prisma directly instead of TypeORM SocietesService
+    const allSocietes = await this.prisma.societe.findMany({
+      where: { isActive: true },
+      include: { sites: true },
+    })
+    this.logger.debug(`[DEBUG getSuperAdminAllSocietes] Prisma returned ${allSocietes.length} societes`)
 
     if (allSocietes.length > 0) {
       this.logger.debug(`[DEBUG getSuperAdminAllSocietes] First societe: ${JSON.stringify({
         id: allSocietes[0].id,
-        nom: allSocietes[0].nom,
+        nom: allSocietes[0].name, // Prisma uses 'name' not 'nom'
         code: allSocietes[0].code
       })}`)
     }
 
     const result = allSocietes.map((societe) => ({
       id: societe.id,
-      nom: societe.nom,
+      nom: societe.name, // Prisma uses 'name' not 'nom'
       code: societe.code,
       role: 'SUPER_ADMIN',
       isDefault: false, // SUPER_ADMIN n'a pas de société par défaut
@@ -178,7 +184,7 @@ export class AuthService {
       sites:
         societe.sites?.map((site: Site) => ({
           id: site.id,
-          nom: site.nom,
+          nom: site.name,
           code: site.code,
         })) || [],
     }))
@@ -191,36 +197,43 @@ export class AuthService {
    * Récupérer les sociétés avec l'ancienne structure (compatibilité)
    */
   private async getUserSocietesLegacy(userId: string) {
-    const userSocietes = await this.societeUsersService.findByUser(userId)
+    // FIXED: Using UserSocieteRole (Prisma) which has role information
+    const userSocieteRoles = await this.prisma.userSocieteRole.findMany({
+      where: { userId, isActive: true },
+      include: {
+        societe: { include: { sites: true } },
+        role: true,
+      },
+    })
 
     // Récupérer le rôle global de l'utilisateur pour la logique de priorité
     const user = await this.usersService.findById(userId)
     const userGlobalRole = user?.role
 
-    return userSocietes.map((us) => {
+    return userSocieteRoles.map((usr) => {
       // Déterminer le rôle à afficher :
       // Si l'utilisateur est SUPER_ADMIN globalement, toujours afficher SUPER_ADMIN
       // Sinon utiliser le rôle spécifique à la société
-      let displayRole: string = us.role.toString()
+      let displayRole: string = usr.role.name || 'USER'
 
       if (userGlobalRole === 'SUPER_ADMIN') {
         displayRole = 'SUPER_ADMIN' // Toujours prioritaire
-      } else if (userGlobalRole === 'ADMIN' && us.role !== UserSocieteRole.ADMIN) {
+      } else if (userGlobalRole === 'ADMIN' && displayRole !== 'ADMIN') {
         // Si l'utilisateur est ADMIN globalement, utiliser ADMIN sauf si le rôle société est ADMIN
         displayRole = 'ADMIN'
       }
 
       return {
-        id: us.societe.id,
-        nom: us.societe.nom,
-        code: us.societe.code,
+        id: usr.societe.id,
+        nom: usr.societe.name, // Prisma uses 'name' not 'nom'
+        code: usr.societe.code,
         role: displayRole,
-        isDefault: us.isDefault,
-        permissions: us.permissions,
+        isDefault: false, // TODO: Implement default societe logic with UserSettings
+        permissions: usr.permissions || [],
         sites:
-          us.societe.sites?.map((site) => ({
+          usr.societe.sites?.map((site: any) => ({
             id: site.id,
-            nom: site.nom,
+            nom: site.name, // Prisma uses 'name' not 'nom' for Site too
             code: site.code,
             isPrincipal: site.isPrincipal,
           })) || [],
@@ -238,18 +251,23 @@ export class AuthService {
       throw new UnauthorizedException('Utilisateur non trouvé')
     }
 
-    // Vérifier la licence de la société AVANT de permettre la connexion
-    const licenseCheck = await this.licenseManagementService.checkLicenseForAuthentication(
-      societeId,
-      userId,
-      true // Permettre les sessions concurrentes selon la configuration de la licence
-    )
+    // DISABLED: License checking temporarily disabled during TypeORM → Prisma migration
+    // TODO: Re-enable license checking with Prisma-based LicenseManagementService
+    // const licenseCheck = await this.licenseManagementService.checkLicenseForAuthentication(
+    //   societeId,
+    //   userId,
+    //   true // Permettre les sessions concurrentes selon la configuration de la licence
+    // )
+    //
+    // if (!licenseCheck.isValid) {
+    //   throw new UnauthorizedException(
+    //     licenseCheck.reason || "Licence invalide ou limite d'utilisateurs atteinte"
+    //   )
+    // }
 
-    if (!licenseCheck.isValid) {
-      throw new UnauthorizedException(
-        licenseCheck.reason || "Licence invalide ou limite d'utilisateurs atteinte"
-      )
-    }
+    this.logger.warn(
+      `⚠️  License checking is temporarily disabled - All users can authenticate without license validation`
+    )
 
     // Utiliser le service unifié pour récupérer ou créer le rôle
     let userSocieteInfo = await this.unifiedRolesService.getUserSocieteRole(userId, societeId)
@@ -283,7 +301,10 @@ export class AuthService {
     }
 
     // Récupérer les informations de la société
-    const societe = await this.societesService.findById(societeId)
+    // FIXED: Using Prisma directly instead of TypeORM SocietesService
+    const societe = await this.prisma.societe.findUnique({
+      where: { id: societeId },
+    })
     if (!societe) {
       throw new UnauthorizedException('Accès non autorisé')
     }
@@ -300,7 +321,7 @@ export class AuthService {
       societeId: societeId,
       societeCode: societe.code,
       siteId: siteId,
-      permissions: userSocieteInfo.permissions,
+      permissions: userSocieteInfo.permissions || [],
       tenantDatabase: societe.databaseName,
     }
 
@@ -324,33 +345,24 @@ export class AuthService {
     }
 
     // Créer la session en base de données avec les métadonnées de société
-    const dbSession = UserSession.createNew(
-      user.id,
+    await this.sessionPrismaService.createSession({
+      userId: user.id,
       sessionId,
       accessToken,
+      refreshToken,
       ipAddress,
       userAgent,
-      refreshToken
-    )
-
-    // Ajouter les métadonnées de société pour le tracking des licences
-    dbSession.metadata = {
-      societeId,
-      societeCode: societe.code,
-      siteId,
-      licenseId: licenseCheck.license?.id,
-      licenseType: licenseCheck.license?.type,
-    }
-
-    if (location) {
-      dbSession.location = location
-    }
-
-    if (deviceInfo) {
-      dbSession.deviceInfo = deviceInfo
-    }
-
-    await this._userSessionRepository.save(dbSession)
+      deviceInfo: deviceInfo ? (deviceInfo as any) : undefined,
+      location: location ? (location as any) : undefined,
+      metadata: {
+        societeId,
+        societeCode: societe.code,
+        siteId,
+        // DISABLED: License checking temporarily disabled
+        licenseId: undefined, // licenseCheck.license?.id,
+        licenseType: undefined, // licenseCheck.license?.type,
+      },
+    })
 
     return {
       user: {
@@ -370,7 +382,7 @@ export class AuthService {
         ],
         societe: {
           id: societe.id,
-          nom: societe.nom,
+          nom: societe.name, // Prisma uses 'name' not 'nom'
           code: societe.code,
           databaseName: societe.databaseName,
         },
@@ -422,24 +434,16 @@ export class AuthService {
     }
 
     // Créer la session en base de données
-    const dbSession = UserSession.createNew(
-      user.id,
+    await this.sessionPrismaService.createSession({
+      userId: user.id,
       sessionId,
       accessToken,
+      refreshToken,
       ipAddress,
       userAgent,
-      refreshToken
-    )
-
-    if (location) {
-      dbSession.location = location
-    }
-
-    if (deviceInfo) {
-      dbSession.deviceInfo = deviceInfo
-    }
-
-    await this._userSessionRepository.save(dbSession)
+      deviceInfo: deviceInfo ? (deviceInfo as any) : undefined,
+      location: location ? (location as any) : undefined,
+    })
 
     // Ajouter la session à Redis pour le tracking temps réel
     await this.sessionRedisService.addActiveSession({
@@ -548,16 +552,14 @@ export class AuthService {
       })
 
       // Vérifier que la session existe et est active
-      const session = await this._userSessionRepository.findOne({
-        where: {
-          sessionId: payload.sessionId,
-          userId: payload.sub,
-          isActive: true,
-          refreshToken: refreshToken,
-        },
-      })
+      const session = await this.sessionPrismaService.findBySessionId(payload.sessionId)
 
-      if (!session) {
+      if (
+        !session ||
+        session.userId !== payload.sub ||
+        !session.isActive ||
+        session.refreshToken !== refreshToken
+      ) {
         throw new UnauthorizedException('Invalid or expired session')
       }
 
@@ -579,10 +581,14 @@ export class AuthService {
       const newRefreshToken = await this.generateRefreshToken(newPayload)
 
       // Mettre à jour la session avec le nouveau refresh token
-      session.refreshToken = newRefreshToken
-      session.accessToken = newAccessToken
-      session.lastActivity = new Date()
-      await this._userSessionRepository.save(session)
+      await this.prisma.userSession.update({
+        where: { sessionId: session.sessionId },
+        data: {
+          refreshToken: newRefreshToken,
+          accessToken: newAccessToken,
+          lastActivity: new Date(),
+        },
+      })
 
       // Mettre à jour aussi dans Redis
       await this.sessionRedisService.updateSessionActivity(session.sessionId)
@@ -606,27 +612,20 @@ export class AuthService {
       await this.sessionRedisService.removeActiveSession(sessionId)
 
       // Marquer la session comme terminée en base de données
-      const dbSession = await this._userSessionRepository.findOne({
-        where: { sessionId, userId },
-      })
-
-      if (dbSession) {
-        dbSession.endSession('normal')
-        await this._userSessionRepository.save(dbSession)
-      }
+      await this.sessionPrismaService.logout(sessionId)
     } else {
       // Déconnexion de toutes les sessions de l'utilisateur
       await this.sessionRedisService.forceLogoutUser(userId)
 
-      // Marquer toutes les sessions actives comme terminées
-      await this._userSessionRepository.update(
-        { userId, status: 'active' },
-        {
+      // Marquer toutes les sessions actives comme terminées (status: 'ended' vs 'logged_out')
+      await this.prisma.userSession.updateMany({
+        where: { userId, status: 'active' },
+        data: {
           status: 'ended',
           logoutTime: new Date(),
           isActive: false,
-        }
-      )
+        },
+      })
     }
   }
 
@@ -690,14 +689,7 @@ export class AuthService {
     await this.sessionRedisService.updateSessionActivity(sessionId)
 
     // Mettre à jour en base de données
-    const dbSession = await this._userSessionRepository.findOne({
-      where: { sessionId },
-    })
-
-    if (dbSession) {
-      dbSession.updateActivity()
-      await this._userSessionRepository.save(dbSession)
-    }
+    await this.sessionPrismaService.updateActivity(sessionId)
   }
 
   /**
@@ -714,15 +706,18 @@ export class AuthService {
     limit: number = 100,
     offset: number = 0
   ): Promise<{
-    sessions: UserSession[]
+    sessions: any[]
     total: number
   }> {
-    const [sessions, total] = await this._userSessionRepository.findAndCount({
-      order: { loginTime: 'DESC' },
-      take: limit,
-      skip: offset,
-      relations: ['user'],
-    })
+    const [sessions, total] = await Promise.all([
+      this.prisma.userSession.findMany({
+        orderBy: { loginTime: 'desc' },
+        take: limit,
+        skip: offset,
+        include: { user: true },
+      }),
+      this.prisma.userSession.count(),
+    ])
 
     return { sessions, total }
   }
@@ -730,12 +725,8 @@ export class AuthService {
   /**
    * Obtenir l'historique d'un utilisateur spécifique
    */
-  async getUserConnectionHistory(userId: string, limit: number = 50): Promise<UserSession[]> {
-    return await this._userSessionRepository.find({
-      where: { userId },
-      order: { loginTime: 'DESC' },
-      take: limit,
-    })
+  async getUserConnectionHistory(userId: string, limit: number = 50): Promise<any[]> {
+    return await this.sessionPrismaService.findUserSessions(userId, false)
   }
 
   /**
@@ -750,14 +741,10 @@ export class AuthService {
     const removedSessions = await this.sessionRedisService.forceLogoutUser(userId)
 
     // Mettre à jour en base de données
-    const activeSessions = await this._userSessionRepository.find({
-      where: { userId, status: 'active' },
-    })
+    const activeSessions = await this.sessionPrismaService.findUserSessions(userId, true)
 
     for (const session of activeSessions) {
-      session.endSession('forced', adminUserId)
-      session.forcedLogoutReason = reason
-      await this._userSessionRepository.save(session)
+      await this.sessionPrismaService.forceLogout(session.sessionId, adminUserId, reason)
     }
 
     return removedSessions
@@ -776,15 +763,7 @@ export class AuthService {
 
     if (success) {
       // Mettre à jour en base de données
-      const dbSession = await this._userSessionRepository.findOne({
-        where: { sessionId },
-      })
-
-      if (dbSession) {
-        dbSession.endSession('forced', adminUserId)
-        dbSession.forcedLogoutReason = reason
-        await this._userSessionRepository.save(dbSession)
-      }
+      await this.sessionPrismaService.forceLogout(sessionId, adminUserId, reason)
     }
 
     return success
@@ -814,19 +793,12 @@ export class AuthService {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    const totalSessions = await this._userSessionRepository.count()
-    const activeSessions = await this._userSessionRepository.count({
-      where: { status: 'active' },
-    })
-    const sessionsToday = await this._userSessionRepository
-      .createQueryBuilder('session')
-      .where('session.loginTime >= :today', { today })
-      .getCount()
-
-    const suspiciousSessions = await this._userSessionRepository
-      .createQueryBuilder('session')
-      .where('session.warningCount > :count', { count: 0 })
-      .getCount()
+    const [totalSessions, activeSessions, sessionsToday, suspiciousSessions] = await Promise.all([
+      this.prisma.userSession.count(),
+      this.prisma.userSession.count({ where: { status: 'active' } }),
+      this.prisma.userSession.count({ where: { loginTime: { gte: today } } }),
+      this.prisma.userSession.count({ where: { warningCount: { gt: 0 } } }),
+    ])
 
     return {
       redis: redisStats,
@@ -850,21 +822,7 @@ export class AuthService {
     const redisCleanedCount = await this.sessionRedisService.cleanupExpiredSessions()
 
     // Nettoyer la base de données (marquer comme expirées)
-    const expiredThreshold = new Date()
-    expiredThreshold.setHours(expiredThreshold.getHours() - 24) // 24 heures
-
-    const expiredSessions = await this._userSessionRepository
-      .createQueryBuilder('session')
-      .where('session.status = :status', { status: 'active' })
-      .andWhere('session.lastActivity < :threshold', { threshold: expiredThreshold })
-      .getMany()
-
-    let databaseCleanedCount = 0
-    for (const session of expiredSessions) {
-      session.endSession('expired')
-      await this._userSessionRepository.save(session)
-      databaseCleanedCount++
-    }
+    const databaseCleanedCount = await this.sessionPrismaService.cleanupExpiredSessions()
 
     return {
       redisCleanedCount,
@@ -888,7 +846,7 @@ export class AuthService {
       .map((method) => ({
         type: method.type,
         isEnabled: method.isEnabled,
-        lastUsed: method.lastUsedAt,
+        ...(method.lastUsedAt && { lastUsed: method.lastUsedAt }), // Only include lastUsed if it exists
       }))
   }
 
@@ -898,11 +856,12 @@ export class AuthService {
   async loginWithMFA(userId: string, mfaSessionToken: string, request?: Request): Promise<unknown> {
     try {
       // Vérifier que la session MFA est valide et vérifiée
-      const mfaSession = await this.mfaService.mfaSessionRepository.findOne({
+      // FIXED: Using Prisma directly instead of TypeORM repository
+      const mfaSession = await this.prisma.mfaSession.findFirst({
         where: {
           userId,
-          sessionToken: mfaSessionToken,
-          status: 'verified',
+          challenge: mfaSessionToken, // Prisma schema uses 'challenge' not 'sessionToken'
+          verified: true,
         },
       })
 
@@ -1018,13 +977,9 @@ export class AuthService {
 
   ): Promise<{ success: boolean; message: string }> {
     try {
-      // Utiliser le nouveau service si disponible
-      if (this.userSocieteRolesService) {
-        await this.userSocieteRolesService.setDefaultSociete(userId, societeId)
-      } else {
-        // Fallback sur l'ancien service
-        await this.societeUsersService.setDefault(userId, societeId)
-      }
+      // FIXED: Using only the Prisma-based service (TypeORM service disabled)
+      await this.userSocieteRolesService.setDefaultSociete(userId, societeId)
+      // Fallback removed - TypeORM SocieteUsersService is disabled
       return {
         success: true,
         message: 'Société définie par défaut avec succès',

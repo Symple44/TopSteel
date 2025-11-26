@@ -1,13 +1,9 @@
-import { CommonEntity } from '../../../core/database/entities/base/multi-tenant.entity'
-
 /**
  * Entité métier de base avec fonctionnalités communes
  */
-export abstract class BusinessEntity extends CommonEntity {
-  /**
-   * Note: version est héritée de BaseEntity via CommonEntity
-   */
-
+export abstract class BusinessEntity {
+  createdAt?: Date
+  updatedAt?: Date
   /**
    * Métadonnées métier extensibles
    */
@@ -53,6 +49,11 @@ export abstract class BusinessEntity extends CommonEntity {
     if (source.businessMetadata) {
       this.businessMetadata = { ...source.businessMetadata }
     }
-    // Note: version is inherited from BaseEntity via CommonEntity
+    if (source.createdAt) {
+      this.createdAt = source.createdAt
+    }
+    if (source.updatedAt) {
+      this.updatedAt = source.updatedAt
+    }
   }
 }

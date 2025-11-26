@@ -13,6 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import type { Request as ExpressRequest } from 'express'
+import { Public } from '../../../core/multi-tenant'
 
 // RequestWithUser type definition for query builder operations
 interface RequestWithUser extends ExpressRequest {
@@ -40,6 +41,7 @@ import type { QueryExecutionParams } from '../services/query-builder-executor.se
 import { SchemaIntrospectionService } from '../services/schema-introspection.service'
 
 @Controller('query-builder')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard, QueryBuilderSecurityGuard)
 export class QueryBuilderController {
   private readonly logger = new Logger(QueryBuilderController.name)
@@ -64,7 +66,9 @@ export class QueryBuilderController {
       // Validate main table access
       this.securityService.validateTable(createDto.mainTable)
 
-      return await this.queryBuilderService.create(createDto, req.user.id)
+      // Use a default societeId or get from user context if available
+      const societeId = (req.user as { societeId?: string }).societeId || 'default-societe-id'
+      return await this.queryBuilderService.create(createDto, req.user.id, societeId)
     } catch (error) {
       this.logger.error('Failed to create query builder', {
         userId: req.user.id,
@@ -321,6 +325,7 @@ export class QueryBuilderController {
   @QueryBuilderWriteAccess()
   async duplicate(
     @Param('id') id: string,
+    @Body() body: { newName?: string } = {},
     @Request() req: ExpressRequest & { user: { id: string } }
   ) {
     this.logger.log('Query builder duplication requested', {
@@ -329,7 +334,8 @@ export class QueryBuilderController {
     })
 
     try {
-      return await this.queryBuilderService.duplicate(id, req.user.id)
+      const newName = body.newName || `Copy of ${id}`
+      return await this.queryBuilderService.duplicate(id, newName, req.user.id)
     } catch (error) {
       this.logger.error('Failed to duplicate query builder', {
         userId: req.user.id,

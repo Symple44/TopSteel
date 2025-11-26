@@ -4,16 +4,17 @@ import type { Request as ExpressRequest } from 'express'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
-import type { UserMenuPreference } from '../../../domains/admin/entities/user-menu-preference.entity'
-import { UserMenuPreferenceService } from '../services/user-menu-preference.service'
+import { UserMenuPreferenceCleanService } from '../services/user-menu-preference-clean.service'
+import { Public } from '../../../core/multi-tenant'
 
 @ApiTags('User Menu Preferences')
 @Controller('user/menu-preferences')
+@Public() // Bypass TenantGuard - JwtAuthGuard handles authentication
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class UserMenuPreferenceController {
   constructor(
-    private readonly userMenuPreferenceService: UserMenuPreferenceService,
+    private readonly userMenuPreferenceService: UserMenuPreferenceCleanService,
     private readonly cacheService: OptimizedCacheService
   ) {}
 
@@ -22,7 +23,7 @@ export class UserMenuPreferenceController {
   @ApiResponse({ status: 200, description: 'Préférences récupérées avec succès' })
   async getPreferences(
     @Request() req: ExpressRequest & { user: { id: string } }
-  ): Promise<{ success: boolean; data: UserMenuPreference[] }> {
+  ): Promise<{ success: boolean; data: any[] }> {
     const userId = req.user.id
     const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
 
@@ -51,7 +52,7 @@ export class UserMenuPreferenceController {
   async updateMenuVisibility(
     @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { menuId: string; isVisible: boolean }
-  ): Promise<{ success: boolean; data: UserMenuPreference }> {
+  ): Promise<{ success: boolean; data: any }> {
     const userId = req.user.id
     const updated = await this.userMenuPreferenceService.updateMenuVisibility(
       userId,
@@ -70,7 +71,7 @@ export class UserMenuPreferenceController {
   async togglePage(
     @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { pageId: string }
-  ): Promise<{ success: boolean; data: UserMenuPreference }> {
+  ): Promise<{ success: boolean; data: any }> {
     const userId = req.user.id
     const updated = await this.userMenuPreferenceService.togglePage(userId, body.pageId)
 
@@ -85,7 +86,7 @@ export class UserMenuPreferenceController {
   async updateMenuOrder(
     @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { menuId: string; order: number }
-  ): Promise<{ success: boolean; data: UserMenuPreference }> {
+  ): Promise<{ success: boolean; data: any }> {
     const userId = req.user.id
     const updated = await this.userMenuPreferenceService.updateMenuOrder(
       userId,
@@ -104,9 +105,9 @@ export class UserMenuPreferenceController {
   async updatePreferences(
     @Request() req: ExpressRequest & { user: { id: string } },
     @Body() body: { menuId: string; isVisible?: boolean; order?: number; customLabel?: string }
-  ): Promise<{ success: boolean; data: UserMenuPreference }> {
+  ): Promise<{ success: boolean; data: any }> {
     const userId = req.user.id
-    let updated: UserMenuPreference
+    let updated: any
 
     if (body.isVisible !== undefined) {
       updated = await this.userMenuPreferenceService.updateMenuVisibility(
@@ -409,7 +410,7 @@ export class UserMenuPreferenceController {
   @ApiOperation({ summary: 'Réinitialiser les préférences' })
   async resetPreferences(
     @Request() req: ExpressRequest & { user: { id: string } }
-  ): Promise<{ success: boolean; data: UserMenuPreference[] }> {
+  ): Promise<{ success: boolean; data: any }> {
     const userId = req.user.id
     const reset = await this.userMenuPreferenceService.resetPreferences(userId)
 
@@ -434,7 +435,7 @@ export class UserMenuPreferenceController {
 
     try {
       // Sauvegarder le menu personnalisé dans les métadonnées utilisateur
-      const result = await this.userMenuPreferenceService.saveCustomMenu(userId, menuItems)
+      const result = await this.userMenuPreferenceService.saveCustomMenu(userId, { items: menuItems })
 
       // Invalider le cache après la mise à jour
       const cacheKey = `user:custom-menu:${userId}`
@@ -442,7 +443,11 @@ export class UserMenuPreferenceController {
 
       return {
         success: true,
-        data: result,
+        data: {
+          success: true,
+          itemCount: menuItems.length,
+          savedAt: result.updatedAt.toISOString()
+        },
       }
     } catch (error) {
       return {

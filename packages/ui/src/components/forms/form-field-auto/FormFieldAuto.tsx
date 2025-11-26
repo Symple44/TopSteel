@@ -62,11 +62,12 @@ export const FormFieldAuto = forwardRef<HTMLDivElement, FormFieldAutoProps>(
     const errorId = error ? `${fieldId}-error` : undefined
     const descriptionId = description ? `${fieldId}-description` : undefined
 
-    // Clone the children element to add the necessary props
+    // Clone the children element to add the necessary props for accessibility
     const childWithProps = children
       ? React.cloneElement(children, {
           id: fieldId,
           'aria-invalid': !!error,
+          'aria-required': required ? true : undefined,
           'aria-describedby': [errorId, descriptionId].filter(Boolean).join(' ') || undefined,
           ...children.props,
         })
@@ -84,9 +85,12 @@ export const FormFieldAuto = forwardRef<HTMLDivElement, FormFieldAutoProps>(
           >
             {label}
             {required && showRequired && (
-              <span className="text-destructive ml-1" title="required">
-                *
-              </span>
+              <>
+                <span className="sr-only"> (obligatoire)</span>
+                <span className="text-destructive ml-1" aria-hidden="true" title="Champ obligatoire">
+                  *
+                </span>
+              </>
             )}
           </Label>
         )}

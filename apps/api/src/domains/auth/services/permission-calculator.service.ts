@@ -1,12 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Permission, Role, RolePermission, UserSocieteRole } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { getErrorMessage } from '../../../core/common/utils/error.utils'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import { Permission } from '../core/entities/permission.entity'
-import { Role } from '../core/entities/role.entity'
-import { RolePermission } from '../core/entities/role-permission.entity'
-import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 import type { IPermission, IRolePermission } from '../types/entities.types'
 
 
@@ -51,14 +47,7 @@ export class PermissionCalculatorService {
   private readonly CACHE_TTL = 300 // 5 minutes
 
   constructor(
-    @InjectRepository(UserSocieteRole, 'auth')
-    private readonly userSocieteRoleRepository: Repository<UserSocieteRole>,
-    @InjectRepository(Role, 'auth')
-    private readonly roleRepository: Repository<Role>,
-    @InjectRepository(Permission, 'auth')
-    private readonly permissionRepository: Repository<Permission>,
-    @InjectRepository(RolePermission, 'auth')
-    readonly _rolePermissionRepository: Repository<RolePermission>,
+    private readonly prisma: PrismaService,
     private readonly cacheService: OptimizedCacheService
   ) {}
 
@@ -80,9 +69,9 @@ export class PermissionCalculatorService {
 
     try {
       // 1. Récupérer le rôle utilisateur-société
-      const userSocieteRole = await this.userSocieteRoleRepository.findOne({
+      const userSocieteRole = await this.prisma.userSocieteRole.findFirst({
         where: { userId, societeId, isActive: true },
-        relations: ['user', 'role'],
+        include: { user: true, role: true },
       })
 
       if (!userSocieteRole) {
@@ -90,42 +79,53 @@ export class PermissionCalculatorService {
         return this.createEmptyPermissionSet(userId, societeId, siteId)
       }
 
-      // 2. Vérifier l'accès au site si spécifié
-      if (siteId && !userSocieteRole.hasAccessToSite(siteId)) {
-        return this.createEmptyPermissionSet(userId, societeId, siteId)
+      // 2. Parse permissions JSON if needed
+      const permissionsData = (userSocieteRole.permissions as any) || {}
+      const allowedSiteIds = permissionsData.allowedSiteIds || []
+      const additionalPermissions = permissionsData.additionalPermissions || []
+      const restrictedPermissions = permissionsData.restrictedPermissions || []
+      const isDefaultSociete = permissionsData.isDefaultSociete || false
+
+      // 3. Vérifier l'accès au site si spécifié
+      if (siteId && allowedSiteIds.length > 0) {
+        const hasAccess = allowedSiteIds.includes(siteId)
+        if (!hasAccess) {
+          return this.createEmptyPermissionSet(userId, societeId, siteId)
+        }
       }
 
-      // 3. Récupérer les permissions du rôle global
+      // 4. Récupérer les permissions du rôle global
       const globalRole = userSocieteRole.user?.role || 'USER'
       const globalPermissions = await this.getGlobalRolePermissions(globalRole)
 
-      // 4. Récupérer les permissions du rôle société
+      // 5. Récupérer les permissions du rôle société
+      const societeRole = userSocieteRole.role?.name || 'USER'
       const societePermissions = await this.getSocieteRolePermissions(
-        userSocieteRole.roleType,
+        societeRole,
         societeId
       )
 
-      // 5. Fusionner les permissions
+      // 6. Fusionner les permissions
       const mergedPermissions = this.mergePermissions(
         globalPermissions,
         societePermissions,
-        userSocieteRole.additionalPermissions,
-        userSocieteRole.restrictedPermissions
+        additionalPermissions,
+        restrictedPermissions
       )
 
-      // 6. Créer le résultat
+      // 7. Créer le résultat
       const result: UserPermissionSet = {
         userId,
         societeId,
         siteId,
         globalRole,
-        societeRole: userSocieteRole.roleType,
+        societeRole,
         permissions: mergedPermissions,
-        additionalPermissions: userSocieteRole.additionalPermissions,
-        restrictedPermissions: userSocieteRole.restrictedPermissions,
+        additionalPermissions,
+        restrictedPermissions,
         effectivePermissions: Array.from(mergedPermissions.keys()),
-        isDefaultSociete: userSocieteRole.isDefaultSociete,
-        allowedSiteIds: userSocieteRole.allowedSiteIds,
+        isDefaultSociete,
+        allowedSiteIds,
         calculatedAt: new Date(),
       }
 
@@ -168,11 +168,10 @@ export class PermissionCalculatorService {
     }
 
     // Récupérer les permissions depuis la base de données si nécessaire
-    const dbPermissions = await this.permissionRepository.find({
+    const dbPermissions = await this.prisma.permission.findMany({
       where: {
-        scope: 'system',
         isActive: true,
-        societeId: undefined, // Permissions globales uniquement
+        societeId: null, // Permissions globales uniquement
       },
     })
 
@@ -180,7 +179,7 @@ export class PermissionCalculatorService {
       if (this.roleHasAccessToPermission(roleType, dbPerm)) {
         const key = `${dbPerm.resource}:${dbPerm.action}`
         permissions.set(key, {
-          resource: dbPerm.resource,
+          resource: dbPerm.resource || '',
           action: dbPerm.action,
           level: this.getAccessLevelForRole(roleType, dbPerm.action),
           source: 'role',
@@ -203,19 +202,25 @@ export class PermissionCalculatorService {
     const permissions = new Map<string, CalculatedPermission>()
 
     // Récupérer le rôle spécifique s'il existe
-    const role = await this.roleRepository.findOne({
+    const role = await this.prisma.role.findFirst({
       where: {
-        parentRoleType: roleType,
+        name: roleType,
         societeId,
         isActive: true,
       },
-      relations: ['rolePermissions', 'rolePermissions.permission'],
+      include: {
+        permissions: {
+          include: {
+            permission: true
+          }
+        }
+      },
     })
 
-    if (role?.rolePermissions) {
-      for (const rolePerm of role.rolePermissions) {
-        const rp = rolePerm as IRolePermission
-        const permission = rp.permission as IPermission
+    if (role?.permissions) {
+      for (const rolePerm of role.permissions) {
+        const rp = rolePerm as any
+        const permission = rp.permission as any
 
         if (rp.isActive && rp.isGranted && permission.isActive) {
           const key = `${permission.resource}:${permission.action}`
@@ -459,13 +464,14 @@ export class PermissionCalculatorService {
     }
 
     const allowedResources = rolePermissionMatrix[roleType] || []
-    return allowedResources.includes(permission.resource) || allowedResources.includes('*')
+    return allowedResources.includes(permission.resource || '') || allowedResources.includes('*')
   }
 
   /**
    * Obtient le niveau d'accès pour un rôle et une action
    */
-  private getAccessLevelForRole(roleType: string, action: string): CalculatedPermission['level'] {
+  private getAccessLevelForRole(roleType: string, action: string | null): CalculatedPermission['level'] {
+    if (!action) return 'BLOCKED'
     const roleLevelMatrix: Record<string, Record<string, CalculatedPermission['level']>> = {
       SUPER_ADMIN: {
         read: 'ADMIN',

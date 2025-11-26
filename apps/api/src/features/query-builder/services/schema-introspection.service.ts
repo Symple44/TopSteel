@@ -1,6 +1,5 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
 
 export interface TableInfo {
   tableName: string
@@ -34,26 +33,23 @@ export interface RelationInfo {
 
 @Injectable()
 export class SchemaIntrospectionService {
-  constructor(
-    @InjectDataSource('tenant')
-    private _dataSource: DataSource
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getTables(schemaName: string = 'public'): Promise<TableInfo[]> {
     const query = `
-      SELECT 
+      SELECT
         table_name as "tableName",
         table_schema as "schemaName",
         obj_description(pgclass.oid, 'pg_class') as comment
       FROM information_schema.tables
       LEFT JOIN pg_catalog.pg_class pgclass ON pgclass.relname = table_name
-      WHERE table_schema = $1 
+      WHERE table_schema = $1
         AND table_type = 'BASE TABLE'
         AND table_name NOT LIKE 'typeorm_%'
       ORDER BY table_name
     `
 
-    return this._dataSource.query(query, [schemaName])
+    return this.prisma.$queryRawUnsafe<TableInfo[]>(query, schemaName)
   }
 
   async getColumns(tableName: string, schemaName: string = 'public'): Promise<ColumnInfo[]> {
@@ -61,7 +57,7 @@ export class SchemaIntrospectionService {
       WITH primary_keys AS (
         SELECT kcu.column_name
         FROM information_schema.table_constraints tc
-        JOIN information_schema.key_column_usage kcu 
+        JOIN information_schema.key_column_usage kcu
           ON tc.constraint_name = kcu.constraint_name
           AND tc.table_schema = kcu.table_schema
         WHERE tc.constraint_type = 'PRIMARY KEY'
@@ -84,7 +80,7 @@ export class SchemaIntrospectionService {
           AND tc.table_name = $1
           AND tc.table_schema = $2
       )
-      SELECT 
+      SELECT
         c.table_name as "tableName",
         c.column_name as "columnName",
         c.data_type as "dataType",
@@ -102,17 +98,17 @@ export class SchemaIntrospectionService {
       LEFT JOIN primary_keys pk ON pk.column_name = c.column_name
       LEFT JOIN foreign_keys fk ON fk.column_name = c.column_name
       LEFT JOIN pg_catalog.pg_class pgclass ON pgclass.relname = c.table_name
-      WHERE c.table_name = $1 
+      WHERE c.table_name = $1
         AND c.table_schema = $2
       ORDER BY c.ordinal_position
     `
 
-    return this._dataSource.query(query, [tableName, schemaName])
+    return this.prisma.$queryRawUnsafe<ColumnInfo[]>(query, tableName, schemaName)
   }
 
   async getRelations(tableName: string, schemaName: string = 'public'): Promise<RelationInfo[]> {
     const query = `
-      SELECT 
+      SELECT
         tc.constraint_name as "constraintName",
         tc.table_name as "sourceTable",
         kcu.column_name as "sourceColumn",
@@ -130,7 +126,7 @@ export class SchemaIntrospectionService {
         AND tc.table_schema = $2
     `
 
-    return this._dataSource.query(query, [tableName, schemaName])
+    return this.prisma.$queryRawUnsafe<RelationInfo[]>(query, tableName, schemaName)
   }
 
   async getDatabases(): Promise<string[]> {
@@ -142,8 +138,8 @@ export class SchemaIntrospectionService {
       ORDER BY datname
     `
 
-    const results = await this._dataSource.query(query)
-    return results.map((r: unknown) => (r as { database: string }).database)
+    const results = await this.prisma.$queryRawUnsafe<Array<{ database: string }>>(query)
+    return results.map((r) => r.database)
   }
 
   async getSchemas(): Promise<string[]> {
@@ -155,7 +151,7 @@ export class SchemaIntrospectionService {
       ORDER BY schema_name
     `
 
-    const results = await this._dataSource.query(query)
-    return results.map((r: unknown) => (r as { schema_name: string }).schema_name)
+    const results = await this.prisma.$queryRawUnsafe<Array<{ schema_name: string }>>(query)
+    return results.map((r) => r.schema_name)
   }
 }

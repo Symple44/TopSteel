@@ -274,19 +274,20 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
       if (response?.ok && data?.success && data?.data) {
         setUsers(data?.data)
       } else {
-        setError(t('users.loadingError'))
+        setError('Erreur lors du chargement des utilisateurs')
       }
     } catch (_error) {
-      setError(t('users.connectionError'))
+      setError('Erreur de connexion')
     } finally {
       setLoading(false)
     }
-  }, [t])
+  }, []) // Retirer t des dépendances pour éviter la boucle infinie
 
-  // Charger les utilisateurs
+  // Charger les utilisateurs une seule fois au montage
   useEffect(() => {
     loadUsers()
-  }, [loadUsers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Charger une seule fois au montage
 
   const handleCellEdit = (row: User, column: ColumnConfig<User>, value: unknown) => {
     setUsers((prevData) =>

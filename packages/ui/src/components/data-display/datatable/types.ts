@@ -198,7 +198,7 @@ export interface DataTableConfig<T = DataRecord> {
   tableId?: string // Pour la sauvegarde des paramètres
   userId?: string // Pour isoler les paramètres par utilisateur
 
-  // Fonctionnalités
+  // Fonctionnalites
   sortable?: boolean
   searchable?: boolean
   filterable?: boolean
@@ -206,6 +206,14 @@ export interface DataTableConfig<T = DataRecord> {
   selectable?: boolean
   exportable?: boolean
   pagination?: boolean | PaginationConfig
+  /** Delai de debounce pour la recherche globale en ms (defaut: 300) */
+  searchDebounceMs?: number
+  /** Active la virtualisation pour les grandes listes (defaut: auto basee sur virtualizeThreshold) */
+  virtualize?: boolean
+  /** Seuil de lignes pour activer la virtualisation automatique (defaut: 100) */
+  virtualizeThreshold?: number
+  /** Hauteur estimee d'une ligne en pixels pour la virtualisation (defaut: 48) */
+  estimatedRowHeight?: number
 
   // Apparence
   title?: string

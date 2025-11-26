@@ -1,3 +1,5 @@
+import { MenuItem, MenuConfiguration, UserMenuPreference } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import type { Request } from 'express'
 
 // RequestWithUser type definition for menu admin operations
@@ -30,17 +32,17 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+
+
 import { Roles } from '../../auth/decorators/roles.decorator'
 import {
   Action,
   CombinedSecurityGuard,
   Resource,
 } from '../../auth/security/guards/combined-security.guard'
-import { MenuConfiguration } from '../entities/menu-configuration.entity'
-import { MenuItem } from '../entities/menu-item.entity'
-import { UserMenuPreference } from '../entities/user-menu-preference.entity'
+
+
+
 import { MenuSyncOptions, MenuSyncService } from '../services/menu-sync.service'
 import { PageDiscoveryService } from '../services/page-discovery.service'
 
@@ -55,12 +57,7 @@ export class MenuAdminController {
   constructor(
     private readonly pageDiscoveryService: PageDiscoveryService,
     private readonly menuSyncService: MenuSyncService,
-    @InjectRepository(MenuConfiguration, 'auth')
-    private readonly menuConfigRepository: Repository<MenuConfiguration>,
-    @InjectRepository(MenuItem, 'auth')
-    private readonly menuItemRepository: Repository<MenuItem>,
-    @InjectRepository(UserMenuPreference, 'auth')
-    private readonly userPreferenceRepository: Repository<UserMenuPreference>
+    private readonly prisma: PrismaService
   ) {}
 
   /**
@@ -220,19 +217,16 @@ export class MenuAdminController {
     @Query('isActive') isActive?: boolean,
     @Query('societeId') societeId?: string
   ) {
-    const query = this.menuConfigRepository.createQueryBuilder('menu')
+    const where: any = {}
 
-    if (type) {
-      query.andWhere('menu.type = :type', { type })
-    }
     if (isActive !== undefined) {
-      query.andWhere('menu.isActive = :isActive', { isActive })
+      where.isActive = isActive
     }
     if (societeId) {
-      query.andWhere('(menu.societeId = :societeId OR menu.societeId IS NULL)', { societeId })
+      where.OR = [{ societeId }, { societeId: null }]
     }
 
-    const menus = await query.getMany()
+    const menus = await this.prisma.menuConfiguration.findMany({ where })
 
     return {
       success: true,
@@ -248,9 +242,9 @@ export class MenuAdminController {
   @Action('read')
   @ApiOperation({ summary: 'Get menu configuration with items' })
   async getMenuConfiguration(@Param('id') id: string) {
-    const menu = await this.menuConfigRepository.findOne({
+    const menu = await this.prisma.menuConfiguration.findUnique({
       where: { id },
-      relations: ['items'],
+      include: { menuItems: true },
     })
 
     if (!menu) {
@@ -265,7 +259,7 @@ export class MenuAdminController {
     const rootItems: MenuItemHierarchy[] = []
 
     // Convert items to hierarchical structure
-    const hierarchicalItems: MenuItemHierarchy[] = menu.items.map(
+    const hierarchicalItems: MenuItemHierarchy[] = menu.menuItems.map(
       (item) =>
         ({
           ...item,
@@ -288,9 +282,9 @@ export class MenuAdminController {
       }
     })
 
-    // Sort items by orderIndex
+    // Sort items by order
     const sortItems = (items: MenuItemHierarchy[]) => {
-      items.sort((a, b) => a.orderIndex - b.orderIndex)
+      items.sort((a, b) => a.order - b.order)
       items.forEach((item) => {
         if (item.children?.length) {
           sortItems(item.children)
@@ -317,8 +311,15 @@ export class MenuAdminController {
   @Action('create')
   @ApiOperation({ summary: 'Create menu configuration' })
   async createMenuConfiguration(@Body() data: Partial<MenuConfiguration>) {
-    const menu = this.menuConfigRepository.create(data)
-    const saved = await this.menuConfigRepository.save(menu)
+    const saved = await this.prisma.menuConfiguration.create({
+      data: {
+        name: data.name || 'New Menu',
+        societeId: data.societeId,
+        description: data.description,
+        isActive: data.isActive !== undefined ? data.isActive : true,
+        isDefault: data.isDefault !== undefined ? data.isDefault : false,
+      },
+    })
 
     return {
       success: true,
@@ -334,7 +335,7 @@ export class MenuAdminController {
   @Action('update')
   @ApiOperation({ summary: 'Update menu configuration' })
   async updateMenuConfiguration(@Param('id') id: string, @Body() data: Partial<MenuConfiguration>) {
-    const menu = await this.menuConfigRepository.findOne({ where: { id } })
+    const menu = await this.prisma.menuConfiguration.findUnique({ where: { id } })
 
     if (!menu) {
       return {
@@ -343,8 +344,17 @@ export class MenuAdminController {
       }
     }
 
-    Object.assign(menu, data)
-    const saved = await this.menuConfigRepository.save(menu)
+    const updateData: any = {}
+    if (data.name !== undefined) updateData.name = data.name
+    if (data.description !== undefined) updateData.description = data.description
+    if (data.societeId !== undefined) updateData.societeId = data.societeId
+    if (data.isActive !== undefined) updateData.isActive = data.isActive
+    if (data.isDefault !== undefined) updateData.isDefault = data.isDefault
+
+    const saved = await this.prisma.menuConfiguration.update({
+      where: { id },
+      data: updateData,
+    })
 
     return {
       success: true,
@@ -360,13 +370,21 @@ export class MenuAdminController {
   @Action('delete')
   @ApiOperation({ summary: 'Delete menu configuration' })
   async deleteMenuConfiguration(@Param('id') id: string) {
-    const result = await this.menuConfigRepository.delete(id)
-
-    return {
-      success: (result.affected ?? 0) > 0,
-      data: {
-        deleted: result.affected ?? 0,
-      },
+    try {
+      await this.prisma.menuConfiguration.delete({ where: { id } })
+      return {
+        success: true,
+        data: {
+          deleted: 1,
+        },
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: {
+          deleted: 0,
+        },
+      }
     }
   }
 
@@ -394,7 +412,7 @@ export class MenuAdminController {
   @Action('update')
   @ApiOperation({ summary: 'Update menu item' })
   async updateMenuItem(@Param('id') id: string, @Body() data: Partial<MenuItem>) {
-    const item = await this.menuItemRepository.findOne({ where: { id } })
+    const item = await this.prisma.menuItem.findUnique({ where: { id } })
 
     if (!item) {
       return {
@@ -403,8 +421,20 @@ export class MenuAdminController {
       }
     }
 
-    Object.assign(item, data)
-    const saved = await this.menuItemRepository.save(item)
+    const updateData: any = {}
+    if (data.label !== undefined) updateData.label = data.label
+    if (data.icon !== undefined) updateData.icon = data.icon
+    if (data.path !== undefined) updateData.path = data.path
+    if (data.order !== undefined) updateData.order = data.order
+    if (data.parentId !== undefined) updateData.parentId = data.parentId
+    if (data.isActive !== undefined) updateData.isActive = data.isActive
+    if (data.isVisible !== undefined) updateData.isVisible = data.isVisible
+    if (data.metadata !== undefined) updateData.metadata = data.metadata
+
+    const saved = await this.prisma.menuItem.update({
+      where: { id },
+      data: updateData,
+    })
 
     return {
       success: true,
@@ -420,13 +450,21 @@ export class MenuAdminController {
   @Action('delete')
   @ApiOperation({ summary: 'Delete menu item' })
   async deleteMenuItem(@Param('id') id: string) {
-    const result = await this.menuItemRepository.delete(id)
-
-    return {
-      success: (result.affected ?? 0) > 0,
-      data: {
-        deleted: result.affected ?? 0,
-      },
+    try {
+      await this.prisma.menuItem.delete({ where: { id } })
+      return {
+        success: true,
+        data: {
+          deleted: 1,
+        },
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: {
+          deleted: 0,
+        },
+      }
     }
   }
 
@@ -456,19 +494,20 @@ export class MenuAdminController {
   async getUserPreferences(@Req() req: RequestWithUser, @Query('menuId') menuId?: string) {
     const userId = req.user.id
 
-    const query = this.userPreferenceRepository
-      .createQueryBuilder('pref')
-      .where('pref.userId = :userId', { userId })
+    const preference = await this.prisma.userMenuPreference.findUnique({
+      where: { userId },
+    })
 
-    if (menuId) {
-      query.andWhere('pref.menuId = :menuId', { menuId })
+    if (!preference) {
+      return {
+        success: true,
+        data: null,
+      }
     }
-
-    const preferences = await query.getMany()
 
     return {
       success: true,
-      data: preferences,
+      data: preference,
     }
   }
 
@@ -485,21 +524,28 @@ export class MenuAdminController {
   ) {
     const userId = req.user.id
 
-    let preference = await this.userPreferenceRepository.findOne({
-      where: { userId, menuId },
+    const existingPreference = await this.prisma.userMenuPreference.findUnique({
+      where: { userId },
     })
 
-    if (preference) {
-      Object.assign(preference, data)
-    } else {
-      preference = this.userPreferenceRepository.create({
-        userId,
-        menuId,
-        ...data,
-      })
-    }
+    const updateData: any = {}
+    if (data.menuData !== undefined) updateData.menuData = data.menuData as any
+    if (data.preferences !== undefined) updateData.preferences = data.preferences as any
+    if (data.societeId !== undefined) updateData.societeId = data.societeId
 
-    const saved = await this.userPreferenceRepository.save(preference)
+    const saved = existingPreference
+      ? await this.prisma.userMenuPreference.update({
+          where: { userId },
+          data: updateData,
+        })
+      : await this.prisma.userMenuPreference.create({
+          data: {
+            userId,
+            societeId: data.societeId,
+            menuData: (data.menuData || {}) as any,
+            preferences: data.preferences as any,
+          },
+        })
 
     return {
       success: true,
@@ -516,16 +562,23 @@ export class MenuAdminController {
   async resetUserPreferences(@Req() req: RequestWithUser, @Param('menuId') menuId: string) {
     const userId = req.user.id
 
-    const result = await this.userPreferenceRepository.delete({
-      userId,
-      menuId,
-    })
-
-    return {
-      success: (result.affected ?? 0) > 0,
-      data: {
-        reset: true,
-      },
+    try {
+      await this.prisma.userMenuPreference.delete({
+        where: { userId },
+      })
+      return {
+        success: true,
+        data: {
+          reset: true,
+        },
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: {
+          reset: false,
+        },
+      }
     }
   }
 
@@ -538,17 +591,15 @@ export class MenuAdminController {
   async exportUserPreferences(@Req() req: RequestWithUser) {
     const userId = req.user.id
 
-    const preferences = await this.userPreferenceRepository.find({
+    const preference = await this.prisma.userMenuPreference.findUnique({
       where: { userId },
     })
-
-    const exportData = preferences.map((pref) => pref.exportPreferences())
 
     return {
       success: true,
       data: {
         userId,
-        preferences: exportData,
+        preferences: preference ? [preference] : [],
         exportedAt: new Date(),
       },
     }
@@ -563,36 +614,48 @@ export class MenuAdminController {
   @ApiOperation({ summary: 'Import user menu preferences' })
   async importUserPreferences(
     @Req() req: RequestWithUser,
-    @Body() data: { preferences: UserMenuPreference[] }
+    @Body() data: { preferences: Partial<UserMenuPreference>[] }
   ) {
     const userId = req.user.id
-    const imported = []
 
-    for (const prefData of data.preferences) {
-      const menuId = prefData.menuId
-      if (!menuId) continue
-
-      let preference = await this.userPreferenceRepository.findOne({
-        where: { userId, menuId },
-      })
-
-      if (!preference) {
-        preference = this.userPreferenceRepository.create({
-          userId,
-          menuId,
-        })
+    if (!data.preferences || data.preferences.length === 0) {
+      return {
+        success: false,
+        data: {
+          imported: 0,
+          preferences: [],
+        },
       }
-
-      preference.importPreferences(prefData)
-      const saved = await this.userPreferenceRepository.save(preference)
-      imported.push(saved)
     }
+
+    const prefData = data.preferences[0]
+    const existingPreference = await this.prisma.userMenuPreference.findUnique({
+      where: { userId },
+    })
+
+    const saved = existingPreference
+      ? await this.prisma.userMenuPreference.update({
+          where: { userId },
+          data: {
+            menuData: (prefData.menuData || {}) as any,
+            preferences: prefData.preferences as any,
+            societeId: prefData.societeId,
+          },
+        })
+      : await this.prisma.userMenuPreference.create({
+          data: {
+            userId,
+            menuData: (prefData.menuData || {}) as any,
+            preferences: prefData.preferences as any,
+            societeId: prefData.societeId,
+          },
+        })
 
     return {
       success: true,
       data: {
-        imported: imported.length,
-        preferences: imported,
+        imported: 1,
+        preferences: [saved],
       },
     }
   }

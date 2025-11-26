@@ -9,8 +9,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator'
-import { UserRole } from '../entities/user.entity'
-import { User } from '@prisma/client'
+import { GlobalUserRole } from '../../auth/core/constants/roles.constants'
+
+// Alias for backward compatibility
+const UserRole = GlobalUserRole
 
 
 export class CreateUserDto {
@@ -38,10 +40,10 @@ export class CreateUserDto {
   @MinLength(6)
   password!: string
 
-  @ApiPropertyOptional({ enum: UserRole, default: UserRole.OPERATEUR })
+  @ApiPropertyOptional({ enum: GlobalUserRole, default: GlobalUserRole.OPERATEUR })
   @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole = UserRole.OPERATEUR
+  @IsEnum(GlobalUserRole)
+  role?: GlobalUserRole = GlobalUserRole.OPERATEUR
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()

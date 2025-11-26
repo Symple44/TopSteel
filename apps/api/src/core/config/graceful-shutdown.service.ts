@@ -67,40 +67,15 @@ export class GracefulShutdownService implements OnApplicationShutdown {
     this.logger.log('📝 3/6 - Fermeture des connexions base de données...')
     try {
       if (this.app) {
-        // Essayer de fermer les connexions TypeORM
+        // Fermer Prisma connections
         try {
-          const { getConnectionManager } = await import('typeorm')
-          try {
-            const connectionManager = getConnectionManager()
-            const connections =
-              connectionManager.connections?.filter((conn) => conn?.isConnected) || []
-
-            for (const connection of connections) {
-              if (connection?.isConnected) {
-                await connection.close()
-              }
-            }
-
-            if (connections.length > 0) {
-              this.logger.log('✅ Connexions base de données fermées')
-            }
-          } catch (_legacyError) {
-            // Fallback pour les versions plus récentes de TypeORM
-            this.logger.warn('⚠️  Méthode legacy TypeORM non disponible')
+          const prismaService = this.app.get('PrismaService', { strict: false })
+          if (prismaService && typeof prismaService.$disconnect === 'function') {
+            await prismaService.$disconnect()
+            this.logger.log('✅ Connexions Prisma fermées')
           }
-        } catch (_dbError) {
-          // Essayer une approche alternative avec le service de l'app
-          try {
-            const dataSource =
-              this.app.get('CONNECTION', { strict: false }) ||
-              this.app.get('Database', { strict: false })
-            if (dataSource?.isInitialized) {
-              await dataSource.destroy()
-              this.logger.log('✅ Connexions base de données fermées (alternative)')
-            }
-          } catch (_altError) {
-            this.logger.warn('⚠️  Impossible de fermer les connexions BDD automatiquement')
-          }
+        } catch (_prismaError) {
+          this.logger.warn('⚠️  Impossible de fermer les connexions Prisma automatiquement')
         }
       }
     } catch (error) {

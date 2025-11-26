@@ -1,16 +1,15 @@
+import { Prisma } from '@prisma/client'
+import type { NotificationRule as PrismaNotificationRule, NotificationEvent as PrismaNotificationEvent, NotificationRuleExecution as PrismaNotificationRuleExecution, Notification } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+
+
 import { getErrorMessage } from '../../../core/common/utils'
 import {
   EventStatus,
   ExecutionResult,
   type NotificationCategory,
-  type NotificationEvent,
   type NotificationPriority,
-  NotificationRule,
-  NotificationRuleExecution,
-  Notifications,
   type NotificationType,
   type RecipientType,
   TriggerType,
@@ -22,24 +21,26 @@ export class NotificationRuleEngineService {
   private readonly logger = new Logger(NotificationRuleEngineService.name)
 
   constructor(
-    @InjectRepository(NotificationRule, 'shared')
-    private readonly _ruleRepository: Repository<NotificationRule>,
-    @InjectRepository(Notifications, 'auth')
-    private readonly _notificationRepository: Repository<Notifications>,
+    private readonly prisma: PrismaService,
     private readonly ruleService: NotificationRuleService
   ) {}
 
   // ===== TRAITEMENT DES ÉVÉNEMENTS =====
 
-  async processEvent(event: NotificationEvent): Promise<void> {
+  async processEvent(event: PrismaNotificationEvent): Promise<void> {
     const startTime = Date.now()
 
     try {
-      this.logger.log(`Processing event: ${event.getEventKey()}`)
+      this.logger.log(`Processing event: ${event.type}`)
 
       // Marquer l'événement comme en cours de traitement
-      event.markAsProcessing()
-      await this.ruleService._eventRepository.save(event)
+      await this.prisma.notificationEvent.update({
+        where: { id: event.id },
+        data: {
+          processed: false,
+          processingDetails: { status: 'processing', startedAt: new Date().toISOString() } as Prisma.InputJsonValue
+        }
+      })
 
       // Récupérer les règles actives pour ce type d'événement
       const applicableRules = await this.getApplicableRules(event)
@@ -61,8 +62,19 @@ export class NotificationRuleEngineService {
       }
 
       // Marquer l'événement comme traité
-      event.markAsProcessed(rulesTriggered, notificationsCreated)
-      await this.ruleService._eventRepository.save(event)
+      await this.prisma.notificationEvent.update({
+        where: { id: event.id },
+        data: {
+          processed: true,
+          processedAt: new Date(),
+          processingDetails: {
+            status: 'completed',
+            rulesTriggered,
+            notificationsCreated,
+            completedAt: new Date().toISOString()
+          } as Prisma.InputJsonValue
+        }
+      })
 
       const executionTime = Date.now() - startTime
       this.logger.log(
@@ -72,74 +84,107 @@ export class NotificationRuleEngineService {
       this.logger.error(`Error processing event ${event.id}:`, error)
       const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
       const errorStack = error instanceof Error ? error.stack : undefined
-      event.markAsFailed(errorMessage, { stack: errorStack })
-      await this.ruleService._eventRepository.save(event)
+      await this.prisma.notificationEvent.update({
+        where: { id: event.id },
+        data: {
+          processed: false,
+          processingDetails: {
+            status: 'failed',
+            error: errorMessage,
+            stack: errorStack,
+            failedAt: new Date().toISOString()
+          } as Prisma.InputJsonValue
+        }
+      })
     }
   }
 
-  private async getApplicableRules(event: NotificationEvent): Promise<NotificationRule[]> {
-    return await this._ruleRepository
-      .createQueryBuilder('rule')
-      .where('rule.isActive = :isActive', { isActive: true })
-      .andWhere("rule.trigger ->> 'type' = :triggerType", { triggerType: event.type })
-      .andWhere("rule.trigger ->> 'event' = :eventName", { eventName: event.event })
-      .getMany()
+  private async getApplicableRules(event: PrismaNotificationEvent): Promise<PrismaNotificationRule[]> {
+    // Get all active rules
+    const activeRules = await this.prisma.notificationRule.findMany({
+      where: {
+        isActive: true,
+        enabled: true,
+        societeId: event.societeId
+      }
+    })
+
+    // Filter by trigger type in JSON field
+    return activeRules.filter(rule => {
+      const trigger = rule.trigger as Record<string, unknown> | null
+      return trigger?.type === event.type
+    })
   }
 
   private async processRuleForEvent(
-    rule: NotificationRule,
-    event: NotificationEvent
+    rule: PrismaNotificationRule,
+    event: PrismaNotificationEvent
   ): Promise<boolean> {
     const startTime = Date.now()
 
     try {
       // Vérifier si la règle peut être exécutée
-      if (!rule.canExecute()) {
-        const execution = NotificationRuleExecution.createSkipped(
-          rule.id,
-          event.data,
-          ExecutionResult.RULE_INACTIVE,
-          {},
-          Date.now() - startTime
-        )
-        await this.ruleService.createExecution(execution)
+      if (!rule.isActive || !rule.enabled) {
+        await this.ruleService.createExecution({
+          ruleId: rule.id,
+          triggered: false,
+          success: false,
+          errorMessage: 'Rule is not active or enabled',
+          executionTime: Date.now() - startTime,
+          data: { result: ExecutionResult.RULE_INACTIVE }
+        })
         return false
       }
 
+      // Cast event data from JsonValue
+      const eventData = (event.data || {}) as Record<string, unknown>
+
       // Évaluer les conditions
-      const conditionResult = this.ruleService.evaluateConditions(rule.conditions, event.data)
+      const conditions = rule.conditions as unknown[] | null
+      const conditionResult = this.ruleService.evaluateConditions(conditions || [], eventData)
 
       if (!conditionResult.result) {
-        const execution = NotificationRuleExecution.createSkipped(
-          rule.id,
-          event.data,
-          ExecutionResult.CONDITIONS_NOT_MET,
-          conditionResult.details,
-          Date.now() - startTime
-        )
-        await this.ruleService.createExecution(execution)
+        await this.ruleService.createExecution({
+          ruleId: rule.id,
+          triggered: false,
+          success: false,
+          errorMessage: 'Conditions not met',
+          executionTime: Date.now() - startTime,
+          data: {
+            result: ExecutionResult.CONDITIONS_NOT_MET,
+            details: conditionResult.details
+          } as any
+        })
         return false
       }
 
       // Préparer les variables pour le template
-      const templateVariables = this.prepareTemplateVariables(event.data, rule)
+      const templateVariables = this.prepareTemplateVariables(eventData, rule)
 
       // Créer la notification
-      const notification = await this.createNotificationFromRule(rule, templateVariables)
+      const notification = await this.createNotificationFromRule(rule, templateVariables, event.societeId)
 
       // Incrémenter le compteur de déclenchements
-      rule.incrementTriggerCount()
-      await this._ruleRepository.save(rule)
+      await this.prisma.notificationRule.update({
+        where: { id: rule.id },
+        data: {
+          triggerCount: { increment: 1 },
+          lastTriggered: new Date().toISOString()
+        }
+      })
 
       // Enregistrer l'exécution réussie
-      const execution = NotificationRuleExecution.createSuccess(
-        rule.id,
-        notification.id,
-        event.data,
-        templateVariables,
-        Date.now() - startTime
-      )
-      await this.ruleService.createExecution(execution)
+      await this.ruleService.createExecution({
+        ruleId: rule.id,
+        notificationId: notification.id,
+        triggered: true,
+        success: true,
+        executionTime: Date.now() - startTime,
+        data: {
+          eventData,
+          templateVariables
+        } as any
+      })
 
       this.logger.log(
         `Rule ${rule.id} triggered successfully, notification ${notification.id} created`
@@ -150,15 +195,18 @@ export class NotificationRuleEngineService {
 
       const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
       const errorStack = error instanceof Error ? error.stack : undefined
-      const execution = NotificationRuleExecution.createFailed(
-        rule.id,
-        event.data,
-        ExecutionResult.SYSTEM_ERROR,
+      await this.ruleService.createExecution({
+        ruleId: rule.id,
+        triggered: false,
+        success: false,
         errorMessage,
-        { stack: errorStack },
-        Date.now() - startTime
-      )
-      await this.ruleService.createExecution(execution)
+        executionTime: Date.now() - startTime,
+        data: {
+          result: ExecutionResult.SYSTEM_ERROR,
+          error: errorMessage,
+          stack: errorStack
+        }
+      })
 
       return false
     }
@@ -166,7 +214,7 @@ export class NotificationRuleEngineService {
 
   private prepareTemplateVariables(
     eventData: Record<string, unknown>,
-    rule: NotificationRule
+    rule: PrismaNotificationRule
   ): Record<string, unknown> {
     // Commencer avec les données de l'événement
     const variables = { ...eventData }
@@ -176,8 +224,12 @@ export class NotificationRuleEngineService {
     variables.rule_name = rule.name
     variables.rule_id = rule.id
 
+    // Cast trigger JsonValue to proper type
+    const trigger = rule.trigger as Record<string, unknown> | null
+    const triggerType = trigger?.type as TriggerType | undefined
+
     // Ajouter des variables spécifiques selon le type d'événement
-    switch (rule.trigger.type) {
+    switch (triggerType) {
       case TriggerType.STOCK:
         variables.stock_url = `/stock/materials/${variables.material_id}`
         variables.threshold_percentage = variables.threshold
@@ -210,48 +262,54 @@ export class NotificationRuleEngineService {
   }
 
   private async createNotificationFromRule(
-    rule: NotificationRule,
-    variables: Record<string, unknown>
-  ): Promise<Notifications> {
-    const config = rule.notification
+    rule: PrismaNotificationRule,
+    variables: Record<string, unknown>,
+    societeId: string
+  ): Promise<Notification> {
+    // Cast notification JsonValue to proper type
+    const config = rule.notification as Record<string, unknown> | null
+
+    if (!config) {
+      throw new Error('Notification configuration is missing')
+    }
 
     try {
+      const titleTemplate = config.titleTemplate as string
+      const messageTemplate = config.messageTemplate as string
+      const actionUrlTemplate = config.actionUrl as string | undefined
+
       // Substituer les variables dans les templates
-      const title = this.ruleService.substituteVariables(config.titleTemplate, variables)
-      const message = this.ruleService.substituteVariables(config.messageTemplate, variables)
-      const actionUrl = config.actionUrl
-        ? this.ruleService.substituteVariables(config.actionUrl, variables)
+      const title = this.ruleService.substituteVariables(titleTemplate, variables)
+      const message = this.ruleService.substituteVariables(messageTemplate, variables)
+      const actionUrl = actionUrlTemplate
+        ? this.ruleService.substituteVariables(actionUrlTemplate, variables)
         : undefined
 
       // Calculer la date d'expiration
-      const expiresAt = config.expiresIn
-        ? new Date(Date.now() + config.expiresIn * 60 * 60 * 1000)
+      const expiresIn = config.expiresIn as number | undefined
+      const expiresAt = expiresIn
+        ? new Date(Date.now() + expiresIn * 60 * 60 * 1000)
         : undefined
 
-      // Créer l'objet notification
-      const notificationData = {
-        title: title,
-        message,
-        type: config.type as NotificationType,
-        category: config.category as NotificationCategory,
-        priority: config.priority as NotificationPriority,
-        source: `rule:${rule.id}`,
-        entityType: 'notification_rule',
-        entityId: rule.id,
-        data: variables,
-        recipientType: config.recipientType as RecipientType,
-        recipientId: config.recipientIds?.join(','),
-        actionUrl,
-        actionLabel: config.actionLabel,
-        actionType: config.actionType as 'primary' | 'secondary',
-        expiresAt,
-        persistent: config.persistent ?? true,
-        autoRead: false,
-        isArchived: false,
-      }
+      const recipientIds = config.recipientIds as string[] | undefined
+      const userId = recipientIds?.[0] || 'system'
 
-      const notification = this._notificationRepository.create(notificationData as any)
-      return await this._notificationRepository.save(notification as any)
+      // Créer la notification
+      return await this.prisma.notification.create({
+        data: {
+          societeId,
+          userId,
+          title,
+          message,
+          type: (config.type as string) || 'info',
+          category: config.category as string | undefined,
+          priority: config.priority as string | undefined,
+          data: variables as Prisma.InputJsonValue,
+          actionUrl,
+          actionLabel: config.actionLabel as string | undefined,
+          expiresAt,
+        }
+      })
     } catch (error) {
       this.logger.error(`Error creating notification from rule ${rule.id}:`, error)
       throw new Error(
@@ -263,9 +321,9 @@ export class NotificationRuleEngineService {
   // ===== MÉTHODES UTILITAIRES =====
 
   async processAllPendingEvents(): Promise<void> {
-    const pendingEvents = await this.ruleService._eventRepository.find({
-      where: { status: EventStatus.PENDING },
-      order: { occurredAt: 'ASC' },
+    const pendingEvents = await this.prisma.notificationEvent.findMany({
+      where: { processed: false },
+      orderBy: { createdAt: 'asc' },
       take: 100, // Traiter par batch
     })
 
@@ -280,25 +338,29 @@ export class NotificationRuleEngineService {
     const maxAgeDate = new Date()
     maxAgeDate.setHours(maxAgeDate.getHours() - maxAge)
 
-    const failedEvents = await this.ruleService._eventRepository
-      .createQueryBuilder('event')
-      .where('event.status = :status', { status: EventStatus.FAILED })
-      .andWhere('event.occurredAt >= :date', { date: maxAgeDate })
-      .orderBy('event.occurredAt', 'ASC')
-      .take(50)
-      .getMany()
+    const failedEvents = await this.prisma.notificationEvent.findMany({
+      where: {
+        processed: false,
+        createdAt: { gte: maxAgeDate }
+      },
+      orderBy: { createdAt: 'asc' },
+      take: 50
+    })
 
     this.logger.log(`Reprocessing ${failedEvents.length} failed events`)
 
     for (const event of failedEvents) {
       // Réinitialiser le statut
-      event.status = EventStatus.PENDING
-      event.processingError = undefined
-      event.processingDetails = undefined
-      await this.ruleService._eventRepository.save(event)
+      const resetEvent = await this.prisma.notificationEvent.update({
+        where: { id: event.id },
+        data: {
+          processed: false,
+          processingDetails: Prisma.DbNull
+        }
+      })
 
       // Retraiter l'événement
-      await this.processEvent(event)
+      await this.processEvent(resetEvent)
     }
   }
 
@@ -306,29 +368,29 @@ export class NotificationRuleEngineService {
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep)
 
-    const result = await this.ruleService._eventRepository
-      .createQueryBuilder()
-      .delete()
-      .where('occurredAt < :cutoffDate', { cutoffDate })
-      .andWhere('status = :status', { status: EventStatus.PROCESSED })
-      .execute()
+    const result = await this.prisma.notificationEvent.deleteMany({
+      where: {
+        createdAt: { lt: cutoffDate },
+        processed: true
+      }
+    })
 
-    this.logger.log(`Cleaned up ${result.affected} old events`)
-    return result.affected || 0
+    this.logger.log(`Cleaned up ${result.count} old events`)
+    return result.count
   }
 
   async cleanupOldExecutions(daysToKeep: number = 30): Promise<number> {
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep)
 
-    const result = await this.ruleService._executionRepository
-      .createQueryBuilder()
-      .delete()
-      .where('executedAt < :cutoffDate', { cutoffDate })
-      .execute()
+    const result = await this.prisma.notificationRuleExecution.deleteMany({
+      where: {
+        createdAt: { lt: cutoffDate }
+      }
+    })
 
-    this.logger.log(`Cleaned up ${result.affected} old executions`)
-    return result.affected || 0
+    this.logger.log(`Cleaned up ${result.count} old executions`)
+    return result.count
   }
 
   // ===== MÉTHODES DE DÉCLENCHEMENT MANUEL =====
@@ -338,9 +400,10 @@ export class NotificationRuleEngineService {
     event: string,
     data: Record<string, unknown>,
     source: string = 'manual',
-    userId?: string
-  ): Promise<NotificationEvent> {
-    const notificationEvent = await this.ruleService.createEvent(type, event, data, source, userId)
+    userId?: string,
+    societeId?: string
+  ): Promise<PrismaNotificationEvent> {
+    const notificationEvent = await this.ruleService.createEvent(type, event, data, source, userId, undefined, undefined, societeId)
 
     // Traiter immédiatement l'événement
     await this.processEvent(notificationEvent)
@@ -366,7 +429,8 @@ export class NotificationRuleEngineService {
       const rule = await this.ruleService.getRuleById(ruleId)
 
       // Évaluer les conditions
-      const conditionResult = this.ruleService.evaluateConditions(rule.conditions, testData)
+      const conditions = rule.conditions as unknown[] | null
+      const conditionResult = this.ruleService.evaluateConditions(conditions || [], testData)
 
       if (!conditionResult.result) {
         return {
@@ -379,15 +443,25 @@ export class NotificationRuleEngineService {
       // Préparer les variables
       const templateVariables = this.prepareTemplateVariables(testData, rule)
 
+      // Cast notification JsonValue to proper type
+      const config = rule.notification as Record<string, unknown> | null
+
+      if (!config) {
+        throw new Error('Notification configuration is missing')
+      }
+
+      const titleTemplate = config.titleTemplate as string
+      const messageTemplate = config.messageTemplate as string
+      const actionUrlTemplate = config.actionUrl as string | undefined
+
       // Générer un aperçu de la notification
-      const config = rule.notification
-      const title = this.ruleService.substituteVariables(config.titleTemplate, templateVariables)
+      const title = this.ruleService.substituteVariables(titleTemplate, templateVariables)
       const message = this.ruleService.substituteVariables(
-        config.messageTemplate,
+        messageTemplate,
         templateVariables
       )
-      const actionUrl = config.actionUrl
-        ? this.ruleService.substituteVariables(config.actionUrl, templateVariables)
+      const actionUrl = actionUrlTemplate
+        ? this.ruleService.substituteVariables(actionUrlTemplate, templateVariables)
         : undefined
 
       return {

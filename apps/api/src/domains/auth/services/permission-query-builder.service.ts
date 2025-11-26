@@ -1,21 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import {
-  Brackets,
-  type Repository,
-  type SelectQueryBuilder,
-  type WhereExpressionBuilder,
-} from 'typeorm'
+import type { User, Permission, Role, RolePermission, UserSocieteRole } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type {
   PermissionData,
   UserSocieteRole as UserSocieteRoleType,
 } from '../../../types/entities/user.types'
-import { User } from '../../users/entities/user.entity'
-import { Permission } from '../core/entities/permission.entity'
-import { Role } from '../core/entities/role.entity'
-import { RolePermission } from '../core/entities/role-permission.entity'
-import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 import type { IRolePermission } from '../types/entities.types'
 
 
@@ -142,16 +132,7 @@ export interface PermissionConflict {
 @Injectable()
 export class PermissionQueryBuilderService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Permission, 'auth')
-    private readonly permissionRepository: Repository<Permission>,
-    @InjectRepository(Role, 'auth')
-    private readonly roleRepository: Repository<Role>,
-    @InjectRepository(RolePermission, 'auth')
-    private readonly rolePermissionRepository: Repository<RolePermission>,
-    @InjectRepository(UserSocieteRole, 'auth')
-    private readonly userSocieteRoleRepository: Repository<UserSocieteRole>,
+    private readonly prisma: PrismaService,
     private readonly cacheService: OptimizedCacheService
   ) {}
 
@@ -175,11 +156,29 @@ export class PermissionQueryBuilderService {
       }
     }
 
-    // Build query
-    const query = this.buildPermissionQuery(options)
+    // Build Prisma query
+    const where = this.buildPermissionWhere(options)
+    const orderBy = this.buildOrderBy(options)
 
-    // Execute query
-    const [permissions, total] = await query.getManyAndCount()
+    // Execute query with Prisma
+    const [permissions, total] = await Promise.all([
+      this.prisma.permission.findMany({
+        where,
+        orderBy,
+        skip: options.offset,
+        take: options.limit,
+        include: options.includeRoles
+          ? ({
+              permissions: {
+                include: {
+                  role: true,
+                },
+              },
+            } as any)
+          : undefined,
+      }),
+      this.prisma.permission.count({ where }),
+    ])
 
     // Format results
     const result: PermissionQueryResult = {
@@ -209,40 +208,42 @@ export class PermissionQueryBuilderService {
   ): Promise<UserPermissionQueryResult> {
     const startTime = Date.now()
 
-    // Build user query
-    const query = this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userSocieteRoles', 'userRole')
-      .leftJoinAndSelect('userRole.role', 'role')
-      .leftJoinAndSelect('role.permissions', 'rolePermission')
-      .leftJoinAndSelect('rolePermission.permission', 'permission')
+    // Build where clause for users
+    const where = this.buildUserPermissionWhere(conditions, options?.logic || 'AND')
 
-    // Apply permission conditions
-    this.applyUserPermissionConditions(query, conditions, options?.logic || 'AND')
-
-    // Apply sorting
-    if (options?.sortBy) {
-      const sortOrder = options.sortOrder || 'ASC'
-      switch (options.sortBy) {
-        case 'user':
-          query.orderBy('user.email', sortOrder)
-          break
-        case 'createdAt':
-          query.orderBy('user.createdAt', sortOrder)
-          break
-      }
+    // Build orderBy
+    const orderBy: any = {}
+    if (options?.sortBy === 'user') {
+      orderBy.email = options.sortOrder?.toLowerCase() || 'asc'
+    } else if (options?.sortBy === 'createdAt') {
+      orderBy.createdAt = options.sortOrder?.toLowerCase() || 'asc'
     }
 
-    // Apply pagination
-    if (options?.limit) {
-      query.limit(options.limit)
-    }
-    if (options?.offset) {
-      query.offset(options.offset)
-    }
-
-    // Execute query
-    const [users, total] = await query.getManyAndCount()
+    // Execute query with Prisma
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        orderBy,
+        skip: options?.offset,
+        take: options?.limit,
+        include: {
+          societeRoles: {
+            include: {
+              role: {
+                include: {
+                  permissions: {
+                    include: {
+                      permission: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ])
 
     // Format results
     const result: UserPermissionQueryResult = {
@@ -265,23 +266,49 @@ export class PermissionQueryBuilderService {
     societeId?: string,
     siteId?: string
   ): Promise<User[]> {
-    const query = this.userRepository
-      .createQueryBuilder('user')
-      .innerJoin('user.userSocieteRoles', 'userRole')
-      .innerJoin('userRole.role', 'role')
-      .innerJoin('role.permissions', 'rolePermission')
-      .innerJoin('rolePermission.permission', 'permission')
-      .where("(permission.resource || ':' || permission.action) = :permission", { permission })
+    // Split permission into resource and action
+    const [resource, action] = permission.split(':')
 
+    // Build where clause
+    const where: any = {
+      userSocieteRoles: {
+        some: {
+          role: {
+            rolePermissions: {
+              some: {
+                permission: {
+                  resource,
+                  action,
+                },
+              },
+            },
+          },
+        },
+      },
+    }
+
+    // Add societeId filter if provided
     if (societeId) {
-      query.andWhere('userRole.societeId = :societeId', { societeId })
+      where.userSocieteRoles.some.societeId = societeId
     }
 
+    // Add siteId filter if provided
     if (siteId) {
-      query.andWhere(':siteId = ANY(userRole.allowedSites)', { siteId })
+      where.userSocieteRoles.some.allowedSiteIds = {
+        has: siteId,
+      }
     }
 
-    return await query.getMany()
+    return await this.prisma.user.findMany({
+      where,
+      include: {
+        societeRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    })
   }
 
   /**
@@ -291,30 +318,44 @@ export class PermissionQueryBuilderService {
     pattern: string,
     operator: PermissionOperator = PermissionOperator.MATCHES
   ): Promise<Permission[]> {
-    const query = this.permissionRepository.createQueryBuilder('permission')
+    // Use raw SQL for complex pattern matching
+    let sql = ''
+    const params: any[] = []
 
     switch (operator) {
       case PermissionOperator.STARTS_WITH:
-        query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
-          pattern: `${pattern}%`,
+        return await this.prisma.permission.findMany({
+          where: {
+            OR: [
+              { resource: { startsWith: pattern } },
+              { action: { startsWith: pattern } },
+            ],
+          },
         })
-        break
       case PermissionOperator.ENDS_WITH:
-        query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
-          pattern: `%${pattern}`,
+        return await this.prisma.permission.findMany({
+          where: {
+            OR: [
+              { resource: { endsWith: pattern } },
+              { action: { endsWith: pattern } },
+            ],
+          },
         })
-        break
       case PermissionOperator.CONTAINS:
-        query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
-          pattern: `%${pattern}%`,
+        return await this.prisma.permission.findMany({
+          where: {
+            OR: [
+              { resource: { contains: pattern } },
+              { action: { contains: pattern } },
+            ],
+          },
         })
-        break
       default:
-        query.where("(permission.resource || ':' || permission.action) ~ :pattern", { pattern })
-        break
+        // For regex matching, use raw SQL
+        sql = `SELECT * FROM "Permission" WHERE (resource || ':' || action) ~ $1`
+        params.push(pattern)
+        return await this.prisma.$queryRawUnsafe<Permission[]>(sql, ...params)
     }
-
-    return await query.getMany()
   }
 
   /**
@@ -325,9 +366,19 @@ export class PermissionQueryBuilderService {
     societeId: string
   ): Promise<PermissionConflict[]> {
     // Get user's roles and permissions
-    const userRoles = await this.userSocieteRoleRepository.find({
+    const userRoles = await this.prisma.userSocieteRole.findMany({
       where: { userId, societeId },
-      relations: ['role', 'role.permissions', 'role.permissions.permission'],
+      include: {
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: true
+              }
+            }
+          }
+        }
+      },
     })
 
     const conflicts: PermissionConflict[] = []
@@ -339,9 +390,9 @@ export class PermissionQueryBuilderService {
       const role = userRole.role
       if (!role) continue
 
-      for (const rolePerm of role.rolePermissions || []) {
-        const rp = rolePerm as IRolePermission
-        const permission = rp.permission as unknown as PermissionData
+      for (const rolePerm of role.permissions || []) {
+        const rp = rolePerm as any
+        const permission = rp.permission as any
         const permCode = `${permission.resource}:${permission.action}`
         let conflict = permissionMap.get(permCode)
 
@@ -363,8 +414,10 @@ export class PermissionQueryBuilderService {
         })
       }
 
-      // Additional permissions
-      for (const addPerm of userRole.additionalPermissions || []) {
+      // Additional permissions from JSON
+      const permissionsData = (userRole.permissions as any) || {}
+      const additionalPermissions = permissionsData.additionalPermissions || []
+      for (const addPerm of additionalPermissions) {
         let conflict = permissionMap.get(addPerm)
 
         if (!conflict) {
@@ -385,8 +438,9 @@ export class PermissionQueryBuilderService {
         })
       }
 
-      // Restricted permissions
-      for (const resPerm of userRole.restrictedPermissions || []) {
+      // Restricted permissions from JSON
+      const restrictedPermissions = permissionsData.restrictedPermissions || []
+      for (const resPerm of restrictedPermissions) {
         let conflict = permissionMap.get(resPerm)
 
         if (conflict) {
@@ -437,7 +491,7 @@ export class PermissionQueryBuilderService {
       parent?: string
     }>
   > {
-    const permissions = await this.permissionRepository.find()
+    const permissions = await this.prisma.permission.findMany()
     const hierarchy: Array<{
       permission: string
       level: number
@@ -537,79 +591,75 @@ export class PermissionQueryBuilderService {
     }
 
     // Total permissions
-    stats.totalPermissions = await this.permissionRepository.count()
+    stats.totalPermissions = await this.prisma.permission.count()
 
     // Total roles
-    const roleQuery = this.roleRepository.createQueryBuilder('role')
-    if (societeId) {
-      roleQuery.where('role.societeId = :societeId OR role.societeId IS NULL', { societeId })
-    }
-    stats.totalRoles = await roleQuery.getCount()
+    const roleWhere = societeId ? { OR: [{ societeId }, { societeId: null }] } : {}
+    stats.totalRoles = await this.prisma.role.count({ where: roleWhere })
 
     // Total users with permissions
-    const userQuery = this.userSocieteRoleRepository.createQueryBuilder('userRole')
-    if (societeId) {
-      userQuery.where('userRole.societeId = :societeId', { societeId })
-    }
-    stats.totalUsers = await userQuery
-      .select('COUNT(DISTINCT userRole.userId)', 'count')
-      .getRawOne()
-      .then((r) => parseInt(r.count, 10))
+    const userWhere = societeId ? { societeId } : {}
+    const distinctUsers = await this.prisma.userSocieteRole.findMany({
+      where: userWhere,
+      distinct: ['userId'],
+      select: { userId: true },
+    })
+    stats.totalUsers = distinctUsers.length
 
-    // Most used permissions
-    const permissionUsage = await this.rolePermissionRepository
-      .createQueryBuilder('rp')
-      .select('rp.permissionId', 'permissionId')
-      .addSelect('p.code', 'code')
-      .addSelect('COUNT(*)', 'count')
-      .innerJoin('rp.permission', 'p')
-      .groupBy('rp.permissionId, p.code')
-      .orderBy('count', 'DESC')
-      .limit(10)
-      .getRawMany()
+    // Most/Least used permissions - use raw SQL for GROUP BY aggregations
+    const permissionUsage = await this.prisma.$queryRaw<
+      Array<{ permissionid: string; resource: string; action: string; count: bigint }>
+    >`
+      SELECT rp."permissionId" as permissionid, p.resource, p.action, COUNT(*) as count
+      FROM "RolePermission" rp
+      INNER JOIN "Permission" p ON rp."permissionId" = p.id
+      GROUP BY rp."permissionId", p.resource, p.action
+      ORDER BY count DESC
+      LIMIT 10
+    `
 
     stats.mostUsedPermissions = permissionUsage.map((p) => ({
-      permission: p.code,
-      count: parseInt(p.count, 10),
+      permission: `${p.resource}:${p.action}`,
+      count: Number(p.count),
     }))
 
-    // Least used permissions
-    const leastUsed = await this.rolePermissionRepository
-      .createQueryBuilder('rp')
-      .select('rp.permissionId', 'permissionId')
-      .addSelect('p.code', 'code')
-      .addSelect('COUNT(*)', 'count')
-      .innerJoin('rp.permission', 'p')
-      .groupBy('rp.permissionId, p.code')
-      .orderBy('count', 'ASC')
-      .limit(10)
-      .getRawMany()
+    const leastUsed = await this.prisma.$queryRaw<
+      Array<{ permissionid: string; resource: string; action: string; count: bigint }>
+    >`
+      SELECT rp."permissionId" as permissionid, p.resource, p.action, COUNT(*) as count
+      FROM "RolePermission" rp
+      INNER JOIN "Permission" p ON rp."permissionId" = p.id
+      GROUP BY rp."permissionId", p.resource, p.action
+      ORDER BY count ASC
+      LIMIT 10
+    `
 
     stats.leastUsedPermissions = leastUsed.map((p) => ({
-      permission: p.code,
-      count: parseInt(p.count, 10),
+      permission: `${p.resource}:${p.action}`,
+      count: Number(p.count),
     }))
 
     // Roles with most permissions
-    const rolePermCounts = await this.roleRepository
-      .createQueryBuilder('role')
-      .select('role.name', 'name')
-      .addSelect('COUNT(rp.id)', 'count')
-      .leftJoin('role.permissions', 'rp')
-      .groupBy('role.id, role.name')
-      .orderBy('count', 'DESC')
-      .limit(10)
-      .getRawMany()
+    const rolePermCounts = await this.prisma.$queryRaw<
+      Array<{ id: string; name: string; count: bigint }>
+    >`
+      SELECT r.id, r.name, COUNT(rp.id) as count
+      FROM "Role" r
+      LEFT JOIN "RolePermission" rp ON r.id = rp."roleId"
+      GROUP BY r.id, r.name
+      ORDER BY count DESC
+      LIMIT 10
+    `
 
     stats.rolesWithMostPermissions = rolePermCounts.map((r) => ({
       role: r.name,
-      count: parseInt(r.count, 10),
+      count: Number(r.count),
     }))
 
     // Permissions by category
-    const permissions = await this.permissionRepository.find()
+    const permissions = await this.prisma.permission.findMany()
     for (const perm of permissions) {
-      const category = perm.resource || 'uncategorized' // Use resource as category
+      const category = perm.resource || 'uncategorized'
       stats.permissionsByCategory[category] = (stats.permissionsByCategory[category] || 0) + 1
     }
 
@@ -617,239 +667,167 @@ export class PermissionQueryBuilderService {
   }
 
   /**
-   * Build permission query
+   * Build permission where clause for Prisma
    */
-  private buildPermissionQuery(options: PermissionQueryOptions): SelectQueryBuilder<Permission> {
-    const query = this.permissionRepository.createQueryBuilder('permission')
-
-    // Apply conditions
-    if (options.conditions.length > 0) {
-      if (options.logic === 'OR') {
-        query.where(
-          new Brackets((qb) => {
-            for (const condition of options.conditions) {
-              qb.orWhere(
-                new Brackets((subQb) => {
-                  this.applyPermissionCondition(subQb, condition)
-                })
-              )
-            }
-          })
-        )
-      } else {
-        for (const condition of options.conditions) {
-          query.andWhere(
-            new Brackets((qb) => {
-              this.applyPermissionCondition(qb, condition)
-            })
-          )
-        }
-      }
+  private buildPermissionWhere(options: PermissionQueryOptions): any {
+    if (options.conditions.length === 0) {
+      return {}
     }
 
-    // Include relations if requested
-    if (options.includeRoles) {
-      query.leftJoinAndSelect('permission.roles', 'role')
-    }
+    const conditions = options.conditions.map((condition) =>
+      this.buildPermissionConditionWhere(condition)
+    )
 
-    // Apply sorting
-    if (options.sortBy) {
-      const sortOrder = options.sortOrder || 'ASC'
-      query.orderBy(`permission.${options.sortBy}`, sortOrder)
+    if (options.logic === 'OR') {
+      return { OR: conditions }
+    } else {
+      return { AND: conditions }
     }
-
-    // Apply pagination
-    if (options.limit) {
-      query.limit(options.limit)
-    }
-    if (options.offset) {
-      query.offset(options.offset)
-    }
-
-    return query
   }
 
   /**
-   * Apply permission condition to query
+   * Build single permission condition where clause
    */
-  private applyPermissionCondition(
-    query: SelectQueryBuilder<Permission> | WhereExpressionBuilder,
-    condition: PermissionCondition
-  ): void {
+  private buildPermissionConditionWhere(condition: PermissionCondition): any {
+    const where: any = {}
+
     switch (condition.operator) {
       case PermissionOperator.HAS:
         if (condition.permissions?.length) {
-          query.where("(permission.resource || ':' || permission.action) IN (:...permissions)", {
-            permissions: condition.permissions,
+          // Split permissions into resource:action pairs
+          const orConditions = condition.permissions.map((perm) => {
+            const [resource, action] = perm.split(':')
+            return { resource, action }
           })
+          where.OR = orConditions
         }
         break
 
       case PermissionOperator.HAS_NONE:
         if (condition.permissions?.length) {
-          query.where(
-            "(permission.resource || ':' || permission.action) NOT IN (:...permissions)",
-            {
-              permissions: condition.permissions,
-            }
-          )
-        }
-        break
-
-      case PermissionOperator.MATCHES:
-        if (condition.pattern) {
-          query.where("(permission.resource || ':' || permission.action) ~ :pattern", {
-            pattern: condition.pattern,
+          const notConditions = condition.permissions.map((perm) => {
+            const [resource, action] = perm.split(':')
+            return { NOT: { AND: [{ resource }, { action }] } }
           })
+          where.AND = notConditions
         }
         break
 
       case PermissionOperator.STARTS_WITH:
         if (condition.pattern) {
-          query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
-            pattern: `${condition.pattern}%`,
-          })
+          where.OR = [
+            { resource: { startsWith: condition.pattern } },
+            { action: { startsWith: condition.pattern } },
+          ]
         }
         break
 
       case PermissionOperator.ENDS_WITH:
         if (condition.pattern) {
-          query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
-            pattern: `%${condition.pattern}`,
-          })
+          where.OR = [
+            { resource: { endsWith: condition.pattern } },
+            { action: { endsWith: condition.pattern } },
+          ]
         }
         break
 
       case PermissionOperator.CONTAINS:
         if (condition.pattern) {
-          query.where("(permission.resource || ':' || permission.action) LIKE :pattern", {
-            pattern: `%${condition.pattern}%`,
-          })
+          where.OR = [
+            { resource: { contains: condition.pattern } },
+            { action: { contains: condition.pattern } },
+          ]
         }
         break
     }
+
+    return where
   }
 
   /**
-   * Apply user permission conditions
+   * Build orderBy for Prisma
    */
-  private applyUserPermissionConditions(
-    query: SelectQueryBuilder<User>,
+  private buildOrderBy(options: PermissionQueryOptions): any {
+    if (!options.sortBy) {
+      return undefined
+    }
+
+    const sortOrder = (options.sortOrder || 'ASC').toLowerCase()
+    return { [options.sortBy]: sortOrder }
+  }
+
+  /**
+   * Build user permission where clause for Prisma
+   */
+  private buildUserPermissionWhere(
     conditions: PermissionCondition[],
     logic: 'AND' | 'OR'
-  ): void {
-    if (conditions.length === 0) return
+  ): any {
+    if (conditions.length === 0) {
+      return {}
+    }
 
-    const brackets = new Brackets((qb) => {
-      for (let i = 0; i < conditions.length; i++) {
-        const condition = conditions[i]
-        const subBrackets = new Brackets((subQb) => {
-          switch (condition.operator) {
-            case PermissionOperator.HAS:
-              if (condition.permissions?.length === 1) {
-                subQb.where(`(permission.resource || ':' || permission.action) = :perm${i}`, {
-                  [`perm${i}`]: condition.permissions[0],
-                })
-              } else if (condition.permissions?.length) {
-                subQb.where(
-                  `(permission.resource || ':' || permission.action) IN (:...perms${i})`,
-                  {
-                    [`perms${i}`]: condition.permissions,
-                  }
-                )
-              }
-              break
+    const whereConditions = conditions.map((condition) => {
+      const userWhere: any = {}
 
-            case PermissionOperator.HAS_ALL:
-              if (condition.permissions?.length) {
-                // This requires a more complex subquery
-                for (const perm of condition.permissions) {
-                  subQb.andWhere(
-                    `EXISTS (
-                      SELECT 1 FROM user_societe_roles usr2
-                      JOIN roles r2 ON usr2.role_id = r2.id
-                      JOIN role_permissions rp2 ON r2.id = rp2.role_id
-                      JOIN permissions p2 ON rp2.permission_id = p2.id
-                      WHERE usr2.user_id = user.id
-                      AND p2.code = :perm_${i}_${perm}
-                    )`,
-                    { [`perm_${i}_${perm}`]: perm }
-                  )
-                }
-              }
-              break
-
-            case PermissionOperator.HAS_ANY:
-              if (condition.permissions?.length) {
-                subQb.where(
-                  `(permission.resource || ':' || permission.action) IN (:...perms${i})`,
-                  {
-                    [`perms${i}`]: condition.permissions,
-                  }
-                )
-              }
-              break
-
-            case PermissionOperator.HAS_NONE:
-              if (condition.permissions?.length) {
-                subQb.where(
-                  `(permission.resource || ':' || permission.action) NOT IN (:...perms${i})`,
-                  {
-                    [`perms${i}`]: condition.permissions,
-                  }
-                )
-              }
-              break
-
-            case PermissionOperator.MATCHES:
-              if (condition.pattern) {
-                subQb.where(`(permission.resource || ':' || permission.action) ~ :pattern${i}`, {
-                  [`pattern${i}`]: condition.pattern,
-                })
-              }
-              break
-
-            case PermissionOperator.STARTS_WITH:
-              if (condition.pattern) {
-                subQb.where(`(permission.resource || ':' || permission.action) LIKE :pattern${i}`, {
-                  [`pattern${i}`]: `${condition.pattern}%`,
-                })
-              }
-              break
-
-            case PermissionOperator.CONTAINS:
-              if (condition.pattern) {
-                subQb.where(`(permission.resource || ':' || permission.action) LIKE :pattern${i}`, {
-                  [`pattern${i}`]: `%${condition.pattern}%`,
-                })
-              }
-              break
-          }
-
-          // Apply scope filters
-          if (condition.societeId) {
-            subQb.andWhere(`userRole.societeId = :societeId${i}`, {
-              [`societeId${i}`]: condition.societeId,
-            })
-          }
-
-          if (condition.siteId) {
-            subQb.andWhere(`:siteId${i} = ANY(userRole.allowedSites)`, {
-              [`siteId${i}`]: condition.siteId,
-            })
+      // Build permission filter
+      if (condition.permissions?.length) {
+        const permissionFilters = condition.permissions.map((perm) => {
+          const [resource, action] = perm.split(':')
+          return {
+            societeRoles: {
+              some: {
+                role: {
+                  permissions: {
+                    some: {
+                      permission: {
+                        resource,
+                        action,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           }
         })
 
-        if (logic === 'OR') {
-          qb.orWhere(subBrackets)
-        } else {
-          qb.andWhere(subBrackets)
+        switch (condition.operator) {
+          case PermissionOperator.HAS:
+          case PermissionOperator.HAS_ANY:
+            userWhere.OR = permissionFilters
+            break
+          case PermissionOperator.HAS_ALL:
+            userWhere.AND = permissionFilters
+            break
+          case PermissionOperator.HAS_NONE:
+            userWhere.NOT = { OR: permissionFilters }
+            break
         }
       }
+
+      // Add societeId filter if provided
+      if (condition.societeId && userWhere.societeRoles) {
+        userWhere.societeRoles.some.societeId = condition.societeId
+      }
+
+      // Add siteId filter if provided
+      if (condition.siteId && userWhere.societeRoles) {
+        userWhere.societeRoles.some.allowedSiteIds = {
+          has: condition.siteId,
+        }
+      }
+
+      return userWhere
     })
 
-    query.where(brackets)
+    if (logic === 'OR') {
+      return { OR: whereConditions }
+    } else {
+      return { AND: whereConditions }
+    }
   }
+
 
   /**
    * Format permission results
@@ -873,8 +851,8 @@ export class PermissionQueryBuilderService {
       } = {
         code: `${permission.resource}:${permission.action}`,
         name: permission.name,
-        description: permission.description,
-        category: permission.resource, // Using resource as category
+        description: permission.description || undefined,
+        category: permission.resource || undefined, // Using resource as category
         scope: this.getPermissionScope(`${permission.resource}:${permission.action}`),
       }
 
@@ -906,7 +884,7 @@ export class PermissionQueryBuilderService {
    * Format user results
    */
   private async formatUserResults(
-    users: User[],
+    users: any[],
     conditions: PermissionCondition[]
   ): Promise<UserPermissionQueryResult['users']> {
     const formatted = []
@@ -914,31 +892,48 @@ export class PermissionQueryBuilderService {
     for (const user of users) {
       const permissions = new Set<string>()
       const roles = []
+      const societes = []
 
-      // Collect permissions and roles
-      // Note: userSocieteRoles relation would need to be loaded separately
-      // For now, we'll skip this part as the relation isn't defined in the User entity
-      const userSocieteRoles = [] as UserSocieteRoleType[]
-      for (const userRole of userSocieteRoles) {
-        if (userRole.role) {
-          roles.push({
-            code: userRole.role.parentRoleType || userRole.role.name, // Use parentRoleType or name as code
-            name: userRole.role.name,
-          })
+      // Collect permissions and roles from societeRoles
+      if (user.societeRoles) {
+        for (const userRole of user.societeRoles) {
+          if (userRole.role) {
+            roles.push({
+              code: userRole.role.parentRoleType || userRole.role.name,
+              name: userRole.role.name,
+            })
 
-          for (const rolePerm of userRole.role.rolePermissions || []) {
-            permissions.add(`${rolePerm.permission.resource}:${rolePerm.permission.action}`)
+            // Add role permissions
+            if (userRole.role.permissions) {
+              for (const rolePerm of userRole.role.permissions) {
+                if (rolePerm.permission) {
+                  permissions.add(`${rolePerm.permission.resource}:${rolePerm.permission.action}`)
+                }
+              }
+            }
           }
-        }
 
-        // Add additional permissions
-        for (const perm of userRole.additionalPermissions || []) {
-          permissions.add(perm)
-        }
+          // Add additional permissions from JSON
+          const permissionsData = (userRole.permissions as any) || {}
+          const additionalPermissions = permissionsData.additionalPermissions || []
+          const restrictedPermissions = permissionsData.restrictedPermissions || []
 
-        // Remove restricted permissions
-        for (const perm of userRole.restrictedPermissions || []) {
-          permissions.delete(perm)
+          for (const perm of additionalPermissions) {
+            permissions.add(perm)
+          }
+
+          // Remove restricted permissions
+          for (const perm of restrictedPermissions) {
+            permissions.delete(perm)
+          }
+
+          // Add societe info
+          if (userRole.societe) {
+            societes.push({
+              id: userRole.societeId,
+              name: userRole.societe.name || 'Unknown',
+            })
+          }
         }
       }
 
@@ -956,7 +951,7 @@ export class PermissionQueryBuilderService {
         name: `${user.prenom || ''} ${user.nom || ''}`.trim(),
         permissions: Array.from(permissions),
         roles,
-        societes: [], // Would need to be loaded separately
+        societes,
         matchedConditions,
       })
     }

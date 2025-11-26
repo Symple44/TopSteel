@@ -22,14 +22,17 @@ export async function callBackendApi(
   // Construction automatique de l'URL avec préfixe
   const url = `${BACKEND_CONFIG?.baseUrl}/${BACKEND_CONFIG?.globalPrefix}/${endpoint?.replace(/^\/+/, '')}`
 
+  // Extract headers from options to merge properly
+  const { headers: optionHeaders, ...restOptions } = options
+
   // Configuration par défaut avec credentials
   const defaultOptions: RequestInit = {
     credentials: 'include',
+    ...restOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(optionHeaders as Record<string, string>),
     },
-    ...options,
   }
 
   return safeFetch(url, defaultOptions)
@@ -101,18 +104,18 @@ export async function callHealthApi(
   endpoint: string,
   options: RequestInit & { timeout?: number } = {}
 ): Promise<Response> {
-  const { timeout = 5000, ...fetchOptions } = options || {}
+  const { timeout = 5000, headers: optionHeaders, ...restOptions } = options || {}
 
   const url = `${BACKEND_CONFIG?.baseUrl}/${BACKEND_CONFIG?.globalPrefix}/${endpoint?.replace(/^\/+/, '')}`
 
   const defaultOptions: RequestInit = {
     credentials: 'include',
+    ...restOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...fetchOptions.headers,
+      ...(optionHeaders as Record<string, string>),
     },
     signal: AbortSignal?.timeout(timeout),
-    ...fetchOptions,
   }
 
   return safeFetch(url, defaultOptions)
@@ -129,14 +132,40 @@ export async function callClientApi(
   // Pour les appels côté client, on utilise les routes API Next.js
   const url = `/api/${endpoint?.replace(/^\/+/, '')}`
 
+  // Extract headers from options to merge properly
+  const { headers: optionHeaders, ...restOptions } = options
+
+  // Normalize headers to a plain object (handles Headers instances and arrays)
+  let normalizedHeaders: Record<string, string> = {}
+  if (optionHeaders) {
+    if (optionHeaders instanceof Headers) {
+      optionHeaders.forEach((value, key) => {
+        normalizedHeaders[key] = value
+      })
+    } else if (Array.isArray(optionHeaders)) {
+      optionHeaders.forEach(([key, value]) => {
+        normalizedHeaders[key] = value
+      })
+    } else {
+      normalizedHeaders = optionHeaders as Record<string, string>
+    }
+  }
+
+  const finalHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...normalizedHeaders,
+  }
+
   const defaultOptions: RequestInit = {
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
+    ...restOptions,
+    headers: finalHeaders,
   }
+
+  // Debug logging
+  console.log('[callClientApi] URL:', url)
+  console.log('[callClientApi] Headers being sent:', finalHeaders)
+  console.log('[callClientApi] Authorization header:', finalHeaders['Authorization'] || finalHeaders['authorization'] || 'NOT SET')
 
   return safeFetch(url, defaultOptions)
 }

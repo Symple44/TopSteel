@@ -15,5 +15,5 @@ afterAll(() => {
 })
 
 process.env.NODE_ENV = 'test'
-process.env.JWT_SECRET = 'test-secret-key-for-topsteel'
+process.env.JWT_SECRET = 'test-secret-key-for-topsteel-must-be-at-least-32-characters-long'
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/topsteel_test'

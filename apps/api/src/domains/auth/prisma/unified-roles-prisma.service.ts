@@ -7,6 +7,8 @@ import {
   GLOBAL_TO_SOCIETE_ROLE_MAPPING,
   SYSTEM_ADMIN_ROLES,
 } from '../core/constants/roles.constants'
+import type { UserSocieteInfo, AssignUserToSocieteOptions } from '../services/unified-roles.service'
+import type { UserSocieteRole } from '@prisma/client'
 
 /**
  * UnifiedRolesPrismaService - Gestion unifiée des rôles (Global + Société)
@@ -184,6 +186,177 @@ export class UnifiedRolesPrismaService {
         updatedAt: new Date(),
       },
     })
+  }
+
+  /**
+   * Récupère tous les rôles société d'un utilisateur avec informations détaillées
+   */
+  async getUserSocieteRoles(userId: string): Promise<UserSocieteInfo[]> {
+    const userSocieteRoles = await this.prisma.userSocieteRole.findMany({
+      where: {
+        userId,
+        isActive: true,
+      },
+      include: {
+        role: true,
+        societe: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            sites: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+              },
+            },
+          },
+        },
+      },
+    })
+
+    // Récupérer le rôle global pour calculer le rôle effectif
+    const globalRole = await this.getUserGlobalRole(userId)
+    const globalAsSocieteRole = GLOBAL_TO_SOCIETE_ROLE_MAPPING[globalRole]
+
+    return userSocieteRoles.map((usr) => {
+      const societeRole = usr.role.name as SocieteRoleType
+      const effectiveRole = this.getHigherRole(globalAsSocieteRole, societeRole)
+
+      const permissions = usr.permissions
+        ? Array.isArray(usr.permissions)
+          ? (usr.permissions as string[])
+          : []
+        : []
+
+      return {
+        id: usr.id,
+        userId: usr.userId,
+        societeId: usr.societeId,
+        societeRole,
+        effectiveRole,
+        isActive: usr.isActive,
+        isDefaultSociete: false, // TODO: Implement default societe logic
+        additionalPermissions: permissions,
+        restrictedPermissions: [],
+        grantedAt: usr.createdAt,
+        grantedBy: null,
+        expiresAt: null,
+        globalRole: globalRole,
+        permissions: permissions,
+        societe: usr.societe
+          ? {
+              id: usr.societe.id,
+              nom: usr.societe.name,
+              code: usr.societe.code,
+              sites: usr.societe.sites?.map((site) => ({
+                id: site.id,
+                nom: site.name,
+                code: site.code,
+              })),
+            }
+          : undefined,
+      }
+    })
+  }
+
+  /**
+   * Assigne un utilisateur à une société avec un rôle spécifique
+   */
+  async assignUserToSociete(
+    userId: string,
+    societeId: string,
+    roleType: SocieteRoleType,
+    assignedBy: string,
+    options?: AssignUserToSocieteOptions
+  ): Promise<UserSocieteRole> {
+    // Vérifier que l'utilisateur existe
+    await this.getUserGlobalRole(userId)
+
+    // Vérifier que la société existe
+    const societe = await this.prisma.societe.findUnique({
+      where: { id: societeId },
+    })
+
+    if (!societe) {
+      throw new NotFoundException(`Societe ${societeId} not found`)
+    }
+
+    // Trouver le rôle par son nom
+    const role = await this.prisma.role.findFirst({
+      where: { name: roleType },
+    })
+
+    if (!role) {
+      throw new NotFoundException(`Role ${roleType} not found`)
+    }
+
+    // Vérifier si un rôle existe déjà
+    const existingRole = await this.prisma.userSocieteRole.findFirst({
+      where: {
+        userId,
+        societeId,
+        isActive: true,
+      },
+    })
+
+    if (existingRole) {
+      // Mettre à jour le rôle existant
+      return this.prisma.userSocieteRole.update({
+        where: { id: existingRole.id },
+        data: {
+          roleId: role.id,
+          permissions: options?.additionalPermissions ? options.additionalPermissions : undefined,
+          isActive: true,
+          activatedAt: new Date(),
+          updatedAt: new Date(),
+        },
+      })
+    }
+
+    // Créer un nouveau rôle
+    return this.prisma.userSocieteRole.create({
+      data: {
+        userId,
+        societeId,
+        roleId: role.id,
+        permissions: options?.additionalPermissions ? options.additionalPermissions : undefined,
+        isActive: true,
+        activatedAt: new Date(),
+      },
+    })
+  }
+
+  /**
+   * Révoque l'accès d'un utilisateur à une société
+   */
+  async revokeUserFromSociete(userId: string, societeId: string): Promise<boolean> {
+    const result = await this.prisma.userSocieteRole.updateMany({
+      where: {
+        userId,
+        societeId,
+        isActive: true,
+      },
+      data: {
+        isActive: false,
+        deactivatedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    })
+
+    return result.count > 0
+  }
+
+  /**
+   * Nettoie les rôles expirés en les désactivant
+   * Note: Le schéma actuel n'a pas de champ expiresAt, donc cette fonction
+   * ne fait rien pour l'instant. À implémenter si le champ est ajouté.
+   */
+  async cleanupExpiredRoles(): Promise<number> {
+    // TODO: Implémenter quand le champ expiresAt sera ajouté au schéma
+    this.logger.warn('cleanupExpiredRoles called but expiresAt field not in schema')
+    return 0
   }
 
   /**

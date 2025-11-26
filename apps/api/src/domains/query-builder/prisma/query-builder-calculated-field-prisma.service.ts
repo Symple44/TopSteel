@@ -302,4 +302,42 @@ export class QueryBuilderCalculatedFieldPrismaService {
 
     return this.createCalculatedField(data)
   }
+
+  /**
+   * Alias methods for backward compatibility
+   */
+
+  /**
+   * Créer un champ calculé avec interface legacy
+   */
+  async createCalculatedFieldLegacy(data: {
+    queryBuilderId: string
+    name?: string
+    fieldName?: string
+    expression?: string
+    formula?: string
+    dataType: string
+    format?: Record<string, any>
+    dependencies?: Record<string, any>
+    order?: number
+    isVisible?: boolean
+  }): Promise<QueryBuilderCalculatedField> {
+    return this.createCalculatedField({
+      queryBuilderId: data.queryBuilderId,
+      name: data.name || data.fieldName || '',
+      expression: data.expression || data.formula || '',
+      dataType: data.dataType,
+      format: data.format,
+      dependencies: data.dependencies,
+      order: data.order,
+      isVisible: data.isVisible,
+    })
+  }
+
+  /**
+   * Alias pour deleteAllCalculatedFields
+   */
+  async deleteByQueryBuilderId(queryBuilderId: string): Promise<number> {
+    return this.deleteAllCalculatedFields(queryBuilderId)
+  }
 }

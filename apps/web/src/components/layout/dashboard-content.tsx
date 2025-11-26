@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import CompanySelector from '../../components/auth/company-selector'
 import { Header } from '../../components/layout/header'
 import { Sidebar } from '../../components/layout/sidebar'
@@ -27,27 +27,38 @@ export function DashboardContent({
   // Utiliser le hook de connexion API
   useApiConnection()
 
-  const handleToggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed)
-  }
+  const handleToggleSidebar = useCallback(() => {
+    setIsSidebarCollapsed((prev) => !prev)
+  }, [])
+
+  // Keyboard shortcut: Ctrl+B to toggle sidebar (like VS Code)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+        e.preventDefault()
+        handleToggleSidebar()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleToggleSidebar])
 
   // Déterminer la classe de largeur en fonction du paramètre utilisateur
   const getContainerClass = () => {
     if (settings.contentWidth === 'full') {
-      return 'w-full' // Pleine largeur
+      return 'w-full'
     }
-    return 'mx-auto max-w-7xl' // Largeur limitée (comportement actuel)
+    return 'mx-auto max-w-7xl'
   }
 
   // Afficher seulement les enfants (sans layout) si la sélection de société est requise
-  // Les SUPER_ADMIN peuvent accéder au layout même sans société (company peut être null)
   if (requiresCompanySelection) {
     return children
   }
 
   return (
     <>
-      {/* Layout normal avec Header et Sidebar */}
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
         <Sidebar isCollapsed={isSidebarCollapsed} onToggle={handleToggleSidebar} />
@@ -62,7 +73,7 @@ export function DashboardContent({
           />
 
           {/* Zone de contenu */}
-          <main className="flex-1 overflow-auto bg-muted/30 p-6">
+          <main className="flex-1 overflow-auto bg-muted/30 p-4">
             <div className={getContainerClass()}>
               <AutoBreadcrumbWrapper />
               {children}
@@ -71,7 +82,7 @@ export function DashboardContent({
         </div>
       </div>
 
-      {/* Modal de changement de société - Affiché au niveau racine pour éviter les contraintes de layout */}
+      {/* Modal de changement de société */}
       <CompanySelector
         open={showCompanySelector}
         onOpenChange={setShowCompanySelector}

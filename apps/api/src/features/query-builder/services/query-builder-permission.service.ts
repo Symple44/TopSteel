@@ -1,17 +1,16 @@
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { User } from '../../../domains/users/entities/user.entity'
-import { type PermissionType, QueryBuilderPermission } from '../entities'
+/**
+ * QueryBuilderPermissionService - Refactored to use Prisma
+ * Provides backward compatibility layer for permission checking
+ */
 
+import { Injectable } from '@nestjs/common'
+import { QueryBuilderPermissionPrismaService } from '../../../domains/query-builder/prisma/query-builder-permission-prisma.service'
+import type { PermissionType } from '../entities'
 
 @Injectable()
 export class QueryBuilderPermissionService {
   constructor(
-    @InjectRepository(QueryBuilderPermission, 'auth')
-    private _permissionRepository: Repository<QueryBuilderPermission>,
-    @InjectRepository(User, 'auth')
-    private userRepository: Repository<User>
+    private readonly permissionPrisma: QueryBuilderPermissionPrismaService
   ) {}
 
   async checkPermission(
@@ -19,220 +18,93 @@ export class QueryBuilderPermissionService {
     userId: string,
     permissionType: PermissionType
   ): Promise<boolean> {
-    // Check user-specific permission
-    const userPermission = await this._permissionRepository.findOne({
-      where: {
-        queryBuilderId,
-        userId,
-        permissionType,
-      },
-    })
+    const permission = await this.permissionPrisma.getQueryBuilderPermissionForUser(
+      queryBuilderId,
+      userId
+    )
 
-    if (userPermission) {
-      return userPermission.isAllowed
+    if (!permission) {
+      return false
     }
 
-    // Check role-based permissions
-    // First get user's roles
-    const userRoles = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('user_roles', 'ur', 'ur.userId = user.id')
-      .select('ur.roleId')
-      .where('user.id = :userId', { userId })
-      .getRawMany()
-
-    const roleIds = userRoles.map((ur) => ur.ur_roleId).filter(Boolean)
-
-    if (roleIds.length > 0) {
-      // Check permissions for these roles
-      const rolePermissions = await this._permissionRepository.find({
-        where: roleIds.map((roleId) => ({
-          queryBuilderId,
-          roleId,
-          permissionType,
-        })),
-      })
-
-      // If any role grants permission, allow it
-      const roleGrantsPermission = rolePermissions.some((p) => p.isAllowed)
-      if (roleGrantsPermission) {
-        return true
-      }
-
-      // If any role explicitly denies permission, deny it
-      const roleDeniesPermission = rolePermissions.some((p) => !p.isAllowed)
-      if (roleDeniesPermission) {
+    // Map permission type to boolean flag
+    switch (permissionType) {
+      case 'view':
+        return permission.canView
+      case 'edit':
+        return permission.canEdit
+      case 'delete':
+        return permission.canDelete
+      case 'share':
+        return permission.canShare || false
+      default:
         return false
-      }
     }
-
-    // Default behavior based on permission type and system configuration
-    return this.getDefaultPermission(permissionType)
   }
 
   async addPermission(data: {
     queryBuilderId: string
-    userId?: string
-    roleId?: string
+    userId: string
     permissionType: PermissionType
     isAllowed: boolean
-  }): Promise<QueryBuilderPermission> {
-    const permission = this._permissionRepository.create(data)
-    return this._permissionRepository.save(permission)
-  }
+  }): Promise<void> {
+    // Check if permission already exists
+    const existing = await this.permissionPrisma.getQueryBuilderPermissionForUser(
+      data.queryBuilderId,
+      data.userId
+    )
 
-  async removePermission(id: string): Promise<void> {
-    await this._permissionRepository.delete(id)
-  }
+    if (existing) {
+      // Update existing permission
+      const updateData: any = {}
+      if (data.permissionType === 'view') updateData.canView = data.isAllowed
+      if (data.permissionType === 'edit') updateData.canEdit = data.isAllowed
+      if (data.permissionType === 'delete') updateData.canDelete = data.isAllowed
+      if (data.permissionType === 'share') updateData.canShare = data.isAllowed
 
-  async getPermissions(queryBuilderId: string): Promise<QueryBuilderPermission[]> {
-    return this._permissionRepository.find({
-      where: { queryBuilderId },
-      relations: ['user', 'role'],
-    })
-  }
-
-  async updatePermission(id: string, isAllowed: boolean): Promise<QueryBuilderPermission> {
-    await this._permissionRepository.update(id, { isAllowed })
-    const permission = await this._permissionRepository.findOne({ where: { id } })
-    if (!permission) {
-      throw new Error(`Permission with id ${id} not found`)
-    }
-    return permission
-  }
-
-  /**
-   * Get default permission for a given permission type
-   */
-  private getDefaultPermission(permissionType: PermissionType): boolean {
-    switch (permissionType) {
-      case 'view':
-        return true // Allow view by default for backward compatibility
-      case 'edit':
-        return false // Require explicit permission to edit
-      case 'delete':
-        return false // Require explicit permission to delete
-      case 'share':
-        return false // Require explicit permission to share
-      case 'export':
-        return true // Allow export by default (can be restricted)
-      default:
-        return false // Deny unknown permissions by default
-    }
-  }
-
-  /**
-   * Get user's role-based permissions for a specific query builder
-   */
-  async getUserRolePermissions(
-    queryBuilderId: string,
-    userId: string
-
-  ): Promise<Array<{ roleId: string; roleName: string; permissions: PermissionType[] }>> {
-    const userRoles = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('user_roles', 'ur', 'ur.userId = user.id')
-      .leftJoin('roles', 'role', 'role.id = ur.roleId')
-      .select(['ur.roleId', 'role.name'])
-      .where('user.id = :userId', { userId })
-      .getRawMany()
-
-    const result = []
-
-    for (const userRole of userRoles) {
-      if (!userRole.ur_roleId) continue
-
-      const permissions = await this._permissionRepository.find({
-        where: {
-          queryBuilderId,
-          roleId: userRole.ur_roleId,
-          isAllowed: true,
-        },
-      })
-
-      result.push({
-        roleId: userRole.ur_roleId,
-        roleName: userRole.role_name || 'Unknown Role',
-        permissions: permissions.map((p) => p.permissionType),
-      })
-    }
-
-    return result
-  }
-
-  /**
-   * Check if user has any permissions for a query builder
-   */
-  async hasAnyPermission(queryBuilderId: string, userId: string): Promise<boolean> {
-    const permissionTypes: PermissionType[] = ['view', 'edit', 'delete', 'share', 'export']
-
-    for (const permissionType of permissionTypes) {
-      if (await this.checkPermission(queryBuilderId, userId, permissionType)) {
-        return true
+      await this.permissionPrisma.updateQueryBuilderPermission(existing.id, updateData)
+    } else {
+      // Create new permission
+      const createData: any = {
+        queryBuilderId: data.queryBuilderId,
+        userId: data.userId,
+        canView: data.permissionType === 'view' ? data.isAllowed : false,
+        canEdit: data.permissionType === 'edit' ? data.isAllowed : false,
+        canDelete: data.permissionType === 'delete' ? data.isAllowed : false,
+        canShare: data.permissionType === 'share' ? data.isAllowed : false,
       }
-    }
 
-    return false
+      await this.permissionPrisma.createQueryBuilderPermission(createData)
+    }
   }
 
-  /**
-   * Get all user permissions for a query builder
-   */
-  async getUserPermissions(
+  async removePermission(
     queryBuilderId: string,
-    userId: string
-  ): Promise<Record<PermissionType, boolean>> {
-    const permissionTypes: PermissionType[] = ['view', 'edit', 'delete', 'share', 'export']
-    const permissions: Record<PermissionType, boolean> = {} as Record<PermissionType, boolean>
-
-    for (const permissionType of permissionTypes) {
-      permissions[permissionType] = await this.checkPermission(
-        queryBuilderId,
-        userId,
-        permissionType
-      )
-    }
-
-    return permissions
-  }
-
-  /**
-   * Grant permission to a user or role
-   */
-  async grantPermission(
-    queryBuilderId: string,
-    targetId: string,
-    targetType: 'user' | 'role',
-    permissionType: PermissionType
-  ): Promise<QueryBuilderPermission> {
-    const data = {
-      queryBuilderId,
-      permissionType,
-      isAllowed: true,
-      ...(targetType === 'user' ? { userId: targetId } : { roleId: targetId }),
-    }
-
-    return this.addPermission(data)
-  }
-
-  /**
-   * Revoke permission from a user or role
-   */
-  async revokePermission(
-    queryBuilderId: string,
-    targetId: string,
-    targetType: 'user' | 'role',
+    userId: string,
     permissionType: PermissionType
   ): Promise<void> {
-    const whereCondition = {
+    const permission = await this.permissionPrisma.getQueryBuilderPermissionForUser(
       queryBuilderId,
-      permissionType,
-      ...(targetType === 'user' ? { userId: targetId } : { roleId: targetId }),
-    }
+      userId
+    )
 
-    const permission = await this._permissionRepository.findOne({ where: whereCondition })
     if (permission) {
-      await this._permissionRepository.delete(permission.id)
+      // Set the specific permission to false
+      const updateData: any = {}
+      if (permissionType === 'view') updateData.canView = false
+      if (permissionType === 'edit') updateData.canEdit = false
+      if (permissionType === 'delete') updateData.canDelete = false
+      if (permissionType === 'share') updateData.canShare = false
+
+      await this.permissionPrisma.updateQueryBuilderPermission(permission.id, updateData)
     }
+  }
+
+  async getPermissions(queryBuilderId: string) {
+    return this.permissionPrisma.getQueryBuilderPermissions(queryBuilderId)
+  }
+
+  async getUserPermissions(userId: string) {
+    return this.permissionPrisma.getQueryBuilderPermissionsByUser(userId)
   }
 }

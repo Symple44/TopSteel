@@ -8,7 +8,10 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator'
-import type { FieldAggregation, FieldFormat } from '../services/query-builder.service'
+
+// Type aliases for field format and aggregation
+type FieldFormat = Record<string, any>
+type FieldAggregation = Record<string, any>
 
 export class CreateQueryBuilderColumnDto {
   @IsString()

@@ -8,7 +8,7 @@ import { Redis } from 'ioredis'
  */
 export function createRedisModule(): DynamicModule {
   // Vérifier si Redis est activé
-  const redisEnabled = process.env.REDIS_ENABLED === 'true'
+  const redisEnabled = process.env.REDIS_ENABLED === 'true' && process.env.CACHE_ENABLED !== 'false'
 
   if (!redisEnabled) {
     return {

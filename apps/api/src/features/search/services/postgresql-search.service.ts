@@ -1,6 +1,6 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+
 import {
   generateSearchQuery,
   getAccessibleEntities,
@@ -20,13 +20,17 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
   private readonly logger = new Logger(PostgreSQLSearchService.name)
 
   constructor(
-    @InjectDataSource('auth') private readonly dataSource: DataSource,
-    @InjectDataSource('tenant') private readonly tenantDataSource: DataSource,
-    private readonly formatter: SearchResultFormatterService
+    private readonly formatter: SearchResultFormatterService,
+    private readonly prisma: PrismaService
   ) {}
 
   async isAvailable(): Promise<boolean> {
-    return this.dataSource.isInitialized
+    try {
+      await this.prisma.$queryRaw`SELECT 1`
+      return true
+    } catch {
+      return false
+    }
   }
 
   async search(options: SearchOptions): Promise<SearchResponse> {
@@ -85,12 +89,6 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
   }
 
   async searchEntity(entity: SearchableEntity, options: SearchOptions): Promise<SearchResult[]> {
-    // Determine which datasource to use
-    const ds =
-      entity.database === 'tenant' && this.tenantDataSource
-        ? this.tenantDataSource
-        : this.dataSource
-
     // Check if table exists before searching
     const tableExists = await this.checkTableExists(entity.tableName)
     if (!tableExists) {
@@ -115,7 +113,8 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
     const { query, params } = generateSearchQuery(entity, options.query, options.tenantId)
 
     try {
-      const records = await ds.query(query, params)
+      // Use Prisma's $queryRawUnsafe for raw SQL with parameters
+      const records = await this.prisma.$queryRawUnsafe<AnyDatabaseRecord[]>(query, ...params)
 
       return records.map((record: AnyDatabaseRecord) =>
         this.formatter.formatEntityResult(entity, record, options.query)
@@ -128,10 +127,10 @@ export class PostgreSQLSearchService implements IPostgreSQLSearchService {
 
   async checkTableExists(tableName: string): Promise<boolean> {
     try {
-      const result = await this.dataSource.query(
+      const result = await this.prisma.$queryRawUnsafe<Array<{ exists: boolean }>>(
         `SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_schema = 'public' 
+          SELECT FROM information_schema.tables
+          WHERE table_schema = 'public'
           AND table_name = $1
         )`,
         [tableName]

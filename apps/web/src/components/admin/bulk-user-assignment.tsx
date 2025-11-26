@@ -78,8 +78,8 @@ export function BulkUserAssignment({
     targetGroup ? [targetGroup.id] : []
   )
   const [searchTerm, setSearchTerm] = useState('')
-  const [departmentFilter, setDepartmentFilter] = useState('')
-  const [roleFilter, setRoleFilter] = useState('')
+  const [departmentFilter, setDepartmentFilter] = useState('__all__')
+  const [roleFilter, setRoleFilter] = useState('__all__')
   const [showOnlyUnassigned, setShowOnlyUnassigned] = useState(false)
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('select-users')
@@ -127,8 +127,8 @@ export function BulkUserAssignment({
       user?.lastName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       user?.email?.toLowerCase().includes(searchTerm?.toLowerCase())
 
-    const matchesDepartment = !departmentFilter || user?.department === departmentFilter
-    const matchesRole = !roleFilter || user.role === roleFilter
+    const matchesDepartment = departmentFilter === '__all__' || !departmentFilter || user?.department === departmentFilter
+    const matchesRole = roleFilter === '__all__' || !roleFilter || user.role === roleFilter
 
     const matchesGroupFilter =
       !showOnlyUnassigned ||
@@ -253,7 +253,7 @@ export function BulkUserAssignment({
                           <SelectValue placeholder="Tous les départements" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Tous les départements</SelectItem>
+                          <SelectItem value="__all__">Tous les départements</SelectItem>
                           {departments?.map(
                             (dept) =>
                               dept && (
@@ -272,7 +272,7 @@ export function BulkUserAssignment({
                           <SelectValue placeholder="Tous les rôles" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Tous les rôles</SelectItem>
+                          <SelectItem value="__all__">Tous les rôles</SelectItem>
                           {roles?.map(
                             (role) =>
                               role && (

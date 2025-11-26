@@ -19,6 +19,7 @@ import {
   WifiOff,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from '../../lib/i18n/hooks'
 
 interface ConnectionInfo {
   tenant: string
@@ -47,6 +48,7 @@ export function ConnectionManagementPanel({
   onRefresh,
   isLoading = false,
 }: ConnectionManagementPanelProps) {
+  const { t } = useTranslation('admin')
   const [selectedConnection, setSelectedConnection] = useState<string>('')
   const [,] = useState<'list' | 'grid'>('list')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'idle' | 'error'>('all')
@@ -72,7 +74,7 @@ export function ConnectionManagementPanel({
     if (!connection.isInitialized) {
       return (
         <Badge variant="destructive" className="text-xs">
-          Non initialisée
+          {t('connections.status.notInitialized')}
         </Badge>
       )
     }
@@ -81,25 +83,25 @@ export function ConnectionManagementPanel({
       case 'active':
         return (
           <Badge variant="default" className="text-xs">
-            Active
+            {t('connections.status.active')}
           </Badge>
         )
       case 'idle':
         return (
           <Badge variant="secondary" className="text-xs">
-            Inactive
+            {t('connections.status.idle')}
           </Badge>
         )
       case 'error':
         return (
           <Badge variant="destructive" className="text-xs">
-            Erreur
+            {t('connections.status.error')}
           </Badge>
         )
       default:
         return (
           <Badge variant="default" className="text-xs">
-            Connectée
+            {t('connections.status.connected')}
           </Badge>
         )
     }
@@ -144,9 +146,9 @@ export function ConnectionManagementPanel({
       {/* En-tête et contrôles */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Gestion des Connexions</h3>
+          <h3 className="text-lg font-semibold">{t('connections.title')}</h3>
           <p className="text-sm text-muted-foreground">
-            {connections.length} connexion{connections.length !== 1 ? 's' : ''} tenant
+            {connections.length} {t('connections.subtitle')}
             {filteredConnections?.length !== connections.length &&
               ` (${filteredConnections?.length} affiché${filteredConnections?.length !== 1 ? 's' : ''})`}
           </p>
@@ -162,10 +164,7 @@ export function ConnectionManagementPanel({
                 onClick={() => setFilterStatus(filter)}
                 className="text-xs border-0 rounded-none first:rounded-l-lg last:rounded-r-lg"
               >
-                {filter === 'all' && 'Toutes'}
-                {filter === 'active' && 'Actives'}
-                {filter === 'idle' && 'Inactives'}
-                {filter === 'error' && 'Erreurs'}
+                {t(`connections.filters.${filter}`)}
                 <span className="ml-1">
                   (
                   {filter === 'all'
@@ -206,7 +205,7 @@ export function ConnectionManagementPanel({
                 <div className="text-2xl font-bold">
                   {connections?.filter((c) => c.isInitialized).length}
                 </div>
-                <div className="text-xs text-muted-foreground">Initialisées</div>
+                <div className="text-xs text-muted-foreground">{t('connections.stats.initialized')}</div>
               </div>
             </div>
           </CardContent>
@@ -220,7 +219,7 @@ export function ConnectionManagementPanel({
                 <div className="text-2xl font-bold">
                   {connections?.filter((c) => c.status === 'active').length}
                 </div>
-                <div className="text-xs text-muted-foreground">Actives</div>
+                <div className="text-xs text-muted-foreground">{t('connections.stats.active')}</div>
               </div>
             </div>
           </CardContent>
@@ -234,7 +233,7 @@ export function ConnectionManagementPanel({
                 <div className="text-2xl font-bold">
                   {connections?.reduce((sum, c) => sum + (c.queryCount ?? 0), 0)}
                 </div>
-                <div className="text-xs text-muted-foreground">Requêtes total</div>
+                <div className="text-xs text-muted-foreground">{t('connections.stats.totalQueries')}</div>
               </div>
             </div>
           </CardContent>
@@ -248,7 +247,7 @@ export function ConnectionManagementPanel({
                 <div className="text-2xl font-bold">
                   {connections?.reduce((sum, c) => sum + (c.activeQueries ?? 0), 0)}
                 </div>
-                <div className="text-xs text-muted-foreground">Requêtes actives</div>
+                <div className="text-xs text-muted-foreground">{t('connections.stats.activeQueries')}</div>
               </div>
             </div>
           </CardContent>
@@ -275,10 +274,10 @@ export function ConnectionManagementPanel({
                     <div className="space-y-1">
                       <div className="flex items-center space-x-3">
                         <h4 className="font-semibold">
-                          Tenant: {connection.tenant}
+                          {t('connections.card.tenant')}: {connection.tenant}
                           {connection.isCurrent && (
                             <Badge variant="default" className="ml-2 text-xs">
-                              Session active
+                              {t('connections.card.currentSession')}
                             </Badge>
                           )}
                         </h4>
@@ -290,14 +289,14 @@ export function ConnectionManagementPanel({
                         {connection.createdAt && (
                           <span className="flex items-center space-x-1">
                             <Clock className="w-3 h-3" />
-                            <span>Créé: {formatDuration(connection.createdAt)}</span>
+                            <span>{t('connections.card.created')}: {formatDuration(connection.createdAt)}</span>
                           </span>
                         )}
 
                         {connection.lastActivity && (
                           <span className="flex items-center space-x-1">
                             <Activity className="w-3 h-3" />
-                            <span>Activité: {formatDuration(connection.lastActivity)}</span>
+                            <span>{t('connections.card.activity')}: {formatDuration(connection.lastActivity)}</span>
                           </span>
                         )}
                       </div>
@@ -314,7 +313,7 @@ export function ConnectionManagementPanel({
                           >
                             {connection.queryCount}
                           </div>
-                          <div className="text-xs text-muted-foreground">Requêtes</div>
+                          <div className="text-xs text-muted-foreground">{t('connections.card.queries')}</div>
                         </div>
                       )}
 
@@ -325,7 +324,7 @@ export function ConnectionManagementPanel({
                           >
                             {connection.activeQueries}
                           </div>
-                          <div className="text-xs text-muted-foreground">Actives</div>
+                          <div className="text-xs text-muted-foreground">{t('connections.card.activeLabel')}</div>
                         </div>
                       )}
 
@@ -334,7 +333,7 @@ export function ConnectionManagementPanel({
                           <div className={`font-mono ${getStatsColor(connection.poolSize, 20)}`}>
                             {connection.poolSize}
                           </div>
-                          <div className="text-xs text-muted-foreground">Pool</div>
+                          <div className="text-xs text-muted-foreground">{t('connections.card.pool')}</div>
                         </div>
                       )}
                     </div>
@@ -373,7 +372,7 @@ export function ConnectionManagementPanel({
                   <div className="mt-4 pt-4 border-t">
                     <div className="grid md:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <h5 className="font-medium text-sm">Statut de Santé</h5>
+                        <h5 className="font-medium text-sm">{t('connections.details.healthStatus')}</h5>
                         <div className="flex items-center space-x-2">
                           {getConnectionHealth(connection) === 'healthy' && (
                             <CheckCircle2 className="w-4 h-4 text-green-600" />
@@ -385,32 +384,32 @@ export function ConnectionManagementPanel({
                             <AlertTriangle className="w-4 h-4 text-red-600" />
                           )}
                           <span className="text-sm">
-                            {getConnectionHealth(connection) === 'healthy' && 'Excellent'}
-                            {getConnectionHealth(connection) === 'degraded' && 'Dégradé'}
-                            {getConnectionHealth(connection) === 'unhealthy' && 'Problématique'}
+                            {getConnectionHealth(connection) === 'healthy' && t('connections.details.healthy')}
+                            {getConnectionHealth(connection) === 'degraded' && t('connections.details.degraded')}
+                            {getConnectionHealth(connection) === 'unhealthy' && t('connections.details.unhealthy')}
                           </span>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <h5 className="font-medium text-sm">Configuration</h5>
+                        <h5 className="font-medium text-sm">{t('connections.details.configuration')}</h5>
                         <div className="text-xs text-muted-foreground space-y-1">
-                          <div>Base: erp_topsteel_{connection.tenant}</div>
-                          <div>Pool: {connection.poolSize || 'N/A'} connexions</div>
-                          <div>Timeout: 30s</div>
+                          <div>{t('connections.details.database')}: erp_topsteel_{connection.tenant}</div>
+                          <div>{t('connections.card.pool')}: {connection.poolSize || 'N/A'} {t('connections.details.poolConnections')}</div>
+                          <div>{t('connections.details.timeout')}: 30s</div>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <h5 className="font-medium text-sm">Actions Rapides</h5>
+                        <h5 className="font-medium text-sm">{t('connections.details.quickActions')}</h5>
                         <div className="flex space-x-2">
                           <Button type="button" size="sm" variant="outline" className="text-xs">
                             <Settings className="w-3 h-3 mr-1" />
-                            Configurer
+                            {t('connections.details.configure')}
                           </Button>
                           <Button type="button" size="sm" variant="outline" className="text-xs">
                             <RefreshCw className="w-3 h-3 mr-1" />
-                            Redémarrer
+                            {t('connections.details.restart')}
                           </Button>
                         </div>
                       </div>
@@ -427,13 +426,13 @@ export function ConnectionManagementPanel({
             <Server className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
               {connections.length === 0
-                ? 'Aucune connexion tenant active'
-                : 'Aucune connexion ne correspond aux filtres'}
+                ? t('connections.empty.noConnections')
+                : t('connections.empty.noMatchingFilters')}
             </p>
             {connections.length === 0 && (
               <Button type="button" size="sm" className="mt-4">
                 <Plus className="w-4 h-4 mr-2" />
-                Créer une connexion
+                {t('connections.empty.createConnection')}
               </Button>
             )}
           </CardContent>

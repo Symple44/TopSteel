@@ -176,9 +176,9 @@ export function ElasticsearchAdmin() {
         setConfig((prev) => ({ ...prev, ...defaultConfig }))
       }
     } catch {
-      toast?.error(t('elasticsearch.configurationError'))
+      toast?.error('Erreur de configuration Elasticsearch')
     }
-  }, [t])
+  }, []) // Removed t dependency to prevent infinite loop
 
   const saveConfig = async () => {
     setConfigLoading(true)

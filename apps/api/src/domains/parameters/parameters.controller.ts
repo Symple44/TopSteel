@@ -1,5 +1,6 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../core/multi-tenant'
 import { JwtAuthGuard } from '../auth/security/guards/jwt-auth.guard'
 import { ParameterSystemPrismaService } from './prisma/parameter-system-prisma.service'
 
@@ -15,6 +16,7 @@ import { ParameterSystemPrismaService } from './prisma/parameter-system-prisma.s
  */
 @Controller('parameters')
 @ApiTags('🔧 Parameters')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class ParametersController {

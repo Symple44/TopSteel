@@ -122,7 +122,7 @@ export class EnhancedTenantGuard implements CanActivate {
 
         // Mettre à jour les permissions avec les permissions effectives
         if (userSocieteInfo) {
-          tenantContext.permissions = userSocieteInfo.permissions
+          tenantContext.permissions = userSocieteInfo.permissions || []
         }
       }
 

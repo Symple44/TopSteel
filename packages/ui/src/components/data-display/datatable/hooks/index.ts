@@ -28,3 +28,8 @@ export type {
   UseDataTableStateReturn,
 } from './useDataTableState'
 export { useDataTableState } from './useDataTableState'
+export type {
+  UseVirtualizedTableOptions,
+  UseVirtualizedTableReturn,
+} from './useVirtualizedTable'
+export { useVirtualizedTable, VIRTUAL_TABLE_DEFAULTS } from './useVirtualizedTable'

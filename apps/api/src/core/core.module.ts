@@ -25,7 +25,7 @@ import { jwtConfig } from './config/jwt.config'
 import { redisConfig } from './config/redis.config'
 import { throttlerAsyncConfig } from './config/throttler.config'
 // Database
-import { DatabaseMultiTenantModule } from './database/database-multi-tenant.module'
+// import { DatabaseMultiTenantModule } from './database/database-multi-tenant.module' // REMOVED: Prisma migration
 import { PrismaModule } from './database/prisma/prisma.module'
 // Health
 import { HealthController } from './health/health.controller'
@@ -39,12 +39,14 @@ import { RedisModule } from './redis/redis.module'
  *
  * Contains all core infrastructure components:
  * - Configuration management
- * - Database connections
+ * - Database connections (Prisma ORM)
  * - Cache (Redis)
  * - Health checks
  * - Monitoring and metrics
  * - Scheduling
  * - Rate limiting
+ *
+ * Note: TypeORM legacy connections removed - using Prisma exclusively
  */
 @Global()
 @Module({
@@ -57,8 +59,8 @@ import { RedisModule } from './redis/redis.module'
       expandVariables: true,
     }),
 
-    // Database
-    DatabaseMultiTenantModule,
+    // Database (Prisma only - TypeORM removed during migration)
+    // DatabaseMultiTenantModule, // REMOVED: Prisma migration
     PrismaModule,
 
     // Scheduling
@@ -79,7 +81,7 @@ import { RedisModule } from './redis/redis.module'
   controllers: [HealthController],
   providers: [
     // Health services
-    IntegrityService,
+    IntegrityService, // Re-enabled - already uses Prisma
     SystemHealthService,
 
     // Monitoring services
@@ -99,7 +101,7 @@ import { RedisModule } from './redis/redis.module'
   ],
   exports: [
     ConfigModule,
-    DatabaseMultiTenantModule,
+    // DatabaseMultiTenantModule, // REMOVED: Prisma migration
     PrismaModule,
     RedisModule,
     MetricsService,

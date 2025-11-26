@@ -214,7 +214,7 @@ export default function MenuConfigurationPage() {
           <TabsTrigger value="configurations">
             {t('menuConfig.configurations')} ({configurations.length})
           </TabsTrigger>
-          <TabsTrigger value="preview">{t('menuConfig.preview')}</TabsTrigger>
+          <TabsTrigger value="preview">{t('menuConfig.previewLabel')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="configurations" className="space-y-4">
@@ -364,7 +364,7 @@ export default function MenuConfigurationPage() {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {t('menuConfig.preview')}: {selectedConfig?.name}
+              {t('menuConfig.previewLabel')}: {selectedConfig?.name}
             </DialogTitle>
           </DialogHeader>
           <MenuConfigPreview config={selectedConfig} />

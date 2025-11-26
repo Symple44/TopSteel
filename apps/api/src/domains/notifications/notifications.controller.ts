@@ -16,9 +16,18 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@ne
 import { Roles } from '../../core/common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/security/guards/roles.guard'
-import { UserRole } from '../users/entities/user.entity'
 import { NotificationPrismaService } from './prisma/notification-prisma.service'
-import { User } from '@prisma/client'
+
+/**
+ * User role enum - replaces deleted TypeORM entity import
+ */
+enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ADMIN = 'ADMIN',
+  MANAGER = 'MANAGER',
+  USER = 'USER',
+  GUEST = 'GUEST',
+}
 
 
 /**

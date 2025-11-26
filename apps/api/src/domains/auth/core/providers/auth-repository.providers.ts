@@ -3,7 +3,8 @@ import {
   SocieteAuthRepositoryService,
   SocieteUserAuthRepositoryService,
 } from '../../../../features/societes/services/societe-auth-repository.service'
-import { UserAuthPrismaRepositoryService } from '../../../users/services/user-auth-prisma-repository.service'
+// FIXED: Corrected filename - it's user-auth-repository.service.ts not user-auth-prisma-repository.service.ts
+import { UserAuthRepositoryService as UserAuthPrismaRepositoryService } from '../../../users/services/user-auth-repository.service'
 import type {
   ISocieteRepository,
   ISocieteUserRepository,

@@ -21,7 +21,7 @@ export interface DataTableState<T> {
   columns: ColumnConfig<T>[]
   visibleColumns: ColumnConfig<T>[]
 
-  // Données
+  // Donnees
   data: T[]
   processedData: T[]
   displayData: T[]
@@ -29,8 +29,12 @@ export interface DataTableState<T> {
   // Filtrage
   filters: FilterConfig[]
   searchTerm: string
+  /** Valeur debouncee du terme de recherche utilisee pour le filtrage */
+  debouncedSearchTerm: string
   advancedFilters: AdvancedFilterGroup | null
   isFiltered: boolean
+  /** Indique si une recherche est en attente de debounce */
+  isSearchPending: boolean
 
   // Tri
   sortConfig: SortConfig[]
@@ -57,20 +61,22 @@ export interface DataTableState<T> {
 }
 
 export interface UseDataTableStateProps<T> {
-  // Données et configuration
+  // Donnees et configuration
   data: T[]
   columns: ColumnConfig<T>[]
   keyField: string | number
 
-  // Options de fonctionnalités
+  // Options de fonctionnalites
   sortable?: boolean
   filterable?: boolean
   searchable?: boolean
   selectable?: boolean
   exportable?: boolean
   pagination?: boolean | PaginationConfig
+  /** Delai de debounce pour la recherche en ms (defaut: 300) */
+  searchDebounceMs?: number
 
-  // Paramètres sauvegardés
+  // Parametres sauvegardes
   settings?: TableSettings
 
   // Callbacks
@@ -140,6 +146,7 @@ export function useDataTableState<T extends Record<string, unknown>>({
   selectable = false,
   exportable = false,
   pagination = false,
+  searchDebounceMs = 300,
   settings: initialSettings = { columns: {} },
   onSettingsChange,
   onSelectionChange,
@@ -168,11 +175,12 @@ export function useDataTableState<T extends Record<string, unknown>>({
       })
   }, [columns, settings])
 
-  // Hook de filtrage
+  // Hook de filtrage (avec debounce sur la recherche)
   const {
     filteredData,
     filters,
     searchTerm,
+    debouncedSearchTerm,
     advancedFilters,
     setFilters,
     setSearchTerm,
@@ -181,11 +189,13 @@ export function useDataTableState<T extends Record<string, unknown>>({
     removeFilter,
     clearFilters,
     isFiltered,
+    isSearchPending,
   } = useDataFiltering({
     data,
     columns: visibleColumns,
     initialFilters,
     searchable,
+    searchDebounceMs,
   })
 
   // Hook de tri
@@ -316,7 +326,7 @@ export function useDataTableState<T extends Record<string, unknown>>({
     setColumns(initialColumns)
   }, [initialColumns])
 
-  // État consolidé
+  // Etat consolide
   const state: DataTableState<T> = useMemo(
     () => ({
       columns,
@@ -326,8 +336,10 @@ export function useDataTableState<T extends Record<string, unknown>>({
       displayData,
       filters,
       searchTerm,
+      debouncedSearchTerm,
       advancedFilters,
       isFiltered,
+      isSearchPending,
       sortConfig,
       selection,
       selectedData,
@@ -348,8 +360,10 @@ export function useDataTableState<T extends Record<string, unknown>>({
       displayData,
       filters,
       searchTerm,
+      debouncedSearchTerm,
       advancedFilters,
       isFiltered,
+      isSearchPending,
       sortConfig,
       selection,
       selectedData,

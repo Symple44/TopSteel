@@ -250,4 +250,48 @@ export class QueryBuilderJoinPrismaService {
       throw error
     }
   }
+
+  /**
+   * Alias methods for backward compatibility
+   */
+
+  /**
+   * Créer une jointure avec interface legacy
+   */
+  async createJoin(data: {
+    queryBuilderId: string
+    joinType: string
+    sourceTable?: string
+    leftTable?: string
+    targetTable?: string
+    rightTable?: string
+    sourceColumn?: string
+    leftColumn?: string
+    targetColumn?: string
+    rightColumn?: string
+    order?: number
+  }): Promise<QueryBuilderJoin> {
+    const sourceTable = data.sourceTable || data.leftTable || ''
+    const targetTable = data.targetTable || data.rightTable || ''
+    const sourceColumn = data.sourceColumn || data.leftColumn || ''
+    const targetColumn = data.targetColumn || data.rightColumn || ''
+
+    // Construire la condition de jointure
+    const condition = `${sourceTable}.${sourceColumn} = ${targetTable}.${targetColumn}`
+
+    return this.createQueryBuilderJoin({
+      queryBuilderId: data.queryBuilderId,
+      joinTable: targetTable,
+      joinType: data.joinType,
+      condition,
+      order: data.order,
+    })
+  }
+
+  /**
+   * Alias pour deleteAllJoins
+   */
+  async deleteByQueryBuilderId(queryBuilderId: string): Promise<number> {
+    return this.deleteAllJoins(queryBuilderId)
+  }
 }

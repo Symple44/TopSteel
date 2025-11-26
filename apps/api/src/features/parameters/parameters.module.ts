@@ -1,20 +1,23 @@
+import { DatabaseModule } from '../../core/database/database.module'
 import { Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { ParameterApplication } from '../../features/parameters/entities/parameter-application.entity'
-import { ParameterClient } from '../../features/parameters/entities/parameter-client.entity'
-import { ParameterSystem } from '../../features/parameters/entities/parameter-system.entity'
-import { ParametersController } from './parameters.controller'
-import { ParameterService } from './services/parameter.service'
-import { TestParametersController } from './test-parameters.controller'
 import { ParametersPrismaModule } from '../../domains/parameters/prisma/parameters-prisma.module'
+import { ParametersController } from '../../domains/parameters/parameters.controller'
 
 @Module({
   imports: [
+    DatabaseModule,
     ParametersPrismaModule, // Prisma-based parameter services (System/Application/Client)
-    TypeOrmModule.forFeature([ParameterSystem, ParameterApplication, ParameterClient], 'auth'),
+    // TypeORM repositories disabled - using Prisma services
   ],
-  controllers: [ParametersController, TestParametersController],
-  providers: [ParameterService],
-  exports: [ParameterService],
+  controllers: [
+    ParametersController, // Clean - uses pure Prisma (ParameterSystemPrismaService)
+    // TestParametersController, // Disabled - depends on TypeORM @InjectRepository
+  ],
+  providers: [
+    // ParameterService, // Disabled - uses TypeORM @InjectRepository
+  ],
+  exports: [
+    ParametersPrismaModule, // Export Prisma services for other modules
+  ],
 })
 export class ParametersModule {}

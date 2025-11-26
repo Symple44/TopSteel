@@ -1,10 +1,28 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString, IsUUID } from 'class-validator'
-import { ParameterClient } from '@prisma/client'
-import {
-  ClientParameterAccess,
-  ClientParameterScope,
-  ClientParameterType,
-} from '../entities/parameter-client.entity'
+
+// Local enum definitions
+export enum ClientParameterType {
+  STRING = 'STRING',
+  NUMBER = 'NUMBER',
+  BOOLEAN = 'BOOLEAN',
+  JSON = 'JSON',
+  ARRAY = 'ARRAY',
+  DATE = 'DATE',
+  FILE = 'FILE',
+}
+
+export enum ClientParameterScope {
+  COMPANY = 'COMPANY',
+  SITE = 'SITE',
+  DEPARTMENT = 'DEPARTMENT',
+  USER = 'USER',
+}
+
+export enum ClientParameterAccess {
+  READ_ONLY = 'READ_ONLY',
+  READ_WRITE = 'READ_WRITE',
+  ADMIN_ONLY = 'ADMIN_ONLY',
+}
 
 export class CreateParameterClientDto {
   @IsUUID()

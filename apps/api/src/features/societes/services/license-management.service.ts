@@ -1,27 +1,42 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { InjectRepository } from '@nestjs/typeorm'
-import { LessThan, type Repository } from 'typeorm'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { License, LicenseStatus, LicenseType, Prisma } from '@prisma/client'
 import { GlobalUserRole } from '../../../domains/auth/core/constants/roles.constants'
-import { UserSession } from '../../../domains/auth/core/entities/user-session.entity'
-import { User } from '../../../domains/users/entities/user.entity'
-import {
-  NotificationCategory,
-  NotificationPriority,
-  Notifications,
-  NotificationType,
-  RecipientType,
-} from '../../../features/notifications/entities/notifications.entity'
-import { Societe } from '../entities/societe.entity'
-import { LicenseStatus, LicenseType, SocieteLicense } from '../entities/societe-license.entity'
 
+// Local enum definitions (Prisma uses string fields, not enums for notifications)
+export enum NotificationType {
+  SYSTEM = 'SYSTEM',
+  USER = 'USER',
+  ALERT = 'ALERT',
+  INFO = 'INFO',
+}
 
+export enum NotificationCategory {
+  LICENSE = 'LICENSE',
+  SYSTEM = 'SYSTEM',
+  SECURITY = 'SECURITY',
+  BILLING = 'BILLING',
+}
+
+export enum NotificationPriority {
+  LOW = 'LOW',
+  NORMAL = 'NORMAL',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT',
+}
+
+export enum RecipientType {
+  USER = 'USER',
+  ROLE = 'ROLE',
+  SOCIETE = 'SOCIETE',
+}
 
 export interface LicenseCheckResult {
   isValid: boolean
   reason?: string
-  license?: SocieteLicense
+  license?: License
   availableSlots?: number
   utilizationPercent?: number
 }
@@ -40,21 +55,41 @@ export interface LicenseUsageStats {
   daysUntilExpiration?: number
 }
 
+// Utility functions to replace entity methods
+function isLicenseValid(license: License): boolean {
+  if (license.status !== 'ACTIVE') return false
+  if (license.expiresAt && license.expiresAt < new Date()) return false
+  return true
+}
+
+function getUserUtilizationPercent(license: License, currentUsers: number): number {
+  if (license.maxUsers === 0) return 0
+  return Math.round((currentUsers / license.maxUsers) * 100)
+}
+
+function getDaysUntilExpiration(license: License): number | null {
+  if (!license.expiresAt) return null
+  const now = new Date()
+  const diff = license.expiresAt.getTime() - now.getTime()
+  return Math.ceil(diff / (1000 * 60 * 60 * 24))
+}
+
+function needsRenewalNotification(license: License): boolean {
+  if (!license.expiresAt) return false
+  const daysUntil = getDaysUntilExpiration(license)
+  if (daysUntil === null) return false
+
+  // Only notify at specific intervals: 30, 15, 7, 3, 1 days
+  const notificationDays = [30, 15, 7, 3, 1]
+  return notificationDays.includes(daysUntil)
+}
+
 @Injectable()
 export class LicenseManagementService {
   private readonly logger = new Logger(LicenseManagementService.name)
 
   constructor(
-    @InjectRepository(SocieteLicense, 'auth')
-    private licenseRepository: Repository<SocieteLicense>,
-    @InjectRepository(Societe, 'auth')
-    private societeRepository: Repository<Societe>,
-    @InjectRepository(User, 'auth')
-    private userRepository: Repository<User>,
-    @InjectRepository(UserSession, 'auth')
-    private sessionRepository: Repository<UserSession>,
-    @InjectRepository(Notifications, 'auth')
-    private notificationRepository: Repository<Notifications>,
+    private readonly prisma: PrismaService,
     private configService: ConfigService
   ) {}
 
@@ -66,9 +101,8 @@ export class LicenseManagementService {
     userId: string,
     allowConcurrent = true
   ): Promise<LicenseCheckResult> {
-    const license = await this.licenseRepository.findOne({
-      where: { societeId, status: LicenseStatus.ACTIVE },
-      relations: ['societe'],
+    const license = await this.prisma.license.findFirst({
+      where: { societeId, status: 'ACTIVE' },
     })
 
     // Si aucune licence n'existe, appliquer le comportement par défaut
@@ -102,7 +136,7 @@ export class LicenseManagementService {
     }
 
     // Vérifier la validité de la licence
-    if (!license.isValid()) {
+    if (!isLicenseValid(license)) {
       return {
         isValid: false,
         reason: 'Licence expirée ou invalide',
@@ -111,7 +145,7 @@ export class LicenseManagementService {
     }
 
     // Vérifier les sessions concurrentes si nécessaire
-    if (!allowConcurrent || !license.allowConcurrentSessions) {
+    if (!allowConcurrent || !license.allowApiAccess) {
       const activeSessions = await this.getActiveSessionCount(societeId, userId)
 
       if (activeSessions > 0) {
@@ -123,14 +157,15 @@ export class LicenseManagementService {
       }
     }
 
-    // Vérifier la limite de sessions concurrentes globale
-    if (license.maxConcurrentSessions) {
+    // Vérifier la limite de sessions concurrentes globale (stored in metadata)
+    const maxConcurrent = (license.metadata as any)?.maxConcurrentSessions
+    if (maxConcurrent && typeof maxConcurrent === 'number') {
       const totalActiveSessions = await this.getTotalActiveSessionCount(societeId)
 
-      if (totalActiveSessions >= license.maxConcurrentSessions) {
+      if (totalActiveSessions >= maxConcurrent) {
         return {
           isValid: false,
-          reason: `Limite de ${license.maxConcurrentSessions} sessions concurrentes atteinte`,
+          reason: `Limite de ${maxConcurrent} sessions concurrentes atteinte`,
           license,
         }
       }
@@ -154,103 +189,111 @@ export class LicenseManagementService {
     }
 
     // Mise à jour du compteur d'utilisateurs actifs
-    await this.updateActiveUserCount(license)
+    await this.updateActiveUserCount(license, activeUsers)
 
     return {
       isValid: true,
       license,
       availableSlots: Math.max(0, license.maxUsers - activeUsers),
-      utilizationPercent: license.getUserUtilizationPercent(),
+      utilizationPercent: getUserUtilizationPercent(license, activeUsers),
     }
   }
 
   /**
    * Créer une nouvelle licence pour une société
    */
-  async createLicense(societeId: string, data: Partial<SocieteLicense>): Promise<SocieteLicense> {
-    const societe = await this.societeRepository.findOne({ where: { id: societeId } })
+  async createLicense(societeId: string, data: Prisma.LicenseCreateInput): Promise<License> {
+    const societe = await this.prisma.societe.findUnique({ where: { id: societeId } })
 
     if (!societe) {
       throw new NotFoundException('Société non trouvée')
     }
 
     // Vérifier qu'il n'y a pas déjà une licence active
-    const existingLicense = await this.licenseRepository.findOne({
-      where: { societeId, status: LicenseStatus.ACTIVE },
+    const existingLicense = await this.prisma.license.findFirst({
+      where: { societeId, status: 'ACTIVE' },
     })
 
     if (existingLicense) {
       throw new BadRequestException('Une licence active existe déjà pour cette société')
     }
 
-    const license = this.licenseRepository.create({
-      ...data,
-      societeId,
-      status: LicenseStatus.ACTIVE,
-      currentUsers: 0,
-      currentSites: 0,
-      currentStorageGB: 0,
+    return await this.prisma.license.create({
+      data: {
+        ...data,
+        societe: {
+          connect: { id: societeId }
+        },
+        status: 'ACTIVE',
+      },
     })
-
-    return await this.licenseRepository.save(license)
   }
 
   /**
    * Mettre à jour une licence existante
    */
-  async updateLicense(
-    licenseId: string,
-    updates: Partial<SocieteLicense>
-  ): Promise<SocieteLicense> {
-    const license = await this.licenseRepository.findOne({ where: { id: licenseId } })
+  async updateLicense(licenseId: string, updates: Prisma.LicenseUpdateInput): Promise<License> {
+    const license = await this.prisma.license.findUnique({ where: { id: licenseId } })
 
     if (!license) {
       throw new NotFoundException('Licence non trouvée')
     }
 
+    // Get current user count for validation
+    const currentUsers = await this.getActiveUserCount(license.societeId)
+    const currentSites = await this.getActiveSiteCount(license.societeId)
+
     // Ne pas permettre de réduire les limites en dessous de l'utilisation actuelle
-    if (updates.maxUsers && updates.maxUsers < license.currentUsers) {
+    if (updates.maxUsers && typeof updates.maxUsers === 'number' && updates.maxUsers < currentUsers) {
       throw new BadRequestException(
-        `Impossible de réduire la limite à ${updates.maxUsers} utilisateurs. ${license.currentUsers} utilisateurs actifs actuellement.`
+        `Impossible de réduire la limite à ${updates.maxUsers} utilisateurs. ${currentUsers} utilisateurs actifs actuellement.`
       )
     }
 
-    if (updates.maxSites && updates.maxSites < license.currentSites) {
+    if (updates.maxSites && typeof updates.maxSites === 'number' && updates.maxSites < currentSites) {
       throw new BadRequestException(
-        `Impossible de réduire la limite à ${updates.maxSites} sites. ${license.currentSites} sites actifs actuellement.`
+        `Impossible de réduire la limite à ${updates.maxSites} sites. ${currentSites} sites actifs actuellement.`
       )
     }
 
-    Object.assign(license, updates)
-    license.updatedAt = new Date()
-
-    return await this.licenseRepository.save(license)
+    return await this.prisma.license.update({
+      where: { id: licenseId },
+      data: updates,
+    })
   }
 
   /**
    * Suspendre une licence
    */
   async suspendLicense(licenseId: string, reason?: string): Promise<void> {
-    const license = await this.licenseRepository.findOne({ where: { id: licenseId } })
+    const license = await this.prisma.license.findUnique({ where: { id: licenseId } })
 
     if (!license) {
       throw new NotFoundException('Licence non trouvée')
     }
 
-    license.status = LicenseStatus.SUSPENDED
-    license.violationCount++
+    // Get current metadata
+    const metadata = (license.metadata as any) || {}
+    const violationHistory = metadata.violationHistory || []
+    violationHistory.push({
+      date: new Date().toISOString(),
+      type: 'SUSPENSION',
+      details: reason || 'No reason provided',
+      resolved: false,
+    })
 
-    if (reason) {
-      license.violationHistory = license.violationHistory || []
-      license.violationHistory.push({
-        date: new Date(),
-        type: 'SUSPENSION',
-        details: reason,
-        resolved: false,
-      })
-    }
-
-    await this.licenseRepository.save(license)
+    await this.prisma.license.update({
+      where: { id: licenseId },
+      data: {
+        status: 'SUSPENDED',
+        suspendedAt: new Date(),
+        metadata: {
+          ...metadata,
+          violationHistory,
+          violationCount: (metadata.violationCount || 0) + 1,
+        },
+      },
+    })
 
     // Déconnecter tous les utilisateurs de cette société
     await this.disconnectAllUsers(license.societeId)
@@ -265,8 +308,8 @@ export class LicenseManagementService {
    * Obtenir les statistiques d'utilisation d'une licence
    */
   async getLicenseUsageStats(societeId: string): Promise<LicenseUsageStats> {
-    const license = await this.licenseRepository.findOne({
-      where: { societeId, status: LicenseStatus.ACTIVE },
+    const license = await this.prisma.license.findFirst({
+      where: { societeId, status: 'ACTIVE' },
     })
 
     if (!license) {
@@ -277,18 +320,20 @@ export class LicenseManagementService {
     const activeSessions = await this.getTotalActiveSessionCount(societeId)
     const activeSites = await this.getActiveSiteCount(societeId)
 
+    const metadata = (license.metadata as any) || {}
+
     return {
       societeId,
       currentUsers: activeUsers,
       maxUsers: license.maxUsers,
       currentSites: activeSites,
       maxSites: license.maxSites,
-      currentStorageGB: Number(license.currentStorageGB),
-      maxStorageGB: license.maxStorageGB,
+      currentStorageGB: license.maxStorage,
+      maxStorageGB: license.maxStorage,
       activeSessions,
-      maxConcurrentSessions: license.maxConcurrentSessions,
-      utilizationPercent: license.getUserUtilizationPercent(),
-      daysUntilExpiration: license.getDaysUntilExpiration() ?? undefined,
+      maxConcurrentSessions: metadata.maxConcurrentSessions,
+      utilizationPercent: getUserUtilizationPercent(license, activeUsers),
+      daysUntilExpiration: getDaysUntilExpiration(license) ?? undefined,
     }
   }
 
@@ -296,19 +341,23 @@ export class LicenseManagementService {
    * Vérifier et nettoyer les licences expirées (Cron job)
    */
   @Cron(CronExpression.EVERY_DAY_AT_2AM)
-  async checkAndCleanupExpiredLicenses(): Promise<void> {
+  async checkAndCleanupExpiredLicenses() {
     this.logger.log('Vérification des licences expirées...')
 
-    const expiredLicenses = await this.licenseRepository.find({
+    const expiredLicenses = await this.prisma.license.findMany({
       where: {
-        status: LicenseStatus.ACTIVE,
-        expiresAt: LessThan(new Date()),
+        status: 'ACTIVE',
+        expiresAt: {
+          lt: new Date(),
+        },
       },
     })
 
     for (const license of expiredLicenses) {
-      license.status = LicenseStatus.EXPIRED
-      await this.licenseRepository.save(license)
+      await this.prisma.license.update({
+        where: { id: license.id },
+        data: { status: 'EXPIRED' },
+      })
 
       // Déconnecter tous les utilisateurs
       await this.disconnectAllUsers(license.societeId)
@@ -323,20 +372,27 @@ export class LicenseManagementService {
    * Envoyer des notifications de renouvellement (Cron job)
    */
   @Cron(CronExpression.EVERY_DAY_AT_9AM)
-  async sendRenewalNotifications(): Promise<void> {
+  async sendRenewalNotifications() {
     this.logger.log('Envoi des notifications de renouvellement...')
 
-    const licensesToNotify = await this.licenseRepository
-      .createQueryBuilder('license')
-      .where('license.status = :status', { status: LicenseStatus.ACTIVE })
-      .andWhere('license.expiresAt IS NOT NULL')
-      .andWhere('license.expiresAt > NOW()')
-      .andWhere("license.expiresAt < NOW() + INTERVAL '30 days'")
-      .getMany()
+    // Find licenses expiring in the next 30 days
+    const thirtyDaysFromNow = new Date()
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
+
+    const licensesToNotify = await this.prisma.license.findMany({
+      where: {
+        status: 'ACTIVE',
+        expiresAt: {
+          not: null,
+          gt: new Date(),
+          lt: thirtyDaysFromNow,
+        },
+      },
+    })
 
     for (const license of licensesToNotify) {
-      if (license.needsRenewalNotification()) {
-        const daysUntilExpiration = license.getDaysUntilExpiration()
+      if (needsRenewalNotification(license)) {
+        const daysUntilExpiration = getDaysUntilExpiration(license)
 
         // Create renewal notification
         await this.createRenewalNotification(license, daysUntilExpiration || 0)
@@ -345,8 +401,16 @@ export class LicenseManagementService {
           `Notification de renouvellement envoyée pour société ${license.societeId} - ${daysUntilExpiration} jours restants`
         )
 
-        license.lastNotificationAt = new Date()
-        await this.licenseRepository.save(license)
+        // Update last notification time
+        await this.prisma.license.update({
+          where: { id: license.id },
+          data: {
+            metadata: {
+              ...((license.metadata as any) || {}),
+              lastNotificationAt: new Date().toISOString(),
+            },
+          },
+        })
       }
     }
   }
@@ -354,85 +418,96 @@ export class LicenseManagementService {
   // Méthodes privées utilitaires
 
   private async getActiveUserCount(societeId: string): Promise<number> {
-    const result = await this.userRepository
-      .createQueryBuilder('user')
-      .innerJoin('user_societe_roles', 'usr', 'usr.userId = user.id')
-      .where('usr.societeId = :societeId', { societeId })
-      .andWhere('usr.isActive = :usrActive', { usrActive: true })
-      .andWhere('user.actif = :userActive', { userActive: true })
-      .getCount()
-
-    return result
+    return await this.prisma.user.count({
+      where: {
+        societeRoles: {
+          some: {
+            societeId,
+            isActive: true,
+          },
+        },
+        actif: true,
+      },
+    })
   }
 
   private async isUserActive(societeId: string, userId: string): Promise<boolean> {
-    const result = await this.userRepository
-      .createQueryBuilder('user')
-      .innerJoin('user_societe_roles', 'usr', 'usr.userId = user.id')
-      .where('usr.societeId = :societeId', { societeId })
-      .andWhere('usr.userId = :userId', { userId })
-      .andWhere('usr.isActive = :usrActive', { usrActive: true })
-      .andWhere('user.actif = :userActive', { userActive: true })
-      .getCount()
+    const count = await this.prisma.user.count({
+      where: {
+        id: userId,
+        societeRoles: {
+          some: {
+            societeId,
+            isActive: true,
+          },
+        },
+        actif: true,
+      },
+    })
 
-    return result > 0
+    return count > 0
   }
 
   private async getActiveSessionCount(societeId: string, userId: string): Promise<number> {
-    const result = await this.sessionRepository
-      .createQueryBuilder('session')
-      .where('session.userId = :userId', { userId })
-      .andWhere('session.metadata ::jsonb @> :metadata', {
-        metadata: JSON.stringify({ societeId }),
-      })
-      .andWhere('session.isActive = :isActive', { isActive: true })
-      .andWhere('session.expiresAt > NOW()')
-      .getCount()
+    // Use raw SQL since userSession doesn't have expiresAt in schema
+    const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>(
+      `SELECT COUNT(*) as count
+       FROM user_sessions
+       WHERE user_id = $1
+       AND metadata::jsonb @> $2::jsonb
+       AND is_active = true`,
+      userId,
+      JSON.stringify({ societeId })
+    )
 
-    return result
+    return Number(result[0]?.count || 0)
   }
 
   private async getTotalActiveSessionCount(societeId: string): Promise<number> {
-    const result = await this.sessionRepository
-      .createQueryBuilder('session')
-      .where('session.metadata ::jsonb @> :metadata', {
-        metadata: JSON.stringify({ societeId }),
-      })
-      .andWhere('session.isActive = :isActive', { isActive: true })
-      .andWhere('session.expiresAt > NOW()')
-      .getCount()
+    // This requires raw SQL due to JSONB query (removed expires_at check as not in schema)
+    const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>(
+      `SELECT COUNT(*) as count
+       FROM user_sessions
+       WHERE metadata::jsonb @> $1::jsonb
+       AND is_active = true`,
+      JSON.stringify({ societeId })
+    )
 
-    return result
+    return Number(result[0]?.count || 0)
   }
 
   private async getActiveSiteCount(societeId: string): Promise<number> {
-    const result = await this.societeRepository
-      .createQueryBuilder('societe')
-      .leftJoin('societe.sites', 'site')
-      .where('societe.id = :societeId', { societeId })
-      .andWhere('site.isActive = true')
-      .getCount()
-
-    return result
+    return await this.prisma.site.count({
+      where: {
+        societeId,
+        isActive: true,
+      },
+    })
   }
 
-  private async updateActiveUserCount(license: SocieteLicense): Promise<void> {
-    const activeUsers = await this.getActiveUserCount(license.societeId)
-    license.currentUsers = activeUsers
-    license.lastCheckAt = new Date()
-    await this.licenseRepository.save(license)
+  private async updateActiveUserCount(license: License, activeUsers: number): Promise<void> {
+    await this.prisma.license.update({
+      where: { id: license.id },
+      data: {
+        metadata: {
+          ...((license.metadata as any) || {}),
+          currentUsers: activeUsers,
+          lastCheckAt: new Date().toISOString(),
+        },
+      },
+    })
   }
 
   private async disconnectAllUsers(societeId: string): Promise<void> {
     // Désactiver toutes les sessions actives de la société
-    await this.sessionRepository
-      .createQueryBuilder()
-      .update(UserSession)
-      .set({ isActive: false, logoutTime: new Date() })
-      .where('metadata ::jsonb @> :metadata', {
-        metadata: JSON.stringify({ societeId }),
-      })
-      .execute()
+    // This requires raw SQL due to JSONB path query
+    await this.prisma.$executeRawUnsafe(
+      `UPDATE user_sessions
+       SET is_active = false, logout_time = NOW()
+       WHERE metadata::jsonb @> $1::jsonb
+       AND is_active = true`,
+      JSON.stringify({ societeId })
+    )
 
     this.logger.log(`Toutes les sessions déconnectées pour la société ${societeId}`)
   }
@@ -441,15 +516,17 @@ export class LicenseManagementService {
    * Vérifier si une fonctionnalité est disponible dans la licence
    */
   async isFeatureEnabled(societeId: string, feature: string): Promise<boolean> {
-    const license = await this.licenseRepository.findOne({
-      where: { societeId, status: LicenseStatus.ACTIVE },
+    const license = await this.prisma.license.findFirst({
+      where: { societeId, status: 'ACTIVE' },
     })
 
-    if (!license || !license.isValid()) {
+    if (!license || !isLicenseValid(license)) {
       return false
     }
 
-    return license.features?.[feature] === true
+    // Check in restrictions JSON field
+    const restrictions = license.restrictions as any
+    return restrictions?.[feature] === true
   }
 
   /**
@@ -460,15 +537,16 @@ export class LicenseManagementService {
     restriction: string,
     currentValue: number
   ): Promise<boolean> {
-    const license = await this.licenseRepository.findOne({
-      where: { societeId, status: LicenseStatus.ACTIVE },
+    const license = await this.prisma.license.findFirst({
+      where: { societeId, status: 'ACTIVE' },
     })
 
-    if (!license || !license.isValid()) {
+    if (!license || !isLicenseValid(license)) {
       return false
     }
 
-    const limit = license.restrictions?.[restriction]
+    const restrictions = license.restrictions as any
+    const limit = restrictions?.[restriction]
     if (!limit) {
       return true // Pas de restriction
     }
@@ -500,7 +578,7 @@ export class LicenseManagementService {
    */
   private async createDefaultTrialLicense(societeId: string): Promise<void> {
     try {
-      const existingLicense = await this.licenseRepository.findOne({
+      const existingLicense = await this.prisma.license.findFirst({
         where: { societeId },
       })
 
@@ -513,29 +591,35 @@ export class LicenseManagementService {
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + defaultConfig.trialDurationDays)
 
-      const trialLicense = this.licenseRepository.create({
-        societeId,
-        type: LicenseType.BASIC,
-        status: LicenseStatus.ACTIVE,
-        maxUsers: defaultConfig.defaultMaxUsers,
-        maxSites: defaultConfig.defaultMaxSites,
-        currentUsers: 0,
-        currentSites: 0,
-        currentStorageGB: 0,
-        allowConcurrentSessions: true,
-        features: {
-          advancedReporting: false,
-          apiAccess: false,
-          customIntegrations: false,
-          multiCurrency: false,
-          advancedWorkflows: false,
-        },
-        validFrom: new Date(),
-        expiresAt,
-        notes: "Licence d'essai créée automatiquement",
-      })
+      // Generate a simple license key
+      const licenseKey = `TRIAL-${societeId.substring(0, 8).toUpperCase()}-${Date.now()}`
 
-      await this.licenseRepository.save(trialLicense)
+      await this.prisma.license.create({
+        data: {
+          licenseKey,
+          societeId,
+          customerName: 'Trial Customer',
+          customerEmail: 'trial@example.com',
+          type: 'TRIAL',
+          status: 'ACTIVE',
+          maxUsers: defaultConfig.defaultMaxUsers,
+          maxSites: defaultConfig.defaultMaxSites,
+          allowCustomModules: false,
+          allowApiAccess: false,
+          allowWhiteLabel: false,
+          startsAt: new Date(),
+          expiresAt,
+          restrictions: {
+            advancedReporting: false,
+            apiAccess: false,
+            customIntegrations: false,
+            multiCurrency: false,
+            advancedWorkflows: false,
+          },
+          metadata: {},
+          notes: "Licence d'essai créée automatiquement",
+        },
+      })
 
       this.logger.log(
         `Licence d'essai créée automatiquement pour la société ${societeId} (expire le ${expiresAt.toISOString()})`
@@ -552,12 +636,11 @@ export class LicenseManagementService {
    * Créer une notification de renouvellement de licence
    */
   private async createRenewalNotification(
-    license: SocieteLicense,
+    license: License,
     daysUntilExpiration: number
   ): Promise<void> {
-    const societe = await this.societeRepository.findOne({
+    const societe = await this.prisma.societe.findUnique({
       where: { id: license.societeId },
-      relations: ['administrateurs'],
     })
 
     if (!societe) {
@@ -570,42 +653,37 @@ export class LicenseManagementService {
     const priority = this.getRenewalNotificationPriority(daysUntilExpiration)
     const urgencyLevel = this.getUrgencyLevel(daysUntilExpiration)
 
+    const currentUsers = await this.getActiveUserCount(license.societeId)
+
     // Créer la notification pour les administrateurs de la société
-    const notification = this.notificationRepository.create({
-      title: `${urgencyLevel} - Renouvellement de licence requis`,
-      message: this.buildRenewalMessage(license, daysUntilExpiration, societe.nom),
-      type: NotificationType.SYSTEM,
-      category: NotificationCategory.LICENSE,
-      priority,
-      source: 'license_management',
-      entityType: 'societe_license',
-      entityId: license.id,
+    await this.prisma.notification.create({
       data: {
         societeId: license.societeId,
-        societeDenomination: societe.nom,
-        licenseId: license.id,
-        licenseType: license.type,
-        expirationDate: license.expiresAt,
-        daysUntilExpiration,
-        currentUsers: license.currentUsers,
-        maxUsers: license.maxUsers,
-        utilizationPercent: license.getUserUtilizationPercent(),
+        userId: 'system', // Système notification
+        title: `${urgencyLevel} - Renouvellement de licence requis`,
+        message: this.buildRenewalMessage(license, daysUntilExpiration, societe.name),
+        type: NotificationType.SYSTEM,
+        category: NotificationCategory.LICENSE,
+        priority,
+        data: {
+          societeId: license.societeId,
+          societeDenomination: societe.name,
+          licenseId: license.id,
+          licenseType: license.type,
+          expirationDate: license.expiresAt,
+          daysUntilExpiration,
+          currentUsers,
+          maxUsers: license.maxUsers,
+          utilizationPercent: getUserUtilizationPercent(license, currentUsers),
+        },
+        actionUrl: `/admin/licenses/${license.id}`,
+        actionLabel: 'Renouveler maintenant',
+        expiresAt: license.expiresAt, // Notification expire avec la licence
       },
-      recipientType: RecipientType.ROLE,
-      recipientId: 'admin', // Pour les administrateurs de la société
-      actionUrl: `/admin/licenses/${license.id}`,
-      actionLabel: 'Renouveler maintenant',
-      actionType: 'primary',
-      expiresAt: license.expiresAt, // Notification expire avec la licence
-      persistent: true,
-      autoRead: false,
-      isArchived: false,
     })
 
-    await this.notificationRepository.save(notification)
-
     // Créer des notifications individuelles pour les super-administrateurs
-    const adminUsers = await this.userRepository.find({
+    const adminUsers = await this.prisma.user.findMany({
       where: {
         role: GlobalUserRole.SUPER_ADMIN,
         actif: true,
@@ -613,19 +691,35 @@ export class LicenseManagementService {
     })
 
     for (const admin of adminUsers) {
-      const adminNotification = this.notificationRepository.create({
-        ...notification,
-        id: undefined, // Nouvelle notification
-        recipientType: RecipientType.USER,
-        recipientId: admin.id,
-        title: `[${societe.nom}] ${urgencyLevel} - Licence arrivant à expiration`,
+      await this.prisma.notification.create({
+        data: {
+          societeId: license.societeId,
+          userId: admin.id,
+          title: `[${societe.name}] ${urgencyLevel} - Licence arrivant à expiration`,
+          message: this.buildRenewalMessage(license, daysUntilExpiration, societe.name),
+          type: NotificationType.SYSTEM,
+          category: NotificationCategory.LICENSE,
+          priority,
+          data: {
+            societeId: license.societeId,
+            societeDenomination: societe.name,
+            licenseId: license.id,
+            licenseType: license.type,
+            expirationDate: license.expiresAt,
+            daysUntilExpiration,
+            currentUsers,
+            maxUsers: license.maxUsers,
+            utilizationPercent: getUserUtilizationPercent(license, currentUsers),
+          },
+          actionUrl: `/admin/licenses/${license.id}`,
+          actionLabel: 'Renouveler maintenant',
+          expiresAt: license.expiresAt,
+        },
       })
-
-      await this.notificationRepository.save(adminNotification)
     }
 
     this.logger.log(
-      `Notifications de renouvellement créées pour la société ${societe.nom} (${daysUntilExpiration} jours restants)`
+      `Notifications de renouvellement créées pour la société ${societe.name} (${daysUntilExpiration} jours restants)`
     )
   }
 
@@ -633,7 +727,7 @@ export class LicenseManagementService {
    * Construire le message de notification de renouvellement
    */
   private buildRenewalMessage(
-    license: SocieteLicense,
+    license: License,
     daysUntilExpiration: number,
     societeNom: string
   ): string {
@@ -677,11 +771,11 @@ export class LicenseManagementService {
    * Créer une notification de violation de licence
    */
   async createViolationNotification(
-    license: SocieteLicense,
+    license: License,
     violationType: string,
     details: string
   ): Promise<void> {
-    const societe = await this.societeRepository.findOne({
+    const societe = await this.prisma.societe.findUnique({
       where: { id: license.societeId },
     })
 
@@ -689,45 +783,38 @@ export class LicenseManagementService {
       return
     }
 
-    const notification = this.notificationRepository.create({
-      title: `Violation de licence détectée - ${societe.nom}`,
-      message: `Une violation de licence de type "${violationType}" a été détectée pour la société "${societe.nom}". ${details}`,
-      type: NotificationType.SYSTEM,
-      category: NotificationCategory.SYSTEM,
-      priority: NotificationPriority.URGENT,
-      source: 'license_management',
-      entityType: 'societe_license',
-      entityId: license.id,
+    await this.prisma.notification.create({
       data: {
         societeId: license.societeId,
-        societeDenomination: societe.nom,
-        licenseId: license.id,
-        violationType,
-        details,
-        violationTime: new Date(),
+        userId: 'system', // System notification
+        title: `Violation de licence détectée - ${societe.name}`,
+        message: `Une violation de licence de type "${violationType}" a été détectée pour la société "${societe.name}". ${details}`,
+        type: NotificationType.SYSTEM,
+        category: NotificationCategory.SYSTEM,
+        priority: NotificationPriority.URGENT,
+        data: {
+          societeId: license.societeId,
+          societeDenomination: societe.name,
+          licenseId: license.id,
+          violationType,
+          details,
+          violationTime: new Date(),
+        },
+        actionUrl: `/admin/licenses/${license.id}/violations`,
+        actionLabel: 'Examiner la violation',
       },
-      recipientType: RecipientType.ROLE,
-      recipientId: 'super_admin',
-      actionUrl: `/admin/licenses/${license.id}/violations`,
-      actionLabel: 'Examiner la violation',
-      actionType: 'primary',
-      persistent: true,
-      autoRead: false,
-      isArchived: false,
     })
 
-    await this.notificationRepository.save(notification)
-
     this.logger.warn(
-      `Notification de violation de licence créée pour ${societe.nom}: ${violationType} - ${details}`
+      `Notification de violation de licence créée pour ${societe.name}: ${violationType} - ${details}`
     )
   }
 
   /**
    * Créer une notification de suspension de licence
    */
-  async createSuspensionNotification(license: SocieteLicense, reason: string): Promise<void> {
-    const societe = await this.societeRepository.findOne({
+  async createSuspensionNotification(license: License, reason: string): Promise<void> {
+    const societe = await this.prisma.societe.findUnique({
       where: { id: license.societeId },
     })
 
@@ -735,35 +822,27 @@ export class LicenseManagementService {
       return
     }
 
-    const notification = this.notificationRepository.create({
-      title: `Licence suspendue - ${societe.nom}`,
-      message: `La licence de la société "${societe.nom}" a été suspendue. Raison: ${reason}. Tous les utilisateurs ont été déconnectés.`,
-      type: NotificationType.SYSTEM,
-      category: NotificationCategory.SYSTEM,
-      priority: NotificationPriority.URGENT,
-      source: 'license_management',
-      entityType: 'societe_license',
-      entityId: license.id,
+    await this.prisma.notification.create({
       data: {
         societeId: license.societeId,
-        societeDenomination: societe.nom,
-        licenseId: license.id,
-        suspensionReason: reason,
-        suspensionTime: new Date(),
+        userId: 'system', // System notification
+        title: `Licence suspendue - ${societe.name}`,
+        message: `La licence de la société "${societe.name}" a été suspendue. Raison: ${reason}. Tous les utilisateurs ont été déconnectés.`,
+        type: NotificationType.SYSTEM,
+        category: NotificationCategory.SYSTEM,
+        priority: NotificationPriority.URGENT,
+        data: {
+          societeId: license.societeId,
+          societeDenomination: societe.name,
+          licenseId: license.id,
+          suspensionReason: reason,
+          suspensionTime: new Date(),
+        },
+        actionUrl: `/admin/licenses/${license.id}`,
+        actionLabel: 'Gérer la suspension',
       },
-      recipientType: RecipientType.ROLE,
-      recipientId: 'super_admin',
-      actionUrl: `/admin/licenses/${license.id}`,
-      actionLabel: 'Gérer la suspension',
-      actionType: 'primary',
-      persistent: true,
-      autoRead: false,
-      isArchived: false,
     })
 
-    await this.notificationRepository.save(notification)
-
-    this.logger.error(`Notification de suspension créée pour ${societe.nom}: ${reason}`)
+    this.logger.error(`Notification de suspension créée pour ${societe.name}: ${reason}`)
   }
 }
-

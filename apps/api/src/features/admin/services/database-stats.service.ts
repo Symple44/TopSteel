@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { getErrorMessage } from '../../../core/common/utils'
 
 interface DatabaseStats {
@@ -23,7 +22,7 @@ interface DatabaseStats {
 
 @Injectable()
 export class DatabaseStatsService {
-  constructor(@InjectDataSource('auth') private _dataSource: DataSource) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getStats(): Promise<DatabaseStats> {
     try {
@@ -85,9 +84,9 @@ export class DatabaseStatsService {
       }> = []
 
       // Récupérer toutes les tables
-      const tables = await this._dataSource.query(`
-        SELECT tablename 
-        FROM pg_tables 
+      const tables = await this.prisma.$queryRawUnsafe<Array<{ tablename: string }>>(`
+        SELECT tablename
+        FROM pg_tables
         WHERE schemaname = 'public'
       `)
 
@@ -95,7 +94,7 @@ export class DatabaseStatsService {
       for (const table of tables) {
         try {
           // VACUUM ANALYZE pour optimiser et mettre à jour les statistiques
-          await this._dataSource.query(`VACUUM ANALYZE ${table.tablename}`)
+          await this.prisma.$queryRawUnsafe(`VACUUM ANALYZE ${table.tablename}`)
           results.push({
             table: table.tablename,
             status: 'success',
@@ -112,7 +111,7 @@ export class DatabaseStatsService {
 
       // Réindexer les index
       try {
-        await this._dataSource.query('REINDEX DATABASE CONCURRENTLY')
+        await this.prisma.$queryRawUnsafe('REINDEX DATABASE CONCURRENTLY')
         results.push({
           operation: 'reindex',
           status: 'success',
@@ -141,7 +140,7 @@ export class DatabaseStatsService {
 
   private async getTotalSize(): Promise<string> {
     try {
-      const result = await this._dataSource.query(`
+      const result = await this.prisma.$queryRawUnsafe<Array<{ size: string }>>(`
         SELECT pg_size_pretty(pg_database_size(current_database())) as size
       `)
       return result[0]?.size || '0 B'
@@ -152,12 +151,12 @@ export class DatabaseStatsService {
 
   private async getTotalTables(): Promise<number> {
     try {
-      const result = await this._dataSource.query(`
+      const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>(`
         SELECT COUNT(*) as count
         FROM information_schema.tables
         WHERE table_schema = 'public'
       `)
-      return parseInt(result[0]?.count, 10) || 0
+      return Number(result[0]?.count) || 0
     } catch (_error) {
       return 0
     }
@@ -165,11 +164,11 @@ export class DatabaseStatsService {
 
   private async getTotalRows(): Promise<number> {
     try {
-      const result = await this._dataSource.query(`
+      const result = await this.prisma.$queryRawUnsafe<Array<{ total_rows: bigint }>>(`
         SELECT SUM(n_tup_ins + n_tup_upd + n_tup_del) as total_rows
         FROM pg_stat_user_tables
       `)
-      return parseInt(result[0]?.total_rows, 10) || 0
+      return Number(result[0]?.total_rows) || 0
     } catch (_error) {
       return 0
     }
@@ -177,12 +176,12 @@ export class DatabaseStatsService {
 
   private async getActiveConnections(): Promise<number> {
     try {
-      const result = await this._dataSource.query(`
+      const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>(`
         SELECT COUNT(*) as count
         FROM pg_stat_activity
         WHERE state = 'active'
       `)
-      return parseInt(result[0]?.count, 10) || 0
+      return Number(result[0]?.count) || 0
     } catch (_error) {
       return 0
     }
@@ -190,14 +189,14 @@ export class DatabaseStatsService {
 
   private async getCacheHitRate(): Promise<number> {
     try {
-      const result = await this._dataSource.query(`
+      const result = await this.prisma.$queryRawUnsafe<Array<{ cache_hit_rate: number }>>(`
         SELECT ROUND(
           (sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read))) * 100, 2
         ) as cache_hit_rate
         FROM pg_statio_user_tables
         WHERE heap_blks_hit + heap_blks_read > 0
       `)
-      return parseFloat(result[0]?.cache_hit_rate) || 0
+      return result[0]?.cache_hit_rate || 0
     } catch (_error) {
       return 0
     }
@@ -205,21 +204,21 @@ export class DatabaseStatsService {
 
   private async getQueryPerformance(): Promise<{ avgResponseTime: number; slowQueries: number }> {
     try {
-      const avgResult = await this._dataSource.query(`
+      const avgResult = await this.prisma.$queryRawUnsafe<Array<{ avg_time: number }>>(`
         SELECT ROUND(AVG(mean_exec_time), 2) as avg_time
         FROM pg_stat_statements
         WHERE calls > 0
       `)
 
-      const slowResult = await this._dataSource.query(`
+      const slowResult = await this.prisma.$queryRawUnsafe<Array<{ slow_count: bigint }>>(`
         SELECT COUNT(*) as slow_count
         FROM pg_stat_statements
         WHERE mean_exec_time > 1000
       `)
 
       return {
-        avgResponseTime: parseFloat(avgResult[0]?.avg_time) || 0,
-        slowQueries: parseInt(slowResult[0]?.slow_count, 10) || 0,
+        avgResponseTime: avgResult[0]?.avg_time || 0,
+        slowQueries: Number(slowResult[0]?.slow_count) || 0,
       }
     } catch (_error) {
       // pg_stat_statements pourrait ne pas être disponible
@@ -234,8 +233,16 @@ export class DatabaseStatsService {
     Array<{ tableName: string; totalSize: string; rowCount: number; indexSize: string }>
   > {
     try {
-      const result = await this._dataSource.query(`
-        SELECT 
+      const result = await this.prisma.$queryRawUnsafe<
+        Array<{
+          schemaname: string
+          table_name: string
+          total_size: string
+          index_size: string
+          row_count: bigint
+        }>
+      >(`
+        SELECT
           schemaname,
           tablename as table_name,
           pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as total_size,
@@ -248,19 +255,12 @@ export class DatabaseStatsService {
         LIMIT 20
       `)
 
-      return result.map(
-        (row: {
-          table_name: string
-          total_size: string
-          index_size: string
-          row_count: string
-        }) => ({
-          tableName: row.table_name,
-          totalSize: row.total_size || '0 B',
-          rowCount: parseInt(row.row_count, 10) || 0,
-          indexSize: row.index_size || '0 B',
-        })
-      )
+      return result.map((row) => ({
+        tableName: row.table_name,
+        totalSize: row.total_size || '0 B',
+        rowCount: Number(row.row_count) || 0,
+        indexSize: row.index_size || '0 B',
+      }))
     } catch (_error) {
       return []
     }

@@ -1,12 +1,10 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import { SocieteStatus } from '../../../../features/societes/entities/societe.entity'
 import type {
   ISocieteRepository,
   ISocieteUserRepository,
 } from '../interfaces/societe-repository.interface'
 import { IUserRepository } from '../interfaces/user-repository.interface'
-import { Societe } from '@prisma/client'
 import {
   SOCIETE_REPOSITORY_TOKEN,
   SOCIETE_USER_REPOSITORY_TOKEN,
@@ -67,12 +65,11 @@ export class AuthCoreService {
     const societeUsers = await this.societeUserRepository.findByUserId(userId)
 
     return societeUsers
-      .filter((su) => su.societe?.status === SocieteStatus.ACTIVE)
+      .filter((su) => su.societe?.isActive === true && su.isActive === true)
       .map((su) => ({
         id: su.societe.id,
-        nom: su.societe.nom,
+        nom: su.societe.name,
         code: su.societe.code,
-        isDefault: su.isDefault,
       }))
   }
 

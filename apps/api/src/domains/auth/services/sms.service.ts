@@ -1,13 +1,13 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { InjectRepository } from '@nestjs/typeorm'
+
 // import { Auth } from '@vonage/auth'
 // import { Vonage } from '@vonage/server-sdk'
 import * as Twilio from 'twilio'
-import { Between, type Repository } from 'typeorm'
-import { SMSLog } from '../entities/sms-log.entity'
-import { SmsLog } from '@prisma/client'
+
+import type { SmsLog } from '@prisma/client'
 
 
 /**
@@ -59,8 +59,7 @@ export class SMSService {
 
   constructor(
     private readonly configService: ConfigService,
-    @InjectRepository(SMSLog, 'auth')
-    private readonly smsLogRepository: Repository<SMSLog>
+    private readonly prisma: PrismaService
   ) {
     this.config = {
       provider: this.configService.get<string>(
@@ -227,24 +226,16 @@ export class SMSService {
     responseTime: number
   ): Promise<void> {
     try {
-      const log = this.smsLogRepository.create({
-        phoneNumber: this.maskPhoneNumber(request.phoneNumber),
-        message: request.message.substring(0, 160), // Stocker seulement les 160 premiers caractères
-        messageType: request.messageType || 'info',
-        provider: this.config.provider,
-        status: response.success ? 'sent' : 'failed',
-        messageId: response.messageId,
-        cost: response.cost,
-        segmentCount: response.segmentCount || 1,
-        error: response.error,
-        metadata: {
-          templateId: request.templateId,
-          variables: request.variables,
-          responseTime,
+      await this.prisma.smsLog.create({
+        data: {
+          phoneNumber: this.maskPhoneNumber(request.phoneNumber),
+          message: request.message.substring(0, 160), // Stocker seulement les 160 premiers caractères
+          provider: this.config.provider,
+          status: response.success ? 'sent' : 'failed',
+          errorMessage: response.error || null,
+          sentAt: response.success ? new Date() : null,
         },
       })
-
-      await this.smsLogRepository.save(log)
     } catch (error) {
       this.logger.error('Failed to log SMS:', error)
     }
@@ -457,9 +448,12 @@ export class SMSService {
   }> {
     try {
       // Récupérer tous les logs dans la période
-      const logs = await this.smsLogRepository.find({
+      const logs = await this.prisma.smsLog.findMany({
         where: {
-          createdAt: Between(startDate, endDate),
+          createdAt: {
+            gte: startDate,
+            lte: endDate,
+          },
         },
       })
 
@@ -475,21 +469,22 @@ export class SMSService {
 
       // Calculer les statistiques
       const totalSent = logs.length
-      const successCount = logs.filter((log) => log.status === 'sent').length
+      const successCount = logs.filter((log: SmsLog) => log.status === 'sent').length
       const successRate = (successCount / totalSent) * 100
-      const totalCost = logs.reduce((sum, log) => sum + (log.cost || 0), 0)
+      const totalCost = 0 // Cost field removed from simplified schema
 
       // Grouper par fournisseur
       const byProvider: Record<string, number> = {}
-      logs.forEach((log) => {
-        byProvider[log.provider] = (byProvider[log.provider] || 0) + 1
+      logs.forEach((log: SmsLog) => {
+        const provider = log.provider || 'unknown'
+        byProvider[provider] = (byProvider[provider] || 0) + 1
       })
 
-      // Grouper par type
-      const byType: Record<string, number> = {}
-      logs.forEach((log) => {
-        byType[log.messageType] = (byType[log.messageType] || 0) + 1
-      })
+      // Grouper par type (field removed from simplified schema)
+      const byType: Record<string, number> = {
+        sent: successCount,
+        failed: totalSent - successCount,
+      }
 
       return {
         totalSent,

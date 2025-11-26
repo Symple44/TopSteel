@@ -1,4 +1,5 @@
 import { Controller, Get, Logger, Req, Res } from '@nestjs/common'
+import { Public } from '../../../core/multi-tenant'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
 import { SkipCsrf } from './csrf.guard'
@@ -6,6 +7,7 @@ import { CsrfService } from './csrf.service'
 
 @ApiTags('🔐 CSRF')
 @Controller('csrf')
+@Public()
 export class CsrfController {
   private readonly logger = new Logger(CsrfController.name)
 

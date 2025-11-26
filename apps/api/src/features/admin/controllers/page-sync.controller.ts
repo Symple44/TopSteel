@@ -1,17 +1,19 @@
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Controller, Get, Logger, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Public } from '../../../core/multi-tenant'
+
 import { getErrorMessage } from '../../../core/common/utils'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import { DiscoveredPage } from '../../menu/entities/discovered-page.entity'
+
 import { PageSyncService } from '../../menu/services/page-sync.service'
 
 
 
 @Controller('admin/page-sync')
 @ApiTags('🔧 Admin - Page Synchronization')
+@Public() // Bypass global TenantGuard - CombinedSecurityGuard handles JWT auth
 @UseGuards(CombinedSecurityGuard)
 @RequireSystemAdmin()
 @ApiBearerAuth('JWT-auth')
@@ -20,8 +22,7 @@ export class PageSyncController {
 
   constructor(
     private readonly pageSyncService: PageSyncService,
-    @InjectRepository(DiscoveredPage, 'auth')
-    private readonly discoveredPageRepository: Repository<DiscoveredPage>
+    private readonly prisma: PrismaService
   ) {}
 
   @Post('sync')
@@ -60,33 +61,26 @@ export class PageSyncController {
   async getSyncStatus() {
     try {
       // Récupérer les statistiques réelles depuis la base de données
-      const totalPages = await this.discoveredPageRepository.count()
-      const enabledPages = await this.discoveredPageRepository.count({
-        where: { isEnabled: true },
-      })
-      const visiblePages = await this.discoveredPageRepository.count({
-        where: { isVisible: true },
+      const totalPages = await this.prisma.discoveredPage.count()
+      const enabledPages = await this.prisma.discoveredPage.count({
+        where: { isActive: true },
       })
 
       // Obtenir la dernière page mise à jour
-      const lastUpdatedPage = await this.discoveredPageRepository.findOne({
-        order: { updatedAt: 'DESC' },
+      const lastUpdatedPage = await this.prisma.discoveredPage.findFirst({
+        orderBy: { updatedAt: 'desc' },
       })
 
       // Compter les pages par catégorie
-      const pagesByCategory = await this.discoveredPageRepository
-        .createQueryBuilder('page')
-        .select('page.category, COUNT(*) as count')
-        .groupBy('page.category')
-        .getRawMany()
+      const pagesByCategory = await this.prisma.discoveredPage.groupBy({
+        by: ['category'],
+        _count: true,
+      })
 
-      const categoryStats = pagesByCategory.reduce(
-        (acc, item) => {
-          acc[item.category || 'uncategorized'] = parseInt(item.count, 10)
-          return acc
-        },
-        {} as Record<string, number>
-      )
+      const categoryStats: Record<string, number> = {}
+      for (const item of pagesByCategory) {
+        categoryStats[item.category || 'uncategorized'] = item._count
+      }
 
       return {
         success: true,
@@ -94,7 +88,7 @@ export class PageSyncController {
           lastSync: lastUpdatedPage?.updatedAt || null,
           totalPages,
           enabledPages,
-          visiblePages,
+          visiblePages: enabledPages, // isActive is used for both enabled and visible
           disabledPages: totalPages - enabledPages,
           categoryStats,
           syncHealth: {

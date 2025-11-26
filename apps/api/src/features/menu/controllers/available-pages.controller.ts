@@ -5,14 +5,16 @@ import {
   GlobalUserRole,
   SocieteRoleType,
 } from '../../../domains/auth/core/constants/roles.constants'
-import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
-import type { User } from '../../../domains/users/entities/user.entity'
+import type { User } from '@prisma/client'
 import { PageSyncService } from '../services/page-sync.service'
+import { Public } from '../../../core/multi-tenant'
 
 @Controller('user/available-pages')
 @ApiTags('📋 User - Available Pages')
-@UseGuards(CombinedSecurityGuard)
+@Public() // Bypass TenantGuard - JwtAuthGuard handles authentication
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class AvailablePagesController {
   private readonly logger = new Logger(AvailablePagesController.name)
@@ -54,17 +56,17 @@ export class AvailablePagesController {
       const userPermissions = new Set<string>()
       for (const roleInfo of userSocieteRoles) {
         if (roleInfo.permissions) {
-          roleInfo.permissions.forEach((permission) => {
+          roleInfo.permissions.forEach((permission: string) => {
             userPermissions.add(permission)
           })
         }
         if (roleInfo.additionalPermissions) {
-          roleInfo.additionalPermissions.forEach((permission) => {
+          roleInfo.additionalPermissions.forEach((permission: string) => {
             userPermissions.add(permission)
           })
         }
         if (roleInfo.restrictedPermissions) {
-          roleInfo.restrictedPermissions.forEach((permission) => {
+          roleInfo.restrictedPermissions.forEach((permission: string) => {
             userPermissions.delete(permission)
           })
         }

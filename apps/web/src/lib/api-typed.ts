@@ -1,166 +1,85 @@
 /**
- * Typed API Client Wrapper
- * Ensures all API responses are properly typed
+ * API Typed Utilities - Socle
+ *
+ * Direct API client for calling backend endpoints.
+ * Uses NEXT_PUBLIC_API_URL env var or defaults to localhost:3002
+ * Automatically adds /api prefix for NestJS global prefix
  */
 
-import type { ApiResponse } from '../types/api-types'
-import type { RequestConfig } from './api-client'
-import { apiClient } from './api-client-instance'
-import { extractData, extractError } from './api-response-handler'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
-// HTTPRequestConfig compatible with the API client
-interface HTTPRequestConfig extends RequestConfig {
-  params?: Record<string, unknown>
-  responseType?: 'json' | 'blob' | 'text'
-  signal?: AbortSignal
-}
-
-// Generic typed fetch function
-export async function fetchTyped<T>(url: string, options?: HTTPRequestConfig): Promise<T> {
-  try {
-    // Extract signal from options if present and pass it to the RequestConfig
-    const { signal, ...configOptions } = options || {}
-    const requestConfig: RequestConfig = {
-      ...configOptions,
-      // Pass signal as part of headers or as a custom property if supported
-      ...(signal && { signal }),
+/**
+ * Get the access token from cookies (client-side)
+ */
+function getAccessToken(): string | null {
+  if (typeof document === 'undefined') return null
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    if (name === 'accessToken') {
+      return value
     }
-
-    const response = await apiClient.get<ApiResponse<T>>(url, requestConfig)
-
-    // Handle direct data response
-    if (response && typeof response === 'object') {
-      // Check if it's already the data we want
-      if (!('data' in response) && !('error' in response)) {
-        return response as T
-      }
-
-      // Extract from ApiResponse wrapper
-      if ('data' in response) {
-        return response?.data as T
-      }
-    }
-
-    // Use extraction helper
-    const data = extractData<T>(response)
-    if (data !== null) {
-      return data
-    }
-
-    throw new Error('No data received from API')
-  } catch (error) {
-    const errorMessage = extractError(error)
-    throw new Error(errorMessage || 'API request failed')
   }
+  return null
 }
 
-// POST with typed response
-export async function postTyped<T, D = any>(
-  url: string,
-  data?: D,
-  options?: HTTPRequestConfig
-): Promise<T> {
-  try {
-    const response = await apiClient.post<ApiResponse<T>>(url, data, options)
+export async function fetchTyped<T>(url: string, options?: RequestInit): Promise<T> {
+  // Ensure URL starts with /api for NestJS global prefix
+  const apiUrl = url.startsWith('/api') ? url : `/api${url}`
 
-    // Handle direct response
-    if (response && typeof response === 'object') {
-      if (!('data' in response) && !('error' in response)) {
-        return response as T
-      }
-      if ('data' in response) {
-        return response?.data as T
-      }
-    }
-
-    const extractedData = extractData<T>(response)
-    if (extractedData !== null) {
-      return extractedData
-    }
-
-    throw new Error('No data received from API')
-  } catch (error) {
-    const errorMessage = extractError(error)
-    throw new Error(errorMessage || 'API request failed')
+  // Get auth token and build headers
+  const token = getAccessToken()
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>),
   }
-}
-
-// PUT with typed response
-export async function putTyped<T, D = any>(
-  url: string,
-  data?: D,
-  options?: HTTPRequestConfig
-): Promise<T> {
-  try {
-    const response = await apiClient.put<ApiResponse<T>>(url, data, options)
-
-    if (response && typeof response === 'object') {
-      if (!('data' in response) && !('error' in response)) {
-        return response as T
-      }
-      if ('data' in response) {
-        return response?.data as T
-      }
-    }
-
-    const extractedData = extractData<T>(response)
-    if (extractedData !== null) {
-      return extractedData
-    }
-
-    throw new Error('No data received from API')
-  } catch (error) {
-    const errorMessage = extractError(error)
-    throw new Error(errorMessage || 'API request failed')
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
   }
+
+  const response = await fetch(`${API_BASE_URL}${apiUrl}`, {
+    ...options,
+    credentials: 'include',
+    headers,
+  })
+  if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+  return response.json()
 }
 
-// DELETE with typed response
-export async function deleteTyped<T = void>(url: string, options?: HTTPRequestConfig): Promise<T> {
-  try {
-    const response = await apiClient.delete<ApiResponse<T>>(url, options)
-
-    if (response && typeof response === 'object') {
-      if (!('data' in response) && !('error' in response)) {
-        return response as T
-      }
-      if ('data' in response) {
-        return response?.data as T
-      }
-    }
-
-    const data = extractData<T>(response)
-    if (data !== null) {
-      return data
-    }
-
-    // For DELETE, no data is often expected
-    return undefined as unknown as T
-  } catch (error) {
-    const errorMessage = extractError(error)
-    throw new Error(errorMessage || 'API request failed')
-  }
+export async function postTyped<T>(url: string, data?: unknown): Promise<T> {
+  return fetchTyped<T>(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: data ? JSON.stringify(data) : undefined,
+  })
 }
 
-// Ensure response has data property
-export function ensureDataProperty<T>(response: unknown): { data: T } {
-  if (response && typeof response === 'object') {
-    if ('data' in response) {
-      return response as { data: T }
-    }
-    // Wrap in data property
-    return { data: response as T }
-  }
-  return { data: response as T }
+export async function putTyped<T>(url: string, data?: unknown): Promise<T> {
+  return fetchTyped<T>(url, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: data ? JSON.stringify(data) : undefined,
+  })
 }
 
-// Type guard for checking if response has data
-export function hasDataProperty<T>(response: unknown): response is { data: T } {
-  return response !== null && typeof response === 'object' && 'data' in response
+export async function deleteTyped<T>(url: string): Promise<T> {
+  return fetchTyped<T>(url, { method: 'DELETE' })
 }
 
-// Extract or default
+export function hasDataProperty<T>(obj: unknown): obj is { data: T } {
+  return typeof obj === 'object' && obj !== null && 'data' in obj
+}
+
+export function ensureDataProperty<T>(response: unknown): T {
+  if (hasDataProperty<T>(response)) return response.data
+  return response as T
+}
+
 export function extractOrDefault<T>(response: unknown, defaultValue: T): T {
-  const data = extractData<T>(response)
-  return data !== null ? data : defaultValue
+  try {
+    if (hasDataProperty<T>(response)) return response.data
+    return (response as T) ?? defaultValue
+  } catch {
+    return defaultValue
+  }
 }

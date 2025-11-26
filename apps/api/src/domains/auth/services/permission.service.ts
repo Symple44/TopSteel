@@ -1,12 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { TopSteelLogger } from '../../../core/common/logger/structured-logger.service'
 import { RedisService } from '../../../core/common/services/redis.service'
-import { User } from '../../users/entities/user.entity'
-import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
-
-
 
 /**
  * Définition des permissions système
@@ -86,143 +81,95 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   SUPER_ADMIN: Object.values(Permission), // Toutes les permissions
 
   ADMIN: [
-    // Users (sans super admin)
     Permission.USERS_VIEW,
     Permission.USERS_CREATE,
     Permission.USERS_EDIT,
     Permission.USERS_DELETE,
     Permission.USERS_MANAGE_ROLES,
-
-    // Partners
     Permission.PARTNERS_VIEW,
     Permission.PARTNERS_CREATE,
     Permission.PARTNERS_EDIT,
     Permission.PARTNERS_DELETE,
     Permission.PARTNERS_EXPORT,
-
-    // Inventory
     Permission.INVENTORY_VIEW,
     Permission.INVENTORY_CREATE,
     Permission.INVENTORY_EDIT,
     Permission.INVENTORY_DELETE,
     Permission.INVENTORY_MANAGE_STOCK,
-
-    // Orders
     Permission.ORDERS_VIEW,
     Permission.ORDERS_CREATE,
     Permission.ORDERS_EDIT,
     Permission.ORDERS_DELETE,
     Permission.ORDERS_APPROVE,
     Permission.ORDERS_SHIP,
-
-    // Quotes
     Permission.QUOTES_VIEW,
     Permission.QUOTES_CREATE,
     Permission.QUOTES_EDIT,
     Permission.QUOTES_DELETE,
     Permission.QUOTES_APPROVE,
-
-    // Projects
     Permission.PROJECTS_VIEW,
     Permission.PROJECTS_CREATE,
     Permission.PROJECTS_EDIT,
     Permission.PROJECTS_DELETE,
     Permission.PROJECTS_MANAGE_TEAM,
-
-    // Finance
     Permission.FINANCE_VIEW,
     Permission.FINANCE_CREATE,
     Permission.FINANCE_EDIT,
     Permission.FINANCE_DELETE,
     Permission.FINANCE_APPROVE,
-
-    // Reports
     Permission.REPORTS_VIEW,
     Permission.REPORTS_CREATE,
     Permission.REPORTS_EXPORT,
-
-    // Settings
     Permission.SETTINGS_VIEW,
     Permission.SETTINGS_EDIT,
     Permission.SETTINGS_MANAGE_COMPANY,
-
-    // Admin
     Permission.ADMIN_COMPANY,
   ],
 
   MANAGER: [
-    // Users (lecture seule)
     Permission.USERS_VIEW,
-
-    // Partners
     Permission.PARTNERS_VIEW,
     Permission.PARTNERS_CREATE,
     Permission.PARTNERS_EDIT,
     Permission.PARTNERS_EXPORT,
-
-    // Inventory
     Permission.INVENTORY_VIEW,
     Permission.INVENTORY_CREATE,
     Permission.INVENTORY_EDIT,
     Permission.INVENTORY_MANAGE_STOCK,
-
-    // Orders
     Permission.ORDERS_VIEW,
     Permission.ORDERS_CREATE,
     Permission.ORDERS_EDIT,
     Permission.ORDERS_APPROVE,
     Permission.ORDERS_SHIP,
-
-    // Quotes
     Permission.QUOTES_VIEW,
     Permission.QUOTES_CREATE,
     Permission.QUOTES_EDIT,
     Permission.QUOTES_APPROVE,
-
-    // Projects
     Permission.PROJECTS_VIEW,
     Permission.PROJECTS_CREATE,
     Permission.PROJECTS_EDIT,
     Permission.PROJECTS_MANAGE_TEAM,
-
-    // Finance
     Permission.FINANCE_VIEW,
     Permission.FINANCE_CREATE,
     Permission.FINANCE_EDIT,
-
-    // Reports
     Permission.REPORTS_VIEW,
     Permission.REPORTS_CREATE,
     Permission.REPORTS_EXPORT,
-
-    // Settings
     Permission.SETTINGS_VIEW,
   ],
 
   USER: [
-    // Partners (lecture seule)
     Permission.PARTNERS_VIEW,
-
-    // Inventory (lecture seule)
     Permission.INVENTORY_VIEW,
-
-    // Orders
     Permission.ORDERS_VIEW,
     Permission.ORDERS_CREATE,
-
-    // Quotes
     Permission.QUOTES_VIEW,
     Permission.QUOTES_CREATE,
-
-    // Projects (lecture seule)
     Permission.PROJECTS_VIEW,
-
-    // Reports (lecture seule)
     Permission.REPORTS_VIEW,
   ],
 
   GUEST: [
-    // Lecture seule limitée
     Permission.PARTNERS_VIEW,
     Permission.INVENTORY_VIEW,
     Permission.ORDERS_VIEW,
@@ -232,16 +179,14 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
 
 /**
  * Service de gestion des permissions
+ * Migrated from TypeORM to Prisma
  */
 @Injectable()
 export class PermissionService {
   constructor(
-    @InjectRepository(UserSocieteRole, 'auth')
-    private userSocieteRoleRepository: Repository<UserSocieteRole>,
-    @InjectRepository(User, 'auth')
-    private userRepository: Repository<User>,
-    private cacheService: RedisService,
-    private logger: TopSteelLogger
+    private readonly prisma: PrismaService,
+    private readonly cacheService: RedisService,
+    private readonly logger: TopSteelLogger
   ) {}
 
   /**
@@ -263,7 +208,7 @@ export class PermissionService {
     let permissions: Permission[] = []
 
     // Récupérer l'utilisateur et son rôle global
-    const user = await this.userRepository.findOne({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
     })
 
@@ -277,35 +222,41 @@ export class PermissionService {
 
     // Si une société est spécifiée, récupérer les permissions spécifiques
     if (societeId) {
-      const userSocieteRole = await this.userSocieteRoleRepository.findOne({
+      const userSocieteRole = await this.prisma.userSocieteRole.findFirst({
         where: {
           userId,
           societeId,
           isActive: true,
         },
+        include: {
+          role: true,
+        },
       })
 
-      if (userSocieteRole) {
+      if (userSocieteRole && userSocieteRole.role) {
         // Permissions du rôle spécifique à la société
-        const societePermissions = ROLE_PERMISSIONS[userSocieteRole.roleType] || []
+        const societePermissions = ROLE_PERMISSIONS[userSocieteRole.role.name] || []
 
         // Fusionner avec les permissions globales (prendre le plus élevé)
         const mergedPermissions = this.mergePermissions(globalPermissions, societePermissions)
 
+        // Parse permissions JSON field
+        const permissionsData = userSocieteRole.permissions as any
+        const additionalPermissions = permissionsData?.additionalPermissions as string[] | null
+        const restrictedPermissions = permissionsData?.restrictedPermissions as string[] | null
+
         // Ajouter les permissions additionnelles
-        if (userSocieteRole.additionalPermissions?.length) {
+        if (additionalPermissions?.length) {
           mergedPermissions.push(
-            ...userSocieteRole.additionalPermissions
+            ...additionalPermissions
               .filter((p) => Object.values(Permission).includes(p as Permission))
               .map((p) => p as Permission)
           )
         }
 
         // Retirer les permissions restreintes
-        if (userSocieteRole.restrictedPermissions?.length) {
-          permissions = mergedPermissions.filter(
-            (p) => !userSocieteRole.restrictedPermissions.includes(p)
-          )
+        if (restrictedPermissions?.length) {
+          permissions = mergedPermissions.filter((p) => !restrictedPermissions.includes(p))
         } else {
           permissions = mergedPermissions
         }
@@ -452,4 +403,3 @@ export class PermissionService {
     return summary
   }
 }
-

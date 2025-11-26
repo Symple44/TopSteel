@@ -6,6 +6,7 @@ import { SocietesPrismaModule } from './societes/prisma/societes-prisma.module'
 import { NotificationsPrismaModule } from './notifications/prisma/notifications-prisma.module'
 import { ParametersPrismaModule } from './parameters/prisma/parameters-prisma.module'
 import { LicensingPrismaModule } from './licensing/prisma/licensing-prisma.module'
+import { EmailModule } from '../core/email/email.module'
 
 // Import new Prisma controllers (without -prisma suffix)
 import { UsersController } from './users/users.controller'
@@ -61,6 +62,7 @@ import { LicenseUsageController } from './licensing/controllers/license-usage.co
     NotificationsPrismaModule, // Provides Notification services
     ParametersPrismaModule, // Provides Parameter services
     LicensingPrismaModule, // Provides LicensePrismaService
+    EmailModule, // Provides EmailService for AuthController
   ],
   controllers: [
     // Core Auth & Users

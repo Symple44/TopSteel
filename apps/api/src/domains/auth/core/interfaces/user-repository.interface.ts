@@ -1,4 +1,5 @@
-import type { User } from '../../../users/entities/user.entity'
+// FIXED: Using Prisma types instead of deleted TypeORM entities
+import type { User } from '@prisma/client'
 
 /**
  * Interface d'abstraction pour les opérations utilisateur

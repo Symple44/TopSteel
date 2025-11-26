@@ -3,8 +3,10 @@ import { getErrorMessage } from '../../../core/common/utils'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { MenuRawService } from '../services/menu-raw.service'
+import { Public } from '../../../core/multi-tenant'
 
 @Controller('admin/menu-raw')
+@Public() // Bypass TenantGuard - JwtAuthGuard handles authentication
 @UseGuards(JwtAuthGuard)
 export class MenuRawController {
   constructor(

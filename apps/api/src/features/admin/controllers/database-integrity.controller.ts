@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../../core/multi-tenant'
+import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { DatabaseBackupService } from '../services/database-backup.service'
-import { DatabaseEnumFixService } from '../services/database-enum-fix.service'
+// import { DatabaseEnumFixService } from '../services/database-enum-fix.service'
 import { DatabaseIntegrityService } from '../services/database-integrity.service'
 import type { DatabaseIntegrityReport } from '../services/database-integrity.service'
 import { DatabaseStatsService } from '../services/database-stats.service'
@@ -40,14 +42,15 @@ interface BackupInfo {
 
 @ApiTags('Database Management')
 @Controller('admin/database')
-// @UseGuards(JwtAuthGuard) // Temporairement désactivé pour debug
-// @ApiBearerAuth()
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class DatabaseIntegrityController {
   constructor(
     private readonly databaseIntegrityService: DatabaseIntegrityService,
     private readonly databaseBackupService: DatabaseBackupService,
-    private readonly databaseStatsService: DatabaseStatsService,
-    private readonly databaseEnumFixService: DatabaseEnumFixService
+    private readonly databaseStatsService: DatabaseStatsService
+    // private readonly databaseEnumFixService: DatabaseEnumFixService
   ) {}
 
   @Get('integrity-report')
@@ -164,13 +167,13 @@ export class DatabaseIntegrityController {
     return await this.databaseBackupService.downloadBackup(backupId)
   }
 
-  @Post('fix-enum')
-  @ApiOperation({ summary: "Corriger l'enum notifications_type_enum" })
-  async fixNotificationTypeEnum(): Promise<{
-    success: boolean
-    message: string
-    data?: Record<string, unknown>
-  }> {
-    return await this.databaseEnumFixService.fixNotificationTypeEnum()
-  }
+  // @Post('fix-enum')
+  // @ApiOperation({ summary: "Corriger l'enum notifications_type_enum" })
+  // async fixNotificationTypeEnum(): Promise<{
+  //   success: boolean
+  //   message: string
+  //   data?: Record<string, unknown>
+  // }> {
+  //   return await this.databaseEnumFixService.fixNotificationTypeEnum()
+  // }
 }

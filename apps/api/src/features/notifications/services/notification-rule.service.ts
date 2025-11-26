@@ -1,88 +1,102 @@
+/**
+ * Service migré de TypeORM vers Prisma
+ * Migration automatique + ajustements manuels
+ */
+
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { Prisma, NotificationRule, NotificationRuleExecution, NotificationEvent } from '@prisma/client'
 import {
   ConditionOperator,
   EventStatus,
   ExecutionStatus,
-  NotificationEvent,
-  NotificationRule,
-  NotificationRuleExecution,
   type TriggerType,
 } from '../entities'
 
 @Injectable()
 export class NotificationRuleService {
   constructor(
-    @InjectRepository(NotificationRule)
-    private readonly _ruleRepository: Repository<NotificationRule>,
-    @InjectRepository(NotificationRuleExecution)
-    public readonly _executionRepository: Repository<NotificationRuleExecution>,
-    @InjectRepository(NotificationEvent)
-    public readonly _eventRepository: Repository<NotificationEvent>
+    private readonly prisma: PrismaService
   ) {}
 
   // ===== GESTION DES RÈGLES =====
 
   async createRule(ruleData: Partial<NotificationRule>): Promise<NotificationRule> {
     // Validation des données
-    if (!ruleData.name || !ruleData.trigger || !ruleData.notification) {
-      throw new BadRequestException('Nom, déclencheur et configuration de notification sont requis')
+    if (!ruleData.name || !ruleData.trigger || !ruleData.notification || !ruleData.societeId || !ruleData.type) {
+      throw new BadRequestException('Nom, societeId, type, déclencheur et configuration de notification sont requis')
     }
 
     // Vérifier l'unicité du nom
-    const existingRule = await this._ruleRepository.findOne({
-      where: { name: ruleData.name },
+    const existingRule = await this.prisma.notificationRule.findFirst({
+      where: { name: ruleData.name, societeId: ruleData.societeId },
     })
     if (existingRule) {
       throw new BadRequestException('Une règle avec ce nom existe déjà')
     }
 
-    const rule = this._ruleRepository.create({
-      ...ruleData,
-      isActive: ruleData.isActive ?? true,
-      triggerCount: 0,
-      conditions: ruleData.conditions || [],
-    } as any)
-
-    return await this._ruleRepository.save(rule as any)
+    return await this.prisma.notificationRule.create({
+      data: {
+        name: ruleData.name,
+        societeId: ruleData.societeId,
+        type: ruleData.type,
+        description: ruleData.description,
+        enabled: ruleData.enabled ?? true,
+        isActive: ruleData.isActive ?? true,
+        trigger: (ruleData.trigger || {}) as Prisma.InputJsonValue,
+        conditions: (ruleData.conditions || []) as Prisma.InputJsonValue,
+        actions: (ruleData.actions || []) as Prisma.InputJsonValue,
+        notification: (ruleData.notification || {}) as Prisma.InputJsonValue,
+        triggerCount: 0,
+      },
+    })
   }
 
   async updateRule(id: string, updates: Partial<NotificationRule>): Promise<NotificationRule> {
-    const rule = await this._ruleRepository.findOne({ where: { id } })
+    const rule = await this.prisma.notificationRule.findUnique({ where: { id } })
     if (!rule) {
       throw new NotFoundException('Règle de notification non trouvée')
     }
 
     // Vérifier l'unicité du nom si modifié
     if (updates.name && updates.name !== rule.name) {
-      const existingRule = await this._ruleRepository.findOne({
-        where: { name: updates.name },
+      const existingRule = await this.prisma.notificationRule.findFirst({
+        where: { name: updates.name, societeId: rule.societeId, id: { not: id } },
       })
       if (existingRule) {
         throw new BadRequestException('Une règle avec ce nom existe déjà')
       }
     }
 
-    Object.assign(rule, updates)
-    rule.lastModified = new Date()
-
-    return await this._ruleRepository.save(rule)
+    return await this.prisma.notificationRule.update({
+      where: { id },
+      data: {
+        name: updates.name,
+        description: updates.description,
+        type: updates.type,
+        enabled: updates.enabled,
+        isActive: updates.isActive,
+        trigger: updates.trigger ? (updates.trigger as Prisma.InputJsonValue) : undefined,
+        conditions: updates.conditions ? (updates.conditions as Prisma.InputJsonValue) : undefined,
+        actions: updates.actions ? (updates.actions as Prisma.InputJsonValue) : undefined,
+        notification: updates.notification ? (updates.notification as Prisma.InputJsonValue) : undefined,
+      },
+    })
   }
 
   async deleteRule(id: string): Promise<void> {
-    const rule = await this._ruleRepository.findOne({ where: { id } })
+    const rule = await this.prisma.notificationRule.findUnique({ where: { id } })
     if (!rule) {
       throw new NotFoundException('Règle de notification non trouvée')
     }
 
-    await this._ruleRepository.remove(rule)
+    await this.prisma.notificationRule.delete({ where: { id } })
   }
 
   async getRuleById(id: string): Promise<NotificationRule> {
-    const rule = await this._ruleRepository.findOne({
+    const rule = await this.prisma.notificationRule.findUnique({
       where: { id },
-      relations: ['executions'],
+      include: { executions: true },
     })
     if (!rule) {
       throw new NotFoundException('Règle de notification non trouvée')
@@ -94,34 +108,46 @@ export class NotificationRuleService {
     isActive?: boolean
     triggerType?: TriggerType
     createdBy?: string
+    societeId?: string
   }): Promise<NotificationRule[]> {
-    const query = this._ruleRepository.createQueryBuilder('rule')
+    const where: Prisma.NotificationRuleWhereInput = {}
 
     if (filters?.isActive !== undefined) {
-      query.andWhere('rule.isActive = :isActive', { isActive: filters.isActive })
+      where.isActive = filters.isActive
     }
 
+    if (filters?.societeId) {
+      where.societeId = filters.societeId
+    }
+
+    const rules = await this.prisma.notificationRule.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    })
+
+    // Filter by triggerType from JSON field if provided
     if (filters?.triggerType) {
-      query.andWhere("rule.trigger ->> 'type' = :triggerType", { triggerType: filters.triggerType })
+      return rules.filter((rule) => {
+        const trigger = rule.trigger as any
+        return trigger?.type === filters.triggerType
+      })
     }
 
-    if (filters?.createdBy) {
-      query.andWhere('rule.createdBy = :createdBy', { createdBy: filters.createdBy })
-    }
-
-    return await query.orderBy('rule.createdAt', 'DESC').getMany()
+    return rules
   }
 
   async toggleRuleStatus(id: string): Promise<NotificationRule> {
-    const rule = await this._ruleRepository.findOne({ where: { id } })
+    const rule = await this.prisma.notificationRule.findUnique({ where: { id } })
     if (!rule) {
       throw new NotFoundException('Règle de notification non trouvée')
     }
 
-    rule.isActive = !rule.isActive
-    rule.lastModified = new Date()
-
-    return await this._ruleRepository.save(rule)
+    return await this.prisma.notificationRule.update({
+      where: { id },
+      data: {
+        isActive: !rule.isActive,
+      },
+    })
   }
 
   // ===== GESTION DES ÉVÉNEMENTS =====
@@ -133,23 +159,26 @@ export class NotificationRuleService {
     source?: string,
     userId?: string,
     entityType?: string,
-    entityId?: string
+    entityId?: string,
+    societeId?: string
   ): Promise<NotificationEvent> {
-    const notificationEvent = NotificationEvent.create(
-      type,
-      event,
-      data,
-      source,
-      userId,
-      entityType,
-      entityId
-    )
+    if (!societeId) {
+      throw new BadRequestException('societeId est requis pour créer un événement')
+    }
 
-    return await this._eventRepository.save(notificationEvent)
+    return await this.prisma.notificationEvent.create({
+      data: {
+        societeId,
+        type: type.toString(),
+        source: source || 'system',
+        data: (data || {}) as Prisma.InputJsonValue,
+        processed: false,
+      },
+    })
   }
 
   async getEventById(id: string): Promise<NotificationEvent> {
-    const event = await this._eventRepository.findOne({ where: { id } })
+    const event = await this.prisma.notificationEvent.findUnique({ where: { id } })
     if (!event) {
       throw new NotFoundException('Événement non trouvé')
     }
@@ -161,53 +190,69 @@ export class NotificationRuleService {
     event?: string
     status?: EventStatus
     userId?: string
+    societeId?: string
     limit?: number
     offset?: number
   }): Promise<{ events: NotificationEvent[]; total: number }> {
-    const query = this._eventRepository.createQueryBuilder('event')
+    const where: Prisma.NotificationEventWhereInput = {}
 
     if (filters?.type) {
-      query.andWhere('event.type = :type', { type: filters.type })
+      where.type = filters.type.toString()
     }
 
-    if (filters?.event) {
-      query.andWhere('event.event = :event', { event: filters.event })
+    if (filters?.societeId) {
+      where.societeId = filters.societeId
     }
 
-    if (filters?.status) {
-      query.andWhere('event.status = :status', { status: filters.status })
+    // For status, we map to the processed field
+    if (filters?.status === EventStatus.PROCESSED) {
+      where.processed = true
+    } else if (filters?.status === EventStatus.PENDING) {
+      where.processed = false
     }
 
-    if (filters?.userId) {
-      query.andWhere('event.userId = :userId', { userId: filters.userId })
-    }
-
-    const total = await query.getCount()
-
-    const events = await query
-      .orderBy('event.occurredAt', 'DESC')
-      .limit(filters?.limit || 50)
-      .offset(filters?.offset || 0)
-      .getMany()
+    const [events, total] = await Promise.all([
+      this.prisma.notificationEvent.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: filters?.limit || 50,
+        skip: filters?.offset || 0,
+      }),
+      this.prisma.notificationEvent.count({ where }),
+    ])
 
     return { events, total }
   }
 
   // ===== GESTION DES EXÉCUTIONS =====
 
-  async createExecution(execution: NotificationRuleExecution): Promise<NotificationRuleExecution> {
-    return await this._executionRepository.save(execution)
+  async createExecution(executionData: Partial<NotificationRuleExecution>): Promise<NotificationRuleExecution> {
+    if (!executionData.ruleId) {
+      throw new BadRequestException('ruleId est requis pour créer une exécution')
+    }
+
+    return await this.prisma.notificationRuleExecution.create({
+      data: {
+        ruleId: executionData.ruleId,
+        notificationId: executionData.notificationId,
+        triggered: executionData.triggered ?? false,
+        success: executionData.success ?? false,
+        errorMessage: executionData.errorMessage,
+        executionTime: executionData.executionTime,
+        data: (executionData.data || {}) as Prisma.InputJsonValue,
+      },
+    })
   }
 
   async getExecutionsByRule(
     ruleId: string,
     limit: number = 50
   ): Promise<NotificationRuleExecution[]> {
-    return await this._executionRepository.find({
+    return await this.prisma.notificationRuleExecution.findMany({
       where: { ruleId },
-      order: { executedAt: 'DESC' },
+      orderBy: { createdAt: 'desc' },
       take: limit,
-      relations: ['notification'],
+      include: { notification: true },
     })
   }
 
@@ -218,17 +263,17 @@ export class NotificationRuleService {
     skipped: number
     successRate: number
   }> {
-    const query = this._executionRepository.createQueryBuilder('execution')
+    const where: Prisma.NotificationRuleExecutionWhereInput = {}
 
     if (ruleId) {
-      query.where('execution.ruleId = :ruleId', { ruleId })
+      where.ruleId = ruleId
     }
 
-    const executions = await query.getMany()
+    const executions = await this.prisma.notificationRuleExecution.findMany({ where })
     const total = executions.length
-    const success = executions.filter((e) => e.status === ExecutionStatus.SUCCESS).length
-    const failed = executions.filter((e) => e.status === ExecutionStatus.FAILED).length
-    const skipped = executions.filter((e) => e.status === ExecutionStatus.SKIPPED).length
+    const success = executions.filter((e) => e.success).length
+    const failed = executions.filter((e) => !e.success && e.triggered).length
+    const skipped = executions.filter((e) => !e.triggered).length
     const successRate = total > 0 ? (success / total) * 100 : 0
 
     return {
@@ -378,7 +423,7 @@ export class NotificationRuleService {
 
   // ===== STATISTIQUES =====
 
-  async getDashboardStats(): Promise<{
+  async getDashboardStats(societeId?: string): Promise<{
     totalRules: number
     activeRules: number
     totalEvents: number
@@ -387,14 +432,17 @@ export class NotificationRuleService {
     successRate: number
     recentActivity: unknown[]
   }> {
+    const ruleWhere: Prisma.NotificationRuleWhereInput = societeId ? { societeId } : {}
+    const eventWhere: Prisma.NotificationEventWhereInput = societeId ? { societeId } : {}
+
     const [totalRules, activeRules] = await Promise.all([
-      this._ruleRepository.count(),
-      this._ruleRepository.count({ where: { isActive: true } }),
+      this.prisma.notificationRule.count({ where: ruleWhere }),
+      this.prisma.notificationRule.count({ where: { ...ruleWhere, isActive: true } }),
     ])
 
     const [totalEvents, pendingEvents] = await Promise.all([
-      this._eventRepository.count(),
-      this._eventRepository.count({ where: { status: EventStatus.PENDING } }),
+      this.prisma.notificationEvent.count({ where: eventWhere }),
+      this.prisma.notificationEvent.count({ where: { ...eventWhere, processed: false } }),
     ])
 
     const executionStats = await this.getExecutionStats()
@@ -403,12 +451,14 @@ export class NotificationRuleService {
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
 
-    const recentActivity = await this._eventRepository
-      .createQueryBuilder('event')
-      .where('event.occurredAt >= :date', { date: yesterday })
-      .orderBy('event.occurredAt', 'DESC')
-      .take(10)
-      .getMany()
+    const recentActivity = await this.prisma.notificationEvent.findMany({
+      where: {
+        ...eventWhere,
+        createdAt: { gte: yesterday },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    })
 
     return {
       totalRules,

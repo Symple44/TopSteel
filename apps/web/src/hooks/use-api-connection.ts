@@ -1,26 +1,24 @@
-'use client'
-
-import { useEffect } from 'react'
-import { useConnection } from '../contexts/connection-context'
-import { apiClientEnhanced } from '../lib/api-client-enhanced'
-
 /**
- * Hook pour synchroniser l'état de connexion avec le client API
+ * API Connection Hook Stub - Socle
  */
+import { useState, useEffect } from 'react'
+
 export function useApiConnection() {
-  const { setConnectionLost, setConnectionRestored } = useConnection()
+  const [isConnected, setIsConnected] = useState(true)
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true)
 
   useEffect(() => {
-    // S'abonner aux changements de connexion du client API
-    const unsubscribe = apiClientEnhanced?.onConnectionChange((isConnected) => {
-      if (isConnected) {
-        setConnectionRestored()
-      } else {
-        setConnectionLost()
-      }
-    })
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
 
-    // Nettoyer l'abonnement
-    return unsubscribe
-  }, [setConnectionLost, setConnectionRestored])
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  return { isConnected, isOnline }
 }

@@ -1,6 +1,21 @@
 import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator'
-import { ParameterScope, ParameterType } from '../entities/parameter-system.entity'
-import { ParameterSystem } from '@prisma/client'
+
+// Local enum definitions
+export enum ParameterType {
+  STRING = 'STRING',
+  NUMBER = 'NUMBER',
+  BOOLEAN = 'BOOLEAN',
+  JSON = 'JSON',
+  ARRAY = 'ARRAY',
+  DATE = 'DATE',
+}
+
+export enum ParameterScope {
+  GLOBAL = 'GLOBAL',
+  TENANT = 'TENANT',
+  USER = 'USER',
+  MODULE = 'MODULE',
+}
 
 
 export class CreateParameterSystemDto {

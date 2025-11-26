@@ -50,7 +50,7 @@ export function useDataTableState<T = unknown>(): DataTableState<T> {
 }
 
 /**
- * Hook pour accéder aux actions de filtrage
+ * Hook pour acceder aux actions de filtrage
  */
 export function useDataTableFilters<T>() {
   const context = useDataTableContext<T>()
@@ -58,8 +58,10 @@ export function useDataTableFilters<T>() {
   return {
     filters: context.state.filters,
     searchTerm: context.state.searchTerm,
+    debouncedSearchTerm: context.state.debouncedSearchTerm,
     advancedFilters: context.state.advancedFilters,
     isFiltered: context.state.isFiltered,
+    isSearchPending: context.state.isSearchPending,
     setFilters: context.setFilters,
     addFilter: context.addFilter,
     removeFilter: context.removeFilter,

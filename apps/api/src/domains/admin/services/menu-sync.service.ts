@@ -1,12 +1,13 @@
+/**
+ * Service migré de TypeORM vers Prisma
+ * Migration automatique + ajustements manuels
+ */
+
 import { Injectable, Logger } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { InjectRepository } from '@nestjs/typeorm'
-import { In, type Repository } from 'typeorm'
-
+import { MenuItem, MenuConfiguration, UserMenuPreference } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import { MenuItemAction } from '../entities/menu-item-action.entity'
-import { MenuConfiguration } from '../entities/menu-configuration.entity'
-import { MenuItem } from '../entities/menu-item.entity'
 import { DiscoveredPage, PageDiscoveryService } from './page-discovery.service'
 
 /**
@@ -199,12 +200,7 @@ export class MenuSyncService {
   ]
 
   constructor(
-    @InjectRepository(MenuConfiguration, 'auth')
-    private readonly menuConfigRepository: Repository<MenuConfiguration>,
-    @InjectRepository(MenuItem, 'auth')
-    private readonly menuItemRepository: Repository<MenuItem>,
-    @InjectRepository(MenuItemAction, 'auth')
-    readonly _menuActionRepository: Repository<MenuItemAction>,
+    private readonly prisma: PrismaService,
     private readonly pageDiscoveryService: PageDiscoveryService,
     private readonly cacheService: OptimizedCacheService,
     private readonly eventEmitter: EventEmitter2
@@ -251,20 +247,20 @@ export class MenuSyncService {
 
       // Get menus to sync
       const menus = menuId
-        ? await this.menuConfigRepository.find({ where: { id: menuId } })
-        : await this.menuConfigRepository.find({ where: { type: In(['main', 'sidebar']) } })
+        ? await this.prisma.menuConfiguration.findMany({ where: { id: menuId } })
+        : await this.prisma.menuConfiguration.findMany({ where: { isActive: true } })
 
       for (const menu of menus) {
         this.logger.debug(`Processing menu: ${menu.name} (${menu.id})`)
 
         // Get existing menu items
-        const existingItems = await this.menuItemRepository.find({
-          where: { menuId: menu.id },
-          relations: ['actions'],
+        const existingItems = await this.prisma.menuItem.findMany({
+          where: { menuConfigurationId: menu.id },
+          include: { roles: true, permissions: true },
         })
 
         const existingItemsMap = new Map(
-          existingItems.map((item) => [item.route || item.code, item])
+          existingItems.map((item) => [item.path || item.id, item])
         )
 
         // Process discovered pages
@@ -315,9 +311,10 @@ export class MenuSyncService {
           const pagePathsSet = new Set(pagesToProcess.map((p) => p.fullPath))
 
           for (const item of existingItems) {
-            if (item.route && !pagePathsSet.has(item.route) && !item.metadata?.custom) {
+            const metadata = item.metadata as any
+            if (item.path && !pagePathsSet.has(item.path) && !metadata?.custom) {
               if (!dryRun) {
-                await this.menuItemRepository.remove(item)
+                await this.prisma.menuItem.delete({ where: { id: item.id } })
               }
               result.removed++
               result.items.removed.push(item)
@@ -427,54 +424,69 @@ export class MenuSyncService {
   ): Promise<MenuItem | null> {
     if (dryRun) {
       return {
-        menuId: menu.id,
-        code: this.generateCode(page.fullPath),
+        id: 'dry-run-' + this.generateCode(page.fullPath),
+        menuConfigurationId: menu.id,
+        parentId: null,
         label: mapping.label,
-        labelKey: mapping.labelKey,
-        icon: mapping.icon,
-        iconType: mapping.iconType || 'material',
-        route: page.fullPath,
-        type: mapping.type || 'link',
-        orderIndex: mapping.order || 999,
-        permission: page.metadata.permissions?.[0],
+        icon: mapping.icon || null,
+        path: page.fullPath,
+        order: mapping.order || 999,
         isActive: true,
         isVisible: !mapping.hidden,
-      } as MenuItem
+        metadata: {
+          labelKey: mapping.labelKey,
+          iconType: mapping.iconType || 'material',
+          type: mapping.type || 'link',
+          permission: page.metadata.permissions?.[0],
+          requiredRoles: page.metadata.roles,
+          badge: mapping.badge,
+          badgeColor: mapping.badgeColor,
+          auto: true,
+          discoveredAt: new Date().toISOString(),
+          module: page.module,
+          controller: page.controller,
+          handler: page.handler,
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as unknown as MenuItem
     }
 
     const parentItem = mapping.parent
-      ? await this.menuItemRepository.findOne({
-          where: { menuId: menu.id, code: mapping.parent },
+      ? await this.prisma.menuItem.findFirst({
+          where: {
+            menuConfigurationId: menu.id,
+            label: mapping.parent
+          },
         })
       : null
 
-    const menuItem = this.menuItemRepository.create({
-      menuId: menu.id,
-      parentId: parentItem?.id,
-      code: this.generateCode(page.fullPath),
-      label: mapping.label,
-      labelKey: mapping.labelKey,
-      icon: mapping.icon,
-      iconType: mapping.iconType || 'material',
-      route: page.fullPath,
-      type: mapping.type || 'link',
-      orderIndex: mapping.order || 999,
-      permission: page.metadata.permissions?.[0],
-      requiredRoles: page.metadata.roles ? { roles: page.metadata.roles } : undefined,
-      badge: mapping.badge,
-      badgeColor: mapping.badgeColor,
-      isActive: true,
-      isVisible: !mapping.hidden,
-      metadata: {
-        auto: true,
-        discoveredAt: new Date(),
-        module: page.module,
-        controller: page.controller,
-        handler: page.handler,
+    return await this.prisma.menuItem.create({
+      data: {
+        menuConfigurationId: menu.id,
+        parentId: parentItem?.id,
+        label: mapping.label,
+        icon: mapping.icon,
+        path: page.fullPath,
+        order: mapping.order || 999,
+        isActive: true,
+        isVisible: !mapping.hidden,
+        metadata: {
+          labelKey: mapping.labelKey,
+          iconType: mapping.iconType || 'material',
+          type: mapping.type || 'link',
+          permission: page.metadata.permissions?.[0],
+          requiredRoles: page.metadata.roles,
+          badge: mapping.badge,
+          badgeColor: mapping.badgeColor,
+          auto: true,
+          discoveredAt: new Date(),
+          module: page.module,
+          controller: page.controller,
+          handler: page.handler,
+        },
       },
-    } as any)
-
-    return await this.menuItemRepository.save(menuItem as any)
+    })
   }
 
   /**
@@ -486,10 +498,12 @@ export class MenuSyncService {
     mapping: MenuItemMapping,
     dryRun: boolean
   ): Promise<MenuItem | null> {
+    const metadata = item.metadata as any
+
     // Check if update is needed
     const needsUpdate =
-      item.permission !== page.metadata.permissions?.[0] ||
-      item.requiredRoles?.roles?.join(',') !== page.metadata.roles?.join(',') ||
+      metadata?.permission !== page.metadata.permissions?.[0] ||
+      metadata?.requiredRoles?.join(',') !== page.metadata.roles?.join(',') ||
       item.label !== mapping.label ||
       item.icon !== mapping.icon
 
@@ -500,24 +514,33 @@ export class MenuSyncService {
     if (dryRun) {
       return {
         ...item,
-        permission: page.metadata.permissions?.[0],
-        requiredRoles: page.metadata.roles ? { roles: page.metadata.roles } : undefined,
+        metadata: {
+          ...metadata,
+          permission: page.metadata.permissions?.[0],
+          requiredRoles: page.metadata.roles,
+        },
       } as MenuItem
     }
 
-    item.permission = page.metadata.permissions?.[0]
-    item.requiredRoles = page.metadata.roles ? { roles: page.metadata.roles } : undefined
-
     // Update metadata
-    item.metadata = {
-      ...item.metadata,
+    const updatedMetadata = {
+      ...metadata,
+      permission: page.metadata.permissions?.[0],
+      requiredRoles: page.metadata.roles,
       lastSyncedAt: new Date(),
       module: page.module,
       controller: page.controller,
       handler: page.handler,
     }
 
-    return await this.menuItemRepository.save(item)
+    return await this.prisma.menuItem.update({
+      where: { id: item.id },
+      data: {
+        label: mapping.label,
+        icon: mapping.icon,
+        metadata: updatedMetadata,
+      },
+    })
   }
 
   /**
@@ -554,23 +577,27 @@ export class MenuSyncService {
     unmappedPages: number
   }> {
     const pages = await this.pageDiscoveryService.discoverAllPages()
-    const menuItems = await this.menuItemRepository.find()
+    const menuItems = await this.prisma.menuItem.findMany()
 
     const pagePathsSet = new Set(
       pages.filter((p) => !this.shouldSkipPage(p)).map((p) => p.fullPath)
     )
 
-    const orphanedItems = menuItems.filter(
-      (item) => item.route && !pagePathsSet.has(item.route) && !item.metadata?.custom
-    ).length
+    const orphanedItems = menuItems.filter((item) => {
+      const metadata = item.metadata as any
+      return item.path && !pagePathsSet.has(item.path) && !metadata?.custom
+    }).length
 
-    const mappedPaths = new Set(menuItems.map((item) => item.route).filter(Boolean))
+    const mappedPaths = new Set(menuItems.map((item) => item.path).filter(Boolean))
     const unmappedPages = pages.filter(
       (page) => !this.shouldSkipPage(page) && !mappedPaths.has(page.fullPath)
     ).length
 
     const lastSync = menuItems
-      .map((item) => item.metadata?.lastSyncedAt)
+      .map((item) => {
+        const metadata = item.metadata as any
+        return metadata?.lastSyncedAt ? new Date(metadata.lastSyncedAt) : null
+      })
       .filter((date): date is Date => date instanceof Date)
       .sort((a, b) => a.getTime() - b.getTime())
       .pop()
@@ -588,7 +615,6 @@ export class MenuSyncService {
    * Preview sync changes
    */
   async previewSync(options: MenuSyncOptions = {}): Promise<{
-
     toCreate: Array<{ path: string; label: string; module: string }>
     toUpdate: Array<{ path: string; changes: string[] }>
     toRemove: Array<{ path: string; label: string }>
@@ -596,17 +622,20 @@ export class MenuSyncService {
     const result = await this.syncMenus({ ...options, dryRun: true })
 
     return {
-      toCreate: result.items.created.map((item) => ({
-        path: item.route || '',
-        label: item.label,
-        module: typeof item.metadata?.module === 'string' ? item.metadata.module : 'unknown',
-      })),
+      toCreate: result.items.created.map((item) => {
+        const metadata = item.metadata as any
+        return {
+          path: item.path || '',
+          label: item.label,
+          module: typeof metadata?.module === 'string' ? metadata.module : 'unknown',
+        }
+      }),
       toUpdate: result.items.updated.map((item) => ({
-        path: item.route || '',
+        path: item.path || '',
         changes: ['permissions', 'roles'], // Simplified for now
       })),
       toRemove: result.items.removed.map((item) => ({
-        path: item.route || '',
+        path: item.path || '',
         label: item.label,
       })),
     }
@@ -616,7 +645,7 @@ export class MenuSyncService {
    * Add custom menu item
    */
   async addCustomMenuItem(menuId: string, item: Partial<MenuItem>): Promise<MenuItem> {
-    const menu = await this.menuConfigRepository.findOne({
+    const menu = await this.prisma.menuConfiguration.findUnique({
       where: { id: menuId },
     })
 
@@ -624,17 +653,24 @@ export class MenuSyncService {
       throw new Error(`Menu ${menuId} not found`)
     }
 
-    const menuItem = this.menuItemRepository.create({
-      ...item,
-      menuId,
-      metadata: {
-        ...item.metadata,
-        custom: true,
-        createdAt: new Date(),
+    const itemMetadata = item.metadata as any
+    const saved = await this.prisma.menuItem.create({
+      data: {
+        menuConfigurationId: menuId,
+        parentId: item.parentId,
+        label: item.label || 'New Item',
+        icon: item.icon,
+        path: item.path,
+        order: item.order || 999,
+        isActive: item.isActive !== undefined ? item.isActive : true,
+        isVisible: item.isVisible !== undefined ? item.isVisible : true,
+        metadata: {
+          ...itemMetadata,
+          custom: true,
+          createdAt: new Date(),
+        },
       },
     })
-
-    const saved = await this.menuItemRepository.save(menuItem)
 
     // Clear cache
     await this.cacheService.invalidateGroup('menus')
@@ -653,16 +689,16 @@ export class MenuSyncService {
     const errors: string[] = []
     const warnings: string[] = []
 
-    const menuItems = await this.menuItemRepository.find({
-      where: { menuId },
-      relations: ['actions'],
+    const menuItems = await this.prisma.menuItem.findMany({
+      where: { menuConfigurationId: menuId },
+      include: { roles: true, permissions: true },
     })
 
     // Check for orphaned parent references
     const itemIds = new Set(menuItems.map((item) => item.id))
     for (const item of menuItems) {
       if (item.parentId && !itemIds.has(item.parentId)) {
-        errors.push(`Item ${item.code} references non-existent parent ${item.parentId}`)
+        errors.push(`Item ${item.label} (${item.id}) references non-existent parent ${item.parentId}`)
       }
     }
 
@@ -692,24 +728,27 @@ export class MenuSyncService {
       checkCircular(item.id)
     }
 
-    // Check for duplicate codes
-    const codes = new Map<string, MenuItem[]>()
+    // Check for duplicate paths
+    const paths = new Map<string, MenuItem[]>()
     for (const item of menuItems) {
-      const items = codes.get(item.code) || []
-      items.push(item)
-      codes.set(item.code, items)
-    }
-
-    for (const [code, items] of codes.entries()) {
-      if (items.length > 1) {
-        warnings.push(`Duplicate code '${code}' found in ${items.length} items`)
+      if (item.path) {
+        const items = paths.get(item.path) || []
+        items.push(item)
+        paths.set(item.path, items)
       }
     }
 
+    Array.from(paths.entries()).forEach(([path, items]) => {
+      if (items.length > 1) {
+        warnings.push(`Duplicate path '${path}' found in ${items.length} items`)
+      }
+    })
+
     // Check for missing permissions
     for (const item of menuItems) {
-      if (!item.permission && !item.metadata?.custom) {
-        warnings.push(`Item ${item.code} has no permission defined`)
+      const metadata = item.metadata as any
+      if (!metadata?.permission && !metadata?.custom) {
+        warnings.push(`Item ${item.label} has no permission defined`)
       }
     }
 

@@ -29,6 +29,7 @@ export class NotificationTemplatePrismaService {
   async createNotificationTemplate(data: {
     code: string
     name: string
+    societeId: string
     description?: string
     type: string
     template: string
@@ -42,6 +43,7 @@ export class NotificationTemplatePrismaService {
         data: {
           code: data.code,
           name: data.name,
+          societeId: data.societeId,
           description: data.description || null,
           type: data.type,
           template: data.template,
@@ -196,6 +198,7 @@ export class NotificationTemplatePrismaService {
   async upsertNotificationTemplate(data: {
     code: string
     name: string
+    societeId: string
     description?: string
     type: string
     template: string
@@ -210,6 +213,7 @@ export class NotificationTemplatePrismaService {
         create: {
           code: data.code,
           name: data.name,
+          societeId: data.societeId,
           description: data.description || null,
           type: data.type,
           template: data.template,

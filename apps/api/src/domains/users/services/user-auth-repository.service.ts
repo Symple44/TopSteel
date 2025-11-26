@@ -1,8 +1,8 @@
+import type { User } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+
 import { IUserRepository } from '../../auth/core/interfaces/user-repository.interface'
-import { User } from '../entities/user.entity'
 
 /**
  * Implémentation du repository utilisateur pour l'authentification
@@ -11,21 +11,23 @@ import { User } from '../entities/user.entity'
 @Injectable()
 export class UserAuthRepositoryService implements IUserRepository {
   constructor(
-    @InjectRepository(User, 'auth')
-    private readonly userRepository: Repository<User>
+    private readonly prisma: PrismaService
   ) {}
 
   async findByEmailOrAcronym(emailOrAcronym: string): Promise<User | null> {
-    return await this.userRepository.findOne({
-      where: [{ email: emailOrAcronym }, { acronyme: emailOrAcronym }],
-      select: ['id', 'email', 'nom', 'prenom', 'acronyme', 'password', 'role'],
+    return await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: emailOrAcronym },
+          { acronyme: emailOrAcronym }
+        ]
+      },
     })
   }
 
   async findById(id: string): Promise<User | null> {
-    return await this.userRepository.findOne({
+    return await this.prisma.user.findFirst({
       where: { id },
-      select: ['id', 'email', 'nom', 'prenom', 'acronyme', 'role'],
     })
   }
 
@@ -36,12 +38,12 @@ export class UserAuthRepositoryService implements IUserRepository {
   }
 
   async existsByEmail(email: string): Promise<boolean> {
-    const count = await this.userRepository.count({ where: { email } })
+    const count = await this.prisma.user.count({ where: { email } })
     return count > 0
   }
 
   async existsByAcronym(acronym: string): Promise<boolean> {
-    const count = await this.userRepository.count({ where: { acronyme: acronym } })
+    const count = await this.prisma.user.count({ where: { acronyme: acronym } })
     return count > 0
   }
 }

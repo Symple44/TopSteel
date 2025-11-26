@@ -431,11 +431,11 @@ export default function CompanySelector({
       } else {
       }
     } catch {
-      toast?.error(t('companies.loadingError'))
+      toast?.error('Erreur lors du chargement des sociétés')
     } finally {
       setLoading(false)
     }
-  }, [t])
+  }, []) // Removed t dependency to prevent infinite loop
 
   useEffect(() => {
     // Charger les sociétés une seule fois au montage

@@ -1,6 +1,6 @@
 'use client'
 
-import { Columns, Download, Filter, Plus, Search, Settings } from 'lucide-react'
+import { Columns, Download, Filter, Loader2, Plus, Search, Settings } from 'lucide-react'
 import type React from 'react'
 import { Button } from '../../../../primitives/button'
 import {
@@ -143,7 +143,7 @@ export function DataTableHeader({
 
       {/* Barre de recherche et filtres */}
       <div className="flex items-center gap-4">
-        {/* Recherche */}
+        {/* Recherche avec indicateur de debounce */}
         {showSearch && (
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -151,8 +151,12 @@ export function DataTableHeader({
               placeholder={searchPlaceholder}
               value={state.searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
+              className="pl-9 pr-9"
             />
+            {/* Indicateur de recherche en cours */}
+            {state.isSearchPending && (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
+            )}
           </div>
         )}
 

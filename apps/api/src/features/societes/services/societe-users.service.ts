@@ -1,280 +1,265 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { IsNull, type Repository } from 'typeorm'
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { SocieteUser, type UserSocieteRole } from '../entities/societe-user.entity'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import type { SocieteUser, Prisma } from '@prisma/client'
 
-
-
+/**
+ * Service de gestion des associations utilisateur-société
+ * Migrated from TypeORM to Prisma
+ *
+ * Note: Le schéma Prisma SocieteUser n'a pas certains champs de l'ancienne entité TypeORM:
+ * - pas de champ 'deletedAt' (soft delete désactivé)
+ * - 'actif' renommé en 'isActive'
+ * - pas de champ 'role', 'isDefault', 'lastActivityAt', 'restrictedPermissions'
+ */
 @Injectable()
 export class SocieteUsersService {
-  constructor(
-    @InjectRepository(SocieteUser, 'auth')
-    private _societeUserRepository: Repository<SocieteUser>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Récupère toutes les associations utilisateur-société
+   */
   async findAll(): Promise<SocieteUser[]> {
-    return this._societeUserRepository.find({
-      where: { deletedAt: IsNull() },
-      relations: ['societe'],
+    return this.prisma.societeUser.findMany({
+      include: { societe: true, user: true },
     })
   }
 
+  /**
+   * Récupère toutes les sociétés d'un utilisateur
+   */
   async findByUser(userId: string): Promise<SocieteUser[]> {
-    return this._societeUserRepository
-      .createQueryBuilder('su')
-      .leftJoinAndSelect('su.societe', 'societe')
-      .leftJoinAndSelect('societe.sites', 'sites')
-      .select([
-        'su.id',
-        'su.user_id',
-        'su.societe_id',
-        'su.role',
-        'su.actif',
-        'su.is_default',
-        'su.permissions',
-        'su.restricted_permissions',
-        'societe.id',
-        'societe.nom',
-        'societe.code',
-        'sites.id',
-        'sites.nom',
-        'sites.code',
-        'sites.is_principal',
-      ])
-      .where('su.user_id = :userId', { userId })
-      .andWhere('su.deleted_at IS NULL')
-      .getMany()
-  }
-
-  async findBySociete(societeId: string): Promise<SocieteUser[]> {
-    return this._societeUserRepository.find({
-      where: {
-        societeId,
-        deletedAt: IsNull(),
-      },
-      relations: ['societe'],
-    })
-  }
-
-  async findUserSociete(userId: string, societeId: string): Promise<SocieteUser | null> {
-    return this._societeUserRepository.findOne({
-      where: {
-        userId,
-        societeId,
-        deletedAt: IsNull(),
-      },
-      relations: ['societe'],
-    })
-  }
-
-  async findDefaultSociete(userId: string): Promise<SocieteUser | null> {
-    return this._societeUserRepository.findOne({
-      where: {
-        userId,
-        isDefault: true,
-        actif: true,
-        deletedAt: IsNull(),
-      },
-      relations: ['societe'],
-    })
-  }
-
-  async create(associationData: Partial<SocieteUser>): Promise<SocieteUser> {
-    const association = this._societeUserRepository.create(associationData)
-    return this._societeUserRepository.save(association)
-  }
-
-  async update(
-    id: string,
-    associationData: QueryDeepPartialEntity<SocieteUser>
-  ): Promise<SocieteUser> {
-    await this._societeUserRepository.update(id, associationData)
-    const association = await this._societeUserRepository.findOne({
-      where: { id },
-      relations: ['societe'],
-    })
-    if (!association) {
-      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
-    }
-    return association
-  }
-
-  async delete(id: string): Promise<void> {
-    await this._societeUserRepository.softDelete(id)
-  }
-
-  async setDefault(userId: string, societeId: string): Promise<SocieteUser> {
-    // D'abord, retirer le statut par défaut des autres associations
-    await this._societeUserRepository.update({ userId }, { isDefault: false })
-
-    // Puis définir la nouvelle association par défaut
-    const association = await this.findUserSociete(userId, societeId)
-    if (association) {
-      await this._societeUserRepository.update(association.id, {
-        isDefault: true,
-      })
-      const updatedAssociation = await this._societeUserRepository.findOne({
-        where: { id: association.id },
-        relations: ['societe'],
-      })
-      if (!updatedAssociation) {
-        throw new NotFoundException(`SocieteUser with ID ${association.id} not found`)
-      }
-      return updatedAssociation
-    }
-
-    throw new Error('Association utilisateur-société non trouvée')
-  }
-
-  async activate(id: string): Promise<SocieteUser> {
-    await this._societeUserRepository.update(id, { actif: true })
-    const association = await this._societeUserRepository.findOne({
-      where: { id },
-      relations: ['societe'],
-    })
-    if (!association) {
-      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
-    }
-    return association
-  }
-
-  async deactivate(id: string): Promise<SocieteUser> {
-    await this._societeUserRepository.update(id, { actif: false })
-    const association = await this._societeUserRepository.findOne({
-      where: { id },
-      relations: ['societe'],
-    })
-    if (!association) {
-      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
-    }
-    return association
-  }
-
-  async updateLastActivity(userId: string, societeId: string): Promise<void> {
-    const association = await this.findUserSociete(userId, societeId)
-    if (association) {
-      await this._societeUserRepository.update(association.id, {
-        lastActivityAt: new Date(),
-      })
-    }
-  }
-
-  async grantPermissions(id: string, permissions: string[]): Promise<SocieteUser> {
-    const association = await this._societeUserRepository.findOne({ where: { id } })
-    if (association) {
-      const existingPermissions = association.permissions || []
-      const newPermissions = [...new Set([...existingPermissions, ...permissions])]
-
-      await this._societeUserRepository.update(id, {
-        permissions: newPermissions,
-      })
-    }
-
-    const updatedAssociation = await this._societeUserRepository.findOne({
-      where: { id },
-      relations: ['societe'],
-    })
-    if (!updatedAssociation) {
-      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
-    }
-    return updatedAssociation
-  }
-
-  async revokePermissions(id: string, permissions: string[]): Promise<SocieteUser> {
-    const association = await this._societeUserRepository.findOne({ where: { id } })
-    if (association) {
-      const existingPermissions = association.permissions || []
-      const newPermissions = existingPermissions.filter((p) => !permissions.includes(p))
-
-      await this._societeUserRepository.update(id, {
-        permissions: newPermissions,
-      })
-    }
-
-    const updatedAssociation = await this._societeUserRepository.findOne({
-      where: { id },
-      relations: ['societe'],
-    })
-    if (!updatedAssociation) {
-      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
-    }
-    return updatedAssociation
-  }
-
-  async getUserCompanies(userId: string): Promise<SocieteUser[]> {
-    return await this._societeUserRepository.find({
+    return this.prisma.societeUser.findMany({
       where: { userId },
-      relations: ['societe'],
+      include: {
+        societe: {
+          include: {
+            sites: true,
+          },
+        },
+      },
     })
   }
 
-  async getCompanyUsers(societeId: string): Promise<SocieteUser[]> {
-    return await this._societeUserRepository.find({
+  /**
+   * Récupère tous les utilisateurs d'une société
+   */
+  async findBySociete(societeId: string): Promise<SocieteUser[]> {
+    return this.prisma.societeUser.findMany({
       where: { societeId },
-      relations: ['user'],
+      include: { societe: true, user: true },
     })
   }
 
+  /**
+   * Trouve l'association entre un utilisateur et une société
+   */
+  async findUserSociete(userId: string, societeId: string): Promise<SocieteUser | null> {
+    return this.prisma.societeUser.findFirst({
+      where: {
+        userId,
+        societeId,
+      },
+      include: { societe: true, user: true },
+    })
+  }
+
+  /**
+   * Récupère toutes les sociétés actives d'un utilisateur
+   */
+  async findActiveBySociete(userId: string): Promise<SocieteUser[]> {
+    return this.prisma.societeUser.findMany({
+      where: {
+        userId,
+        isActive: true,
+      },
+      include: { societe: true },
+    })
+  }
+
+  /**
+   * Crée une nouvelle association utilisateur-société
+   */
+  async create(associationData: Prisma.SocieteUserCreateInput): Promise<SocieteUser> {
+    return this.prisma.societeUser.create({
+      data: associationData,
+      include: { societe: true, user: true },
+    })
+  }
+
+  /**
+   * Met à jour une association utilisateur-société
+   */
+  async update(id: string, associationData: Prisma.SocieteUserUpdateInput): Promise<SocieteUser> {
+    const association = await this.prisma.societeUser.update({
+      where: { id },
+      data: associationData,
+      include: { societe: true, user: true },
+    })
+
+    if (!association) {
+      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
+    }
+
+    return association
+  }
+
+  /**
+   * Supprime une association utilisateur-société
+   * Note: Le schéma Prisma n'a pas de soft delete pour SocieteUser
+   */
+  async delete(id: string): Promise<void> {
+    await this.prisma.societeUser.delete({
+      where: { id },
+    })
+  }
+
+  /**
+   * Active une association utilisateur-société
+   */
+  async activate(id: string): Promise<SocieteUser> {
+    const association = await this.prisma.societeUser.update({
+      where: { id },
+      data: { isActive: true },
+      include: { societe: true, user: true },
+    })
+
+    if (!association) {
+      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
+    }
+
+    return association
+  }
+
+  /**
+   * Désactive une association utilisateur-société
+   */
+  async deactivate(id: string): Promise<SocieteUser> {
+    const association = await this.prisma.societeUser.update({
+      where: { id },
+      data: { isActive: false, leftAt: new Date() },
+      include: { societe: true, user: true },
+    })
+
+    if (!association) {
+      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
+    }
+
+    return association
+  }
+
+  /**
+   * Accorde des permissions à un utilisateur pour une société
+   */
+  async grantPermissions(id: string, permissions: string[]): Promise<SocieteUser> {
+    const association = await this.prisma.societeUser.findUnique({ where: { id } })
+
+    if (!association) {
+      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
+    }
+
+    const existingPermissions = (association.permissions as string[]) || []
+    const newPermissions = [...new Set([...existingPermissions, ...permissions])]
+
+    return this.prisma.societeUser.update({
+      where: { id },
+      data: { permissions: newPermissions },
+      include: { societe: true, user: true },
+    })
+  }
+
+  /**
+   * Révoque des permissions à un utilisateur pour une société
+   */
+  async revokePermissions(id: string, permissions: string[]): Promise<SocieteUser> {
+    const association = await this.prisma.societeUser.findUnique({ where: { id } })
+
+    if (!association) {
+      throw new NotFoundException(`SocieteUser with ID ${id} not found`)
+    }
+
+    const existingPermissions = (association.permissions as string[]) || []
+    const newPermissions = existingPermissions.filter((p) => !permissions.includes(p))
+
+    return this.prisma.societeUser.update({
+      where: { id },
+      data: { permissions: newPermissions },
+      include: { societe: true, user: true },
+    })
+  }
+
+  /**
+   * Récupère toutes les sociétés d'un utilisateur
+   */
+  async getUserCompanies(userId: string): Promise<SocieteUser[]> {
+    return this.prisma.societeUser.findMany({
+      where: { userId },
+      include: { societe: true },
+    })
+  }
+
+  /**
+   * Récupère tous les utilisateurs d'une société
+   */
+  async getCompanyUsers(societeId: string): Promise<SocieteUser[]> {
+    return this.prisma.societeUser.findMany({
+      where: { societeId },
+      include: { user: true },
+    })
+  }
+
+  /**
+   * Accorde l'accès à une société pour un utilisateur
+   */
   async grantUserAccess(
     societeId: string,
     userId: string,
-    role: string,
     permissions: string[] = [],
     isActive: boolean = true
   ): Promise<SocieteUser> {
-    const roleEnum = role as UserSocieteRole
     const existingAccess = await this.findUserSociete(userId, societeId)
 
     if (existingAccess) {
       // Update existing access
-      await this._societeUserRepository.update(existingAccess.id, {
-        role: roleEnum,
-        permissions,
-        actif: isActive,
-      })
-      const updated = await this._societeUserRepository.findOne({
+      return this.prisma.societeUser.update({
         where: { id: existingAccess.id },
-        relations: ['societe'],
+        data: {
+          permissions,
+          isActive,
+        },
+        include: { societe: true, user: true },
       })
-      if (!updated) {
-        throw new NotFoundException(`SocieteUser with ID ${existingAccess.id} not found`)
-      }
-      return updated
-    } else {
-      // Create new access
-      const newAccess = this._societeUserRepository.create({
-        userId,
-        societeId,
-        role: roleEnum,
-        permissions,
-        actif: isActive,
-      })
-      return await this._societeUserRepository.save(newAccess)
     }
+
+    // Create new access
+    return this.prisma.societeUser.create({
+      data: {
+        user: { connect: { id: userId } },
+        societe: { connect: { id: societeId } },
+        permissions,
+        isActive,
+      },
+      include: { societe: true, user: true },
+    })
   }
 
+  /**
+   * Met à jour l'accès d'un utilisateur à une société
+   */
   async updateUserAccess(
     societeUserId: string,
     updates: {
-      role?: string
       permissions?: string[]
       isActive?: boolean
     }
   ): Promise<SocieteUser> {
-    const updateData: Partial<SocieteUser> = {}
-    if (updates.role !== undefined) updateData.role = updates.role as UserSocieteRole
+    const updateData: Prisma.SocieteUserUpdateInput = {}
     if (updates.permissions !== undefined) updateData.permissions = updates.permissions
-    if (updates.isActive !== undefined) updateData.actif = updates.isActive
+    if (updates.isActive !== undefined) updateData.isActive = updates.isActive
 
-    await this._societeUserRepository.update(
-      societeUserId,
-      updateData as QueryDeepPartialEntity<SocieteUser>
-    )
-
-    const updated = await this._societeUserRepository.findOne({
+    const updated = await this.prisma.societeUser.update({
       where: { id: societeUserId },
-      relations: ['societe'],
+      data: updateData,
+      include: { societe: true, user: true },
     })
 
     if (!updated) {
@@ -284,14 +269,14 @@ export class SocieteUsersService {
     return updated
   }
 
+  /**
+   * Met à jour les permissions d'un utilisateur pour une société
+   */
   async updateUserPermissions(societeUserId: string, permissions: string[]): Promise<SocieteUser> {
-    await this._societeUserRepository.update(societeUserId, {
-      permissions,
-    } as QueryDeepPartialEntity<SocieteUser>)
-
-    const updated = await this._societeUserRepository.findOne({
+    const updated = await this.prisma.societeUser.update({
       where: { id: societeUserId },
-      relations: ['societe'],
+      data: { permissions },
+      include: { societe: true, user: true },
     })
 
     if (!updated) {
@@ -301,28 +286,16 @@ export class SocieteUsersService {
     return updated
   }
 
+  /**
+   * Révoque l'accès d'un utilisateur à une société
+   */
   async revokeUserAccess(societeUserId: string): Promise<void> {
-    const result = await this._societeUserRepository.delete(societeUserId)
-    if (result.affected === 0) {
+    try {
+      await this.prisma.societeUser.delete({
+        where: { id: societeUserId },
+      })
+    } catch (error) {
       throw new NotFoundException(`SocieteUser with ID ${societeUserId} not found`)
-    }
-  }
-
-  async setDefaultSociete(userId: string, societeId: string): Promise<void> {
-    // D'abord, enlever le statut par défaut de toutes les sociétés de l'utilisateur
-    await this._societeUserRepository.update({ userId }, { isDefault: false })
-
-    // Ensuite, définir la société spécifiée comme par défaut
-    const result = await this._societeUserRepository.update(
-      { userId, societeId },
-      {
-        isDefault: true,
-      }
-    )
-
-    if (result.affected === 0) {
-      throw new NotFoundException(`No access found for user ${userId} to company ${societeId}`)
     }
   }
 }
-

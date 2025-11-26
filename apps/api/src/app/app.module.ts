@@ -1,5 +1,6 @@
 // apps/api/src/app.module.ts
 import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common'
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 // Controllers
 import { TestController } from '../api/controllers/test.controller'
 // Middleware
@@ -8,6 +9,8 @@ import { LoggerMiddleware } from '../core/common/middleware/logger.middleware'
 // Core modules
 import { CoreModule } from '../core/core.module'
 import { SecurityModule } from '../core/security/security.module'
+// Multi-tenant
+import { MultiTenantModule, TenantGuard, TenantRLSInterceptor } from '../core/multi-tenant'
 // Domain modules
 import { AuthModule } from '../domains/auth/auth.module'
 import { AuthPrismaModule } from '../domains/auth/prisma/auth-prisma.module'
@@ -45,6 +48,9 @@ import { AppService } from './app.service'
     // Core infrastructure (Config, DB, Redis, Health, Monitoring)
     CoreModule,
 
+    // Multi-tenant support (RLS, context, middleware)
+    MultiTenantModule,
+
     // Enhanced security with CSP and nonce support
     SecurityModule,
 
@@ -68,7 +74,19 @@ import { AppService } from './app.service'
     FeaturesModule,
   ],
   controllers: [AppController, TestController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // Multi-tenant global guard (applies to all routes)
+    {
+      provide: APP_GUARD,
+      useClass: TenantGuard,
+    },
+    // Multi-tenant RLS interceptor (configures PostgreSQL session variables)
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TenantRLSInterceptor,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

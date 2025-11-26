@@ -1,33 +1,29 @@
 // apps/api/src/modules/auth/guards/jwt-auth.guard.ts
 import { type ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import type { Observable } from 'rxjs'
-import { IS_PUBLIC_KEY } from '../../../../core/common/decorators/public.decorator'
-import type { User } from '../../../users/entities/user.entity'
+import type { User } from '@prisma/client'
 
+/**
+ * JWT Authentication Guard
+ *
+ * This guard validates JWT tokens when explicitly applied via @UseGuards(JwtAuthGuard).
+ * Unlike the global TenantGuard, this guard does NOT check for @Public() decorator
+ * because when you explicitly apply this guard, you WANT JWT validation.
+ *
+ * Use case: Routes that need JWT validation but bypass tenant validation (like /auth/verify)
+ * - Mark route with @Public() to bypass global TenantGuard
+ * - Apply @UseGuards(JwtAuthGuard) to enforce JWT validation
+ */
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   private readonly logger = new Logger(JwtAuthGuard.name)
 
-  constructor(private readonly reflector: Reflector) {
-    super()
-  }
-
   override canActivate(
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
-    // Vérifier si la route est marquée comme publique
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ])
-
-    if (isPublic) {
-      return true
-    }
-
-    // Appeler la logique d'authentification parent
+    // Always validate JWT when this guard is explicitly applied
+    // No @Public() check - that's handled by the global TenantGuard
     return super.canActivate(context)
   }
 

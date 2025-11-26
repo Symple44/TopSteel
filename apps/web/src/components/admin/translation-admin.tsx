@@ -81,11 +81,11 @@ export function TranslationAdmin() {
       setEntries(loadedEntries)
       setStats(calculateTranslationStats(loadedEntries))
     } catch (_error) {
-      toast?.error(t('modules.translations.loadError'))
+      toast?.error('Erreur lors du chargement des traductions')
     } finally {
       setLoading(false)
     }
-  }, [t])
+  }, []) // Removed t dependency to prevent infinite loop
 
   // Charger les traductions au montage - une seule fois
   useEffect(() => {

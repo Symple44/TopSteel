@@ -1,27 +1,102 @@
+import { Prisma, type UserMenuPreferences, type UserMenuItemPreference } from '@prisma/client'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { UserMenuItemPreference } from '../entities/user-menu-item-preference.entity'
-import { UserMenuPreferences } from '../entities/user-menu-preferences.entity'
+
 import { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
 
+/**
+ * Service for managing user menu preferences
+ *
+ * Schema fields available:
+ * - UserMenuPreferences: userId, societeId, theme, layout, customColors, shortcuts
+ * - UserMenuItemPreference: userMenuPreferencesId, menuItemId, isVisible, order, customLabel
+ *
+ * Additional data is stored in JSON fields (customColors, shortcuts) or as computed values
+ */
 
-// Interface for UserMenuItemPreference data
-interface UserMenuItemPreferenceData {
+// Type definitions for JSON fields
+interface CustomColors {
+  primary?: string
+  secondary?: string
+  accent?: string
+}
+
+interface Shortcut {
+  key: string
+  href: string
+  title: string
+}
+
+interface ExtendedPreferences {
+  // Core fields from schema
+  theme: string | null
+  layout: string | null
+  customColors: CustomColors | null
+  shortcuts: Shortcut[] | null
+
+  // Virtual fields (stored in JSON or computed)
+  useCustomLayout?: boolean
+  layoutType?: string
+  showIcons?: boolean
+  showBadges?: boolean
+  allowCollapse?: boolean
+  favoriteItems?: string[]
+  hiddenItems?: string[]
+  pinnedItems?: string[]
+  customOrder?: Record<string, number>
+}
+
+// Helper functions
+function getDefaultPreferences(): ExtendedPreferences {
+  return {
+    theme: 'light',
+    layout: 'standard',
+    customColors: null,
+    shortcuts: null,
+    useCustomLayout: false,
+    layoutType: 'standard',
+    showIcons: true,
+    showBadges: true,
+    allowCollapse: true,
+    favoriteItems: [],
+    hiddenItems: [],
+    pinnedItems: [],
+    customOrder: undefined,
+  }
+}
+
+function createUserMenuItemPreferenceData(
+  userPreferencesId: string,
+  menuItemId: string,
+  data?: Partial<UserMenuItemPreference>
+): Prisma.UserMenuItemPreferenceCreateInput {
+  return {
+    preferences: {
+      connect: { id: userPreferencesId }
+    },
+    menuItemId,
+    isVisible: data?.isVisible ?? true,
+    order: data?.order ?? null,
+    customLabel: data?.customLabel ?? null,
+  }
+}
+
+// Interface for extended item preferences with virtual fields
+interface ExtendedItemPreference {
   id: string
-  userPreferencesId: string
+  userMenuPreferencesId: string
   menuItemId: string
   isVisible: boolean
-  isFavorite: boolean
-  isPinned: boolean
-  customOrder?: number
+  order: number | null
+  customLabel: string | null
+  // Virtual fields (computed or from parent preferences JSON)
+  isFavorite?: boolean
+  isPinned?: boolean
   customTitle?: string
   customIcon?: string
   customColor?: string
   customBadge?: string
-  metadata?: Record<string, unknown>
-  createdAt: Date
-  updatedAt: Date
+  customOrder?: number
 }
 
 export interface UpdateUserPreferencesDto {
@@ -31,22 +106,22 @@ export interface UpdateUserPreferencesDto {
   showBadges?: boolean
   allowCollapse?: boolean
   theme?: 'light' | 'dark' | 'auto'
-  customColors?: {
-    primary?: string
-    secondary?: string
-    accent?: string
-  }
+  customColors?: CustomColors
+  favoriteItems?: string[]
+  hiddenItems?: string[]
+  pinnedItems?: string[]
+  customOrder?: Record<string, number>
 }
 
 export interface MenuItemAction {
   action: 'favorite' | 'unfavorite' | 'hide' | 'show' | 'pin' | 'unpin' | 'reorder'
   menuItemId: string
-  value?: number // Pour reorder, contient le nouvel ordre
+  value?: number // For reorder, contains the new order
 }
 
 export interface CustomMenuItemDto {
   menuItemId: string
-  customTitle?: string
+  customLabel?: string
   customIcon?: string
   customColor?: string
   customBadge?: string
@@ -58,7 +133,7 @@ export interface UserMenuWithPreferences extends MenuTreeNode {
     isVisible: boolean
     isFavorite: boolean
     isPinned: boolean
-    customTitle?: string
+    customLabel?: string
     customIcon?: string
     customColor?: string
     customBadge?: string
@@ -66,173 +141,318 @@ export interface UserMenuWithPreferences extends MenuTreeNode {
   }
 }
 
+type UserMenuPreferencesWithItems = UserMenuPreferences & {
+  items: UserMenuItemPreference[]
+}
+
 @Injectable()
 export class UserMenuPreferencesService {
   constructor(
-    @InjectRepository(UserMenuPreferences, 'auth')
-    private readonly _preferencesRepository: Repository<UserMenuPreferences>,
-    @InjectRepository(UserMenuItemPreference, 'auth')
-    private readonly _itemPreferencesRepository: Repository<UserMenuItemPreference>,
+    private readonly prisma: PrismaService,
     private readonly menuConfigService: MenuConfigurationService
   ) {}
 
-  // ===== GESTION DES PRÉFÉRENCES GÉNÉRALES =====
+  // ===== PREFERENCE MANAGEMENT =====
 
-  async getUserPreferences(userId: string): Promise<UserMenuPreferences> {
-    let preferences = await this._preferencesRepository.findOne({
+  /**
+   * Get user preferences, creating defaults if not found
+   */
+  async getUserPreferences(userId: string): Promise<UserMenuPreferencesWithItems> {
+    let preferences = await this.prisma.userMenuPreferences.findUnique({
       where: { userId },
-      relations: ['itemPreferences'],
+      include: { items: true },
     })
 
     if (!preferences) {
-      // Créer des préférences par défaut
-      const activeConfig = await this.menuConfigService.findActiveConfiguration()
-      preferences = UserMenuPreferences.createDefault(userId, activeConfig?.id)
-      preferences = await this._preferencesRepository.save(preferences)
+      // Create default preferences
+      const defaults = getDefaultPreferences()
+      preferences = await this.prisma.userMenuPreferences.create({
+        data: {
+          userId,
+          theme: defaults.theme,
+          layout: defaults.layout,
+          customColors: ((defaults.customColors ?? Prisma.JsonNull) as unknown) as Prisma.InputJsonValue,
+          shortcuts: ((defaults.shortcuts ?? Prisma.JsonNull) as unknown) as Prisma.InputJsonValue,
+        },
+        include: { items: true },
+      })
     }
 
     return preferences
   }
 
+  /**
+   * Get extended preferences with virtual fields
+   */
+  private getExtendedPreferences(prefs: UserMenuPreferences): ExtendedPreferences {
+    const extended: ExtendedPreferences = {
+      theme: prefs.theme,
+      layout: prefs.layout,
+      customColors: prefs.customColors as CustomColors | null,
+      shortcuts: prefs.shortcuts as Shortcut[] | null,
+    }
+
+    // Try to extract virtual fields from customColors JSON if they exist
+    const colors = prefs.customColors as any
+    if (colors && typeof colors === 'object') {
+      extended.useCustomLayout = colors.useCustomLayout ?? false
+      extended.layoutType = colors.layoutType ?? prefs.layout ?? 'standard'
+      extended.showIcons = colors.showIcons ?? true
+      extended.showBadges = colors.showBadges ?? true
+      extended.allowCollapse = colors.allowCollapse ?? true
+      extended.favoriteItems = colors.favoriteItems ?? []
+      extended.hiddenItems = colors.hiddenItems ?? []
+      extended.pinnedItems = colors.pinnedItems ?? []
+      extended.customOrder = colors.customOrder ?? null
+    }
+
+    return extended
+  }
+
+  /**
+   * Update user preferences
+   */
   async updateUserPreferences(
     userId: string,
     updateDto: UpdateUserPreferencesDto
   ): Promise<UserMenuPreferences> {
     const preferences = await this.getUserPreferences(userId)
+    const extended = this.getExtendedPreferences(preferences)
 
-    Object.assign(preferences, updateDto)
-    preferences.updatedAt = new Date()
+    // Merge updates
+    const updatedExtended: ExtendedPreferences = {
+      ...extended,
+      ...updateDto,
+      theme: updateDto.theme ?? extended.theme,
+      layout: updateDto.layoutType ?? extended.layout,
+    }
 
-    return await this._preferencesRepository.save(preferences)
+    // Store virtual fields in customColors JSON
+    const customColors = {
+      ...(extended.customColors || {}),
+      primary: updateDto.customColors?.primary ?? extended.customColors?.primary,
+      secondary: updateDto.customColors?.secondary ?? extended.customColors?.secondary,
+      accent: updateDto.customColors?.accent ?? extended.customColors?.accent,
+      useCustomLayout: updatedExtended.useCustomLayout,
+      layoutType: updatedExtended.layoutType,
+      showIcons: updatedExtended.showIcons,
+      showBadges: updatedExtended.showBadges,
+      allowCollapse: updatedExtended.allowCollapse,
+      favoriteItems: updatedExtended.favoriteItems,
+      hiddenItems: updatedExtended.hiddenItems,
+      pinnedItems: updatedExtended.pinnedItems,
+      customOrder: updatedExtended.customOrder,
+    }
+
+    return await this.prisma.userMenuPreferences.update({
+      where: { id: preferences.id },
+      data: {
+        theme: updatedExtended.theme,
+        layout: updatedExtended.layout,
+        customColors: customColors as Prisma.InputJsonValue,
+      },
+    })
   }
 
+  /**
+   * Reset user preferences to defaults
+   */
   async resetUserPreferences(userId: string): Promise<UserMenuPreferences> {
     const preferences = await this.getUserPreferences(userId)
-    const activeConfig = await this.menuConfigService.findActiveConfiguration()
 
-    // Supprimer toutes les préférences d'items existantes
-    await this._itemPreferencesRepository.delete({ userPreferencesId: preferences.id })
+    // Delete all item preferences
+    await this.prisma.userMenuItemPreference.deleteMany({
+      where: { userMenuPreferencesId: preferences.id }
+    })
 
-    // Réinitialiser les préférences générales
-    const defaultPrefs = UserMenuPreferences.createDefault(userId, activeConfig?.id)
-    Object.assign(preferences, defaultPrefs)
-    // L'ID existant est préservé par Object.assign
-
-    return await this._preferencesRepository.save(preferences)
+    // Reset to defaults
+    const defaults = getDefaultPreferences()
+    return await this.prisma.userMenuPreferences.update({
+      where: { id: preferences.id },
+      data: {
+        theme: defaults.theme,
+        layout: defaults.layout,
+        customColors: ((defaults.customColors ?? Prisma.JsonNull) as unknown) as Prisma.InputJsonValue,
+        shortcuts: ((defaults.shortcuts ?? Prisma.JsonNull) as unknown) as Prisma.InputJsonValue,
+      },
+    })
   }
 
-  // ===== GESTION DES ACTIONS SUR LES ITEMS =====
+  // ===== MENU ITEM ACTIONS =====
 
+  /**
+   * Execute an action on a menu item
+   */
   async executeMenuItemAction(userId: string, action: MenuItemAction): Promise<void> {
     const preferences = await this.getUserPreferences(userId)
+    const extended = this.getExtendedPreferences(preferences)
 
-    let itemPreference = await this._itemPreferencesRepository.findOne({
+    // Get or create item preference
+    let itemPreference = await this.prisma.userMenuItemPreference.findFirst({
       where: {
-        userPreferencesId: preferences.id,
+        userMenuPreferencesId: preferences.id,
         menuItemId: action.menuItemId,
       },
     })
 
-    if (!itemPreference) {
-      itemPreference = UserMenuItemPreference.create(preferences.id, action.menuItemId)
-    }
+    // Update arrays in extended preferences
+    const favoriteItems = new Set(extended.favoriteItems || [])
+    const hiddenItems = new Set(extended.hiddenItems || [])
+    const pinnedItems = new Set(extended.pinnedItems || [])
+    const customOrder = { ...(extended.customOrder || {}) }
+
+    let isVisible = itemPreference?.isVisible ?? true
+    let order = itemPreference?.order ?? null
 
     switch (action.action) {
       case 'favorite':
-        itemPreference.isFavorite = true
-        preferences.addFavorite(action.menuItemId)
+        favoriteItems.add(action.menuItemId)
         break
       case 'unfavorite':
-        itemPreference.isFavorite = false
-        preferences.removeFavorite(action.menuItemId)
+        favoriteItems.delete(action.menuItemId)
         break
       case 'hide':
-        itemPreference.isVisible = false
-        preferences.hideItem(action.menuItemId)
+        isVisible = false
+        hiddenItems.add(action.menuItemId)
         break
       case 'show':
-        itemPreference.isVisible = true
-        preferences.showItem(action.menuItemId)
+        isVisible = true
+        hiddenItems.delete(action.menuItemId)
         break
       case 'pin':
-        itemPreference.isPinned = true
-        preferences.pinItem(action.menuItemId)
+        pinnedItems.add(action.menuItemId)
         break
       case 'unpin':
-        itemPreference.isPinned = false
-        preferences.unpinItem(action.menuItemId)
+        pinnedItems.delete(action.menuItemId)
         break
       case 'reorder':
-        itemPreference.customOrder = action.value
-        if (!preferences.customOrder) preferences.customOrder = {}
-        preferences.customOrder[action.menuItemId] = action.value || 0
+        order = action.value ?? null
+        if (action.value !== undefined) {
+          customOrder[action.menuItemId] = action.value
+        }
         break
     }
 
-    await Promise.all([
-      this._itemPreferencesRepository.save(itemPreference),
-      this._preferencesRepository.save(preferences),
-    ])
+    // Update or create item preference
+    if (itemPreference) {
+      await this.prisma.userMenuItemPreference.update({
+        where: { id: itemPreference.id },
+        data: { isVisible, order },
+      })
+    } else {
+      await this.prisma.userMenuItemPreference.create({
+        data: {
+          preferences: { connect: { id: preferences.id } },
+          menuItemId: action.menuItemId,
+          isVisible,
+          order,
+        },
+      })
+    }
+
+    // Update parent preferences with arrays
+    const customColors = {
+      ...(extended.customColors || {}),
+      favoriteItems: Array.from(favoriteItems),
+      hiddenItems: Array.from(hiddenItems),
+      pinnedItems: Array.from(pinnedItems),
+      customOrder,
+    }
+
+    await this.prisma.userMenuPreferences.update({
+      where: { id: preferences.id },
+      data: {
+        customColors: customColors as Prisma.InputJsonValue,
+      },
+    })
   }
 
+  /**
+   * Update custom menu item properties
+   */
   async updateCustomMenuItem(userId: string, customItemDto: CustomMenuItemDto): Promise<void> {
     const preferences = await this.getUserPreferences(userId)
 
-    let itemPreference = await this._itemPreferencesRepository.findOne({
+    // Find existing item preference
+    const itemPreference = await this.prisma.userMenuItemPreference.findFirst({
       where: {
-        userPreferencesId: preferences.id,
+        userMenuPreferencesId: preferences.id,
         menuItemId: customItemDto.menuItemId,
       },
     })
 
-    if (!itemPreference) {
-      itemPreference = UserMenuItemPreference.create(preferences.id, customItemDto.menuItemId)
+    const data: Prisma.UserMenuItemPreferenceUpdateInput = {
+      customLabel: customItemDto.customLabel ?? undefined,
+      order: customItemDto.customOrder ?? undefined,
     }
 
-    Object.assign(itemPreference, {
-      customTitle: customItemDto.customTitle,
-      customIcon: customItemDto.customIcon,
-      customColor: customItemDto.customColor,
-      customBadge: customItemDto.customBadge,
-      customOrder: customItemDto.customOrder,
-    })
-
-    await this._itemPreferencesRepository.save(itemPreference)
+    if (itemPreference) {
+      await this.prisma.userMenuItemPreference.update({
+        where: { id: itemPreference.id },
+        data,
+      })
+    } else {
+      await this.prisma.userMenuItemPreference.create({
+        data: {
+          preferences: { connect: { id: preferences.id } },
+          menuItemId: customItemDto.menuItemId,
+          customLabel: customItemDto.customLabel ?? null,
+          order: customItemDto.customOrder ?? null,
+        },
+      })
+    }
   }
 
-  // ===== GESTION DES RACCOURCIS =====
+  // ===== SHORTCUTS MANAGEMENT =====
 
+  /**
+   * Add or update a shortcut
+   */
   async addShortcut(
     userId: string,
-
     shortcut: { key: string; href: string; title: string }
   ): Promise<void> {
     const preferences = await this.getUserPreferences(userId)
+    const shortcuts = ((preferences.shortcuts as unknown) as Shortcut[]) || []
 
-    if (!preferences.shortcuts) preferences.shortcuts = []
-
-    // Vérifier que le raccourci n'existe pas déjà
-    const existingShortcut = preferences.shortcuts.find((s) => s.key === shortcut.key)
-    if (existingShortcut) {
-      Object.assign(existingShortcut, shortcut)
+    // Update existing or add new
+    const existingIndex = shortcuts.findIndex((s) => s.key === shortcut.key)
+    if (existingIndex >= 0) {
+      shortcuts[existingIndex] = shortcut
     } else {
-      preferences.shortcuts.push(shortcut)
+      shortcuts.push(shortcut)
     }
 
-    await this._preferencesRepository.save(preferences)
+    await this.prisma.userMenuPreferences.update({
+      where: { id: preferences.id },
+      data: {
+        shortcuts: (shortcuts as unknown) as Prisma.InputJsonValue,
+      },
+    })
   }
 
+  /**
+   * Remove a shortcut
+   */
   async removeShortcut(userId: string, key: string): Promise<void> {
     const preferences = await this.getUserPreferences(userId)
+    const shortcuts = ((preferences.shortcuts as unknown) as Shortcut[]) || []
 
-    if (preferences.shortcuts) {
-      preferences.shortcuts = preferences.shortcuts.filter((s) => s.key !== key)
-      await this._preferencesRepository.save(preferences)
-    }
+    const filtered = shortcuts.filter((s) => s.key !== key)
+
+    await this.prisma.userMenuPreferences.update({
+      where: { id: preferences.id },
+      data: {
+        shortcuts: (filtered as unknown) as Prisma.InputJsonValue,
+      },
+    })
   }
 
-  // ===== MENU PERSONNALISÉ =====
+  // ===== CUSTOMIZED MENU =====
 
+  /**
+   * Get user's customized menu with preferences applied
+   */
   async getUserCustomizedMenu(
     userId: string,
     userRoles: string[],
@@ -240,86 +460,87 @@ export class UserMenuPreferencesService {
   ): Promise<UserMenuWithPreferences[]> {
     const preferences = await this.getUserPreferences(userId)
 
-    // Obtenir le menu de base filtré par permissions
+    // Get base menu filtered by permissions
     const baseMenu = await this.menuConfigService.getFilteredMenuForUser(
       userId,
       userRoles,
       userPermissions
     )
 
-    // Appliquer les préférences utilisateur
+    // Apply user preferences to menu
     return this.applyUserPreferencesToMenu(baseMenu, preferences)
   }
 
+  /**
+   * Apply user preferences to menu items
+   */
   private async applyUserPreferencesToMenu(
     menuItems: MenuTreeNode[],
-    preferences: UserMenuPreferences
+    preferences: UserMenuPreferencesWithItems
   ): Promise<UserMenuWithPreferences[]> {
-    const itemPreferencesMap = new Map<string, UserMenuItemPreferenceData>()
+    const extended = this.getExtendedPreferences(preferences)
 
-    // Charger toutes les préférences d'items pour cet utilisateur
-    if (preferences.itemPreferences) {
-      preferences.itemPreferences.forEach((pref) => {
-        itemPreferencesMap.set(pref.menuItemId, pref)
-      })
-    }
+    // Create map of item preferences
+    const itemPreferencesMap = new Map<string, UserMenuItemPreference>()
+    preferences.items.forEach((pref) => {
+      itemPreferencesMap.set(pref.menuItemId, pref)
+    })
+
+    const favoriteItems = new Set(extended.favoriteItems || [])
+    const hiddenItems = new Set(extended.hiddenItems || [])
+    const pinnedItems = new Set(extended.pinnedItems || [])
+    const customOrder = extended.customOrder || {}
 
     const processItems = (items: MenuTreeNode[]): UserMenuWithPreferences[] => {
       return items
         .map((item) => {
           if (!item.id) {
-            throw new Error('MenuItem doit avoir un ID')
+            return {
+              ...item,
+              children: processItems(item.children || []),
+            } as UserMenuWithPreferences
           }
-          const itemPref = itemPreferencesMap.get(item.id)
 
-          // Appliquer les préférences de l'item
+          const itemPref = itemPreferencesMap.get(item.id)
+          const isFavorite = favoriteItems.has(item.id)
+          const isHidden = hiddenItems.has(item.id)
+          const isPinned = pinnedItems.has(item.id)
+          const itemCustomOrder = customOrder[item.id]
+
+          // Build customized item
           const customizedItem: UserMenuWithPreferences = {
             ...item,
-            title: itemPref?.customTitle || item.title,
-            icon: itemPref?.customIcon || item.icon,
-            badge: itemPref?.customBadge || item.badge,
-            children: processItems(item.children),
-            userPreferences: itemPref
-              ? {
-                  isVisible: itemPref.isVisible,
-                  isFavorite: itemPref.isFavorite,
-                  isPinned: itemPref.isPinned,
-                  customTitle: itemPref.customTitle,
-                  customIcon: itemPref.customIcon,
-                  customColor: itemPref.customColor,
-                  customBadge: itemPref.customBadge,
-                  customOrder: itemPref.customOrder,
-                }
-              : {
-                  isVisible: item.id ? !preferences.isItemHidden(item.id) : true,
-                  isFavorite: item.id ? preferences.isItemFavorite(item.id) : false,
-                  isPinned: item.id ? preferences.isItemPinned(item.id) : false,
-                },
+            title: itemPref?.customLabel || item.title,
+            children: processItems(item.children || []),
+            userPreferences: {
+              isVisible: itemPref?.isVisible ?? !isHidden,
+              isFavorite,
+              isPinned,
+              customLabel: itemPref?.customLabel ?? undefined,
+              customOrder: itemPref?.order ?? itemCustomOrder ?? undefined,
+            },
           }
 
           return customizedItem
         })
         .filter((item) => {
-          // Filtrer les items cachés si l'utilisateur utilise un layout personnalisé
-          if (preferences.useCustomLayout) {
+          // Filter hidden items if using custom layout
+          if (extended.useCustomLayout) {
             return item.userPreferences?.isVisible !== false
           }
           return true
         })
         .sort((a, b) => {
-          // Trier selon les préférences utilisateur
-          const aOrder =
-            a.userPreferences?.customOrder ??
-            (a.id ? preferences.getItemOrder(a.id) : null) ??
-            a.orderIndex
-          const bOrder =
-            b.userPreferences?.customOrder ??
-            (b.id ? preferences.getItemOrder(b.id) : null) ??
-            b.orderIndex
+          // Sort pinned items first
+          const aPinned = a.userPreferences?.isPinned ?? false
+          const bPinned = b.userPreferences?.isPinned ?? false
 
-          // Les items épinglés en premier
-          if (a.userPreferences?.isPinned && !b.userPreferences?.isPinned) return -1
-          if (!a.userPreferences?.isPinned && b.userPreferences?.isPinned) return 1
+          if (aPinned && !bPinned) return -1
+          if (!aPinned && bPinned) return 1
+
+          // Then by custom order
+          const aOrder = a.userPreferences?.customOrder ?? a.orderIndex ?? 0
+          const bOrder = b.userPreferences?.customOrder ?? b.orderIndex ?? 0
 
           return aOrder - bOrder
         })
@@ -328,100 +549,170 @@ export class UserMenuPreferencesService {
     return processItems(menuItems)
   }
 
-  // ===== TEMPLATES ET UTILITAIRES =====
+  // ===== TEMPLATES AND UTILITIES =====
 
+  /**
+   * Create template-based preferences
+   */
   async createTemplatePreferences(
     userId: string,
     templateType: 'minimal' | 'business' | 'admin' | 'developer'
   ): Promise<UserMenuPreferences> {
-    const activeConfig = await this.menuConfigService.findActiveConfiguration()
-    const preferences = UserMenuPreferences.createDefault(userId, activeConfig?.id)
+    const defaults = getDefaultPreferences()
+    let theme = 'light'
+    let layout = 'standard'
+    let customSettings: Partial<ExtendedPreferences> = {}
 
     switch (templateType) {
       case 'minimal':
-        preferences.layoutType = 'compact'
-        preferences.showIcons = false
-        preferences.showBadges = false
-        preferences.useCustomLayout = true
+        layout = 'compact'
+        customSettings = {
+          showIcons: false,
+          showBadges: false,
+          useCustomLayout: true,
+        }
         break
       case 'business':
-        preferences.layoutType = 'standard'
-        preferences.showIcons = true
-        preferences.showBadges = true
-        preferences.useCustomLayout = false
+        layout = 'standard'
+        customSettings = {
+          showIcons: true,
+          showBadges: true,
+          useCustomLayout: false,
+        }
         break
       case 'admin':
-        preferences.layoutType = 'expanded'
-        preferences.showIcons = true
-        preferences.showBadges = true
-        preferences.useCustomLayout = true
+        layout = 'expanded'
+        customSettings = {
+          showIcons: true,
+          showBadges: true,
+          useCustomLayout: true,
+        }
         break
       case 'developer':
-        preferences.layoutType = 'compact'
-        preferences.showIcons = true
-        preferences.showBadges = false
-        preferences.theme = 'dark'
-        preferences.useCustomLayout = true
+        theme = 'dark'
+        layout = 'compact'
+        customSettings = {
+          showIcons: true,
+          showBadges: false,
+          useCustomLayout: true,
+        }
         break
     }
 
-    return await this._preferencesRepository.save(preferences)
+    const customColors = {
+      ...defaults.customColors,
+      ...customSettings,
+    }
+
+    return await this.prisma.userMenuPreferences.upsert({
+      where: { userId },
+      create: {
+        userId,
+        theme,
+        layout,
+        customColors: customColors as Prisma.InputJsonValue,
+        shortcuts: Prisma.JsonNull,
+      },
+      update: {
+        theme,
+        layout,
+        customColors: customColors as Prisma.InputJsonValue,
+      },
+    })
   }
 
+  /**
+   * Export user preferences
+   */
   async exportUserPreferences(userId: string): Promise<Record<string, unknown>> {
     const preferences = await this.getUserPreferences(userId)
+    const extended = this.getExtendedPreferences(preferences)
 
     return {
       userId,
       preferences: {
-        useCustomLayout: preferences.useCustomLayout,
-        layoutType: preferences.layoutType,
-        showIcons: preferences.showIcons,
-        showBadges: preferences.showBadges,
-        allowCollapse: preferences.allowCollapse,
         theme: preferences.theme,
-        customColors: preferences.customColors,
-        favoriteItems: preferences.favoriteItems,
-        hiddenItems: preferences.hiddenItems,
-        pinnedItems: preferences.pinnedItems,
-        customOrder: preferences.customOrder,
-        shortcuts: preferences.shortcuts,
+        layout: preferences.layout,
+        customColors: extended.customColors,
+        shortcuts: extended.shortcuts,
+        useCustomLayout: extended.useCustomLayout,
+        layoutType: extended.layoutType,
+        showIcons: extended.showIcons,
+        showBadges: extended.showBadges,
+        allowCollapse: extended.allowCollapse,
+        favoriteItems: extended.favoriteItems,
+        hiddenItems: extended.hiddenItems,
+        pinnedItems: extended.pinnedItems,
+        customOrder: extended.customOrder,
       },
-      itemPreferences: preferences.itemPreferences?.map((pref) => ({
+      itemPreferences: preferences.items.map((pref) => ({
         menuItemId: pref.menuItemId,
         isVisible: pref.isVisible,
-        isFavorite: pref.isFavorite,
-        isPinned: pref.isPinned,
-        customOrder: pref.customOrder,
-        customTitle: pref.customTitle,
-        customIcon: pref.customIcon,
-        customColor: pref.customColor,
-        customBadge: pref.customBadge,
+        order: pref.order,
+        customLabel: pref.customLabel,
       })),
       exportedAt: new Date().toISOString(),
     }
   }
 
+  /**
+   * Import user preferences
+   */
   async importUserPreferences(
     userId: string,
     importData: Record<string, unknown>
   ): Promise<UserMenuPreferences> {
-    // Supprimer les préférences existantes
+    // Reset existing preferences
     await this.resetUserPreferences(userId)
 
-    // Créer les nouvelles préférences
-    const preferences = await this.getUserPreferences(userId)
-    Object.assign(preferences, importData.preferences)
+    const prefs = importData.preferences as any
+    if (!prefs) {
+      throw new Error('Invalid import data: missing preferences')
+    }
 
-    await this._preferencesRepository.save(preferences)
+    // Create custom colors with virtual fields
+    const customColors = {
+      primary: prefs.customColors?.primary,
+      secondary: prefs.customColors?.secondary,
+      accent: prefs.customColors?.accent,
+      useCustomLayout: prefs.useCustomLayout,
+      layoutType: prefs.layoutType,
+      showIcons: prefs.showIcons,
+      showBadges: prefs.showBadges,
+      allowCollapse: prefs.allowCollapse,
+      favoriteItems: prefs.favoriteItems,
+      hiddenItems: prefs.hiddenItems,
+      pinnedItems: prefs.pinnedItems,
+      customOrder: prefs.customOrder,
+    }
 
-    // Créer les préférences d'items
-    if (importData.itemPreferences) {
-      const itemPreferences = (importData.itemPreferences as Record<string, unknown>[]).map(
-        (pref: Record<string, unknown>) =>
-          UserMenuItemPreference.create(preferences.id, pref.menuItemId as string, pref)
-      )
-      await this._itemPreferencesRepository.save(itemPreferences)
+    // Update preferences
+    const preferences = await this.prisma.userMenuPreferences.update({
+      where: { userId },
+      data: {
+        theme: prefs.theme,
+        layout: prefs.layout,
+        customColors: customColors as Prisma.InputJsonValue,
+        shortcuts: prefs.shortcuts as Prisma.InputJsonValue,
+      },
+      include: { items: true },
+    })
+
+    // Import item preferences
+    if (importData.itemPreferences && Array.isArray(importData.itemPreferences)) {
+      const itemPrefs = importData.itemPreferences as any[]
+
+      for (const itemPref of itemPrefs) {
+        await this.prisma.userMenuItemPreference.create({
+          data: {
+            preferences: { connect: { id: preferences.id } },
+            menuItemId: itemPref.menuItemId,
+            isVisible: itemPref.isVisible ?? true,
+            order: itemPref.order ?? null,
+            customLabel: itemPref.customLabel ?? null,
+          },
+        })
+      }
     }
 
     return await this.getUserPreferences(userId)

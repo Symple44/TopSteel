@@ -52,6 +52,7 @@ interface RoleWithStats extends Role {
 }
 
 export function RoleManagementPanel() {
+  const { t } = useTranslation('admin')
   const [roles, setRoles] = useState<RoleWithStats[]>([])
   const [modules, setModules] = useState<Module[]>([])
   const [selectedRole, setSelectedRole] = useState<RoleWithStats | null>(null)
@@ -98,7 +99,7 @@ export function RoleManagementPanel() {
   }, [loadModules, loadRoles])
 
   const handleDeleteRole = async (roleId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce rôle ?')) {
+    if (!confirm(t('roles.deleteConfirm'))) {
       return
     }
 
@@ -123,7 +124,7 @@ export function RoleManagementPanel() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
-          <p className="mt-4 text-gray-600">Chargement des rôles...</p>
+          <p className="mt-4 text-gray-600">{t('roles.loading')}</p>
         </div>
       </div>
     )
@@ -134,9 +135,9 @@ export function RoleManagementPanel() {
       {/* En-tête */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold">Gestion des Rôles & Permissions</h1>
+          <h1 className="text-3xl font-bold">{t('roles.title')}</h1>
           <p className="text-muted-foreground mt-2">
-            Configurez les rôles utilisateurs et leurs permissions d'accès aux modules
+            {t('roles.description')}
           </p>
         </div>
         <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
@@ -144,12 +145,12 @@ export function RoleManagementPanel() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Nouveau rôle
+                {t('roles.newRole')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Créer un nouveau rôle</DialogTitle>
+                <DialogTitle>{t('roles.createRole')}</DialogTitle>
               </DialogHeader>
               <RoleForm
                 onSave={() => {
@@ -164,10 +165,10 @@ export function RoleManagementPanel() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="roles">Rôles ({roles.length})</TabsTrigger>
-          <TabsTrigger value="groups">Groupes</TabsTrigger>
-          <TabsTrigger value="modules">Modules ({modules.length})</TabsTrigger>
-          <TabsTrigger value="permissions">Permissions</TabsTrigger>
+          <TabsTrigger value="roles">{t('roles.tabs.roles')} ({roles.length})</TabsTrigger>
+          <TabsTrigger value="groups">{t('roles.tabs.groups')}</TabsTrigger>
+          <TabsTrigger value="modules">{t('roles.tabs.modules')} ({modules.length})</TabsTrigger>
+          <TabsTrigger value="permissions">{t('roles.tabs.permissions')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="roles" className="space-y-4">
@@ -186,26 +187,26 @@ export function RoleManagementPanel() {
                           {role.isSystemRole && (
                             <Badge variant="outline" className="text-xs">
                               <Lock className="h-3 w-3 mr-1" />
-                              Système
+                              {t('roles.system')}
                             </Badge>
                           )}
                           <Badge variant={role.isActive ? 'default' : 'secondary'}>
-                            {role.isActive ? 'Actif' : 'Inactif'}
+                            {role.isActive ? t('roles.active') : t('roles.inactive')}
                           </Badge>
                         </div>
                         <p className="text-muted-foreground mb-3">{role.description}</p>
                         <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                           <div className="flex items-center space-x-1">
                             <Users className="h-4 w-4" />
-                            <span>{role.userCount} utilisateurs</span>
+                            <span>{role.userCount} {t('roles.users')}</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <Settings className="h-4 w-4" />
-                            <span>{role.moduleCount} modules</span>
+                            <span>{role.moduleCount} {t('roles.modules')}</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <Eye className="h-4 w-4" />
-                            <span>{role.permissionCount} permissions</span>
+                            <span>{role.permissionCount} {t('roles.permissions')}</span>
                           </div>
                         </div>
                       </div>
@@ -217,7 +218,7 @@ export function RoleManagementPanel() {
                         onClick={() => openPermissionDialog(role)}
                       >
                         <Settings className="h-4 w-4 mr-2" />
-                        Permissions
+                        {t('roles.permissionsButton')}
                       </Button>
                       <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
                         <Button
@@ -267,7 +268,7 @@ export function RoleManagementPanel() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Modifier le rôle: {selectedRole?.name}</DialogTitle>
+            <DialogTitle>{t('roles.editRole')}: {selectedRole?.name}</DialogTitle>
           </DialogHeader>
           <RoleForm
             role={selectedRole}
@@ -283,7 +284,7 @@ export function RoleManagementPanel() {
       <Dialog open={isPermissionDialogOpen} onOpenChange={setIsPermissionDialogOpen}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Permissions du rôle: {selectedRole?.name}</DialogTitle>
+            <DialogTitle>{t('roles.permissionsFor')}: {selectedRole?.name}</DialogTitle>
           </DialogHeader>
           <PermissionEditor
             role={selectedRole}
@@ -301,7 +302,7 @@ export function RoleManagementPanel() {
 
 // Composant pour créer/éditer un rôle
 function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () => void }) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('admin')
   const [formData, setFormData] = useState({
     name: role?.name || '',
     description: role?.description || '',
@@ -332,27 +333,27 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor={fieldIds.name}>Nom du rôle</Label>
+        <Label htmlFor={fieldIds.name}>{t('roles.form.name')}</Label>
         <Input
           id={fieldIds.name}
           value={formData.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setFormData((prev) => ({ ...prev, name: e?.target?.value }))
           }
-          placeholder="Ex: Deviseur, Superviseur..."
+          placeholder={t('roles.form.namePlaceholder')}
           required
         />
       </div>
 
       <div>
-        <Label htmlFor={fieldIds.description}>Description</Label>
+        <Label htmlFor={fieldIds.description}>{t('roles.form.description')}</Label>
         <Textarea
           id={fieldIds.description}
           value={formData.description}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setFormData((prev) => ({ ...prev, description: e?.target?.value }))
           }
-          placeholder="Décrivez les responsabilités de ce rôle..."
+          placeholder={t('roles.form.descriptionPlaceholder')}
           required
         />
       </div>
@@ -365,14 +366,14 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () =>
             setFormData((prev) => ({ ...prev, isActive: checked }))
           }
         />
-        <Label htmlFor={fieldIds.isActive}>Rôle actif</Label>
+        <Label htmlFor={fieldIds.isActive}>{t('roles.form.isActive')}</Label>
       </div>
 
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
-          {t('actions.cancel')}
+          {t('common.cancel')}
         </Button>
-        <Button type="submit">{role ? t('actions.edit') : t('actions.create')}</Button>
+        <Button type="submit">{role ? t('common.save') : t('common.create')}</Button>
       </div>
     </form>
   )
@@ -430,12 +431,13 @@ function ModulesView({ modules }: { modules: Module[] }) {
 
 // Composant pour afficher les permissions
 function PermissionsView() {
+  const { t } = useTranslation('admin')
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Niveaux d'accès</CardTitle>
+        <CardTitle>{t('roles.accessLevels.title')}</CardTitle>
         <CardDescription>
-          Les différents niveaux d'accès disponibles dans le système
+          {t('roles.accessLevels.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -444,7 +446,7 @@ function PermissionsView() {
             <div key={level} className="flex items-center space-x-3">
               <Badge className={ACCESS_LEVEL_COLORS[level as AccessLevel]}>{label}</Badge>
               <span className="text-sm text-muted-foreground">
-                {getAccessLevelDescription(level as AccessLevel)}
+                {t(`roles.accessLevels.${level.toLowerCase()}`)}
               </span>
             </div>
           ))}
@@ -464,6 +466,7 @@ function PermissionEditor({
   modules: Module[]
   onSave: () => void
 }) {
+  const { t } = useTranslation('admin')
   const [permissions, setPermissions] = useState<
     {
       id: string
@@ -522,13 +525,13 @@ function PermissionEditor({
   }
 
   if (loading) {
-    return <div className="text-center py-8">Chargement des permissions...</div>
+    return <div className="text-center py-8">{t('roles.permissionEditor.loading')}</div>
   }
 
   return (
     <div className="space-y-6">
       <div className="text-sm text-muted-foreground">
-        Configurez les permissions pour le rôle <strong>{role?.name}</strong>
+        {t('roles.permissionEditor.configure')} <strong>{role?.name}</strong>
       </div>
 
       <div className="space-y-6">
@@ -550,9 +553,9 @@ function PermissionEditor({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Permission</TableHead>
-                      <TableHead>Niveau d'accès</TableHead>
-                      <TableHead>Autorisé</TableHead>
+                      <TableHead>{t('roles.permissionEditor.permission')}</TableHead>
+                      <TableHead>{t('roles.permissionEditor.accessLevel')}</TableHead>
+                      <TableHead>{t('roles.permissionEditor.authorized')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -602,9 +605,9 @@ function PermissionEditor({
 
       <div className="flex justify-end space-x-2">
         <Button variant="outline" onClick={onSave}>
-          Annuler
+          {t('common.cancel')}
         </Button>
-        <Button onClick={handleSave}>Sauvegarder</Button>
+        <Button onClick={handleSave}>{t('common.save')}</Button>
       </div>
     </div>
   )
@@ -613,21 +616,4 @@ function PermissionEditor({
 // Composant pour afficher les groupes
 function GroupsView() {
   return <GroupManagementPanel />
-}
-
-function getAccessLevelDescription(level: AccessLevel): string {
-  switch (level) {
-    case 'BLOCKED':
-      return 'Aucun accès au module'
-    case 'READ':
-      return 'Consultation uniquement'
-    case 'WRITE':
-      return 'Lecture et modification'
-    case 'DELETE':
-      return 'Lecture, modification et suppression'
-    case 'ADMIN':
-      return 'Accès administrateur complet'
-    default:
-      return ''
-  }
 }

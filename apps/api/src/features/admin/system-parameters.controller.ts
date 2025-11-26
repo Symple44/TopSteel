@@ -12,28 +12,30 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../core/multi-tenant'
 import { Roles } from '../../core/common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../domains/auth/security/guards/roles.guard'
-import { UserRole } from '../../domains/users/entities/user.entity'
+import { GlobalUserRole } from '../../domains/auth/core/constants/roles.constants'
 import type {
   CreateSystemParameterDto,
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
+  ParameterCategory,
 } from './dto/system-parameter.dto'
-import type { ParameterCategory } from './entitites/system-parameter.entity'
 import { SystemParametersService } from './system-parameters.service'
 import { User } from '@prisma/client'
 
 @Controller('admin/system-parameters')
 @ApiTags('🔧 System Parameters')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class SystemParametersController {
   constructor(private readonly systemParametersService: SystemParametersService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  @Roles(GlobalUserRole.ADMIN)
   @ApiOperation({ summary: 'Créer un nouveau paramètre système' })
   @ApiResponse({ status: 201, description: 'Paramètre créé avec succès' })
   async create(@Body() createDto: CreateSystemParameterDto) {
@@ -41,7 +43,7 @@ export class SystemParametersController {
   }
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(GlobalUserRole.ADMIN, GlobalUserRole.MANAGER)
   @ApiOperation({ summary: 'Lister tous les paramètres système' })
   @ApiResponse({ status: 200, description: 'Liste des paramètres récupérée avec succès' })
   async findAll(@Query() query: SystemParameterQueryDto) {
@@ -49,7 +51,7 @@ export class SystemParametersController {
   }
 
   @Get('by-category')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(GlobalUserRole.ADMIN, GlobalUserRole.MANAGER)
   @ApiOperation({ summary: 'Récupérer les paramètres groupés par catégorie' })
   @ApiResponse({ status: 200, description: 'Paramètres groupés par catégorie' })
   async getByCategory(@Query('category') category?: string) {
@@ -60,7 +62,7 @@ export class SystemParametersController {
   }
 
   @Get(':key')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(GlobalUserRole.ADMIN, GlobalUserRole.MANAGER)
   @ApiOperation({ summary: 'Récupérer un paramètre par sa clé' })
   @ApiResponse({ status: 200, description: 'Paramètre récupéré avec succès' })
   async findByKey(@Param('key') key: string) {
@@ -68,7 +70,7 @@ export class SystemParametersController {
   }
 
   @Patch(':key')
-  @Roles(UserRole.ADMIN)
+  @Roles(GlobalUserRole.ADMIN)
   @ApiOperation({ summary: 'Mettre à jour un paramètre système' })
   @ApiResponse({ status: 200, description: 'Paramètre mis à jour avec succès' })
   async update(@Param('key') key: string, @Body() updateDto: UpdateSystemParameterDto) {
@@ -76,7 +78,7 @@ export class SystemParametersController {
   }
 
   @Patch()
-  @Roles(UserRole.ADMIN)
+  @Roles(GlobalUserRole.ADMIN)
   @ApiOperation({ summary: 'Mettre à jour plusieurs paramètres en une fois' })
   @ApiResponse({ status: 200, description: 'Paramètres mis à jour avec succès' })
 
@@ -85,7 +87,7 @@ export class SystemParametersController {
   }
 
   @Delete(':key')
-  @Roles(UserRole.ADMIN)
+  @Roles(GlobalUserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un paramètre système' })
   @ApiResponse({ status: 204, description: 'Paramètre supprimé avec succès' })

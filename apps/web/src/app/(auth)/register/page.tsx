@@ -102,8 +102,23 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      // Simulate account creation
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          company: formData.company || undefined,
+          password: formData.password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || t('accountCreationError'))
+      }
 
       toast({
         title: t('accountCreatedSuccess'),
@@ -112,10 +127,10 @@ export default function RegisterPage() {
       })
 
       router?.push('/login')
-    } catch (_error) {
+    } catch (error) {
       toast({
         title: t('error'),
-        description: t('accountCreationError'),
+        description: error instanceof Error ? error.message : t('accountCreationError'),
         variant: 'destructive',
       })
     } finally {

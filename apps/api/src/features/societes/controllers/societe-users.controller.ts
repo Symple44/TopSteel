@@ -1,11 +1,13 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../../core/multi-tenant'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { SocieteUsersService } from '../services/societe-users.service'
 import { SocietesService } from '../services/societes.service'
 
 @ApiTags('Societes - Users')
 @ApiBearerAuth()
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard)
 @Controller('societes')
 export class SocieteUsersController {
@@ -55,7 +57,6 @@ export class SocieteUsersController {
     const access = await this.societeUsersService.grantUserAccess(
       societeId,
       body.userId,
-      body.role,
       body.permissions || [],
       body.isActive !== false
     )
@@ -106,17 +107,17 @@ export class SocieteUsersController {
     }
   }
 
-  @Post('users/:userId/default-societe')
-  @ApiOperation({ summary: 'Set default company for a user' })
-  @ApiResponse({ status: 200, description: 'Default company set' })
-  async setDefaultCompany(@Param('userId') userId: string, @Body() body: { societeId: string }) {
-    await this.societeUsersService.setDefaultSociete(userId, body.societeId)
-    return {
-      statusCode: 200,
-      message: 'Default company set successfully',
-      timestamp: new Date().toISOString(),
-    }
-  }
+  // @Post('users/:userId/default-societe')
+  // @ApiOperation({ summary: 'Set default company for a user' })
+  // @ApiResponse({ status: 200, description: 'Default company set' })
+  // async setDefaultCompany(@Param('userId') userId: string, @Body() body: { societeId: string }) {
+  //   await this.societeUsersService.setDefaultSociete(userId, body.societeId)
+  //   return {
+  //     statusCode: 200,
+  //     message: 'Default company set successfully',
+  //     timestamp: new Date().toISOString(),
+  //   }
+  // }
 
   @Delete('users/:societeUserId')
   @ApiOperation({ summary: 'Revoke user access to a company' })

@@ -1,18 +1,11 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { IsNull, Not, type Repository } from 'typeorm'
-import { User } from '../../users/entities/user.entity'
-
-
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 
 @Injectable()
 export class SessionInvalidationService implements OnModuleInit {
   private readonly logger = new Logger(SessionInvalidationService.name)
 
-  constructor(
-    @InjectRepository(User, 'auth')
-    private readonly _userRepository: Repository<User>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async onModuleInit() {
     // Désactivé temporairement - problème avec l'ordre d'initialisation TypeORM
@@ -27,24 +20,24 @@ export class SessionInvalidationService implements OnModuleInit {
    */
   async invalidateAllSessions(): Promise<void> {
     try {
-      // Vérifier que le repository est prêt
-      if (!this._userRepository || !this._userRepository.metadata) {
-        this.logger.warn("Repository non initialisé, saut de l'invalidation des sessions")
-        return
-      }
-
       const startTime = Date.now()
 
-      // Mettre à jour tous les refresh tokens à null
-      const result = await this._userRepository.update(
-        { refreshToken: Not(IsNull()) },
-        { refreshToken: undefined }
-      )
+      // Mettre à jour tous les refresh tokens à null via Prisma
+      const result = await this.prisma.user.updateMany({
+        where: {
+          refreshToken: {
+            not: null,
+          },
+        },
+        data: {
+          refreshToken: null,
+        },
+      })
 
       const duration = Date.now() - startTime
 
       this.logger.log(
-        `Sessions invalidées au redémarrage: ${result.affected} utilisateurs (${duration}ms)`
+        `Sessions invalidées au redémarrage: ${result.count} utilisateurs (${duration}ms)`
       )
     } catch (error) {
       this.logger.error("Erreur lors de l'invalidation des sessions:", error)
@@ -56,7 +49,10 @@ export class SessionInvalidationService implements OnModuleInit {
    */
   async invalidateUserSession(userId: string): Promise<void> {
     try {
-      await this._userRepository.update(userId, { refreshToken: undefined })
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { refreshToken: null },
+      })
       this.logger.log(`Session invalidée pour l'utilisateur: ${userId}`)
     } catch (error) {
       this.logger.error(`Erreur lors de l'invalidation de la session pour ${userId}:`, error)
@@ -68,15 +64,21 @@ export class SessionInvalidationService implements OnModuleInit {
    */
   async forceInvalidateAllSessions(): Promise<number> {
     try {
-      const result = await this._userRepository.update(
-        { refreshToken: Not(IsNull()) },
-        { refreshToken: undefined }
-      )
+      const result = await this.prisma.user.updateMany({
+        where: {
+          refreshToken: {
+            not: null,
+          },
+        },
+        data: {
+          refreshToken: null,
+        },
+      })
 
       this.logger.warn(
-        `Invalidation forcée de toutes les sessions: ${result.affected} utilisateurs`
+        `Invalidation forcée de toutes les sessions: ${result.count} utilisateurs`
       )
-      return result.affected || 0
+      return result.count
     } catch (error) {
       this.logger.error("Erreur lors de l'invalidation forcée:", error)
       throw error

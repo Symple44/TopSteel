@@ -34,7 +34,7 @@ export interface SessionInfo {
   lastActivity: number
 }
 
-interface AuthState {
+export interface AuthState {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
@@ -48,7 +48,7 @@ interface AuthState {
   loginAttempts: LoginAttempt[]
 }
 
-interface AuthActions {
+export interface AuthActions {
   setUser: (user: User | null) => void
   setAuthenticated: (authenticated: boolean) => void
   setLoading: (loading: boolean) => void

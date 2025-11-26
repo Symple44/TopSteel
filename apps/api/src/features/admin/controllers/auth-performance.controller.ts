@@ -1,5 +1,6 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Public } from '../../../core/multi-tenant'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { AuthPerformanceService } from '../../../domains/auth/services/auth-performance.service'
@@ -20,6 +21,7 @@ interface PerformanceMetrics {
 
 @Controller('admin/auth-performance')
 @ApiTags('🔧 Admin - Performance Monitoring')
+@Public() // Bypass global TenantGuard - CombinedSecurityGuard handles JWT auth
 @UseGuards(CombinedSecurityGuard)
 @RequireSystemAdmin()
 @ApiBearerAuth('JWT-auth')

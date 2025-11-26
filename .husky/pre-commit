@@ -1,0 +1,11 @@
+# i18n check - Ensure all translation keys used in code are defined
+echo "Checking i18n translations..."
+cd apps/web && npx tsx scripts/i18n-usage.ts
+
+# If the check fails, prevent the commit
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "i18n check failed! Please add missing translation keys before committing."
+  echo "Run 'pnpm --filter @erp/web i18n:usage' to see the full report."
+  exit 1
+fi

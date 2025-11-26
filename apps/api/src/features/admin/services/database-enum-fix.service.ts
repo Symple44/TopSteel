@@ -1,43 +1,39 @@
 import { Injectable } from '@nestjs/common'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import { getErrorMessage } from '../../../core/common/utils'
 
 @Injectable()
 export class DatabaseEnumFixService {
-  constructor(
-    @InjectDataSource('auth')
-    private _dataSource: DataSource
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async fixNotificationTypeEnum() {
     try {
       // Vérifier si l'enum existe et contient 'info'
-      const enumValues = await this._dataSource.query(`
-        SELECT enumlabel 
-        FROM pg_enum 
+      const enumValues = await this.prisma.$queryRawUnsafe<Array<{ enumlabel: string }>>(`
+        SELECT enumlabel
+        FROM pg_enum
         WHERE enumtypid = (
-          SELECT oid 
-          FROM pg_type 
+          SELECT oid
+          FROM pg_type
           WHERE typname = 'notifications_type_enum'
         )
       `)
 
-      const hasInfo = enumValues.some((row: Record<string, unknown>) => row.enumlabel === 'info')
+      const hasInfo = enumValues.some((row) => row.enumlabel === 'info')
 
       if (hasInfo) {
         return {
           success: true,
-          message: 'La valeur "info" existe déjà dans l\'enum',
-          enumValues: enumValues.map((row: Record<string, unknown>) => row.enumlabel),
+          message: "La valeur \"info\" existe déjà dans l'enum",
+          enumValues: enumValues.map((row) => row.enumlabel),
         }
       } else {
         // Ajouter 'info' à l'enum
-        await this._dataSource.query(`ALTER TYPE notifications_type_enum ADD VALUE 'info'`)
+        await this.prisma.$queryRawUnsafe(`ALTER TYPE notifications_type_enum ADD VALUE 'info'`)
         return {
           success: true,
-          message: 'Valeur "info" ajoutée à l\'enum notifications_type_enum',
-          enumValues: [...enumValues.map((row: Record<string, unknown>) => row.enumlabel), 'info'],
+          message: "Valeur \"info\" ajoutée à l'enum notifications_type_enum",
+          enumValues: [...enumValues.map((row) => row.enumlabel), 'info'],
         }
       }
     } catch (error) {
@@ -45,7 +41,7 @@ export class DatabaseEnumFixService {
       const errorMessage = error instanceof Error ? getErrorMessage(error) : getErrorMessage(error)
       if (errorMessage.includes('type "notifications_type_enum" does not exist')) {
         try {
-          await this._dataSource.query(`
+          await this.prisma.$queryRawUnsafe(`
             CREATE TYPE notifications_type_enum AS ENUM ('info', 'warning', 'error', 'success')
           `)
           return {

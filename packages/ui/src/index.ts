@@ -44,6 +44,38 @@ export type {
 } from './components/data-display/reorderable-list'
 // Feedback - Export all including ConnectionLostDialog
 export * from './components/feedback'
+// Explicit exports for new feedback components (Phase 2 UX)
+export {
+  SkeletonLoader,
+  CardSkeleton,
+  AvatarSkeleton,
+  TableSkeleton,
+  EmptyState,
+  SearchEmptyState,
+  TableEmptyState,
+  LoadingSpinner,
+  FullPageSpinner,
+  ButtonSpinner,
+  LoadingWrapper,
+  SkipLink,
+  SkipLinks,
+  // New inline loading and success components
+  InlineLoader,
+  SavingIndicator,
+  ProcessingIndicator,
+  SuccessState,
+  FormSuccessState,
+  OperationSuccessState,
+} from './components/feedback'
+export type {
+  SkeletonLoaderProps,
+  TableSkeletonProps,
+  EmptyStateProps,
+  LoadingSpinnerProps,
+  SkipLinkProps,
+  InlineLoaderProps,
+  SuccessStateProps,
+} from './components/feedback'
 // Forms
 export {
   Form,
@@ -56,6 +88,20 @@ export {
   Label,
   TranslationField,
   useFormField,
+  // Advanced form components
+  Pagination,
+  DateRangePicker,
+  FileUpload,
+  FormWizard,
+  useWizard,
+} from './components/forms'
+export type {
+  PaginationProps,
+  DateRangePickerProps,
+  DateRange,
+  FileUploadProps,
+  FormWizardProps,
+  WizardStep,
 } from './components/forms'
 // Layout
 export {

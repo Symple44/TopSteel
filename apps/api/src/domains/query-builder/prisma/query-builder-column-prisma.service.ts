@@ -245,4 +245,44 @@ export class QueryBuilderColumnPrismaService {
       throw error
     }
   }
+
+  /**
+   * Alias methods for backward compatibility
+   */
+
+  /**
+   * Alias pour createQueryBuilderColumn
+   */
+  async createColumn(data: {
+    queryBuilderId: string
+    sourceTable?: string
+    tableName?: string
+    columnName: string
+    field?: string
+    alias?: string
+    dataType?: string
+    format?: Record<string, any>
+    aggregation?: Record<string, any>
+    order?: number
+    isVisible?: boolean
+    width?: number
+  }): Promise<QueryBuilderColumn> {
+    return this.createQueryBuilderColumn({
+      queryBuilderId: data.queryBuilderId,
+      columnName: data.columnName || data.field!,
+      alias: data.alias || data.columnName,
+      dataType: data.dataType,
+      format: data.format,
+      aggregation: data.aggregation,
+      order: data.order,
+      isVisible: data.isVisible,
+    })
+  }
+
+  /**
+   * Alias pour deleteAllColumns
+   */
+  async deleteByQueryBuilderId(queryBuilderId: string): Promise<number> {
+    return this.deleteAllColumns(queryBuilderId)
+  }
 }

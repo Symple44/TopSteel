@@ -12,16 +12,24 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import type { MenuConfiguration } from '../../../domains/admin/entities/menu-configuration.entity'
-import { MenuItemType } from '../../../domains/admin/entities/menu-item.entity'
-import { MenuItem } from '@prisma/client'
+import { Public } from '../../../core/multi-tenant'
+import type { MenuConfiguration } from '@prisma/client'
 import type {
   CreateMenuConfigDto,
   MenuConfigurationService,
   UpdateMenuConfigDto,
 } from '../services/menu-configuration.service'
 
+// Local enum definition for menu item types
+enum MenuItemType {
+  FOLDER = 'F',
+  PROGRAM = 'P',
+  LINK = 'L',
+  DATA_VIEW = 'D',
+}
+
 @Controller('admin/menus')
+@Public() // Bypass global TenantGuard - JwtAuthGuard handles JWT auth
 @UseGuards(JwtAuthGuard)
 export class AdminMenusController {
   constructor(private readonly menuConfigService: MenuConfigurationService) {}

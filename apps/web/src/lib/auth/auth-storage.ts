@@ -53,7 +53,9 @@ export class AuthStorage {
       // Sauvegarder également le token d'accès dans les cookies pour les routes API Next.js
       if (tokens.accessToken) {
         // biome-ignore lint: Token storage in secure cookie for API routes
-        document.cookie = `accessToken=${tokens.accessToken}; path=/; secure; samesite=strict; max-age=${rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60}`
+        const isProduction = typeof window !== 'undefined' && window.location.protocol === 'https:'
+        const secureFlag = isProduction ? 'secure;' : ''
+        document.cookie = `accessToken=${tokens.accessToken}; path=/; ${secureFlag}samesite=lax; max-age=${rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60}`
       }
 
       // Sauvegarder le flag remember me

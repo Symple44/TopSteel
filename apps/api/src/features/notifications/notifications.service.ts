@@ -1,89 +1,70 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { NotificationPrismaService } from '../../domains/notifications/prisma/notification-prisma.service'
 import type { PaginationResultDto } from '../../core/common/dto/base.dto'
-import { toTypeORMUpdate } from '../../core/database/typeorm-helpers'
 import type { CreateNotificationsDto } from './dto/create-notifications.dto'
 import type { NotificationsQueryDto } from './dto/notifications-query.dto'
 import type { UpdateNotificationsDto } from './dto/update-notifications.dto'
-import { Notifications } from './entities/notifications.entity'
+import type { Notification } from '@prisma/client'
 
+/**
+ * NotificationsService - Clean Prisma implementation
+ * Wrapper autour de NotificationPrismaService pour l'API
+ */
 @Injectable()
 export class NotificationsService {
-  constructor(
-    @InjectRepository(Notifications, 'auth')
-    private readonly _repository: Repository<Notifications>
-  ) {}
+  constructor(private readonly notificationPrismaService: NotificationPrismaService) {}
 
-  async create(createDto: CreateNotificationsDto): Promise<Notifications> {
-    const entity = this._repository.create(createDto)
-    return this._repository.save(entity)
+  async create(createDto: CreateNotificationsDto): Promise<Notification> {
+    // Pour l'instant, on utilise des valeurs par défaut pour userId et societeId
+    // TODO: Récupérer userId et societeId depuis le contexte de la requête (JWT)
+    return this.notificationPrismaService.create({
+      userId: '', // TODO: Get from request context
+      societeId: '', // TODO: Get from request context
+      type: createDto.type || 'INFO',
+      title: createDto.title,
+      message: createDto.message,
+    })
   }
 
-  async findAll(query: NotificationsQueryDto): Promise<PaginationResultDto<Notifications>> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query
-    const skip = (page - 1) * limit
+  async findAll(query: NotificationsQueryDto): Promise<PaginationResultDto<Notification>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC', type } = query
 
-    const queryBuilder = this._repository.createQueryBuilder('entity')
-
-    if (search) {
-      queryBuilder.andWhere('(entity.title ILIKE :search OR entity.message ILIKE :search)', {
-        search: `%${search}%`,
-      })
-    }
-
-    if (query.isArchived !== undefined) {
-      queryBuilder.andWhere('entity.isArchived = :isArchived', { isArchived: query.isArchived })
-    }
-
-    if (query.type) {
-      queryBuilder.andWhere('entity.type = :type', { type: query.type })
-    }
-
-    const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
-      .skip(skip)
-      .take(limit)
-      .getManyAndCount()
-
-    return {
-      data,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1,
-      },
-    }
+    return this.notificationPrismaService.findAll({
+      page,
+      limit,
+      search,
+      type,
+      sortBy,
+      sortOrder: sortOrder as 'ASC' | 'DESC',
+    })
   }
 
-  async findOne(id: string): Promise<Notifications> {
-    const entity = await this._repository.findOne({ where: { id } })
-    if (!entity) {
-      throw new NotFoundException(`Notifications with ID ${id} not found`)
+  async findOne(id: string): Promise<Notification> {
+    const notification = await this.notificationPrismaService.findOne(id)
+    if (!notification) {
+      throw new NotFoundException(`Notification with ID ${id} not found`)
     }
-    return entity
+    return notification
   }
 
-  async update(id: string, updateDto: UpdateNotificationsDto): Promise<Notifications> {
-    await this._repository.update(id, toTypeORMUpdate(updateDto))
-    return this.findOne(id)
+  async update(id: string, updateDto: UpdateNotificationsDto): Promise<Notification> {
+    // Vérifier que la notification existe
+    await this.findOne(id)
+    return this.notificationPrismaService.update(id, updateDto)
   }
 
   async remove(id: string): Promise<void> {
-    await this._repository.softDelete(id)
+    // Vérifier que la notification existe
+    await this.findOne(id)
+    return this.notificationPrismaService.remove(id)
   }
 
-  async getStats(): Promise<unknown> {
-    const total = await this._repository.count()
-    const active = await this._repository.count({ where: { isArchived: false } })
-
-    return {
-      total,
-      active,
-      inactive: total - active,
-    }
+  async getStats(): Promise<{
+    total: number
+    read: number
+    unread: number
+    expired: number
+  }> {
+    return this.notificationPrismaService.getStats()
   }
 }

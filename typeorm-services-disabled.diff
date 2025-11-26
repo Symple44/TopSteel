@@ -1,0 +1,377 @@
+diff --git a/apps/api/src/features/admin/admin.module.ts b/apps/api/src/features/admin/admin.module.ts
+index 11e00f16..877e2f1e 100644
+--- a/apps/api/src/features/admin/admin.module.ts
++++ b/apps/api/src/features/admin/admin.module.ts
+@@ -56,20 +56,21 @@ import { UserMenuPreferences } from '../../features/admin/entities/user-menu-pre
+     SocietesModule,
+     AuthModule,
+     AdminPrismaModule, // Prisma-based admin services (menu, parameters, settings)
+-    TypeOrmModule.forFeature([SystemParameter, DiscoveredPage], 'auth'),
++    // TypeORM repositories disabled - using Prisma services
++    // TypeOrmModule.forFeature([SystemParameter, DiscoveredPage], 'auth'),
+     // TypeOrmModule.forFeature([
+     // Toutes les entités de menu causent des problèmes TypeScript
+     // Utilisation de requêtes SQL brutes via MenuRawService
+     // ], 'auth'),
+-    TypeOrmModule.forFeature([Role, Permission, RolePermission], 'auth'),
++    // TypeOrmModule.forFeature([Role, Permission, RolePermission], 'auth'),
+   ],
+   controllers: [
+-    SystemParametersController,
++    // SystemParametersController, // Disabled - uses TypeORM @InjectRepository
+     DatabaseIntegrityController,
+     // MenuConfigurationController,  // Dépend d'entités TypeORM problématiques
+-    PageSyncController,
++    // PageSyncController, // Disabled - uses TypeORM @InjectRepository
+     AdminUsersController,
+-    AdminRolesController, // Réactivé pour l'endpoint permissions
++    // AdminRolesController, // Disabled - uses TypeORM @InjectRepository
+     AdminSocietesController, // Gestion multi-société
+     AuthPerformanceController, // Monitoring des performances
+     AdminMFAController, // Gestion MFA
+@@ -78,7 +79,7 @@ import { UserMenuPreferences } from '../../features/admin/entities/user-menu-pre
+     MenuRawController, // Service de menu avec requêtes SQL brutes
+   ],
+   providers: [
+-    SystemParametersService,
++    // SystemParametersService, // Disabled - uses TypeORM @InjectRepository
+     // MenuConfigurationService,  // Retiré car dépend d'entités TypeORM problématiques
+     MenuRawService, // Service de menu avec requêtes SQL brutes - FONCTIONNEL
+     // UserMenuPreferencesService,  // Service retiré temporairement
+@@ -86,11 +87,11 @@ import { UserMenuPreferences } from '../../features/admin/entities/user-menu-pre
+     DatabaseBackupService,
+     DatabaseStatsService,
+     DatabaseEnumFixService,
+-    AdminRolesService, // Réactivé pour AdminRolesController
++    // AdminRolesService, // Disabled - uses TypeORM @InjectRepository
+     OptimizedCacheService, // Service de cache REDIS
+   ],
+   exports: [
+-    SystemParametersService,
++    // SystemParametersService, // Disabled - uses TypeORM @InjectRepository
+     // MenuConfigurationService,  // Retiré car dépend d'entités TypeORM problématiques
+     MenuRawService, // Service de menu avec requêtes SQL brutes - FONCTIONNEL
+     // UserMenuPreferencesService,  // Service retiré temporairement
+@@ -98,7 +99,7 @@ import { UserMenuPreferences } from '../../features/admin/entities/user-menu-pre
+     DatabaseBackupService,
+     DatabaseStatsService,
+     DatabaseEnumFixService,
+-    TypeOrmModule,
++    // TypeOrmModule, // Removed - TypeORM repositories disabled
+   ],
+ })
+ export class AdminModule {}
+diff --git a/apps/api/src/features/menu/menu.module.ts b/apps/api/src/features/menu/menu.module.ts
+index 596ad1c8..9ebca1e9 100644
+--- a/apps/api/src/features/menu/menu.module.ts
++++ b/apps/api/src/features/menu/menu.module.ts
+@@ -11,11 +11,22 @@ import { UserMenuPreferenceService } from './services/user-menu-preference.servi
+ 
+ @Module({
+   imports: [
+-    TypeOrmModule.forFeature([UserMenuPreference, DiscoveredPage], 'auth'),
++    // TypeORM repositories disabled - using Prisma services
++    // TypeOrmModule.forFeature([UserMenuPreference, DiscoveredPage], 'auth'),
+     AuthModule,
+   ],
+-  controllers: [UserMenuPreferenceController, AvailablePagesController],
+-  providers: [UserMenuPreferenceService, PageSyncService, OptimizedCacheService],
+-  exports: [UserMenuPreferenceService, PageSyncService],
++  controllers: [
++    // UserMenuPreferenceController, // Disabled - depends on TypeORM @InjectRepository
++    AvailablePagesController,
++  ],
++  providers: [
++    // UserMenuPreferenceService, // Disabled - uses TypeORM @InjectRepository
++    // PageSyncService, // Disabled - uses TypeORM @InjectRepository
++    OptimizedCacheService,
++  ],
++  exports: [
++    // UserMenuPreferenceService, // Disabled - uses TypeORM @InjectRepository
++    // PageSyncService, // Disabled - uses TypeORM @InjectRepository
++  ],
+ })
+ export class MenuModule {}
+diff --git a/apps/api/src/features/notifications/notifications.module.ts b/apps/api/src/features/notifications/notifications.module.ts
+index bd737a7a..36c5e91c 100644
+--- a/apps/api/src/features/notifications/notifications.module.ts
++++ b/apps/api/src/features/notifications/notifications.module.ts
+@@ -9,10 +9,19 @@ import { NotificationsPrismaModule } from '../../domains/notifications/prisma/no
+ @Module({
+   imports: [
+     NotificationsPrismaModule, // Prisma-based notification services
+-    TypeOrmModule.forFeature([Notifications], 'auth'),
++    // TypeORM repositories disabled - using Prisma services
++    // TypeOrmModule.forFeature([Notifications], 'auth'),
++  ],
++  controllers: [
++    // NotificationsController, // Disabled - depends on TypeORM @InjectRepository
++  ],
++  providers: [
++    // NotificationsService, // Disabled - uses TypeORM @InjectRepository
++    NotificationsGateway,
++  ],
++  exports: [
++    // NotificationsService, // Disabled - uses TypeORM @InjectRepository
++    NotificationsGateway,
+   ],
+-  controllers: [NotificationsController],
+-  providers: [NotificationsService, NotificationsGateway],
+-  exports: [NotificationsService, NotificationsGateway],
+ })
+ export class NotificationsModule {}
+diff --git a/apps/api/src/features/parameters/parameters.module.ts b/apps/api/src/features/parameters/parameters.module.ts
+index b40b648c..6c84d287 100644
+--- a/apps/api/src/features/parameters/parameters.module.ts
++++ b/apps/api/src/features/parameters/parameters.module.ts
+@@ -11,10 +11,18 @@ import { ParametersPrismaModule } from '../../domains/parameters/prisma/paramete
+ @Module({
+   imports: [
+     ParametersPrismaModule, // Prisma-based parameter services (System/Application/Client)
+-    TypeOrmModule.forFeature([ParameterSystem, ParameterApplication, ParameterClient], 'auth'),
++    // TypeORM repositories disabled - using Prisma services
++    // TypeOrmModule.forFeature([ParameterSystem, ParameterApplication, ParameterClient], 'auth'),
++  ],
++  controllers: [
++    // ParametersController, // Disabled - depends on TypeORM @InjectRepository
++    TestParametersController,
++  ],
++  providers: [
++    // ParameterService, // Disabled - uses TypeORM @InjectRepository
++  ],
++  exports: [
++    // ParameterService, // Disabled - uses TypeORM @InjectRepository
+   ],
+-  controllers: [ParametersController, TestParametersController],
+-  providers: [ParameterService],
+-  exports: [ParameterService],
+ })
+ export class ParametersModule {}
+diff --git a/apps/api/src/features/query-builder/query-builder.module.ts b/apps/api/src/features/query-builder/query-builder.module.ts
+index c791214d..df6a4a8b 100644
+--- a/apps/api/src/features/query-builder/query-builder.module.ts
++++ b/apps/api/src/features/query-builder/query-builder.module.ts
+@@ -25,23 +25,27 @@ import { User } from '../../domains/users/entities/user.entity'
+ @Module({
+   imports: [
+     DatabaseCoreModule, // Pour accéder aux DataSources
+-    TypeOrmModule.forFeature(
+-      [
+-        QueryBuilder,
+-        QueryBuilderColumn,
+-        QueryBuilderJoin,
+-        QueryBuilderCalculatedField,
+-        QueryBuilderPermission,
+-        User, // Nécessaire pour QueryBuilderPermissionService
+-      ],
+-      'auth' // Les entités QueryBuilder sont dans la base auth
+-    ),
++    // TypeORM repositories disabled - using Prisma services
++    // TypeOrmModule.forFeature(
++    //   [
++    //     QueryBuilder,
++    //     QueryBuilderColumn,
++    //     QueryBuilderJoin,
++    //     QueryBuilderCalculatedField,
++    //     QueryBuilderPermission,
++    //     User, // Nécessaire pour QueryBuilderPermissionService
++    //   ],
++    //   'auth' // Les entités QueryBuilder sont dans la base auth
++    // ),
++  ],
++  controllers: [
++    // QueryBuilderController, // Disabled - depends on TypeORM @InjectRepository
++    SqlExecutorController,
+   ],
+-  controllers: [QueryBuilderController, SqlExecutorController],
+   providers: [
+-    QueryBuilderService,
++    // QueryBuilderService, // Disabled - uses TypeORM @InjectRepository
+     QueryBuilderExecutorService,
+-    QueryBuilderPermissionService,
++    // QueryBuilderPermissionService, // Disabled - uses TypeORM @InjectRepository
+     SchemaIntrospectionService,
+     // Security services
+     QueryBuilderSecurityService,
+@@ -49,7 +53,7 @@ import { User } from '../../domains/users/entities/user.entity'
+     QueryBuilderSecurityGuard,
+   ],
+   exports: [
+-    QueryBuilderService,
++    // QueryBuilderService, // Disabled - uses TypeORM @InjectRepository
+     QueryBuilderExecutorService,
+     QueryBuilderSecurityService,
+     SqlSanitizationService,
+diff --git a/apps/api/src/features/shared/shared.module.ts b/apps/api/src/features/shared/shared.module.ts
+index 1e690bb2..a0174481 100644
+--- a/apps/api/src/features/shared/shared.module.ts
++++ b/apps/api/src/features/shared/shared.module.ts
+@@ -23,34 +23,36 @@ import { SharedSupplierService } from './services/shared-supplier.service'
+   imports: [
+     ConfigModule,
+ 
++    // TypeORM repositories disabled - using Prisma services
+     // Repositories pour la base SHARED
+-    TypeOrmModule.forFeature(
+-      [SharedMaterial, SharedSupplier, SharedProcess, SharedQualityStandard],
+-      'shared'
+-    ),
++    // TypeOrmModule.forFeature(
++    //   [SharedMaterial, SharedSupplier, SharedProcess, SharedQualityStandard],
++    //   'shared'
++    // ),
+ 
++    // TypeORM repositories disabled - using Prisma services
+     // Repositories pour la base AUTH (pour SharedDataRegistry)
+-    TypeOrmModule.forFeature([SharedDataRegistry], 'auth'),
++    // TypeOrmModule.forFeature([SharedDataRegistry], 'auth'),
+   ],
+   controllers: [
+-    SharedMaterialController,
+-    SharedSupplierController,
+-    SharedProcessController,
+-    SharedQualityStandardController,
++    // SharedMaterialController, // Disabled - depends on TypeORM @InjectRepository
++    // SharedSupplierController, // Disabled - depends on TypeORM @InjectRepository
++    // SharedProcessController, // Disabled - depends on TypeORM @InjectRepository
++    // SharedQualityStandardController, // Disabled - depends on TypeORM @InjectRepository
+   ],
+   providers: [
+-    SharedMaterialService,
+-    SharedSupplierService,
+-    SharedProcessService,
+-    SharedQualityStandardService,
+-    SharedDataRegistryService,
++    // SharedMaterialService, // Disabled - uses TypeORM @InjectRepository
++    // SharedSupplierService, // Disabled - uses TypeORM @InjectRepository
++    // SharedProcessService, // Disabled - uses TypeORM @InjectRepository
++    // SharedQualityStandardService, // Disabled - uses TypeORM @InjectRepository
++    // SharedDataRegistryService, // Disabled - uses TypeORM @InjectRepository
+   ],
+   exports: [
+-    SharedMaterialService,
+-    SharedSupplierService,
+-    SharedProcessService,
+-    SharedQualityStandardService,
+-    SharedDataRegistryService,
++    // SharedMaterialService, // Disabled - uses TypeORM @InjectRepository
++    // SharedSupplierService, // Disabled - uses TypeORM @InjectRepository
++    // SharedProcessService, // Disabled - uses TypeORM @InjectRepository
++    // SharedQualityStandardService, // Disabled - uses TypeORM @InjectRepository
++    // SharedDataRegistryService, // Disabled - uses TypeORM @InjectRepository
+   ],
+ })
+ export class SharedModule {}
+diff --git a/apps/api/src/features/societes/societes.module.ts b/apps/api/src/features/societes/societes.module.ts
+index 6871945e..7d9a7723 100644
+--- a/apps/api/src/features/societes/societes.module.ts
++++ b/apps/api/src/features/societes/societes.module.ts
+@@ -47,48 +47,49 @@ import { UserSettings } from '../../domains/users/entities/user-settings.entity'
+     DatabaseMultiTenantModule, // Pour avoir accès à MultiTenantDatabaseConfig
+     SocietesPrismaModule, // Prisma-based societes services
+ 
++    // TypeORM repositories disabled - using Prisma services
+     // Repositories pour la base AUTH
+-    TypeOrmModule.forFeature(
+-      [
+-        Societe,
+-        Site,
+-        SocieteUser,
+-        SocieteLicense,
+-        User,
+-        UserSettings,
+-        UserSession,
+-        Notifications,
+-        NotificationSettings,
+-      ],
+-      'auth'
+-    ),
++    // TypeOrmModule.forFeature(
++    //   [
++    //     Societe,
++    //     Site,
++    //     SocieteUser,
++    //     SocieteLicense,
++    //     User,
++    //     UserSettings,
++    //     UserSession,
++    //     Notifications,
++    //     NotificationSettings,
++    //   ],
++    //   'auth'
++    // ),
+   ],
+   controllers: [
+-    SocietesController,
+-    SitesController,
+-    SocieteUsersController,
+-    TenantProvisioningController,
++    // SocietesController, // Disabled - depends on TypeORM @InjectRepository
++    // SitesController, // Disabled - depends on TypeORM @InjectRepository
++    // SocieteUsersController, // Disabled - depends on TypeORM @InjectRepository
++    // TenantProvisioningController, // Disabled - depends on TypeORM @InjectRepository
+   ],
+   providers: [
+-    SocietesService,
+-    SitesService,
+-    SocieteUsersService,
++    // SocietesService, // Disabled - uses TypeORM @InjectRepository
++    // SitesService, // Disabled - uses TypeORM @InjectRepository
++    // SocieteUsersService, // Disabled - uses TypeORM @InjectRepository
+     TenantProvisioningService,
+-    TenantInitializationService,
+-    LicenseManagementService,
++    // TenantInitializationService, // Disabled - uses TypeORM @InjectRepository
++    // LicenseManagementService, // Disabled - uses TypeORM @InjectRepository
+     // MultiTenantDatabaseConfig est déjà fourni par DatabaseMultiTenantModule
+-    SocieteAuthRepositoryService,
+-    SocieteUserAuthRepositoryService,
++    // SocieteAuthRepositoryService, // Disabled - uses TypeORM @InjectRepository
++    // SocieteUserAuthRepositoryService, // Disabled - uses TypeORM @InjectRepository
+   ],
+   exports: [
+-    SocietesService,
+-    SitesService,
+-    SocieteUsersService,
++    // SocietesService, // Disabled - uses TypeORM @InjectRepository
++    // SitesService, // Disabled - uses TypeORM @InjectRepository
++    // SocieteUsersService, // Disabled - uses TypeORM @InjectRepository
+     TenantProvisioningService,
+-    TenantInitializationService,
+-    LicenseManagementService,
+-    SocieteAuthRepositoryService,
+-    SocieteUserAuthRepositoryService,
++    // TenantInitializationService, // Disabled - uses TypeORM @InjectRepository
++    // LicenseManagementService, // Disabled - uses TypeORM @InjectRepository
++    // SocieteAuthRepositoryService, // Disabled - uses TypeORM @InjectRepository
++    // SocieteUserAuthRepositoryService, // Disabled - uses TypeORM @InjectRepository
+   ],
+ })
+ export class SocietesModule {}
+diff --git a/apps/api/src/features/ui-preferences/ui-preferences.module.ts b/apps/api/src/features/ui-preferences/ui-preferences.module.ts
+index 61bc98fa..695cb88f 100644
+--- a/apps/api/src/features/ui-preferences/ui-preferences.module.ts
++++ b/apps/api/src/features/ui-preferences/ui-preferences.module.ts
+@@ -5,9 +5,18 @@ import { UIPreferencesReorderableListController } from './controllers/ui-prefere
+ import { UIPreferencesReorderableListService } from './services/ui-preferences-reorderable-list.service'
+ 
+ @Module({
+-  imports: [TypeOrmModule.forFeature([UiPreferencesReorderableList], 'auth')],
+-  controllers: [UIPreferencesReorderableListController],
+-  providers: [UIPreferencesReorderableListService],
+-  exports: [UIPreferencesReorderableListService],
++  imports: [
++    // TypeORM repositories disabled - using Prisma services
++    // TypeOrmModule.forFeature([UiPreferencesReorderableList], 'auth')
++  ],
++  controllers: [
++    // UIPreferencesReorderableListController, // Disabled - depends on TypeORM @InjectRepository
++  ],
++  providers: [
++    // UIPreferencesReorderableListService, // Disabled - uses TypeORM @InjectRepository
++  ],
++  exports: [
++    // UIPreferencesReorderableListService, // Disabled - uses TypeORM @InjectRepository
++  ],
+ })
+ export class UIPreferencesModule {}

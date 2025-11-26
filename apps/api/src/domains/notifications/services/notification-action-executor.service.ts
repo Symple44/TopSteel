@@ -2,8 +2,6 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import type { AxiosResponse } from 'axios'
 import { firstValueFrom } from 'rxjs'
-import { ActionType, type NotificationAction } from '../entities/notification-action.entity'
-import type { NotificationExecution } from '../entities/notification-execution.entity'
 import type {
   ActionExecutionResult,
   ApiCallResult,
@@ -18,6 +16,95 @@ import type {
   TaskCreationResult,
   WorkflowTriggerResult,
 } from '../types/notification-execution.types'
+
+/**
+ * Action types enum - replaces deleted TypeORM entity
+ */
+export enum ActionType {
+  SEND_NOTIFICATION = 'SEND_NOTIFICATION',
+  UPDATE_FIELD = 'UPDATE_FIELD',
+  EXECUTE_FUNCTION = 'EXECUTE_FUNCTION',
+  CALL_API = 'CALL_API',
+  CREATE_TASK = 'CREATE_TASK',
+  TRIGGER_WORKFLOW = 'TRIGGER_WORKFLOW',
+  LOG_EVENT = 'LOG_EVENT',
+  SEND_REPORT = 'SEND_REPORT',
+  CUSTOM = 'CUSTOM',
+}
+
+/**
+ * Notification action interface - replaces deleted TypeORM entity
+ */
+export interface NotificationAction {
+  name: string
+  type: ActionType
+  notificationConfig?: {
+    templateId?: string
+    title?: string
+    body?: string
+    priority?: string
+    channels?: string[]
+  }
+  updateFieldConfig?: {
+    entity: string
+    fieldPath: string
+    value: unknown
+  }
+  functionConfig?: {
+    name: string
+    parameters?: Record<string, unknown>
+    timeout?: number
+  }
+  apiConfig?: {
+    url: string
+    method: string
+    headers?: Record<string, unknown>
+    body?: Record<string, unknown>
+    authentication?: {
+      type: string
+      credentials?: {
+        token?: string
+      }
+    }
+    timeoutSeconds?: number
+  }
+  taskConfig?: {
+    title: string
+    description?: string
+    assignTo?: string
+    priority?: string
+    dueDate?: string
+    tags?: string[]
+    metadata?: Record<string, unknown>
+  }
+  workflowConfig?: {
+    workflowId: string
+    parameters?: Record<string, unknown>
+    waitForCompletion?: boolean
+    timeoutSeconds?: number
+  }
+  logConfig?: {
+    level: 'debug' | 'info' | 'warn' | 'error'
+    message: string
+    category?: string
+    metadata?: Record<string, unknown>
+  }
+  reportConfig?: {
+    reportId: string
+    format: string
+    recipients: string[]
+    parameters?: Record<string, unknown>
+  }
+  customConfig?: Record<string, unknown>
+}
+
+/**
+ * Notification execution interface - replaces deleted TypeORM entity
+ */
+export interface NotificationExecution {
+  addRecipient(recipient: { type: string; email: string }): void
+  markRecipientDelivered(email: string, type: string, messageId: string): void
+}
 
 /**
  * Notification action executor service

@@ -104,73 +104,75 @@ interface BulkOperation {
   requiresData?: boolean
 }
 
-const BULK_OPERATIONS: BulkOperation[] = [
+
+// Function to get bulk operations with translations
+const getBulkOperations = (t: (key: string) => string): BulkOperation[] => [
   {
     type: 'assign_roles',
-    label: 'Assigner des rôles',
-    description: 'Ajouter des rôles aux utilisateurs sélectionnés',
+    label: t('bulk.operations.assign_roles'),
+    description: t('bulk.operations.assign_roles_desc'),
     icon: <Shield className="h-4 w-4" />,
     requiresData: true,
   },
   {
     type: 'remove_roles',
-    label: 'Retirer des rôles',
-    description: 'Supprimer des rôles des utilisateurs sélectionnés',
+    label: t('bulk.operations.remove_roles'),
+    description: t('bulk.operations.remove_roles_desc'),
     icon: <Shield className="h-4 w-4" />,
     requiresData: true,
   },
   {
     type: 'assign_groups',
-    label: 'Assigner à des groupes',
-    description: 'Ajouter les utilisateurs à des groupes',
+    label: t('bulk.operations.assign_groups'),
+    description: t('bulk.operations.assign_groups_desc'),
     icon: <Users className="h-4 w-4" />,
     requiresData: true,
   },
   {
     type: 'remove_groups',
-    label: 'Retirer des groupes',
-    description: 'Supprimer les utilisateurs des groupes',
+    label: t('bulk.operations.remove_groups'),
+    description: t('bulk.operations.remove_groups_desc'),
     icon: <Users className="h-4 w-4" />,
     requiresData: true,
   },
   {
     type: 'activate',
-    label: 'Activer les comptes',
-    description: 'Activer les comptes utilisateurs sélectionnés',
+    label: t('bulk.operations.activate'),
+    description: t('bulk.operations.activate_desc'),
     icon: <Eye className="h-4 w-4" />,
   },
   {
     type: 'deactivate',
-    label: 'Désactiver les comptes',
-    description: 'Désactiver les comptes utilisateurs sélectionnés',
+    label: t('bulk.operations.deactivate'),
+    description: t('bulk.operations.deactivate_desc'),
     icon: <EyeOff className="h-4 w-4" />,
   },
   {
     type: 'reset_password',
-    label: 'Réinitialiser mots de passe',
-    description: 'Envoyer des liens de réinitialisation par email',
+    label: t('bulk.operations.reset_password'),
+    description: t('bulk.operations.reset_password_desc'),
     icon: <Key className="h-4 w-4" />,
   },
   {
     type: 'update_department',
-    label: 'Changer le département',
-    description: 'Mettre à jour le département des utilisateurs',
+    label: t('bulk.operations.update_department'),
+    description: t('bulk.operations.update_department_desc'),
     icon: <Building className="h-4 w-4" />,
     requiresData: true,
   },
 ]
 
 export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfileManagementProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('admin')
   const [users, setUsers] = useState<User[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [groups, setGroups] = useState<Group[]>([])
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [selectedOperation, setSelectedOperation] = useState<BulkOperation | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [departmentFilter, setDepartmentFilter] = useState('')
-  const [roleFilter, setRoleFilter] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [departmentFilter, setDepartmentFilter] = useState('__all__')
+  const [roleFilter, setRoleFilter] = useState('__all__')
+  const [statusFilter, setStatusFilter] = useState('__all__')
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('select-users')
 
@@ -226,10 +228,10 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
       user?.lastName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       user?.email?.toLowerCase().includes(searchTerm?.toLowerCase())
 
-    const matchesDepartment = !departmentFilter || user?.department === departmentFilter
-    const matchesRole = !roleFilter || user?.currentRoles?.includes(roleFilter)
+    const matchesDepartment = departmentFilter === '__all__' || !departmentFilter || user?.department === departmentFilter
+    const matchesRole = roleFilter === '__all__' || !roleFilter || user?.currentRoles?.includes(roleFilter)
     const matchesStatus =
-      !statusFilter ||
+      statusFilter === '__all__' || !statusFilter ||
       (statusFilter === 'active' && user?.isActive) ||
       (statusFilter === 'inactive' && !user?.isActive)
 
@@ -319,7 +321,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Gestion en masse des profils utilisateurs
+            {t('bulk.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -327,19 +329,19 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="select-users">
-                1. Utilisateurs ({selectedUsers.length})
+                1. {t('bulk.tabs.selectUsers')} ({selectedUsers.length})
               </TabsTrigger>
               <TabsTrigger value="select-operation" disabled={selectedUsers.length === 0}>
-                2. Opération
+                2. {t('bulk.tabs.selectOperation')}
               </TabsTrigger>
               <TabsTrigger value="configure-operation" disabled={!selectedOperation}>
-                3. Configuration
+                3. {t('bulk.tabs.configure')}
               </TabsTrigger>
               <TabsTrigger
                 value="review"
                 disabled={!selectedOperation || selectedUsers.length === 0}
               >
-                4. Confirmation
+                4. {t('bulk.tabs.review')}
               </TabsTrigger>
             </TabsList>
 
@@ -349,17 +351,17 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Filter className="h-4 w-4" />
-                    Filtres et recherche
+                    {t('bulk.filters.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
-                      <Label>Recherche</Label>
+                      <Label>{t('bulk.filters.search')}</Label>
                       <div className="relative">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="Nom, prénom, email..."
+                          placeholder={t('bulk.filters.searchPlaceholder')}
                           value={searchTerm}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setSearchTerm(e?.target?.value)
@@ -369,15 +371,15 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                       </div>
                     </div>
                     <div>
-                      <Label>Département</Label>
+                      <Label>{t('bulk.filters.department')}</Label>
                       <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Tous" />
+                          <SelectValue placeholder={t('bulk.filters.all')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Tous les départements</SelectItem>
+                          <SelectItem value="__all__">{t('bulk.filters.allDepartments')}</SelectItem>
                           {departments?.map((dept) => (
-                            <SelectItem key={dept} value={dept || ''}>
+                            <SelectItem key={dept} value={dept || '__none__'}>
                               {dept}
                             </SelectItem>
                           ))}
@@ -385,13 +387,13 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                       </Select>
                     </div>
                     <div>
-                      <Label>Rôle</Label>
+                      <Label>{t('bulk.filters.role')}</Label>
                       <Select value={roleFilter} onValueChange={setRoleFilter}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Tous" />
+                          <SelectValue placeholder={t('bulk.filters.all')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Tous les rôles</SelectItem>
+                          <SelectItem value="__all__">{t('bulk.filters.allRoles')}</SelectItem>
                           {userRoles?.map((roleId) => {
                             const role = roles?.find((r) => r.id === roleId)
                             return role ? (
@@ -404,15 +406,15 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                       </Select>
                     </div>
                     <div>
-                      <Label>Statut</Label>
+                      <Label>{t('bulk.filters.status')}</Label>
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Tous" />
+                          <SelectValue placeholder={t('bulk.filters.all')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Tous</SelectItem>
-                          <SelectItem value="active">{t('status.active')}</SelectItem>
-                          <SelectItem value="inactive">Inactifs</SelectItem>
+                          <SelectItem value="__all__">{t('bulk.filters.all')}</SelectItem>
+                          <SelectItem value="active">{t('bulk.filters.active')}</SelectItem>
+                          <SelectItem value="inactive">{t('bulk.filters.inactive')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -422,13 +424,13 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                         variant="outline"
                         onClick={() => {
                           setSearchTerm('')
-                          setDepartmentFilter('')
-                          setRoleFilter('')
-                          setStatusFilter('')
+                          setDepartmentFilter('__all__')
+                          setRoleFilter('__all__')
+                          setStatusFilter('__all__')
                         }}
                       >
                         <X className="h-4 w-4 mr-2" />
-                        Reset
+                        {t('bulk.filters.reset')}
                       </Button>
                     </div>
                   </div>
@@ -439,7 +441,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
               <Card className="flex-1 overflow-hidden">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>Utilisateurs ({filteredUsers?.length})</CardTitle>
+                    <CardTitle>{t('bulk.userList.title')} ({filteredUsers?.length})</CardTitle>
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={
@@ -448,7 +450,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                         }
                         onCheckedChange={handleSelectAll}
                       />
-                      <span className="text-sm">Tout sélectionner</span>
+                      <span className="text-sm">{t('bulk.userList.selectAll')}</span>
                     </div>
                   </div>
                 </CardHeader>
@@ -457,12 +459,12 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-12"></TableHead>
-                        <TableHead>Utilisateur</TableHead>
-                        <TableHead>Département</TableHead>
-                        <TableHead>Rôles</TableHead>
-                        <TableHead>Groupes</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Dernière connexion</TableHead>
+                        <TableHead>{t('bulk.userList.columns.user')}</TableHead>
+                        <TableHead>{t('bulk.userList.columns.department')}</TableHead>
+                        <TableHead>{t('bulk.userList.columns.roles')}</TableHead>
+                        <TableHead>{t('bulk.userList.columns.groups')}</TableHead>
+                        <TableHead>{t('bulk.userList.columns.status')}</TableHead>
+                        <TableHead>{t('bulk.userList.columns.lastLogin')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -526,7 +528,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                           </TableCell>
                           <TableCell>
                             <Badge variant={user?.isActive ? 'default' : 'secondary'}>
-                              {user?.isActive ? 'Actif' : 'Inactif'}
+                              {user?.isActive ? t('bulk.filters.active') : t('bulk.filters.inactive')}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -548,11 +550,11 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
             <TabsContent value="select-operation" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Sélectionner une opération</CardTitle>
+                  <CardTitle>{t('bulk.operations.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {BULK_OPERATIONS?.map((operation) => (
+                    {getBulkOperations(t)?.map((operation) => (
                       <button
                         type="button"
                         key={operation.type}
@@ -583,7 +585,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       {selectedOperation.icon}
-                      Configuration : {selectedOperation.label}
+                      {t('bulk.configure.title')} : {selectedOperation.label}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -591,7 +593,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                     {(selectedOperation.type === 'assign_roles' ||
                       selectedOperation.type === 'remove_roles') && (
                       <div>
-                        <Label>Rôles concernés</Label>
+                        <Label>{t('bulk.configure.rolesLabel')}</Label>
                         <div className="grid grid-cols-2 gap-2 mt-2 border rounded-md p-3 max-h-48 overflow-y-auto">
                           {roles?.map((role) => (
                             <div key={role?.id} className="flex items-center space-x-2">
@@ -620,7 +622,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                     {(selectedOperation.type === 'assign_groups' ||
                       selectedOperation.type === 'remove_groups') && (
                       <div>
-                        <Label>Groupes concernés</Label>
+                        <Label>{t('bulk.configure.groupsLabel')}</Label>
                         <div className="grid grid-cols-2 gap-2 mt-2 border rounded-md p-3 max-h-48 overflow-y-auto">
                           {groups?.map((group) => (
                             <div key={group?.id} className="flex items-center space-x-2">
@@ -650,30 +652,30 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
 
                     {selectedOperation.type === 'update_department' && (
                       <div>
-                        <Label>Nouveau département</Label>
+                        <Label>{t('bulk.configure.newDepartment')}</Label>
                         <Input
                           value={newDepartment}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setNewDepartment(e?.target?.value)
                           }
-                          placeholder="Ex: Production, Commercial, Technique..."
+                          placeholder={t('bulk.configure.newDepartmentPlaceholder')}
                         />
                       </div>
                     )}
 
                     <div className="flex items-center space-x-2">
                       <Switch checked={sendNotification} onCheckedChange={setSendNotification} />
-                      <Label>Envoyer une notification par email</Label>
+                      <Label>{t('bulk.configure.sendNotification')}</Label>
                     </div>
 
                     <div>
-                      <Label>Raison de l'opération (optionnel)</Label>
+                      <Label>{t('bulk.configure.reason')}</Label>
                       <Textarea
                         value={operationReason}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                           setOperationReason(e?.target?.value)
                         }
-                        placeholder="Décrivez la raison de cette opération en masse..."
+                        placeholder={t('bulk.configure.reasonPlaceholder')}
                         rows={3}
                       />
                     </div>
@@ -685,12 +687,12 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
             <TabsContent value="review" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Révision de l'opération</CardTitle>
+                  <CardTitle>{t('bulk.review.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
                     <div>
-                      <h4 className="font-medium mb-2">Opération sélectionnée</h4>
+                      <h4 className="font-medium mb-2">{t('bulk.review.selectedOperation')}</h4>
                       {selectedOperation && (
                         <div className="p-3 border rounded-lg bg-muted/30">
                           <div className="flex items-center gap-2">
@@ -708,7 +710,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
 
                     <div>
                       <h4 className="font-medium mb-2">
-                        Utilisateurs concernés ({selectedUsers.length})
+                        {t('bulk.review.affectedUsers')} ({selectedUsers.length})
                       </h4>
                       <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                         {selectedUsers?.map((userId) => {
@@ -725,12 +727,10 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                     <Separator />
 
                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <p className="font-medium text-yellow-800">⚠️ Attention</p>
+                      <p className="font-medium text-yellow-800">⚠️ {t('bulk.review.warning')}</p>
                       <p className="text-sm text-yellow-700 mt-1">
-                        Cette opération va affecter {selectedUsers.length} utilisateur(s).
-                        Assurez-vous que cette action est bien intentionnelle.
-                        {sendNotification &&
-                          ' Les utilisateurs recevront une notification par email.'}
+                        {t('bulk.review.warningMessagePrefix')} {selectedUsers.length} {t('bulk.review.warningMessageSuffix')}
+                        {sendNotification && ` ${t('bulk.review.notificationNote')}`}
                       </p>
                     </div>
                   </div>
@@ -742,27 +742,27 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
 
         <div className="flex justify-between items-center pt-4 border-t">
           <Button type="button" variant="outline" onClick={onClose}>
-            Annuler
+            {t('common.cancel')}
           </Button>
 
           <div className="flex gap-2">
             {activeTab === 'select-users' && selectedUsers.length > 0 && (
               <Button type="button" onClick={() => setActiveTab('select-operation')}>
-                Suivant : Opération
+                {t('bulk.actions.nextOperation')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}
 
             {activeTab === 'select-operation' && selectedOperation && (
               <Button type="button" onClick={() => setActiveTab('configure-operation')}>
-                Suivant : Configuration
+                {t('bulk.actions.nextConfigure')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}
 
             {activeTab === 'configure-operation' && selectedOperation && (
               <Button type="button" onClick={() => setActiveTab('review')}>
-                Suivant : Révision
+                {t('bulk.actions.nextReview')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}
@@ -777,12 +777,12 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                 {loading ? (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Traitement...
+                    {t('bulk.actions.processing')}
                   </>
                 ) : (
                   <>
                     <Check className="h-4 w-4 mr-2" />
-                    Confirmer l'opération
+                    {t('bulk.actions.confirm')}
                   </>
                 )}
               </Button>

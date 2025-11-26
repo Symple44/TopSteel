@@ -1,7 +1,7 @@
+import { PrismaService } from '../../core/database/prisma/prisma.service'
 import { Injectable, Logger, Optional } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { InjectDataSource } from '@nestjs/typeorm'
-import type { DataSource } from 'typeorm'
+
 import { SessionRedisService } from '../../domains/auth/services/session-redis.service'
 
 @Injectable()
@@ -9,8 +9,7 @@ export class IntegrityService {
   private readonly logger = new Logger(IntegrityService.name)
 
   constructor(
-    @InjectDataSource('auth')
-    private readonly _dataSource: DataSource,
+    private readonly prisma: PrismaService,
     @Optional() private readonly sessionRedisService?: SessionRedisService
   ) {}
 
@@ -84,13 +83,13 @@ export class IntegrityService {
 
     try {
       // Toujours vérifier la BDD aussi (surtout si Redis est OFF)
-      const result = await this._dataSource.query(`
-        SELECT COUNT(*) as count 
-        FROM users 
+      const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>(`
+        SELECT COUNT(*) as count
+        FROM users
         WHERE dernier_login > NOW() - INTERVAL '30 minutes'
         AND actif = true
       `)
-      activeFromDB = Number.parseInt(result[0]?.count ?? '0', 10)
+      activeFromDB = Number(result[0]?.count ?? 0)
       this.logger.debug(`Utilisateurs actifs depuis BDD: ${activeFromDB}`)
     } catch (error) {
       this.logger.warn('Erreur lors du comptage BDD', error)
@@ -115,12 +114,12 @@ export class IntegrityService {
 
   private async getActiveConnections() {
     try {
-      const result = await this._dataSource.query(`
-        SELECT count(*) as connections 
-        FROM pg_stat_activity 
+      const result = await this.prisma.$queryRawUnsafe<Array<{ connections: bigint }>>(`
+        SELECT count(*) as connections
+        FROM pg_stat_activity
         WHERE state = 'active'
       `)
-      return Number.parseInt(result[0]?.connections ?? '0', 10)
+      return Number(result[0]?.connections ?? 0)
     } catch (_error) {
       this.logger.error('Erreur lors de la récupération du nombre de clients', _error)
       return 0
@@ -129,8 +128,8 @@ export class IntegrityService {
 
   private async getProjectCount() {
     try {
-      const result = await this._dataSource.query('SELECT COUNT(*) as count FROM projets')
-      return Number.parseInt(result[0]?.count ?? '0', 10)
+      const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>('SELECT COUNT(*) as count FROM projets')
+      return Number(result[0]?.count ?? 0)
     } catch (_error) {
       return 0
     }
@@ -138,8 +137,8 @@ export class IntegrityService {
 
   private async getClientCount() {
     try {
-      const result = await this._dataSource.query('SELECT COUNT(*) as count FROM clients')
-      return Number.parseInt(result[0]?.count ?? '0', 10)
+      const result = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>('SELECT COUNT(*) as count FROM clients')
+      return Number(result[0]?.count ?? 0)
     } catch (_error) {
       return 0
     }

@@ -1,9 +1,40 @@
-import type {
-  CompanyInfo,
-  UserPreferences,
-  UserProfile,
-  UserSettings,
-} from '../entities/user-settings.entity'
+// Types for JSON fields in UserSettings
+interface UserProfile {
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  avatar?: string
+}
+
+interface CompanyInfo {
+  name?: string
+  address?: string
+  city?: string
+  postalCode?: string
+  country?: string
+  phone?: string
+  email?: string
+  website?: string
+}
+
+interface UserPreferences {
+  language?: string
+  timezone?: string
+  theme?: string
+  notifications?: any
+  appearance?: any
+}
+
+interface UserSettings {
+  id: string
+  profile: any
+  company: any
+  preferences: any
+  metadata: any
+  createdAt: Date
+  updatedAt: Date
+}
 
 export class GetUserSettingsResponseDto {
   id: string
