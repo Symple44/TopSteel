@@ -50,23 +50,20 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
 
-# Copy built web application (standalone)
-COPY --from=builder /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder /app/apps/web/public ./apps/web/public
-
-# Copy built API application
-COPY --from=builder /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/apps/api/package.json ./apps/api/
+# Copy full application for API (needs node_modules)
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api ./apps/api
+COPY --from=builder /app/package.json ./package.json
 
-# Copy prisma schema for migrations
-COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
+# Copy built web application (standalone) - overwrites apps/web
+COPY --from=builder /app/apps/web/.next/standalone ./standalone
+COPY --from=builder /app/apps/web/.next/static ./standalone/apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./standalone/apps/web/public
 
 # Create startup script
 RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'cd /app/apps/api && node dist/app/main.js &' >> /app/start.sh && \
-    echo 'cd /app && node apps/web/server.js' >> /app/start.sh && \
+    echo 'cd /app && node apps/api/dist/app/main.js &' >> /app/start.sh && \
+    echo 'cd /app/standalone && node apps/web/server.js' >> /app/start.sh && \
     chmod +x /app/start.sh
 
 EXPOSE 3000 3002
