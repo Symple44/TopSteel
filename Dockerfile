@@ -31,8 +31,11 @@ ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
-# Build all packages
-RUN pnpm turbo run build
+# Generate Prisma client (needed for some packages)
+RUN pnpm --filter @erp/api exec prisma generate || true
+
+# Build only web app and its dependencies (not API)
+RUN pnpm turbo run build --filter=@erp/web
 
 # Production stage for web (Next.js standalone)
 FROM node:22-alpine AS runner
