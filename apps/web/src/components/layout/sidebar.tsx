@@ -112,10 +112,10 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
       />
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2">
+      <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden py-2', isCollapsed ? 'px-2' : 'px-3')}>
         {navigation?.length === 0 && mode === 'custom' && !loading ? (
           <div className="p-3 text-center">
-            <Palette className="h-6 w-6 mx-auto mb-2 text-muted-foreground/50" />
+            <Palette className="h-5 w-5 mx-auto mb-2 text-muted-foreground/50" />
             <p className="text-xs text-muted-foreground mb-2">{t('emptyCustomMenu')}</p>
             <Button
               type="button"

@@ -1382,7 +1382,6 @@ export const fr = {
     validationError: 'Erreur de validation',
     unauthorized: 'Accès non autorisé',
     forbidden: 'Accès interdit',
-    notFound: 'Ressource non trouvée',
     serverError: 'Erreur serveur',
     timeout: "Délai d'attente dépassé",
     tryAgain: 'Réessayer',
@@ -1391,7 +1390,6 @@ export const fr = {
 
     // Pages d'erreur
     title: 'Erreur',
-    unexpected: "Une erreur inattendue s'est produite.",
     unexpectedDetailed: "Une erreur inattendue s'est produite. Veuillez réessayer.",
     dashboardError: 'Problème dans le dashboard',
     dashboardMessage: "Une erreur s'est produite lors du chargement du dashboard.",

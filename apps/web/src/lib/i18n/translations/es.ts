@@ -1164,7 +1164,6 @@ export const es = {
     validationError: 'Error de validación',
     unauthorized: 'Acceso no autorizado',
     forbidden: 'Acceso prohibido',
-    notFound: 'Recurso no encontrado',
     serverError: 'Error del servidor',
     timeout: 'Tiempo de espera agotado',
     tryAgain: 'Intentar de nuevo',
@@ -1173,7 +1172,6 @@ export const es = {
 
     // Páginas de error
     title: 'Error',
-    unexpected: 'Ha ocurrido un error inesperado.',
     unexpectedDetailed: 'Ha ocurrido un error inesperado. Por favor, inténtelo de nuevo.',
     dashboardError: 'Problema en el panel',
     dashboardMessage: 'Se produjo un error al cargar el panel.',

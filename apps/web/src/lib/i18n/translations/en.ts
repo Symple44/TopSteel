@@ -887,7 +887,6 @@ export const en = {
     validationError: 'Validation error',
     unauthorized: 'Unauthorized access',
     forbidden: 'Access forbidden',
-    notFound: 'Resource not found',
     serverError: 'Server error',
     timeout: 'Request timeout',
     tryAgain: 'Try again',
@@ -896,7 +895,6 @@ export const en = {
 
     // Error pages
     title: 'Error',
-    unexpected: 'An unexpected error occurred.',
     unexpectedDetailed: 'An unexpected error occurred. Please try again.',
     dashboardError: 'Dashboard issue',
     dashboardMessage: 'An error occurred while loading the dashboard.',

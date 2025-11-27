@@ -3,9 +3,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   // Minimal transpile packages
   transpilePackages: ['@erp/types', '@erp/ui', '@erp/api-client', '@erp/utils'],
 
