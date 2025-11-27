@@ -161,6 +161,7 @@ export const company = {
 }
 
 export const modules = {
+  title: 'Modules',
   access: 'Access',
 }
 

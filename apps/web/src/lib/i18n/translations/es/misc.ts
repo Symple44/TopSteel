@@ -29,6 +29,11 @@ export const menu = {
   visible: 'Visible',
 }
 
+export const modules = {
+  title: 'Módulos',
+  access: 'Acceso',
+}
+
 export const messages = {
   selectTableColumn: 'Por favor seleccione al menos una tabla y una columna',
   querySuccess: 'Consulta ejecutada correctamente ({{count}} resultados)',

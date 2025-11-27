@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnConfig } from '@erp/ui'
-import { Avatar, AvatarFallback, Badge, Button, DataTable } from '@erp/ui'
+import { Avatar, AvatarFallback, Badge, Button, DataTable, usePersistedTableSettings } from '@erp/ui'
 import {
   Building,
   Calendar,
@@ -13,7 +13,7 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BulkProfileManagement } from '../../../../components/admin/bulk-profile-management'
 import { useTranslation } from '../../../../lib/i18n/hooks'
 import type { User } from '../../../../types/auth'
@@ -250,9 +250,13 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
 interface UsersDataTableProps {
   onUserEdit?: (user: User) => void
   onUserCreate?: () => void
+  /** Masquer le header interne (si géré par le parent) */
+  hideHeader?: boolean
+  /** Callback pour exposer les actions au parent */
+  onActionsReady?: (actions: React.ReactNode) => void
 }
 
-export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps) {
+export function UsersDataTable({ onUserEdit, onUserCreate, hideHeader = false }: UsersDataTableProps) {
   const { t } = useTranslation('admin')
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -260,7 +264,10 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
   const [isBulkManagementOpen, setIsBulkManagementOpen] = useState(false)
 
   // Create columns with translation support
-  const columns = getColumns(t)
+  const columns = useMemo(() => getColumns(t), [t])
+
+  // Persistance des préférences de la DataTable
+  const { settings, setSettings } = usePersistedTableSettings('admin-users', columns)
 
   const loadUsers = useCallback(async () => {
     try {
@@ -349,97 +356,63 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">
-            {t('users.userManagement')}
-          </h1>
-          <p className="text-muted-foreground/80 text-lg">{t('users.userManagementDescription')}</p>
+    <div className="space-y-4">
+      {/* Header épuré avec titre et actions alignés */}
+      {!hideHeader && (
+        <div className="flex items-center justify-between pb-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg">
+              <Users className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-foreground">
+                {t('users.userManagement')}
+              </h1>
+              <p className="text-muted-foreground text-sm">{t('users.userManagementDescription')}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={exportUsers}>
+              <Download className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">{t('users.export')}</span>
+            </Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setIsBulkManagementOpen(true)}>
+              <Settings className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">{t('users.bulkManagement')}</span>
+            </Button>
+            <Button type="button" size="sm" onClick={handleCreate}>
+              <UserPlus className="h-4 w-4" />
+              <span className="ml-2">{t('users.newUser')}</span>
+            </Button>
+          </div>
         </div>
-        <div className="flex space-x-3">
-          <Button type="button" variant="outline" onClick={exportUsers}>
-            <Download className="h-4 w-4 mr-2" />
-            {t('users.export')}
-          </Button>
-          <Button type="button" variant="outline" onClick={() => setIsBulkManagementOpen(true)}>
-            <Settings className="h-4 w-4 mr-2" />
-            {t('users.bulkManagement')}
-          </Button>
-          <Button type="button" onClick={handleCreate}>
-            <UserPlus className="h-4 w-4 mr-2" />
-            {t('users.newUser')}
-          </Button>
+      )}
+
+      {/* Statistiques compactes en ligne */}
+      <div className="flex items-center gap-6 py-2 px-1 text-sm">
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <span className="text-muted-foreground">{t('users.totalUsers')}:</span>
+          <span className="font-semibold text-foreground">{users.length}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <UserCheck className="h-4 w-4 text-green-600" />
+          <span className="text-muted-foreground">{t('users.activeUsers')}:</span>
+          <span className="font-semibold text-green-600">{users?.filter((u) => u.isActive).length}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-muted-foreground" />
+          <span className="text-muted-foreground">{t('users.withRoles')}:</span>
+          <span className="font-semibold text-foreground">{users?.filter((u) => u?.roles?.length && u.roles.length > 0).length}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Building className="h-4 w-4 text-muted-foreground" />
+          <span className="text-muted-foreground">{t('users.withGroups')}:</span>
+          <span className="font-semibold text-foreground">{users?.filter((u) => u?.groups?.length && u.groups.length > 0).length}</span>
         </div>
       </div>
 
-      {/* Statistiques rapides */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('users.totalUsers')}
-              </h3>
-              <p className="text-3xl font-bold text-foreground">{users.length}</p>
-            </div>
-            <div className="p-3 bg-primary rounded-lg">
-              <Users className="h-6 w-6 text-primary-foreground" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('users.activeUsers')}
-              </h3>
-              <p className="text-3xl font-bold text-foreground">
-                {users?.filter((u) => u.isActive).length}
-              </p>
-            </div>
-            <div className="p-3 bg-primary rounded-lg">
-              <UserCheck className="h-6 w-6 text-primary-foreground" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('users.withRoles')}
-              </h3>
-              <p className="text-3xl font-bold text-foreground">
-                {users?.filter((u) => u?.roles?.length && u.roles.length > 0).length}
-              </p>
-            </div>
-            <div className="p-3 bg-secondary rounded-lg">
-              <Shield className="h-6 w-6 text-secondary-foreground" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('users.withGroups')}
-              </h3>
-              <p className="text-3xl font-bold text-foreground">
-                {users?.filter((u) => u?.groups?.length && u.groups.length > 0).length}
-              </p>
-            </div>
-            <div className="p-3 bg-secondary rounded-lg">
-              <Building className="h-6 w-6 text-secondary-foreground" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* DataTable */}
+      {/* DataTable avec persistance des préférences */}
       <DataTable
         data={users}
         columns={columns}
@@ -467,6 +440,8 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         loading={loading}
         error={error}
         className="border rounded-lg"
+        settings={settings}
+        onSettingsChange={setSettings}
       />
 
       {/* Dialog de gestion en masse */}

@@ -4,10 +4,11 @@
 import { Button } from '@erp/ui'
 import { Palette, Settings2 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ErpInfoModalWrapper as ErpInfoModal } from '../../components/wrappers'
 import { useBackendStatus } from '../../hooks/use-backend-health'
 import { useDynamicMenu } from '../../hooks/use-dynamic-menu'
+import { useSidebarPreferences } from '../../hooks/use-ui-preferences'
 import { useTranslation } from '../../lib/i18n'
 import { cn } from '../../lib/utils'
 import { NavItem } from './sidebar/components/NavItem'
@@ -28,8 +29,18 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { t } = useTranslation('navigation')
+
+  // Utiliser les préférences persistées pour les items expandés
+  const { expandedItems: persistedExpanded, setExpandedItems: persistExpanded, toggleExpandedItem } = useSidebarPreferences()
   const [expandedItems, setExpandedItems] = useState<string[]>([t('configuration')])
   const [showErpInfo, setShowErpInfo] = useState(false)
+
+  // Synchroniser avec les préférences persistées
+  useEffect(() => {
+    if (persistedExpanded.length > 0) {
+      setExpandedItems(persistedExpanded)
+    }
+  }, [persistedExpanded])
 
   const { statusColor, statusText } = useBackendStatus()
 
@@ -63,9 +74,14 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   }, [loading, filteredMenu, convertMenuCallback, staticNavigation, error])
 
   const toggleExpanded = (title: string) => {
-    setExpandedItems((prev) =>
-      prev?.includes(title) ? prev?.filter((item) => item !== title) : [...prev, title]
-    )
+    setExpandedItems((prev) => {
+      const newExpanded = prev?.includes(title)
+        ? prev?.filter((item) => item !== title)
+        : [...prev, title]
+      // Persister dans localStorage
+      persistExpanded(newExpanded)
+      return newExpanded
+    })
   }
 
   const renderNavItem = (item: NavItemType, index: number) => {
@@ -96,8 +112,8 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'flex flex-col h-full bg-card border-r border-border transition-[width] duration-200',
-        isCollapsed ? 'w-[60px]' : 'w-[240px]'
+        'flex flex-col h-full bg-card/95 backdrop-blur-sm border-r border-border/50 transition-all duration-300 ease-out shadow-sm',
+        isCollapsed ? 'w-[68px]' : 'w-[260px]'
       )}
     >
       {/* Header */}
@@ -112,7 +128,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
       />
 
       {/* Navigation */}
-      <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden py-2', isCollapsed ? 'px-2' : 'px-3')}>
+      <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden py-3', isCollapsed ? 'px-2' : 'px-3')}>
         {navigation?.length === 0 && mode === 'custom' && !loading ? (
           <div className="p-3 text-center">
             <Palette className="h-5 w-5 mx-auto mb-2 text-muted-foreground/50" />

@@ -66,3 +66,15 @@ export { useSidebar, useToasts, useUI } from './use-ui'
 export { useUserMenuPreferences } from './use-user-menu-preferences'
 export { useUserSettings } from './use-user-settings'
 export { useWebVitals } from './use-web-vitals'
+
+// Local storage and persistence
+export { useLocalStorage, useLocalStorageSync } from './use-local-storage'
+export {
+  useUIPreferences,
+  useSidebarPreferences,
+  useDataTablePreferences,
+  useDisplayPreferences,
+  type SidebarPreferences,
+  type DataTablePreferences,
+  type UIPreferences,
+} from './use-ui-preferences'

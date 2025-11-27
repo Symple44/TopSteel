@@ -17,6 +17,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  PageContainer,
+  PageHeader,
+  PageSection,
   Tabs,
   TabsContent,
   TabsList,
@@ -346,22 +349,25 @@ export default function SecuritySettingsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{ts('security.title')}</h1>
-          <p className="text-muted-foreground">{ts('security.subtitle')}</p>
-        </div>
-        {mfaStats && (
-          <Badge variant={getSecurityLevelColor(mfaStats.securityLevel)} className="text-sm">
-            <Shield className="w-4 h-4 mr-1" />
-            {getSecurityLevelText(mfaStats.securityLevel)}
-          </Badge>
-        )}
-      </div>
+    <PageContainer maxWidth="xl" padding="default">
+      <PageHeader
+        title={ts('security.title')}
+        description={ts('security.subtitle')}
+        icon={Shield}
+        iconBackground="bg-gradient-to-br from-emerald-500 to-green-600"
+        badge={
+          mfaStats && (
+            <Badge variant={getSecurityLevelColor(mfaStats.securityLevel)} className="text-sm">
+              <Shield className="w-4 h-4 mr-1" />
+              {getSecurityLevelText(mfaStats.securityLevel)}
+            </Badge>
+          )
+        }
+      />
 
       {/* Security Overview */}
-      <Card>
+      <PageSection spacing="default">
+        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
@@ -549,6 +555,7 @@ export default function SecuritySettingsPage() {
           </Card>
         </TabsContent>
       </Tabs>
+      </PageSection>
 
       {/* Dialog de configuration TOTP */}
       <Dialog
@@ -719,6 +726,6 @@ export default function SecuritySettingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   )
 }

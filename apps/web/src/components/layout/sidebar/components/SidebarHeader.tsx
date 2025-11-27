@@ -13,15 +13,15 @@ interface SidebarHeaderProps {
 
 export function SidebarHeader({ isCollapsed, onToggle, t }: SidebarHeaderProps) {
   return (
-    <div className={cn('px-3 py-3 border-b border-border', isCollapsed && 'px-2')}>
-      <div className={cn('flex items-center', isCollapsed ? 'justify-center' : 'gap-2.5')}>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-          <LayoutDashboard className="h-4 w-4" />
+    <div className={cn('px-4 py-4 border-b border-border/50', isCollapsed && 'px-3')}>
+      <div className={cn('flex items-center', isCollapsed ? 'justify-center' : 'gap-3')}>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25">
+          <LayoutDashboard className="h-5 w-5" />
         </div>
         {!isCollapsed && (
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-foreground truncate">{t('navigationTitle')}</p>
-            <p className="text-[11px] text-muted-foreground truncate">{t('modulesERP')}</p>
+            <p className="text-sm font-bold text-foreground truncate tracking-tight">{t('navigationTitle')}</p>
+            <p className="text-xs text-muted-foreground/80 truncate">{t('modulesERP')}</p>
           </div>
         )}
       </div>

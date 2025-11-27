@@ -276,6 +276,16 @@ export const usePersistedTableSettings = <T>(
   userId?: string,
   autoSave: boolean = true
 ) => {
+  // Utiliser useRef pour stabiliser la référence des colonnes et éviter les boucles infinies
+  const columnsRef = React.useRef(columns)
+  columnsRef.current = columns
+
+  const tableIdRef = React.useRef(tableId)
+  tableIdRef.current = tableId
+
+  const userIdRef = React.useRef(userId)
+  userIdRef.current = userId
+
   const [settings, setSettingsState] = React.useState<TableSettings>(() => {
     const defaultSettings = SettingsManager.createDefaultSettings(columns)
     const savedSettings = SettingsManager.loadSettings(tableId, userId)
@@ -290,39 +300,33 @@ export const usePersistedTableSettings = <T>(
     return defaultSettings
   })
 
-  const setSettings = React.useCallback(
-    (newSettings: TableSettings) => {
-      const validatedSettings = SettingsManager.validateSettings(newSettings, columns)
-      setSettingsState(validatedSettings)
+  const setSettings = React.useCallback((newSettings: TableSettings) => {
+    const validatedSettings = SettingsManager.validateSettings(newSettings, columnsRef.current)
+    setSettingsState(validatedSettings)
 
-      if (autoSave) {
-        SettingsManager.saveSettings(tableId, validatedSettings, userId)
-      }
-    },
-    [tableId, columns, userId, autoSave]
-  )
+    if (autoSave) {
+      SettingsManager.saveSettings(tableIdRef.current, validatedSettings, userIdRef.current)
+    }
+  }, [autoSave])
 
   const resetSettings = React.useCallback(() => {
-    const defaultSettings = SettingsManager.createDefaultSettings(columns)
+    const defaultSettings = SettingsManager.createDefaultSettings(columnsRef.current)
     setSettingsState(defaultSettings)
-    SettingsManager.removeSettings(tableId, userId)
-  }, [tableId, columns, userId])
+    SettingsManager.removeSettings(tableIdRef.current, userIdRef.current)
+  }, [])
 
   const exportSettings = React.useCallback(() => {
-    return SettingsManager.exportSettings(userId)
-  }, [userId])
+    return SettingsManager.exportSettings(userIdRef.current)
+  }, [])
 
-  const importSettings = React.useCallback(
-    (settingsData: Record<string, unknown>) => {
-      SettingsManager.importSettings(settingsData, userId)
-      // Recharger les paramètres après l'import
-      const reloadedSettings = SettingsManager.loadSettings(tableId, userId)
-      if (reloadedSettings) {
-        setSettingsState(SettingsManager.validateSettings(reloadedSettings, columns))
-      }
-    },
-    [tableId, columns, userId]
-  )
+  const importSettings = React.useCallback((settingsData: Record<string, unknown>) => {
+    SettingsManager.importSettings(settingsData, userIdRef.current)
+    // Recharger les paramètres après l'import
+    const reloadedSettings = SettingsManager.loadSettings(tableIdRef.current, userIdRef.current)
+    if (reloadedSettings) {
+      setSettingsState(SettingsManager.validateSettings(reloadedSettings, columnsRef.current))
+    }
+  }, [])
 
   return {
     settings,

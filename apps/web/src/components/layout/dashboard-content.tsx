@@ -7,6 +7,7 @@ import { Header } from '../../components/layout/header'
 import { Sidebar } from '../../components/layout/sidebar'
 import { AutoBreadcrumbWrapper } from '../../components/wrappers'
 import { useApiConnection } from '../../hooks/use-api-connection'
+import { useSidebarPreferences } from '../../hooks/use-ui-preferences'
 
 interface DashboardContentProps {
   children: ReactNode
@@ -19,14 +20,21 @@ export function DashboardContent({
   requiresCompanySelection,
   company,
 }: DashboardContentProps) {
+  // Utiliser les préférences persistées pour la sidebar
+  const { isCollapsed: persistedCollapsed, toggleCollapsed } = useSidebarPreferences()
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [showCompanySelector, setShowCompanySelector] = useState(false)
 
   useApiConnection()
 
+  // Synchroniser l'état local avec les préférences persistées
+  useEffect(() => {
+    setIsSidebarCollapsed(persistedCollapsed)
+  }, [persistedCollapsed])
+
   const handleToggleSidebar = useCallback(() => {
-    setIsSidebarCollapsed((prev) => !prev)
-  }, [])
+    toggleCollapsed() // Persiste automatiquement dans localStorage
+  }, [toggleCollapsed])
 
   // Keyboard shortcut: Ctrl+B to toggle sidebar
   useEffect(() => {

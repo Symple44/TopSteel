@@ -50,16 +50,16 @@ export function NavItem({
       aria-haspopup={hasChildren ? 'true' : undefined}
       type="button"
       className={cn(
-        'group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm cursor-pointer w-full text-left',
+        'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm cursor-pointer w-full text-left',
         'transition-all duration-200 ease-out',
         level === 0 && 'font-medium',
-        level === 1 && 'text-[13px] pl-3 py-2',
+        level === 1 && 'text-[13px] pl-4 py-2 rounded-lg',
         isActive
-          ? 'bg-primary/10 text-primary shadow-sm'
+          ? 'bg-primary/10 text-primary shadow-sm shadow-primary/10 font-semibold'
           : hasActiveChild
-            ? 'text-foreground bg-muted/30'
-            : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:translate-x-0.5',
-        isCollapsed && 'justify-center px-2'
+            ? 'text-foreground bg-muted/40'
+            : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-0.5',
+        isCollapsed && 'justify-center px-2 rounded-lg'
       )}
     >
         {/* Active indicator - animated left border */}

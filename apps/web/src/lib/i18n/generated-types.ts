@@ -2,7 +2,7 @@
  * Auto-generated i18n types - DO NOT EDIT MANUALLY
  * Generated from French translations (reference language)
  * Run: node apps/web/src/lib/i18n/scripts/generate-types.mjs
- * Generated: 2025-11-27T14:09:45.421Z
+ * Generated: 2025-11-27T15:27:22.386Z
  */
 
 // All available translation keys
@@ -1210,6 +1210,8 @@ export type TranslationKey =
   | 'messages.saveError'
   | 'messages.saveErrorGeneric'
   | 'messages.selectTableColumn'
+  | 'modules.access'
+  | 'modules.title'
   | 'navigation.admin'
   | 'navigation.administration'
   | 'navigation.clickToSwitch'
@@ -1805,4 +1807,4 @@ export type I18nNamespace = TranslationKey extends `${infer NS}.${string}` ? NS 
 export type TranslationParams = Record<string, string | number>
 
 // Total count of translation keys
-export const TRANSLATION_KEY_COUNT = 1790 as const
+export const TRANSLATION_KEY_COUNT = 1792 as const

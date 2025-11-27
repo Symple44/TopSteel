@@ -11,6 +11,14 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  PageContainer,
+  PageGrid,
+  PageHeader,
+  PageSection,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   useFormFieldIds,
 } from '@erp/ui'
 import {
@@ -137,7 +145,7 @@ export default function ProfilePage() {
   const tabs = [
     { id: 'profile', label: t('title'), icon: User },
     { id: 'security', label: t('security'), icon: Shield },
-  ]
+  ] as const
 
   const handleSaveProfile = async () => {
     setIsLoading(true)
@@ -723,55 +731,53 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('title')}</h1>
-          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button type="button" variant="outline" onClick={handleReset}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            {tc('reset') || 'Réinitialiser'}
-          </Button>
-          <Button type="button" onClick={handleSaveProfile} disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-2 h-4 w-4" />
-            )}
-            {t('saveProfile')}
-          </Button>
-        </div>
-      </div>
+    <PageContainer maxWidth="xl" padding="default">
+      <PageHeader
+        title={t('title')}
+        description={t('subtitle')}
+        icon={User}
+        iconBackground="bg-gradient-to-br from-blue-600 to-cyan-600"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" onClick={handleReset}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              {tc('reset') || 'Réinitialiser'}
+            </Button>
+            <Button type="button" onClick={handleSaveProfile} disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              {t('saveProfile')}
+            </Button>
+          </div>
+        }
+      />
 
-      {/* Navigation Tabs */}
-      <div className="border-b border-border">
-        <nav className="flex space-x-8">
-          {tabs?.map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                type="button"
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'
-                }`}
-              >
-                <Icon className="h-5 w-5 mr-2" />
-                {tab.label}
-              </button>
-            )
-          })}
-        </nav>
-      </div>
+      <PageSection spacing="none">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-6">
+            {tabs?.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+                  <Icon className="h-4 w-4" />
+                  {tab.label}
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
 
-      {/* Tab Content */}
-      <div className="mt-6">{renderTabContent()}</div>
-    </div>
+          <TabsContent value="profile" className="space-y-6">
+            {renderTabContent()}
+          </TabsContent>
+
+          <TabsContent value="security" className="space-y-6">
+            {renderTabContent()}
+          </TabsContent>
+        </Tabs>
+      </PageSection>
+    </PageContainer>
   )
 }

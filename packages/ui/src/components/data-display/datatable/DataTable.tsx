@@ -92,26 +92,30 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
       <th
         key={column.id}
         className={cn(
-          'px-4 py-3 text-left text-sm font-medium text-muted-foreground',
-          isSortable && 'cursor-pointer hover:text-foreground',
-          compact && 'py-2'
+          'px-4 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider',
+          'transition-colors duration-150',
+          isSortable && 'cursor-pointer hover:text-foreground hover:bg-muted/30',
+          sortDirection && 'text-foreground bg-muted/20',
+          compact && 'py-2.5'
         )}
         style={{ width: column.width }}
         onClick={isSortable ? () => handleSort(column.id) : undefined}
       >
         <div className="flex items-center gap-2">
           <span>{column.title}</span>
-          {column.description && <span className="text-xs text-muted-foreground">ⓘ</span>}
+          {column.description && (
+            <span className="text-[10px] text-muted-foreground/60 normal-case font-normal" title={column.description}>ⓘ</span>
+          )}
           {isSortable && (
             <span className="ml-auto">
               {sortDirection ? (
                 sortDirection === 'asc' ? (
-                  <ArrowUp className="h-4 w-4" />
+                  <ArrowUp className="h-3.5 w-3.5 text-primary" />
                 ) : (
-                  <ArrowDown className="h-4 w-4" />
+                  <ArrowDown className="h-3.5 w-3.5 text-primary" />
                 )
               ) : (
-                <ArrowUpDown className="h-4 w-4 text-muted-foreground/50" />
+                <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/40" />
               )}
             </span>
           )}
@@ -132,7 +136,11 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
   return (
     <DataTableProvider value={tableState}>
       <div
-        className={cn('flex flex-col bg-background rounded-lg', bordered && 'border', className)}
+        className={cn(
+          'flex flex-col bg-background rounded-xl overflow-hidden shadow-sm',
+          bordered && 'border border-border/50',
+          className
+        )}
         style={{ height }}
       >
         {/* Header avec recherche et actions */}
@@ -149,7 +157,7 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
         <div className="flex-1 overflow-auto">
           <table className="w-full">
             {/* En-têtes de colonnes */}
-            <thead className="sticky top-0 bg-background border-b">
+            <thead className="sticky top-0 bg-muted/40 backdrop-blur-sm border-b border-border/50 z-10">
               <tr>
                 {/* Checkbox de sélection globale */}
                 {selectable && (

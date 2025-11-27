@@ -14,14 +14,18 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  PageContainer,
+  PageGrid,
+  PageSection,
 } from '@erp/ui'
-import { Building, Calendar, Mail, Phone, Shield } from 'lucide-react'
+import { Building, Calendar, Mail, Phone, Shield, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { AdminGuard } from '../../../../components/auth/admin-guard'
 import { useTranslation } from '../../../../lib/i18n/hooks'
 import type { User } from '../../../../types/auth'
 import { UsersDataTable } from './users-datatable'
+
 export default function UsersManagementPage() {
   const router = useRouter()
   const { t } = useTranslation('admin')
@@ -29,7 +33,6 @@ export default function UsersManagementPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   const handleUserEdit = (user: { id: string }) => {
-    // Navigate to detail page
     router?.push(`/admin/users/${user.id}`)
   }
 
@@ -41,126 +44,112 @@ export default function UsersManagementPage() {
       requiredPermissions={['USER_VIEW']}
       showUnauthorized={true}
     >
-      <UsersDataTable onUserEdit={handleUserEdit} onUserCreate={handleUserCreate} />
+      <PageContainer maxWidth="full" padding="default">
+        <PageSection spacing="none">
+          <UsersDataTable onUserEdit={handleUserEdit} onUserCreate={handleUserCreate} />
+        </PageSection>
+      </PageContainer>
 
       {/* User details dialog */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           {selectedUser && (
             <>
-              <DialogHeader className="pb-6 border-b">
-                <div className="flex items-center space-x-4">
+              <DialogHeader className="pb-6 border-b border-border/50">
+                <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarFallback className="bg-blue-100 text-blue-700 text-lg font-semibold">
+                    <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
                       {(selectedUser.firstName?.[0] || '').toUpperCase()}
                       {(selectedUser.lastName?.[0] || '').toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <DialogTitle className="text-xl text-gray-900">
+                  <div className="flex-1 min-w-0">
+                    <DialogTitle className="text-xl">
                       {selectedUser.firstName || selectedUser.lastName
                         ? `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim()
                         : t('users.user')}
                     </DialogTitle>
                     <DialogDescription asChild>
-                      <div className="text-gray-600 flex items-center mt-1">
-                        <Mail className="h-4 w-4 mr-2" />
-                        {selectedUser.email}
+                      <div className="flex items-center gap-2 mt-1">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <span>{selectedUser.email}</span>
                       </div>
                     </DialogDescription>
                   </div>
-                  <Badge
-                    variant={selectedUser.isActive ? 'default' : 'secondary'}
-                    className={
-                      selectedUser.isActive
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }
-                  >
+                  <Badge variant={selectedUser.isActive ? 'default' : 'secondary'}>
                     {selectedUser.isActive ? t('users.active') : t('users.inactive')}
                   </Badge>
                 </div>
               </DialogHeader>
 
               <div className="py-6 space-y-6">
-                {/* General information */}
+                {/* Informations générales */}
                 <Card>
-                  <CardHeader>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {t('users.generalInfo')}
-                    </h3>
+                  <CardHeader className="pb-3">
+                    <h3 className="text-lg font-semibold">{t('users.generalInfo')}</h3>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 gap-6">
+                    <PageGrid cols={2}>
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-500">Email</p>
-                        <p className="text-gray-900 flex items-center">
-                          <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                        <p className="text-sm font-medium text-muted-foreground">Email</p>
+                        <p className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
                           {selectedUser.email}
                         </p>
                       </div>
-
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-500">{t('users.phone')}</p>
-                        <p className="text-gray-900 flex items-center">
-                          <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                        <p className="text-sm font-medium text-muted-foreground">{t('users.phone')}</p>
+                        <p className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
                           {selectedUser.phone || t('users.notSpecified')}
                         </p>
                       </div>
-
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-500">{t('users.department')}</p>
-                        <p className="text-gray-900 flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-gray-400" />
+                        <p className="text-sm font-medium text-muted-foreground">{t('users.department')}</p>
+                        <p className="flex items-center gap-2">
+                          <Building className="h-4 w-4 text-muted-foreground" />
                           {selectedUser.department || t('users.notSpecified')}
                         </p>
                       </div>
-
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-500">{t('users.lastLogin')}</p>
-                        <p className="text-gray-900 flex items-center">
-                          <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                        <p className="text-sm font-medium text-muted-foreground">{t('users.lastLogin')}</p>
+                        <p className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
                           {selectedUser.lastLogin
                             ? new Date(selectedUser.lastLogin).toLocaleDateString('fr-FR')
                             : t('users.never')}
                         </p>
                       </div>
-                    </div>
+                    </PageGrid>
                   </CardContent>
                 </Card>
 
-                {/* Roles and permissions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Rôles et groupes */}
+                <PageGrid cols={2}>
                   <Card>
-                    <CardHeader>
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <Shield className="h-5 w-5 mr-2 text-blue-600" />
+                    <CardHeader className="pb-3">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Shield className="h-5 w-5 text-primary" />
                         {t('users.rolesCount', { count: selectedUser.roles?.length ?? 0 })}
                       </h3>
                     </CardHeader>
                     <CardContent>
                       {selectedUser.roles && selectedUser?.roles?.length > 0 ? (
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                           {selectedUser?.roles?.map((role) => (
                             <div
                               key={role.id}
-                              className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100"
+                              className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/10"
                             >
                               <div>
-                                <p className="font-medium text-blue-900">{role.name}</p>
-                                <p className="text-sm text-blue-600">{role.description}</p>
+                                <p className="font-medium">{role.name}</p>
+                                <p className="text-sm text-muted-foreground">{role.description}</p>
                               </div>
-                              <Badge
-                                variant="outline"
-                                className="bg-white border-blue-200 text-blue-700"
-                              >
-                                {t('users.roleLabel')}
-                              </Badge>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-center text-gray-500 py-4">
+                        <p className="text-center text-muted-foreground py-4">
                           {t('users.noRolesAssigned')}
                         </p>
                       )}
@@ -168,41 +157,35 @@ export default function UsersManagementPage() {
                   </Card>
 
                   <Card>
-                    <CardHeader>
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <Building className="h-5 w-5 mr-2 text-purple-600" />
+                    <CardHeader className="pb-3">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Building className="h-5 w-5 text-purple-600" />
                         {t('users.groupsCount', { count: selectedUser.groups?.length ?? 0 })}
                       </h3>
                     </CardHeader>
                     <CardContent>
                       {selectedUser.groups && selectedUser?.groups?.length > 0 ? (
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                           {selectedUser?.groups?.map((group) => (
                             <div
                               key={group.id}
-                              className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100"
+                              className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800/30"
                             >
                               <div>
-                                <p className="font-medium text-purple-900">{group.name}</p>
-                                <p className="text-sm text-purple-600">{group.type}</p>
+                                <p className="font-medium">{group.name}</p>
+                                <p className="text-sm text-muted-foreground">{group.type}</p>
                               </div>
-                              <Badge
-                                variant="outline"
-                                className="bg-white border-purple-200 text-purple-700"
-                              >
-                                {t('users.groupLabel')}
-                              </Badge>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-center text-gray-500 py-4">
+                        <p className="text-center text-muted-foreground py-4">
                           {t('users.noGroupsAssigned')}
                         </p>
                       )}
                     </CardContent>
                   </Card>
-                </div>
+                </PageGrid>
               </div>
             </>
           )}

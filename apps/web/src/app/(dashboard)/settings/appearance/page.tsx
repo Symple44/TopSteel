@@ -11,9 +11,17 @@ import React from 'react'
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
-  ArrowLeft,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  PageContainer,
+  PageHeader,
+  PageSection,
+} from '@erp/ui'
+import {
   Eye,
   Globe,
   Layout,
@@ -178,43 +186,29 @@ export default function AppearanceSettingsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50/30 to-pink-50/30">
-      <div className="px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => router?.back()}
-            className="mb-4 text-slate-600 hover:text-slate-900"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t('appearance.back')}
-          </Button>
+    <PageContainer maxWidth="xl" padding="default">
+      <PageHeader
+        title={t('appearance.title')}
+        description={t('appearance.subtitle')}
+        icon={Palette}
+        iconBackground="bg-gradient-to-br from-indigo-500 to-purple-600"
+        onBack={() => router?.back()}
+        backLabel={t('appearance.back')}
+      />
 
-          <div className="flex items-center mb-6">
-            <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg mr-4">
-              <Palette className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">{t('appearance.title')}</h1>
-              <p className="text-slate-600">{t('appearance.subtitle')}</p>
-            </div>
-          </div>
-        </div>
-
+      <PageSection spacing="default">
         <div className="space-y-8">
           {/* Sélecteur de Templates */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+          <Card>
             <CardContent className="p-6">
               <TemplateSelector />
             </CardContent>
           </Card>
 
           {/* Thème */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center text-slate-800">
+              <CardTitle className="flex items-center text-foreground">
                 <Palette className="h-6 w-6 mr-3 text-indigo-600" />
                 {t('settingsEnhanced.appearance.sections.theme')}
               </CardTitle>
@@ -225,18 +219,18 @@ export default function AppearanceSettingsPage() {
                   <button
                     key={themeOption.id}
                     type="button"
-                    className={`w-full text-left p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    className={`w-full text-left p-4 border-2 rounded-xl cursor-pointer transition-all ${
                       settings.theme === themeOption.id
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
                     }`}
                     onClick={() => updateSetting('theme', themeOption.id)}
                   >
                     <div className="flex items-center mb-2">
-                      <themeOption.icon className="h-5 w-5 mr-2 text-slate-600" />
-                      <span className="font-medium text-slate-800">{themeOption.label}</span>
+                      <themeOption.icon className="h-5 w-5 mr-2 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{themeOption.label}</span>
                     </div>
-                    <p className="text-sm text-slate-600">{themeOption.description}</p>
+                    <p className="text-sm text-muted-foreground">{themeOption.description}</p>
                   </button>
                 ))}
               </div>
@@ -244,9 +238,9 @@ export default function AppearanceSettingsPage() {
           </Card>
 
           {/* Langue */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center text-slate-800">
+              <CardTitle className="flex items-center text-foreground">
                 <Globe className="h-6 w-6 mr-3 text-blue-600" />
                 {t('settingsEnhanced.appearance.sections.language')}
               </CardTitle>
@@ -257,15 +251,15 @@ export default function AppearanceSettingsPage() {
                   <button
                     key={lang.id}
                     type="button"
-                    className={`w-full p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
+                    className={`w-full p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
                       settings.language === lang.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
                     }`}
                     onClick={() => updateSetting('language', lang.id)}
                   >
                     <div className="text-2xl mb-1">{lang.flag}</div>
-                    <span className="text-sm font-medium text-slate-800">{lang.label}</span>
+                    <span className="text-sm font-medium text-foreground">{lang.label}</span>
                   </button>
                 ))}
               </div>
@@ -273,9 +267,9 @@ export default function AppearanceSettingsPage() {
           </Card>
 
           {/* Couleur d'accent */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center text-slate-800">
+              <CardTitle className="flex items-center text-foreground">
                 <Eye className="h-6 w-6 mr-3 text-purple-600" />
                 {t('settingsEnhanced.appearance.sections.accentColor')}
               </CardTitle>
@@ -286,15 +280,15 @@ export default function AppearanceSettingsPage() {
                   <button
                     key={color.id}
                     type="button"
-                    className={`w-full p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
+                    className={`w-full p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
                       settings.accentColor === color.id
-                        ? 'border-slate-400 bg-slate-50'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
                     }`}
                     onClick={() => updateSetting('accentColor', color.id)}
                   >
                     <div className={`w-8 h-8 ${color.color} rounded-full mx-auto mb-1`}></div>
-                    <span className="text-xs font-medium text-slate-800">{color.label}</span>
+                    <span className="text-xs font-medium text-foreground">{color.label}</span>
                   </button>
                 ))}
               </div>
@@ -302,9 +296,9 @@ export default function AppearanceSettingsPage() {
           </Card>
 
           {/* Taille de police */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center text-slate-800">
+              <CardTitle className="flex items-center text-foreground">
                 <Type className="h-6 w-6 mr-3 text-green-600" />
                 {t('settingsEnhanced.appearance.sections.fontSize')}
               </CardTitle>
@@ -342,7 +336,7 @@ export default function AppearanceSettingsPage() {
                       }
                       className="text-green-600"
                     />
-                    <span className={`${size.sample} text-slate-800`}>
+                    <span className={`${size.sample} text-foreground`}>
                       {size.label} - {tc('common.example')} de texte
                     </span>
                   </label>
@@ -352,9 +346,9 @@ export default function AppearanceSettingsPage() {
           </Card>
 
           {/* Densité d'affichage */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center text-slate-800">
+              <CardTitle className="flex items-center text-foreground">
                 <Layout className="h-6 w-6 mr-3 text-orange-600" />
                 {t('settingsEnhanced.appearance.sections.density')}
               </CardTitle>
@@ -397,8 +391,8 @@ export default function AppearanceSettingsPage() {
                       className="text-orange-600"
                     />
                     <div>
-                      <div className="font-medium text-slate-800">{densityOption.label}</div>
-                      <div className="text-sm text-slate-600">{densityOption.description}</div>
+                      <div className="font-medium text-foreground">{densityOption.label}</div>
+                      <div className="text-sm text-muted-foreground">{densityOption.description}</div>
                     </div>
                   </label>
                 ))}
@@ -407,9 +401,9 @@ export default function AppearanceSettingsPage() {
           </Card>
 
           {/* Largeur du contenu */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center text-slate-800">
+              <CardTitle className="flex items-center text-foreground">
                 <Maximize className="h-6 w-6 mr-3 text-purple-600" />
                 {t('settingsEnhanced.appearance.sections.contentWidth')}
               </CardTitle>
@@ -446,8 +440,8 @@ export default function AppearanceSettingsPage() {
                       className="text-purple-600"
                     />
                     <div>
-                      <div className="font-medium text-slate-800">{widthOption.label}</div>
-                      <div className="text-sm text-slate-600">{widthOption.description}</div>
+                      <div className="font-medium text-foreground">{widthOption.label}</div>
+                      <div className="text-sm text-muted-foreground">{widthOption.description}</div>
                     </div>
                   </label>
                 ))}
@@ -455,7 +449,7 @@ export default function AppearanceSettingsPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </div>
+      </PageSection>
+    </PageContainer>
   )
 }

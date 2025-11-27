@@ -115,7 +115,20 @@ export {
   ScrollArea,
   ScrollBar,
   Separator,
+  // Page Layout Components
+  PageContainer,
+  PageSection,
+  PageGrid,
+  PageRow,
 } from './components/layout'
+// Export PageLayout types
+export type {
+  PageContainerProps,
+  PageSectionProps,
+  PageGridProps,
+  PageRowProps,
+} from './components/layout'
+export type { PageHeaderProps } from './components/layout/page-header/PageHeader'
 // Export Card types explicitly
 export type {
   CardContentProps,
