@@ -1,101 +1,28 @@
-# TopSteel ERP - .dockerignore
-
-# Git
-.git
-.gitignore
-.gitattributes
-
-# Documentation
-README.md
-DEPLOYMENT.md
-CHANGELOG.md
-*.md
-
-# IDE et éditeurs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
 # Dependencies
-node_modules/
-**/node_modules/
-apps/*/node_modules/
-packages/*/node_modules/
-npm-debug.log*
-.pnpm-debug.log*
-
-# Testing
-coverage/
-.nyc_output
-test-results/
-playwright-report/
-
-# Environment
-.env*
-!.env.example
-
-# Next.js
-.next/
-out/
-
-# Nuxt.js
-.nuxt/
-dist/
+node_modules
+**/node_modules
 
 # Build outputs
-dist/
-build/
-.turbo/
+.next
+**/dist
+**/.turbo
 
-# Temporary files
-tmp/
-temp/
+# Development
+.git
+.gitignore
+*.md
+LICENSE
+.env*.local
+.vscode
+.idea
 
-# OS
+# Tests
+**/*.test.*
+**/*.spec.*
+**/coverage
+**/__tests__
+
+# Misc
+*.log
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-
-# Docker
-Dockerfile*
-docker-compose*.yml
-.dockerignore
-
-# Backups
-backups/
-*.sql
-*.dump
-
-# SSL Certificates
-letsencrypt/
-*.pem
-*.key
-*.crt
-
-# Uploads (ne pas inclure dans l'image)
-uploads/
-storage/
-
-# Cache
-.cache
-.parcel-cache
-
-# Storybook
-storybook-static/
-
-# Husky
-.husky/

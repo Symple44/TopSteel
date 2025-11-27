@@ -18,6 +18,15 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react({
         jsxRuntime: 'automatic',
+        // Force production JSX transform (not jsxDEV) in production builds
+        jsxImportSource: 'react',
+        babel: isDev
+          ? undefined
+          : {
+              plugins: [
+                ['@babel/plugin-transform-react-jsx', { runtime: 'automatic', development: false }],
+              ],
+            },
       }),
       ...(skipTypes
         ? []
@@ -242,10 +251,16 @@ export default defineConfig(({ mode }) => {
       // Remove console.log in production
       drop: isDev ? [] : ['console', 'debugger'],
       legalComments: 'none',
+      // Force production JSX transform
+      jsx: 'automatic',
+      jsxDev: isDev,
+      jsxImportSource: 'react',
     },
 
     define: {
       __DEV__: isDev,
+      // Explicitly set NODE_ENV to ensure production JSX transform
+      'process.env.NODE_ENV': isDev ? '"development"' : '"production"',
     },
   }
 })
