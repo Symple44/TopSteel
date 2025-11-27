@@ -3,6 +3,7 @@ FROM node:22-alpine AS builder
 
 # Install pnpm and required build tools
 RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
@@ -28,35 +29,49 @@ COPY . .
 # Build arguments for environment variables needed at build time
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_APP_URL
+ARG DATABASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV DATABASE_URL=$DATABASE_URL
 
-# Generate Prisma client (needed for some packages)
-RUN pnpm --filter @erp/api exec prisma generate || true
+# Generate Prisma client
+RUN cd apps/api && npx prisma generate
 
-# Build only web app and its dependencies (not API)
-RUN pnpm turbo run build --filter=@erp/web
+# Build all packages
+RUN pnpm turbo run build
 
-# Production stage for web (Next.js standalone)
+# Production stage
 FROM node:22-alpine AS runner
+
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
-ENV PORT=3000
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+# Copy built web application (standalone)
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
 
-# Copy built application from builder
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+# Copy built API application
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/package.json ./apps/api/
+COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=builder /app/node_modules/.pnpm ./node_modules/.pnpm
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-USER nextjs
+# Copy prisma schema for migrations
+COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 
-EXPOSE 3000
+# Create startup script
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'cd /app/apps/api && node dist/main.js &' >> /app/start.sh && \
+    echo 'cd /app && node apps/web/server.js' >> /app/start.sh && \
+    chmod +x /app/start.sh
 
-CMD ["node", "apps/web/server.js"]
+EXPOSE 3000 3002
+
+CMD ["/bin/sh", "/app/start.sh"]
