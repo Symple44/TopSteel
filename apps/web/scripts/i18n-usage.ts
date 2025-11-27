@@ -68,7 +68,7 @@ function extractUsedKeysFromFile(filePath: string): Set<string> {
 /**
  * Extrait les clés définies dans un fichier de traduction
  */
-function extractDefinedKeys(filePath: string): Set<string> {
+function extractDefinedKeysFromFile(filePath: string): Set<string> {
   const content = fs.readFileSync(filePath, 'utf-8')
   const keys = new Set<string>()
 
@@ -76,8 +76,15 @@ function extractDefinedKeys(filePath: string): Set<string> {
 
   const lines = content.split('\n')
   for (const line of lines) {
-    // Ouverture d'objet
-    const objectStart = line.match(/^\s*(\w+)\s*:\s*\{/)
+    // Export const (racine du namespace)
+    const exportConst = line.match(/^export\s+const\s+(\w+)\s*=\s*\{/)
+    if (exportConst) {
+      pathStack.push(exportConst[1])
+      continue
+    }
+
+    // Ouverture d'objet imbriqué
+    const objectStart = line.match(/^\s+(\w+)\s*:\s*\{/)
     if (objectStart) {
       pathStack.push(objectStart[1])
       continue
@@ -91,12 +98,34 @@ function extractDefinedKeys(filePath: string): Set<string> {
     }
 
     // Clé avec valeur string
-    const keyValue = line.match(/^\s*(\w+)\s*:\s*['"`]/)
+    const keyValue = line.match(/^\s+(\w+)\s*:\s*['"`]/)
     if (keyValue) {
       const key = keyValue[1]
       const fullPath = pathStack.length > 0 ? `${pathStack.join('.')}.${key}` : key
       keys.add(fullPath)
     }
+  }
+
+  return keys
+}
+
+/**
+ * Extrait les clés définies dans un répertoire de traductions (structure modulaire)
+ */
+function extractDefinedKeys(langPath: string): Set<string> {
+  const keys = new Set<string>()
+
+  // Vérifier si c'est un répertoire (nouvelle structure modulaire)
+  if (fs.existsSync(langPath) && fs.statSync(langPath).isDirectory()) {
+    const files = fs.readdirSync(langPath).filter((f) => f.endsWith('.ts') && f !== 'index.ts')
+    for (const file of files) {
+      const filePath = path.join(langPath, file)
+      const fileKeys = extractDefinedKeysFromFile(filePath)
+      fileKeys.forEach((k) => keys.add(k))
+    }
+  } else if (fs.existsSync(`${langPath}.ts`)) {
+    // Ancienne structure: fichier unique (fallback)
+    return extractDefinedKeysFromFile(`${langPath}.ts`)
   }
 
   return keys
@@ -144,9 +173,9 @@ function analyzeUsage(): UsageReport {
   console.log(`${c.blue}Fichiers analysés:${c.reset} ${fileCount}`)
   console.log(`${c.blue}Clés trouvées:${c.reset} ${usedKeys.size}`)
 
-  // 2. Extraire les clés définies dans la référence
+  // 2. Extraire les clés définies dans la référence (répertoire ou fichier)
   console.log(`\n${c.cyan}🔍 Analyse des traductions...${c.reset}`)
-  const refPath = path.join(TRANSLATIONS_DIR, `${REFERENCE_LANG}.ts`)
+  const refPath = path.join(TRANSLATIONS_DIR, REFERENCE_LANG)
   const definedKeys = extractDefinedKeys(refPath)
   console.log(`${c.blue}Clés définies (${REFERENCE_LANG}):${c.reset} ${definedKeys.size}`)
 
