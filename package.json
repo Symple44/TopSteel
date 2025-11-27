@@ -140,7 +140,7 @@
   },
   "engines": {
     "pnpm": ">=8.0.0",
-    "node": ">=22.14.0",
+    "node": ">=22.11.0",
     "npm": "Please use pnpm",
     "yarn": "Please use pnpm"
   },
