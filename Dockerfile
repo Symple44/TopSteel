@@ -65,7 +65,7 @@ COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 
 # Create startup script
 RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'cd /app/apps/api && node dist/main.js &' >> /app/start.sh && \
+    echo 'cd /app/apps/api && node dist/app/main.js &' >> /app/start.sh && \
     echo 'cd /app && node apps/web/server.js' >> /app/start.sh && \
     chmod +x /app/start.sh
 
