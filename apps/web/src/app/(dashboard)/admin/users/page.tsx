@@ -44,11 +44,7 @@ export default function UsersManagementPage() {
       requiredPermissions={['USER_VIEW']}
       showUnauthorized={true}
     >
-      <PageContainer maxWidth="full" padding="default">
-        <PageSection spacing="none">
-          <UsersDataTable onUserEdit={handleUserEdit} onUserCreate={handleUserCreate} />
-        </PageSection>
-      </PageContainer>
+      <UsersDataTable onUserEdit={handleUserEdit} onUserCreate={handleUserCreate} />
 
       {/* User details dialog */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>

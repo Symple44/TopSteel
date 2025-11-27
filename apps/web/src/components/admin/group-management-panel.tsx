@@ -17,6 +17,7 @@ import {
   DialogTrigger,
   Input,
   Label,
+  PageHeader,
   Select,
   SelectContent,
   SelectItem,
@@ -221,29 +222,27 @@ export function GroupManagementPanel() {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold">{t('groups.title')}</h1>
-          <p className="text-muted-foreground mt-2">
-            {t('groups.description')}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
-            <Button variant="outline" onClick={() => openBulkAssignment()}>
-              <UsersIcon className="h-4 w-4 mr-2" />
-              {t('groups.bulkAssignment')}
-            </Button>
-          </PermissionHide>
-          <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('groups.newGroup')}
-                </Button>
-              </DialogTrigger>
+      <PageHeader
+        title={t('groups.title')}
+        description={t('groups.description')}
+        icon={Building}
+        iconBackground="bg-gradient-to-br from-purple-500 to-pink-600"
+        actions={
+          <div className="flex gap-2">
+            <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
+              <Button variant="ghost" size="sm" onClick={() => openBulkAssignment()}>
+                <UsersIcon className="h-4 w-4" />
+                <span className="ml-2 hidden sm:inline">{t('groups.bulkAssignment')}</span>
+              </Button>
+            </PermissionHide>
+            <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="h-4 w-4" />
+                    <span className="ml-2">{t('groups.newGroup')}</span>
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>{t('groups.createGroup')}</DialogTitle>
@@ -259,7 +258,8 @@ export function GroupManagementPanel() {
             </Dialog>
           </PermissionHide>
         </div>
-      </div>
+        }
+      />
 
       {/* Statistiques */}
       <div className="grid gap-4 md:grid-cols-4">

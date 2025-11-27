@@ -15,6 +15,7 @@ import {
   DialogTrigger,
   Input,
   Label,
+  PageHeader,
   Switch,
   Table,
   TableBody,
@@ -133,35 +134,35 @@ export function RoleManagementPanel() {
   return (
     <div className="space-y-6">
       {/* En-tête */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold">{t('roles.title')}</h1>
-          <p className="text-muted-foreground mt-2">
-            {t('roles.description')}
-          </p>
-        </div>
-        <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                {t('roles.newRole')}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>{t('roles.createRole')}</DialogTitle>
-              </DialogHeader>
-              <RoleForm
-                onSave={() => {
-                  setIsCreateDialogOpen(false)
-                  loadRoles()
-                }}
-              />
-            </DialogContent>
-          </Dialog>
-        </PermissionHide>
-      </div>
+      <PageHeader
+        title={t('roles.title')}
+        description={t('roles.description')}
+        icon={Shield}
+        iconBackground="bg-gradient-to-br from-blue-500 to-indigo-600"
+        actions={
+          <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm">
+                  <Plus className="h-4 w-4" />
+                  <span className="ml-2">{t('roles.newRole')}</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>{t('roles.createRole')}</DialogTitle>
+                </DialogHeader>
+                <RoleForm
+                  onSave={() => {
+                    setIsCreateDialogOpen(false)
+                    loadRoles()
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          </PermissionHide>
+        }
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">

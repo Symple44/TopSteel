@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  PageHeader,
   Tabs,
   TabsContent,
   TabsList,
@@ -268,22 +269,19 @@ export default function DatabaseManagementPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Database className="w-8 h-8 text-blue-600" />
-          <div>
-            <h1 className="text-3xl font-bold">{tDb('database.title')}</h1>
-            <p className="text-muted-foreground mt-1">{tDb('database.subtitle')}</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
+    <div className="space-y-6">
+      <PageHeader
+        title={tDb('database.title')}
+        description={tDb('database.subtitle')}
+        icon={Database}
+        iconBackground="bg-gradient-to-br from-blue-500 to-cyan-600"
+        actions={
           <Button type="button" onClick={loadData} disabled={loading} size="sm">
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            {tDb('database.refresh')}
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span className="ml-2">{tDb('database.refresh')}</span>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full max-w-2xl bg-muted p-1 rounded-lg">

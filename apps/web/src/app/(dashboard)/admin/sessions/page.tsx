@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
+  PageHeader,
   Select,
   SelectContent,
   SelectItem,
@@ -245,29 +246,29 @@ function SessionsManagementContent() {
   return (
     <div className="space-y-6">
       {/* En-tête */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold">Sessions Utilisateurs</h1>
-          <p className="text-muted-foreground mt-2">
-            Surveillance des utilisateurs connectés et historique des connexions
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <Button
-            type="button"
-            variant={autoRefresh ? 'default' : 'outline'}
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            size="sm"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
-            {autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
-          </Button>
-          <Button type="button" onClick={loadData} size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Actualiser
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('sessions.title') || 'Sessions Utilisateurs'}
+        description={t('sessions.description') || 'Surveillance des utilisateurs connectés et historique des connexions'}
+        icon={Monitor}
+        iconBackground="bg-gradient-to-br from-green-500 to-emerald-600"
+        actions={
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={autoRefresh ? 'default' : 'ghost'}
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              size="sm"
+            >
+              <RefreshCw className={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
+              <span className="ml-2 hidden sm:inline">{autoRefresh ? 'Auto ON' : 'Auto OFF'}</span>
+            </Button>
+            <Button type="button" variant="ghost" onClick={loadData} size="sm">
+              <RefreshCw className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">{t('common.refresh') || 'Actualiser'}</span>
+            </Button>
+          </div>
+        }
+      />
 
       {/* Statistiques */}
       <div className="grid gap-4 md:grid-cols-4">

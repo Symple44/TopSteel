@@ -9,7 +9,7 @@ import { profile, profileEnhanced } from './profile'
 import { queryBuilder, datatable, codeViewer } from './data'
 import { roles, groups, roleManagement } from './rbac'
 import { companies, tabSync } from './connections'
-import { status, warehouse, address, filters, menu, modules, messages, system, projects, materials, actions, search, statusIndicator, templates, app, menuConfig, rootKeys } from './misc'
+import { status, warehouse, address, filters, menu, modules, societes, messages, system, projects, materials, actions, search, statusIndicator, templates, app, menuConfig, rootKeys } from './misc'
 
 export const fr = {
   common,
@@ -42,6 +42,7 @@ export const fr = {
   filters,
   menu,
   modules,
+  societes,
   messages,
   system,
   projects,

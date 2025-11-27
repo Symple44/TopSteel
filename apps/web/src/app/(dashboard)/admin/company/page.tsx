@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, useFormFieldIds } from '@erp/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, PageHeader, useFormFieldIds } from '@erp/ui'
 import { Building2, Save, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
@@ -99,14 +99,14 @@ export default function CompanySettingsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('company.title')}</h1>
-          <p className="text-muted-foreground mt-1">{t('company.subtitle')}</p>
-        </div>
-      </div>
+      <PageHeader
+        title={t('company.title')}
+        description={t('company.subtitle')}
+        icon={Building2}
+        iconBackground="bg-gradient-to-br from-indigo-500 to-purple-600"
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Logo de l'entreprise */}

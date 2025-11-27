@@ -9,7 +9,7 @@ import { profile, profileEnhanced } from './profile'
 import { queryBuilder, datatable, codeViewer } from './data'
 import { roles, groups, roleNames, roleManagement, bulk } from './rbac'
 import { connections, companies, tabSync } from './connections'
-import { status, warehouse, address, filters, menu, messages, system, projects, materials, actions, search, statusIndicator, templates, app, menuConfig, company, modules, users, authentication, rootKeys } from './misc'
+import { status, warehouse, address, filters, menu, messages, system, projects, materials, actions, search, statusIndicator, templates, app, menuConfig, company, modules, societes, users, authentication, rootKeys } from './misc'
 
 export const en = {
   common,
@@ -56,6 +56,7 @@ export const en = {
   menuConfig,
   company,
   modules,
+  societes,
   users,
   authentication,
   ...rootKeys,

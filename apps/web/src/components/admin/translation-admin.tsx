@@ -16,6 +16,7 @@ import {
   DialogTitle,
   Input,
   Label,
+  PageHeader,
   Progress,
   Separator,
   Textarea,
@@ -297,28 +298,24 @@ export function TranslationAdmin() {
   return (
     <div className="space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Languages className="h-8 w-8" />
-            Gestion des Traductions
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Gérez et modifiez toutes les traductions de l'application
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" onClick={() => setImportDialog(true)}>
-            <Upload className="h-4 w-4 mr-2" />
-            {t('modules.translations.import')}
-          </Button>
-          <Button type="button" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            {t('modules.translations.export')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('modules.translations.title') || 'Gestion des Traductions'}
+        description={t('modules.translations.description') || "Gérez et modifiez toutes les traductions de l'application"}
+        icon={Languages}
+        iconBackground="bg-gradient-to-br from-amber-500 to-orange-600"
+        actions={
+          <div className="flex gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={() => setImportDialog(true)}>
+              <Upload className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">{t('modules.translations.import')}</span>
+            </Button>
+            <Button type="button" size="sm" onClick={handleExport}>
+              <Download className="h-4 w-4" />
+              <span className="ml-2">{t('modules.translations.export')}</span>
+            </Button>
+          </div>
+        }
+      />
 
       {/* {t('modules.translations.statistics')} */}
       {memoizedStats && (

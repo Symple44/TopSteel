@@ -165,6 +165,12 @@ export const modules = {
   access: 'Access',
 }
 
+export const societes = {
+  title: 'Companies Management',
+  description: 'Company administration and user management',
+  newSociete: 'New company',
+}
+
 export const users = {
   actions: {
     edit: 'Edit user',

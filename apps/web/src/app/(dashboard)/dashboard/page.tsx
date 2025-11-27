@@ -1,17 +1,6 @@
 'use client'
 
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  PageContainer,
-  PageGrid,
-  PageHeader,
-  PageSection,
-} from '@erp/ui'
+import { Badge, Card, CardContent, PageContainer, PageGrid, PageHeader, PageSection } from '@erp/ui'
 import {
   ArrowRight,
   Database,
@@ -93,29 +82,23 @@ export default function Dashboard() {
   ]
 
   return (
-    <PageContainer maxWidth="xl" padding="default">
-      {/* Header compact avec message de bienvenue */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg">
-            <LayoutDashboard className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold text-foreground">
-              {t('title') || 'Tableau de bord'}
-            </h1>
-            <p className="text-muted-foreground">
-              {t('welcomeMessage', { name: user?.prenom || user?.nom || '' }) ||
-                `Bienvenue${user?.prenom ? `, ${user.prenom}` : ''}`}
-            </p>
-          </div>
-        </div>
-        {user && (
-          <Badge variant="secondary" className="font-normal">
-            {user.role}
-          </Badge>
-        )}
-      </div>
+    <PageContainer maxWidth="xl" padding="none">
+      <PageHeader
+        title={t('title') || 'Tableau de bord'}
+        description={
+          t('welcomeMessage', { name: user?.prenom || user?.nom || '' }) ||
+          `Bienvenue${user?.prenom ? `, ${user.prenom}` : ''}`
+        }
+        icon={LayoutDashboard}
+        iconBackground="bg-gradient-to-br from-blue-600 to-purple-600"
+        badge={
+          user && (
+            <Badge variant="secondary" className="font-normal text-xs">
+              {user.role}
+            </Badge>
+          )
+        }
+      />
 
       {/* Navigation Grid */}
       <PageSection spacing="default">
@@ -123,50 +106,40 @@ export default function Dashboard() {
           {navigationItems.map((item) => (
             <Card
               key={item.href}
-              className="group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+              className="group cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
               onClick={() => router?.push(item.href)}
               onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router?.push(item.href)}
               tabIndex={0}
               role="button"
               aria-label={item.title}
             >
-              <CardHeader className="pb-3">
-                <div className={`p-3 ${item.color} rounded-xl w-fit mb-3 shadow-lg`}>
-                  <item.icon className="h-6 w-6 text-white" />
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white ${item.color}`}>
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                    {item.title}
+                  </h3>
                 </div>
-                <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">
-                  {item.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">{item.description}</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-0 h-auto text-muted-foreground group-hover:text-primary"
-                >
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{item.description}</p>
+                <div className="flex items-center text-xs font-medium text-primary">
                   {t('access') || 'Accéder'}
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                  <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                </div>
               </CardContent>
             </Card>
           ))}
         </PageGrid>
       </PageSection>
 
-      {/* System Info */}
-      <PageSection spacing="none">
-        <Card className="bg-muted/30">
-          <CardContent className="py-4">
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>{t('version') || 'Version'}: Socle 1.0</span>
-              <span>
-                {t('connectedAs') || 'Connecté en tant que'}: {user?.email}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </PageSection>
+      {/* System Info - compact */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-border/50">
+        <span>{t('version') || 'Version'}: Socle 1.0</span>
+        <span>
+          {t('connectedAs') || 'Connecté en tant que'}: {user?.email}
+        </span>
+      </div>
     </PageContainer>
   )
 }

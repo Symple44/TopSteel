@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnConfig } from '@erp/ui'
-import { Avatar, AvatarFallback, Badge, Button, DataTable, usePersistedTableSettings } from '@erp/ui'
+import { Avatar, AvatarFallback, Badge, Button, DataTable, PageHeader, usePersistedTableSettings } from '@erp/ui'
 import {
   Building,
   Calendar,
@@ -357,39 +357,35 @@ export function UsersDataTable({ onUserEdit, onUserCreate, hideHeader = false }:
 
   return (
     <div className="space-y-4">
-      {/* Header épuré avec titre et actions alignés */}
+      {/* Header avec PageHeader standard */}
       {!hideHeader && (
-        <div className="flex items-center justify-between pb-2">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg">
-              <Users className="h-5 w-5 text-white" />
+        <PageHeader
+          title={t('users.userManagement')}
+          description={t('users.userManagementDescription')}
+          icon={Users}
+          iconBackground="bg-gradient-to-br from-blue-600 to-cyan-600"
+          spacing="sm"
+          actions={
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="ghost" size="sm" onClick={exportUsers}>
+                <Download className="h-4 w-4" />
+                <span className="ml-2 hidden sm:inline">{t('users.export')}</span>
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setIsBulkManagementOpen(true)}>
+                <Settings className="h-4 w-4" />
+                <span className="ml-2 hidden sm:inline">{t('users.bulkManagement')}</span>
+              </Button>
+              <Button type="button" size="sm" onClick={handleCreate}>
+                <UserPlus className="h-4 w-4" />
+                <span className="ml-2">{t('users.newUser')}</span>
+              </Button>
             </div>
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">
-                {t('users.userManagement')}
-              </h1>
-              <p className="text-muted-foreground text-sm">{t('users.userManagementDescription')}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={exportUsers}>
-              <Download className="h-4 w-4" />
-              <span className="ml-2 hidden sm:inline">{t('users.export')}</span>
-            </Button>
-            <Button type="button" variant="ghost" size="sm" onClick={() => setIsBulkManagementOpen(true)}>
-              <Settings className="h-4 w-4" />
-              <span className="ml-2 hidden sm:inline">{t('users.bulkManagement')}</span>
-            </Button>
-            <Button type="button" size="sm" onClick={handleCreate}>
-              <UserPlus className="h-4 w-4" />
-              <span className="ml-2">{t('users.newUser')}</span>
-            </Button>
-          </div>
-        </div>
+          }
+        />
       )}
 
       {/* Statistiques compactes en ligne */}
-      <div className="flex items-center gap-6 py-2 px-1 text-sm">
+      <div className="flex items-center gap-6 py-2 px-1 text-sm border-b border-border/50">
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-muted-foreground" />
           <span className="text-muted-foreground">{t('users.totalUsers')}:</span>

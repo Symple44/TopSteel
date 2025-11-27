@@ -8,9 +8,7 @@ import { AdminGuard } from '../../../../components/auth/admin-guard'
 export default function TranslationsAdminPage() {
   return (
     <AdminGuard requiredRoles={['SUPER_ADMIN', 'ADMIN']} requiredPermissions={['SYSTEM_SETTINGS']}>
-      <div className="py-6">
-        <TranslationAdmin />
-      </div>
+      <TranslationAdmin />
     </AdminGuard>
   )
 }

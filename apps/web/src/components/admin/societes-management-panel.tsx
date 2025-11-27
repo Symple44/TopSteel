@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   Label,
+  PageHeader,
   Table,
   TableBody,
   TableCell,
@@ -26,6 +27,7 @@ import {
   TabsTrigger,
 } from '@erp/ui'
 import { Building, Database, Edit, Eye, MapPin, Plus, Shield, Users } from 'lucide-react'
+import { useTranslation } from '../../lib/i18n/hooks'
 import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '../../utils/backend-api'
 
@@ -86,6 +88,7 @@ interface SocieteStats {
 }
 
 export function SocietesManagementPanel() {
+  const { t } = useTranslation('admin')
   const [societes, setSocietes] = useState<Societe[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -174,24 +177,24 @@ export function SocietesManagementPanel() {
   return (
     <div className="space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestion des Sociétés</h1>
-          <p className="text-gray-600 mt-2">
-            Administration des sociétés et gestion des utilisateurs
-          </p>
-        </div>
-        <Button
-          type="button"
-          onClick={() => {
-            setIsCreateSocieteOpen(true)
-          }}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Nouvelle société
-        </Button>
-      </div>
+      <PageHeader
+        title={t('societes.title') || 'Gestion des Sociétés'}
+        description={t('societes.description') || 'Administration des sociétés et gestion des utilisateurs'}
+        icon={Building}
+        iconBackground="bg-gradient-to-br from-emerald-500 to-teal-600"
+        actions={
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              setIsCreateSocieteOpen(true)
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            <span className="ml-2">{t('societes.newSociete') || 'Nouvelle société'}</span>
+          </Button>
+        }
+      />
 
       {/* Statistiques rapides */}
       <div className="grid gap-6 md:grid-cols-4">

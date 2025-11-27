@@ -51,6 +51,7 @@ export const common = {
   remove: 'Remove',
   changePhoto: 'Change photo',
   reset: 'Reset',
+  refresh: 'Refresh',
   resetToDefaults: 'Reset to Defaults',
   start: 'Start',
   end: 'End',

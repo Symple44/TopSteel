@@ -34,6 +34,12 @@ export const modules = {
   access: 'Acceso',
 }
 
+export const societes = {
+  title: 'Gestión de Empresas',
+  description: 'Administración de empresas y gestión de usuarios',
+  newSociete: 'Nueva empresa',
+}
+
 export const messages = {
   selectTableColumn: 'Por favor seleccione al menos una tabla y una columna',
   querySuccess: 'Consulta ejecutada correctamente ({{count}} resultados)',

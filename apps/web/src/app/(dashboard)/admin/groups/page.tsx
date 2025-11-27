@@ -12,9 +12,7 @@ export default function GroupManagementPage() {
       requiredPermissions={['SYSTEM_ADMIN', 'USER_CREATE']}
       showUnauthorized={true}
     >
-      <div className="py-6">
-        <GroupManagementPanel />
-      </div>
+      <GroupManagementPanel />
     </AdminGuard>
   )
 }

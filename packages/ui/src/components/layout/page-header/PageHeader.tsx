@@ -6,17 +6,16 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../primitives/button'
 
-const pageHeaderVariants = cva('mb-6 sm:mb-8', {
+const pageHeaderVariants = cva('mb-6', {
   variants: {
     variant: {
       default: '',
-      bordered: 'pb-6 border-b border-border/50',
-      card: 'bg-card rounded-xl p-6 border border-border/50 shadow-sm',
+      bordered: 'pb-4 border-b border-border/50',
     },
     spacing: {
       sm: 'mb-4',
-      default: 'mb-6 sm:mb-8',
-      lg: 'mb-8 sm:mb-10',
+      default: 'mb-6',
+      lg: 'mb-8',
       none: 'mb-0',
     },
   },
@@ -50,8 +49,8 @@ export interface PageHeaderProps
 }
 
 /**
- * PageHeader - En-tête standardisé pour les pages
- * Inclut titre, description, icône, actions et bouton retour optionnel
+ * PageHeader - En-tête compact et standardisé pour les pages
+ * Style uniforme : icône (10x10) | titre (xl) + description | actions à droite
  */
 const PageHeader = React.forwardRef<HTMLDivElement, PageHeaderProps>(
   (
@@ -93,37 +92,36 @@ const PageHeader = React.forwardRef<HTMLDivElement, PageHeaderProps>(
             variant="ghost"
             size="sm"
             onClick={handleBack}
-            className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
+            className="mb-3 -ml-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {backLabel}
           </Button>
         )}
 
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           {/* Partie gauche: icône, titre, description */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             {Icon && (
               <div
                 className={cn(
-                  'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white shadow-lg',
+                  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white',
                   iconBackground
                 )}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="h-5 w-5" />
               </div>
             )}
 
-            <div className="space-y-1">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold text-foreground truncate">
                   {title}
                 </h1>
                 {badge}
               </div>
-
               {description && (
-                <p className="text-muted-foreground text-sm sm:text-base max-w-2xl">
+                <p className="text-sm text-muted-foreground truncate">
                   {description}
                 </p>
               )}

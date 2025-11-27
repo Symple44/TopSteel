@@ -12,9 +12,7 @@ export default function SocietesManagementPage() {
       requiredPermissions={['SYSTEM_ADMIN']}
       showUnauthorized={true}
     >
-      <div className="py-6">
-        <SocietesManagementPanel />
-      </div>
+      <SocietesManagementPanel />
     </AdminGuard>
   )
 }

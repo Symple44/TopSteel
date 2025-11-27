@@ -10,8 +10,6 @@ export const dynamic = 'force-dynamic'
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   EmptyState,
   PageContainer,
   PageGrid,
@@ -145,7 +143,7 @@ export default function AdminPage() {
   })
 
   return (
-    <PageContainer maxWidth="xl" padding="default">
+    <PageContainer maxWidth="xl" padding="none">
       <PageHeader
         title={t('title')}
         description={t('description')}
@@ -153,11 +151,7 @@ export default function AdminPage() {
         iconBackground="bg-gradient-to-br from-slate-600 to-gray-700"
       />
 
-      <PageSection
-        title={t('modules.title') || 'Modules'}
-        description={t('subtitle')}
-        count={visibleModules?.length}
-      >
+      <PageSection spacing="default">
         {visibleModules?.length === 0 ? (
           <EmptyState
             icon={<Lock className="h-12 w-12" />}
@@ -169,25 +163,24 @@ export default function AdminPage() {
             {visibleModules?.map((module) => (
               <Card
                 key={module.href}
-                className="group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                className="group cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                 onClick={() => router?.push(module.href)}
               >
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center text-foreground group-hover:text-primary transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3 mb-3">
                     <div
-                      className={`p-3 bg-gradient-to-r ${module.color} rounded-xl mr-3 shadow-lg group-hover:scale-110 transition-transform`}
+                      className={`p-2 bg-gradient-to-r ${module.color} rounded-lg group-hover:scale-105 transition-transform`}
                     >
-                      <module.icon className="h-6 w-6 text-white" />
+                      <module.icon className="h-5 w-5 text-white" />
                     </div>
-                    {module.title}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">{module.description}</p>
-                  <div className="flex items-center text-sm font-medium text-primary">
+                    <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                      {module.title}
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{module.description}</p>
+                  <div className="flex items-center text-xs font-medium text-primary">
                     {t('modules.access')}
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </CardContent>
               </Card>

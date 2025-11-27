@@ -12,9 +12,7 @@ import {
   CardTitle,
   Input,
   PageContainer,
-  PageGrid,
   PageHeader,
-  PageSection,
   Tabs,
   TabsContent,
   TabsList,
@@ -731,7 +729,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <PageContainer maxWidth="xl" padding="default">
+    <PageContainer maxWidth="xl" padding="none">
       <PageHeader
         title={t('title')}
         description={t('subtitle')}
@@ -739,45 +737,44 @@ export default function ProfilePage() {
         iconBackground="bg-gradient-to-br from-blue-600 to-cyan-600"
         actions={
           <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" onClick={handleReset}>
-              <RotateCcw className="mr-2 h-4 w-4" />
-              {tc('reset') || 'Réinitialiser'}
+            <Button type="button" variant="ghost" size="sm" onClick={handleReset}>
+              <RotateCcw className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">{tc('reset') || 'Réinitialiser'}</span>
             </Button>
-            <Button type="button" onClick={handleSaveProfile} disabled={isLoading}>
+            <Button type="button" size="sm" onClick={handleSaveProfile} disabled={isLoading}>
               {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Save className="mr-2 h-4 w-4" />
+                <Save className="h-4 w-4" />
               )}
-              {t('saveProfile')}
+              <span className="ml-2">{t('saveProfile')}</span>
             </Button>
           </div>
         }
       />
 
-      <PageSection spacing="none">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6">
-            {tabs?.map((tab) => {
-              const Icon = tab.icon
-              return (
-                <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" />
-                  {tab.label}
-                </TabsTrigger>
-              )
-            })}
-          </TabsList>
+      {/* Tabs navigation */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="mb-6">
+          {tabs?.map((tab) => {
+            const Icon = tab.icon
+            return (
+              <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+                <Icon className="h-4 w-4" />
+                {tab.label}
+              </TabsTrigger>
+            )
+          })}
+        </TabsList>
 
-          <TabsContent value="profile" className="space-y-6">
-            {renderTabContent()}
-          </TabsContent>
+        <TabsContent value="profile" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
 
-          <TabsContent value="security" className="space-y-6">
-            {renderTabContent()}
-          </TabsContent>
-        </Tabs>
-      </PageSection>
+        <TabsContent value="security" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+      </Tabs>
     </PageContainer>
   )
 }

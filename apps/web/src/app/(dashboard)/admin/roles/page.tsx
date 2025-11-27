@@ -12,9 +12,7 @@ export default function RoleManagementPage() {
       requiredPermissions={['SYSTEM_ADMIN', 'USER_DELETE']}
       showUnauthorized={true}
     >
-      <div className="py-6">
-        <RoleManagementPanel />
-      </div>
+      <RoleManagementPanel />
     </AdminGuard>
   )
 }

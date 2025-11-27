@@ -87,8 +87,7 @@ export default function SettingsPage() {
   ]
 
   return (
-    <PageContainer maxWidth="xl">
-      {/* En-tête de page */}
+    <PageContainer maxWidth="xl" padding="none">
       <PageHeader
         title={t('title')}
         description={t('description')}
@@ -96,7 +95,7 @@ export default function SettingsPage() {
         iconBackground="bg-gradient-to-br from-blue-600 to-purple-600"
         badge={
           user && (
-            <Badge variant="secondary" className="font-normal">
+            <Badge variant="secondary" className="font-normal text-xs">
               <User className="h-3 w-3 mr-1" />
               {user.prenom} {user.nom}
             </Badge>
@@ -105,26 +104,26 @@ export default function SettingsPage() {
       />
 
       {/* Modules de paramètres */}
-      <PageSection title="Modules" description="Configurez les différents aspects de l'application">
+      <PageSection spacing="default">
         <PageGrid cols={2}>
           {settingsModules?.map((module) => (
             <Card
               key={module.href}
-              className="group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+              className="group cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
               onClick={() => router?.push(module.href)}
             >
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
                   <div
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white shadow-lg ${module.color}`}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white ${module.color}`}
                   >
-                    <module.icon className="h-6 w-6" />
+                    <module.icon className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                    <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
                       {module.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    <p className="text-sm text-muted-foreground line-clamp-1">
                       {module.description}
                     </p>
                   </div>
@@ -137,30 +136,28 @@ export default function SettingsPage() {
 
       {/* Informations du compte */}
       {user && (
-        <PageSection title="Informations du compte" icon={User} variant="card">
-          <PageGrid cols={2}>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{t('fullName')}</p>
-              <p className="text-foreground font-medium">
-                {user.prenom} {user.nom}
-              </p>
+        <div className="pt-4 border-t border-border/50">
+          <div className="flex items-center gap-6 text-sm">
+            <div>
+              <p className="text-muted-foreground">{t('fullName')}</p>
+              <p className="font-medium text-foreground">{user.prenom} {user.nom}</p>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{t('email')}</p>
-              <p className="text-foreground font-medium">{user.email}</p>
+            <div>
+              <p className="text-muted-foreground">{t('email')}</p>
+              <p className="font-medium text-foreground">{user.email}</p>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{t('role')}</p>
-              <p className="text-foreground font-medium">{user.role}</p>
+            <div>
+              <p className="text-muted-foreground">{t('role')}</p>
+              <p className="font-medium text-foreground">{user.role}</p>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{t('status')}</p>
-              <Badge variant="default" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+            <div>
+              <p className="text-muted-foreground">{t('status')}</p>
+              <Badge variant="default" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-xs">
                 {t('active')}
               </Badge>
             </div>
-          </PageGrid>
-        </PageSection>
+          </div>
+        </div>
       )}
     </PageContainer>
   )

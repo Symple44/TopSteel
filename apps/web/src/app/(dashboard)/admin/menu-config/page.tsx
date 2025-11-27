@@ -19,6 +19,7 @@ import {
   DialogTrigger,
   Input,
   Label,
+  PageHeader,
   Table,
   TableBody,
   TableCell,
@@ -32,6 +33,7 @@ import {
   Textarea,
   useUniqueId,
 } from '@erp/ui'
+import { Menu } from 'lucide-react'
 import {
   AlertTriangle,
   Check,
@@ -164,39 +166,39 @@ export default function MenuConfigurationPage() {
   return (
     <div className="space-y-6">
       {/* En-tête */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold">{t('menuConfig.title')}</h1>
-          <p className="text-muted-foreground mt-2">{t('menuConfig.description')}</p>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={handleCreateDefault}>
-            <Zap className="h-4 w-4 mr-2" />
-            {t('menuConfig.defaultMenu')}
-          </Button>
-          {/* <PermissionHide permission="MENU_CREATE" roles={['SUPER_ADMIN']}> */}
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                {t('menuConfig.newConfiguration')}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>{t('menuConfig.createNewConfiguration')}</DialogTitle>
-              </DialogHeader>
-              <MenuConfigForm
-                onSave={() => {
-                  setIsCreateDialogOpen(false)
-                  loadConfigurations()
-                }}
-              />
-            </DialogContent>
-          </Dialog>
-          {/* </PermissionHide> */}
-        </div>
-      </div>
+      <PageHeader
+        title={t('menuConfig.title')}
+        description={t('menuConfig.description')}
+        icon={Menu}
+        iconBackground="bg-gradient-to-br from-purple-500 to-pink-600"
+        actions={
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={handleCreateDefault}>
+              <Zap className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">{t('menuConfig.defaultMenu')}</span>
+            </Button>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm">
+                  <Plus className="h-4 w-4" />
+                  <span className="ml-2">{t('menuConfig.newConfiguration')}</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>{t('menuConfig.createNewConfiguration')}</DialogTitle>
+                </DialogHeader>
+                <MenuConfigForm
+                  onSave={() => {
+                    setIsCreateDialogOpen(false)
+                    loadConfigurations()
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        }
+      />
 
       {/* Configuration active */}
       {activeConfig && (
