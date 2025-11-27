@@ -15,7 +15,7 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/types/package.json ./packages/types/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/config/package.json ./packages/config/
-COPY packages/entities/package.json ./packages/entities/
+COPY packages/erp-entities/package.json ./packages/erp-entities/
 COPY packages/domains/package.json ./packages/domains/
 COPY packages/api-client/package.json ./packages/api-client/
 
