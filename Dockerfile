@@ -58,10 +58,7 @@ COPY --from=builder /app/apps/web/public ./apps/web/public
 # Copy built API application
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/package.json ./apps/api/
-COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=builder /app/node_modules/.pnpm ./node_modules/.pnpm
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy prisma schema for migrations
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
