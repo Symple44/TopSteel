@@ -1,7 +1,7 @@
 'use client'
 
 import { Dialog, DialogContent, DialogTitle } from '@erp/ui'
-import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify'
 import {
   ArrowRight,
   Bell,

@@ -18,7 +18,6 @@ export { useConfirm } from './use-confirm'
 export { useDashboard } from './use-dashboard'
 export { useDataView } from './use-data-view'
 export { useDebounce } from './use-debounce'
-export { useDebouncedValue } from './use-debounced-value'
 export { useDesignSystem } from './use-design-system'
 
 // Menu and navigation
@@ -37,8 +36,16 @@ export { useOptimizedQuery } from './use-optimized-query'
 
 // Performance and optimization
 export { usePerformance } from './use-performance'
-export { usePermissions } from './use-permissions'
-export { usePermissions as usePermissionsV2 } from './use-permissions-v2'
+
+// Permissions (API-driven unified system)
+export {
+  usePermissions,
+  useRoles,
+  useModuleAccess,
+  useActionPermission,
+  type Permission,
+  type Role,
+} from './use-permissions'
 
 export { useSecureValidation } from './use-secure-validation'
 export { useSelectedPages } from './use-selected-pages'

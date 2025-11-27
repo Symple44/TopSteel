@@ -75,6 +75,9 @@ export async function saveUserInfoInCookie(
     email: user.email,
     prenom: user.prenom,
     nom: user.nom,
+    role: user.role,
+    roles: user.roles,
+    permissions: user.permissions,
     isSuperAdmin: hasIsSuperAdminProperty(user) ? user.isSuperAdmin || false : false,
     company: company
       ? {
@@ -140,6 +143,9 @@ export async function getUserInfoFromCookie(request?: NextRequest): Promise<{
         email: userInfo.email,
         prenom: userInfo.prenom,
         nom: userInfo.nom,
+        role: userInfo.role,
+        roles: userInfo.roles,
+        permissions: userInfo.permissions,
         isSuperAdmin: userInfo.isSuperAdmin,
       } as Partial<User>,
       company: userInfo.company,
@@ -285,6 +291,9 @@ export function extractUserFromToken(token: string): Partial<User> | null {
       email: payload.email,
       prenom: payload.prenom,
       nom: payload.nom,
+      role: payload.role,
+      roles: payload.roles,
+      permissions: payload.permissions,
       isSuperAdmin: payload.isSuperAdmin ?? false,
     } as Partial<User>
   } catch {

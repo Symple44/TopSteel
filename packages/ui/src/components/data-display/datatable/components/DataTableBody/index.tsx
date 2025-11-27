@@ -157,18 +157,46 @@ export function DataTableBody<T extends Record<string, unknown>>({
   // Nombre de colonnes pour le colspan
   const colSpan = visibleColumns.length + (state.selection ? 1 : 0) + (actions ? 1 : 0)
 
+  // Composant skeleton row pour le chargement
+  const SkeletonRow = ({ index }: { index: number }) => (
+    <tr
+      key={`skeleton-${index}`}
+      className={cn(
+        'border-b animate-pulse',
+        striped && index % 2 === 0 && 'bg-muted/30'
+      )}
+    >
+      {state.selection && (
+        <td className="w-12 px-4 py-3">
+          <div className="h-4 w-4 bg-muted rounded" />
+        </td>
+      )}
+      {visibleColumns.map((column, colIndex) => (
+        <td key={`skeleton-${index}-${column.id}`} className="px-4 py-3">
+          <div
+            className="h-4 bg-muted rounded"
+            style={{
+              width: colIndex === 0 ? '70%' : colIndex === visibleColumns.length - 1 ? '40%' : '60%',
+            }}
+          />
+        </td>
+      ))}
+      {actions && actions.length > 0 && (
+        <td className="w-20 px-2 py-3">
+          <div className="h-6 w-6 bg-muted rounded mx-auto" />
+        </td>
+      )}
+    </tr>
+  )
+
   // Etats vides et chargement
   if (loading) {
     return (
       <tbody>
-        <tr>
-          <td colSpan={colSpan} className="text-center py-8">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="ml-3 text-muted-foreground">Chargement...</span>
-            </div>
-          </td>
-        </tr>
+        {/* Afficher 5 skeleton rows pour un meilleur feedback */}
+        {Array.from({ length: 5 }).map((_, index) => (
+          <SkeletonRow key={index} index={index} />
+        ))}
       </tbody>
     )
   }
@@ -177,8 +205,30 @@ export function DataTableBody<T extends Record<string, unknown>>({
     return (
       <tbody>
         <tr>
-          <td colSpan={colSpan} className="text-center py-8 text-muted-foreground">
-            {state.isFiltered ? 'Aucun resultat trouve' : emptyMessage}
+          <td colSpan={colSpan} className="py-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <svg
+                className="w-12 h-12 text-muted-foreground/50 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+              <p className="text-sm font-medium text-muted-foreground mb-1">
+                {state.isFiltered ? 'Aucun résultat trouvé' : 'Aucune donnée'}
+              </p>
+              <p className="text-xs text-muted-foreground/70">
+                {state.isFiltered
+                  ? 'Essayez de modifier vos filtres de recherche'
+                  : emptyMessage}
+              </p>
+            </div>
           </td>
         </tr>
       </tbody>

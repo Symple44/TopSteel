@@ -1,7 +1,7 @@
 /**
  * 🔒 SECURITY UTILS ENTERPRISE - VERSION RENFORCÉE ET CORRIGÉE
  */
-import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify'
 import { z } from 'zod'
 
 /**

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { fetchTyped, postTyped } from '../../../../../lib/api-typed'
+import { fetchTyped, postTyped } from '../../../../../utils/backend-api'
 import { mapMenuItemRecursively } from '../utils/menu-transformers'
 import type { MenuItemConfig, UserMenuItem } from '../types/menu.types'
 

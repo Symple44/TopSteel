@@ -143,26 +143,43 @@ export const switchVariants = cva(
 export type SwitchVariants = VariantProps<typeof switchVariants>
 
 // === CARD VARIANTS ===
-export const cardVariants = cva('rounded-lg border bg-card text-card-foreground shadow', {
-  variants: {
-    variant: {
-      default: 'border-border',
-      elevated: 'border-transparent shadow-lg',
-      ghost: 'border-transparent shadow-none',
-      outline: 'border-border shadow-none',
+export const cardVariants = cva(
+  'rounded-lg border bg-card text-card-foreground transition-all duration-200',
+  {
+    variants: {
+      variant: {
+        default: 'border-border shadow-sm',
+        elevated: 'border-transparent shadow-lg hover:shadow-xl',
+        ghost: 'border-transparent shadow-none bg-transparent',
+        outline: 'border-border shadow-none',
+        interactive:
+          'border-border shadow-sm cursor-pointer hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5',
+        success: 'border-green-500/30 bg-green-50 dark:bg-green-950/20',
+        warning: 'border-amber-500/30 bg-amber-50 dark:bg-amber-950/20',
+        error: 'border-destructive/30 bg-destructive/5 dark:bg-destructive/10',
+        info: 'border-blue-500/30 bg-blue-50 dark:bg-blue-950/20',
+      },
+      padding: {
+        none: 'p-0',
+        xs: 'p-2',
+        sm: 'p-4',
+        default: 'p-6',
+        lg: 'p-8',
+      },
+      hover: {
+        none: '',
+        lift: 'hover:shadow-lg hover:-translate-y-1',
+        glow: 'hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] hover:border-primary/30',
+        highlight: 'hover:bg-muted/50',
+      },
     },
-    padding: {
-      none: 'p-0',
-      sm: 'p-4',
-      default: 'p-6',
-      lg: 'p-8',
+    defaultVariants: {
+      variant: 'default',
+      padding: 'default',
+      hover: 'none',
     },
-  },
-  defaultVariants: {
-    variant: 'default',
-    padding: 'default',
-  },
-})
+  }
+)
 
 export type CardVariants = VariantProps<typeof cardVariants>
 

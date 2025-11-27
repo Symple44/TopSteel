@@ -1,42 +1,34 @@
 /**
- * Utilitaires JWT pour Client Components
- * Ne dépend pas de next/headers
+ * JWT Utilities - Client Components
+ * For browser-side token extraction
+ * Does NOT depend on next/headers
  */
 
 import type { NextRequest } from 'next/server'
+import {
+  type AuthenticatedUser,
+  type JWTPayload,
+  decodeJWTPayload,
+  hasAccessToCompany,
+  hasAllPermissions,
+  hasAnyPermission,
+  hasPermission,
+  isAdmin,
+  payloadToUser,
+  requireAuthenticatedUser,
+} from './jwt-utils-shared'
 
-/**
- * Interface pour le payload JWT
- */
-export interface JWTPayload {
-  sub: string
-  email: string
-  role: string
-  roles?: string[]
-  permissions?: string[]
-  exp: number
-  iat: number
-  societeId?: string
-  societeCodes?: string[]
+// Re-export shared types and functions
+export type { AuthenticatedUser, JWTPayload }
+export {
+  decodeJWTPayload,
+  hasAccessToCompany,
+  hasAllPermissions,
+  hasAnyPermission,
+  hasPermission,
+  isAdmin,
+  requireAuthenticatedUser,
 }
-
-/**
- * Interface pour l'utilisateur authentifié
- */
-export interface AuthenticatedUser {
-  id: string
-  email: string
-  role: string
-  roles?: string[]
-  permissions?: string[]
-  societeId?: string
-  societeCodes?: string[]
-}
-
-/**
- * Rôles administrateur
- */
-const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN'] as const
 
 /**
  * Extrait le token depuis les cookies du navigateur (côté client)
@@ -47,9 +39,9 @@ export function extractTokenFromCookies(): string | null {
   }
 
   try {
-    const cookies = document?.cookie?.split(';') || []
+    const cookies = document.cookie.split(';')
     for (const cookie of cookies) {
-      const [name, value] = (cookie || '').trim().split('=')
+      const [name, value] = cookie.trim().split('=')
       if (name === 'token' || name === 'access_token' || name === 'topsteel-access-token') {
         return value
       }
@@ -65,7 +57,6 @@ export function extractTokenFromCookies(): string | null {
  */
 export function extractTokenFromRequest(request: NextRequest): string | null {
   try {
-    // 1. Vérifier les cookies
     const tokenFromCookie =
       request.cookies?.get('token')?.value ||
       request.cookies?.get('access_token')?.value ||
@@ -75,48 +66,12 @@ export function extractTokenFromRequest(request: NextRequest): string | null {
       return tokenFromCookie
     }
 
-    // 2. Vérifier l'header Authorization
-    const authHeader = request?.headers?.get('authorization')
+    const authHeader = request.headers.get('authorization')
     if (authHeader?.startsWith('Bearer ')) {
-      return authHeader?.substring(7)
+      return authHeader.substring(7)
     }
 
     return null
-  } catch {
-    return null
-  }
-}
-
-/**
- * Décode le payload JWT sans vérifier la signature
- */
-export function decodeJWTPayload(token: string): JWTPayload | null {
-  try {
-    const parts = token?.split('.')
-    if (parts?.length !== 3) {
-      return null
-    }
-
-    // Décoder le payload
-    let base64 = parts?.[1]?.replace(/-/g, '+').replace(/_/g, '/')
-    while (base64?.length % 4) {
-      base64 += '='
-    }
-
-    const payload = JSON.parse(atob(base64)) as JWTPayload
-
-    // Vérification basique de structure
-    if (!payload?.sub || !payload?.exp || !payload?.email) {
-      return null
-    }
-
-    // Vérifier l'expiration
-    const now = Math.floor(Date.now() / 1000)
-    if (payload?.exp <= now) {
-      return null
-    }
-
-    return payload
   } catch {
     return null
   }
@@ -137,77 +92,8 @@ export function getAuthenticatedUser(): AuthenticatedUser | null {
       return null
     }
 
-    return {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role,
-      roles: payload.roles,
-      permissions: payload.permissions,
-      societeId: payload.societeId,
-      societeCodes: payload.societeCodes,
-    }
+    return payloadToUser(payload)
   } catch {
     return null
   }
-}
-
-/**
- * Vérifie si l'utilisateur a une permission spécifique
- */
-export function hasPermission(user: AuthenticatedUser, permission: string): boolean {
-  // Super admin a toutes les permissions
-  if (user.role === 'SUPER_ADMIN') {
-    return true
-  }
-
-  // Vérifier dans les permissions explicites
-  if (user.permissions?.includes(permission)) {
-    return true
-  }
-
-  // Vérifier les permissions par rôle
-  const rolePermissions: Record<string, string[]> = {
-    ADMIN: ['manage_users', 'manage_companies', 'view_analytics'],
-    MANAGER: ['manage_team', 'view_reports'],
-    USER: ['view_own_data'],
-  }
-
-  return rolePermissions[user.role]?.includes(permission) || false
-}
-
-/**
- * Vérifie si l'utilisateur est un administrateur
- */
-export function isAdmin(user: AuthenticatedUser): boolean {
-  return ADMIN_ROLES?.includes(user.role as (typeof ADMIN_ROLES)[number])
-}
-
-/**
- * Vérifie si l'utilisateur a accès à une société spécifique
- */
-export function hasAccessToCompany(user: AuthenticatedUser, companyId: string): boolean {
-  // Super admin a accès à toutes les sociétés
-  if (user.role === 'SUPER_ADMIN') {
-    return true
-  }
-
-  // Vérifier l'accès direct
-  if (user.societeId === companyId) {
-    return true
-  }
-
-  // Vérifier via les codes société
-  return user.societeCodes?.includes(companyId) || false
-}
-
-/**
- * Récupère l'utilisateur authentifié ou lance une erreur
- * Utiliser dans les routes qui nécessitent absolument une authentification
- */
-export function requireAuthenticatedUser(user: AuthenticatedUser | null): AuthenticatedUser {
-  if (!user) {
-    throw new Error('Authentication required')
-  }
-
-  return user
 }

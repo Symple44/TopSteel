@@ -10,17 +10,7 @@ import '../styles/globals.css'
 import { getCSPNonce } from '../lib/security/csp-nonce'
 import { Providers } from './providers'
 import { GlobalErrorBoundary } from '../components/global-error-boundary'
-// import { logStartupInfo } from '../lib/startup-logger'
-
-// Tests désactivés pour réduire les logs
-// import '../utils/fetch-test'
-// import '../utils/menu-preferences-debug'
 import '../utils/telemetry-test'
-
-// Log startup info on server side
-// if (typeof window === 'undefined') {
-//   logStartupInfo()
-// }
 
 const inter = Inter({
   subsets: ['latin'],

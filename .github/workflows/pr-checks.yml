@@ -119,9 +119,14 @@ jobs:
       - name: Check i18n usage (missing keys)
         run: pnpm --filter @erp/web i18n:usage
 
-      - name: Check i18n sync (language coverage)
-        run: pnpm --filter @erp/web i18n:check
+      - name: Validate i18n translations
+        run: pnpm --filter @erp/web i18n:validate
         continue-on-error: true
+
+      - name: Generate i18n types (verify up-to-date)
+        run: |
+          pnpm --filter @erp/web i18n:types
+          git diff --exit-code apps/web/src/lib/i18n/generated-types.ts || (echo "❌ i18n types are outdated. Run 'pnpm --filter @erp/web i18n:types'" && exit 1)
 
   # Analyse des fichiers modifiés
   changed-files:

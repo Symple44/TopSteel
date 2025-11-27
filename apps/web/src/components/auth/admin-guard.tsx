@@ -26,7 +26,7 @@ export function AdminGuard({
   showUnauthorized = false,
 }: AdminGuardProps) {
   const { user, isAuthenticated, isLoading } = useAuth()
-  const { hasPermission, hasAnyRole } = usePermissions()
+  const { hasPermission, hasAnyRole, loading: permissionsLoading } = usePermissions()
   const { t } = useTranslation('auth')
   const router = useRouter()
 
@@ -37,9 +37,24 @@ export function AdminGuard({
       return
     }
 
+    // Attendre que le rôle soit disponible (peut être extrait du JWT de manière asynchrone)
+    if (!user.role) {
+      return
+    }
+
     // Vérifier les rôles requis
     if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles)) {
       router?.push(fallbackPath)
+      return
+    }
+
+    // SUPER_ADMIN bypass toutes les permissions
+    if (user.role === 'SUPER_ADMIN') {
+      return
+    }
+
+    // Attendre que les permissions soient chargées avant de les vérifier
+    if (requiredPermissions.length > 0 && permissionsLoading) {
       return
     }
 
@@ -57,6 +72,7 @@ export function AdminGuard({
   }, [
     isAuthenticated,
     isLoading,
+    permissionsLoading,
     user,
     hasAnyRole,
     hasPermission,
@@ -66,8 +82,8 @@ export function AdminGuard({
     fallbackPath,
   ])
 
-  // Affichage de chargement
-  if (isLoading) {
+  // Affichage de chargement (auth ou permissions)
+  if (isLoading || (requiredPermissions.length > 0 && permissionsLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -79,6 +95,15 @@ export function AdminGuard({
   // On ne fait que passer si pas authentifié (AuthGuard gère la redirection)
   if (!isAuthenticated || !user) {
     return null
+  }
+
+  // Attendre que le rôle soit disponible avant de vérifier les permissions
+  if (!user.role) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   // Vérification des rôles
@@ -98,8 +123,13 @@ export function AdminGuard({
     ) : null
   }
 
-  // Vérification des permissions
-  if (requiredPermissions.length > 0) {
+  // SUPER_ADMIN bypass toutes les vérifications de permissions
+  if (user.role === 'SUPER_ADMIN') {
+    return <>{children}</>
+  }
+
+  // Vérification des permissions (seulement si chargées)
+  if (requiredPermissions.length > 0 && !permissionsLoading) {
     const hasRequiredPermissions = requiredPermissions?.every((permission) =>
       hasPermission(permission)
     )

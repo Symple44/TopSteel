@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { apiClient } from '../lib/api-client-instance'
+import { apiClient } from '../utils/backend-api'
 import { callClientApi } from '../utils/backend-api'
 
 interface SystemParameter {

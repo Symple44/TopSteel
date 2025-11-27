@@ -32,13 +32,27 @@ export const SUPPORTED_LANGUAGES: Language[] = [
 
 export const DEFAULT_LANGUAGE = 'fr'
 
-export type TranslationKey = string
+// Re-export generated types for type-safe translations
+export type { TranslationKey as StrictTranslationKey } from './generated-types'
+
 export type TranslationValue = string | Record<string, unknown>
 export type TranslationNamespace = Record<string, TranslationValue>
 export type Translations = Record<string, TranslationNamespace>
 
-// Define the translation function type
-export type TranslationFunction = (key: string, params?: Record<string, string | number>) => string
+// Flexible key type (allows any string for backwards compatibility)
+export type TranslationKey = string
+
+// Type-safe translation params
+export type TranslationParams = Record<string, string | number>
+
+// Define the translation function type (flexible)
+export type TranslationFunction = (key: string, params?: TranslationParams) => string
+
+// Type-safe translation function (strict mode - use with generated keys)
+export type StrictTranslationFunction = (
+  key: import('./generated-types').TranslationKey,
+  params?: TranslationParams
+) => string
 
 // Define the plural translation function type
 export type PluralTranslationFunction = (

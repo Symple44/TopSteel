@@ -6,3 +6,6 @@ export * from './translator'
 // Re-export for convenience
 export { translator as i18n } from './translator'
 export * from './types'
+
+// Export generated types for strict type checking
+export type { TranslationKey, TRANSLATION_KEY_COUNT } from './generated-types'

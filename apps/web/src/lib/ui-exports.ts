@@ -105,31 +105,75 @@ export type {
   CardTitleProps,
 } from '@erp/ui'
 
-// Export types from React 19 compatible components
-export type {
-  AlertDescriptionProps,
-  AlertProps,
-  AlertTitleProps,
-  DialogContentProps,
-  DialogDescriptionProps,
-  DialogFooterProps,
-  DialogHeaderProps,
-  DialogProps,
-  DialogTitleProps,
-  InputProps,
-  LabelProps,
-  PageHeaderProps,
-  ProgressProps,
-  SelectContentProps,
-  SelectItemProps,
-  SelectProps,
-  SelectTriggerProps,
-  TabsContentProps,
-  TabsListProps,
-  TabsProps,
-  TabsTriggerProps,
-  TextareaProps,
-} from './react-19-ui-components'
+// Re-export additional types from @erp/ui
+export type { InputProps, TextareaProps } from '@erp/ui'
+
+// Base component props - inline definitions
+interface BaseComponentProps {
+  children?: ReactNode
+  className?: string
+}
+
+// Alert types
+export interface AlertProps extends BaseComponentProps {
+  variant?: 'default' | 'destructive'
+}
+export interface AlertDescriptionProps extends BaseComponentProps {}
+export interface AlertTitleProps extends BaseComponentProps {}
+
+// Dialog types
+export interface DialogProps extends BaseComponentProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+export interface DialogContentProps extends BaseComponentProps {}
+export interface DialogHeaderProps extends BaseComponentProps {}
+export interface DialogTitleProps extends BaseComponentProps {}
+export interface DialogDescriptionProps extends BaseComponentProps {}
+export interface DialogFooterProps extends BaseComponentProps {}
+
+// Form types
+export interface LabelProps extends BaseComponentProps {
+  htmlFor?: string
+}
+
+// Select types
+export interface SelectProps extends BaseComponentProps {
+  value?: string
+  onValueChange?: (value: string) => void
+  defaultValue?: string
+}
+export interface SelectTriggerProps extends BaseComponentProps {}
+export interface SelectContentProps extends BaseComponentProps {}
+export interface SelectItemProps extends BaseComponentProps {
+  value: string
+}
+
+// Tabs types
+export interface TabsProps extends BaseComponentProps {
+  value?: string
+  onValueChange?: (value: string) => void
+  defaultValue?: string
+}
+export interface TabsListProps extends BaseComponentProps {}
+export interface TabsTriggerProps extends BaseComponentProps {
+  value: string
+  disabled?: boolean
+}
+export interface TabsContentProps extends BaseComponentProps {
+  value: string
+}
+
+// Other types
+export interface PageHeaderProps extends BaseComponentProps {
+  title: string
+  description?: string
+  actions?: ReactNode
+}
+export interface ProgressProps extends BaseComponentProps {
+  value?: number
+  max?: number
+}
 
 // Form components are commented out due to export issues from UI package
 // If needed, these can be imported directly from '@erp/ui' in individual components

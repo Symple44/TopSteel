@@ -302,13 +302,11 @@ const SimpleTooltip = React.forwardRef<
 
     // Auto-detect si on doit utiliser asChild
     // Si triggerAsChild n'est pas explicitement défini, on détecte automatiquement
+    // Note: On utilise asChild par défaut pour tout élément React valide
+    // car TooltipTrigger rend un <button> par défaut, ce qui causerait
+    // une erreur d'hydratation si l'enfant est aussi un <button>
     const shouldUseAsChild =
-      triggerAsChild !== undefined
-        ? triggerAsChild
-        : React.isValidElement(triggerContent) &&
-          (triggerContent.type === 'button' ||
-            (typeof triggerContent.type === 'function' &&
-              (triggerContent.type as { displayName?: string }).displayName?.includes('Button')))
+      triggerAsChild !== undefined ? triggerAsChild : React.isValidElement(triggerContent)
 
     if (!content || disabled) {
       // Si pas de contenu ou désactivé, retourner juste le trigger

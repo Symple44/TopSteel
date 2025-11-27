@@ -13,7 +13,7 @@ export {
 // Authentication
 export type { Company, User } from './auth/auth-types'
 export * from './auth/cookie-auth'
-export type { AuthenticatedUser } from './auth/jwt-utils'
+export type { AuthenticatedUser } from './auth/jwt-utils-shared'
 export { RBACService } from './auth/rbac-service'
 export type { AccessContext, AccessPolicy, ExtendedUser, UserSocieteRole } from './auth/rbac-types'
 
@@ -54,7 +54,7 @@ export { default as ssrUtils } from './ssr-utils'
 export { predefinedTemplates } from './templates/predefined-templates'
 
 // UI Components
-export * from './ui-components-complete'
+export * from './ui-exports'
 
 // Rate Limiting
 export {

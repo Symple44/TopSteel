@@ -2,8 +2,8 @@
 'use client'
 
 import { Badge, SimpleTooltip } from '@erp/ui'
-import { ChevronDown, ChevronRight, Settings } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { ChevronRight, Settings } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 import { cn } from '../../../../lib/utils'
 import { getTranslatedTitle } from '../../../../utils/menu-translations'
@@ -50,32 +50,38 @@ export function NavItem({
       aria-haspopup={hasChildren ? 'true' : undefined}
       type="button"
       className={cn(
-        'group relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm cursor-pointer transition-colors w-full text-left',
+        'group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm cursor-pointer w-full text-left',
+        'transition-all duration-200 ease-out',
         level === 0 && 'font-medium',
-        level === 1 && 'text-[13px] pl-3',
+        level === 1 && 'text-[13px] pl-3 py-2',
         isActive
-          ? 'bg-primary/10 text-primary'
+          ? 'bg-primary/10 text-primary shadow-sm'
           : hasActiveChild
-            ? 'text-foreground'
-            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+            ? 'text-foreground bg-muted/30'
+            : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:translate-x-0.5',
         isCollapsed && 'justify-center px-2'
       )}
     >
-        {/* Active indicator - simple left border */}
-        {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
-        )}
-
-        {/* Icon - simple, no gradients */}
+        {/* Active indicator - animated left border */}
         <div
           className={cn(
-            'flex items-center justify-center shrink-0',
-            level === 0 ? 'h-5 w-5' : 'h-4 w-4'
+            'absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-full bg-primary transition-all duration-200',
+            isActive ? 'h-5 opacity-100' : 'h-0 opacity-0'
+          )}
+        />
+
+        {/* Icon with subtle animation */}
+        <div
+          className={cn(
+            'flex items-center justify-center shrink-0 transition-transform duration-200',
+            level === 0 ? 'h-5 w-5' : 'h-4 w-4',
+            !isActive && 'group-hover:scale-110'
           )}
         >
           {item.icon ? (
             <item.icon
               className={cn(
+                'transition-colors duration-200',
                 level === 0 ? 'h-[18px] w-[18px]' : 'h-4 w-4',
                 isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
               )}
@@ -83,6 +89,7 @@ export function NavItem({
           ) : (
             <Settings
               className={cn(
+                'transition-colors duration-200',
                 level === 0 ? 'h-[18px] w-[18px]' : 'h-4 w-4',
                 isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
               )}
@@ -94,22 +101,22 @@ export function NavItem({
           <>
             <span className="flex-1 truncate">{translatedTitle}</span>
 
-            {/* Badge - simple style */}
+            {/* Badge with improved style */}
             {item.badge && (
-              <Badge variant="secondary" className="h-5 px-1.5 text-xs font-medium">
+              <Badge variant="secondary" className="h-5 px-1.5 text-xs font-medium bg-primary/10 text-primary border-0">
                 {item.badge}
               </Badge>
             )}
 
-            {/* Chevron for items with children */}
+            {/* Animated chevron for items with children */}
             {hasChildren && (
-              <div className="text-muted-foreground">
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
+              <ChevronRight
+                className={cn(
+                  'h-4 w-4 text-muted-foreground transition-transform duration-200 ease-out',
+                  isExpanded && 'rotate-90',
+                  'group-hover:text-foreground'
                 )}
-              </div>
+              />
             )}
           </>
         )}
@@ -127,18 +134,25 @@ export function NavItem({
         buttonContent
       )}
 
-      {/* Submenu - clean hierarchy */}
-      {hasChildren && isExpanded && !isCollapsed && (
-        <div className="mt-0.5 ml-3 pl-3 border-l border-border space-y-0.5">
-          {(item.children || []).map((child, childIndex) => (
-            <NavItemRecursive
-              key={`${child.href || child.title || 'unnamed'}-child-${childIndex}-level-${level}`}
-              item={child}
-              level={level + 1}
-              isCollapsed={isCollapsed}
-              onToggleExpanded={onToggleExpanded}
-            />
-          ))}
+      {/* Submenu with smooth animation */}
+      {hasChildren && !isCollapsed && (
+        <div
+          className={cn(
+            'overflow-hidden transition-all duration-200 ease-out',
+            isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          )}
+        >
+          <div className="mt-1 ml-3 pl-3 border-l border-border/50 space-y-0.5 py-0.5">
+            {(item.children || []).map((child, childIndex) => (
+              <NavItemRecursive
+                key={`${child.href || child.title || 'unnamed'}-child-${childIndex}-level-${level}`}
+                item={child}
+                level={level + 1}
+                isCollapsed={isCollapsed}
+                onToggleExpanded={onToggleExpanded}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -161,6 +175,7 @@ function NavItemRecursive({
   isCollapsed,
   onToggleExpanded,
 }: NavItemRecursiveProps) {
+  const pathname = usePathname()
   const [expandedItems, setExpandedItems] = React.useState<string[]>([])
   const isExpanded = expandedItems?.includes(item.title)
 
@@ -170,7 +185,6 @@ function NavItemRecursive({
     )
   }
 
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : ''
   const isActive = item.href ? pathname === item.href : false
   const hasActiveChild =
     item.children?.some((child) => child.href && (pathname === child.href || pathname?.startsWith(`${child.href}/`))) || false

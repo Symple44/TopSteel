@@ -24,6 +24,27 @@ import {
   isValidUser,
 } from '../type-guards'
 
+/**
+ * Extrait le rôle depuis le payload JWT
+ * Utilisé comme fallback si le rôle manque dans les données stockées
+ */
+function extractRoleFromJWT(accessToken: string): string | null {
+  try {
+    const parts = accessToken?.split('.')
+    if (parts?.length !== 3) return null
+
+    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    while (base64.length % 4) {
+      base64 += '='
+    }
+
+    const payload = JSON.parse(atob(base64))
+    return payload?.role || null
+  } catch {
+    return null
+  }
+}
+
 // État par défaut
 const defaultAuthState: AuthState = {
   isLoading: true,
@@ -159,7 +180,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // Convertir l'utilisateur existant vers le nouveau format si nécessaire
         if (user && !hasSocieteRoles(user)) {
-          // Convertir vers le format ExistingUser attendu par l'adaptateur
           const existingUserFormat = {
             id: user.id,
             nom: user.nom,
@@ -179,6 +199,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (company && !hasIsActiveProperty(company)) {
           if (isValidCompany(company)) {
             company = AuthAdapter?.toNewCompany(company)
+          }
+        }
+
+        // TOUJOURS appliquer le rôle du JWT APRÈS les conversions (source autoritaire)
+        if (user && tokens?.accessToken) {
+          const jwtRole = extractRoleFromJWT(tokens.accessToken)
+          if (jwtRole) {
+            user = { ...user, role: jwtRole }
           }
         }
 
@@ -317,8 +345,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
 
           const extendedUser = AuthAdapter?.toExtendedUser(result.user)
-          const user = AuthAdapter?.toAuthUser(extendedUser)
+          let user = AuthAdapter?.toAuthUser(extendedUser)
           const tokens = AuthAdapter?.toNewAuthTokens(result.tokens)
+
+          // TOUJOURS utiliser le rôle du JWT comme source autoritaire (signé par le serveur)
+          const jwtRole = extractRoleFromJWT(tokens.accessToken)
+          if (jwtRole) {
+            user = { ...user, role: jwtRole }
+          }
 
           // Sauvegarder temporairement les tokens pour permettre les appels API
           authStorage?.saveSession(user, tokens, null, rememberMe)

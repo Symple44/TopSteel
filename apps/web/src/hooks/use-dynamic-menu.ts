@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { fetchTyped } from '../lib/api-typed'
+import { fetchTyped } from '../utils/backend-api'
 import { translator } from '../lib/i18n/translator'
 import { useMenuMode } from './use-menu-mode'
-import { usePermissions } from './use-permissions-v2'
+import { usePermissions } from './use-permissions'
 
 // Types pour les réponses API
 interface MenuApiResponse {

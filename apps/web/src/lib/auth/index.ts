@@ -23,18 +23,19 @@ export type {
   User,
 } from './auth-types'
 
-export type {
-  AuthenticatedUser,
-  JWTPayload,
-} from './jwt-utils-client'
-// Export depuis jwt-utils-client pour les Client Components
+// Export shared JWT types and functions
+export type { AuthenticatedUser, JWTPayload } from './jwt-utils-shared'
 export {
+  ADMIN_ROLES,
   decodeJWTPayload,
-  extractTokenFromCookies,
-  extractTokenFromRequest,
-  getAuthenticatedUser,
   hasAccessToCompany,
+  hasAllPermissions,
+  hasAnyPermission,
   hasPermission,
   isAdmin,
+  payloadToUser,
   requireAuthenticatedUser,
-} from './jwt-utils-client'
+} from './jwt-utils-shared'
+
+// Export client-specific functions
+export { extractTokenFromCookies, extractTokenFromRequest, getAuthenticatedUser } from './jwt-utils-client'

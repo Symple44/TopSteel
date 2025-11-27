@@ -9,3 +9,14 @@ if [ $? -ne 0 ]; then
   echo "Run 'pnpm --filter @erp/web i18n:usage' to see the full report."
   exit 1
 fi
+
+# Check if i18n types are up to date (only if translation files changed)
+if git diff --cached --name-only | grep -q "i18n/translations/"; then
+  echo "Checking i18n types are up to date..."
+  node src/lib/i18n/scripts/generate-types.mjs
+  if ! git diff --exit-code src/lib/i18n/generated-types.ts > /dev/null 2>&1; then
+    echo ""
+    echo "i18n types are outdated! Adding generated-types.ts to commit..."
+    git add src/lib/i18n/generated-types.ts
+  fi
+fi

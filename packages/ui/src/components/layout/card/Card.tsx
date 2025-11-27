@@ -42,6 +42,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       className,
       variant = 'default',
       padding = 'default',
+      hover = 'none',
       children,
       onClick,
       role,
@@ -51,7 +52,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ) => {
     const interactiveProps = getInteractiveA11yProps(onClick, role)
     const finalClassName = cn(
-      cardVariants({ variant, padding }),
+      cardVariants({ variant, padding, hover }),
       getInteractiveClassName({
         onClick,
         baseClassName: '',

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../hooks/use-auth'
 import { useDebounce } from '../hooks/use-debounce'
-import { fetchTyped, postTyped } from '../lib/api-typed'
+import { fetchTyped, postTyped } from '../utils/backend-api'
 
 export interface SearchResult {
   type: string

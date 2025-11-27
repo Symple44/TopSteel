@@ -71,7 +71,7 @@ export function MobileDataCard<T extends Record<string, unknown>>({
       c.id !== primaryCol?.id &&
       c.id !== secondaryCol?.id &&
       c.id !== keyField &&
-      !c.hidden
+      c.visible !== false
   )
 
   const visibleColumns = remainingColumns.slice(0, maxVisibleFields)
@@ -81,7 +81,7 @@ export function MobileDataCard<T extends Record<string, unknown>>({
   const getDisplayValue = (column: ColumnConfig<T>) => {
     const value = data[column.id as keyof T]
     if (column.render) {
-      return column.render(value, data)
+      return column.render(value, data, column)
     }
     if (value === null || value === undefined) {
       return '-'
@@ -225,7 +225,7 @@ export function MobileDataCard<T extends Record<string, unknown>>({
                 className="flex justify-between items-center text-sm gap-2"
               >
                 <span className="text-muted-foreground font-medium truncate">
-                  {column.header}
+                  {column.title}
                 </span>
                 <span className="text-foreground text-right truncate max-w-[60%]">
                   {getDisplayValue(column)}

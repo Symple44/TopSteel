@@ -6,6 +6,66 @@ const BACKEND_CONFIG = {
   globalPrefix: 'api',
 }
 
+// ============================================================================
+// Types & Errors
+// ============================================================================
+
+export class APIError extends Error {
+  constructor(
+    message: string,
+    public status?: number,
+    public code?: string
+  ) {
+    super(message)
+    this.name = 'APIError'
+  }
+}
+
+export interface RequestConfig {
+  method?: string
+  headers?: Record<string, string>
+  body?: unknown
+}
+
+export interface APIMetrics {
+  requestCount: number
+  errorCount: number
+  averageResponseTime: number
+}
+
+export interface APIErrorDetails {
+  message: string
+  code?: string
+  status?: number
+}
+
+export interface APIClientInterface {
+  get: <T>(url: string) => Promise<T>
+  post: <T>(url: string, data?: unknown) => Promise<T>
+  put: <T>(url: string, data?: unknown) => Promise<T>
+  patch: <T>(url: string, data?: unknown) => Promise<T>
+  delete: <T>(url: string) => Promise<T>
+}
+
+// ============================================================================
+// Token & Cookie Utilities
+// ============================================================================
+
+/**
+ * Get the access token from cookies (client-side)
+ */
+function getAccessToken(): string | null {
+  if (typeof document === 'undefined') return null
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    if (name === 'accessToken') {
+      return value
+    }
+  }
+  return null
+}
+
 /**
  * Utilitaire centralisé pour les appels au backend NestJS
  * Gère automatiquement le versioning et la configuration
@@ -175,4 +235,110 @@ export async function callClientApi(
  */
 export function getBackendConfig() {
   return { ...BACKEND_CONFIG }
+}
+
+// ============================================================================
+// Typed Fetch Utilities (consolidated from api-typed.ts)
+// ============================================================================
+
+/**
+ * Fetch with automatic typing and auth token handling
+ */
+export async function fetchTyped<T>(url: string, options?: RequestInit): Promise<T> {
+  const apiUrl = url.startsWith('/api') ? url : `/api${url}`
+  const token = getAccessToken()
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>),
+  }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  const response = await fetch(`${BACKEND_CONFIG.baseUrl}${apiUrl}`, {
+    ...options,
+    credentials: 'include',
+    headers,
+  })
+  if (!response.ok) throw new APIError(`Request failed: ${response.status}`, response.status)
+  return response.json()
+}
+
+export async function postTyped<T>(url: string, data?: unknown): Promise<T> {
+  return fetchTyped<T>(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: data ? JSON.stringify(data) : undefined,
+  })
+}
+
+export async function putTyped<T>(url: string, data?: unknown): Promise<T> {
+  return fetchTyped<T>(url, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: data ? JSON.stringify(data) : undefined,
+  })
+}
+
+export async function deleteTyped<T>(url: string): Promise<T> {
+  return fetchTyped<T>(url, { method: 'DELETE' })
+}
+
+// ============================================================================
+// API Client Object (consolidated from api-client.ts)
+// ============================================================================
+
+async function request<T>(url: string, options?: RequestInit): Promise<T> {
+  const apiUrl = url.startsWith('/api') ? url : `/api${url}`
+  const response = await fetch(`${BACKEND_CONFIG.baseUrl}${apiUrl}`, {
+    ...options,
+    credentials: 'include',
+  })
+  if (!response.ok) throw new APIError('Request failed', response.status)
+  return response.json()
+}
+
+export const apiClient: APIClientInterface = {
+  get: async <T>(url: string): Promise<T> => request<T>(url),
+  post: async <T>(url: string, data?: unknown): Promise<T> =>
+    request<T>(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: data ? JSON.stringify(data) : undefined,
+    }),
+  put: async <T>(url: string, data?: unknown): Promise<T> =>
+    request<T>(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: data ? JSON.stringify(data) : undefined,
+    }),
+  patch: async <T>(url: string, data?: unknown): Promise<T> =>
+    request<T>(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: data ? JSON.stringify(data) : undefined,
+    }),
+  delete: async <T>(url: string): Promise<T> => request<T>(url, { method: 'DELETE' }),
+}
+
+// ============================================================================
+// Data Extraction Helpers
+// ============================================================================
+
+export function hasDataProperty<T>(obj: unknown): obj is { data: T } {
+  return typeof obj === 'object' && obj !== null && 'data' in obj
+}
+
+export function ensureDataProperty<T>(response: unknown): T {
+  if (hasDataProperty<T>(response)) return response.data
+  return response as T
+}
+
+export function extractOrDefault<T>(response: unknown, defaultValue: T): T {
+  try {
+    if (hasDataProperty<T>(response)) return response.data
+    return (response as T) ?? defaultValue
+  } catch {
+    return defaultValue
+  }
 }

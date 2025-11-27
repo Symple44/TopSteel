@@ -21,7 +21,7 @@ import {
 import { Menu, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from '../../hooks/use-toast'
-import { postTyped } from '../../lib/api-typed'
+import { postTyped } from '../../utils/backend-api'
 import { useTranslation } from '../../lib/i18n/hooks'
 
 interface AddToMenuButtonProps {
